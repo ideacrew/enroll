@@ -107,6 +107,7 @@ describe 'applicant_outreach_report' do
         has_access_to_health_coverage_kinds
       ]
       headers << "#{curr_year}_most_recent_health_plan_id"
+      headers << "#{curr_year}_most_recent_health_status"
   end
 
   context 'family with application in current enrollment year' do
@@ -283,6 +284,12 @@ describe 'applicant_outreach_report' do
           health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == curr_year}.sort_by(&:submitted_at).reverse.first
           expect(@file_content[1][21]).to eq(health_enrollment.product.hios_id)
           expect(@file_content[2][21]).to eq(health_enrollment.product.hios_id)
+        end
+
+        it 'should match with the current year most recent health plan status' do
+          health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == curr_year}.sort_by(&:submitted_at).reverse.first
+          expect(@file_content[1][22]).to eq(health_enrollment.aasm_state)
+          expect(@file_content[2][22]).to eq(health_enrollment.aasm_state)
         end
       end
     end

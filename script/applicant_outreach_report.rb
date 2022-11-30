@@ -26,6 +26,7 @@ field_names = %w[
 curr_year = TimeKeeper.date_of_record.year
 next_year = TimeKeeper.date_of_record.year + 1
 field_names << "#{curr_year}_most_recent_health_plan_id"
+field_names << "#{curr_year}_most_recent_health_status"
 
 
 file_name = "#{Rails.root}/applicant_outreach_report.csv"
@@ -97,7 +98,8 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
                 subscriber_id,
                 applicant.has_eligible_health_coverage,
                 applicant.benefits.eligible.map(&:insurance_kind).join(", "),
-                curr_mr_health_enrollment&.product&.hios_id
+                curr_mr_health_enrollment&.product&.hios_id,
+                curr_mr_health_enrollment&.aasm_state
               ]
       end
     rescue StandardError => e
