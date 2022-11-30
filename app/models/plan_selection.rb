@@ -109,22 +109,18 @@ class PlanSelection
   end
 
   def member_coverage_start_on(matched_member, existing_coverage, current_coverage)
-    if current_coverage.is_shop?
-      matched_member.coverage_start_on || existing_coverage.effective_on
-    else
-      shopping_year = current_coverage.effective_on.year
-      if [matched_member.coverage_start_on&.year, existing_coverage.effective_on&.year, current_coverage.effective_on&.year].compact.all?(shopping_year)
-        existing_coverage_start_on = (matched_member.coverage_start_on || existing_coverage.effective_on)
-        value = current_coverage.effective_on <=> existing_coverage_start_on
-        case value
-        when -1 || 0
-          current_coverage.effective_on
-        when 1
-          existing_coverage_start_on
-        end
-      else
-        current_coverage.effective_on
-      end
+    return matched_member.coverage_start_on || existing_coverage.effective_on if current_coverage.is_shop?
+
+    shopping_year = current_coverage.effective_on.year
+    return current_coverage.effective_on unless [matched_member.coverage_start_on&.year, existing_coverage.effective_on&.year].compact.all?(shopping_year)
+
+    existing_coverage_start_on = (matched_member.coverage_start_on || existing_coverage.effective_on)
+    value = current_coverage.effective_on <=> existing_coverage_start_on
+    case value
+    when -1 || 0
+      current_coverage.effective_on
+    when 1
+      existing_coverage_start_on
     end
   end
 
