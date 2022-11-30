@@ -35,7 +35,7 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
     let!(:th2) do
       FactoryBot.create(:tax_household,
                         household: family.active_household,
-                        yearly_expected_contribution: 3100.50,
+                        yearly_expected_contribution: nil,
                         effective_starting_on: Date.new(2022),
                         effective_ending_on: nil)
     end
@@ -43,10 +43,32 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
     let!(:thhm22) { FactoryBot.create(:tax_household_member, applicant_id: fm2.id, tax_household: th2) }
     let!(:ed2) { FactoryBot.create(:eligibility_determination, tax_household: th2, max_aptc: 200.00) }
 
+    let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id) }
+    let!(:ed) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application, aptc_csr_annual_household_income: '90000') }
+    let!(:applicant) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        application: application,
+                        eligibility_determination_id: ed.id,
+                        is_ia_eligible: true,
+                        family_member_id: fm1.id,
+                        is_claimed_as_tax_dependent: false,
+                        is_required_to_file_taxes: true)
+    end
+
+    let!(:applicant2) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        application: application,
+                        eligibility_determination_id: ed.id,
+                        is_ia_eligible: true,
+                        family_member_id: fm2.id,
+                        is_claimed_as_tax_dependent: true)
+    end
+
     context 'with active and inactive thhs with all ia_eligible members' do
       let!(:th1) do
         FactoryBot.create(:tax_household,
                           household: family.active_household,
+                          yearly_expected_contribution: nil,
                           effective_starting_on: Date.new(2022))
       end
       let!(:thhm11) do
@@ -59,19 +81,54 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
       let!(:thhm12) { FactoryBot.create(:tax_household_member, applicant_id: fm2.id, tax_household: th1) }
       let!(:ed1) { FactoryBot.create(:eligibility_determination, tax_household: th1) }
 
-      before { subject.migrate }
+      let!(:hbx_enrollment) do
+        FactoryBot.create(:hbx_enrollment,
+                          :individual_assisted,
+                          :with_enrollment_members,
+                          :with_health_product,
+                          family: family,
+                          applied_aptc_amount: 200,
+                          enrollment_members: family.family_members,
+                          effective_on: Date.new(2022))
+      end
+
+      let(:slcsp_info) do
+        OpenStruct.new(
+          households: [OpenStruct.new(
+            household_id: th1.id,
+            household_benchmark_ehb_premium: 200.00,
+            members: family.family_members.collect do |fm|
+              OpenStruct.new(
+                family_member_id: fm.id.to_s,
+                relationship_with_primary: fm.primary_relationship,
+                date_of_birth: fm.dob,
+                age_on_effective_date: fm.age_on(TimeKeeper.date_of_record)
+              )
+            end
+          )]
+        )
+      end
+
+      before :each do
+        allow(::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts).to receive(:new).and_return(
+          double('IdentifySlcspWithPediatricDentalCosts',
+                 call: double(:value! => slcsp_info, :success? => true))
+        )
+        subject.migrate
+      end
 
       it 'should create TaxHouseholdGroups, TaxHouseholds and TaxHouseholdMembers' do
         thhgs = family.reload.tax_household_groups
         expect(thhgs.count).to eq(2)
         expect(thhgs.first.tax_households.count).to eq(1)
         expect(thhgs[1].tax_households.count).to eq(1)
-        expect(thhgs.first.tax_households.first.yearly_expected_contribution).to eq(th2.yearly_expected_contribution)
-        expect(thhgs[1].tax_households.first.yearly_expected_contribution).to eq(th1.yearly_expected_contribution)
+        expect(thhgs.first.tax_households.first.yearly_expected_contribution).not_to be_zero
+        expect(thhgs[1].tax_households.first.yearly_expected_contribution).not_to be_zero
         expect(thhgs.first.tax_households.first.tax_household_members.count).to eq(2)
         expect(thhgs[1].tax_households.first.tax_household_members.count).to eq(2)
         expect(family.reload.eligibility_determination.grants.count).not_to be_zero
         expect(family.reload.eligibility_determination.subjects.first.csr_by_year(system_date.year)).not_to be_nil
+        expect(::TaxHouseholdEnrollment.where(enrollment_id: hbx_enrollment.id).size).to eq 1
       end
     end
 
@@ -82,7 +139,7 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
         thhgs = family.reload.tax_household_groups
         expect(thhgs.count).to eq(1)
         expect(thhgs.first.tax_households.count).to eq(1)
-        expect(thhgs.first.tax_households.first.yearly_expected_contribution).to eq(th2.yearly_expected_contribution)
+        expect(thhgs.first.tax_households.first.yearly_expected_contribution).not_to be_zero
         expect(thhgs.first.tax_households.first.tax_household_members.count).to eq(2)
         expect(family.reload.eligibility_determination.grants.count).not_to be_zero
         expect(family.reload.eligibility_determination.subjects.first.csr_by_year(system_date.year)).not_to be_nil
@@ -97,7 +154,7 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
         expect(family.reload.tax_household_groups.count).to eq(1)
         subject.migrate
         expect(family.reload.tax_household_groups.active.count).to eq(1)
-        expect(family.reload.tax_household_groups.count).to eq(2)
+        expect(family.reload.tax_household_groups.count).to eq(1)
       end
     end
 
@@ -113,7 +170,7 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
         thhgs = family.reload.tax_household_groups
         expect(thhgs.count).to eq(1)
         expect(thhgs.first.tax_households.count).to eq(1)
-        expect(thhgs.first.tax_households.first.yearly_expected_contribution).to eq(th2.yearly_expected_contribution)
+        expect(thhgs.first.tax_households.first.yearly_expected_contribution).not_to be_zero
         expect(thhgs.first.tax_households.first.tax_household_members.count).to eq(2)
         # Should not create any Aptc or Csr Grants as no APTC members.
         expect(family.reload.eligibility_determination.grants.count).to be_zero
@@ -125,7 +182,7 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
       let!(:th) do
         FactoryBot.create(:tax_household,
                           household: family.active_household,
-                          yearly_expected_contribution: 3100.50,
+                          yearly_expected_contribution: nil,
                           effective_starting_on: Date.new(2021),
                           effective_ending_on: nil)
       end
@@ -167,7 +224,7 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
           thhgs = family.reload.tax_household_groups
           expect(thhgs.count).to eq(1)
           expect(thhgs.first.tax_households.count).to eq(1)
-          expect(thhgs.first.tax_households.first.yearly_expected_contribution).to eq(th2.yearly_expected_contribution)
+          expect(thhgs.first.tax_households.first.yearly_expected_contribution).not_to be_zero
           expect(thhgs.first.tax_households.first.tax_household_members.count).to eq(2)
           expect(family.reload.eligibility_determination.grants.count).not_to be_zero
           expect(family.reload.eligibility_determination.subjects.first.csr_by_year(system_date.year)).not_to be_nil

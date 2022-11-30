@@ -58,7 +58,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
         effective_starting_on: thh.effective_starting_on,
         effective_ending_on: effective_ending_on,
         max_aptc: thh.latest_eligibility_determination.max_aptc,
-        yearly_expected_contribution: calculate_yearly_expected_contribution(thh, thh.family) || thh.yearly_expected_contribution
+        yearly_expected_contribution: calculate_yearly_expected_contribution(thh, thh.family)
       }
 
       new_thh = thhg.tax_households.build(thh_params)
@@ -179,6 +179,41 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
     new_thh
   end
 
+  def migrate_tax_household_enrollments(family)
+    th_groups = family.tax_household_groups.where(:assistance_year => 2022).order_by(:created_at.desc)
+    enrollments = family.enrollments.where(:"applied_aptc_amount.cents".gt => 0).by_year(2022).order_by(:created_at.asc)
+
+    enrollments.each do |enrollment|
+      th_group = th_groups.where(:end_on.lte => enrollment.created_at).first || th_groups.where(:end_on => nil).first
+
+      if th_group.blank?
+        logger.info "----- Failed TH enrollment missing th group family_hbx_assigned_id: #{family.hbx_assigned_id}"
+        next
+      end
+
+      if th_group.tax_households.any? {|th| th.yearly_expected_contribution.nil? }
+        logger.info "----- Failed TH enrollment missing yearly_expected_contribution on th group family_hbx_assigned_id: #{family.hbx_assigned_id}"
+        next
+      end
+
+      exclude_enrollments_list = enrollments.or(
+        {:created_at.gte => enrollment.created_at},
+        {:created_at.lte => enrollment.created_at, :terminated_on.lte => enrollment.effective_on}
+      ).map(&:hbx_id)
+
+
+      ::Operations::PremiumCredits::FindAptcWithTaxHouseholds.new.call({
+                                                                         hbx_enrollment: enrollment,
+                                                                         effective_on: enrollment.effective_on,
+                                                                         tax_households: th_group.tax_households,
+                                                                         exclude_enrollments_list: exclude_enrollments_list,
+                                                                         is_migrating: true
+                                                                       })
+
+      logger.info "----- Failed TH enrollment FindAptcWithTaxHouseholds family_hbx_assigned_id: #{family.hbx_assigned_id}" if TaxHouseholdEnrollment.where(enrollment_id: enrollment.id)
+    end
+  end
+
   def process_families(families, file_name, offset_count, logger)
     field_names = %w[primary_person_hbx_id family_hbx_assigned_id aptc_csr_tax_households_count migrated_tax_households_count(new) family_has_active_tax_households?]
 
@@ -192,23 +227,21 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
           next family
         end
 
-        active_thhs_of_household = family.active_household.tax_households.active_tax_household.tax_household_with_year(2022)
-        if active_thhs_of_household.present?
-          active_2022_tax_household_groups = family.tax_household_groups.by_year(2022)
-          family = if active_2022_tax_household_groups.present?
-                     process_inactive_thhs_of_household(family, active_thhs_of_household, true)
-                   else
-                     process_active_thhs_of_household(family, active_thhs_of_household)
-                   end
-        end
+        tax_households = family.active_household.tax_households.tax_household_with_year(2022).where(:'eligibility_determinations.source'.ne => 'Admin').order_by(:created_at.asc)
 
-        inactive_thhs_of_household = family.active_household.tax_households.where(:effective_ending_on.ne => nil).tax_household_with_year(2022)
-        family = process_inactive_thhs_of_household(family, inactive_thhs_of_household, false) if inactive_thhs_of_household.present?
+        active_thhs_of_household = tax_households.active_tax_household
+        inactive_thhs_of_household = tax_households.where(:effective_ending_on.ne => nil)
+
+        process_active_thhs_of_household(family, active_thhs_of_household) if active_thhs_of_household.present? && family.tax_household_groups.by_year(2022).blank?
+        process_inactive_thhs_of_household(family, inactive_thhs_of_household, false) if inactive_thhs_of_household.present?
+
         if family.save!
           logger.info "----- Successfully created TaxHouseholdGroups for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
           determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family.reload, effective_date: TimeKeeper.date_of_record)
           if determination.success?
             logger.info "----- Successfully created FamilyDetermination: #{determination.success} for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
+
+            migrate_tax_household_enrollments(family)
           else
             logger.info "----- Failed to create FamilyDetermination: #{determination.failure} for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
           end
@@ -228,10 +261,20 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
 
     if hbx_ids.present?
       family_hbx_ids = Person.where(:hbx_id.in => hbx_ids).map(&:primary_family).compact.map(&:hbx_assigned_id)
-      Family.all_tax_households.where(:hbx_assigned_id.in => family_hbx_ids)
+      target_families.where(:hbx_assigned_id.in => family_hbx_ids)
     else
-      Family.all_tax_households
+      target_families
     end
+  end
+
+  def target_families
+    Family.all_tax_households.where({
+                                      :'households.tax_households.eligibility_determinations' => {:'$exists' => true},
+                                      :'households.tax_households' => {:"$elemMatch" => {:effective_starting_on.gte => Date.new(2022, 1, 1), :'eligibility_determinations.source'.ne => 'Admin'}}
+                                    }).or(
+                                      {:'households.tax_households.effective_ending_on'.lte => Date.new(2022, 12, 31)},
+                                      {:'households.tax_households.effective_ending_on' => nil}
+                                    )
   end
 
   def migrate
