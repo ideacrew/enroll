@@ -187,4 +187,79 @@ RSpec.describe ::Operations::Eligibilities::FamilyEvidencesDataExport,
       expect(member_row).to include(person2.last_name)
     end
   end
+
+  context 'with a deactivated family_member' do
+    before { family_member.update_attributes!(is_active: false) }
+
+    it 'includes primary and not dependent' do
+      result = subject.call(required_params)
+      expect(result.success?).to be_truthy
+      expect(result.success.count).to eq 1
+      member_row = result.success[0]
+      expect(member_row).to include(person1.hbx_id)
+      expect(member_row).not_to include(person2.hbx_id)
+    end
+  end
+
+  context 'with financial_assistance determination' do
+    let!(:thhg) { FactoryBot.create(:tax_household_group, family: family) }
+    let!(:new_thh) do
+      thhg.tax_households.create(
+        eligibility_determination_hbx_id: '7821',
+        yearly_expected_contribution: 100.00,
+        effective_starting_on: TimeKeeper.date_of_record,
+        max_aptc: 500.00
+      )
+    end
+    let!(:new_thhm1) { FactoryBot.create(:tax_household_member, applicant_id: family.primary_applicant.id, tax_household: new_thh, csr_percent_as_integer: 100) }
+    let!(:new_thhm2) { FactoryBot.create(:tax_household_member, applicant_id: family_member.id, tax_household: new_thh, csr_percent_as_integer: 100) }
+
+    let!(:legacy_thh) { FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil) }
+    let!(:legacy_thhm1) { FactoryBot.create(:tax_household_member, applicant_id: family.primary_applicant.id, tax_household: legacy_thh, csr_percent_as_integer: 73) }
+    let!(:legacy_thhm2) { FactoryBot.create(:tax_household_member, applicant_id: family_member.id, tax_household: legacy_thh, csr_percent_as_integer: 73) }
+    let!(:legacy_ed) { FactoryBot.create(:eligibility_determination, tax_household: legacy_thh, max_aptc: 300.00) }
+
+
+    context 'when MTHHs feature is enabled' do
+      before do
+        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+      end
+
+      it 'returns max_aptc and CSR from new THHs' do
+        result = subject.call(required_params)
+        expect(result.success.count).to eq 2
+        member1_row = result.success[0]
+        member2_row = result.success[1]
+        expect(member1_row).to include(100)
+        expect(member1_row).not_to include(73)
+        expect(member1_row).to include(500.00)
+        expect(member1_row).not_to include(300.00)
+        expect(member2_row).to include(100)
+        expect(member2_row).not_to include(73)
+        expect(member2_row).to include(500.00)
+        expect(member2_row).not_to include(300.00)
+      end
+    end
+
+    context 'when MTHHs feature is disabled' do
+      before do
+        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(false)
+      end
+
+      it 'returns max_aptc and CSR from legacy THHs' do
+        result = subject.call(required_params)
+        expect(result.success.count).to eq 2
+        member1_row = result.success[0]
+        member2_row = result.success[1]
+        expect(member1_row).not_to include(100)
+        expect(member1_row).to include(73)
+        expect(member1_row).not_to include(500.00)
+        expect(member1_row).to include(300.00)
+        expect(member2_row).not_to include(100)
+        expect(member2_row).to include(73)
+        expect(member2_row).not_to include(500.00)
+        expect(member2_row).to include(300.00)
+      end
+    end
+  end
 end
