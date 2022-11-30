@@ -71,7 +71,7 @@ module Operations
 
       def current_benchmark_premium(current_tax_household)
         return 0.0 if benchmark_premiums.blank?
-        round_down_float_two_decimals(benchmark_premiums.households.find {|household| household.household_id == current_tax_household.id }&.household_benchmark_ehb_premium || 0.0)
+        round_down_float_two_decimals(benchmark_premiums.households.find {|household| household.household_id.to_s == current_tax_household.id.to_s }&.household_benchmark_ehb_premium || 0.0)
       end
 
       def persist_tax_household_enrollment(current_tax_household, available_max_aptc)
@@ -83,7 +83,7 @@ module Operations
           th_enrollment = TaxHouseholdEnrollment.create(enrollment_id: @hbx_enrollment.id, tax_household_id: current_tax_household.id)
         end
 
-        household_info = benchmark_premiums.households.find {|household| household.household_id == current_tax_household.id } if benchmark_premiums.present?
+        household_info = benchmark_premiums.households.find {|household| household.household_id.to_s == current_tax_household.id.to_s } if benchmark_premiums.present?
 
         th_enrollment.update!(
           household_benchmark_ehb_premium: (household_info&.household_benchmark_ehb_premium || 0.0),
@@ -187,7 +187,7 @@ module Operations
       end
 
       def enrollments
-        @family.enrollments.individual_market.where(:effective_on => {:"$gte" => @effective_on.beginning_of_year, :"$lte" => @effective_on.end_of_year})
+        @family.active_household.hbx_enrollments.show_enrollments_sans_canceled.individual_market.where(:effective_on => {:"$gte" => @effective_on.beginning_of_year, :"$lte" => @effective_on.end_of_year})
       end
 
       def coinciding_family_members

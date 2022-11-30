@@ -207,10 +207,11 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
                                                                          effective_on: enrollment.effective_on,
                                                                          tax_households: th_group.tax_households,
                                                                          exclude_enrollments_list: exclude_enrollments_list,
+                                                                         include_term_enrollments: true,
                                                                          is_migrating: true
                                                                        })
 
-      logger.info "----- Failed TH enrollment FindAptcWithTaxHouseholds family_hbx_assigned_id: #{family.hbx_assigned_id}" if TaxHouseholdEnrollment.where(enrollment_id: enrollment.id)
+      @logger.info "----- Failed TH enrollment FindAptcWithTaxHouseholds family_hbx_assigned_id: #{family.hbx_assigned_id}" if TaxHouseholdEnrollment.where(enrollment_id: enrollment.id).blank?
     end
   end
 
