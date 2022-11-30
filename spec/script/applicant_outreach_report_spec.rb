@@ -80,8 +80,10 @@ describe 'applicant_outreach_report' do
   let(:applicants) { [primary_applicant, spouse_applicant] }
   let!(:workflow_state_transition) { WorkflowStateTransition.new(to_state: 'draft', transition_at: Time.now) }
   let(:benefit) { FactoryBot.build(:financial_assistance_benefit) }
+  let(:curr_year) { TimeKeeper.date_of_record.year }
+  let(:next_year) { TimeKeeper.date_of_record.year + 1 }
   let(:field_names) do
-    %w[
+    headers = %w[
         primary_hbx_id
         first_name
         last_name
@@ -104,6 +106,7 @@ describe 'applicant_outreach_report' do
         has_access_to_health_coverage
         has_access_to_health_coverage_kinds
       ]
+      headers << "#{curr_year}_most_recent_health_plan_id"
   end
 
   context 'family with application in current enrollment year' do
@@ -253,8 +256,12 @@ describe 'applicant_outreach_report' do
       end
 
       context 'plan' do
+        before do
+          @enrollments = family.active_household.hbx_enrollments
+        end
+
         it 'should match with the most recent active health plan hios id' do
-          health_plan = family.active_household.hbx_enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'health'}&.product
+          health_plan = @enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'health'}&.product
           expect(@file_content[1][13]).to eq(health_plan&.hios_id)
           expect(@file_content[2][13]).to eq(health_plan&.hios_id)
         end
@@ -266,10 +273,16 @@ describe 'applicant_outreach_report' do
         end
 
         it 'should match with health plan subscriber hbx id' do
-          health_enrollment = family.active_household.hbx_enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'health'}
+          health_enrollment = @enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'health'}
           subscriber_id = health_enrollment&.subscriber&.hbx_id
           expect(@file_content[1][18]).to eq(subscriber_id.to_s)
           expect(@file_content[2][18]).to eq(subscriber_id.to_s)
+        end
+
+        it 'should match with the current year most recent health plan hios id' do
+          health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == curr_year}.sort_by(&:submitted_at).reverse.first
+          expect(@file_content[1][21]).to eq(health_enrollment.product.hios_id)
+          expect(@file_content[2][21]).to eq(health_enrollment.product.hios_id)
         end
       end
     end

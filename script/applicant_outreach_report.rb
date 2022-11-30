@@ -23,6 +23,11 @@ field_names = %w[
     has_access_to_health_coverage
     has_access_to_health_coverage_kinds
   ]
+curr_year = TimeKeeper.date_of_record.year
+next_year = TimeKeeper.date_of_record.year + 1
+field_names << "#{curr_year}_most_recent_health_plan_id"
+
+
 file_name = "#{Rails.root}/applicant_outreach_report.csv"
 enrollment_year = FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!
 # Target all families with an application in the current enrollment year
@@ -55,20 +60,22 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
         person = family_member&.person
         next unless applicant.is_applying_coverage && person
 
-        health_enrollment = family.active_household.hbx_enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'health'}
-        dental_enrollment = family.active_household.hbx_enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'dental'}
-        enrollment_member = if health_enrollment
-                              health_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
+        enrollments = family.active_household.hbx_enrollments
+        mra_health_enrollment = enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'health'}
+        mra_dental_enrollment = enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'dental'}
+        enrollment_member = if mra_health_enrollment
+          mra_health_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
                             else
-                              dental_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
+                              mra_dental_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
                             end
         fpl_year = application&.assistance_year - 1
-        subscriber_id = if health_enrollment
-                        health_enrollment&.subscriber&.hbx_id
+        subscriber_id = if mra_health_enrollment
+          mra_health_enrollment&.subscriber&.hbx_id
                       else
-                        dental_enrollment&.subscriber&.hbx_id
+                        mra_dental_enrollment&.subscriber&.hbx_id
                       end
-
+        curr_mr_health_enrollment = enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == curr_year}.sort_by(&:submitted_at).reverse.first
+        next_mr_health_enrollment = enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == next_year}.sort_by(&:submitted_at).reverse.first
         csv << [person.hbx_id,
                 person.first_name,
                 person.last_name,
@@ -82,14 +89,15 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
                 primary_person.user&.email, # only primary person has a User account
                 primary_person.user&.last_portal_visited,
                 program_eligible_for(applicant),
-                health_enrollment&.product&.hios_id,
-                dental_enrollment&.product&.hios_id,
+                mra_health_enrollment&.product&.hios_id,
+                mra_dental_enrollment&.product&.hios_id,
                 enrollment_member&.is_subscriber,
                 application.transfer_id,
                 fpl_year,
                 subscriber_id,
                 applicant.has_eligible_health_coverage,
-                applicant.benefits.eligible.map(&:insurance_kind).join(", ")
+                applicant.benefits.eligible.map(&:insurance_kind).join(", "),
+                curr_mr_health_enrollment&.product&.hios_id
               ]
       end
     rescue StandardError => e
