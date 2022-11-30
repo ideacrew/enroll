@@ -108,10 +108,10 @@ describe 'applicant_outreach_report' do
         has_access_to_health_coverage
         has_access_to_health_coverage_kinds
       ]
-      headers << "#{curr_year}_most_recent_health_plan_id"
-      headers << "#{curr_year}_most_recent_health_status"
-      headers << "#{next_year}_most_recent_health_plan_id"
-      headers << "#{next_year}_most_recent_health_status"
+    headers << "#{curr_year}_most_recent_health_plan_id"
+    headers << "#{curr_year}_most_recent_health_status"
+    headers << "#{next_year}_most_recent_health_plan_id"
+    headers << "#{next_year}_most_recent_health_status"
   end
 
   context 'family with application in current enrollment year' do
