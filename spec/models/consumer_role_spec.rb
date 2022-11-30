@@ -386,12 +386,14 @@ context 'Verification process and notices' do
     let(:subject) { consumer_role.can_receive_paper_communication? }
 
     before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:contact_method_via_dropdown).and_return(contact_method_via_dropdown)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:location_residency_verification_type).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(false)
     end
 
     context 'when contact_method_via_dropdown feature is enabled' do
@@ -435,6 +437,7 @@ context 'Verification process and notices' do
     let(:subject) { consumer_role.can_receive_electronic_communication? }
 
     before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:contact_method_via_dropdown).and_return(contact_method_via_dropdown)

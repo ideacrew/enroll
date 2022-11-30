@@ -347,6 +347,12 @@ class TaxHousehold
     tax_household_members
   end
 
+  def thhm_by(family_member)
+    return nil unless family_member.is_a?(FamilyMember)
+
+    tax_household_members.where(applicant_id: family_member.id).first
+  end
+
   private
 
   def validate_dates
