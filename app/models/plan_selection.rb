@@ -84,11 +84,11 @@ class PlanSelection
   end
 
   def existing_coverage
-    if hbx_enrollment.is_shop?
-      @hbx_enrollment.parent_enrollment
-    else
-      existing_enrollment_for_covered_individuals
-    end
+    @existing_coverage ||= if hbx_enrollment.is_shop?
+                             @hbx_enrollment.parent_enrollment
+                           else
+                             existing_enrollment_for_covered_individuals
+                           end
   end
 
   def set_enrollment_member_coverage_start_dates(enrollment_obj = hbx_enrollment)
@@ -100,12 +100,32 @@ class PlanSelection
         matched = previous_enrollment_members.detect{|enrollment_member| enrollment_member.hbx_id == member.hbx_id}
 
         if matched
-          member.coverage_start_on = matched.coverage_start_on || existing_coverage.effective_on
+          member.coverage_start_on = member_coverage_start_on(matched, existing_coverage, enrollment_obj)
         end
       end
     end
 
     enrollment_obj
+  end
+
+  def member_coverage_start_on(matched_member, existing_coverage, current_coverage)
+    if current_coverage.is_shop?
+      matched_member.coverage_start_on || existing_coverage.effective_on
+    else
+      shopping_year = current_coverage.effective_on.year
+      if [matched_member.coverage_start_on&.year, existing_coverage.effective_on&.year, current_coverage.effective_on&.year].compact.all?(shopping_year)
+        existing_coverage_start_on = (matched_member.coverage_start_on || existing_coverage.effective_on)
+        value = current_coverage.effective_on <=> existing_coverage_start_on
+        case value
+        when -1 || 0
+          current_coverage.effective_on
+        when 1
+          existing_coverage_start_on
+        end
+      else
+        current_coverage.effective_on
+      end
+    end
   end
 
   # for IVL market, we need to compare hios_ids instead of product IDs
