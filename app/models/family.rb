@@ -46,6 +46,7 @@ class Family
   field :relevant_previous_changes, type: Array
   # Used for recording payloads sent to CRM Gateway
   field :cv3_payload, type: Hash, default: {}
+  field :crm_notifiction_needed, type: Boolean
 
   belongs_to  :person, optional: true
   has_many :hbx_enrollments
