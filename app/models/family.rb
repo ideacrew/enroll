@@ -1353,6 +1353,10 @@ class Family
     Operations::Families::TaxHouseholdGroups::CreateOnFaDetermination.new.call(application)
   end
 
+  def active_thhg(year)
+    tax_household_groups.active.by_year(year).first
+  end
+
 private
   def build_household
     if households.size == 0
