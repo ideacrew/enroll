@@ -21,6 +21,8 @@ describe 'applicant_outreach_report' do
   let!(:spouse_fm) { FactoryBot.create(:family_member, family: family, person: spouse_person) }
   let!(:family_members) { [primary_fm, spouse_fm] }
   let!(:health_enrollment) { FactoryBot.create(:hbx_enrollment, :with_health_product, family: family) }
+  let(:prospective_year) { TimeKeeper.date_of_record.year + 1 }
+  let!(:prospective_year_health_enrollment) { FactoryBot.create(:hbx_enrollment, :with_health_product, family: family, effective_on: Date.new(prospective_year, 1, 1)) }
   let!(:dental_enrollment) { FactoryBot.create(:hbx_enrollment, :with_dental_product, family: family) }
   let!(:enrollment_members) do
     family_members.map do |member|
@@ -108,6 +110,8 @@ describe 'applicant_outreach_report' do
       ]
       headers << "#{curr_year}_most_recent_health_plan_id"
       headers << "#{curr_year}_most_recent_health_status"
+      headers << "#{next_year}_most_recent_health_plan_id"
+      headers << "#{next_year}_most_recent_health_status"
   end
 
   context 'family with application in current enrollment year' do
@@ -290,6 +294,18 @@ describe 'applicant_outreach_report' do
           health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == curr_year}.sort_by(&:submitted_at).reverse.first
           expect(@file_content[1][22]).to eq(health_enrollment.aasm_state)
           expect(@file_content[2][22]).to eq(health_enrollment.aasm_state)
+        end
+
+        it 'should match with the prospective year most recent health plan hios id' do
+          health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == next_year}.sort_by(&:submitted_at).reverse.first
+          expect(@file_content[1][23]).to eq(health_enrollment.product.hios_id)
+          expect(@file_content[2][23]).to eq(health_enrollment.product.hios_id)
+        end
+
+        it 'should match with the prospective year most recent health plan status' do
+          health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == next_year}.sort_by(&:submitted_at).reverse.first
+          expect(@file_content[1][24]).to eq(health_enrollment.aasm_state)
+          expect(@file_content[2][24]).to eq(health_enrollment.aasm_state)
         end
       end
     end
