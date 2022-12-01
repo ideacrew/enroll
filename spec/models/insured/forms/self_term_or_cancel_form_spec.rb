@@ -148,9 +148,7 @@ module Insured
         form = Insured::Forms::SelfTermOrCancelForm.for_view(attrs)
         # TODO: Not sure about these values
         # monthly aggregate should be applied for enrollments within the same coverage year
-        if future_effective_date.year == enrollment.effective_on.year
-          expect(form.available_aptc).to eq(1732.14)
-        end
+        expect(form.available_aptc).to eq(1732.14) if future_effective_date.year == enrollment.effective_on.year
       end
 
       it 'should return default_tax_credit_value' do
@@ -158,9 +156,7 @@ module Insured
         attrs = {enrollment_id: enrollment.id.to_s, family_id: family.id}
         form = Insured::Forms::SelfTermOrCancelForm.for_view(attrs)
         # monthly aggregate should be applied for enrollments within the same coverage year
-        if future_effective_date.year == enrollment.effective_on.year
-          expect(form.default_tax_credit_value).to eq applied_aptc_amount
-        end
+        expect(form.default_tax_credit_value).to eq applied_aptc_amount  if future_effective_date.year == enrollment.effective_on.year
       end
 
       it 'should return new_enrollment_premium' do
@@ -224,11 +220,10 @@ module Insured
         # monthly aggregate should be applied for enrollments within the same coverage year
         if future_effective_date.year == enrollment.effective_on.year
           expect(family.hbx_enrollments.size).to eq 2
-          expect(family.hbx_enrollments.last.product.csr_variant_id).to eq '01'
         else
           expect(family.hbx_enrollments.size).to eq 1
-          expect(family.hbx_enrollments.last.product.csr_variant_id).to eq '01'
         end
+        expect(family.hbx_enrollments.last.product.csr_variant_id).to eq '01'
       end
 
       context 'Hios id of the product match for a different variant' do
