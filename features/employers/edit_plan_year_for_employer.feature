@@ -25,7 +25,6 @@ Feature: Edit Plan Year For Initial Employer
     Examples:
       | contribution_percent |
       | 100                  |
-      | 0                    |
 
   Scenario: Employer should be able to change open enrollment end dates
     When ABC Widgets is logged in and on the home page
