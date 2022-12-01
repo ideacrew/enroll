@@ -86,7 +86,7 @@ module Operations
         grants = build_aptc_grants(values[:family], values[:effective_date]).success
 
         determination = {
-          effective_date: values[:effective_date],
+          effective_date: TimeKeeper.date_of_record, # Since this is only being used for eligibility determination effective date
           subjects: subjects,
           grants: grants
         }
