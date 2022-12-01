@@ -9,6 +9,7 @@ field_names = %w[
     primary_email_address
     home_address
     mailing_address
+    primary/secondary_phone(s)
     application_aasm_state
     application_aasm_state_date
     external_id
@@ -65,6 +66,10 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
         person = family_member&.person
         next unless applicant.is_applying_coverage && person
 
+        phones = applicant.phones.each_with_object("") do |phone, collect| 
+          phone_string = phone.primary ? "#{phone} (#{phone.kind})" : " / #{phone} (#{phone.kind})"
+          collect.concat(phone_string)
+        end
         enrollments = family.active_household.hbx_enrollments
         mra_health_enrollment = enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'health'}
         mra_dental_enrollment = enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'dental'}
@@ -90,6 +95,7 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
                 person.work_email_or_best,
                 applicant.home_address.to_s,
                 applicant.addresses.where(kind: 'mailing').first,
+                phones,
                 application&.aasm_state,
                 application&.workflow_state_transitions&.first&.transition_at,
                 family.external_app_id,
