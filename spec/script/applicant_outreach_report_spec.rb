@@ -38,8 +38,7 @@ describe 'applicant_outreach_report' do
       aasm_state: 'draft',
       transfer_id: 'tr12345',
       assistance_year: FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!,
-      transferred_at: DateTime.now,
-      transfer_id: 'transfer123'
+      transferred_at: DateTime.now
     )
   end
   let!(:primary_applicant) do
@@ -184,10 +183,6 @@ describe 'applicant_outreach_report' do
       end
 
       it 'should match with the primary person primary/secondary phone(s)' do
-        # phones_str = phones.each_with_object("") do |phone, collect| 
-        #   phone_string = phone.primary ? "#{phone} (#{phone.kind})" : " / #{phone} (#{phone.kind})"
-        #   collect.concat(phone_string)
-        # end
         primary_phone = phones.first
         secondary_phone = phones.second
         phones_str = "#{primary_phone} (#{primary_phone.kind}) / #{secondary_phone} (#{secondary_phone.kind})"
