@@ -39,7 +39,7 @@ module Subscribers
       person.families.each do |family|
         ::Operations::Eligibilities::BuildFamilyDetermination.new.call(
           family: family,
-          effective_date: person.updated_at.to_date # Needs a revisit, using this since this method is being called on person_saved event
+          effective_date: TimeKeeper.date_of_record
         )
       end
     end
