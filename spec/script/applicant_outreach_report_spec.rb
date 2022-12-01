@@ -37,7 +37,9 @@ describe 'applicant_outreach_report' do
       family_id: family.id,
       aasm_state: 'draft',
       transfer_id: 'tr12345',
-      assistance_year: FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!
+      assistance_year: FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!,
+      transferred_at: DateTime.now,
+      transfer_id: 'transfer123'
     )
   end
   let!(:primary_applicant) do
@@ -113,6 +115,7 @@ describe 'applicant_outreach_report' do
     headers << "#{curr_year}_most_recent_health_status"
     headers << "#{next_year}_most_recent_health_plan_id"
     headers << "#{next_year}_most_recent_health_status"
+    headers << "inbound_transfer_date"
   end
 
   context 'family with application in current enrollment year' do
@@ -260,6 +263,12 @@ describe 'applicant_outreach_report' do
         fpl_year = application.assistance_year - 1
         expect(@file_content[1][18]).to eq(fpl_year.to_s)
         expect(@file_content[2][18]).to eq(fpl_year.to_s)
+      end
+
+      it 'should match with the inbound transfer timestamp' do
+        transfer_timestamp = application.transferred_at
+        expect(@file_content[1][26]).to eq(transfer_timestamp.to_s)
+        expect(@file_content[2][26]).to eq(transfer_timestamp.to_s)
       end
     end
 

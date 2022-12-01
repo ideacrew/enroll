@@ -30,6 +30,7 @@ field_names << "#{curr_year}_most_recent_health_plan_id"
 field_names << "#{curr_year}_most_recent_health_status"
 field_names << "#{next_year}_most_recent_health_plan_id"
 field_names << "#{next_year}_most_recent_health_status"
+field_names << "inbound_transfer_date"
 
 
 file_name = "#{Rails.root}/applicant_outreach_report.csv"
@@ -80,6 +81,7 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
                         end
         curr_mr_health_enrollment = enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == curr_year}.sort_by(&:submitted_at).reverse.first
         next_mr_health_enrollment = enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == next_year}.sort_by(&:submitted_at).reverse.first
+        inbound_transfer_date = application.transferred_at if application.transferred_at.present? && application.transfer_id.present? && !application.account_transferred
         csv << [person.hbx_id,
                 person.first_name,
                 person.last_name,
@@ -105,7 +107,8 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
                 curr_mr_health_enrollment&.product&.hios_id,
                 curr_mr_health_enrollment&.aasm_state,
                 next_mr_health_enrollment&.product&.hios_id,
-                next_mr_health_enrollment&.aasm_state
+                next_mr_health_enrollment&.aasm_state,
+                inbound_transfer_date
               ]
       end
     rescue StandardError => e
