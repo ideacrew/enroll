@@ -4,6 +4,7 @@ field_names = %w[
     primary_hbx_id
     first_name
     last_name
+    dob
     communication_preference
     primary_email_address
     home_address
@@ -67,21 +68,22 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
         mra_health_enrollment = enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'health'}
         mra_dental_enrollment = enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'dental'}
         enrollment_member = if mra_health_enrollment
-          mra_health_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
+                              mra_health_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
                             else
                               mra_dental_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
                             end
         fpl_year = application&.assistance_year - 1
         subscriber_id = if mra_health_enrollment
-          mra_health_enrollment&.subscriber&.hbx_id
-                      else
-                        mra_dental_enrollment&.subscriber&.hbx_id
-                      end
+                          mra_health_enrollment&.subscriber&.hbx_id
+                        else
+                          mra_dental_enrollment&.subscriber&.hbx_id
+                        end
         curr_mr_health_enrollment = enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == curr_year}.sort_by(&:submitted_at).reverse.first
         next_mr_health_enrollment = enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == next_year}.sort_by(&:submitted_at).reverse.first
         csv << [person.hbx_id,
                 person.first_name,
                 person.last_name,
+                person&.dob,
                 person&.consumer_role&.contact_method,
                 person.work_email_or_best,
                 applicant.home_address.to_s,
