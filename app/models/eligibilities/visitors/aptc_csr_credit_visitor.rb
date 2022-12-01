@@ -41,7 +41,7 @@ module Eligibilities
           :family_id => subject.family.id,
           :aasm_state => 'determined',
           :effective_date.gte => DateTime.new(year_begin.year, year_begin.month, year_begin.day) - 6.months,
-          :effective_date.lte => DateTime.new(year_end.year, year_end.month, year_end.day)
+          :effective_date.lte => DateTime.new(year_end.year, year_end.month, year_end.day) + 3.months
         ).last
       end
 
