@@ -10,6 +10,7 @@ module Notifier
     attribute :employee_responsible_amount, String
     attribute :employer_responsible_amount, String
     attribute :premium_amount, String
+    attribute :eligible_child_care_subsidy, String
     attribute :product, MergeDataModels::Product
     attribute :subscriber, MergeDataModels::Person
     attribute :dependents, Array[MergeDataModels::Person]
@@ -60,7 +61,8 @@ module Notifier
         is_receiving_assistance: false,
         aptc_amount: '5',
         effective_on: TimeKeeper.date_of_record.next.beginning_of_month,
-        responsible_amount: '458'
+        responsible_amount: '458',
+        eligible_child_care_subsidy: '150'
       })
 
       enrollment.subscriber = Notifier::MergeDataModels::Person.stubbed_object
