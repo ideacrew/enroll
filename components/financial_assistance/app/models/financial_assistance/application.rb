@@ -1058,7 +1058,9 @@ module FinancialAssistance
         return
       end
 
-      family_determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: self.family.reload, effective_date: TimeKeeper.date_of_record)
+      rt_transfer
+
+      family_determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: self.family.reload, effective_date: self.effective_date.to_date)
 
       if family_determination.success?
         apply_aggregate_to_enrollment
