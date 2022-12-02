@@ -165,6 +165,10 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           tax_household_group.tax_households.first
         end
 
+        let(:inactive_tax_household) do
+          inactive_tax_household_group.tax_households.first
+        end
+
         let(:eligibility_determination) do
           determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
           determination.grants.create(
@@ -174,12 +178,12 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
             end_on: TimeKeeper.date_of_record.end_of_year,
             assistance_year: TimeKeeper.date_of_record.year,
             member_ids: family.family_members.map(&:id).map(&:to_s),
-            tax_household_id: tax_household.id
+            tax_household_id: inactive_tax_household.id
           )
 
           determination
         end
-
+        
         let(:aptc_grant) { eligibility_determination.grants.first }
 
         let(:hbx_enrollment) do
