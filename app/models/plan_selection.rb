@@ -108,20 +108,16 @@ class PlanSelection
     enrollment_obj
   end
 
-  def member_coverage_start_on(matched_member, existing_coverage, current_coverage)
-    return matched_member.coverage_start_on || existing_coverage.effective_on if current_coverage.is_shop?
+  def member_coverage_start_on(matched_member, existing_coverage, shopping_coverage)
+    return (matched_member.coverage_start_on || existing_coverage.effective_on) if shopping_coverage.is_shop?
+    existing_coverage_start_on = existing_coverage.effective_on
+    return shopping_coverage.effective_on unless existing_coverage.effective_on&.year == shopping_coverage.effective_on.year
 
-    shopping_year = current_coverage.effective_on.year
-    return current_coverage.effective_on unless [matched_member.coverage_start_on&.year, existing_coverage.effective_on&.year].compact.all?(shopping_year)
-
-    existing_coverage_start_on = (matched_member.coverage_start_on || existing_coverage.effective_on)
-    value = current_coverage.effective_on <=> existing_coverage_start_on
-    case value
-    when -1 || 0
-      current_coverage.effective_on
-    when 1
-      existing_coverage_start_on
-    end
+    value = shopping_coverage.effective_on <=> existing_coverage_start_on
+    # -1 represents shopping coverage is in the past
+    # 0 represents shopping coverage is in the present
+    # 1 represents shopping coverage is in the future
+    value == 1 ? existing_coverage_start_on : shopping_coverage.effective_on
   end
 
   # for IVL market, we need to compare hios_ids instead of product IDs

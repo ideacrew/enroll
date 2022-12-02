@@ -167,18 +167,59 @@ describe PlanSelection, dbclean: :after_each, :if => ExchangeTestingConfiguratio
   end
 
   describe '.set_enrollment_member_coverage_start_dates' do
-    context 'when a new enrollment has a previous enrollment' do
-      def hash_key_creator(hbx_enrollment_member)
-        hbx_enrollment_member.person.hbx_id
+    context 'when a new enrollment has a previous enrollment with same start date' do
+      it 'should set eligibility dates to that of the shopping enrollment' do
+        previous_coverage.update_attributes(effective_on: hbx_enrollment.effective_on)
+        previous_coverage.hbx_enrollment_members.update_all(coverage_start_on: hbx_enrollment.effective_on)
+        result = subject.set_enrollment_member_coverage_start_dates
+        expect(result.hbx_enrollment_members.first.coverage_start_on).to eq(hbx_enrollment.effective_on)
       end
+    end
 
+    context 'when a new enrollment has a previous enrollment  with future start date' do
+      it 'should set eligibility dates to that of the shopping enrollment' do
+        previous_coverage.update_attributes(effective_on: hbx_enrollment.effective_on + 1.month)
+        previous_coverage.hbx_enrollment_members.update_all(coverage_start_on: hbx_enrollment.effective_on + 1.month)
+        result = subject.set_enrollment_member_coverage_start_dates
+        expect(result.hbx_enrollment_members.first.coverage_start_on).to eq(hbx_enrollment.effective_on)
+      end
+    end
+
+    context 'when a new enrollment has a previous enrollment  with past start date' do
       it 'should set eligibility dates to that of the previous enrollment' do
-        subject.set_enrollment_member_coverage_start_dates
-        previous_eligibility_dates = Hash[previous_coverage.hbx_enrollment_members.collect {|hbx_em| [hash_key_creator(hbx_em), hbx_em.coverage_start_on]}]
-        new_eligibility_dates = Hash[hbx_enrollment.hbx_enrollment_members.collect {|hbx_em| [hash_key_creator(hbx_em), hbx_em.coverage_start_on]}]
-        new_eligibility_dates.each do |hbx_id, date|
-          expect(previous_eligibility_dates[hbx_id]).to eq(date)
-        end
+        previous_coverage.update_attributes(effective_on: hbx_enrollment.effective_on - 1.month)
+        previous_coverage.hbx_enrollment_members.update_all(coverage_start_on: hbx_enrollment.effective_on - 1.month)
+        result = subject.set_enrollment_member_coverage_start_dates
+        expect(result.hbx_enrollment_members.first.coverage_start_on).to eq(previous_coverage.effective_on)
+      end
+    end
+  end
+
+  describe '.member_coverage_start_on' do
+    context 'when a new enrollment has a previous enrollment with same start date' do
+      it 'should set coverage start to that of the current enrollment' do
+        previous_coverage.update_attributes(effective_on: hbx_enrollment.effective_on)
+        previous_coverage.hbx_enrollment_members.update_all(coverage_start_on: hbx_enrollment.effective_on)
+        result = subject.member_coverage_start_on(hbx_enrollment.hbx_enrollment_members.first, previous_coverage, hbx_enrollment)
+        expect(result).to eq(hbx_enrollment.effective_on)
+      end
+    end
+
+    context 'when a new enrollment has a previous enrollment with future start date' do
+      it 'should set coverage start to that of the previous enrollment' do
+        previous_coverage.update_attributes(effective_on: hbx_enrollment.effective_on + 1.month)
+        previous_coverage.hbx_enrollment_members.update_all(coverage_start_on: hbx_enrollment.effective_on + 1.month)
+        result = subject.member_coverage_start_on(hbx_enrollment.hbx_enrollment_members.first, previous_coverage, hbx_enrollment)
+        expect(result).to eq(hbx_enrollment.effective_on)
+      end
+    end
+
+    context 'when a new enrollment has a previous enrollment with past start date' do
+      it 'should set coverage start dates to that of the current enrollment' do
+        previous_coverage.update_attributes(effective_on: hbx_enrollment.effective_on - 1.month)
+        previous_coverage.hbx_enrollment_members.update_all(coverage_start_on: hbx_enrollment.effective_on - 1.month)
+        result = subject.member_coverage_start_on(hbx_enrollment.hbx_enrollment_members.first, previous_coverage, hbx_enrollment)
+        expect(result).to eq(previous_coverage.effective_on)
       end
     end
   end
