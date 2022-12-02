@@ -101,7 +101,7 @@ module Operations
 
       def persist_tax_household_members_enrollment_members(current_tax_household, th_enrollment, household_info)
         th_id = BSON::ObjectId.from_string(current_tax_household.id.to_s)
-        tax_household_group = @family.tax_household_groups.active.order_by(created_at: :desc).where(:"tax_households._id" => th_id).first
+        tax_household_group = @family.tax_household_groups.order_by(created_at: :desc).where(:"tax_households._id" => th_id).first
         tax_household = tax_household_group.tax_households.where(_id: th_id).first
         hbx_enrollment_members = @hbx_enrollment.hbx_enrollment_members
         tax_household_members = tax_household.tax_household_members
