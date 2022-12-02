@@ -105,7 +105,7 @@ module Operations
         tax_household = tax_household_group.tax_households.where(_id: th_id).first
         hbx_enrollment_members = @hbx_enrollment.hbx_enrollment_members
         tax_household_members = tax_household.tax_household_members
-        th_member_ids = current_tax_household.tax_household_members.map(&:applicant_id).map(&:to_s)
+        th_member_ids = current_tax_household.tax_household_members.where(is_ia_eligible: true).map(&:applicant_id).map(&:to_s)
 
         (th_member_ids & enrolled_family_member_ids).each do |family_member_id|
           hbx_enrollment_member_id = hbx_enrollment_members.where(applicant_id: family_member_id).first&.id
@@ -199,7 +199,7 @@ module Operations
         return @benchmark_premiums if defined? @benchmark_premiums
 
         households_hash = @current_tax_households.inject([]) do |result, current_tax_household|
-          members_hash = (current_tax_household.tax_household_members.map(&:applicant_id).map(&:to_s) & enrolled_family_member_ids).inject([]) do |member_result, member_id|
+          members_hash = (current_tax_household.tax_household_members.where(is_ia_eligible: true).map(&:applicant_id).map(&:to_s) & enrolled_family_member_ids).inject([]) do |member_result, member_id|
             next member_result if coinciding_family_members.include? member_id
             family_member = FamilyMember.find(member_id)
 
