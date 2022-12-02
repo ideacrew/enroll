@@ -25,7 +25,7 @@ module Operations
         enrollment.previous_enrollments(year).each do |previous_enrollment|
           enrollment.generate_signature(previous_enrollment)
           if enrollment.same_signatures(previous_enrollment) && !previous_enrollment.is_shop?
-            if (enrollment.effective_on > previous_enrollment.effective_on && !previous_enrollment.coverage_terminated?) && previous_enrollment.may_terminate_coverage?
+            if enrollment.effective_on > previous_enrollment.effective_on && previous_enrollment.may_terminate_coverage?
               previous_enrollment.terminate_coverage!(enrollment.effective_on - 1.day)
             elsif previous_enrollment.may_cancel_coverage?
               previous_enrollment.cancel_coverage!
