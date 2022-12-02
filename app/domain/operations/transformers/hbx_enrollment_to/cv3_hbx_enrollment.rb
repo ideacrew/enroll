@@ -39,7 +39,10 @@ module Operations
           }
           payload.merge!(is_receiving_assistance: (enr.applied_aptc_amount > 0 || (product.is_csr? ? true : false))) if product
           payload.merge!(consumer_role_reference: consumer_role_reference(consumer_role)) if consumer_role
-          payload.merge!(product_reference: product_reference(product, issuer)) if product && issuer
+          if product && issuer
+            family_rated_info = family_tier_total_premium(product, enr)
+            payload.merge!(product_reference: product_reference(product, issuer, family_rated_info))
+          end
           payload.merge!(issuer_profile_reference: issuer_profile_reference(issuer)) if issuer
           payload.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment? && enr.special_enrollment_period
           enr_tax_households = tax_household_enrollments(enr)
@@ -109,7 +112,31 @@ module Operations
           }
         end
 
-        def product_reference(product, issuer)
+        def pediatric_dental_ehb(product)
+          return 0.0 if product.health?
+
+          product.ehb_apportionment_for_pediatric_dental
+        end
+
+        def family_tier_total_premium(product, enr)
+          return {} if product.blank? || product.health? || product.age_based_rating?
+
+          qhp = ::Products::Qhp.where(standard_component_id: product.hios_base_id, active_year: product.active_year).first
+          exchange_provided_code = enr.rating_area&.exchange_provided_code
+          return {} if exchange_provided_code.blank?
+
+          qhp_table = qhp.qhp_premium_tables.where(rate_area_id: enr.rating_area.exchange_provided_code).first
+          return {} if qhp_table.blank?
+
+          {
+            exchange_provided_code: exchange_provided_code,
+            primary_enrollee: qhp_table.primary_enrollee,
+            primary_enrollee_one_dependent: qhp_table.primary_enrollee_one_dependent,
+            primary_enrollee_many_dependent: qhp_table.primary_enrollee_many_dependent
+          }
+        end
+
+        def product_reference(product, issuer, family_rated_info)
           {
             hios_id: product.hios_id,
             name: product.title,
@@ -122,16 +149,47 @@ module Operations
             family_deductible: product.family_deductible,
             individual_deductible: product.deductible,
             product_kind: product.product_kind.to_s,
+            rating_method: product.rating_method,
+            pediatric_dental_ehb: pediatric_dental_ehb(product),
+            family_rated_premiums: family_rated_info,
             issuer_profile_reference: { hbx_id: issuer.hbx_id, name: issuer.legal_name, abbrev: issuer.abbrev }
           }
         end
 
+        def fetch_slcsp_benchmark_premium_for_member(person_hbx_id, slcsp_info)
+          return if slcsp_info.blank?
+
+          slcsp_info.dig(person_hbx_id, :health_only_slcsp_premiums, :cost)&.to_money&.to_hash
+        end
+
+        def fetch_slcsp_info(family, effective_date)
+          premiums = ::Operations::Products::Fetch.new.call({ family: family, effective_date: effective_date })
+          return {} if premiums.failure?
+
+          slcsp_info = ::Operations::Products::FetchSlcsp.new.call(member_silver_product_premiums: premiums.success)
+          return {} if slcsp_info.failure?
+          slcsp_info.success
+        end
+
+        # Include SlCSP Member Premium for all HbxEnrollmentMembers
         def enrollment_member_hash(enrollment)
+          slcsp_info = fetch_slcsp_info(enrollment.family, enrollment.effective_on)
+
           enrollment.hbx_enrollment_members.collect do |hem|
             person = hem.person
             {
-              family_member_reference: {family_member_hbx_id: hem.hbx_id, age: hem.age_on_effective_date, first_name: person.first_name, last_name: person.last_name, person_hbx_id: person.hbx_id,
-                                        is_primary_family_member: (hem.primary_relationship == 'self')}, is_subscriber: hem.is_subscriber, eligibility_date: hem.eligibility_date, coverage_start_on: hem.coverage_start_on
+              family_member_reference: {
+                family_member_hbx_id: hem.hbx_id,
+                age: hem.age_on_effective_date,
+                first_name: person.first_name,
+                last_name: person.last_name,
+                person_hbx_id: person.hbx_id,
+                is_primary_family_member: (hem.primary_relationship == 'self')
+              },
+              is_subscriber: hem.is_subscriber,
+              eligibility_date: hem.eligibility_date,
+              coverage_start_on: hem.coverage_start_on,
+              slcsp_member_premium: fetch_slcsp_benchmark_premium_for_member(person.hbx_id, slcsp_info)
             }
           end
         end
