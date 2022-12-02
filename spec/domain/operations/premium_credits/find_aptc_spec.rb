@@ -183,7 +183,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
 
           determination
         end
-        
+
         let(:aptc_grant) { eligibility_determination.grants.first }
 
         let(:hbx_enrollment) do
