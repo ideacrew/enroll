@@ -67,36 +67,61 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
   end
 
   def calculate_yearly_expected_contribution(thh, family)
-    return nil if thh.effective_starting_on.year != 2022
+    application = find_applications(thh, family)&.first
+    return if application.blank?
+
+    eligibility_determination = application.eligibility_determinations.detect { |ed| ed.applicants.map(&:family_member_id).sort == thh.tax_household_members.map(&:applicant_id).sort }
+    annual_tax_household_income = eligibility_determination.aptc_csr_annual_household_income
+
+    total_household_count = application.applicants.size
+    fpl_data = fp_levels[application.assistance_year]
+
+    total_annual_poverty_guideline = fpl_data[:annual_poverty_guideline] +
+                                     ((total_household_count - 1) * fpl_data[:annual_per_person_amount])
+    fpl_percentage = (annual_tax_household_income.div(total_annual_poverty_guideline) * 100).to_f
+
+    annual_tax_household_income * applicable_percentage(fpl_percentage)
+  end
+
+  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+  def find_applications(thh, family)
+    return ::FinancialAssistance::Application.where(family_id: family.id).determined.where(:'eligibility_determinations.determined_at'.lte => thh.created_at).order_by(:created_at.desc) if thh.latest_eligibility_determination&.source == 'Admin'
 
     determined_at = thh.latest_eligibility_determination&.determined_at
 
     applications = ::FinancialAssistance::Application.where(family_id: family.id).determined.where(:'eligibility_determinations.determined_at' => determined_at.to_date)
 
-    if applications.size != 1 && thh.created_at.present?
-      created_at = thh.created_at
-      applications = applications.where(:workflow_state_transitions => {'$elemMatch' => {:to_state => 'determined', :transition_at.lte => created_at + 15.seconds, :transition_at.gte => created_at - 15.seconds}})
-    end
-
-    if applications.size == 1
-      application = applications.first
-      eligibility_determination = application.eligibility_determinations.detect { |ed| ed.applicants.map(&:family_member_id).sort == thh.tax_household_members.map(&:applicant_id).sort }
-      annual_tax_household_income = eligibility_determination.aptc_csr_annual_household_income
-
-      total_household_count = application.applicants.size
-      fpl_data = fp_levels[application.assistance_year]
-
-      total_annual_poverty_guideline = fpl_data[:annual_poverty_guideline] +
-                                       ((total_household_count - 1) * fpl_data[:annual_per_person_amount])
-      fpl_percentage = (annual_tax_household_income.div(total_annual_poverty_guideline) * 100).to_f
-
-      annual_tax_household_income * applicable_percentage(fpl_percentage)
-    else
-      @logger.info "----- Failed to update Yearly Expected Contribution for family with family_hbx_assigned_id: #{family.hbx_assigned_id}, thh: #{thh.hbx_assigned_id}. Found #{applications.size} applications"
+    if applications.blank?
       @app_ambiguity_hbx_ids << { family_hbx_id: family.hbx_assigned_id, thh_hbx_id: thh.hbx_assigned_id }
-      nil
+      @logger.info "----- Failed to update Yearly Expected Contribution for family with family_hbx_assigned_id: #{family.hbx_assigned_id}, thh: #{thh.hbx_assigned_id}. Found #{applications.size} applications. No determined applications on given day"
+      return
     end
+
+    created_at = thh.created_at
+
+    if applications.size != 1
+      [90, 60, 30, 5, 2, 1, 0].each do |i|
+        break if applications.blank? || applications.size == 1
+        applications = applications.where(:workflow_state_transitions => {'$elemMatch' => {:to_state => 'determined', :transition_at => {:"$gte" => created_at - i.seconds, :"$lte" => created_at}}})
+      end
+    end
+
+    if applications.blank?
+      @app_ambiguity_hbx_ids << { family_hbx_id: family.hbx_assigned_id, thh_hbx_id: thh.hbx_assigned_id }
+      # rubocop:disable Layout/LineLength
+      @logger.info "----- Failed to update Yearly Expected Contribution for family with family_hbx_assigned_id: #{family.hbx_assigned_id}, thh: #{thh.hbx_assigned_id}. Found #{applications.size} applications. No determined applications in last 90 seconds"
+      # rubocop:enable Layout/LineLength
+      return
+    end
+
+    if applications.size > 1
+      @app_ambiguity_hbx_ids << { family_hbx_id: family.hbx_assigned_id, thh_hbx_id: thh.hbx_assigned_id }
+      @logger.info "----- Failed to update Yearly Expected Contribution for family with family_hbx_assigned_id: #{family.hbx_assigned_id}, thh: #{thh.hbx_assigned_id}. Found #{applications.size} applications at 0 sec"
+      return
+    end
+    applications
   end
+  # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
 
   def applicable_percentage(fpl_percentage)
     if fpl_percentage < 150
@@ -181,18 +206,18 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
 
   def migrate_tax_household_enrollments(family)
     th_groups = family.tax_household_groups.where(:assistance_year => 2022).order_by(:created_at.desc)
-    enrollments = family.enrollments.where(:"applied_aptc_amount.cents".gt => 0).by_year(2022).order_by(:created_at.asc)
+    enrollments = family.enrollments.by_year(2022).order_by(:created_at.asc)
 
     enrollments.each do |enrollment|
-      th_group = th_groups.where(:end_on.lte => enrollment.created_at).first || th_groups.where(:end_on => nil).first
+      th_group = th_groups.where(:end_on.gte => enrollment.created_at).first || th_groups.where(:end_on => nil).first
 
       if th_group.blank?
-        logger.info "----- Failed TH enrollment missing th group family_hbx_assigned_id: #{family.hbx_assigned_id}"
+        @logger.info "----- Failed TH enrollment missing th group family_hbx_assigned_id: #{family.hbx_assigned_id}"
         next
       end
 
       if th_group.tax_households.any? {|th| th.yearly_expected_contribution.nil? }
-        logger.info "----- Failed TH enrollment missing yearly_expected_contribution on th group family_hbx_assigned_id: #{family.hbx_assigned_id}"
+        @logger.info "----- Failed TH enrollment missing yearly_expected_contribution on th group family_hbx_assigned_id: #{family.hbx_assigned_id}"
         next
       end
 
@@ -207,10 +232,11 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
                                                                          effective_on: enrollment.effective_on,
                                                                          tax_households: th_group.tax_households,
                                                                          exclude_enrollments_list: exclude_enrollments_list,
+                                                                         include_term_enrollments: true,
                                                                          is_migrating: true
                                                                        })
 
-      logger.info "----- Failed TH enrollment FindAptcWithTaxHouseholds family_hbx_assigned_id: #{family.hbx_assigned_id}" if TaxHouseholdEnrollment.where(enrollment_id: enrollment.id)
+      @logger.info "----- Failed TH enrollment FindAptcWithTaxHouseholds family_hbx_assigned_id: #{family.hbx_assigned_id}" if TaxHouseholdEnrollment.where(enrollment_id: enrollment.id).blank?
     end
   end
 
@@ -227,7 +253,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
           next family
         end
 
-        tax_households = family.active_household.tax_households.tax_household_with_year(2022).where(:'eligibility_determinations.source'.ne => 'Admin').order_by(:created_at.asc)
+        tax_households = family.active_household.tax_households.tax_household_with_year(2022).order_by(:created_at.asc)
 
         active_thhs_of_household = tax_households.active_tax_household
         inactive_thhs_of_household = tax_households.where(:effective_ending_on.ne => nil)
@@ -241,7 +267,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
           if determination.success?
             logger.info "----- Successfully created FamilyDetermination: #{determination.success} for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
 
-            migrate_tax_household_enrollments(family)
+            migrate_tax_household_enrollments(family.reload)
           else
             logger.info "----- Failed to create FamilyDetermination: #{determination.failure} for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
           end
@@ -269,8 +295,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
 
   def target_families
     Family.all_tax_households.where({
-                                      :'households.tax_households.eligibility_determinations' => {:'$exists' => true},
-                                      :'households.tax_households' => {:"$elemMatch" => {:effective_starting_on.gte => Date.new(2022, 1, 1), :'eligibility_determinations.source'.ne => 'Admin'}}
+                                      :'households.tax_households' => {:"$elemMatch" => {:effective_starting_on.gte => Date.new(2022, 1, 1)}}
                                     }).or(
                                       {:'households.tax_households.effective_ending_on'.lte => Date.new(2022, 12, 31)},
                                       {:'households.tax_households.effective_ending_on' => nil}
