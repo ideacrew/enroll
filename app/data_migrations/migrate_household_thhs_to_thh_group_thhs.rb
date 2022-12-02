@@ -68,7 +68,17 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
 
   def calculate_yearly_expected_contribution(thh, family)
     application = find_applications(thh, family)&.first
-    return if application.blank?
+
+    if application.blank?
+      application = ::FinancialAssistance::Application.where(family_id: family.id, assistance_year: 2022).determined.order_by(:created_at.desc).first
+      @logger.info "----- Picked latest 2022 application for family with family_hbx_assigned_id: #{family.hbx_assigned_id}, thh: #{thh.hbx_assigned_id}."
+
+      if application.blank?
+        @app_ambiguity_hbx_ids << { family_hbx_id: family.hbx_assigned_id, thh_hbx_id: thh.hbx_assigned_id }
+        @logger.info "----- Failed to update Yearly Expected Contribution for family with family_hbx_assigned_id: #{family.hbx_assigned_id}, thh: #{thh.hbx_assigned_id}. No application found"
+        return
+      end
+    end
 
     eligibility_determination = application.eligibility_determinations.detect { |ed| ed.applicants.map(&:family_member_id).sort == thh.tax_household_members.map(&:applicant_id).sort }
     annual_tax_household_income = eligibility_determination.aptc_csr_annual_household_income
@@ -83,22 +93,15 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
     annual_tax_household_income * applicable_percentage(fpl_percentage)
   end
 
-  # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
   def find_applications(thh, family)
     return ::FinancialAssistance::Application.where(family_id: family.id).determined.where(:'eligibility_determinations.determined_at'.lte => thh.created_at).order_by(:created_at.desc) if thh.latest_eligibility_determination&.source == 'Admin'
 
     determined_at = thh.latest_eligibility_determination&.determined_at
 
     applications = ::FinancialAssistance::Application.where(family_id: family.id).determined.where(:'eligibility_determinations.determined_at' => determined_at.to_date)
-
-    if applications.blank?
-      @app_ambiguity_hbx_ids << { family_hbx_id: family.hbx_assigned_id, thh_hbx_id: thh.hbx_assigned_id }
-      @logger.info "----- Failed to update Yearly Expected Contribution for family with family_hbx_assigned_id: #{family.hbx_assigned_id}, thh: #{thh.hbx_assigned_id}. Found #{applications.size} applications. No determined applications on given day"
-      return
-    end
+    return if applications.blank?
 
     created_at = thh.created_at
-
     if applications.size != 1
       [90, 60, 30, 5, 2, 1, 0].each do |i|
         break if applications.blank? || applications.size == 1
@@ -106,22 +109,8 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
       end
     end
 
-    if applications.blank?
-      @app_ambiguity_hbx_ids << { family_hbx_id: family.hbx_assigned_id, thh_hbx_id: thh.hbx_assigned_id }
-      # rubocop:disable Layout/LineLength
-      @logger.info "----- Failed to update Yearly Expected Contribution for family with family_hbx_assigned_id: #{family.hbx_assigned_id}, thh: #{thh.hbx_assigned_id}. Found #{applications.size} applications. No determined applications in last 90 seconds"
-      # rubocop:enable Layout/LineLength
-      return
-    end
-
-    if applications.size > 1
-      @app_ambiguity_hbx_ids << { family_hbx_id: family.hbx_assigned_id, thh_hbx_id: thh.hbx_assigned_id }
-      @logger.info "----- Failed to update Yearly Expected Contribution for family with family_hbx_assigned_id: #{family.hbx_assigned_id}, thh: #{thh.hbx_assigned_id}. Found #{applications.size} applications at 0 sec"
-      return
-    end
-    applications
+    applications.order_by(:created_at.desc)
   end
-  # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity
 
   def applicable_percentage(fpl_percentage)
     if fpl_percentage < 150
