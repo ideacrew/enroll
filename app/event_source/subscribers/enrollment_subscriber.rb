@@ -109,7 +109,7 @@ module Subscribers
 
       family.update_due_dates_on_vlp_docs_and_evidences(assistance_year)
 
-      ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family, effective_date: TimeKeeper.date_of_record)
+      ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family, effective_date: enrollment.effective_on.to_date)
     end
 
     private
