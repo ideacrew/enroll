@@ -36,7 +36,7 @@ module Subscribers
         applicant = GlobalID::Locator.locate(payload[:gid])
         application = applicant.application
 
-        result = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: application.family, effective_date: TimeKeeper.date_of_record)
+        result = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: application.family, effective_date: application.effective_date.to_date)
 
         if result.success?
           logger.info "AptcCsrCreditEligibilitiesSubscriber: acked with success: #{result.success}"
@@ -80,7 +80,7 @@ module Subscribers
       subscriber_logger.info "AptcCsrCreditEligibilitiesSubscriber, response: #{payload}"
       application = GlobalID::Locator.locate(payload[:gid])
       family = application.family
-      result = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family, effective_date: TimeKeeper.date_of_record)
+      result = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family, effective_date: application.effective_date.to_date)
       return unless result.failure?
       errors = result.failure.is_a?(Dry::Validation::Result) ? result.failure.errors.to_h : result.failure
       logger.info "Error: unable to migrate evidences for applicant: #{applicant.id} in application #{application.id} due to #{errors}"

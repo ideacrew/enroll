@@ -27,35 +27,39 @@ module Operations
         # Updates should only be made to CRM gateway if critical attributes are changed
         # or new family members are added/deleted
         def send_to_gateway?(family, new_payload)
-          old_payload = family.cv3_payload
-          return true if old_payload.blank?
-          new_payload_changes = {}
-          old_payload_changes = {}
-          new_payload.to_h.with_indifferent_access[:family_members].each_with_index do |fm_hash, index_num|
-            fm_hash = fm_hash.with_indifferent_access
-            new_payload_changes[index_num] = [
-              {
-                encrypted_ssn: fm_hash.dig(:person, :person_demographics, :encrypted_ssn),
-                first_name: fm_hash.dig(:person, :person_demographics, :first_name),
-                last_name: fm_hash.dig(:person, :person_demographics, :last_name),
-                addresses: fm_hash.dig(:person, :addresses),
-                phones: fm_hash.dig(:person, :phones)
-              }
-            ]
+          if EnrollRegistry.feature_enabled?(:check_for_crm_updates)
+            family.family_members.detect{|fm| fm.person.crm_notifiction_needed } || family.crm_notifiction_needed
+          else
+            old_payload = family.cv3_payload
+            return true if old_payload.blank?
+            new_payload_changes = {}
+            old_payload_changes = {}
+            new_payload.to_h.with_indifferent_access[:family_members].each_with_index do |fm_hash, index_num|
+              fm_hash = fm_hash.with_indifferent_access
+              new_payload_changes[index_num] = [
+                {
+                  encrypted_ssn: fm_hash.dig(:person, :person_demographics, :encrypted_ssn),
+                  first_name: fm_hash.dig(:person, :person_demographics, :first_name),
+                  last_name: fm_hash.dig(:person, :person_demographics, :last_name),
+                  addresses: fm_hash.dig(:person, :addresses),
+                  phones: fm_hash.dig(:person, :phones)
+                }
+              ]
+            end
+            old_payload.to_h.with_indifferent_access[:family_members].each_with_index do |fm_hash, index_num|
+              fm_hash = fm_hash.with_indifferent_access
+              old_payload_changes[index_num] = [
+                {
+                  encrypted_ssn: fm_hash.dig(:person, :person_demographics, :encrypted_ssn),
+                  first_name: fm_hash.dig(:person, :person_demographics, :first_name),
+                  last_name: fm_hash.dig(:person, :person_demographics, :last_name),
+                  addresses: fm_hash.dig(:person, :addresses),
+                  phones: fm_hash.dig(:person, :phones)
+                }
+              ]
+            end
+            new_payload_changes != old_payload_changes
           end
-          old_payload.to_h.with_indifferent_access[:family_members].each_with_index do |fm_hash, index_num|
-            fm_hash = fm_hash.with_indifferent_access
-            old_payload_changes[index_num] = [
-              {
-                encrypted_ssn: fm_hash.dig(:person, :person_demographics, :encrypted_ssn),
-                first_name: fm_hash.dig(:person, :person_demographics, :first_name),
-                last_name: fm_hash.dig(:person, :person_demographics, :last_name),
-                addresses: fm_hash.dig(:person, :addresses),
-                phones: fm_hash.dig(:person, :phones)
-              }
-            ]
-          end
-          new_payload_changes != old_payload_changes
         end
 
         def construct_payload_hash(family)

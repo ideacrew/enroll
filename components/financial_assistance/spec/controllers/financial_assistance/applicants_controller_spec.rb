@@ -366,6 +366,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       let(:county_params) {  update_params[:applicant][:addresses_attributes][:'0'][:county]}
 
       before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:counties_import).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
@@ -402,6 +403,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       end
 
       before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:counties_import).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
@@ -471,6 +473,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
         dependent_params[:id] = dependent.id
         dependent.update_attributes!(relationship: 'spouse')
         dependent.update_attributes!(same_with_primary: true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:counties_import).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)

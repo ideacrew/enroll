@@ -155,6 +155,35 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
     end
   end
 
+  context 'when effective date is not system date' do
+    let(:eligibility_items_requested) do
+      { aptc_csr_credit: { evidence_items: [:esi_evidence] } }
+    end
+
+    let(:required_params) do
+      {
+        subjects: subjects,
+        effective_date: effective_date,
+        family: family,
+        eligibility_items_requested: eligibility_items_requested
+      }
+    end
+
+    before do
+      application.update_attributes(effective_date: application.effective_date.next_year)
+      @result = subject.call(required_params)
+    end
+
+    it 'should not build aptc_csr_credit evidences' do
+      expect(@result.success?).to be_truthy
+      expect(@result.value!.subjects.values.last.dig(:eligibility_states, :aptc_csr_credit, :evidence_states)).to be_empty
+    end
+
+    it 'should have eligibility determination effective date as system date' do
+      expect(@result.value!.effective_date).to eq TimeKeeper.date_of_record
+    end
+  end
+
   context "enable residency verification" do
     before do
       EnrollRegistry[:residency].feature.stub(:is_enabled).and_return(true)
