@@ -29,7 +29,7 @@ module Eligibilities
           .where(
             :family_id => subject.family.id,
             :effective_on.gte => effective_date.beginning_of_year,
-            :effective_on.lte => effective_date.end_of_year
+            :effective_on.lte => effective_date.end_of_year + 3.months
           )
           .individual_market
           .by_dental
