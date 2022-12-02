@@ -1497,15 +1497,6 @@ describe "has_valid_e_case_id" do
     expect(family1000.has_valid_e_case_id?).to be_truthy
   end
 end
-#TODO: fix me when ivl plans refactored to products
-# describe "currently_enrolled_plans_ids" do
-#   let!(:family100) { FactoryBot.create(:family, :with_primary_family_member) }
-#   let!(:enrollment100) { FactoryBot.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
-#
-#   it "should return a non-empty array of plan ids" do
-#     expect(family100.currently_enrolled_plans_ids(enrollment100).present?).to be_truthy
-#   end
-# end
 
 describe "set_due_date_on_verification_types" do
   let!(:person)           { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
@@ -2138,224 +2129,56 @@ describe "terminated_enrollments", dbclean: :after_each do
   end
 end
 
-describe "#currently_enrolled_products", dbclean: :after_each do
-  let!(:person) { FactoryBot.create(:person)}
-  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-  let!(:household) { FactoryBot.create(:household, family: family) }
-  let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
-  let!(:effective_on) { TimeKeeper.date_of_record.beginning_of_month}
-  let!(:hbx_enrollment_member) { FactoryBot.build(:hbx_enrollment_member, applicant_id: family.primary_applicant.id) }
-
-  let!(:active_enrollment) {
-    FactoryBot.create(:hbx_enrollment,
-                      family: family,
-                      household: family.active_household,
-                      coverage_kind: "health",
-                      product: product,
-                      aasm_state: 'coverage_selected',
-                      hbx_enrollment_members: [hbx_enrollment_member]
-    )}
-  let!(:shopping_enrollment) {
-    FactoryBot.create(:hbx_enrollment,
-                      family: family,
-                      effective_on: effective_on,
-                      household: family.active_household,
-                      coverage_kind: "health",
-                      aasm_state: 'shopping',
-                      hbx_enrollment_members: [hbx_enrollment_member]
-    )}
-
-
-  context "when consumer has active enrollment" do
-    it "should return current active enrolled product" do
-      expect(family.currently_enrolled_products(shopping_enrollment)).to eq [active_enrollment.product]
-    end
+describe 'application_applicable_year' do
+  let(:current_year) { TimeKeeper.date_of_record.year }
+  let!(:hbx_profile) do
+    FactoryBot.create(:hbx_profile,
+                      :normal_ivl_open_enrollment,
+                      us_state_abbreviation: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
+                      cms_id: "#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.upcase}0")
   end
 
-  context "when consumer has contionus coverage" do
-
-    let!(:term_enrollment) {
-      FactoryBot.create(:hbx_enrollment,
-                        family: family,
-                        household: family.active_household,
-                        coverage_kind: "health",
-                        product: product,
-                        terminated_on: effective_on - 1.day,
-                        aasm_state: 'coverage_terminated',
-                        hbx_enrollment_members: [hbx_enrollment_member]
-      )}
-
-    before do
-      active_enrollment.cancel_coverage!
-    end
-
-    it "should return contionus coverage product" do
-      expect(family.currently_enrolled_products(shopping_enrollment)).to eq [term_enrollment.product]
-    end
-  end
-
-  context "when consumer no contionus coverage" do
-
-    let!(:term_enrollment) {
-      FactoryBot.create(:hbx_enrollment,
-                        family: family,
-                        household: family.active_household,
-                        coverage_kind: "health",
-                        product: product,
-                        terminated_on: effective_on - 2.day,
-                        aasm_state: 'coverage_terminated',
-                        hbx_enrollment_members: [hbx_enrollment_member]
-      )}
-
-    before do
-      active_enrollment.cancel_coverage!
-    end
-
-    it "should return []" do
-      expect(family.currently_enrolled_products(shopping_enrollment)).to eq []
-    end
-  end
-
-  describe 'application_applicable_year' do
-    let(:current_year) { TimeKeeper.date_of_record.year }
-    let!(:hbx_profile) do
-      FactoryBot.create(:hbx_profile,
-                        :normal_ivl_open_enrollment,
-                        us_state_abbreviation: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
-                        cms_id: "#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.upcase}0")
-    end
-
-    context 'system date within OE' do
-      context 'after start of OE and end of current year i.e usually b/w 11/1, 12/31' do
-        before do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 5))
-        end
-
-        it 'should return benefit_coverage_period with start_on year as current_year + 1' do
-          expect(Family.application_applicable_year).to eq(current_year.next)
-        end
+  context 'system date within OE' do
+    context 'after start of OE and end of current year i.e usually b/w 11/1, 12/31' do
+      before do
+        allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 5))
       end
 
-      context 'after start of prospective year and end of OE end on i.e usually b/w 1/1, 1/31' do
-        before do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year.next, 1, 5))
-        end
-
-        it 'should return benefit_coverage_period with start_on year as current_year + 1' do
-          expect(Family.application_applicable_year).to eq(current_year.next)
-        end
+      it 'should return benefit_coverage_period with start_on year as current_year + 1' do
+        expect(Family.application_applicable_year).to eq(current_year.next)
       end
     end
 
-    context 'system date outside OE' do
-      context 'before start of OE start i.e usually before 11/1' do
-        before do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 9, 5))
-        end
-
-        it 'should return benefit_coverage_period with start_on year same as current_year' do
-          expect(Family.application_applicable_year).to eq(current_year)
-        end
+    context 'after start of prospective year and end of OE end on i.e usually b/w 1/1, 1/31' do
+      before do
+        allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year.next, 1, 5))
       end
 
-      context 'after end of OE i.e usually after 1/31' do
-        before do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year.next, 4, 5))
-        end
-
-        it 'should return benefit_coverage_period with start_on year as current_year + 1' do
-          expect(Family.application_applicable_year).to eq(current_year.next)
-        end
+      it 'should return benefit_coverage_period with start_on year as current_year + 1' do
+        expect(Family.application_applicable_year).to eq(current_year.next)
       end
     end
   end
-end
 
+  context 'system date outside OE' do
+    context 'before start of OE start i.e usually before 11/1' do
+      before do
+        allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 9, 5))
+      end
 
-describe "#any_member_currently_enrolled_products", dbclean: :after_each do
-  let!(:person) { FactoryBot.create(:person)}
-  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-  let!(:household) { FactoryBot.create(:household, family: family) }
-  let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
-  let!(:effective_on) { TimeKeeper.date_of_record.beginning_of_month}
-  let!(:hbx_enrollment_member) { FactoryBot.build(:hbx_enrollment_member, applicant_id: family.primary_applicant.id) }
-
-
-  let!(:person2) { FactoryBot.create(:person)}
-  let!(:dependent_family_member) do
-    FactoryBot.create(:family_member, family: family, person: person2)
-  end
-
-  let!(:dependent_hbx_enrollment_member) { FactoryBot.build(:hbx_enrollment_member, applicant_id: dependent_family_member.id) }
-
-  let!(:active_enrollment) do
-    FactoryBot.create(:hbx_enrollment,
-                      family: family,
-                      household: family.active_household,
-                      coverage_kind: "health",
-                      product: product,
-                      aasm_state: 'coverage_selected',
-                      hbx_enrollment_members: [hbx_enrollment_member, dependent_hbx_enrollment_member])
-  end
-
-  let!(:shopping_enrollment) do
-    FactoryBot.create(:hbx_enrollment,
-                      family: family,
-                      effective_on: effective_on,
-                      household: family.active_household,
-                      coverage_kind: "health",
-                      aasm_state: 'shopping',
-                      hbx_enrollment_members: [dependent_hbx_enrollment_member])
-  end
-
-  context "when dependent has active enrollment" do
-
-    it "should return current active enrolled product for dependent" do
-      expect(family.any_member_currently_enrolled_products(shopping_enrollment)).to eq [active_enrollment.product]
-    end
-  end
-
-  context "when dependent has contionus coverage" do
-
-    let!(:term_enrollment) do
-      FactoryBot.create(:hbx_enrollment,
-                        family: family,
-                        household: family.active_household,
-                        coverage_kind: "health",
-                        product: product,
-                        terminated_on: effective_on - 1.day,
-                        aasm_state: 'coverage_terminated',
-                        hbx_enrollment_members: [hbx_enrollment_member, dependent_hbx_enrollment_member])
+      it 'should return benefit_coverage_period with start_on year same as current_year' do
+        expect(Family.application_applicable_year).to eq(current_year)
+      end
     end
 
-    before do
-      active_enrollment.cancel_coverage!
-    end
+    context 'after end of OE i.e usually after 1/31' do
+      before do
+        allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year.next, 4, 5))
+      end
 
-    it "should return contionus coverage product" do
-      expect(family.any_member_currently_enrolled_products(shopping_enrollment)).to eq [term_enrollment.product]
-    end
-  end
-
-  context "when dependent or consumer has no contionus coverage" do
-
-    let!(:term_enrollment) do
-      FactoryBot.create(:hbx_enrollment,
-                        family: family,
-                        household: family.active_household,
-                        coverage_kind: "health",
-                        product: product,
-                        terminated_on: effective_on - 2.day,
-                        aasm_state: 'coverage_terminated',
-                        hbx_enrollment_members: [hbx_enrollment_member])
-    end
-
-    before do
-      active_enrollment.cancel_coverage!
-    end
-
-    it "should return []" do
-      expect(family.any_member_currently_enrolled_products(shopping_enrollment)).to eq []
+      it 'should return benefit_coverage_period with start_on year as current_year + 1' do
+        expect(Family.application_applicable_year).to eq(current_year.next)
+      end
     end
   end
 end
