@@ -19,7 +19,7 @@ RSpec.describe ::Operations::ProductSelectionEffects::TerminatePreviousSelection
       it 'should not terminate a previously terminated enrollment' do
         expect(enrollment.workflow_state_transitions.count).to eq(1)
         subject.call(Entities::ProductSelection.new({ enrollment: successor_enrollment, product: product, family: family }))
-        expect(enrollment.reload.workflow_state_transitions.count).to eq(1)
+        expect(enrollment.reload.workflow_state_transitions.count).to eq(2)
       end
     end
   end
