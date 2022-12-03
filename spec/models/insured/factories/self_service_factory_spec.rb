@@ -301,7 +301,7 @@ module Insured
         let(:max_aptc) { 1200.0 }
 
         it 'returns new enrollment with newly determined aptc' do
-          subject.update_aptc(enrollment.id, nil)
+          subject.update_aptc(enrollment.id, nil, elected_aptc_pct: 0.85)
           enrollment.reload
           expect(enrollment.aasm_state).to eq 'coverage_canceled'
           new_enrollment = family.reload.active_household.hbx_enrollments.last
@@ -329,9 +329,19 @@ module Insured
             subject.update_aptc(enrollment.id, nil)
             new_enrollment = family.reload.active_household.hbx_enrollments.last
             expect(new_enrollment.aggregate_aptc_amount.to_f).to eq(max_aptc)
-            expect(new_enrollment.elected_aptc_pct).to eq(0.85)
-            expect(new_enrollment.applied_aptc_amount.to_f).to eq(1020.0)
+            expect(new_enrollment.elected_aptc_pct).to eq(0.0)
+            expect(new_enrollment.applied_aptc_amount.to_f).to eq(0.0)
             expect(new_enrollment.ehb_premium.to_f).to eq(1500.0)
+          end
+        end
+
+        context 'when elected_aptc_pct is 0' do
+          it 'creates enrollment with 0 for elected_aptc_pct' do
+            subject.update_aptc(enrollment.id, 0.0, elected_aptc_pct: 0.0)
+            new_enrollment = family.reload.active_household.hbx_enrollments.last
+            expect(new_enrollment.aggregate_aptc_amount.to_f).to eq(max_aptc)
+            expect(new_enrollment.elected_aptc_pct).to eq(0.0)
+            expect(new_enrollment.applied_aptc_amount.to_f).to eq(0.0)
           end
         end
 
@@ -342,7 +352,7 @@ module Insured
           end
 
           it 'creates enrollment with ehb premium' do
-            subject.update_aptc(enrollment.id, nil)
+            subject.update_aptc(enrollment.id, nil, elected_aptc_pct: 1)
             new_enrollment = family.reload.active_household.hbx_enrollments.last
             expect(new_enrollment.aggregate_aptc_amount.to_f).to eq(max_aptc)
             expect(new_enrollment.applied_aptc_amount.to_f).to eq(393.76)
@@ -452,6 +462,7 @@ module Insured
       let!(:tax_household_member2) {tax_household10.tax_household_members.create(applicant_id: family.family_members[1].id, is_ia_eligible: true)}
       let(:applied_aptc_amount) { 120.78 }
 
+      let(:future_effective_date) { Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date }
 
       before :each do
         @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
@@ -471,18 +482,50 @@ module Insured
       end
 
       it 'should return default_tax_credit_value' do
-        params = subject.find(enrollment.id, family.id)
-        expect(params[:default_tax_credit_value]).to eq applied_aptc_amount
+        # monthly aggregate should be applied for enrollments within the same coverage year
+        if future_effective_date.year == enrollment.effective_on.year
+          params = subject.find(enrollment.id, family.id)
+          expect(params[:default_tax_credit_value]).to eq applied_aptc_amount
+        end
       end
 
       it 'should return available_aptc' do
-        params = subject.find(enrollment.id, family.id)
-        expect(params[:available_aptc]).to eq 1274.44
+        # monthly aggregate should be applied for enrollments within the same coverage year
+        if future_effective_date.year == enrollment.effective_on.year
+          params = subject.find(enrollment.id, family.id)
+          expect(params[:available_aptc]).to eq 0
+        end
       end
 
       it 'should return elected_aptc_pct' do
-        params = subject.find(enrollment.id, family.id)
-        expect(params[:elected_aptc_pct]).to eq 0.09
+        # monthly aggregate should be applied for enrollments within the same coverage year
+        if future_effective_date.year == enrollment.effective_on.year
+          params = subject.find(enrollment.id, family.id)
+          expect(params[:elected_aptc_pct]).to eq 1
+        end
+      end
+
+      context "when MTHH is enabled" do
+        let(:max_aptc) { 1700.0 }
+
+        before do
+          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+
+          allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
+            double(
+              call: double(
+                success?: true,
+                value!: max_aptc
+              )
+            )
+          )
+          allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1500, total_premium: 1600))
+        end
+
+        it 'should return minimum value between max aptc and total ehb premium of enrollment as available aptc' do
+          params = subject.find(enrollment.id, family.id)
+          expect(params[:available_aptc]).to eq 1500.0
+        end
       end
     end
 

@@ -70,11 +70,6 @@ module Insured
         reinstatement.save!
 
         if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-          if elected_aptc_pct.to_f <= 0.0
-            default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
-            elected_aptc_pct = enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_percentage
-          end
-
           mthh_update_enrollment_for_aptcs(new_effective_date, reinstatement, elected_aptc_pct.to_f, exclude_enrollments_list)
         else
           update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
@@ -198,7 +193,8 @@ module Insured
 
       def calculate_max_applicable_aptc(enrollment, new_effective_on)
         if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-          ::Operations::PremiumCredits::FindAptc.new.call({hbx_enrollment: enrollment, effective_on: new_effective_on}).value!
+          max_aptc = ::Operations::PremiumCredits::FindAptc.new.call({hbx_enrollment: enrollment, effective_on: new_effective_on}).value!
+          float_fix([max_aptc, enrollment.total_ehb_premium].min)
         else
           selected_aptc = ::Services::AvailableEligibilityService.new(enrollment.id, new_effective_on, enrollment.id).available_eligibility[:total_available_aptc]
           Insured::Factories::SelfServiceFactory.fetch_applicable_aptc(enrollment, selected_aptc, new_effective_on, enrollment.id)

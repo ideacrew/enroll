@@ -27,7 +27,10 @@
           <% else %>
             <td> -- </td>
           <% end %>
-          <% if calculate %>
+          <% if !EnrollRegistry.feature_enabled?(:display_you_pay) %>
+            <td class='text-right' data-cuke='no_you_pay'></td>
+            <td class='text-right'></td>
+          <% elsif calculate %>
             <% if osse_eligible %>
               <td class="text-right"></td>
               <td class="text-right"></td>
@@ -47,7 +50,7 @@
               <td class="text-right"><%- number_to_currency(member.applied_aptc_amount.to_f) %></td>
               <td class="text-right"><%= number_to_currency(@plan.premium_for(member) - member.applied_aptc_amount.to_f) %></td>
             <% end %>
-           <% end %>
+          <% end %>
         </tr>
       <% end %>
       <tr class="gray-row">

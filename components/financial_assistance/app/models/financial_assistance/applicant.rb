@@ -823,7 +823,6 @@ module FinancialAssistance
       questions_array << (non_ssn_apply_reason == "" ? nil : non_ssn_apply_reason) if FinancialAssistanceRegistry.feature_enabled?(:no_ssn_reason_dropdown) && is_ssn_applied == false && is_applying_coverage
       questions_array << is_former_foster_care if foster_age_satisfied? && is_applying_coverage
       questions_array << is_post_partum_period unless is_pregnant
-      questions_array << has_unemployment_income if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
       questions_array << is_physically_disabled if is_applying_coverage && FinancialAssistanceRegistry.feature_enabled?(:question_required)
       questions_array << pregnancy_due_on if is_pregnant && FinancialAssistanceRegistry.feature_enabled?(:pregnancy_due_on_required)
       questions_array << children_expected_count if is_pregnant
@@ -831,7 +830,6 @@ module FinancialAssistance
         questions_array << pregnancy_end_on
         questions_array << is_enrolled_on_medicaid if FinancialAssistanceRegistry.feature_enabled?(:is_enrolled_on_medicaid)
       end
-
 
       (other_questions_answers << questions_array).flatten.include?(nil) ? false : true
     end
@@ -1407,8 +1405,7 @@ module FinancialAssistance
           array
         end
       else
-        update_attributes!(is_post_partum_period: false) if is_pregnant
-        [:is_pregnant, :is_post_partum_period].collect{|question| send(question)}
+        is_pregnant ? [is_pregnant] : [is_post_partum_period]
       end
     end
 

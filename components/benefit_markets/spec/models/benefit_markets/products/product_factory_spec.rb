@@ -47,60 +47,96 @@ module BenefitMarkets
     end
 
     describe 'group products' do
-      let!(:product1) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :gold, csr_variant_id: '01')}
-      let!(:product2) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :catastrophic, csr_variant_id: '01')}
-      let!(:product3) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :bronze, csr_variant_id: '01')}
-      let!(:product4) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :silver, csr_variant_id: '05')}
+      let!(:silver_01) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :silver, hios_id: '41842ME12345S-01', csr_variant_id: '01') }
+      let!(:silver_02) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :silver, hios_id: '41842ME12345S-02', csr_variant_id: '02') }
+      let!(:silver_03) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :silver, hios_id: '41842ME12345S-03', csr_variant_id: '03') }
+      let!(:silver_04) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :silver, hios_id: '41842ME12345S-04', csr_variant_id: '04') }
+      let!(:silver_05) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :silver, hios_id: '41842ME12345S-05', csr_variant_id: '05') }
+      let!(:silver_06) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :silver, hios_id: '41842ME12345S-06', csr_variant_id: '06') }
 
-      let!(:product5) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :silver, csr_variant_id: '02')}
-      let!(:product6) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :gold, csr_variant_id: '02')}
-      let!(:product7) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :bronze, csr_variant_id: '02')}
-      let!(:product8) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :platinum, csr_variant_id: '02')}
+      let!(:gold_01) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :gold, hios_id: '41842ME12345G-01', csr_variant_id: '01') }
+      let!(:gold_02) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :gold, hios_id: '41842ME12345G-02', csr_variant_id: '02') }
+      let!(:gold_03) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :gold, hios_id: '41842ME12345G-03', csr_variant_id: '03') }
 
-      let!(:product9) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :silver, csr_variant_id: '03')}
-      let!(:product10) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :gold, csr_variant_id: '03')}
-      let!(:product11) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :bronze, csr_variant_id: '03')}
-      let!(:product12) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :platinum, csr_variant_id: '03')}
+      let!(:bronze_01) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :bronze, hios_id: '41842ME12345B-01', csr_variant_id: '01') }
+      let!(:bronze_02) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :bronze, hios_id: '41842ME12345B-02', csr_variant_id: '02') }
+      let!(:bronze_03) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :bronze, hios_id: '41842ME12345B-03', csr_variant_id: '03') }
 
-      let!(:product13) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :silver, csr_variant_id: '04')}
-      let!(:product14) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :platinum, csr_variant_id: '04')}
+      let!(:platinum_01) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :platinum, hios_id: '41842ME12345P-01', csr_variant_id: '01') }
+      let!(:platinum_02) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :platinum, hios_id: '41842ME12345P-02', csr_variant_id: '02') }
+      let!(:platinum_03) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :platinum, hios_id: '41842ME12345P-03', csr_variant_id: '03') }
 
-      let!(:product15) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :silver, csr_variant_id: '06')}
-      let!(:product16) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, metal_level_kind: :platinum, csr_variant_id: '06')}
-      let(:all_products) { [product1,product2,product3,product4, product5, product6, product7, product8, product9, product10, product11, product12, product13, product14, product15, product16]}
-      before do
-        @products = product_factory.new({market_kind: "individual"})
-      end
+      let!(:catastrophic_01) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :catastrophic, hios_id: '41842ME12345C-01', csr_variant_id: '01') }
 
       context 'by_coverage_kind_year_and_csr' do
-        it 'should return all default csr products' do
-          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: nil)).to eq [product1,product2,product3]
+        let(:eligible_products) { product_factory.new({ market_kind: 'individual' }).by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: csr_kind) }
+
+        context 'csr_kind: csr_100' do
+          let(:csr_kind) { 'csr_100' }
+
+          it 'should return [silver gold bronze platinum] products with 02 variant & catastrophic with 01 variant' do
+            expect(eligible_products.pluck(:id).sort).to eq([silver_02.id, gold_02.id, bronze_02.id, platinum_02.id, catastrophic_01.id].sort)
+          end
         end
 
-        it 'should return all product along with product having csr 87' do
-          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_87")).to eq [product1,product2,product3,product4]
+        context 'csr_kind: csr_limited' do
+          let(:csr_kind) { 'csr_limited' }
+
+          it 'should return [silver gold bronze platinum] products with 03 variant & catastrophic with 01 variant' do
+            expect(eligible_products.pluck(:id).sort).to eq([silver_03.id, gold_03.id, bronze_03.id, platinum_03.id, catastrophic_01.id].sort)
+          end
         end
 
-        it 'should return all product along with product having csr 94' do
-          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_94")).to eq [product1,product2,product3,product15]
+        context 'csr_kind: csr_0' do
+          let(:csr_kind) { 'csr_0' }
+
+          it 'should return [silver gold bronze platinum catastrophic] products with 01 variant' do
+            expect(eligible_products.pluck(:id).sort).to eq([silver_01.id, gold_01.id, bronze_01.id, platinum_01.id, catastrophic_01.id].sort)
+          end
         end
 
-        it 'should return all products if the csr_kind is csr_100' do
-          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_100")).to eq all_products
+        context 'csr_kind: csr_94' do
+          let(:csr_kind) { 'csr_94' }
+
+          it 'should return [catastrophic gold bronze platinum] products with 01 variant & silver with 06 variant' do
+            expect(eligible_products.pluck(:id).sort).to eq([silver_06.id, gold_01.id, bronze_01.id, platinum_01.id, catastrophic_01.id].sort)
+          end
         end
 
-        it 'should return all products if the csr_kind is csr_limited'  do
-          expect(@products.by_coverage_kind_year_and_csr('health', TimeKeeper.date_of_record.year, csr_kind: "csr_limited")).to eq all_products
+        context 'csr_kind: csr_87' do
+          let(:csr_kind) { 'csr_87' }
+
+          it 'should return [catastrophic gold bronze platinum] products with 01 variant & silver with 05 variant' do
+            expect(eligible_products.pluck(:id).sort).to eq([silver_05.id, gold_01.id, bronze_01.id, platinum_01.id, catastrophic_01.id].sort)
+          end
+        end
+
+        context 'csr_kind: csr_73' do
+          let(:csr_kind) { 'csr_73' }
+
+          it 'should return [catastrophic gold bronze platinum] products with 01 variant & silver with 04 variant' do
+            expect(eligible_products.pluck(:id).sort).to eq([silver_04.id, gold_01.id, bronze_01.id, platinum_01.id, catastrophic_01.id].sort)
+          end
         end
       end
 
       context 'by_coverage_kind_and_year' do
-        it 'should return health products' do
-          expect(@products.by_coverage_kind_and_year('health', TimeKeeper.date_of_record.year).count).to eq 16
+        let(:eligible_products) { product_factory.new({ market_kind: 'individual' }).by_coverage_kind_and_year(coverage_kind, TimeKeeper.date_of_record.year) }
+
+        context 'coverage_kind: health' do
+          let(:coverage_kind) { 'health' }
+
+          it 'should return health products' do
+            expect(eligible_products.count).to eq 16
+          end
         end
 
-        it 'should return deltal products' do
-          expect(@products.by_coverage_kind_and_year('dental', TimeKeeper.date_of_record.year).count).to eq 0
+        context 'coverage_kind: dental' do
+          let(:coverage_kind) { 'dental' }
+
+          it 'should return dental products' do
+            expect(eligible_products.count).to eq 0
+          end
         end
       end
     end

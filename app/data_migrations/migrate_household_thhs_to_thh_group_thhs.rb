@@ -58,12 +58,124 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
         effective_starting_on: thh.effective_starting_on,
         effective_ending_on: effective_ending_on,
         max_aptc: thh.latest_eligibility_determination.max_aptc,
-        yearly_expected_contribution: thh.yearly_expected_contribution
+        yearly_expected_contribution: calculate_yearly_expected_contribution(thh, thh.family)
       }
 
       new_thh = thhg.tax_households.build(thh_params)
       build_thhms(thh.tax_household_members, new_thh)
     end
+  end
+
+  def calculate_yearly_expected_contribution(thh, family)
+    application = find_applications(thh, family)&.first
+
+    if application.blank?
+      application = ::FinancialAssistance::Application.where(family_id: family.id, assistance_year: 2022).determined.order_by(:created_at.desc).first
+      @logger.info "----- Picked latest 2022 application for family with family_hbx_assigned_id: #{family.hbx_assigned_id}, thh: #{thh.hbx_assigned_id}."
+
+      if application.blank?
+        @app_ambiguity_hbx_ids << { family_hbx_id: family.hbx_assigned_id, thh_hbx_id: thh.hbx_assigned_id }
+        @logger.info "----- Failed to update Yearly Expected Contribution for family with family_hbx_assigned_id: #{family.hbx_assigned_id}, thh: #{thh.hbx_assigned_id}. No application found"
+        return
+      end
+    end
+
+    eligibility_determination = application.eligibility_determinations.detect { |ed| ed.applicants.map(&:family_member_id).sort == thh.tax_household_members.map(&:applicant_id).sort }
+    annual_tax_household_income = eligibility_determination.aptc_csr_annual_household_income
+
+    total_household_count = application.applicants.size
+    fpl_data = fp_levels[application.assistance_year]
+
+    total_annual_poverty_guideline = fpl_data[:annual_poverty_guideline] +
+                                     ((total_household_count - 1) * fpl_data[:annual_per_person_amount])
+    fpl_percentage = (annual_tax_household_income.div(total_annual_poverty_guideline) * 100).to_f
+
+    annual_tax_household_income * applicable_percentage(fpl_percentage)
+  end
+
+  def find_applications(thh, family)
+    return ::FinancialAssistance::Application.where(family_id: family.id).determined.where(:'eligibility_determinations.determined_at'.lte => thh.created_at).order_by(:created_at.desc) if thh.latest_eligibility_determination&.source == 'Admin'
+
+    determined_at = thh.latest_eligibility_determination&.determined_at
+
+    applications = ::FinancialAssistance::Application.where(family_id: family.id).determined.where(:'eligibility_determinations.determined_at' => determined_at.to_date)
+    return if applications.blank?
+
+    created_at = thh.created_at
+    if applications.size != 1
+      [90, 60, 30, 5, 2, 1, 0].each do |i|
+        break if applications.blank? || applications.size == 1
+        applications = applications.where(:workflow_state_transitions => {'$elemMatch' => {:to_state => 'determined', :transition_at => {:"$gte" => created_at - i.seconds, :"$lte" => created_at}}})
+      end
+    end
+
+    applications.order_by(:created_at.desc)
+  end
+
+  def applicable_percentage(fpl_percentage)
+    if fpl_percentage < 150
+      BigDecimal('0')
+    elsif fpl_percentage >= 150 && fpl_percentage < 200
+      ((fpl_percentage - BigDecimal('150')) / BigDecimal('50')) * BigDecimal('2')
+    elsif fpl_percentage >= 200 && fpl_percentage < 250
+      (((fpl_percentage - BigDecimal('200')) / BigDecimal('50')) * BigDecimal('2')) + BigDecimal('2')
+    elsif fpl_percentage >= 250 && fpl_percentage < 300
+      (((fpl_percentage - BigDecimal('250')) / BigDecimal('50')) * BigDecimal('2')) + BigDecimal('4')
+    elsif fpl_percentage >= 300 && fpl_percentage < 400
+      (((fpl_percentage - BigDecimal('300')) / BigDecimal('100')) * BigDecimal('2.5')) + BigDecimal('6')
+    else
+      # covers 400 and above
+      BigDecimal('8.5')
+    end.div(BigDecimal('100'), 3)
+  end
+
+  def fp_levels
+    {
+      2013 => {
+        annual_poverty_guideline: BigDecimal(11_490.to_s),
+        annual_per_person_amount: BigDecimal(4_020.to_s)
+      },
+      2014 => {
+        annual_poverty_guideline: BigDecimal(11_670.to_s),
+        annual_per_person_amount: BigDecimal(4_060.to_s)
+      },
+      2015 => {
+        annual_poverty_guideline: BigDecimal(11_770.to_s),
+        annual_per_person_amount: BigDecimal(4_160.to_s)
+      },
+      2016 => {
+        annual_poverty_guideline: BigDecimal(11_880.to_s),
+        annual_per_person_amount: BigDecimal(4_160.to_s)
+      },
+      2017 => {
+        annual_poverty_guideline: BigDecimal(12_060.to_s),
+        annual_per_person_amount: BigDecimal(4_180.to_s)
+      },
+      2018 => {
+        annual_poverty_guideline: BigDecimal(12_140.to_s),
+        annual_per_person_amount: BigDecimal(4_320.to_s)
+      },
+      2019 => {
+        annual_poverty_guideline: BigDecimal(12_490.to_s),
+        annual_per_person_amount: BigDecimal(4_420.to_s)
+      },
+      2020 => {
+        annual_poverty_guideline: BigDecimal(12_760.to_s),
+        annual_per_person_amount: BigDecimal(4_480.to_s)
+      },
+      2021 => {
+        annual_poverty_guideline: BigDecimal(12_880.to_s),
+        annual_per_person_amount: BigDecimal(4_540.to_s)
+      },
+      2022 => {
+        annual_poverty_guideline: BigDecimal(13_590.to_s),
+        annual_per_person_amount: BigDecimal(4_720.to_s)
+      },
+      2023 => {
+        annual_poverty_guideline: BigDecimal(13_590.to_s),
+        annual_per_person_amount: BigDecimal(4_720.to_s)
+      }
+    }
   end
 
   # Builds tax_household_members for a given tax_household
@@ -81,6 +193,42 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
     new_thh
   end
 
+  def migrate_tax_household_enrollments(family)
+    th_groups = family.tax_household_groups.where(:assistance_year => 2022).order_by(:created_at.desc)
+    enrollments = family.enrollments.by_year(2022).order_by(:created_at.asc)
+
+    enrollments.each do |enrollment|
+      th_group = th_groups.where(:end_on.gte => enrollment.created_at).first || th_groups.where(:end_on => nil).first
+
+      if th_group.blank?
+        @logger.info "----- Failed TH enrollment missing th group family_hbx_assigned_id: #{family.hbx_assigned_id}"
+        next
+      end
+
+      if th_group.tax_households.any? {|th| th.yearly_expected_contribution.nil? }
+        @logger.info "----- Failed TH enrollment missing yearly_expected_contribution on th group family_hbx_assigned_id: #{family.hbx_assigned_id}"
+        next
+      end
+
+      exclude_enrollments_list = enrollments.or(
+        {:created_at.gte => enrollment.created_at},
+        {:created_at.lte => enrollment.created_at, :terminated_on.lte => enrollment.effective_on}
+      ).map(&:hbx_id)
+
+
+      ::Operations::PremiumCredits::FindAptcWithTaxHouseholds.new.call({
+                                                                         hbx_enrollment: enrollment,
+                                                                         effective_on: enrollment.effective_on,
+                                                                         tax_households: th_group.tax_households,
+                                                                         exclude_enrollments_list: exclude_enrollments_list,
+                                                                         include_term_enrollments: true,
+                                                                         is_migrating: true
+                                                                       })
+
+      @logger.info "----- Failed TH enrollment FindAptcWithTaxHouseholds family_hbx_assigned_id: #{family.hbx_assigned_id}" if TaxHouseholdEnrollment.where(enrollment_id: enrollment.id).blank?
+    end
+  end
+
   def process_families(families, file_name, offset_count, logger)
     field_names = %w[primary_person_hbx_id family_hbx_assigned_id aptc_csr_tax_households_count migrated_tax_households_count(new) family_has_active_tax_households?]
 
@@ -94,23 +242,21 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
           next family
         end
 
-        active_thhs_of_household = family.active_household.tax_households.active_tax_household.tax_household_with_year(2022)
-        if active_thhs_of_household.present?
-          active_2022_tax_household_groups = family.tax_household_groups.by_year(2022)
-          family = if active_2022_tax_household_groups.present?
-                     process_inactive_thhs_of_household(family, active_thhs_of_household, true)
-                   else
-                     process_active_thhs_of_household(family, active_thhs_of_household)
-                   end
-        end
+        tax_households = family.active_household.tax_households.tax_household_with_year(2022).order_by(:created_at.asc)
 
-        inactive_thhs_of_household = family.active_household.tax_households.where(:effective_ending_on.ne => nil).tax_household_with_year(2022)
-        family = process_inactive_thhs_of_household(family, inactive_thhs_of_household, false) if inactive_thhs_of_household.present?
+        active_thhs_of_household = tax_households.active_tax_household
+        inactive_thhs_of_household = tax_households.where(:effective_ending_on.ne => nil)
+
+        process_active_thhs_of_household(family, active_thhs_of_household) if active_thhs_of_household.present? && family.tax_household_groups.by_year(2022).blank?
+        process_inactive_thhs_of_household(family, inactive_thhs_of_household, false) if inactive_thhs_of_household.present?
+
         if family.save!
           logger.info "----- Successfully created TaxHouseholdGroups for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
           determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family.reload, effective_date: TimeKeeper.date_of_record)
           if determination.success?
             logger.info "----- Successfully created FamilyDetermination: #{determination.success} for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
+
+            migrate_tax_household_enrollments(family.reload)
           else
             logger.info "----- Failed to create FamilyDetermination: #{determination.failure} for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
           end
@@ -125,11 +271,32 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
     end
   end
 
+  def find_families
+    hbx_ids = ENV['person_hbx_ids'].to_s.split(',').map(&:squish!)
+
+    if hbx_ids.present?
+      family_hbx_ids = Person.where(:hbx_id.in => hbx_ids).map(&:primary_family).compact.map(&:hbx_assigned_id)
+      target_families.where(:hbx_assigned_id.in => family_hbx_ids)
+    else
+      target_families
+    end
+  end
+
+  def target_families
+    Family.all_tax_households.where({
+                                      :'households.tax_households' => {:"$elemMatch" => {:effective_starting_on.gte => Date.new(2022, 1, 1)}}
+                                    }).or(
+                                      {:'households.tax_households.effective_ending_on'.lte => Date.new(2022, 12, 31)},
+                                      {:'households.tax_households.effective_ending_on' => nil}
+                                    )
+  end
+
   def migrate
-    logger = Logger.new("#{Rails.root}/log/migrate_household_thhs_to_thh_group_thhs_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+    @logger = Logger.new("#{Rails.root}/log/migrate_household_thhs_to_thh_group_thhs_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
     start_time = DateTime.current
-    logger.info "MigrateHouseholdThhsToThhGroupThhs start_time: #{start_time}"
-    families = Family.all_tax_households
+    @logger.info "MigrateHouseholdThhsToThhGroupThhs start_time: #{start_time}"
+    @app_ambiguity_hbx_ids = []
+    families = find_families
     total_count = families.count
     familes_per_iteration = 5_000.0
     number_of_iterations = (total_count / familes_per_iteration).ceil
@@ -138,10 +305,11 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
     while counter < number_of_iterations
       file_name = "#{Rails.root}/household_thhs_to_thh_group_thhs_migration_list_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}_#{counter + 1}.csv"
       offset_count = familes_per_iteration * counter
-      process_families(families, file_name, offset_count, logger)
+      process_families(families, file_name, offset_count, @logger)
       counter += 1
     end
     end_time = DateTime.current
-    logger.info "MigrateHouseholdThhsToThhGroupThhs end_time: #{end_time}, total_time_taken_in_minutes: #{((end_time - start_time) * 24 * 60).to_f.ceil}" unless Rails.env.test?
+    @logger.info "MigrateHouseholdThhsToThhGroupThhs end_time: #{end_time}, total_time_taken_in_minutes: #{((end_time - start_time) * 24 * 60).to_f.ceil}" unless Rails.env.test?
+    @logger.info "Families with missing yearly_expected_contribution - #{@app_ambiguity_hbx_ids}"
   end
 end

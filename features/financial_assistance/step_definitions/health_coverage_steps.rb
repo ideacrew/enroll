@@ -66,6 +66,10 @@ Then(/^the employer id field should indicate it is required$/) do
   expect(find("#benefit_esi_ein")["placeholder"]).to include "*"
 end
 
+Then(/^the employer id label should indicate it is required$/) do
+  expect(find(CostSavingsApplicationPage.benefit_esi_ein_label).text).to include "*"
+end
+
 And(/^the user not sure link next to minimum standard value question$/) do
   find("#is_esi_mec_met_not_sure").click
 end

@@ -235,6 +235,7 @@ class ConsumerRole
 
   after_initialize :setup_lawful_determination_instance
   after_create :create_initial_market_transition, :publish_created_event
+  after_update :publish_updated_event
   before_validation :ensure_verification_types
 
   before_validation :ensure_validation_states, on: [:create, :update]
@@ -1183,6 +1184,8 @@ class ConsumerRole
   end
 
   def admin_ridp_verification_action(admin_action, ridp_type, update_reason, person)
+    remove_ridp_verification_documents(ridp_type) unless EnrollRegistry.feature_enabled?(:show_people_with_no_evidence)
+
     case admin_action
       when 'verify'
         UserMailer.identity_verification_acceptance(person.emails.first.address, person.first_name, person.hbx_id).deliver_now if EnrollRegistry.feature_enabled?(:email_validation_notifications) && person.emails.present?
@@ -1227,6 +1230,11 @@ class ConsumerRole
       update_attributes(:application_validation => 'valid', :application_update_reason => update_reason)
     end
     "#{ridp_type} successfully verified."
+  end
+
+  def remove_ridp_verification_documents(ridp_type)
+    ridp_documents_to_remove = ridp_documents.where(ridp_verification_type: ridp_type)
+    ridp_documents_to_remove.delete_all if ridp_documents_to_remove.present?
   end
 
   def update_verification_type(v_type, update_reason, *authority)
@@ -1307,5 +1315,12 @@ class ConsumerRole
     event.success.publish if event.success?
   rescue StandardError => e
     Rails.logger.error { "Couldn't generate consumer role create event due to #{e.backtrace}" }
+  end
+
+  def publish_updated_event
+    event = event('events.individual.consumer_roles.updated', attributes: { gid: to_global_id.uri, previous: changed_attributes })
+    event.success.publish if event.success?
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't generate consumer role updated event due to #{e.backtrace}" }
   end
 end

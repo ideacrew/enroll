@@ -17,6 +17,7 @@
           <h3><%= l10n("Choose_a_plan_year") %></h3>
           <label><%= f.radio_button :assistance_year, oe_year %> <%= l10n("faa.assitance_year_option1", year: oe_year) %></label><br>
           <label><%= f.radio_button :assistance_year, current_year  %> <%= current_year %> Report a Life Change</label>
+          <p><b><%= l10n("faa.update_reminder", year: current_year, year2: oe_year) %></b><br></p>
         </div>
 
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">

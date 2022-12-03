@@ -43,7 +43,7 @@
           <%= phone_fields.text_field :full_phone_number, placeholder: 'PHONE NUMBER *', required: required, value: benefit.employer_phone.try(:full_phone_number), class: "floatlabel phone_number" %>
         </div>
         <div class="col-md-6">
-          <% employer_id_placeholder = l10n("EMPLOYER_IDENTIFICATION_NO.(EIN)").upcase %>
+          <% employer_id_placeholder = l10n("esi_employer_ein") %>
           <% employer_id_placeholder += " *" unless EnrollRegistry[:skip_employer_id_validation].enabled? %>
           <%= f.text_field :employer_id, placeholder: employer_id_placeholder, class: "floatlabel ph-width fien_field", data: {cuke: 'benefit_esi_ein'}, id: 'benefit_esi_ein'  %>
         </div>

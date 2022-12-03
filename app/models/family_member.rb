@@ -10,7 +10,9 @@ class FamilyMember
 
   # Responsible for updating eligibility when family member is created/updated
   after_create :family_member_created
+  before_create :notify_family
   after_update :family_member_updated, if: :is_active_changed?
+  after_destroy :notify_family
 
   # Person responsible for this family
   field :is_primary_applicant, type: Boolean, default: false
@@ -74,6 +76,7 @@ class FamilyMember
   delegate :is_dc_resident?, to: :person, allow_nil: true
   delegate :ivl_coverage_selected, to: :person
   delegate :is_applying_coverage, to: :person, allow_nil: true
+  delegate :age_off_excluded, to: :person, allow_nil: true
 
   validates_presence_of :person_id, :is_primary_applicant, :is_coverage_applicant
 
@@ -168,6 +171,12 @@ class FamilyMember
   def family_member_created
     deactivate_tax_households
     create_financial_assistance_applicant
+  end
+
+  def notify_family
+    return unless EnrollRegistry.feature_enabled?(:check_for_crm_updates)
+    return unless family
+    family.set(crm_notifiction_needed: true)
   end
 
   def create_financial_assistance_applicant

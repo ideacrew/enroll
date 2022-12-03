@@ -239,6 +239,36 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           allow(child3).to receive(:relationship).and_return('child')
           allow(EnrollRegistry[:age_off_relaxed_eligibility].feature).to receive(:is_enabled).and_return(true)
         end
+
+        context 'children aged above 26' do
+          before do
+            child1.person.update_attributes!(dob: TimeKeeper.date_of_record - 27.years)
+            child2.person.update_attributes!(dob: TimeKeeper.date_of_record - 21.years)
+          end
+
+          context 'age_off_excluded for children set to true' do
+            before do
+              update_age_off_excluded(family, true)
+            end
+
+            it 'should include child1' do
+              expect(subject.renew.hbx_enrollment_members.map(&:applicant_id)).to include(child1.id)
+              expect(subject.renew.hbx_enrollment_members.map(&:applicant_id)).to include(child2.id)
+            end
+          end
+
+          context 'age_off_excluded for children set to false' do
+            before do
+              update_age_off_excluded(family, false)
+            end
+
+            it 'should not include child1' do
+              expect(subject.renew.hbx_enrollment_members.map(&:applicant_id)).not_to include(child1.id)
+              expect(subject.renew.hbx_enrollment_members.map(&:applicant_id)).to include(child2.id)
+            end
+          end
+        end
+
         context "When a child is aged off" do
           it "should include child" do
             applicant_ids = subject.clone_enrollment_members.collect(&:applicant_id)
@@ -362,6 +392,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         before do
           allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1390, total_premium: 1390))
           EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+          update_age_off_excluded(enrollment.family, false)
         end
 
         let(:assisted) { false }
@@ -519,7 +550,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           let(:dependent_bp) { 600.00 }
 
           context 'when renewal grants not present' do
-            let(:eligibility_determination) do
+            let!(:eligibility_determination) do
               determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
               determination.grants.create(
                 key: "AdvancePremiumAdjustmentGrant",
@@ -548,7 +579,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
 
           context 'when renewal grants present' do
-            let(:eligibility_determination) do
+            let!(:eligibility_determination) do
               determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
               determination.grants.create(
                 key: "AdvancePremiumAdjustmentGrant",
@@ -732,7 +763,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           let(:dependent_bp) { 600.00 }
 
           context 'when renewal grants not present' do
-            let(:eligibility_determination) do
+            let!(:eligibility_determination) do
               determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
               determination.grants.create(
                 key: "AdvancePremiumAdjustmentGrant",
@@ -755,7 +786,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
 
           context 'when renewal grants present' do
-            let(:eligibility_determination) do
+            let!(:eligibility_determination) do
               determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
               determination.grants.create(
                 key: "AdvancePremiumAdjustmentGrant",
@@ -1024,8 +1055,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             bcp.update_attributes!(slcsp_id: slcsp_id)
           end
           hbx_profile.reload
-
           family_assisted.active_household.reload
+          update_age_off_excluded(family_assisted, false)
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
         end
 
@@ -1050,6 +1081,12 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           expect(new_enr.subscriber.id).not_to eq(enrollment_assisted.subscriber.id)
         end
       end
+    end
+  end
+
+  def update_age_off_excluded(fam, true_or_false)
+    fam.family_members.map(&:person).each do |per|
+      per.update_attributes!(age_off_excluded: true_or_false)
     end
   end
 end

@@ -37,9 +37,9 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
       :nationwide => true,
       :network_information => "This is a test",
       :deductible => 0,
-      :total_premium => 0,
+      :total_premium => 100.00,
       :total_employer_contribution => 0,
-      :total_employee_cost => 0,
+      :total_employee_cost => 100.00,
       :rx_formulary_url => "http://www.example.com",
       :provider_directory_url => "http://www.example1.com",
       :ehb => 0.988,
@@ -53,6 +53,8 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
       metal_level: 'Bronze',
       network: 'nationwide',
       :can_use_aptc? => true,
+      total_ehb_premium: 99.00,
+      total_childcare_subsidy_amount: 0.0,
       :sbc_document => document
     }
   end
@@ -73,6 +75,7 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
   before :each do
     allow(view).to receive(:request).and_return(mock_request)
     allow(mock_request).to receive(:referrer).and_return('')
+    allow(mock_issuer_profile).to receive(:abbrev).and_return("MOCK_CARRIER")
     Caches::MongoidCache.release(CarrierProfile)
     allow(person).to receive(:primary_family).and_return(family)
     allow(family).to receive(:enrolled_hbx_enrollments).and_return([hbx_enrollment])
@@ -86,6 +89,11 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
   it "should display standard plan indicator" do
     render "ui-components/v1/cards/summary", :qhp => mock_qhp_cost_share_variance
     expect(rendered).to have_selector('i', text: 'STANDARD PLAN')
+  end
+
+  it 'should display premium amount' do
+    render 'ui-components/v1/cards/summary', qhp: mock_qhp_cost_share_variance
+    expect(rendered).to include('$100.00')
   end
 
   context "with no rx_formulary_url and provider urls for coverage_kind = dental" do
@@ -155,6 +163,16 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
       expect(rendered).to match("PROVIDER DIRECTORY")
     end
 
+    it "should not have provider directory url if issuer is excluded" do
+      allow(view).to receive(:offers_nationwide_plans?).and_return(true)
+      allow(mock_product).to receive(:provider_directory_url).and_return("mock_url")
+      allow(mock_product).to receive(:issuer_profile).and_return(mock_issuer_profile)
+      allow(mock_issuer_profile).to receive(:abbrev).and_return("GHMSI")
+      render "ui-components/v1/cards/summary", :qhp => mock_qhp_cost_share_variance
+      expect(rendered).to_not match(/#{mock_product.provider_directory_url}/)
+      expect(rendered).to_not match("PROVIDER DIRECTORY")
+    end
+
     it "should not have provider directory url if nationwide = false(for ma)" do
       allow(view).to receive(:offers_nationwide_plans?).and_return(false)
       allow(mock_product).to receive(:nationwide).and_return(false)
@@ -176,8 +194,10 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
     let(:hbx_staff_person) {FactoryBot.create(:person, :with_hbx_staff_role)}
 
     before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_enr_summary).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
@@ -213,6 +233,7 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
 
   context 'for display of enrollment additional summary with consumer' do
     before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_enr_summary).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
@@ -247,6 +268,7 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
     let(:broker_user) { FactoryBot.create(:user, person: broker_person) }
     let(:broker_person) {FactoryBot.create(:person, :with_broker_role)}
     before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_enr_summary).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)

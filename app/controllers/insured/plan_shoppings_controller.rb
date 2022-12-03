@@ -253,7 +253,6 @@ class Insured::PlanShoppingsController < ApplicationController
 
     generate_eligibility_data
     generate_checkbook_service if params[:market_kind] == 'individual'
-
     @carriers = @carrier_names_map.values
     @waivable = @hbx_enrollment.try(:can_complete_shopping?)
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
@@ -350,7 +349,8 @@ class Insured::PlanShoppingsController < ApplicationController
     end
     if @tax_household.present? || @aptc_grants.present?
       entity = @tax_household || @aptc_grants
-      if is_eligibility_determined_and_not_csr_0?(entity)
+      @csr_available = is_eligibility_determined_and_not_csr_0?(entity)
+      if @csr_available
         sort_for_csr(@plans)
       else
         sort_by_standard_plans(@plans)

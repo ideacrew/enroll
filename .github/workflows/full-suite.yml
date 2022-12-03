@@ -44,7 +44,7 @@ jobs:
             cd ../..
           done
   engines:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     services:
       rabbitmq:
         image: rabbitmq:latest
@@ -138,7 +138,7 @@ jobs:
           bundle config path ../../vendor/bundle
           bundle exec rspec
   benefit-sponsors:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     services:
       rabbitmq:
         image: rabbitmq:latest
