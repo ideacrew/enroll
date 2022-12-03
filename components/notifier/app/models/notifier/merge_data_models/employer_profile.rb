@@ -19,6 +19,7 @@ module Notifier
     attribute :invoice_date, String
     attribute :coverage_month, String
     attribute :total_amount_due, String
+    attribute :total_eligible_child_care_subsidy, String
     attribute :date_due, String
     attribute :employer_name, String
     attribute :mailing_address, MergeDataModels::Address
@@ -47,6 +48,7 @@ module Notifier
         invoice_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y"),
         coverage_month: TimeKeeper.date_of_record.next_month.strftime("%m/%Y"),
         total_amount_due: '$1523.25',
+        total_eligible_child_care_subsidy: '$950.00',
         date_due: (TimeKeeper.date_of_record + 10.days).strftime("%m/%d/%Y")
 
       })
