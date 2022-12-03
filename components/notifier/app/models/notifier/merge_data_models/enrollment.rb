@@ -113,8 +113,16 @@ module Notifier
       coverage_kind == 'dental'
     end
 
+    def osse_subsidy_amount
+      number_to_currency(eligible_child_care_subsidy.to_f)
+    end
+
     def premium
       number_to_currency(premium_amount.to_f)
+    end
+
+    def premium_after_subsidy
+      number_to_currency(premium_amount.to_f - eligible_child_care_subsidy.to_f)
     end
 
     def number_of_enrolled
