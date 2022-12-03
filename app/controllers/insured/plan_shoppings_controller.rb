@@ -474,7 +474,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def enrolled_plans_by_hios_id_and_active_year
     family = @hbx_enrollment.family
     if @hbx_enrollment.is_shop?
-      @enrolled_hbx_enrollment_plans = family.current_enrolled_or_termed_products(@hbx_enrollment).map(&:id)
+      @enrolled_hbx_enrollment_plans = family.current_enrolled_or_termed_coverages(@hbx_enrollment, true).collect(&:product_id)
       (@plans.collect(&:id) & @enrolled_hbx_enrollment_plan_ids)
     else
       @enrolled_hbx_enrollment_plans = family.current_enrolled_or_termed_products_by_subscriber(@hbx_enrollment)
