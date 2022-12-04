@@ -274,7 +274,7 @@ class Insured::PlanShoppingsController < ApplicationController
       end
     end
     ::Caches::CustomCache.allocate(::BenefitSponsors::Organizations::Organization, :plan_shopping, ip_lookup_table)
-    @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.currently_enrolled_plans(@hbx_enrollment)
+    @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.current_enrolled_or_termed_coverages(@hbx_enrollment, true).collect(&:product_id)
 
     @member_groups = sort_member_groups(sponsored_cost_calculator.groups_for_products(products))
     @products = @member_groups.map(&:group_enrollment).map(&:product)
@@ -448,7 +448,8 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def set_plans_by(hbx_enrollment_id:)
     Caches::MongoidCache.allocate(CarrierProfile)
-    @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.currently_enrolled_product_ids(@hbx_enrollment)
+
+    @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.current_enrolled_or_termed_products_by_subscriber(@hbx_enrollment).map(&:id)
 
     if @hbx_enrollment.blank?
       @plans = []
@@ -471,13 +472,14 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def enrolled_plans_by_hios_id_and_active_year
-    if !@hbx_enrollment.is_shop?
-      @enrolled_hbx_enrollment_plans = @hbx_enrollment.family.currently_enrolled_products(@hbx_enrollment)
-      @enrolled_hbx_enrollment_plans = @hbx_enrollment.family.any_member_currently_enrolled_products(@hbx_enrollment) if @enrolled_hbx_enrollment_plans.empty?
-      (@plans.select{|plan| @enrolled_hbx_enrollment_plans.select {|existing_plan| plan.is_same_plan_by_hios_id_and_active_year?(existing_plan) }.present? }).collect(&:id)
-    else
-      @enrolled_hbx_enrollment_plans = @hbx_enrollment.family.currently_enrolled_plans(@hbx_enrollment)
+    family = @hbx_enrollment.family
+    if @hbx_enrollment.is_shop?
+      @enrolled_hbx_enrollment_plans = family.current_enrolled_or_termed_coverages(@hbx_enrollment, true).collect(&:product_id)
       (@plans.collect(&:id) & @enrolled_hbx_enrollment_plan_ids)
+    else
+      @enrolled_hbx_enrollment_plans = family.current_enrolled_or_termed_products_by_subscriber(@hbx_enrollment)
+      @enrolled_hbx_enrollment_plans = family.current_enrolled_or_termed_products(@hbx_enrollment) if @enrolled_hbx_enrollment_plans.empty?
+      (@plans.select{|plan| @enrolled_hbx_enrollment_plans.select {|existing_plan| plan.is_same_plan_by_hios_id_and_active_year?(existing_plan) }.present? }).collect(&:id)
     end
   end
 
