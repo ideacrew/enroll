@@ -120,8 +120,20 @@ module Notifier
       active_benefit_sponsorship.benefit_applications.where(:aasm_state.in => submitted_states).max_by(&:created_at)
     end
 
+    def valid_enrollments
+      @valid_enrollments ||= submitted_benefit_application.enrollments_till_given_effective_on(current_sys_date.next_month.beginning_of_month).reject{|enr| enr.aasm_state == "inactive"}
+    end
+
+    # for all enrollments
+    def total_eligible_child_care_subsidy
+      subsidy = valid_enrollments.map(&:eligible_child_care_subsidy).sum.to_f
+      merge_model.total_eligible_child_care_subsidy = number_to_currency(subsidy)
+    end
+
     def total_amount_due
-      merge_model.total_amount_due = number_to_currency(submitted_benefit_application.enrollments_till_given_effective_on(current_sys_date.next_month.beginning_of_month).reject{|enr| enr.aasm_state == "inactive"}.map(&:total_premium).sum)
+      total_amount = valid_enrollments.map(&:total_premium).sum.to_f - valid_enrollments.map(&:eligible_child_care_subsidy).sum.to_f
+
+      merge_model.total_amount_due = number_to_currency(total_amount)
     end
 
     def date_due

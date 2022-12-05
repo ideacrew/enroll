@@ -45,6 +45,8 @@ module Notifier
     attribute :enrollment_errors, Hash[Symbol => String]
     attribute :benefit_packages, Array[MergeDataModels::BenefitPackage]
 
+    attribute :osse_eligible, Boolean
+
     def self.stubbed_object
       reference_date = TimeKeeper.date_of_record.next_month.beginning_of_month
       current_py_start = reference_date.prev_year
@@ -84,7 +86,8 @@ module Notifier
         enrollment_errors: "at least 3 non-owner employee must enroll",
         total_enrolled_count: '2',
         eligible_to_enroll_count: '6',
-        monthly_employer_contribution_amount: "$216.34"
+        monthly_employer_contribution_amount: "$216.34",
+        osse_eligible: true
       })
       benefit_application.benefit_packages = Notifier::MergeDataModels::BenefitPackage.stubbed_object
       benefit_application
