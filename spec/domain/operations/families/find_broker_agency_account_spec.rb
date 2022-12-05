@@ -12,7 +12,10 @@ RSpec.describe ::Operations::Families::FindBrokerAgencyAccount, dbclean: :after_
   describe 'broker agency account find' do
 
     before(:each) do
-      family.hire_broker_agency(writing_agent.id)
+      family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                          writing_agent_id: writing_agent.id,
+                                                                                          start_on: Time.now,
+                                                                                          is_active: true)
       family.reload
     end
 

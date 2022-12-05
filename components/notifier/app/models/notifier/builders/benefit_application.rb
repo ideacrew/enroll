@@ -195,6 +195,12 @@ module Notifier
       end
     end
 
+    def benefit_application_osse_eligible
+      return unless current_benefit_application.present?
+
+      merge_model.benefit_application.osse_eligible = current_benefit_application.osse_eligible?
+    end
+
     def benefit_application_enrollment_errors
       enrollment_errors = []
       benefit_application = (renewal_benefit_application || current_benefit_application)

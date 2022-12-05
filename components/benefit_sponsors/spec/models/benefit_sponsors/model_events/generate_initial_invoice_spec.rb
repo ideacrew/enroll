@@ -17,6 +17,54 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GenerateInitialEmployerInvoice', d
     :effective_period =>  start_on..(start_on + 1.year) - 1.day
   )}
 
+  let(:person)                  { FactoryBot.create(:person, :with_family) }
+  let(:family)                  { person.primary_family }
+  let!(:census_employee) do
+    create(
+      :benefit_sponsors_census_employee,
+      benefit_sponsorship: benefit_sponsorship,
+      employer_profile: model_instance,
+      first_name: person.first_name,
+      last_name: person.last_name,
+      benefit_group_assignments: [benefit_group_assignment]
+    )
+  end
+  let(:benefit_group_assignment) { build(:benefit_group_assignment, benefit_group: benefit_application.benefit_packages[0]) }
+
+  let!(:employee_role)          { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: model_instance, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: model_instance.id)}
+  let!(:hbx_enrollment) do
+    create(
+      :hbx_enrollment, :with_enrollment_members, :with_product,
+      household: family.active_household,
+      family: family,
+      aasm_state: "coverage_selected",
+      effective_on: benefit_application.start_on,
+      submitted_at: benefit_application.open_enrollment_period.max,
+      rating_area_id: benefit_application.recorded_rating_area_id,
+      sponsored_benefit_id: benefit_application.benefit_packages.first.health_sponsored_benefit.id,
+      sponsored_benefit_package_id: benefit_application.benefit_packages.first.id,
+      benefit_sponsorship_id: benefit_application.benefit_sponsorship.id,
+      eligible_child_care_subsidy: eligible_child_care_subsidy,
+      employee_role_id: employee_role.id,
+      hbx_enrollment_members: [hbx_enrollment_member]
+    )
+  end
+  let(:eligible_child_care_subsidy) { 150.0 }
+
+  let!(:hbx_enrollment_member) do
+    HbxEnrollmentMember.new(
+      applicant_id: family.family_members.first.id,
+      is_subscriber: true,
+      eligibility_date: TimeKeeper.date_of_record.prev_month,
+      coverage_start_on: TimeKeeper.date_of_record.prev_month
+    )
+  end
+
+  before do
+    census_employee.update_attributes(employee_role_id: employee_role.id)
+    allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(814.85)
+  end
+
   describe "ModelEvent" do
     it "should trigger model event" do
       model_instance.class.observer_peers.keys.select{ |ob| ob.is_a? BenefitSponsors::Observers::NoticeObserver }.each do |observer|
@@ -55,7 +103,10 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GenerateInitialEmployerInvoice', d
         "employer_profile.invoice_number",
         "employer_profile.invoice_date",
         "employer_profile.coverage_month",
-        "employer_profile.date_due"
+        "employer_profile.date_due",
+        "employer_profile.total_eligible_child_care_subsidy",
+        "employer_profile.total_amount_due",
+        "employer_profile.benefit_application.osse_eligible"
       ]
     }
     let(:merge_model) { subject.construct_notice_object }
@@ -74,32 +125,45 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GenerateInitialEmployerInvoice', d
       before do
         allow(subject).to receive(:resource).and_return(model_instance)
         allow(subject).to receive(:payload).and_return(payload)
+        allow(benefit_application).to receive(:osse_eligible?).and_return(true)
         model_instance.trigger_model_event(:generate_initial_employer_invoice)
       end
 
-      it "should retrun merge model" do
+      it "should return merge model" do
         expect(merge_model).to be_a(recipient.constantize)
       end
 
-      it "should retrun account number" do
+      it "should return account number" do
         expect(merge_model.account_number).to eq (model_instance.organization.hbx_id)
       end
 
-      it "should retrun invoice number" do
+      it "should return invoice number" do
         expect(merge_model.invoice_number).to eq (model_instance.organization.hbx_id+DateTime.now.next_month.strftime('%m%Y'))
       end
 
-      it "should retrun invoice date" do
+      it "should return invoice date" do
         expect(merge_model.invoice_date).to eq (TimeKeeper.date_of_record.strftime("%m/%d/%Y"))
       end
 
-      it "should retrun coverage month" do
+      it "should return coverage month" do
         expect(merge_model.coverage_month).to eq (TimeKeeper.date_of_record.next_month.strftime("%m/%Y"))
       end
 
-      it "should retrun due date" do
+      it "should return due date" do
         schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
         expect(merge_model.date_due).to eq (schedular.calculate_open_enrollment_date(benefit_application.is_renewing? ,TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].strftime("%m/%d/%Y"))
+      end
+
+      it "should return osse subsidy" do
+        expect(merge_model.total_eligible_child_care_subsidy).to eq("$150.00")
+      end
+
+      it "should return total amount due" do
+        expect(merge_model.total_amount_due).to eq("$664.85")
+      end
+
+      it "should return osse eligibility" do
+        expect(merge_model.benefit_application.osse_eligible).to be_truthy
       end
     end
   end
