@@ -103,7 +103,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
 
   def find_eligibility_determined_app(applications, thh)
     applications.detect do |app|
-      app.eligibility_determinations.detect { |ed| ed.applicants.map(&:family_member_id).sort == thh.tax_household_members.map(&:applicant_id).sort }
+      app.eligibility_determinations.detect { |ed| ed.applicants.map(&:person_hbx_id).sort == thh.tax_household_members.map {|thm| thm.person.hbx_id }.sort }
     end
   end
 
