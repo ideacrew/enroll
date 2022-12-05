@@ -102,6 +102,8 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
   end
 
   def find_eligibility_determined_app(applications, thh)
+    return if applications.blank?
+
     applications.detect do |app|
       app.eligibility_determinations.detect { |ed| ed.applicants.map(&:person_hbx_id).sort == thh.tax_household_members.map {|thm| thm.person.hbx_id }.sort }
     end
