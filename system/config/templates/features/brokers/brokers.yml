@@ -29,6 +29,6 @@ registry:
       - key: :allow_edit_broker_npn
         is_enabled: false
       - key: :send_broker_hired_event_to_edi
-        is_enabled: false
+        is_enabled: <%= ENV['BROKER_HIRED_EVENT_TO_EDI_IS_ENABLED'] || false %>
       - key: :send_broker_fired_event_to_edi
-        is_enabled: false
+        is_enabled: <%= ENV['BROKER_FIRED_EVENT_TO_EDI_IS_ENABLED'] || false %>
