@@ -67,11 +67,15 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
   end
 
   def calculate_yearly_expected_contribution(thh, family)
-    application = find_applications(thh, family)&.first
+    applications = find_applications(thh, family)
+
+    application = find_eligibility_determined_app(applications, thh)
 
     if application.blank?
-      application = ::FinancialAssistance::Application.where(family_id: family.id, assistance_year: 2022).determined.order_by(:created_at.desc).first
+      applications = ::FinancialAssistance::Application.where(family_id: family.id, assistance_year: 2022).determined.order_by(:created_at.desc)
       @logger.info "----- Picked latest 2022 application for family with family_hbx_assigned_id: #{family.hbx_assigned_id}, thh: #{thh.hbx_assigned_id}."
+
+      application = find_eligibility_determined_app(applications, thh)
 
       if application.blank?
         @app_ambiguity_hbx_ids << { family_hbx_id: family.hbx_assigned_id, thh_hbx_id: thh.hbx_assigned_id }
@@ -80,6 +84,10 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
       end
     end
 
+    fetch_yearly_expected_contribution(application, thh)
+  end
+
+  def fetch_yearly_expected_contribution(application, thh)
     eligibility_determination = application.eligibility_determinations.detect { |ed| ed.applicants.map(&:family_member_id).sort == thh.tax_household_members.map(&:applicant_id).sort }
     annual_tax_household_income = eligibility_determination.aptc_csr_annual_household_income
 
@@ -91,6 +99,12 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
     fpl_percentage = (annual_tax_household_income.div(total_annual_poverty_guideline) * 100).to_f
 
     annual_tax_household_income * applicable_percentage(fpl_percentage)
+  end
+
+  def find_eligibility_determined_app(applications, thh)
+    applications.detect do |app|
+      app.eligibility_determinations.detect { |ed| ed.applicants.map(&:family_member_id).sort == thh.tax_household_members.map(&:applicant_id).sort }
+    end
   end
 
   def find_applications(thh, family)
