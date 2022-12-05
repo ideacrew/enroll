@@ -1415,11 +1415,13 @@ describe "broker agency account for EDI" do
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
   let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
-  let(:hire_broker) {family.hire_broker_agency(writing_agent.id)}
   let(:subject) {HbxEnrollment.new(:submitted_at => TimeKeeper.date_of_record, family: family)}
 
   before(:each) do
-    family.hire_broker_agency(writing_agent.id)
+    family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                        writing_agent_id: writing_agent.id,
+                                                                                        start_on: Time.now,
+                                                                                        is_active: true)
     family.reload
     family.broker_agency_accounts.first.update_attributes(start_on: TimeKeeper.date_of_record - 1.day)
   end
@@ -1443,6 +1445,122 @@ describe "broker agency account for EDI" do
     it "should return broker agency account" do
       expect(subject.broker_agency_account_for_edi.writing_agent.npn).to eq writing_agent.npn
     end
+  end
+end
+
+describe '#notify_of_broker_update' do
+  let!(:person) { FactoryBot.create(:person)}
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+  let!(:household) { FactoryBot.create(:household, family: family) }
+  let!(:enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      household: family.active_household,
+                      coverage_kind: "health",
+                      kind: 'individual',
+                      aasm_state: 'coverage_selected')
+  end
+  let(:object_id) { BSON::ObjectId.new.to_s }
+
+  it "should notify broker event if enrollment is active" do
+    expect(enrollment).to receive(:notify).with(
+      "acapi.info.events.family.broker_updates",
+      {
+        "hbx_enrollment_id" => enrollment.hbx_id,
+        "family_id" => object_id,
+        "new_broker_id" => object_id,
+        "new_broker_npn" => 12_345,
+        "timestamp" => Time.now.strftime("%Y-%m-%d %H:%M")
+      }
+    )
+    enrollment.notify_of_broker_update({family_id: object_id,
+                                        broker_role_id: object_id,
+                                        broker_role_npn: 12_345})
+  end
+
+  it "should not notify broker event if enrollment is terminated" do
+    enrollment.update_attributes(aasm_state: 'coverage_terminated', terminated_on: TimeKeeper.date_of_record.prev_month.end_of_month)
+    expect(enrollment).not_to receive(:notify).with(
+      "acapi.info.events.family.broker_updates",
+      {
+        "hbx_enrollment_id" => enrollment.hbx_id,
+        "family_id" => object_id,
+        "new_broker_id" => object_id,
+        "new_broker_npn" => 12_345,
+        "timestamp" => Time.now.strftime("%Y-%m-%d %H:%M")
+      }
+    )
+    enrollment.notify_of_broker_update({family_id: object_id,
+                                        broker_role_id: object_id,
+                                        broker_role_npn: 12_345})
+  end
+
+  it "should not notify broker event if enrollment is expired" do
+    enrollment.update_attributes(aasm_state: 'coverage_expired')
+    expect(enrollment).not_to receive(:notify).with(
+      "acapi.info.events.family.broker_updates",
+      {
+        "hbx_enrollment_id" => enrollment.hbx_id,
+        "family_id" => object_id,
+        "new_broker_id" => object_id,
+        "new_broker_npn" => 12_345,
+        "timestamp" => Time.now.strftime("%Y-%m-%d %H:%M")
+      }
+    )
+    enrollment.notify_of_broker_update({family_id: object_id,
+                                        broker_role_id: object_id,
+                                        broker_role_npn: 12_345})
+  end
+
+  it "should not notify broker event if enrollment is shop" do
+    enrollment.update_attributes(kind: 'employer_sponsored')
+    expect(enrollment).not_to receive(:notify).with(
+      "acapi.info.events.family.broker_updates",
+      {
+        "hbx_enrollment_id" => enrollment.hbx_id,
+        "family_id" => object_id,
+        "new_broker_id" => object_id,
+        "new_broker_npn" => 12_345,
+        "timestamp" => Time.now.strftime("%Y-%m-%d %H:%M")
+      }
+    )
+    enrollment.notify_of_broker_update({family_id: object_id,
+                                        broker_role_id: object_id,
+                                        broker_role_npn: 12_345})
+  end
+
+  it "should not notify broker event if enrollment is canceled" do
+    enrollment.update_attributes(aasm_state: 'coverage_canceled')
+    expect(enrollment).not_to receive(:notify).with(
+      "acapi.info.events.family.broker_updates",
+      {
+        "hbx_enrollment_id" => enrollment.hbx_id,
+        "family_id" => object_id,
+        "new_broker_id" => object_id,
+        "new_broker_npn" => 12_345,
+        "timestamp" => Time.now.strftime("%Y-%m-%d %H:%M")
+      }
+    )
+    enrollment.notify_of_broker_update({family_id: object_id,
+                                        broker_role_id: object_id,
+                                        broker_role_npn: 12_345})
+  end
+
+  it "should notify broker event if enrollment termination is in future" do
+    enrollment.update_attributes(aasm_state: 'coverage_terminated', terminated_on: TimeKeeper.date_of_record.next_month.end_of_month)
+    expect(enrollment).to receive(:notify).with(
+      "acapi.info.events.family.broker_updates",
+      {
+        "hbx_enrollment_id" => enrollment.hbx_id,
+        "family_id" => object_id,
+        "new_broker_id" => object_id,
+        "new_broker_npn" => 12_345,
+        "timestamp" => Time.now.strftime("%Y-%m-%d %H:%M")
+      }
+    )
+    enrollment.notify_of_broker_update({family_id: object_id,
+                                        broker_role_id: object_id,
+                                        broker_role_npn: 12_345})
   end
 end
 
