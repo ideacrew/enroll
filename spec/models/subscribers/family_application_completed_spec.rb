@@ -226,9 +226,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             broker_agency_profile.primary_broker_role.update_attributes(npn: "1234567890", benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, broker_agency_profile_id: broker_agency_profile.id)
             person.primary_family.update_attributes!(e_case_id: "curam_landing_for#{person.id}")
             expect(subject).not_to receive(:log)
+            expect_any_instance_of(Events::Family::Brokers::BrokerHired).to receive(:publish)
             subject.call(nil, nil, nil, nil, message)
-            expect(family_db.current_broker_agency.benefit_sponsors_broker_agency_profile_id).to eq broker_agency_profile.id
-            expect(family_db.current_broker_agency.writing_agent_id).to eq broker_id
           end
 
           it "should update the users identity final decision code" do

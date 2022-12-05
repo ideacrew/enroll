@@ -254,78 +254,62 @@ describe Family, type: :model, dbclean: :around_each do
       end
     end
 
-    context "when a broker account is created for the Family" do
+    context "when a broker agency is hired or terminated for a family" do
       let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
       let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
-      let(:broker_agency_profile2) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile)}
-      let(:writing_agent2)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile2.id) }
 
-      it "adds a broker agency account" do
+      it "trigger broker broker hired event" do
+        expect_any_instance_of(Events::Family::Brokers::BrokerHired).to receive(:publish)
         carols_family.hire_broker_agency(writing_agent.id)
-        carols_family.reload
-        expect(carols_family.broker_agency_accounts.length).to eq(1)
       end
 
-      it "adding twice only gives two broker agency accounts" do
-        carols_family.hire_broker_agency(writing_agent.id)
-        carols_family.hire_broker_agency(writing_agent.id)
-        carols_family.reload
-        expect(carols_family.broker_agency_accounts.unscoped.length).to eq(2)
-        expect(Family.by_writing_agent_id(writing_agent.id).count).to eq(1)
+      it "trigger broker fired event" do
+        carols_family.broker_agency_accounts.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                 writing_agent_id: writing_agent.id,
+                                                 start_on: Time.now,
+                                                 is_active: true)
+        expect_any_instance_of(Events::Family::Brokers::BrokerFired).to receive(:publish)
+        carols_family.terminate_broker_agency(writing_agent.id)
+      end
+    end
+  end
+
+  context "notify_broker_update_on_impacted_enrollments_to_edi" do
+    let(:person)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+    let(:family)       { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let(:enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        household: family.active_household,
+        effective_on: TimeKeeper.date_of_record.beginning_of_year,
+        family: family,
+        kind: "individual",
+        is_any_enrollment_member_outstanding: true,
+        aasm_state: "coverage_selected"
+      )
+    end
+
+    context "send broker events to edi if feature is enabled" do
+      before do
+        EnrollRegistry[:send_broker_hired_event_to_edi].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:send_broker_fired_event_to_edi].feature.stub(:is_enabled).and_return(true)
       end
 
-      it "new broker adds a broker_agency_account" do
-        carols_family.hire_broker_agency(writing_agent.id)
-        carols_family.reload
-        carols_family.hire_broker_agency(writing_agent2.id)
-        carols_family.reload
-        expect(carols_family.broker_agency_accounts.unscoped.length).to eq(2)
-        expect(carols_family.broker_agency_accounts.unscoped[0].is_active).to be_falsey
-        expect(carols_family.broker_agency_accounts.unscoped[1].is_active).to be_truthy
-        expect(carols_family.broker_agency_accounts.unscoped[1].writing_agent_id).to eq(writing_agent2.id)
+      it "should notify edi on impacted enrollments if feature is enabled" do
+        result = family.notify_broker_update_on_impacted_enrollments_to_edi(BSON::ObjectId.new)
+        expect(result).to eq true
+      end
+    end
+
+    context "send broker events to edi if feature is disabled" do
+      before do
+        EnrollRegistry[:send_broker_hired_event_to_edi].feature.stub(:is_enabled).and_return(false)
+        EnrollRegistry[:send_broker_fired_event_to_edi].feature.stub(:is_enabled).and_return(false)
       end
 
-      it "carol changes brokers" do
-        carols_family.hire_broker_agency(writing_agent.id)
-        carols_family.reload
-        carols_family.hire_broker_agency(writing_agent2.id)
-        carols_family.reload
-        expect(Family.by_writing_agent_id(writing_agent.id).count).to eq(0)
-        expect(Family.by_writing_agent_id(writing_agent2.id).count).to eq(1)
-      end
-
-      it "writing_agent is popular" do
-        carols_family.hire_broker_agency(writing_agent.id)
-        carols_family.reload
-        carols_family.hire_broker_agency(writing_agent2.id)
-        carols_family.reload
-        carols_family.hire_broker_agency(writing_agent.id)
-        carols_family.reload
-        mikes_family.hire_broker_agency(writing_agent.id)
-        mikes_family.reload
-        expect(Family.by_writing_agent_id(writing_agent.id).count).to eq(2)
-        expect(Family.by_writing_agent_id(writing_agent2.id).count).to eq(0)
-      end
-
-      it "broker agency profile is popular" do
-        carols_family.hire_broker_agency(writing_agent.id)
-        carols_family.reload
-        carols_family.hire_broker_agency(writing_agent2.id)
-        carols_family.reload
-        carols_family.hire_broker_agency(writing_agent.id)
-        carols_family.reload
-        mikes_family.hire_broker_agency(writing_agent.id)
-        mikes_family.reload
-        expect(Family.by_broker_agency_profile_id(broker_agency_profile.id).count).to eq(2)
-        expect(Family.by_broker_agency_profile_id(broker_agency_profile2.id).count).to eq(0)
-      end
-
-      it "should not rehire already existing active broker" do
-        carols_family.hire_broker_agency(writing_agent.id)
-        carols_family.reload
-        carols_family.hire_broker_agency(writing_agent.id)
-        carols_family.reload
-        expect(carols_family.broker_agency_accounts.unscoped.length).to eq(1)
+      it "should notify edi on impacted enrollments if feature is enabled" do
+        result = family.notify_broker_update_on_impacted_enrollments_to_edi(BSON::ObjectId.new)
+        expect(result).to eq false
       end
     end
   end
