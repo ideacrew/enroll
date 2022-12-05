@@ -15,6 +15,7 @@ module Operations
         family = yield find_family(valid_params)
         existing_account = yield find_broker_agency_account(valid_params)
         result = yield hire_broker_agency(existing_account, broker_role, family, valid_params)
+        _event_notified = yield notify_broker_hired_event_to_edi(family, broker_role)
 
         Success(result)
       end
@@ -44,16 +45,21 @@ module Operations
         existing_account.end_on.blank? && valid_params[:terminate_date] <= valid_params[:start_date].to_date
       end
 
-      def terminate_existing_broker_agency(valid_params)
-        terminate_params = { family_id: valid_params[:family_id], broker_account_id: valid_params[:current_broker_account_id], terminate_date: valid_params[:terminate_date] }
-        ::Operations::Families::TerminateBrokerAgency.new.call(terminate_params)
+      def terminate_existing_broker_agency(family, valid_params)
+        terminate_params = { family_id: valid_params[:family_id],
+                             broker_account_id: valid_params[:current_broker_account_id],
+                             terminate_date: valid_params[:terminate_date],
+                             new_broker_hired: true,
+                             notify_edi: false }
+
+        family.publish_broker_fired_event(terminate_params)
       end
 
       def hire_broker_agency(existing_account, broker_role, family, valid_params)
         if existing_account.present?
           same_broker_hire = idempotency_check?(existing_account, broker_role, valid_params)
           return Success(true) if same_broker_hire
-          terminate_existing_broker_agency(valid_params)
+          terminate_existing_broker_agency(family, valid_params)
         end
 
         family.broker_agency_accounts.new(benefit_sponsors_broker_agency_profile_id: broker_role.benefit_sponsors_broker_agency_profile_id,
@@ -62,6 +68,15 @@ module Operations
                                           is_active: true)
 
         family.save! ? Success(true) : Failure("Unable to HireBrokerAgency")
+      end
+
+      def notify_broker_hired_event_to_edi(family, broker_role)
+        return Success("") unless broker_role&.npn&.scan(/\D/)&.empty?
+
+        family.notify_broker_update_on_impacted_enrollments_to_edi({broker_role_id: broker_role.id.to_s,
+                                                                    broker_role_npn: broker_role.npn,
+                                                                    family_id: family.id.to_s})
+        Success("Broker event notified to EDI")
       end
     end
   end
