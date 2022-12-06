@@ -2,7 +2,7 @@
 
 module Subscribers
   module FdshGateway
-    # Subscriber will receive response payload from FDSH gateway 
+    # Subscriber will receive response payload from FDSH gateway
     class PvcMdcrDeterminationSubscriber
       include EventSource::Logging
       include ::EventSource::Subscriber[amqp: 'fdsh.pvc.medicare']
