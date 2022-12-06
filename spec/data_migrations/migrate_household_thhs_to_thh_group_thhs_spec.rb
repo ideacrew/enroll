@@ -52,6 +52,7 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
                         is_ia_eligible: true,
                         family_member_id: fm1.id,
                         is_claimed_as_tax_dependent: false,
+                        person_hbx_id: person.hbx_id,
                         is_required_to_file_taxes: true)
     end
 
@@ -61,6 +62,7 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
                         eligibility_determination_id: ed.id,
                         is_ia_eligible: true,
                         family_member_id: fm2.id,
+                        person_hbx_id: person2.hbx_id,
                         is_claimed_as_tax_dependent: true)
     end
 
