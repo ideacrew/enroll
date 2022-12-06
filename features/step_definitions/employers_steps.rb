@@ -671,7 +671,9 @@ And(/^employer (.*) (.*) contribution percent for the application$/) do |create_
 end
 
 Then(/^employer should see create plan year button disabled$/) do
-  expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql true
+  benefit_application = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.first.benefit_applications.select {|ba| ba.effective_period.cover?(TimeKeeper.date_of_record) }
+
+  expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql true if benefit_application.present?
 end
 
 Then(/^employer should see your estimated montly cost$/) do
@@ -1082,9 +1084,11 @@ Then(/^employer should see Enter effective date for (.*?) Action/) do |action_na
 end
 
 And(/^employer should see that the create plan year is (.*)$/) do |plan_year_btn_enabled|
-  if plan_year_btn_enabled == 'true'
+  benefit_application = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.first.benefit_applications.select {|ba| ba.effective_period.cover?(TimeKeeper.date_of_record) }
+
+  if plan_year_btn_enabled == 'true' && benefit_application.present?
     expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql false
-  else
+  elsif plan_year_btn_enabled == 'false' && benefit_application.present?
     expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql true
   end
 end
