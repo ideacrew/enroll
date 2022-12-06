@@ -53,6 +53,7 @@ Feature: Add Plan Year For Employer
     Then employer should see your estimated montly cost
     And employer should see that the create plan year is <plan_year_btn_enabled>
 
+    # initial employers no longer receive flex rules
     Examples:
       | contribution_percent | plan_year_btn_enabled |
       | 100                  | true                  |
