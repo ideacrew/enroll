@@ -671,7 +671,7 @@ And(/^employer (.*) (.*) contribution percent for the application$/) do |create_
 end
 
 Then(/^employer should see create plan year button disabled$/) do
-  expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql true if benefit_application.present?
+  expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql true
 end
 
 Then(/^employer should see your estimated montly cost$/) do
