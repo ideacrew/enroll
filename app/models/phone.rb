@@ -30,8 +30,6 @@ class Phone
   before_validation :save_phone_components
 
   before_save :set_full_phone_number
-  before_save :set_crm_updates
-  before_destroy :set_crm_updates
 
   validates :area_code,
     numericality: true,
@@ -97,12 +95,6 @@ class Phone
 
   def set_full_phone_number
     self.full_phone_number = to_s
-  end
-
-  def set_crm_updates
-    return unless EnrollRegistry[:check_for_crm_updates].enabled?
-    return unless person
-    person.set(crm_notifiction_needed: true) if changes&.any?
   end
 
 private

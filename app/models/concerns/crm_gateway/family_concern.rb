@@ -19,16 +19,9 @@ module CrmGateway
       result = ::Operations::Families::SugarCrm::PublishFamily.new.call(self)
       # Update column directly without callbacks
       if result.success?
-        if EnrollRegistry.feature_enabled?(:check_for_crm_updates)
-          self.set(crm_notifiction_needed: false)
-          self.family_members.each do |fm|
-            fm.person&.set(crm_notifiction_needed: false)
-          end
-        else
-          family_payload = result.success.last
-          self.set(cv3_payload: family_payload.to_h.with_indifferent_access)
-          p family_payload if Rails.env.test?
-        end
+        family_payload = result.success.last
+        self.set(cv3_payload: family_payload.to_h.with_indifferent_access)
+        p family_payload if Rails.env.test?
       else
         Rails.logger.warn("Publish Family Exception family_id: #{self.id}: #{result.failure}")
         p result.failure
