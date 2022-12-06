@@ -6,14 +6,46 @@ require File.join(Rails.root, 'lib/mongoid_migration_task')
 class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
   def process_active_thhs_of_household(family, active_thhs_of_household)
     active_thhs_of_household.group_by(&:group_by_year).each do |_year, active_thhs_by_year|
-      family = build_thhg_thhs_and_thhms(family, active_thhs_by_year, false)
+      thhs_by_created_at = active_thhs_by_year.group_by(&:created_at)
+
+      new_thh_groups = {}
+
+      thhs_by_created_at.each do |a, _b|
+        keys = thhs_by_created_at.keys.select {|k| k <= a + 30.seconds && k >= a }
+
+        new_thh_groups[keys] = keys.inject([]) do |result, k|
+          result << thhs_by_created_at[k]
+          result
+        end.flatten
+
+        keys.each {|k| thhs_by_created_at.delete(k)}
+      end
+
+      new_thh_groups.each do |_year, thhs_by_determined_on|
+        family = build_thhg_thhs_and_thhms(family, thhs_by_determined_on, false)
+      end
     end
     family
   end
 
   def process_inactive_thhs_of_household(family, inactive_thhs_of_household, set_external_effective_ending_on)
     inactive_thhs_of_household.group_by(&:group_by_year).each do |_year, thhs_by_year|
-      thhs_by_year.group_by{ |thh| thh.latest_eligibility_determination&.determined_at&.to_date }.each do |_year, thhs_by_determined_on|
+      thhs_by_created_at = thhs_by_year.group_by(&:created_at)
+
+      new_thh_groups = {}
+
+      thhs_by_created_at.each do |a, _b|
+        keys = thhs_by_created_at.keys.select {|k| k <= a + 30.seconds && k >= a }
+
+        new_thh_groups[keys] = keys.inject([]) do |result, k|
+          result << thhs_by_created_at[k]
+          result
+        end.flatten
+
+        keys.each {|k| thhs_by_created_at.delete(k)}
+      end
+
+      new_thh_groups.each do |_year, thhs_by_determined_on|
         family = build_thhg_thhs_and_thhms(family, thhs_by_determined_on, set_external_effective_ending_on)
       end
     end
