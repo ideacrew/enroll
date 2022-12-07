@@ -4,8 +4,18 @@
 # rails runner script/list_of_tax_household_enrollments.rb -e production
 
 def process_enrollments(enrollments, file_name, offset_count, logger)
-  field_names = %w[person_hbx_id enrollment_hbx_id enrollment_applied_aptc_amount tax_household_members household_benchmark_ehb_premium health_product_hios_id dental_product_hios_id household_health_benchmark_ehb_premium
+  field_names = %w[person_hbx_id
+                   enrollment_hbx_id
+                   enrollment_applied_aptc_amount
+                   enrollment_total_premium
+                   product_ehb
+                   tax_household_members
+                   household_benchmark_ehb_premium
+                   health_product_hios_id
+                   dental_product_hios_id
+                   household_health_benchmark_ehb_premium
                    household_dental_benchmark_ehb_premium]
+
   CSV.open(file_name, 'w', force_quotes: true) do |csv|
     csv << field_names
     enrollments.no_timeout.limit(5_000).offset(offset_count).inject([]) do |_dummy, enrollment|
@@ -18,6 +28,8 @@ def process_enrollments(enrollments, file_name, offset_count, logger)
         csv << [
           person.hbx_id,
           enrollment.hbx_id,
+          enrollment.total_premium.to_f,
+          enrollment.product.ehb,
           enrollment.applied_aptc_amount.to_f,
           thh_enr.tax_household&.tax_household_members.map(&:person).flat_map(&:full_name),
           thh_enr.household_benchmark_ehb_premium,
