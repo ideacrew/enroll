@@ -6,14 +6,46 @@ require File.join(Rails.root, 'lib/mongoid_migration_task')
 class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
   def process_active_thhs_of_household(family, active_thhs_of_household)
     active_thhs_of_household.group_by(&:group_by_year).each do |_year, active_thhs_by_year|
-      family = build_thhg_thhs_and_thhms(family, active_thhs_by_year, false)
+      thhs_by_created_at = active_thhs_by_year.group_by(&:created_at)
+
+      new_thh_groups = {}
+
+      thhs_by_created_at.each do |a, _b|
+        keys = thhs_by_created_at.keys.select {|k| k <= a + 30.seconds && k >= a }
+
+        new_thh_groups[keys] = keys.inject([]) do |result, k|
+          result << thhs_by_created_at[k]
+          result
+        end.flatten
+
+        keys.each {|k| thhs_by_created_at.delete(k)}
+      end
+
+      new_thh_groups.each do |_year, thhs_by_determined_on|
+        family = build_thhg_thhs_and_thhms(family, thhs_by_determined_on, false)
+      end
     end
     family
   end
 
   def process_inactive_thhs_of_household(family, inactive_thhs_of_household, set_external_effective_ending_on)
     inactive_thhs_of_household.group_by(&:group_by_year).each do |_year, thhs_by_year|
-      thhs_by_year.group_by{ |thh| thh.latest_eligibility_determination&.determined_at&.to_date }.each do |_year, thhs_by_determined_on|
+      thhs_by_created_at = thhs_by_year.group_by(&:created_at)
+
+      new_thh_groups = {}
+
+      thhs_by_created_at.each do |a, _b|
+        keys = thhs_by_created_at.keys.select {|k| k <= a + 30.seconds && k >= a }
+
+        new_thh_groups[keys] = keys.inject([]) do |result, k|
+          result << thhs_by_created_at[k]
+          result
+        end.flatten
+
+        keys.each {|k| thhs_by_created_at.delete(k)}
+      end
+
+      new_thh_groups.each do |_year, thhs_by_determined_on|
         family = build_thhg_thhs_and_thhms(family, thhs_by_determined_on, set_external_effective_ending_on)
       end
     end
@@ -67,11 +99,16 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
   end
 
   def calculate_yearly_expected_contribution(thh, family)
-    application = find_applications(thh, family)&.first
+    determined_apps = ::FinancialAssistance::Application.where(family_id: family.id, assistance_year: 2022).determined
+    applications = find_applications(thh, determined_apps)
+
+    application = find_eligibility_determined_app(applications, thh)
 
     if application.blank?
-      application = ::FinancialAssistance::Application.where(family_id: family.id, assistance_year: 2022).determined.order_by(:created_at.desc).first
+      applications = determined_apps.order_by(:created_at.asc)
       @logger.info "----- Picked latest 2022 application for family with family_hbx_assigned_id: #{family.hbx_assigned_id}, thh: #{thh.hbx_assigned_id}."
+
+      application = find_eligibility_determined_app(applications, thh)
 
       if application.blank?
         @app_ambiguity_hbx_ids << { family_hbx_id: family.hbx_assigned_id, thh_hbx_id: thh.hbx_assigned_id }
@@ -80,8 +117,17 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
       end
     end
 
-    eligibility_determination = application.eligibility_determinations.detect { |ed| ed.applicants.map(&:family_member_id).sort == thh.tax_household_members.map(&:applicant_id).sort }
-    annual_tax_household_income = eligibility_determination.aptc_csr_annual_household_income
+    fetch_yearly_expected_contribution(application, thh)
+  end
+
+  def fetch_yearly_expected_contribution(application, thh)
+    if is_admin?(thh)
+      eligibility_determinations = application.eligibility_determinations
+      annual_tax_household_income = eligibility_determinations.sum(&:aptc_csr_annual_household_income)
+    else
+      eligibility_determination = application.eligibility_determinations.detect { |ed| ed.applicants.map(&:person_hbx_id).sort == thh.tax_household_members.map {|thm| thm.person.hbx_id }.sort }
+      annual_tax_household_income = eligibility_determination.aptc_csr_annual_household_income
+    end
 
     total_household_count = application.applicants.size
     fpl_data = fp_levels[application.assistance_year]
@@ -93,12 +139,20 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
     annual_tax_household_income * applicable_percentage(fpl_percentage)
   end
 
-  def find_applications(thh, family)
-    return ::FinancialAssistance::Application.where(family_id: family.id).determined.where(:'eligibility_determinations.determined_at'.lte => thh.created_at).order_by(:created_at.desc) if thh.latest_eligibility_determination&.source == 'Admin'
+  def find_eligibility_determined_app(applications, thh)
+    return applications&.first if applications.blank? || is_admin?(thh)
+
+    applications.detect do |app|
+      app.eligibility_determinations.detect { |ed| ed.applicants.map(&:person_hbx_id).sort == thh.tax_household_members.map {|thm| thm.person.hbx_id }.sort }
+    end
+  end
+
+  def find_applications(thh, determined_apps)
+    return determined_apps.where(:'eligibility_determinations.determined_at'.lte => thh.created_at).order_by(:created_at.desc) if is_admin?(thh)
 
     determined_at = thh.latest_eligibility_determination&.determined_at
 
-    applications = ::FinancialAssistance::Application.where(family_id: family.id).determined.where(:'eligibility_determinations.determined_at' => determined_at.to_date)
+    applications = determined_apps.where(:'eligibility_determinations.determined_at'.lte => determined_at.to_date)
     return if applications.blank?
 
     created_at = thh.created_at
@@ -110,6 +164,10 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
     end
 
     applications.order_by(:created_at.desc)
+  end
+
+  def is_admin?(thh)
+    thh.latest_eligibility_determination&.source == 'Admin'
   end
 
   def applicable_percentage(fpl_percentage)
@@ -195,7 +253,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
 
   def migrate_tax_household_enrollments(family)
     th_groups = family.tax_household_groups.where(:assistance_year => 2022).order_by(:created_at.desc)
-    enrollments = family.enrollments.by_year(2022).order_by(:created_at.asc)
+    enrollments = family.enrollments.by_year(2022).by_coverage_kind('health').order_by(:created_at.asc)
 
     enrollments.each do |enrollment|
       th_group = th_groups.where(:end_on.gte => enrollment.created_at).first || th_groups.where(:end_on => nil).first
@@ -266,6 +324,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
 
         csv << [family.primary_person.hbx_id, family.hbx_assigned_id, family.active_household.tax_households.count, family.reload.tax_household_groups.map(&:tax_households).flatten.count, active_thhs_of_household.present?]
       rescue StandardError => e
+        @rescue_hbx_ids << family.hbx_assigned_id
         logger.info "----- Error raised processing family with family_hbx_assigned_id: #{family.hbx_assigned_id}, error: #{e}, backtrace: #{e.backtrace.join('\n')}"
       end
     end
@@ -296,6 +355,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
     start_time = DateTime.current
     @logger.info "MigrateHouseholdThhsToThhGroupThhs start_time: #{start_time}"
     @app_ambiguity_hbx_ids = []
+    @rescue_hbx_ids = []
     families = find_families
     total_count = families.count
     familes_per_iteration = 5_000.0
@@ -311,5 +371,6 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
     end_time = DateTime.current
     @logger.info "MigrateHouseholdThhsToThhGroupThhs end_time: #{end_time}, total_time_taken_in_minutes: #{((end_time - start_time) * 24 * 60).to_f.ceil}" unless Rails.env.test?
     @logger.info "Families with missing yearly_expected_contribution - #{@app_ambiguity_hbx_ids}"
+    @logger.info "Families rescued - #{@rescue_hbx_ids}"
   end
 end
