@@ -225,7 +225,9 @@ module Operations
         payload = {
           family_id: @family.id,
           effective_date: @effective_on,
-          households: households_hash
+          households: households_hash,
+          is_migrating: @is_migrating,
+          enrollment: @hbx_enrollment
         }
 
         result = ::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts.new.call(payload)
