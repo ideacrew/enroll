@@ -28,6 +28,8 @@ module Operations
 
       def validate(params)
         @application_hbx_id = params[:application_hbx_id] if params[:application_hbx_id].present?
+        @is_migrating = params[:is_migrating]
+        @hbx_enrollment = params[:hbx_enrollment]
         ::Operations::BenchmarkProducts::Initialize.new.call(params)
       end
 
@@ -37,7 +39,18 @@ module Operations
       end
 
       def identify_rating_and_service_areas(family, benchmark_product_model)
-        ::Operations::BenchmarkProducts::IdentifyRatingAndServiceAreas.new.call({ family: family, benchmark_product_model: benchmark_product_model })
+        if @is_migrating
+          ::Operations::BenchmarkProducts::IdentifyRatingAndServiceAreasForMigration.new.call(
+            { family: family,
+              benchmark_product_model: benchmark_product_model,
+              is_migrating: @is_migrating,
+              hbx_enrollment: @hbx_enrollment }
+          )
+        else
+          ::Operations::BenchmarkProducts::IdentifyRatingAndServiceAreas.new.call(
+            { family: family, benchmark_product_model: benchmark_product_model }
+          )
+        end
       end
 
       def identify_slcsapd(family, benchmark_product_model)
