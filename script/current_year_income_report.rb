@@ -20,8 +20,8 @@ CSV.open(file_name, 'w+', headers: true) do |csv|
     next unless primary_family_member_hbx_id
 
     application&.applicants.each do |applicant|
-      next unless applicant&.incomes
-      applicant.incomes.each do |income|
+      next unless applicant&.incomes || applicant&.deductions
+      applicant&.incomes.each do |income|
         csv << [primary_family_member_hbx_id, applicant&.person_hbx_id, applicant&.full_name, income&.kind, income&.start_on, income&.end_on, applicant.phones&.first&.full_phone_number]
       end
       next unless applicant&.deductions
