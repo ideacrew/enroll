@@ -30,6 +30,7 @@ class TaxHousehold
   field :max_aptc, type: Money
   # field :monthly_expected_contribution, type: Money
   field :eligibility_determination_hbx_id, type: BSON::ObjectId
+  field :legacy_hbx_assigned_id, type: Integer
 
   index({ "effective_ending_on" => 1, "effective_starting_on" => 1 })
 
