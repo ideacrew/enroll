@@ -263,12 +263,19 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
       th_group = mapped_th_group || th_groups.where(:end_on.gte => enrollment.created_at).first || th_groups.where(:end_on => nil).first
 
       if th_group.blank?
-        @logger.info "----- Failed TH enrollment missing th group family_hbx_assigned_id: #{family.hbx_assigned_id}"
+        @logger.info "----- Skipped: TH enrollment missing th group family_hbx_assigned_id: #{family.hbx_assigned_id}"
         next
       end
 
       if th_group.tax_households.any? {|th| th.yearly_expected_contribution.nil? }
         @logger.info "----- Failed TH enrollment missing yearly_expected_contribution on th group family_hbx_assigned_id: #{family.hbx_assigned_id}"
+        next
+      end
+
+      enrolled_family_member_ids = enrollment.hbx_enrollment_members.map(&:applicant_id).map(&:to_s)
+
+      if th_group.tax_households.select {|th| th.tax_household_members.any? { |thm| enrolled_family_member_ids.include?(thm.applicant_id.to_s) } }.blank?
+        @logger.info "----- Skipped: Tax households does not have any enrollment members family_hbx_assigned_id: #{family.hbx_assigned_id} enrollment: #{enrollment.hbx_id}"
         next
       end
 
