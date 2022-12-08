@@ -331,7 +331,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
             logger.info "----- Successfully created FamilyDetermination: #{determination.success} for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
 
             migrate_tax_household_enrollments(family.reload)
-          else
+          elsif is_migrating
             logger.info "----- Failed to create FamilyDetermination: #{determination.failure} for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
           end
         else

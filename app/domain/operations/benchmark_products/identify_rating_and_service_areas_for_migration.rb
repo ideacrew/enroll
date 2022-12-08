@@ -41,9 +41,23 @@ module Operations
         rating_area = eligible_history_tracks.each do |history_obj|
           params = params.merge(history_obj.modified)
           add_struct = OpenStruct.new(params)
-          rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(add_struct, during: effective_date)
+          rating = ::BenefitMarkets::Locations::RatingArea.rating_area_for(add_struct, during: effective_date)
 
-          break rating_area if rating_area.present?
+          break rating if rating.present?
+        end
+
+        addresses = @primary_person.addresses.where(:kind.in => ['home', 'mailing'])
+        if rating_area.blank?
+          address_created_before_enr = addresses.where(:created_at.lte => @hbx_enrollment.created_at).order_by(:created_at.desc).first
+          rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(address_created_before_enr, during: @hbx_enrollment.effective_on) if address_created_before_enr.present?
+        end
+
+        if rating_area.blank?
+          rating_area = addresses.where(:created_at.gte => @hbx_enrollment.created_at).order_by(:created_at.asc).each do |add|
+            rating = ::BenefitMarkets::Locations::RatingArea.rating_area_for(add, during: @hbx_enrollment.effective_on)
+
+            break rating if rating.present?
+          end
         end
 
         if rating_area.present?
@@ -65,9 +79,23 @@ module Operations
         service_areas = eligible_history_tracks.each do |history_obj|
           params = params.merge(history_obj.modified)
           add_struct = OpenStruct.new(params)
-          service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(add_struct, during: effective_date)
+          services = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(add_struct, during: effective_date)
 
-          break service_areas if service_areas.present?
+          break services if services.present?
+        end
+
+        addresses = @primary_person.addresses.where(:kind.in => ['home', 'mailing'])
+        if service_areas.blank?
+          address_created_before_enr = addresses.where(:created_at.lte => @hbx_enrollment.created_at).order_by(:created_at.desc).first
+          service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_created_before_enr, during: @hbx_enrollment.effective_on) if address_created_before_enr.present?
+        end
+
+        if service_areas.blank?
+          service_areas = addresses.where(:created_at.gte => @hbx_enrollment.created_at).order_by(:created_at.asc).each do |add|
+            services = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(add, during: @hbx_enrollment.effective_on)
+
+            break services if services.present?
+          end
         end
 
         if service_areas.present?
