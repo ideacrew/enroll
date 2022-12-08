@@ -1991,7 +1991,7 @@ class HbxEnrollment
         "family_id" => opts[:family_id],
         "new_broker_id" => opts[:broker_role_id],
         "new_broker_npn" => opts[:broker_role_npn],
-        "timestamp" => Time.now.strftime("%Y-%m-%d %H:%M")
+        "timestamp" => Time.now.to_i
       }
     )
   end
