@@ -271,15 +271,20 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
         next
       end
 
-      if th_group.tax_households.any? {|th| th.yearly_expected_contribution.nil? }
-        @logger.info "----- Failed TH enrollment missing yearly_expected_contribution on th group family_hbx_assigned_id: #{family.hbx_assigned_id}"
+      enrolled_family_member_ids = enrollment.hbx_enrollment_members.map(&:applicant_id).map(&:to_s)
+      enrolled_thhs = th_group.tax_households.select {|th| th.tax_household_members.any? { |thm| enrolled_family_member_ids.include?(thm.applicant_id.to_s) } }
+
+      if enrolled_thhs.blank?
+        @logger.info "----- Skipped: Tax households does not have any enrollment members family_hbx_assigned_id: #{family.hbx_assigned_id} enrollment: #{enrollment.hbx_id}"
         next
       end
 
-      enrolled_family_member_ids = enrollment.hbx_enrollment_members.map(&:applicant_id).map(&:to_s)
-
-      if th_group.tax_households.select {|th| th.tax_household_members.any? { |thm| enrolled_family_member_ids.include?(thm.applicant_id.to_s) } }.blank?
-        @logger.info "----- Skipped: Tax households does not have any enrollment members family_hbx_assigned_id: #{family.hbx_assigned_id} enrollment: #{enrollment.hbx_id}"
+      if enrolled_thhs.any? {|th| th.yearly_expected_contribution.nil? }
+        if mapped_th_group.blank?
+          @logger.info "----- Failed TH enrollment missing yearly_expected_contribution (not part of migration, as we have active th group) family_hbx_assigned_id: #{family.hbx_assigned_id} enrollment: #{enrollment.hbx_id}"
+        else
+          @logger.info "----- Failed TH enrollment missing yearly_expected_contribution on th group family_hbx_assigned_id: #{family.hbx_assigned_id} enrollment: #{enrollment.hbx_id}"
+        end
         next
       end
 
@@ -298,7 +303,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
                                                                          is_migrating: true
                                                                        })
 
-      @logger.info "----- Failed TH enrollment FindAptcWithTaxHouseholds family_hbx_assigned_id: #{family.hbx_assigned_id}" if TaxHouseholdEnrollment.where(enrollment_id: enrollment.id).blank?
+      @logger.info "----- Failed TH enrollment FindAptcWithTaxHouseholds family_hbx_assigned_id: #{family.hbx_assigned_id} enrollment: #{enrollment.hbx_id}" if TaxHouseholdEnrollment.where(enrollment_id: enrollment.id).blank?
     end
   end
 
@@ -331,7 +336,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
             logger.info "----- Successfully created FamilyDetermination: #{determination.success} for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
 
             migrate_tax_household_enrollments(family.reload)
-          else
+          elsif is_migrating
             logger.info "----- Failed to create FamilyDetermination: #{determination.failure} for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
           end
         else
