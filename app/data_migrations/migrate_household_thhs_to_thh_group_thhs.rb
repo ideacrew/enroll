@@ -87,6 +87,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
                             end
 
       thh_params = {
+        legacy_hbx_assigned_id: thh.hbx_assigned_id,
         effective_starting_on: thh.effective_starting_on,
         effective_ending_on: effective_ending_on,
         max_aptc: thh.latest_eligibility_determination.max_aptc,
@@ -252,11 +253,14 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
   end
 
   def migrate_tax_household_enrollments(family)
-    th_groups = family.tax_household_groups.where(:assistance_year => 2022).order_by(:created_at.desc)
+    th_groups = family.tax_household_groups.where(:assistance_year => 2022).order_by(:created_at.asc)
     enrollments = family.enrollments.by_year(2022).by_coverage_kind('health').order_by(:created_at.asc)
+    legacy_tax_households = family.active_household.tax_households.tax_household_with_year(2022)
 
     enrollments.each do |enrollment|
-      th_group = th_groups.where(:end_on.gte => enrollment.created_at).first || th_groups.where(:end_on => nil).first
+      legacy_th = legacy_tax_households.order_by(:created_at.desc).where(:created_at.lte => enrollment.created_at).first
+      mapped_th_group = th_groups.where(:'tax_households.legacy_hbx_assigned_id' => legacy_th.hbx_assigned_id).first
+      th_group = mapped_th_group || th_groups.where(:end_on.gte => enrollment.created_at).first || th_groups.where(:end_on => nil).first
 
       if th_group.blank?
         @logger.info "----- Failed TH enrollment missing th group family_hbx_assigned_id: #{family.hbx_assigned_id}"
