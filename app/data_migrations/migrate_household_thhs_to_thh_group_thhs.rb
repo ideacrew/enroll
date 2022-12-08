@@ -259,6 +259,10 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
 
     enrollments.each do |enrollment|
       legacy_th = legacy_tax_households.order_by(:created_at.desc).where(:created_at.lte => enrollment.created_at).first
+      if legacy_th.blank?
+        @logger.info "----- Skipped: TH enrollment missing legacy tax household family_hbx_assigned_id: #{family.hbx_assigned_id}"
+        next
+      end
       mapped_th_group = th_groups.where(:'tax_households.legacy_hbx_assigned_id' => legacy_th.hbx_assigned_id).first
       th_group = mapped_th_group || th_groups.where(:end_on.gte => enrollment.created_at).first || th_groups.where(:end_on => nil).first
 
