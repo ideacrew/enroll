@@ -131,7 +131,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
     end
 
     total_household_count = application.applicants.size
-    fpl_data = fp_levels[application.assistance_year]
+    fpl_data = fp_levels[application.assistance_year - 1]
 
     total_annual_poverty_guideline = fpl_data[:annual_poverty_guideline] +
                                      ((total_household_count - 1) * fpl_data[:annual_per_person_amount])
