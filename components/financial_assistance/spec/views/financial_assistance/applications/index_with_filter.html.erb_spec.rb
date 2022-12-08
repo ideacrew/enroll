@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe "financial_assistance/applications/index_with_filter.html.erb" do
+Rspec.describe "financial_assistance/applications/index_with_filter.html.erb" do
   let(:person) { FactoryBot.create(:person) }
   let(:user) { FactoryBot.create(:user, person: person) }
   let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
