@@ -151,12 +151,12 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
     context 'with active thhs and active 2022 tax household groups' do
       let!(:thhg) { FactoryBot.create(:tax_household_group, family: family, assistance_year: 2022) }
 
-      it 'should not create any active TaxHouseholdGroups, TaxHouseholds and TaxHouseholdMembers' do
+      it 'should create data for both active & inactive groups' do
         expect(family.reload.tax_household_groups.active.count).to eq(1)
         expect(family.reload.tax_household_groups.count).to eq(1)
         subject.migrate
         expect(family.reload.tax_household_groups.active.count).to eq(1)
-        expect(family.reload.tax_household_groups.count).to eq(1)
+        expect(family.reload.tax_household_groups.count).to eq(2)
       end
     end
 

@@ -254,4 +254,7 @@
     </div>
   </div>
   </div>
+  <% if hbx_enrollment.product.present? %>
+    <%= render "shared/pay_now_modal", hbx_enrollment: hbx_enrollment, source: "enrollment_tile" %>
+  <% end %>
 <% end %>
