@@ -36,7 +36,7 @@ module Operations
         @family ||= Family.where(id: family_id).first
         return Failure("Unable to find Family with family_id: #{family_id}") if @family.blank?
 
-        family_member = @family.active_family_members.where(id: family_member_id).first
+        family_member = @family.family_members.where(id: family_member_id).first
         return Failure("Unable to find FamilyMember for family_id: #{family_id}, with family_member_id: #{family_member_id}") if family_member.blank?
 
         Success(family_member)

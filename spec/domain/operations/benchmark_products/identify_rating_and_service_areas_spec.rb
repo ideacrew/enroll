@@ -54,7 +54,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifyRatingAndServiceAreas do
       end
 
       it 'return failure with message' do
-        expect(@result.failure).to eq("Unable to find Rating Address for Primary Person with hbx_id: #{family.primary_person.hbx_id} of Family with id: #{family.id}")
+        expect(@result.failure).to eq("Unable to find Rating Address for PrimaryPerson with hbx_id: #{family.primary_person.hbx_id} of Family with id: #{family.id}")
       end
     end
   end
