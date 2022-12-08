@@ -6,9 +6,9 @@
 def process_enrollments(enrollments, file_name, offset_count, logger)
   field_names = %w[person_hbx_id
                    enrollment_hbx_id
-                   enrollment_applied_aptc_amount
                    enrollment_total_premium
                    product_ehb
+                   enrollment_applied_aptc_amount
                    tax_household_members
                    household_benchmark_ehb_premium
                    health_product_hios_id
