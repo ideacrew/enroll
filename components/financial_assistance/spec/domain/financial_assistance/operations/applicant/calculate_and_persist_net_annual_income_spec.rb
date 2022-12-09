@@ -113,6 +113,28 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CalculateAndPersistNe
       end
     end
 
+    context 'Income (no deductions) has start date on 1st of present year and end date less than assistance year end date' do
+      let(:params) do
+        {application_assistance_year: application.assistance_year, applicant: applicant}
+      end
+
+      let(:income) do
+        FactoryBot.build(:financial_assistance_income, start_on: Date.new(TimeKeeper.date_of_record.year, 1, 1),
+                                                       end_on: Date.new(TimeKeeper.date_of_record.year, 8, 1),
+                                                       amount: 1000, frequency_kind: "monthly")
+      end
+
+      before do
+        applicant.incomes << income
+      end
+
+      it "should calculate net_annual_income correctly" do
+        result = subject.call(params)
+        expect(result.success).to eq applicant
+        expect(applicant.net_annual_income.to_f.ceil).to eq 7_003
+      end
+    end
+
     context 'Income and deductions have start date in future year and end date in future year and frequency kind is daily' do
       let(:params) do
         {application_assistance_year: application.assistance_year, applicant: applicant}
