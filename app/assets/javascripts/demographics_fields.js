@@ -271,8 +271,9 @@ var PersonValidations = (function (window, undefined) {
 
     var tribe_member_yes = $("input#indian_tribe_member_yes").is(':checked');
     var tribe_member_no = $("input#indian_tribe_member_no").is(':checked');
+    var tribe_member_visible = $(".no_coverage_tribe_details").is(':visible')
 
-    if (!tribe_member_yes && !tribe_member_no){
+    if (!tribe_member_yes && !tribe_member_no && tribe_member_visible){
       alert("Please select the option for 'Are you a member of an American Indian or Alaska Native Tribe?'");
       PersonValidations.restoreRequiredAttributes(e);
     };
