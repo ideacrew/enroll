@@ -109,7 +109,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CalculateAndPersistNe
       it "should calculate net_annual_income correctly" do
         result = subject.call(params)
         expect(result.success).to eq applicant
-        expect(applicant.net_annual_income.to_f.ceil).to eq 12000
+        expect(applicant.net_annual_income.to_f.ceil).to eq 12_000
       end
     end
 
