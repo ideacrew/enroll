@@ -59,6 +59,18 @@ RSpec.describe ::FinancialAssistance::Operations::EnrollmentDates::EarliestEffec
             expect(result.success).to eq (application_date.next_month + 1.month).beginning_of_month
           end
         end
+
+        context 'and after enrollment monthly due date and override enabled' do
+          let(:application_date) { Date.new(Date.today.year, 5, 16)}
+          before do
+            FinancialAssistanceRegistry[:faa_fifteenth_of_the_month_rule_overridden].feature.stub(:is_enabled).and_return(true)
+          end
+
+          it 'should return month after next month effective date' do
+            expect(result).to be_a(Dry::Monads::Result::Success)
+            expect(result.success).to eq application_date.next_month.beginning_of_month
+          end
+        end
       end
     end
   end
