@@ -250,6 +250,8 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           let(:benchmark_premium) { nil }
 
           it 'returns zero $' do
+            expect(family.tax_household_groups.active.count).to eq 1
+            expect(family.tax_household_groups.active.first.id).to eq tax_household_group.id
             inactive_aptc_grant.update_attribute(:tax_household_id, BSON::ObjectId.new)
             expect(result.success?).to eq true
             expect(result.value!).to eq 0
