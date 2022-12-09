@@ -52,6 +52,7 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
                         is_ia_eligible: true,
                         family_member_id: fm1.id,
                         is_claimed_as_tax_dependent: false,
+                        person_hbx_id: person.hbx_id,
                         is_required_to_file_taxes: true)
     end
 
@@ -61,6 +62,7 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
                         eligibility_determination_id: ed.id,
                         is_ia_eligible: true,
                         family_member_id: fm2.id,
+                        person_hbx_id: person2.hbx_id,
                         is_claimed_as_tax_dependent: true)
     end
 
@@ -149,12 +151,12 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
     context 'with active thhs and active 2022 tax household groups' do
       let!(:thhg) { FactoryBot.create(:tax_household_group, family: family, assistance_year: 2022) }
 
-      it 'should not create any active TaxHouseholdGroups, TaxHouseholds and TaxHouseholdMembers' do
+      it 'should create data for both active & inactive groups' do
         expect(family.reload.tax_household_groups.active.count).to eq(1)
         expect(family.reload.tax_household_groups.count).to eq(1)
         subject.migrate
         expect(family.reload.tax_household_groups.active.count).to eq(1)
-        expect(family.reload.tax_household_groups.count).to eq(1)
+        expect(family.reload.tax_household_groups.count).to eq(2)
       end
     end
 
@@ -175,20 +177,6 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
         # Should not create any Aptc or Csr Grants as no APTC members.
         expect(family.reload.eligibility_determination.grants.count).to be_zero
         expect(family.reload.eligibility_determination.subjects.first.csr_by_year(system_date.year)).to be_nil
-      end
-    end
-
-    context '#calculate_yearly_expected_contribution' do
-      let!(:th) do
-        FactoryBot.create(:tax_household,
-                          household: family.active_household,
-                          yearly_expected_contribution: nil,
-                          effective_starting_on: Date.new(2021),
-                          effective_ending_on: nil)
-      end
-
-      it 'returns nil when effective_starting_on is not 2022' do
-        expect(subject.calculate_yearly_expected_contribution(th, family)).to eq nil
       end
     end
 

@@ -56,8 +56,12 @@ RSpec.describe Operations::BenchmarkProducts::IdentifyTypeOfHousehold do
         per
       end
       let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person1) }
-      let(:family_member1) { family.primary_applicant }
-      let(:family_member2) { FactoryBot.create(:family_member, family: family, person: person2) }
+      let(:family_member1) do
+        fm = family.primary_applicant
+        fm.update_attributes!(is_active: false)
+        fm
+      end
+      let(:family_member2) { FactoryBot.create(:family_member, family: family, person: person2, is_active: false) }
       let(:family_id) { family.id }
 
       context 'adult_only' do

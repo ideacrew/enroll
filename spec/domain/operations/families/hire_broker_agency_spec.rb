@@ -30,7 +30,10 @@ RSpec.describe ::Operations::Families::HireBrokerAgency, dbclean: :after_each do
 
     context 'rehiring same active broker' do
       before(:each) do
-        family.hire_broker_agency(writing_agent.id)
+        family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                            writing_agent_id: writing_agent.id,
+                                                                                            start_on: Time.now,
+                                                                                            is_active: true)
         family.reload
       end
 
@@ -39,7 +42,7 @@ RSpec.describe ::Operations::Families::HireBrokerAgency, dbclean: :after_each do
         hire_params = { family_id: family.id,
                         terminate_date: TimeKeeper.date_of_record,
                         broker_role_id: writing_agent.id,
-                        start_date: DateTime.now,
+                        start_date: DateTime.now.utc.to_datetime,
                         current_broker_account_id: family&.current_broker_agency&.id }
 
         result = subject.call(hire_params)
@@ -52,11 +55,14 @@ RSpec.describe ::Operations::Families::HireBrokerAgency, dbclean: :after_each do
 
     context 'hiring new broker' do
       before(:each) do
-        family.hire_broker_agency(writing_agent.id)
+        family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                            writing_agent_id: writing_agent.id,
+                                                                                            start_on: Time.now,
+                                                                                            is_active: true)
         family.reload
       end
 
-      it 'should termiante old broker and create broker agency account for new broker' do
+      it 'should terminate old broker and create broker agency account for new broker' do
         expect(family.broker_agency_accounts.unscoped.length).to eq(1)
         hire_params = { family_id: family.id,
                         terminate_date: TimeKeeper.date_of_record,
