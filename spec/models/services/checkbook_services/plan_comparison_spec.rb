@@ -197,7 +197,7 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
 
     context 'when the feature filter_by_tax_household_groups is disabled' do
 
-      it "should return csr_0 if no tax households are present" do
+      it "should return -01" do
         expect(subject.csr_value).to eq '-01'
       end
     end
