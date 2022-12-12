@@ -6,6 +6,7 @@
 def process_enrollments(enrollments, file_name, offset_count, logger)
   field_names = %w[person_hbx_id
                    enrollment_hbx_id
+                   enrollment_aasm_state
                    enrollment_total_premium
                    product_ehb
                    enrollment_applied_aptc_amount
@@ -28,6 +29,7 @@ def process_enrollments(enrollments, file_name, offset_count, logger)
         csv << [
           person.hbx_id,
           enrollment.hbx_id,
+          enrollment.aasm_state,
           enrollment.total_premium.to_f,
           enrollment.product.ehb,
           enrollment.applied_aptc_amount.to_f,
