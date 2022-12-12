@@ -20,7 +20,7 @@ module FinancialAssistance
         private
 
         def calculate(application_date, assistance_year)
-          override_enabled = FinancialAssistanceRegistry[:faa_fifteenth_of_the_month_rule_overridden].feature.is_enabled
+          override_enabled = FinancialAssistanceRegistry.feature_enabled?(:faa_fifteenth_of_the_month_rule_overridden)
           effective_date = if application_date.mday <= FinancialAssistanceRegistry[:enrollment_dates].setting(:enrollment_due_day_of_month).item || override_enabled
             application_date.end_of_month + 1.day
           else
