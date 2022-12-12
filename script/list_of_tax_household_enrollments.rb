@@ -55,7 +55,7 @@ number_of_iterations = (total_count / familes_per_iteration).ceil
 counter = 0
 
 while counter < number_of_iterations
-  file_name = "#{Rails.root}/list_of_ed_object_ids_for_curam_cases_#{counter + 1}.csv"
+  file_name = "#{Rails.root}/list_of_enrollments_with_thh_enr_info_#{counter + 1}.csv"
   offset_count = familes_per_iteration * counter
   process_enrollments(enrollments, file_name, offset_count, logger)
   counter += 1
