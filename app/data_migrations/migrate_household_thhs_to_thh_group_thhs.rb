@@ -277,7 +277,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
       end
 
       enrolled_family_member_ids = enrollment.hbx_enrollment_members.map(&:applicant_id).map(&:to_s)
-      enrolled_thhs = th_group.tax_households.select {|th| th.tax_household_members.any? { |thm| enrolled_family_member_ids.include?(thm.applicant_id.to_s) } }
+      enrolled_thhs = th_group.tax_households.select {|th| th.tax_household_members.where(is_ia_eligible: true).any? { |thm| enrolled_family_member_ids.include?(thm.applicant_id.to_s) } }
 
       if enrolled_thhs.blank?
         @logger.info "----- Skipped: Tax households does not have any enrollment members family_hbx_assigned_id: #{family.hbx_assigned_id} enrollment: #{enrollment.hbx_id}"
