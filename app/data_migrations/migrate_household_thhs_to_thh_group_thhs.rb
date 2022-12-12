@@ -87,6 +87,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
                             end
 
       thh_params = {
+        legacy_hbx_assigned_id: thh.hbx_assigned_id,
         effective_starting_on: thh.effective_starting_on,
         effective_ending_on: effective_ending_on,
         max_aptc: thh.latest_eligibility_determination.max_aptc,
@@ -130,7 +131,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
     end
 
     total_household_count = application.applicants.size
-    fpl_data = fp_levels[application.assistance_year]
+    fpl_data = fp_levels[application.assistance_year - 1]
 
     total_annual_poverty_guideline = fpl_data[:annual_poverty_guideline] +
                                      ((total_household_count - 1) * fpl_data[:annual_per_person_amount])
@@ -252,19 +253,38 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
   end
 
   def migrate_tax_household_enrollments(family)
-    th_groups = family.tax_household_groups.where(:assistance_year => 2022).order_by(:created_at.desc)
+    th_groups = family.tax_household_groups.where(:assistance_year => 2022).order_by(:created_at.asc)
     enrollments = family.enrollments.by_year(2022).by_coverage_kind('health').order_by(:created_at.asc)
+    legacy_tax_households = family.active_household.tax_households.tax_household_with_year(2022)
 
     enrollments.each do |enrollment|
-      th_group = th_groups.where(:end_on.gte => enrollment.created_at).first || th_groups.where(:end_on => nil).first
+      legacy_th = legacy_tax_households.order_by(:created_at.desc).where(:created_at.lte => enrollment.created_at).first
+      if legacy_th.blank?
+        @logger.info "----- Skipped: TH enrollment missing legacy tax household family_hbx_assigned_id: #{family.hbx_assigned_id}"
+        next
+      end
+      mapped_th_group = th_groups.where(:'tax_households.legacy_hbx_assigned_id' => legacy_th.hbx_assigned_id).first
+      th_group = mapped_th_group || th_groups.where(:end_on.gte => enrollment.created_at).first || th_groups.where(:end_on => nil).first
 
       if th_group.blank?
-        @logger.info "----- Failed TH enrollment missing th group family_hbx_assigned_id: #{family.hbx_assigned_id}"
+        @logger.info "----- Skipped: TH enrollment missing th group family_hbx_assigned_id: #{family.hbx_assigned_id}"
         next
       end
 
-      if th_group.tax_households.any? {|th| th.yearly_expected_contribution.nil? }
-        @logger.info "----- Failed TH enrollment missing yearly_expected_contribution on th group family_hbx_assigned_id: #{family.hbx_assigned_id}"
+      enrolled_family_member_ids = enrollment.hbx_enrollment_members.map(&:applicant_id).map(&:to_s)
+      enrolled_thhs = th_group.tax_households.select {|th| th.tax_household_members.any? { |thm| enrolled_family_member_ids.include?(thm.applicant_id.to_s) } }
+
+      if enrolled_thhs.blank?
+        @logger.info "----- Skipped: Tax households does not have any enrollment members family_hbx_assigned_id: #{family.hbx_assigned_id} enrollment: #{enrollment.hbx_id}"
+        next
+      end
+
+      if enrolled_thhs.any? {|th| th.yearly_expected_contribution.nil? }
+        if mapped_th_group.blank?
+          @logger.info "----- Failed TH enrollment missing yearly_expected_contribution (not part of migration, as we have active th group) family_hbx_assigned_id: #{family.hbx_assigned_id} enrollment: #{enrollment.hbx_id}"
+        else
+          @logger.info "----- Failed TH enrollment missing yearly_expected_contribution on th group family_hbx_assigned_id: #{family.hbx_assigned_id} enrollment: #{enrollment.hbx_id}"
+        end
         next
       end
 
@@ -283,7 +303,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
                                                                          is_migrating: true
                                                                        })
 
-      @logger.info "----- Failed TH enrollment FindAptcWithTaxHouseholds family_hbx_assigned_id: #{family.hbx_assigned_id}" if TaxHouseholdEnrollment.where(enrollment_id: enrollment.id).blank?
+      @logger.info "----- Failed TH enrollment FindAptcWithTaxHouseholds family_hbx_assigned_id: #{family.hbx_assigned_id} enrollment: #{enrollment.hbx_id}" if TaxHouseholdEnrollment.where(enrollment_id: enrollment.id).blank?
     end
   end
 
@@ -305,17 +325,25 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
         active_thhs_of_household = tax_households.active_tax_household
         inactive_thhs_of_household = tax_households.where(:effective_ending_on.ne => nil)
 
-        process_active_thhs_of_household(family, active_thhs_of_household) if active_thhs_of_household.present? && family.tax_household_groups.by_year(2022).blank?
+        if active_thhs_of_household.present?
+          if family.tax_household_groups.by_year(2022).blank?
+            process_active_thhs_of_household(family, active_thhs_of_household)
+          else
+            process_inactive_thhs_of_household(family, active_thhs_of_household, true)
+          end
+        end
+
         process_inactive_thhs_of_household(family, inactive_thhs_of_household, false) if inactive_thhs_of_household.present?
 
         if family.save!
           logger.info "----- Successfully created TaxHouseholdGroups for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
-          determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family.reload, effective_date: TimeKeeper.date_of_record)
+          is_migrating = family.enrollments.present?
+          determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family.reload, effective_date: TimeKeeper.date_of_record, is_migrating: is_migrating)
           if determination.success?
             logger.info "----- Successfully created FamilyDetermination: #{determination.success} for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
 
             migrate_tax_household_enrollments(family.reload)
-          else
+          elsif is_migrating
             logger.info "----- Failed to create FamilyDetermination: #{determination.failure} for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
           end
         else
