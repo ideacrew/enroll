@@ -88,6 +88,10 @@ Given(/^a new household member is not applying$/) do
   find(:xpath, '//label[@for="is_applying_coverage_false"]').click
 end
 
+Then(/^the new household member should not see consumer fields$/) do
+  expect(page.has_css?(IvlManageFamilyPage.consumer_fields)).to eq false
+end
+
 Then(/^the no ssn warning will appear$/) do
   expect(page).to have_content("providing your SSN can be helpful")
 end
