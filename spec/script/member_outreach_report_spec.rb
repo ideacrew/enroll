@@ -101,8 +101,9 @@ describe 'member_outreach_report' do
         primary_email_address
         home_address
         mailing_address
-        primary_phone
-        secondary_phones
+        home_phone
+        work_phone
+        mobile_phone
         external_id
         user_account
         last_page_visited
@@ -180,30 +181,35 @@ describe 'member_outreach_report' do
         expect(@file_content[1][9]).to eq(mailing_address.to_s)
       end
 
-      it 'should match with the primary person primary phone' do
-        primary_phone = primary_person.phones.first
-        expect(@file_content[1][10]).to eq(primary_phone.to_s)
+      it 'should match with the primary person home phone' do
+        home_phone = primary_person.phones.detect{|p| p.kind == 'home'}
+        expect(@file_content[1][10]).to eq(home_phone.to_s)
       end
 
-      it 'should match with the primary person secondary phones' do
-        secondary_phone = primary_person.phones.second
-        expect(@file_content[1][11]).to eq(secondary_phone.to_s)
+      it 'should match with the primary person work phone' do
+        work_phone = primary_person.phones.detect{|p| p.kind == 'work'}
+        expect(@file_content[1][11]).to eq(work_phone.to_s)
+      end
+
+      it 'should match with the primary person mobile phone' do
+        mobile_phone = primary_person.phones.detect{|p| p.kind == 'mobile'}
+        expect(@file_content[1][12]).to eq(mobile_phone.to_s)
       end
     end
 
     context 'primary applicant' do
       it 'should match with the programs that the applicant is eligible for' do
         eligible_programs = "QHP without financial assistance"
-        expect(@file_content[1][15]).to eq(eligible_programs)
+        expect(@file_content[1][16]).to eq(eligible_programs)
       end
 
       it 'should match with the applicant access to health coverage response' do
-        expect(@file_content[1][21]).to eq(primary_applicant.has_eligible_health_coverage.present?.to_s)
+        expect(@file_content[1][22]).to eq(primary_applicant.has_eligible_health_coverage.present?.to_s)
       end
 
       it 'should match with the health coverage kinds applicant has access to' do
         insurance_kinds = primary_applicant.benefits.eligible.map(&:insurance_kind).join(", ")
-        expect(@file_content[1][22]).to eq(insurance_kinds)
+        expect(@file_content[1][23]).to eq(insurance_kinds)
       end
     end
 
@@ -237,62 +243,69 @@ describe 'member_outreach_report' do
       end
 
       it 'should match with the spouse person mailing address' do
-        mailing_address = spouse_person.addresses.where(kind: 'mailing').first
+        mailing_address = spouse_person.mailing_address
         expect(@file_content[2][9]).to eq(mailing_address.to_s)
       end
 
-      it 'should match with the spouse person primary phone' do
-        expect(@file_content[2][10]).to eq("")
+      it 'should match with the spouse person home phone' do
+        home_phone = spouse_person.phones.detect{|p| p.kind == 'home'}
+        expect(@file_content[2][10]).to eq(home_phone.to_s)
       end
 
-      it 'should match with the spouse person secondary phones' do
-        expect(@file_content[2][11]).to eq("")
+      it 'should match with the spouse person work phone' do
+        work_phone = spouse_person.phones.detect{|p| p.kind == 'work'}
+        expect(@file_content[2][11]).to eq(work_phone.to_s)
+      end
+
+      it 'should match with the spouse person mobile phone' do
+        mobile_phone = spouse_person.phones.detect{|p| p.kind == 'mobile'}
+        expect(@file_content[2][12]).to eq(mobile_phone.to_s)
       end
     end
 
     context 'spouse applicant' do
       it 'should match with the programs that the applicant is eligible for' do
         eligible_programs = "MaineCare and Cub Care(Medicaid)"
-        expect(@file_content[2][15]).to eq(eligible_programs)
+        expect(@file_content[2][16]).to eq(eligible_programs)
       end
 
       it 'should match with the applicant access to health coverage response' do
-        expect(@file_content[2][21]).to eq(spouse_applicant.has_eligible_health_coverage.present?.to_s)
+        expect(@file_content[2][22]).to eq(spouse_applicant.has_eligible_health_coverage.present?.to_s)
       end
 
       it 'should match with the health coverage kinds applicant has access to' do
         insurance_kinds = spouse_applicant.benefits.eligible.map(&:insurance_kind).join(", ")
-        expect(@file_content[2][22]).to eq(insurance_kinds)
+        expect(@file_content[2][23]).to eq(insurance_kinds)
       end
     end
 
     context 'application' do
       it 'should match with the application aasm_state' do
-        expect(@file_content[1][16]).to eq(application.aasm_state)
-        expect(@file_content[2][16]).to eq(application.aasm_state)
+        expect(@file_content[1][17]).to eq(application.aasm_state)
+        expect(@file_content[2][17]).to eq(application.aasm_state)
       end
 
       it 'should match with the date of the most recent aasm_state transition' do
-        expect(@file_content[1][17]).to eq(application.workflow_state_transitions.first.transition_at.to_s)
-        expect(@file_content[2][17]).to eq(application.workflow_state_transitions.first.transition_at.to_s)
+        expect(@file_content[1][18]).to eq(application.workflow_state_transitions.first.transition_at.to_s)
+        expect(@file_content[2][18]).to eq(application.workflow_state_transitions.first.transition_at.to_s)
       end
 
       it 'should match with the transfer id' do
-        expect(@file_content[1][18]).to eq(application.transfer_id)
-        expect(@file_content[2][18]).to eq(application.transfer_id)
+        expect(@file_content[1][19]).to eq(application.transfer_id)
+        expect(@file_content[2][19]).to eq(application.transfer_id)
       end
 
       it 'should match with the inbound transfer timestamp' do
         transfer_timestamp = application.transferred_at
-        expect(@file_content[1][19]).to eq(transfer_timestamp.to_s)
-        expect(@file_content[2][19]).to eq(transfer_timestamp.to_s)
+        expect(@file_content[1][20]).to eq(transfer_timestamp.to_s)
+        expect(@file_content[2][20]).to eq(transfer_timestamp.to_s)
       end
     end
 
     context 'family' do
       it 'should match with the family external app id' do
-        expect(@file_content[1][12]).to eq(family.external_app_id)
-        expect(@file_content[2][12]).to eq(family.external_app_id)
+        expect(@file_content[1][13]).to eq(family.external_app_id)
+        expect(@file_content[2][13]).to eq(family.external_app_id)
       end
 
       context 'plan' do
@@ -307,39 +320,39 @@ describe 'member_outreach_report' do
 
         it 'should match with the current year most recent health plan hios id' do
           health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == curr_year}.sort_by(&:submitted_at).reverse.first
-          expect(@file_content[1][23]).to eq(health_enrollment.product.hios_id)
-          expect(@file_content[2][23]).to eq(health_enrollment.product.hios_id)
+          expect(@file_content[1][24]).to eq(health_enrollment.product.hios_id)
+          expect(@file_content[2][24]).to eq(health_enrollment.product.hios_id)
         end
 
         it 'should match with the current year most recent health plan status' do
           health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == curr_year}.sort_by(&:submitted_at).reverse.first
-          expect(@file_content[1][24]).to eq(health_enrollment.aasm_state)
-          expect(@file_content[2][24]).to eq(health_enrollment.aasm_state)
+          expect(@file_content[1][25]).to eq(health_enrollment.aasm_state)
+          expect(@file_content[2][25]).to eq(health_enrollment.aasm_state)
         end
 
         it 'should match with the prospective year most recent health plan hios id' do
           health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == next_year}.sort_by(&:submitted_at).reverse.first
-          expect(@file_content[1][25]).to eq(health_enrollment.product.hios_id)
-          expect(@file_content[2][25]).to eq(health_enrollment.product.hios_id)
+          expect(@file_content[1][26]).to eq(health_enrollment.product.hios_id)
+          expect(@file_content[2][26]).to eq(health_enrollment.product.hios_id)
         end
 
         it 'should match with the prospective year most recent health plan status' do
           health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == next_year}.sort_by(&:submitted_at).reverse.first
-          expect(@file_content[1][26]).to eq(health_enrollment.aasm_state)
-          expect(@file_content[2][26]).to eq(health_enrollment.aasm_state)
+          expect(@file_content[1][27]).to eq(health_enrollment.aasm_state)
+          expect(@file_content[2][27]).to eq(health_enrollment.aasm_state)
         end
       end
     end
 
     context 'user' do
       it 'should match with the user account email' do
-        expect(@file_content[1][13]).to eq(primary_person.user.email)
-        expect(@file_content[2][13]).to eq(primary_person.user.email)
+        expect(@file_content[1][14]).to eq(primary_person.user.email)
+        expect(@file_content[2][14]).to eq(primary_person.user.email)
       end
 
-      it 'should match with the user account last page visited' do
-        expect(@file_content[1][14]).to eq(primary_person.user.last_portal_visited)
-        expect(@file_content[2][14]).to eq(primary_person.user.last_portal_visited)
+      it 'should match with the u5er account last page visited' do
+        expect(@file_content[1][15]).to eq(primary_person.user.last_portal_visited)
+        expect(@file_content[2][15]).to eq(primary_person.user.last_portal_visited)
       end
     end
 

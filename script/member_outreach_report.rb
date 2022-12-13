@@ -13,8 +13,9 @@ field_names = %w[
     primary_email_address
     home_address
     mailing_address
-    primary_phone
-    secondary_phones
+    home_phone
+    work_phone
+    mobile_phone
     external_id
     user_account
     last_page_visited
@@ -76,11 +77,9 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
         person = family_member&.person
         applicant = application&.applicants&.detect {|a| a.person_hbx_id == person.hbx_id}
         # what is considered primary phone?  assumption: use home phone
-        primary_phone = person.phones.detect { |phone| phone.kind == 'home' }
-        secondary_phones = person.phones&.each_with_object("") do |phone, collect|
-                             next if phone.kind == 'home'
-                             collect.concat("#{phone}, ")
-                           end&.chop&.chop
+        home_phone = person.phones.detect { |phone| phone.kind == 'home' }
+        work_phone = person.phones.detect { |phone| phone.kind == 'work' }
+        mobile_phone = person.phones.detect { |phone| phone.kind == 'mobile' }
         enrollments = family.active_household.hbx_enrollments
         mra_health_enrollment = enrollments.enrolled_and_renewal.effective_desc.detect {|enr| enr.coverage_kind == 'health'}
         mra_dental_enrollment = enrollments.enrolled_and_renewal.effective_desc.detect {|enr| enr.coverage_kind == 'dental'}
@@ -104,8 +103,9 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
             person.work_email_or_best,
             person.home_address.to_s,
             person.mailing_address,
-            primary_phone,
-            secondary_phones,
+            home_phone,
+            work_phone,
+            mobile_phone,
             family.external_app_id,
             primary_person.user&.email, # only primary person has a User account
             primary_person.user&.last_portal_visited,
