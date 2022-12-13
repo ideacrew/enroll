@@ -89,17 +89,12 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
                             else
                               mra_dental_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
                             end
-        subscriber_id = if mra_health_enrollment
-                          mra_health_enrollment&.subscriber&.hbx_id
-                        else
-                          mra_dental_enrollment&.subscriber&.hbx_id
-                        end
         curr_mr_health_enrollment = enrollments.enrolled_and_renewal.select {|enr| enr.coverage_kind == 'health' && enr.effective_on&.year == curr_year}.sort_by(&:submitted_at).reverse.first
         next_mr_health_enrollment = enrollments.enrolled_and_renewal.select {|enr| enr.coverage_kind == 'health' && enr.effective_on&.year == next_year}.sort_by(&:submitted_at).reverse.first
         inbound_transfer_date = application.transferred_at if application&.transferred_at.present? && application&.transfer_id.present? && !application&.account_transferred
 
         csv << [
-            subscriber_id,
+            family.primary_applicant.hbx_id,
             person.hbx_id,
             enrollment_member&.is_subscriber.present?,
             person.first_name,
