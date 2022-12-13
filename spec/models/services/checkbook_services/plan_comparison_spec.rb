@@ -123,9 +123,27 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
     subject { ::Services::CheckbookServices::PlanComparision.new(ivl_enrollment,false) }
 
     context 'when all members are aptc eligible' do
+      let(:tax_household_group) do
+        ivl_family.tax_household_groups.create!(
+          assistance_year: TimeKeeper.date_of_record.year,
+          source: 'Admin',
+          start_on: TimeKeeper.date_of_record.beginning_of_year,
+          tax_households: [ivl_tax_household]
+        )
+      end
+
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:temporary_configuration_enable_multi_tax_household_feature).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
+
+      end
+
       ::EligibilityDetermination::CSR_KINDS.each do |csr_kind|
         it "should return a value mapped to #{csr_kind} as all members are aptc eligible" do
           ivl_thhm.first.update_attributes!(csr_eligibility_kind: csr_kind)
+          ivl_family.tax_household_groups << tax_household_group
+          ivl_family.save
+          ivl_family.reload
           csr = ::EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]
           expect(subject.csr_value).to eq ("-" + csr)
         end
@@ -142,8 +160,44 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
     end
 
     context 'when there is no active tax household', dbclean: :after_each do
+      let(:tax_household_group) do
+        ivl_family.tax_household_groups.create!(
+          assistance_year: TimeKeeper.date_of_record.year,
+          source: 'Admin',
+          start_on: TimeKeeper.date_of_record.beginning_of_year,
+          tax_households: [ivl_tax_household]
+        )
+      end
+
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:temporary_configuration_enable_multi_tax_household_feature).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
+      end
+
       it 'should return -01' do
+        family.reload
         ivl_tax_household.update_attributes!(effective_ending_on: TimeKeeper.date_of_record.end_of_year)
+        expect(subject.csr_value).to eq '-01'
+      end
+    end
+
+    context 'when there is no active tax household group', dbclean: :after_each do
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:temporary_configuration_enable_multi_tax_household_feature).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
+      end
+
+      it 'should return -01' do
+        expect(subject.csr_value).to eq '-01'
+      end
+    end
+
+    context 'when the feature temporary_configuration_enable_multi_tax_household_feature is disabled' do
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:temporary_configuration_enable_multi_tax_household_feature).and_return(false)
+      end
+
+      it "should return -01 if there is no tax household" do
         expect(subject.csr_value).to eq '-01'
       end
     end
