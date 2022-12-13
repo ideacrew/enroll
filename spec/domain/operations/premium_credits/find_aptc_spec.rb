@@ -149,24 +149,8 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           )
         end
 
-        let!(:inactive_tax_household_group) do
-          family.tax_household_groups.create!(
-            assistance_year: TimeKeeper.date_of_record.year,
-            source: 'Admin',
-            start_on: TimeKeeper.date_of_record.beginning_of_year,
-            end_on: TimeKeeper.date_of_record.end_of_year,
-            tax_households: [
-              FactoryBot.build(:tax_household, household: family.active_household)
-            ]
-          )
-        end
-
         let(:tax_household) do
           tax_household_group.tax_households.first
-        end
-
-        let(:inactive_tax_household) do
-          inactive_tax_household_group.tax_households.first
         end
 
         let(:eligibility_determination) do
@@ -184,24 +168,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           determination
         end
 
-        let(:inactive_eligibility_determination) do
-          determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
-          determination.grants.create(
-            key: "AdvancePremiumAdjustmentGrant",
-            value: yearly_expected_contribution,
-            start_on: TimeKeeper.date_of_record.beginning_of_year,
-            end_on: TimeKeeper.date_of_record.end_of_year,
-            assistance_year: TimeKeeper.date_of_record.year,
-            member_ids: family.family_members.map(&:id).map(&:to_s),
-            tax_household_id: inactive_tax_household.id
-          )
-
-          determination
-        end
-
         let(:aptc_grant) { eligibility_determination.grants.first }
-
-        let(:inactive_aptc_grant) { inactive_eligibility_determination.grants.first }
 
         let(:hbx_enrollment) do
           FactoryBot.create(:hbx_enrollment,
@@ -246,21 +213,19 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           end
         end
 
-        context 'when benchmark_premium & household_info is nil for inactive houseehold' do
-          let(:benchmark_premium) { nil }
+        context 'without any coinciding enrollments' do
+          let(:benchmark_premium) { primary_bp }
 
-          it 'returns zero $' do
-            expect(family.tax_household_groups.active.count).to eq 1
-            expect(family.tax_household_groups.active.first.id).to eq tax_household_group.id
-            inactive_aptc_grant.update_attribute(:tax_household_id, BSON::ObjectId.new)
+          it 'returns difference of benchmark premiums and monthly_expected_contribution as total available aptc' do
             expect(result.success?).to eq true
-            expect(result.value!).to eq 0
-            expect(TaxHouseholdEnrollment.all.size).to eq 1
-            expect(TaxHouseholdEnrollment.all.first.tax_household_members_enrollment_members.size).to eq 0
+            expect(result.value!).to eq 375.00
           end
         end
 
         context 'without any coinciding enrollments' do
+          before do
+            family.tax_household_groups.active.first.update_attributes!(end_on: TimeKeeper.date_of_record.end_of_year)
+          end
           let(:benchmark_premium) { primary_bp }
 
           it 'returns difference of benchmark premiums and monthly_expected_contribution as total available aptc' do
