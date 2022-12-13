@@ -62,7 +62,7 @@ module Services
 
       def csr_value
         family = @hbx_enrollment.family
-        active_tax_house_hold = if EnrollRegistry.feature_enabled?(:filter_by_tax_household_groups)
+        active_tax_house_hold = if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
                                   family.active_thhg(enrollment_year).latest_active_tax_household_with_year(enrollment_year) if family.active_thhg(enrollment_year).present?
                                 else
                                   @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year)

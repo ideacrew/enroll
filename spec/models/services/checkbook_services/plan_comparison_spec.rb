@@ -133,7 +133,6 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
       end
 
       before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:filter_by_tax_household_groups).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:temporary_configuration_enable_multi_tax_household_feature).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
 
@@ -171,7 +170,6 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
       end
 
       before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:filter_by_tax_household_groups).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:temporary_configuration_enable_multi_tax_household_feature).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
       end
@@ -185,7 +183,6 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
 
     context 'when there is no active tax household group', dbclean: :after_each do
       before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:filter_by_tax_household_groups).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:temporary_configuration_enable_multi_tax_household_feature).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
       end

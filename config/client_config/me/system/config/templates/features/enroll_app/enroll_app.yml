@@ -841,6 +841,3 @@ registry:
       - key: :show_people_with_no_evidence
         item: :show_people_with_no_evidence
         is_enabled: <%= ENV['SHOW_PEOPLE_WITH_NO_EVIDENCE_IS_ENABLED'] || true %>
-      - key: :filter_by_tax_household_groups
-        item: :filter_by_tax_household_groups
-        is_enabled: <%= ENV['FILTER_BY_TAX_HOUSEHOLD_GROUPS_IS_ENABLED'] || false %>
