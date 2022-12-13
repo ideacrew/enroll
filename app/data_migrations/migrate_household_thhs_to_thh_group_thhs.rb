@@ -255,10 +255,17 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
   def migrate_tax_household_enrollments(family)
     th_groups = family.tax_household_groups.where(:assistance_year => 2022).order_by(:created_at.asc)
     enrollments = family.enrollments.by_year(2022).by_coverage_kind('health').order_by(:created_at.asc)
-    legacy_tax_households = family.active_household.tax_households.tax_household_with_year(2022)
+    legacy_tax_households = family.active_household.tax_households.tax_household_with_year(2022).order_by(:created_at.desc)
 
     enrollments.each do |enrollment|
-      legacy_th = legacy_tax_households.order_by(:created_at.desc).where(:created_at.lte => enrollment.created_at).first
+      if TaxHouseholdEnrollment.where(enrollment_id: enrollment.id).present?
+        @logger.info "----- Skipped: TaxHouseholdEnrollments exists for enrollment_hbx_id: #{enrollment.hbx_id}, family_hbx_assigned_id: #{family.hbx_assigned_id}"
+        next
+      end
+
+      eligible_legacy_thhs = legacy_tax_households.where(:created_at.lte => enrollment.created_at)
+      legacy_th = eligible_legacy_thhs.where(:'eligibility_determinations.source'.ne => 'Admin').first || eligible_legacy_thhs.first
+
       if legacy_th.blank?
         @logger.info "----- Skipped: TH enrollment missing legacy tax household family_hbx_assigned_id: #{family.hbx_assigned_id}"
         next
@@ -272,7 +279,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
       end
 
       enrolled_family_member_ids = enrollment.hbx_enrollment_members.map(&:applicant_id).map(&:to_s)
-      enrolled_thhs = th_group.tax_households.select {|th| th.tax_household_members.any? { |thm| enrolled_family_member_ids.include?(thm.applicant_id.to_s) } }
+      enrolled_thhs = th_group.tax_households.select {|th| th.tax_household_members.where(is_ia_eligible: true).any? { |thm| enrolled_family_member_ids.include?(thm.applicant_id.to_s) } }
 
       if enrolled_thhs.blank?
         @logger.info "----- Skipped: Tax households does not have any enrollment members family_hbx_assigned_id: #{family.hbx_assigned_id} enrollment: #{enrollment.hbx_id}"

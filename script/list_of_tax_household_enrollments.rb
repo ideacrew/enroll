@@ -6,6 +6,7 @@
 def process_enrollments(enrollments, file_name, offset_count, logger)
   field_names = %w[person_hbx_id
                    enrollment_hbx_id
+                   enrollment_aasm_state
                    enrollment_total_premium
                    product_ehb
                    enrollment_applied_aptc_amount
@@ -28,6 +29,7 @@ def process_enrollments(enrollments, file_name, offset_count, logger)
         csv << [
           person.hbx_id,
           enrollment.hbx_id,
+          enrollment.aasm_state,
           enrollment.total_premium.to_f,
           enrollment.product.ehb,
           enrollment.applied_aptc_amount.to_f,
@@ -48,14 +50,17 @@ end
 start_time = DateTime.current
 logger = Logger.new("#{Rails.root}/migration_validation_log_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
 logger.info "Migration Report start_time: #{start_time}"
-enrollments = HbxEnrollment.by_year(2022).by_coverage_kind('health').show_enrollments_sans_canceled
+show_enrollments_sans_canceled = %w[coverage_selected transmitted_to_carrier coverage_enrolled coverage_termination_pending unverified coverage_reinstated auto_renewing renewing_coverage_selected renewing_transmitted_to_carrier
+                                    renewing_coverage_enrolled auto_renewing_contingent renewing_contingent_selected renewing_contingent_transmitted_to_carrier renewing_contingent_enrolled coverage_terminated coverage_expired
+                                    inactive renewing_waived]
+enrollments = HbxEnrollment.by_year(2022).by_coverage_kind('health').where(:aasm_state.in => show_enrollments_sans_canceled)
 total_count = enrollments.count
 familes_per_iteration = 5_000.0
 number_of_iterations = (total_count / familes_per_iteration).ceil
 counter = 0
 
 while counter < number_of_iterations
-  file_name = "#{Rails.root}/list_of_ed_object_ids_for_curam_cases_#{counter + 1}.csv"
+  file_name = "#{Rails.root}/list_of_enrollments_with_thh_enr_info_#{counter + 1}.csv"
   offset_count = familes_per_iteration * counter
   process_enrollments(enrollments, file_name, offset_count, logger)
   counter += 1
