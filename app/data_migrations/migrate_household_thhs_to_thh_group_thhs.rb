@@ -255,7 +255,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
   def migrate_tax_household_enrollments(family)
     th_groups = family.tax_household_groups.where(:assistance_year => 2022).order_by(:created_at.asc)
     enrollments = family.enrollments.by_year(2022).by_coverage_kind('health').order_by(:created_at.asc)
-    legacy_tax_households = family.active_household.tax_households.tax_household_with_year(2022)
+    legacy_tax_households = family.active_household.tax_households.tax_household_with_year(2022).order_by(:created_at.desc)
 
     enrollments.each do |enrollment|
       if TaxHouseholdEnrollment.where(enrollment_id: enrollment.id).present?
@@ -263,7 +263,9 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
         next
       end
 
-      legacy_th = legacy_tax_households.order_by(:created_at.desc).where(:created_at.lte => enrollment.created_at).first
+      eligible_legacy_thhs = legacy_tax_households.where(:created_at.lte => enrollment.created_at)
+      legacy_th = eligible_legacy_thhs.where(:'eligibility_determinations.source'.ne => 'Admin').first || eligible_legacy_thhs.first
+
       if legacy_th.blank?
         @logger.info "----- Skipped: TH enrollment missing legacy tax household family_hbx_assigned_id: #{family.hbx_assigned_id}"
         next
