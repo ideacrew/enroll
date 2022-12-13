@@ -3,7 +3,8 @@
 # This script generates a CSV report with information about Enrollments with TaxHouseholdEnrollments
 # rails runner script/list_of_tax_household_enrollments.rb -e production
 
-def process_enrollments(enrollments, file_name, offset_count, logger)
+def process_enrollments(enrollments, logger)
+  file_name = "#{Rails.root}/list_of_enrollments_with_thh_enr_info.csv"
   field_names = %w[person_hbx_id
                    enrollment_hbx_id
                    enrollment_aasm_state
@@ -19,7 +20,7 @@ def process_enrollments(enrollments, file_name, offset_count, logger)
 
   CSV.open(file_name, 'w', force_quotes: true) do |csv|
     csv << field_names
-    enrollments.no_timeout.limit(5_000).offset(offset_count).inject([]) do |_dummy, enrollment|
+    enrollments.no_timeout.inject([]) do |_dummy, enrollment|
       person = enrollment.family.primary_person
       thh_enrs = TaxHouseholdEnrollment.where(enrollment_id: enrollment.id)
 
@@ -54,16 +55,6 @@ show_enrollments_sans_canceled = %w[coverage_selected transmitted_to_carrier cov
                                     renewing_coverage_enrolled auto_renewing_contingent renewing_contingent_selected renewing_contingent_transmitted_to_carrier renewing_contingent_enrolled coverage_terminated coverage_expired
                                     inactive renewing_waived]
 enrollments = HbxEnrollment.by_year(2022).by_coverage_kind('health').where(:aasm_state.in => show_enrollments_sans_canceled)
-total_count = enrollments.count
-familes_per_iteration = 5_000.0
-number_of_iterations = (total_count / familes_per_iteration).ceil
-counter = 0
-
-while counter < number_of_iterations
-  file_name = "#{Rails.root}/list_of_enrollments_with_thh_enr_info_#{counter + 1}.csv"
-  offset_count = familes_per_iteration * counter
-  process_enrollments(enrollments, file_name, offset_count, logger)
-  counter += 1
-end
+process_enrollments(enrollments, logger)
 end_time = DateTime.current
 logger.info "Migration Report end_time: #{end_time}, total_time_taken_in_minutes: #{((end_time - start_time) * 24 * 60).to_i}"
