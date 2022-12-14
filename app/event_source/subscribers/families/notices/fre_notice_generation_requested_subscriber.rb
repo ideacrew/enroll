@@ -3,7 +3,7 @@
 module Subscribers
   module Families
     module Notices
-        # Subscriber will receive request payload from EA to submit rrv non_esi determination requests
+      # Subscriber will receive request payload contains family id from EA to generate fre notice
       class FreNoticeGenerationRequestedSubscriber
         include ::EventSource::Subscriber[amqp: 'enroll.families.notices.fre_notice_generation']
 
@@ -16,9 +16,10 @@ module Subscribers
 
           logger.info "on_enroll_families_notices_fre_notice_generation FreNoticeGenerationRequestedSubscriber payload: #{payload}"
           logger.debug "invoked FreNoticeGenerationRequestedSubscriber with #{delivery_info}"
+
           family = Family.where("id": payload[:family_id]).first
           result = Operations::Notices::IvlFinalRenewalEligibilityNotice.new.call(family: family)
-          person_hbx_id = family.primary_applicant&.hbx_id
+          person_hbx_id = family&.primary_applicant&.hbx_id
 
           if result.success?
             subscriber_logger.info "on_enroll_families_notices_fre_notice_generation, success: person_hbx_id: #{person_hbx_id} | app_hbx_id: #{result.success}"

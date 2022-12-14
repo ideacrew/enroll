@@ -3,7 +3,7 @@
 module Publishers
   module Families
     module Notices
-        # This class will register event 'determination_build_requested' and 'determination_requested'
+      # This class will register event 'fre_notice_generation.requested'
       class FreNoticeGenerationRequestedPublisher < EventSource::Event
         include ::EventSource::Publisher[amqp: 'enroll.families.notices.fre_notice_generation']
 
