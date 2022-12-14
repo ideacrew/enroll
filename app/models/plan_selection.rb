@@ -68,7 +68,25 @@ class PlanSelection
     @same_plan_enrollment.hbx_enrollment_members = build_hbx_enrollment_members
     @same_plan_enrollment = set_enrollment_member_coverage_start_dates(@same_plan_enrollment)
 
+    update_tax_household_enrollments
     @same_plan_enrollment
+  end
+
+  # Update only if TaxHouseholdMemberEnrollmentMember exists and the bson_id is different.
+  def update_tax_household_enrollments
+    member_applicant_ids = @same_plan_enrollment.hbx_enrollment_members.map(&:applicant_id)
+    return if member_applicant_ids.blank?
+
+    th_enrollments = TaxHouseholdEnrollment.where(enrollment_id: hbx_enrollment.id)
+    th_enrollments.each do |th_enr|
+      th_enr.tax_household_members_enrollment_members.each do |thh_enr_member|
+        enr_member_id = @same_plan_enrollment.hbx_enrollment_members.where(applicant_id: thh_enr_member.family_member_id).first.id
+        thh_enr_member.hbx_enrollment_member_id = enr_member_id if enr_member_id.present? && thh_enr_member.hbx_enrollment_member_id != enr_member_id
+      end
+      th_enr.save!
+    end
+  rescue StandardError => e
+    Rails.logger.error "Error raised while update_tax_household_enrollments message: #{e}, backtrace: #{e.backtrace.join('\n')}"
   end
 
   def build_hbx_enrollment_members
@@ -92,7 +110,6 @@ class PlanSelection
   end
 
   def set_enrollment_member_coverage_start_dates(enrollment_obj = hbx_enrollment)
-
     if existing_coverage.present?
       previous_enrollment_members = existing_coverage.hbx_enrollment_members
 
@@ -110,24 +127,10 @@ class PlanSelection
 
   # for IVL market, we need to compare hios_ids instead of product IDs
   def existing_enrollment_for_covered_individuals
-    previous_active_coverages.detect do |en|
+    family.current_enrolled_or_termed_coverages(hbx_enrollment).detect do |en|
       (en.hbx_enrollment_members.collect(&:hbx_id) & hbx_enrollment.hbx_enrollment_members.collect(&:hbx_id)).present? &&
-        en.id != hbx_enrollment.id && (plan.present? ? plan.is_same_plan_by_hios_id_and_active_year?(en.product) : false)
+        (plan.present? ? plan.is_same_plan_by_hios_id_and_active_year?(en.product) : false)
     end
-  end
-
-  def previous_active_coverages
-    coverage_year_start = hbx_enrollment.effective_on.beginning_of_year
-
-    family.active_household.hbx_enrollments.where(
-      {:_id.ne => hbx_enrollment.id,
-       :kind => hbx_enrollment.kind,
-       :coverage_kind => hbx_enrollment.coverage_kind,
-       :effective_on.gte => coverage_year_start}
-    ).or(
-      {:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES},
-      {:aasm_state.in => HbxEnrollment::TERMINATED_STATUSES, :terminated_on.gte => hbx_enrollment.effective_on.prev_day}
-    ).order('effective_on DESC')
   end
 
   def family

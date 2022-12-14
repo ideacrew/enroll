@@ -70,12 +70,6 @@ module Insured
         reinstatement.save!
 
         if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-          not_elected_zero_aptc = applied_aptc_amount.nil? || applied_aptc_amount.to_f > 0.0
-          if elected_aptc_pct.to_f <= 0.0 && not_elected_zero_aptc
-            default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
-            elected_aptc_pct = enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_percentage
-          end
-
           mthh_update_enrollment_for_aptcs(new_effective_date, reinstatement, elected_aptc_pct.to_f, exclude_enrollments_list)
         else
           update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
@@ -223,7 +217,8 @@ module Insured
           year = current_enrollment_effective_on.year
           month = hbx_created_datetime.next_month.month + offset_month
         else
-          offset_month = hbx_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? 1 : 2
+          override_enabled = EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature.is_enabled
+          offset_month = (hbx_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth || override_enabled) ? 1 : 2
           year = hbx_created_datetime.year
           month = hbx_created_datetime.month + offset_month
         end

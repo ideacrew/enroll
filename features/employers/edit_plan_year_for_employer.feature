@@ -11,7 +11,7 @@ Feature: Edit Plan Year For Initial Employer
     And update rating area
     And initial employer ABC Widgets has draft benefit application
 
-  Scenario Outline: Editing contribution percentages for exiting plan year
+  Scenario Outline: Editing contribution percentages for existing plan year 100 contribution percent
     When ABC Widgets is logged in and on the home page
     And staff role person clicked on benefits tab
     Then employer should see edit plan year button
@@ -25,6 +25,19 @@ Feature: Edit Plan Year For Initial Employer
     Examples:
       | contribution_percent |
       | 100                  |
+  
+  Scenario Outline: Editing contribution percentages for existing plan year zero contribution percent
+    When ABC Widgets is logged in and on the home page
+    And staff role person clicked on benefits tab
+    Then employer should see edit plan year button
+    And employer clicked on edit plan year button
+    Then employer should see form for benefit application and benefit package
+    And employer updated <contribution_percent> contribution percent for the application
+    And employer should see create plan year button disabled
+    And employer logs out
+
+    Examples:
+      | contribution_percent |
       | 0                    |
 
   Scenario: Employer should be able to change open enrollment end dates

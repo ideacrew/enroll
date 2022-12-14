@@ -1500,6 +1500,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:show_non_pay_enrollments).and_call_original
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:home_tiles_current_and_future_only).and_call_original
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:show_non_pay_enrollments).and_call_original
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:show_non_pay_enrollments)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
     end
 
     context "without any FF " do

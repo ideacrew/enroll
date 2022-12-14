@@ -40,6 +40,9 @@ registry:
           - key: :application_year
             item: FinancialAssistance::Operations::EnrollmentDates::ApplicationYear
             is_enabled: true
+      - key: :faa_fifteenth_of_the_month_rule_overridden
+        item: :faa_fifteenth_of_the_month_rule_overridden
+        is_enabled: <%= ENV['FAA_FIFTEENTH_OF_THE_MONTH_RULE_OVERRIDE_IS_ENABLED'] || false %>
       - key: :benchmark_plans
         item: :benchmark_plans
         is_enabled: true

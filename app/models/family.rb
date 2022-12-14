@@ -22,6 +22,7 @@ class Family
   include RemoveFamilyMember
   include CrmGateway::FamilyConcern
   include GlobalID::Identification
+  include EventSource::Command
 
   IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner)
 
@@ -46,6 +47,7 @@ class Family
   field :relevant_previous_changes, type: Array
   # Used for recording payloads sent to CRM Gateway
   field :cv3_payload, type: Hash, default: {}
+  field :crm_notifiction_needed, type: Boolean
 
   belongs_to  :person, optional: true
   has_many :hbx_enrollments
@@ -356,52 +358,48 @@ class Family
     latest_household
   end
 
-  def enrolled_benefits
-    # latest_household.try(:enrolled_hbx_enrollments)
-  end
-
-  def terminated_benefits
-  end
-
-  def renewal_benefits
-  end
-
-  def currently_enrolled_plans(enrollment)
-    enrolled_plans = active_household.hbx_enrollments.enrolled_and_renewing.by_coverage_kind(enrollment.coverage_kind)
-
-    if enrollment.is_shop?
-      bg_ids = enrollment.sponsored_benefit_package.benefit_application.benefit_packages.map(&:id)
-      enrolled_plans = enrolled_plans.where(:sponsored_benefit_package_id.in => bg_ids)
-    end
-
-    enrolled_plans.collect(&:product_id)
-  end
-
   # filters enrolled enrollments by subscriber only
-  def currently_enrolled_products(enrollment)
-    any_member_current_enrollments(enrollment).select do |enr|
+  def current_enrolled_or_termed_products_by_subscriber(enrollment)
+    current_enrolled_or_termed_coverages(enrollment).select do |enr|
       enr.subscriber.applicant_id == enrollment.subscriber.applicant_id
     end.map(&:product)
   end
 
-  def any_member_currently_enrolled_products(enrollment)
-    any_member_current_enrollments(enrollment).map(&:product)
+  def current_enrolled_or_termed_products(enrollment)
+    current_enrolled_or_termed_coverages(enrollment).map(&:product)
+  end
+
+  def existing_coverage_query_expr(enrollment, include_matching_effective_date)
+    query_criteria = {
+      :_id.ne => enrollment.id, :kind => enrollment.kind
+    }
+
+    if include_matching_effective_date
+      query_criteria.merge!({:effective_on.lte => enrollment.effective_on})
+    else
+      query_criteria.merge!({:effective_on.lt => enrollment.effective_on})
+    end
+
+    if enrollment.is_shop?
+      application = enrollment.sponsored_benefit_package&.benefit_application
+      return query_criteria unless application
+      query_criteria.merge({:sponsored_benefit_package_id.in => application.benefit_packages.pluck(:id)})
+    else
+      query_criteria.merge({:effective_on.gte => enrollment.effective_on.beginning_of_year})
+    end
   end
 
   # fetch the current active or terminated enrollments for continous coverage
-  def any_member_current_enrollments(enrollment)
-    enrolled_enrollments = active_household.hbx_enrollments.enrolled_and_renewing.by_coverage_kind(enrollment.coverage_kind)
-
-    if enrolled_enrollments.blank?
-      enrolled_enrollments = active_household.hbx_enrollments.terminated.by_coverage_kind(enrollment.coverage_kind).by_terminated_period(enrollment.effective_on - 1.day)
-    end
-
-    enrolled_enrollments
+  # rubocop:disable Style/OptionalBooleanParameter
+  def current_enrolled_or_termed_coverages(enrollment, include_matching_effective_date = false)
+    coverages = active_household.hbx_enrollments.by_coverage_kind(enrollment.coverage_kind)
+    query_expr = existing_coverage_query_expr(enrollment, include_matching_effective_date)
+    coverages.where(query_expr).or(
+      {:aasm_state.in => HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES},
+      {:aasm_state.in => HbxEnrollment::TERMINATED_STATUSES, :terminated_on.gte => enrollment.effective_on.prev_day}
+    ).order('effective_on DESC')
   end
-
-  def currently_enrolled_product_ids(enrollment)
-    currently_enrolled_products(enrollment).collect(&:id)
-  end
+  # rubocop:enable Style/OptionalBooleanParameter
 
   def enrollments
     return [] if  latest_household.blank?
@@ -933,7 +931,26 @@ class Family
                     broker_role_id: broker_role_id,
                     start_date: TimeKeeper.datetime_local,
                     current_broker_account_id: current_broker_agency&.id }
-    ::Operations::Families::HireBrokerAgency.new.call(hire_params)
+
+    publish_broker_hired_event(hire_params)
+  end
+
+  def publish_broker_hired_event(hire_params)
+    event = event('events.family.brokers.broker_hired', attributes: hire_params)
+    event.success.publish if event.success?
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't publish broker hired event due to #{e.backtrace}" }
+  end
+
+  def notify_broker_update_on_impacted_enrollments_to_edi(opts = {})
+    return false unless EnrollRegistry.feature_enabled?(:send_broker_hired_event_to_edi) ||
+                        EnrollRegistry.feature_enabled?(:send_broker_fired_event_to_edi)
+
+    enrollments.each do |enr|
+      enr.notify_of_broker_update(opts)
+    end
+
+    true
   end
 
   # Terminate the active Broker agency for this family
@@ -943,7 +960,15 @@ class Family
     terminate_params = { family_id: id,
                          terminate_date: terminate_on,
                          broker_account_id: current_broker_agency&.id }
-    ::Operations::Families::TerminateBrokerAgency.new.call(terminate_params)
+
+    publish_broker_fired_event(terminate_params)
+  end
+
+  def publish_broker_fired_event(terminate_params)
+    event = event('events.family.brokers.broker_fired', attributes: terminate_params)
+    event.success.publish if event.success?
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't publish broker fired event due to #{e.backtrace}" }
   end
 
   # Get the active {BrokerAgencyAccount} account for this family. New Individual market enrollments will include this
@@ -1351,6 +1376,10 @@ class Family
 
   def create_thhg_on_fa_determination(application)
     Operations::Families::TaxHouseholdGroups::CreateOnFaDetermination.new.call(application)
+  end
+
+  def active_thhg(year)
+    tax_household_groups.active.by_year(year).first
   end
 
 private

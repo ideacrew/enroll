@@ -77,6 +77,17 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
       end
     end
 
+    context 'person without incarceration_status' do
+      let(:person_wo_incarceration_stats) { FactoryBot.create(:person, :with_consumer_role, is_incarcerated: nil) }
+      let!(:family_member_3) { FactoryBot.create(:family_member, person: person_wo_incarceration_stats, family: family)}
+
+      it 'should return success' do
+        result = subject.call({enrollment: enrollment.reload})
+
+        expect(result.success?).to be_truthy
+      end
+    end
+
     context '#build_family_member_hash' do
       let(:person_2) { FactoryBot.create(:person, :with_consumer_role) }
       let!(:family_member_2) { FactoryBot.create(:family_member, person: person_2, family: family)}

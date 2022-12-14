@@ -234,6 +234,48 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           end
         end
 
+        context 'with inactive tax household group' do
+          before do
+            family.tax_household_groups.active.first.update_attributes!(end_on: TimeKeeper.date_of_record.end_of_year)
+          end
+          let(:benchmark_premium) { primary_bp }
+
+          it 'returns difference of benchmark premiums and monthly_expected_contribution as total available aptc' do
+            expect(result.success?).to eq true
+            expect(result.value!).to eq 375.00
+          end
+        end
+
+        context 'for tax_household_member_enrollment_member' do
+          let(:benchmark_premium) { primary_bp }
+
+          before do
+            thh_enr = TaxHouseholdEnrollment.create(
+              enrollment_id: hbx_enrollment.id,
+              tax_household_id: aptc_grant.tax_household_id,
+              household_benchmark_ehb_premium: 500.00,
+              available_max_aptc: 375.00
+            )
+            thh_enr.tax_household_members_enrollment_members.create(
+              family_member_id: hbx_enrollment.hbx_enrollment_members.first.applicant_id,
+              hbx_enrollment_member_id: BSON::ObjectId.new,
+              tax_household_member_id: BSON::ObjectId.new,
+              age_on_effective_date: 20,
+              relationship_with_primary: 'self',
+              date_of_birth: TimeKeeper.date_of_record - 20.years
+            )
+          end
+
+          it 'updates tax_household_member_enrollment_member with correct hbx_enrollment_member_id' do
+            result
+            expect(
+              TaxHouseholdEnrollment.first.tax_household_members_enrollment_members.first.hbx_enrollment_member_id
+            ).to eq(
+              hbx_enrollment.hbx_enrollment_members.first.id
+            )
+          end
+        end
+
         context 'with coinciding enrollments' do
           let!(:prev_enrollment) do
             FactoryBot.create(:hbx_enrollment,
