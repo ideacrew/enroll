@@ -234,6 +234,18 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           end
         end
 
+        context 'with inactive tax household group' do
+          before do
+            family.tax_household_groups.active.first.update_attributes!(end_on: TimeKeeper.date_of_record.end_of_year)
+          end
+          let(:benchmark_premium) { primary_bp }
+
+          it 'returns difference of benchmark premiums and monthly_expected_contribution as total available aptc' do
+            expect(result.success?).to eq true
+            expect(result.value!).to eq 375.00
+          end
+        end
+
         context 'for tax_household_member_enrollment_member' do
           let(:benchmark_premium) { primary_bp }
 

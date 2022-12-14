@@ -41,6 +41,10 @@ class TaxHouseholdGroup
   scope :active,    ->{ where(end_on: nil) }
   scope :inactive,  ->{ where(:end_on.ne => nil) }
 
+  def latest_active_tax_household_with_year(year)
+    tax_households.tax_household_with_year(year).active_tax_household.order_by(:created_at.desc).first
+  end
+
   private
 
   def generate_hbx_id
