@@ -145,12 +145,12 @@ describe 'member_outreach_report' do
     end
 
     context 'family members' do
-        it 'should include all family members in the report' do
-          # minus 1 b/c first row is headers
-          members_count = family_members.count + no_app_family_members.count
-          expect(@file_content.length - 1).to eq(members_count)
-        end
+      it 'should include all family members in the report' do
+        # minus 1 b/c first row is headers
+        members_count = family_members.count + no_app_family_members.count
+        expect(@file_content.length - 1).to eq(members_count)
       end
+    end
 
     context 'primary person' do
       it 'should match with the primary person hbx id' do
@@ -346,7 +346,7 @@ describe 'member_outreach_report' do
           expect(@file_content[1][27]).to eq(health_enrollment.aasm_state)
           expect(@file_content[2][27]).to eq(health_enrollment.aasm_state)
         end
-  
+
         it 'should match with the current year most recent dental plan hios id' do
           dental_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on.year == curr_year}.sort_by(&:submitted_at).reverse.first
           expect(@file_content[1][28]).to eq(dental_enrollment.product.hios_id)
