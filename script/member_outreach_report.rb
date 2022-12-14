@@ -34,7 +34,10 @@ field_names << "#{curr_year}_most_recent_health_plan_id"
 field_names << "#{curr_year}_most_recent_health_status"
 field_names << "#{next_year}_most_recent_health_plan_id"
 field_names << "#{next_year}_most_recent_health_status"
-
+field_names << "#{curr_year}_most_recent_dental_plan_id"
+field_names << "#{curr_year}_most_recent_dental_status"
+field_names << "#{next_year}_most_recent_dental_plan_id"
+field_names << "#{next_year}_most_recent_dental_status"
 
 file_name = "#{Rails.root}/member_outreach_report.csv"
 all_families = Family.all
@@ -90,6 +93,8 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
                             end
         curr_mr_health_enrollment = enrollments.enrolled_and_renewal.select {|enr| enr.coverage_kind == 'health' && enr.effective_on&.year == curr_year}.sort_by(&:submitted_at).reverse.first
         next_mr_health_enrollment = enrollments.enrolled_and_renewal.select {|enr| enr.coverage_kind == 'health' && enr.effective_on&.year == next_year}.sort_by(&:submitted_at).reverse.first
+        curr_mr_dental_enrollment = enrollments.enrolled_and_renewal.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on&.year == curr_year}.sort_by(&:submitted_at).reverse.first
+        next_mr_dental_enrollment = enrollments.enrolled_and_renewal.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on&.year == next_year}.sort_by(&:submitted_at).reverse.first
         inbound_transfer_date = application.transferred_at if application&.transferred_at.present? && application&.transfer_id.present? && !application&.account_transferred
 
         csv << [
@@ -121,7 +126,11 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
             curr_mr_health_enrollment&.product&.hios_id,
             curr_mr_health_enrollment&.aasm_state,
             next_mr_health_enrollment&.product&.hios_id,
-            next_mr_health_enrollment&.aasm_state
+            next_mr_health_enrollment&.aasm_state,
+            curr_mr_dental_enrollment&.product&.hios_id,
+            curr_mr_dental_enrollment&.aasm_state,
+            next_mr_dental_enrollment&.product&.hios_id,
+            next_mr_dental_enrollment&.aasm_state
           ]
       end
     rescue StandardError => e
