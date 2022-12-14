@@ -47,7 +47,7 @@ class UpdateThhmEnrMember < MongoidMigrationTask
   end
 
   def fetch_hbx_enrollment_hbx_ids
-    ENV['enrollment_hbx_ids'].to_s.split(',').map(&:squish!).presence || HbxEnrollment.where(:created_at.gte => Date.new(2022, 10, 1), coverage_kind: 'health').pluck(:hbx_id)
+    ENV['enrollment_hbx_ids'].to_s.split(',').map(&:squish!).presence || HbxEnrollment.where(:created_at.gte => Date.new(2022, 10, 1), coverage_kind: 'health', :aasm_state.ne => 'shopping', :product_id.ne => nil).pluck(:hbx_id)
   end
 
   def migrate
