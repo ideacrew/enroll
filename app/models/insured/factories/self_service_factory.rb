@@ -217,7 +217,8 @@ module Insured
           year = current_enrollment_effective_on.year
           month = hbx_created_datetime.next_month.month + offset_month
         else
-          offset_month = hbx_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? 1 : 2
+          override_enabled = EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature.is_enabled
+          offset_month = (hbx_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth || override_enabled) ? 1 : 2
           year = hbx_created_datetime.year
           month = hbx_created_datetime.month + offset_month
         end
