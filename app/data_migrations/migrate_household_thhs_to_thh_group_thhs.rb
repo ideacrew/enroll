@@ -314,7 +314,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
     end
   end
 
-  def process_family(family, logger)
+  def process_family(family)
     tax_households = family.active_household.tax_households.tax_household_with_year(2022).order_by(:created_at.asc)
 
     active_thhs_of_household = tax_households.active_tax_household
@@ -365,7 +365,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
           next family
         end
 
-        active_thhs_of_household = process_family(family, logger)
+        active_thhs_of_household = process_family(family)
 
         csv << [family.primary_person.hbx_id, family.hbx_assigned_id, family.active_household.tax_households.count, family.reload.tax_household_groups.map(&:tax_households).flatten.count, active_thhs_of_household.present?]
       rescue StandardError => e
@@ -407,7 +407,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
         thh_enr.destroy!
       end
     rescue StandardError => e
-      @logger.info "TaxHouseholdEnrollment #{thh_enr.id} - Unable to destroy TaxHouseholdEnrollment"
+      @logger.info "TaxHouseholdEnrollment #{thh_enr.id} - Unable to destroy TaxHouseholdEnrollment, message: #{e}"
     end
     @logger.info "------------------------------Finished Processing TaxHouseholdEnrollments ------------------------------"
   end
