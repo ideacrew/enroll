@@ -1030,16 +1030,18 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     context "delete delete_consumer_broker" do
       let(:family) {FactoryBot.build(:family)}
       before :each do
+        EnrollRegistry[:send_broker_fired_event_to_edi].feature.stub(:is_enabled).and_return(true)
         allow(person).to receive(:hbx_staff_role).and_return(double('hbx_staff_role', permission: double('permission',modify_family: true)))
         allow(person).to receive(:agent?).and_return(true)
         family.broker_agency_accounts = [
           FactoryBot.build(:broker_agency_account, family: family, employer_profile: nil)
         ]
         allow(Family).to receive(:find).and_return family
-        delete :delete_consumer_broker , params: {:id => family.id}
       end
 
       it "should delete consumer broker" do
+        expect(family).to receive(:notify_broker_update_on_impacted_enrollments_to_edi)
+        delete :delete_consumer_broker, params: {:id => family.id }
         expect(response).to have_http_status(:redirect)
         expect(family.current_broker_agency).to be nil
       end
