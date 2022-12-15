@@ -666,7 +666,7 @@ module Insured
           EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature.stub(:is_enabled).and_return(true)
           system_date = Date.new(Date.today.year, 12, Settings.aca.individual_market.monthly_enrollment_due_on.next)
           allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
-          @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), (Date.new(Date.today.year.next, 1, 1))).to_date
+          @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), Date.new(Date.today.year.next, 1, 1)).to_date
         end
 
         it 'should return start of as 1/1' do
