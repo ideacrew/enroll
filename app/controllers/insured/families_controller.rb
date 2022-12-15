@@ -344,7 +344,11 @@ class Insured::FamiliesController < FamiliesController
 
   def delete_consumer_broker
     @family = Family.find(params[:id])
-    if @family.current_broker_agency.destroy
+    broker_agency = @family&.current_broker_agency
+
+    if broker_agency.present?
+      @family&.notify_broker_update_on_impacted_enrollments_to_edi({family_id: @family&.id.to_s})
+      broker_agency.destroy
       redirect_to :action => "home" , flash: {notice: "Successfully deleted."}
     end
   end
