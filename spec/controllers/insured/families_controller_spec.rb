@@ -1041,7 +1041,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
       it "should delete consumer broker" do
         expect(family).to receive(:notify_broker_update_on_impacted_enrollments_to_edi)
-        delete :delete_consumer_broker , params: {:id => family.id }
+        delete :delete_consumer_broker, params: {:id => family.id }
         expect(response).to have_http_status(:redirect)
         expect(family.current_broker_agency).to be nil
       end

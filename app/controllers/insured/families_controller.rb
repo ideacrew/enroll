@@ -349,7 +349,9 @@ class Insured::FamiliesController < FamiliesController
     if broker_agency.present?
       @family&.notify_broker_update_on_impacted_enrollments_to_edi({family_id: @family&.id.to_s})
       broker_agency.destroy
-      redirect_to :action => "home" , flash: {notice: "Successfully deleted."}
+      redirect_to :action => "home", flash: {notice: "Successfully deleted."}
+    else
+      redirect_to :action => "home", flash: {notice: "Unable to remove expert from this account"}
     end
   end
 
