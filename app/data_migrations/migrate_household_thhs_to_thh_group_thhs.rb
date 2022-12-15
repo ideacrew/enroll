@@ -401,7 +401,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
     TaxHouseholdEnrollment.all.no_timeout.each do |thh_enr|
       enrollment = HbxEnrollment.where(id: thh_enr.enrollment_id).first
       next if enrollment.nil?
-      next if enrollment.effective_on.year
+      next if enrollment.effective_on.year != 2022
       if thh_enr.created_at.to_date != enrollment.created_at.to_date
         @logger.info "HbxEnrollment #{enrollment.hbx_id} - Destroyed TaxHouseholdEnrollment info: #{thh_enr.attributes}"
         thh_enr.destroy!
