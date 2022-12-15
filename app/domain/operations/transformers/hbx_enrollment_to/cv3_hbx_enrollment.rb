@@ -142,7 +142,7 @@ module Operations
             name: product.title,
             active_year: product.active_year,
             is_dental_only: product.dental?,
-            metal_level: product.metal_level,
+            metal_level: product.metal_level_kind.to_s,
             benefit_market_kind: product.benefit_market_kind.to_s,
             csr_variant_id: product.csr_variant_id,
             is_csr: product.is_csr?,

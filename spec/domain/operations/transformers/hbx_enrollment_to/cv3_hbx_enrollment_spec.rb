@@ -8,7 +8,9 @@ RSpec.describe ::Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment, db
   include_context '3 dental products with different rating_methods, different child_only_offerings and 3 health products'
 
   let(:enr_product) do
-    BenefitMarkets::Products::DentalProducts::DentalProduct.by_year(TimeKeeper.date_of_record.year).detect(&:family_based_rating?)
+    product = BenefitMarkets::Products::DentalProducts::DentalProduct.by_year(TimeKeeper.date_of_record.year).detect(&:family_based_rating?)
+    product.update_attributes!(dental_level: nil)
+    product
   end
 
   let!(:enrollment) do
@@ -33,5 +35,6 @@ RSpec.describe ::Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment, db
     expect(@validated_payload[:hbx_enrollment_members].first[:slcsp_member_premium]).not_to be_empty
     expect(@validated_payload[:product_reference][:family_rated_premiums]).not_to be_empty
     expect(@validated_payload[:product_reference][:pediatric_dental_ehb]).not_to be_nil
+    expect(@validated_payload[:product_reference][:metal_level]).to eq(enr_product.metal_level_kind.to_s)
   end
 end
