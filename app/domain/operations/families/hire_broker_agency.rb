@@ -45,13 +45,12 @@ module Operations
         existing_account.end_on.blank? && valid_params[:terminate_date] <= valid_params[:start_date].to_date
       end
 
-      def terminate_existing_broker_agency(family, valid_params, is_new_broker_assister)
+      def terminate_existing_broker_agency(family, valid_params)
         terminate_params = { family_id: valid_params[:family_id],
                              broker_account_id: valid_params[:current_broker_account_id],
                              terminate_date: valid_params[:terminate_date],
-                             new_broker_hired: true }
-        notify_edi = is_new_broker_assister ? true : false
-        terminate_params.merge!(notify_edi: notify_edi)
+                             new_broker_hired: true,
+                             notify_edi: false }
         family.publish_broker_fired_event(terminate_params)
       end
 
@@ -59,8 +58,7 @@ module Operations
         if existing_account.present?
           same_broker_hire = idempotency_check?(existing_account, broker_role, valid_params)
           return Success(true) if same_broker_hire
-          is_new_broker_assister = broker_role&.npn&.scan(/\D/)&.present?
-          terminate_existing_broker_agency(family, valid_params, is_new_broker_assister)
+          terminate_existing_broker_agency(family, valid_params)
         end
 
         family.broker_agency_accounts.new(benefit_sponsors_broker_agency_profile_id: broker_role.benefit_sponsors_broker_agency_profile_id,
@@ -72,11 +70,13 @@ module Operations
       end
 
       def notify_broker_hired_event_to_edi(family, broker_role)
-        return Success("") unless broker_role&.npn&.scan(/\D/)&.empty?
+        broker_params = { broker_role_id: broker_role.id.to_s,
+                          broker_role_npn: broker_role.npn,
+                          family_id: family.id.to_s }
 
-        family.notify_broker_update_on_impacted_enrollments_to_edi({broker_role_id: broker_role.id.to_s,
-                                                                    broker_role_npn: broker_role.npn,
-                                                                    family_id: family.id.to_s})
+        broker_params.merge!(broker_role_id: nil, broker_role_npn: nil) if broker_role&.npn&.scan(/\D/)&.present?
+
+        family.notify_broker_update_on_impacted_enrollments_to_edi(broker_params)
         Success("Broker event notified to EDI")
       end
     end

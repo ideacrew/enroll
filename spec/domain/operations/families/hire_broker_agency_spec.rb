@@ -83,32 +83,6 @@ RSpec.describe ::Operations::Families::HireBrokerAgency, dbclean: :after_each do
       end
     end
 
-    context 'hiring new assister broker' do
-      before(:each) do
-        family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
-                                                                                            writing_agent_id: writing_agent.id,
-                                                                                            start_on: Time.now,
-                                                                                            is_active: true)
-        family.reload
-      end
-
-      it 'should terminate old broker and create broker agency account for new broker' do
-        expect(family.broker_agency_accounts.unscoped.length).to eq(1)
-        hire_params = { family_id: family.id,
-                        terminate_date: TimeKeeper.date_of_record,
-                        broker_role_id: assister.id,
-                        start_date: DateTime.now,
-                        current_broker_account_id: family&.current_broker_agency&.id }
-
-        result = subject.call(hire_params)
-        expect(result).to be_a(Dry::Monads::Result::Success)
-        expect(result.success).to eq true
-        family.reload
-        expect(family.broker_agency_accounts.unscoped.length).to eq(2)
-        expect(family.broker_agency_accounts.unscoped.flat_map(&:writing_agent).pluck(:npn)).to include(assister.npn)
-      end
-    end
-
     context 'hiring broker in imported state' do
       it 'should return failure' do
         writing_agent.update_attributes(aasm_state: 'imported')
