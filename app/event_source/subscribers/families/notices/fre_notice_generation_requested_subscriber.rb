@@ -22,8 +22,8 @@ module Subscribers
           person_hbx_id = family&.primary_applicant&.hbx_id
 
           if result.success?
-            subscriber_logger.info "on_enroll_families_notices_fre_notice_generation, success: person_hbx_id: #{person_hbx_id} | app_hbx_id: #{result.success}"
-            logger.info "on_enroll_families_notices_fre_notice_generation: acked, SuccessResult: person_hbx_id: #{person_hbx_id} | #{result.success}"
+            subscriber_logger.info "on_enroll_families_notices_fre_notice_generation, success: person_hbx_id: #{person_hbx_id} | result: #{result.value!}"
+            logger.info "on_enroll_families_notices_fre_notice_generation: acked, SuccessResult: person_hbx_id: #{person_hbx_id} | #{result.value!}"
           else
             errors =
               if result.failure.is_a?(Dry::Validation::Result)
