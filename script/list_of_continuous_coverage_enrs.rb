@@ -78,10 +78,14 @@ def process_enrollment_hbx_ids
   CSV.open(file_name, 'w', force_quotes: true) do |csv|
     csv << field_names
     enr_hbx_ids = find_enrollment_hbx_ids
+    @logger.info "Total No. of enrollments count: #{enr_hbx_ids.count}"
+    counter = 0
     enr_hbx_ids.each do |enr_hbx_id|
+      counter += 1
       enrollment = HbxEnrollment.where(hbx_id: enr_hbx_id).first
       process_enrollment(enrollment, csv)
       @logger.info "Processed EnrollmentHbxId: #{enr_hbx_id}"
+      @logger.info "Processed #{counter} number of Enrollments." if counter % 1000 == 0
     rescue StandardError => e
       @logger.info e.message
     end
