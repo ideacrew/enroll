@@ -42,7 +42,7 @@ registry:
             is_enabled: true
       - key: :faa_fifteenth_of_the_month_rule_overridden
         item: :faa_fifteenth_of_the_month_rule_overridden
-        is_enabled: <%= ENV['FAA_FIFTEENTH_OF_THE_MONTH_RULE_OVERRIDE_IS_ENABLED'] || false %>
+        is_enabled: true
       - key: :benchmark_plans
         item: :benchmark_plans
         is_enabled: true
