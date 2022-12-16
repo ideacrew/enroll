@@ -48,6 +48,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
   before do
     allow_any_instance_of(::FinancialAssistance::Locations::Address).to receive(:county_check).and_return true
+    allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).and_return(false)
   end
 
   describe '.modelFeilds' do
