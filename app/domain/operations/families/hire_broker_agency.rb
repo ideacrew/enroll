@@ -45,13 +45,13 @@ module Operations
         existing_account.end_on.blank? && valid_params[:terminate_date] <= valid_params[:start_date].to_date
       end
 
-      def terminate_existing_broker_agency(family, valid_params)
+      def terminate_existing_broker_agency(family, valid_params, is_new_broker_assister)
         terminate_params = { family_id: valid_params[:family_id],
                              broker_account_id: valid_params[:current_broker_account_id],
                              terminate_date: valid_params[:terminate_date],
-                             new_broker_hired: true,
-                             notify_edi: false }
-
+                             new_broker_hired: true }
+        notify_edi = is_new_broker_assister ? true : false
+        terminate_params.merge!(notify_edi: notify_edi)
         family.publish_broker_fired_event(terminate_params)
       end
 
@@ -59,7 +59,8 @@ module Operations
         if existing_account.present?
           same_broker_hire = idempotency_check?(existing_account, broker_role, valid_params)
           return Success(true) if same_broker_hire
-          terminate_existing_broker_agency(family, valid_params)
+          is_new_broker_assister = broker_role&.npn&.scan(/\D/)&.present?
+          terminate_existing_broker_agency(family, valid_params, is_new_broker_assister)
         end
 
         family.broker_agency_accounts.new(benefit_sponsors_broker_agency_profile_id: broker_role.benefit_sponsors_broker_agency_profile_id,
