@@ -8,6 +8,11 @@ RSpec.describe ::Operations::Families::HireBrokerAgency, dbclean: :after_each do
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
   let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
+  let(:assister)  do
+    assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00")
+    assister.save(validate: false)
+    assister
+  end
   let(:broker_agency_profile2) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile)}
   let(:writing_agent2)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile2.id) }
 
