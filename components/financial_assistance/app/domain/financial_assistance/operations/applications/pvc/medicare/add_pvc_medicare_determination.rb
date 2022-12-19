@@ -32,7 +32,7 @@ module FinancialAssistance
             end
 
             def find_application(application_entity)
-              application = ::FinancialAssistance::Application.by_hbx_id(application_entity.hbx_id)&.first
+              application = ::FinancialAssistance::Application.by_hbx_id(application_entity.hbx_id).first
               application.present? ? Success(application) : Failure({:errors => ["Could not find application with given hbx_id: #{application_entity.hbx_id}"]})
             end
 
