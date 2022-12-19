@@ -9,10 +9,10 @@ module CrmGateway
     end
 
     def trigger_async_publish
-      # return unless EnrollRegistry.feature_enabled?(:crm_update_family_save)
-      return unless send_to_gateway? # if EnrollRegistry.feature_enabled?(:check_for_crm_updates)
+      return unless EnrollRegistry.feature_enabled?(:crm_update_family_save)
+      return unless send_to_gateway? if EnrollRegistry.feature_enabled?(:check_for_crm_updates)
       CrmWorker.perform_async(self.id.to_s, self.class.to_s, :trigger_crm_family_update_publish)
-      reset_crm_notifiction_needed # if EnrollRegistry.feature_enabled?(:check_for_crm_updates)
+      reset_crm_notifiction_needed if EnrollRegistry.feature_enabled?(:check_for_crm_updates)
       "Triggered CRM family update publish for family"
     end
 
