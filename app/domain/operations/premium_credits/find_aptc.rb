@@ -75,6 +75,10 @@ module Operations
       end
 
       def persist_tax_household_enrollment(aptc_grant, available_max_aptc)
+        # To avoid creation of TaxHouseholdEnrollment when operation is called with EffectiveOn Date not same as .
+        # Where we try to get Available APTC for same composition with future effective on date.
+        return if @hbx_enrollment.effective_on.to_date != @effective_on.to_date
+
         th_enrollment = TaxHouseholdEnrollment.find_or_create_by(enrollment_id: @hbx_enrollment.id, tax_household_id: aptc_grant.tax_household_id)
         household_info = benchmark_premiums.households.find {|household| household.household_id == aptc_grant.tax_household_id } if benchmark_premiums.present?
 
@@ -94,7 +98,7 @@ module Operations
         return if household_info.blank?
 
         th_id = BSON::ObjectId.from_string(aptc_grant.tax_household_id.to_s)
-        tax_household_group = @family.tax_household_groups.active.order_by(created_at: :desc).where(:"tax_households._id" => th_id).first
+        tax_household_group = @family.tax_household_groups.order_by(created_at: :desc).where(:"tax_households._id" => th_id).first
         tax_household = tax_household_group.tax_households.where(_id: th_id).first
         hbx_enrollment_members = @hbx_enrollment.hbx_enrollment_members
         tax_household_members = tax_household.tax_household_members

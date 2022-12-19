@@ -255,10 +255,17 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
   def migrate_tax_household_enrollments(family)
     th_groups = family.tax_household_groups.where(:assistance_year => 2022).order_by(:created_at.asc)
     enrollments = family.enrollments.by_year(2022).by_coverage_kind('health').order_by(:created_at.asc)
-    legacy_tax_households = family.active_household.tax_households.tax_household_with_year(2022)
+    legacy_tax_households = family.active_household.tax_households.tax_household_with_year(2022).order_by(:created_at.desc)
 
     enrollments.each do |enrollment|
-      legacy_th = legacy_tax_households.order_by(:created_at.desc).where(:created_at.lte => enrollment.created_at).first
+      if TaxHouseholdEnrollment.where(enrollment_id: enrollment.id).present?
+        @logger.info "----- Skipped: TaxHouseholdEnrollments exists for enrollment_hbx_id: #{enrollment.hbx_id}, family_hbx_assigned_id: #{family.hbx_assigned_id}"
+        next
+      end
+
+      eligible_legacy_thhs = legacy_tax_households.where(:created_at.lte => enrollment.created_at)
+      legacy_th = eligible_legacy_thhs.where(:'eligibility_determinations.source'.ne => 'Admin').first || eligible_legacy_thhs.first
+
       if legacy_th.blank?
         @logger.info "----- Skipped: TH enrollment missing legacy tax household family_hbx_assigned_id: #{family.hbx_assigned_id}"
         next
@@ -272,7 +279,7 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
       end
 
       enrolled_family_member_ids = enrollment.hbx_enrollment_members.map(&:applicant_id).map(&:to_s)
-      enrolled_thhs = th_group.tax_households.select {|th| th.tax_household_members.any? { |thm| enrolled_family_member_ids.include?(thm.applicant_id.to_s) } }
+      enrolled_thhs = th_group.tax_households.select {|th| th.tax_household_members.where(is_ia_eligible: true).any? { |thm| enrolled_family_member_ids.include?(thm.applicant_id.to_s) } }
 
       if enrolled_thhs.blank?
         @logger.info "----- Skipped: Tax households does not have any enrollment members family_hbx_assigned_id: #{family.hbx_assigned_id} enrollment: #{enrollment.hbx_id}"
@@ -307,53 +314,63 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
     end
   end
 
-  def process_families(families, file_name, offset_count, logger)
-    field_names = %w[primary_person_hbx_id family_hbx_assigned_id aptc_csr_tax_households_count migrated_tax_households_count(new) family_has_active_tax_households?]
+  def process_family(family)
+    tax_households = family.active_household.tax_households.tax_household_with_year(2022).order_by(:created_at.asc)
 
+    active_thhs_of_household = tax_households.active_tax_household
+    inactive_thhs_of_household = tax_households.where(:effective_ending_on.ne => nil)
+
+    if active_thhs_of_household.present?
+      if family.tax_household_groups.by_year(2022).blank?
+        process_active_thhs_of_household(family, active_thhs_of_household)
+      else
+        process_inactive_thhs_of_household(family, active_thhs_of_household, true)
+      end
+    end
+
+    process_inactive_thhs_of_household(family, inactive_thhs_of_household, false) if inactive_thhs_of_household.present?
+
+    if family.save!
+      @logger.info "----- Successfully created TaxHouseholdGroups for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
+      is_migrating = family.enrollments.present?
+      determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family.reload, effective_date: TimeKeeper.date_of_record, is_migrating: is_migrating)
+      if determination.success?
+        @logger.info "----- Successfully created FamilyDetermination: #{determination.success} for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
+
+        migrate_tax_household_enrollments(family.reload)
+      elsif is_migrating
+        @logger.info "----- Failed to create FamilyDetermination: #{determination.failure} for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
+      end
+    else
+      @logger.info "----- Errors persisting family with family_hbx_assigned_id: #{family.hbx_assigned_id}, errors: #{family.errors.full_messages}"
+    end
+
+    active_thhs_of_household
+  end
+
+  def process_families
+    file_name = "#{Rails.root}/household_thhs_to_thh_group_thhs_migration_list_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.csv"
+    counter = 0
+
+    field_names = %w[primary_person_hbx_id family_hbx_assigned_id aptc_csr_tax_households_count migrated_tax_households_count(new) family_has_active_tax_households?]
     CSV.open(file_name, 'w', force_quotes: true) do |csv|
       csv << field_names
 
-      families.no_timeout.limit(5_000).offset(offset_count).inject([]) do |_dummy, family|
-        logger.info "---------- Processing Family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
+      find_families.no_timeout.each do |family|
+        counter += 1
+        @logger.info "Processed #{counter} applications" if counter % 1000 == 0
+        @logger.info "---------- Processing Family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
         unless family.valid?
-          logger.info "----- Invalid family with family_hbx_assigned_id: #{family.hbx_assigned_id}, errors: #{family.errors.full_messages}"
+          @logger.info "----- Invalid family with family_hbx_assigned_id: #{family.hbx_assigned_id}, errors: #{family.errors.full_messages}"
           next family
         end
 
-        tax_households = family.active_household.tax_households.tax_household_with_year(2022).order_by(:created_at.asc)
-
-        active_thhs_of_household = tax_households.active_tax_household
-        inactive_thhs_of_household = tax_households.where(:effective_ending_on.ne => nil)
-
-        if active_thhs_of_household.present?
-          if family.tax_household_groups.by_year(2022).blank?
-            process_active_thhs_of_household(family, active_thhs_of_household)
-          else
-            process_inactive_thhs_of_household(family, active_thhs_of_household, true)
-          end
-        end
-
-        process_inactive_thhs_of_household(family, inactive_thhs_of_household, false) if inactive_thhs_of_household.present?
-
-        if family.save!
-          logger.info "----- Successfully created TaxHouseholdGroups for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
-          is_migrating = family.enrollments.present?
-          determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family.reload, effective_date: TimeKeeper.date_of_record, is_migrating: is_migrating)
-          if determination.success?
-            logger.info "----- Successfully created FamilyDetermination: #{determination.success} for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
-
-            migrate_tax_household_enrollments(family.reload)
-          elsif is_migrating
-            logger.info "----- Failed to create FamilyDetermination: #{determination.failure} for family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
-          end
-        else
-          logger.info "----- Errors persisting family with family_hbx_assigned_id: #{family.hbx_assigned_id}, errors: #{family.errors.full_messages}"
-        end
+        active_thhs_of_household = process_family(family)
 
         csv << [family.primary_person.hbx_id, family.hbx_assigned_id, family.active_household.tax_households.count, family.reload.tax_household_groups.map(&:tax_households).flatten.count, active_thhs_of_household.present?]
       rescue StandardError => e
         @rescue_hbx_ids << family.hbx_assigned_id
-        logger.info "----- Error raised processing family with family_hbx_assigned_id: #{family.hbx_assigned_id}, error: #{e}, backtrace: #{e.backtrace.join('\n')}"
+        @logger.info "----- Error raised processing family with family_hbx_assigned_id: #{family.hbx_assigned_id}, error: #{e}, backtrace: #{e.backtrace.join('\n')}"
       end
     end
   end
@@ -378,24 +395,31 @@ class MigrateHouseholdThhsToThhGroupThhs < MongoidMigrationTask
                                     )
   end
 
+  def process_tax_household_enrollments
+    # EnrollmentCreatedAt is not on the same day as TaxHouseholdEnrollmentCreatedAt
+    @logger.info "------------------------------Started Processing TaxHouseholdEnrollments ------------------------------"
+    TaxHouseholdEnrollment.all.no_timeout.each do |thh_enr|
+      enrollment = HbxEnrollment.where(id: thh_enr.enrollment_id).first
+      next if enrollment.nil?
+      next if enrollment.effective_on.year != 2022
+      if thh_enr.created_at.to_date != enrollment.created_at.to_date
+        @logger.info "HbxEnrollment #{enrollment.hbx_id} - Destroyed TaxHouseholdEnrollment info: #{thh_enr.attributes}"
+        thh_enr.destroy!
+      end
+    rescue StandardError => e
+      @logger.info "TaxHouseholdEnrollment #{thh_enr.id} - Unable to destroy TaxHouseholdEnrollment, message: #{e}"
+    end
+    @logger.info "------------------------------Finished Processing TaxHouseholdEnrollments ------------------------------"
+  end
+
   def migrate
     @logger = Logger.new("#{Rails.root}/log/migrate_household_thhs_to_thh_group_thhs_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
     start_time = DateTime.current
     @logger.info "MigrateHouseholdThhsToThhGroupThhs start_time: #{start_time}"
     @app_ambiguity_hbx_ids = []
     @rescue_hbx_ids = []
-    families = find_families
-    total_count = families.count
-    familes_per_iteration = 5_000.0
-    number_of_iterations = (total_count / familes_per_iteration).ceil
-    counter = 0
-
-    while counter < number_of_iterations
-      file_name = "#{Rails.root}/household_thhs_to_thh_group_thhs_migration_list_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}_#{counter + 1}.csv"
-      offset_count = familes_per_iteration * counter
-      process_families(families, file_name, offset_count, @logger)
-      counter += 1
-    end
+    process_tax_household_enrollments
+    process_families
     end_time = DateTime.current
     @logger.info "MigrateHouseholdThhsToThhGroupThhs end_time: #{end_time}, total_time_taken_in_minutes: #{((end_time - start_time) * 24 * 60).to_f.ceil}" unless Rails.env.test?
     @logger.info "Families with missing yearly_expected_contribution - #{@app_ambiguity_hbx_ids}"

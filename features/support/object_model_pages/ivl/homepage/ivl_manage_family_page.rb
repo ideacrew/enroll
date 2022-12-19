@@ -251,4 +251,7 @@ class IvlManageFamilyPage
     '.interaction-click-control-continue'
   end
 
+  def self.consumer_fields
+    '[data-cuke="consumer_fields"]'
+  end
 end
