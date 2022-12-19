@@ -4,6 +4,7 @@ require 'dry/monads'
 require 'dry/monads/do'
 require 'aca_entities/magi_medicaid/libraries/iap_library'
 
+# rubocop:disable Metrics/ClassLength
 module Operations
   module Transformers
     module FamilyTo
@@ -49,7 +50,7 @@ module Operations
 
         def transform_applications(family)
           return unless EnrollRegistry.feature_enabled?(:financial_assistance)
-          member_hbx_ids = family.active_family_members.collect {|family_member| family_member.person.hbx_id}
+          # member_hbx_ids = family.active_family_members.collect {|family_member| family_member.person.hbx_id}
           applications = ::FinancialAssistance::Application.where(family_id: family.id).where(:aasm_state.in => ["submitted", "determined"])
           transformed_applications = applications.collect do |application|
             # applicant_person_hbx_ids = application.active_applicants.pluck(:person_hbx_id)
@@ -378,3 +379,4 @@ module Operations
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
