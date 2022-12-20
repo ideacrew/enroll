@@ -18,7 +18,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                   gender: person.gender,
                                   ssn: person.ssn,
                                   application: application,
-                                  ethnicity: [],
+                                  ethnicity: nil,
                                   is_primary_applicant: true,
                                   person_hbx_id: person.hbx_id,
                                   is_self_attested_blind: false,
@@ -173,6 +173,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
       it 'should not return nil for is_primary_applicant' do
         expect(@applicant[:is_primary_applicant]).not_to be_nil
+      end
+
+      it 'should not return nil for ethnicity' do
+        expect(@applicant[:demographic][:ethnicity]).not_to be_nil
       end
 
       it 'should not return nil for is_consumer_role' do
