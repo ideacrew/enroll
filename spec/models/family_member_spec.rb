@@ -245,7 +245,6 @@ describe FamilyMember, 'callback set crm_notifiction_needed', dbclean: :after_ea
     person.person_relationships << PersonRelationship.new(relative: person, kind: "self")
     person.person_relationships.build(relative: dependent_person, kind: "spouse")
     person.save!
-    family.save!
   end
 
   it 'should set to true on create' do
