@@ -41,7 +41,7 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
 
   describe '#transform_applications' do
 
-    subject { Operations::Transformers::FamilyTo::Cv3Family.new.transform_applications(family) }
+    subject { Operations::Transformers::FamilyTo::Cv3Family.new.transform_applications(family, false) }
 
     context "when application is invalid" do
       before do
@@ -53,6 +53,26 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
 
       it "should throw a failure if cv3 application throws failure" do
         expect(subject).to be_a(Dry::Monads::Result::Failure)
+      end
+    end
+
+    context "when applications are excluded" do
+      before do
+        create_instate_addresses
+        create_relationships
+        application.save!
+        allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Failure.new(application))
+      end
+
+      it "should return an empty array when exclue applications true" do
+        result = Operations::Transformers::FamilyTo::Cv3Family.new.transform_applications(family, true)
+        expect(result).to be_empty
+      end
+
+      it "should still be a valid cv3 family when exclude applications true" do
+        result = Operations::Transformers::FamilyTo::Cv3Family.new.call(family, true)
+        contract_result = ::AcaEntities::Contracts::Families::FamilyContract.new.call(result.value!)
+        expect(contract_result.success?).to eq true
       end
     end
 
