@@ -1027,7 +1027,7 @@ module FinancialAssistance
     end
 
     def apply_aggregate_to_enrollment
-      return unless EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment) || !previously_renewal_draft?
+      return unless EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment) || !previously_renewal_draft? || self.effective_date.to_date == self.effective_date.end_of_year.to_date
       on_new_determination = ::Operations::Individual::OnNewDetermination.new.call({family: self.family, year: self.effective_date.year})
 
       Rails.logger.error { "Failed while creating enrollment on_new_determination: #{self.hbx_id}, Error: #{on_new_determination.failure}" } unless on_new_determination.success?
