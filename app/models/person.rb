@@ -1,3 +1,6 @@
+
+
+
 class Person
   include Config::AcaModelConcern
   include Config::SiteModelConcern
