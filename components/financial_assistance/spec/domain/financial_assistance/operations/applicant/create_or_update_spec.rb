@@ -168,7 +168,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
          :dob => (Date.today - 10.years).strftime("%d/%m/%Y"),
          :emails => [{:address => "example1@example.com", :kind => "work"}],
          :encrypted_ssn => "wFDFw1whehQ1Udku1/79DA==\n",
-         :ethnicity => [],
+         :ethnicity => nil,
          :expiration_date => nil,
          :family_member_id => BSON::ObjectId('5f60c648bb40ee0c3d288a83'),
          :first_name => "james",
