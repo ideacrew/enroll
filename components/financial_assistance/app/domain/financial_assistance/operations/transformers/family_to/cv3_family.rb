@@ -49,11 +49,13 @@ module FinancialAssistance
             member_hbx_ids = family.active_family_members.collect {|family_member| family_member.person.hbx_id}
             applications = ::FinancialAssistance::Application.where(family_id: family.id).where(:aasm_state.in => ["submitted", "determined"])
             applications.collect do |application|
-              applicant_person_hbx_ids = application.active_applicants.pluck(:person_hbx_id)
-              if member_hbx_ids.to_set == applicant_person_hbx_ids.to_set
-                appl = ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
-                appl.success? ? appl.value! : {result: appl }
-              end
+              # NOTE: this class should be deprecated in favor of Operations::Transformers::FamilyTo::Cv3Family
+              # NOTE: for now, disabling validation of matching member and applicant hbx ids as is done in Operations::Transformers::FamilyTo::Cv3Family
+              # applicant_person_hbx_ids = application.active_applicants.pluck(:person_hbx_id)
+              # if member_hbx_ids.to_set == applicant_person_hbx_ids.to_set
+              appl = ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
+              appl.success? ? appl.value! : {result: appl }
+              # end
             end.compact
           end
 

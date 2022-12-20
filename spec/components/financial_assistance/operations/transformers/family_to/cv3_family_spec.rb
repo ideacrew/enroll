@@ -987,15 +987,16 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
       end
     end
 
-    context "when a family member is deleted" do
-      before do
-        family.family_members.last.delete
-        family.reload
-      end
+    # NOTE: for now, disabling validation of matching member and applicant hbx ids as is done in Operations::Transformers::FamilyTo::Cv3Family
+    # context "when a family member is deleted" do
+    #   before do
+    #     family.family_members.last.delete
+    #     family.reload
+    #   end
 
-      it "should ignore the application and return an empty array" do
-        expect(subject).to be_empty
-      end
-    end
+    #   it "should ignore the application and return an empty array" do
+    #     expect(subject).to be_empty
+    #   end
+    # end
   end
 end
