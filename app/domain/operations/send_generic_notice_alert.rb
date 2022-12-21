@@ -81,7 +81,11 @@ module Operations
     end
 
     def is_employer?
-      @resource.is_a?("::BenefitSponsors::Organizations::AcaShop#{site_key.capitalize}EmployerProfile".constantize) || @resource.is_a?(::BenefitSponsors::Organizations::FehbEmployerProfile)
+      employer_class = [::BenefitSponsors::Organizations::AcaShopDcEmployerProfile, ::BenefitSponsors::Organizations::AcaShopMeEmployerProfile].find do |profile_class|
+        profile_class.to_s == "BenefitSponsors::Organizations::AcaShop#{site_key.capitalize}EmployerProfile"
+      end
+
+      (employer_class.present? && @resource.is_a?(employer_class)) || @resource.is_a?(::BenefitSponsors::Organizations::FehbEmployerProfile)
     end
 
     def is_general_agency?
