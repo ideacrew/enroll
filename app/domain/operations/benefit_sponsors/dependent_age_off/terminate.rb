@@ -23,9 +23,9 @@ module Operations
         end
 
         def process_shop_dep_age_off(enrollment_hbx_id, shop_logger, new_date) # rubocop:disable Metrics/CyclomaticComplexity
-          cut_off_age = EnrollRegistry[:aca_shop_dependent_age_off].settings(:cut_off_age).item
+          cut_off_age = ::EnrollRegistry[:aca_shop_dependent_age_off].settings(:cut_off_age).item
 
-          enrollment = HbxEnrollment.by_hbx_id(enrollment_hbx_id).first
+          enrollment = ::HbxEnrollment.by_hbx_id(enrollment_hbx_id).first
           primary_person = enrollment.family.primary_person
           enr_members = enrollment.hbx_enrollment_members
           covered_family_members = enr_members.map(&:family_member)
@@ -58,12 +58,12 @@ module Operations
         end
 
         def fetch_relation_objects(primary_person, covered_members_ids)
-          dependent_relations = EnrollRegistry[:aca_shop_dependent_age_off].setting(:relationship_kinds).item
+          dependent_relations = ::EnrollRegistry[:aca_shop_dependent_age_off].setting(:relationship_kinds).item
           primary_person.person_relationships.where(:kind.in => dependent_relations).select{ |rel| (covered_members_ids.include? rel.relative_id)}
         end
 
         def terminate_and_reinstate_enrollment(enrollment, effective_date, eligible_dependents)
-          reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(enrollment, effective_date, nil, eligible_dependents).build
+          reinstate_enrollment = ::Enrollments::Replicator::Reinstatement.new(enrollment, effective_date, nil, eligible_dependents).build
           reinstate_enrollment.save!
           return unless reinstate_enrollment.may_reinstate_coverage?
           reinstate_enrollment.force_select_coverage!

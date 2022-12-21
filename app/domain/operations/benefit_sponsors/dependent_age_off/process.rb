@@ -38,7 +38,7 @@ module Operations
           return Success(enrollment_query) unless enrollment_query.nil?
 
           # only interested in terminating previous year's enrollments
-          Success(HbxEnrollment.by_year(TimeKeeper.date_of_record.last_year.year).enrolled.shop_market.all_with_multiple_enrollment_members)
+          Success(::HbxEnrollment.by_year(TimeKeeper.date_of_record.last_year.year).enrolled.shop_market.all_with_multiple_enrollment_members)
         end
 
         def process_shop_dep_age_off(enrollments, shop_logger, new_date) # rubocop:disable Metrics/CyclomaticComplexity
