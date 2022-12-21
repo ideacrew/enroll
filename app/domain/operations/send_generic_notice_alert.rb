@@ -85,7 +85,7 @@ module Operations
         profile_class.to_s == "BenefitSponsors::Organizations::AcaShop#{site_key.capitalize}EmployerProfile"
       end
 
-      (employer_class.present? && @resource.is_a?(employer_class)) || @resource.is_a?(::BenefitSponsors::Organizations::FehbEmployerProfile)
+      (employer_class && @resource.is_a?(employer_class)) || @resource.is_a?(::BenefitSponsors::Organizations::FehbEmployerProfile)
     end
 
     def is_general_agency?
