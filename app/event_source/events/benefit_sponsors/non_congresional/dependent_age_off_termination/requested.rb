@@ -6,7 +6,7 @@ module Events
       module DependentAgeOffTermination
         # This class will register event 'dependent_age_off_termination.requested'
         class Requested < EventSource::Event
-          publisher_path 'publishers.benefit_sponsors.non_congressional.dependent_age_off_termination_requested_publisher'
+          publisher_path 'publishers.benefit_sponsors.non_congressional.dependent_age_off_termination_publisher'
 
         end
       end

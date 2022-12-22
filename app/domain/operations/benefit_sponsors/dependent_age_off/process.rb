@@ -60,7 +60,7 @@ module Operations
           if failed_enrollments.blank?
             Success("Successfully processed dependent age-off termination at #{TimeKeeper.datetime_of_record}")
           else
-            Failure("Failed to process dependent age-off terminations for a subset of enrollments: #{failed_enrollments}.join(', ')")
+            Failure("Failed to process dependent age-off terminations for a subset of enrollments: #{failed_enrollments.join(', ')}")
           end
         end
       end
