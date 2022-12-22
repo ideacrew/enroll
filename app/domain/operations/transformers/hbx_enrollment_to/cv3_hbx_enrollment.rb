@@ -28,10 +28,12 @@ module Operations
           issuer = product&.issuer_profile
           consumer_role = enr&.consumer_role
           payload = {
+            hbx_id: enr.hbx_id,
             effective_on: enr.effective_on,
             aasm_state: enr.aasm_state,
             market_place_kind: enr.kind,
             enrollment_period_kind: enr.enrollment_kind,
+            terminated_on: enr.terminated_on,
             product_kind: enr.coverage_kind,
             total_premium: enr.total_premium,
             applied_aptc_amount: { cents: enr.applied_aptc_amount.cents, currency_iso: enr.applied_aptc_amount.currency.iso_code },
@@ -189,6 +191,7 @@ module Operations
               is_subscriber: hem.is_subscriber,
               eligibility_date: hem.eligibility_date,
               coverage_start_on: hem.coverage_start_on,
+              coverage_end_on: hem.coverage_end_on,
               slcsp_member_premium: fetch_slcsp_benchmark_premium_for_member(person.hbx_id, slcsp_info)
             }
           end
