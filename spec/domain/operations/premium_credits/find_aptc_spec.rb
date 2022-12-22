@@ -234,6 +234,24 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           end
         end
 
+        context 'with member coverage_start_on different from effective_on' do
+          let(:benchmark_premium) { primary_bp }
+          let(:today) { TimeKeeper.date_of_record }
+          let(:dob_year) { today.year - 15 }
+
+          before do
+            hbx_enrollment.update_attributes!(effective_on: TimeKeeper.date_of_record)
+            hbx_enrollment.hbx_enrollment_members.each do |mmbr|
+              mmbr.person.update_attributes!(dob: Date.new(dob_year, today.month, today.day) - 15.days)
+              mmbr.update_attributes!(coverage_start_on: 1.month.ago.to_date)
+            end
+          end
+
+          it 'returns success' do
+            expect(result.success?).to eq true
+          end
+        end
+
         context 'with inactive tax household group' do
           before do
             family.tax_household_groups.active.first.update_attributes!(end_on: TimeKeeper.date_of_record.end_of_year)
