@@ -218,6 +218,8 @@ module Notifier
             unless benefit_application.effective_date.yday == 1
               enrollment_errors << "number of eligible participants enrolling (#{benefit_application.all_enrolled_and_waived_member_count}) is less than minimum required #{benefit_application.minimum_enrolled_count}"
             end
+          when 'all_waived_members_eligiblity'
+            enrollment_errors << "at least one non-owner eligible member enrolling must not be waived"
           end
         end
       end

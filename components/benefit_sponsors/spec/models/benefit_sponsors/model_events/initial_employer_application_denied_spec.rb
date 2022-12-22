@@ -116,6 +116,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerApplicationDenied',
               unless model_instance.effective_date.yday == 1
                 enrollment_errors << "number of eligible participants enrolling (#{model_instance.all_enrolled_and_waived_member_count}) is less than minimum required #{model_instance.minimum_enrolled_count}"
               end
+            when 'all_waived_members_eligiblity'
+              enrollment_errors << "at least one non-owner eligible member enrolling must not be waived"
             end
           end
         end
