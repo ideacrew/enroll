@@ -164,6 +164,101 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
   end
 
+  describe 'GET thankyou for set_aptcs_for_continuous_coverage', :dbclean => :around_each do
+    let!(:system_year) { Date.today.year }
+    let!(:start_of_year) { Date.new(system_year) }
+    let!(:person10) { FactoryBot.create(:person, :with_consumer_role, dob: Date.new(system_year - 25, 1, 19)) }
+    let!(:family10) { FactoryBot.create(:family, :with_primary_family_member, person: person10) }
+    let!(:hbx_enrollment10) do
+      FactoryBot.create(:hbx_enrollment,
+                        :with_silver_health_product,
+                        :individual_unassisted,
+                        effective_on: start_of_year,
+                        family: family10,
+                        household: family10.active_household,
+                        coverage_kind: "health",
+                        rating_area_id: rating_area.id)
+    end
+    let!(:hbx_enrollment_member10) do
+      FactoryBot.create(:hbx_enrollment_member, is_subscriber: true, hbx_enrollment: hbx_enrollment10, applicant_id: family10.primary_applicant.id,
+                                                coverage_start_on: start_of_year, eligibility_date: start_of_year)
+    end
+
+    let!(:hbx_enrollment11) do
+      FactoryBot.create(:hbx_enrollment,
+                        :individual_unassisted,
+                        effective_on: start_of_year.next_month,
+                        family: family10,
+                        product_id: hbx_enrollment10.product_id,
+                        household: family10.active_household,
+                        coverage_kind: "health",
+                        rating_area_id: rating_area.id)
+    end
+
+    let!(:hbx_enrollment_member11) do
+      FactoryBot.create(:hbx_enrollment_member, is_subscriber: true, hbx_enrollment: hbx_enrollment11,
+                                                applicant_id: family10.primary_applicant.id, coverage_start_on: start_of_year.next_month,
+                                                eligibility_date: start_of_year.next_month)
+    end
+
+    let(:input_params) do
+      {
+        id: hbx_enrollment11.id,
+        plan_id: hbx_enrollment11.product_id,
+        elected_aptc: 300.00
+      }
+    end
+
+    let(:session_variables) { { elected_aptc: 300.00, max_aptc: 300.00, aptc_grants: double } }
+
+    before do
+      allow(TimeKeeper).to receive(:date_of_record).and_return(start_of_year)
+      controller.instance_variable_set(:@elected_aptc, 300.00)
+      controller.instance_variable_set(:@max_aptc, 300.00)
+      controller.instance_variable_set(:@aptc_grants, double)
+
+      EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+
+      allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
+        double(
+          call: double(
+            success?: true,
+            value!: 200.00
+          )
+        )
+      )
+    end
+
+    context 'with continuous coverage' do
+      before do
+        sign_in(user)
+        get :thankyou, params: input_params, session: session_variables
+      end
+
+      it 'resets max_aptc and elected_aptc' do
+        expect(response).to have_http_status(:success)
+        expect(assigns(:elected_aptc)).to eq(200.00)
+        expect(assigns(:max_aptc)).to eq(200.00)
+      end
+    end
+
+    context 'without continuous coverage' do
+      let(:product11) { FactoryBot.create(:benefit_markets_products_health_products_health_product, metal_level_kind: :silver) }
+
+      before do
+        hbx_enrollment11.update_attributes!(product_id: product11.id)
+        sign_in(user)
+        get :thankyou, params: input_params, session: session_variables
+      end
+
+      it 'does not reset max_aptc and elected_aptc' do
+        expect(response).to have_http_status(:success)
+        expect(assigns(:elected_aptc)).to eq(300.00)
+        expect(assigns(:max_aptc)).to eq(300.00)
+      end
+    end
+  end
+
   context "GET thankyou", :dbclean => :around_each do
     let(:member_group) { double("MEMBERGROUP")}
     let(:product_delegator) { double }

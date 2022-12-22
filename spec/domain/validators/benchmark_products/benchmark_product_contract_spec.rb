@@ -27,7 +27,8 @@ RSpec.describe Validators::BenchmarkProducts::BenchmarkProductContract,  dbclean
               family_member_id: BSON::ObjectId.new,
               relationship_with_primary: 'self',
               date_of_birth: TimeKeeper.date_of_record - 30.years,
-              age_on_effective_date: 30
+              age_on_effective_date: 30,
+              coverage_start_on: TimeKeeper.date_of_record
             }
           ]
         }

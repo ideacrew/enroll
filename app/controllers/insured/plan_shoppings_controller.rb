@@ -98,6 +98,7 @@ class Insured::PlanShoppingsController < ApplicationController
       @enrollment.verify_and_reset_osse_subsidy_amount(@member_group)
     else
       @enrollment.reset_dates_on_previously_covered_members(@plan)
+      set_aptcs_for_continuous_coverage
       @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc)
       @enrollment.update(eligible_child_care_subsidy: @plan.total_childcare_subsidy_amount)
       # Used for determing whether or not to show the extended APTC message
@@ -366,6 +367,22 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   private
+
+  def set_aptcs_for_continuous_coverage
+    return unless enrollment_effective_on_not_same_as_coverage_start_on && EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+
+    percentage = @elected_aptc / @max_aptc
+    @max_aptc = ::Operations::PremiumCredits::FindAptc.new.call({ hbx_enrollment: @enrollment, effective_on: @enrollment.effective_on }).value!
+    @elected_aptc = percentage * @max_aptc
+  end
+
+  # Checks if Enrollment is a Continuous Coverage Enrollment
+  def enrollment_effective_on_not_same_as_coverage_start_on
+    @enrollment.hbx_enrollment_members.any? do |member|
+      next member if member.coverage_start_on.blank?
+      member.coverage_start_on != @enrollment.effective_on
+    end
+  end
 
   def dependents_with_existing_coverage(enrollment)
     existing_coverages = ::Operations::FetchExistingCoverage.new.call({enrollment_id: enrollment.id})
