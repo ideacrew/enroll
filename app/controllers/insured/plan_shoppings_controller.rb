@@ -369,19 +369,13 @@ class Insured::PlanShoppingsController < ApplicationController
   private
 
   def set_aptcs_for_continuous_coverage
-    return unless enrollment_effective_on_not_same_as_coverage_start_on && EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+    return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+    return unless @enrollment.continuous_coverage?
+    return if @max_aptc.zero?
 
     percentage = @elected_aptc / @max_aptc
     @max_aptc = ::Operations::PremiumCredits::FindAptc.new.call({ hbx_enrollment: @enrollment, effective_on: @enrollment.effective_on }).value!
     @elected_aptc = percentage * @max_aptc
-  end
-
-  # Checks if Enrollment is a Continuous Coverage Enrollment
-  def enrollment_effective_on_not_same_as_coverage_start_on
-    @enrollment.hbx_enrollment_members.any? do |member|
-      next member if member.coverage_start_on.blank?
-      member.coverage_start_on != @enrollment.effective_on
-    end
   end
 
   def dependents_with_existing_coverage(enrollment)
