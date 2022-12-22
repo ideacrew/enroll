@@ -47,14 +47,14 @@ module Operations
             next if enrollment.employer_profile&.is_fehb?
 
             payload = { enrollment_hbx_id: enrollment.hbx_id.to_s, new_date: new_date }
-            event = event('events.benefit_sponsors.non_congressional.dep_age_off_termination.requested', attributes: payload).value!
+            event = event('events.benefit_sponsors.non_congressional.dependent_age_off_termination.requested', attributes: payload).value!
             event.publish
-            shop_logger.info "Published dep_age_off_termination event for enrollment #{enrollment.hbx_id} at #{TimeKeeper.datetime_of_record}"
+            shop_logger.info "Published dependent_age_off_termination event for enrollment #{enrollment.hbx_id} at #{TimeKeeper.datetime_of_record}"
 
             Success()
           rescue StandardError => e
             failed_enrollments << enrollment.hbx_id
-            shop_logger.error "Unable to publish dep_age_off_termination event for enrollment #{enrollment.hbx_id} due to #{e.message}"
+            shop_logger.error "Unable to publish dependent_age_off_termination event for enrollment #{enrollment.hbx_id} due to #{e.message}"
           end
 
           if failed_enrollments.blank?
