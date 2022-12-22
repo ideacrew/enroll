@@ -50,8 +50,8 @@ module Operations
 
         model_object = Object.const_get(model)
 
-        if model_object == BenefitSponsors::Organizations::AcaShopDcEmployerProfile
-          BenefitSponsors::Operations::Profiles::FindProfile.new.call(profile_id: params[:model_id])
+        if model_object == ::BenefitSponsors::Organizations::AcaShopDcEmployerProfile
+          ::BenefitSponsors::Operations::Profiles::FindProfile.new.call(profile_id: params[:model_id])
         elsif model_object == Person
           ::Operations::People::Find.new.call(person_id: params[:model_id])
         else
