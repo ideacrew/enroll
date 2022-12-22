@@ -209,14 +209,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       }
     end
 
-    let(:session_variables) { { elected_aptc: 300.00, max_aptc: 300.00, aptc_grants: double } }
-
     before do
       allow(TimeKeeper).to receive(:date_of_record).and_return(start_of_year)
-      controller.instance_variable_set(:@elected_aptc, 300.00)
-      controller.instance_variable_set(:@max_aptc, 300.00)
-      controller.instance_variable_set(:@aptc_grants, double)
-
       EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
 
       allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
@@ -230,7 +224,12 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
 
     context 'with continuous coverage' do
+      let(:session_variables) { { elected_aptc: 300.00, max_aptc: 300.00, aptc_grants: double } }
+
       before do
+        controller.instance_variable_set(:@elected_aptc, 300.00)
+        controller.instance_variable_set(:@max_aptc, 300.00)
+        controller.instance_variable_set(:@aptc_grants, double)
         sign_in(user)
         get :thankyou, params: input_params, session: session_variables
       end
@@ -242,10 +241,27 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       end
     end
 
-    context 'without continuous coverage' do
-      let(:product11) { FactoryBot.create(:benefit_markets_products_health_products_health_product, metal_level_kind: :silver) }
+    context 'with continuous coverage without APTC(UQHP)' do
+      let(:session_variables) { {} }
 
       before do
+        sign_in(user)
+        get :thankyou, params: input_params, session: session_variables
+      end
+
+      it 'returns success' do
+        expect(response).to have_http_status(:success)
+      end
+    end
+
+    context 'without continuous coverage' do
+      let(:product11) { FactoryBot.create(:benefit_markets_products_health_products_health_product, metal_level_kind: :silver) }
+      let(:session_variables) { { elected_aptc: 300.00, max_aptc: 300.00, aptc_grants: double } }
+
+      before do
+        controller.instance_variable_set(:@elected_aptc, 300.00)
+        controller.instance_variable_set(:@max_aptc, 300.00)
+        controller.instance_variable_set(:@aptc_grants, double)
         hbx_enrollment11.update_attributes!(product_id: product11.id)
         sign_in(user)
         get :thankyou, params: input_params, session: session_variables
