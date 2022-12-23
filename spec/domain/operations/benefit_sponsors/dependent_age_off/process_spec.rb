@@ -11,7 +11,7 @@ RSpec.describe Operations::BenefitSponsors::DependentAgeOff::Process, type: :mod
   let!(:family)          { FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let!(:hbx_enrollment)  { FactoryBot.create(:hbx_enrollment, :individual_unassisted, household: family.active_household, family: family) }
 
-  let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month }
+  let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month.prev_year }
   let(:effective_on) { current_effective_date }
   let(:hired_on) { TimeKeeper.date_of_record - 3.months }
   let(:shop_family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent)}
