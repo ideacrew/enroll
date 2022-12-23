@@ -12,7 +12,8 @@ module Operations
 
         def call(enrollment_hbx_id:, new_date:)
           shop_logger = yield initialize_logger("shop")
-          process_shop_dep_age_off(enrollment_hbx_id, shop_logger, new_date)
+          parsed_date = yield parse_date(new_date)
+          process_shop_dep_age_off(enrollment_hbx_id, shop_logger, parsed_date)
         end
 
         private
@@ -20,6 +21,22 @@ module Operations
         def initialize_logger(market_kind)
           logger_file = Logger.new("#{Rails.root}/log/dependent_age_off_#{market_kind}_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
           Success(logger_file)
+        end
+
+        def parse_date(new_date)
+          date =
+            case new_date
+            when String
+              Date.parse(new_date)
+            when Date
+              new_date
+            end
+
+          if date
+            Success(date)
+          else
+            Failure("unknown date format")
+          end
         end
 
         def process_shop_dep_age_off(enrollment_hbx_id, shop_logger, new_date) # rubocop:disable Metrics/CyclomaticComplexity
@@ -49,7 +66,7 @@ module Operations
             Success("No relations found for #{enrollment_hbx_id}")
           end
         rescue StandardError => e
-          shop_logger.error "Unable to terminate dependent age-off enrollment #{enrollment.hbx_id} due to #{e.message}"
+          shop_logger.error "Unable to terminate dependent age-off enrollment #{enrollment_hbx_id} due to #{e.message}"
           Failure("Unable to terminate dependent age-off for enrollment #{enrollment_hbx_id} due to #{e.message}")
         end
 

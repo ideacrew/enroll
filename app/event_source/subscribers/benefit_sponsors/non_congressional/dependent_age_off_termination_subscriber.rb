@@ -17,7 +17,8 @@ module Subscribers
           logger.info "on_enroll_benefit_sponsors_non_congressional_dependent_age_off_termination payload: #{payload}"
           logger.debug "invoked DependentAgeOffTerminationSubscriber with #{delivery_info}"
 
-          result = Operations::BenefitSponsors::DependentAgeOff::Terminate.new.call(enrollment_hbx_id: payload[:enrollment_hbx_id], new_date: payload[:new_date])
+          enrollment_hbx_id = payload[:enrollment_hbx_id]
+          result = Operations::BenefitSponsors::DependentAgeOff::Terminate.new.call(enrollment_hbx_id: enrollment_hbx_id, new_date: payload[:new_date])
 
           if result.success?
             subscriber_logger.info "on_enroll_benefit_sponsors_non_congressional_dependent_age_off_termination, success: enrollment_hbx_id: #{enrollment_hbx_id} | result: #{result.value!}"
