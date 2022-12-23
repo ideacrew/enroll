@@ -25,9 +25,10 @@ module Operations
 
         def parse_date(new_date)
           date =
-            if new_date.is_a?(String)
+            case new_date
+            when String
               Date.parse(new_date)
-            elsif new_date.is_a?(Date)
+            when Date
               new_date
             end
 
