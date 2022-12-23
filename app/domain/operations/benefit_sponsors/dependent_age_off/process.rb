@@ -45,11 +45,15 @@ module Operations
           failed_enrollments = []
           enrollments.no_timeout.each do |enrollment|
             next if enrollment.employer_profile&.is_fehb?
-
             payload = { enrollment_hbx_id: enrollment.hbx_id.to_s, new_date: new_date }
-            event = event('events.benefit_sponsors.non_congressional.dependent_age_off_termination.requested', attributes: payload).value!
-            event.publish
-            shop_logger.info "Published dependent_age_off_termination event for enrollment #{enrollment.hbx_id} at #{TimeKeeper.datetime_of_record}"
+
+            if Rails.env.test?
+              Operations::BenefitSponsors::DependentAgeOff::Terminate.new.call(payload)
+            else
+              event = event('events.benefit_sponsors.non_congressional.dependent_age_off_termination.requested', attributes: payload).value!
+              event.publish
+              shop_logger.info "Published dependent_age_off_termination event for enrollment #{enrollment.hbx_id} at #{TimeKeeper.datetime_of_record}"
+            end
 
             Success()
           rescue StandardError => e
@@ -60,7 +64,7 @@ module Operations
           if failed_enrollments.blank?
             Success("Successfully processed dependent age-off termination at #{TimeKeeper.datetime_of_record}")
           else
-            Failure("Failed to process dependent age-off terminations for a subset of enrollments: #{failed_enrollments}.join(', ')")
+            Failure("Failed to process dependent age-off terminations for a subset of enrollments: #{failed_enrollments.join(', ')}")
           end
         end
       end
