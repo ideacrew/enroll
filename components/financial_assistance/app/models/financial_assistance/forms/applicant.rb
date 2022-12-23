@@ -114,6 +114,7 @@ module FinancialAssistance
         applicant_entity = FinancialAssistance::Operations::Applicant::Build.new.call(params: extract_applicant_params.merge(is_living_in_state: is_living_in_state))
         if applicant_entity.success?
           values = applicant_entity.success.to_h.except(:addresses, :emails, :phones).merge(nested_parameters)
+          values.merge(applying_coverage_params) unless values[:is_applying_coverage]
           applicant = application.applicants.find(applicant_id) if applicant_id.present?
           if applicant.present? && applicant.persisted?
             applicant.update(values)
@@ -203,6 +204,10 @@ module FinancialAssistance
         params.merge(phones_attributes: phones_attributes.reject{|_key, value| value[:full_phone_number].blank?}) if phones_attributes.present?
         params.merge(emails_attributes: emails_attributes.reject{|_key, value| value[:address].blank?}) if emails_attributes.present?
         params
+      end
+
+      def applying_coverage_params
+        { has_enrolled_health_coverage: nil, has_eligible_health_coverage: nil}
       end
 
       def primary_applicant_address_attributes
