@@ -12,9 +12,10 @@ module Operations
       def call(params)
         valid_params = yield validate(params)
         agency_account = yield find_broker_agency_account(valid_params)
+        broker_role = agency_account.writing_agent
         family = yield find_family(valid_params)
         result = yield terminate_broker_agency(agency_account, valid_params)
-        notify_broker_terminated_event_to_edi(valid_params, family)
+        notify_broker_terminated_event_to_edi(valid_params, family, broker_role)
         Success(result)
       end
 
@@ -38,7 +39,7 @@ module Operations
         ::Operations::Families::Find.new.call(id: valid_params[:family_id])
       end
 
-      def notify_broker_terminated_event_to_edi(valid_params, family)
+      def notify_broker_terminated_event_to_edi(valid_params, family, broker_role)
         return Success("") if valid_params[:notify_edi].present? && valid_params[:notify_edi] == false
         return Success("") unless broker_role&.npn&.scan(/\D/)&.empty?
 
