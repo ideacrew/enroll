@@ -135,6 +135,26 @@ RSpec.describe ::FinancialAssistance::Forms::Applicant, type: :model, dbclean: :
     end
   end
 
+  describe "save form with is_applying_coverage false" do
+    let(:input_applicant) {spouse_applicant}
+    let(:relationship) {'spouse'}
+
+    before do
+      spouse_applicant.update_attributes!(first_name: "spouse", last_name: "Roberts", gender: "female", has_enrolled_health_coverage: true, has_eligible_health_coverage: true)
+      @applicant_form = described_class.new(params.merge!(is_applying_coverage: false))
+      @applicant_form.application_id = application.id
+      @applicant_form.applicant_id = input_applicant.id
+      @applicant_form.relationship_validation
+      @applicant_form.save
+      spouse_applicant.reload
+    end
+
+    it 'should update applicant health coverage field' do
+      expect(spouse_applicant.has_enrolled_health_coverage).to be_nil
+      expect(spouse_applicant.has_eligible_health_coverage).to be_nil
+    end
+  end
+
 
   context 'check_same_ssn' do
     context 'applicant child update with same ssn' do
