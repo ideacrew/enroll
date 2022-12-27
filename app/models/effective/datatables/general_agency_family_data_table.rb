@@ -4,32 +4,32 @@ module Effective
       attr_reader :person_cache
 
       datatable do
-        table_column :name, :label => 'Name', :proc => Proc.new { |row| 
+        table_column :name, :label => 'Name', :proc => proc { |row|
           pp = @effective_datatable.person_cache[row.primary_applicant.person_id]
-          link_to pp.full_name, resume_enrollment_exchanges_agents_path(person_id: pp.id)
+          link_to pp.full_name, resume_enrollment_exchanges_agents_path(person_id: pp.id), rel: 'noopener noreferrer'
            }, :filter => false, :sortable => false
 
-        table_column :ssn, :label => 'SSN', :proc => Proc.new { |row| 
+        table_column :ssn, :label => 'SSN', :proc => proc { |row|
              pp = @effective_datatable.person_cache[row.primary_applicant.person_id]
              primary_ssn = pp.ssn
              primary_ssn.blank? ? "" : number_to_obscured_ssn(primary_ssn)
          }, :filter => false, :sortable => false
 
-        table_column :dob, :label => 'DOB', :proc => Proc.new { |row| 
+        table_column :dob, :label => 'DOB', :proc => proc { |row|
           pp = @effective_datatable.person_cache[row.primary_applicant.person_id]
           format_date(pp.dob) }, :filter => false, :sortable => false
-        
-        table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row|
+
+        table_column :hbx_id, :label => 'HBX ID', :proc => proc { |row|
          pp = @effective_datatable.person_cache[row.primary_applicant.person_id]
          pp.hbx_id  }, :filter => false, :sortable => false
-        
-        table_column :family_ct, :label => 'Family Ct', :proc => Proc.new { |row| row.active_family_members.size }, :filter => false, :sortable => false
-        
-        table_column :consumer, :label => 'Consumer?', :proc => Proc.new {  |row|  
+
+        table_column :family_ct, :label => 'Family Ct', :proc => proc { |row| row.active_family_members.size }, :filter => false, :sortable => false
+
+        table_column :consumer, :label => 'Consumer?', :proc => proc {  |row|
           pp = @effective_datatable.person_cache[row.primary_applicant.person_id]
           pp.consumer_role.present?  ? "Yes" : "No"}, :filter => false, :sortable => false
 
-        table_column :employee, :label => 'Employee?', :proc => Proc.new {  |row|  
+        table_column :employee, :label => 'Employee?', :proc => proc {  |row|
           pp = @effective_datatable.person_cache[row.primary_applicant.person_id]
           pp.employee_roles.present?  ? "Yes" : "No" }, :filter => false, :sortable => false
       end

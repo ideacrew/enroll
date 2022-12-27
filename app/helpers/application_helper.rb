@@ -49,7 +49,8 @@ module ApplicationHelper
       # TODO: Change from root url to family home page
       link_to(
         "#{row.target_record&.primary_person&.full_name} (Family Primary Person)",
-        resume_enrollment_exchanges_agents_path(person_id: row&.target_record&.primary_applicant&.person&.id)
+        resume_enrollment_exchanges_agents_path(person_id: row&.target_record&.primary_applicant&.person&.id),
+        rel: 'noopener noreferrer'
       )
     end
   end

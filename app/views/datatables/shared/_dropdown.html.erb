@@ -12,32 +12,32 @@
       <%case line[2]%>
       <%when "disabled"%>
         <% if line[0] == 'Edit APTC / CSR' %>
-          <%= link_to line[0], line[1], class: "btn btn-info btn-xs edit_aptc_csr_#{row_actions_id}", disabled: true, remote: true %>
+          <%= link_to line[0], line[1], class: "btn btn-info btn-xs edit_aptc_csr_#{row_actions_id}", disabled: true, remote: true, rel: 'noopener noreferrer' %>
         <% else %>
-          <%= link_to line[0], line[1], class: "btn btn-info btn-xs", disabled: true %>
+          <%= link_to line[0], line[1], class: "btn btn-info btn-xs", disabled: true, rel: 'noopener noreferrer' %>
         <% end %>
       <%when "static"%>
-        <%= link_to line[0], line[1], class: "btn btn-xs", data: {turbolinks: false} %>
+        <%= link_to line[0], line[1], class: "btn btn-xs", data: {turbolinks: false}, rel: 'noopener noreferrer' %>
 			<% when "post" %>
-				<%= link_to line[0], line[1], method: :post, class: "btn btn-xs" %>
+				<%= link_to line[0], line[1], method: :post, class: "btn btn-xs", rel: 'noopener noreferrer' %>
       <%when "post_ajax"%>
-        <%= link_to line[0], line[1], method: :post, class: "btn btn-xs",remote: true  %>
+        <%= link_to line[0], line[1], method: :post, class: "btn btn-xs",remote: true , rel: 'noopener noreferrer' %>
       <%when "post_ajax_with_confirmation"%>
-        <%= link_to line[0], line[1], method: :post, class: "btn btn-xs", remote: true, data: { confirm: line[3] }  %>
+        <%= link_to line[0], line[1], method: :post, class: "btn btn-xs", remote: true, data: { confirm: line[3] } , rel: 'noopener noreferrer' %>
       <%when "ajax"%>
 				<% if line[0] == l10n('admin_actions.edit_aptc_csr') %>
-					<%= link_to line[0], line[1], class: "btn btn-xs edit-aptc-csr-enabled", remote: true %>
+					<%= link_to line[0], line[1], class: "btn btn-xs edit-aptc-csr-enabled", remote: true, rel: 'noopener noreferrer' %>
 				<% else %>
-					<%= link_to line[0], line[1], class: "btn btn-xs", remote: true %>
+					<%= link_to line[0], line[1], class: "btn btn-xs", remote: true, rel: 'noopener noreferrer' %>
 				<% end %>
       <%when "ajax with confirm"%>
-        <%= link_to line[0], line[1], class: "btn btn-xs", remote: true, data: { confirm: line[3] } %>
+        <%= link_to line[0], line[1], class: "btn btn-xs", remote: true, data: { confirm: line[3] }, rel: 'noopener noreferrer' %>
       <%when "delete with confirm"%>
-        <%= link_to line[0], line[1], class: "btn btn-xs", :method => 'delete', data: { confirm: line[3] } %>
+        <%= link_to line[0], line[1], class: "btn btn-xs", :method => 'delete', data: { confirm: line[3] }, rel: 'noopener noreferrer' %>
 			<% when "delete ajax with confirm"%>
-				<%= link_to line[0], line[1], class: "btn btn-xs", :method=> 'delete', data: { confirm: line[3] } %>
+				<%= link_to line[0], line[1], class: "btn btn-xs", :method=> 'delete', data: { confirm: line[3] }, rel: 'noopener noreferrer' %>
       <% when "delete ajax with confirm and elementId"%>
-        <%= link_to line[0], line[1], class: "btn btn-xs", :method => 'delete', :remote => true, data: { confirm: line[3] }, id: line[4] %>
+        <%= link_to line[0], line[1], class: "btn btn-xs", :method => 'delete', :remote => true, data: { confirm: line[3] }, id: line[4], rel: 'noopener noreferrer' %>
       <%end%>
     </li>
   <% end %>

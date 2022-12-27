@@ -9,7 +9,9 @@ module Effective
 
       datatable do
         #table_column :family_hbx_id, :proc => Proc.new { |row| row.hbx_assigned_id }, :filter => false, :sql_column => "hbx_id"
-        table_column :name, :label => 'Name', :proc => proc { |row| link_to row.primary_applicant.person.full_name, resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id)}, :filter => false, :sortable => false
+        table_column :name, :label => 'Name', :proc => proc { |row|
+          link_to row.primary_applicant.person.full_name, resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id), rel: 'noopener noreferrer'
+        }, :filter => false, :sortable => false
         table_column :ssn, :label => 'SSN', :proc => proc { |row| truncate(number_to_obscured_ssn(row.primary_applicant.person.ssn)) }, :filter => false, :sortable => false
         table_column :dob, :label => 'DOB', :proc => proc { |row| format_date(row.primary_applicant.person.dob)}, :filter => false, :sortable => false
         table_column :hbx_id, :label => 'HBX ID', :proc => proc { |row| row.primary_applicant.person.hbx_id }, :filter => false, :sortable => false
