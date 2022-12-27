@@ -107,7 +107,7 @@ class Person
   field :is_active, type: Boolean, default: true
   field :age_off_excluded, type: Boolean, default: false
   field :updated_by, type: String
-  field :no_ssn, type: String #ConsumerRole TODO TODOJF
+  field :no_ssn, type: String, default: ->{ self.encrypted_ssn.present? ? '0' : '1' }
   field :is_physically_disabled, type: Boolean
   field :is_applying_for_assistance, type: Boolean
 
