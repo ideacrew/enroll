@@ -114,7 +114,7 @@ module FinancialAssistance
         applicant_entity = FinancialAssistance::Operations::Applicant::Build.new.call(params: extract_applicant_params.merge(is_living_in_state: is_living_in_state))
         if applicant_entity.success?
           values = applicant_entity.success.to_h.except(:addresses, :emails, :phones).merge(nested_parameters)
-          values.merge(applying_coverage_params) unless values[:is_applying_coverage]
+          values.merge!(applying_coverage_params) unless values[:is_applying_coverage]
           applicant = application.applicants.find(applicant_id) if applicant_id.present?
           if applicant.present? && applicant.persisted?
             applicant.update(values)
