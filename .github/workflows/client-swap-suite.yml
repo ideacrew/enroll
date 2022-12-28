@@ -20,6 +20,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
+        with:
+          rubygems: 3.3.26
       - uses: actions/setup-node@v1
         with:
           node-version: '10'
@@ -80,6 +82,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
+        with:
+          rubygems: 3.3.26
       - uses: actions/setup-node@v1
         with:
           node-version: '10'
@@ -145,6 +149,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
+        with:
+          rubygems: 3.3.26
       - uses: actions/setup-node@v1
         with:
           node-version: '10'
@@ -207,6 +213,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
+        with:
+          rubygems: 3.3.26
       - uses: actions/setup-node@v1
         with:
           node-version: '10'
@@ -260,6 +268,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
+        with:
+          rubygems: 3.3.26
       - uses: actions/setup-node@v1
         with:
           node-version: '10'
