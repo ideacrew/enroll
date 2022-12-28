@@ -21,7 +21,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          rubygems: latest
+          rubygems: 3.3.26
       - name: Run View Linter
         run: |
           git fetch --no-tags --depth=1 origin trunk
@@ -33,7 +33,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          rubygems: latest
+          rubygems: 3.3.26
       - run: gem install brakeman
       - run: brakeman -i config/brakeman.ignore
       - name: Run Brakeman In Components
@@ -287,7 +287,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          rubygems: latest
+          rubygems: 3.3.26
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
@@ -398,7 +398,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          rubygems: latest
+          rubygems: 3.3.26
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
