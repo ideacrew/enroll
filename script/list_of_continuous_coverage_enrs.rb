@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# This script generates a CSV report with information about Continuous Coverage Enrollments with TaxHouseholdEnrollments
+# This script generates a CSV report with information about Continuous Coverage Health Enrollments created on or after 2022/1/1 with TaxHouseholdEnrollments.
+# This excludes enrollments in shopping or coverage_canceled state.
 # bundle exec rails runner script/list_of_continuous_coverage_enrs.rb
 
 # To run this on specific enrollments
@@ -104,7 +105,8 @@ def find_enrollment_hbx_ids
           "coverage_kind" => "health",
           "consumer_role_id" => {"$ne" => nil},
           "product_id" => {"$ne" => nil},
-          "aasm_state" => {"$ne" => 'shopping'}
+          "aasm_state" => {"$nin" => ['shopping', 'coverage_canceled']},
+          "effective_on" =>  {"$gte" => Date.new(2022)}
         }
       },
       {
