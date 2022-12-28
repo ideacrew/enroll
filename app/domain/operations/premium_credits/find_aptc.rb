@@ -195,6 +195,7 @@ module Operations
 
             member_result << {
               family_member_id: member_id,
+              coverage_start_on: @hbx_enrollment.hbx_enrollment_members.where(applicant_id: member_id).first&.coverage_start_on,
               relationship_with_primary: family_member.primary_relationship
             }
 
