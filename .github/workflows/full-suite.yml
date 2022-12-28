@@ -92,6 +92,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
+        with:
+          rubygems: 3.3.26
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
@@ -178,6 +180,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
+        with:
+          rubygems: 3.3.26
       - uses: actions/setup-node@v3
         with:
           node-version: '14'
