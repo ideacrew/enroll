@@ -24,7 +24,7 @@ class WelcomeController < ApplicationController
   private
 
   def set_same_site_cookie_attribute
-    response.headers['Set-Cookie'] = 'SameSite=Strict'
+    response.headers['Set-Cookie'] = "_session_id=#{session.id}; SameSite=Strict; Secure=true"
   end
 
 end
