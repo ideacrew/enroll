@@ -49,6 +49,13 @@ RSpec.describe Operations::BenefitSponsors::DependentAgeOff::Terminate, type: :m
   let!(:enr_mem2) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member2.id, is_subscriber: family_member2.is_primary_applicant, hbx_enrollment: shop_enrollment) }
   let!(:enr_mem3) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member3.id, is_subscriber: family_member3.is_primary_applicant, hbx_enrollment: shop_enrollment) }
 
+  before do
+    shop_family.family_members.each do |family_member|
+      family_member.person.age_off_excluded = nil
+      family_member.person.save!
+    end
+  end
+
   it 'should be a container-ready operation' do
     expect(subject.respond_to?(:call)).to be_truthy
   end
