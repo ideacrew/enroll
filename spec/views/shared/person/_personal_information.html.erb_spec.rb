@@ -16,7 +16,7 @@ describe "shared/person/_personal_information.html.erb" do
   end
 
   it "should have a required input field" do
-    expect(rendered).to have_selector('input[required="required"]', count: 6)
+    expect(rendered).to have_selector('input[required="required"]', count: 5)
   end
 
   it "should have required input fields with asterisk" do
