@@ -64,7 +64,7 @@ describe Person, :dbclean => :after_each do
           context 'ssn is NOT present' do
             let(:params) {valid_params.except(:ssn)}
             let(:person) {Person.create(**params)}
-            it "should set the no_ssn field to '0'" do
+            it "should set the no_ssn field to '1'" do
               expect(person.no_ssn).to eq '1'
             end
           end
