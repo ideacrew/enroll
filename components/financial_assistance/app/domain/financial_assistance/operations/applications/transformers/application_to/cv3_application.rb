@@ -155,7 +155,6 @@ module FinancialAssistance
                 mitc_eligible_incomes = eligible_incomes_for_mitc(applicant)
                 prior_insurance_benefit = prior_insurance(applicant)
                 result << {name: name(applicant),
-                          #  identifying_information: {has_ssn: applicant.no_ssn, encrypted_ssn: encrypt(applicant.ssn)},
                            identifying_information: identifying_information(applicant),
                            demographic: demographic(applicant),
                            attestation: attestation(applicant),
