@@ -46,7 +46,7 @@ class EmployeeRole
   delegate :benefit_package_for_date, to: :census_employee, allow_nil: true
 
   validates_presence_of :dob, :gender, :hired_on
-  validates_presence_of :ssn, :if => Proc { |m| !m.person.no_ssn || m.person.no_ssn == '1' }
+  validates_presence_of :ssn, :if => proc { |m| !m.person.no_ssn || m.person.no_ssn == '1' }
   # validates_presence_of :employer_profile_id
   # validates_presence_of :benefit_sponsors_employer_profile_id
   validates_presence_of :employer_profile_id, :if => Proc.new { |m| m.benefit_sponsors_employer_profile_id.blank? }
