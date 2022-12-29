@@ -9,7 +9,7 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :find_consumer_role, only: [:edit, :update]
   before_action :individual_market_is_enabled?
   before_action :decrypt_params, only: [:create]
-  before_action :set_cache_headers, only: [:edit]
+  before_action :set_cache_headers, only: [:edit, :help_paying_coverage, :privacy, :search]
   before_action :redirect_if_medicaid_tax_credits_link_is_disabled, only: [:privacy, :search]
   before_action :sanitize_contact_method, only: [:update]
 
