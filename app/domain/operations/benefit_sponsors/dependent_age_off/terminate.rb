@@ -71,7 +71,7 @@ module Operations
         end
 
         def fetch_aged_off_people(relations, new_date, cut_off_age)
-          relations.select{|dep| dep.relative.age_on(new_date - 1.day) >= cut_off_age}.flat_map(&:relative).select{|p| p.age_off_excluded == false}
+          relations.select{|dep| dep.relative.age_on(new_date - 1.day) >= cut_off_age}.flat_map(&:relative).reject{|p| p.age_off_excluded == true}
         end
 
         def fetch_relation_objects(primary_person, covered_members_ids)
