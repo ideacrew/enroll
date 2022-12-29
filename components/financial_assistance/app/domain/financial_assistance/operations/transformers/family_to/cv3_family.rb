@@ -268,13 +268,14 @@ module FinancialAssistance
 
           def transform_tax_household_members(members)
             members.collect do |member|
+              next unless member.family_member.present?
               {
                 family_member_reference: member.family_member.hbx_id,
                 # product_eligibility_determination: member.product_eligibility_determination,
                 is_subscriber: member.is_subscriber,
                 reason: member.reason
               }
-            end
+            end.compact
           end
 
           def transform_family_members(family_members)
