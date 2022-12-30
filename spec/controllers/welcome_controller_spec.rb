@@ -11,8 +11,9 @@ RSpec.describe WelcomeController, :type => :controller do
         expect(response).to render_template("index")
       end
 
-      it "has strict same site Cookie attributes" do
+      it "has Cookie attributes" do
         expect(response.headers["Set-Cookie"]).to match(/SameSite=Strict/)
+        expect(response.headers["Strict-Transport-Security"]).to match(/max-age=31536000; includeSubDomains; preload/)
       end
     end
 
