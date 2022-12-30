@@ -135,29 +135,36 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
           expect(result.failure).to eq "Not an ivl enrollment."
         end
 
-        it 'should return a failure when hbx_enrollment is not an ivl' do
+        it 'should return a failure when members have not been selected for termination' do
           result = subject.call({hbx_enrollment: enrollment,
                                  options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record + 1.day).to_s}})
 
           expect(result.failure).to eq "Member(s) have not been selected for termination."
         end
 
-        it 'should return a failure when hbx_enrollment is not an ivl' do
+        it 'should return a failure when termination date has not been selected' do
           result = subject.call({hbx_enrollment: enrollment,
                                  options: {"terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}})
 
           expect(result.failure).to eq "Termination date has not been selected."
         end
 
-        it 'should return a failure when hbx_enrollment is not an ivl' do
-          result = subject.call({hbx_enrollment: enrollment,
-                                 options: {"termination_date_#{enrollment.id}" => enrollment.effective_on.end_of_year.to_s,
-                                           "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}})
+        context 'when termination date is before effective on' do
+          before do
+            new_effective_on = Date.today.next_year.beginning_of_year
+            enrollment.update(effective_on: new_effective_on)
+          end
 
-          expect(result.failure).to eq "Termination date must be in current calendar year."
+          it 'should return a failure when termination date is not in current calendar year' do
+            termination_date = enrollment.effective_on - 1
+            result = subject.call({hbx_enrollment: enrollment,
+                                   options: {"termination_date_#{enrollment.id}" => termination_date.to_s,
+                                             "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}})
+            expect(result.failure).to eq "Termination date must be in current calendar year."
+          end
         end
 
-        it 'should return a failure when hbx_enrollment is not an ivl' do
+        it 'should return a failure when termination date is not in current calendar year' do
           result = subject.call({hbx_enrollment: enrollment,
                                  options: {"termination_date_#{enrollment.id}" => enrollment.effective_on.next_year.to_s,
                                            "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}})
