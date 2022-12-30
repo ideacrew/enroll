@@ -1,7 +1,7 @@
 class WelcomeController < ApplicationController
   layout 'bootstrap_4'
   skip_before_action :require_login
-  before_action :set_same_site_cookie_attribute, only: [:index]
+  before_action :set_cookie_attributes, only: [:index]
 
   def show_hints
     current_user.hints = !current_user.hints
@@ -23,8 +23,9 @@ class WelcomeController < ApplicationController
 
   private
 
-  def set_same_site_cookie_attribute
+  def set_cookie_attributes
     response.headers['Set-Cookie'] = "_session_id=#{session.id}; SameSite=Strict; Secure=true"
+    response.headers['Strict-Transport-Security'] = "max-age=31536000; includeSubDomains; preload"
   end
 
 end
