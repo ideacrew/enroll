@@ -12,7 +12,7 @@ RSpec.describe WelcomeController, :type => :controller do
       end
 
       it "has strict same site Cookie attributes" do
-        expect(response.headers["Set-Cookie"]).to eql("SameSite=Strict")
+        expect(response.headers["Set-Cookie"]).to match(/SameSite=Strict/)
       end
     end
 
