@@ -32,7 +32,7 @@ $(document).ready(function(){
 
         <tr id="family_<%= family.id %>">
 
-          <td><%#= pp.hbx_id %> <%= link_to pp.hbx_id, resume_enrollment_exchanges_agents_path(person_id: pp.id), rel: 'noopener noreferrer' %></td>
+          <td><%#= pp.hbx_id %> <%= link_to_with_noopener_noreferrer(pp.hbx_id, resume_enrollment_exchanges_agents_path(person_id: pp.id)) %></td>
           <td><%= pp.last_name%></td>
           <td><%= pp.first_name%></td>
           <td><%= format_date(pp.dob) %></td>

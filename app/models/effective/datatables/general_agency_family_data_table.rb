@@ -1,13 +1,15 @@
 module Effective
   module Datatables
     class GeneralAgencyFamilyDataTable < Effective::MongoidDatatable
+      include ApplicationHelper
+
       attr_reader :person_cache
 
       datatable do
         table_column :name, :label => 'Name', :proc => proc { |row|
           pp = @effective_datatable.person_cache[row.primary_applicant.person_id]
-          link_to pp.full_name, resume_enrollment_exchanges_agents_path(person_id: pp.id), rel: 'noopener noreferrer'
-           }, :filter => false, :sortable => false
+          link_to_with_noopener_noreferrer(pp.full_name, resume_enrollment_exchanges_agents_path(person_id: pp.id))
+        }, :filter => false, :sortable => false
 
         table_column :ssn, :label => 'SSN', :proc => proc { |row|
              pp = @effective_datatable.person_cache[row.primary_applicant.person_id]
