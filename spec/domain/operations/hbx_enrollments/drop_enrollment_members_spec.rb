@@ -158,8 +158,8 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
           it 'should return a failure when termination date is not in current calendar year' do
             termination_date = enrollment.effective_on - 1
             result = subject.call({hbx_enrollment: enrollment,
-                                  options: {"termination_date_#{enrollment.id}" => termination_date.to_s,
-                                            "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}})
+                                   options: {"termination_date_#{enrollment.id}" => termination_date.to_s,
+                                             "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}})
             expect(result.failure).to eq "Termination date must be in current calendar year."
           end
         end
