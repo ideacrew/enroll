@@ -68,7 +68,6 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
     )
   end
   let(:mock_qhp_cost_share_variance) { instance_double(Products::QhpCostShareVariance, :qhp_service_visits => []) }
-  let(:mock_request) { double }
 
   before :each do
     allow(view).to receive(:request).and_return(mock_request)
