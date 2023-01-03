@@ -202,6 +202,8 @@ RSpec.describe ::Operations::Eligibilities::FamilyEvidencesDataExport,
   end
 
   context 'with financial_assistance determination' do
+    before { EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(false) }
+
     let!(:thhg) { FactoryBot.create(:tax_household_group, family: family) }
     let!(:new_thh) do
       thhg.tax_households.create(
@@ -218,7 +220,6 @@ RSpec.describe ::Operations::Eligibilities::FamilyEvidencesDataExport,
     let!(:legacy_thhm1) { FactoryBot.create(:tax_household_member, applicant_id: family.primary_applicant.id, tax_household: legacy_thh, csr_percent_as_integer: 73) }
     let!(:legacy_thhm2) { FactoryBot.create(:tax_household_member, applicant_id: family_member.id, tax_household: legacy_thh, csr_percent_as_integer: 73) }
     let!(:legacy_ed) { FactoryBot.create(:eligibility_determination, tax_household: legacy_thh, max_aptc: 300.00) }
-
 
     context 'when MTHHs feature is enabled' do
       before do
