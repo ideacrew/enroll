@@ -20,7 +20,6 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
   end
 
   describe 'migrate household thhs to tax_household_group thhs' do
-    let(:system_date) { TimeKeeper.date_of_record }
     let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
     let!(:person2) do
       per2 = FactoryBot.create(:person)
@@ -43,7 +42,7 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
     let!(:thhm22) { FactoryBot.create(:tax_household_member, applicant_id: fm2.id, tax_household: th2) }
     let!(:ed2) { FactoryBot.create(:eligibility_determination, tax_household: th2, max_aptc: 200.00) }
 
-    let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id) }
+    let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, assistance_year: 2022) }
     let!(:ed) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application, aptc_csr_annual_household_income: '90000') }
     let!(:applicant) do
       FactoryBot.create(:financial_assistance_applicant,
@@ -129,7 +128,7 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
         expect(thhgs.first.tax_households.first.tax_household_members.count).to eq(2)
         expect(thhgs[1].tax_households.first.tax_household_members.count).to eq(2)
         expect(family.reload.eligibility_determination.grants.count).not_to be_zero
-        expect(family.reload.eligibility_determination.subjects.first.csr_by_year(system_date.year)).not_to be_nil
+        expect(family.reload.eligibility_determination.subjects.first.csr_by_year(2022)).not_to be_nil
         expect(::TaxHouseholdEnrollment.where(enrollment_id: hbx_enrollment.id).size).to eq 1
       end
     end
@@ -144,7 +143,7 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
         expect(thhgs.first.tax_households.first.yearly_expected_contribution).not_to be_zero
         expect(thhgs.first.tax_households.first.tax_household_members.count).to eq(2)
         expect(family.reload.eligibility_determination.grants.count).not_to be_zero
-        expect(family.reload.eligibility_determination.subjects.first.csr_by_year(system_date.year)).not_to be_nil
+        expect(family.reload.eligibility_determination.subjects.first.csr_by_year(2022)).not_to be_nil
       end
     end
 
@@ -176,7 +175,7 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
         expect(thhgs.first.tax_households.first.tax_household_members.count).to eq(2)
         # Should not create any Aptc or Csr Grants as no APTC members.
         expect(family.reload.eligibility_determination.grants.count).to be_zero
-        expect(family.reload.eligibility_determination.subjects.first.csr_by_year(system_date.year)).to be_nil
+        expect(family.reload.eligibility_determination.subjects.first.csr_by_year(2022)).to be_nil
       end
     end
 
@@ -215,7 +214,7 @@ describe MigrateHouseholdThhsToThhGroupThhs, dbclean: :after_each do
           expect(thhgs.first.tax_households.first.yearly_expected_contribution).not_to be_zero
           expect(thhgs.first.tax_households.first.tax_household_members.count).to eq(2)
           expect(family.reload.eligibility_determination.grants.count).not_to be_zero
-          expect(family.reload.eligibility_determination.subjects.first.csr_by_year(system_date.year)).not_to be_nil
+          expect(family.reload.eligibility_determination.subjects.first.csr_by_year(2022)).not_to be_nil
         end
       end
     end
