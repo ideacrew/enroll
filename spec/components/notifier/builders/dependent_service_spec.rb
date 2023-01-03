@@ -50,7 +50,7 @@ RSpec.describe 'Components::Notifier::Builders::DependentService', :dbclean => :
           if member_dob.month < TimeKeeper.date_of_record.month
             expect(aqhp_dependent.age).to eq(((TimeKeeper.date_of_record.year - member_dob.year)).floor)
           else
-            expect(aqhp_dependent.age).to eq(((TimeKeeper.date_of_record.year - member_dob.year)) -1.floor)
+            expect(aqhp_dependent.age).to eq(((TimeKeeper.date_of_record.year - member_dob.year)) - 1.floor)
           end
         end
       end
