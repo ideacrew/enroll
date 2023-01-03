@@ -2113,6 +2113,38 @@ describe "terminated_enrollments", dbclean: :after_each do
   end
 end
 
+describe 'trigger_async_publish with critical changes' do
+  let!(:person) { FactoryBot.create(:person)}
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+
+  before do
+    allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
+    person.crm_notifiction_needed = true
+    person.save!
+  end
+
+  it 'should no longer have a person how needs a crm notification' do
+    family.send(:trigger_async_publish)
+    expect(person.reload.crm_notifiction_needed).to eq false
+  end
+
+  it 'should no longer need a crm notification' do
+    family.send(:trigger_async_publish)
+    expect(family.reload.crm_notifiction_needed).to eq false
+  end
+
+  it 'should trigger the first time' do
+    expect(family.send(:trigger_async_publish)).not_to eq nil
+  end
+
+  it 'should not trigger a second time' do
+    family.send(:trigger_async_publish)
+    expect(family.reload.send(:trigger_async_publish)).to eq nil
+  end
+end
+
 describe 'application_applicable_year' do
   let(:current_year) { TimeKeeper.date_of_record.year }
   let!(:hbx_profile) do

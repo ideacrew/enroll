@@ -2839,6 +2839,13 @@ class HbxEnrollment
     @any_member_greater_than_30 ||= hbx_enrollment_members.any? { |member| member.age_on_effective_date > 30 }
   end
 
+  def continuous_coverage?
+    hbx_enrollment_members.any? do |member|
+      next member if member.coverage_start_on.blank?
+      member.coverage_start_on != effective_on
+    end
+  end
+
   private
 
   def set_is_any_enrollment_member_outstanding

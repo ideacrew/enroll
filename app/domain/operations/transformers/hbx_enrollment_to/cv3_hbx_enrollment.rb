@@ -28,10 +28,12 @@ module Operations
           issuer = product&.issuer_profile
           consumer_role = enr&.consumer_role
           payload = {
+            hbx_id: enr.hbx_id,
             effective_on: enr.effective_on,
             aasm_state: enr.aasm_state,
             market_place_kind: enr.kind,
             enrollment_period_kind: enr.enrollment_kind,
+            terminated_on: enr.terminated_on,
             product_kind: enr.coverage_kind,
             total_premium: enr.total_premium,
             applied_aptc_amount: { cents: enr.applied_aptc_amount.cents, currency_iso: enr.applied_aptc_amount.currency.iso_code },
@@ -142,7 +144,7 @@ module Operations
             name: product.title,
             active_year: product.active_year,
             is_dental_only: product.dental?,
-            metal_level: product.metal_level,
+            metal_level: product.metal_level_kind.to_s,
             benefit_market_kind: product.benefit_market_kind.to_s,
             csr_variant_id: product.csr_variant_id,
             is_csr: product.is_csr?,
@@ -189,6 +191,7 @@ module Operations
               is_subscriber: hem.is_subscriber,
               eligibility_date: hem.eligibility_date,
               coverage_start_on: hem.coverage_start_on,
+              coverage_end_on: hem.coverage_end_on,
               slcsp_member_premium: fetch_slcsp_benchmark_premium_for_member(person.hbx_id, slcsp_info)
             }
           end

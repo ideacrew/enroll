@@ -27,6 +27,8 @@ registry:
             item: 20
           - key: :fifteenth_of_the_month
             item: 15
+      - key: :fifteenth_of_the_month_rule_overridden
+        is_enabled: true
       - key: :aca_individual_assistance_benefits
         is_enabled: true
         settings:

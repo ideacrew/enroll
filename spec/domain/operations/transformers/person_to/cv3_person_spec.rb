@@ -30,5 +30,14 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
     it 'should have contact method' do
       expect(subject[:contact_method]).to eq('Paper and Electronic communications')
     end
+
+    context 'when verification_type_history_elements are present' do
+      let!(:verification_type_history_element) { create(:verification_type_history_element, consumer_role: person.consumer_role) }
+      subject { ::Operations::Transformers::PersonTo::Cv3Person.new.construct_consumer_role(person.consumer_role.reload) }
+
+      it 'should construct verification_type_history_elements' do
+        expect(subject[:verification_type_history_elements][0][:verification_type]).to eq(verification_type_history_element.verification_type)
+      end
+    end
   end
 end
