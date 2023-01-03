@@ -2,9 +2,11 @@
 
 require File.join(Rails.root, 'lib/mongoid_migration_task')
 
-# This class is for updating TaxHouseholdEnrollment objects for Health Enrollments with Continuous Coverage that got created on or after 2022/1/1.
+# This class is for updating TaxHouseholdEnrollment objects for Health Enrollments that got created on or after 2022/1/1.
+#   1. Continuous Coverage
+#   2. With more than 3 dependents which have incorrect BenchmarkPremiums
 # This class will not update Enrollment.
-class FixBenchmarkForContinuousCoverageEnrollments < MongoidMigrationTask
+class FixBenchmarkForContinuousCoverageAndMoreThan3DepEnrs < MongoidMigrationTask
   def update_not_needed?(household_info, th_enrollment)
     th_enrollment.household_benchmark_ehb_premium.to_d == household_info.household_benchmark_ehb_premium.to_d &&
       th_enrollment.health_product_hios_id == household_info.health_product_hios_id &&
@@ -117,39 +119,51 @@ class FixBenchmarkForContinuousCoverageEnrollments < MongoidMigrationTask
     hbx_ids = ENV['enrollment_hbx_ids'].to_s.split(',').map(&:squish!)
     return hbx_ids if hbx_ids.present?
 
-    HbxEnrollment.collection.aggregate(
-      [
-        {
-          "$match" => {
-            "hbx_enrollment_members" => {"$ne" => nil},
-            "coverage_kind" => "health",
-            "consumer_role_id" => {"$ne" => nil},
-            "product_id" => {"$ne" => nil},
-            "aasm_state" => {"$nin" => ['shopping', 'coverage_canceled']},
-            "effective_on" => {"$gte" => Date.new(2022)}
-          }
-        },
-        {
-          "$project" => {
-            "hbx_enrollment_members" => "$hbx_enrollment_members",
-            "effective_on" => "$effective_on",
-            "hbx_id" => "$hbx_id"
-          }
-        },
-        {"$unwind" => "$hbx_enrollment_members"},
-        {
-          "$match" => {
-            "$expr" => {
-              "$ne" => [
-                { "$dateToString" => { "format" => "%Y-%m-%d", date: "$hbx_enrollment_members.coverage_start_on" }},
-                { "$dateToString": { "format": "%Y-%m-%d", date: "$effective_on" }}
-              ]
+    enr_with_more_than_3_dependent_hbx_ids =
+      HbxEnrollment.where(
+        :effective_on.gte => Date.new(2022),
+        :aasm_state.ne => ['shopping', 'coverage_canceled'],
+        :'hbx_enrollment_members.3'.exists => true,
+        :product_id.ne => nil,
+        coverage_kind: 'health'
+      ).pluck(:hbx_id)
+
+    continuous_coverage_enrollment_hbx_ids =
+      HbxEnrollment.collection.aggregate(
+        [
+          {
+            "$match" => {
+              "hbx_enrollment_members" => {"$ne" => nil},
+              "coverage_kind" => "health",
+              "consumer_role_id" => {"$ne" => nil},
+              "product_id" => {"$ne" => nil},
+              "aasm_state" => {"$nin" => ['shopping', 'coverage_canceled']},
+              "effective_on" => {"$gte" => Date.new(2022)}
             }
-          }
-        },
-        "$group" => { "_id" => "$hbx_id"}
-      ]
-    ).map { |rec| rec['_id'] }
+          },
+          {
+            "$project" => {
+              "hbx_enrollment_members" => "$hbx_enrollment_members",
+              "effective_on" => "$effective_on",
+              "hbx_id" => "$hbx_id"
+            }
+          },
+          {"$unwind" => "$hbx_enrollment_members"},
+          {
+            "$match" => {
+              "$expr" => {
+                "$ne" => [
+                  { "$dateToString" => { "format" => "%Y-%m-%d", date: "$hbx_enrollment_members.coverage_start_on" }},
+                  { "$dateToString": { "format": "%Y-%m-%d", date: "$effective_on" }}
+                ]
+              }
+            }
+          },
+          "$group" => { "_id" => "$hbx_id"}
+        ]
+      ).map { |rec| rec['_id'] }
+
+    (enr_with_more_than_3_dependent_hbx_ids + continuous_coverage_enrollment_hbx_ids).uniq
   end
 
   def process_hbx_enrollment_hbx_ids
@@ -190,9 +204,9 @@ class FixBenchmarkForContinuousCoverageEnrollments < MongoidMigrationTask
   def migrate
     @logger = Logger.new("#{Rails.root}/log/fix_benchmark_for_continuous_coverage_enrollments_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
     start_time = DateTime.current
-    @logger.info "FixBenchmarkForContinuousCoverageEnrollments start_time: #{start_time}"
+    @logger.info "FixBenchmarkForContinuousCoverageAndMoreThan3DepEnrs start_time: #{start_time}"
     process_hbx_enrollment_hbx_ids
     end_time = DateTime.current
-    @logger.info "FixBenchmarkForContinuousCoverageEnrollments end_time: #{end_time}, total_time_taken_in_minutes: #{((end_time - start_time) * 24 * 60).to_f.ceil}"
+    @logger.info "FixBenchmarkForContinuousCoverageAndMoreThan3DepEnrs end_time: #{end_time}, total_time_taken_in_minutes: #{((end_time - start_time) * 24 * 60).to_f.ceil}"
   end
 end

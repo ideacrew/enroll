@@ -1,17 +1,17 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require File.join(Rails.root, 'app', 'data_migrations', 'fix_benchmark_for_continuous_coverage_enrollments')
+require File.join(Rails.root, 'app', 'data_migrations', 'fix_benchmark_for_continuous_coverage_and_more_than_3_dep_enrs')
 
-describe FixBenchmarkForContinuousCoverageEnrollments, dbclean: :after_each do
+describe FixBenchmarkForContinuousCoverageAndMoreThan3DepEnrs, dbclean: :after_each do
   after :all do
-    logger_name = "#{Rails.root}/log/fix_benchmark_for_continuous_coverage_enrollments_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+    logger_name = "#{Rails.root}/log/fix_benchmark_for_continuous_coverage_and_more_than_3_dep_enrs_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
     csv_name = "#{Rails.root}/benchmark_for_continuous_coverage_enrollments_list_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}_1.csv"
     File.delete(logger_name) if File.exist?(logger_name)
     File.delete(csv_name) if File.exist?(csv_name)
   end
 
-  subject { FixBenchmarkForContinuousCoverageEnrollments.new('fix_benchmark_for_continuous_coverage_enrollments', double(:current_scope => nil)) }
+  subject { FixBenchmarkForContinuousCoverageAndMoreThan3DepEnrs.new('fix_benchmark_for_continuous_coverage_and_more_than_3_dep_enrs', double(:current_scope => nil)) }
 
   describe '#migrate', :dbclean => :around_each do
     let!(:system_year) { Date.today.year }
