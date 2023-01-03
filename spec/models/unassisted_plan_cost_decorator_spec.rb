@@ -404,9 +404,20 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
     let(:address) { person.rating_address }
     let(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
     let!(:family10) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
-    let!(:hbx_enrollment10) {FactoryBot.create(:hbx_enrollment, family: family10, household: family10.active_household, aasm_state: 'shopping', product: product, consumer_role_id: person.consumer_role.id, rating_area_id: rating_area.id)}
-    let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family10.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment10)}
-    let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family10.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment10)}
+    let!(:hbx_enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        family: family10,
+        household: family10.active_household,
+        aasm_state: 'shopping',
+        product: product,
+        consumer_role_id: person.consumer_role.id,
+        rating_area_id: rating_area.id,
+        effective_on: TimeKeeper.date_of_record.beginning_of_month
+      )
+    end
+    let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family10.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment)}
+    let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family10.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment)}
     let!(:tax_household10) {FactoryBot.create(:tax_household, household: family10.active_household, effective_ending_on: nil)}
     let!(:eligibility_determination) {FactoryBot.create(:eligibility_determination, tax_household: tax_household10, max_aptc: 2000)}
     let!(:tax_household_member1) {tax_household10.tax_household_members.create(applicant_id: family10.primary_applicant.id, is_subscriber: true, is_ia_eligible: true)}
@@ -424,12 +435,12 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
       premium_table.premium_tuples.where(age: 60).first.update_attributes(cost: 846.72)
       premium_table.premium_tuples.where(age: 61).first.update_attributes(cost: 879.8)
       @product.save!
-      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 59, area, 'NA').and_return(814.85)
-      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 60, area, 'NA').and_return(846.72)
-      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment10.effective_on, 61, area, 'NA').and_return(879.8)
-      person.update_attributes!(dob: (hbx_enrollment10.effective_on - 61.years))
-      person2.update_attributes!(dob: (hbx_enrollment10.effective_on - 59.years))
-      @upcd_1 = UnassistedPlanCostDecorator.new(@product, hbx_enrollment10, 1700.00, tax_household10)
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment.effective_on, 59, area, 'NA').and_return(814.85)
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment.effective_on, 60, area, 'NA').and_return(846.72)
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment.effective_on, 61, area, 'NA').and_return(879.8)
+      person.update_attributes!(dob: (hbx_enrollment.effective_on - 61.years))
+      person2.update_attributes!(dob: (hbx_enrollment.effective_on - 59.years))
+      @upcd_1 = UnassistedPlanCostDecorator.new(@product, hbx_enrollment, 1700.00, tax_household10)
     end
 
     context 'for total_ehb_premium' do
