@@ -29,7 +29,6 @@ Feature: Insured Plan Shopping on Individual Assisted market
   Scenario: Validation of the dailog box when selecting a non silver plan with eligiblity with MTHH turned on
     Given EnrollRegistry temporary_configuration_enable_multi_tax_household_feature feature is enabled
     Then multi tax household info is prepared for aptc user with selected eligibility
-    Then multi tax household info is prepared for aptc user with selected eligibility for future year
     And the individual clicks the Continue button of the Group Selection page
     And the individual selects a non silver plan on Plan Shopping page
     Then the individual should see the modal pop up for eligibility

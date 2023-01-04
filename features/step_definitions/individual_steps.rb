@@ -893,7 +893,11 @@ end
 Then(/^multi tax household info is prepared for aptc user with selected eligibility$/) do
   person = User.find_by(email: 'aptc@dclink.com').person
   family = person.primary_family
-  start_on = TimeKeeper.date_of_record.beginning_of_year
+  current_year = TimeKeeper.date_of_record.beginning_of_year
+  future_year = Date.new(TimeKeeper.date_of_record.year + 1, 1,1)
+  day_of_month = FinancialAssistanceRegistry[:enrollment_dates].settings(:application_new_year_effective_date_day_of_month).item
+  month_of_year = FinancialAssistanceRegistry[:enrollment_dates].settings(:application_new_year_effective_date_month_of_year).item
+  start_on = TimeKeeper.date_of_record > Date.new(current_year.year, month_of_year, day_of_month) ? future_year : current_year
   create_mthh_for_family_with_aptc_csr(family, start_on, '73')
 end
 
