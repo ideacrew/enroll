@@ -102,7 +102,6 @@ RSpec.describe Operations::Subscribers::ProcessRequests::DetermineSlcsp, type: :
       end
 
       it 'should return entity' do
-        binding.irb
         expect(subject.success).to be_a(AcaEntities::MagiMedicaid::Application)
         expect(subject.success.benchmark_product.to_h).not_to be_empty
       end
