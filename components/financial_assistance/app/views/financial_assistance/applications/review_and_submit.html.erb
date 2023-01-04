@@ -12,10 +12,10 @@
           </div>
         <% end %>
 
-        <% if @shop_coverage.to_s == "true" %> 
+        <% if @shop_coverage.to_s == "true" %>
           <div id="shop-check-response">
             <%= render partial: 'financial_assistance/applications/shop_check_results' %>
-          </div> 
+          </div>
         <% end %>
       <% end %>
 
@@ -290,7 +290,7 @@
               <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                 <div class="col-md-11">HEALTH COVERAGE</div>
                 <div class="col-md-1">
-                  <%= link_to application_applicant_benefits_path(@application, applicant), id: 'edit-health-coverage-pencil' do %>
+                  <%= link_to application_applicant_benefits_path(@application, applicant), id: 'edit-health-coverage-pencil', rel: 'noopener noreferrer' do %>
                     <i class="fa fa-pencil fa-lg"></i>
                   <% end %>
                 </div>
