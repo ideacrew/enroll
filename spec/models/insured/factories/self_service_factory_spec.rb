@@ -406,7 +406,8 @@ module Insured
 
       describe "for invalid members" do
         before :each do
-          FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[2].id, eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: enrollment, tobacco_use: 'N')
+          coverage_start_on = enrollment.hbx_enrollment_members.first.coverage_start_on
+          FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[2].id, eligibility_date: coverage_start_on, coverage_start_on: coverage_start_on, hbx_enrollment: enrollment, tobacco_use: 'N')
           EnrollRegistry[:check_enrollment_member_eligibility].feature.stub(:is_enabled).and_return(true)
         end
 
