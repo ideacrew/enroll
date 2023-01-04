@@ -160,8 +160,9 @@ class BrokerRole
   end
 
   def send_invitation
-    return unless active?
-    Invitation.invite_broker!(self)
+    if active?
+      Invitation.invite_broker!(self)
+    end
   end
 
   ## Class methods
