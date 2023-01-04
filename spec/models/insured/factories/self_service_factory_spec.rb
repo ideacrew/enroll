@@ -406,7 +406,8 @@ module Insured
 
       describe "for invalid members" do
         before :each do
-          FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[2].id, eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: enrollment, tobacco_use: 'N')
+          coverage_start_on = enrollment.hbx_enrollment_members.first.coverage_start_on
+          FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[2].id, eligibility_date: coverage_start_on, coverage_start_on: coverage_start_on, hbx_enrollment: enrollment, tobacco_use: 'N')
           EnrollRegistry[:check_enrollment_member_eligibility].feature.stub(:is_enabled).and_return(true)
         end
 
@@ -658,6 +659,19 @@ module Insured
 
         it 'should return start of as 3/1' do
           expect(@effective_date).to eq(Date.new(Date.today.year.next, 3, 1))
+        end
+      end
+
+      context "within OE last month and after monthly_enrollment_due_on day of the month of IndividualEnrollmentDueDayOfMonth effective date 1/1 and 15 day disabled" do
+        before do
+          EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature.stub(:is_enabled).and_return(true)
+          system_date = Date.new(Date.today.year, 12, Settings.aca.individual_market.monthly_enrollment_due_on.next)
+          allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
+          @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), Date.new(Date.today.year.next, 1, 1)).to_date
+        end
+
+        it 'should return start of as 1/1' do
+          expect(@effective_date).to eq(Date.new(Date.today.year.next, 1, 1))
         end
       end
 

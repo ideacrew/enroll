@@ -16,7 +16,7 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          rubygems: latest
+          rubygems: 3.3.26
       - run: |
           git config diff.renameLimit 800
           git fetch --no-tags --depth=1 origin trunk

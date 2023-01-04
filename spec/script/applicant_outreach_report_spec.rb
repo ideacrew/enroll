@@ -20,7 +20,7 @@ describe 'applicant_outreach_report' do
   let!(:primary_fm) { family.primary_applicant }
   let!(:spouse_fm) { FactoryBot.create(:family_member, family: family, person: spouse_person) }
   let!(:family_members) { [primary_fm, spouse_fm] }
-  let!(:health_enrollment) { FactoryBot.create(:hbx_enrollment, :with_health_product, family: family) }
+  let!(:health_enrollment) { FactoryBot.create(:hbx_enrollment, :with_health_product, family: family, effective_on: TimeKeeper.date_of_record.beginning_of_year) }
   let(:prospective_year) { TimeKeeper.date_of_record.year + 1 }
   let!(:prospective_year_health_enrollment) { FactoryBot.create(:hbx_enrollment, :with_health_product, family: family, effective_on: Date.new(prospective_year, 1, 1)) }
   let!(:dental_enrollment) { FactoryBot.create(:hbx_enrollment, :with_dental_product, family: family) }

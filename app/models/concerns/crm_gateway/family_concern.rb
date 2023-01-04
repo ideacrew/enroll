@@ -10,7 +10,21 @@ module CrmGateway
 
     def trigger_async_publish
       return unless EnrollRegistry.feature_enabled?(:crm_update_family_save)
+      return if EnrollRegistry.feature_enabled?(:check_for_crm_updates) && !send_to_gateway?
       CrmWorker.perform_async(self.id.to_s, self.class.to_s, :trigger_crm_family_update_publish)
+      reset_crm_notifiction_needed if EnrollRegistry.feature_enabled?(:check_for_crm_updates)
+      "Triggered CRM family update publish for family"
+    end
+
+    def send_to_gateway?
+      self.family_members&.detect{|fm| fm.person.crm_notifiction_needed } || self.crm_notifiction_needed
+    end
+
+    def reset_crm_notifiction_needed
+      self.set(crm_notifiction_needed: false)
+      self.family_members.each do |fm|
+        fm.person&.set(crm_notifiction_needed: false)
+      end
     end
 
     def trigger_crm_family_update_publish
@@ -19,16 +33,9 @@ module CrmGateway
       result = ::Operations::Families::SugarCrm::PublishFamily.new.call(self)
       # Update column directly without callbacks
       if result.success?
-        if EnrollRegistry.feature_enabled?(:check_for_crm_updates)
-          self.set(crm_notifiction_needed: false)
-          self.family_members.each do |fm|
-            fm.person&.set(crm_notifiction_needed: false)
-          end
-        else
-          family_payload = result.success.last
-          self.set(cv3_payload: family_payload.to_h.with_indifferent_access)
-          p family_payload if Rails.env.test?
-        end
+        family_payload = result.success.last
+        self.set(cv3_payload: family_payload.to_h.with_indifferent_access) unless EnrollRegistry.feature_enabled?(:check_for_crm_updates)
+        p family_payload if Rails.env.test?
       else
         Rails.logger.warn("Publish Family Exception family_id: #{self.id}: #{result.failure}")
         p result.failure

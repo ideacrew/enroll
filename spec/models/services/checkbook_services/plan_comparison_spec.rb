@@ -134,6 +134,7 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
 
       before do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:temporary_configuration_enable_multi_tax_household_feature).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
 
       end
@@ -172,6 +173,7 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
       before do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:temporary_configuration_enable_multi_tax_household_feature).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
       end
 
       it 'should return -01' do
@@ -185,6 +187,7 @@ describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
       before do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:temporary_configuration_enable_multi_tax_household_feature).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
       end
 
       it 'should return -01' do

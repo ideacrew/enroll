@@ -25,7 +25,7 @@ module Operations
 
             family_member = result.success
             member[:date_of_birth] = family_member.dob
-            member[:age_on_effective_date] = family_member.age_on(bpm_params[:effective_date])
+            member[:age_on_effective_date] = family_member.age_on(member[:coverage_start_on] || bpm_params[:effective_date])
           end
         end
 

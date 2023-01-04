@@ -24,11 +24,16 @@ def process_enrollments(enrollments, logger)
 
   CSV.open(file_name, 'w', force_quotes: true) do |csv|
     csv << field_names
-    enrollments.no_timeout.inject([]) do |_dummy, enrollment|
+    enrollments.no_timeout.each do |enrollment|
       person = enrollment.family.primary_person
       thh_enrs = TaxHouseholdEnrollment.where(enrollment_id: enrollment.id)
 
       logger.info "No TaxHouseholdEnrollment objects for given enrollment with hbx_id: #{enrollment.hbx_id}, PrimaryPersonHbxId: #{person.hbx_id}" if thh_enrs.blank?
+
+      thh = thh_enr.tax_household
+      next enrollment if thh.blank?
+
+      valid_thh_members = thh.tax_household_members.where(:id.in => thh_enr.tax_household_members_enrollment_members.pluck(:tax_household_member_id))
 
       thh_enrs.each do |thh_enr|
         csv << [
@@ -38,7 +43,7 @@ def process_enrollments(enrollments, logger)
           enrollment.total_premium.to_f,
           enrollment.product.ehb,
           enrollment.applied_aptc_amount.to_f,
-          thh_enr.tax_household&.tax_household_members.map(&:person).flat_map(&:full_name),
+          valid_thh_members.map(&:person).flat_map(&:full_name),
           thh_enr.household_benchmark_ehb_premium,
           thh_enr.health_product_hios_id,
           thh_enr.dental_product_hios_id,

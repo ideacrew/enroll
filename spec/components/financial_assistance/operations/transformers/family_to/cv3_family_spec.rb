@@ -107,7 +107,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                   :date_of_death => nil,
                   :dob_check => nil,
                   :is_incarcerated => false,
-                  :ethnicity => nil,
+                  :ethnicity => [],
                   :race => nil,
                   :tribal_id => nil,
                   :language_code => "en"
@@ -218,7 +218,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                   :date_of_death => nil,
                   :dob_check => nil,
                   :is_incarcerated => false,
-                  :ethnicity => nil,
+                  :ethnicity => [],
                   :race => nil,
                   :tribal_id => nil,
                   :language_code => "en"
@@ -335,7 +335,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                   :date_of_death => nil,
                   :dob_check => nil,
                   :is_incarcerated => false,
-                  :ethnicity => nil,
+                  :ethnicity => [],
                   :race => nil,
                   :tribal_id => nil,
                   :language_code => "en"
@@ -491,7 +491,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                   :deductions => [],
                   :demographic => {
                     :dob => primary_applicant.dob,
-                    :ethnicity => nil,
+                    :ethnicity => [],
                     :gender => "Male",
                     :is_veteran_or_active_military => false,
                     :is_vets_spouse_or_child => false,
@@ -647,7 +647,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                   :deductions => [],
                   :demographic => {
                     :dob => primary_applicant.dob,
-                    :ethnicity => nil,
+                    :ethnicity => [],
                     :gender => "Male",
                     :is_veteran_or_active_military => false,
                     :is_vets_spouse_or_child => false,
@@ -796,7 +796,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                   :deductions => [],
                   :demographic => {
                     :dob => primary_applicant.dob,
-                    :ethnicity => nil,
+                    :ethnicity => [],
                     :gender => "Female",
                     :is_veteran_or_active_military => false,
                     :is_vets_spouse_or_child => false,
@@ -987,15 +987,31 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
       end
     end
 
-    context "when a family member is deleted" do
-      before do
-        family.family_members.last.delete
-        family.reload
-      end
+    # NOTE: for now, disabling validation of matching member and applicant hbx ids as is done in Operations::Transformers::FamilyTo::Cv3Family
+    # context "when a family member is deleted" do
+    #   before do
+    #     family.family_members.last.delete
+    #     family.reload
+    #   end
 
-      it "should ignore the application and return an empty array" do
-        expect(subject).to be_empty
-      end
+    #   it "should ignore the application and return an empty array" do
+    #     expect(subject).to be_empty
+    #   end
+    # end
+  end
+
+  context 'tax household member is missing matching family member' do
+    let(:effective_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+    let!(:tax_household) {FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil, effective_starting_on: effective_on)}
+    let!(:tax_household_member1) {FactoryBot.create(:tax_household_member, applicant_id: family.family_members.first.id, tax_household: tax_household)}
+    let!(:tax_household_member2) {FactoryBot.create(:tax_household_member, tax_household: tax_household)}
+
+    subject { FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Family.new.call(family) }
+
+    it 'should not include the tax household member with the missing family member' do
+      result = subject.value!
+      tax_household_members = result[:households].first[:tax_households].first[:tax_household_members]
+      expect(tax_household_members.count).to eq(1)
     end
   end
 end

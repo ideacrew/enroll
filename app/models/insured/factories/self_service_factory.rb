@@ -206,18 +206,18 @@ module Insured
         hour = hbx_created_datetime.hour
         min = hbx_created_datetime.min
         sec = hbx_created_datetime.sec
+        override_enabled = EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature.is_enabled
         # this condition is for self service APTC feature ONLY.
         if eligible_for_1_1_effective_date?(hbx_created_datetime, current_enrollment_effective_on)
           year = current_enrollment_effective_on.year
           month = day = 1
         elsif current_enrollment_effective_on.year != hbx_created_datetime.year
-          monthly_enrollment_due_on = Settings.aca.individual_market.monthly_enrollment_due_on
+          monthly_enrollment_due_on = override_enabled ? 31 : Settings.aca.individual_market.monthly_enrollment_due_on
           condition = (Date.new(hbx_created_datetime.year, 11, 1)..Date.new(hbx_created_datetime.year, 12, monthly_enrollment_due_on)).include?(hbx_created_datetime.to_date)
           offset_month = condition ? 0 : 1
           year = current_enrollment_effective_on.year
           month = hbx_created_datetime.next_month.month + offset_month
         else
-          override_enabled = EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature.is_enabled
           offset_month = (hbx_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth || override_enabled) ? 1 : 2
           year = hbx_created_datetime.year
           month = hbx_created_datetime.month + offset_month

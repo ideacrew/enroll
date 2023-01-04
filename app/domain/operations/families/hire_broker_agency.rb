@@ -51,7 +51,6 @@ module Operations
                              terminate_date: valid_params[:terminate_date],
                              new_broker_hired: true,
                              notify_edi: false }
-
         family.publish_broker_fired_event(terminate_params)
       end
 
@@ -71,11 +70,13 @@ module Operations
       end
 
       def notify_broker_hired_event_to_edi(family, broker_role)
-        return Success("") unless broker_role&.npn&.scan(/\D/)&.empty?
+        broker_params = { broker_role_id: broker_role.id.to_s,
+                          broker_role_npn: broker_role.npn,
+                          family_id: family.id.to_s }
 
-        family.notify_broker_update_on_impacted_enrollments_to_edi({broker_role_id: broker_role.id.to_s,
-                                                                    broker_role_npn: broker_role.npn,
-                                                                    family_id: family.id.to_s})
+        broker_params.merge!(broker_role_id: nil, broker_role_npn: nil) if broker_role&.npn&.scan(/\D/)&.present?
+
+        family.notify_broker_update_on_impacted_enrollments_to_edi(broker_params)
         Success("Broker event notified to EDI")
       end
     end

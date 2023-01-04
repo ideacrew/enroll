@@ -63,7 +63,7 @@ module Operations
         end
 
         def construct_payload_hash(family)
-          payload_hash = Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
+          payload_hash = Operations::Transformers::FamilyTo::Cv3Family.new.call(family, true)
           if !family.is_a?(::Family)
             Failure("Invalid Family Object. Family class is: #{family.class}")
           elsif send_to_gateway?(family, payload_hash.value!)
