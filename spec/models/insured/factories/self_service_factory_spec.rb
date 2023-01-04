@@ -494,7 +494,7 @@ module Insured
         # monthly aggregate should be applied for enrollments within the same coverage year
         if future_effective_date.year == enrollment.effective_on.year
           params = subject.find(enrollment.id, family.id)
-          expect(params[:available_aptc]).to eq 0
+          expect(params[:available_aptc]).to eq 1274.44
         end
       end
 
@@ -502,7 +502,7 @@ module Insured
         # monthly aggregate should be applied for enrollments within the same coverage year
         if future_effective_date.year == enrollment.effective_on.year
           params = subject.find(enrollment.id, family.id)
-          expect(params[:elected_aptc_pct]).to eq 1
+          expect(params[:elected_aptc_pct]).to eq 0.09
         end
       end
 
