@@ -338,7 +338,7 @@ RSpec.describe Exchanges::BrokerApplicantsController do
       let(:invitation) { Invitation.new }
       before :each do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:resend_broker_email_button).and_return(true)
-        put :update, params:{id: broker_role.person.id, sendemail: true}, format: :js
+        put :update, params: {id: broker_role.person.id, sendemail: true}, format: :js
       end
 
       it "should call send_broker_invitation" do
