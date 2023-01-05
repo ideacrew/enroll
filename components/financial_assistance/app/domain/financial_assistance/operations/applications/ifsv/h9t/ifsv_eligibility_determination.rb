@@ -58,6 +58,7 @@ module FinancialAssistance
                 applicant.person_hbx_id == res_applicant_entity.person_hbx_id
               end
             end
+            
 
             def update_applicant_evidence(applicant, status, response_applicant_entity, enrollments)
               response_income_evidence = response_applicant_entity.income_evidence
