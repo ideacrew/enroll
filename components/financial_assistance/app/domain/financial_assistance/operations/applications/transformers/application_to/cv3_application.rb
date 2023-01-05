@@ -155,7 +155,7 @@ module FinancialAssistance
                 mitc_eligible_incomes = eligible_incomes_for_mitc(applicant)
                 prior_insurance_benefit = prior_insurance(applicant)
                 result << {name: name(applicant),
-                           identifying_information: {has_ssn: applicant.no_ssn, encrypted_ssn: encrypt(applicant.ssn)},
+                           identifying_information: identifying_information(applicant),
                            demographic: demographic(applicant),
                            attestation: attestation(applicant),
                            is_primary_applicant: applicant.is_primary_applicant.present?,
@@ -335,6 +335,11 @@ module FinancialAssistance
                is_self_attested_disabled: applicant.is_physically_disabled.present?,
                is_self_attested_blind: applicant.is_self_attested_blind.present?,
                is_self_attested_long_term_care: applicant.is_self_attested_long_term_care.present?}
+            end
+
+            def identifying_information(applicant)
+              has_ssn = applicant.no_ssn == "0" || applicant.ssn.present?
+              {has_ssn: has_ssn, encrypted_ssn: encrypt(applicant.ssn)}
             end
 
             def demographic(applicant)

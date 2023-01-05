@@ -35,10 +35,15 @@ module Operations
             end
 
             def fetch_application(family, assistance_year)
-              ::FinancialAssistance::Application.where(:family_id => family.id,
-                                                       :assistance_year => assistance_year,
-                                                       :aasm_state => 'determined',
-                                                       :"applicants.is_ia_eligible" => true).max_by(&:created_at)
+              applications = ::FinancialAssistance::Application.where(:family_id => family.id,
+                                                                      :assistance_year => assistance_year,
+                                                                      :aasm_state => 'determined',
+                                                                      :"applicants.is_ia_eligible" => true)
+
+              determined_application = applications.exists(:predecessor_id => true).max_by(&:created_at)
+              return nil unless determined_application
+
+              raise "Found multiple determined applications. Can't process changes to application after annual eligibility redetermination." if applications.any?{|application| application.created_at > determined_application.created_at}
             end
 
             def build_event(payload)
