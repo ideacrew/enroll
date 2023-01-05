@@ -6,10 +6,8 @@ module Subscribers
     include ::EventSource::Subscriber[amqp: 'edi_gateway.families.cv3_family']
 
     subscribe(:on_requested) do |delivery_info, _metadata, response|
-      binding.irb
       logger.info "Subscribers::PolicySubscriber: invoked on_requested with response: #{response.inspect}"
       payload = JSON.parse(response, symbolize_names: true)
-      binding.irb
       result = Operations::Policies::BuildCv3FamilyFromPolicy.new.call(payload)
 
       logger.info "Subscribers::PolicySubscriber => #{payload} -- success: #{result.success?} -- output: #{result}" unless Rails.env.test?
