@@ -71,4 +71,81 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Bui
       expect(result.failure).to eq "No determined applications with ia_eligible applicants found in assistance_year #{TimeKeeper.date_of_record.year}"
     end
   end
+
+  context 'when new application submitted after annual redetermination' do
+
+    let!(:person) { FactoryBot.create(:person, hbx_id: "732020")}
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+
+    let!(:predecessor) do
+      FactoryBot.create(:financial_assistance_application,
+                        family_id: family.id,
+                        aasm_state: 'determined',
+                        hbx_id: "830293",
+                        assistance_year: TimeKeeper.date_of_record.year,
+                        effective_date: TimeKeeper.date_of_record.beginning_of_year,
+                        created_at: Date.new(TimeKeeper.date_of_record.year - 1, 10, 1))
+    end
+
+    let!(:application) do
+      FactoryBot.create(:financial_assistance_application,
+                        family_id: family.id,
+                        aasm_state: 'determined',
+                        hbx_id: "830293",
+                        assistance_year: TimeKeeper.date_of_record.year + 1,
+                        effective_date: TimeKeeper.date_of_record.beginning_of_year,
+                        predecessor_id: predecessor.id,
+                        created_at: Date.new(TimeKeeper.date_of_record.year, 10, 1))
+    end
+
+    let!(:applicant) do
+      FactoryBot.create(:applicant, :with_student_information,
+                        first_name: person.first_name,
+                        last_name: person.last_name,
+                        dob: person.dob,
+                        gender: person.gender,
+                        ssn: person.ssn,
+                        application: application,
+                        ethnicity: [],
+                        is_primary_applicant: true,
+                        person_hbx_id: person.hbx_id,
+                        is_ia_eligible: true)
+    end
+
+    let!(:new_application) do
+      FactoryBot.create(:financial_assistance_application,
+                        family_id: family.id,
+                        aasm_state: 'determined',
+                        hbx_id: "830293",
+                        assistance_year: TimeKeeper.date_of_record.year + 1,
+                        effective_date: TimeKeeper.date_of_record.beginning_of_year,
+                        created_at: Date.new(TimeKeeper.date_of_record.year, 11, 1))
+    end
+
+    let!(:new_applicant) do
+      FactoryBot.create(:applicant, :with_student_information,
+                        first_name: person.first_name,
+                        last_name: person.last_name,
+                        dob: person.dob,
+                        gender: person.gender,
+                        ssn: person.ssn,
+                        application: new_application,
+                        ethnicity: [],
+                        is_primary_applicant: true,
+                        person_hbx_id: person.hbx_id,
+                        is_ia_eligible: true)
+    end
+
+    let(:custom_logger) {  Logger.new("#{Rails.root}/log/rrv_non_esi_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log") }
+
+    before do
+      allow(Logger).to receive(:new).and_return(custom_logger)
+    end
+
+    it "should fail" do
+      expect(custom_logger).to receive(:error).with(/failed to process for person with hbx_id #{person.hbx_id}/i)
+      subject.call(assistance_year: TimeKeeper.date_of_record.year + 1)
+    end
+  end
 end
+

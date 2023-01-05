@@ -2,13 +2,15 @@
 module Effective
   module Datatables
     class IdentityVerificationDataTable < Effective::MongoidDatatable
+      include ApplicationHelper
+
       datatable do
-        table_column :name, :label => 'Name', :proc => Proc.new { |row| link_to row.full_name, resume_enrollment_exchanges_agents_path(person_id: row.id) }, :filter => false, :sortable => false
-        table_column :ssn, :label => 'SSN', :proc => Proc.new { |row| truncate(number_to_obscured_ssn(row.ssn))}, :filter => false, :sortable => false
-        table_column :dob, :label => 'DOB', :proc => Proc.new { |row| row.dob }, :filter => false, :sortable => false
-        table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.hbx_id }, :filter => false, :sortable => false
-        table_column :count, :label => 'Count', :width => '100px', :proc => Proc.new { |row| row.primary_family.active_family_members.size  }, :filter => false, :sortable => false
-        table_column :document_type, :label => 'Document Type', :proc => proc { |row| link_to document_type(row), document_uploaded_path(row) }, :filter => false, :sortable => false
+        table_column :name, :label => 'Name', :proc => proc { |row| link_to_with_noopener_noreferrer(row.full_name, resume_enrollment_exchanges_agents_path(person_id: row.id)) }, :filter => false, :sortable => false
+        table_column :ssn, :label => 'SSN', :proc => proc { |row| truncate(number_to_obscured_ssn(row.ssn))}, :filter => false, :sortable => false
+        table_column :dob, :label => 'DOB', :proc => proc { |row| row.dob }, :filter => false, :sortable => false
+        table_column :hbx_id, :label => 'HBX ID', :proc => proc { |row| row.hbx_id }, :filter => false, :sortable => false
+        table_column :count, :label => 'Count', :width => '100px', :proc => proc { |row| row.primary_family.active_family_members.size  }, :filter => false, :sortable => false
+        table_column :document_type, :label => 'Document Type', :proc => proc { |row| link_to_with_noopener_noreferrer(document_type(row), document_uploaded_path(row))}, :filter => false, :sortable => false
         table_column :date_uploaded, :label => "Date Uploaded", :width => '100px', :proc => proc { |row| document_uploaded_date(row) }, :filter => false, :sortable => false
       end
 
@@ -45,7 +47,7 @@ module Effective
         return 'Identity' if is_identity
         return 'Application' if is_application
       end
-      
+
       def document_uploaded_date(row)
         role = row.consumer_role
         identity_validation = role.identity_validation

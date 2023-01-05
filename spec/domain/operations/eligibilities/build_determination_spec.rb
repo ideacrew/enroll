@@ -170,7 +170,7 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
     end
 
     before do
-      application.update_attributes(effective_date: application.effective_date.next_year)
+      application.update_attributes(effective_date: application.effective_date.next_year + 6.months)
       @result = subject.call(required_params)
     end
 

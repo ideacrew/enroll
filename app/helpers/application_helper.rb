@@ -47,7 +47,7 @@ module ApplicationHelper
       "Not Yet Seeded"
     when 'Family'
       # TODO: Change from root url to family home page
-      link_to(
+      link_to_with_noopener_noreferrer(
         "#{row.target_record&.primary_person&.full_name} (Family Primary Person)",
         resume_enrollment_exchanges_agents_path(person_id: row&.target_record&.primary_applicant&.person&.id)
       )
@@ -122,6 +122,10 @@ module ApplicationHelper
     cost > 0 ? cost.round(2) : 0
   end
   # rubocop:enable Style/OptionalBooleanParameter
+
+  def link_to_with_noopener_noreferrer(name, path, options = {})
+    link_to(name, path, options.merge(rel: 'noopener noreferrer'))
+  end
 
   def datepicker_control(f, field_name, options = {}, value = "")
     sanitized_field_name = field_name.to_s.sub(/\?$/,"")

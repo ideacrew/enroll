@@ -448,6 +448,14 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
     end
 
     context 'when passing nil for terminated member with key present' do
+      before do
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 10,20))
+      end
+
+      after do
+        TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      end
+
       it 'should return failure.' do
         dropped_members = subject.call({hbx_enrollment: enrollment,
                                         options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record - 30.days).to_s,
