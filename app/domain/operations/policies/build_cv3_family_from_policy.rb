@@ -11,7 +11,7 @@ module Operations
       include EventSource::Command
 
       def call(params)
-        enrollment  = yield find_hbx_enrollment(params[:policy_id])
+        enrollment = yield find_hbx_enrollment(params[:policy_id])
         family     = yield find_family(enrollment)
         cv3_family = yield transform_family(family)
         payload    = yield validate_payload(cv3_family)
