@@ -68,16 +68,21 @@ module Operations
       end
 
       def group_ehb_premium(health_product, benchmark_product_model)
-        child_members = @members.select { |member| member[:relationship_with_primary] == 'child' }
+        enr_member_structs = @members.inject([]) do |result, member|
+          result << OpenStruct.new(age_on_effective_date: member[:age_on_effective_date], tobacco_use: member[:tobacco_use] || 'N')
+        end
 
-        members = if child_members.count > 3
-                    eligible_children = child_members.sort_by { |k| k[:age_on_effective_date] }.last(3)
-                    eligible_children + @members.reject { |member| member[:relationship_with_primary] == 'child' }
-                  else
-                    @members
-                  end
+        enrollment_struct = OpenStruct.new(
+          effective_on: @effective_date,
+          product_id: health_product.id,
+          product: health_product,
+          hbx_enrollment_members: enr_member_structs,
+          rating_area: OpenStruct.new(exchange_provided_code: @exchange_provided_code)
+        )
 
-        members_premium = members.reduce(0.00) do |sum, member|
+        @plan_cost_decorator = UnassistedPlanCostDecorator.new(health_product, enrollment_struct)
+
+        members_premium = enr_member_structs.reduce(0.00) do |sum, member|
           (sum + member_ehb_premium(health_product, member)).round(2)
         end
 
@@ -91,7 +96,7 @@ module Operations
       end
 
       def member_ehb_premium(health_product, member)
-        (::BenefitMarkets::Products::ProductRateCache.lookup_rate(health_product, @effective_date, member[:age_on_effective_date], @exchange_provided_code, 'NA') * health_product.ehb).round(2)
+        (@plan_cost_decorator.premium_for(member) * health_product.ehb).round(2)
       end
 
       def identify_slcsp(product_to_ehb_premium_hash)
