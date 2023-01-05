@@ -386,6 +386,21 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
     end
 
+    context 'identifying_information' do
+      let(:request_payload) { result.success }
+
+      context 'applicant no_ssn field is nil' do
+        before do
+          applicant.set(no_ssn: nil)
+        end
+
+        it 'should not return nil for has_ssn' do
+          applicant = request_payload[:applicants].first
+          expect(applicant[:identifying_information][:has_ssn]).not_to be_nil
+        end
+      end
+    end
+
     context 'mitc_income' do
       before do
         request_payload = result.success

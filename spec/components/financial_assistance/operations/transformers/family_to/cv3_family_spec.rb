@@ -529,7 +529,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                   :hours_worked_per_week => 0,
                   :identifying_information => {
                     :encrypted_ssn => nil,
-                    :has_ssn => "0"
+                    :has_ssn => true
                   },
                   :incomes => [],
                   :is_applying_coverage => true,
@@ -683,7 +683,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                   :has_state_health_benefit => false,
                   :has_unemployment_income => false,
                   :hours_worked_per_week => 0,
-                  :identifying_information => {:encrypted_ssn => nil, :has_ssn => "0"},
+                  :identifying_information => {:encrypted_ssn => nil, :has_ssn => true},
                   :incomes => [],
                   :is_applying_coverage => true,
                   five_year_bar_applies: false,
@@ -832,7 +832,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Fam
                   :has_state_health_benefit => false,
                   :has_unemployment_income => false,
                   :hours_worked_per_week => 0,
-                  :identifying_information => {:encrypted_ssn => nil, :has_ssn => "0"},
+                  :identifying_information => {:encrypted_ssn => nil, :has_ssn => true},
                   :incomes => [],
                   :is_applying_coverage => true,
                   five_year_bar_applies: false,
