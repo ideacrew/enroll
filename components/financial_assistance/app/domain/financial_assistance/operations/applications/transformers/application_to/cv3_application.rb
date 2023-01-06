@@ -491,7 +491,7 @@ module FinancialAssistance
               applicant.deductions.where(:kind.in => other_kinds).inject(0) do |result, deduction|
                 frequency = deduction.frequency_kind
                 deduction_end_date = calculate_end_date(deduction, assistance_year_end)
-                deduction_start_date = calculate_start_date(applicant, deduction, deduction_end_date, assistance_year_start, assistance_year_end)
+                deduction_start_date = calculate_start_date(deduction, deduction_end_date, assistance_year_start, assistance_year_end)
                 return BigDecimal('0') unless (assistance_year_start..assistance_year_end).cover?(deduction_start_date)
                 result += calculate_magi_deductions(deduction, deduction_start_date, deduction_end_date, assistance_year_end).to_i
                 result
@@ -510,7 +510,7 @@ module FinancialAssistance
               ((end_day_of_year - start_day_of_year + 1) * amount_per_day).round(2)
             end
 
-            def calculate_start_date(applicant, deduction, deduction_end_date, assistance_year_start, assistance_year_end)
+            def calculate_start_date(deduction, deduction_end_date, assistance_year_start, assistance_year_end)
               if (assistance_year_start..assistance_year_end).cover?(deduction_end_date) && assistance_year_start > deduction.start_on
                 assistance_year_start
               else
