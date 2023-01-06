@@ -182,6 +182,8 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
     let(:new_sample_max_aptc_1) {1500}
     let(:new_sample_csr_percent_1) {87}
     let!(:new_eligibility_determination) {FactoryBot.create(:eligibility_determination, tax_household: new_tax_household, max_aptc: new_sample_max_aptc_1, csr_percent_as_integer: new_sample_csr_percent_1)}
+    let(:enrollment) { family.hbx_enrollments.first }
+    let(:future_effective_date) { Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date }
 
     before do
       tax_household.update_attributes(effective_ending_on: new_tax_household.effective_starting_on - 1.day)
