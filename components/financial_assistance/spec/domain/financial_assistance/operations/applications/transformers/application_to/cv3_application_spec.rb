@@ -1347,12 +1347,12 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     context 'deduction with end_on in previous year than assistance year' do
       before do
-        applicant.deductions.first.update_attributes!(start_on:(Date.new(application.assistance_year) - 1).beginning_of_year, end_on: (Date.new(application.assistance_year) - 1).end_of_year)
+        applicant.deductions.first.update_attributes!(start_on: (Date.new(application.assistance_year) - 1).beginning_of_year, end_on: (Date.new(application.assistance_year) - 1).end_of_year)
       end
 
       it 'should have magi deductions be zero' do
-         result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
-         expect(result.to_i).to eql(0)
+        result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
+        expect(result.to_i).to eql(0)
       end
 
     end
@@ -1370,7 +1370,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     context 'deduction with end_on in same year as assistance year' do
       before do
-        applicant.deductions.first.update_attributes!(end_on: (Date.new(application.assistance_year,3,1)))
+        applicant.deductions.first.update_attributes!(end_on: Date.new(application.assistance_year,3,1))
       end
 
       it "should return deduction amount until the end date within the assistance year" do
@@ -1384,7 +1384,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
         expect(result.to_i).to eql(5200)
       end
-      
+
     end
 
     context 'with no deductions' do
@@ -1409,7 +1409,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
       it "should add the deductions together" do
         result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
-        expect(result.to_i).to eql(17200)
+        expect(result.to_i).to eql(17_200)
       end
     end
 
