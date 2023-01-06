@@ -44,6 +44,7 @@ module Operations
               return nil unless determined_application
 
               raise "Found multiple determined applications. Can't process changes to application after annual eligibility redetermination." if applications.any?{|application| application.created_at > determined_application.created_at}
+              determined_application
             end
 
             def build_event(payload)
