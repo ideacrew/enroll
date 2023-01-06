@@ -2,22 +2,22 @@
 
 require 'rails_helper'
 
-RSpec.describe ::Operations::Policies::BuildCv3FamilyFromPolicy, dbclean: :after_each do
+RSpec.describe ::Operations::EdiGateway::PublishCv3Family, dbclean: :after_each do
 
   let(:family)      { FactoryBot.create(:family, :with_primary_family_member) }
   let!(:enrollment) { FactoryBot.create(:hbx_enrollment, family: family) }
 
-  describe 'with Invalid policy(enrollment) ID' do
-    it "fail with invalid enrollment " do
-      result = described_class.new.call({policy_id: "12345"})
+  describe 'with Invalid person hbx ID' do
+    it "fail with invalid person hbx ID" do
+      result = described_class.new.call({ person_hbx_id: "12345" })
       expect(result.success?).to be_falsey
-      expect(result.failure).to eq("Enrollment not found")
+      expect(result.failure).to eq("Unable to find person")
     end
   end
 
   describe 'with valid params' do
     it "success with correct family" do
-      result = described_class.new.call({policy_id: enrollment.hbx_id})
+      result = described_class.new.call({ person_hbx_id: family.primary_person.hbx_id, year: 2022 })
       expect(result.success?).to be_truthy
     end
   end

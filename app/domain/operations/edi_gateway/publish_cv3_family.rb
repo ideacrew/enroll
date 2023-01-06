@@ -4,30 +4,41 @@ require 'dry/monads'
 require 'dry/monads/do'
 
 module Operations
-  module Policies
+  module EdiGateway
     # Publish event after find and transform family to cv3 family.
-    class BuildCv3FamilyFromPolicy
+    class PublishCv3Family
       include Dry::Monads[:result, :do, :try]
       include EventSource::Command
 
       def call(params)
-        enrollment = yield find_hbx_enrollment(params[:policy_id])
-        family     = yield find_family(enrollment)
+        person = yield find_person(params[:person_hbx_id])
+        family     = yield find_primary_family(person)
         cv3_family = yield transform_family(family)
         payload    = yield validate_payload(cv3_family)
-        _result    = yield build_and_publish_event(payload, enrollment.effective_on.year)
+        event = yield build_event(payload, params[:year])
+        result    = yield publish(event)
 
-        Success("Successfully published Family with id #{family.id}")
+        Success(result)
       end
 
       private
 
-      def find_hbx_enrollment(policy_id)
-        Operations::HbxEnrollments::Find.new.call({hbx_id: policy_id })
+      def find_person(person_hbx_id)
+        person = Person.where(hbx_id: person_hbx_id).first
+        if person
+          Success(person)
+        else
+          Failure("Unable to find person")
+        end
       end
 
-      def find_family(enrollment)
-        Success(enrollment.family)
+      def find_primary_family(person)
+        primary_family = person.primary_family
+        if primary_family
+          Success(primary_family)
+        else
+          Failure("No primary family exists")
+        end
       end
 
       def transform_family(family)
@@ -44,10 +55,14 @@ module Operations
         end
       end
 
-      def build_and_publish_event(payload, year)
-        event = event("events.irs_groups.built_requested_seed", attributes: { payload: payload.to_h,
-                                                                              year: year }).value!
-        Success(event.publish)
+      def build_event(payload, year)
+        event("events.irs_groups.built_requested_seed", attributes: { payload: payload.to_h,
+                                                                      year: year })
+      end
+
+      def publish(event)
+        event.publish
+        Success("Successfully published Family")
       end
     end
   end
