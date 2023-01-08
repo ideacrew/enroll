@@ -54,3 +54,5 @@ The Resource Registry is a homegrown feature flagging system that uses YML files
 Because values in the Resource Registry cannot change without a redeploy of the entire application codebase, we have added a layer of indirection using Environment Variables. These variables are used in place of a hard-coded configuration value and point at values that only exist in the environment. These variables have their values set in the Kubernetes repository specific to each Client.
 
 What this extra layer of indirection allows us to do is change Client configuration without redeploying the application, as well as having specific features turned on in environments where they need to be tested.
+
+For all new features that are developed, we require a Feature Flag to control the visibility to our end users. All Pull Requests will require reference to this feature flag to ensure that no new development is unflagged and `trunk` remains safe and stable.
