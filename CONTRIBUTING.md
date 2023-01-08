@@ -14,7 +14,7 @@ Before you submit your Pull Request (PR) consider the following guidelines:
 1. [Fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) the ideacrew/enroll repo.
 2. In your forked repository, make your changes in a new git branch
 3. Create your patch, **including appropriate test cases**.
-4. Follow our [Coding Rules](#rules).
+4. Follow our [Development Process](DEVELOPMENT.md).
 5. Run the most relevant tests, including the any that you've updated or created, and ensure that all tests pass.
 6. Commit your changes using a descriptive commit message
 7. Push your branch to GitHub
@@ -42,6 +42,6 @@ At IdeaCrew, we squash all PRs into a single commit that uses the PR title as th
 4. No capitalization
 5. No punctuation
 
-### After your pull request is merged
+## After your pull request is merged
 
 After your pull request is merged, you can safely delete your branch and pull the changes from the main (upstream) repository
