@@ -598,9 +598,7 @@ module FinancialAssistance
     def is_transferrable?
       return false if FinancialAssistanceRegistry.feature_enabled?(:block_renewal_application_transfers) && previously_renewal_draft?
       unless FinancialAssistanceRegistry.feature_enabled?(:non_magi_transfer)
-        # legally required to send application for full assessment if consumer requests it
-        return true if full_medicaid_determination
-        # otherwise block transfer if any applicant is eligible for non-MAGI reasons
+        # block transfer if any applicant is eligible for non-MAGI reasons
         return false if has_non_magi_referrals?
       end
       applicants.any? do |applicant|
