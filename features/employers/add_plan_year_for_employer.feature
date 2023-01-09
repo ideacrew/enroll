@@ -57,4 +57,4 @@ Feature: Add Plan Year For Employer
       | contribution_percent | plan_year_btn_enabled |
       | 100                  | true                  |
       | 60                   | true                  |
-      | 20                   | true                  |
+      | 20                   | false                 |
