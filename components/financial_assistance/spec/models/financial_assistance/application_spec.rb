@@ -2070,24 +2070,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
           application.applicants.first.update(is_non_magi_medicaid_eligible: true)
         end
 
-        context 'full medicaid determination requested' do
-          before do
-            application.update(full_medicaid_determination: true)
-          end
-
-          it 'should return true' do
-            expect(application.is_transferrable?).to eq(true)
-          end
-        end
-
-        context 'full medicaid determination NOT requested' do
-          before do
-            application.update(full_medicaid_determination: false)
-          end
-
-          it 'should return false' do
-            expect(application.is_transferrable?).to eq(false)
-          end
+        it 'should return false' do
+          expect(application.is_transferrable?).to eq(false)
         end
       end
     end
