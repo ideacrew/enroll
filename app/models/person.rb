@@ -88,6 +88,7 @@ class Person
   field :dob_check, type: Boolean
 
   field :is_incarcerated, type: Boolean
+  field :test_field, type: Boolean
 
   field :is_disabled, type: Boolean
   field :ethnicity, type: Array
