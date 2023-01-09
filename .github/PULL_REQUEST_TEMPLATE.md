@@ -9,7 +9,7 @@ Please check if your PR fulfills the following requirements
 What kind of change does this PR introduce?
 
 - [ ] Bugfix
-- [ ] Feature
+- [ ] Feature (requires Feature flag)
 - [ ] Data fix or migration (inert code, no impact until run)
 - [ ] Refactoring (no functional changes, no api changes)
 - [ ] Build related changes
@@ -24,3 +24,12 @@ Ticket:
 Current behavior:
 
 New behavior:
+
+# Environment Variable
+
+For all new feature development, a feature flag is required to control the exposure of the feature to our end users. Please share the name of the variable below that would enable/disable the feature and which client it applies to.
+
+Variable name:
+
+- [ ] DC
+- [ ] ME
