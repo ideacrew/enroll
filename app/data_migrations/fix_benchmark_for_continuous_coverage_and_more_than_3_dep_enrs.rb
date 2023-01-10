@@ -12,7 +12,7 @@ class FixBenchmarkForContinuousCoverageAndMoreThan3DepEnrs < MongoidMigrationTas
       th_enrollment.health_product_hios_id == household_info.health_product_hios_id &&
       th_enrollment.dental_product_hios_id == household_info.dental_product_hios_id &&
       th_enrollment.household_health_benchmark_ehb_premium.to_d == household_info.household_health_benchmark_ehb_premium.to_d &&
-      th_enrollment.household_dental_benchmark_ehb_premium.to_d == household_info.household_dental_benchmark_ehb_premium.to_d
+      th_enrollment.household_dental_benchmark_ehb_premium&.to_d == household_info.household_dental_benchmark_ehb_premium&.to_d
   end
 
   def update_benchmark_premiums(family, enrollment, enrolled_family_member_ids, old_tax_hh_enrs)
@@ -47,9 +47,25 @@ class FixBenchmarkForContinuousCoverageAndMoreThan3DepEnrs < MongoidMigrationTas
       effective_date: enrollment.effective_on,
       households: households_hash
     }
-    benchmark_premiums = ::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts.new.call(payload).success
+    benchmark_premiums_result = ::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts.new.call(payload)
+
+    if benchmark_premiums_result.failure?
+      errors = if benchmark_premiums_result.failure.is_a?(Dry::Validation::Result)
+                 result.failure.errors.to_h
+               else
+                 result.failure
+               end
+      @logger.info "---------- EnrHbxID: #{enrollment.hbx_id} - BenchmarkPremiums issue errors: #{errors}"
+
+      return
+    end
+
+    benchmark_premiums = benchmark_premiums_result.success
+
     old_tax_hh_enrs.each do |th_enrollment|
       household_info = benchmark_premiums.households.find { |household| household.household_id.to_s == th_enrollment.tax_household_id.to_s }
+      next th_enrollment if household_info.nil?
+
       if update_not_needed?(household_info, th_enrollment)
         @logger.info "---------- EnrHbxID: #{enrollment.hbx_id} - Update not needed as TaxHouseholdEnrollment information is same. TaxHousehold hbx_assigned_id: #{th_enrollment.tax_household.hbx_assigned_id}"
         next th_enrollment
@@ -61,6 +77,13 @@ class FixBenchmarkForContinuousCoverageAndMoreThan3DepEnrs < MongoidMigrationTas
         household_health_benchmark_ehb_premium: household_info.household_health_benchmark_ehb_premium,
         household_dental_benchmark_ehb_premium: household_info.household_dental_benchmark_ehb_premium
       )
+
+      th_enrollment.tax_household_members_enrollment_members.each do |member|
+        hh_member = household_info.members.detect { |mmbr| mmbr.family_member_id == member.family_member_id }
+        next member if hh_member.blank?
+
+        member.update!(age_on_effective_date: hh_member.age_on_effective_date)
+      end
     end
     true
   end
