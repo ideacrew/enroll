@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # This script generates a CSV report with information about Enrollments with TaxHouseholdEnrollments
-# To run this for all 2022 enrollments
+# To run this for all enrollments effective 2022
 # bundle exec rails runner script/list_of_tax_household_enrollments.rb
 
 # To run this on specific enrollments
@@ -20,22 +20,19 @@ def process_enrollments(enrollments, logger)
                    health_product_hios_id
                    dental_product_hios_id
                    household_health_benchmark_ehb_premium
-                   household_dental_benchmark_ehb_premium]
+                   household_dental_benchmark_ehb_premium
+                   thh_enr_applied_aptc
+                   thh_enr_group_ehb_premium]
 
   CSV.open(file_name, 'w', force_quotes: true) do |csv|
     csv << field_names
     enrollments.no_timeout.each do |enrollment|
       person = enrollment.family.primary_person
       thh_enrs = TaxHouseholdEnrollment.where(enrollment_id: enrollment.id)
-
       logger.info "No TaxHouseholdEnrollment objects for given enrollment with hbx_id: #{enrollment.hbx_id}, PrimaryPersonHbxId: #{person.hbx_id}" if thh_enrs.blank?
-
-      thh = thh_enr.tax_household
-      next enrollment if thh.blank?
-
-      valid_thh_members = thh.tax_household_members.where(:id.in => thh_enr.tax_household_members_enrollment_members.pluck(:tax_household_member_id))
-
       thh_enrs.each do |thh_enr|
+        thh = thh_enr.tax_household
+        valid_thh_members = thh.tax_household_members.where(:id.in => thh_enr.tax_household_members_enrollment_members.pluck(:tax_household_member_id))
         csv << [
           person.hbx_id,
           enrollment.hbx_id,
@@ -44,15 +41,17 @@ def process_enrollments(enrollments, logger)
           enrollment.product.ehb,
           enrollment.applied_aptc_amount.to_f,
           valid_thh_members.map(&:person).flat_map(&:full_name),
-          thh_enr.household_benchmark_ehb_premium,
+          thh_enr.household_benchmark_ehb_premium.to_f,
           thh_enr.health_product_hios_id,
           thh_enr.dental_product_hios_id,
-          thh_enr.household_health_benchmark_ehb_premium,
-          thh_enr.household_dental_benchmark_ehb_premium
+          thh_enr.household_health_benchmark_ehb_premium.to_f,
+          thh_enr.household_dental_benchmark_ehb_premium.to_f,
+          thh_enr.applied_aptc.to_f,
+          thh_enr.group_ehb_premium.to_f
         ]
       end
     rescue StandardError => e
-      logger.info e.message
+      logger.info "Error raised for EnrHbxID: #{enrollment.hbx_id}, message: #{e}"
     end
   end
 end
@@ -65,14 +64,14 @@ def find_enrollments
   hbx_ids = ENV['enr_hbx_ids'].to_s.split(',').map(&:squish!)
 
   if hbx_ids.present?
-    HbxEnrollment.by_year(2022).by_coverage_kind('health').where(:aasm_state.in => show_enrollments_sans_canceled, :hbx_id.in => hbx_ids)
+    HbxEnrollment.by_coverage_kind('health').where(:effective_on.gte => Date.new(2022), :aasm_state.in => show_enrollments_sans_canceled, :hbx_id.in => hbx_ids)
   else
-    HbxEnrollment.by_year(2022).by_coverage_kind('health').where(:aasm_state.in => show_enrollments_sans_canceled)
+    HbxEnrollment.by_coverage_kind('health').where(:effective_on.gte => Date.new(2022), :aasm_state.in => show_enrollments_sans_canceled)
   end
 end
 
 start_time = DateTime.current
-logger = Logger.new("#{Rails.root}/migration_validation_log_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+logger = Logger.new("#{Rails.root}/enrollments_with_thh_enr_info_log_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
 logger.info "Migration Report start_time: #{start_time}"
 enrollments = find_enrollments
 process_enrollments(enrollments, logger)
