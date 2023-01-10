@@ -98,7 +98,7 @@ describe FixBenchmarkForContinuousCoverageAndMoreThan3DepEnrs, dbclean: :after_e
       EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
       allow(::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts).to receive(:new).and_return(
         double('IdentifySlcspWithPediatricDentalCosts',
-               call: double(success: slcsp_info, success?: true))
+               call: double(success: slcsp_info, success?: true, failure?: false))
       )
     end
 
