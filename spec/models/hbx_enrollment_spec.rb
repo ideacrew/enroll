@@ -671,3 +671,107 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
     end
   end
 end
+
+describe '#update_tax_household_enrollment' do
+  let(:start_of_month) { TimeKeeper.date_of_record.beginning_of_month }
+  let(:person) { create(:person, :with_consumer_role, :with_active_consumer_role) }
+  let(:family) { create(:family, :with_primary_family_member, person: person) }
+  let(:hbx_enrollment) { create(:hbx_enrollment, :individual_aptc, :with_silver_health_product, family: family, consumer_role_id: person.consumer_role.id) }
+  let(:hbx_enrollment_member) do
+    create(:hbx_enrollment_member,
+           hbx_enrollment: hbx_enrollment,
+           applicant_id: family.primary_applicant.id,
+           coverage_start_on: start_of_month,
+           eligibility_date: start_of_month)
+  end
+  let(:tax_household_group) do
+    thhg = family.tax_household_groups.create!(
+      assistance_year: start_of_month.year, source: 'Admin', start_on: start_of_month.year,
+      tax_households: [FactoryBot.build(:tax_household, household: family.active_household)]
+    )
+    thhg.tax_households.first.tax_household_members.create!(
+      applicant_id: family.primary_applicant.id, is_ia_eligible: true
+    )
+    thhg
+  end
+  let!(:tax_household_enrollment) do
+    thh_enr = TaxHouseholdEnrollment.create(
+      enrollment_id: hbx_enrollment.id, tax_household_id: tax_household_group.tax_households.first.id,
+      household_benchmark_ehb_premium: 500.00, available_max_aptc: available_max_aptc
+    )
+
+    thh_enr.tax_household_members_enrollment_members.create(
+      family_member_id: hbx_enrollment_member.applicant_id, hbx_enrollment_member_id: hbx_enrollment_member.id,
+      tax_household_member_id: tax_household_group.tax_households.first.tax_household_members.first.id,
+      age_on_effective_date: 20, relationship_with_primary: 'self', date_of_birth: start_of_month - 20.years
+    )
+    thh_enr
+  end
+
+  before do
+    ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+    EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+  end
+
+  subject { hbx_enrollment.update_tax_household_enrollment }
+
+  context 'with one TaxHouseholdEnrollment' do
+    let(:available_max_aptc) { 375.00 }
+
+    it 'should update applied_aptc' do
+      subject
+      expect(tax_household_enrollment.reload.applied_aptc.to_f).not_to eq(0.00)
+      expect(tax_household_enrollment.reload.group_ehb_premium.to_f).to eq(0.00)
+    end
+  end
+
+  context 'with two TaxHouseholdEnrollments' do
+    let(:available_max_aptc) { 250.00 }
+    let(:available_max_aptc2) { 275.00 }
+    let(:person2) do
+      per = create(:person, :with_consumer_role, :with_active_consumer_role)
+      person.ensure_relationship_with(per, 'spouse')
+      per
+    end
+    let(:family_member) { create(:family_member, person: person2, family: family) }
+    let(:hbx_enrollment_member2) do
+      create(:hbx_enrollment_member,
+             is_subscriber: false,
+             hbx_enrollment: hbx_enrollment,
+             applicant_id: family_member.id,
+             coverage_start_on: start_of_month,
+             eligibility_date: start_of_month)
+    end
+    let(:tax_household_group2) do
+      thhg = family.tax_household_groups.create!(
+        assistance_year: start_of_month.year, source: 'Admin', start_on: start_of_month.year,
+        tax_households: [FactoryBot.build(:tax_household, household: family.active_household)]
+      )
+      thhg.tax_households.first.tax_household_members.create!(
+        applicant_id: family_member.id, is_ia_eligible: true
+      )
+      thhg
+    end
+    let!(:tax_household_enrollment2) do
+      thh_enr = TaxHouseholdEnrollment.create(
+        enrollment_id: hbx_enrollment.id, tax_household_id: tax_household_group2.tax_households.first.id,
+        household_benchmark_ehb_premium: 500.00, available_max_aptc: available_max_aptc2
+      )
+
+      thh_enr.tax_household_members_enrollment_members.create(
+        family_member_id: hbx_enrollment_member2.applicant_id, hbx_enrollment_member_id: hbx_enrollment_member2.id,
+        tax_household_member_id: tax_household_group2.tax_households.first.tax_household_members.first.id,
+        age_on_effective_date: 20, relationship_with_primary: 'self', date_of_birth: start_of_month - 20.years
+      )
+      thh_enr
+    end
+
+    it 'should update applied_aptc of all TaxHouseholdEnrollments' do
+      subject
+      expect(tax_household_enrollment.reload.applied_aptc.to_f).not_to eq(0.00)
+      expect(tax_household_enrollment.reload.group_ehb_premium.to_f).not_to eq(0.00)
+      expect(tax_household_enrollment2.reload.applied_aptc.to_f).not_to eq(0.00)
+      expect(tax_household_enrollment2.reload.group_ehb_premium.to_f).not_to eq(0.00)
+    end
+  end
+end

@@ -88,6 +88,8 @@ module Operations
           dental_product_hios_id: household_info&.dental_product_hios_id,
           household_health_benchmark_ehb_premium: household_info&.household_health_benchmark_ehb_premium,
           household_dental_benchmark_ehb_premium: household_info&.household_dental_benchmark_ehb_premium,
+          slcsp_request_payload: @payload,
+          slcsp_response_payload: benchmark_premiums.to_h,
           available_max_aptc: available_max_aptc
         )
 
@@ -213,13 +215,13 @@ module Operations
 
         return nil if households_hash.blank?
 
-        payload = {
+        @payload = {
           family_id: @family.id,
           effective_date: @effective_on,
           households: households_hash
         }
 
-        result = ::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts.new.call(payload)
+        result = ::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts.new.call(@payload)
 
         raise "IdentifySlcspWithPediatricDentalCosts raised an error - #{result.failure}" unless result.success?
 

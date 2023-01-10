@@ -26,10 +26,23 @@ class TaxHouseholdEnrollment
   #       the :group_ehb_premium is sum of ehb_premiums of A and C
   field :group_ehb_premium, type: Money
 
+  # Request and Response payloads of IdentifySlcspWithPediatricDentalCosts
+  field :slcsp_request_payload, type: Hash
+  field :slcsp_response_payload, type: Hash
+
+  # Scopes
+  scope :by_enrollment_id, ->(enrollment_id) { where(enrollment_id: enrollment_id) }
+
   embeds_many :tax_household_members_enrollment_members, class_name: "::TaxHouseholdMemberEnrollmentMember", cascade_callbacks: true
 
   def enrollment
     HbxEnrollment.find(enrollment_id)
+  end
+
+  def enrolled_aptc_members
+    tax_household_members_enrollment_members.where(
+      :family_member_id.in => tax_household.aptc_members.map(&:applicant_id) & enrollment.hbx_enrollment_members.map(&:applicant_id)
+    )
   end
 
   def tax_household
