@@ -4,7 +4,7 @@ module Events
   module Families
     module Notices
       module Corrected1095a
-        # This class will register event 'fre_notice_generation.requested'
+        # This class will register event 'corrected1095a_notice.requested'
         class Requested < EventSource::Event
           publisher_path 'publishers.families.notices.corrected1095a_notice_requested_publisher'
 
