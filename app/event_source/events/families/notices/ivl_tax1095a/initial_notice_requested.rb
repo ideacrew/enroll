@@ -3,10 +3,10 @@
 module Events
   module Families
     module Notices
-      module Initial1095a
+      module IvlTax1095a
         # This class will register event 'initial1095a_notice.requested'
-        class Requested < EventSource::Event
-          publisher_path 'publishers.families.notices.initial1095a_notice_requested_publisher'
+        class InitialNoticeRequested < EventSource::Event
+          publisher_path 'publishers.families.notices.ivl_tax1095a_notice_requested_publisher'
 
         end
       end

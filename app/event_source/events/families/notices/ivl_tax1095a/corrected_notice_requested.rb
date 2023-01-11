@@ -3,10 +3,10 @@
 module Events
   module Families
     module Notices
-      module Corrected1095a
+      module IvlTax1095a
         # This class will register event 'corrected1095a_notice.requested'
-        class Requested < EventSource::Event
-          publisher_path 'publishers.families.notices.corrected1095a_notice_requested_publisher'
+        class CorrectedNoticeRequested < EventSource::Event
+          publisher_path 'publishers.families.notices.ivl_tax1095a_notice_requested_publisher'
 
         end
       end

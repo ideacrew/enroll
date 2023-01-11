@@ -3,10 +3,10 @@
 module Events
   module Families
     module Notices
-      module Catastrophic1095a
+      module IvlTax1095a
         # This class will register event 'catastrophic1095a_notice.requested'
-        class Requested < EventSource::Event
-          publisher_path 'publishers.families.notices.catastrophic1095a_notice_requested_publisher'
+        class CatastrophicNoticeRequested < EventSource::Event
+          publisher_path 'publishers.families.notices.ivl_tax1095a_notice_requested_publisher'
 
         end
       end
