@@ -1,17 +1,17 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require File.join(Rails.root, 'app', 'data_migrations', 'fix_benchmark_for_continuous_coverage_and_more_than_3_dep_enrs')
+require File.join(Rails.root, 'app', 'data_migrations', 'update_benchmark_for_continuous_coverage_and_child_member_enrs')
 
-describe FixBenchmarkForContinuousCoverageAndMoreThan3DepEnrs, dbclean: :after_each do
+describe UpdateBenchmarkForContinuousCoverageAndChildMemberEnrs, dbclean: :after_each do
   after :all do
-    logger_name = "#{Rails.root}/log/fix_benchmark_for_continuous_coverage_and_more_than_3_dep_enrs_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+    logger_name = "#{Rails.root}/log/update_benchmark_for_continuous_coverage_and_child_member_enrs_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
     csv_name = "#{Rails.root}/benchmark_for_continuous_coverage_enrollments_list_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}_1.csv"
     File.delete(logger_name) if File.exist?(logger_name)
     File.delete(csv_name) if File.exist?(csv_name)
   end
 
-  subject { FixBenchmarkForContinuousCoverageAndMoreThan3DepEnrs.new('fix_benchmark_for_continuous_coverage_and_more_than_3_dep_enrs', double(:current_scope => nil)) }
+  subject { UpdateBenchmarkForContinuousCoverageAndChildMemberEnrs.new('update_benchmark_for_continuous_coverage_and_child_member_enrs', double(:current_scope => nil)) }
 
   describe '#migrate', :dbclean => :around_each do
     let!(:system_year) { Date.today.year }
@@ -21,7 +21,7 @@ describe FixBenchmarkForContinuousCoverageAndMoreThan3DepEnrs, dbclean: :after_e
     let!(:hbx_enrollment) do
       FactoryBot.create(:hbx_enrollment,
                         :with_silver_health_product,
-                        :individual_unassisted,
+                        :individual_aptc,
                         consumer_role_id: person.consumer_role.id,
                         effective_on: Date.new(system_year, 2, 1),
                         family: family,
@@ -102,11 +102,26 @@ describe FixBenchmarkForContinuousCoverageAndMoreThan3DepEnrs, dbclean: :after_e
       )
     end
 
-    it 'updates household_benchmark_ehb_premium' do
-      subject.migrate
-      expect(
-        TaxHouseholdEnrollment.where(enrollment_id: hbx_enrollment.id).first.household_benchmark_ehb_premium.to_f
-      ).to eq(200.00)
+    context 'with continuous_coverage_enr' do
+      it 'updates household_benchmark_ehb_premium' do
+        subject.migrate
+        expect(
+          TaxHouseholdEnrollment.where(enrollment_id: hbx_enrollment.id).first.household_benchmark_ehb_premium.to_f
+        ).to eq(200.00)
+      end
+    end
+
+    context 'with children_aged_20_or_below' do
+      before do
+        person.update_attributes!(dob: Date.new(system_year - 19, 1, 19))
+      end
+
+      it 'updates household_benchmark_ehb_premium' do
+        subject.migrate
+        expect(
+          TaxHouseholdEnrollment.where(enrollment_id: hbx_enrollment.id).first.household_benchmark_ehb_premium.to_f
+        ).to eq(200.00)
+      end
     end
   end
 end
