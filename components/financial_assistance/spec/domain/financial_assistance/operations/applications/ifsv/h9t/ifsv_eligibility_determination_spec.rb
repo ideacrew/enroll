@@ -139,7 +139,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
                                 first_name: 'Income',
                                 last_name: 'evidence',
                                 ssn: "111111111",
-                                dob: Date.new(1988, 11, 11),
+                                dob: Date.new(1987, 11, 11),
                                 family_member_id: family.primary_family_member.id,
                                 application: application)
             end
