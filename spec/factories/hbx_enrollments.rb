@@ -42,6 +42,15 @@ FactoryBot.define do
       coverage_kind { "dental" }
     end
 
+    trait :individual_aptc do
+      kind                { 'individual' }
+      effective_on        { TimeKeeper.date_of_record.beginning_of_month }
+      coverage_kind       { 'health' }
+      applied_aptc_amount { 150.00 }
+      elected_aptc_pct    { 1.00 }
+      aasm_state          { 'coverage_selected' }
+    end
+
     trait :individual_unassisted do
       kind { "individual" }
       elected_premium_credit { 0 }
