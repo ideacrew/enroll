@@ -210,6 +210,8 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
       elsif eligible_csr_variant == '01'
         fetch_product("01")&.id || @enrollment.product.renewal_product_id
       else
+        product = fetch_product(eligible_csr_variant) || fetch_product('01')
+        return product.id if product
         @enrollment.product.renewal_product_id
       end
     else
