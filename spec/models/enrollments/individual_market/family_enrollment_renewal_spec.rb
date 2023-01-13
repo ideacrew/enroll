@@ -1035,7 +1035,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
         before :each do
           ::BenefitMarkets::Products::HealthProducts::HealthProduct.silver_plans.update_all(metal_level_kind: :bronze)
-           enrollment.product.update_attributes!(renewal_product_id: renewal_product.id)
+          enrollment.product.update_attributes!(renewal_product_id: renewal_product.id)
         end
         it "should default to 01 variant if no other plan found" do
           expect(subject.assisted_renewal_product).to eq csr_01_product.id
