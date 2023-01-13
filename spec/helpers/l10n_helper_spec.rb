@@ -44,8 +44,20 @@ RSpec.describe L10nHelper, :type => :helper do
       EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
     end
 
-    it "should load wage types" do
-      expect(l10n('faa.income.wages_and_salaries')).to eq("Wages and Salaries")
+    context "income" do
+      it "should load wage type" do
+        expect(l10n('faa.income.wages_and_salaries')).to eq("Wages and Salaries")
+      end
+
+      it "should load other type" do
+        expect(l10n('faa.income.other')).to eq("Other taxable income")
+      end
+    end
+
+    context "deduction" do
+      it "should load other type" do
+        expect(l10n('faa.deduction.other')).to eq("Other Deductions")
+      end
     end
   end
 end
