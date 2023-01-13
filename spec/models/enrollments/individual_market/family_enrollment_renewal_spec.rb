@@ -1024,7 +1024,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
 
       context "when individual has CSR change" do
-
         let!(:renewal_product) { FactoryBot.create(:renewal_ivl_silver_health_product,  hios_id: "11111111122302-04", hios_base_id: "11111111122302", csr_variant_id: "04") }
         let!(:current_product) { FactoryBot.create(:active_ivl_silver_health_product, hios_id: "11111111122302-04", hios_base_id: "11111111122302", csr_variant_id: "04", renewal_product_id: renewal_product.id) }
         let!(:csr_product) { FactoryBot.create(:renewal_ivl_silver_health_product, hios_id: "11111111122302-05", hios_base_id: "11111111122302", csr_variant_id: "05") }
