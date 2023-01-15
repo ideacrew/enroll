@@ -28,7 +28,7 @@ class PopulateAppliedAptcForThhEnrs < MongoidMigrationTask
     end
   end
 
-  def update_single_thh_enr(family, enrollment, thh_enr)
+  def update_single_thh_enr(enrollment, thh_enr)
     thh_enr.update_attributes!(
       {
         applied_aptc: enrollment.applied_aptc_amount,
@@ -106,7 +106,7 @@ class PopulateAppliedAptcForThhEnrs < MongoidMigrationTask
     thh_enr_premiums
   end
 
-  def update_thh_enrs_ineligible_for_applied_aptc(family, enrollment, tax_hh_enrs)
+  def update_thh_enrs_ineligible_for_applied_aptc(tax_hh_enrs)
     tax_hh_enrs.each do |thh_enr|
       thh_enr.applied_aptc = 0.00
       thh_enr.group_ehb_premium = 0.00
@@ -114,7 +114,7 @@ class PopulateAppliedAptcForThhEnrs < MongoidMigrationTask
     end
   end
 
-  def update_multiple_thh_enrs(family, enrollment, tax_hh_enrs)
+  def update_multiple_thh_enrs(_family, enrollment, tax_hh_enrs)
     thh_enr_premiums = find_premiums_for_thh_enrs(enrollment, tax_hh_enrs)
     non_applied_aptc_thh_enrs = find_non_applied_aptc_thh_enrs(thh_enr_premiums)
     applied_aptc_amount = enrollment.applied_aptc_amount
@@ -140,7 +140,7 @@ class PopulateAppliedAptcForThhEnrs < MongoidMigrationTask
     TaxHouseholdEnrollment.where(enrollment_id: enrollment.id, :'available_max_aptc.cents'.lte => 0.00).each do |thh_enr|
       thh_enr.update_attributes!(
         applied_aptc: 0.00,
-        group_ehb_premium: 0.00,
+        group_ehb_premium: 0.00
       )
     end
   end
@@ -160,7 +160,6 @@ class PopulateAppliedAptcForThhEnrs < MongoidMigrationTask
       enrollment.coverage_kind == 'health' &&
       enrollment.applied_aptc_amount.positive? &&
       enrollment.consumer_role_id.present?
-
   end
 
   def process_hbx_enrollment_hbx_ids
@@ -188,9 +187,9 @@ class PopulateAppliedAptcForThhEnrs < MongoidMigrationTask
         end
 
         if !eligible_to_populate_applied_aptc?(enrollment)
-          update_thh_enrs_ineligible_for_applied_aptc(family, enrollment, tax_hh_enrs)
+          update_thh_enrs_ineligible_for_applied_aptc(tax_hh_enrs)
         elsif tax_hh_enrs.count == 1
-          update_single_thh_enr(family, enrollment, tax_hh_enrs.first)
+          update_single_thh_enr(enrollment, tax_hh_enrs.first)
         else
           update_multiple_thh_enrs(family, enrollment, tax_hh_enrs)
         end
