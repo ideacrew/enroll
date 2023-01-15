@@ -1071,7 +1071,7 @@ class HbxEnrollment
     return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
     thh_enr_premiums = thh_enr_group_ehb_premium_of_aptc_members(aptc_tax_household_enrollments)
-    update_multiple_thh_enrollments(aptc_tax_household_enrollments, thh_enr_premiums)
+    populate_applied_aptc_for_thh_enrs(aptc_tax_household_enrollments, thh_enr_premiums)
   rescue StandardError => e
     Rails.logger.error { "Couldn't generate enrollment save event due to #{e.backtrace}" }
   end
@@ -2877,7 +2877,7 @@ class HbxEnrollment
   #   1. group_ehb_premium (or)
   #   2. thh_enr.available_max_aptc * elected_aptc_pct
   # To make this inline with plan shopping logic we are considering tax_household_enrollment level ehb_premium.
-  def update_multiple_thh_enrollments(thh_enrs, thh_enr_premiums)
+  def populate_applied_aptc_for_thh_enrs(thh_enrs, thh_enr_premiums)
     if applied_aptc_amount == total_ehb_premium.to_money
       thh_enrs.each do |thh_enr|
         thh_enr.update_attributes!(

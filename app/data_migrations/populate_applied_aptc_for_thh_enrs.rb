@@ -17,7 +17,6 @@ class PopulateAppliedAptcForThhEnrs < MongoidMigrationTask
       :aasm_state.ne => ['shopping', 'coverage_canceled'],
       :product_id.ne => nil,
       coverage_kind: 'health',
-      :'applied_aptc_amount.cents'.gt => 0,
       :consumer_role_id.ne => nil
     ).pluck(:hbx_id)
   end
@@ -36,8 +35,6 @@ class PopulateAppliedAptcForThhEnrs < MongoidMigrationTask
         group_ehb_premium: float_fix(sum_of_member_ehb_premiums(enrollment, thh_enr))
       }
     )
-
-    populate_info_to_csv(family, enrollment, thh_enr)
   end
 
   def populate_info_to_csv(family, enrollment, thh_enr)
@@ -67,7 +64,7 @@ class PopulateAppliedAptcForThhEnrs < MongoidMigrationTask
     ratio = enrollment.applied_aptc_amount / tax_hh_enrs.map(&:available_max_aptc).sum
 
     tax_hh_enrs.inject({}) do |thh_enr_premiums_hash, thh_enrollment|
-      assumed_applied_aptc = ratio * thh_enrollment.available_max_aptc
+      assumed_applied_aptc = ratio * (thh_enrollment.available_max_aptc.positive? ? thh_enrollment.available_max_aptc : 0.00.to_money)
       group_ehb_cost = Money.new(
         float_fix(sum_of_member_ehb_premiums(enrollment, thh_enrollment)) * 100
       )
@@ -76,8 +73,9 @@ class PopulateAppliedAptcForThhEnrs < MongoidMigrationTask
       thh_enr_premiums_hash[thh_enrollment] = {
         assumed_applied_aptc: assumed_applied_aptc,
         group_ehb_premium: group_ehb_cost,
+        available_max_aptc: thh_enrollment.available_max_aptc.positive? ? thh_enrollment.available_max_aptc : 0.00.to_money,
         assumed_applied_aptc_greater_than_group_ehb_premium: assumed_applied_aptc_greater_than_group_ehb_premium,
-        applied_aptc: assumed_applied_aptc_greater_than_group_ehb_premium ? group_ehb_cost : 0.00
+        applied_aptc: assumed_applied_aptc_greater_than_group_ehb_premium ? group_ehb_cost : nil
       }
 
       thh_enr_premiums_hash
@@ -86,26 +84,34 @@ class PopulateAppliedAptcForThhEnrs < MongoidMigrationTask
 
   def find_non_applied_aptc_thh_enrs(thh_enr_premiums)
     thh_enr_premiums.select do |_thh_enr, premium_hash|
-      premium_hash[:applied_aptc].zero?
+      premium_hash[:applied_aptc].nil?
     end
   end
 
   def set_applied_aptc_for_remaining_thh_enrs(thh_enr_premiums, non_applied_aptc_thh_enrs, applied_aptc_amount)
     non_applied_aptc_count = non_applied_aptc_thh_enrs.count
-    remaining_consumed_aptc = applied_aptc_amount - thh_enr_premiums.values.collect { |val| val[:applied_aptc] }.sum
-    ratio = remaining_consumed_aptc / non_applied_aptc_thh_enrs.keys.map(&:available_max_aptc).sum
+    remaining_consumed_aptc = applied_aptc_amount - thh_enr_premiums.values.collect { |val| val[:applied_aptc].presence || 0.00 }.sum
+    ratio = remaining_consumed_aptc / non_applied_aptc_thh_enrs.values.reduce(0) {|sum, thh_enr_hash|  sum + thh_enr_hash[:available_max_aptc] }
 
     non_applied_aptc_thh_enrs.each_with_index do |haash, i|
       thh_enr = haash.first
       thh_enr_premiums[thh_enr][:applied_aptc] =
         if i == non_applied_aptc_count.pred
-          applied_aptc_amount - thh_enr_premiums.values.collect { |val| val[:applied_aptc] }.sum
+          applied_aptc_amount - thh_enr_premiums.values.collect { |val| val[:applied_aptc].presence || 0.00 }.sum
         else
-          ratio * thh_enr.available_max_aptc
+          ratio * thh_enr_premiums[thh_enr][:available_max_aptc]
         end
     end
 
     thh_enr_premiums
+  end
+
+  def update_thh_enrs_ineligible_for_applied_aptc(family, enrollment, tax_hh_enrs)
+    tax_hh_enrs.each do |thh_enr|
+      thh_enr.applied_aptc = 0.00
+      thh_enr.group_ehb_premium = 0.00
+      thh_enr.save!
+    end
   end
 
   def update_multiple_thh_enrs(family, enrollment, tax_hh_enrs)
@@ -116,30 +122,45 @@ class PopulateAppliedAptcForThhEnrs < MongoidMigrationTask
     thh_enr_premiums =
       if non_applied_aptc_thh_enrs.count == 1
         thh_enr_premiums[non_applied_aptc_thh_enrs.keys.first][:applied_aptc] =
-          applied_aptc_amount - thh_enr_premiums.values.collect { |val| val[:applied_aptc] }.sum
+          applied_aptc_amount - thh_enr_premiums.values.collect { |val| val[:applied_aptc].presence || 0.00  }.sum
 
         thh_enr_premiums
       else
         set_applied_aptc_for_remaining_thh_enrs(thh_enr_premiums, non_applied_aptc_thh_enrs, applied_aptc_amount)
       end
 
-    thh_enrs_info_array = []
     thh_enr_premiums.each do |thh_enr, premiums_hash|
       thh_enr.applied_aptc = premiums_hash[:applied_aptc]
       thh_enr.group_ehb_premium = premiums_hash[:group_ehb_premium]
       thh_enr.save!
-      thh_enrs_info_array << populate_info_to_csv(family, enrollment, thh_enr)
     end
+  end
 
-    thh_enrs_info_array
+  def update_applied_aptc_for_thh_enrs_with_negative_available_aptc(enrollment)
+    TaxHouseholdEnrollment.where(enrollment_id: enrollment.id, :'available_max_aptc.cents'.lte => 0.00).each do |thh_enr|
+      thh_enr.update_attributes!(
+        applied_aptc: 0.00,
+        group_ehb_premium: 0.00,
+      )
+    end
   end
 
   def aptc_tax_household_enrollments(enrollment)
     TaxHouseholdEnrollment.where(enrollment_id: enrollment.id).select do |thh_enr|
-      thh_enr.tax_household_members_enrollment_members.where(
+      thh_enr.available_max_aptc.positive? && thh_enr.tax_household_members_enrollment_members.where(
         :family_member_id.in => thh_enr.tax_household.aptc_members.map(&:applicant_id)
       ).present?
     end
+  end
+
+  def eligible_to_populate_applied_aptc?(enrollment)
+    enrollment.effective_on >= Date.new(2022) &&
+      ['shopping', 'coverage_canceled'].exclude?(enrollment.aasm_state) &&
+      enrollment.product_id.present? &&
+      enrollment.coverage_kind == 'health' &&
+      enrollment.applied_aptc_amount.positive? &&
+      enrollment.consumer_role_id.present?
+
   end
 
   def process_hbx_enrollment_hbx_ids
@@ -159,18 +180,23 @@ class PopulateAppliedAptcForThhEnrs < MongoidMigrationTask
         @logger.info "----- EnrHbxID: #{hbx_id} - Processing Enrollment"
         enrollment = HbxEnrollment.by_hbx_id(hbx_id).first
         family = enrollment.family
+        update_applied_aptc_for_thh_enrs_with_negative_available_aptc(enrollment)
         tax_hh_enrs = aptc_tax_household_enrollments(enrollment)
         if tax_hh_enrs.blank?
           @logger.info "---------- EnrHbxID: #{hbx_id} - No TaxHouseholdEnrollments for Enrollment"
           next hbx_id
         end
 
-        if tax_hh_enrs.count == 1
-          csv << update_single_thh_enr(family, enrollment, tax_hh_enrs.first)
+        if !eligible_to_populate_applied_aptc?(enrollment)
+          update_thh_enrs_ineligible_for_applied_aptc(family, enrollment, tax_hh_enrs)
+        elsif tax_hh_enrs.count == 1
+          update_single_thh_enr(family, enrollment, tax_hh_enrs.first)
         else
-          update_multiple_thh_enrs(family, enrollment, tax_hh_enrs).each do |csv_data|
-            csv << csv_data
-          end
+          update_multiple_thh_enrs(family, enrollment, tax_hh_enrs)
+        end
+
+        TaxHouseholdEnrollment.where(enrollment_id: enrollment.id).each do |thh_enr|
+          csv << populate_info_to_csv(family, enrollment, thh_enr)
         end
       rescue StandardError => e
         @logger.info "---------- EnrHbxID: #{hbx_id} - Error raised processing enrollment, error: #{e}, backtrace: #{e.backtrace}"
