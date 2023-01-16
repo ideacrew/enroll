@@ -17,7 +17,7 @@ class TaxHouseholdEnrollment
 
   field :available_max_aptc, type: Money
 
-  # group_ehb_premium is sum of ehb_premiums of TaxHouseholdMembers associated with :tax_household_id who are enrolled in HbxEnrollment(enrollment_id).
+  # group_ehb_premium is sum of ehb_premiums of APTC eligible TaxHouseholdMembers associated with :tax_household_id who are enrolled in HbxEnrollment(enrollment_id).
   #   For Example:
   #     Enrollment1: A, B, C, D
   #     TaxHousehold1: A, C
@@ -25,6 +25,9 @@ class TaxHouseholdEnrollment
   #     For a given TaxHouseholdEnrollment(enrollment_id: Enrollment1.id, tax_household_id: TaxHousehold1.id),
   #       the :group_ehb_premium is sum of ehb_premiums of A and C
   field :group_ehb_premium, type: Money
+
+  # Scopes
+  scope :by_enrollment_id, ->(enrollment_id) { where(enrollment_id: enrollment_id) }
 
   embeds_many :tax_household_members_enrollment_members, class_name: "::TaxHouseholdMemberEnrollmentMember", cascade_callbacks: true
 
