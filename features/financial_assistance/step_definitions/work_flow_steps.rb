@@ -150,6 +150,8 @@ end
 
 Then(/^the oe application warning will not display$/) do
   expect(page.has_css?(CostSavingsApplicationPage.oe_application_warning_display)).to eq false
+end
+
 Then(/^the coverage update reminder warning will display$/) do
   expect(page.has_css?(CostSavingsApplicationPage.coverage_update_reminder_display)).to eq true
 end
