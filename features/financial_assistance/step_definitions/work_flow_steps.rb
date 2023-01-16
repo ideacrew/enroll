@@ -132,12 +132,12 @@ end
 
 And(/^it is before open enrollment$/) do
   oe_start_on = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.start_on.year == Date.today.year}.open_enrollment_start_on
-  allow(Date).to receive(:today).and_return Date.new(oe_start_on.year,10,27)
+  allow(TimeKeeper).to receive(:date_of_record).and_return Date.new(oe_start_on.year,10,27)
 end
 
 And(/^it is after open enrollment$/) do
   oe_end_on = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.open_enrollment_end_on
-  allow(Date).to receive(:today).and_return Date.new(oe_end_on.year,2,15)
+  allow(TimeKeeper).to receive(:date_of_record).and_return Date.new(oe_end_on.year,2,15)
 end
 
 And(/^current hbx is not under open enrollment$/) do
