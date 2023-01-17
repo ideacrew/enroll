@@ -58,7 +58,7 @@ module FinancialAssistance
             params = {
               type: "pvc_manifest_type",
               assistance_year: assistance_year,
-              count: get_count(families),
+              initial_count: get_count(families),
             }
             ::AcaEntities::Pdm::Contracts::ManifestContract.new.call(params).to_h
           end

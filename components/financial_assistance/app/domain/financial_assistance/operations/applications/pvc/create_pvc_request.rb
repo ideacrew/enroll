@@ -20,7 +20,7 @@ module FinancialAssistance
             values = yield validate(params)
             family_application = yield fetch_family_application(values[:family_id], values[:manifest][:assistance_year])
             applicant_payload = yield construct_applicant_payload(family_application, values[:person])
-            event = yield build_event(values[:manifest], applicant_payload)
+            event = yield build_event(values[:manifest], applicant_payload, family_application.hbx_id)
             result = yield publish(event)
             Success(result)
           end
@@ -53,9 +53,7 @@ module FinancialAssistance
             return Failure("Cv3Application transform failed for person hbx id: #{person_hbx_id}") unless cv3_application.success?
 
             applicants = cv3_application.value![:applicants]
-
             applicant = applicants.detect {|applicant| applicant[:person_hbx_id] == person_hbx_id}
-
             return Failure("invalid applicant for person hbx id #{person_hbx_id}") unless applicant.present?
 
             result = AcaEntities::MagiMedicaid::Contracts::ApplicantContract.new.call(applicant)
@@ -78,8 +76,8 @@ module FinancialAssistance
             errors.empty? ? Success(params) : Failure(errors)
           end
 
-          def build_event(manifest, applicant)
-            result = event('events.fdsh.evidences.periodic_verification_confirmation', attributes: { manifest: manifest, applicant: applicant })
+          def build_event(manifest, applicant, application_hbx_id)
+            result = event('events.fdsh.evidences.periodic_verification_confirmation', attributes: { manifest: manifest, applicant: applicant, application_hbx_id: application_hbx_id })
             result
           end
 
