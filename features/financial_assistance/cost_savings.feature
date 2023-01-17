@@ -105,7 +105,7 @@ Feature: Cost Savings
     Then the consumer will navigate to the Cost Savings page
     Then the coverage update reminder warning will display
 
-  Scenario: Under Open Enrollment - Consumer should see OE Application warning message
+  Scenario: Not under Open Enrollment - Consumer should not see OE Application warning message
     Given the oe application warning display feature is enabled
     Given current hbx is not under open enrollment
     Given consumer visits home page
