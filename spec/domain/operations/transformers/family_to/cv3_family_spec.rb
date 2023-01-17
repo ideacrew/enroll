@@ -11,7 +11,7 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: primary_applicant) }
   let(:family_member2) { FactoryBot.create(:family_member, family: family, person: dependent1) }
   let(:family_member3) { FactoryBot.create(:family_member, family: family, person: dependent2) }
-  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: DateTime.new(2021,1,1,4,5,6)) }
+  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
   let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: application, family_member_id: primary_applicant.id, is_primary_applicant: true, person_hbx_id: primary_applicant.hbx_id) }
   let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, application: application, family_member_id: family_member2.id, person_hbx_id: dependent1.hbx_id) }
   let!(:applicant3) { FactoryBot.create(:financial_assistance_applicant, application: application, family_member_id: family_member3.id, person_hbx_id: dependent2.hbx_id) }
@@ -38,6 +38,9 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
     application.build_relationship_matrix
     application.save!
   end
+  let(:benefit_sponsorship) { FactoryBot.build(:benefit_sponsorship) }
+  let!(:hbx_profile) { FactoryBot.create :hbx_profile, benefit_sponsorship: benefit_sponsorship}
+
 
   describe '#transform_applications' do
 
@@ -202,6 +205,44 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
         member_slcsp_info = cv3_family.fetch_slcsp_benchmark_premium_for_member(person_hbx_id, slcsp_info)
         expect(member_slcsp_info).to eq slcsp_info.dig(person_hbx_id, :health_only_slcsp_premiums, :cost)&.to_money&.to_hash
       end
+    end
+  end
+
+  context 'tax household member is missing matching family member' do
+    let(:family_member_id) { family.family_members.first.id.to_s }
+    let(:silver_product_premiums) do
+      {
+        family_member_id => [
+          { :cost => 200.0, :product_id => BSON::ObjectId.new },
+          { :cost => 300.0, :product_id => BSON::ObjectId.new },
+          { :cost => 400.0, :product_id => BSON::ObjectId.new }
+        ]
+      }
+    end
+    let!(:list_products) { FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 5, :silver) }
+    let(:products) { ::BenefitMarkets::Products::Product.all }
+    let(:products_payload) do
+      {
+        rating_area_id: BSON::ObjectId.new,
+        products: products
+      }
+    end
+    let(:effective_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+    let!(:tax_household) {FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil, effective_starting_on: effective_on)}
+    let!(:tax_household_member1) {FactoryBot.create(:tax_household_member, applicant_id: family.family_members.first.id, tax_household: tax_household)}
+    let!(:tax_household_member2) {FactoryBot.create(:tax_household_member, tax_household: tax_household)}
+
+    before do
+      allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(::Dry::Monads::Result::Success.new(application))
+      allow(Operations::Products::FetchSilverProducts).to receive(:new).and_return double(call: ::Dry::Monads::Result::Success.new(products_payload))
+      allow(Operations::Products::FetchSilverProductPremiums).to receive(:new).and_return double(call: ::Dry::Monads::Result::Success.new(silver_product_premiums))
+      allow(Operations::Products::FetchSlcsp).to receive(:new).and_return double(call: ::Dry::Monads::Result::Success.new({}))
+    end
+
+    it 'should not include the tax household member with the missing family member' do
+      result = subject.call(family).value!
+      tax_household_members = result[:households].first[:tax_households].first[:tax_household_members]
+      expect(tax_household_members.count).to eq(1)
     end
   end
 end

@@ -289,6 +289,8 @@ module Operations
           slcsp_info = fetch_slcsp_info(tax_household)
           application = latest_application_in_tax_household_year(tax_household)
           tax_household.tax_household_members.collect do |member|
+            next unless member.family_member.present?
+
             person_hbx_id = member.family_member.person.hbx_id
             {
               family_member_reference: transform_family_member_reference(member),
@@ -298,7 +300,7 @@ module Operations
               slcsp_benchmark_premium: fetch_slcsp_benchmark_premium_for_member(person_hbx_id, slcsp_info),
               reason: member.reason
             }
-          end
+          end.compact
         end
 
         def fetch_tax_filer_status(person_hbx_id, application)

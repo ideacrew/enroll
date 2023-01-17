@@ -516,6 +516,16 @@ Given(/the iap year selection feature is enabled/) do
   enable_feature :iap_year_selection
 end
 
+Given(/the iap year selection form feature is enabled/) do
+  enable_feature :iap_year_selection_form, {registry_name: FinancialAssistanceRegistry}
+  enable_feature :iap_year_selection_form
+end
+
+Given(/the iap year selection form feature is disabled/) do
+  disable_feature :iap_year_selection_form, {registry_name: FinancialAssistanceRegistry}
+  disable_feature :iap_year_selection_form
+end
+
 Given(/the oe application warning display feature is enabled/) do
   enable_feature :oe_application_warning_display, {registry_name: FinancialAssistanceRegistry}
   enable_feature :oe_application_warning_display

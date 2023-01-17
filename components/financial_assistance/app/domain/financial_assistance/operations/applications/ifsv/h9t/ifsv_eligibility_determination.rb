@@ -67,7 +67,7 @@ module FinancialAssistance
               when "verified"
                 applicant.set_income_evidence_verified
               when "outstanding"
-                if enrolled?(applicant, enrollments)
+                if enrolled?(applicant, enrollments) && income_evidence.aasm_state == 'pending'
                   applicant.set_evidence_outstanding(income_evidence)
                 else
                   applicant.set_evidence_to_negative_response(income_evidence)

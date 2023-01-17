@@ -79,6 +79,10 @@ FactoryBot.define do
       income_evidence { FactoryBot.build(:evidence, key: :income, title: 'Income', aasm_state: 'pending', is_satisfied: false) }
     end
 
+    trait :with_attested_income_evidence do
+      income_evidence { FactoryBot.build(:evidence, key: :income, title: 'Income', aasm_state: 'attested', is_satisfied: false) }
+    end
+
     trait :with_esi_evidence do
       esi_evidence { FactoryBot.build(:evidence, key: :esi_mec, title: 'ESI MEC') }
     end

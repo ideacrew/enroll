@@ -1,5 +1,9 @@
 <% if FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection_form) %>
-  <%= render 'year_selection_form' %>
+  <% if HbxProfile.current_hbx.under_open_enrollment? %>
+    <%= render 'year_selection_form' %>
+  <% else %>
+    <%= render 'non_oe_year_selection_form' %>
+  <% end %>
 <% else %>
   <div class="container">
     <div id="new_person_wrapper">
