@@ -107,7 +107,7 @@ module FinancialAssistance
       if copy_result.success?
         @application = copy_result.success
         @application.set_assistance_year
-        assistance_year_page = HbxProfile.current_hbx.under_open_enrollment? && EnrollRegistry.feature_enabled?(:iap_year_selection)
+        assistance_year_page = EnrollRegistry.feature_enabled?(:iap_year_selection) && (HbxProfile.current_hbx.under_open_enrollment? || EnrollRegistry.feature_enabled?(:iap_year_selection_form))
         redirect_path = assistance_year_page ? application_year_selection_application_path(@application) : edit_application_path(@application)
 
         redirect_to redirect_path

@@ -1022,6 +1022,24 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           expect(subject.assisted_renewal_product).to eq renewal_product.id
         end
       end
+
+      context "when individual has CSR change" do
+        let!(:renewal_product) { FactoryBot.create(:renewal_ivl_silver_health_product,  hios_id: "11111111122302-04", hios_base_id: "11111111122302", csr_variant_id: "04") }
+        let!(:current_product) { FactoryBot.create(:active_ivl_silver_health_product, hios_id: "11111111122302-04", hios_base_id: "11111111122302", csr_variant_id: "04", renewal_product_id: renewal_product.id) }
+        let!(:csr_product) { FactoryBot.create(:renewal_ivl_silver_health_product, hios_id: "11111111122302-05", hios_base_id: "11111111122302", csr_variant_id: "05") }
+        let!(:csr_01_product) { FactoryBot.create(:active_ivl_silver_health_product, hios_id: "11111111122302-01", hios_base_id: "11111111122302", csr_variant_id: "01") }
+        let!(:csr_02_product) { FactoryBot.create(:active_ivl_silver_health_product, hios_id: "11111111122302-02", hios_base_id: "11111111122302", csr_variant_id: "02") }
+        let!(:csr_03_product) { FactoryBot.create(:active_ivl_silver_health_product, hios_id: "11111111122302-03", hios_base_id: "11111111122302", csr_variant_id: "03") }
+        let(:aptc_values) {{ csr_amt: "94" }}
+
+        before :each do
+          ::BenefitMarkets::Products::HealthProducts::HealthProduct.silver_plans.update_all(metal_level_kind: :bronze)
+          enrollment.product.update_attributes!(renewal_product_id: renewal_product.id)
+        end
+        it "should default to 01 variant if no other plan found" do
+          expect(subject.assisted_renewal_product).to eq csr_01_product.id
+        end
+      end
     end
 
     describe ".clone_enrollment" do

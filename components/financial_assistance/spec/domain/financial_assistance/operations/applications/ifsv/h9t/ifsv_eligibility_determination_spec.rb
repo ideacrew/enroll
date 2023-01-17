@@ -107,7 +107,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
             expect(@result).to be_success
           end
 
-          it 'should returns negative_response_received' do
+          it 'should return negative_response_received' do
             @applicant.reload
             income_evidence = @applicant.income_evidence
             expect(income_evidence.negative_response_received?).to be_truthy
@@ -127,6 +127,29 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
             income_evidence = @applicant.income_evidence
             expect(income_evidence.outstanding?).to be_truthy
             expect(income_evidence.verification_outstanding).to be_truthy
+          end
+
+          context 'with income not in pending state' do
+            let!(:applicant) do
+              FactoryBot.create(:financial_assistance_applicant,
+                                :with_attested_income_evidence,
+                                eligibility_determination_id: ed.id,
+                                person_hbx_id: '1629165429385938',
+                                is_primary_applicant: true,
+                                first_name: 'Income',
+                                last_name: 'evidence',
+                                ssn: "111111111",
+                                dob: Date.new(1988, 11, 11),
+                                family_member_id: family.primary_family_member.id,
+                                application: application)
+            end
+
+            it 'should return negative_response_received' do
+              @applicant.reload
+              income_evidence = @applicant.income_evidence
+              expect(income_evidence.negative_response_received?).to be_truthy
+              expect(income_evidence.verification_outstanding).to be_falsey
+            end
           end
         end
       end
