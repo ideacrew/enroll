@@ -17,6 +17,8 @@ class HbxEnrollment
   include EventSource::Command
   include ::Employers::EmployerHelper
 
+  include FloatHelper
+
   belongs_to :household
   # Override attribute accessor as well
   # Migrate all the family ids to that
@@ -1065,12 +1067,11 @@ class HbxEnrollment
   end
 
   def update_tax_household_enrollment
-    return if is_shop?
+    return if is_shop? || dental? || applied_aptc_amount.zero?
     return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
-    TaxHouseholdEnrollment.where(enrollment_id: id).each do |th_enrollment|
-      th_enrollment.update_attributes(applied_aptc: (th_enrollment.available_max_aptc * elected_aptc_pct))
-    end
+    thh_enr_premiums = thh_enr_group_ehb_premium_of_aptc_members(aptc_tax_household_enrollments)
+    populate_applied_aptc_for_thh_enrs(aptc_tax_household_enrollments, thh_enr_premiums)
   rescue StandardError => e
     Rails.logger.error { "Couldn't generate enrollment save event due to #{e.backtrace}" }
   end
@@ -2847,6 +2848,56 @@ class HbxEnrollment
   end
 
   private
+
+  def aptc_tax_household_enrollments
+    @aptc_tax_household_enrollments ||=
+      TaxHouseholdEnrollment.by_enrollment_id(id).select do |thh_enr|
+        thh_enr.tax_household_members_enrollment_members.where(
+          :family_member_id.in => thh_enr.tax_household.aptc_members.map(&:applicant_id)
+        ).present?
+      end
+  end
+
+  # Calculates sum of enrolled aptc member's of TaxHouseholdEnrollment ehb_premiums including Minimum Responsibility.
+  def sum_of_member_ehb_premiums(thh_enr)
+    aptc_family_member_ids = thh_enr.tax_household.aptc_members.map(&:applicant_id)
+    hbx_enrollment_members.where(:applicant_id.in => aptc_family_member_ids).reduce(0) do |sum, member|
+      sum + ivl_decorated_hbx_enrollment.member_ehb_premium(member)
+    end
+  end
+
+  def thh_enr_group_ehb_premium_of_aptc_members(thh_enrs)
+    thh_enrs.inject({}) do |premiums, thh_enr|
+      premiums[thh_enr] = { group_ehb_premium: float_fix(sum_of_member_ehb_premiums(thh_enr)) }
+      premiums
+    end
+  end
+
+  # Incase of MultipleTaxHouseholdEnrollments, applied_aptc is either
+  #   1. group_ehb_premium (or)
+  #   2. thh_enr.available_max_aptc * elected_aptc_pct
+  # To make this inline with plan shopping logic we are considering tax_household_enrollment level ehb_premium.
+  def populate_applied_aptc_for_thh_enrs(thh_enrs, thh_enr_premiums)
+    if applied_aptc_amount == total_ehb_premium.to_money
+      thh_enrs.each do |thh_enr|
+        thh_enr.update_attributes!(
+          {
+            applied_aptc: thh_enr_premiums[thh_enr][:group_ehb_premium],
+            group_ehb_premium: thh_enr_premiums[thh_enr][:group_ehb_premium]
+          }
+        )
+      end
+    else
+      thh_enrs.each do |thh_enr|
+        thh_enr.update_attributes!(
+          {
+            applied_aptc: thh_enr.available_max_aptc * elected_aptc_pct,
+            group_ehb_premium: thh_enr_premiums[thh_enr][:group_ehb_premium]
+          }
+        )
+      end
+    end
+  end
 
   def set_is_any_enrollment_member_outstanding
     if kind == "individual"
