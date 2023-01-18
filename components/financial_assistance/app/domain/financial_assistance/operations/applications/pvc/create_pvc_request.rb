@@ -29,8 +29,8 @@ module FinancialAssistance
 
           def fetch_family_application(family_id, year)
             apps = ::FinancialAssistance::Application.where(assistance_year: year,
-                                                     aasm_state: 'determined',
-                                                     family_id: family_id)
+                                                            aasm_state: 'determined',
+                                                            family_id: family_id)
 
             if apps.present?
               app = apps.max_by(&:created_at)
@@ -45,7 +45,6 @@ module FinancialAssistance
             application.create_rrv_evidences
           end
 
-
           def construct_applicant_payload(application, person_params)
             #convert to cv3 and return just the applicant
             person_hbx_id = person_params[:hbx_id]
@@ -53,7 +52,7 @@ module FinancialAssistance
             return Failure("Cv3Application transform failed for person hbx id: #{person_hbx_id}") unless cv3_application.success?
 
             applicants = cv3_application.value![:applicants]
-            applicant = applicants.detect {|applicant| applicant[:person_hbx_id] == person_hbx_id}
+            applicant = applicants.detect {|applicant_loop| applicant_loop[:person_hbx_id] == person_hbx_id}
             return Failure("invalid applicant for person hbx id #{person_hbx_id}") unless applicant.present?
 
             result = AcaEntities::MagiMedicaid::Contracts::ApplicantContract.new.call(applicant)
@@ -77,8 +76,7 @@ module FinancialAssistance
           end
 
           def build_event(manifest, applicant, application_hbx_id)
-            result = event('events.fdsh.evidences.periodic_verification_confirmation', attributes: { manifest: manifest, applicant: applicant, application_hbx_id: application_hbx_id })
-            result
+            event('events.fdsh.evidences.periodic_verification_confirmation', attributes: { manifest: manifest, applicant: applicant, application_hbx_id: application_hbx_id })
           end
 
           def publish(event)
