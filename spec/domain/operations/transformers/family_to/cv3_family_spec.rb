@@ -41,7 +41,6 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
   let(:benefit_sponsorship) { FactoryBot.build(:benefit_sponsorship) }
   let!(:hbx_profile) { FactoryBot.create :hbx_profile, benefit_sponsorship: benefit_sponsorship}
 
-
   describe '#transform_applications' do
 
     subject { Operations::Transformers::FamilyTo::Cv3Family.new.transform_applications(family, false) }
