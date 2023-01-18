@@ -54,7 +54,7 @@ module FinancialAssistance
             params = {
               type: "pvc_manifest_type",
               assistance_year: assistance_year,
-              initial_count: get_count(families),
+              initial_count: get_count(families)
             }
             ::AcaEntities::Pdm::Contracts::ManifestContract.new.call(params).to_h
           end
@@ -63,7 +63,7 @@ module FinancialAssistance
             Family.periodic_verifiable_for_assistance_year(params[:assistance_year], params[:csr_list]).distinct(:_id)
           end
 
-          def submit(params, family_ids, manifest)
+          def submit(_params, family_ids, manifest)
             families = Family.where(:_id.in => family_ids)
             families.each do |family|
               family.family_members.each do |member|
