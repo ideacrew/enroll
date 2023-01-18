@@ -95,8 +95,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::CreatePvcRe
   let(:event) { Success(double) }
   let(:obj)  { FinancialAssistance::Operations::Applications::Pvc::CreatePvcRequest.new }
 
-  let!(:manifest) {{ assistance_year: TimeKeeper.date_of_record.year, type: 'pvc_manifest_type' }
-}
+  let!(:manifest) do
+    { assistance_year: TimeKeeper.date_of_record.year, type: 'pvc_manifest_type' }
+  end
   before do
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:full_medicaid_determination_step).and_return(false)
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(false)
