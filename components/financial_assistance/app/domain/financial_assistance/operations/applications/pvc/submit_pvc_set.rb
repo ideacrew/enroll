@@ -19,7 +19,6 @@ module FinancialAssistance
           # "02", "04", "05", "06" are already converted
           PVC_CSR_LIST = [100, 73, 87, 94].freeze
 
-          # @param [Int] applications_per_event
           # @param [Int] assistance_year
           # @param [Array] csr_list
           # @return [ Success ] Job successfully completed
@@ -39,7 +38,6 @@ module FinancialAssistance
 
           def validate(params)
             errors = []
-            # errors << 'applications_per_event ref missing' unless params[:applications_per_event]
             errors << 'assistance_year ref missing' unless params[:assistance_year]
             params[:csr_list] = PVC_CSR_LIST if params[:csr_list].blank?
             errors.empty? ? Success(params) : Failure(errors)
@@ -50,8 +48,6 @@ module FinancialAssistance
             unwind_stage = { '$unwind' => { "path" => "$family_members" } }
             count_stage = { '$count' => 'total' }
             Family.collection.aggregate([match_stage, unwind_stage, count_stage]).first&.dig("total")
-            # ::FinancialAssistance::Application.where(assistance_year: year,
-            #   aasm_state: 'determined', :family_id.in => family_ids ).max_by(&:created_at)
           end
 
           def make_manifest(families, assistance_year)
@@ -64,34 +60,16 @@ module FinancialAssistance
           end
 
           def find_families(params)
-            # Family.periodic_verifiable_for_assistance_year(params[:assistance_year], params[:csr_list]).distinct(:_id)
-            Family.distinct(:id) #this is for testing
-            # Family.periodic_verifiable_for_assistance_year(params[:assistance_year], params[:csr_list]).distinct(:_id)
-
-            # old code
-            # family_ids = Family.periodic_verifiable_for_assistance_year(params[:assistance_year], params[:csr_list]).distinct(:_id)
-            # Family.where(:_id.in => family_ids).all
+            Family.periodic_verifiable_for_assistance_year(params[:assistance_year], params[:csr_list]).distinct(:_id)
           end
 
           def submit(params, family_ids, manifest)
             families = Family.where(:_id.in => family_ids)
             families.each do |family|
-              # publish({family: family, manifest: manifest})
               family.family_members.each do |member|
                 publish({manifest: manifest, person: member.person, family_id: family.id})
               end
             end
-            # skip = params[:skip] || 0
-            # applications_per_event = params[:applications_per_event]
-
-            # while skip < families.count
-            #   criteria = families.skip(skip).limit(applications_per_event)
-            #   publish({families: criteria.pluck(:id), assistance_year: params[:assistance_year]})
-            #   puts "Total number of records processed #{skip + criteria.pluck(:id).length}"
-            #   skip += applications_per_event
-
-            #   break if params[:max_applications].present? && params[:max_applications] > skip
-            # end
           end
 
           def build_event(payload)
