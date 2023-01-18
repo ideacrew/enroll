@@ -32,6 +32,20 @@ RSpec.describe ::Operations::Families::TerminateBrokerAgency, dbclean: :after_ea
         family.reload
         expect(family.current_broker_agency).to eq nil
       end
+
+      it 'should terminate broker agency account but should not notify EDI if set to false' do
+        expect(family.current_broker_agency.writing_agent).to eq writing_agent
+        terminate_params = { family_id: family.id,
+                             terminate_date: TimeKeeper.date_of_record,
+                             broker_account_id: family.current_broker_agency&.id,
+                             notify_edi: false }
+
+        result = subject.call(terminate_params)
+        expect(result).to be_a(Dry::Monads::Result::Success)
+        expect(result.success).to eq "Not notifying EDI"
+        family.reload
+        expect(family.current_broker_agency).to eq nil
+      end
     end
 
     context 'when invalid params passed' do
