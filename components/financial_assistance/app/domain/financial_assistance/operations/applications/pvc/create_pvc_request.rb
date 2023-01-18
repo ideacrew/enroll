@@ -22,6 +22,7 @@ module FinancialAssistance
             applicant_payload = yield construct_applicant_payload(family_application, values[:person])
             event = yield build_event(values[:manifest], applicant_payload, family_application.hbx_id)
             result = yield publish(event)
+            add_evidence(family_application)
             Success(result)
           end
 
@@ -70,7 +71,7 @@ module FinancialAssistance
             errors = []
             errors << 'person missing' unless params[:person]
             errors << 'manifest missing' unless params[:manifest]
-            errors << 'family_id missing' unless params[:person]
+            errors << 'family_id missing' unless params[:family_id]
 
             errors.empty? ? Success(params) : Failure(errors)
           end
