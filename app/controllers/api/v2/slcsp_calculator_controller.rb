@@ -9,12 +9,16 @@ module Api
         if params[:taxYear].blank?
           errors << 'No parameters provided'
         end
-        response = []
+        values = []
         for i in 1..12
-          response << { month: i, month_name: Date::MONTHNAMES[i] , slcsp: rand(10000..50000).fdiv(100) }
+          values << { month: i, month_name: Date::MONTHNAMES[i] , slcsp: rand(10000..50000).fdiv(100) }
         end
-        render json: { error: 'No parameters provided' }, status: :bad_request if errors.present?
-        render json: response, status: :ok
+        response = { assistance_year: params[:taxYear], estimates: values }
+        if errors.present?
+          render json: { error: 'Inavlid parameters' }, status: :bad_request 
+        else
+          render json: response, status: :ok
+        end
       end
     end 
   end 
