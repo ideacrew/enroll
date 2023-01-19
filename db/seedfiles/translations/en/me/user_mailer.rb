@@ -1,4 +1,4 @@
-bbUSER_MAILER_TRANSLATIONS = {
+USER_MAILER_TRANSLATIONS = {
   "en.user_mailer.generic_consumer.bottom_text" => "<p class='heading'>Questions or need help?</p><p>Call the %{contact_center_name} at %{marketplace_phone} or go online to <a href='%{site_home_business_url}'>CoverME website</a>.</p>",
   "en.user_mailer.generic_notice_alert.full_text" => "<p>Hi %{first_name},</p><p>You have a new message from %{site_short_name} about your health coverage that may require action. Login to your account to read this message.<br><a href=%{site_home_business_url} class='button-link'>Log In To %{site_short_name}</a><br><p>Questions? Call us at %{contact_center_phone_number}.</p><p>The %{site_short_name} Team</p>",
   "en.user_mailer.tax_form_notice_alert.full_text" => "<p>Hi %{first_name},</p><p>You have a new tax form from %{site_short_name}. Log in to your account to view the form.</p><a href=%{site_home_business_url} class='button-link'>Log in to %{site_short_name}</a><p>Questions? Call us at %{contact_center_phone_number}.</p><p>The %{site_short_name} Team</p>",
