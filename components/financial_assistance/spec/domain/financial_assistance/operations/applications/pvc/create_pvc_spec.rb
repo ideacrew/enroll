@@ -95,6 +95,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::CreatePvcRe
   let(:event) { Success(double) }
   let(:obj)  { FinancialAssistance::Operations::Applications::Pvc::CreatePvcRequest.new }
 
+  let!(:manifest) do
+    { assistance_year: TimeKeeper.date_of_record.year, type: 'pvc_manifest_type' }
+  end
   before do
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:full_medicaid_determination_step).and_return(false)
     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(false)
@@ -118,7 +121,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::CreatePvcRe
     it 'should return success' do
       expect(applicant.income_evidence.present?).to be_falsey
       expect(applicant.non_esi_evidence.present?).to be_falsey
-      result = subject.call(families: Family.all, assistance_year: application.assistance_year)
+      result = subject.call(family_id: family.id, person: person, assistance_year: application.assistance_year, manifest: manifest)
       expect(result).to be_success
       expect(applicant.reload.income_evidence.present?).to be_truthy
       expect(applicant.reload.non_esi_evidence.present?).to be_truthy
@@ -129,7 +132,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::CreatePvcRe
     applicant.update(is_applying_coverage: false, is_ia_eligible: false)
     expect(applicant.income_evidence.present?).to be_falsey
     expect(applicant.non_esi_evidence.present?).to be_falsey
-    result = subject.call(families: Family.all, assistance_year: application.assistance_year)
+    result = subject.call(family_id: family.id, person: person, assistance_year: application.assistance_year, manifest: manifest)
     expect(result).to be_success
     expect(applicant.reload.income_evidence.present?).to be_falsey
     expect(applicant.reload.non_esi_evidence.present?).to be_falsey
