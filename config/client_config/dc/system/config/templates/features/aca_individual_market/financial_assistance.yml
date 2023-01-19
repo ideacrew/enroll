@@ -85,6 +85,9 @@ registry:
       - key: :filtered_application_list
         item: :filtered_application_list
         is_enabled: <%= ENV['FILTERED_APPLICATION_LIST_IS_ENABLED'] || false %>
+      - key: :slcsp_calculator_api
+        item: :slcsp_calculator_api
+        is_enabled: <%= ENV['SLCSP_CALCULATOR_API_IS_ENABLED'] || false %>
       - key: :featured_tribes_selection
         item: :featured_tribes_selection
         is_enabled: <%= ENV['FEATURED_TRIBES_IS_ENABLED'] || false %>

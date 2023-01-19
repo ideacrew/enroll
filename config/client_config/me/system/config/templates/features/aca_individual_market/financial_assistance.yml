@@ -79,6 +79,9 @@ registry:
       - key: :filtered_application_list
         item: :filtered_application_list
         is_enabled: <%= ENV['FILTERED_APPLICATION_LIST_IS_ENABLED'] || false %>
+      - key: :slcsp_calculator_api
+        item: :slcsp_calculator_api
+        is_enabled: <%= ENV['SLCSP_CALCULATOR_API_IS_ENABLED'] || false %>
       - key: :divorce_agreement_year
         item: :divorce_agreement_year
         is_enabled: <%= ENV['DIVORCE_AGREEMENT_YEAR_TOOLTIP_IS_ENABLED'] || false %>
