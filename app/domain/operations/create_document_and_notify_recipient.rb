@@ -14,7 +14,7 @@ module Operations
       resource = yield fetch_resource(validate_params)
       document = yield create_document(resource, params)
       _secure_message = yield send_secure_message(resource, document, params[:file_name])
-      result = yield send_generic_notice_alert(resource)
+      result = yield send_notice(resource, params[:file_name])
       Success(result)
     end
 
@@ -57,9 +57,13 @@ module Operations
     # rubocop:enable Layout/LineLength
     # rubocop:enable Style/StringConcatenation
 
-    def send_generic_notice_alert(resource)
-      ::Operations::SendGenericNoticeAlert.new.call(resource: resource)
+    def send_notice(resource, file_name)
+      formatted_file_name = file_name.gsub(/[^0-9a-z.]/i,'').gsub('.pdf', '')
+      if EnrollRegistry.feature_enabled?(:ivl_tax_form_notice) && ['Your1095AHealthCoverageTaxFormforYourFederalTaxReturn', 'NoticeVoidForm1095ATaxForm'].include?(formatted_file_name)
+        ::Operations::SendTaxFormNoticeAlert.new.call(resource: resource)
+      else
+        ::Operations::SendGenericNoticeAlert.new.call(resource: resource)
+      end
     end
-
   end
 end

@@ -160,6 +160,12 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  def tax_form_notice_alert(first_name, email)
+    mail({to: email, subject: "You have a new tax document from #{site_short_name}", from: "no-reply@individual.#{site_domain_name}"}) do |format|
+      format.html {render "tax_form_notice_alert", locals: {first_name: first_name}}
+    end
+  end
+
   def generic_notice_alert_to_ba_and_ga(first_name, email, employer_name)
     return if email.blank?
 

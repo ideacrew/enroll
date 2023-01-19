@@ -789,7 +789,7 @@ registry:
         item: 'R-DC001'
         is_enabled: true
       - key: :osse_eligibility_history
-        is_enabled: <%= ENV['OSSE_ELIGIBILITY_HISTORY_IS_ENABLED'] || false %>
+        is_enabled: <%= ENV['OSSE_ELIGIBILITY_HISTORY_IS_ENABLED'] | false %>
       - key: :enrollment_product_date_match
         is_enabled: false
       - key: :enrollment_plan_tile_update
@@ -807,3 +807,6 @@ registry:
       - key: :show_people_with_no_evidence
         item: :show_people_with_no_evidence
         is_enabled: <%= ENV['SHOW_PEOPLE_WITH_NO_EVIDENCE_IS_ENABLED'] || true %>
+      - key: :ivl_tax_form_notice
+        item: :ivl_tax_form_notice
+        is_enabled: <%= ENV['IVL_TAX_FORM_NOTICE_IS_ENABLED'] || false %>
