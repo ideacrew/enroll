@@ -30,7 +30,7 @@ RSpec.describe Api::V2::SlcspCalculatorController, :type => :controller, :dbclea
 
     it "renders the user" do
       parsed = JSON.parse(response.body)
-      expect(parsed["estimates"].count).to eq 12
+      expect(parsed["values"].count).to eq 12
     end
   end
 end
