@@ -193,7 +193,7 @@ jobs:
       - name: Git Commit Data w/ Message
         uses: jcputney/git-commit-data-action@1.0.2
       - name: Post to a Slack channel
-        id: slack
+        id: ic-slack
         uses: slackapi/slack-github-action@v1
         with:
           channel-id: 'docker-images-${{ needs.prep.outputs.repositoryName }}'
@@ -225,7 +225,7 @@ jobs:
           MATRIX_CLIENT=$(echo ${{ matrix.client }} | tr '[:lower:]' '[:upper:]')
           echo "CLIENT=${MATRIX_CLIENT}" >> ${GITHUB_ENV}
       - name: Post to a Slack channel
-        id: slack
+        id: dc-slack
         uses: slackapi/slack-github-action@v1
         with:
           channel-id: 'docker-images-${{ needs.prep.outputs.repositoryName }}'
@@ -246,3 +246,27 @@ jobs:
             }
         env:
           SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
+      - name: Post to DC slack
+        # Only run if matrix client is DC
+        if: matrix.client == 'dc'
+        id: slack
+        uses: slackapi/slack-github-action@v1
+        with:
+          channel-id: 'docker-images-${{ needs.prep.outputs.repositoryName }}'
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*${{ format('{0} {1} image*:\n`{2}/{3}-{4}`', env.CLIENT, matrix.registry, matrix.registry, needs.prep.outputs.taggedImage, matrix.client) }}"
+                  }
+                },
+                {
+                  "type": "divider"
+                }
+              ]
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.DC_DEPLOY_SLACK_BOT_TOKEN }}
