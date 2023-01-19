@@ -163,8 +163,9 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.year_selection_oe_year" => " Open Enrollment",
   "en.faa.see_if_you_qualify_1" => "Select to see if you qualify for lower monthly premiums on your %{short_name} insurance plan or %{medicaid_or_chip_program_short_name}.",
   "en.faa.see_if_you_qualify_2" => "Select if you have experienced a life change and need to update your current enrollment or see if you qualify for lower monthly premiums or %{medicaid_or_chip_program_short_name}",
-  "en.faa.non_oe_see_if_you_qualify_1" => "Select if you have experienced a life change or need to enroll for the first time",
-  "en.faa.non_oe_see_if_you_qualify_2" => "Select if you need to make changes for coverage from last year. <b>This is uncommon.</b> You can only sign up for %{previous_year} coverage if CoverMe.gov has approved you for a special enrollment period. Changes you make to your %{previous_year} application do not automatically apply to your %{calendar_year} application. To apply changes, you must copy your application and submit it for %{calendar_year}",
+  "en.faa.non_oe_see_if_you_qualify_1" => "Select if you've experienced a life change and need to enroll through a Special Enrollment Period or make an update to your %{year} application.",
+  "en.faa.non_oe_see_if_you_qualify_2" => "Select if you need to make changes for coverage from last year. <b>This is uncommon.</b> You can only sign up for %{previous_year} coverage if CoverMe.gov has approved you for a Special Enrollment Period. Changes you make to your %{previous_year} application do not automatically apply to your %{calendar_year} application. To apply changes, you must copy your application and submit it for %{calendar_year}.",
+  "en.faa.non_oe_learn_more" => "<a target='_blank' href='%{special_enrollment_periods_link}'> Learn more about Special Enrollment Periods</a>",
   "en.faa.year_selection_oe_range_from" => "Open enrollment is from ",
   "en.faa.year_selection_oe_range_through" => " through ",
   "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a href='#'>submit a webform</a> or call %{short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
