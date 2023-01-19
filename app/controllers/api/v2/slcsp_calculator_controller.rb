@@ -8,7 +8,6 @@ module Api
 
       def estimate
         errors = []
-        puts params
         errors << 'No parameters provided' if params[:taxYear].blank?
         values = []
         (1..12).each do |i|
