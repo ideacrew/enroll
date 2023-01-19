@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe Api::V2::SlcspCalculatorController, :type => :controller, :dbclean => :after_each do
@@ -9,7 +11,7 @@ RSpec.describe Api::V2::SlcspCalculatorController, :type => :controller, :dbclea
     end
 
     it "respond bad request" do
-      expect(response.status).to eq 400 
+      expect(response.status).to eq 400
     end
   end
 
