@@ -12,23 +12,15 @@ module Subscribers
 
       payload = JSON.parse(response, symbolize_names: true)
 
-      subscriber_logger =
-        Logger.new(
-          "#{Rails.root}/log/on_enroll_iap_family_pvc_determination_events_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
-        )
+      result = ::FinancialAssistance::Operations::Applications::Pvc::CreatePvcRequest.new.call(person: payload[:person], manifest: payload[:manifest], family_id: payload[:family_id])
 
-      subscriber_logger.info "FamilyPvcDeterminationSubscriber, response: #{payload}"
-
-      families = Family.where(:_id.in => payload[:families]).all
-      ::FinancialAssistance::Operations::Applications::Pvc::CreatePvcRequest.new.call(families: families, assistance_year: payload[:assistance_year])
-
-      logger.info "FamilyPvcDeterminationSubscriber size #{families.length} payload: #{payload} ACK " unless Rails.env.test?
+      logger.info "FamilyPvcDeterminationSubscriber ACK/SUCCESS person payload: #{payload[:person][:hbx_id]} " if result.success?
+      logger.error "FamilyPvcDeterminationSubscriber ACK/FAILURE person payload: #{payload[:person][:hbx_id]} - #{result.failure} " unless result.success?
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "FamilyPvcDeterminationSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      logger.info "FamilyPvcDeterminationSubscriber: errored & acked. Backtrace: #{e.backtrace}"
-      subscriber_logger.info "FamilyPvcDeterminationSubscriber, ack: #{payload}"
+      logger.error "FamilyPvcDeterminationSubscriber error message: #{e.message}, backtrace: #{e.backtrace}"
+      logger.error "FamilyPvcDeterminationSubscriber payload: #{payload} "
       ack(delivery_info.delivery_tag)
     end
   end
