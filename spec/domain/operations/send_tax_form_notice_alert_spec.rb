@@ -3,6 +3,7 @@
 require "rails_helper"
 
 module Operations
+  # This class is invoked when we want to send a tax notice
   RSpec.describe SendTaxFormNoticeAlert do
     subject do
       described_class.new.call(params)
