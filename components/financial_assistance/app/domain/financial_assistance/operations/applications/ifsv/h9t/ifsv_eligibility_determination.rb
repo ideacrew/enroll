@@ -67,7 +67,10 @@ module FinancialAssistance
               when "verified"
                 applicant.set_income_evidence_verified
               when "outstanding"
-                if enrolled?(applicant, enrollments) && income_evidence.aasm_state == 'pending'
+                enrollment_member = enrollments.flat_map(&:hbx_enrollment_members).first
+                aptc_or_csr_used = (defined?(enrollment_member.applied_aptc_amount) && enrollment_member.applied_aptc_amount > 0) || ['csr_73', 'csr_87', 'csr_94', 'csr_limited'].include?(applicant.csr_eligibility_kind)
+
+                if enrolled?(applicant, enrollments) && (aptc_or_csr_used || ['pending', 'negative_response_received'].include?(income_evidence.aasm_state))
                   applicant.set_evidence_outstanding(income_evidence)
                 else
                   applicant.set_evidence_to_negative_response(income_evidence)
