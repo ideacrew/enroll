@@ -789,7 +789,7 @@ registry:
         item: 'R-DC001'
         is_enabled: true
       - key: :osse_eligibility_history
-        is_enabled: <%= ENV['OSSE_ELIGIBILITY_HISTORY_IS_ENABLED'] | false %>
+        is_enabled: <%= ENV['OSSE_ELIGIBILITY_HISTORY_IS_ENABLED'] || false %>
       - key: :enrollment_product_date_match
         is_enabled: false
       - key: :enrollment_plan_tile_update
