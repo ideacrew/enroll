@@ -59,8 +59,8 @@ module Operations
     # rubocop:enable Style/StringConcatenation
 
     def send_notice(resource, file_name)
-      formatted_file_name = file_name.gsub(/[^0-9a-z.]/i,'').gsub('.pdf', '')
-      if EnrollRegistry.feature_enabled?(:ivl_tax_form_notice) && ['Your1095AHealthCoverageTaxFormforYourFederalTaxReturn', 'NoticeVoidForm1095ATaxForm'].include?(formatted_file_name)
+      formatted_file_name = file_name.gsub(/[^0-9a-z.]/i,'').gsub('.pdf', '').downcase
+      if EnrollRegistry.feature_enabled?(:ivl_tax_form_notice) && ['your1095Ahealthcoveragetaxform', 'noticevoidform1095ataxform'].include?(formatted_file_name)
         ::Operations::SendTaxFormNoticeAlert.new.call(resource: resource)
       else
         ::Operations::SendGenericNoticeAlert.new.call(resource: resource)
