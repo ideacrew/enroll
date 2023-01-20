@@ -30,8 +30,8 @@ module Operations
 
     def fetch_recipient_target
       if is_person?
-        Success(@resource) 
-      else 
+        Success(@resource)
+      else
         Failure({:message => ['Resource is not a person']})
       end
     end
