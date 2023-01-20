@@ -816,11 +816,9 @@ Rails.application.routes.draw do
         end
       end
 
-      if FinancialAssistanceRegistry.feature_enabled?(:slcsp_calculator_api)
-        resources :slcsp_calculator, :only => []  do
-          collection do
-            post :estimate
-          end
+      resources :slcsp_calculator, :only => []  do
+        collection do
+          post :estimate
         end
       end
     end
