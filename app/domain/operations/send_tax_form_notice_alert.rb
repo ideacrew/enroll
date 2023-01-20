@@ -11,10 +11,9 @@ module Operations
     include Config::SiteHelper
 
     def call(resource:)
-      return Failure({:message => ['Please find valid resource to send the alert message']}) if resource.blank?
-      @resource = resource
+      validated_resource = yield validate(resource)
+      @resource = validated_resource
       recipient_target = yield fetch_recipient_target
-      return Success(true) if recipient_target.blank?
       recipient_name = yield fetch_recipient_name(recipient_target)
       recipient_email = yield fetch_recipient_email(recipient_target)
       send_tax_form_notice_alert_to_resource(recipient_name, recipient_email)
@@ -24,8 +23,17 @@ module Operations
 
     private
 
+    def validate(resource)
+      return Failure({:message => ['Please find valid resource to send the alert message']}) if resource.blank?
+      Success(resource)
+    end
+
     def fetch_recipient_target
-      Success(@resource) if is_person?
+      if is_person?
+        Success(@resource) 
+      else 
+        Failure({:message => ['Resource is not a person']})
+      end
     end
 
     def fetch_recipient_name(recipient_target)

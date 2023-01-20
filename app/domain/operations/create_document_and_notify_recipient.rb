@@ -23,6 +23,7 @@ module Operations
     def validate_params(params)
       return Failure({ :message => ['Resource id is missing'] }) if params[:subjects][0][:id].nil?
       return Failure({ :message => ['Document Identifier is missing'] }) if params[:id].nil?
+      return Failure({:message => ['Document file name is missing']}) if params[:file_name].nil?
 
       Success(params.deep_symbolize_keys)
     end
