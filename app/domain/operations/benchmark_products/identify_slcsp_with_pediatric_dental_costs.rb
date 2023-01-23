@@ -13,13 +13,13 @@ module Operations
       # Calculate adjusted EHB premium values
       # Identify the SLCSP for the tax household
       def call(params)
-        benchmark_product_model = yield validate(params)
-        family, benchmark_product_model = yield identify_type_of_household(benchmark_product_model)
-        benchmark_product_model = yield identify_rating_and_service_areas(family, benchmark_product_model)
-        benchmark_product_model = yield identify_slcsapd(family, benchmark_product_model)
-        benchmark_product_model = yield identify_slcsp(family, benchmark_product_model)
-        benchmark_product_model = yield calculate_household_group_benchmark_ehb_premium(benchmark_product_model)
-        _created                = yield persist_calculation(family, params, benchmark_product_model)
+        benchmark_product_model          = yield validate(params)
+        @family, benchmark_product_model = yield identify_type_of_household(benchmark_product_model)
+        benchmark_product_model          = yield identify_rating_and_service_areas(benchmark_product_model)
+        benchmark_product_model          = yield identify_slcsapd(benchmark_product_model)
+        benchmark_product_model          = yield identify_slcsp(benchmark_product_model)
+        benchmark_product_model          = yield calculate_household_group_benchmark_ehb_premium(benchmark_product_model)
+        _created                         = yield persist_calculation(params, benchmark_product_model)
 
         Success(benchmark_product_model)
       end
@@ -38,27 +38,27 @@ module Operations
         ::Operations::BenchmarkProducts::IdentifyTypeOfHousehold.new.call(benchmark_product_model)
       end
 
-      def identify_rating_and_service_areas(family, benchmark_product_model)
+      def identify_rating_and_service_areas(benchmark_product_model)
         if @is_migrating
           ::Operations::BenchmarkProducts::IdentifyRatingAndServiceAreasForMigration.new.call(
-            { family: family,
+            { family: @family,
               benchmark_product_model: benchmark_product_model,
               is_migrating: @is_migrating,
               hbx_enrollment: @hbx_enrollment }
           )
         else
           ::Operations::BenchmarkProducts::IdentifyRatingAndServiceAreas.new.call(
-            { family: family, benchmark_product_model: benchmark_product_model }
+            { family: @family, benchmark_product_model: benchmark_product_model }
           )
         end
       end
 
-      def identify_slcsapd(family, benchmark_product_model)
+      def identify_slcsapd(benchmark_product_model)
         bpm_params = benchmark_product_model.to_h
         bpm_params[:households].each_with_index do |household, ind|
           next unless check_slcsapd_enabled?(household, benchmark_product_model)
           result = ::Operations::BenchmarkProducts::IdentifySlcsapd.new.call(
-            { family: family, benchmark_product_model: benchmark_product_model, household_params: household }
+            { benchmark_product_model: benchmark_product_model, household_params: household }
           )
           return result if result.failure?
           bpm_params[:households][ind] = result.success
@@ -76,11 +76,11 @@ module Operations
         EnrollRegistry[:atleast_one_silver_plan_donot_cover_pediatric_dental_cost]&.settings(effective_year)&.item && household[:type_of_household] != 'adult_only'
       end
 
-      def identify_slcsp(family, benchmark_product_model)
+      def identify_slcsp(benchmark_product_model)
         bpm_params = benchmark_product_model.to_h
         bpm_params[:households].each_with_index do |household, ind|
           result = ::Operations::BenchmarkProducts::IdentifySlcsp.new.call(
-            { family: family, benchmark_product_model: benchmark_product_model, household_params: household }
+            { benchmark_product_model: benchmark_product_model, household_params: household }
           )
           return result if result.failure?
           bpm_params[:households][ind] = result.success
@@ -97,10 +97,10 @@ module Operations
         validate(bpm_params)
       end
 
-      def persist_calculation(family, params, benchmark_product_model)
+      def persist_calculation(params, benchmark_product_model)
         begin
           ::BenchmarkProduct.create(
-            family_id: family.id,
+            family_id: @family&.id,
             application_hbx_id: @application_hbx_id,
             request_payload: params.to_json,
             response_payload: benchmark_product_model.to_h.to_json
