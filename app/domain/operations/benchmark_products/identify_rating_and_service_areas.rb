@@ -18,15 +18,36 @@ module Operations
 
       private
 
-      def find_rating_address(params)
-        @family = params[:family]
-        bpm_params = params[:benchmark_product_model].to_h
+      def find_rating_address_from_family(bpm_params)
         rating_address = @family.primary_person&.rating_address
         if rating_address.present?
           bpm_params[:primary_rating_address_id] = rating_address.id
           Success([bpm_params, rating_address])
         else
           Failure("Unable to find Rating Address for PrimaryPerson with hbx_id: #{@family.primary_person.hbx_id} of Family with id: #{@family.id}")
+        end
+      end
+
+      def initialize_address_struct(bpm_params)
+        address_struct = OpenStruct.new(
+          {
+            'county' => bpm_params[:rating_address][:county],
+            'state' => bpm_params[:rating_address][:state],
+            'zip' => bpm_params[:rating_address][:zip]
+          }
+        )
+
+        Success([bpm_params, address_struct])
+      end
+
+      def find_rating_address(params)
+        @family = params[:family]
+        bpm_params = params[:benchmark_product_model].to_h
+
+        if @family.present?
+          find_rating_address_from_family(bpm_params)
+        else
+          initialize_address_struct(bpm_params)
         end
       end
 
@@ -40,7 +61,7 @@ module Operations
           Success(bpm_params)
         else
           Failure(
-            "Rating Area not found for PrimaryPerson hbx_id: #{@family.primary_person.hbx_id}, effective_date: #{effective_date}, county: #{address.county}, zip: #{address.zip}, state: #{address.state}"
+            "Rating Area not found for effective_date: #{effective_date}, county: #{address.county}, zip: #{address.zip}, state: #{address.state}"
           )
         end
       end
@@ -53,7 +74,7 @@ module Operations
           bpm_params[:service_area_ids] = service_areas.map(&:id)
           Success(bpm_params)
         else
-          Failure("Service Areas not found for effective_date: #{effective_date}, county: #{address.county}, zip: #{address.zip}")
+          Failure("Service Areas not found for effective_date: #{effective_date}, county: #{address.county}, zip: #{address.zip}, state: #{address.state}")
         end
       end
 
