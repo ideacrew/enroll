@@ -13,7 +13,7 @@ module Operations
       # Adjust the EHB cost of all health plans that do not have pediatric dental benefits embedded
       #   Add the EHB premium of the SLCSADP
       def call(params)
-        # params = { family: family, benchmark_product_model: benchmark_product_model, household_params: household }
+        # params = { benchmark_product_model: benchmark_product_model, household_params: household }
 
         silver_health_products = yield fetch_silver_health_products(params)
         product_to_ehb_premium_hash = yield calculate_ehb_premiums(params, silver_health_products)

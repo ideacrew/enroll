@@ -807,3 +807,6 @@ registry:
       - key: :show_people_with_no_evidence
         item: :show_people_with_no_evidence
         is_enabled: <%= ENV['SHOW_PEOPLE_WITH_NO_EVIDENCE_IS_ENABLED'] || true %>
+      - key: :ivl_tax_form_notice
+        item: :ivl_tax_form_notice
+        is_enabled: <%= ENV['IVL_TAX_FORM_NOTICE_IS_ENABLED'] || false %>
