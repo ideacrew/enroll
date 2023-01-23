@@ -120,6 +120,7 @@ gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
 gem 'loofah', '~> 2.3.1'
 gem 'stimulus_reflex', '~> 3.3'
+gem 'malloc_trim', '0.1.0'
 
 group :doc do
   gem 'sdoc',                   '~> 1.0'
