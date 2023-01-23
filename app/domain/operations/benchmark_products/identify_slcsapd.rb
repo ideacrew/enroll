@@ -14,7 +14,7 @@ module Operations
       # Identify the second lowest cost standalone dental plan (SLCSADP)
       # add dental information to household
       def call(params)
-        # params = { family: family, benchmark_product_model: benchmark_product_model, household_params: household }
+        # params = { benchmark_product_model: benchmark_product_model, household_params: household }
 
         dental_products = yield fetch_dental_products(params)
         product_to_ehb_premium_hash = yield calculate_ehb_premiums(dental_products)
