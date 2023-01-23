@@ -78,6 +78,14 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     0
   end
 
+  def premium_for_non_tobacco_use(member)
+    (::BenefitMarkets::Products::ProductRateCache.lookup_rate(__getobj__, schedule_date, age_of(member), rating_area) * large_family_factor(member)).round(2)
+  rescue StandardError => e
+    warn e.inspect unless Rails.env.test?
+    warn e.backtrace unless Rails.env.test?
+    0
+  end
+
   def employer_contribution_for(_member)
     0.00
   end

@@ -14,7 +14,7 @@ module Operations
       resource = yield fetch_resource(validate_params)
       document = yield create_document(resource, params)
       _secure_message = yield send_secure_message(resource, document, params[:file_name])
-      result = yield send_generic_notice_alert(resource)
+      result = yield send_notice(resource, params[:file_name])
       Success(result)
     end
 
@@ -23,6 +23,7 @@ module Operations
     def validate_params(params)
       return Failure({ :message => ['Resource id is missing'] }) if params[:subjects][0][:id].nil?
       return Failure({ :message => ['Document Identifier is missing'] }) if params[:id].nil?
+      return Failure({:message => ['Document file name is missing']}) if params[:file_name].nil?
 
       Success(params.deep_symbolize_keys)
     end
@@ -57,9 +58,13 @@ module Operations
     # rubocop:enable Layout/LineLength
     # rubocop:enable Style/StringConcatenation
 
-    def send_generic_notice_alert(resource)
-      ::Operations::SendGenericNoticeAlert.new.call(resource: resource)
+    def send_notice(resource, file_name)
+      formatted_file_name = file_name.gsub(/[^0-9a-z.]/i,'').gsub('.pdf', '').downcase
+      if EnrollRegistry.feature_enabled?(:ivl_tax_form_notice) && ['your1095ahealthcoveragetaxform', 'noticevoid1095ataxform'].include?(formatted_file_name)
+        ::Operations::SendTaxFormNoticeAlert.new.call(resource: resource)
+      else
+        ::Operations::SendGenericNoticeAlert.new.call(resource: resource)
+      end
     end
-
   end
 end

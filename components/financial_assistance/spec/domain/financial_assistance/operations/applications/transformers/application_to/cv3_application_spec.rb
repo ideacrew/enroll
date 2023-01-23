@@ -1335,6 +1335,86 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
   end
 
+  describe 'magi deduction calculations' do
+    let!(:deduction) do
+      deduction = ::FinancialAssistance::Deduction.new({ kind: 'moving_expenses',
+                                                         amount: 100.00,
+                                                         start_on: Date.new(application.assistance_year),
+                                                         frequency_kind: 'weekly' })
+      applicant.deductions << deduction
+      applicant.save!
+    end
+
+    context 'deduction with end_on in previous year than assistance year' do
+      before do
+        applicant.deductions.first.update_attributes!(start_on: (Date.new(application.assistance_year) - 1).beginning_of_year, end_on: (Date.new(application.assistance_year) - 1).end_of_year)
+      end
+
+      it 'should have magi deductions be zero' do
+        result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
+        expect(result.to_i).to eql(0)
+      end
+
+    end
+
+    context 'deduction with end_on in future year than assistance year' do
+      before do
+        applicant.deductions.first.update_attributes!(end_on: (Date.new(application.assistance_year) + 1.year))
+      end
+
+      it "should have deduction end on be at the end of the application assistance year" do
+        result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
+        expect(result.to_i).to eql(5200)
+      end
+    end
+
+    context 'deduction with end_on in same year as assistance year' do
+      before do
+        applicant.deductions.first.update_attributes!(end_on: Date.new(application.assistance_year,3,1))
+      end
+
+      it "should return deduction amount until the end date within the assistance year" do
+        result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
+        expect(result.to_i).to eql(854)
+      end
+    end
+
+    context 'deduction with  nil end_on' do
+      it "should return deduction for the entire assistance year" do
+        result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
+        expect(result.to_i).to eql(5200)
+      end
+
+    end
+
+    context 'with no deductions' do
+      before do
+        applicant.deductions = []
+        applicant.save
+      end
+      it "should return 0" do
+        result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
+        expect(result.to_i).to eql(0)
+      end
+    end
+
+    context "with multiple deductions" do
+      let!(:deduction2) do
+        deduction = ::FinancialAssistance::Deduction.new({ kind: 'moving_expenses',
+                                                           amount: 1000.00,
+                                                           start_on: Date.new(application.assistance_year),
+                                                           frequency_kind: 'monthly' })
+        applicant.deductions << deduction
+        applicant.save!
+      end
+      it "should add the deductions together" do
+        result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
+        expect(result.to_i).to eql(17_200)
+      end
+    end
+
+  end
+
   context 'with deductable_part_of_self_employment_taxes deduction' do
     let!(:deduction) do
       deduction = ::FinancialAssistance::Deduction.new({ kind: 'deductable_part_of_self_employment_taxes',

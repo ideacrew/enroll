@@ -33,7 +33,7 @@ module FinancialAssistance
           end
 
           def transform_person(person)
-            Operations::Transformers::PersonTo::Cv3Person.new.call(person)
+            ::Operations::Transformers::PersonTo::Cv3Person.new.call(person)
           end
 
           def construct_payload(person)
