@@ -121,6 +121,7 @@ gem 'fast_jsonapi'
 gem 'loofah', '~> 2.3.1'
 gem 'stimulus_reflex', '~> 3.3'
 gem 'malloc_trim', '0.1.0'
+gem 'ruby-progressbar',             '~> 1'
 
 group :doc do
   gem 'sdoc',                   '~> 1.0'
@@ -171,7 +172,6 @@ group :test do
   gem 'mongoid-rspec',                '~> 4'
   gem 'rspec-instafail',              '~> 1'
   gem 'rspec-benchmark'
-  gem 'ruby-progressbar',             '~> 1'
   gem 'shoulda-matchers',             '~> 3'
   gem 'simplecov',                    '~> 0.14',  :require => false
   gem 'test-prof'
