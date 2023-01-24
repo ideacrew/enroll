@@ -66,7 +66,7 @@ class AuditPeoplePublisher
           {
             :routing_key => audit_queue_name,
             :headers => {
-              :person_id => person_id
+              :person_id => person_id.to_s
             }
           }
         )
