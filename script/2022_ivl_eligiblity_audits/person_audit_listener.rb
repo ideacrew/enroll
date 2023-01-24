@@ -37,6 +37,8 @@ class PersonAuditListener
   def subscribe
     @benefit_packages = IvlEligibilityAudits::AuditQueryCache.benefit_packages_for(2022)
     @queue.subcribe(:block => true, :manual_ack => true) do |delivery_info, properties, payload|
+      headers = properties.headers || {}
+      person_id = headers["person_id"]
       execute_audit(person_id, @channel, delivery_info)
     end
   end
