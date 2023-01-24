@@ -57,7 +57,7 @@ class AuditPeoplePublisher
   end
 
   def self.publish_person_ids(channel, person_ids)
-    d_ex = out_chan.default_exchange
+    d_ex = channel.default_exchange
     channel.confirm_select
     person_ids.in_groups_of(100, false) do |group|
       group.each do |person_id|
