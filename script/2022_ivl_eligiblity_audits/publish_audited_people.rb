@@ -64,7 +64,7 @@ class AuditPeoplePublisher
         d_ex.publish(
           "",
           {
-            :routing_key => queue_name,
+            :routing_key => audit_queue_name,
             :headers => {
               :person_id => person_id
             }
