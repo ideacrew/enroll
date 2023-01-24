@@ -77,6 +77,7 @@ class AuditPeoplePublisher
 end
 
 conn = Bunny.new(Rails.application.config.acapi.remote_broker_uri, :heartbeat => 15)
+conn.start
 chan = conn.create_channel
 AuditPeoplePublisher.create_audit_queue(chan)
 AuditPeoplePublisher.create_result_queue(chan)

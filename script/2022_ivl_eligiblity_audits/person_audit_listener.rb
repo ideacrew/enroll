@@ -29,6 +29,7 @@ class PersonAuditListener
 
   def self.run
     conn = Bunny.new(Rails.application.config.acapi.remote_broker_uri, :heartbeat => 15)
+    conn.start
     chan = conn.create_channel
     q = create_queue(chan)
     self.new(chan, q).subscribe
