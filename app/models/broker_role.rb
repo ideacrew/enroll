@@ -159,6 +159,11 @@ class BrokerRole
     parent.emails.detect { |email| email.kind == "work" }
   end
 
+  def send_invitation
+    return unless active?
+    Invitation.invite_broker!(self)
+  end
+
   ## Class methods
   class << self
 
@@ -382,12 +387,6 @@ class BrokerRole
       to_state: aasm.to_state,
       event: aasm.current_event
     )
-  end
-
-  def send_invitation
-    if active?
-      Invitation.invite_broker!(self)
-    end
   end
 
   def notify_broker_denial

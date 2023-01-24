@@ -18,6 +18,34 @@ module Operations
 
       def find_age_of_every_member_of_each_household(benchmark_product_model)
         bpm_params = benchmark_product_model.to_h
+
+        if bpm_params[:family_id].present?
+          find_member_ages_from_family(bpm_params)
+        else
+          find_member_ages_from_params(bpm_params)
+        end
+      end
+
+      def find_member_ages_from_params(bpm_params)
+        bpm_params[:households].each do |household|
+          household[:members].each do |member|
+            member[:age_on_effective_date] = age_on(member[:date_of_birth], member[:coverage_start_on] || bpm_params[:effective_date])
+          end
+        end
+
+        Success(bpm_params)
+      end
+
+      def age_on(dob, date)
+        age = date.year - dob.year
+        if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
+          age - 1
+        else
+          age
+        end
+      end
+
+      def find_member_ages_from_family(bpm_params)
         bpm_params[:households].each do |household|
           household[:members].each do |member|
             result = find_family_member(bpm_params[:family_id], member[:family_member_id])
