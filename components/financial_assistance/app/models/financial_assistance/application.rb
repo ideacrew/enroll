@@ -603,6 +603,7 @@ module FinancialAssistance
       unless FinancialAssistanceRegistry.feature_enabled?(:non_magi_transfer)
         # block transfer if any applicant is eligible for non-MAGI reasons
         return false if has_non_magi_referrals?
+        return true if full_medicaid_determination
       end
       active_applicants.any? do |applicant|
         applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || applicant.is_non_magi_medicaid_eligible || applicant.is_medicare_eligible || applicant.is_eligible_for_non_magi_reasons
