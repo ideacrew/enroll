@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-require "rails_helper"
+require 'rails_helper'
 
-RSpec.describe Api::V2::SlcspCalculatorController, :type => :controller, :dbclean => :after_each do
-  let(:user) { FactoryBot.create(:user) }
-
-  let!(:valid_params) do
+RSpec.describe Validators::Api::SlcspContract,  dbclean: :after_each do
+  let!(:json_example) do
     '{
         "householdConfirmation": true,
         "householdCount": 1,
@@ -63,24 +61,29 @@ RSpec.describe Api::V2::SlcspCalculatorController, :type => :controller, :dbclea
       }'
   end
 
-
-  describe "POST estimate, without parameters" do
-    before :each do
-      post :estimate, body: "{}"
-    end
-
-    it "respond bad request" do
-      expect(response.status).to eq 400
+  context "Given valid parameter scenarios" do
+    context "with all valid parameters" do
+      it 'should succeed' do
+        result = subject.call(JSON.parse(json_example))
+        expect(result.success?).to be_truthy
+      end
     end
   end
 
-  describe "POST current" do
-    before :each do
-      post :estimate, body: valid_params
+  context "Given invalid parameter scenarios" do
+    it 'should fail with invalid parameters' do
+      result = subject.call({})
+      expect(result.success?).to be_falsey
     end
 
-    it "is successful" do
-      expect(response.status).to eq 200
+    it 'should fail without the requiered parameters' do
+      result = subject.call(JSON.parse(json_example).delete("taxYear"))
+      expect(result.success?).to be_falsey
     end
+    it 'should fail without the requiered parameters' do
+      result = subject.call(JSON.parse(json_example).delete("residences"))
+      expect(result.success?).to be_falsey
+    end
+
   end
 end
