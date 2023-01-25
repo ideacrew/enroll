@@ -12,6 +12,8 @@ module Operations
     include Config::SiteHelper
 
     def call(params)
+      @logger = Logger.new(STDOUT)
+
       validated_resource = yield validate(params)
       result = yield process(validated_resource.to_h)
       Success(result)
@@ -20,14 +22,20 @@ module Operations
     private
 
     def process(params)
-      puts params
       result = {}
       (1..12).each do |i|
         month_key = Date::MONTHNAMES[i][0..2].downcase.to_sym
         params[:members].each do |member|
           next unless member[:coverage][month_key]
-          value = calculate(member, params[:taxYear], params[:state], i, month_key)
-          result[month_key] = value.value!
+          calculation = calculate(member, params[:taxYear], params[:state], i, month_key)
+          # if result.success?
+          #   result[month_key] = result.value! 
+          # else
+          #   result[month_key] = 0
+          # end
+          # binding.irb
+          # @logger.warning "Unable to calculate SLCSP " + calculation.errors.to_h.to_s  unless calculation.success?
+          result[month_key] = calculation.success? ? calculation.value! : 0
         end
       end
       Success(result)
@@ -36,7 +44,8 @@ module Operations
     def calculate(member, assistance_year, state, month, month_key)
       payload = build_operation_payload(member, assistance_year, state, month, month_key)
       result = Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts.new.call(payload)
-      Failure("Unable to calculate SLCSP for #{member[:name]}") unless result.success?
+      @logger.warn "Unable to calculate SLCSP " + result.failure  if result.failure?
+      return Failure("Unable to calculate SLCSP for #{member[:name]}") if result.failure?
       Success(result.value![:household_group_benchmark_ehb_premium])
     end
 
@@ -46,7 +55,7 @@ module Operations
       {
         rating_address: {
           county: residence_data[:county][:name],
-          zip: residence_data[:county][:fips],
+          zip: residence_data[:county][:zipcode],
           state: residence_data[:county][:state]
         },
         effective_date: Date.new(assistance_year, month, 1),
