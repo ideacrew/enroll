@@ -42,7 +42,6 @@ module Operations
 
     def build_operation_payload(member, assistance_year, _state, month, month_key)
       residence_data = resolve_residence(member[:residences], month_key)
-        # puts member.dig("dob","day").class
       dob = Date.new(member[:dob][:year], member[:dob][:month], member[:dob][:day])
       {
         rating_address: {
@@ -76,21 +75,7 @@ module Operations
     end
 
     def validate(params)
-        #::Validators::BenchmarkProducts::BenchmarkProductContract.new.call(params)
       result = ::Validators::Api::SlcspContract.new.call(params)
-      # puts result.failure?
-    #   result = AcaEntities::Fdsh::Pvc::Medicare::IndividualResponseContract.new.call(response)
-    #   if result.success?
-    #     Success(result)
-    #   else
-    #     Failure("Invalid response, #{result.errors.to_h}")
-    #   end
-    #   unless result.success?
-    #     errors << result.errors.to_h
-    #   end
-    #   puts result
-    # puts result.failure?
-    # puts result.errors.to_h.to_s
       return Failure({:message => result.errors.to_h.to_s}) if result.failure?
       Success(result)
     end
