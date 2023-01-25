@@ -28,13 +28,6 @@ module Operations
         params[:members].each do |member|
           next unless member[:coverage][month_key]
           calculation = calculate(member, params[:taxYear], params[:state], i, month_key)
-          # if result.success?
-          #   result[month_key] = result.value! 
-          # else
-          #   result[month_key] = 0
-          # end
-          # binding.irb
-          # @logger.warning "Unable to calculate SLCSP " + calculation.errors.to_h.to_s  unless calculation.success?
           result[month_key] = calculation.success? ? calculation.value! : 0
         end
       end
