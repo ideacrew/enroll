@@ -158,7 +158,7 @@ class PersonAuditListener
   end
 
   def execute_audit(person_id, chan, delivery_info)
-    benefit_packages = @health_benefit_packages
+    health_benefit_packages = @health_benefit_packages
     passive_r_date = PASSIVE_RENEWAL_DATE
     pers_record = Person.find(person_id)
     families = pers_record.families
