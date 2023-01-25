@@ -37,7 +37,7 @@ class PersonAuditListener
 
   def subscribe
     @benefit_packages = IvlEligibilityAudits::AuditQueryCache.benefit_packages_for(2022)
-    @queue.subcribe(:block => true, :manual_ack => true) do |delivery_info, properties, payload|
+    @queue.subscribe(:block => true, :manual_ack => true) do |delivery_info, properties, payload|
       headers = properties.headers || {}
       person_id = headers["person_id"]
       execute_audit(person_id, @channel, delivery_info)
@@ -45,7 +45,7 @@ class PersonAuditListener
   end
 
   def publish_response(person_id, response, code)
-    with_response_exchange do |r_ex|
+    with_response_exchange(@connection) do |r_ex|
       r_ex.publish(response, 
       {
         :routing_key => self.class.result_queue_name,
