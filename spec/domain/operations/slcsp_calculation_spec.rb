@@ -1,0 +1,86 @@
+# frozen_string_literal: true
+
+require 'rails_helper'
+require File.join(Rails.root, 'spec/shared_contexts/benchmark_products')
+
+RSpec.describe Operations::SlcspCalculation, type: :model, dbclean: :after_each do
+  include_context 'family with 2 family members with county_zip, rating_area & service_area'
+  include_context '3 dental products with different rating_methods, different child_only_offerings and 3 health products'
+  let(:one_household) do
+    {
+      family_id: family.id,
+      effective_date: start_of_year,
+      households: [
+        {
+          household_id: 'a12bs6dbs1',
+          members: [
+            {
+              family_member_id: family_member1.id,
+              relationship_with_primary: 'self'
+            },
+            {
+              family_member_id: family_member2.id,
+              relationship_with_primary: 'spouse'
+            }
+          ]
+        }
+      ]
+    }
+  end
+
+  let(:person_rating_address) { person1.rating_address }
+
+  let!(:valid_params) do
+    {:householdConfirmation => true, :householdCount => 1, :taxYear => start_of_year.year, :state => "ME",
+     :members => [{:primaryMember => true,
+                   :name => "Mark",
+                   :dob => {:month => "1", :day => "1", :year => "1979"},
+                   :residences => [{:county => {:zipcode => person_rating_address.zip,
+                                                :name => person_rating_address.county,
+                                                :fips => "23005",
+                                                :state => person_rating_address.state},
+                                    :months => {:jan => true,
+                                                :feb => true,
+                                                :mar => true,
+                                                :apr => true,
+                                                :may => true,
+                                                :jun => true,
+                                                :jul => true,
+                                                :aug => true,
+                                                :sep => true,
+                                                :oct => true,
+                                                :nov => true,
+                                                :dec => true}}],
+                   :coverage => {:jan => true,
+                                 :feb => true,
+                                 :mar => true,
+                                 :apr => true,
+                                 :may => true,
+                                 :jun => true,
+                                 :jul => true,
+                                 :aug => true,
+                                 :sep => true,
+                                 :oct => true,
+                                 :nov => true,
+                                 :dec => true}}]}
+  end
+
+  before do
+    ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+  end
+
+  context 'with valid params' do
+    it 'should return a success' do
+      result = subject.call(valid_params)
+      expect(result.success?).to be_truthy
+    end
+
+    it 'should not be zero' do
+      result = subject.call(valid_params)
+      (1..12).each do |i|
+        month_key = Date::MONTHNAMES[i][0..2].downcase.to_sym
+        expect(result.value![month_key]).to be > 0
+      end
+    end
+  end
+end
