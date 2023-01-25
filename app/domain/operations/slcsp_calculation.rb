@@ -12,7 +12,7 @@ module Operations
     include Config::SiteHelper
 
     def call(params)
-      @logger = Logger.new(STDOUT)
+      @logger = Logger.new($stdout)
 
       validated_resource = yield validate(params)
       result = yield process(validated_resource.to_h)
@@ -37,7 +37,7 @@ module Operations
     def calculate(member, assistance_year, state, month, month_key)
       payload = build_operation_payload(member, assistance_year, state, month, month_key)
       result = Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts.new.call(payload)
-      @logger.warn "Unable to calculate SLCSP " + result.failure  if result.failure?
+      @logger.warn "Unable to calculate SLCSP #{result.failure}"  if result.failure?
       return Failure("Unable to calculate SLCSP for #{member[:name]}") if result.failure?
       Success(result.value![:household_group_benchmark_ehb_premium])
     end
