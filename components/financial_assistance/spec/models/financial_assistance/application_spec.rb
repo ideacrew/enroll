@@ -2074,6 +2074,16 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
           expect(application.is_transferrable?).to eq(false)
         end
       end
+
+      context 'user requested referral when not non-MAGI' do
+        before do
+          application.update(full_medicaid_determination: true)
+        end
+
+        it 'should be transferrable' do
+          expect(application.is_transferrable?).to eq(true)
+        end
+      end
     end
 
     context 'block_renewal_application_transfers feature enabled' do
