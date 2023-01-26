@@ -8,13 +8,18 @@ module Api
       skip_before_action :verify_authenticity_token
 
       def estimate
-        params_parsed = JSON.parse(request.body.read)
-        response = Operations::SlcspCalculation.new.call(params_parsed)
-        if response.success?
-          render json: response.value!, status: :ok
-        else
-          logger.warn "API input error: #{response.failure}"
-          render json: { error: 'Invalid parameters' }, status: :bad_request
+        begin
+          params_parsed = JSON.parse(request.body.read)
+          response = Operations::SlcspCalculation.new.call(params_parsed)
+          if response.success?
+            render json: response.value!, status: :ok
+          else
+            logger.warn "API input error: #{response.failure}"
+            render json: { error: 'Invalid parameters' }, status: :bad_request
+          end
+        rescue JSON::ParserError
+          logger.warn "unprocessable json : #{request}"
+          render json: { error: 'Bad bot' }, status: :unprocessable_entity
         end
       end
     end
