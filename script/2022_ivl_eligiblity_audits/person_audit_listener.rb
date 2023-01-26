@@ -236,7 +236,12 @@ class PersonAuditListener
     unless error
       File.open(csv_file, "rb") do |f|
         data = f.read
-        publish_response(person_id, data, "200")
+        data ||= ""
+        if data.strip.blank?
+          publish_response(person_id, data, "204")
+        else
+          publish_response(person_id, data, "200")
+        end
       end
       chan.acknowledge(delivery_info.delivery_tag, false)
     end
