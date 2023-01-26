@@ -212,16 +212,16 @@ class PersonAuditListener
                   end
                 end          
               rescue Mongoid::Errors::DocumentNotFound => e
-                publish_response(person_id, e.inspect, "500")
+                publish_response(person_id, e.inspect + "\n\n" + e.backtrace.inspect, "500")
                 chan.acknowledge(delivery_info.delivery_tag, false)
               end
             end
           end
         rescue HistoryTrackerReversalError => htre
-          publish_response(person_id, htre.inspect, "500")
+          publish_response(person_id, htre.inspect + "\n\n" + htre.backtrace.inspect, "500")
           chan.acknowledge(delivery_info.delivery_tag, false)
         rescue Exception => x
-          publish_response(person_id, x.inspect, "500")
+          publish_response(person_id, x.inspect + "\n\n" + x.backtrace.inspect, "500")
           chan.acknowledge(delivery_info.delivery_tag, false)
         end
       end
