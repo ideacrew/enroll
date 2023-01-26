@@ -31,6 +31,7 @@ class PersonAuditListener
     conn = Bunny.new(Rails.application.config.acapi.remote_broker_uri, :heartbeat => 15)
     conn.start
     chan = conn.create_channel
+    chan.prefetch(1)
     q = create_queue(chan)
     self.new(chan, q).subscribe
   end
@@ -45,8 +46,10 @@ class PersonAuditListener
   end
 
   def publish_response(person_id, response, code)
-    with_response_exchange(@connection) do |r_ex|
-      r_ex.publish(response, 
+    out_chan = @connection.create_channel
+    out_chan.tx_select
+    d_ex = out_chan.default_exchange
+    d_ex.publish(response, 
       {
         :routing_key => self.class.result_queue_name,
         :headers => {
@@ -54,7 +57,8 @@ class PersonAuditListener
           :person_id => person_id
         }
       })
-    end
+    out_chan.tx_commit
+    out_chan.close
   end
 
   def relationship_for(person, family, version_date)
