@@ -167,6 +167,7 @@ class PersonAuditListener
     t_file.close
     t_file.unlink
     person_versions = Versioning::VersionCollection.new(pers_record, passive_r_date)
+    error = false
     CSV.open(csv_file, "wb") do |csv|
       person_versions.each do |p_v|
         begin
@@ -214,23 +215,31 @@ class PersonAuditListener
               rescue Mongoid::Errors::DocumentNotFound => e
                 publish_response(person_id, e.inspect + "\n\n" + e.backtrace.inspect, "500")
                 chan.acknowledge(delivery_info.delivery_tag, false)
+                error = true
+                break
               end
             end
           end
         rescue HistoryTrackerReversalError => htre
           publish_response(person_id, htre.inspect + "\n\n" + htre.backtrace.inspect, "500")
           chan.acknowledge(delivery_info.delivery_tag, false)
+          error = true
+          break
         rescue Exception => x
           publish_response(person_id, x.inspect + "\n\n" + x.backtrace.inspect, "500")
           chan.acknowledge(delivery_info.delivery_tag, false)
+          error = true
+          break
         end
       end
     end
-    File.open(csv_file, "rb") do |f|
-      data = f.read
-      publish_response(person_id, data, "200")
+    unless error
+      File.open(csv_file, "rb") do |f|
+        data = f.read
+        publish_response(person_id, data, "200")
+      end
+      chan.acknowledge(delivery_info.delivery_tag, false)
     end
-    chan.acknowledge(delivery_info.delivery_tag, false)
   end
 end
 
