@@ -7,7 +7,7 @@ class AuditRecordReader
 
   def self.result_queue_name
     config = Rails.application.config.acapi
-    "#{config.hbx_id}.#{config.environment_name}.q.#{config.app_id}.dc_ivl_audit_results"
+    "dc0.prod.q.enroll.dc_ivl_audit_results"
   end
 
   def self.create_queue(ch)
@@ -15,7 +15,7 @@ class AuditRecordReader
   end
 
   def self.run
-    conn = Bunny.new(Rails.application.config.acapi.remote_broker_uri, :heartbeat => 15)
+    conn = Bunny.new("amqp://pvt-rabbitmq.priv.dchbx.org:5672", :heartbeat => 15)
     conn.start
     chan = conn.create_channel
     q = create_queue(chan)
@@ -79,6 +79,7 @@ class AuditRecordReader
       else
         e_csv << [person_id, status, payload]
       end
+      di, props, payload = @queue.pop(manual_ack: true)
     end
   end
 end
