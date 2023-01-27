@@ -34,6 +34,7 @@ RSpec.describe Operations::SlcspCalculation, type: :model, dbclean: :after_each 
     {:householdConfirmation => true, :householdCount => 1, :taxYear => start_of_year.year, :state => "ME",
      :members => [{:primaryMember => true,
                    :name => "Mark",
+                   :relationship => "self",
                    :dob => {:month => "1", :day => "1", :year => "1979"},
                    :residences => [{:county => {:zipcode => person_rating_address.zip,
                                                 :name => person_rating_address.county,
