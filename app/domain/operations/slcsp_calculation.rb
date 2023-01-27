@@ -32,7 +32,7 @@ module Operations
       Date.new(dob[:year], dob[:month], dob[:day])
     end
 
-    # rubocop:disable Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/CyclomaticComplexity,Metrics/AbcSize
     def process(params)
       result = {}
       primary_member = resolve_primary_member_data(params[:members])
@@ -72,7 +72,7 @@ module Operations
             recalculate = false
           end
           last_call = calculate_month(current_month_data, params[:taxYear], i, month_key) if recalculate
-          if recalculate && last_call.success? 
+          if recalculate && last_call.success?
             last_full_result = last_call.value!
             current = last_full_result[:household_group_benchmark_ehb_premium]
           else
@@ -85,7 +85,7 @@ module Operations
       end
       Success(result)
     end
-    # rubocop:enable Metrics/CyclomaticComplexity
+    # rubocop:enable Metrics/CyclomaticComplexity,Metrics/AbcSize
 
     def calculate_month(current_month_data, assistance_year, month, month_key)
       payload = build_operation_payload(current_month_data, assistance_year, month)
