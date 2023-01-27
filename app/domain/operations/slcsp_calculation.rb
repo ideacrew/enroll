@@ -71,8 +71,6 @@ module Operations
             current = nil
             recalculate = false
           end
-          # last_full_result = calculate_month(current_month_data, params[:taxYear], i, month_key) if recalculate
-          # current = last_full_result[:household_group_benchmark_ehb_premium] if recalculate
           last_call = calculate_month(current_month_data, params[:taxYear], i, month_key) if recalculate
           if recalculate && last_call.success? 
             last_full_result = last_call.value!
