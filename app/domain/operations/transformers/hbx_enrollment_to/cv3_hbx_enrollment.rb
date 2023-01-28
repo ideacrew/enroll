@@ -46,7 +46,7 @@ module Operations
             payload.merge!(product_reference: product_reference(product, issuer, family_rated_info))
           end
           payload.merge!(issuer_profile_reference: issuer_profile_reference(issuer)) if issuer
-          payload.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment? && enr.special_enrollment_period
+          payload.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment?
           enr_tax_households = tax_household_enrollments(enr)
           payload.merge!(tax_households_references: transform_enr_tax_households(enr_tax_households)) if enr_tax_households.present?
           Success(payload)
@@ -68,8 +68,18 @@ module Operations
           Operations::Transformers::TaxHouseholdEnrollmentTo::Cv3TaxHouseholdEnrollment.new.call(tax_household_enr).value!
         end
 
+        def fetch_special_enrollment_period(enrollment)
+          family = enrollment.family
+
+          seps = family.special_enrollment_periods.select do |sep|
+            (sep.start_on..sep.end_on).cover?(enrollment.submitted_at) if sep.start_on.present? && sep.end_on.present?
+          end
+
+          seps.max_by(&:created_at)
+        end
+
         def special_enrollment_period_reference(enrollment)
-          sep = enrollment.special_enrollment_period
+          sep = enrollment.special_enrollment_period || fetch_special_enrollment_period(enrollment)
           qle = sep.qualifying_life_event_kind
           {
             qualifying_life_event_kind_reference: construct_qle_reference(sep.qualifying_life_event_kind),
