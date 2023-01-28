@@ -65,7 +65,7 @@ module Operations
             end
           end
           if prev_month_data[:members] != current_month_data[:members] && current_month_data[:members].blank?
-            @logger.info "SLCSP ------------------------- members changed"
+            @logger.info "SLCSP ------------------------- gap in coverage"
             @start_dates_by_member = {}
             @first_effective_date = nil
             current = nil
