@@ -105,7 +105,7 @@ RSpec.describe ::Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment, db
         qualifying_life_event_kind_id: qle.id,
         market_kind: "ivl",
         start_on: start_on,
-        end_on: start_on.next_month,
+        end_on: start_on.next_month
       )
     end
 
