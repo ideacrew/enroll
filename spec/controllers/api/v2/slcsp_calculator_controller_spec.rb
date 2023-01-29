@@ -14,6 +14,7 @@ RSpec.describe Api::V2::SlcspCalculatorController, :type => :controller, :dbclea
         "members": [
           {
             "primaryMember": true,
+            "relationship": "self",
             "name": "Mark",
             "dob": {
               "month": "1",

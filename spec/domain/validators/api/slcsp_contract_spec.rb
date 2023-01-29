@@ -12,6 +12,7 @@ RSpec.describe Validators::Api::SlcspContract,  dbclean: :after_each do
         "members": [
           {
             "primaryMember": true,
+            "relationship": "self",
             "name": "Mark",
             "dob": {
               "month": "1",
