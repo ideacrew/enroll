@@ -308,6 +308,8 @@ module Operations
         end
 
         def construct_person_demographics(person)
+          # is_incarcerated field is nil when person is NOT applying for coverage but is required in cv3 contract
+          is_incarcerated = person.is_incarcerated || false
           {
             encrypted_ssn: encrypt(person.ssn),
             no_ssn: person.no_ssn == "0" || person.ssn.present? ? false : true,
@@ -315,7 +317,7 @@ module Operations
             dob: person.dob,
             date_of_death: person.date_of_death,
             dob_check: person.dob_check,
-            is_incarcerated: person.is_incarcerated,
+            is_incarcerated: is_incarcerated,
             ethnicity: person.ethnicity,
             race: person.race,
             tribal_id: person.tribal_id,
