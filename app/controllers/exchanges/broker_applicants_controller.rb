@@ -62,6 +62,9 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       broker_role.update(params.require(:person).require(:broker_role_attributes).permit(:training, :license, :carrier_appointments => {}).except(:id))
       broker_role.pending!
       flash[:notice] = "Broker applicant is now pending."
+    elsif params['sendemail']
+      broker_role.send_invitation
+      flash[:notice] = "Broker invite email has been resent."
     else
       broker_carrier_appointments
       broker_role.update(params.require(:person).require(:broker_role_attributes).permit(:training, :license, :carrier_appointments => {}).except(:id))

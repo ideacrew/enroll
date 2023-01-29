@@ -483,14 +483,44 @@ module FinancialAssistance
             end
 
             def magi_deductions(applicant)
+              assistance_year_start = Date.new(applicant.application.assistance_year)
+              assistance_year_end = assistance_year_start.end_of_year
               other_kinds = ["alimony_paid", "domestic_production_activities", "penalty_on_early_withdrawal_of_savings",
                              "educator_expenses", "self_employment_sep_simple_and_qualified_plans", "self_employed_health_insurance",
                              "moving_expenses", "health_savings_account", "reservists_performing_artists_and_fee_basis_government_official_expenses"]
               applicant.deductions.where(:kind.in => other_kinds).inject(0) do |result, deduction|
                 frequency = deduction.frequency_kind
-                result += annual_amount(frequency(frequency), deduction.amount.to_i)
+                deduction_end_date = calculate_end_date(deduction, assistance_year_end)
+                deduction_start_date = calculate_start_date(deduction, deduction_end_date, assistance_year_start, assistance_year_end)
+                return BigDecimal('0') unless (assistance_year_start..assistance_year_end).cover?(deduction_start_date)
+                result += calculate_magi_deductions(deduction, deduction_start_date, deduction_end_date, assistance_year_end).to_i
                 result
               end
+            end
+
+            def calculate_magi_deductions(deduction, deduction_start_date, deduction_end_date, assistance_year_end)
+              end_date_year = deduction_end_date.year
+              start_date_year = deduction_start_date.year
+              start_day_of_year = deduction_start_date.yday
+              year_difference = end_date_year - start_date_year
+              days_in_start_year = Date.gregorian_leap?(deduction.start_on.year) ? 366 : 365
+              end_day_of_year = deduction_end_date.yday + (year_difference * days_in_start_year)
+              frequency = deduction.frequency_kind
+              amount_per_day = annual_amount(frequency(frequency), deduction.amount.to_i).to_f / assistance_year_end.yday
+              ((end_day_of_year - start_day_of_year + 1) * amount_per_day).round(2)
+            end
+
+            def calculate_start_date(deduction, deduction_end_date, assistance_year_start, assistance_year_end)
+              if (assistance_year_start..assistance_year_end).cover?(deduction_end_date) && assistance_year_start > deduction.start_on
+                assistance_year_start
+              else
+                deduction.start_on
+              end
+            end
+
+            def calculate_end_date(deduction, assistance_year_end)
+              return deduction.end_on if deduction.end_on.present? && (deduction.end_on <= assistance_year_end)
+              assistance_year_end
             end
 
             def deductible_part_of_self_employment_tax(applicant)

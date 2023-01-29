@@ -4,15 +4,15 @@ require File.join(Rails.root, 'lib/mongoid_migration_task')
 
 # This class is for updating TaxHouseholdEnrollment objects for Health Enrollments that got created on or after 2022/1/1.
 #   1. Continuous Coverage
-#   2. With more than 3 dependents which have incorrect BenchmarkPremiums
+#   2. Children aged 20 or below. This is to fix the incorrectly calculated second lowest cost standalone dental plan ehb premium
 # This class will not update Enrollment.
-class FixBenchmarkForContinuousCoverageAndMoreThan3DepEnrs < MongoidMigrationTask
+class UpdateBenchmarkForContinuousCoverageAndChildMemberEnrs < MongoidMigrationTask
   def update_not_needed?(household_info, th_enrollment)
     th_enrollment.household_benchmark_ehb_premium.to_d == household_info.household_benchmark_ehb_premium.to_d &&
       th_enrollment.health_product_hios_id == household_info.health_product_hios_id &&
       th_enrollment.dental_product_hios_id == household_info.dental_product_hios_id &&
       th_enrollment.household_health_benchmark_ehb_premium.to_d == household_info.household_health_benchmark_ehb_premium.to_d &&
-      th_enrollment.household_dental_benchmark_ehb_premium.to_d == household_info.household_dental_benchmark_ehb_premium.to_d
+      th_enrollment.household_dental_benchmark_ehb_premium&.to_d == household_info.household_dental_benchmark_ehb_premium&.to_d
   end
 
   def update_benchmark_premiums(family, enrollment, enrolled_family_member_ids, old_tax_hh_enrs)
@@ -47,9 +47,25 @@ class FixBenchmarkForContinuousCoverageAndMoreThan3DepEnrs < MongoidMigrationTas
       effective_date: enrollment.effective_on,
       households: households_hash
     }
-    benchmark_premiums = ::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts.new.call(payload).success
+    benchmark_premiums_result = ::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts.new.call(payload)
+
+    if benchmark_premiums_result.failure?
+      errors = if benchmark_premiums_result.failure.is_a?(Dry::Validation::Result)
+                 result.failure.errors.to_h
+               else
+                 result.failure
+               end
+      @logger.info "---------- EnrHbxID: #{enrollment.hbx_id} - BenchmarkPremiums issue errors: #{errors}"
+
+      return
+    end
+
+    benchmark_premiums = benchmark_premiums_result.success
+
     old_tax_hh_enrs.each do |th_enrollment|
       household_info = benchmark_premiums.households.find { |household| household.household_id.to_s == th_enrollment.tax_household_id.to_s }
+      next th_enrollment if household_info.nil?
+
       if update_not_needed?(household_info, th_enrollment)
         @logger.info "---------- EnrHbxID: #{enrollment.hbx_id} - Update not needed as TaxHouseholdEnrollment information is same. TaxHousehold hbx_assigned_id: #{th_enrollment.tax_household.hbx_assigned_id}"
         next th_enrollment
@@ -61,6 +77,13 @@ class FixBenchmarkForContinuousCoverageAndMoreThan3DepEnrs < MongoidMigrationTas
         household_health_benchmark_ehb_premium: household_info.household_health_benchmark_ehb_premium,
         household_dental_benchmark_ehb_premium: household_info.household_dental_benchmark_ehb_premium
       )
+
+      th_enrollment.tax_household_members_enrollment_members.each do |member|
+        hh_member = household_info.members.detect { |mmbr| mmbr.family_member_id == member.family_member_id }
+        next member if hh_member.blank?
+
+        member.update!(age_on_effective_date: hh_member.age_on_effective_date)
+      end
     end
     true
   end
@@ -119,51 +142,23 @@ class FixBenchmarkForContinuousCoverageAndMoreThan3DepEnrs < MongoidMigrationTas
     hbx_ids = ENV['enrollment_hbx_ids'].to_s.split(',').map(&:squish!)
     return hbx_ids if hbx_ids.present?
 
-    enr_with_more_than_3_dependent_hbx_ids =
-      HbxEnrollment.where(
-        :effective_on.gte => Date.new(2022),
-        :aasm_state.ne => ['shopping', 'coverage_canceled'],
-        :'hbx_enrollment_members.3'.exists => true,
-        :product_id.ne => nil,
-        coverage_kind: 'health'
-      ).pluck(:hbx_id)
+    HbxEnrollment.where(
+      coverage_kind: 'health',
+      :consumer_role_id.ne => nil,
+      :product_id.ne => nil,
+      :aasm_state.ne => ['shopping', 'coverage_canceled'],
+      :effective_on.gte => Date.new(2022),
+      :'applied_aptc_amount.cents'.gt => 0
+    ).pluck(:hbx_id)
+  end
 
-    continuous_coverage_enrollment_hbx_ids =
-      HbxEnrollment.collection.aggregate(
-        [
-          {
-            "$match" => {
-              "hbx_enrollment_members" => {"$ne" => nil},
-              "coverage_kind" => "health",
-              "consumer_role_id" => {"$ne" => nil},
-              "product_id" => {"$ne" => nil},
-              "aasm_state" => {"$nin" => ['shopping', 'coverage_canceled']},
-              "effective_on" => {"$gte" => Date.new(2022)}
-            }
-          },
-          {
-            "$project" => {
-              "hbx_enrollment_members" => "$hbx_enrollment_members",
-              "effective_on" => "$effective_on",
-              "hbx_id" => "$hbx_id"
-            }
-          },
-          {"$unwind" => "$hbx_enrollment_members"},
-          {
-            "$match" => {
-              "$expr" => {
-                "$ne" => [
-                  { "$dateToString" => { "format" => "%Y-%m-%d", date: "$hbx_enrollment_members.coverage_start_on" }},
-                  { "$dateToString": { "format": "%Y-%m-%d", date: "$effective_on" }}
-                ]
-              }
-            }
-          },
-          "$group" => { "_id" => "$hbx_id"}
-        ]
-      ).map { |rec| rec['_id'] }
+  # Dental Benchmark fix for enrollments that got created before Slcsapd fix(https://github.com/ideacrew/enroll/pull/2254)
+  def any_child_aged_20_or_below?(enrollment)
+    enrollment.hbx_enrollment_members.any?{ |member| member.age_on_effective_date <= 20 && member.primary_relationship == 'child' }
+  end
 
-    (enr_with_more_than_3_dependent_hbx_ids + continuous_coverage_enrollment_hbx_ids).uniq
+  def continuous_coverage_enr?(enrollment)
+    enrollment.hbx_enrollment_members.any?{ |member| member.coverage_start_on != enrollment.effective_on }
   end
 
   def process_hbx_enrollment_hbx_ids
@@ -179,8 +174,7 @@ class FixBenchmarkForContinuousCoverageAndMoreThan3DepEnrs < MongoidMigrationTas
 
     CSV.open(file_name, 'w', force_quotes: true) do |csv|
       csv << field_names
-      enr_hbx_ids = find_enrollment_hbx_ids
-      enr_hbx_ids.each do |hbx_id|
+      find_enrollment_hbx_ids.each do |hbx_id|
         counter += 1
         @logger.info "Processed #{counter} hbx_enrollments" if counter % 100 == 0
         @logger.info "----- EnrHbxID: #{hbx_id} - Processing Enrollment"
@@ -189,6 +183,7 @@ class FixBenchmarkForContinuousCoverageAndMoreThan3DepEnrs < MongoidMigrationTas
           @logger.info "---------- EnrHbxID: #{enrollment.hbx_id} - Enrollment not found"
           next hbx_id
         end
+        next hbx_id unless any_child_aged_20_or_below?(enrollment) || continuous_coverage_enr?(enrollment)
 
         csv_result = process_enrollment(enrollment)
         next hbx_id if csv_result.nil?
@@ -204,9 +199,9 @@ class FixBenchmarkForContinuousCoverageAndMoreThan3DepEnrs < MongoidMigrationTas
   def migrate
     @logger = Logger.new("#{Rails.root}/log/fix_benchmark_for_continuous_coverage_enrollments_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
     start_time = DateTime.current
-    @logger.info "FixBenchmarkForContinuousCoverageAndMoreThan3DepEnrs start_time: #{start_time}"
+    @logger.info "UpdateBenchmarkForContinuousCoverageAndChildMemberEnrs start_time: #{start_time}"
     process_hbx_enrollment_hbx_ids
     end_time = DateTime.current
-    @logger.info "FixBenchmarkForContinuousCoverageAndMoreThan3DepEnrs end_time: #{end_time}, total_time_taken_in_minutes: #{((end_time - start_time) * 24 * 60).to_f.ceil}"
+    @logger.info "UpdateBenchmarkForContinuousCoverageAndChildMemberEnrs end_time: #{end_time}, total_time_taken_in_minutes: #{((end_time - start_time) * 24 * 60).to_f.ceil}"
   end
 end
