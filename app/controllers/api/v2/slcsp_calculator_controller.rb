@@ -16,6 +16,9 @@ module Api
           logger.warn "API input error: #{response.failure}"
           render json: { error: 'Invalid parameters' }, status: :bad_request
         end
+      rescue JSON::ParserError
+        logger.warn "unprocessable json : #{request}"
+        render json: { error: 'Bad bot' }, status: :unprocessable_entity
       end
     end
   end
