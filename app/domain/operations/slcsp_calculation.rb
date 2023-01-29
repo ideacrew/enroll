@@ -115,13 +115,18 @@ module Operations
       @first_effective_date = Date.new(assistance_year, month, 1) if @first_effective_date.blank?
       {
         rating_address: {
-          county: current_month_data[:residence][:name],
+          county: county_name_hack(current_month_data[:residence][:name]),
           zip: current_month_data[:residence][:zipcode],
           state: current_month_data[:residence][:state]
         },
         effective_date: @first_effective_date,
         households: [household]
       }
+    end
+
+    def county_name_hack(county_name)
+      # our counties don't have the word county on them :)
+      return county_name.gsub(/county/i, '').strip unless county_name.blank?
     end
 
     def reorder_data_by_month(members, primary_member)
