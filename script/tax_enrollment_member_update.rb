@@ -21,8 +21,10 @@ def process_enrollment(enrollment)
   en_members_mismatched = (tax_enrollment.tax_household_members_enrollment_members.pluck(:hbx_enrollment_member_id) - enrollment.hbx_enrollment_members.pluck(:id)).present?
   return unless en_members_mismatched
   updates = update_tax_household_enrollment_members(enrollment, tax_enrollment)
+  family = enrollment.family
   [
-    enrollment.family.hbx_assigned_id,
+    family.primary_person.hbx_id,
+    family.hbx_assigned_id,
     enrollment.hbx_id,
     enrollment.effective_on.strftime("%m/%d/%Y"),
     enrollment.created_at.strftime("%m/%d/%Y"),
@@ -35,7 +37,7 @@ def process_enrollment(enrollment)
   ]
 end
 
-enrollments = HbxEnrollment.where(:aasm_state.nin => ["shopping", "coverage_canceled"]).where(:effective_on.gte => Date.new(2022,1,1))
+enrollments = HbxEnrollment.where(:aasm_state.nin => ["shopping"]).where(:effective_on.gte => Date.new(2022,1,1))
 batch_size = 1000
 query_offset = 0
 
@@ -44,6 +46,7 @@ p "total enrollments #{enrollments.count}"
 CSV.open("tax_enrollment_members_issues_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv", "w") do |csv|
 
   csv << [
+      "primary hbx id",
       "family hbx id",
       "enrollment hbx id",
       "enrollment effective date",
