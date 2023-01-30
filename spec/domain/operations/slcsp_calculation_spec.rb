@@ -121,7 +121,7 @@ RSpec.describe Operations::SlcspCalculation, type: :model, dbclean: :after_each 
                                                   :jul => false,
                                                   :aug => false,
                                                   :sep => false,
-                                                  :oct => true,
+                                                  :oct => false,
                                                   :nov => true,
                                                   :dec => true}}],
                      :coverage => {:jan => true,
@@ -133,7 +133,7 @@ RSpec.describe Operations::SlcspCalculation, type: :model, dbclean: :after_each 
                                    :jul => false,
                                    :aug => true,
                                    :sep => true,
-                                   :oct => true,
+                                   :oct => false,
                                    :nov => true,
                                    :dec => true}},
                     {:primaryMember => false,
@@ -165,7 +165,7 @@ RSpec.describe Operations::SlcspCalculation, type: :model, dbclean: :after_each 
                                    :jul => false,
                                    :aug => true,
                                    :sep => true,
-                                   :oct => true,
+                                   :oct => false,
                                    :nov => true,
                                    :dec => true}}]}
 
@@ -181,7 +181,8 @@ RSpec.describe Operations::SlcspCalculation, type: :model, dbclean: :after_each 
       expect(result.value![:jan]).to eq(590)
       expect(result.value![:jul]).to be_nil
       expect(result.value![:aug]).to eq(1180)
-      expect(result.value![:oct]).to eq(1180)
+      expect(result.value![:oct]).to be_nil
+      expect(result.value![:nov]).to eq(1180)
     end
   end
 end

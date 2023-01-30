@@ -32,7 +32,7 @@ module Operations
       Date.new(dob[:year], dob[:month], dob[:day])
     end
 
-    # rubocop:disable Metrics/CyclomaticComplexity,Metrics/AbcSize
+    # rubocop:disable Metrics/CyclomaticComplexity,Metrics/AbcSize,Metrics/PerceivedComplexity
     def process(params)
       result = {}
       primary_member = resolve_primary_member_data(params[:members])
@@ -53,7 +53,7 @@ module Operations
         else
           recalculate = true
           # something changed we need to recalculate
-          if prev_month_data[:residence] != current_month_data[:residence] && !last_full_result.nil?
+          if prev_month_data[:residence] != current_month_data[:residence] && !last_full_result.nil? && !current_month_data[:members].blank?
             @logger.info "SLCSP ------------------------- residence changed"
             # figure it out if we are on a different rating area
             seeker = calculate_month(current_month_data, params[:taxYear], i, month_key).value!
@@ -85,7 +85,7 @@ module Operations
       end
       Success(result)
     end
-    # rubocop:enable Metrics/CyclomaticComplexity,Metrics/AbcSize
+    # rubocop:enable Metrics/CyclomaticComplexity,Metrics/AbcSize,Metrics/PerceivedComplexity
 
     def calculate_month(current_month_data, assistance_year, month, month_key)
       payload = build_operation_payload(current_month_data, assistance_year, month)
