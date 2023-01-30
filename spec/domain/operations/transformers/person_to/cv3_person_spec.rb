@@ -40,4 +40,19 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
       end
     end
   end
+
+  describe '#construct_person_demographics' do
+
+    subject { ::Operations::Transformers::PersonTo::Cv3Person.new.construct_person_demographics(person) }
+
+    context 'when is_incarcerated is nil' do
+      before do
+        person.update(is_incarcerated: nil)
+      end
+
+      it 'should set the value of the field to false' do
+        expect(subject[:is_incarcerated]).to eq false
+      end
+    end
+  end
 end

@@ -214,8 +214,7 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
       result = subject.call(params)
       expect(result.success?).to be_truthy
       key = result.success[:product_package_values][:assigned_contribution_model].key
-
-      expect(key).to eq :zero_percent_sponsor_fixed_percent_contribution_model
+      expect(key).to eq EnrollRegistry["initial_sponsor_default_#{enrollment_eligibility_initial.effective_date.year}"].setting(:contribution_model_key).item
     end
 
     context 'when employer does not have relaxed rules, but osse eligible' do

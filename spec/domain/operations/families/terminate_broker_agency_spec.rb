@@ -8,6 +8,11 @@ RSpec.describe ::Operations::Families::TerminateBrokerAgency, dbclean: :after_ea
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
   let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
+  let(:assistor)  do
+    assistor = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00")
+    assistor.save(validate: false)
+    assistor
+  end
 
   describe 'broker agency account term params for family' do
 
@@ -29,6 +34,40 @@ RSpec.describe ::Operations::Families::TerminateBrokerAgency, dbclean: :after_ea
         result = subject.call(terminate_params)
         expect(result).to be_a(Dry::Monads::Result::Success)
         expect(result.success).to eq true
+        family.reload
+        expect(family.current_broker_agency).to eq nil
+      end
+
+      it 'should terminate broker agency account but should not notify EDI if set to false' do
+        expect(family.current_broker_agency.writing_agent).to eq writing_agent
+        terminate_params = { family_id: family.id,
+                             terminate_date: TimeKeeper.date_of_record,
+                             broker_account_id: family.current_broker_agency&.id,
+                             notify_edi: false }
+
+        result = subject.call(terminate_params)
+        expect(result).to be_a(Dry::Monads::Result::Success)
+        expect(result.success).to eq "Not notifying EDI"
+        family.reload
+        expect(family.current_broker_agency).to eq nil
+      end
+
+      it 'should terminate broker agency account but not notify EDI if broker is assistor' do
+        family.current_broker_agency.update(is_active: false)
+        family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                            writing_agent_id: assistor.id,
+                                                                                            start_on: Time.now,
+                                                                                            is_active: true)
+        family.reload
+        expect(family.current_broker_agency.writing_agent).to eq assistor
+        terminate_params = { family_id: family.id,
+                             terminate_date: TimeKeeper.date_of_record,
+                             broker_account_id: family.current_broker_agency&.id,
+                             notify_edi: true }
+
+        result = subject.call(terminate_params)
+        expect(result).to be_a(Dry::Monads::Result::Success)
+        expect(result.success).to eq "Not notifying EDI because broker is an assistor"
         family.reload
         expect(family.current_broker_agency).to eq nil
       end

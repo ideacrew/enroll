@@ -64,6 +64,20 @@ module Operations
       end
     end
 
+    context "when file_name is missing" do
+      let(:params) do
+        payload[:file_name] = nil
+        payload
+      end
+
+      let(:error_message) { { :message => ["Document file name is missing"] } }
+
+      it "fails" do
+        expect(subject).not_to be_success
+        expect(subject.failure).to eq error_message
+      end
+    end
+
     context "passing valid data to documents create operation" do
       it "success" do
         document = Operations::CreateDocumentAndNotifyRecipient.new.create_document(person, payload)

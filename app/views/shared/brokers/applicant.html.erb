@@ -52,6 +52,9 @@
               <% if broker_or_staff_role.may_decertify? %>
                 <%= submit_tag 'Decertify', name: 'decertify', class: "btn btn-primary  interaction-click-control-broker-decertify" %>
               <% end %>
+              <% if broker_or_staff_role.aasm_state == 'active' && EnrollRegistry.feature_enabled?(:resend_broker_email_button) %>
+                <%= submit_tag 'Resend Email Invite', name: 'sendemail', class: "btn btn-primary" %>
+              <% end %>
               <% if broker_or_staff_role.may_recertify? %>
                 <%= submit_tag 'Re-Certify', name: 'recertify', class: "btn btn-primary  interaction-click-control-broker-recertify" %>
               <% end %>

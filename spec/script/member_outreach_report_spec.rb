@@ -23,13 +23,13 @@ describe 'member_outreach_report' do
   let!(:primary_fm) { family.primary_applicant }
   let!(:spouse_fm) { FactoryBot.create(:family_member, family: family, person: spouse_person) }
   let!(:family_members) { [primary_fm, spouse_fm] }
-  let!(:health_enrollment) { FactoryBot.create(:hbx_enrollment, :with_health_product, family: family) }
+  let!(:health_enrollment) { FactoryBot.create(:hbx_enrollment, :with_health_product, family: family, effective_on: TimeKeeper.date_of_record.beginning_of_year) }
   let!(:no_app_family) { FactoryBot.create(:family, :with_primary_family_member, person: no_app_primary_person) }
   let!(:no_app_primary_fm) { no_app_family.primary_applicant }
   let!(:no_app_family_members) { [no_app_primary_fm] }
   let(:prospective_year) { TimeKeeper.date_of_record.year + 1 }
   let!(:prospective_year_health_enrollment) { FactoryBot.create(:hbx_enrollment, :with_health_product, family: family, effective_on: Date.new(prospective_year, 1, 1)) }
-  let!(:dental_enrollment) { FactoryBot.create(:hbx_enrollment, :with_dental_product, family: family) }
+  let!(:dental_enrollment) { FactoryBot.create(:hbx_enrollment, :with_dental_product, family: family, effective_on: TimeKeeper.date_of_record.beginning_of_year) }
   let!(:prospective_year_dental_enrollment) { FactoryBot.create(:hbx_enrollment, :with_dental_product, family: family, effective_on: Date.new(prospective_year, 1, 1)) }
   let!(:enrollment_members) do
     family_members.map do |member|

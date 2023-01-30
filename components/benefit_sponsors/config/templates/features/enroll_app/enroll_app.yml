@@ -257,7 +257,7 @@ registry:
       - :aca_shop
     features:
       - key: :aca_shop_dependent_age_off
-        item: Operations::Shop::DependentAgeOff.new
+        item: Operations::BenefitSponsors::DependentAgeOff::Process.new
         is_enabled: true
         settings:
           - key: :period

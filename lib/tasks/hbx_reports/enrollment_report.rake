@@ -24,18 +24,86 @@ namespace :reports do
       (enr.total_premium - enr.applied_aptc_amount.to_f).to_f.round(2)
     end
 
-    def member_status(enr)
-      enrollments = enr.family.hbx_enrollments.where(:effective_on.lt => ENV['start_on'],
-                                                     :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES,
-                                                     coverage_kind: enr.coverage_kind,
-                                                     :external_id.exists => true,
-                                                     :consumer_role_id.ne => nil)
+    def all_enrollments_for_year(enr, all_enrollments, person)
+      states = HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES
+      all_enrollments.select do |enrollment|
+        enrollment_member_hbx_ids = enrollment.hbx_enrollment_members.flat_map(&:person).pluck(:hbx_id)
+        states.include?(enrollment.aasm_state) && enrollment.coverage_kind == enr.coverage_kind &&
+          enrollment.effective_on >= enr.effective_on.beginning_of_year &&
+          enrollment_member_hbx_ids.include?(person.hbx_id)
+      end
+    end
 
-      if enr.external_id.blank? && enrollments.present?
+    def pre_11_1_purchase_enrollments(enr, all_enrollments, person)
+      time_period = Time.zone.parse("2022-11-01 10:00:00").utc
+      states = HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES
+      all_enrollments.select do |enrollment|
+        enrollment_member_hbx_ids = enrollment.hbx_enrollment_members.flat_map(&:person).pluck(:hbx_id)
+        enrollment.created_at < time_period && states.include?(enrollment.aasm_state) &&
+          enrollment.coverage_kind == enr.coverage_kind &&
+          enrollment.effective_on >= enr.effective_on.beginning_of_year &&
+          enrollment_member_hbx_ids.include?(person.hbx_id)
+      end
+    end
+
+    def post_11_1_purchase_enrollments(enr, all_enrollments, person)
+      time_period = Time.zone.parse("2022-11-01 10:00:00").utc
+      states = HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES
+      all_enrollments.select do |enrollment|
+        enrollment_member_hbx_ids = enrollment.hbx_enrollment_members.flat_map(&:person).pluck(:hbx_id)
+        enrollment.created_at >= time_period && states.include?(enrollment.aasm_state) &&
+          enrollment.coverage_kind == enr.coverage_kind &&
+          enrollment.effective_on >= enr.effective_on.beginning_of_year &&
+          enrollment_member_hbx_ids.include?(person.hbx_id)
+      end
+    end
+
+    def all_effectuated_enrollments_for_prev_year(enr, all_enrollments, person)
+      start_date = enr.effective_on.beginning_of_year.prev_year
+      end_date  = start_date.end_of_year
+      states = ['shopping', 'coverage_canceled']
+
+      all_enrollments.select do |enrollment|
+        enrollment_member_hbx_ids = enrollment.hbx_enrollment_members.flat_map(&:person).pluck(:hbx_id)
+        !states.include?(enrollment.aasm_state) && enrollment.coverage_kind == enr.coverage_kind &&
+          enrollment.effective_on.between?(start_date,end_date)  &&
+          enrollment_member_hbx_ids.include?(person.hbx_id)
+      end
+    end
+
+    def all_expired_enrollments_for_prev_year(enr, all_enrollments, person)
+      start_date = enr.effective_on.beginning_of_year.prev_year
+      end_date  = start_date.end_of_year
+
+      states = ['coverage_expired']
+
+      all_enrollments.select do |enrollment|
+        enrollment_member_hbx_ids = enrollment.hbx_enrollment_members.flat_map(&:person).pluck(:hbx_id)
+        states.include?(enrollment.aasm_state) && enrollment.coverage_kind == enr.coverage_kind &&
+          enrollment.effective_on.between?(start_date,end_date)  &&
+          enrollment_member_hbx_ids.include?(person.hbx_id)
+      end
+    end
+
+    def has_effectuated_coverage_in_prev_year_during_oe?(enrollment)
+      prev_year = enrollment.effective_on.prev_year.year
+      @previous_enrollments.select do |enr|
+        effective_date = enr.coverage_terminated? ? enr.terminated_on : Date.new(prev_year, 12, 31)
+        effective_date.between?(Date.new(prev_year, 11,1),Date.new(prev_year,12,31))
+      end
+    end
+
+    def member_status(enr)
+      enrs_between_nov_and_dec_set = has_effectuated_coverage_in_prev_year_during_oe?(enr)
+      re_enrolled_member_set = @enrollments&.map(&:hbx_id)
+      active_renewals_set = re_enrolled_member_set & @post_11_1_purchases&.map(&:hbx_id)
+      passive_renewals_set = re_enrolled_member_set - @post_11_1_purchases&.map(&:hbx_id)
+
+      if active_renewals_set.present? && enrs_between_nov_and_dec_set.present?
         "Active Re-enrollee"
-      elsif enr.aasm_state == "auto_renewing" || (enr.external_id.present? && enrollments.any? {|enrollment| enrollment.subscriber.hbx_id == enr.subscriber.hbx_id})
+      elsif passive_renewals_set.present? && enrs_between_nov_and_dec_set.present?
         "Re-enrollee"
-      else
+      elsif enrs_between_nov_and_dec_set.empty? || @previous_enrollments.blank?
         "New Consumer"
       end
     end
@@ -64,6 +132,7 @@ namespace :reports do
     count = 0
     batch_size = 1000
     offset = 0
+    @member_status_lookup = {}
     total_count = enrollments.size
     CSV.open("enroll_enrollment_report.csv", 'w') do |csv|
       csv << ["Primary Member ID", "Member ID", "Policy ID", "Policy Last Updated", "Policy Subscriber ID", "Status", "Member Status",
@@ -90,10 +159,17 @@ namespace :reports do
                 per = en.person
                 premium_amount = (enr.is_ivl_by_kind? ? enr.premium_for(en) : (enr.decorated_hbx_enrollment.member_enrollments.find { |enrollment| enrollment.member_id == en.id }).product_price).to_f.round(2)
                 next if per.blank?
+
+                all_enrollments_for_person = per.families.flat_map(&:hbx_enrollments)
+                @enrollments = all_enrollments_for_year(enr, all_enrollments_for_person, per)
+                @pre_11_1_purchases = pre_11_1_purchase_enrollments(enr, all_enrollments_for_person, per)
+                @post_11_1_purchases = post_11_1_purchase_enrollments(enr, all_enrollments_for_person, per)
+                @previous_enrollments = all_effectuated_enrollments_for_prev_year(enr, all_enrollments_for_person, per)
+                @all_expired_enrollments = all_expired_enrollments_for_prev_year(enr, all_enrollments_for_person, per)
                 csv << [
                   primary_person_hbx_id, per.hbx_id, enr.hbx_id, enr&.updated_at&.to_s,
                   enr.subscriber.hbx_id, enr.aasm_state,
-                  member_status(enr),
+                  @member_status_lookup["#{enr.coverage_kind}_#{per.hbx_id}"] ||= member_status(enr),
                   per.first_name,
                   per.last_name,
                   per.ssn,

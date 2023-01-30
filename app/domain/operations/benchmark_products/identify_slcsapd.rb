@@ -14,7 +14,7 @@ module Operations
       # Identify the second lowest cost standalone dental plan (SLCSADP)
       # add dental information to household
       def call(params)
-        # params = { family: family, benchmark_product_model: benchmark_product_model, household_params: household }
+        # params = { benchmark_product_model: benchmark_product_model, household_params: household }
 
         dental_products = yield fetch_dental_products(params)
         product_to_ehb_premium_hash = yield calculate_ehb_premiums(dental_products)
@@ -43,7 +43,7 @@ module Operations
         service_area_ids = params[:benchmark_product_model].service_area_ids
         @effective_date = params[:benchmark_product_model].effective_date
         members = params[:household_params][:members]
-        @child_members = members.select { |member| member[:relationship_with_primary] == 'child' && member[:age_on_effective_date] < 21 }
+        @child_members = members.select { |member| member[:age_on_effective_date] < 21 }
 
         query = {
           :service_area_id.in => service_area_ids,

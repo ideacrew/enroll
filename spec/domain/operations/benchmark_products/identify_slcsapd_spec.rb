@@ -145,8 +145,10 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
   end
 
   describe "with more than 3 children", dbclean: :around_each do
-    include_context "family with 5 family members"
+    include_context "family with 6 family members"
     include_context '3 dental products with different rating_methods, different child_only_offerings and 3 health products'
+
+    let(:person6_age) { 27 }
 
     let(:input_params) do
       {
@@ -175,6 +177,10 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
               },
               {
                 family_member_id: family_member5.id,
+                relationship_with_primary: 'child'
+              },
+              {
+                family_member_id: family_member6.id,
                 relationship_with_primary: 'child'
               }
             ]
@@ -206,7 +212,8 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
         household_params[:members][1][:relationship_with_primary] = 'child'
         household_params[:members][2][:relationship_with_primary] = 'child'
         household_params[:members][3][:relationship_with_primary] = 'child'
-        household_params[:members][3][:relationship_with_primary] = 'child'
+        household_params[:members][4][:relationship_with_primary] = 'child'
+        household_params[:members][5][:relationship_with_primary] = 'child'
 
         @result = ::Operations::BenchmarkProducts::IdentifySlcsapd.new.call(
           { family: family, benchmark_product_model: @benchmark_product_model, household_params: household_params }
@@ -223,7 +230,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
       end
     end
 
-    context 'Adult with 4 children - one 19yo, the rest under 19' do
+    context 'Adult with 4 members - one 19yo, the rest under 19' do
       let(:person1_age) { 30 }
       let(:person2_age) { 19 }
       let(:person3_age) { 2 }
@@ -239,9 +246,9 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
         household_params.merge!({ type_of_household: 'child_only' })
         household_params[:members][0][:relationship_with_primary] = 'self'
         household_params[:members][1][:relationship_with_primary] = 'child'
-        household_params[:members][2][:relationship_with_primary] = 'child'
+        household_params[:members][2][:relationship_with_primary] = 'other_relationship'
         household_params[:members][3][:relationship_with_primary] = 'child'
-        household_params[:members][3][:relationship_with_primary] = 'child'
+        household_params[:members][4][:relationship_with_primary] = 'other_relationship'
 
         @result = ::Operations::BenchmarkProducts::IdentifySlcsapd.new.call(
           { family: family, benchmark_product_model: @benchmark_product_model, household_params: household_params }

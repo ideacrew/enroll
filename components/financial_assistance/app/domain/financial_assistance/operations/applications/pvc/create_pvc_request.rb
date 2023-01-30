@@ -17,64 +17,71 @@ module FinancialAssistance
           include FinancialAssistance::JobsHelper
 
           def call(params)
-            start_time = process_start_time
             values = yield validate(params)
-            applications = yield collect_applications_from_families(values)
-            event = yield build_event(applications)
+            family_application = yield fetch_family_application(values[:family_id], values[:manifest][:assistance_year])
+            applicant_payload = yield construct_applicant_payload(family_application, values[:person])
+            event = yield build_event(values[:manifest], applicant_payload, family_application.hbx_id)
             result = yield publish(event)
-            end_time = process_end_time_formatted(start_time)
-            logger.info "Successfully created PVC request for #{params[:families].count} families for PVC in #{end_time}"
+            add_evidence(family_application)
             Success(result)
           end
 
           private
 
+          def fetch_family_application(family_id, year)
+            apps = ::FinancialAssistance::Application.where(assistance_year: year,
+                                                            aasm_state: 'determined',
+                                                            family_id: family_id)
+
+            if apps.present?
+              app = apps.max_by(&:created_at)
+              Success(app)
+            else
+              Failure("No applications found for family id #{family_id}")
+            end
+          end
+
+          def add_evidence(application)
+            # apparently there is no different between the rrv or pvc evidences on the way out, they are both non-esi mec
+            application.create_rrv_evidences
+          end
+
+          def construct_applicant_payload(application, person_params)
+            #convert to cv3 and return just the applicant
+            person_hbx_id = person_params[:hbx_id]
+            cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
+            return Failure("Cv3Application transform failed for person hbx id: #{person_hbx_id}") unless cv3_application.success?
+
+            applicants = cv3_application.value![:applicants]
+            applicant = applicants.detect {|applicant_loop| applicant_loop[:person_hbx_id] == person_hbx_id}
+            return Failure("invalid applicant for person hbx id #{person_hbx_id}") unless applicant.present?
+
+            result = AcaEntities::MagiMedicaid::Contracts::ApplicantContract.new.call(applicant)
+
+            if result.success?
+              applicant_entity = AcaEntities::MagiMedicaid::Applicant.new(result.to_h)
+
+              Success(applicant_entity)
+            else
+              Failure(result.errors)
+            end
+          end
+
           def validate(params)
             errors = []
-            errors << 'families ref missing' unless params[:families]
-            errors << 'assistance_year ref missing' unless params[:assistance_year]
+            errors << 'person missing' unless params[:person]
+            errors << 'manifest missing' unless params[:manifest]
+            errors << 'family_id missing' unless params[:family_id]
 
             errors.empty? ? Success(params) : Failure(errors)
           end
 
-          def fetch_application(family, year)
-            ::FinancialAssistance::Application.where(assistance_year: year,
-                                                     aasm_state: 'determined',
-                                                     family_id: family.id).max_by(&:created_at)
-          end
-
-          def transform_and_construct(family, assistance_year)
-            application = fetch_application(family, assistance_year)
-            payload = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
-            AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(payload.value!).value!
-          end
-
-          def collect_applications_from_families(params)
-            applications_with_evidences = []
-            count = 0
-            pvc_logger = Logger.new("#{Rails.root}/log/pvc_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
-
-            params[:families].no_timeout.each do |family|
-              determined_application = fetch_application(family, params[:assistance_year])
-              determined_application.create_rrv_evidences
-              cv3_application = transform_and_construct(family, params[:assistance_year])
-              applications_with_evidences << cv3_application.to_h
-              count += 1
-              pvc_logger.info("********************************* processed #{count}*********************************") if count % 100 == 0
-            rescue StandardError => e
-              pvc_logger.info("failed to process for person with hbx_id #{family.primary_person.hbx_id}/family_id #{family.id}/year #{params[:assistance_year]} due to #{e.inspect}")
-            end
-
-            applications_with_evidences.present? ? Success(applications_with_evidences) : Failure("No Applications for given families")
-          end
-
-          def build_event(payload)
-            event('events.fdsh.evidences.periodic_verification_confirmation', attributes: { applications: payload })
+          def build_event(manifest, applicant, application_hbx_id)
+            event('events.fdsh.evidences.periodic_verification_confirmation', attributes: { manifest: manifest, applicant: applicant, application_hbx_id: application_hbx_id })
           end
 
           def publish(event)
             event.publish
-
             Success("Successfully published the pvc payload")
           end
         end
