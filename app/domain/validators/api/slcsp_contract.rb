@@ -10,6 +10,7 @@ module Validators
         optional(:state).value(:string)
         required(:members).array(:hash) do
           optional(:primaryMember).value(:bool)
+          required(:relationship).value(:string)
           required(:name).value(:string)
           required(:dob).hash do
             required(:month).filled(:integer)
