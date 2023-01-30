@@ -230,7 +230,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
       end
     end
 
-    context 'Adult with 4 children - one 19yo, the rest under 19' do
+    context 'Adult with 4 members - one 19yo, the rest under 19' do
       let(:person1_age) { 30 }
       let(:person2_age) { 19 }
       let(:person3_age) { 2 }
@@ -246,9 +246,9 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsapd do
         household_params.merge!({ type_of_household: 'child_only' })
         household_params[:members][0][:relationship_with_primary] = 'self'
         household_params[:members][1][:relationship_with_primary] = 'child'
-        household_params[:members][2][:relationship_with_primary] = 'child'
+        household_params[:members][2][:relationship_with_primary] = 'other_relationship'
         household_params[:members][3][:relationship_with_primary] = 'child'
-        household_params[:members][4][:relationship_with_primary] = 'child'
+        household_params[:members][4][:relationship_with_primary] = 'other_relationship'
 
         @result = ::Operations::BenchmarkProducts::IdentifySlcsapd.new.call(
           { family: family, benchmark_product_model: @benchmark_product_model, household_params: household_params }
