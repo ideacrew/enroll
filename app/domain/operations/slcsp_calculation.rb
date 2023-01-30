@@ -113,7 +113,6 @@ module Operations
       end
 
       @first_effective_date = Date.new(assistance_year, month, 1) if @first_effective_date.blank?
-      puts current_month_data
       {
         rating_address: {
           county: county_name_hack(current_month_data[:residence][:name]),
