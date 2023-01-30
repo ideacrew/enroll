@@ -34,6 +34,7 @@ RSpec.describe Operations::SlcspCalculation, type: :model, dbclean: :after_each 
     {:householdConfirmation => true, :householdCount => 1, :taxYear => start_of_year.year, :state => "ME",
      :members => [{:primaryMember => true,
                    :name => "Mark",
+                   :relationship => "self",
                    :dob => {:month => "1", :day => "1", :year => "1979"},
                    :residences => [{:county => {:zipcode => person_rating_address.zip,
                                                 :name => person_rating_address.county,
@@ -81,6 +82,106 @@ RSpec.describe Operations::SlcspCalculation, type: :model, dbclean: :after_each 
         month_key = Date::MONTHNAMES[i][0..2].downcase.to_sym
         expect(result.value![month_key]).to be > 0
       end
+    end
+  end
+
+  context 'with uber payload' do
+    let!(:uber_payload) do
+      {:householdConfirmation => true, :householdCount => 1, :taxYear => start_of_year.year, :state => "ME",
+       :members => [{:primaryMember => true,
+                     :name => "Mark",
+                     :relationship => "self",
+                     :dob => {:month => "1", :day => "1", :year => "1979"},
+                     :residences => [{:county => {:zipcode => person_rating_address.zip,
+                                                  :name => person_rating_address.county,
+                                                  :fips => "23005",
+                                                  :state => person_rating_address.state},
+                                      :months => {:jan => true,
+                                                  :feb => true,
+                                                  :mar => true,
+                                                  :apr => true,
+                                                  :may => true,
+                                                  :jun => true,
+                                                  :jul => true,
+                                                  :aug => true,
+                                                  :sep => true,
+                                                  :oct => false,
+                                                  :nov => false,
+                                                  :dec => false}},
+                                     {:county => {:zipcode => "04003",
+                                                  :name => "Cumberland",
+                                                  :fips => "23005",
+                                                  :state => "ME"},
+                                      :months => {:jan => false,
+                                                  :feb => false,
+                                                  :mar => false,
+                                                  :apr => false,
+                                                  :may => false,
+                                                  :jun => false,
+                                                  :jul => false,
+                                                  :aug => false,
+                                                  :sep => false,
+                                                  :oct => true,
+                                                  :nov => true,
+                                                  :dec => true}}],
+                     :coverage => {:jan => true,
+                                   :feb => true,
+                                   :mar => true,
+                                   :apr => true,
+                                   :may => true,
+                                   :jun => true,
+                                   :jul => false,
+                                   :aug => true,
+                                   :sep => true,
+                                   :oct => true,
+                                   :nov => true,
+                                   :dec => true}},
+                    {:primaryMember => false,
+                     :name => "Nella",
+                     :relationship => "spouse",
+                     :dob => {:month => "1", :day => "2", :year => "1980"},
+                     :residences => [{:county => {:zipcode => person_rating_address.zip,
+                                                  :name => person_rating_address.county,
+                                                  :fips => "23005",
+                                                  :state => person_rating_address.state},
+                                      :months => {:jan => true,
+                                                  :feb => true,
+                                                  :mar => true,
+                                                  :apr => true,
+                                                  :may => true,
+                                                  :jun => true,
+                                                  :jul => true,
+                                                  :aug => true,
+                                                  :sep => true,
+                                                  :oct => true,
+                                                  :nov => true,
+                                                  :dec => true}}],
+                     :coverage => {:jan => false,
+                                   :feb => false,
+                                   :mar => false,
+                                   :apr => false,
+                                   :may => false,
+                                   :jun => false,
+                                   :jul => false,
+                                   :aug => true,
+                                   :sep => true,
+                                   :oct => true,
+                                   :nov => true,
+                                   :dec => true}}]}
+
+    end
+
+    it 'should return a success' do
+      result = subject.call(uber_payload)
+      expect(result.success?).to be_truthy
+    end
+
+    it 'should not be zero' do
+      result = subject.call(uber_payload)
+      expect(result.value![:jan]).to eq(590)
+      expect(result.value![:jul]).to be_nil
+      expect(result.value![:aug]).to eq(1180)
+      expect(result.value![:oct]).to eq(1180)
     end
   end
 end
