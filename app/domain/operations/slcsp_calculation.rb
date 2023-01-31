@@ -53,7 +53,7 @@ module Operations
         else
           recalculate = true
           # something changed we need to recalculate
-          if prev_month_data[:residence] != current_month_data[:residence] && !last_full_result.nil? && !current_month_data[:members].blank?
+          if prev_month_data[:residence] != current_month_data[:residence] && !last_full_result.nil? && !current_month_data[:members].blank? && !current_month_data[:primary_absent]
             @logger.info "SLCSP ------------------------- residence changed"
             # figure it out if we are on a different rating area
             seeker = calculate_month(current_month_data, params[:taxYear], i, month_key).value!
