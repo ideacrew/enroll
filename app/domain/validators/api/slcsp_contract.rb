@@ -63,9 +63,10 @@ module Validators
           values[:members].each_with_index do |member, member_index|
             member[:residences].each_with_index do |residence, residence_index|
               next if residence[:absent]
+              next if valid_county?(residence[:county])
               key(
                 [:member, member_index, :residences, residence_index, :county]
-              ).failure(text: 'please provide valid county information') unless valid_county?(residence[:county])
+              ).failure(text: 'please provide valid county information')
             end
           end
         end
