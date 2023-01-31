@@ -18,11 +18,12 @@ module Validators
             required(:year).filled(:integer)
           end
           required(:residences).array(:hash) do
-            required(:county).hash do
-              required(:zipcode).filled(:string)
-              required(:name).filled(:string)
-              required(:fips).filled(:string)
-              required(:state).filled(:string)
+            optional(:absent).value(:bool)
+            optional(:county).hash do
+              optional(:zipcode).value(:string)
+              optional(:name).value(:string)
+              optional(:fips).value(:string)
+              optional(:state).value(:string)
             end
             required(:months).hash do
               required(:jan).filled(:bool)
@@ -39,6 +40,7 @@ module Validators
               required(:dec).filled(:bool)
             end
           end
+
           required(:coverage).hash do
             required(:jan).filled(:bool)
             required(:feb).filled(:bool)
@@ -55,6 +57,25 @@ module Validators
           end
         end
       end
+
+      rule(:residences) do
+        if values[:members].present?
+          values[:members].each_with_index do |member, member_index|
+            member[:residences].each_with_index do |residence, residence_index|
+              next if residence[:absent]
+              next if valid_county?(residence[:county])
+              key(
+                [:member, member_index, :residences, residence_index, :county]
+              ).failure(text: 'please provide valid county information')
+            end
+          end
+        end
+      end
+
+      def valid_county?(county)
+        county.present? && county.is_a?(Hash) && county[:name].present? && county[:state].present? && county[:zipcode].present?
+      end
+
     end
   end
 end

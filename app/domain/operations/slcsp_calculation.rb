@@ -77,6 +77,7 @@ module Operations
             current = last_full_result[:household_group_benchmark_ehb_premium]
           else
             current = nil
+            current = "Lived on another country or was deceased" if current_month_data[:primary_absent]
           end
         end
 
@@ -133,9 +134,11 @@ module Operations
       result = {}
       (1..12).each do |i|
         month_key = Date::MONTHNAMES[i][0..2].downcase.to_sym
+        primary_residence = resolve_residence(primary_member, month_key)
         result[month_key] = {
           members: resolve_cohabitants(members, month_key),
-          residence: resolve_residence(primary_member, month_key)
+          residence: primary_residence&.dig(:county),
+          primary_absent: primary_residence&.dig(:absent)
         }
       end
       result
@@ -143,8 +146,9 @@ module Operations
 
     def resolve_residence(residences, month_key)
       residences.each do |residence|
-        return residence[:county] if residence[:months][month_key]
+        return residence if residence[:months][month_key]
       end
+      nil
     end
 
     def resolve_cohabitants(members, month_key)
