@@ -344,7 +344,7 @@ module Operations
             magi_medicaid_monthly_income_limit: member.magi_medicaid_monthly_income_limit&.to_hash,
             magi_as_percentage_of_fpl: member.magi_as_percentage_of_fpl,
             magi_medicaid_category: member.magi_medicaid_category,
-            csr: member.csr_percent_as_integer
+            csr: member.csr_eligibility_kind.split('_').last
           }
         end
 
