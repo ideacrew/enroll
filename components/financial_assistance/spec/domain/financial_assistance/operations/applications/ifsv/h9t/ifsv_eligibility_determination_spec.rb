@@ -140,6 +140,17 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
             end
           end
 
+          context 'without aptc used' do
+            let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members,family: family, enrollment_members: family.family_members) }
+
+            it 'returns outstanding' do
+              @applicant.reload
+              income_evidence = @applicant.income_evidence
+              expect(income_evidence.outstanding?).to be_truthy
+              expect(income_evidence.verification_outstanding).to be_truthy
+            end
+          end
+
           context 'with csr used' do
             let!(:applicant) do
               FactoryBot.create(:financial_assistance_applicant,
