@@ -77,7 +77,7 @@ module Operations
             current = last_full_result[:household_group_benchmark_ehb_premium]
           else
             current = nil
-            current = "Lived on another country or was deceased" if current_month_data[:primary_absent]
+            current = "Lived in another country or was deceased" if current_month_data[:primary_absent]
           end
         end
 

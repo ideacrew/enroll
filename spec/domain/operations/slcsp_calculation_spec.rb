@@ -196,7 +196,7 @@ RSpec.describe Operations::SlcspCalculation, type: :model, dbclean: :after_each 
 
     it 'should not be zero' do
       result = subject.call(uber_payload)
-      expect(result.value![:jan]).to eq("Lived on another country or was deceased")
+      expect(result.value![:jan]).to eq("Lived in another country or was deceased")
       expect(result.value![:jul]).to be_nil
       expect(result.value![:aug]).to eq(1180)
       expect(result.value![:oct]).to be_nil
