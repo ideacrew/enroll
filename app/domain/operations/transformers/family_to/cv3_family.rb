@@ -344,7 +344,7 @@ module Operations
             magi_medicaid_monthly_income_limit: member.magi_medicaid_monthly_income_limit&.to_hash,
             magi_as_percentage_of_fpl: member.magi_as_percentage_of_fpl,
             magi_medicaid_category: member.magi_medicaid_category,
-            csr: member.csr_percent_as_integer
+            csr: member.csr_eligibility_kind.split('_').last
           }
         end
 
@@ -383,3 +383,23 @@ module Operations
     end
   end
 end
+
+hbxs = [1002778,1006113,1008426,1009637,1009945,1011200,1011623,1011747,1017151,1022244,1022400,1022854,1023864,1025017,1025217,1028082]
+
+
+hbxs.each do |hbx|
+  family = Person.where(hbx_id: hbx).first.primary_family
+  family.households.each do |household|
+    household.tax_households.each do |th|
+      th.tax_household_members.each do |thm|
+       puts thm.csr_eligibility_kind.gsub('csr_', '')
+      end
+    end
+  end
+end
+
+
+
+
+
+#foo[:households].map { |h| h[:tax_households].map{ |th| th[:tax_household_members].map{ |thm| thm[:product_eligibility_determination][:csr] } } }
