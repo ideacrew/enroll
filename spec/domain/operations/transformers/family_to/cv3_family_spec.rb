@@ -185,6 +185,17 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
       result = AcaEntities::Households::TaxHouseholdGroup.new(contract_result.to_h)
       expect(result).to be_a AcaEntities::Households::TaxHouseholdGroup
     end
+
+    context 'member has csr kind value of csr_limited' do
+      before do
+        member = family.tax_household_groups.first.tax_households.first.tax_household_members.first
+        member.update(csr_eligibility_kind: 'csr_limited')
+      end
+
+      it 'should remove csr prefix in the hash' do
+        expect(subject.first[:tax_households].first[:tax_household_members].first[:product_eligibility_determination][:csr]).to eq 'limited'
+      end
+    end
   end
 
   describe '#fetch_slcsp_benchmark_premium_for_member' do
