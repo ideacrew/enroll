@@ -56,7 +56,9 @@ module Operations
           if prev_month_data[:residence] != current_month_data[:residence] && !last_full_result.nil? && !current_month_data[:members].blank? && !current_month_data[:primary_absent]
             @logger.info "SLCSP ------------------------- residence changed"
             # figure it out if we are on a different rating area
-            seeker = calculate_month(current_month_data, params[:taxYear], i, month_key).value!
+            seeker = {}
+            seeker_call = calculate_month(current_month_data, params[:taxYear], i, month_key)
+            seeker = seeker_call.value! if seeker_call.success?
             if last_full_result[:rating_area_id] != seeker[:rating_area_id] && last_full_result[:service_area_ids] != seeker[:service_area_ids]
               # If the change is only to rating area, there's no change in SLCSP. If it's a change in rating + service area (meaning a different SLCSP)
               # then effective date of the new SLCSP is the month of the change.
