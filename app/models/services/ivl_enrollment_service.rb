@@ -23,7 +23,7 @@ module Services
         :kind.in => ['individual', 'coverall'],
         :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending']
       )
-      individual_market_enrollments.each do |enrollment|
+      individual_market_enrollments.no_timeout.each do |enrollment|
         enrollment.expire_coverage! if enrollment.may_expire_coverage?
         @logger.info "Processed enrollment: #{enrollment.hbx_id}"
       rescue Exception => e
