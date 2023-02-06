@@ -31,6 +31,9 @@ class TaxHouseholdEnrollment
 
   embeds_many :tax_household_members_enrollment_members, class_name: "::TaxHouseholdMemberEnrollmentMember", cascade_callbacks: true
 
+  index({"enrollment_id" => 1})
+  index({"tax_household_id" => 1})
+
   def enrollment
     HbxEnrollment.find(enrollment_id)
   end

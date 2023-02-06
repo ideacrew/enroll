@@ -13,9 +13,10 @@ module Operations
         valid_params = yield validate(params)
         agency_account = yield find_broker_agency_account(valid_params)
         family = yield find_family(valid_params)
-        result = yield terminate_broker_agency(agency_account, valid_params)
-        notify_broker_terminated_event_to_edi(valid_params, family)
-        Success(result)
+        broker_role = agency_account.writing_agent
+        _result = yield terminate_broker_agency(agency_account, valid_params)
+        notify_edi = yield notify_broker_terminated_event_to_edi(valid_params, family, broker_role)
+        Success(notify_edi)
       end
 
       private
@@ -38,11 +39,12 @@ module Operations
         ::Operations::Families::Find.new.call(id: valid_params[:family_id])
       end
 
-      def notify_broker_terminated_event_to_edi(valid_params, family)
-        return Success("") unless valid_params[:notify_edi]
-        return Success("") unless broker_role&.npn&.scan(/\D/)&.empty?
+      def notify_broker_terminated_event_to_edi(valid_params, family, broker_role)
+        return Success("Not notifying EDI") if valid_params[:notify_edi] == false
+        return Success("Not notifying EDI because broker is an assistor") unless broker_role&.npn&.scan(/\D/)&.empty?
 
         family.notify_broker_update_on_impacted_enrollments_to_edi({family_id: family.id.to_s})
+        Success(true)
       end
     end
   end

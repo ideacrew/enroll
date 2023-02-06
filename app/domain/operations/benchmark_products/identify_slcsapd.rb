@@ -43,7 +43,7 @@ module Operations
         service_area_ids = params[:benchmark_product_model].service_area_ids
         @effective_date = params[:benchmark_product_model].effective_date
         members = params[:household_params][:members]
-        @child_members = members.select { |member| member[:relationship_with_primary] == 'child' && member[:age_on_effective_date] < 21 }
+        @child_members = members.select { |member| member[:age_on_effective_date] < 21 }
 
         query = {
           :service_area_id.in => service_area_ids,

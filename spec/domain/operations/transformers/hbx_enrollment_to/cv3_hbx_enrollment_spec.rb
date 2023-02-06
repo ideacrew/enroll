@@ -13,6 +13,7 @@ RSpec.describe ::Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment, db
     product
   end
 
+  let(:submitted_at) { 2.months.ago }
   let!(:enrollment) do
     FactoryBot.create(:hbx_enrollment,
                       :individual_unassisted,
@@ -21,31 +22,35 @@ RSpec.describe ::Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment, db
                       family: family,
                       product_id: enr_product.id,
                       rating_area_id: rating_area.id,
+                      enrollment_kind: enrollment_kind,
                       coverage_kind: 'dental',
+                      submitted_at: submitted_at,
                       consumer_role_id: family.primary_person.consumer_role.id,
                       enrollment_members: family.family_members)
   end
 
+  let(:enrollment_kind) { 'open_enrollment' }
   let!(:enrollment_member) do
     FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id,
                                               eligibility_date: (TimeKeeper.date_of_record - 2.months), hbx_enrollment: enrollment,
                                               coverage_end_on: TimeKeeper.date_of_record.end_of_month)
   end
 
+  context 'slcsp' do
+    before do
+      transformed_payload = subject.call(enrollment).success
+      @validated_payload = AcaEntities::Contracts::Enrollments::HbxEnrollmentContract.new.call(transformed_payload).to_h
+    end
 
-  before do
-    transformed_payload = subject.call(enrollment).success
-    @validated_payload = AcaEntities::Contracts::Enrollments::HbxEnrollmentContract.new.call(transformed_payload).to_h
-  end
-
-  it 'returns with :slcsp_member_premium, :family_rated_premiums & :pediatric_dental_ehb' do
-    expect(@validated_payload[:hbx_id]).to eq(enrollment.hbx_id.to_s)
-    expect(@validated_payload[:terminated_on]).to eq(enrollment.terminated_on)
-    expect(@validated_payload[:hbx_enrollment_members].first[:slcsp_member_premium]).not_to be_empty
-    expect(@validated_payload[:hbx_enrollment_members].first[:coverage_end_on]).to eq enrollment_member.coverage_end_on
-    expect(@validated_payload[:product_reference][:family_rated_premiums]).not_to be_empty
-    expect(@validated_payload[:product_reference][:pediatric_dental_ehb]).not_to be_nil
-    expect(@validated_payload[:product_reference][:metal_level]).to eq(enr_product.metal_level_kind.to_s)
+    it 'returns with :slcsp_member_premium, :family_rated_premiums & :pediatric_dental_ehb' do
+      expect(@validated_payload[:hbx_id]).to eq(enrollment.hbx_id.to_s)
+      expect(@validated_payload[:terminated_on]).to eq(enrollment.terminated_on)
+      expect(@validated_payload[:hbx_enrollment_members].first[:slcsp_member_premium]).not_to be_empty
+      expect(@validated_payload[:hbx_enrollment_members].first[:coverage_end_on]).to eq enrollment_member.coverage_end_on
+      expect(@validated_payload[:product_reference][:family_rated_premiums]).not_to be_empty
+      expect(@validated_payload[:product_reference][:pediatric_dental_ehb]).not_to be_nil
+      expect(@validated_payload[:product_reference][:metal_level]).to eq(enr_product.metal_level_kind.to_s)
+    end
   end
 
   context 'for tobacco use' do
@@ -87,5 +92,37 @@ RSpec.describe ::Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment, db
       expect(@validated_payload[:product_reference][:metal_level]).to eq(enr_product.metal_level_kind.to_s)
     end
   end
-end
 
+  context 'when special_enrollment_period is not present for a special enrollment' do
+    let(:enrollment_kind) { 'special_enrollment' }
+
+    let(:submitted_at) { TimeKeeper.date_of_record }
+    let(:start_on) { submitted_at.prev_day }
+    let(:special_enrollment_period) do
+      build(
+        :special_enrollment_period,
+        family: family,
+        qualifying_life_event_kind_id: qle.id,
+        market_kind: "ivl",
+        start_on: start_on,
+        end_on: start_on.next_month
+      )
+    end
+
+    let!(:add_special_enrollment_period) do
+      family.special_enrollment_periods = [special_enrollment_period]
+      family.save
+    end
+    let!(:qle)  { FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual") }
+
+    before do
+      transformed_payload = subject.call(enrollment.reload).success
+      @validated_payload = AcaEntities::Contracts::Enrollments::HbxEnrollmentContract.new.call(transformed_payload).to_h
+    end
+
+    it 'should return special enrollment period reference along with other attributes' do
+      expect(@validated_payload[:special_enrollment_period_reference][:qualifying_life_event_kind_reference][:title]).to eq(qle.title)
+      expect(@validated_payload[:special_enrollment_period_reference][:start_on]).to eq(special_enrollment_period.start_on)
+    end
+  end
+end
