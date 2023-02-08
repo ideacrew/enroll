@@ -426,7 +426,7 @@ registry:
           - key: :plan_shopping
             item: false
           - key: :enrollment_tile
-            item: false
+            item: <%= ENV['KAISER_PERMANENTE_PAY_NOW_ENROLLMENT_TILE_IS_ENABLED'] || false %>
           - key: :carriers_long_name
             item: 'Kaiser Permanente'
           - key: :connect_test
