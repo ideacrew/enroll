@@ -486,17 +486,17 @@ registry:
             item: 'MetLife'
           - key: :connect_test
             item: false
-      - key: :carefirst_pay_now
-        is_enabled: false
+- key: :carefirst_pay_now
+        is_enabled: <%= ENV['CAREFIRST_PAY_NOW_IS_ENABLED'] || false %>
         settings:
           - key: :plan_shopping
-            item: false
+            item: <%= ENV['CAREFIRST_PAY_NOW_PLAN_SHOPPING_IS_ENABLED'] || false %>
           - key: :enrollment_tile
-            item: false
+            item: <%= ENV['CAREFIRST_PAY_NOW_ENROLLMENT_TILE_IS_ENABLED'] || false %>
           - key: :carriers_long_name
             item: 'CareFirst'
           - key: :connect_test
-            item: false
+            item: <%= ENV['CAREFIRST_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
       - key: :aetna_pay_now
         is_enabled: false
         settings:
