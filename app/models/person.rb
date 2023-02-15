@@ -71,7 +71,7 @@ class Person
   NON_SHOP_ROLES = ['Individual','Coverall']
 
   IVL_ELIGIBILITY_EXCLUDED_CHAINS = [
-    "verification_types",
+    # "verification_types",
     "employee_roles",
     "employer_staff_roles",
     "general_agency_staff_roles",

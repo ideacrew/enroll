@@ -52,6 +52,10 @@ class AuditRecordReader
         "Residency Exemption Reason",
         "Is applying for coverage",
         "Resident Role",
+        "Citizenship Status Verified",
+        "Immigration Status Verified",
+        "SSN Verified",
+        "Income Verified",
         "Eligible",
         "Denial Reasons"
       ]

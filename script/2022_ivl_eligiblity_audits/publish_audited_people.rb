@@ -8,7 +8,7 @@ STDERR.puts "TESTING STANDARD ERROR REDIRECTION"
 STDERR.flush
 
 RECORDS_AT_ISSUE = [
-  # "5d08fd82cc35a8797f00008b"
+  "5d08fd82cc35a8797f00008b"
 ]
 
 RECORDS_AT_ISSUE.each do |rec_no|
@@ -61,15 +61,17 @@ class AuditPeoplePublisher
     channel.confirm_select
     person_ids.in_groups_of(100, false) do |group|
       group.each do |person_id|
-        d_ex.publish(
-          "",
-          {
-            :routing_key => audit_queue_name,
-            :headers => {
-              :person_id => person_id.to_s
+        if !RECORDS_AT_ISSUE.include?(person_id.to_s)
+          d_ex.publish(
+            "",
+            {
+              :routing_key => audit_queue_name,
+              :headers => {
+                :person_id => person_id.to_s
+              }
             }
-          }
-        )
+          )
+        end
       end
       channel.wait_for_confirms
     end

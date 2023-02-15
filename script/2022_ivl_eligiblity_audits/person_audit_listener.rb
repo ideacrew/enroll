@@ -161,6 +161,14 @@ class PersonAuditListener
     nil
   end
 
+  def latest_verification_type_value_for(pers, v_type)
+    vts = pers.verification_types.sort_by(&:updated_at)
+    selected_vts = vts.select do |vt|
+      vt.type_name == v_type
+    end
+    selected_vts.last
+  end
+
   def execute_audit(person_id, chan, delivery_info)
     health_benefit_packages = @benefit_packages
     passive_r_date = PASSIVE_RENEWAL_DATE
@@ -211,6 +219,10 @@ class PersonAuditListener
                         no_dc_address_reason_for(pers),
                         cr.is_applying_coverage,
                         pers.resident_role.present?,
+                        latest_verification_type_value_for(pers, "Citizenship"), # Citizenship Status
+                        latest_verification_type_value_for(pers, "Immigration status"), # Immigration Status
+                        latest_verification_type_value_for(pers, "Social Security Number"), # Social Security Status 
+                        "Unknown",  # Income Verification
                         eligible,
                         eligible ? "" : eligibility_errors
                     ])
