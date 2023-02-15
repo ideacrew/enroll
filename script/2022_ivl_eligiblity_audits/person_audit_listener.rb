@@ -166,7 +166,9 @@ class PersonAuditListener
     selected_vts = vts.select do |vt|
       vt.type_name == v_type
     end
-    selected_vts.last
+    last_verification = selected_vts.last
+    return nil unless last_verification
+    last_verification.validation_status
   end
 
   def execute_audit(person_id, chan, delivery_info)
