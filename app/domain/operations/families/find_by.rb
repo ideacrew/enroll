@@ -12,11 +12,11 @@ module Operations
 
       # params = { { person_hbx_id: 10239, year: 2022 } }
       def call(params)
-        person     = yield find_person(params[:person_hbx_id])
+        person     = yield find_person(params[:response][:person_hbx_id])
         family     = yield find_primary_family(person)
         cv3_family = yield transform_family(family)
         payload    = yield validate_payload(cv3_family, person)
-        event      = yield build_event(payload, params[:year])
+        event      = yield build_event(payload, params)
         result     = yield publish(event)
 
         Success(result)
@@ -24,8 +24,11 @@ module Operations
 
       private
 
-      def build_event(payload, year)
-        event('events.families.found_by', attributes: { payload: payload.to_h, year: year })
+      def build_event(payload, params)
+        event('events.families.found_by', attributes: {
+                family: payload.to_h,
+                primary_person_hbx_id: params[:response][:person_hbx_id]
+              }, headers: { correlation_id: params[:correlation_id] })
       end
 
       def find_person(person_hbx_id)
