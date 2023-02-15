@@ -6,14 +6,15 @@ module Subscribers
     class FindByRequestedSubscriber
       include ::EventSource::Subscriber[amqp: 'edi_gateway.families']
 
-      subscribe(:on_find_by_requested) do |delivery_info, _properties, response|
+      subscribe(:on_find_by_requested) do |delivery_info, properties, response|
         logger.info "on_find_by_requested response: #{response}"
         subscriber_logger = subscriber_logger_for(:on_families_find_by_requested)
+        correlation_id = properties.correlation_id
         response = JSON.parse(response, symbolize_names: true)
         logger.info "on_find_by_requested response: #{response}"
         subscriber_logger.info "on_find_by_requested response: #{response}"
 
-        process_find_by_requested_event(subscriber_logger, response) unless Rails.env.test?
+        process_find_by_requested_event(subscriber_logger, correlation_id, response) unless Rails.env.test?
 
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e
@@ -31,9 +32,9 @@ module Subscribers
         end
       end
 
-      def process_find_by_requested_event(subscriber_logger, response)
+      def process_find_by_requested_event(subscriber_logger, correlation_id, response)
         subscriber_logger.info "process_find_by_requested_event: ------- start"
-        result = ::Operations::Families::FindBy.new.call(response)
+        result = ::Operations::Families::FindBy.new.call({correlation_id: correlation_id, response: response})
 
         if result.success?
           message = result.success
