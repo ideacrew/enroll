@@ -1204,6 +1204,50 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
   end
 
+  context 'mitc_income with prior year assistance year' do
+    let!(:job_income) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'yearly',
+                                                amount: 30_000.00,
+                                                start_on: (TimeKeeper.date_of_record - 1.year).beginning_of_year,
+                                                employer_name: 'Testing employer' })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    before :each do
+      application.update_attributes!(assistance_year: application.assistance_year - 1)
+      result = subject.call(application.reload)
+      @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+      @mitc_income = result.success[:applicants].first[:mitc_income]
+    end
+    it "should return income of 30_000" do
+      expect(@mitc_income[:amount]).to eql(30_000)
+    end
+  end
+
+  context 'mitc_income with future year assistance year' do
+    let!(:job_income) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'yearly',
+                                                amount: 30_000.00,
+                                                start_on: TimeKeeper.date_of_record,
+                                                employer_name: 'Testing employer' })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    before :each do
+      application.update_attributes!(assistance_year: application.assistance_year + 1)
+      result = subject.call(application.reload)
+      @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+      @mitc_income = result.success[:applicants].first[:mitc_income]
+    end
+    it "should return income of 30_000" do
+      expect(@mitc_income[:amount]).to eql(30_000)
+    end
+  end
+
   context 'for has_daily_living_help' do
     let!(:has_daily_living_help) do
       applicant.update_attributes!({ has_daily_living_help: true,
