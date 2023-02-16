@@ -902,6 +902,7 @@ module FinancialAssistance
               end
             end
 
+            # Incomes will be selected matching Mitc needs.
             def eligible_incomes_for_mitc(applicant)
               assistance_year = applicant.application.assistance_year
               applicant.incomes.select do |inc|
