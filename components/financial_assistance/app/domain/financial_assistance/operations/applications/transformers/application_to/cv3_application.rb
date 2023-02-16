@@ -890,24 +890,25 @@ module FinancialAssistance
             end
 
             # Eligible month for selecting matching incomes
-            def month_date_range(assistance_year)
+            def month_date_range(assistance_year, income_start_on)
               system_date = TimeKeeper.date_of_record
               if assistance_year > system_date.year
                 start_of_year = Date.new(assistance_year).beginning_of_year
                 start_of_year..start_of_year.end_of_month
-              else
+              elsif assistance_year == system_date.year
                 system_date.beginning_of_month..system_date.end_of_month
+              else
+                income_start_on..income_start_on.end_of_month
               end
             end
 
-            # Incomes will be selected matching Mitc needs.
             def eligible_incomes_for_mitc(applicant)
               assistance_year = applicant.application.assistance_year
               applicant.incomes.select do |inc|
                 next inc unless assistance_year
                 end_on = inc.end_on || Date.new(assistance_year).end_of_year
                 income_date_range = (inc.start_on)..end_on
-                date_ranges_overlap?(income_date_range, month_date_range(assistance_year))
+                date_ranges_overlap?(income_date_range, month_date_range(assistance_year, inc.start_on))
               end
             end
 
