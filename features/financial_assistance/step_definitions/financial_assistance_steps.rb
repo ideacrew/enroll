@@ -448,6 +448,11 @@ Given(/^the kaiser paynow feature configuration is disabled$/) do
   disable_feature :kaiser_pay_now
 end
 
+When(/kaiser pay now feature is enabled/) do
+  EnrollRegistry[:kaiser_pay_now].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry[:kaiser_pay_now].setting(:plan_shopping).stub(:item).and_return(true)
+end
+
 Given(/^the enrollment tile feature is enabled$/) do
   skip_this_scenario unless EnrollRegistry[:kaiser_pay_now].setting(:enrollment_tile).item || EnrollRegistry[:anthem_blue_cross_and_blue_shield_pay_now].setting(:enrollment_tile).item
 end

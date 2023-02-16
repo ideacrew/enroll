@@ -414,16 +414,16 @@ registry:
       - :pay_now_feature
     features:
       - key: :kaiser_pay_now
-        is_enabled: true
+        is_enabled: <%= ENV['KAISER_PERMANENTE_PAY_NOW_IS_ENABLED'] || false %>
         settings:
           - key: :plan_shopping
-            item: true
+            item: <%= ENV['KAISER_PERMANENTE_PAY_NOW_PLAN_SHOPPING_IS_ENABLED'] || false %>
           - key: :enrollment_tile
             item: <%= ENV['KAISER_PERMANENTE_PAY_NOW_ENROLLMENT_TILE_IS_ENABLED'] || false %>
           - key: :carriers_long_name
             item: 'Kaiser Permanente'
           - key: :connect_test
-            item: true
+            item: <%= ENV['KAISER_PERMANENTE_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
       - key: :delta_dental_pay_now
         is_enabled: false
         settings:
@@ -480,16 +480,16 @@ registry:
           - key: :connect_test
             item: false
       - key: :carefirst_pay_now
-        is_enabled: false
+        is_enabled: <%= ENV['CAREFIRST_PAY_NOW_IS_ENABLED'] || false %>
         settings:
           - key: :plan_shopping
-            item: false
+            item: <%= ENV['CAREFIRST_PAY_NOW_PLAN_SHOPPING_IS_ENABLED'] || false %>
           - key: :enrollment_tile
-            item: false
+            item: <%= ENV['CAREFIRST_PAY_NOW_ENROLLMENT_TILE_IS_ENABLED'] || false %>
           - key: :carriers_long_name
             item: 'CareFirst'
           - key: :connect_test
-            item: false
+            item: <%= ENV['CAREFIRST_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
       - key: :aetna_pay_now
         is_enabled: false
         settings:
