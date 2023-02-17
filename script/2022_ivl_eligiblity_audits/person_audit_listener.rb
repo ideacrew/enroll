@@ -171,6 +171,26 @@ class PersonAuditListener
     last_verification.validation_status
   end
 
+  def latest_person_income_verification(pers, family, version_time)
+    family_member = family.family_members.detect do |fm|
+      fm.person_id == pers.id
+    end
+    return nil unless family_member
+    determined_applications = FinancialAssistance::Application.where(family_id: family.id).determined
+    existing_applications = determined_applications.select do |da|
+      da.created_at <= version_time
+    end
+    last_application = existing_applications.sort_by(&:created_at).last
+    return nil unless last_application
+    applicant = last_application.applicants.detect do |appl|
+      appl.family_member_id == family_member.id
+    end
+    return nil unless applicant
+    income_evidence = applicant.income_evidence
+    return nil unless income_evidence
+    income_evidence.aasm_state
+  end
+
   def execute_audit(person_id, chan, delivery_info)
     health_benefit_packages = @benefit_packages
     passive_r_date = PASSIVE_RENEWAL_DATE
@@ -224,7 +244,7 @@ class PersonAuditListener
                         latest_verification_type_value_for(pers, "Citizenship"), # Citizenship Status
                         latest_verification_type_value_for(pers, "Immigration status"), # Immigration Status
                         latest_verification_type_value_for(pers, "Social Security Number"), # Social Security Status 
-                        "Unknown",  # Income Verification
+                        latest_person_income_verification(pers, fam, person_updated_at), # Income Verification
                         eligible,
                         eligible ? "" : eligibility_errors
                     ])
