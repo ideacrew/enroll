@@ -163,7 +163,13 @@ class PersonAuditListener
 
   def latest_verification_type_value_for(pers, v_type)
     vts = pers.verification_types.sort_by do |vt|
-      vt.updated_at || vt.created_at
+      if vt.updated_at
+        vt.updated_at
+      elsif vt.created_at
+        vt.created_at
+      else
+        vt.id.generation_time
+      end
     end
     selected_vts = vts.select do |vt|
       vt.type_name == v_type
