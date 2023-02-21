@@ -29,7 +29,10 @@ module Operations
             errors = []
             errors << 'assistance_year required' unless params[:assistance_year]
             errors << 'report_types required' unless params[:report_types]
-            errors << 'invalid report_types' if params[:report_types] && (params[:report_types] - REPORT_TYPES).any?
+            if params[:report_types] &&
+               (params[:report_types] - REPORT_TYPES).any?
+              errors << 'invalid report_types'
+            end
 
             return Failure(errors) if errors.present?
             Success(params)
@@ -38,7 +41,7 @@ module Operations
           def build_event(values)
             event =
               event(
-                'events.h41.transmissions.create_requested',
+                'events.h41_1095as.transmission_requested',
                 attributes: {
                   excluded_policies: values[:excluded_policies]
                 },

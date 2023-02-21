@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe ::Operations::Fdsh::H41::Transmissions::Create do
+RSpec.describe ::Operations::Fdsh::H411095as::Transmissions::Create do
   send(:include, Dry::Monads[:result, :do, :try])
   subject { described_class.new }
 
