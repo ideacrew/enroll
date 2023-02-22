@@ -420,8 +420,6 @@ registry:
   - namespace:
       - :pay_now_feature
     features:
-      - key: :generic_redirect
-        is_enabled: <%= ENV['GENERIC_REDIRECT_IS_ENABLED'] || false %>
       - key: :kaiser_pay_now
         is_enabled: <%= ENV['KAISER_PERMANENTE_PAY_NOW_IS_ENABLED'] || false %>
         settings:
@@ -433,6 +431,8 @@ registry:
             item: 'Kaiser Permanente'
           - key: :connect_test
             item: <%= ENV['KAISER_PERMANENTE_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
+          - key: :generic_redirect
+            item: <%= ENV['KAISER_PERMANENTE_PAY_NOW_GENERIC_REDIRECT_IS_ENABLED'] || false %>
       - key: :delta_dental_pay_now
         is_enabled: false
         settings:
@@ -444,6 +444,8 @@ registry:
             item: 'Delta Dental'
           - key: :connect_test
             item: false
+          - key: :generic_redirect
+            item: <%= ENV['DELTA_DENTAL_PAY_NOW_GENERIC_REDIRECT_IS_ENABLED'] || false %>
       - key: :dentegra_pay_now
         is_enabled: false
         settings:
@@ -455,6 +457,8 @@ registry:
             item: 'Dentegra'
           - key: :connect_test
             item: false
+          - key: :generic_redirect
+            item: <%= ENV['DENTEGRA_PAY_NOW_GENERIC_REDIRECT_IS_ENABLED'] || false %>
       - key: :dominion_national_pay_now
         is_enabled: false
         settings:
@@ -466,6 +470,8 @@ registry:
             item: 'Dominion National'
           - key: :connect_test
             item: false
+          - key: :generic_redirect
+            item: <%= ENV['DOMINION_NATIONAL_PAY_NOW_GENERIC_REDIRECT_IS_ENABLED'] || false %>
       - key: :best_life_pay_now
         is_enabled: false
         settings:
@@ -477,6 +483,8 @@ registry:
             item: 'BEST Life'
           - key: :connect_test
             item: false
+          - key: :generic_redirect
+            item: <%= ENV['BEST_LIFE_PAY_NOW_GENERIC_REDIRECT_IS_ENABLED'] || false %>
       - key: :metlife_pay_now
         is_enabled: false
         settings:
@@ -488,6 +496,8 @@ registry:
             item: 'MetLife'
           - key: :connect_test
             item: false
+          - key: :generic_redirect
+            item: <%= ENV['METLIFE_PAY_NOW_GENERIC_REDIRECT_IS_ENABLED'] || false %>
       - key: :carefirst_pay_now
         is_enabled: <%= ENV['CAREFIRST_PAY_NOW_IS_ENABLED'] || false %>
         settings:
@@ -499,6 +509,8 @@ registry:
             item: 'CareFirst'
           - key: :connect_test
             item: <%= ENV['CAREFIRST_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
+          - key: :generic_redirect
+            item: <%= ENV['CAREFIRST_PAY_NOW_GENERIC_REDIRECT_IS_ENABLED'] || false %>
       - key: :aetna_pay_now
         is_enabled: false
         settings:
@@ -510,6 +522,8 @@ registry:
             item: 'Aetna'
           - key: :connect_test
             item: false
+          - key: :generic_redirect
+            item: <%= ENV['AETNA_PAY_NOW_GENERIC_REDIRECT_IS_ENABLED'] || false %>
       - key: :unitedhealthcare_pay_now
         is_enabled: false
         settings:
@@ -521,6 +535,8 @@ registry:
             item: 'UnitedHealthcare'
           - key: :connect_test
             item: false
+          - key: :generic_redirect
+            item: <%= ENV['UNITEDHEALTHCARE_PAY_NOW_GENERIC_REDIRECT_IS_ENABLED'] || false %>
       - key: :northeast_delta_dental_pay_now
         is_enabled: true
         settings:
@@ -532,6 +548,8 @@ registry:
             item: 'Northeast Delta Dental'
           - key: :connect_test
             item: false
+          - key: :generic_redirect
+            item: <%= ENV['NORTHEAST_DELTA_DENTAL_PAY_NOW_GENERIC_REDIRECT_IS_ENABLED'] || false %>
       - key: :anthem_blue_cross_and_blue_shield_pay_now
         is_enabled: true
         settings:
@@ -543,6 +561,8 @@ registry:
             item: 'Anthem Blue Cross and Blue Shield'
           - key: :connect_test
             item: true
+          - key: :generic_redirect
+            item: <%= ENV['ANTHEM_BLUE_CROSS_AND_BLUE_SHIELD_PAY_NOW_GENERIC_REDIRECT_IS_ENABLED'] || false %>
       - key: :harvard_pilgrim_health_care_pay_now
         is_enabled: true
         settings:
@@ -554,6 +574,8 @@ registry:
             item: 'Harvard Pilgrim Health Care'
           - key: :connect_test
             item: true
+          - key: :generic_redirect
+            item: <%= ENV['HARVARD_PILGRIM_HEALTH_CARE_PAY_NOW_GENERIC_REDIRECT_IS_ENABLED'] || false %>
       - key: :community_health_options_pay_now
         is_enabled: true
         settings:
@@ -565,6 +587,8 @@ registry:
             item: 'Community Health Options'
           - key: :connect_test
             item: true
+          - key: :generic_redirect
+            item: <%= ENV['COMMUNITY_HEALTH_OPTIONS_PAY_NOW_GENERIC_REDIRECT_IS_ENABLED'] || false %>
       - key: :taro_health_pay_now
         is_enabled: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_IS_ENABLED'] || false %>
         settings:
@@ -580,6 +604,8 @@ registry:
             item: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_EMBED_XML_IS_ENABLED'] || false %>
           - key: :taro_health_home_page_url
             item: <%= ENV['TARO_HEALTH_HOME_PAGE_URL'] || false %>
+          - key: :generic_redirect
+            item: <%= ENV['TARO_HEALTH_PLAN_OF_MAINE_INC_PAY_NOW_GENERIC_REDIRECT_IS_ENABLED'] || false %>
       - key: :carrier_abbrev_list
         item: ['CHO', 'HPHC', 'ANTHM', 'NEDD', 'TARO']
         is_enabled: true
