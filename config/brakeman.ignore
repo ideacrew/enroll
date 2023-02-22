@@ -926,6 +926,22 @@
       "note": ""
     },
     {
+      "warning_type": "Unmaintained Dependency",
+      "warning_code": 120,
+      "fingerprint": "081f5d87a244b41d3cf1d5994cb792d2cec639cd70e4e306ffe1eb8abf0f32f7",
+      "check_name": "EOLRuby",
+      "message": "Support for Ruby 2.5.9 ended on 2021-03-31",
+      "file": ".ruby-version",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
+      "code": null,
+      "render_path": null,
+      "location": null,
+      "user_input": null,
+      "confidence": "High",
+      "note": ""
+    },
+    {
       "warning_type": "File Access",
       "warning_code": 16,
       "fingerprint": "ef486a2f648e540d2eb04ea78e5c6ba243cbaf21350fdec96467367fb1632736",
