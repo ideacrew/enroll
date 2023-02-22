@@ -7,11 +7,13 @@ module HistoryTrackerToRecord
     "destroy"  => 10
   }
 
+  HISTORY_TRACK_FILTER = (::Person::IVL_ELIGIBILITY_EXCLUDED_CHAINS + ["verification_types"])
+
   def filtered_history_tracks
     self.history_tracks.reject do |ht|
       last_chain_name = ht.association_chain.last["name"]
       ((ht.created_at.to_f - self.created_at.to_f).abs < 1.1) ||
-        ::Person::IVL_ELIGIBILITY_EXCLUDED_CHAINS.include?(last_chain_name)
+        HISTORY_TRACK_FILTER.include?(last_chain_name)
     end
   end
 
