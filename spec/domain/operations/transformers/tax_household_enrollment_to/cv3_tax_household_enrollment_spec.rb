@@ -14,7 +14,7 @@ RSpec.describe Operations::Transformers::TaxHouseholdEnrollmentTo::Cv3TaxHouseho
       max_aptc: 100.00
     )
   end
-  let!(:thhm) { FactoryBot.create(:tax_household_member, applicant_id: family.primary_applicant.id, tax_household: thh) }
+  let!(:thhm) { FactoryBot.create(:tax_household_member, applicant_id: family.primary_applicant.id, tax_household: thh, csr_eligibility_kind: "csr_limited", csr_percent_as_integer: -1) }
   let!(:hbx_enrollment) do
     FactoryBot.create(:hbx_enrollment, :with_silver_health_product,
                       :with_enrollment_members, enrollment_members: family.family_members, family: family)
