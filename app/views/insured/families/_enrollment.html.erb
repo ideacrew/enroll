@@ -113,7 +113,7 @@
           </div>
         </div>
       <% end %>
-      
+
       <div class="col-xs-12 vertically-aligned-row">
         <% if !EnrollRegistry.feature_enabled?(:hide_enrollment_market_type) %>
           <div class="enrollment-type info">
@@ -129,7 +129,7 @@
           </div>
         <% end %>
       </div>
-      
+
       <div class="col-xs-12 vertically-aligned-row">
         <div class="enrollment-type info vertical-align-top">
           <p>
@@ -236,7 +236,8 @@
                       <% if EnrollRegistry.feature_enabled?("#{carrier}_pay_now".to_sym) && EnrollRegistry["#{carrier}_pay_now".to_sym].setting(:enrollment_tile).item %>
                         <% if show_pay_now?("Enrollment Tile", hbx_enrollment) %>
                           <button class="btn-link btn-block" data-toggle="modal" data-target="#payNowModal<%= hbx_enrollment.hbx_id %>" style="padding: 6px 12px; margin: 4px 0; text-align: left;" data-enrollment="<%= hbx_enrollment.hbx_id %>">
-                            <%= render partial:"shared/glossary_hover", locals: {key: "make_a_first_payment", title: "Make a first Payment for my new plan", term: sanitize(l10n("plans.issuer.pay_now.first_payment")) } %>
+                            <% hover_text = past_effective_on?(hbx_enrollment) ? "make_a_first_payment" : "make_a_first_payment_before_effective" %>
+                            <%= render partial:"shared/glossary_hover", locals: {key: "hover_text", title: "Make a first Payment for my new plan", term: sanitize(l10n("plans.issuer.pay_now.first_payment")) } %>
                           </button>
                         <% elsif enable_pay_now(hbx_enrollment) %>
                           <button class="btn-link btn-block" data-toggle="modal" data-target="#payNowModal<%= hbx_enrollment.hbx_id %>" style="padding: 6px 12px; margin: 4px 0; text-align: left;" data-enrollment="<%= hbx_enrollment.hbx_id %>">
