@@ -4,6 +4,7 @@ module BenefitSponsors
   # Class to create employees from csv file upload
   class BulkEmployeesUploadWorker
     include Sidekiq::Worker
+    sidekiq_options retry: false
 
     def perform(file_name, content_type, employer_profile_id, user_email)
       organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(employer_profile_id)).first
