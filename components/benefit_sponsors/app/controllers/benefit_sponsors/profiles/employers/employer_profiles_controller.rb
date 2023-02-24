@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Profiles
     module Employers
@@ -21,7 +23,8 @@ module BenefitSponsors
           end
         end
 
-        def show # TODO - Each when clause should be a seperate action.
+# TODO: - Each when clause should be a seperate action.
+        def show
           authorize @employer_profile
           @tab = params['tab']
           @broker_agency_profile = @employer_profile.active_broker_agency_account.broker_agency_profile if @employer_profile.active_broker_agency_account.present?
@@ -116,23 +119,16 @@ module BenefitSponsors
         def bulk_employee_upload
           authorize @employer_profile, :show?
           if roster_upload_file_type.include?(file_content_type)
-            file = params.require(:file)
-            @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, @employer_profile)
-            roaster_upload_count = @roster_upload_form.census_records.length
-            begin
-              if @roster_upload_form.save
-                flash[:notice] = "#{roaster_upload_count } records uploaded from CSV"
-                redirect_to URI.parse(@roster_upload_form.redirection_url).to_s
-              else
-                render @roster_upload_form.redirection_url || default_url
-              end
-            rescue StandardError => e
-              @roster_upload_form.errors.add(:base, e.message)
-              render @roster_upload_form.redirection_url || default_url
-            end
+            tmp = params[:file].tempfile
+            file = File.join("public", params[:file].original_filename.gsub(" ", "_"))
+            FileUtils.cp tmp.path, file
+            # calling worker
+            BenefitSponsors::BulkEmployeesUploadWorker.perform_async(params[:file].original_filename.gsub(" ", "_"), params[:file].content_type, @employer_profile._id, current_user.email)
+            flash[:notice] = "your CSV file is being processing, you will receive an email once it's done."
+            redirect_to employees_upload_url(@employer_profile.id)
           else
             @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.new
-            @roster_upload_form.errors.add(:base, "Can't detect file type #{params[:file] &.original_filename}, please upload Excel/CSV format files only.")
+            @roster_upload_form.errors.add(:base, "Can't detect file type #{params[:file]&.original_filename}, please upload Excel/CSV format files only.")
             respond_to do |format|
               format.html {  render default_url}
             end
@@ -140,7 +136,7 @@ module BenefitSponsors
         end
 
         def file_content_type
-          params[:file].content_type if params[:file]
+          params[:file]&.content_type
         end
 
         def roster_upload_file_type
@@ -162,10 +158,10 @@ module BenefitSponsors
         def download_invoice
           return unless @invoice.present?
 
-          options={}
+          options = {}
           options[:content_type] = @invoice.type
           options[:filename] = @invoice.title
-          send_data Aws::S3Storage.find(@invoice.identifier) , options
+          send_data Aws::S3Storage.find(@invoice.identifier), options
         end
 
         def generate_sic_tree
@@ -187,7 +183,7 @@ module BenefitSponsors
             flash[:error] = "No Active Plan Year present, unable to terminate employee enrollments."
           end
 
-          redirect_to profiles_employers_employer_profile_path(@employer_profile) + "?tab=employees"
+          redirect_to "#{profiles_employers_employer_profile_path(@employer_profile)}?tab=employees"
         end
 
         private
@@ -218,10 +214,12 @@ module BenefitSponsors
           @invoice = @employer_profile.documents.find(params[:invoice_id]) if params[:invoice_id]
         end
 
-        def collect_and_sort_invoices(sort_order='ASC')
+        def collect_and_sort_invoices(sort_order = 'ASC')
           @invoices = @employer_profile.invoices
           @invoice_years = (Settings.invoices.minimum_invoice_display_year..TimeKeeper.date_of_record.year).to_a.reverse
-          sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse! unless @documents
+          unless @documents
+            sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse!
+          end
         end
 
         def find_employer
@@ -235,9 +233,11 @@ module BenefitSponsors
         def employee_datatable_params
           data_table_params = { id: params[:id], scopes: params[:scopes] }
 
-          data_table_params.merge!({
-            renewal: true
-          }) if @employer_profile.renewal_benefit_application.present?
+          if @employer_profile.renewal_benefit_application.present?
+            data_table_params.merge!({
+                                       renewal: true
+                                     })
+          end
 
           if @employer_profile.off_cycle_benefit_application.present?
             data_table_params.merge!(
@@ -251,9 +251,11 @@ module BenefitSponsors
           data_table_params.merge!({ future_reinstated: true }) if @employer_profile.future_active_reinstated_benefit_application.present?
           data_table_params.merge!({reinstated: true}) if @employer_profile.current_benefit_application&.reinstated_id.present?
 
-          data_table_params.merge!({
-            is_submitted: true
-          }) if @employer_profile&.renewal_benefit_application&.is_submitted?
+          if @employer_profile&.renewal_benefit_application&.is_submitted?
+            data_table_params.merge!({
+                                       is_submitted: true
+                                     })
+          end
 
           if @employer_profile&.off_cycle_benefit_application&.is_submitted?
             data_table_params.merge!(
@@ -277,7 +279,7 @@ module BenefitSponsors
         def load_group_enrollments
           billing_date = Date.strptime(params[:billing_date], "%m/%d/%Y") if params[:billing_date]
           query = Queries::CoverageReportsQuery.new(@employer_profile, billing_date)
-          @group_enrollments =  query.execute
+          @group_enrollments = query.execute
           @product_info = load_products
         end
 
@@ -288,7 +290,7 @@ module BenefitSponsors
 
           plans = BenefitMarkets::Products::Product.aca_shop_market.by_state(Settings.aca.state_abbreviation)
 
-          current_possible_plans = plans.where(:"application_period.min".in =>[
+          current_possible_plans = plans.where(:"application_period.min".in => [
             Date.new(previous_year, 1, 1),
             Date.new(current_year, 1, 1),
             Date.new(next_year, 1, 1)
@@ -308,11 +310,15 @@ module BenefitSponsors
           "/benefit_sponsors/profiles/employers/employer_profiles/_employee_csv_upload_errors"
         end
 
+        def employees_upload_url(profile_id)
+          "/benefit_sponsors/profiles/employers/employer_profiles/#{profile_id}?tab=employees"
+        end
+
         def csv_for(groups)
           (output = "").tap do
             CSV.generate(output) do |csv|
               csv << ["Name", "SSN", "DOB", "Hired On", "Benefit Group", "Type", "Name", "Issuer", "Covered Ct", "Employer Contribution",
-              "Employee Premium", "Total Premium"]
+                      "Employee Premium", "Total Premium"]
               groups.each do |element|
                 primary = element.primary_member
                 census_employee = primary.employee_role.census_employee
@@ -340,10 +346,10 @@ module BenefitSponsors
 
         def csv_content_type
           case request.user_agent
-            when /windows/i
-              'application/vnd.ms-excel'
-            else
-              'text/csv'
+          when /windows/i
+            'application/vnd.ms-excel'
+          else
+            'text/csv'
           end
         end
 
