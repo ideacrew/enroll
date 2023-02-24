@@ -33,7 +33,8 @@ RSpec.describe ::Operations::Fdsh::H411095as::Transmissions::Create do
         {
           assistance_year: Date.today.year,
           report_types: [:original],
-          excluded_policies: ['523232']
+          allow_list: ['523232'],
+          deny_list: ['523232']
         }
       end
 

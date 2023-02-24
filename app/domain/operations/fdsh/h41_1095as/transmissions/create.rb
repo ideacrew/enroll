@@ -43,7 +43,8 @@ module Operations
               event(
                 'events.h41_1095as.transmission_requested',
                 attributes: {
-                  excluded_policies: values[:excluded_policies]
+                  allow_list: values[:allow_list],
+                  deny_list: values[:deny_list]
                 },
                 headers: values.slice(:assistance_year, :report_types)
               )
