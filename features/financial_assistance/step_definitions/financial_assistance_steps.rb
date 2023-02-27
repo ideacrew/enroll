@@ -457,6 +457,14 @@ Given(/^the enrollment tile feature is enabled$/) do
   skip_this_scenario unless EnrollRegistry[:kaiser_pay_now].setting(:enrollment_tile).item || EnrollRegistry[:anthem_blue_cross_and_blue_shield_pay_now].setting(:enrollment_tile).item
 end
 
+Given(/^the kaiser_generic_redirect setting is enabled$/) do
+  EnrollRegistry[:kaiser_pay_now].setting(:generic_redirect).stub(:item).and_return(true)
+end
+
+Given(/^the kaiser_generic_redirect setting is disabled$/) do
+  EnrollRegistry[:kaiser_pay_now].setting(:generic_redirect).stub(:item).and_return(false)
+end
+
 Given(/^the FAA feature configuration is enabled$/) do
   enable_feature :financial_assistance
 end
