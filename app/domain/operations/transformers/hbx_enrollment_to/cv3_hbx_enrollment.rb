@@ -46,7 +46,6 @@ module Operations
             payload.merge!(product_reference: product_reference(product, issuer, family_rated_info))
           end
           payload.merge!(issuer_profile_reference: issuer_profile_reference(issuer)) if issuer
-          binding.pry
           payload.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment? && !options[:exclude_seps]
           enr_tax_households = tax_household_enrollments(enr)
           payload.merge!(tax_households_references: transform_enr_tax_households(enr_tax_households)) if enr_tax_households.present?
