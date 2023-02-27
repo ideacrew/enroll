@@ -22,7 +22,7 @@ module Operations
 
         private
 
-        # rubocop:disable Metrics/CyclomaticComplexity
+        # rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize
         def construct_payload(enr, options)
           product = enr.product
           issuer = product&.issuer_profile
@@ -54,7 +54,7 @@ module Operations
           puts "Cv3HbxEnrollment error: #{e.message} | exception: #{e.inspect} | backtrace: #{e.backtrace.inspect}"
           Rails.logger.error "Cv3HbxEnrollment error: #{e.message} | exception: #{e.inspect} | backtrace: #{e.backtrace.inspect}"
         end
-        # rubocop:enable Metrics/CyclomaticComplexity
+        # rubocop:enable Metrics/CyclomaticComplexity, Metrics/AbcSize
 
         def tax_household_enrollments(enr)
           TaxHouseholdEnrollment.where(enrollment_id: enr.id)
