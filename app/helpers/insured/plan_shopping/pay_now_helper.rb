@@ -26,7 +26,7 @@ module Insured
         rr_feature_enabled = EnrollRegistry.feature_enabled?("#{@issuer_key}_pay_now".to_sym)
         return false unless rr_feature_enabled == true
         return !pay_now_button_timed_out?(hbx_enrollment) if source == "Plan Shopping"
-        return past_effective_on?(hbx_enrollment) if source == "Enrollment Tile" && EnrollRegistry["#{@issuer_key}_pay_now".to_sym].setting(:enrollment_tile).item
+        return before_effective_date?(hbx_enrollment) if source == "Enrollment Tile" && EnrollRegistry["#{@issuer_key}_pay_now".to_sym].setting(:enrollment_tile).item
         false
       end
       # rubocop:enable Metrics/CyclomaticComplexity
@@ -68,7 +68,7 @@ module Insured
         covered_time.transition_at + 15.minutes <= Time.now
       end
 
-      def past_effective_on?(hbx_enrollment)
+      def before_effective_date?(hbx_enrollment)
         hbx_enrollment.effective_on > TimeKeeper.date_of_record
       end
 
