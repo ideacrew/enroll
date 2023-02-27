@@ -109,14 +109,6 @@ module Insured
         end
       end
 
-      def enable_pay_now(hbx_enrollment)
-        issuer = issuer_key(hbx_enrollment)
-        return false unless individual?(hbx_enrollment) && EnrollRegistry.key?("feature_index.#{issuer}_pay_now")
-        rr_feature = EnrollRegistry["#{@issuer_key}_pay_now".to_sym]
-        return false unless rr_feature&.enabled?
-        rr_feature.setting(:enrollment_tile)&.item
-      end
-
       def fetch_issuer_name(issuer_name)
         carrier_legal_name = issuer_name&.downcase
         carrier_legal_name.downcase.gsub(' ', '_').gsub(/[,.]/, '')
