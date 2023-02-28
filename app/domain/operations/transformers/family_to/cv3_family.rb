@@ -16,30 +16,10 @@ module Operations
         require 'securerandom'
 
         # rubocop:disable Style/OptionalBooleanParameter
-        # This method takes required param - family and optional params - exclude_applications and *args to build payload.
+        # **************Important**************
         # Args param is a temporary solution and currently accepts attribute (exclude_seps)in cv3_hbx_enrollment - developed for Pivotal-184575110,
-        # **To use args(exclude_seps) elsewhere needs approval from Dan**
-        #
-        # @visibility public
-        # @param family [#object]
-        # @param exclude_applications [#boolean]
-        # @param args [#array of hash]
-        #
-        # @example
-        #   call(family)
-        #   # => Object
-        #
-        # @example
-        #   call(family, true)
-        #   # => Object
-        #
-        # @example
-        #   call(family, false, {exclude_seps: true})
-        #   # => Object
-        #
-        # @return [Object]
-        #
-        # @api public
+        # **Do not pass in args(exclude_seps) elsewhere unless approved from Dan/leadership team**
+        # **************Important**************
         def call(family, exclude_applications = false, *args)
           request_payload = yield construct_payload(family, exclude_applications, args)
 
