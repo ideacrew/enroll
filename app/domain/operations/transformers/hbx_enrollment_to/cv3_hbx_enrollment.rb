@@ -14,10 +14,10 @@ module Operations
         include Acapi::Notifiers
         require 'securerandom'
 
-        # **************Important**************
+        # !!!Important!!!
         # options param is a temporary solution and currently accepts attribute (exclude_seps)in cv3_hbx_enrollment - developed for Pivotal-184575110,
         # **Do not pass in options(exclude_seps) elsewhere unless approved from Dan/leadership team**
-        # **************Important**************
+        # !!!Important!!!
         def call(enrollment, options = {})
           request_payload = yield construct_payload(enrollment, options)
 

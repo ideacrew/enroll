@@ -16,10 +16,10 @@ module Operations
         require 'securerandom'
 
         # rubocop:disable Style/OptionalBooleanParameter
-        # **************Important**************
+        # !!!Important!!!
         # Args param is a temporary solution and currently accepts attribute (exclude_seps)in cv3_hbx_enrollment - developed for Pivotal-184575110,
         # **Do not pass in args(exclude_seps) elsewhere unless approved from Dan/leadership team**
-        # **************Important**************
+        # !!!Important!!!
         def call(family, exclude_applications = false, *args)
           request_payload = yield construct_payload(family, exclude_applications, args)
 
