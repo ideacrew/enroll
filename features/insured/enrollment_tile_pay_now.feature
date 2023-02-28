@@ -23,7 +23,7 @@ Feature: User should be able to pay for plan
 
   Scenario: User can see make payments for enrollments with past effective date when generic redirect enabled
     Given a DC site exists
-    Given the kaiser_generic_redirect setting is enabled
+    Given the generic_redirect setting is enabled
     Given the FAA feature configuration is disabled
     Given individual Qualifying life events are present
     Given Patrick Doe has active individual market role and verified identity and IVL Kaiser enrollment
@@ -35,7 +35,7 @@ Feature: User should be able to pay for plan
   
   Scenario: User cannot see make payments for enrollments with past effective date when generic redirect disabled
     Given a DC site exists
-    Given the kaiser_generic_redirect setting is disabled
+    Given the generic_redirect setting is disabled
     Given the FAA feature configuration is disabled
     Given individual Qualifying life events are present
     Given Patrick Doe has active individual market role and verified identity and IVL Kaiser enrollment
