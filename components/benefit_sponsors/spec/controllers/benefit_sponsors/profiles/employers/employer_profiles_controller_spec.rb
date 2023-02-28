@@ -97,7 +97,7 @@ module BenefitSponsors
         end
 
         it 'should render flash message successfully' do
-          expect(flash[:notice]).to eq("2 records uploaded from CSV")
+          expect(flash[:notice]).to eq("your CSV file is being processing, you will receive an email once it's done.")
         end
       end
 
