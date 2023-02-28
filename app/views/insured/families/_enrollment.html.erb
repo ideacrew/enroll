@@ -241,17 +241,15 @@
                     <% legal_name = hbx_enrollment.product.carrier_profile&.legal_name %>
                     <% carrier = fetch_issuer_name(legal_name) %>
                     <% if EnrollRegistry.key?("feature_index.#{carrier}_pay_now") %>
-                      <% if EnrollRegistry.feature_enabled?("#{carrier}_pay_now".to_sym) && EnrollRegistry["#{carrier}_pay_now".to_sym].setting(:enrollment_tile).item %>
-                        <% if show_pay_now?("Enrollment Tile", hbx_enrollment) %>
-                          <button class="btn-link btn-block" data-toggle="modal" data-target="#payNowModal<%= hbx_enrollment.hbx_id %>" style="padding: 6px 12px; margin: 4px 0; text-align: left;" data-enrollment="<%= hbx_enrollment.hbx_id %>">
-                            <% hover_text = past_effective_on?(hbx_enrollment) ? "make_a_first_payment" : "make_a_first_payment_before_effective" %>
+                      <% if show_pay_now?("Enrollment Tile", hbx_enrollment)%>
+                          <button class="btn-link btn-block" data-toggle="modal" data-target="#payNowModal<%= hbx_enrollment.hbx_id %>" style="padding: 6px 12px; margin: 4px 0; text-align: left;" data-enrollment="<%= hbx_enrollment.hbx_id %>"> 
+                            <% hover_text = past_effective_on?(hbx_enrollment) ? "make_a_first_payment" : "make_a_first_payment_before_effective" %>                                 
                             <%= render partial:"shared/glossary_hover", locals: {key: hover_text, title: "Make a first Payment for my new plan", term: sanitize(l10n("plans.issuer.pay_now.first_payment")) } %>
-                          </button>
-                        <% elsif enable_pay_now(hbx_enrollment) %>
+                          </button>            
+                      <% elsif EnrollRegistry.feature_enabled?(:generic_redirect)%>
                           <button class="btn-link btn-block" data-toggle="modal" data-target="#payNowModal<%= hbx_enrollment.hbx_id %>" style="padding: 6px 12px; margin: 4px 0; text-align: left;" data-enrollment="<%= hbx_enrollment.hbx_id %>">
                             <%= render partial:"shared/glossary_hover", locals: {key: "make_payments_for_my_plan", title: "Make payments for my plan", term: sanitize(l10n("plans.issuer.pay_now.make_payment_for_my_plan")) } %>
                           </button>
-                        <% end %>
                       <% end %>
                     <% end %>
                   <% end %>
