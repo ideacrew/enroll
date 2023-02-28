@@ -26,7 +26,7 @@ module Insured
         rr_feature_enabled = EnrollRegistry.feature_enabled?("#{@issuer_key}_pay_now".to_sym)
         return false unless rr_feature_enabled == true
         return !pay_now_button_timed_out?(hbx_enrollment) if source == "Plan Shopping"
-        return past_effective_on?(hbx_enrollment) if source == "Enrollment Tile"
+        return past_effective_on?(hbx_enrollment) if source == "Enrollment Tile" && EnrollRegistry["#{@issuer_key}_pay_now".to_sym].setting(:enrollment_tile).item
         false
       end
       # rubocop:enable Metrics/CyclomaticComplexity
@@ -107,14 +107,6 @@ module Insured
         else
           "https://"
         end
-      end
-
-      def enable_pay_now(hbx_enrollment)
-        issuer = issuer_key(hbx_enrollment)
-        return false unless individual?(hbx_enrollment) && EnrollRegistry.key?("feature_index.#{issuer}_pay_now")
-        rr_feature = EnrollRegistry["#{@issuer_key}_pay_now".to_sym]
-        return false unless rr_feature&.enabled?
-        rr_feature.setting(:enrollment_tile)&.item
       end
 
       def fetch_issuer_name(issuer_name)
