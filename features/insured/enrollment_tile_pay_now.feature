@@ -21,7 +21,7 @@ Feature: User should be able to pay for plan
     |              kaiser_pay_now                | Kaiser |  DC      |
     | anthem_blue_cross_and_blue_shield_pay_now  | Anthm  |  ME      |
 
-  Scenario: User can see make payments for enrollments with past effective date
+  Scenario: User can see make payments for enrollments with past effective date when generic redirect enabled
     Given a DC site exists
     Given the kaiser_generic_redirect setting is enabled
     Given the FAA feature configuration is disabled
@@ -33,7 +33,7 @@ Feature: User should be able to pay for plan
     Then person clicks on the Actions button
     Then person should the the Make Payments button
   
-  Scenario: User can see make payments for enrollments with past effective date
+  Scenario: User cannot see make payments for enrollments with past effective date when generic redirect disabled
     Given a DC site exists
     Given the kaiser_generic_redirect setting is disabled
     Given the FAA feature configuration is disabled
