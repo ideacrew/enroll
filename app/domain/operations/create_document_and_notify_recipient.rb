@@ -60,7 +60,7 @@ module Operations
 
     def send_notice(resource, file_name)
       formatted_file_name = file_name.gsub(/[^0-9a-z.]/i,'').gsub('.pdf', '').downcase
-      if EnrollRegistry.feature_enabled?(:ivl_tax_form_notice) && ['your1095ahealthcoveragetaxform', 'noticevoid1095ataxform'].include?(formatted_file_name)
+      if EnrollRegistry.feature_enabled?(:ivl_tax_form_notice) && ['your1095ahealthcoveragetaxform', 'void1095ataxform', 'corrected1095ataxform'].include?(formatted_file_name)
         ::Operations::SendTaxFormNoticeAlert.new.call(resource: resource)
       else
         ::Operations::SendGenericNoticeAlert.new.call(resource: resource)
