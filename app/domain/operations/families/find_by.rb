@@ -7,13 +7,14 @@ module Operations
   module Families
     # Operation is for finding family with person person hbx_id and publishing an event 'enroll.families.found_by'
     class FindBy
-      include Dry::Monads[:result, :do, :try]
+      include Dry::Monads[:result, :do]
       include EventSource::Command
 
       # params = { { person_hbx_id: 10239, year: 2022 } }
       def call(params)
         person     = yield find_person(params[:response][:person_hbx_id])
         family     = yield find_primary_family(person)
+        binding.irb # cv3_family = Operations::Transformers::FamilyTo::Cv3Family.new.call(family); validate_payload(cv3_family, person)
         cv3_family = yield transform_family(family)
         payload    = yield validate_payload(cv3_family, person)
         event      = yield build_event(payload, params)
@@ -55,7 +56,7 @@ module Operations
       end
 
       def transform_family(family)
-        Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
+        Operations::Transformers::FamilyTo::Cv3Family.new.call(family, true)
       end
 
       def validate_payload(cv3_family, person)

@@ -16,10 +16,47 @@ RSpec.describe ::Operations::Families::FindBy, dbclean: :after_each do
       let(:year) { TimeKeeper.date_of_record.year }
       let(:correlation_id) { "12345" }
 
-      it 'returns a success with a message' do
-        expect(
-          subject.success
-        ).to eq('Successfully published event: events.families.found_by')
+      context 'without financial assistance applications' do
+        it 'returns a success with a message' do
+          expect(
+            subject.success
+          ).to eq('Successfully published event: events.families.found_by')
+        end
+      end
+
+      context 'with bad applications where income is invalid' do
+        let(:application) do
+          FactoryBot.create(:financial_assistance_application,
+                            family_id: family.id,
+                            effective_date: Date.today,
+                            
+                          )
+        end
+        let(:applicant) do
+          FactoryBot.create(:financial_assistance_applicant, application: application, family_member_id: family.primary_applicant.id)
+        end
+        let(:invalid_income) do
+          income = FinancialAssistance::Income.new(
+            {
+              amount: 200,
+              start_on: Date.new(2021, 6, 1),
+              end_on: Date.new(2021, 6, 30),
+              frequency_kind: "biweekly"
+            }
+          )
+          applicant.incomes << income
+          income.end_on = Date.new(1990)
+          income.save(validate: false)
+          applicant.incomes.first
+        end
+  
+        it 'returns a success' do
+          invalid_income
+          binding.irb
+          expect(
+            subject.success
+          ).to eq('Successfully published event: events.families.found_by')
+        end
       end
     end
 
