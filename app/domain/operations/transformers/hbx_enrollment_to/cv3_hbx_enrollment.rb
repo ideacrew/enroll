@@ -14,6 +14,25 @@ module Operations
         include Acapi::Notifiers
         require 'securerandom'
 
+        # This method takes required param - family and optional params - options to build payload.
+        # options param is a temporary solution and currently accepts attribute (exclude_seps) - developed for Pivotal-184575110.
+        # **To use args(exclude_seps) elsewhere needs approval from Dan**
+        #
+        # @visibility public
+        # @param enrollment [#object]
+        # @param options [#array of hash]
+        #
+        # @example
+        #   call(enrollment)
+        #   # => Object
+        #
+        # @example
+        #   call(enrollment, {exclude_seps: true})
+        #   # => Object
+        #
+        # @return [Object]
+        #
+        # @api public
         def call(enrollment, options = {})
           request_payload = yield construct_payload(enrollment, options)
 
