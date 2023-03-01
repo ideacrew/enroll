@@ -2,7 +2,7 @@
 
 module Operations
   module PayNow
-    module Carefirst
+    module CareFirst
       # Generate Pay Now custom embedded XML payload for CareFirst carrier
       class EmbeddedXml
 

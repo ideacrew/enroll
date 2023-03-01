@@ -2,7 +2,7 @@ require 'rails_helper'
 
 module OneLogin
   RSpec.describe RubySaml::SamlGenerator do
-    let(:transaction_id)   { '1234' }
+    let(:transaction_id) { '1234' }
     let(:pay_now_key) { :carefirst_pay_now }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
     let!(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: 'Kaiser') }
@@ -129,12 +129,13 @@ module OneLogin
       end
 
       context 'carrier has embedded custom xml' do
-        let(:operation) { instance_double(Operations::PayNow::Carefirst::EmbeddedXml) }
+        let(:operation) { instance_double(Operations::PayNow::CareFirst::EmbeddedXml) }
 
         before do
           allow(xml_settings_double).to receive(:item).and_return(true)
-          allow(Operations::PayNow::Carefirst::EmbeddedXml).to receive(:new).and_return(operation)
+          allow(Operations::PayNow::CareFirst::EmbeddedXml).to receive(:new).and_return(operation)
           allow(operation).to receive(:call)
+          issuer_profile.update(legal_name: 'CareFirst')
           saml_generator.build_saml_response
         end
 
