@@ -427,16 +427,16 @@ registry:
           - key: :connect_test
             item: <%= ENV['KAISER_PERMANENTE_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
       - key: :delta_dental_pay_now
-        is_enabled: false
+        is_enabled: <%= ENV['DELTA_DENTAL_PAY_NOW_IS_ENABLED'] || false %>
         settings:
           - key: :plan_shopping
-            item: false
+            item: <%= ENV['DELTA_DENTAL_PAY_NOW_PLAN_SHOPPING_IS_ENABLED'] || false %>
           - key: :enrollment_tile
-            item: false
+            item: <%= ENV['DELTA_DENTAL_PAY_NOW_ENROLLMENT_TILE_IS_ENABLED'] || false %>
           - key: :carriers_long_name
             item: 'Delta Dental'
           - key: :connect_test
-            item: false
+            item: <%= ENV['DELTA_DENTAL_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
       - key: :dentegra_pay_now
         is_enabled: false
         settings:
@@ -449,27 +449,27 @@ registry:
           - key: :connect_test
             item: false
       - key: :dominion_national_pay_now
-        is_enabled: false
+        is_enabled: <%= ENV['DOMINION_PAY_NOW_IS_ENABLED'] || false %>
         settings:
           - key: :plan_shopping
-            item: false
+            item: <%= ENV['DOMINION_PAY_NOW_PLAN_SHOPPING_IS_ENABLED'] || false %>
           - key: :enrollment_tile
-            item: false
+            item: <%= ENV['DOMINION_PAY_NOW_ENROLLMENT_TILE_IS_ENABLED'] || false %>
           - key: :carriers_long_name
             item: 'Dominion National'
           - key: :connect_test
-            item: false
+            item: <%= ENV['DOMINION_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
       - key: :best_life_pay_now
-        is_enabled: false
+        is_enabled: <%= ENV['BEST_LIFE_PAY_NOW_IS_ENABLED'] || false %>
         settings:
           - key: :plan_shopping
-            item: false
+            item: <%= ENV['BEST_LIFE_PAY_NOW_PLAN_SHOPPING_IS_ENABLED'] || false %>
           - key: :enrollment_tile
-            item: false
+            item: <%= ENV['BEST_LIFE_PAY_NOW_ENROLLMENT_TILE_IS_ENABLED'] || false %>
           - key: :carriers_long_name
             item: 'BEST Life'
           - key: :connect_test
-            item: false
+            item: <%= ENV['BEST_LIFE_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
       - key: :metlife_pay_now
         is_enabled: false
         settings:
