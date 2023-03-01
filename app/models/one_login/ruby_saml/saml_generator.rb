@@ -25,11 +25,12 @@ module OneLogin
       NAME_FORMAT = 'urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified'
       PASSWORD = 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'.freeze
 
-      attr_reader :transaction_id, :hbx_enrollment, :private_key, :cert
+      attr_reader :transaction_id, :hbx_enrollment, :private_key, :cert, :pay_now_key
 
-      def initialize(transaction_id, hbx_enrollment)
+      def initialize(transaction_id, hbx_enrollment, pay_now_key)
         @transaction_id = transaction_id
         @hbx_enrollment = hbx_enrollment
+        @pay_now_key = pay_now_key
 
         if Rails.env.production?
           @private_key = OpenSSL::PKey::RSA.new(File.read(SamlInformation.pay_now_private_key_location))
@@ -150,7 +151,7 @@ module OneLogin
         when 'Subscriber Identifier'
           hbx_enrollment.subscriber.person.hbx_id.rjust(10, '0')
         when 'Additional Information'
-          hbx_enrollment.hbx_enrollment_members.map(&:person).map{|person| person.first_name_last_name_and_suffix(',')}.join(';')
+          build_additional_info
         end
       end
 
@@ -184,6 +185,19 @@ module OneLogin
 
       def generate_uuid
         SecureRandom.uuid
+      end
+
+      def build_additional_info
+        if EnrollRegistry[@pay_now_key].setting(:embed_xml).item
+          carrier_name_strings = @pay_now_key.to_s.gsub('_pay_now', '').split('_')
+          carrier_camel_case = carrier_name_strings.inject('') do |full_name, name_string|
+            full_name.concat(name_string.humanize)
+          end
+          generate_xml = "Operations::PayNow::#{carrier_camel_case}::EmbeddedXml".constantize
+          generate_xml.new.call
+        else
+          @hbx_enrollment.hbx_enrollment_members.map(&:person).map{|person| person.first_name_last_name_and_suffix(',')}.join(';')
+        end
       end
     end
   end
