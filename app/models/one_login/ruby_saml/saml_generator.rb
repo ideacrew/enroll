@@ -202,9 +202,8 @@ module OneLogin
         case carrier_name
         when 'CareFirst'
           ::Operations::PayNow::CareFirst::EmbeddedXml
-        else
         end
-      end 
+      end
     end
   end
 end
