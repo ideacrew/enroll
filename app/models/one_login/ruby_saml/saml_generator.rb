@@ -28,6 +28,7 @@ module OneLogin
       attr_reader :transaction_id, :hbx_enrollment, :private_key, :cert, :pay_now_key
 
       def initialize(transaction_id, hbx_enrollment, pay_now_key)
+        super()
         @transaction_id = transaction_id
         @hbx_enrollment = hbx_enrollment
         @pay_now_key = pay_now_key
