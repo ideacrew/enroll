@@ -492,6 +492,8 @@ registry:
             item: 'CareFirst'
           - key: :connect_test
             item: <%= ENV['CAREFIRST_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
+          - key: :embed_xml
+            item: <%= ENV['CAREFIRST_PAY_NOW_EMBED_XML_IS_ENABLED'] || false %>
       - key: :aetna_pay_now
         is_enabled: false
         settings:
