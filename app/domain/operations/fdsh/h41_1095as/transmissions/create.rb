@@ -2,7 +2,7 @@
 
 module Operations
   module Fdsh
-    module H41
+    module H411095as
       module Transmissions
         # Send transmission request to generate h41 and 1095a
         class Create
