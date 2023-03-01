@@ -24,8 +24,8 @@ module Insured
 
         if source == "Plan Shopping"
           !pay_now_button_timed_out?(hbx_enrollment)
-        elsif source == "Enrollment Tile" && EnrollRegistry["#{@carrier_key}_pay_now".to_sym].setting(:enrollment_tile).item
-          before_effective_date?(hbx_enrollment)
+        elsif source == "Enrollment Tile"
+          EnrollRegistry["#{@carrier_key}_pay_now".to_sym].setting(:enrollment_tile).item
         end
       end
 
@@ -77,7 +77,7 @@ module Insured
 
       def carrier_paynow_enabled(carrier_name)
         carrier_key = fetch_carrier_key_from_legal_name(carrier_name)
-        carrier_name.present? && EnrollRegistry.key?("pay_now_feature.#{carrier_key}_pay_now") && EnrollRegistry.feature_enabled?("#{carrier_key}_pay_now".to_sym)
+        EnrollRegistry.feature_enabled?("#{carrier_key}_pay_now".to_sym)
       end
 
       def is_kaiser_translation_key?(carrier_key)
