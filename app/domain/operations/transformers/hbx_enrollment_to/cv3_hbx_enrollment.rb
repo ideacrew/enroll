@@ -14,16 +14,20 @@ module Operations
         include Acapi::Notifiers
         require 'securerandom'
 
-        def call(enrollment)
-          request_payload = yield construct_payload(enrollment)
+        # !!!Important!!!
+        # options param is a temporary solution and currently accepts attribute (exclude_seps)in cv3_hbx_enrollment - developed for Pivotal-184575110,
+        # **Do not pass in options(exclude_seps) elsewhere unless approved from Dan/leadership team**
+        # !!!Important!!!
+        def call(enrollment, options = {})
+          request_payload = yield construct_payload(enrollment, options)
 
           Success(request_payload)
         end
 
         private
 
-        # rubocop:disable Metrics/CyclomaticComplexity
-        def construct_payload(enr)
+        # rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize
+        def construct_payload(enr, options)
           product = enr.product
           issuer = product&.issuer_profile
           consumer_role = enr&.consumer_role
@@ -46,7 +50,7 @@ module Operations
             payload.merge!(product_reference: product_reference(product, issuer, family_rated_info))
           end
           payload.merge!(issuer_profile_reference: issuer_profile_reference(issuer)) if issuer
-          payload.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment?
+          payload.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment? && !options[:exclude_seps]
           enr_tax_households = tax_household_enrollments(enr)
           payload.merge!(tax_households_references: transform_enr_tax_households(enr_tax_households)) if enr_tax_households.present?
           Success(payload)
@@ -54,7 +58,7 @@ module Operations
           puts "Cv3HbxEnrollment error: #{e.message} | exception: #{e.inspect} | backtrace: #{e.backtrace.inspect}"
           Rails.logger.error "Cv3HbxEnrollment error: #{e.message} | exception: #{e.inspect} | backtrace: #{e.backtrace.inspect}"
         end
-        # rubocop:enable Metrics/CyclomaticComplexity
+        # rubocop:enable Metrics/CyclomaticComplexity, Metrics/AbcSize
 
         def tax_household_enrollments(enr)
           TaxHouseholdEnrollment.where(enrollment_id: enr.id)
