@@ -8,7 +8,7 @@ module Operations
         class Create
           send(:include, Dry::Monads[:result, :do, :try])
           include EventSource::Command
-          REPORT_TYPES = %i[all original corrected voided].freeze
+          REPORT_TYPES = %i[all original corrected void].freeze
 
           # @param [String] assistance_year
           # @param [Array] report_types
