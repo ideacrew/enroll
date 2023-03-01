@@ -134,7 +134,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
           allow(hbx_enrollment).to receive(:applied_aptc_amount).and_return(100.0)
           allow(view).to receive(:individual?).and_return(true)
           allow(view).to receive(:before_effective_date?).and_return(true)
-          allow(view).to receive(:can_pay_now?).and_return(true)
+          allow(view).to receive(:enrollment_can_pay_now?).and_return(true)
           allow(hbx_enrollment).to receive(:is_any_enrollment_member_outstanding).and_return false
           allow(hbx_enrollment).to receive(:terminate_reason).and_return 'non_payment'
           render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }

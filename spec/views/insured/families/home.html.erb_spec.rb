@@ -38,7 +38,7 @@ RSpec.describe "insured/families/home.html.erb" do
     allow(hbx).to receive(:product).and_return(product)
     allow(term_hbx).to receive(:product).and_return(product)
     allow(view).to receive(:display_carrier_logo).with(any_args).and_return(double)
-    allow(view).to receive(:fetch_issuer_name).with(nil).and_return(double)
+    allow(view).to receive(:fetch_carrier_key_from_legal_name).with(nil).and_return(double)
   end
 
   it "should display the title" do
