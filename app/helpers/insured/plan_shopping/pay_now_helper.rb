@@ -19,24 +19,23 @@ module Insured
 
       # rubocop:disable Metrics/CyclomaticComplexity
       def show_pay_now?(source, hbx_enrollment)
-        @issuer_key = fetch_issuer_name(hbx_enrollment&.product&.issuer_profile&.legal_name)
+        @carrier_key = fetch_issuer_name(hbx_enrollment&.product&.issuer_profile&.legal_name)
 
-        return false unless carrier_paynow_enabled(@issuer_key) && can_pay_now?(hbx_enrollment)
-        return false unless EnrollRegistry.feature_enabled?("#{@issuer_key}_pay_now".to_sym)
+        return false unless carrier_paynow_enabled(@carrier_key) && enrollment_can_pay_now?(hbx_enrollment)
+        return false unless EnrollRegistry.feature_enabled?("#{@carrier_key}_pay_now".to_sym)
         return !pay_now_button_timed_out?(hbx_enrollment) if source == "Plan Shopping"
-        # return before_effective_date?(hbx_enrollment) if source == "Enrollment Tile"
-        return before_effective_date?(hbx_enrollment) if source == "Enrollment Tile" && EnrollRegistry["#{@issuer_key}_pay_now".to_sym].setting(:enrollment_tile).item
+        return before_effective_date?(hbx_enrollment) if source == "Enrollment Tile" && EnrollRegistry["#{@carrier_key}_pay_now".to_sym].setting(:enrollment_tile).item
 
         false
       end
       # rubocop:enable Metrics/CyclomaticComplexity
 
-      def issuer_key(enrollment)
+      def carrier_key_from_enrollment(enrollment)
         carrier_key = enrollment&.product&.issuer_profile&.legal_name
-        fetch_issuer_name(carrier_key)
+        fetch_carrier_key_from_legal_name(carrier_key)
       end
 
-      def can_pay_now?(hbx_enrollment)
+      def enrollment_can_pay_now?(hbx_enrollment)
         individual?(hbx_enrollment) && (has_break_in_coverage_enrollments?(hbx_enrollment) || !has_any_previous_enrollments?(hbx_enrollment))
       end
 
@@ -56,7 +55,7 @@ module Insured
       def has_any_previous_enrollments?(hbx_enrollment)
         all_carrier_enrollments = hbx_enrollment.family.hbx_enrollments.where(:aasm_state.nin => ["inactive", "shopping", "coverage_canceled"]).select do |enr|
           next if enr.product.blank? || enr.subscriber.blank? || enr.is_shop?
-          fetch_issuer_name(enr.product.issuer_profile.legal_name) == @issuer_key && enr.effective_on.year == hbx_enrollment.effective_on.year && enr.subscriber.applicant_id == hbx_enrollment.subscriber.applicant_id
+          fetch_carrier_key_from_legal_name(enr.product.issuer_profile.legal_name) == @carrier_key && enr.effective_on.year == hbx_enrollment.effective_on.year && enr.subscriber.applicant_id == hbx_enrollment.subscriber.applicant_id
         end
         enrollments = all_carrier_enrollments - hbx_enrollment.to_a
         enrollments.present? ? true : false
@@ -77,40 +76,40 @@ module Insured
         enrollments.any? { |enr| enr.terminated_on.year == hbx_enrollment.effective_on.year && (hbx_enrollment.effective_on - enr.terminated_on) > 1 }
       end
 
-      def carrier_paynow_enabled(issuer)
-        issuer = fetch_issuer_name(issuer)
-        issuer.present? && EnrollRegistry.key?("feature_index.#{issuer}_pay_now") && EnrollRegistry["#{issuer}_pay_now".to_sym].feature.is_enabled
+      def carrier_paynow_enabled(carrier_name)
+        carrier_key = fetch_carrier_key_from_legal_name(carrier_name)
+        carrier_name.present? && EnrollRegistry.key?("pay_now_feature.#{carrier_key}_pay_now") && EnrollRegistry.feature_enabled?("#{carrier_key}_pay_now".to_sym)
       end
 
       def is_kaiser_translation_key?(carrier_key)
         carrier_key == 'kaiser' ? 'issuer' : 'other'
       end
 
-      def carrier_long_name(issuer)
-        issuer_key = fetch_issuer_name(issuer)
-        carrier_paynow_enabled(issuer) ? EnrollRegistry["#{issuer_key}_pay_now".to_sym].settings[2].item : issuer
+      def carrier_long_name(carrier_name)
+        carrier_key = fetch_carrier_key_from_legal_name(carrier_name)
+        carrier_paynow_enabled(carrier_name) ? EnrollRegistry["#{carrier_key}_pay_now"].setting(:carriers_long_name).item : carrier_name
       end
 
-      def pay_now_url(issuer_name)
-        if carrier_paynow_enabled(issuer_name)
-          issuer_name = fetch_issuer_name(issuer_name)
-          SamlInformation.send("#{issuer_name}_pay_now_url")
+      def pay_now_url(carrier_name)
+        if carrier_paynow_enabled(carrier_name)
+          carrier_key = fetch_carrier_key_from_legal_name(carrier_name)
+          SamlInformation.send("#{carrier_key}_pay_now_url")
         else
           "https://"
         end
       end
 
-      def pay_now_relay_state(issuer_name)
-        if carrier_paynow_enabled(issuer_name)
-          issuer_name = fetch_issuer_name(issuer_name)
-          SamlInformation.send("#{issuer_name}_pay_now_relay_state")
+      def pay_now_relay_state(carrier_name)
+        if carrier_paynow_enabled(carrier_name)
+          carrier_key = fetch_carrier_key_from_legal_name(carrier_name)
+          SamlInformation.send("#{carrier_key}_pay_now_relay_state")
         else
           "https://"
         end
       end
 
-      def fetch_issuer_name(issuer_name)
-        carrier_legal_name = issuer_name&.downcase
+      def fetch_carrier_key_from_legal_name(carrier_key)
+        carrier_legal_name = carrier_key&.downcase
         carrier_legal_name.downcase.gsub(' ', '_').gsub(/[,.]/, '')
       end
     end

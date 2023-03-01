@@ -34,9 +34,8 @@
                 <%# pay now %>
                 <div class="dropdown-divider" style="border-top: 1px solid #e9ecef"></div>
                 <% if hbx_enrollment.product.present? %>
-                    <% legal_name = hbx_enrollment.product.carrier_profile&.legal_name %>
-                    <% carrier = fetch_issuer_name(legal_name) %>
-                    <% if EnrollRegistry.key?("feature_index.#{carrier}_pay_now") %>
+                    <% carrier = fetch_carrier_key_from_legal_name(hbx_enrollment.product.carrier_profile&.legal_name) %>
+                    <% if EnrollRegistry.key?("pay_now_feature.#{carrier}_pay_now") %>
                         <% if show_pay_now?("Enrollment Tile", hbx_enrollment)%>
                             <button class="btn-link btn-block" data-toggle="modal" data-target="#payNowModal<%= hbx_enrollment.hbx_id %>" style="padding: 6px 12px; margin: 4px 0; text-align: left;" data-enrollment="<%= hbx_enrollment.hbx_id %>">
                                 <% hover_text = before_effective_date?(hbx_enrollment) ? "make_a_first_payment" : "make_a_first_payment_before_effective" %>
