@@ -4,7 +4,7 @@ require 'dry/monads'
 require 'dry/monads/do'
 
 module Operations
-  # Call SamGenerator to generate a SAML response
+  # Call SamlGenerator to generate a SAML response
   class GenerateSamlResponse
     include Dry::Monads[:result, :do]
 
@@ -12,7 +12,7 @@ module Operations
       values               = yield validate(params)
       hbx_enrollment       = yield enrollment(values)
       payment_transaction  = yield create_payment_transaction(hbx_enrollment, values[:source])
-      saml_object          = yield init_saml_generator(payment_transaction, hbx_enrollment)
+      saml_object          = yield init_saml_generator(payment_transaction, hbx_enrollment, values[:pay_now_key])
       saml_response        = yield build_saml_response(saml_object)
       result               = yield encode_saml_reponse(saml_object, saml_response)
 
@@ -36,8 +36,8 @@ module Operations
       payment ? Success(payment) : Failure("Issue with Payment transcation")
     end
 
-    def init_saml_generator(payment_transaction, hbx_enrollment)
-      saml_obj = OneLogin::RubySaml::SamlGenerator.new(payment_transaction.payment_transaction_id, hbx_enrollment)
+    def init_saml_generator(payment_transaction, hbx_enrollment, pay_now_key)
+      saml_obj = OneLogin::RubySaml::SamlGenerator.new(payment_transaction.payment_transaction_id, hbx_enrollment, pay_now_key)
       saml_obj ? Success(saml_obj) : Failure('Unable to initialize OneLogin::RubySaml::SamlGenerator.')
     end
 
