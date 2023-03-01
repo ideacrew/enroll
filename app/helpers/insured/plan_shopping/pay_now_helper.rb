@@ -15,18 +15,18 @@ module Insured
         "Anthem Blue Cross and Blue Shield" => "https://www.anthem.com/contact-us/maine",
         "Northeast Delta Dental" => "https://www.nedelta.com/Home",
         "Taro Health Plan of Maine, Inc." => EnrollRegistry['taro_health_pay_now'].setting(:taro_health_home_page_url).item
-
       }.freeze
 
       # rubocop:disable Metrics/CyclomaticComplexity
       def show_pay_now?(source, hbx_enrollment)
-        carrier_name = hbx_enrollment&.product&.issuer_profile&.legal_name
-        @issuer_key = fetch_issuer_name(carrier_name)
+        @issuer_key = fetch_issuer_name(hbx_enrollment&.product&.issuer_profile&.legal_name)
+
         return false unless carrier_paynow_enabled(@issuer_key) && can_pay_now?(hbx_enrollment)
-        rr_feature_enabled = EnrollRegistry.feature_enabled?("#{@issuer_key}_pay_now".to_sym)
-        return false unless rr_feature_enabled == true
+        return false unless EnrollRegistry.feature_enabled?("#{@issuer_key}_pay_now".to_sym)
         return !pay_now_button_timed_out?(hbx_enrollment) if source == "Plan Shopping"
+        # return before_effective_date?(hbx_enrollment) if source == "Enrollment Tile"
         return before_effective_date?(hbx_enrollment) if source == "Enrollment Tile" && EnrollRegistry["#{@issuer_key}_pay_now".to_sym].setting(:enrollment_tile).item
+
         false
       end
       # rubocop:enable Metrics/CyclomaticComplexity
