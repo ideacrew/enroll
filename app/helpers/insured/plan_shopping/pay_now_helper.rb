@@ -34,8 +34,8 @@ module Insured
         fetch_carrier_key_from_legal_name(carrier_key)
       end
 
-      def can_pay_now?(hbx_enrollment)
-        has_break_in_coverage_enrollments?(hbx_enrollment) || !has_any_previous_enrollments?(hbx_enrollment)
+      def enrollment_can_pay_now?(hbx_enrollment)
+        individual?(hbx_enrollment) && (has_break_in_coverage_enrollments?(hbx_enrollment) || !has_any_previous_enrollments?(hbx_enrollment))
       end
 
       def carrier_url(legal_name)
