@@ -129,18 +129,15 @@ module OneLogin
       end
 
       context 'carrier has embedded custom xml' do
-        let(:operation) do
-          instance_double(
-            Operations::PayNow::Carefirst::EmbeddedXml
-          )
-        end
+        let(:operation) { instance_double(Operations::PayNow::Carefirst::EmbeddedXml) }
+
         before do
           allow(xml_settings_double).to receive(:item).and_return(true)
           allow(Operations::PayNow::Carefirst::EmbeddedXml).to receive(:new).and_return(operation)
           allow(operation).to receive(:call)
           saml_generator.build_saml_response
         end
-  
+
         it 'should call the external operation to generate xml' do
           expect(operation).to have_received(:call)
         end
