@@ -17,18 +17,17 @@ module Insured
         "Taro Health Plan of Maine, Inc." => EnrollRegistry['taro_health_pay_now'].setting(:taro_health_home_page_url).item
       }.freeze
 
-      # rubocop:disable Metrics/CyclomaticComplexity
       def show_pay_now?(source, hbx_enrollment)
         @carrier_key = fetch_carrier_key_from_legal_name(hbx_enrollment&.product&.issuer_profile&.legal_name)
 
-        return false unless carrier_paynow_enabled(@carrier_key) && enrollment_can_pay_now?(hbx_enrollment)
-        return false unless EnrollRegistry.feature_enabled?("#{@carrier_key}_pay_now".to_sym)
-        return !pay_now_button_timed_out?(hbx_enrollment) if source == "Plan Shopping"
-        return before_effective_date?(hbx_enrollment) if source == "Enrollment Tile" && EnrollRegistry["#{@carrier_key}_pay_now".to_sym].setting(:enrollment_tile).item
+        return unless carrier_paynow_enabled(@carrier_key) && enrollment_can_pay_now?(hbx_enrollment)
 
-        false
+        if source == "Plan Shopping"
+          !pay_now_button_timed_out?(hbx_enrollment)
+        elsif source == "Enrollment Tile" && EnrollRegistry["#{@carrier_key}_pay_now".to_sym].setting(:enrollment_tile).item
+          before_effective_date?(hbx_enrollment)
+        end
       end
-      # rubocop:enable Metrics/CyclomaticComplexity
 
       def carrier_key_from_enrollment(enrollment)
         carrier_key = enrollment&.product&.issuer_profile&.legal_name
