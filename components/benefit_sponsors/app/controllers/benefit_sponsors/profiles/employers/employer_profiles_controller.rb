@@ -32,56 +32,68 @@ module BenefitSponsors
           if (params[:q] || params[:page] || params[:commit] || params[:status]).present?
             # paginate_employees
           else
-            case @tab
-            when 'benefits'
-              @benefit_sponsorship = @employer_profile.organization.active_benefit_sponsorship
-              @benefit_applications = @employer_profile.benefit_applications.non_imported.desc(:start_on, :created_at)
-            when 'documents'
-              @datatable = ::Effective::Datatables::BenefitSponsorsEmployerDocumentsDataTable.new({employer_profile_id: @employer_profile.id})
-              load_documents if employer_attestation_is_enabled?
-            when 'accounts'
-              collect_and_sort_invoices(params[:sort_order])
-              @benefit_sponsorship = @employer_profile.organization.active_benefit_sponsorship
-              @benefit_sponsorship_account = @benefit_sponsorship.benefit_sponsorship_account
-              @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
-              #only exists if coming from redirect from sso failing
-              @page_num = params[:page_num] if params[:page_num].present?
-              if @page_num.present?
-                retrieve_payments_for_page(@page_num)
-              else
-                retrieve_payments_for_page(1)
-              end
-              respond_to do |format|
-                format.js {render 'benefit_sponsors/profiles/employers/employer_profiles/my_account/accounts/payment_history'}
-                format.html
-                format.any { head :ok }
-              end
-            when 'employees'
-              @datatable = ::Effective::Datatables::EmployeeDatatable.new(employee_datatable_params)
-            when 'brokers'
-              @broker_agency_account = @employer_profile.active_broker_agency_account
-            when 'families'
-              @employees = EmployeeRole.find_by_employer_profile(@employer_profile).compact.select { |ee| CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include?(ee.census_employee.aasm_state)}
-            when 'inbox'
+            when_clause_block
+          end
+        end
 
-            else
-              @broker_agency_account = @employer_profile.active_broker_agency_account
-              @benefit_sponsorship = @employer_profile.latest_benefit_sponsorship
+        def when_clause_block
+          case @tab
+          when 'benefits'
+            @benefit_sponsorship = @employer_profile.organization.active_benefit_sponsorship
+            @benefit_applications = @employer_profile.benefit_applications.non_imported.desc(:start_on, :created_at)
+          when 'documents'
+            @datatable = ::Effective::Datatables::BenefitSponsorsEmployerDocumentsDataTable.new({employer_profile_id: @employer_profile.id})
+            load_documents if employer_attestation_is_enabled?
+          when 'accounts'
+            accounts_block
+          when 'employees'
+            @datatable = ::Effective::Datatables::EmployeeDatatable.new(employee_datatable_params)
+          when 'brokers'
+            @broker_agency_account = @employer_profile.active_broker_agency_account
+          when 'families'
+            @employees = EmployeeRole.find_by_employer_profile(@employer_profile).compact.select { |ee| CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include?(ee.census_employee.aasm_state)}
+          when 'inbox'
+              # do something
+          else
+            else_block
+          end
+        end
 
-              if @benefit_sponsorship.present?
-                @broker_agency_accounts = @benefit_sponsorship.broker_agency_accounts
-                @current_plan_year = @benefit_sponsorship.submitted_benefit_application(include_term_pending: false)
-              end
+        def accounts_block
+          collect_and_sort_invoices(params[:sort_order])
+          @benefit_sponsorship = @employer_profile.organization.active_benefit_sponsorship
+          @benefit_sponsorship_account = @benefit_sponsorship.benefit_sponsorship_account
+          @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
+          #only exists if coming from redirect from sso failing
+          @page_num = params[:page_num] if params[:page_num].present?
+          if @page_num.present?
+            retrieve_payments_for_page(@page_num)
+          else
+            retrieve_payments_for_page(1)
+          end
+          respond_to do |format|
+            format.js {render 'benefit_sponsors/profiles/employers/employer_profiles/my_account/accounts/payment_history'}
+            format.html
+            format.any { head :ok }
+          end
+        end
 
-              collect_and_sort_invoices(params[:sort_order])
-              @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
+        def else_block
+          @broker_agency_account = @employer_profile.active_broker_agency_account
+          @benefit_sponsorship = @employer_profile.latest_benefit_sponsorship
 
-              respond_to do |format|
-                format.html
-                format.js
-                format.any { head :ok }
-              end
-            end
+          if @benefit_sponsorship.present?
+            @broker_agency_accounts = @benefit_sponsorship.broker_agency_accounts
+            @current_plan_year = @benefit_sponsorship.submitted_benefit_application(include_term_pending: false)
+          end
+
+          collect_and_sort_invoices(params[:sort_order])
+          @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
+
+          respond_to do |format|
+            format.html
+            format.js
+            format.any { head :ok }
           end
         end
 
@@ -232,39 +244,18 @@ module BenefitSponsors
 
         def employee_datatable_params
           data_table_params = { id: params[:id], scopes: params[:scopes] }
-
-          if @employer_profile.renewal_benefit_application.present?
-            data_table_params.merge!({
-                                       renewal: true
-                                     })
-          end
-
-          if @employer_profile.off_cycle_benefit_application.present?
-            data_table_params.merge!(
-              {
-                off_cycle: true
-              }
-            )
-            data_table_params.merge!({current_py_terminated: true}) if @employer_profile.current_benefit_application&.terminated?
-          end
-
-          data_table_params.merge!({ future_reinstated: true }) if @employer_profile.future_active_reinstated_benefit_application.present?
+          data_table_params_block(data_table_params)
           data_table_params.merge!({reinstated: true}) if @employer_profile.current_benefit_application&.reinstated_id.present?
+          data_table_params.merge!({ is_submitted: true }) if @employer_profile&.renewal_benefit_application&.is_submitted?
+          data_table_params.merge!({ is_off_cycle_submitted: true }) if @employer_profile&.off_cycle_benefit_application&.is_submitted?
+          data_table_params
+        end
 
-          if @employer_profile&.renewal_benefit_application&.is_submitted?
-            data_table_params.merge!({
-                                       is_submitted: true
-                                     })
-          end
-
-          if @employer_profile&.off_cycle_benefit_application&.is_submitted?
-            data_table_params.merge!(
-              {
-                is_off_cycle_submitted: true
-              }
-            )
-          end
-
+        def data_table_params_block(data_table_params)
+          data_table_params.merge!({ renewal: true }) if @employer_profile.renewal_benefit_application.present?
+          data_table_params.merge!({ off_cycle: true }) if @employer_profile.off_cycle_benefit_application.present?
+          data_table_params.merge!({current_py_terminated: true}) if @employer_profile.off_cycle_benefit_application.present? && @employer_profile.current_benefit_application&.terminated?
+          data_table_params.merge!({ future_reinstated: true }) if @employer_profile.future_active_reinstated_benefit_application.present?
           data_table_params
         end
 
