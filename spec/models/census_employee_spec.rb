@@ -578,6 +578,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         )
       end
       before do
+        allow(Rails).to receive_message_chain(:env, :test?).and_return false
         organization.active_benefit_sponsorship.update_attributes(source_kind: :conversion)
         person = employee_role.person
         person.user = user
@@ -590,8 +591,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       end
 
       it 'should send an invite' do
-        allow(Rails).to receive_message_chain(:env, :test?).and_return false
-        expect(census_employee).to receive(:send_invite!)
+        expect(Invitation.all.size).to eq 1
       end
     end
 
