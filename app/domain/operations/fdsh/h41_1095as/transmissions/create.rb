@@ -8,7 +8,7 @@ module Operations
         class Create
           send(:include, Dry::Monads[:result, :do, :try])
           include EventSource::Command
-          REPORT_TYPES = %i[all original corrected void].freeze
+          REPORT_TYPES = %w[all original corrected void].freeze
 
           # @param [String] assistance_year
           # @param [Array] report_types
@@ -24,7 +24,7 @@ module Operations
           private
 
           def validate(params)
-            params[:report_types]&.map!(&:to_sym)
+            params[:report_types]&.map!(&:to_s)
 
             errors = []
             errors << 'assistance_year required' unless params[:assistance_year]

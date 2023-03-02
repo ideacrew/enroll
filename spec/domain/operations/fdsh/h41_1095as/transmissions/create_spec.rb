@@ -27,28 +27,22 @@ RSpec.describe ::Operations::Fdsh::H411095as::Transmissions::Create do
         expect(result.failure).to include('invalid report_types')
       end
     end
+  end
 
-    context 'when valid params passed' do
-      let(:params) do
-        {
-          assistance_year: Date.today.year,
-          report_types: [:original],
-          allow_list: ['523232'],
-          deny_list: ['523232']
-        }
-      end
+  context 'when valid params passed' do
+    let(:params) do
+      {
+        assistance_year: Date.today.year,
+        report_types: ['original'],
+        allow_list: ['523232'],
+        deny_list: ['523232']
+      }
+    end
 
-      let(:success_double) do
-        double(success?: true, success: double(publish: true))
-      end
+    it 'should publish event successfully' do
+      result = subject.call(params)
 
-      before { allow(subject).to receive(:event).and_return(success_double) }
-
-      it 'should publish event successfully' do
-        result = subject.call(params)
-
-        expect(result.success?).to be_truthy
-      end
+      expect(result.success?).to be_truthy
     end
   end
 end
