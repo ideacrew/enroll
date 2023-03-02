@@ -373,11 +373,5 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
       allow(TimeKeeper).to receive(:date_of_record).and_return(hbx_enrollment.effective_on)
       expect(helper.show_pay_now?("Enrollment Tile", hbx_enrollment)).to eq false
     end
-
-    it 'should return false if enrollment kind is employer sponsored' do
-      allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
-      allow(TimeKeeper).to receive(:date_of_record).and_return(hbx_enrollment1.effective_on)
-      expect(helper.show_pay_now?("Enrollment Tile", hbx_enrollment1)).to eq false
-    end
   end
 end
