@@ -578,6 +578,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         )
       end
       before do
+        organization.active_benefit_sponsorship.update_attributes(source_kind: :conversion)
         person = employee_role.person
         person.user = user
         person.save
@@ -586,6 +587,11 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       end
       it "should return true when link_employee_role!" do
         expect(census_employee.aasm_state).to eq('employee_role_linked')
+      end
+
+      it 'should send an invite' do
+        allow(Rails).to receive_message_chain(:env, :test?).and_return false
+        expect(census_employee).to receive(:send_invite!)
       end
     end
 
