@@ -19,6 +19,8 @@ module BenefitSponsors
       let(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
       context 'when a correct format is uploaded' do
         before do
+          new_file = File.join("public", "DCHL_Employee_Census.xlsx")
+          FileUtils.cp Rails.root.join("spec", "test_data", "census_employee_import", "DCHL Employee Census.xlsx"), new_file
           benefit_sponsorship.save!
           BenefitSponsors::BulkEmployeesUploadWorker.perform_async('DCHL_Employee_Census.xlsx', 'application/xlsx', benefit_sponsor.profiles.first.id, current_user.email)
 
@@ -32,6 +34,8 @@ module BenefitSponsors
 
       context 'when a wrong file is uploaded' do
         before do
+          new_file = File.join("public", "individual.xlsx")
+          FileUtils.cp Rails.root.join("spec", "test_data", "census_employee_import", "individual.xlsx"), new_file
           benefit_sponsorship.save!
           BenefitSponsors::BulkEmployeesUploadWorker.perform_async('individual.xlsx', 'application/xlsx', benefit_sponsor.profiles.first.id, current_user.email)
         end

@@ -30,7 +30,7 @@ module BenefitSponsors
         # sending an error email
         EmployeeUploadMailer.error_email(user_email, e.message).deliver_now
       ensure
-        FileUtils.rm file.tempfile unless Rails.env == 'test'
+        FileUtils.rm file.tempfile
       end
     end
   end
