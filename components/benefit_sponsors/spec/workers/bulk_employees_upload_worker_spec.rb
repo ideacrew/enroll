@@ -5,7 +5,7 @@ require 'sidekiq/testing'
 Sidekiq::Testing.inline!
 # BenefitSponsors
 module BenefitSponsors
-  describe BulkEmployeesUploadWorker, :dbclean => :after_each do
+  RSpec.describe BulkEmployeesUploadWorker, :dbclean => :after_each do
     describe "#perform" do
       let(:current_user) { FactoryBot.create :user }
       let(:file) do
