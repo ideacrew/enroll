@@ -3,6 +3,7 @@
 module BenefitSponsors
   module Profiles
     module Employers
+      # EmployerProfilesController
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
 
         include Config::AcaHelper
@@ -217,9 +218,8 @@ module BenefitSponsors
         def collect_and_sort_invoices(sort_order = 'ASC')
           @invoices = @employer_profile.invoices
           @invoice_years = (Settings.invoices.minimum_invoice_display_year..TimeKeeper.date_of_record.year).to_a.reverse
-          unless @documents
-            sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse!
-          end
+          return unless @documents
+          sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse!
         end
 
         def find_employer
