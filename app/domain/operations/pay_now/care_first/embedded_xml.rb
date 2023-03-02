@@ -1,8 +1,9 @@
 module Operations
   module PayNow
-    module Carefirst
-      module EmbeddedXml
-        # format will be {members: [array of cv3 person payloads], enrollment: cv3 enrollment payload}
+    module CareFirst
+      # Generate Pay Now custom embedded XML payload for CareFirst carrier
+      class EmbeddedXml
+        
         def call(enrollment)
           result = yield construct_payload(enrollment)
           Success(result)

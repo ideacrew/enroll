@@ -190,14 +190,18 @@ module OneLogin
 
       def build_additional_info
         if EnrollRegistry[@pay_now_key].setting(:embed_xml).item
-          carrier_name_strings = @pay_now_key.to_s.gsub('_pay_now', '').split('_')
-          carrier_camel_case = carrier_name_strings.inject('') do |full_name, name_string|
-            full_name.concat(name_string.humanize)
-          end
-          generate_xml = "Operations::PayNow::#{carrier_camel_case}::EmbeddedXml".constantize
-          generate_xml.new.call
+          embedded_xml_class = fetch_embedded_xml_class_name
+          embedded_xml_class.new.call
         else
           @hbx_enrollment.hbx_enrollment_members.map(&:person).map{|person| person.first_name_last_name_and_suffix(',')}.join(';')
+        end
+      end
+
+      def fetch_embedded_xml_class_name
+        carrier_name = @hbx_enrollment&.product&.issuer_profile&.legal_name
+        case carrier_name
+        when 'CareFirst'
+          ::Operations::PayNow::CareFirst::EmbeddedXml
         end
       end
     end
