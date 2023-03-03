@@ -1,18 +1,37 @@
 # frozen_string_literal: true
 
 require "rails_helper"
+require File.join(Rails.root, "spec/shared_contexts/benchmark_products")
 
 RSpec.describe Operations::PayNow::CareFirst::EmbeddedXml do
-  let!(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
-  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
-  let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: "01") }
-  let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, aasm_state: "shopping", product: product) }
+  include_context "family with 2 family members with county_zip, rating_area & service_area"
+  include_context "3 dental products with different rating_methods, different child_only_offerings and 3 health products"
+  let(:enr_product) do
+    product = BenefitMarkets::Products::DentalProducts::DentalProduct.by_year(TimeKeeper.date_of_record.year).detect(&:family_based_rating?)
+    product.update_attributes!(dental_level: nil)
+    product
+  end
 
-  describe "payload is incomplete" do
-    it "fails with incomplete payload" do
-      result = described_class.new.call("000000")
-      expect(result.success?).to be_falsey
-      expect(result.failure).to eq("unable to transform hbx enrollment 000000")
+  let(:submitted_at) { 2.months.ago }
+  let(:enrollment_kind) { 'open_enrollment' }
+  let!(:enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      :individual_unassisted,
+                      effective_on: TimeKeeper.date_of_record.beginning_of_month,
+                      terminated_on: TimeKeeper.date_of_record.end_of_month,
+                      family: family,
+                      product_id: enr_product.id,
+                      rating_area_id: rating_area.id,
+                      enrollment_kind: enrollment_kind,
+                      coverage_kind: "dental",
+                      submitted_at: submitted_at,
+                      consumer_role_id: family.primary_person.consumer_role.id,
+                      enrollment_members: family.family_members)
+  end
+  context "valid payload is created" do
+    it "should return successful xml" do
+      puts Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment.new.call(enrollment)
+      expect(described_class.new.call(enrollment)).to be_success
     end
   end
 end
