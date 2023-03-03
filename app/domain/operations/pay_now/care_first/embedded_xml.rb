@@ -1,9 +1,12 @@
+# frozen_string_literal: true
+
 require "dry/monads"
 require "dry/monads/do"
 
 module Operations
   module PayNow
     module CareFirst
+      # Generate Pay Now custom embedded XML payload for CareFirst carrier
       class EmbeddedXml
         include Dry::Monads[:result, :do]
 
@@ -27,19 +30,16 @@ module Operations
           enrollment.hbx_enrollment_members.each do |hem|
             person = hem.person
             cv3_person = Operations::Transformers::PersonTo::Cv3Person.new.call(person)
-            if cv3_person.success?
-              members << cv3_person.value!
-            else
-              return Failure("unable to transform person #{person.hbx_id} due to #{cv3_person.failure}")
-            end
+            return Failure("unable to transform person #{person.hbx_id} due to #{cv3_person.failure}") unless cv3_person.success?
+            members << cv3_person.value!
           end
-          return Success(members)
+          Success(members)
         end
 
         def construct_payload(cv3_enrollment, cv3_members)
           payload = {
             hbx_enrollment: cv3_enrollment,
-            members: cv3_members,
+            members: cv3_members
           }
           Success(payload)
         end

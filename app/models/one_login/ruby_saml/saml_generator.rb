@@ -192,7 +192,7 @@ module OneLogin
         carrier_name = @hbx_enrollment&.product&.issuer_profile&.legal_name
         carrier_key = fetch_carrier_key(carrier_name)
         if EnrollRegistry[carrier_key].setting(:embed_xml).item
-          embedded_xml = transform_embedded_xml
+          transform_embedded_xml
         else
           @hbx_enrollment.hbx_enrollment_members.map(&:person).map{|person| person.first_name_last_name_and_suffix(',')}.join(';')
         end
@@ -214,11 +214,7 @@ module OneLogin
       def transform_embedded_xml
         embedded_xml_class = fetch_embedded_xml_class_name
         xml = embedded_xml_class.new.call(@hbx_enrollment)
-        if xml.success?
-          xml.success
-        else
-          raise "Unable to transform xml due to #{xml.failure}"
-        end
+        raise "Unable to transform xml due to #{xml.failure}" unless xml.success?
       end
     end
   end
