@@ -43,7 +43,7 @@ module Effective
 
 
         if EnrollRegistry.feature_enabled?(:aca_shop_osse_subsidy) && EnrollRegistry.feature_enabled?(:TEMP_broker_client_hc4cc_status)
-          table_column :hc4cc, :label => "HC4CC", :proc => Proc.new { |row|
+          table_column :hc4cc, :label => "HC4CC", :proc => proc { |row|
             if row.is_prospect?
               l10n('ineligible')
             else
