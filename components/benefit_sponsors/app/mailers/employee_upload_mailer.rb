@@ -2,6 +2,7 @@
 
 # Employee upload mailer
 class EmployeeUploadMailer < ApplicationMailer
+  default from: EnrollRegistry[:enroll_app].setting(:mail_address).item
 
   def success_email(recipient, records_count)
     @records_count = records_count

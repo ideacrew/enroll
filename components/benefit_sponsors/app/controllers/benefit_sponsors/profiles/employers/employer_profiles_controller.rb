@@ -133,7 +133,7 @@ module BenefitSponsors
           authorize @employer_profile, :show?
           if roster_upload_file_type.include?(file_content_type)
             tmp = params[:file].tempfile
-            file = File.join("public", params[:file].original_filename.gsub(" ", "_"))
+            file = File.join("#{Rails.root}/public", params[:file].original_filename.gsub(" ", "_"))
             FileUtils.cp tmp.path, file
             # calling worker
             BenefitSponsors::BulkEmployeesUploadWorker.perform_async(params[:file].original_filename.gsub(" ", "_"), params[:file].content_type, @employer_profile._id, current_user.email)

@@ -89,8 +89,11 @@ module BenefitSponsors
           benefit_sponsorship.save!
           allow(controller).to receive(:authorize).and_return(true)
           sign_in user
+          new_file = File.join("#{Rails.root}/public", "DCHL Employee Census.xlsx")
+          FileUtils.cp Rails.root.join("spec", "test_data", "census_employee_import", "DCHL Employee Census.xlsx"), new_file
           post :bulk_employee_upload, :params => {:employer_profile_id => benefit_sponsor.profiles.first.id, :file => file}
         end
+
 
         it 'should upload successfully' do
           expect(response).to redirect_to(profiles_employers_employer_profile_path(benefit_sponsor.profiles.first, tab: 'employees'))
@@ -102,12 +105,14 @@ module BenefitSponsors
       end
 
       context 'when a wrong format is uploaded' do
-        let(:file) { Rack::Test::UploadedFile.new(Rails.root.join("spec", "test_data", "individual_person_payloads", "individual.xml")) }
+        let(:file) { Rack::Test::UploadedFile.new(Rails.root.join("spec", "test_data", "census_employee_import", "individual.xlsx")) }
 
         before do
           benefit_sponsorship.save!
           allow(controller).to receive(:authorize).and_return(true)
           sign_in user
+          new_file = File.join("#{Rails.root}/public", "individual.xlsx")
+          FileUtils.cp Rails.root.join("spec", "test_data", "census_employee_import", "individual.xlsx"), new_file
           post :bulk_employee_upload, :params => {:employer_profile_id => benefit_sponsor.profiles.first.id, :file => file}
         end
 
