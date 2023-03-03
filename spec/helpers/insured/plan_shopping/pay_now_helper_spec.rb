@@ -8,7 +8,7 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
   let(:individual_plans) { FactoryBot.create_list(:plan, 5, :with_premium_tables, market: 'individual') }
 
   describe "Carrier with payment options" do
-    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) do
       FactoryBot.create(:benefit_markets_products_health_products_health_product,
                         title: 'IVL Test Plan Silver',
@@ -38,14 +38,14 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
         end
         it "returns #{market.in?(['individual', 'coverall'])} for #{market} + Kaiser" do
           allow(helper).to receive(:has_any_previous_enrollments?).with(hbx_enrollment).and_return false
-          expect(helper.show_pay_now?("Plan Shopping", hbx_enrollment)).to eq false
+          expect(helper.show_pay_now?("Plan Shopping", hbx_enrollment)).to be_falsey
         end
       end
     end
   end
 
   describe "Carrier with NO payment options" do
-    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) do
       FactoryBot.create(:benefit_markets_products_health_products_health_product,
                         title: 'IVL Test Plan Silver',
@@ -70,12 +70,12 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
       assign(:enrollment, hbx_enrollment)
     end
     it "returns false for not Kaiser" do
-      expect(helper.show_pay_now?("Plan Shopping", hbx_enrollment)).to eq false
+      expect(helper.show_pay_now?("Plan Shopping", hbx_enrollment)).to be_falsey
     end
   end
 
   describe "Check family has Kaiser enrollments or not" do
-    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: 'Kaiser') }
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) do
       FactoryBot.create(:benefit_markets_products_health_products_health_product,
                         title: 'IVL Test Plan Silver',
@@ -169,7 +169,7 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
   end
 
   describe 'Whether family has break in coverage enrollments' do
-    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: 'Kaiser') }
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) do
       FactoryBot.create(:benefit_markets_products_health_products_health_product,
                         title: 'IVL Test Plan Silver',
@@ -235,7 +235,7 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
   end
 
   describe 'Pay Now button should be available only for limited time' do
-    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) do
       FactoryBot.create(:benefit_markets_products_health_products_health_product,
                         title: 'IVL Test Plan Silver',
@@ -322,7 +322,7 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
   end
 
   describe 'Pay Now button should be available only for limited time on enrollment tile' do
-    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: 'Kaiser') }
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) do
       FactoryBot.create(:benefit_markets_products_health_products_health_product,
                         title: 'IVL Test Plan Silver',
@@ -371,13 +371,13 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
 
     it 'should return true if current date is equal to enrollment effective date' do
       allow(TimeKeeper).to receive(:date_of_record).and_return(hbx_enrollment.effective_on)
-      expect(helper.show_pay_now?("Enrollment Tile", hbx_enrollment)).to eq false
+      expect(helper.show_pay_now?("Enrollment Tile", hbx_enrollment)).to be_truthy
     end
 
     it 'should return false if enrollment kind is employer sponsored' do
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(TimeKeeper).to receive(:date_of_record).and_return(hbx_enrollment1.effective_on)
-      expect(helper.show_pay_now?("Enrollment Tile", hbx_enrollment1)).to eq false
+      expect(helper.show_pay_now?("Enrollment Tile", hbx_enrollment1)).to be_falsey
     end
   end
 end
