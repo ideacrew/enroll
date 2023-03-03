@@ -28,8 +28,10 @@ module OneLogin
       attr_reader :transaction_id, :hbx_enrollment, :private_key, :cert
 
       def initialize(transaction_id, hbx_enrollment)
+        super()
         @transaction_id = transaction_id
         @hbx_enrollment = hbx_enrollment
+        # @pay_now_key = pay_now_key
 
         if Rails.env.production?
           @private_key = OpenSSL::PKey::RSA.new(File.read(SamlInformation.pay_now_private_key_location))
@@ -150,7 +152,7 @@ module OneLogin
         when 'Subscriber Identifier'
           hbx_enrollment.subscriber.person.hbx_id.rjust(10, '0')
         when 'Additional Information'
-          hbx_enrollment.hbx_enrollment_members.map(&:person).map{|person| person.first_name_last_name_and_suffix(',')}.join(';')
+          build_additional_info
         end
       end
 
@@ -184,6 +186,31 @@ module OneLogin
 
       def generate_uuid
         SecureRandom.uuid
+      end
+
+      def build_additional_info
+        carrier_name = @hbx_enrollment&.product&.issuer_profile&.legal_name
+        carrier_key = fetch_carrier_key(carrier_name)
+
+        if EnrollRegistry[carrier_key].setting(:embed_xml).item
+          embedded_xml_class = fetch_embedded_xml_class_name
+          embedded_xml_class.new.call
+        else
+          @hbx_enrollment.hbx_enrollment_members.map(&:person).map{|person| person.first_name_last_name_and_suffix(',')}.join(';')
+        end
+      end
+
+      def fetch_embedded_xml_class_name
+        carrier_name = @hbx_enrollment&.product&.issuer_profile&.legal_name
+        case carrier_name
+        when 'CareFirst'
+          ::Operations::PayNow::CareFirst::EmbeddedXml
+        end
+      end
+
+      def fetch_carrier_key(carrier_name)
+        snake_case_carrier_name = carrier_name.downcase.gsub(' ', '_').gsub(/[,.]/, '')
+        "#{snake_case_carrier_name}_pay_now".to_sym
       end
     end
   end
