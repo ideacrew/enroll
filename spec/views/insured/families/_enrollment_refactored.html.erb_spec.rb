@@ -140,7 +140,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
           allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
           allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
           allow(hbx_enrollment).to receive(:applied_aptc_amount).and_return(100.0)
-          allow(view).to receive(:individual?).and_return(true)
+          allow(view).to receive(:enrollment_is_ivl_or_coverall?).and_return(true)
           allow(view).to receive(:before_effective_date?).and_return(true)
           allow(view).to receive(:enrollment_can_pay_now?).and_return(true)
           allow(hbx_enrollment).to receive(:is_any_enrollment_member_outstanding).and_return false

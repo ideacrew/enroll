@@ -35,7 +35,7 @@ module Insured
       end
 
       def enrollment_can_pay_now?(hbx_enrollment)
-        individual?(hbx_enrollment) && (has_break_in_coverage_enrollments?(hbx_enrollment) || !has_any_previous_enrollments?(hbx_enrollment))
+        enrollment_is_ivl_or_coverall?(hbx_enrollment) && (has_break_in_coverage_enrollments?(hbx_enrollment) || !has_any_previous_enrollments?(hbx_enrollment))
       end
 
       def carrier_url(legal_name)
@@ -47,7 +47,7 @@ module Insured
         (link_to l10n("plans.issuer.pay_now.first_payment"), carrier_url(legal_name), class: "btn-link btn-block dropdown-item", style: 'padding: 6px 12px; margin: 4px 0;', target: '_blank').html_safe
       end
 
-      def individual?(hbx_enrollment)
+      def enrollment_is_ivl_or_coverall?(hbx_enrollment)
         hbx_enrollment.kind.in?(['individual', 'coverall'])
       end
 
