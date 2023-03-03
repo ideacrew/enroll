@@ -3,14 +3,14 @@ require 'rails_helper'
 module OneLogin
   RSpec.describe RubySaml::SamlGenerator do
     let(:transaction_id) { '1234' }
-    let(:pay_now_key) { :carefirst_pay_now }
+    let(:carrier_key) { :kaiser_pay_now }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
     let!(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: 'Kaiser') }
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
     let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, hbx_id: "123456789", household: family.active_household, aasm_state: 'shopping', family: family, product: product) }
     let!(:hbx_enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment) }
     let!(:hbx_enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment) }
-    let(:saml_generator) { OneLogin::RubySaml::SamlGenerator.new(transaction_id,hbx_enrollment, pay_now_key) }
+    let(:saml_generator) { OneLogin::RubySaml::SamlGenerator.new(transaction_id,hbx_enrollment) }
     let(:test_priv_key) { OpenSSL::PKey::RSA.new(File.read(Rails.root.join('spec', 'test_data').to_s + '/test_wfpk.pem')) }
     let(:test_x509_cert) { OpenSSL::X509::Certificate.new(File.read(Rails.root.join('spec', 'test_data').to_s + '/test_x509.pem')) }
     let(:pay_now_double) { double }
@@ -20,10 +20,9 @@ module OneLogin
     before :each do
       saml_generator.instance_variable_set(:@private_key, test_priv_key)
       saml_generator.instance_variable_set(:@cert, test_x509_cert)
-      saml_generator.instance_variable_set(:@pay_now_key, pay_now_key)
       hbx_enrollment.update_attributes(kind: 'individual')
       allow(EnrollRegistry).to receive(:[]).and_call_original
-      allow(EnrollRegistry).to receive(:[]).with(pay_now_key).and_return(pay_now_double)
+      allow(EnrollRegistry).to receive(:[]).with(:kaiser_pay_now).and_return(pay_now_double)
       allow(pay_now_double).to receive(:setting).with(embed_xml_key).and_return(xml_settings_double)
       allow(xml_settings_double).to receive(:item).and_return(false)
       @saml_response = saml_generator.build_saml_response
@@ -130,8 +129,10 @@ module OneLogin
 
       context 'carrier has embedded custom xml' do
         let(:operation) { instance_double(Operations::PayNow::CareFirst::EmbeddedXml) }
+        let(:carrier_key) { :carefirst_pay_now }
 
         before do
+          allow(EnrollRegistry).to receive(:[]).with(carrier_key).and_return(pay_now_double)
           allow(xml_settings_double).to receive(:item).and_return(true)
           allow(Operations::PayNow::CareFirst::EmbeddedXml).to receive(:new).and_return(operation)
           allow(operation).to receive(:call)

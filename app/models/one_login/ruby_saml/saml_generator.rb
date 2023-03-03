@@ -25,13 +25,13 @@ module OneLogin
       NAME_FORMAT = 'urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified'
       PASSWORD = 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'.freeze
 
-      attr_reader :transaction_id, :hbx_enrollment, :private_key, :cert, :pay_now_key
+      attr_reader :transaction_id, :hbx_enrollment, :private_key, :cert
 
-      def initialize(transaction_id, hbx_enrollment, pay_now_key)
+      def initialize(transaction_id, hbx_enrollment)
         super()
         @transaction_id = transaction_id
         @hbx_enrollment = hbx_enrollment
-        @pay_now_key = pay_now_key
+        # @pay_now_key = pay_now_key
 
         if Rails.env.production?
           @private_key = OpenSSL::PKey::RSA.new(File.read(SamlInformation.pay_now_private_key_location))
@@ -189,6 +189,8 @@ module OneLogin
       end
 
       def build_additional_info
+        carrier_name = @hbx_enrollment&.product&.issuer_profile&.legal_name
+        carrier_key = fetch_carrier_key(carrier_name)
         if EnrollRegistry[@pay_now_key].setting(:embed_xml).item
           embedded_xml = transform_embedded_xml
         else
@@ -202,6 +204,11 @@ module OneLogin
         when 'CareFirst'
           ::Operations::PayNow::CareFirst::EmbeddedXml
         end
+      end
+
+      def fetch_carrier_key(carrier_name)
+        snake_case_carrier_name = carrier_name.downcase.gsub(' ', '_').gsub(/[,.]/, '')
+        "#{snake_case_carrier_name}_pay_now".to_sym
       end
 
       def transform_embedded_xml
