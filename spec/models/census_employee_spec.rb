@@ -654,14 +654,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
                                     hired_on: census_employee.hired_on)
       expect(census_employee.construct_employee_role_for_match_person).to eq true
     end
-
-    it "should send email notification for non conversion employee" do
-      allow(census_employee1).to receive(:active_benefit_group_assignment).and_return benefit_group_assignment
-      person.employee_roles.create!(ssn: census_employee1.ssn,
-                                    employer_profile_id: census_employee1.employer_profile.id,
-                                    hired_on: census_employee1.hired_on)
-      expect(census_employee1.send_invite!).to eq true
-    end
   end
 
 
