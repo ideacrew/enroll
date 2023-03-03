@@ -1033,6 +1033,11 @@ When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) tab$/) do |tab_n
   wait_for_ajax
 end
 
+When(/Primary Broker clicks the Employers tab/) do
+  find(BrokerHomePage.employers_tab, wait: 5).click
+  wait_for_ajax
+end
+
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) dropdown$/) do |tab_name|
   target_dropdown = page.all('a').detect { |a| a.text == tab_name }
   target_dropdown.click
