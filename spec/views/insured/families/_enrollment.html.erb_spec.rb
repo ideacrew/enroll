@@ -321,7 +321,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   context "reinstated enrollment" do
     let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
-    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
     let!(:hbx_enrollment) do
       FactoryBot.create(
@@ -352,7 +352,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   context "Termination Indicator display for terminated enrollments" do
     let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
-    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
     let!(:hbx_enrollment) do
       FactoryBot.create(
@@ -427,7 +427,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   context "Termination Indicator display for terminated enrollments" do
     let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
-    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
     let!(:hbx_enrollment) do
       FactoryBot.create(
@@ -465,7 +465,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   context "when the enrollment is coverage_selected" do
     let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
-    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
     let!(:hbx_enrollment) do
       FactoryBot.create(
