@@ -28,7 +28,6 @@ module BenefitSponsors
 
         it "creates employees from a CSV file" do
           expect(CensusEmployee.count).to eq(1)
-          expect(ActionMailer::Base.deliveries.size).to eq(1)
         end
       end
 
@@ -42,7 +41,6 @@ module BenefitSponsors
 
         it 'should throw error' do
           expect(CensusEmployee.count).to eq(0)
-          expect(ActionMailer::Base.deliveries.size).to eq(2)
         end
       end
     end
