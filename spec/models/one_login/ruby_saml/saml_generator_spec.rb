@@ -128,14 +128,14 @@ module OneLogin
       end
 
       context 'carrier has embedded custom xml' do
-        let(:operation) { instance_double(Operations::PayNow::CareFirst::EmbeddedXml) }
+        let(:operation) { instance_double(Operations::PayNow::CareFirst::EmbeddedXml, call: hbx_enrollment) }
         let(:carrier_key) { :carefirst_pay_now }
 
         before do
           allow(EnrollRegistry).to receive(:[]).with(carrier_key).and_return(pay_now_double)
           allow(xml_settings_double).to receive(:item).and_return(true)
           allow(Operations::PayNow::CareFirst::EmbeddedXml).to receive(:new).and_return(operation)
-          allow(operation).to receive(:call)
+          allow(operation).to receive(:call).and_return(::Dry::Monads::Result::Success.new("sample xml"))
           issuer_profile.update(legal_name: 'CareFirst')
           saml_generator.build_saml_response
         end
