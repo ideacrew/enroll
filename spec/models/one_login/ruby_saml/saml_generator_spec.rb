@@ -128,7 +128,7 @@ module OneLogin
       end
 
       context 'carrier has embedded custom xml' do
-        let(:operation) { instance_double(Operations::PayNow::CareFirst::EmbeddedXml, call: hbx_enrollment) }
+        let(:operation) { instance_double(Operations::PayNow::CareFirst::EmbeddedXml) }
         let(:carrier_key) { :carefirst_pay_now }
 
         before do
