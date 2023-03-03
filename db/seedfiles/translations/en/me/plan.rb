@@ -22,6 +22,12 @@ PLAN_TRANSLATIONS = {
   'en.plans.anthm_hours' => '7:00 am – 7:00 pm (Monday-Friday)',
   'en.plans.anthm_contact_url' => '',
 
+  'en.plans.taro' => 'Taro Health Care',
+  'en.plans.taro_phone_1' => '1-207-210-3434',
+  'en.plans.taro_href_phone_1' => 'tel:+12072103434',
+  'en.plans.taro_hours' => '9am to 6:30pm EST, Monday - Friday',
+  'en.plans.taro_contact_url' => 'www.tarohealth.com',
+
   'en.plans.nedd' => 'Northeast Delta Dental',
   'en.plans.nedd_phone_1' => '1-800-832-5700',
   'en.plans.nedd_phone_2' => '1-603-223-1234',

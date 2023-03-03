@@ -125,7 +125,7 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
     let(:product) { create(:benefit_markets_products_health_products_health_product, :ivl_product, issuer_profile: issuer) }
     let(:issuer) { create(:benefit_sponsors_organizations_issuer_profile, abbrev: 'ANTHM') }
 
-    subject { Operations::Transformers::FamilyTo::Cv3Family.new.transform_households(family.households) }
+    subject { Operations::Transformers::FamilyTo::Cv3Family.new.transform_households(family.households, {exclude_seps: false}) }
 
     context 'when enrollment is in shopping state' do
       let(:aasm_state) { 'shopping' }
@@ -138,6 +138,58 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
       let(:aasm_state) { 'coverage_selected' }
       it 'should include hbx_enrollments in the hash' do
         expect(subject[0][:hbx_enrollments]).to be_present
+      end
+    end
+  end
+
+  describe '#transform hbx_enrollments' do
+    let(:aasm_state) { 'coverage_selected' }
+    let!(:coverage_selected_enrollment) do
+      create(
+        :hbx_enrollment,
+        :with_enrollment_members,
+        :individual_unassisted,
+        family: family,
+        aasm_state: aasm_state,
+        product_id: product.id,
+        applied_aptc_amount: Money.new(44_500),
+        consumer_role_id: primary_applicant.consumer_role.id,
+        enrollment_members: family.family_members,
+        enrollment_kind: "special_enrollment",
+        submitted_at: submitted_at
+      )
+    end
+
+    let(:submitted_at) { TimeKeeper.date_of_record }
+    let(:start_on) { submitted_at.prev_day }
+    let(:special_enrollment_period) do
+      build(
+        :special_enrollment_period,
+        family: family,
+        qualifying_life_event_kind_id: qle.id,
+        market_kind: "ivl",
+        start_on: start_on,
+        end_on: start_on,
+        created_at: submitted_at,
+        updated_at: submitted_at
+      )
+    end
+
+    let!(:add_special_enrollment_period) do
+      family.special_enrollment_periods = [special_enrollment_period]
+      family.save
+    end
+    let!(:qle)  { FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual") }
+
+    let(:product) { create(:benefit_markets_products_health_products_health_product, :ivl_product, issuer_profile: issuer) }
+    let(:issuer) { create(:benefit_sponsors_organizations_issuer_profile, abbrev: 'ANTHM') }
+
+    subject { Operations::Transformers::FamilyTo::Cv3Family.new.transform_households(family.households, {exclude_seps: true}) }
+
+    context 'when enrollment is outside of sep periods and exclude_seps is true' do
+      let(:aasm_state) { 'coverage_selected' }
+      it 'should not return special_enrollment_period_reference' do
+        expect(subject[0][:hbx_enrollments][0][:special_enrollment_period_reference]).to be_nil
       end
     end
   end
