@@ -190,8 +190,7 @@ module OneLogin
 
       def build_additional_info
         if EnrollRegistry[@pay_now_key].setting(:embed_xml).item
-          embedded_xml_class = fetch_embedded_xml_class_name
-          embedded_xml_class.new.call
+          embedded_xml = transform_embedded_xml
         else
           @hbx_enrollment.hbx_enrollment_members.map(&:person).map{|person| person.first_name_last_name_and_suffix(',')}.join(';')
         end
@@ -203,6 +202,12 @@ module OneLogin
         when 'CareFirst'
           ::Operations::PayNow::CareFirst::EmbeddedXml
         end
+      end
+
+      def transform_embedded_xml
+        embedded_xml_class = fetch_embedded_xml_class_name
+        xml = embedded_xml_class.new.call(@hbx_enrollment)
+        xml.success? ? xml : raise "Unable to transform xml due to #{xml.failure}"
       end
     end
   end
