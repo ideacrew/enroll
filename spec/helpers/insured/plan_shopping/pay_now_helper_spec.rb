@@ -360,13 +360,11 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
         from_state: hbx_enrollment.aasm_state,
         to_state: "coverage_selected"
       )
-      hbx_enrollment.update_attributes(effective_on: TimeKeeper.date_of_record + 1.day)
       assign(:enrollment, hbx_enrollment)
     end
 
     it 'should return true if current date is less than enrollment effective date' do
-      #TODO: Remove this consition when setting is turned on
-      expect(helper.show_pay_now?("Enrollment Tile", hbx_enrollment)).to eq true if EnrollRegistry[:kaiser_pay_now].setting(:enrollment_tile).item
+      expect(helper.show_pay_now?("Enrollment Tile", hbx_enrollment)).to eq true
     end
 
     it 'should return true if current date is equal to enrollment effective date' do
@@ -376,7 +374,6 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
 
     it 'should return false if enrollment kind is employer sponsored' do
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
-      allow(TimeKeeper).to receive(:date_of_record).and_return(hbx_enrollment1.effective_on)
       expect(helper.show_pay_now?("Enrollment Tile", hbx_enrollment1)).to be_falsey
     end
   end
