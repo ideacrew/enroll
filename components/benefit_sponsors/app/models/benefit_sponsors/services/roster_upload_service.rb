@@ -340,7 +340,7 @@ module BenefitSponsors
       end
 
       def parse_ssn(cell)
-        cell.blank? ? nil : cell.to_i.to_s.gsub(/\D/, '')
+        cell.blank? ? nil : cell.to_s.split('.').first.gsub(/\D/, '')
       end
 
       def parse_boolean(cell)
