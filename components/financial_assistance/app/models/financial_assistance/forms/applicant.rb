@@ -45,7 +45,7 @@ module FinancialAssistance
         @phones    = FinancialAssistance::Locations::Phone::KINDS.collect{|kind| FinancialAssistance::Locations::Phone.new(kind: kind) }
         @emails    = FinancialAssistance::Locations::Email::KINDS.collect{|kind| FinancialAssistance::Locations::Email.new(kind: kind) }
 
-        @same_with_primary = "true"
+        @same_with_primary = "false"
         @is_applying_coverage = true
       end
 
@@ -114,8 +114,12 @@ module FinancialAssistance
         applicant_entity = FinancialAssistance::Operations::Applicant::Build.new.call(params: extract_applicant_params.merge(is_living_in_state: is_living_in_state))
         if applicant_entity.success?
           values = applicant_entity.success.to_h.except(:addresses, :emails, :phones).merge(nested_parameters)
+
           applicant = application.applicants.find(applicant_id) if applicant_id.present?
           if applicant.present? && applicant.persisted?
+            if applicant.is_not_primary_applicant? && same_with_primary == "true"
+              applicant.home_address.try(:destroy)
+            end
             applicant.update(values)
           else
             applicant = application.applicants.build(values)
@@ -197,7 +201,7 @@ module FinancialAssistance
 
       def nested_parameters
         address_params = addresses_attributes.reject{|_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank?}
-        address_params = primary_applicant_address_attributes if address_params.blank? && same_with_primary == 'true'
+        address_params = primary_applicant_address_attributes if same_with_primary == 'true'
 
         params = {addresses_attributes: address_params}
         params.merge(phones_attributes: phones_attributes.reject{|_key, value| value[:full_phone_number].blank?}) if phones_attributes.present?

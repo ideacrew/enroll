@@ -452,6 +452,10 @@ module FinancialAssistance
       end
     end
 
+    def is_not_primary_applicant?
+      !is_primary_applicant?
+    end
+
     def relation_with_primary
       return 'self' if is_primary_applicant?
 
