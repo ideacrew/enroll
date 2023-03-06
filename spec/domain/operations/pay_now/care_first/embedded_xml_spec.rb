@@ -30,7 +30,6 @@ RSpec.describe Operations::PayNow::CareFirst::EmbeddedXml do
   end
   context "valid payload is created" do
     it "should return successful xml" do
-      puts Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment.new.call(enrollment)
       expect(described_class.new.call(enrollment)).to be_success
     end
   end
