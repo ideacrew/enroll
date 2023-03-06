@@ -215,7 +215,7 @@ module OneLogin
         embedded_xml_class = fetch_embedded_xml_class_name
         xml = embedded_xml_class.new.call(@hbx_enrollment)
         raise "Unable to transform xml due to #{xml.failure}" unless xml.success?
-        return xml.to_s
+        xml.to_s
       end
     end
   end
