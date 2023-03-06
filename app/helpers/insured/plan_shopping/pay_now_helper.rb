@@ -20,7 +20,7 @@ module Insured
       def show_pay_now?(source, hbx_enrollment)
         @carrier_key = fetch_carrier_key_from_legal_name(hbx_enrollment&.product&.issuer_profile&.legal_name)
 
-        return unless carrier_paynow_enabled(@carrier_key) && enrollment_can_pay_now?(hbx_enrollment)
+        return unless carrier_paynow_enabled?(@carrier_key) && enrollment_can_pay_now?(hbx_enrollment)
 
         if source == "Plan Shopping"
           !pay_now_button_timed_out?(hbx_enrollment)
@@ -75,9 +75,9 @@ module Insured
         enrollments.any? { |enr| enr.terminated_on.year == hbx_enrollment.effective_on.year && (hbx_enrollment.effective_on - enr.terminated_on) > 1 }
       end
 
-      def carrier_paynow_enabled(carrier_name)
+      def carrier_paynow_enabled?(carrier_name)
         carrier_key = fetch_carrier_key_from_legal_name(carrier_name)
-        EnrollRegistry.feature_enabled?("#{carrier_key}_pay_now".to_sym)
+        EnrollRegistry.key?("pay_now_feature.#{carrier_key}_pay_now") && EnrollRegistry.feature_enabled?("#{carrier_key}_pay_now".to_sym)
       end
 
       def is_kaiser_translation_key?(carrier_key)
@@ -86,11 +86,11 @@ module Insured
 
       def carrier_long_name(carrier_name)
         carrier_key = fetch_carrier_key_from_legal_name(carrier_name)
-        carrier_paynow_enabled(carrier_name) ? EnrollRegistry["#{carrier_key}_pay_now"].setting(:carriers_long_name).item : carrier_name
+        carrier_paynow_enabled?(carrier_name) ? EnrollRegistry["#{carrier_key}_pay_now"].setting(:carriers_long_name).item : carrier_name
       end
 
       def pay_now_url(carrier_name)
-        if carrier_paynow_enabled(carrier_name)
+        if carrier_paynow_enabled?(carrier_name)
           carrier_key = fetch_carrier_key_from_legal_name(carrier_name)
           SamlInformation.send("#{carrier_key}_pay_now_url")
         else
@@ -99,7 +99,7 @@ module Insured
       end
 
       def pay_now_relay_state(carrier_name)
-        if carrier_paynow_enabled(carrier_name)
+        if carrier_paynow_enabled?(carrier_name)
           carrier_key = fetch_carrier_key_from_legal_name(carrier_name)
           SamlInformation.send("#{carrier_key}_pay_now_relay_state")
         else
