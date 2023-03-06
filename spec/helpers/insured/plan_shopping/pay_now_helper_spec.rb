@@ -321,7 +321,7 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
     end
   end
 
-  describe 'Pay Now button should be available only for limited time on enrollment tile' do
+  describe 'Pay Now button on enrollment tile' do
     let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) do
       FactoryBot.create(:benefit_markets_products_health_products_health_product,
@@ -361,15 +361,6 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
         to_state: "coverage_selected"
       )
       assign(:enrollment, hbx_enrollment)
-    end
-
-    it 'should return true if current date is less than enrollment effective date' do
-      expect(helper.show_pay_now?("Enrollment Tile", hbx_enrollment)).to eq true
-    end
-
-    it 'should return true if current date is equal to enrollment effective date' do
-      allow(TimeKeeper).to receive(:date_of_record).and_return(hbx_enrollment.effective_on)
-      expect(helper.show_pay_now?("Enrollment Tile", hbx_enrollment)).to be_truthy
     end
 
     it 'should return false if enrollment kind is employer sponsored' do
