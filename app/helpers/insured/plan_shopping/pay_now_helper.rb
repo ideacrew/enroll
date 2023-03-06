@@ -22,9 +22,10 @@ module Insured
 
         return unless carrier_paynow_enabled?(@carrier_key) && enrollment_can_pay_now?(hbx_enrollment)
 
-        if source == "Plan Shopping"
+        case source
+        when "Plan Shopping"
           !pay_now_button_timed_out?(hbx_enrollment)
-        elsif source == "Enrollment Tile"
+        when "Enrollment Tile"
           EnrollRegistry["#{@carrier_key}_pay_now".to_sym].setting(:enrollment_tile).item
         end
       end
