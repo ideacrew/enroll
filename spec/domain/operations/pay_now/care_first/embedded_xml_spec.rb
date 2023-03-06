@@ -29,8 +29,19 @@ RSpec.describe Operations::PayNow::CareFirst::EmbeddedXml do
                       enrollment_members: family.family_members)
   end
   context "valid payload is created" do
+    # add piece related to calling aca entities function
     it "should return successful xml" do
       expect(described_class.new.call(enrollment)).to be_success
+    end
+  end
+
+  context "incorrect params are passed to external xml operation" do
+    before do
+        allow(AcaEntitiesOperation).to receive_message_chain('new.call').and_return(Dry::Monads::Result::Failure.new("unable to create xml"))
+
+    end
+    it "should return failure" do
+        expect(described_class.new.call(enrollment)).to be_a(Dry::Monads::Result::Failure)
     end
   end
 end
