@@ -45,7 +45,7 @@ module FinancialAssistance
         @phones    = FinancialAssistance::Locations::Phone::KINDS.collect{|kind| FinancialAssistance::Locations::Phone.new(kind: kind) }
         @emails    = FinancialAssistance::Locations::Email::KINDS.collect{|kind| FinancialAssistance::Locations::Email.new(kind: kind) }
 
-        @same_with_primary = "false"
+        @same_with_primary = "true"
         @is_applying_coverage = true
       end
 
@@ -112,9 +112,9 @@ module FinancialAssistance
         return false unless valid?
         is_living_in_state = has_in_state_home_addresses?(addresses_attributes)
         applicant_entity = FinancialAssistance::Operations::Applicant::Build.new.call(params: extract_applicant_params.merge(is_living_in_state: is_living_in_state))
+
         if applicant_entity.success?
           values = applicant_entity.success.to_h.except(:addresses, :emails, :phones).merge(nested_parameters)
-
           applicant = application.applicants.find(applicant_id) if applicant_id.present?
           if applicant.present? && applicant.persisted?
             applicant.home_address&.destroy if applicant.is_dependent? && same_with_primary == "true"
@@ -174,7 +174,7 @@ module FinancialAssistance
         # and the corresponding relative inverse relationship
         update_relationship_and_relative_relationship(relationship) if relationship
 
-        if same_with_primary == 'true'
+        if applicant.is_dependent? && same_with_primary == "true"
           primary = application.primary_applicant
           attrs.merge!(no_dc_address: primary.no_dc_address, is_homeless: primary.is_homeless?, is_temporarily_out_of_state: primary.is_temporarily_out_of_state?)
         end
@@ -199,7 +199,7 @@ module FinancialAssistance
 
       def nested_parameters
         address_params = addresses_attributes.reject{|_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank?}
-        address_params = primary_applicant_address_attributes if same_with_primary == 'true'
+        address_params = primary_applicant_address_attributes if applicant.is_dependent? && same_with_primary == "true"
 
         params = {addresses_attributes: address_params}
         params.merge(phones_attributes: phones_attributes.reject{|_key, value| value[:full_phone_number].blank?}) if phones_attributes.present?
