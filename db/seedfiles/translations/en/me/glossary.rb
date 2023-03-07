@@ -278,5 +278,6 @@ GLOSSARY_TRANSLATIONS = {
     "en.glossary.make_a_first_payment_before_effective" => "This payment will confirm your enrollment and allow you to begin your coverage. Please note it typically takes up to 3-5 business days after you sign up, for you to be able to make a first payment.",
     "en.glossary.make_changes_to_coverage" => "Make changes to my plan.",
     "en.glossary.view_coverage_details" => "Learn more about what my plan covers.",
+    "en.glossary.generic_make_payments_for_my_plan" => "Go to your insurance company’s payment portal to make a new payment or manage your existing payments.",
     "en.glossary.make_payments_for_my_plan" => "If you have already made your first premium payment for your plan, and are looking to make your monthly premium payment, you may log into your payment account here."
 }
