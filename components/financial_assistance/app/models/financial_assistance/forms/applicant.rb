@@ -10,7 +10,7 @@ module FinancialAssistance
       include AddressValidator
 
       attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id, :application_id, :applicant_id, :gender, :relationship, :relation_with_primary, :no_dc_address, :is_homeless, :is_temporarily_out_of_state,
-                    :tribe_codes, :same_with_primary, :is_applying_coverage, :immigration_doc_statuses, :addresses, :phones, :emails, :addresses_attributes, :phones_attributes, :emails_attributes
+                    :tribe_codes, :same_with_primary, :is_applying_coverage, :immigration_doc_statuses, :addresses, :phones, :emails, :addresses_attributes, :phones_attributes, :emails_attributes, :is_dependent
 
       attr_writer :family
 
@@ -173,7 +173,7 @@ module FinancialAssistance
         # and the corresponding relative inverse relationship
         update_relationship_and_relative_relationship(relationship) if relationship
 
-        if applicant.is_dependent? && same_with_primary == "true"
+        if is_dependent == "true" && same_with_primary == "true"
           primary = application.primary_applicant
           attrs.merge!(no_dc_address: primary.no_dc_address, is_homeless: primary.is_homeless?, is_temporarily_out_of_state: primary.is_temporarily_out_of_state?)
         end
@@ -197,7 +197,7 @@ module FinancialAssistance
 
       def nested_parameters
         address_params = addresses_attributes.reject{|_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank?}
-        address_params = primary_applicant_address_attributes if applicant.is_dependent? && same_with_primary == "true"
+        address_params = primary_applicant_address_attributes if is_dependent == "true" && same_with_primary == "true"
 
         params = {addresses_attributes: address_params}
         params.merge(phones_attributes: phones_attributes.reject{|_key, value| value[:full_phone_number].blank?}) if phones_attributes.present?
