@@ -94,6 +94,7 @@ class ShopEnrollmentReport < MongoidMigrationTask
             enrollees_hbx_ids = hbx_enrollment.hbx_enrollment_members.map(&:hbx_id).join(', ')
             enrollees_dob = hbx_enrollment.hbx_enrollment_members.map { |member| member.person.dob }.join(', ')
             osse_eligible = (hbx_enrollment.eligible_child_care_subsidy > 0 ? "Yes" : "No")
+            total_responsible_amount = BigDecimal((calculator.total_premium.to_f - calculator.total_employer_contribution.to_f - hbx_enrollment.eligible_child_care_subsidy.to_f).to_s).round(2)
             csv << [
               employer_profile.hbx_id, employer_profile.fein, employer_profile.legal_name,
               plan_year_start, plan_year.aasm_state, plan_year.benefit_sponsorship.aasm_state,
@@ -101,7 +102,7 @@ class ShopEnrollmentReport < MongoidMigrationTask
               hbx_enrollment.terminated_on, hbx_enrollment.coverage_kind, hbx_enrollment.aasm_state,
               subscriber_hbx_id,first_name,last_name,
               product.hios_id,
-              calculator.total_premium, calculator.total_employer_contribution, hbx_enrollment.applied_aptc_amount, calculator.total_employee_cost,
+              calculator.total_premium, calculator.total_employer_contribution, hbx_enrollment.applied_aptc_amount, total_responsible_amount,
               hbx_enrollment.hbx_enrollment_members.size,
               enrollment_reason,
               in_glue, hbx_enrollment.product.title, enrollees_hbx_ids, enrollees_dob,
