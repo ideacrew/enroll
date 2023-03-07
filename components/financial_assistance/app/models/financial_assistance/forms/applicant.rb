@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize
 module FinancialAssistance
   module Forms
     class Applicant
@@ -136,12 +137,10 @@ module FinancialAssistance
         end
       end
 
-      # rubocop:disable Metrics/CyclomaticComplexity
       def update_relationship_and_relative_relationship(relationship)
         self&.applicant&.relationships&.last&.update_attributes(kind: relationship)
         self&.applicant&.relationships&.last&.relative&.relationships&.where(relative_id: self.applicant.id)&.first&.update_attributes(kind: FinancialAssistance::Relationship::INVERSE_MAP[relationship])
       end
-      # rubocop:enable Metrics/CyclomaticComplexity
 
       def extract_applicant_params
         assign_citizen_status
@@ -168,7 +167,7 @@ module FinancialAssistance
           citizen_status: citizen_status,
           is_temporarily_out_of_state: is_temporarily_out_of_state,
           immigration_doc_statuses: immigration_doc_statuses.to_a.reject(&:blank?)
-        }#.reject{|_k, val| val.nil?}
+        } #.reject{|_k, val| val.nil?}
 
         # This will update both the relationship being passed through,
         # and the corresponding relative inverse relationship
@@ -186,7 +185,6 @@ module FinancialAssistance
                       emails: nested_parameters[:emails_attributes]&.values || []
                     })
       end
-
 
       def vlp_parameters
         [:vlp_subject, :alien_number, :i94_number, :visa_number, :passport_number, :sevis_id,
@@ -249,3 +247,4 @@ module FinancialAssistance
     end
   end
 end
+# rubocop:enable Metrics/CyclomaticComplexity, Metrics/AbcSize
