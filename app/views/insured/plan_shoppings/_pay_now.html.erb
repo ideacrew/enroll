@@ -1,16 +1,13 @@
-<% if hbx_enrollment.product.present? %>
+<% if hbx_enrollment.product.present? && individual?(hbx_enrollment) %>
 	<% carrier = fetch_issuer_name(hbx_enrollment.product.carrier_profile&.legal_name) %>
-	<% if EnrollRegistry.key?("feature_index.#{carrier}_pay_now") %>
-		<% if EnrollRegistry.feature_enabled?("#{carrier}_pay_now".to_sym) && EnrollRegistry["#{carrier}_pay_now".to_sym].setting(:plan_shopping).item %>
-			<% if show_pay_now?(source, hbx_enrollment) %>
-			  <% if can_access_pay_now_button %>
-			    <button class="btn btn-primary" data-toggle="modal" data-target="#payNowModal<%= hbx_enrollment.hbx_id %>" data-enrollment="<%= hbx_enrollment.hbx_id %>">Pay Now</button>
-			  <% else %>
+	<% if EnrollRegistry.feature_enabled?("#{carrier}_pay_now".to_sym) && EnrollRegistry["#{carrier}_pay_now".to_sym].setting(:plan_shopping).item %>
+		<% if show_pay_now?(source, hbx_enrollment) %>
+			<% if can_access_pay_now_button %>
+				<button class="btn btn-primary" data-toggle="modal" data-target="#payNowModal<%= hbx_enrollment.hbx_id %>" data-enrollment="<%= hbx_enrollment.hbx_id %>">Pay Now</button>
+			<% else %>
 			    <button class="btn btn-primary disabled">Pay Now</button>
-			  <% end %>
 			<% end %>
-
-			 <%= render "shared/pay_now_modal", hbx_enrollment: hbx_enrollment, source: source %>
 		<% end %>
+		<%= render "shared/pay_now_modal", hbx_enrollment: hbx_enrollment, source: source %>
 	<% end %>
 <% end %>
