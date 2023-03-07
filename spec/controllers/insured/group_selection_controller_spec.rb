@@ -867,6 +867,26 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         expect(flash[:notice]).to eq 'Action cannot be performed because of the overlapping plan years.'
       end
     end
+
+    context 'update aptc in the mthh context' do
+
+      let(:new_aptc_amount) {250.0}
+      let(:new_aptc_pct) {'0.5'}
+      let(:max_tax_credit) {500.0}
+
+      let(:params) {{'applied_pct_1' => new_aptc_pct, 'aptc_applied_total' => new_aptc_amount, 'hbx_enrollment_id' => hbx_enrollment_14.id.to_s, max_tax_credit: max_tax_credit}}
+
+      before do
+        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+        post :edit_aptc, params: params
+      end
+
+      it "should update APTC amount on the new enrollment based on the aggregate aptc amount" do
+        family_14.reload
+        new_enrollment = family_14.hbx_enrollments.last
+        expect(new_enrollment.elected_aptc_pct.to_s).to eq new_aptc_pct
+      end
+    end
   end
 
   context "GET terminate_selection" do

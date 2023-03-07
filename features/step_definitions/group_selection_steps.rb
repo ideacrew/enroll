@@ -769,6 +769,10 @@ And(/the user sees the Change Tax Credit Form/) do
   expect(page).to have_content("Are you sure you want to update your tax credit?")
 end
 
+And(/the user sees the mthh text/) do
+  expect(page).to have_content(l10n('aptc_slider_directions'))
+end
+
 When(/the user changes Tax credit applied to 50%/) do
   fill_in("aptc_applied_total", with: "50.0")
   page.execute_script('$(document.elementFromPoint(50, 350)).click();')
