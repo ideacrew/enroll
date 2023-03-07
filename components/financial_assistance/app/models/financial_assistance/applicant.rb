@@ -452,7 +452,7 @@ module FinancialAssistance
       end
     end
 
-    def is_not_primary_applicant?
+    def is_dependent?
       !is_primary_applicant?
     end
 

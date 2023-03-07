@@ -117,9 +117,7 @@ module FinancialAssistance
 
           applicant = application.applicants.find(applicant_id) if applicant_id.present?
           if applicant.present? && applicant.persisted?
-            if applicant.is_not_primary_applicant? && same_with_primary == "true"
-              applicant.home_address.try(:destroy)
-            end
+            applicant.home_address&.destroy if applicant.is_dependent? && same_with_primary == "true"
             applicant.update(values)
           else
             applicant = application.applicants.build(values)
