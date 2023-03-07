@@ -511,20 +511,20 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       end
 
       let(:applicant_params) do
-          {
-            same_with_primary: "true",
-            is_applying_coverage: false,
-            :is_homeless => '0',
-            :is_temporarily_out_of_state => '0',
-            relationship: 'spouse',
-            first_name: 'update',
-            last_name: 'updated',
-            gender: 'male',
-            dob: (TimeKeeper.date_of_record - 20.years).strftime("%Y-%m-%d"),
-            ssn: nil,
-            addresses_attributes: {'0': {kind: 'home', city: '', county: '', state: '', zip: '', address_1: ''}},
-            is_consumer_role: false
-          }
+        {
+          same_with_primary: "true",
+          is_applying_coverage: false,
+          :is_homeless => '0',
+          :is_temporarily_out_of_state => '0',
+          relationship: 'spouse',
+          first_name: 'update',
+          last_name: 'updated',
+          gender: 'male',
+          dob: (TimeKeeper.date_of_record - 20.years).strftime("%Y-%m-%d"),
+          ssn: nil,
+          addresses_attributes: {'0': {kind: 'home', city: '', county: '', state: '', zip: '', address_1: ''}},
+          is_consumer_role: false
+        }
       end
 
       before do
