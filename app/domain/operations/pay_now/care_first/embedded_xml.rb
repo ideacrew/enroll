@@ -26,14 +26,14 @@ module Operations
         end
 
         def transform_member_array(enrollment)
-          members = []
-          enrollment.hbx_enrollment_members.each do |hem|
+          error_message = ""
+          hbx_members = enrollment.hbx_enrollment_members.inject([]) do |members, hem|
             person = hem.person
             cv3_person = Operations::Transformers::PersonTo::Cv3Person.new.call(person)
-            return Failure("unable to transform person #{person.hbx_id} due to #{cv3_person.failure}") unless cv3_person.success?
-            members << cv3_person.value!
+            next members << cv3_person.value! if cv3_person.success?
+            error_message.concat("Unable to transform person #{person.hbx_id} due to #{cv3_person.failure}. ")
           end
-          Success(members)
+          error_message.empty? ? Success(hbx_members) : Failure(error_message)
         end
 
         def construct_payload(cv3_enrollment, cv3_members)
