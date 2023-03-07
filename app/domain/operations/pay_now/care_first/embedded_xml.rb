@@ -38,8 +38,10 @@ module Operations
 
         def construct_payload(cv3_enrollment, cv3_members)
           payload = {
-            hbx_enrollment: cv3_enrollment,
-            members: cv3_members
+            coverage_and_members: {
+              hbx_enrollment: cv3_enrollment,
+              members: cv3_members,
+            },
           }
           Success(payload)
         end
