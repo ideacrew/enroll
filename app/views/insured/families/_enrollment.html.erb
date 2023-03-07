@@ -237,7 +237,7 @@
 
                   <%# pay now %>
                   <div class="dropdown-divider" style="border-top: 1px solid #e9ecef"></div>
-                  <% if hbx_enrollment.product.present? %>
+                  <% if hbx_enrollment.product.present? && individual?(hbx_enrollment) %>
                     <% legal_name = hbx_enrollment.product.carrier_profile&.legal_name %>
                     <% carrier = fetch_issuer_name(legal_name) %>
                     <% if EnrollRegistry.key?("feature_index.#{carrier}_pay_now") %>

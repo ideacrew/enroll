@@ -37,7 +37,7 @@ module Insured
       end
 
       def can_pay_now?(hbx_enrollment)
-        individual?(hbx_enrollment) && (has_break_in_coverage_enrollments?(hbx_enrollment) || !has_any_previous_enrollments?(hbx_enrollment))
+        has_break_in_coverage_enrollments?(hbx_enrollment) || !has_any_previous_enrollments?(hbx_enrollment)
       end
 
       def carrier_url(legal_name)
