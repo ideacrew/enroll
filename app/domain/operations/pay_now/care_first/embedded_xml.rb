@@ -40,8 +40,8 @@ module Operations
           payload = {
             coverage_and_members: {
               hbx_enrollment: cv3_enrollment,
-              members: cv3_members,
-            },
+              members: cv3_members
+            }
           }
           Success(payload)
         end
