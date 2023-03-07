@@ -89,6 +89,10 @@ FactoryBot.define do
       issuer_profile { create(:benefit_sponsors_organizations_issuer_profile, assigned_site: assigned_site, abbrev: 'BCBS') }
     end
 
+    trait :with_issuer_profile_kaiser do
+      issuer_profile { create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
+    end
+
     trait :with_renewal_product do
       transient do
         renewal_service_area { nil }
