@@ -88,7 +88,7 @@ $(document).on("ready ajax:success", function() {
     }
 
     var new_total = parseFloat($('#aptc_applied_total').val().replace(/\$/, ""));
-    var new_percent = max_aptc ? toFixedTrunc(new_total/max_aptc.innerHTML) : toFixedTrunc(new_total/max_aptc_available)
+    var new_percent = max_aptc ? toFixedTrunc(new_total/max_aptc.innerHTML) : toFixedTrunc(new_total/max_aptc_available);
     $('#applied_pct_1').val(new_percent);
     calculatePercent(new_total);
     $('#applied_pct_1').attr('step',0.05)
@@ -102,7 +102,7 @@ $(document).on("ready ajax:success", function() {
     // Max available tax credit per month for month
     var max_aptc = document.getElementById("max_tax_credit");
     var max_aptc_available = document.getElementById("max_aptc_available").innerHTML;
-    var new_percent = max_aptc ? tax_value/max_aptc.innerHTML: tax_value/max_aptc_available;
+    var new_percent = max_aptc ? tax_value/max_aptc.innerHTML : tax_value/max_aptc_available;
 
     var aptc_total_cash_amount_to_apply = max_aptc ? toFixedTrunc(max_aptc.innerHTML * new_percent) : toFixedTrunc(max_aptc_available * new_percent);
     // Update the percentage
