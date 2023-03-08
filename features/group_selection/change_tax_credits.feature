@@ -49,3 +49,5 @@ Feature: Change Tax Credit button
     When consumer clicks on the make changes to my coverage button
     When the user clicks on the Change Tax Credit button
     Then the user should see that applied tax credit has been set accordingly
+
+
