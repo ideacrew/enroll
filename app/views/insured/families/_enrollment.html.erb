@@ -246,7 +246,7 @@
                       </button>
                     <% elsif EnrollRegistry.feature_enabled?(:generic_redirect) %>
                       <button class="btn-link btn-block" data-toggle="modal" data-target="#payNowModal<%= hbx_enrollment.hbx_id %>" style="padding: 6px 12px; margin: 4px 0; text-align: left;" data-enrollment="<%= hbx_enrollment.hbx_id %>">
-                        <%= render partial:"shared/glossary_hover", locals: {key: "make_payments_for_my_plan", title: "Make payments for my plan", term: sanitize(l10n("plans.issuer.pay_now.make_payment_for_my_plan")) } %>
+                        <%= render partial:"shared/glossary_hover", locals: {key: "generic_make_payments_for_my_plan", title: "Make payments for my plan", term: sanitize(l10n("plans.issuer.pay_now.make_payment_for_my_plan")) } %>
                       </button>
                     <% end %>
                   <% end %>
