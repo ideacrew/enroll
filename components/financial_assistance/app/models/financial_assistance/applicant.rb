@@ -452,10 +452,6 @@ module FinancialAssistance
       end
     end
 
-    def is_dependent?
-      !is_primary_applicant?
-    end
-
     def relation_with_primary
       return 'self' if is_primary_applicant?
 
@@ -1364,6 +1360,10 @@ module FinancialAssistance
     end
 
     private
+
+    def is_dependent?
+      !is_primary_applicant?
+    end
 
     def fetch_evidence_params(evidence)
       evidence.attributes.deep_symbolize_keys.slice(:key, :title, :description, :received_at, :is_satisfied, :verification_outstanding, :aasm_state, :update_reason, :due_on, :external_service, :updated_by)
