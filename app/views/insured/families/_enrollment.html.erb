@@ -240,13 +240,15 @@
                   <% if hbx_enrollment.product.present? && enrollment_is_ivl_or_coverall?(hbx_enrollment) %>
                     <% if show_pay_now?("Enrollment Tile", hbx_enrollment) %>
                       <button class="btn-link btn-block" data-toggle="modal" data-target="#payNowModal<%= hbx_enrollment.hbx_id %>" style="padding: 6px 12px; margin: 4px 0; text-align: left;" data-enrollment="<%= hbx_enrollment.hbx_id %>">
-                        <% hover_text = before_effective_date?(hbx_enrollment) ? "make_a_first_payment_before_effective" : "make_a_first_payment" %>
-                        <% button_text = before_effective_date?(hbx_enrollment) ? "plans.issuer.pay_now.first_payment" : "plans.issuer.pay_now.make_payment_for_my_plan" %>
-                        <%= render partial:"shared/glossary_hover", locals: {key: hover_text, title: "Make a first Payment for my new plan", term: sanitize(l10n(button_text)) } %>
+                        <% if before_effective_date?(hbx_enrollment) %>
+                          <%= render partial:"shared/glossary_hover", locals: {key: "make_payment_before_effective_hover", title: "Make a first payment for my new plan", term: sanitize(l10n("plans.issuer.pay_now.make_first_payment")) } %>
+                        <% else %> <%# after or on effective date %>
+                          <%= render partial:"shared/glossary_hover", locals: {key: "make_payments_hover", title: "Make payments for my plan", term: sanitize(l10n("plans.issuer.pay_now.make_payments")) } %>
+                        <% end %>
                       </button>
                     <% elsif EnrollRegistry.feature_enabled?(:generic_redirect) %>
                       <button class="btn-link btn-block" data-toggle="modal" data-target="#payNowModal<%= hbx_enrollment.hbx_id %>" style="padding: 6px 12px; margin: 4px 0; text-align: left;" data-enrollment="<%= hbx_enrollment.hbx_id %>">
-                        <%= render partial:"shared/glossary_hover", locals: {key: "generic_make_payments_for_my_plan", title: "Make payments for my plan", term: sanitize(l10n("plans.issuer.pay_now.make_payment_for_my_plan")) } %>
+                        <%= render partial:"shared/glossary_hover", locals: {key: "generic_make_payments_hover", title: "Make payments for my plan", term: sanitize(l10n("plans.issuer.pay_now.make_payments")) } %>
                       </button>
                     <% end %>
                   <% end %>
