@@ -58,7 +58,6 @@ module Insured
 
       def self.for_aptc_update_post(attrs)
         return 'Action cannot be performed because of the overlapping plan years.' unless check_to_enable_tax_credit_btn(attrs)
-
         service = self_term_or_cancel_service(attrs)
         service.update_aptc
         'Tax credit updated successfully.'

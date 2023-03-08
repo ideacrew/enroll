@@ -206,7 +206,6 @@ module Insured
       def calculate_max_tax_credit(enrollment, new_effective_on)
         if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
           max_aptc = ::Operations::PremiumCredits::FindAptc.new.call({hbx_enrollment: enrollment, effective_on: new_effective_on}).value!
-          
           return float_fix([max_aptc, enrollment.total_ehb_premium].max)
         end
         0.0
@@ -256,7 +255,7 @@ module Insured
       def calculate_elected_aptc_pct(enrollment, available_aptc, max_aptc)
         pct = if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
                 float_fix(enrollment.applied_aptc_amount.to_f / max_aptc).round(2)
-              else 
+              else
                 float_fix(enrollment.applied_aptc_amount.to_f / available_aptc).round(2)
               end
         pct > 1 ? 1 : pct
