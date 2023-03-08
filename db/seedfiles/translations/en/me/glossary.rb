@@ -274,10 +274,9 @@ GLOSSARY_TRANSLATIONS = {
     "en.glossary.retiree_health_benefits" => "Retiree health benefits describes coverage offered to retirees by some employers or unions. These plans are typically similar to group health insurance plans offered to active employees. If you are eligible for Medicare, you will need to enroll in both Medicare Part A and Part B in order to get full benefits from your retiree coverage.",
     "en.glossary.other_full_benefit_coverage" => "Other full benefit coverage refers to coverage plans that provide comparable benefits to traditional health insurance plans. These plans provide the essential health benefits, as described in the Affordable Care Act, that are the hallmark of a traditional health insurance plan such as hospital coverage, mental health services, and prescription drug coverage.",
     "en.glossary.other_limited_benefit_coverage" => "Limited benefit health plans are coverage plans with fewer and more restricted benefits compared to full benefit coverage. These plans reduce premiums by decreasing the number of covered health services. Limited benefit health plans are not regulated by the Affordable Care Act and should not serve as a person’s only health coverage.",
-    "en.glossary.make_a_first_payment" => "This payment will confirm your enrollment and allow you to begin your coverage.",
-    "en.glossary.make_a_first_payment_before_effective" => "This payment will confirm your enrollment and allow you to begin your coverage. Please note it typically takes up to 3-5 business days after you sign up, for you to be able to make a first payment.",
+    "en.glossary.make_payments_hover" => "If you have already made your first premium payment for your plan, and are looking to make your monthly premium payment, you may log into your payment account here.",
+    "en.glossary.make_payment_before_effective_hover" => "This payment will confirm your enrollment and allow you to begin your coverage. Please note it typically takes up to 3-5 business days after you sign up, for you to be able to make a first payment.",
     "en.glossary.make_changes_to_coverage" => "Make changes to my plan.",
     "en.glossary.view_coverage_details" => "Learn more about what my plan covers.",
-    "en.glossary.generic_make_payments_for_my_plan" => "Go to your insurance company’s payment portal to make a new payment or manage your existing payments.",
-    "en.glossary.make_payments_for_my_plan" => "If you have already made your first premium payment for your plan, and are looking to make your monthly premium payment, you may log into your payment account here."
+    "en.glossary.generic_make_payments_hover" => "Go to your insurance company’s payment portal to make a new payment or manage your existing payments."
 }
