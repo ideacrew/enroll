@@ -3,6 +3,7 @@ require 'rails_helper'
 module BenefitSponsors
   RSpec.describe Profiles::Employers::EmployerProfilesController, type: :controller, dbclean: :after_each do
 
+    include ::L10nHelper
     routes { BenefitSponsors::Engine.routes }
     let!(:security_question)  { FactoryBot.create_default :security_question }
 
@@ -100,7 +101,7 @@ module BenefitSponsors
         end
 
         it 'should render flash message successfully' do
-          expect(flash[:notice]).to eq("your CSV file is being processing, you will receive an email once it's done.")
+          expect(flash[:notice]).to have_content(l10n('employers.employer_profiles.employee_bulk_upload'))
         end
       end
 

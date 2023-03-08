@@ -137,7 +137,7 @@ module BenefitSponsors
             FileUtils.cp tmp.path, file
             # calling worker
             BenefitSponsors::BulkEmployeesUploadWorker.perform_async(params[:file].original_filename.gsub(" ", "_"), params[:file].content_type, @employer_profile._id, current_user.email)
-            flash[:notice] = "your CSV file is being processing, you will receive an email once it's done."
+            flash[:notice] = l10n("employers.employer_profiles.employee_bulk_upload")
             redirect_to employees_upload_url(@employer_profile.id)
           else
             @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.new

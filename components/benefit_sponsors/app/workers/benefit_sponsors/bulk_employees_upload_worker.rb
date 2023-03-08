@@ -17,11 +17,11 @@ module BenefitSponsors
                                                     })
 
       roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, employer_profile)
-      roaster_upload_count = roster_upload_form.census_records.length
+      roster_upload_count = roster_upload_form.census_records.length
       begin
         if roster_upload_form.save
           # success mail
-          EmployeeUploadMailer.success_email(user_email, roaster_upload_count).deliver_now
+          EmployeeUploadMailer.success_email(user_email, roster_upload_count).deliver_now
         else
           # failure email
           EmployeeUploadMailer.failure_email(user_email).deliver_now

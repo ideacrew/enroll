@@ -2,19 +2,27 @@
 
 # Employee upload mailer
 class EmployeeUploadMailer < ApplicationMailer
+  include L10nHelper
   default from: EnrollRegistry[:enroll_app].setting(:mail_address).item
 
   def success_email(recipient, records_count)
-    @records_count = records_count
-    mail({to: recipient, subject: "Employees are created."})
+    message = records_count.to_s + l10n("employers.employer_profiles.mailer.success")
+    mail({to: recipient, subject: "Employees are created."}) do |format|
+      format.html { render "success_email", locals: {message: message}}
+    end
   end
 
   def failure_email(recipient)
-    mail({to: recipient, subject: "Employees are not created."})
+    message = l10n("employers.employer_profiles.mailer.failure")
+    mail({to: recipient, subject: "Employees are not created."}) do |format|
+      format.html { render "success_email", locals: {message: message}}
+    end
   end
 
   def error_email(recipient, error_message)
-    @error_message = error_message
-    mail({to: recipient, subject: "Something went wrong."})
+    message = l10n("employers.employer_profiles.mailer.error")
+    mail({to: recipient, subject: "Something went wrong."}) do |format|
+      format.html { render "success_email", locals: {message: message, error_message: error_message}}
+    end
   end
 end
