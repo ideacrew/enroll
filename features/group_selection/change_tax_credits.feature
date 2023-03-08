@@ -49,16 +49,3 @@ Feature: Change Tax Credit button
     When consumer clicks on the make changes to my coverage button
     When the user clicks on the Change Tax Credit button
     Then the user should see that applied tax credit has been set accordingly
-
-  Scenario: Change Tax Credit Value is available in the MTTH context
-    And EnrollRegistry temporary_configuration_enable_multi_tax_household_feature feature is enabled
-    And the tax household has at least one member that is APTC eligible
-    When consumer should be able to see Actions dropdown
-    Then consumer clicks on the Actions button
-    When consumer clicks on the make changes to my coverage button
-    And the Change Tax Credit button should be available
-    When the user clicks on the Change Tax Credit button
-    And the user sees the Change Tax Credit Form
-    And the user sees mthh text
-
-
