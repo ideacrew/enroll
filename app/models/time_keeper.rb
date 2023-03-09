@@ -143,7 +143,7 @@ class TimeKeeper
     event = event(
       'events.system_date.changed',
       attributes: { payload: {} },
-      headers: { system_date: TimeKeeper.date_of_record }
+      headers: { system_date: TimeKeeper.date_of_record.strftime('%Y-%m-%d') }
     )
 
     event.success.publish
