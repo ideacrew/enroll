@@ -41,6 +41,16 @@ module Effective
           end
         }, :sortable => false, :filter => false
 
+        if EnrollRegistry.feature_enabled?(:aca_shop_osse_subsidy) && EnrollRegistry.feature_enabled?(:TEMP_broker_client_hc4cc_status)
+          table_column :hc4cc, :label => "HC4CC", :proc => proc { |row|
+            if row.is_prospect?
+              l10n('ineligible')
+            else
+              check_employer_osse_eligibility(row) ? l10n('eligible') : l10n('ineligible')
+            end
+          }, :sortable => false, :filter => false
+        end
+
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
@@ -142,6 +152,15 @@ module Effective
               ],
           top_scope: :filters
         }
+      end
+
+      def check_employer_osse_eligibility(employer)
+        org = BenefitSponsors::Organizations::Organization.where(fein: employer.fein).first
+        aba = org&.active_benefit_sponsorship&.active_benefit_application
+        rba = org&.active_benefit_sponsorship&.renewal_benefit_application
+        return rba.osse_eligible? if rba.present?
+        return aba.osse_eligible? if aba.present?
+        false
       end
     end
   end
