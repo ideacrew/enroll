@@ -36,8 +36,8 @@ module Insured
       end
 
       def enrollment_can_pay_now?(hbx_enrollment)
-        if hbx_enrollment.aasm_state != "auto_renewing"
-          has_break_in_coverage_enrollments?(hbx_enrollment) || !has_any_previous_enrollments?(hbx_enrollment)
+        return if hbx_enrollment.aasm_state == "auto_renewing"
+        has_break_in_coverage_enrollments?(hbx_enrollment) || !has_any_previous_enrollments?(hbx_enrollment)
       end
 
       def carrier_url(legal_name)
