@@ -82,7 +82,7 @@ module Operations
       end
 
       def slice_attributes(person, compare_address_keys)
-        [person.attributes.slice(*compare_address_keys), person.home_address.attributes.slice(*compare_address_keys)].flatten
+        [person.attributes.slice(*compare_address_keys), person.home_address&.attributes&.slice(*compare_address_keys)].flatten
       end
 
       def construct_qualified_non_citizen(consumer_role)
