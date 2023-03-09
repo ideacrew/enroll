@@ -308,7 +308,7 @@ registry:
             item: true
           - key: :renewal_criterion_key
             item: :renewal_sponsor_default
- 
+
   - namespace:
       - :enroll_app
       - :aca_shop_market
@@ -427,6 +427,9 @@ registry:
         - key: :aca_shop_osse_subsidy
           item: :aca_shop_osse_subsidy
           is_enabled: <%= ENV['SHOP_OSSE_ELIGIBILITY_IS_ENABLED'] || false %>
+        - key: :TEMP_broker_client_hc4cc_status
+          item: :TEMP_broker_client_hc4cc_status
+          is_enabled: <%= ENV['TEMP_BROKER_CLIENT_HC4CC_STATUS_IS_ENABLED'] || false %>
   - namespace:
     - :enroll_app
     - :aca_shop_market

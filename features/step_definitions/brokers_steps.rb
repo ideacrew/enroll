@@ -468,3 +468,15 @@ end
 Then(/Primary Broker should see Coverage Selected$/) do
   expect(page).to have_content('Coverage Selected')
 end
+
+Given(/the osse subsidy feature is enabled/) do
+  year = TimeKeeper.date_of_record.year
+  EnrollRegistry[:aca_shop_osse_subsidy].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry[:TEMP_broker_client_hc4cc_status].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry["aca_shop_osse_subsidy_#{year}"].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry["aca_shop_osse_subsidy_#{year - 1}"].feature.stub(:is_enabled).and_return(true)
+end
+
+Then(/^The Employer's HC4CC eligibility should show (.*?)$/) do |status|
+  expect(find(BrokerEmployersPage.hc4cc_eligibility).text).to eq status
+end
