@@ -136,6 +136,23 @@ And(/^employer (.*?) hired broker (.*?) from (.*?)$/) do |employer_name, broker_
   assign_broker_agency_account(broker_name, broker_agency_name)
 end
 
+Given(/^employer (.*?) is a prospect client$/) do |legal_name|
+  employer = SponsoredBenefits::Organizations::PlanDesignOrganization.where(legal_name: legal_name).first
+  employer.update_attributes!(sponsor_profile_id: nil, has_active_broker_relationship: false)
+end
+
+Given(/^employer (.*?) has OSSE eligibilities$/) do |legal_name|
+  org = BenefitSponsors::Organizations::Organization.find_by(legal_name: legal_name)
+  aba = org.active_benefit_sponsorship.active_benefit_application
+  rba = org.active_benefit_sponsorship.renewal_benefit_application
+  eligibility1 = FactoryBot.build(:eligibility, :with_evidences, :with_subject, start_on: aba.start_on)
+  eligibility2 = FactoryBot.build(:eligibility, :with_evidences, :with_subject, start_on: rba.start_on)
+
+  org.active_benefit_sponsorship.eligibilities << eligibility1
+  org.active_benefit_sponsorship.eligibilities << eligibility2
+  org.active_benefit_sponsorship.save!
+end
+
 And(/^Hbx Admin is on Broker Index of the Admin Dashboard$/) do
   visit exchanges_hbx_profiles_path
   find('.interaction-click-control-brokers').click
