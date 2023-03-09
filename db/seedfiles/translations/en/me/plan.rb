@@ -36,8 +36,8 @@ PLAN_TRANSLATIONS = {
   'en.plans.nedd_hours' => '8:00 am – 4:45 pm (M-F)',
   'en.plans.nedd_contact_url' => 'www.nedelta.com',
 
-  'en.plans.issuer.pay_now.first_payment' => "<b>Make a first payment</b> for my new plan",
-  'en.plans.issuer.pay_now.make_payment_for_my_plan' => "<b>Make payments</b> for my plan",
+  'en.plans.issuer.pay_now.make_first_payment' => "<b>Make a first payment</b> for my new plan",
+  'en.plans.issuer.pay_now.make_payments' => "<b>Make payments</b> for my plan",
   'en.plans.issuer.pay_now.redirection_message' => "You are leaving the %{site_short_name} website and entering a privately-owned website created, operated, and maintained by %{carrier_name}.",
   'en.plans.issuer.pay_now.link_info' => 'This link is provided for your convenience to allow you to pay your first month’s insurance premium. It’s only available to make your first payment.',
   'en.plans.issuer.pay_now.processing' => "It may take 3-5 business days for %{carrier_name} to process your enrollment information, or to reflect your coverage once you’ve made your first month’s premium payment.",

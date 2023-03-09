@@ -191,10 +191,8 @@ module OneLogin
       def build_additional_info
         carrier_name = @hbx_enrollment&.product&.issuer_profile&.legal_name
         carrier_key = fetch_carrier_key(carrier_name)
-
         if EnrollRegistry[carrier_key].setting(:embed_xml).item
-          embedded_xml_class = fetch_embedded_xml_class_name
-          embedded_xml_class.new.call
+          transform_embedded_xml
         else
           @hbx_enrollment.hbx_enrollment_members.map(&:person).map{|person| person.first_name_last_name_and_suffix(',')}.join(';')
         end
@@ -211,6 +209,13 @@ module OneLogin
       def fetch_carrier_key(carrier_name)
         snake_case_carrier_name = carrier_name.downcase.gsub(' ', '_').gsub(/[,.]/, '')
         "#{snake_case_carrier_name}_pay_now".to_sym
+      end
+
+      def transform_embedded_xml
+        embedded_xml_class = fetch_embedded_xml_class_name
+        xml = embedded_xml_class.new.call(@hbx_enrollment)
+        raise "Unable to transform xml due to #{xml.failure}" unless xml.success?
+        xml.to_s
       end
     end
   end
