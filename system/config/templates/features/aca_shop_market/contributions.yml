@@ -430,6 +430,9 @@ registry:
         - key: :TEMP_broker_client_hc4cc_status
           item: :TEMP_broker_client_hc4cc_status
           is_enabled: <%= ENV['TEMP_BROKER_CLIENT_HC4CC_STATUS_IS_ENABLED'] || false %>
+        - key: :TEMP_broker_quote_hc4cc_status
+          item: :TEMP_broker_quote_hc4cc_status
+          is_enabled: <%= ENV['TEMP_BROKER_QUOTE_HC4CC_STATUS_IS_ENABLED'] || false %>
   - namespace:
     - :enroll_app
     - :aca_shop_market
