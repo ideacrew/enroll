@@ -904,9 +904,10 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     end
 
     let(:new_aptc_amount) {'1000'}
-    let(:new_aptc_pct) {'0.55'}
+    let(:new_aptc_pct) {'0.55' }
     let(:max_tax_credit) {'2000'}
-    let(:result) { new_aptc_amount.to_f / max_tax_credit.to_f }
+    let(:new_aptc_amount_float) { new_aptc_amount.to_f }
+    let(:max_tax_credit_float) { max_tax_credit.to_f }
 
     let(:params) {{'applied_pct_1' => new_aptc_pct, 'aptc_applied_total' => new_aptc_amount, 'hbx_enrollment_id' => hbx_enrollment.id.to_s, max_tax_credit: max_tax_credit}}
 
@@ -919,7 +920,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     it "should update APTC amount on the new enrollment based on the aggregate aptc amount" do
       family.reload
       new_enrollment = family.hbx_enrollments.last
-      expect(new_enrollment.elected_aptc_pct).to eq(result)
+      expect(new_enrollment.elected_aptc_pct).to eq(new_aptc_amount_float / max_tax_credit_float)
     end
   end
 
