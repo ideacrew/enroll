@@ -2,7 +2,7 @@
 
 require "dry/monads"
 require "dry/monads/do"
-require 'aca_entities/pay_now/care_first/operations/generate_xml'
+require "aca_entities/pay_now/care_first/operations/generate_xml"
 
 module Operations
   module PayNow
