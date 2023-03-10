@@ -2,6 +2,7 @@
 
 require "dry/monads"
 require "dry/monads/do"
+require "aca_entities/pay_now/care_first/operations/generate_xml"
 
 module Operations
   module PayNow
@@ -47,9 +48,8 @@ module Operations
         end
 
         def transform_xml(payload)
-          #call aca entities
-          xml_response = Success(payload) # this will change once we have aca entities piece
-          xml_response.success? ? xml_response : Failure("unable to create xml")
+          xml_response = ::AcaEntities::PayNow::CareFirst::Operations::GenerateXml.new.call(payload)
+          xml_response.success? ? xml_response : Failure("unable to create xml due to #{xml_response.failure}.")
         end
       end
     end
