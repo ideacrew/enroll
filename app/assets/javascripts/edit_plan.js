@@ -73,7 +73,7 @@ $(document).on("ready ajax:success", function() {
 
     $('#applied_pct_1').attr('step',0.01)
     var total = parseFloat($('#aptc_applied_total').val().replace(/\$/, ""));
-    var mthh_enabled = $('#mthh_enabled').val() == 'true'
+    var mthh_enabled = $('#mthh_enabled').val() == 'true';
     var max_aptc = mthh_enabled ? parseFloat(document.getElementById("max_tax_credit").innerHTML) : null;
     var max_aptc_available = parseFloat(document.getElementById("max_aptc_available").innerHTML);
 
@@ -100,7 +100,7 @@ $(document).on("ready ajax:success", function() {
     // var applied_aptc_total = $('#aptc_applied_total').val();
     var total_premium_value = document.getElementById("enrollment_total_premium").innerHTML;
     var total_premium = toFixedTrunc(parseFloat(total_premium_value));
-    var mthh_enabled = $('#mthh_enabled').val() == 'true'
+    var mthh_enabled = $('#mthh_enabled').val() == 'true';
     // Max available tax credit per month for month
     var max_aptc = mthh_enabled ? document.getElementById("max_tax_credit").innerHTML : null;
     var max_aptc_available = document.getElementById("max_aptc_available").innerHTML;
@@ -128,7 +128,7 @@ $(document).on("ready ajax:success", function() {
     // Percentage of max aptc available that user wishes to apply
     var percent = Math.round(parseFloat($(selector).val()).toFixed(2) * multiplier);
     // Max available tax credit per month for month
-    var mthh_enabled = $('#mthh_enabled').val() == 'true'
+    var mthh_enabled = $('#mthh_enabled').val() == 'true';
     var max_aptc_available = document.getElementById("max_aptc_available").innerHTML;
     var max_aptc = mthh_enabled ? document.getElementById("max_tax_credit").innerHTML : null;
    
