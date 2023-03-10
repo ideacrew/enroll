@@ -1555,6 +1555,7 @@ module FinancialAssistance
           response_family_member_id = create_or_update_result.success[:family_member_id]
           update_attributes!(family_member_id: response_family_member_id) if family_member_id.nil?
         end
+        application.update_dependents if is_primary_applicant? && (home_address.changed? ||  no_dc_address_changed? || is_homeless_changed? || is_temporarily_out_of_state_changed?)
       end
     rescue StandardError => e
       e.message
