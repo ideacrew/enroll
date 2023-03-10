@@ -904,13 +904,13 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     end
 
     let(:new_aptc_amount) {'1000'}
-    let(:new_aptc_pct) {'0.5'}
+    let(:new_aptc_pct) {'0.55'}
     let(:max_tax_credit) {'2000'}
+    let(:result) { new_aptc_amount.to_f / max_tax_credit.to_f }
 
     let(:params) {{'applied_pct_1' => new_aptc_pct, 'aptc_applied_total' => new_aptc_amount, 'hbx_enrollment_id' => hbx_enrollment.id.to_s, max_tax_credit: max_tax_credit}}
 
     before :each do
-      #allow(EnrollRegistry).to receive(:feature_enabled?).with(:temporary_configuration_enable_multi_tax_household_feature).and_return(true)
       EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
       sign_in user
       post :edit_aptc, params: params
@@ -919,7 +919,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     it "should update APTC amount on the new enrollment based on the aggregate aptc amount" do
       family.reload
       new_enrollment = family.hbx_enrollments.last
-      expect(new_enrollment.elected_aptc_pct.to_s).to eq new_aptc_pct
+      expect(new_enrollment.elected_aptc_pct).to eq(result)
     end
   end
 
