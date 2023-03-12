@@ -3,7 +3,7 @@ module AuditLog
         include Mongoid::Document
         include Mongoid::Timestamps
     
-        belongs_to :auditable, polymorphic: true, optional: true #<- not sure if the opional is correct
+        belongs_to :auditable, polymorphic: true, optional: true
 
         #optional, nested actions
         has_many :sub_actions, class_name: "AuditLog::Entry", foreign_key: "parent_id"                             
@@ -12,6 +12,7 @@ module AuditLog
         # (optional) user that modified the object
         field :user, type:User
   
+        # this may be dup, since with STI we will get the kind of action
         field :action_name, type: String
         field :event_name, type: String # audit_key
         field :event_time, type: DateTime # when it happened
