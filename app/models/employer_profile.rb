@@ -11,6 +11,7 @@ class EmployerProfile
   include Concerns::Observable
   include ModelEvents::EmployerProfile
   include ApplicationHelper
+  include AuditLog::Subject
 
   embedded_in :organization
   attr_accessor :broker_role_id
