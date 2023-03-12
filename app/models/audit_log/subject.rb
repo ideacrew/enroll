@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module AuditLog
-    # A data model for a unitary transaction
+    # A data model for tracking changes to auditable models.
     module Subject
       extend ActiveSupport::Concern
   
