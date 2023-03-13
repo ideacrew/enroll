@@ -113,7 +113,7 @@ RSpec.describe Operations::FinancialAssistance::ParseApplicant, type: :model, db
     end
 
     context "when there is same home address as primary, but is_temporarily_out_of_state is true" do
-      it 'should return same_with_primary as false_state' do
+      it 'should return same_with_primary as false' do
         dependent.person.addresses << Address.new(family_member.person.home_address.attributes.slice("kind", "city", "county", "state", "zip", "address_1", "address_2"))
         dependent.person.save!
         dependent.person.update_attributes(is_temporarily_out_of_state: true)
