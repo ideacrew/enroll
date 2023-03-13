@@ -29,14 +29,8 @@ module Services
         individual_market_enrollments.offset(offset).limit(batch_size).no_timeout.each do |enrollment|
           enrollment.expire_coverage! if enrollment.may_expire_coverage?
           @logger.info "Processed enrollment: #{enrollment.hbx_id}"
-        rescue Exception => e
-          begin
-            family = enrollment.family
-            Rails.logger.error "Unable to expire enrollments for family #{family.id}"
-            @logger.info "Unable to expire enrollments for family #{family.id}, error: #{e.backtrace}"
-          rescue StandardError => e
-            @logger.info "Unable to find family for enrollment#{enrollment.id}, error: #{e.backtrace}"
-          end
+        rescue StandardError => e
+          @logger.info "Unable to find family for enrollment#{enrollment.id}, error: #{e.backtrace}"
         end
         offset += batch_size
       end
@@ -62,14 +56,8 @@ module Services
             count += 1
             @logger.info "Processed enrollment: #{enrollment.hbx_id}"
           end
-        rescue Exception => e
-          begin
-            family = enrollment.family
-            Rails.logger.error "Unable to begin coverage(enrollments) for family #{family.id}, error: #{e.backtrace}"
-            @logger.info "Unable to begin coverage(enrollments) for family #{family.id}, error: #{e.backtrace}"
-          rescue StandardError => e
-            @logger.info "Unable to find family for enrollment #{enrollment.id}, error: #{e.backtrace}"
-          end
+        rescue StandardError => e
+          @logger.info "Unable to find family for enrollment#{enrollment.id}, error: #{e.backtrace}"
         end
         offset += batch_size
       end
