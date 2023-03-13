@@ -105,6 +105,8 @@ class User
   attr_accessor :invitation_id
   #  validate :ensure_valid_invitation, :on => :create
 
+  has_many :audit_logs, class_name: "::AuditLog::Entry", inverse_of: :user, as: :user
+
   def ensure_valid_invitation
     if self.invitation_id.blank?
       errors.add(:base, "There is no valid invitation for this account.")

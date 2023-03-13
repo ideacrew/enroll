@@ -10,7 +10,8 @@ module AuditLog
         belongs_to :parent, class_name: "AuditLog::Entry", optional: true                                                    
       
         # (optional) user that modified the object
-        field :user, type:User
+        # field :user, type:User
+        belongs_to :user,class_name: "User",  optional: true                                                    
   
         # this may be dup, since with STI we will get the kind of action
         field :action_name, type: String
