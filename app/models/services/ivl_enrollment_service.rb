@@ -23,7 +23,7 @@ module Services
       individual_market_enrollments = HbxEnrollment.where(
         :effective_on.lt => current_benefit_period.start_on,
         :kind.in => ["individual", "coverall"],
-        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ["coverage_termination_pending"],
+        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ["coverage_termination_pending"]
       )
       while offset <= individual_market_enrollments.count
         individual_market_enrollments.offset(offset).limit(batch_size).no_timeout.each do |enrollment|
@@ -51,7 +51,7 @@ module Services
       ivl_enrollments = HbxEnrollment.where(
         :effective_on => { "$gte" => current_benefit_period.start_on, "$lt" => current_benefit_period.end_on },
         :kind.in => ["individual", "coverall"],
-        :aasm_state.in => ["auto_renewing", "renewing_coverage_selected"],
+        :aasm_state.in => ["auto_renewing", "renewing_coverage_selected"]
       )
       @logger.info "Total IVL auto renewing enrollment count: #{ivl_enrollments.count}"
       count = 0
