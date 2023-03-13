@@ -55,7 +55,7 @@ module Services
       )
       @logger.info "Total IVL auto renewing enrollment count: #{ivl_enrollments.count}"
       count = 0
-      while offset <= individual_market_enrollments.count
+      while offset <= ivl_enrollments.count
         ivl_enrollments.offset(offset).limit(batch_size).no_timeout.each do |enrollment|
           if enrollment.may_begin_coverage?
             enrollment.begin_coverage!
