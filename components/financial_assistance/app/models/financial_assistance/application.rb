@@ -1430,6 +1430,7 @@ module FinancialAssistance
     def update_dependents
       same_with_primary_keys = ["address_1", "address_2", "address_3", "city", "state", "zip", "kind", "is_homeless", "is_temporarily_out_of_state"]
       same_with_primary_keys << "county" if EnrollRegistry.feature_enabled?(:display_county)
+      primary_applicant = applicants.where(is_primary_applicant: true).first
       home_address_attributes = primary_applicant.home_address.attributes.slice(*same_with_primary_keys)
       no_state_address_attributes = primary_applicant.attributes.slice(*same_with_primary_keys)
       hash = no_state_address_attributes.merge(addresses: [home_address_attributes])
