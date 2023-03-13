@@ -8,7 +8,8 @@ class PaymentTransactionsController < ApplicationController
     status = carrier_connect_test(issuer) if Rails.env.production? #checks to see if EA can connect to carrier payment portal.
     result = Operations::GenerateSamlResponse.new.call({enrollment_id: params[:enrollment_id], source: params[:source]})
     if result.success?
-      render json: {"SAMLResponse": result.value![:SAMLResponse], status: status, error: nil}
+      saml_response = decode_html_entities(result.value![:SAMLResponse])
+      render json: {"SAMLResponse": saml_response, status: status, error: nil}
     else
       render json: {error: result.failure}
     end
@@ -27,5 +28,19 @@ class PaymentTransactionsController < ApplicationController
     enrollment = HbxEnrollment.by_hbx_id(enr_id).last if enr_id.present?
     return unless enrollment.present?
     enrollment.product.issuer_profile.legal_name.downcase.gsub(' ', '_').gsub(/[,.]/, '')
+  end
+
+  def decode_html_entities(saml_response)
+    html_entities = {
+      '&amp;' => '&',
+      '&quot;' => '"',
+      '&apos;' => "'",
+      '&lt;' => '<',
+      '&gt;' => '>'
+    }
+    html_entities.each do |char, entity|
+      saml_response.gsub!(char, entity)
+    end
+    saml_response
   end
 end
