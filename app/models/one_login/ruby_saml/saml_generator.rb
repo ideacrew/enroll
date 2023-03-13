@@ -31,7 +31,6 @@ module OneLogin
         super()
         @transaction_id = transaction_id
         @hbx_enrollment = hbx_enrollment
-        # @pay_now_key = pay_now_key
 
         if Rails.env.production?
           @private_key = OpenSSL::PKey::RSA.new(File.read(SamlInformation.pay_now_private_key_location))
@@ -107,6 +106,14 @@ module OneLogin
           attribute = attribute_statement.add_element('saml:Attribute', 'NameFormat' => NAME_FORMAT)
           attribute.attributes['Name'] = attr_name
           value = attribute.add_element 'saml:AttributeValue'
+
+          if embed_custom_xml? && attr_name == 'Additional Information'
+            value.add_namespace('xmlns', 'http://openhbx.org/api/terms/1.0')
+            value.add_namespace('xmlns:cv', 'http://openhbx.org/api/terms/1.0')
+            value.add_namespace('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance')
+            value.attributes['xsi:type'] = 'cv:PaynowTransferPayloadType'
+          end
+
           value.text = set_attribute_values(attr_name, @hbx_enrollment)
         end
 
@@ -188,10 +195,14 @@ module OneLogin
         SecureRandom.uuid
       end
 
-      def build_additional_info
+      def embed_custom_xml?
         carrier_name = @hbx_enrollment&.product&.issuer_profile&.legal_name
         carrier_key = fetch_carrier_key(carrier_name)
-        if EnrollRegistry[carrier_key].setting(:embed_xml).item
+        EnrollRegistry[carrier_key].setting(:embed_xml).item
+      end
+
+      def build_additional_info
+        if embed_custom_xml?
           transform_embedded_xml
         else
           @hbx_enrollment.hbx_enrollment_members.map(&:person).map{|person| person.first_name_last_name_and_suffix(',')}.join(';')
@@ -215,7 +226,9 @@ module OneLogin
         embedded_xml_class = fetch_embedded_xml_class_name
         xml = embedded_xml_class.new.call(@hbx_enrollment)
         raise "Unable to transform xml due to #{xml.failure}" unless xml.success?
-        xml.value!
+        # temporary fix until aca_entities serializers are restructured
+        cleaned_xml = xml.value!.split("\n")[1...-1].join("\n")
+        "\n#{cleaned_xml}\n"
       end
     end
   end
