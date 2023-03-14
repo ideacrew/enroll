@@ -30,6 +30,11 @@ module Insured
         end
       end
 
+      def show_generic_redirect?(enrollment)
+        return unless EnrollRegistry.feature_enabled?(:generic_redirect)
+        EnrollRegistry.feature_enabled?(:strict_generic_redirect) ? EnrollRegistry["#{@carrier_key}_pay_now".to_sym].setting(:enrollment_tile).item : true
+      end
+
       def carrier_key_from_enrollment(enrollment)
         carrier_key = enrollment&.product&.issuer_profile&.legal_name
         fetch_carrier_key_from_legal_name(carrier_key)
