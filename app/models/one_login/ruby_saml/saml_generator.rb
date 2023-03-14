@@ -196,7 +196,7 @@ module OneLogin
 
       def embed_custom_xml?
         carrier_key = fetch_carrier_key(carrier_name)
-        EnrollRegistry[carrier_key].setting(:embed_xml).item
+        EnrollRegistry[carrier_key].setting(:embed_xml)&.item
       end
 
       def add_custom_xml_namespaces(value)
