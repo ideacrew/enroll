@@ -107,12 +107,6 @@ module OneLogin
           attribute.attributes['Name'] = attr_name
           value = attribute.add_element 'saml:AttributeValue'
 
-          # if embed_custom_xml? && attr_name == 'Additional Information'
-            # value.add_namespace('xmlns', 'http://openhbx.org/api/terms/1.0')
-            # value.add_namespace('xmlns:cv', 'http://openhbx.org/api/terms/1.0')
-            # value.add_namespace('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance')
-            # value.attributes['xsi:type'] = 'cv:PaynowTransferPayloadType'
-          # end
           add_custom_xml_namespaces(value) if embed_custom_xml? && attr_name == 'Additional Information'
 
           value.text = set_attribute_values(attr_name, @hbx_enrollment)
