@@ -1,22 +1,22 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   module Forms
     class PlanDesignProposal
       include ActiveModel::Model
       include ActiveModel::Validations
 
-      attr_reader :title,
-                  :effective_date,
+      attr_reader :effective_date,
                   :zip_code,
                   :county,
                   :sic_code,
                   :quote_date,
                   :plan_option_kind,
-                  :metal_level_for_elected_plan
-      attr_reader :profile
-      attr_reader :plan_design_organization
-      attr_reader :proposal
-      attr_reader :kind
-      attr_reader :osse_eligibility
+                  :metal_level_for_elected_plan,
+                  :profile,
+                  :plan_design_organization,
+                  :proposal
+      attr_accessor :osse_eligibility, :title, :kind
 
       validates_presence_of :title,
                             :effective_date,
@@ -52,16 +52,7 @@ module SponsoredBenefits
         @plan_design_organization = val
       end
 
-      def profile=(attrs)
-      end
-
-      def osse_eligibility=(value)
-        @osse_eligibility = value
-      end
-
-      def title=(val)
-        @title = val
-      end
+      def profile=(attrs); end
 
       def effective_date=(val)
         @effective_date = Date.strptime(val, '%Y-%m-%d')
@@ -79,27 +70,24 @@ module SponsoredBenefits
         end
       end
 
-      def kind=(val)
-        @kind = val
-      end
-
       def prepopulate_attributes
         @title = @proposal.title
         @effective_date =
           @profile
-            .benefit_sponsorships
-            .first
-            .initial_enrollment_period
-            .begin
-            .strftime('%Y-%m-%d')
+          .benefit_sponsorships
+          .first
+          .initial_enrollment_period
+          .begin
+          .strftime('%Y-%m-%d')
         @quote_date = @proposal.updated_at.strftime('%m/%d/%Y')
         sponsorship = @proposal.profile.benefit_sponsorships.first
-        @osse_eligibility ||= 'true' if sponsorship && proposal_osse_eligibility(sponsorship).present?
+        @osse_eligibility ||= 'true' if sponsorship &&
+                                        proposal_osse_eligibility(sponsorship).present?
       end
 
       def ensure_proposal
-        @proposal =
-          @plan_design_organization.plan_design_proposals.build unless @proposal.present?
+        return if @proposal.present?
+        @proposal = @plan_design_organization.plan_design_proposals.build
       end
 
       def ensure_sic_zip_county
@@ -118,9 +106,7 @@ module SponsoredBenefits
           sponsorship.benefit_applications.build
         end
         sponsorship = @profile.benefit_sponsorships.first
-        if sponsorship.benefit_applications.empty?
-          sponsorship.benefit_applications.build
-        end
+        sponsorship.benefit_applications.build if sponsorship.benefit_applications.empty?
       end
 
       def assign_benefit_group(benefit_group)
@@ -178,9 +164,7 @@ module SponsoredBenefits
           benefit_application.open_enrollment_period =
             enrollment_dates[:open_enrollment_period]
 
-          if osse_eligibility.present?
-            create_or_term_osse_eligibility(sponsorship)
-          end
+          create_or_term_osse_eligibility(sponsorship) if osse_eligibility.present?
         end
 
         @proposal.save!
@@ -194,15 +178,16 @@ module SponsoredBenefits
 
         benefit_group = application.benefit_groups.first
 
-        return benefit_group.reference_plan_id.present?
+        benefit_group.reference_plan_id.present?
       end
 
       def to_h
-        unless @effective_date.is_a? Date
-          effective_date = Date.strptime(@effective_date, '%Y-%m-%d')
-        else
-          effective_date = @effective_date
-        end
+        effective_date =
+          if @effective_date.is_a? Date
+            @effective_date
+          else
+            Date.strptime(@effective_date, '%Y-%m-%d')
+          end
         sponsorship = @profile.benefit_sponsorships.first
         {
           title: "Copy of #{@proposal.title}",
@@ -244,19 +229,15 @@ module SponsoredBenefits
       end
 
       def proposal_osse_eligibility(benefit_sponsorship)
-        benefit_sponsorship.eligibility_for(
-            :osse_subsidy,
-            effective_date
-          )
+        benefit_sponsorship.eligibility_for(:osse_subsidy, effective_date)
       end
 
       def create_or_term_osse_eligibility(benefit_sponsorship)
-        osse_eligibility_present = proposal_osse_eligibility(benefit_sponsorship).present?
+        osse_eligibility_present =
+          proposal_osse_eligibility(benefit_sponsorship).present?
 
         if osse_eligibility_present
-          if osse_eligibility.to_s == 'false'
-            terminate_eligibility(benefit_sponsorship)
-          end
+          terminate_eligibility(benefit_sponsorship) if osse_eligibility.to_s == 'false'
           return
         end
 
@@ -273,11 +254,11 @@ module SponsoredBenefits
           ::Operations::Eligibilities::Osse::BuildEligibility.new.call(
             osse_eligibility_params(benefit_sponsorship)
           )
-        if result.success?
-          eligibility =
-            benefit_sponsorship.eligibilities.build(result.success.to_h)
-          eligibility.save!
-        end
+        return unless result.success?
+
+        eligibility =
+          benefit_sponsorship.eligibilities.build(result.success.to_h)
+        eligibility.save!
       end
 
       # do we need to term eligibilities for roster employees??
