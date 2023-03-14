@@ -20,6 +20,8 @@ module Eligibilities
       field :updated_by, type: String
 
       scope :by_key, ->(key) { where(key: key) }
+
+      has_one :log_entry, class_name: 'AuditLog::Entry' #, as: :auditable
     end
   end
 end
