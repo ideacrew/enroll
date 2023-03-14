@@ -34,4 +34,12 @@ class BrokerCreateQuotePage
   def self.download_employee_roster_btn
     '.download-employees.btn.btn-default.interaction-click-control-download-employee-roster'
   end
+
+  def self.back_to_all_quotes
+    "[data-cuke='back_to_all_quotes']"
+  end
+
+  def self.quote_hc4cc_eligibility
+    'tbody .col-hc4cc'
+  end
 end
