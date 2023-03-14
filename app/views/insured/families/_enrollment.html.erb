@@ -248,8 +248,8 @@
                       </button>
                     <% elsif show_generic_redirect? %>
                       <button class="btn-link btn-block" data-toggle="modal" data-target="#payNowModal<%= hbx_enrollment.hbx_id %>" style="padding: 6px 12px; margin: 4px 0; text-align: left;" data-enrollment="<%= hbx_enrollment.hbx_id %>">
-                            <%= render partial:"shared/glossary_hover", locals: {key: "generic_make_payments_hover", title: "Make payments for my plan", term: sanitize(l10n("plans.issuer.pay_now.make_payments")) } %>
-                        </button>
+                          <%= render partial:"shared/glossary_hover", locals: {key: "generic_make_payments_hover", title: "Make payments for my plan", term: sanitize(l10n("plans.issuer.pay_now.make_payments")) } %>
+                      </button>
                     <% end %>
                   <% end %>
                 </div>
