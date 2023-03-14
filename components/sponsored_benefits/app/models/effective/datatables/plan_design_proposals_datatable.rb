@@ -33,12 +33,12 @@
           table_column :state, :label => 'State', :proc => Proc.new { |row| row.aasm_state.capitalize }, :sortable => false, :filter => false
 
           if EnrollRegistry.feature_enabled?(:aca_shop_osse_subsidy) && EnrollRegistry.feature_enabled?(:TEMP_broker_quote_hc4cc_status)
-            table_column :hc4cc, :label => "HC4CC", :proc => proc { |row|
+            table_column :hc4cc, :label => "HC4CC", :proc => proc { #|row|
               # if row.osse_eligible?(row.published_on.year)
               # if row.osse_eligible?(TimeKeeper.date_of_record.year)
               #   l10n("yes")
               # else
-                l10n("no")
+              l10n("no")
               # end
             }, :sortable => false, :filter => false
           end
