@@ -30,7 +30,7 @@ module Insured
         end
       end
 
-      def show_generic_redirect?
+      def show_generic_redirect(hbx_enrollment)?
         return unless EnrollRegistry.feature_enabled?(:generic_redirect)
         @carrier_key = fetch_carrier_key_from_legal_name(hbx_enrollment&.product&.issuer_profile&.legal_name)
         EnrollRegistry.feature_enabled?(:strict_generic_redirect) ? EnrollRegistry["#{@carrier_key}_pay_now".to_sym].setting(:enrollment_tile).item : true
