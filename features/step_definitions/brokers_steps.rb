@@ -486,6 +486,6 @@ When(/^When Primary Broker selects (.*?) for HC4CC quote$/) do |status|
   # To be added when HC4CC field is added to quote publish form
 end
 
-Then(/^The quotes's HC4CC eligibility should show (.*?)$/) do |status|
+Then(/^the quote's HC4CC eligbility should show (.*?)$/) do |status|
   expect(find(BrokerCreateQuotePage.quote_hc4cc_eligibility).text).to eq status
 end
