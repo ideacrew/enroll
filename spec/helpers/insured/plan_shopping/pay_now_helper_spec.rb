@@ -367,5 +367,18 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       expect(helper.show_pay_now?("Enrollment Tile", hbx_enrollment1)).to be_falsey
     end
+
+    it 'should show if generic redirect is enabled' do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:generic_redirect).and_return(true)
+      allow(EnrollRegistry[:generic_redirect].setting(:strict_tile_check)).to receive(:item).and_return(false)
+      expect(helper.show_generic_redirect?(hbx_enrollment)).to eq true
+    end
+
+    it 'should return false if strict generic redirect is enabled and enrollment tile is disabled' do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:generic_redirect).and_return(true)
+      allow(EnrollRegistry[:generic_redirect].setting(:strict_tile_check)).to receive(:item).and_return(true)
+      allow(EnrollRegistry[:kaiser_pay_now].setting(:enrollment_tile)).to receive(:item).and_return(false)
+      expect(helper.show_generic_redirect?(hbx_enrollment)).to be_falsey
+    end
   end
 end
