@@ -107,12 +107,7 @@ module OneLogin
           attribute.attributes['Name'] = attr_name
           value = attribute.add_element 'saml:AttributeValue'
 
-          if embed_custom_xml? && attr_name == 'Additional Information'
-            value.add_namespace('xmlns', 'http://openhbx.org/api/terms/1.0')
-            value.add_namespace('xmlns:cv', 'http://openhbx.org/api/terms/1.0')
-            value.add_namespace('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance')
-            value.attributes['xsi:type'] = 'cv:PaynowTransferPayloadType'
-          end
+          add_custom_xml_namespaces(value) if embed_custom_xml? && attr_name == 'Additional Information'
 
           value.text = set_attribute_values(attr_name, @hbx_enrollment)
         end
@@ -195,10 +190,24 @@ module OneLogin
         SecureRandom.uuid
       end
 
+      def carrier_name
+        @hbx_enrollment&.product&.issuer_profile&.legal_name
+      end
+
       def embed_custom_xml?
-        carrier_name = @hbx_enrollment&.product&.issuer_profile&.legal_name
         carrier_key = fetch_carrier_key(carrier_name)
         EnrollRegistry[carrier_key].setting(:embed_xml).item
+      end
+
+      def add_custom_xml_namespaces(value)
+        case carrier_name
+        when 'CareFirst'
+          value.attributes['xmlns'] = 'http://openhbx.org/api/terms/1.0'
+          value.add_namespace('xmlns:cv', 'http://openhbx.org/api/terms/1.0')
+          value.add_namespace('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance')
+          value.attributes['xsi:type'] = 'cv:PaynowTransferPayloadType'
+          value
+        end
       end
 
       def build_additional_info
@@ -210,7 +219,6 @@ module OneLogin
       end
 
       def fetch_embedded_xml_class_name
-        carrier_name = @hbx_enrollment&.product&.issuer_profile&.legal_name
         case carrier_name
         when 'CareFirst'
           ::Operations::PayNow::CareFirst::EmbeddedXml
@@ -226,9 +234,7 @@ module OneLogin
         embedded_xml_class = fetch_embedded_xml_class_name
         xml = embedded_xml_class.new.call(@hbx_enrollment)
         raise "Unable to transform xml due to #{xml.failure}" unless xml.success?
-        # temporary fix until aca_entities serializers are restructured
-        cleaned_xml = xml.value!.split("\n")[1...-1].join("\n")
-        "\n#{cleaned_xml}\n"
+        xml.value!
       end
     end
   end
