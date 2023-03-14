@@ -198,7 +198,7 @@ module OneLogin
       def embed_custom_xml?
         carrier_name = @hbx_enrollment&.product&.issuer_profile&.legal_name
         carrier_key = fetch_carrier_key(carrier_name)
-        EnrollRegistry[carrier_key].setting(:embed_xml).item
+        EnrollRegistry[carrier_key].setting(:embed_xml)&.item
       end
 
       def build_additional_info
