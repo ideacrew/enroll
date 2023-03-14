@@ -195,8 +195,8 @@ module Insured
 
       def calculate_max_applicable_aptc(enrollment, new_effective_on)
         if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-          @max_aptc = fetch_aptc_value(enrollment, new_effective_on)
-          float_fix([@max_aptc, enrollment.total_ehb_premium].min)
+          max_aptc = fetch_aptc_value(enrollment, new_effective_on)
+          float_fix([max_aptc, enrollment.total_ehb_premium].min)
         else
           selected_aptc = ::Services::AvailableEligibilityService.new(enrollment.id, new_effective_on, enrollment.id).available_eligibility[:total_available_aptc]
           Insured::Factories::SelfServiceFactory.fetch_applicable_aptc(enrollment, selected_aptc, new_effective_on, enrollment.id)
@@ -205,8 +205,8 @@ module Insured
 
       def calculate_max_tax_credit(enrollment, new_effective_on)
         if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-          @max_aptc ||= fetch_aptc_value(enrollment, new_effective_on)
-          return float_fix(@max_aptc)
+          max_aptc = fetch_aptc_value(enrollment, new_effective_on)
+          return float_fix(max_aptc)
         end
         0.0
       end
@@ -249,7 +249,7 @@ module Insured
       private
 
       def fetch_aptc_value(enrollment, effective_on)
-        ::Operations::PremiumCredits::FindAptc.new.call({hbx_enrollment: enrollment, effective_on: effective_on}).value!
+        @fetch_aptc_value ||= ::Operations::PremiumCredits::FindAptc.new.call({hbx_enrollment: enrollment, effective_on: effective_on}).value!
       end
 
       def default_tax_credit_value(enrollment, available_aptc)
