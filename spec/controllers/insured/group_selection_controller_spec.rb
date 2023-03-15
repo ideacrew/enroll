@@ -869,6 +869,61 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     end
   end
 
+  context 'update aptc in the mthh context' do
+    let!(:person) do
+      person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, is_incarcerated: false)
+      person.consumer_role.update_attributes(aasm_state: 'fully_verified')
+      person
+    end
+    let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
+
+    let!(:hbx_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: family.active_household,
+                        coverage_kind: 'health',
+                        effective_on: TimeKeeper.date_of_record.beginning_of_month,
+                        enrollment_kind: 'open_enrollment',
+                        kind: 'individual',
+                        consumer_role: person.consumer_role,
+                        rating_area_id: rating_area.id,
+                        product: product)
+    end
+
+    let!(:rating_area) do
+      ::BenefitMarkets::Locations::RatingArea.rating_area_for(person.rating_address, during: TimeKeeper.date_of_record.beginning_of_month) || FactoryBot.create_default(:benefit_markets_locations_rating_area)
+    end
+
+    let!(:product) do
+      FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                        hios_id: '11111111122301-01',
+                        csr_variant_id: '01',
+                        metal_level_kind: :silver,
+                        application_period: TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year,
+                        benefit_market_kind: :aca_individual)
+    end
+
+    let(:new_aptc_amount) {'1000'}
+    let(:new_aptc_pct) {'0.55' }
+    let(:max_tax_credit) {'2000'}
+    let(:new_aptc_amount_float) { new_aptc_amount.to_f }
+    let(:max_tax_credit_float) { max_tax_credit.to_f }
+
+    let(:params) {{'applied_pct_1' => new_aptc_pct, 'aptc_applied_total' => new_aptc_amount, 'hbx_enrollment_id' => hbx_enrollment.id.to_s, max_tax_credit: max_tax_credit}}
+
+    before :each do
+      EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+      sign_in user
+      post :edit_aptc, params: params
+    end
+
+    it "should update APTC amount on the new enrollment based on the aggregate aptc amount" do
+      family.reload
+      new_enrollment = family.hbx_enrollments.last
+      expect(new_enrollment.elected_aptc_pct).to eq(new_aptc_amount_float / max_tax_credit_float)
+    end
+  end
+
   context "GET terminate_selection" do
     before { allow(Person).to receive(:find).and_return(person) }
     it "return http success and render" do

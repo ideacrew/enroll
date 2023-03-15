@@ -326,6 +326,8 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
         id: applicant.id,
         applicant: {
           is_applying_coverage: false,
+          :is_homeless => '0',
+          :is_temporarily_out_of_state => '0',
           relationship: nil,
           first_name: 'update',
           last_name: 'updated',
@@ -390,6 +392,8 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
           id: applicant.id,
           applicant: {
             is_applying_coverage: false,
+            :is_homeless => '0',
+            :is_temporarily_out_of_state => '0',
             relationship: nil,
             first_name: 'update',
             last_name: 'updated',
@@ -427,6 +431,8 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
           id: applicant.id,
           applicant: {
             is_applying_coverage: false,
+            :is_homeless => '0',
+            :is_temporarily_out_of_state => '0',
             relationship: nil,
             first_name: 'update',
             last_name: 'updated',
@@ -456,6 +462,8 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
           id: applicant.id,
           applicant: {
             is_applying_coverage: false,
+            :is_homeless => '0',
+            :is_temporarily_out_of_state => '0',
             relationship: 'spouse',
             first_name: 'update',
             last_name: 'updated',
@@ -487,6 +495,69 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
         application.reload
         dependent.reload
         expect(dependent.addresses.first.county).to eql('Cumberland')
+      end
+    end
+
+    context "dependent's address" do
+      let(:primary_applicant) { application.applicants.first }
+      let(:dependent) { application.applicants.last }
+
+      let(:dependent_params) do
+        {
+          application_id: application.id,
+          id: applicant.id,
+          is_dependent: "true"
+        }
+      end
+
+      let(:applicant_params) do
+        {
+          same_with_primary: "true",
+          is_applying_coverage: false,
+          :is_homeless => '0',
+          :is_temporarily_out_of_state => '0',
+          relationship: 'spouse',
+          first_name: 'update',
+          last_name: 'updated',
+          gender: 'male',
+          dob: (TimeKeeper.date_of_record - 20.years).strftime("%Y-%m-%d"),
+          ssn: nil,
+          addresses_attributes: {'0': {kind: 'home', city: '', county: '', state: '', zip: '', address_1: ''}},
+          is_consumer_role: false
+        }
+      end
+
+      before do
+        allow(dependent).to receive(:relation_with_primary).and_return('spouse')
+        primary_applicant.addresses << FinancialAssistance::Locations::Address.new({kind: 'home', city: 'Bar Harbor', county: 'Cumberland', state: 'ME', zip: '04401', address_1: '1600 Main St'})
+        dependent_params[:id] = dependent.id
+        dependent.update_attributes!(relationship: 'spouse')
+        dependent.update_attributes!(same_with_primary: true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:counties_import).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
+      end
+
+      context "when same_with_primary is true" do
+        it "should update dependent's addresses with primary" do
+          patch :update, params: dependent_params.merge(applicant: applicant_params.merge(same_with_primary: "true"))
+          application.reload
+          dependent.reload
+          expect(dependent.addresses.first.county).to eql('Cumberland')
+        end
+      end
+
+      context "when same_with_primary is false" do
+        it "should not update dependent's addresses with primary" do
+          patch :update, params: dependent_params.merge(applicant: applicant_params.merge(same_with_primary: "false"))
+          application.reload
+          dependent.reload
+          expect(dependent.addresses.first).to be_nil
+        end
       end
     end
   end

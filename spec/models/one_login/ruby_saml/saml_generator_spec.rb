@@ -22,9 +22,6 @@ module OneLogin
       saml_generator.instance_variable_set(:@cert, test_x509_cert)
       hbx_enrollment.update_attributes(kind: 'individual')
       allow(EnrollRegistry).to receive(:[]).and_call_original
-      allow(EnrollRegistry).to receive(:[]).with(:kaiser_pay_now).and_return(pay_now_double)
-      allow(pay_now_double).to receive(:setting).with(embed_xml_key).and_return(xml_settings_double)
-      allow(xml_settings_double).to receive(:item).and_return(false)
       @saml_response = saml_generator.build_saml_response
       @noko = Nokogiri.parse(@saml_response.to_s) do
         XMLSecurity::BaseDocument::NOKOGIRI_OPTIONS
@@ -133,6 +130,8 @@ module OneLogin
 
         before do
           allow(EnrollRegistry).to receive(:[]).with(carrier_key).and_return(pay_now_double)
+          allow(pay_now_double).to receive(:setting).with(embed_xml_key).and_return(xml_settings_double)
+          allow(xml_settings_double).to receive(:item).and_return(false)
           allow(xml_settings_double).to receive(:item).and_return(true)
           allow(Operations::PayNow::CareFirst::EmbeddedXml).to receive(:new).and_return(operation)
           allow(operation).to receive(:call).and_return(::Dry::Monads::Result::Success.new("sample xml"))
@@ -150,6 +149,12 @@ module OneLogin
       it 'should return encoded value with String class' do
         encoded_response = saml_generator.encode_saml_response(@saml_response)
         expect(encoded_response.class). to eq String
+      end
+    end
+
+    context '#embed_custom_xml?' do
+      it 'should retun nil if the carrier does not have the custom xml setting' do
+        expect(saml_generator.send(:embed_custom_xml?)).to eq nil
       end
     end
   end
