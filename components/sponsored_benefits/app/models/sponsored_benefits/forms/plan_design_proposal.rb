@@ -122,10 +122,13 @@ module SponsoredBenefits
         @proposal.save!
       end
 
-      def save
-        initial_enrollment_period =
-          @effective_date..(@effective_date.next_year.prev_day)
+      def initial_enrollment_period
+        @effective_date = Date.strptime(@effective_date, '%Y-%m-%d') if effective_date.is_a?(String)
 
+        effective_date..(effective_date.next_year.prev_day)
+      end
+
+      def save
         if @proposal.persisted?
           @proposal.assign_attributes(title: @title)
         else
@@ -164,7 +167,7 @@ module SponsoredBenefits
           benefit_application.open_enrollment_period =
             enrollment_dates[:open_enrollment_period]
 
-          create_or_term_osse_eligibility(sponsorship) if osse_eligibility.present?
+          create_or_term_osse_eligibility(sponsorship)
         end
 
         @proposal.save!
@@ -233,6 +236,8 @@ module SponsoredBenefits
       end
 
       def create_or_term_osse_eligibility(benefit_sponsorship)
+        return unless osse_eligibility.present?
+
         osse_eligibility_present =
           proposal_osse_eligibility(benefit_sponsorship).present?
 
