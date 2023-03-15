@@ -209,7 +209,7 @@ class Insured::GroupSelectionController < ApplicationController
 
   def edit_aptc
     aptc_applied_total = params[:aptc_applied_total].delete_prefix('$')
-    applied_aptc_pct = EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature) ? calculate_elected_aptc_pct(aptc_applied_total.to_f, params[:max_tax_credit].to_f) : params[:applied_pct_1]
+    applied_aptc_pct = EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature) ? calculate_elected_aptc_pct(aptc_applied_total.to_f, params[:max_aptc].to_f) : params[:applied_pct_1]
     attrs = {enrollment_id: params.require(:hbx_enrollment_id), elected_aptc_pct: applied_aptc_pct, aptc_applied_total: aptc_applied_total}
 
     begin
