@@ -133,9 +133,9 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
       expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
-    it 'return false previous enrollment is inactive state' do
-      hbx_enrollment.hbx_enrollment_members.detect(&:is_subscriber).update_attributes(is_subscriber: false)
-      hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
+    it 'return false previous enrollment has no subscriber' do
+      hbx_enrollment1.hbx_enrollment_members.detect(&:is_subscriber).update_attributes(is_subscriber: false)
+      hbx_enrollment.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
       expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
