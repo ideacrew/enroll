@@ -33,6 +33,14 @@ module Eligibilities
 
       after_create :create_grants
 
+      scope :with_evidence, lambda { |evidence_key|
+        where(evidences: {
+                :$elemMatch => {
+                  key: evidence_key
+                }
+              })
+      }
+
       scope :by_date, lambda { |compare_date = TimeKeeper.date_of_record|
         where(
           "$or" => [
