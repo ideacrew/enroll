@@ -1359,6 +1359,10 @@ module FinancialAssistance
       clone_local_mec_evidence(new_applicant) if local_mec_evidence.present?
     end
 
+    def is_dependent?
+      !is_primary_applicant?
+    end
+
     private
 
     def fetch_evidence_params(evidence)

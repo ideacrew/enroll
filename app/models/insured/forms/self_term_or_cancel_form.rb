@@ -19,6 +19,7 @@ module Insured
       attribute :new_effective_on,                  Date
       attribute :default_tax_credit_value,          Float
       attribute :new_enrollment_premium,            Float
+      attribute :max_tax_credit,                    Float
 
       validates :market_kind,                       presence: true
 

@@ -208,7 +208,10 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def edit_aptc
-    attrs = {enrollment_id: params.require(:hbx_enrollment_id), elected_aptc_pct: params[:applied_pct_1], aptc_applied_total: params[:aptc_applied_total].delete_prefix('$')}
+    aptc_applied_total = params[:aptc_applied_total].delete_prefix('$')
+    applied_aptc_pct = EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature) ? calculate_elected_aptc_pct(aptc_applied_total.to_f, params[:max_tax_credit].to_f) : params[:applied_pct_1]
+    attrs = {enrollment_id: params.require(:hbx_enrollment_id), elected_aptc_pct: applied_aptc_pct, aptc_applied_total: aptc_applied_total}
+
     begin
       message = ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
       flash[:notice] = message
@@ -220,6 +223,10 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   private
+
+  def calculate_elected_aptc_pct(aptc_applied_amount, aggregate_aptc_amount)
+    aptc_applied_amount / aggregate_aptc_amount
+  end
 
   def family_member_eligibility_check(family_member)
     return unless @adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person)
