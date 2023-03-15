@@ -249,7 +249,7 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
       - name: Post to DC slack
         # Only run if matrix client is DC
-        if: matrix.client == 'dc'
+        if: matrix.client == 'dc-pause'
         id: slack
         uses: slackapi/slack-github-action@v1
         with:
