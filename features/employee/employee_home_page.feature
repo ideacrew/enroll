@@ -24,7 +24,7 @@ Feature: Employee only user should be able to enroll in IVL market
     #And Dual Role Person logs out
 
   Scenario: User with only employee role(s) should not see Audit-Log button
-    Given EnrollRegistry aca_shop_osse_audit_log_2023 feature is enabled
+    Given EnrollRegistry osse_audit_log feature is enabled
     Given a person exists with dual roles
     Then Dual Role Person sign in to portal
     Then Dual Role Person should not see Audit-Log button

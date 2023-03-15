@@ -138,6 +138,3 @@ registry:
       - key: :lowest_cost_silver_product_2023
         item: '94506DC0350033-01'
         is_enabled: <%= ENV['SHOP_OSSE_ELIGIBILITY_2023_IS_ENABLED'] || false %>
-      - key: :aca_shop_osse_audit_log_2023
-        item: :aca_shop_osse_audit_log_2023
-        is_enabled: <%= ENV['SHOP_OSSE_AUDIT_LOG_2023_IS_ENABLED'] || false %>

@@ -33,7 +33,7 @@ nav
         span.badge.message-unread.ml-half
           = @person.inbox.unread_messages.size
 
-    - if true##current_user.try(:has_hbx_staff_role?) && display_osse_audit_log?(@person)
+    - if current_user.try(:has_hbx_staff_role?) && display_osse_audit_log?(@person)
       li
         = link_to "" do
           = l10n("audit_log")

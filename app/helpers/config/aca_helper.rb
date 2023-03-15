@@ -369,16 +369,12 @@ module Config::AcaHelper
     EnrollRegistry.feature?("aca_ivl_osse_subsidy_#{year}") && EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
   end
 
-  def shop_osse_audit_log_is_enabled?(year = TimeKeeper.date_of_record.year)
-    EnrollRegistry.feature?("aca_shop_osse_audit_log_#{year}") && EnrollRegistry.feature_enabled?("aca_shop_osse_audit_log_#{year}")
+  def osse_audit_log_is_enabled?
+    EnrollRegistry.feature?("osse_audit_log") && EnrollRegistry.feature_enabled?("osse_audit_log")
   end
 
   def display_osse_audit_log?(person)
-    (person.has_consumer_role? && ivl_osse_audit_log_is_enabled?) || (person.has_active_employee_role? && shop_osse_audit_log_is_enabled?)
-  end
-
-  def ivl_osse_audit_log_is_enabled?(year = TimeKeeper.date_of_record.year)
-    EnrollRegistry.feature?("aca_ivl_osse_audit_log_#{year}") && EnrollRegistry.feature_enabled?("aca_ivl_osse_audit_log_#{year}")
+    (person.has_consumer_role? || person.has_active_employee_role?) && osse_audit_log_is_enabled?
   end
 
   def display_enr_summary_is_enabled(enrollment)
