@@ -166,6 +166,11 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
       hbx_enrollment1.update_attributes(product_id: "")
       expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
+
+    it 'should return false if previous enrollments are different kinds' do
+      hbx_enrollment1.update_attributes(coverage_kind: "dental")
+      expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
+    end
   end
 
   describe 'Whether family has break in coverage enrollments' do
