@@ -74,8 +74,12 @@ module Insured
       end
 
       def is_previous_enrollment?(hbx_enrollment, enr)
-        enr_carrier_key = fetch_carrier_key_from_legal_name(enr.product.issuer_profile.legal_name)
-        enr_carrier_key == @carrier_key && enr.effective_on.year == hbx_enrollment.effective_on.year && enr.subscriber.applicant_id == hbx_enrollment.subscriber.applicant_id && enr.coverage_kind == hbx_enrollment.coverage_kind
+        same_carrier = fetch_carrier_key_from_legal_name(enr.product.issuer_profile.legal_name) == @carrier_key
+        same_year = enr.effective_on.year == hbx_enrollment.effective_on.year
+        same_subscriber = enr.subscriber.applicant_id == hbx_enrollment.subscriber.applicant_id
+        same_coverage_kind = enr.coverage_kind == hbx_enrollment.coverage_kind
+
+        same_carrier && same_year && same_subscriber && same_coverage_kind
       end
 
       def pay_now_button_timed_out?(hbx_enrollment)
