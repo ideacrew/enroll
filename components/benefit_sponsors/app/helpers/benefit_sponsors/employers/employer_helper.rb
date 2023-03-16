@@ -79,8 +79,8 @@ module BenefitSponsors
         EnrollRegistry.feature?("aca_shop_osse_subsidy_#{year}") && EnrollRegistry.feature_enabled?("aca_shop_osse_subsidy_#{year}")
       end
 
-      def osse_audit_log_is_enabled?
-        EnrollRegistry.feature?("osse_audit_log") && EnrollRegistry.feature_enabled?("osse_audit_log")
+      def eligibility_audit_log_is_enabled?
+        EnrollRegistry.feature?("eligibility_audit_log") && EnrollRegistry.feature_enabled?("eligibility_audit_log")
       end
 
       def osse_eligibility_history_is_enabled?
