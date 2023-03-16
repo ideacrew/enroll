@@ -16,11 +16,13 @@ RSpec.describe Operations::GenerateSamlResponse do
   let(:params) do
     { :enrollment_id => hbx_enrollment.hbx_id, :source => source }
   end
+  let(:saml_validator) { AcaEntities::Serializers::Xml::PayNow::CareFirst::Operations::ValidatePayNowTransferPayloadSaml }
 
   before do
     allow(HTTParty).to receive(:post).and_return connection
     allow_any_instance_of(OneLogin::RubySaml::SamlGenerator).to receive(:build_saml_response).and_return build_saml_repsonse
     allow_any_instance_of(OneLogin::RubySaml::SamlGenerator).to receive(:encode_saml_response).and_return encode_saml_response
+    allow(saml_validator).to receive_message_chain("new.call").and_return(Dry::Monads::Result::Success.new(:ok))
   end
 
   subject do
