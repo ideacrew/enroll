@@ -31,7 +31,6 @@ module OneLogin
         super()
         @transaction_id = transaction_id
         @hbx_enrollment = hbx_enrollment
-        # @pay_now_key = pay_now_key
 
         if Rails.env.production?
           @private_key = OpenSSL::PKey::RSA.new(File.read(SamlInformation.pay_now_private_key_location))
@@ -107,6 +106,9 @@ module OneLogin
           attribute = attribute_statement.add_element('saml:Attribute', 'NameFormat' => NAME_FORMAT)
           attribute.attributes['Name'] = attr_name
           value = attribute.add_element 'saml:AttributeValue'
+
+          add_custom_xml_namespaces(value) if embed_custom_xml? && attr_name == 'Additional Information'
+
           value.text = set_attribute_values(attr_name, @hbx_enrollment)
         end
 
@@ -188,10 +190,28 @@ module OneLogin
         SecureRandom.uuid
       end
 
-      def build_additional_info
-        carrier_name = @hbx_enrollment&.product&.issuer_profile&.legal_name
+      def carrier_name
+        @hbx_enrollment&.product&.issuer_profile&.legal_name
+      end
+
+      def embed_custom_xml?
         carrier_key = fetch_carrier_key(carrier_name)
-        if EnrollRegistry[carrier_key].setting(:embed_xml).item
+        EnrollRegistry[carrier_key].setting(:embed_xml)&.item
+      end
+
+      def add_custom_xml_namespaces(value)
+        case carrier_name
+        when 'CareFirst'
+          value.attributes['xmlns'] = 'http://openhbx.org/api/terms/1.0'
+          value.add_namespace('xmlns:cv', 'http://openhbx.org/api/terms/1.0')
+          value.add_namespace('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance')
+          value.attributes['xsi:type'] = 'cv:PaynowTransferPayloadType'
+          value
+        end
+      end
+
+      def build_additional_info
+        if embed_custom_xml?
           transform_embedded_xml
         else
           @hbx_enrollment.hbx_enrollment_members.map(&:person).map{|person| person.first_name_last_name_and_suffix(',')}.join(';')
@@ -199,7 +219,6 @@ module OneLogin
       end
 
       def fetch_embedded_xml_class_name
-        carrier_name = @hbx_enrollment&.product&.issuer_profile&.legal_name
         case carrier_name
         when 'CareFirst'
           ::Operations::PayNow::CareFirst::EmbeddedXml

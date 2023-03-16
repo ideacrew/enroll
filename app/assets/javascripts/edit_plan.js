@@ -73,6 +73,8 @@ $(document).on("ready ajax:success", function() {
 
     $('#applied_pct_1').attr('step',0.01)
     var total = parseFloat($('#aptc_applied_total').val().replace(/\$/, ""));
+    var mthh_enabled = $('#mthh_enabled').val() == 'true';
+    var max_aptc = mthh_enabled ? parseFloat(document.getElementById("max_tax_credit").innerHTML) : null;
     var max_aptc_available = parseFloat(document.getElementById("max_aptc_available").innerHTML);
 
     if (total >= max_aptc_available) {
@@ -87,8 +89,7 @@ $(document).on("ready ajax:success", function() {
     }
 
     var new_total = parseFloat($('#aptc_applied_total').val().replace(/\$/, ""));
-
-    var new_percent = toFixedTrunc(new_total/max_aptc_available);
+    var new_percent = mthh_enabled ? toFixedTrunc(new_total/max_aptc) : toFixedTrunc(new_total/max_aptc_available);
     $('#applied_pct_1').val(new_percent);
     calculatePercent(new_total);
     $('#applied_pct_1').attr('step',0.05)
@@ -99,11 +100,13 @@ $(document).on("ready ajax:success", function() {
     // var applied_aptc_total = $('#aptc_applied_total').val();
     var total_premium_value = document.getElementById("enrollment_total_premium").innerHTML;
     var total_premium = toFixedTrunc(parseFloat(total_premium_value));
+    var mthh_enabled = $('#mthh_enabled').val() == 'true';
     // Max available tax credit per month for month
+    var max_aptc = mthh_enabled ? document.getElementById("max_tax_credit").innerHTML : null;
     var max_aptc_available = document.getElementById("max_aptc_available").innerHTML;
-    var new_percent = tax_value/max_aptc_available;
+    var new_percent = mthh_enabled ? tax_value/max_aptc : tax_value/max_aptc_available;
 
-    var aptc_total_cash_amount_to_apply = toFixedTrunc(max_aptc_available * new_percent);
+    var aptc_total_cash_amount_to_apply = mthh_enabled ? toFixedTrunc(max_aptc * new_percent) : toFixedTrunc(max_aptc_available * new_percent);
     // Update the percentage
     var percent_string = (new_percent.toFixed(2) * 100) + "%";
     $('#aptc_applied_pct_1_percent').val(percent_string);
@@ -125,12 +128,22 @@ $(document).on("ready ajax:success", function() {
     // Percentage of max aptc available that user wishes to apply
     var percent = Math.round(parseFloat($(selector).val()).toFixed(2) * multiplier);
     // Max available tax credit per month for month
+    var mthh_enabled = $('#mthh_enabled').val() == 'true';
     var max_aptc_available = document.getElementById("max_aptc_available").innerHTML;
-    var aptc_total_cash_amount_to_apply = toFixedTrunc(max_aptc_available * (percent / 100))
+    var max_aptc = mthh_enabled ? document.getElementById("max_tax_credit").innerHTML : null;
+   
+    var new_percent = mthh_enabled && ((percent / 100) * max_aptc > max_aptc_available) ? parseFloat((max_aptc_available / max_aptc) * 100).toFixed(0) : percent;
+    var aptc_total_cash_amount_to_apply = mthh_enabled ? toFixedTrunc(max_aptc * (new_percent / 100)) : toFixedTrunc(max_aptc_available * (new_percent / 100)) 
     // Update the percentage
-    $('#aptc_applied_pct_1_percent').val(percent + '%');
+    $('#aptc_applied_pct_1_percent').val(new_percent + '%');
     // Update the view to reflect the total cash to be applied
     $('#aptc_applied_total').val("$" + aptc_total_cash_amount_to_apply);
+
+    if (mthh_enabled && (max_aptc * (percent / 100) > max_aptc_available)) {
+      $('#applied_pct_1').val((max_aptc_available / max_aptc).toFixed(2));
+      $('#aptc_applied_pct_1_percent').val((max_aptc_available / max_aptc).toFixed(2) * 100 + '%');
+      $('#aptc_applied_total').val("$" + max_aptc_available);
+    }
     // Show dollar amount of Tax Credit value
     var new_premium = (total_premium - aptc_total_cash_amount_to_apply);
     $('#new-premium').html(toFixedTrunc(new_premium.toFixed(8)));
