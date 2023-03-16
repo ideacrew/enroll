@@ -489,6 +489,38 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
   end
 
+  context "when the enrollment is auto-renewing" do
+    let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
+    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
+    let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
+    let!(:hbx_enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days),
+        family: family,
+        household: family.households.first,
+        coverage_kind: "health",
+        kind: "individual",
+        aasm_state: 'auto-renewing',
+        product: product
+      )
+    end
+
+    before :each do
+      allow(view).to receive(:enrollment_can_pay_now?).with(hbx_enrollment).and_return(false)
+      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+    end
+
+    it "should display Actions button" do
+      expect(rendered).to have_text("Actions")
+    end
+
+    it "should not display the Payments button in the actions drop down" do
+      expect(rendered).to_not have_text("Make payments for my plan")
+    end
+  end
+
   context "when the enrollment is_coverage_waived" do
     let(:waived_hbx_enrollment) do
       instance_double(

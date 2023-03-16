@@ -422,6 +422,9 @@ registry:
     features:
       - key: :generic_redirect
         is_enabled: <%= ENV['GENERIC_REDIRECT_PAY_NOW_IS_ENABLED'] || false %>
+        settings: 
+          - key: :strict_tile_check
+            item: <%= ENV['STRICT_TILE_CHECK_PAY_NOW_IS_ENABLED'] || false %>
       - key: :kaiser_pay_now
         is_enabled: <%= ENV['KAISER_PERMANENTE_PAY_NOW_IS_ENABLED'] || false %>
         settings:

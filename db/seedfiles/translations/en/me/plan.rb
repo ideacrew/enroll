@@ -22,7 +22,7 @@ PLAN_TRANSLATIONS = {
   'en.plans.anthm_hours' => '7:00 am – 7:00 pm (Monday-Friday)',
   'en.plans.anthm_contact_url' => '',
 
-  'en.plans.taro' => 'Taro Health Care',
+  'en.plans.taro' => 'Taro Health',
   'en.plans.taro_phone_1' => '1-207-210-3434',
   'en.plans.taro_href_phone_1' => 'tel:+12072103434',
   'en.plans.taro_hours' => '9am to 6:30pm EST, Monday - Friday',

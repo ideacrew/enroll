@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize
 module FinancialAssistance
   module Forms
     class Applicant
@@ -9,7 +10,7 @@ module FinancialAssistance
       include AddressValidator
 
       attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id, :application_id, :applicant_id, :gender, :relationship, :relation_with_primary, :no_dc_address, :is_homeless, :is_temporarily_out_of_state,
-                    :tribe_codes, :same_with_primary, :is_applying_coverage, :immigration_doc_statuses, :addresses, :phones, :emails, :addresses_attributes, :phones_attributes, :emails_attributes
+                    :tribe_codes, :same_with_primary, :is_applying_coverage, :immigration_doc_statuses, :addresses, :phones, :emails, :addresses_attributes, :phones_attributes, :emails_attributes, :is_dependent
 
       attr_writer :family
 
@@ -112,10 +113,12 @@ module FinancialAssistance
         return false unless valid?
         is_living_in_state = has_in_state_home_addresses?(addresses_attributes)
         applicant_entity = FinancialAssistance::Operations::Applicant::Build.new.call(params: extract_applicant_params.merge(is_living_in_state: is_living_in_state))
+
         if applicant_entity.success?
           values = applicant_entity.success.to_h.except(:addresses, :emails, :phones).merge(nested_parameters)
           applicant = application.applicants.find(applicant_id) if applicant_id.present?
           if applicant.present? && applicant.persisted?
+            applicant.home_address&.destroy if applicant.is_dependent? && same_with_primary == "true"
             applicant.update(values)
           else
             applicant = application.applicants.build(values)
@@ -134,12 +137,10 @@ module FinancialAssistance
         end
       end
 
-      # rubocop:disable Metrics/CyclomaticComplexity
       def update_relationship_and_relative_relationship(relationship)
         self&.applicant&.relationships&.last&.update_attributes(kind: relationship)
         self&.applicant&.relationships&.last&.relative&.relationships&.where(relative_id: self.applicant.id)&.first&.update_attributes(kind: FinancialAssistance::Relationship::INVERSE_MAP[relationship])
       end
-      # rubocop:enable Metrics/CyclomaticComplexity
 
       def extract_applicant_params
         assign_citizen_status
@@ -166,13 +167,13 @@ module FinancialAssistance
           citizen_status: citizen_status,
           is_temporarily_out_of_state: is_temporarily_out_of_state,
           immigration_doc_statuses: immigration_doc_statuses.to_a.reject(&:blank?)
-        }#.reject{|_k, val| val.nil?}
+        } #.reject{|_k, val| val.nil?}
 
         # This will update both the relationship being passed through,
         # and the corresponding relative inverse relationship
         update_relationship_and_relative_relationship(relationship) if relationship
 
-        if same_with_primary == 'true'
+        if is_dependent == "true" && same_with_primary == "true"
           primary = application.primary_applicant
           attrs.merge!(no_dc_address: primary.no_dc_address, is_homeless: primary.is_homeless?, is_temporarily_out_of_state: primary.is_temporarily_out_of_state?)
         end
@@ -185,7 +186,6 @@ module FinancialAssistance
                     })
       end
 
-
       def vlp_parameters
         [:vlp_subject, :alien_number, :i94_number, :visa_number, :passport_number, :sevis_id,
          :naturalization_number, :receipt_number, :citizenship_number, :card_number,
@@ -197,7 +197,7 @@ module FinancialAssistance
 
       def nested_parameters
         address_params = addresses_attributes.reject{|_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank?}
-        address_params = primary_applicant_address_attributes if address_params.blank? && same_with_primary == 'true'
+        address_params = primary_applicant_address_attributes if is_dependent == "true" && same_with_primary == "true"
 
         params = {addresses_attributes: address_params}
         params.merge(phones_attributes: phones_attributes.reject{|_key, value| value[:full_phone_number].blank?}) if phones_attributes.present?
@@ -247,3 +247,4 @@ module FinancialAssistance
     end
   end
 end
+# rubocop:enable Metrics/CyclomaticComplexity, Metrics/AbcSize

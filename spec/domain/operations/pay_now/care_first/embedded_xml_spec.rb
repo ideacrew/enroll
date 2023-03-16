@@ -2,6 +2,7 @@
 
 require "rails_helper"
 require File.join(Rails.root, "spec/shared_contexts/benchmark_products")
+require "aca_entities/pay_now/care_first/operations/generate_xml"
 
 RSpec.describe Operations::PayNow::CareFirst::EmbeddedXml do
   include_context "family with 2 family members with county_zip, rating_area & service_area"
@@ -29,20 +30,20 @@ RSpec.describe Operations::PayNow::CareFirst::EmbeddedXml do
                       enrollment_members: family.family_members)
   end
   context "valid payload is created" do
-    # add piece related to calling aca entities function
+    before do
+      allow(::AcaEntities::PayNow::CareFirst::Operations::GenerateXml).to receive_message_chain("new.call").and_return(Dry::Monads::Result::Success.new("sample xml"))
+    end
     it "should return successful xml" do
       expect(described_class.new.call(enrollment)).to be_success
     end
   end
-  # for after acaentities piece gets included
 
-  #   context "external xml function fails" do
-  #     before do
-  #         allow(AcaEntitiesOperation).to receive_message_chain('new.call').and_return(Dry::Monads::Result::Failure.new("unable to create xml"))
-
-  #     end
-  #     it "should return failure" do
-  #         expect(described_class.new.call(enrollment)).to be_a(Dry::Monads::Result::Failure)
-  #     end
-  #   end
+  context "external xml function fails" do
+    before do
+      allow(::AcaEntities::PayNow::CareFirst::Operations::GenerateXml).to receive_message_chain("new.call").and_return(Dry::Monads::Result::Failure.new("unable to create xml"))
+    end
+    it "should return failure" do
+      expect(described_class.new.call(enrollment)).to be_a(Dry::Monads::Result::Failure)
+    end
+  end
 end
