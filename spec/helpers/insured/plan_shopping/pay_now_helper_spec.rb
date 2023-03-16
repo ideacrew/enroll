@@ -109,6 +109,7 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
     end
     before :each do
       assign(:enrollment, hbx_enrollment)
+      @carrier_key = helper.fetch_carrier_key_from_legal_name(hbx_enrollment&.product&.issuer_profile&.legal_name)
     end
 
     it 'return true if household has kaiser enrollments in current benefit coverage period with same subscriber' do
@@ -116,20 +117,20 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
     end
 
     it 'return false previous enrollment is shopping state' do
-      hbx_enrollment.update_attributes(aasm_state: 'shopping')
-      hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
+      hbx_enrollment1.update_attributes(aasm_state: 'shopping')
+      hbx_enrollment.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
       expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
     it 'return false previous enrollment is canceled state' do
-      hbx_enrollment.update_attributes(aasm_state: 'coverage_canceled')
-      hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
+      hbx_enrollment1.update_attributes(aasm_state: 'coverage_canceled')
+      hbx_enrollment.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
       expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
     it 'return false previous enrollment is inactive state' do
-      hbx_enrollment.update_attributes(aasm_state: 'inactive')
-      hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
+      hbx_enrollment1.update_attributes(aasm_state: 'inactive')
+      hbx_enrollment.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
       expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
@@ -140,8 +141,8 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
     end
 
     it 'return false previous enrollment has no product' do
-      hbx_enrollment.unset(:product_id)
-      hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
+      hbx_enrollment1.unset(:product_id)
+      hbx_enrollment.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
       expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
@@ -156,8 +157,8 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
       expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
-    it 'return false if household had no kaiser enrollments in current benefit coverage period' do
-      issuer_profile.update_attributes(legal_name: 'Something')
+    it 'return false if household had no previous kaiser enrollments in current benefit coverage period' do
+      hbx_enrollment1.update_attributes(product_id: "")
       expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
