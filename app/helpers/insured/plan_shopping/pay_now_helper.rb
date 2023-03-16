@@ -65,12 +65,10 @@ module Insured
       end
 
       def has_any_previous_enrollments?(hbx_enrollment)
-        potential_previous_enrollments = hbx_enrollment.family.hbx_enrollments.where(:aasm_state.nin => ["inactive", "shopping", "coverage_canceled"])
-        potential_previous_enrollments.select do |enr|
+        potential_previous_enrollments = hbx_enrollment.family.hbx_enrollments.where(:aasm_state.nin => ["inactive", "shopping", "coverage_canceled"]).select do |enr|
           next if enr.product.blank? || enr.subscriber.blank? || enr.is_shop?
           is_previous_enrollment?(hbx_enrollment, enr)
         end
-        puts potential_previous_enrollments.class
         enrollments = potential_previous_enrollments - hbx_enrollment.to_a
         enrollments.present?
       end
