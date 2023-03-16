@@ -14,6 +14,7 @@ What kind of change does this PR introduce?
 - [ ] Refactoring (no functional changes, no api changes)
 - [ ] Build related changes
 - [ ] CI related changes
+- [ ] Dependency updates (e.g., add a new gem or update version)
 
 # What is the ticket # detailing the issue?
 
