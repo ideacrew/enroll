@@ -927,6 +927,74 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         expect(FinancialAssistance::Operations::Families::CreateOrUpdateMember).to_not have_received(:new)
       end
     end
+
+    context "when primary address changes" do
+      let!(:application2) do
+        FactoryBot.create(:application,
+                          family_id: application.family_id,
+                          aasm_state: 'draft',
+                          assistance_year: TimeKeeper.date_of_record.year,
+                          effective_date: Date.today)
+      end
+
+      let!(:applicant1) do
+
+        FactoryBot.create(:financial_assistance_applicant, :with_home_address,
+                          application: application2,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: true,
+                          same_with_primary: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+
+      context "when same_with_primary is true" do
+        let!(:applicant2) do
+          FactoryBot.create(:financial_assistance_applicant,
+                            application: application2,
+                            dob: Date.today - 38.years,
+                            is_primary_applicant: false,
+                            same_with_primary: true,
+                            family_member_id: BSON::ObjectId.new)
+        end
+
+        let!(:relationship) do
+          application2.ensure_relationship_with_primary(applicant2, 'spouse')
+          application2.reload
+        end
+
+        it 'should update dependent address' do
+          expect(application2.applicants[1].addresses.present?).to be_falsey
+          application2.reload
+          application2.applicants.first.addresses.first.assign_attributes(city: "was")
+          application2.save!
+          expect(application2.applicants[1].addresses.present?).to be_truthy
+        end
+      end
+
+      context "when same_with_primary is false" do
+        let!(:applicant2) do
+          FactoryBot.create(:financial_assistance_applicant,
+                            application: application2,
+                            dob: Date.today - 38.years,
+                            is_primary_applicant: false,
+                            same_with_primary: false,
+                            family_member_id: BSON::ObjectId.new)
+        end
+
+        let!(:relationship) do
+          application2.ensure_relationship_with_primary(applicant2, 'spouse')
+          application2.reload
+        end
+
+        it 'should not update dependent address' do
+          expect(application2.applicants[1].addresses.present?).to be_falsey
+          application2.reload
+          application2.applicants.first.addresses.first.assign_attributes(city: "was")
+          application2.save!
+          expect(application2.applicants[1].addresses.present?).to be_falsey
+        end
+      end
+    end
   end
 
   context 'propagate_destroy' do
