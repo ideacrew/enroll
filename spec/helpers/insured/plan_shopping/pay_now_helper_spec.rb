@@ -111,8 +111,8 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
       assign(:enrollment, hbx_enrollment)
     end
 
-    it 'return false if household has kaiser enrollments in current benefit coverage period with same subscriber' do
-      expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
+    it 'return true if household has kaiser enrollments in current benefit coverage period with same subscriber' do
+      expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq true
     end
 
     it 'return false previous enrollment is shopping state' do
