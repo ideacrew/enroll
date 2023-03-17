@@ -57,9 +57,14 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           expect(result.success?).to eq true
           expect(result.value!).to eq 0.0
         end
+
+        it 'should not create tax_household enrollments' do
+          result
+          expect(TaxHouseholdEnrollment.where(enrollment_id: hbx_enrollment.id).size).to eq 0
+        end
       end
 
-      context 'without no aptc grants for family' do
+      context 'with eligibility_determination and without any aptc grants for family' do
 
         let(:person) { FactoryBot.create(:person) }
         let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
@@ -73,9 +78,25 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                             family: family)
         end
 
+        let!(:tax_household_group) do
+          family.tax_household_groups.create!(
+            assistance_year: TimeKeeper.date_of_record.year,
+            source: 'Admin',
+            start_on: TimeKeeper.date_of_record.beginning_of_year,
+            tax_households: [
+              FactoryBot.build(:tax_household, household: family.active_household)
+            ]
+          )
+        end
+
         it 'returns zero available aptc' do
           expect(result.success?).to eq true
           expect(result.value!).to eq 0.0
+        end
+
+        it 'should create tax household enrollments' do
+          result
+          expect(TaxHouseholdEnrollment.where(enrollment_id: hbx_enrollment.id).size).not_to eq 0
         end
       end
 
@@ -151,6 +172,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
 
         let!(:inactive_tax_household_group) do
           family.tax_household_groups.create!(
+            created_at: TimeKeeper.date_of_record - 1.months,
             assistance_year: TimeKeeper.date_of_record.year,
             source: 'Admin',
             start_on: TimeKeeper.date_of_record.beginning_of_year,
@@ -218,11 +240,10 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           let(:benchmark_premium) { nil }
 
           it 'returns zero $' do
-            aptc_grant.update_attribute(:tax_household_id, BSON::ObjectId.new)
             expect(result.success?).to eq true
             expect(result.value!).to eq 0
             expect(TaxHouseholdEnrollment.all.size).to eq 1
-            expect(TaxHouseholdEnrollment.all.first.tax_household_members_enrollment_members.size).to eq 0
+            expect(TaxHouseholdEnrollment.all.first.tax_household_members_enrollment_members.size).to eq 1
           end
         end
 
