@@ -220,11 +220,6 @@ describe 'member_outreach_report' do
     end
 
     context 'primary applicant' do
-      # it 'should match with the programs that the applicant is eligible for' do
-      #   eligible_programs = "QHP without financial assistance"
-      #   expect(@file_content[1][16]).to eq(eligible_programs)
-      # end
-
       it 'should match with the applicant access to health coverage response' do
         expect(@file_content[1][20]).to eq(primary_applicant.has_eligible_health_coverage.present?.to_s)
       end
@@ -286,11 +281,6 @@ describe 'member_outreach_report' do
     end
 
     context 'spouse applicant' do
-      # it 'should match with the programs that the applicant is eligible for' do
-      #   eligible_programs = "MaineCare and Cub Care(Medicaid)"
-      #   expect(@file_content[2][16]).to eq(eligible_programs)
-      # end
-
       it 'should match with the applicant access to health coverage response' do
         expect(@file_content[2][20]).to eq(spouse_applicant.has_eligible_health_coverage.present?.to_s)
       end
@@ -318,22 +308,6 @@ describe 'member_outreach_report' do
         expect(@file_content[1][18]).to eq(primary_eligible_programs)
         expect(@file_content[2][18]).to eq(spouse_eligible_programs)
       end
-
-      # it 'should match with the date of the most recent aasm_state transition' do
-      #   expect(@file_content[1][18]).to eq(application.workflow_state_transitions.first.transition_at.to_s)
-      #   expect(@file_content[2][18]).to eq(application.workflow_state_transitions.first.transition_at.to_s)
-      # end
-
-      # it 'should match with the transfer id' do
-      #   expect(@file_content[1][19]).to eq(application.transfer_id)
-      #   expect(@file_content[2][19]).to eq(application.transfer_id)
-      # end
-
-      # it 'should match with the inbound transfer timestamp' do
-      #   transfer_timestamp = application.transferred_at
-      #   expect(@file_content[1][20]).to eq(transfer_timestamp.to_s)
-      #   expect(@file_content[2][20]).to eq(transfer_timestamp.to_s)
-      # end
     end
 
     context 'latest application (in any submission state)' do
@@ -443,10 +417,6 @@ describe 'member_outreach_report' do
         expect(@file_content[2][2]).to eq("false")
       end
     end
-  end
-
-  context 'family with no FAA application' do
-    # TODO
   end
 
   after :each do
