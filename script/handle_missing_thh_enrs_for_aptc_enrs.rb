@@ -6,27 +6,6 @@
 
 require 'csv'
 
-def publish_to_edi(person_hbx_id)
-  result = ::Operations::EdiGateway::PublishCv3Family.new.call(
-    {
-      person_hbx_id: person_hbx_id,
-      year: @processing_year
-    }
-  )
-
-  errors = if result.success?
-    result.success
-  elsif result.failure.is_a?(Dry::Validation::Result)
-    "PublishCsvFamily - Failure with errors: #{result.failure.errors.to_h}"
-  else
-    "PublishCsvFamily - Failure with errors: #{result.failure}"
-  end
-
-
-rescue StandardError => e
-  "PublishCsvFamily - Failed to generate Cv3Payload for person_hbx_id: #{person_hbx_id}"
-end
-
 # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
 def process_enrollments(enrollments, field_names, file_name)
   CSV.open(file_name, 'w', force_quotes: true) do |csv|
@@ -60,8 +39,6 @@ def process_enrollments(enrollments, field_names, file_name)
         end
 
         enrollment.update_tax_household_enrollment
-
-        @operation_result = publish_to_edi(family.primary_person.hbx_id.to_s)
       end
 
       benchmark_product_request_payload, benchmark_product_response_payload = if thh_enrs_newly_created
@@ -97,8 +74,7 @@ def process_enrollments(enrollments, field_names, file_name)
             member.relationship_with_primary,
             member.date_of_birth,
             benchmark_product_request_payload,
-            benchmark_product_response_payload,
-            @operation_result.presence || 'N/A'
+            benchmark_product_response_payload
           ]
         end
       end
@@ -144,8 +120,7 @@ field_names = [
   'thh_enr_member_relationship_with_primary',
   'thh_enr_member_date_of_birth',
   'benchmark_product_request_payload',
-  'benchmark_product_response_payload',
-  'Cv3Payload publish to EdiGateway result'
+  'benchmark_product_response_payload'
 ]
 process_enrollments(enrollments, field_names, file_name)
 end_time = DateTime.current
