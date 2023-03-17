@@ -122,8 +122,8 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
             latest_determined_application&.hbx_id,
             latest_determined_application&.submitted_at,
             program_eligible_for(applicant),
-            # fpl depends on enrollment; assumption: use most recent active health plan enrollment
-            fpl_percentage(mra_health_enrollment, enrollment_member, mra_health_enrollment&.effective_on&.year),
+            # Expected outcome is that FPL value populates for all FAA applicants based on most recent determined application
+            applicant&.magi_as_percentage_of_fpl,
             applicant&.has_eligible_health_coverage.present?,
             applicant&.benefits&.eligible&.map(&:insurance_kind)&.join(", "),
             latest_application&.aasm_state,

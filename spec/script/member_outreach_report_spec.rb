@@ -220,6 +220,10 @@ describe 'member_outreach_report' do
     end
 
     context 'primary applicant' do
+      it 'should match with the applicant FPL percentage' do
+        expect(@file_content[1][19]).to eq(primary_applicant.magi_as_percentage_of_fpl.to_s)
+      end
+
       it 'should match with the applicant access to health coverage response' do
         expect(@file_content[1][20]).to eq(primary_applicant.has_eligible_health_coverage.present?.to_s)
       end
@@ -281,6 +285,10 @@ describe 'member_outreach_report' do
     end
 
     context 'spouse applicant' do
+      it 'should match with the applicant FPL percentage' do
+        expect(@file_content[2][19]).to eq(primary_applicant.magi_as_percentage_of_fpl.to_s)
+      end
+
       it 'should match with the applicant access to health coverage response' do
         expect(@file_content[2][20]).to eq(spouse_applicant.has_eligible_health_coverage.present?.to_s)
       end
