@@ -48,6 +48,7 @@ module Operations
     end
 
     def validate_saml_response(saml_response)
+      return Success(:ok) unless EnrollRegistry.feature_enabled?(:validate_saml)
       AcaEntities::Serializers::Xml::PayNow::CareFirst::Operations::ValidatePayNowTransferPayloadSaml.new.call(saml_response)
     end
 
