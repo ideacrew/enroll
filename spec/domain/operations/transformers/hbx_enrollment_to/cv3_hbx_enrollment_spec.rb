@@ -42,12 +42,17 @@ RSpec.describe ::Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment, db
       @validated_payload = AcaEntities::Contracts::Enrollments::HbxEnrollmentContract.new.call(transformed_payload).to_h
     end
 
+    let(:family_rated_premiums_result) do
+      @validated_payload[:product_reference][:family_rated_premiums]
+    end
+
     it 'returns with :slcsp_member_premium, :family_rated_premiums & :pediatric_dental_ehb' do
       expect(@validated_payload[:hbx_id]).to eq(enrollment.hbx_id.to_s)
       expect(@validated_payload[:terminated_on]).to eq(enrollment.terminated_on)
       expect(@validated_payload[:hbx_enrollment_members].first[:slcsp_member_premium]).not_to be_empty
       expect(@validated_payload[:hbx_enrollment_members].first[:coverage_end_on]).to eq enrollment_member.coverage_end_on
-      expect(@validated_payload[:product_reference][:family_rated_premiums]).not_to be_empty
+      expect(family_rated_premiums_result).not_to be_empty
+      expect(family_rated_premiums_result[:primary_enrollee_two_dependents]).not_to be_nil
       expect(@validated_payload[:product_reference][:pediatric_dental_ehb]).not_to be_nil
       expect(@validated_payload[:product_reference][:metal_level]).to eq(enr_product.metal_level_kind.to_s)
     end

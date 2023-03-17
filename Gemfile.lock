@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 8c3a71359fc1f6a76bd205907af84b1b94d3000b
+  revision: 655968480f807cfe9dcbb00de0f4c3eb7afd5476
   branch: trunk
   specs:
     aca_entities (0.10.0)
@@ -877,6 +877,9 @@ GEM
       rspec-expectations (~> 3.9)
       rspec-mocks (~> 3.9)
       rspec-support (~> 3.9)
+    rspec-sidekiq (3.1.0)
+      rspec-core (~> 3.0, >= 3.0.0)
+      sidekiq (>= 2.4.0)
     rspec-support (3.9.3)
     rspec_junit_formatter (0.4.1)
       rspec-core (>= 2, < 4, != 2.12.0)
@@ -1153,6 +1156,7 @@ DEPENDENCIES
   rspec-benchmark
   rspec-instafail (~> 1)
   rspec-rails
+  rspec-sidekiq
   rspec_junit_formatter
   rubocop
   rubocop-git
