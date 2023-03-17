@@ -419,6 +419,73 @@ describe 'member_outreach_report' do
     end
   end
 
+  context 'enrollment is terminated or canceled' do
+    before do
+      health_enrollment.update(aasm_state: 'coverage_terminated')
+      dental_enrollment.update(aasm_state: 'coverage_canceled')
+      latest_application.non_primary_applicants.each{|applicant| latest_application.ensure_relationship_with_primary(applicant, applicant.relationship) }
+      latest_determined_application.non_primary_applicants.each{|applicant| latest_determined_application.ensure_relationship_with_primary(applicant, applicant.relationship) }
+      latest_application.update(workflow_state_transitions: [workflow_state_transition])
+      latest_determined_application.update(workflow_state_transitions: [workflow_state_transition])
+      health_enrollment.update(hbx_enrollment_members: enrollment_members)
+      invoke_member_outreach_report
+      @file_content = CSV.read("#{Rails.root}/member_outreach_report.csv")
+      @enrollments = family.active_household.hbx_enrollments
+    end
+
+    context 'for the terminated enrollment data' do
+      it 'should match with the current year most recent health plan hios id' do
+        health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == curr_year}.sort_by(&:submitted_at).reverse.first
+        expect(@file_content[1][26]).to eq(health_enrollment.product.hios_id)
+        expect(@file_content[2][26]).to eq(health_enrollment.product.hios_id)
+      end
+
+      it 'should match with the current year most recent health plan status' do
+        health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == curr_year}.sort_by(&:submitted_at).reverse.first
+        expect(@file_content[1][27]).to eq(health_enrollment.aasm_state)
+        expect(@file_content[2][27]).to eq(health_enrollment.aasm_state)
+      end
+
+      it 'should match with the prospective year most recent health plan hios id' do
+        health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == next_year}.sort_by(&:submitted_at).reverse.first
+        expect(@file_content[1][28]).to eq(health_enrollment.product.hios_id)
+        expect(@file_content[2][28]).to eq(health_enrollment.product.hios_id)
+      end
+
+      it 'should match with the prospective year most recent health plan status' do
+        health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == next_year}.sort_by(&:submitted_at).reverse.first
+        expect(@file_content[1][29]).to eq(health_enrollment.aasm_state)
+        expect(@file_content[2][29]).to eq(health_enrollment.aasm_state)
+      end
+    end
+
+    context 'for the cancelled enrollment data' do
+      it 'should match with the current year most recent dental plan hios id' do
+        dental_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on.year == curr_year}.sort_by(&:submitted_at).reverse.first
+        expect(@file_content[1][30]).to eq(dental_enrollment.product.hios_id)
+        expect(@file_content[2][30]).to eq(dental_enrollment.product.hios_id)
+      end
+
+      it 'should match with the current year most recent dental plan status' do
+        dental_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on.year == curr_year}.sort_by(&:submitted_at).reverse.first
+        expect(@file_content[1][31]).to eq(dental_enrollment.aasm_state)
+        expect(@file_content[2][31]).to eq(dental_enrollment.aasm_state)
+      end
+
+      it 'should match with the prospective year most recent dental plan hios id' do
+        dental_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on.year == next_year}.sort_by(&:submitted_at).reverse.first
+        expect(@file_content[1][32]).to eq(dental_enrollment.product.hios_id)
+        expect(@file_content[2][32]).to eq(dental_enrollment.product.hios_id)
+      end
+
+      it 'should match with the prospective year most recent dental plan status' do
+        dental_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on.year == next_year}.sort_by(&:submitted_at).reverse.first
+        expect(@file_content[1][33]).to eq(dental_enrollment.aasm_state)
+        expect(@file_content[2][33]).to eq(dental_enrollment.aasm_state)
+      end
+    end
+  end
+
   after :each do
     FileUtils.rm_rf("#{Rails.root}/member_outreach_report.csv")
   end

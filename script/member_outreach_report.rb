@@ -86,18 +86,20 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
         home_phone = person.phones.detect { |phone| phone.kind == 'home' }
         work_phone = person.phones.detect { |phone| phone.kind == 'work' }
         mobile_phone = person.phones.detect { |phone| phone.kind == 'mobile' }
-        enrollments = family.active_household.hbx_enrollments
-        mra_health_enrollment = enrollments.enrolled_and_renewal.effective_desc.detect {|enr| enr.coverage_kind == 'health'}
-        mra_dental_enrollment = enrollments.enrolled_and_renewal.effective_desc.detect {|enr| enr.coverage_kind == 'dental'}
+        enrolled_and_renewal = family.active_household.hbx_enrollments.enrolled_and_renewal
+        canceled_and_terminated = family.active_household.hbx_enrollments.canceled_and_terminated
+        enrollments = enrolled_and_renewal + canceled_and_terminated
+        mra_health_enrollment = enrolled_and_renewal.effective_desc.detect {|enr| enr.coverage_kind == 'health'}
+        mra_dental_enrollment = enrolled_and_renewal.effective_desc.detect {|enr| enr.coverage_kind == 'dental'}
         enrollment_member = if mra_health_enrollment
                               mra_health_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
                             else
                               mra_dental_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
                             end
-        curr_mr_health_enrollment = enrollments.enrolled_and_renewal.select {|enr| enr.coverage_kind == 'health' && enr.effective_on&.year == curr_year}.sort_by(&:submitted_at).reverse.first
-        next_mr_health_enrollment = enrollments.enrolled_and_renewal.select {|enr| enr.coverage_kind == 'health' && enr.effective_on&.year == next_year}.sort_by(&:submitted_at).reverse.first
-        curr_mr_dental_enrollment = enrollments.enrolled_and_renewal.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on&.year == curr_year}.sort_by(&:submitted_at).reverse.first
-        next_mr_dental_enrollment = enrollments.enrolled_and_renewal.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on&.year == next_year}.sort_by(&:submitted_at).reverse.first
+        curr_mr_health_enrollment = enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on&.year == curr_year}.sort_by(&:submitted_at).reverse.first
+        next_mr_health_enrollment = enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on&.year == next_year}.sort_by(&:submitted_at).reverse.first
+        curr_mr_dental_enrollment = enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on&.year == curr_year}.sort_by(&:submitted_at).reverse.first
+        next_mr_dental_enrollment = enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on&.year == next_year}.sort_by(&:submitted_at).reverse.first
         inbound_transfer_date = latest_application.transferred_at if latest_application&.transferred_at.present? && latest_application&.transfer_id.present? && !latest_application&.account_transferred
 
         csv << [
