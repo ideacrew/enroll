@@ -58,19 +58,6 @@ def program_eligible_for(applicant)
   eligible_programs.join(",")
 end
 
-def fpl_percentage(enr, enr_member, effective_year)
-  return unless enr && enr_member
-  tax_households = if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-                     enr.family.tax_household_groups.active.by_year(effective_year).first&.tax_households
-                   else
-                     enr.household.latest_tax_households_with_year(effective_year).active_tax_household
-                   end
-  return "N/A" if tax_households.blank?
-
-  tax_household_member = tax_households.map(&:tax_household_members).flatten.detect{|mem| mem.applicant_id == enr_member.applicant_id}
-  tax_household_member&.magi_as_percentage_of_fpl
-end
-
 puts "Generating member outreach report...."
 CSV.open(file_name, "w", force_quotes: true) do |csv|
   csv << field_names
