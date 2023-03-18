@@ -2024,7 +2024,7 @@ class HbxEnrollment
     return if is_shop?
     return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
-    ::Insured::Factories::SelfServiceFactory.mthh_update_enrollment_for_aptcs(effective_date, reinstatement, elected_aptc_pct)
+    ::Insured::Factories::SelfServiceFactory.mthh_update_enrollment_for_aptcs(effective_date, reinstatement, elected_aptc_pct, nil)
   end
 
   # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
