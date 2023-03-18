@@ -2027,6 +2027,7 @@ class HbxEnrollment
     ::Insured::Factories::SelfServiceFactory.mthh_update_enrollment_for_aptcs(effective_date, reinstatement, elected_aptc_pct)
   end
 
+  # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
   def reinstate(edi: false)
     return false unless can_be_reinstated?
     return false if has_active_term_or_expired_exists_for_reinstated_date?
@@ -2071,6 +2072,7 @@ class HbxEnrollment
     end
     reinstate_enrollment
   end
+  # rubocop:enable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
 
   def self.find_by_benefit_groups(benefit_groups = [])
     id_list = benefit_groups.collect(&:_id).uniq
