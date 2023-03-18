@@ -2020,10 +2020,25 @@ class HbxEnrollment
     end
   end
 
+  def mthh_update_enrollment_for_aptcs(new_effective_date, reinstatement, elected_aptc_pct, exclude_enrollments_list)
+    result = ::Operations::PremiumCredits::FindAptc.new.call({
+                                                               hbx_enrollment: reinstatement,
+                                                               effective_on: new_effective_date
+                                                             })
+    return result unless result.success?
+
+    aggregate_aptc_amount = result.value!
+    ehb_premium = reinstatement.total_ehb_premium
+    applied_aptc_amount = float_fix([(aggregate_aptc_amount * elected_aptc_pct), ehb_premium].min)
+    reinstatement.update_attributes(elected_aptc_pct: elected_aptc_pct, applied_aptc_amount: applied_aptc_amount, aggregate_aptc_amount: aggregate_aptc_amount, ehb_premium: ehb_premium)
+  end
+
   def reinstate(edi: false)
     return false unless can_be_reinstated?
     return false if has_active_term_or_expired_exists_for_reinstated_date?
-    reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(self, fetch_reinstatement_date).build
+    new_effective_date = fetch_reinstatement_date
+    reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(self, new_effective_date).build
+    mthh_update_enrollment_for_aptcs(new_effective_date, reinstate_enrollment, self.elected_aptc_pct) if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
     can_renew = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: reinstate_enrollment})
 
@@ -2904,7 +2919,7 @@ class HbxEnrollment
       active_consumer_role_people = hbx_enrollment_members.flat_map(&:person).select{|per| per if per.is_consumer_role_active?}
       true_or_false = active_consumer_role_people.present? ? active_consumer_role_people.map(&:consumer_role).any?(&:verification_outstanding?) : false
       self.assign_attributes({:is_any_enrollment_member_outstanding => true_or_false})
-    end
+    end 
   end
 
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
