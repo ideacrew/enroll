@@ -174,7 +174,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       )
       effective_on = hbx_profile.benefit_sponsorship.current_benefit_period.start_on
       tax_household10 = FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil, effective_starting_on: hbx_profile.benefit_sponsorship.current_benefit_period.start_on)
-      eligibility_determination = FactoryBot.create(:eligibility_determination, tax_household: tax_household10, max_aptc: 2000, determined_on: hbx_profile.benefit_sponsorship.current_benefit_period.start_on)
+      FactoryBot.create(:eligibility_determination, tax_household: tax_household10, max_aptc: 2000, determined_on: hbx_profile.benefit_sponsorship.current_benefit_period.start_on)
       tax_household10.tax_household_members.create(applicant_id: family.primary_applicant.id, is_subscriber: true, is_ia_eligible: true)
       tax_household10.tax_household_members.create(applicant_id: family.family_members[1].id, is_ia_eligible: true)
       @product = product
