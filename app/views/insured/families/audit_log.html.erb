@@ -1,0 +1,25 @@
+<h1 class="heading-text"><b>Audit Logging</h1>
+
+<h4><b><%= @person.full_name %></h4>
+<h5><b> <%=l10n('hbx_id')%>: <%= @person.hbx_id %></h5>
+
+<table class="table table-striped">
+  <thead class="form-heading">
+    <tr>
+      <th class="form-heading"><%= l10n('change_type') %></th>
+      <th class="form-heading"><%= l10n('change_details') %></th>
+      <th class="form-heading"><%= l10n('last_action') %></th>
+      <th class="form-heading"><%= l10n('action_by') %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @family_members.each do |family_member| %>
+    <tr>
+      <td>Other</td>
+      <td>SEP Request</td>
+      <td><%= family_member.created_at %></td>
+      <td><%= family_member&.person&.emails.first.address %></td>
+    </tr>
+    <%end%>
+  </tbody>
+</table>

@@ -317,6 +317,7 @@ Rails.application.routes.draw do
         put 'update_healthcare_for_childcare_program_eligibility'
         get 'brokers'
         get 'verification'
+        get 'audit_log'
         get 'upload_application'
         get 'document_upload'
         get 'find_sep'

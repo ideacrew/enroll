@@ -182,6 +182,10 @@ class Insured::FamiliesController < FamiliesController
     @family_members = @person.primary_family.has_active_consumer_family_members
   end
 
+  def audit_log
+    @family_members = @person.primary_family.family_members
+  end
+
   def upload_application
     @family_members = @person.primary_family.has_active_resident_family_members
   end
