@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'pry'
 
 RSpec.describe HbxEnrollment, type: :model do
+  include FloatHelper
 
   before :all do
     DatabaseCleaner.clean
@@ -115,20 +115,44 @@ RSpec.describe HbxEnrollment, type: :model do
     subject { hbx_enrollment.update_tax_household_enrollment }
 
     context 'with applied_aptc_amount same as total_ehb_premium' do
-      let(:member1_ehb_premium) { 250.00 }
-      let(:member2_ehb_premium) { 275.00 }
-      let(:available_max_aptc) { 250.00 }
-      let(:available_max_aptc2) { 275.00 }
-      let(:applied_aptc_amount) { available_max_aptc + available_max_aptc2 }
-      let(:enrollment_ehb_premium) { member1_ehb_premium + member2_ehb_premium }
-      let(:elected_aptc_pct) { 1.0 }
+      context 'with rounded member premiums' do
+        let(:member1_ehb_premium) { 250.00 }
+        let(:member2_ehb_premium) { 275.00 }
+        let(:available_max_aptc) { 250.00 }
+        let(:available_max_aptc2) { 275.00 }
+        let(:applied_aptc_amount) { available_max_aptc + available_max_aptc2 }
+        let(:enrollment_ehb_premium) { member1_ehb_premium + member2_ehb_premium }
+        let(:elected_aptc_pct) { 1.0 }
 
-      it 'sets applied_aptc same as ehb_premium' do
-        subject
-        expect(tax_household_enrollment.reload.applied_aptc.to_f).to eq(member1_ehb_premium)
-        expect(tax_household_enrollment.reload.group_ehb_premium.to_f).to eq(member1_ehb_premium)
-        expect(tax_household_enrollment2.reload.applied_aptc.to_f).to eq(member2_ehb_premium)
-        expect(tax_household_enrollment2.reload.group_ehb_premium.to_f).to eq(member2_ehb_premium)
+        it 'sets applied_aptc same as ehb_premium' do
+          subject
+          expect(tax_household_enrollment.reload.applied_aptc.to_f).to eq(member1_ehb_premium)
+          expect(tax_household_enrollment.reload.group_ehb_premium.to_f).to eq(member1_ehb_premium)
+          expect(tax_household_enrollment2.reload.applied_aptc.to_f).to eq(member2_ehb_premium)
+          expect(tax_household_enrollment2.reload.group_ehb_premium.to_f).to eq(member2_ehb_premium)
+        end
+      end
+
+      context 'with non-rounded member premiums' do
+        let(:member1_ehb_premium) { 250.196032 }
+        let(:member2_ehb_premium) { 275.00 }
+        let(:available_max_aptc) { 250.00 }
+        let(:available_max_aptc2) { 275.00 }
+        let(:applied_aptc_amount) { available_max_aptc + available_max_aptc2 }
+        let(:enrollment_ehb_premium) { member1_ehb_premium + member2_ehb_premium }
+        let(:elected_aptc_pct) { 1.0 }
+
+        it 'sets applied_aptc same as ehb_premium' do
+          subject
+          expect(tax_household_enrollment.reload.applied_aptc.to_f).to eq(available_max_aptc)
+          expect(
+            tax_household_enrollment.reload.group_ehb_premium.to_f
+          ).to eq(
+            round_down_float_two_decimals(member1_ehb_premium)
+          )
+          expect(tax_household_enrollment2.reload.applied_aptc.to_f).to eq(member2_ehb_premium)
+          expect(tax_household_enrollment2.reload.group_ehb_premium.to_f).to eq(member2_ehb_premium)
+        end
       end
     end
 
