@@ -59,7 +59,7 @@ def find_tax_household_group(family, enrollment)
 end
 
 def migrate_tax_household_enrollments(family)
-  enrollments = family.active_household.hbx_enrollments.enrolled_waived_terminated_and_expired.where(:effective_on => {:"$gte" => Date.new(2022, 1, 1), :"$lte" => Date.today.end_of_year})
+  enrollments = family.active_household.hbx_enrollments.by_health.enrolled_waived_terminated_and_expired.where(:effective_on => {:"$gte" => Date.new(2022, 1, 1), :"$lte" => Date.today.end_of_year})
 
   enrollments.each do |enrollment|
     tax_household_enrollments = TaxHouseholdEnrollment.where(enrollment_id: enrollment.id)
@@ -89,7 +89,6 @@ def process_families
   Family.where(:tax_household_groups => {:"$exists" => true}).no_timeout.each do |family|
     counter += 1
     @logger.info "Processed #{counter} families count so far by #{DateTime.current}. Took #{((DateTime.current - @start_time) * 24 * 60).to_f.ceil}" if counter % 500 == 0
-    @logger.info "---------- Processing Family with family_hbx_assigned_id: #{family.hbx_assigned_id}"
 
     unless family.valid?
       @logger.info "----- Invalid family with family_hbx_assigned_id: #{family.hbx_assigned_id}, errors: #{family.errors.full_messages}"
