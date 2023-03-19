@@ -94,9 +94,31 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
           expect(result.value!).to eq 0.0
         end
 
-        it 'should create tax household enrollments' do
-          result
-          expect(TaxHouseholdEnrollment.where(enrollment_id: hbx_enrollment.id).size).not_to eq 0
+        context 'no tax household member records exists' do
+          it 'should not create tax household enrollments' do
+            result
+            expect(TaxHouseholdEnrollment.where(enrollment_id: hbx_enrollment.id).size).to eq 0
+          end
+        end
+
+        context 'when thh records exists for enrolled members' do
+          let!(:tax_household_group) do
+            family.tax_household_groups.create!(
+              assistance_year: TimeKeeper.date_of_record.year,
+              source: 'Admin',
+              start_on: TimeKeeper.date_of_record.beginning_of_year,
+              tax_households: [
+                FactoryBot.build(:tax_household, household: family.active_household)
+              ]
+            )
+          end
+          let(:tax_household) { tax_household_group.tax_households.first }
+          let!(:tax_household_member) { tax_household.tax_household_members.create(applicant_id: family.family_members[0].id) }
+
+          it 'should create tax household enrollments' do
+            result
+            expect(TaxHouseholdEnrollment.where(enrollment_id: hbx_enrollment.id).size).not_to eq 0
+          end
         end
       end
 
