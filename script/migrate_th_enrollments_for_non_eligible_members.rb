@@ -79,6 +79,7 @@ def migrate_tax_household_enrollments(family)
     build_taxhousehold_enrollments(enrollment, tax_household_group)
 
     @logger.info "**** Processed EnrollmentHbxId - #{enrollment.hbx_id}; #{enrollment.effective_on}; #{enrollment.aasm_state} ****"
+    nil
   end
 end
 
