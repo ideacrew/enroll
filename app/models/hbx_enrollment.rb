@@ -2033,11 +2033,10 @@ class HbxEnrollment
     return false if has_active_term_or_expired_exists_for_reinstated_date?
     new_effective_date = fetch_reinstatement_date
     reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(self, new_effective_date).build
-    create_or_update_mthh_data(new_effective_date, reinstate_enrollment, self.elected_aptc_pct)
-
     can_renew = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: reinstate_enrollment})
 
     return false unless can_renew.success?
+    create_or_update_mthh_data(new_effective_date, reinstate_enrollment, self.elected_aptc_pct)
 
     if self.is_shop? && !prior_plan_year_coverage?
       census_employee = benefit_group_assignment.census_employee
