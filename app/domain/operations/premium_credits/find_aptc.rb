@@ -56,13 +56,13 @@ module Operations
       def build_taxhousehold_enrollments
         return if @hbx_enrollment.effective_on.to_date != @effective_on.to_date
 
-        tax_household_group.tax_households.each do |tax_household|
+        tax_household_group.tax_households.where(:'tax_household_members.applicant_id'.in => @hbx_enrollment.hbx_enrollment_members.map(&:applicant_id)).each do |tax_household|
           th_enrollment = TaxHouseholdEnrollment.find_or_create_by(enrollment_id: @hbx_enrollment.id, tax_household_id: tax_household.id)
           hbx_enrollment_members = @hbx_enrollment.hbx_enrollment_members
           tax_household_members = tax_household.tax_household_members
 
           (tax_household_members.map(&:applicant_id).map(&:to_s) & enrolled_family_member_ids).each do |family_member_id|
-            hbx_enrollment_member_id = hbx_enrollment_members.where(applicant_id: family_member_id).first&.id
+            hbx_enrollment_member = hbx_enrollment_members.where(applicant_id: family_member_id).first
             tax_household_member_id = tax_household_members.where(applicant_id: family_member_id).first&.id
 
             th_member_enr_member = th_enrollment.tax_household_members_enrollment_members.find_or_create_by(
@@ -70,8 +70,11 @@ module Operations
             )
 
             th_member_enr_member.update!(
-              hbx_enrollment_member_id: hbx_enrollment_member_id&.to_s,
-              tax_household_member_id: tax_household_member_id&.to_s
+              hbx_enrollment_member_id: hbx_enrollment_member&.id,
+              tax_household_member_id: tax_household_member_id,
+              age_on_effective_date: hbx_enrollment_member&.age_on_effective_date,
+              relationship_with_primary: hbx_enrollment_member&.primary_relationship,
+              date_of_birth: hbx_enrollment_member&.person&.dob
             )
           end
         end
