@@ -148,6 +148,7 @@ module Operations
             exchange_provided_code: exchange_provided_code,
             primary_enrollee: qhp_table.primary_enrollee,
             primary_enrollee_one_dependent: qhp_table.primary_enrollee_one_dependent,
+            primary_enrollee_two_dependents: qhp_table.primary_enrollee_two_dependent,
             primary_enrollee_many_dependent: qhp_table.primary_enrollee_many_dependent
           }
         end

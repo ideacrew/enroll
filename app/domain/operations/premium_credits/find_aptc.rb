@@ -39,6 +39,9 @@ module Operations
 
       def not_eligible?
         return true if @hbx_enrollment.dental?
+        return true if tax_household_group&.tax_households.blank?
+
+        build_taxhousehold_enrollments
 
         result = ::Operations::PremiumCredits::FindAll.new.call({ family: @hbx_enrollment.family, year: @effective_on.year, kind: 'AdvancePremiumAdjustmentGrant' })
         return true if result.failure?
@@ -48,6 +51,34 @@ module Operations
         return true if @current_enrolled_aptc_grants.blank?
 
         false
+      end
+
+      def build_taxhousehold_enrollments
+        return if @hbx_enrollment.effective_on.to_date != @effective_on.to_date
+
+        tax_household_group.tax_households.each do |tax_household|
+          th_enrollment = TaxHouseholdEnrollment.find_or_create_by(enrollment_id: @hbx_enrollment.id, tax_household_id: tax_household.id)
+          hbx_enrollment_members = @hbx_enrollment.hbx_enrollment_members
+          tax_household_members = tax_household.tax_household_members
+
+          (tax_household_members.map(&:applicant_id).map(&:to_s) & enrolled_family_member_ids).each do |family_member_id|
+            hbx_enrollment_member_id = hbx_enrollment_members.where(applicant_id: family_member_id).first&.id
+            tax_household_member_id = tax_household_members.where(applicant_id: family_member_id).first&.id
+
+            th_member_enr_member = th_enrollment.tax_household_members_enrollment_members.find_or_create_by(
+              family_member_id: family_member_id
+            )
+
+            th_member_enr_member.update!(
+              hbx_enrollment_member_id: hbx_enrollment_member_id&.to_s,
+              tax_household_member_id: tax_household_member_id&.to_s
+            )
+          end
+        end
+      end
+
+      def tax_household_group
+        @tax_household_group ||= @family.tax_household_groups.by_year(@effective_on.year).order_by(created_at: :desc).first
       end
 
       def available_aptc
@@ -173,7 +204,7 @@ module Operations
       end
 
       def enrolled_family_member_ids
-        @hbx_enrollment.hbx_enrollment_members.map(&:applicant_id).map(&:to_s)
+        @enrolled_family_member_ids ||= @hbx_enrollment.hbx_enrollment_members.map(&:applicant_id).map(&:to_s)
       end
 
       def active_enrollments

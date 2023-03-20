@@ -1423,6 +1423,29 @@ module FinancialAssistance
       applicants.applying_coverage
     end
 
+    def dependents
+      active_applicants.where(is_primary_applicant: false)
+    end
+
+    def update_dependents_home_address
+      address_keys = ["address_1", "address_2", "address_3", "city", "state", "zip", "kind"]
+      address_keys << "county" if EnrollRegistry.feature_enabled?(:display_county)
+      primary_applicant = applicants.where(is_primary_applicant: true).first
+      home_address_attributes = primary_applicant.home_address.attributes.slice(*address_keys)
+      no_state_address_attributes = primary_applicant.attributes.slice("is_homeless", "is_temporarily_out_of_state")
+
+      dependents.where(same_with_primary: true).each do |dependent|
+        if dependent.home_address
+          dependent.home_address.assign_attributes(home_address_attributes)
+        else
+          address = ::FinancialAssistance::Locations::Address.new(home_address_attributes)
+          dependent.addresses << address
+        end
+        dependent.assign_attributes(no_state_address_attributes)
+        dependent.save!
+      end
+    end
+
     private
 
     # If MemberA is parent to MemberB,
