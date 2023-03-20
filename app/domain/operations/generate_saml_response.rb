@@ -4,7 +4,7 @@ require 'dry/monads'
 require 'dry/monads/do'
 
 module Operations
-  # Call SamGenerator to generate a SAML response
+  # Call SamlGenerator to generate a SAML response
   class GenerateSamlResponse
     include Dry::Monads[:result, :do]
 
