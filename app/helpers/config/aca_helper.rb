@@ -369,6 +369,14 @@ module Config::AcaHelper
     EnrollRegistry.feature?("aca_ivl_osse_subsidy_#{year}") && EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
   end
 
+  def eligibility_audit_log_is_enabled?
+    EnrollRegistry.feature?("eligibility_audit_log") && EnrollRegistry.feature_enabled?("eligibility_audit_log")
+  end
+
+  def display_eligibility_audit_log?(person)
+    (person.has_consumer_role? || person.has_active_employee_role?) && eligibility_audit_log_is_enabled?
+  end
+
   def display_enr_summary_is_enabled(enrollment)
     EnrollRegistry.feature_enabled?(:display_enr_summary) && enrollment.hbx_enrollment_members.all? { |member| member.person != current_user.person }
   end

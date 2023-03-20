@@ -35,6 +35,13 @@ module OneLogin
       end
     end
 
+    context 'saml validator' do
+      it 'should generate a schema valid payload' do
+        result = AcaEntities::Serializers::Xml::PayNow::CareFirst::Operations::ValidatePayNowTransferPayloadSaml.new.call(@saml_response.to_s)
+        expect(result.success?).to be_truthy
+      end
+    end
+
     context '#build_saml_response' do
       let(:assertion) { 'urn:oasis:names:tc:SAML:2.0:assertion' }
       let(:protocol) { 'urn:oasis:names:tc:SAML:2.0:protocol' }
@@ -127,6 +134,13 @@ module OneLogin
       context 'carrier has embedded custom xml' do
         let(:operation) { instance_double(Operations::PayNow::CareFirst::EmbeddedXml) }
         let(:carrier_key) { :carefirst_pay_now }
+        let(:custom_xml) do
+          "<coverage_kind>urn:openhbx:terms:v1:qhp_benefit_coverage#health</coverage_kind><primary><exchange_assigned_member_id>12345678</exchange_assigned_member_id>"\
+          "<member_name><person_surname>Smith</person_surname><person_given_name>John</person_given_name><person_full_name>John Smith</person_full_name></member_name>"\
+          "</primary><members><member><exchange_assigned_member_id>12345678</exchange_assigned_member_id><member_name><person_surname>Smith</person_surname><person_given_name>"\
+          "John</person_given_name><person_full_name>John Smith</person_full_name></member_name><birth_date>19860401</birth_date><sex>M</sex><ssn>123456789</ssn><relationship>"\
+          "18</relationship><is_subscriber>false</is_subscriber></member></members>"
+        end
 
         before do
           allow(EnrollRegistry).to receive(:[]).with(carrier_key).and_return(pay_now_double)
@@ -134,13 +148,18 @@ module OneLogin
           allow(xml_settings_double).to receive(:item).and_return(false)
           allow(xml_settings_double).to receive(:item).and_return(true)
           allow(Operations::PayNow::CareFirst::EmbeddedXml).to receive(:new).and_return(operation)
-          allow(operation).to receive(:call).and_return(::Dry::Monads::Result::Success.new("sample xml"))
+          allow(operation).to receive(:call).and_return(::Dry::Monads::Result::Success.new(custom_xml))
           issuer_profile.update(legal_name: 'CareFirst')
           saml_generator.build_saml_response
         end
 
         it 'should call the external operation to generate xml' do
           expect(operation).to have_received(:call)
+        end
+
+        it 'should generate a schema valid payload' do
+          result = AcaEntities::Serializers::Xml::PayNow::CareFirst::Operations::ValidatePayNowTransferPayloadSaml.new.call(@saml_response.to_s)
+          expect(result.success?).to be_truthy
         end
       end
     end
