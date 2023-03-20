@@ -40,7 +40,6 @@ module Operations
 
           eligibilities =
             subject_instance.eligibilities.with_evidence(evidence_key)
-
           eligibilities.each do |eligibility|
             evidence = eligibility.evidences.new
             evidence.title = "#{evidence_key.to_s.titleize} Evidence"
