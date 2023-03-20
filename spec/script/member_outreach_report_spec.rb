@@ -142,11 +142,10 @@ describe 'member_outreach_report' do
     headers << "#{next_year}_most_recent_dental_status"
   end
 
-  context 'family with application in current enrollment year' do
+  context 'family with determined and draft applications in current enrollment year' do
     before do
       latest_application.non_primary_applicants.each{|applicant| latest_application.ensure_relationship_with_primary(applicant, applicant.relationship) }
       latest_determined_application.non_primary_applicants.each{|applicant| latest_determined_application.ensure_relationship_with_primary(applicant, applicant.relationship) }
-      latest_application.update(workflow_state_transitions: [workflow_state_transition])
       latest_determined_application.update(workflow_state_transitions: [workflow_state_transition])
       health_enrollment.update(hbx_enrollment_members: enrollment_members)
       invoke_member_outreach_report
@@ -316,9 +315,11 @@ describe 'member_outreach_report' do
         expect(@file_content[2][22]).to eq(latest_application.aasm_state)
       end
 
-      it 'should match with the date of the most recent aasm_state transition' do
-        expect(@file_content[1][23]).to eq(latest_application.workflow_state_transitions.first.transition_at.to_s)
-        expect(@file_content[2][23]).to eq(latest_application.workflow_state_transitions.first.transition_at.to_s)
+      context 'for the most recent aasm_state transition' do
+        it 'should match with the creation date if application is in draft state' do
+          expect(@file_content[1][23]).to eq(latest_application.created_at.to_s)
+          expect(@file_contentgit[2][23]).to eq(latest_application.created_at.to_s)
+        end
       end
 
       it 'should match with the transfer id' do
@@ -425,7 +426,6 @@ describe 'member_outreach_report' do
       dental_enrollment.update(aasm_state: 'coverage_canceled')
       latest_application.non_primary_applicants.each{|applicant| latest_application.ensure_relationship_with_primary(applicant, applicant.relationship) }
       latest_determined_application.non_primary_applicants.each{|applicant| latest_determined_application.ensure_relationship_with_primary(applicant, applicant.relationship) }
-      latest_application.update(workflow_state_transitions: [workflow_state_transition])
       latest_determined_application.update(workflow_state_transitions: [workflow_state_transition])
       health_enrollment.update(hbx_enrollment_members: enrollment_members)
       invoke_member_outreach_report

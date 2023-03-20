@@ -101,6 +101,7 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
         curr_mr_dental_enrollment = enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on&.year == curr_year}.sort_by(&:submitted_at).reverse.first
         next_mr_dental_enrollment = enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on&.year == next_year}.sort_by(&:submitted_at).reverse.first
         inbound_transfer_date = latest_application.transferred_at if latest_application&.transferred_at.present? && latest_application&.transfer_id.present? && !latest_application&.account_transferred
+        aasm_state_date = latest_application&.aasm_state == 'draft' ? latest_application.created_at : latest_application&.workflow_state_transitions&.first&.transition_at
 
         csv << [
             family.primary_applicant.hbx_id,
@@ -127,7 +128,7 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
             applicant&.has_eligible_health_coverage.present?,
             applicant&.benefits&.eligible&.map(&:insurance_kind)&.join(", "),
             latest_application&.aasm_state,
-            latest_application&.workflow_state_transitions&.first&.transition_at,
+            aasm_state_date,
             latest_application&.transfer_id,
             inbound_transfer_date,
             curr_mr_health_enrollment&.product&.hios_id,
