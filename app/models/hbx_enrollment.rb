@@ -2862,13 +2862,13 @@ class HbxEnrollment
   def sum_of_member_ehb_premiums(thh_enr)
     aptc_family_member_ids = thh_enr.tax_household.aptc_members.map(&:applicant_id)
     hbx_enrollment_members.where(:applicant_id.in => aptc_family_member_ids).reduce(0) do |sum, member|
-      sum + ivl_decorated_hbx_enrollment.member_ehb_premium(member)
+      sum + round_down_float_two_decimals(ivl_decorated_hbx_enrollment.member_ehb_premium(member))
     end
   end
 
   def thh_enr_group_ehb_premium_of_aptc_members(thh_enrs)
     thh_enrs.inject({}) do |premiums, thh_enr|
-      premiums[thh_enr] = { group_ehb_premium: float_fix(sum_of_member_ehb_premiums(thh_enr)) }
+      premiums[thh_enr] = { group_ehb_premium: sum_of_member_ehb_premiums(thh_enr) }
       premiums
     end
   end

@@ -19,14 +19,16 @@ field_names = %w[
     external_id
     user_account
     last_page_visited
-    program_eligible_for
-    application_aasm_state
-    application_aasm_state_date
-    transfer_id
+    latest_determined_application_id
+    determined_date
+    determined_program_eligible_for
+    determined_medicaid_fpl
+    determined_has_access_to_coverage
+    determined_has_access_to_coverage_kinds
+    latest_application_aasm_state
+    latest_application_aasm_state_date
+    latest_transfer_id
     inbound_transfer_date
-    FPL
-    has_access_to_health_coverage
-    has_access_to_health_coverage_kinds
   ]
 curr_year = TimeKeeper.date_of_record.year
 next_year = TimeKeeper.date_of_record.year + 1
@@ -74,28 +76,31 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
   csv << field_names
   while offset < families_count
     all_families.offset(offset).limit(batch_size).no_timeout.each do |family|
-      application = FinancialAssistance::Application.where(family_id: family._id).order_by(:created_at.desc).first
+      latest_determined_application = FinancialAssistance::Application.where(family_id: family._id).determined.order_by(:created_at.desc).first
+      latest_application = FinancialAssistance::Application.where(family_id: family._id).order_by(:created_at.desc).first
       primary_person = family.primary_person
       family.family_members.each do |family_member|
         person = family_member&.person
-        applicant = application&.applicants&.detect {|a| a.person_hbx_id == person.hbx_id}
+        applicant = latest_determined_application&.applicants&.detect {|a| a.person_hbx_id == person.hbx_id}
         # what is considered primary phone?  assumption: use home phone
         home_phone = person.phones.detect { |phone| phone.kind == 'home' }
         work_phone = person.phones.detect { |phone| phone.kind == 'work' }
         mobile_phone = person.phones.detect { |phone| phone.kind == 'mobile' }
-        enrollments = family.active_household.hbx_enrollments
-        mra_health_enrollment = enrollments.enrolled_and_renewal.effective_desc.detect {|enr| enr.coverage_kind == 'health'}
-        mra_dental_enrollment = enrollments.enrolled_and_renewal.effective_desc.detect {|enr| enr.coverage_kind == 'dental'}
+        enrolled_and_renewal = family.active_household.hbx_enrollments.enrolled_and_renewal
+        canceled_and_terminated = family.active_household.hbx_enrollments.canceled_and_terminated
+        enrollments = enrolled_and_renewal + canceled_and_terminated
+        mra_health_enrollment = enrolled_and_renewal.effective_desc.detect {|enr| enr.coverage_kind == 'health'}
+        mra_dental_enrollment = enrolled_and_renewal.effective_desc.detect {|enr| enr.coverage_kind == 'dental'}
         enrollment_member = if mra_health_enrollment
                               mra_health_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
                             else
                               mra_dental_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
                             end
-        curr_mr_health_enrollment = enrollments.enrolled_and_renewal.select {|enr| enr.coverage_kind == 'health' && enr.effective_on&.year == curr_year}.sort_by(&:submitted_at).reverse.first
-        next_mr_health_enrollment = enrollments.enrolled_and_renewal.select {|enr| enr.coverage_kind == 'health' && enr.effective_on&.year == next_year}.sort_by(&:submitted_at).reverse.first
-        curr_mr_dental_enrollment = enrollments.enrolled_and_renewal.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on&.year == curr_year}.sort_by(&:submitted_at).reverse.first
-        next_mr_dental_enrollment = enrollments.enrolled_and_renewal.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on&.year == next_year}.sort_by(&:submitted_at).reverse.first
-        inbound_transfer_date = application.transferred_at if application&.transferred_at.present? && application&.transfer_id.present? && !application&.account_transferred
+        curr_mr_health_enrollment = enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on&.year == curr_year}.sort_by(&:submitted_at).reverse.first
+        next_mr_health_enrollment = enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on&.year == next_year}.sort_by(&:submitted_at).reverse.first
+        curr_mr_dental_enrollment = enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on&.year == curr_year}.sort_by(&:submitted_at).reverse.first
+        next_mr_dental_enrollment = enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on&.year == next_year}.sort_by(&:submitted_at).reverse.first
+        inbound_transfer_date = latest_application.transferred_at if latest_application&.transferred_at.present? && latest_application&.transfer_id.present? && !latest_application&.account_transferred
 
         csv << [
             family.primary_applicant.hbx_id,
@@ -114,15 +119,17 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
             family.external_app_id,
             primary_person.user&.email, # only primary person has a User account
             primary_person.user&.last_portal_visited,
+            latest_determined_application&.hbx_id,
+            latest_determined_application&.submitted_at,
             program_eligible_for(applicant),
-            application&.aasm_state,
-            application&.workflow_state_transitions&.first&.transition_at,
-            application&.transfer_id,
-            inbound_transfer_date,
             # fpl depends on enrollment; assumption: use most recent active health plan enrollment
             fpl_percentage(mra_health_enrollment, enrollment_member, mra_health_enrollment&.effective_on&.year),
             applicant&.has_eligible_health_coverage.present?,
             applicant&.benefits&.eligible&.map(&:insurance_kind)&.join(", "),
+            latest_application&.aasm_state,
+            latest_application&.workflow_state_transitions&.first&.transition_at,
+            latest_application&.transfer_id,
+            inbound_transfer_date,
             curr_mr_health_enrollment&.product&.hios_id,
             curr_mr_health_enrollment&.aasm_state,
             next_mr_health_enrollment&.product&.hios_id,

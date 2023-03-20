@@ -33,18 +33,19 @@ module Operations
       end
 
       def family_member_attributes(family_member)
-        person_attributes(family_member.person).merge(family_member_id: family_member.id,
-                                                      is_primary_applicant: family_member.is_primary_applicant,
-                                                      is_consent_applicant: family_member.is_consent_applicant,
-                                                      relationship: family_member.relationship)
+        person_attributes(family_member).merge(family_member_id: family_member.id,
+                                               is_primary_applicant: family_member.is_primary_applicant,
+                                               is_consent_applicant: family_member.is_consent_applicant,
+                                               relationship: family_member.relationship)
       end
 
-      def person_attributes(person)
+      def person_attributes(family_member)
+        person = family_member.person
         attrs = [:first_name, :last_name, :middle_name, :name_pfx, :name_sfx,
                  :gender, :ethnicity, :tribal_id, :tribal_state, :tribal_name, :tribe_codes, :no_ssn, :is_tobacco_user,
                  :is_homeless, :is_temporarily_out_of_state].inject({}) do |att_hash, attribute|
-                  att_hash[attribute] = person.send(attribute)
-                  att_hash
+          att_hash[attribute] = person.send(attribute)
+          att_hash
         end
         consumer_role = person.consumer_role
         attrs.merge!(person_hbx_id: person.hbx_id,
@@ -56,7 +57,7 @@ module Operations
                      qualified_non_citizen: construct_qualified_non_citizen(consumer_role),
                      citizen_status: person.citizen_status,
                      is_consumer_role: true,
-                     same_with_primary: false,
+                     same_with_primary: same_with_primary?(family_member),
                      indian_tribe_member: consumer_role.is_tribe_member?,
                      is_incarcerated: person.is_incarcerated,
                      addresses: construct_association_fields(person.addresses),
@@ -64,6 +65,24 @@ module Operations
                      emails: construct_association_fields(person.emails))
 
         attrs.merge(vlp_document_params(person.consumer_role))
+      end
+
+      def same_with_primary?(family_member)
+        return false if family_member.is_primary_applicant?
+
+        family = family_member.family
+        dependent = family_member.person
+        primary = family.primary_person
+        compare_address_keys = ["address_1", "address_2", "city", "state", "zip", "is_homeless", "is_temporarily_out_of_state"]
+        compare_address_keys << "county" if EnrollRegistry.feature_enabled?(:display_county)
+        result = [dependent, primary].collect{|person| slice_attributes(person, compare_address_keys)}
+        result.combination(2).any? do |dependent_arr, primary_arr|
+          dependent_arr == primary_arr
+        end
+      end
+
+      def slice_attributes(person, compare_address_keys)
+        [person.attributes.slice(*compare_address_keys), person.home_address&.attributes&.slice(*compare_address_keys)].flatten
       end
 
       def construct_qualified_non_citizen(consumer_role)
