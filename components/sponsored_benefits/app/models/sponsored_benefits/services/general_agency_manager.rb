@@ -63,9 +63,8 @@ module SponsoredBenefits
         broker_agency_profile.save!
         employers = SponsoredBenefits::Organizations::PlanDesignOrganization.where(owner_profile_id: form.broker_agency_profile_id, has_active_broker_relationship: true)
         employers.each do |employer|
-          if employer.general_agency_accounts.first.present?
-            employer.general_agency_accounts.first.benefit_sponsrship_general_agency_profile_id = general_agency_profile.id
-            employer.general_agency_accounts.first.save!
+          if employer.general_agency_accounts.any?
+            employer.general_agency_accounts.update_all(:benefit_sponsrship_general_agency_profile_id => general_agency_profile.id)
           else
             employer_ga_account = employer.general_agency_accounts.new
             employer_ga_account.benefit_sponsrship_general_agency_profile_id = general_agency_profile.id
