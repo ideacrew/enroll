@@ -130,7 +130,7 @@ describe 'member_outreach_report' do
         latest_application_aasm_state
         latest_application_aasm_state_date
         latest_transfer_id
-        inbound_transfer_date
+        latest_inbound_transfer_date
       ]
     headers << "#{curr_year}_most_recent_health_plan_id"
     headers << "#{curr_year}_most_recent_health_status"

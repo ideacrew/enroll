@@ -28,7 +28,7 @@ field_names = %w[
     latest_application_aasm_state
     latest_application_aasm_state_date
     latest_transfer_id
-    inbound_transfer_date
+    latest_inbound_transfer_date
   ]
 curr_year = TimeKeeper.date_of_record.year
 next_year = TimeKeeper.date_of_record.year + 1
