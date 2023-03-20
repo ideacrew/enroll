@@ -413,6 +413,8 @@ registry:
   - namespace:
       - :pay_now_feature
     features:
+      - key: :validate_saml
+        is_enabled: <%= ENV['VALIDATE_SAML_IS_ENABLED'] || false %>
       - key: :generic_redirect
         is_enabled: <%= ENV['GENERIC_REDIRECT_PAY_NOW_IS_ENABLED'] || false %>
         settings: 
