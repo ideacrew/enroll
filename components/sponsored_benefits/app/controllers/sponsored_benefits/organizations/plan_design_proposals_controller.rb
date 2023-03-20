@@ -161,6 +161,7 @@ module SponsoredBenefits
       params.require(:forms_plan_design_proposal).permit(
         :title,
         :effective_date,
+        :osse_eligibility,
         profile: [
           benefit_sponsorship: [
             :initial_enrollment_period,
