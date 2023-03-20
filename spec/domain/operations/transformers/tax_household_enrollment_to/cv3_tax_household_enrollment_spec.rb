@@ -23,20 +23,6 @@ RSpec.describe Operations::Transformers::TaxHouseholdEnrollmentTo::Cv3TaxHouseho
     FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family.primary_applicant.id)
   end
 
-  let!(:thh_enrollment) do
-    TaxHouseholdEnrollment.create(
-      enrollment_id: hbx_enrollment.id,
-      tax_household_id: thh.id,
-      household_benchmark_ehb_premium: 100.00,
-      health_product_hios_id: BSON::ObjectId.new,
-      dental_product_hios_id: nil,
-      household_health_benchmark_ehb_premium: 100.00,
-      household_dental_benchmark_ehb_premium: 0.0,
-      applied_aptc: 100.00,
-      available_max_aptc: 100.00
-    )
-  end
-
   let!(:thh_enrollment_member) do
     thh_enrollment.tax_household_members_enrollment_members.create(
       hbx_enrollment_member_id: hbx_enrollment_member.id,
@@ -51,13 +37,42 @@ RSpec.describe Operations::Transformers::TaxHouseholdEnrollmentTo::Cv3TaxHouseho
   let(:result) { subject.call(thh_enrollment) }
 
   describe '#call' do
-    it 'should return success' do
-      expect(result.success?).to be_truthy
-      contract_result = AcaEntities::Contracts::PremiumCredits::TaxHouseholdEnrollmentContract.new.call(result.success)
-      expect(contract_result.success?).to be_truthy
-      expect(
-        AcaEntities::PremiumCredits::TaxHouseholdEnrollment.new(contract_result.to_h)
-      ).to be_a(AcaEntities::PremiumCredits::TaxHouseholdEnrollment)
+    context 'with slcsp info' do
+      let(:thh_enrollment) do
+        TaxHouseholdEnrollment.create(
+          enrollment_id: hbx_enrollment.id,
+          tax_household_id: thh.id,
+          household_benchmark_ehb_premium: 100.00,
+          health_product_hios_id: BSON::ObjectId.new,
+          dental_product_hios_id: nil,
+          household_health_benchmark_ehb_premium: 100.00,
+          household_dental_benchmark_ehb_premium: 0.0,
+          applied_aptc: 100.00,
+          available_max_aptc: 100.00
+        )
+      end
+
+      it 'should return success' do
+        expect(result.success?).to be_truthy
+        contract_result = AcaEntities::Contracts::PremiumCredits::TaxHouseholdEnrollmentContract.new.call(result.success)
+        expect(contract_result.success?).to be_truthy
+        expect(
+          AcaEntities::PremiumCredits::TaxHouseholdEnrollment.new(contract_result.to_h)
+        ).to be_a(AcaEntities::PremiumCredits::TaxHouseholdEnrollment)
+      end
+    end
+
+    context 'without slcsp info' do
+      let(:thh_enrollment) { TaxHouseholdEnrollment.create(enrollment_id: hbx_enrollment.id, tax_household_id: thh.id) }
+
+      it 'should return success' do
+        expect(result.success?).to be_truthy
+        contract_result = AcaEntities::Contracts::PremiumCredits::TaxHouseholdEnrollmentContract.new.call(result.success)
+        expect(contract_result.success?).to be_truthy
+        expect(
+          AcaEntities::PremiumCredits::TaxHouseholdEnrollment.new(contract_result.to_h)
+        ).to be_a(AcaEntities::PremiumCredits::TaxHouseholdEnrollment)
+      end
     end
   end
 end
