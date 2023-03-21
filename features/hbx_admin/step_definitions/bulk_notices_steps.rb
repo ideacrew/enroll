@@ -5,17 +5,31 @@ Given(/^Admin is on the new Bulk Notice view$/) do
   visit new_exchanges_bulk_notice_path
 end
 
-When(/^Admin selects Employer$/) do
-  select 'Employer'
+When(/^Admin selects (.*?)$/) do |type|
+  select type
 end
 
-When(/^Admin fills form with ACME FEIN$/) do
-  fill_in "bulk-notice-audience-identifiers", with: employer("ACME").fein
+When(/^Admin fills form with (.*?) FEIN$/) do |name|
+  fein = if name == "Employer"
+           employer("ACME").fein
+         elsif name == "BrokerAgency"
+           broker_agency_profile("ACME").fein
+         elsif name == "GeneralAgency"
+           general_agency_profile("ACME").fein
+         end
+  fill_in "bulk-notice-audience-identifiers", with: fein
   find("body").click
 end
 
-Then(/^Admin should see ACME badge$/) do
-  expect(page).to have_css('span.badge', text: employer("ACME").hbx_id)
+Then(/^Admin should see (.*?) badge$/) do |name|
+  hbx_id = if name == "Employer"
+             employer("ACME").hbx_id
+           elsif name == "BrokerAgency"
+             broker_agency_profile("ACME").hbx_id
+           elsif name == "GeneralAgency"
+             general_agency_profile("ACME").hbx_id
+           end
+  expect(page).to have_css('span.badge', text: hbx_id)
 end
 
 When(/^Admin fills in the rest of the form$/) do
