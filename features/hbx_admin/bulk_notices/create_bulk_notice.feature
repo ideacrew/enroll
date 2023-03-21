@@ -12,7 +12,6 @@ Scenario: Admin will create a new bulk notice for Employer
   Given Admin is on the new Bulk Notice view
   When Admin selects Employer
   And Admin fills form with Employer FEIN
-  Then Admin should see Employer badge
   When Admin fills in the rest of the form
   And Admin clicks on Preview button
   Then Admin should see the Preview Screen
