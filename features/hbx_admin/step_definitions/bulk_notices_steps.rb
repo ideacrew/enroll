@@ -5,8 +5,16 @@ Given(/^Admin is on the new Bulk Notice view$/) do
   visit new_exchanges_bulk_notice_path
 end
 
-When(/^Admin selects (.*?)$/) do |type|
-  select type
+When(/^Admin selects Employer$/) do
+  select 'Employer'
+end
+
+When(/^Admin selects BrokerAgency$/) do
+  select 'BrokerAgency'
+end
+
+When(/^Admin selects GeneralAgency$/) do
+  select 'GeneralAgency'
 end
 
 When(/^Admin fills form with (.*?) FEIN$/) do |name|
