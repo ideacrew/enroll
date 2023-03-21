@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+#frozen_string_literal: true
 
 Given(/^Admin is on the new Bulk Notice view$/) do
   load 'app/models/admin/bulk_notice.rb'
@@ -10,11 +10,12 @@ When(/^Admin selects (.*?)$/) do |type|
 end
 
 When(/^Admin fills form with (.*?) FEIN$/) do |name|
-  fein = if name == "Employer"
+  fein = case name
+         when "Employer"
            employer("ACME").fein
-         elsif name == "BrokerAgency"
+         when "BrokerAgency"
            broker_agency_profile("ACME").fein
-         elsif name == "GeneralAgency"
+         when "GeneralAgency"
            general_agency_profile("ACME").fein
          end
   fill_in "bulk-notice-audience-identifiers", with: fein
@@ -22,12 +23,13 @@ When(/^Admin fills form with (.*?) FEIN$/) do |name|
 end
 
 Then(/^Admin should see (.*?) badge$/) do |name|
-  hbx_id = if name == "Employer"
-             employer("ACME").hbx_id
-           elsif name == "BrokerAgency"
-             broker_agency_profile("ACME").hbx_id
-           elsif name == "GeneralAgency"
-             general_agency_profile("ACME").hbx_id
+  hbx_id = case name
+           when "Employer"
+             employer("ACME").fein
+           when "BrokerAgency"
+             broker_agency_profile("ACME").fein
+           when "GeneralAgency"
+             general_agency_profile("ACME").fein
            end
   expect(page).to have_css('span.badge', text: hbx_id)
 end
