@@ -21,7 +21,7 @@ registry:
           - key: :zero_percent_sponsor_fixed_percent_contribution_model
             item: 0
           - key: :fifty_percent_sponsor_fixed_percent_contribution_model
-            item: <%= 2 / 3.0 %>  
+            item: <%= 2 / 3.0 %>
   - namespace:
     - :enroll_app
     - :aca_shop_market

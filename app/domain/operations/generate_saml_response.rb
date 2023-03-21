@@ -14,6 +14,7 @@ module Operations
       payment_transaction  = yield create_payment_transaction(hbx_enrollment, values[:source])
       saml_object          = yield init_saml_generator(payment_transaction, hbx_enrollment)
       saml_response        = yield build_saml_response(saml_object)
+      _validated_saml      = yield validate_saml_response(saml_response)
       result               = yield encode_saml_reponse(saml_object, saml_response)
 
       Success(result)
@@ -44,6 +45,11 @@ module Operations
     def build_saml_response(saml_object)
       result = saml_object.build_saml_response
       result ? Success(result) : Failure('Unable to build saml response for given SamlGenerator object.')
+    end
+
+    def validate_saml_response(saml_response)
+      return Success(:ok) unless EnrollRegistry.feature_enabled?(:validate_saml)
+      AcaEntities::Serializers::Xml::PayNow::CareFirst::Operations::ValidatePayNowTransferPayloadSaml.new.call(saml_response)
     end
 
     def encode_saml_reponse(saml_object, saml_response)

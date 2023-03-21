@@ -109,13 +109,17 @@ module Operations
               hbx_enrollment_reference: hbx_enrollment_reference_hash(th_enr),
               health_product_hios_id: th_enr.health_product_hios_id,
               dental_product_hios_id: th_enr.dental_product_hios_id,
-              household_benchmark_ehb_premium: th_enr.household_benchmark_ehb_premium&.to_hash,
-              household_health_benchmark_ehb_premium: th_enr.household_health_benchmark_ehb_premium&.to_hash,
-              household_dental_benchmark_ehb_premium: th_enr.household_dental_benchmark_ehb_premium&.to_hash,
-              applied_aptc: th_enr.applied_aptc&.to_hash,
-              available_max_aptc: th_enr.available_max_aptc&.to_hash,
+              household_benchmark_ehb_premium: money_to_currency(th_enr.household_benchmark_ehb_premium),
+              household_health_benchmark_ehb_premium: money_to_currency(th_enr.household_health_benchmark_ehb_premium),
+              household_dental_benchmark_ehb_premium: money_to_currency(th_enr.household_dental_benchmark_ehb_premium),
+              applied_aptc: money_to_currency(th_enr.applied_aptc),
+              available_max_aptc: money_to_currency(th_enr.available_max_aptc),
               tax_household_members_enrollment_members: tax_household_members_enrollment_members_hash(th_enr) }
           )
+        end
+
+        def money_to_currency(value)
+          (value || Money.new(0)).to_hash
         end
       end
     end
