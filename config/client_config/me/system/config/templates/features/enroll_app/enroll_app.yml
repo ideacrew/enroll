@@ -417,11 +417,19 @@ registry:
       - key: :address_verification
         item: :address_verification
         is_enabled: <%= ENV['ADDRESS_VERIFICATION_IS_ENABLED'] || false %>
+      - key: :eligibility_audit_log
+        item: :eligibility_audit_log
+        is_enabled: <%= ENV['ELIGIBILITY_AUDIT_LOG_IS_ENABLED'] || false %>
   - namespace:
       - :pay_now_feature
     features:
+      - key: :validate_saml
+        is_enabled: <%= ENV['VALIDATE_SAML_IS_ENABLED'] || false %>
       - key: :generic_redirect
         is_enabled: <%= ENV['GENERIC_REDIRECT_PAY_NOW_IS_ENABLED'] || false %>
+        settings: 
+          - key: :strict_tile_check
+            item: <%= ENV['STRICT_TILE_CHECK_PAY_NOW_IS_ENABLED'] || false %>
       - key: :kaiser_pay_now
         is_enabled: <%= ENV['KAISER_PERMANENTE_PAY_NOW_IS_ENABLED'] || false %>
         settings:
@@ -499,6 +507,8 @@ registry:
             item: 'CareFirst'
           - key: :connect_test
             item: <%= ENV['CAREFIRST_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
+          - key: :embed_xml
+            item: <%= ENV['CAREFIRST_PAY_NOW_EMBED_XML_IS_ENABLED'] || false %>
       - key: :aetna_pay_now
         is_enabled: false
         settings:

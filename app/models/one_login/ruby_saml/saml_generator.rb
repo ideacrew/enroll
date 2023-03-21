@@ -28,6 +28,7 @@ module OneLogin
       attr_reader :transaction_id, :hbx_enrollment, :private_key, :cert
 
       def initialize(transaction_id, hbx_enrollment)
+        super()
         @transaction_id = transaction_id
         @hbx_enrollment = hbx_enrollment
 
@@ -105,6 +106,9 @@ module OneLogin
           attribute = attribute_statement.add_element('saml:Attribute', 'NameFormat' => NAME_FORMAT)
           attribute.attributes['Name'] = attr_name
           value = attribute.add_element 'saml:AttributeValue'
+
+          add_custom_xml_namespaces(value) if embed_custom_xml? && attr_name == 'Additional Information'
+
           value.text = set_attribute_values(attr_name, @hbx_enrollment)
         end
 
@@ -150,7 +154,7 @@ module OneLogin
         when 'Subscriber Identifier'
           hbx_enrollment.subscriber.person.hbx_id.rjust(10, '0')
         when 'Additional Information'
-          hbx_enrollment.hbx_enrollment_members.map(&:person).map{|person| person.first_name_last_name_and_suffix(',')}.join(';')
+          build_additional_info
         end
       end
 
@@ -184,6 +188,53 @@ module OneLogin
 
       def generate_uuid
         SecureRandom.uuid
+      end
+
+      def carrier_name
+        @hbx_enrollment&.product&.issuer_profile&.legal_name
+      end
+
+      def embed_custom_xml?
+        carrier_key = fetch_carrier_key(carrier_name)
+        EnrollRegistry[carrier_key].setting(:embed_xml)&.item
+      end
+
+      def add_custom_xml_namespaces(value)
+        case carrier_name
+        when 'CareFirst'
+          value.attributes['xmlns'] = 'http://openhbx.org/api/terms/1.0'
+          value.add_namespace('xmlns:cv', 'http://openhbx.org/api/terms/1.0')
+          value.add_namespace('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance')
+          value.attributes['xsi:type'] = 'cv:PaynowTransferPayloadType'
+          value
+        end
+      end
+
+      def build_additional_info
+        if embed_custom_xml?
+          transform_embedded_xml
+        else
+          @hbx_enrollment.hbx_enrollment_members.map(&:person).map{|person| person.first_name_last_name_and_suffix(',')}.join(';')
+        end
+      end
+
+      def fetch_embedded_xml_class_name
+        case carrier_name
+        when 'CareFirst'
+          ::Operations::PayNow::CareFirst::EmbeddedXml
+        end
+      end
+
+      def fetch_carrier_key(carrier_name)
+        snake_case_carrier_name = carrier_name.downcase.gsub(' ', '_').gsub(/[,.]/, '')
+        "#{snake_case_carrier_name}_pay_now".to_sym
+      end
+
+      def transform_embedded_xml
+        embedded_xml_class = fetch_embedded_xml_class_name
+        xml = embedded_xml_class.new.call(@hbx_enrollment)
+        raise "Unable to transform xml due to #{xml.failure}" unless xml.success?
+        xml.value!
       end
     end
   end
