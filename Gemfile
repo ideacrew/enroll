@@ -119,7 +119,7 @@ gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
 gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
 gem 'loofah', '~> 2.3.1'
-gem 'stimulus_reflex', '~> 3.3'
+gem 'stimulus_reflex', '3.4.1'
 gem 'rack-cors'
 
 group :doc do
@@ -157,7 +157,7 @@ group :development, :test do
   gem 'railroady',              '~> 1.5.3'
   gem 'rspec-rails'
   gem 'rspec_junit_formatter'
-  gem 'stimulus_reflex_testing'
+  gem 'stimulus_reflex_testing', '~> 0.3.0'
   gem 'yard',                   '~> 0.9.20',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
 end
