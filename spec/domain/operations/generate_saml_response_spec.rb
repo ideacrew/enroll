@@ -24,7 +24,6 @@ RSpec.describe Operations::GenerateSamlResponse do
     allow_any_instance_of(OneLogin::RubySaml::SamlGenerator).to receive(:encode_saml_response).and_return encode_saml_response
     allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
     allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_saml).and_return(false)
-    # allow(saml_validator).to receive_message_chain("new.call").and_return(Dry::Monads::Result::Success.new(:ok))
   end
 
   subject do
