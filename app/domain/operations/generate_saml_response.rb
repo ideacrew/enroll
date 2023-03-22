@@ -63,7 +63,7 @@ module Operations
         '&gt;' => '>'
       }
       character_entities.inject(saml_response) do |decoded_saml, decoder|
-        decoded_saml = decoded_saml.gsub(decoder[0], decoder[1])
+        decoded_saml.gsub(decoder[0], decoder[1])
       end
     end
 

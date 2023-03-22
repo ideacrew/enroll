@@ -65,7 +65,7 @@ RSpec.describe Operations::GenerateSamlResponse do
       "</saml:AttributeValue></saml:Attribute>"
     end
     let(:character_entities) do
-        ['&amp;', '&quot;', '&apos;', '&lt;', '&gt;']
+      ['&amp;', '&quot;', '&apos;', '&lt;', '&gt;']
     end
     it 'should produce xml string with decoded character entities' do
       decoded_string = described_class.new.send(:decode_character_entities, test_string)
