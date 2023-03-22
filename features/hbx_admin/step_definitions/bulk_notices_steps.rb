@@ -9,12 +9,12 @@ When(/^Admin selects Employer$/) do
   select 'Employer'
 end
 
-When(/^Admin selects BrokerAgency$/) do
-  select 'BrokerAgency'
+When(/^Admin selects Broker Agency$/) do
+  select 'Broker Agency'
 end
 
-When(/^Admin selects GeneralAgency$/) do
-  select 'GeneralAgency'
+When(/^Admin selects General Agency$/) do
+  select 'General Agency'
 end
 
 When(/^Admin fills form with (.*?) FEIN$/) do |name|
@@ -33,11 +33,11 @@ end
 Then(/^Admin should see (.*?) badge$/) do |name|
   hbx_id = case name
            when "Employer"
-             employer("ACME").fein
+             employer("ACME").hbx_id
            when "BrokerAgency"
-             broker_agency_profile("ACME").fein
+             broker_agency_profile("ACME").hbx_id
            when "GeneralAgency"
-             general_agency_profile("ACME").fein
+             general_agency_profile("ACME").hbx_id
            end
   expect(page).to have_css('span.badge', text: hbx_id)
 end
