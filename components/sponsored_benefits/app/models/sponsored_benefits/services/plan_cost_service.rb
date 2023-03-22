@@ -74,7 +74,7 @@ class SponsoredBenefits::Services::PlanCostService
           (sum + employee_cost_for(member, census_employee)).round(2)
         end).round(2)
       end
-      BigDecimal((per_employee_cost).to_s).round(2)
+      BigDecimal(per_employee_cost.to_s).round(2)
     end
   end
 
@@ -103,7 +103,7 @@ class SponsoredBenefits::Services::PlanCostService
     member_premium = Rails.cache.fetch("premium_for_#{member.id}_#{plan.id}", expires_in: 15.minutes) do
       if contribution_offered_hash[relationship_for(member)]
         value = rate_lookup(age_of(member), member, census_employee, plan)
-        BigDecimal("#{value}").round(2).to_f
+        BigDecimal(value.to_s).round(2).to_f
       else
         0.00
       end
@@ -120,7 +120,7 @@ class SponsoredBenefits::Services::PlanCostService
     Rails.cache.fetch("osse_subsidy_for_#{census_employee.id}_#{lcsp.id}", expires_in: 15.minutes) do
       coverage_age = age_of(census_employee)
       value = rate_lookup(coverage_age, member, census_employee, lcsp)
-      BigDecimal("#{value}").round(2).to_f
+      BigDecimal(value.to_s).round(2).to_f
     end
   end
 
@@ -175,7 +175,7 @@ class SponsoredBenefits::Services::PlanCostService
   def reference_premium_for(member, census_employee)
     reference_premium = reference_plan_member_premium(member, census_employee)
     subsidy_premium = osse_subsidy_amount(member, census_employee)
-    
+
     [(reference_premium - subsidy_premium), 0.00].max
   rescue
     0.00

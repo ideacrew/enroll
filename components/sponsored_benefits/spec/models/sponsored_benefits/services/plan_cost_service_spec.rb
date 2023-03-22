@@ -109,7 +109,7 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
 
       it "should return total monthly employer contribution amount" do
         # Er contribution 80%. No.of Employees = 2
-        expect(subject.monthly_employer_contribution_amount).to eq (0.8*2*78.0)
+        expect(subject.monthly_employer_contribution_amount).to eq(0.8 * 2 * 78.0)
       end
 
       context 'relationship_benefit premium pct change.' do
@@ -149,7 +149,7 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
 
     context "when broker_quote_hc4cc_subsidy is enabled" do
       before :each do
-        EnrollRegistry[:broker_quote_hc4cc_subsidy].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_quote_hc4cc_subsidy).and_return(true)
         allow(benefit_application).to receive(:osse_eligible?).and_return true
       end
 
@@ -168,7 +168,7 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
 
     context "when broker_quote_hc4cc_subsidy is disabled" do
       before :each do
-        EnrollRegistry[:broker_quote_hc4cc_subsidy].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_quote_hc4cc_subsidy).and_return(false)
       end
 
       it "should return osse subsidy amount as 0 for each census employee" do
