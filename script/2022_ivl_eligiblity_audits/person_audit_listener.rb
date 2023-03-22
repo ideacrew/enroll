@@ -1,7 +1,7 @@
 require 'tempfile'
 
-AUDIT_START_DATE = Date.new(2021,10,1)
-AUDIT_END_DATE = Date.new(2022,10,1)
+AUDIT_START_DATE = Date.new(2022,1,1)
+AUDIT_END_DATE = Date.new(2023,1,1)
 PASSIVE_RENEWAL_DATE = Time.mktime(2021,11,1,0,0,0)
 
 class PersonAuditListener
@@ -15,12 +15,12 @@ class PersonAuditListener
 
   def self.queue_name
     config = Rails.application.config.acapi
-    "#{config.hbx_id}.#{config.environment_name}.q.#{config.app_id}.dc_ivl_audit_people"
+    "#{config.hbx_id}.#{config.environment_name}.q.#{config.app_id}.me_ivl_audit_people"
   end
 
   def self.result_queue_name
     config = Rails.application.config.acapi
-    "#{config.hbx_id}.#{config.environment_name}.q.#{config.app_id}.dc_ivl_audit_results"
+    "#{config.hbx_id}.#{config.environment_name}.q.#{config.app_id}.me_ivl_audit_results"
   end
 
   def self.create_queue(ch)
@@ -157,7 +157,7 @@ class PersonAuditListener
   
   def no_dc_address_reason_for(pers)
     return "homeless" if pers.is_homeless
-    return "I am temporarily living outside of DC" if pers.is_temporarily_out_of_state
+    return "I am temporarily living outside of ME" if pers.is_temporarily_out_of_state
     nil
   end
 

@@ -7,7 +7,7 @@ class AuditRecordReader
 
   def self.result_queue_name
     config = Rails.application.config.acapi
-    "#{config.hbx_id}.#{config.environment_name}.q.#{config.app_id}.dc_ivl_audit_results"
+    "#{config.hbx_id}.#{config.environment_name}.q.#{config.app_id}.me_ivl_audit_results"
   end
 
   def self.create_queue(ch)
@@ -23,7 +23,7 @@ class AuditRecordReader
   end
 
   def build
-    CSV.open("dc_ivl_audit_results_2022.csv", "wb") do |csv|
+    CSV.open("me_ivl_audit_results_2022.csv", "wb") do |csv|
       csv << [
         "Family ID",
         "Hbx ID",
@@ -60,8 +60,8 @@ class AuditRecordReader
         "Denial Reasons"
       ]
     end
-    csv_f = File.open("dc_ivl_audit_results_2022.csv", "ab")
-    CSV.open("dc_ivl_audit_errors_2022.csv", "wb") do |e_csv|
+    csv_f = File.open("me_ivl_audit_results_2022.csv", "ab")
+    CSV.open("me_ivl_audit_errors_2022.csv", "wb") do |e_csv|
       e_csv << ["Person ID", "Code", "Error"]
       run_records(csv_f, e_csv)
     end

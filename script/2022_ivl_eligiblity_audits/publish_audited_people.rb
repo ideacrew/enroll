@@ -1,5 +1,5 @@
-AUDIT_START_DATE = Date.new(2021,10,1)
-AUDIT_END_DATE = Date.new(2022,10,1)
+AUDIT_START_DATE = Date.new(2022,1,1)
+AUDIT_END_DATE = Date.new(2023,1,1)
 PASSIVE_RENEWAL_DATE = Time.mktime(2021,11,1,0,0,0)
 STDOUT.puts "Standard caching complete."
 STDOUT.flush
@@ -8,8 +8,6 @@ STDERR.puts "TESTING STANDARD ERROR REDIRECTION"
 STDERR.flush
 
 RECORDS_AT_ISSUE = [
-  "5d08fd82cc35a8797f00008b",
-  "5efb8102e59c4a4e0d668a7a"
 ]
 
 RECORDS_AT_ISSUE.each do |rec_no|
@@ -41,12 +39,12 @@ STDOUT.flush
 class AuditPeoplePublisher
   def self.audit_queue_name
     config = Rails.application.config.acapi
-    "#{config.hbx_id}.#{config.environment_name}.q.#{config.app_id}.dc_ivl_audit_people"
+    "#{config.hbx_id}.#{config.environment_name}.q.#{config.app_id}.me_ivl_audit_people"
   end
 
   def self.result_queue_name
     config = Rails.application.config.acapi
-    "#{config.hbx_id}.#{config.environment_name}.q.#{config.app_id}.dc_ivl_audit_results"
+    "#{config.hbx_id}.#{config.environment_name}.q.#{config.app_id}.me_ivl_audit_results"
   end
 
   def self.create_audit_queue(ch)
