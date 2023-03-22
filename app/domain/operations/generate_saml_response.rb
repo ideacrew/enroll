@@ -49,7 +49,7 @@ module Operations
 
     def validate_saml_response(saml_response)
       return Success(:ok) unless EnrollRegistry.feature_enabled?(:validate_saml)
-      AcaEntities::Serializers::Xml::PayNow::CareFirst::Operations::ValidatePayNowTransferPayloadSaml.new.call(saml_response)
+      AcaEntities::Serializers::Xml::PayNow::CareFirst::Operations::ValidatePayNowTransferPayloadSaml.new.call(saml_response.to_s)
     end
 
     def encode_saml_reponse(saml_object, saml_response)
