@@ -2,7 +2,7 @@ require 'tempfile'
 
 AUDIT_START_DATE = Date.new(2022,1,1)
 AUDIT_END_DATE = Date.new(2023,1,1)
-PASSIVE_RENEWAL_DATE = Time.mktime(2021,11,1,0,0,0)
+PASSIVE_RENEWAL_DATE = Time.mktime(2021,10,24,0,0,0)
 
 class PersonAuditListener
   include AmqpClientHelpers
