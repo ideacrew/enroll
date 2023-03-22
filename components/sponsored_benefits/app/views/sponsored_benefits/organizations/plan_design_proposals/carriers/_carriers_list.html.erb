@@ -85,7 +85,7 @@
   <% if check_plan_options_title %>
       <% metal_levels = enabled_metal_levels_for_single_carrier - ['dental'] %>
   <% end %>
-  <% if plan_design_proposal.osse_eligibility %>
+  <% if plan_design_proposal.metal_level_products_restricted? %>
       <% metal_levels = metal_levels - ['bronze'] %>
   <% end %>
   <form>

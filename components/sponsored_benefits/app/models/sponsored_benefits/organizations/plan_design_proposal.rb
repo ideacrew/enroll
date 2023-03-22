@@ -57,6 +57,12 @@ module SponsoredBenefits
         benefit_sponsorship.eligibility_for(:osse_subsidy, effective_date)
       end
 
+      def metal_level_products_restricted?
+        grant = osse_eligibility&.grant_for(:employer_metal_level_products)
+        return false unless grant
+        grant.value.run
+      end
+
       # class methods
       class << self
 
