@@ -33,7 +33,7 @@ module FinancialAssistance
       domestic_production_activities: "Domestic production activities deduction",
       penalty_on_early_withdrawal_of_savings: "Penalty on early withdrawal of savings",
       educator_expenses: "Educator expenses",
-      self_employment_sep_simple_and_qualified_plans: "Self-employmed SEP, SIMPLE, and qualified plans",
+      self_employment_sep_simple_and_qualified_plans: "Self-employed SEP, SIMPLE, and qualified plans",
       self_employed_health_insurance: "Self-employed health insurance",
       student_loan_interest: "Student loan interest",
       moving_expenses: "Moving expenses",

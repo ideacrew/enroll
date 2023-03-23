@@ -82,7 +82,7 @@ module SponsoredBenefits
         @quote_date = @proposal.updated_at.strftime('%m/%d/%Y')
         sponsorship = @proposal.profile.benefit_sponsorships.first
         @osse_eligibility ||= 'true' if sponsorship &&
-                                        proposal_osse_eligibility(sponsorship).present?
+                                        osse_eligibility_with(sponsorship).present?
       end
 
       def ensure_proposal
@@ -231,7 +231,7 @@ module SponsoredBenefits
         service.is_dental_plans_avialable?(self)
       end
 
-      def proposal_osse_eligibility(benefit_sponsorship)
+      def osse_eligibility_with(benefit_sponsorship)
         benefit_sponsorship.eligibility_for(:osse_subsidy, effective_date)
       end
 
@@ -239,7 +239,7 @@ module SponsoredBenefits
         return unless osse_eligibility.present?
 
         osse_eligibility_present =
-          proposal_osse_eligibility(benefit_sponsorship).present?
+          osse_eligibility_with(benefit_sponsorship).present?
 
         if osse_eligibility_present
           terminate_eligibility(benefit_sponsorship) if osse_eligibility.to_s == 'false'
@@ -284,6 +284,10 @@ module SponsoredBenefits
           evidence_value: osse_eligibility,
           effective_date: effective_date
         }
+      end
+
+      def osse_eligibile?
+        osse_eligibility == 'true'
       end
     end
   end
