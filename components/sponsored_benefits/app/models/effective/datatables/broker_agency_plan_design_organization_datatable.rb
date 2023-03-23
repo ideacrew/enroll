@@ -41,7 +41,7 @@ module Effective
           end
         }, :sortable => false, :filter => false
 
-        if EnrollRegistry.feature_enabled?(:aca_shop_osse_subsidy) && EnrollRegistry.feature_enabled?(:TEMP_broker_client_hc4cc_status)
+        if EnrollRegistry.feature_enabled?(:aca_shop_osse_subsidy) && EnrollRegistry.feature_enabled?(:broker_quote_hc4cc_subsidy)
           table_column :hc4cc, :label => "HC4CC", :proc => proc { |row|
             if row.is_prospect?
               l10n('ineligible')
