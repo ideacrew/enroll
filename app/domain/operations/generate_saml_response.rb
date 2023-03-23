@@ -49,7 +49,22 @@ module Operations
 
     def validate_saml_response(saml_response)
       return Success(:ok) unless EnrollRegistry.feature_enabled?(:validate_saml)
-      AcaEntities::Serializers::Xml::PayNow::CareFirst::Operations::ValidatePayNowTransferPayloadSaml.new.call(saml_response.to_s)
+      #replace character entities with valid characters that can be parsed by validator
+      decoded_saml = decode_character_entities(saml_response.to_s)
+      AcaEntities::Serializers::Xml::PayNow::CareFirst::Operations::ValidatePayNowTransferPayloadSaml.new.call(decoded_saml)
+    end
+
+    def decode_character_entities(saml_response)
+      character_entities = {
+        '&amp;' => '&',
+        '&quot;' => '"',
+        '&apos;' => "'",
+        '&lt;' => '<',
+        '&gt;' => '>'
+      }
+      character_entities.inject(saml_response) do |decoded_saml, decoder|
+        decoded_saml.gsub(decoder[0], decoder[1])
+      end
     end
 
     def encode_saml_reponse(saml_object, saml_response)

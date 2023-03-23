@@ -349,8 +349,9 @@ GEM
     builder (3.2.4)
     bunny (2.14.4)
       amq-protocol (~> 2.3, >= 2.3.0)
-    cable_ready (4.3.0)
+    cable_ready (4.5.0)
       rails (>= 5.2)
+      thread-local (>= 1.1.0)
     capistrano (3.14.1)
       airbrussh (>= 1.0.0)
       i18n
@@ -979,13 +980,14 @@ GEM
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
     state_machines (0.5.0)
-    stimulus_reflex (3.3.0)
-      cable_ready (>= 4.3.0)
+    stimulus_reflex (3.4.1)
+      cable_ready (>= 4.5)
       nokogiri
       rack
       rails (>= 5.2)
       redis
-    stimulus_reflex_testing (0.1.0)
+    stimulus_reflex_testing (0.3.0)
+      stimulus_reflex (>= 3.3.0)
     symmetric-encryption (3.9.1)
       coercible (~> 1.0)
     temple (0.8.2)
@@ -994,6 +996,7 @@ GEM
       climate_control (>= 0.0.3, < 1.0)
     test-prof (0.11.3)
     thor (1.2.1)
+    thread-local (1.1.0)
     thread_safe (0.3.6)
     tilt (2.0.10)
     timers (4.3.3)
@@ -1176,8 +1179,8 @@ DEPENDENCIES
   sponsored_benefits!
   spring
   spring-watcher-listen
-  stimulus_reflex (~> 3.3)
-  stimulus_reflex_testing
+  stimulus_reflex (= 3.4.1)
+  stimulus_reflex_testing (~> 0.3.0)
   symmetric-encryption (= 3.9.1)
   test-prof
   transport_gateway!
