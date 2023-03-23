@@ -2,6 +2,7 @@ Feature: Broker HC4CC quote creation
     
   Background: Broker Quoting Tool
     Given the shop market configuration is enabled
+    And Broker HC4CC feature enabled
     And a CCA site exists with a benefit market
     And Health and Dental plans exist
     And there is a Broker Agency exists for District Brokers Inc

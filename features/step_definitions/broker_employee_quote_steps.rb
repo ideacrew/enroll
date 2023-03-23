@@ -371,6 +371,11 @@ And(/^Primary broker clicks Actions dropdown and clicks Assign General Agency$/)
   find(BrokerEmployersPage.assign_general_agency).click
 end
 
+And(/^Broker HC4CC feature enabled$/) do
+  EnrollRegistry[:broker_quote_hc4cc_subsidy].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry[:aca_shop_osse_subsidy].feature.stub(:is_enabled).and_return(true)
+end
+
 And(/^Primary Broker should see HC4CC option$/) do
   expect(page).to have_css('.panel', text: 'Healthcare4Childcare (HC4CC) Program')
 end
