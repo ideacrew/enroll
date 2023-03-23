@@ -100,6 +100,10 @@ module SponsoredBenefits
         end.last
       end
 
+      def osse_eligible?(start_on)
+        eligibility_for(:osse_subsidy, start_on).present? && EnrollRegistry.feature_enabled?(:broker_quote_hc4cc_subsidy)
+      end
+
       def save_inbox
         welcome_subject = "Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}"
         welcome_body = "#{EnrollRegistry[:enroll_app].setting(:short_name).item} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your employee's health needs and budget."
