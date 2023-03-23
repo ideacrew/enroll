@@ -85,11 +85,23 @@ module SponsoredBenefits
         # build_inbox if inbox.nil?
       end
 
+      def market_kind
+        if benefit_market.to_s.scan(/aca_shop/).present?
+          'aca_shop'
+        else
+          benefit_market
+        end
+      end
+
       def eligibility_for(evidence_key, start_on)
         eligibilities.by_date(start_on).select do |eligibility|
           el = eligibility.evidences.by_key(evidence_key).max_by(&:created_at)
           el&.is_satisfied == true
         end.last
+      end
+
+      def osse_eligible?(start_on)
+        eligibility_for(:osse_subsidy, start_on).present? && EnrollRegistry.feature_enabled?(:broker_quote_hc4cc_subsidy)
       end
 
       def save_inbox
