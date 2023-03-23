@@ -85,6 +85,14 @@ module SponsoredBenefits
         # build_inbox if inbox.nil?
       end
 
+      def market_kind
+        if benefit_market.to_s.scan(/aca_shop/).present?
+          'aca_shop'
+        else
+          benefit_market
+        end
+      end
+
       def eligibility_for(evidence_key, start_on)
         eligibilities.by_date(start_on).select do |eligibility|
           el = eligibility.evidences.by_key(evidence_key).max_by(&:created_at)

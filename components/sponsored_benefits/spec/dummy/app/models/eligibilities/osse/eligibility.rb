@@ -82,7 +82,7 @@ module Eligibilities
       # TODO: returns other classes in the future
       #
       def grant_value_klass
-        if subject[:klass] == 'BenefitSponsors::BenefitSponsorships::BenefitSponsorship'
+        if subject[:klass].match(/BenefitSponsorships::BenefitSponsorship/).present?
           'Eligibilities::Osse::BenefitSponsorshipOssePolicy'
         else
           'Eligibilities::Osse::Value'
