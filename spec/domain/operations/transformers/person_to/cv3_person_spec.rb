@@ -66,6 +66,11 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
       it 'should not include the field in the output hash' do
         expect(subject.key?(:residency_determined_at)).to eq false
       end
+
+      it 'should be valid according to the ResdientRole contract' do
+        contract_result = ::AcaEntities::Contracts::People::ResidentRoleContract.new.call(subject)
+        expect(contract_result.errors).to be_empty
+      end
     end
 
     context 'when residency_determined_at field is not nil' do
@@ -78,6 +83,11 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
       it 'should include the field and value in the output hash' do
         expect(subject.key?(:residency_determined_at)).to eq true
         expect(subject[:residency_determined_at]).to eq timestamp
+      end
+
+      it 'should be valid according to the ResdientRole contract' do
+        contract_result = ::AcaEntities::Contracts::People::ResidentRoleContract.new.call(subject)
+        expect(contract_result.errors).to be_empty
       end
     end
   end

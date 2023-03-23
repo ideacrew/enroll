@@ -203,7 +203,7 @@ module Operations
             local_residency_responses: resident_role.local_residency_responses,
             lawful_presence_determination: construct_lawful_presence_determination(resident_role.lawful_presence_determination)
           }
-          # only include residency_determined_at key if value is present in order to pass ResidentRoleContract validations
+          # only include residency_determined_at key if value is present in order to pass ResidentRoleContract fvalidations
           result.merge!(residency_determined_at: residency_determined_at) if residency_determined_at.present?
           result
         end
