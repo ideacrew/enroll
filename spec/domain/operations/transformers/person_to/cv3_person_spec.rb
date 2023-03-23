@@ -64,7 +64,7 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
 
     context 'when residency_determined_at field is nil' do
       it 'should not include the field in the output hash' do
-        expect(subject.has_key?(:residency_determined_at)).to eq false
+        expect(subject.key?(:residency_determined_at)).to eq false
       end
     end
 
@@ -76,7 +76,7 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
       end
 
       it 'should include the field and value in the output hash' do
-        expect(subject.has_key?(:residency_determined_at)).to eq true
+        expect(subject.key?(:residency_determined_at)).to eq true
         expect(subject[:residency_determined_at]).to eq timestamp
       end
     end
