@@ -3,11 +3,13 @@ module SponsoredBenefits
     class PlanDesignProposalBuilder
 
       attr_reader :plan_design_organization, :census_employees
+      attr_accessor :osse_eligibility
 
       def initialize(plan_design_organization, effective_date)
         @employer_profile = plan_design_organization.employer_profile
         @plan_design_organization = plan_design_organization
         @effective_date = effective_date
+        @osse_eligibility ||= 'false'
         @plan_design_proposal = plan_design_organization.plan_design_proposals.build(title: "Plan Design #{@effective_date.year}")
       end
 

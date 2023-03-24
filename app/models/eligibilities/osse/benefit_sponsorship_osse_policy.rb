@@ -17,6 +17,10 @@ module Eligibilities
         :benefit_application_fte_count
       ].freeze
 
+      METAL_LEVEL_PRODUCTS_RESTRICTED = [
+        :employer_metal_level_products
+      ].freeze
+
       embedded_in :grant, class_name: "::Eligibilities::Osse::Grant"
 
       field :value, type: String
@@ -24,7 +28,7 @@ module Eligibilities
       validates_presence_of :value
 
       def run
-        RELAXED_RULES.include?(key)
+        RELAXED_RULES.include?(key) || METAL_LEVEL_PRODUCTS_RESTRICTED.include?(key)
       end
     end
   end
