@@ -14,7 +14,7 @@ module Insured
         "Harvard Pilgrim Health Care" => "https://www.harvardpilgrim.org/public/home",
         "Anthem Blue Cross and Blue Shield" => "https://www.anthem.com/contact-us/maine",
         "Northeast Delta Dental" => "https://www.nedelta.com/Home",
-        "Taro Health Plan of Maine, Inc." => EnrollRegistry['taro_health_pay_now'].setting(:taro_health_home_page_url).item
+        "Taro Health" => EnrollRegistry['taro_health_pay_now'].setting(:taro_health_home_page_url).item
       }.freeze
 
       def show_pay_now?(source, hbx_enrollment)
