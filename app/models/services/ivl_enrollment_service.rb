@@ -18,22 +18,21 @@ module Services
     def expire_individual_market_enrollments
       @logger.info "Started expire_individual_market_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
       current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+      batch_size = 500
+      offset = 0
       individual_market_enrollments = HbxEnrollment.where(
         :effective_on.lt => current_benefit_period.start_on,
-        :kind.in => ['individual', 'coverall'],
-        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending']
+        :kind.in => ["individual", "coverall"],
+        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ["coverage_termination_pending"]
       )
-      individual_market_enrollments.no_timeout.each do |enrollment|
-        enrollment.expire_coverage! if enrollment.may_expire_coverage?
-        @logger.info "Processed enrollment: #{enrollment.hbx_id}"
-      rescue Exception => e
-        begin
-          family = enrollment.family
-          Rails.logger.error "Unable to expire enrollments for family #{family.id}"
-          @logger.info "Unable to expire enrollments for family #{family.id}, error: #{e.backtrace}"
+      while offset <= individual_market_enrollments.count
+        individual_market_enrollments.offset(offset).limit(batch_size).no_timeout.each do |enrollment|
+          enrollment.expire_coverage! if enrollment.may_expire_coverage?
+          @logger.info "Processed enrollment: #{enrollment.hbx_id}"
         rescue StandardError => e
-          @logger.info "Unable to find family for enrollment#{enrollment.id}, error: #{e.backtrace}"
+          @logger.info "Unable to expire enrollment#{enrollment.id}, error: #{e.backtrace}"
         end
+        offset += batch_size
       end
       @logger.info "Ended expire_individual_market_enrollments process at #{TimeKeeper.datetime_of_record}"
     end
@@ -41,27 +40,26 @@ module Services
     def begin_coverage_for_ivl_enrollments
       @logger.info "Started begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
       current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+      batch_size = 500
+      offset = 0
       ivl_enrollments = HbxEnrollment.where(
-        :effective_on => { "$gte" => current_benefit_period.start_on, "$lt" => current_benefit_period.end_on},
-        :kind.in => ['individual', 'coverall'],
-        :aasm_state.in => ['auto_renewing', 'renewing_coverage_selected']
+        :effective_on => { "$gte" => current_benefit_period.start_on, "$lt" => current_benefit_period.end_on },
+        :kind.in => ["individual", "coverall"],
+        :aasm_state.in => ["auto_renewing", "renewing_coverage_selected"]
       )
       @logger.info "Total IVL auto renewing enrollment count: #{ivl_enrollments.count}"
       count = 0
-      ivl_enrollments.no_timeout.each do |enrollment|
-        if enrollment.may_begin_coverage?
-          enrollment.begin_coverage!
-          count += 1
-          @logger.info "Processed enrollment: #{enrollment.hbx_id}"
-        end
-      rescue Exception => e
-        begin
-          family = enrollment.family
-          Rails.logger.error "Unable to begin coverage(enrollments) for family #{family.id}, error: #{e.backtrace}"
-          @logger.info "Unable to begin coverage(enrollments) for family #{family.id}, error: #{e.backtrace}"
+      while offset <= ivl_enrollments.count
+        ivl_enrollments.offset(offset).limit(batch_size).no_timeout.each do |enrollment|
+          if enrollment.may_begin_coverage?
+            enrollment.begin_coverage!
+            count += 1
+            @logger.info "Processed enrollment: #{enrollment.hbx_id}"
+          end
         rescue StandardError => e
-          @logger.info "Unable to find family for enrollment #{enrollment.id}, error: #{e.backtrace}"
+          @logger.info "Unable to begin coverage for #{enrollment.id}, error: #{e.backtrace}"
         end
+        offset += batch_size
       end
       @logger.info "Total IVL auto renewing enrollment processed count: #{count}"
       @logger.info "Ended begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
