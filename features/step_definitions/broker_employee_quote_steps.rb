@@ -360,6 +360,7 @@ end
 
 And(/^Primary broker clicks Actions dropdown and clicks Create Quote$/) do
   find(BrokerEmployersPage.actions_dropdown).click
+  wait_for_ajax
   expect(page).to have_css('.btn.btn-xs', text: 'Create Quote')
   find(BrokerEmployersPage.create_quote).click
 end
@@ -370,3 +371,21 @@ And(/^Primary broker clicks Actions dropdown and clicks Assign General Agency$/)
   find(BrokerEmployersPage.assign_general_agency).click
 end
 
+And(/^Broker HC4CC feature enabled$/) do
+  EnrollRegistry[:broker_quote_hc4cc_subsidy].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry[:aca_shop_osse_subsidy].feature.stub(:is_enabled).and_return(true)
+end
+
+And(/^Primary Broker should see HC4CC option$/) do
+  expect(page).to have_css('.panel', text: 'Healthcare4Childcare (HC4CC) Program')
+end
+
+Then(/^Primary Broker selects quote as HC4CCC quote$/) do
+  find('#forms_plan_design_proposal_osse_eligibility_true').click
+  wait_for_ajax
+end
+
+And(/^Primary broker should see metal level non bronze options$/) do
+  expect(find_all('.benefits-setup-tab-bqt ul li').count).to eq 1
+  expect(find_all("input[name='metal_level_for_elected_plan']").collect(&:value)).not_to include('bronze')
+end

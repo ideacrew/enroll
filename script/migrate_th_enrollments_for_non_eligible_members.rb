@@ -59,6 +59,7 @@ def find_tax_household_group(family, enrollment)
 end
 
 def migrate_tax_household_enrollments(family)
+  primary_hbx_id = family.primary_applicant&.person&.hbx_id
   enrollments = family.active_household.hbx_enrollments.by_health.enrolled_waived_terminated_and_expired.where(:effective_on => {:"$gte" => Date.new(2022, 1, 1), :"$lte" => Date.today.end_of_year})
 
   enrollments.each do |enrollment|
@@ -67,7 +68,7 @@ def migrate_tax_household_enrollments(family)
 
     if tax_household_groups.size == 1
       enrolled_members = enrollment.hbx_enrollment_members.map(&:id).sort
-      member_ids = tax_household_enrollments.flat_map(&:tax_household_members_enrollment_members).map(&:hbx_enrollment_member_id).sort
+      member_ids = tax_household_enrollments.flat_map(&:tax_household_members_enrollment_members).map(&:hbx_enrollment_member_id).sort.uniq
       next if enrolled_members == member_ids
 
       tax_household_group = tax_household_groups.first
@@ -78,7 +79,9 @@ def migrate_tax_household_enrollments(family)
 
     build_taxhousehold_enrollments(enrollment, tax_household_group)
 
-    @logger.info "**** Processed EnrollmentHbxId - #{enrollment.hbx_id}; #{enrollment.effective_on}; #{enrollment.aasm_state} ****"
+    th_enrollments = TaxHouseholdEnrollment.where(enrollment_id: enrollment.id)
+
+    @logger.info "**** Processed EnrollmentHbxId - #{enrollment.hbx_id}; #{enrollment.effective_on}; #{enrollment.aasm_state}; Primary Hbx Id - #{primary_hbx_id}; Tax Households Count - #{th_enrollments.size} ****"
     nil
   end
 end

@@ -38,10 +38,11 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
       benefit_sponsorship: benefit_sponsorship
   end
 
+  let(:reference_plan) { FactoryBot.create(:plan, :with_complex_premium_tables, :with_rating_factors) }
+
   let(:benefit_group) do
     benefit_application.benefit_groups.first.tap do |benefit_group|
-      reference_plan_id = FactoryBot.create(:plan, :with_complex_premium_tables, :with_rating_factors).id
-      benefit_group.update_attributes(reference_plan_id: reference_plan_id, plan_option_kind: 'single_carrier')
+      benefit_group.update_attributes(reference_plan_id: reference_plan.id, plan_option_kind: 'single_carrier')
     end
   end
 
@@ -57,6 +58,8 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
       :with_random_age,
       benefit_sponsorship_id: benefit_sponsorship.id
   end
+
+  let(:census_dependent) { FactoryBot.create(:plan_design_census_employee, :with_random_age, benefit_sponsorship_id: benefit_sponsorship.id) }
 
   let(:organization) { plan_design_organization.sponsor_profile.organization }
 
@@ -99,21 +102,79 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
       allow(Caches::PlanDetails).to receive(:lookup_rate).and_return 78.0
     end
 
-    it "should return total monthly employer contribution amount" do
-      # Er contribution 80%. No.of Employees = 2
-      expect(subject.monthly_employer_contribution_amount).to eq (0.8*2*78.0)
+    context "when broker_quote_hc4cc_subsidy is disabled" do
+      before do
+        allow(benefit_application).to receive(:osse_eligible?).and_return false
+      end
+
+      it "should return total monthly employer contribution amount" do
+        # Er contribution 80%. No.of Employees = 2
+        expect(subject.monthly_employer_contribution_amount).to eq(0.8 * 2 * 78.0)
+      end
+
+      context 'relationship_benefit premium pct change.' do
+        before :each do
+          benefit_group.relationship_benefits.each do |rb|
+            rb.update_attributes(premium_pct: 50.0)
+          end
+        end
+
+        it "should return total monthly employer contribution amount with 50%" do
+          # Er contribution 50%. No.of Employees = 2
+          expect(subject.monthly_employer_contribution_amount).to eq(0.5 * 2 * 78.0)
+        end
+      end
     end
 
-    context 'relationship_benefit premium pct change.' do
+    context "when broker_quote_hc4cc_subsidy is enabled" do
+      before do
+        allow(benefit_application).to receive(:osse_eligible?).and_return true
+        allow(subject).to receive(:lcsp).and_return(reference_plan)
+      end
+
+      it "should return total monthly employer contribution amount" do
+        # Er contribution 80%. No.of Employees = 2 && subsidy = 78.0 for each employee
+        expect(subject.monthly_employer_contribution_amount).to eq 0.00
+      end
+    end
+  end
+
+  context "#osse_subsidy_amount" do
+    before :each do
+      allow(Caches::PlanDetails).to receive(:lookup_rate_with_area).and_return 78.0
+      allow(Caches::PlanDetails).to receive(:lookup_rate).and_return 78.0
+      allow(subject).to receive(:lcsp).and_return(reference_plan)
+      allow(subject).to receive(:plan).and_return(reference_plan)
+    end
+
+    context "when broker_quote_hc4cc_subsidy is enabled" do
       before :each do
-        benefit_group.relationship_benefits.each do |rb|
-          rb.update_attributes(premium_pct: 50.0)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_quote_hc4cc_subsidy).and_return(true)
+        allow(benefit_application).to receive(:osse_eligible?).and_return true
+      end
+
+      it "should return osse subsidy amount for each census employee" do
+        plan_design_census_employee.each do |ce|
+          expect(subject.osse_subsidy_amount(ce, ce)).to eq 78.00
         end
       end
 
-      it "should return total monthly employer contribution amount with 50%" do
-        # Er contribution 50%. No.of Employees = 2
-        expect(subject.monthly_employer_contribution_amount).to eq(0.5 * 2 * 78.0)
+      it "should return osse subsidy amount 0 for each census dependent" do
+        plan_design_census_employee.each do |census_employee|
+          expect(subject.osse_subsidy_amount(census_dependent, census_employee)).to eq 0.00
+        end
+      end
+    end
+
+    context "when broker_quote_hc4cc_subsidy is disabled" do
+      before :each do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_quote_hc4cc_subsidy).and_return(false)
+      end
+
+      it "should return osse subsidy amount as 0 for each census employee" do
+        plan_design_census_employee.each do |ce|
+          expect(subject.osse_subsidy_amount(ce, ce)).to eq 0.00
+        end
       end
     end
   end
