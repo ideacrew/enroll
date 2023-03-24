@@ -9,11 +9,11 @@ namespace :reports do
     end_on = ENV['end_on']
 
     def fpl_percentage(enr, enr_member, effective_year)
-      if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-        tax_households = enr.family.tax_household_groups.active.by_year(effective_year).first&.tax_households
-      else
-        tax_households = enr.household.latest_tax_households_with_year(effective_year).active_tax_household
-      end
+      tax_households = if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+                         enr.family.tax_household_groups.active.by_year(effective_year).first&.tax_households
+                       else
+                         enr.household.latest_tax_households_with_year(effective_year).active_tax_household
+                       end
       return "N/A" if tax_households.blank?
 
       tax_household_member = tax_households.map(&:tax_household_members).flatten.detect{|mem| mem.applicant_id == enr_member.applicant_id}
@@ -60,13 +60,13 @@ namespace :reports do
 
     def all_effectuated_enrollments_for_prev_year(enr, all_enrollments, person)
       start_date = enr.effective_on.beginning_of_year.prev_year
-      end_date  = start_date.end_of_year
+      end_date = start_date.end_of_year
       states = ['shopping', 'coverage_canceled']
 
       all_enrollments.select do |enrollment|
         enrollment_member_hbx_ids = enrollment.hbx_enrollment_members.flat_map(&:person).pluck(:hbx_id)
         !states.include?(enrollment.aasm_state) && enrollment.coverage_kind == enr.coverage_kind &&
-          enrollment.effective_on.between?(start_date,end_date)  &&
+          enrollment.effective_on.between?(start_date,end_date) &&
           enrollment_member_hbx_ids.include?(person.hbx_id)
       end
     end
@@ -80,7 +80,7 @@ namespace :reports do
       all_enrollments.select do |enrollment|
         enrollment_member_hbx_ids = enrollment.hbx_enrollment_members.flat_map(&:person).pluck(:hbx_id)
         states.include?(enrollment.aasm_state) && enrollment.coverage_kind == enr.coverage_kind &&
-          enrollment.effective_on.between?(start_date,end_date)  &&
+          enrollment.effective_on.between?(start_date,end_date) &&
           enrollment_member_hbx_ids.include?(person.hbx_id)
       end
     end
@@ -93,6 +93,7 @@ namespace :reports do
       end
     end
 
+    # rubocop:disable Metrics/CyclomaticComplexity
     def member_status(enr)
       enrs_between_nov_and_dec_set = has_effectuated_coverage_in_prev_year_during_oe?(enr)
       re_enrolled_member_set = @enrollments&.map(&:hbx_id)
@@ -107,6 +108,7 @@ namespace :reports do
         "New Consumer"
       end
     end
+    # rubocop:enable Metrics/CyclomaticComplexity
 
     def broker_assisted(enr, person)
       broker_role = person&.user.present? ? (person.broker_role || person.active_broker_staff_roles) : nil
@@ -139,7 +141,7 @@ namespace :reports do
               "First Name", "Last Name","SSN", "DOB", "Age", "Gender", "Relationship", "Benefit Type", "Tobacco Status",
               "Plan Name", "HIOS ID", "Plan Metal Level", "Carrier Name", "Rating Area",
               "Premium Amount", "Premium Total", "Policy APTC", "Responsible Premium Amt", "FPL",
-              "Purchase Date", "Coverage Start", "Coverage End",
+              "Purchase Date", "Coverage Start", "Coverage End", "SEP Reason", "Term Reason",
               "Home Address", "Mailing Address","Work Email", "Home Email", "Phone Number","Broker", "Broker NPN",
               "Broker Assignment Date","Race", "Ethnicity", "Citizen Status",
               "Broker Assisted"]
@@ -186,6 +188,8 @@ namespace :reports do
                   enr&.time_of_purchase&.to_s,
                   enr.effective_on.blank? ? nil : enr.effective_on.strftime("%Y%m%d"),
                   enr.terminated_on.blank? ? nil : enr.terminated_on.strftime("%Y%m%d"),
+                  enr.special_enrollment_period&.qualifying_life_event_kind&.reason,
+                  enr.termination_reason,
                   per.home_address&.full_address || enr.subscriber.person.home_address&.full_address,
                   per.mailing_address&.full_address || enr.subscriber.person.mailing_address&.full_address,
                   per.work_email&.address || enr.subscriber.person.work_email&.address,
