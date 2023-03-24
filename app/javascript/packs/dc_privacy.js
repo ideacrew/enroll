@@ -1,0 +1,1 @@
+import '../src/dc/privacy.js.erb';
