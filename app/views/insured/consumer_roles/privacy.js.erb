@@ -1,0 +1,16 @@
+document.addEventListener('DOMContentLoaded', () => {
+  console.log("here");
+  switch(<%= EnrollRegistry[:enroll_app].setting(:state_abbreviation).item %>) {
+    case "ME":
+      // attach link and styling to CoverME.gov
+      // attach privacy link and styling to www.coverme.gov/privacy-policy
+      // styling for 'understand' and 'CONTINUE'
+      break;
+    case "DC":
+      // attach site_privacy_url to Learn more about how we will use your information
+      // attach site_privacy_act_statement to View Privacy Act statement
+      break;
+    default:
+      // code block
+  }
+});
