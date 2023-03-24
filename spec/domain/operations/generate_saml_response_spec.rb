@@ -56,4 +56,21 @@ RSpec.describe Operations::GenerateSamlResponse do
       expect(subject).to be_success
     end
   end
+
+  context '#decode_character_entities' do
+    let(:test_string) do
+      "<saml:Attribute Name='Additional Information' NameFormat='urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified'>"\
+      "<saml:AttributeValue xmlns:cv='http://openhbx.org/api/terms/1.0' xsi:type='cv:PaynowTransferPayloadType' xmlns='http://openhbx.org/api/terms/1.0'"\
+      " xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>&lt;coverage_kind&gt;urn:openhbx:terms:v1:qhp_benefit_coverage#health&lt;/coverage_kind&gt;"\
+      "</saml:AttributeValue></saml:Attribute>"
+    end
+    let(:character_entities) do
+      ['&amp;', '&quot;', '&apos;', '&lt;', '&gt;']
+    end
+    it 'should produce xml string with decoded character entities' do
+      decoded_string = described_class.new.send(:decode_character_entities, test_string)
+      result = character_entities.any? {|entity| decoded_string.include?(entity)}
+      expect(result).to be_falsey
+    end
+  end
 end

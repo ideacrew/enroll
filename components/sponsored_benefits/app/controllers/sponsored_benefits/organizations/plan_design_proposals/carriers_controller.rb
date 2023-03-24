@@ -33,6 +33,9 @@ module SponsoredBenefits
 
         def load_broker_agency_profile
           @plan_design_organization = PlanDesignOrganization.find(params[:plan_design_organization_id])
+          @plan_design_proposal = @plan_design_organization.plan_design_proposals.find(
+            params[:plan_design_proposal_id]
+          )
           @broker_agency_profile = @plan_design_organization.broker_agency_profile
           @provider = @broker_agency_profile.primary_broker_role.person
         end

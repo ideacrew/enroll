@@ -85,6 +85,9 @@
   <% if check_plan_options_title %>
       <% metal_levels = enabled_metal_levels_for_single_carrier - ['dental'] %>
   <% end %>
+  <% if plan_design_proposal.metal_level_products_restricted? %>
+      <% metal_levels = metal_levels - ['bronze'] %>
+  <% end %>
   <form>
   <% metal_levels.each_with_index do |kind, index| %>
     <div class="col-xs-4 metals">
