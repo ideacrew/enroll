@@ -65,12 +65,21 @@ module Insured
       end
 
       def has_any_previous_enrollments?(hbx_enrollment)
-        all_carrier_enrollments = hbx_enrollment.family.hbx_enrollments.where(:aasm_state.nin => ["inactive", "shopping", "coverage_canceled"]).select do |enr|
+        potential_previous_enrollments = hbx_enrollment.family.hbx_enrollments.where(:aasm_state.nin => ["inactive", "shopping", "coverage_canceled"]).select do |enr|
           next if enr.product.blank? || enr.subscriber.blank? || enr.is_shop?
-          fetch_carrier_key_from_legal_name(enr.product.issuer_profile.legal_name) == @carrier_key && enr.effective_on.year == hbx_enrollment.effective_on.year && enr.subscriber.applicant_id == hbx_enrollment.subscriber.applicant_id
+          is_previous_enrollment?(hbx_enrollment, enr)
         end
-        enrollments = all_carrier_enrollments - hbx_enrollment.to_a
-        enrollments.present? ? true : false
+        enrollments = potential_previous_enrollments - hbx_enrollment.to_a
+        enrollments.present?
+      end
+
+      def is_previous_enrollment?(hbx_enrollment, enr)
+        same_carrier = fetch_carrier_key_from_legal_name(enr.product.issuer_profile.legal_name) == @carrier_key
+        same_year = enr.effective_on.year == hbx_enrollment.effective_on.year
+        same_subscriber = enr.subscriber.applicant_id == hbx_enrollment.subscriber.applicant_id
+        same_coverage_kind = enr.coverage_kind == hbx_enrollment.coverage_kind
+
+        same_carrier && same_year && same_subscriber && same_coverage_kind
       end
 
       def pay_now_button_timed_out?(hbx_enrollment)

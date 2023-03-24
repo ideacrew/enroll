@@ -23,23 +23,35 @@ describe 'member_outreach_report' do
   let!(:primary_fm) { family.primary_applicant }
   let!(:spouse_fm) { FactoryBot.create(:family_member, family: family, person: spouse_person) }
   let!(:family_members) { [primary_fm, spouse_fm] }
-  let!(:health_enrollment) { FactoryBot.create(:hbx_enrollment, :with_health_product, family: family, effective_on: TimeKeeper.date_of_record.beginning_of_year) }
+  let!(:health_enrollment) { FactoryBot.create(:hbx_enrollment, :with_health_product, family: family, effective_on: Date.new(current_coverage_period_year - 1,1,1)) }
   let!(:no_app_family) { FactoryBot.create(:family, :with_primary_family_member, person: no_app_primary_person) }
   let!(:no_app_primary_fm) { no_app_family.primary_applicant }
   let!(:no_app_family_members) { [no_app_primary_fm] }
-  let(:prospective_year) { TimeKeeper.date_of_record.year + 1 }
-  let!(:prospective_year_health_enrollment) { FactoryBot.create(:hbx_enrollment, :with_health_product, family: family, effective_on: Date.new(prospective_year, 1, 1)) }
-  let!(:dental_enrollment) { FactoryBot.create(:hbx_enrollment, :with_dental_product, family: family, effective_on: TimeKeeper.date_of_record.beginning_of_year) }
-  let!(:prospective_year_dental_enrollment) { FactoryBot.create(:hbx_enrollment, :with_dental_product, family: family, effective_on: Date.new(prospective_year, 1, 1)) }
+  let!(:prospective_year_health_enrollment) { FactoryBot.create(:hbx_enrollment, :with_health_product, family: family, effective_on: Date.new(current_coverage_period_year, 1, 1)) }
+  let!(:dental_enrollment) { FactoryBot.create(:hbx_enrollment, :with_dental_product, family: family, effective_on: Date.new(current_coverage_period_year - 1,1,1)) }
+  let!(:prospective_year_dental_enrollment) { FactoryBot.create(:hbx_enrollment, :with_dental_product, family: family, effective_on: Date.new(current_coverage_period_year, 1, 1)) }
   let!(:enrollment_members) do
     family_members.map do |member|
       FactoryBot.build(:hbx_enrollment_member, applicant_id: member.id, hbx_enrollment: health_enrollment, is_subscriber: member.is_primary_applicant)
     end
   end
   let(:yesterday) { Time.now.getlocal.prev_day }
-  let!(:application) do
+  let!(:latest_determined_application) do
     FactoryBot.create(
       :financial_assistance_application,
+      applicants: applicants,
+      submitted_at: yesterday,
+      family_id: family.id,
+      aasm_state: 'determined',
+      transfer_id: 'tr12345',
+      assistance_year: FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!,
+      transferred_at: DateTime.now
+    )
+  end
+  let!(:latest_application) do
+    FactoryBot.create(
+      :financial_assistance_application,
+      applicants: applicants,
       submitted_at: yesterday,
       family_id: family.id,
       aasm_state: 'draft',
@@ -48,11 +60,11 @@ describe 'member_outreach_report' do
       transferred_at: DateTime.now
     )
   end
-  let!(:primary_applicant) do
+  let(:primary_applicant) do
     FactoryBot.create(
       :financial_assistance_applicant,
       benefits: [benefit],
-      application: application,
+      # application: application,
       family_member_id: primary_fm.id,
       person_hbx_id: primary_person.hbx_id,
       is_primary_applicant: true,
@@ -67,11 +79,11 @@ describe 'member_outreach_report' do
       has_eligible_health_coverage: true
     )
   end
-  let!(:spouse_applicant) do
+  let(:spouse_applicant) do
     FactoryBot.create(
       :financial_assistance_applicant,
       :spouse,
-      application: application,
+      # application: application,
       family_member_id: spouse_fm.id,
       person_hbx_id: spouse_person.hbx_id,
       citizen_status: 'alien_lawfully_present',
@@ -88,8 +100,10 @@ describe 'member_outreach_report' do
   let(:applicants) { [primary_applicant, spouse_applicant] }
   let!(:workflow_state_transition) { WorkflowStateTransition.new(to_state: 'draft', transition_at: Time.now) }
   let(:benefit) { FactoryBot.build(:financial_assistance_benefit) }
-  let(:curr_year) { TimeKeeper.date_of_record.year }
-  let(:next_year) { TimeKeeper.date_of_record.year + 1 }
+  let!(:organization) { FactoryBot.create(:organization) }
+  let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :current_oe_period_with_past_coverage_periods, :organization => organization) }
+  let!(:benefit_sponsorship) { hbx_profile.benefit_sponsorship }
+  let(:current_coverage_period_year) { benefit_sponsorship.current_benefit_period.start_on.year }
   let(:field_names) do
     headers = %w[
         subscriber_hbx_id
@@ -108,30 +122,34 @@ describe 'member_outreach_report' do
         external_id
         user_account
         last_page_visited
-        program_eligible_for
-        application_aasm_state
-        application_aasm_state_date
-        transfer_id
-        inbound_transfer_date
-        FPL
-        has_access_to_health_coverage
-        has_access_to_health_coverage_kinds
+        latest_determined_application_id
+        determined_date
+        determined_program_eligible_for
+        determined_medicaid_fpl
+        determined_has_access_to_coverage
+        determined_has_access_to_coverage_kinds
+        latest_application_aasm_state
+        latest_application_aasm_state_date
+        latest_transfer_id
+        latest_inbound_transfer_date
       ]
-    headers << "#{curr_year}_most_recent_health_plan_id"
-    headers << "#{curr_year}_most_recent_health_status"
-    headers << "#{next_year}_most_recent_health_plan_id"
-    headers << "#{next_year}_most_recent_health_status"
-    headers << "#{curr_year}_most_recent_dental_plan_id"
-    headers << "#{curr_year}_most_recent_dental_status"
-    headers << "#{next_year}_most_recent_dental_plan_id"
-    headers << "#{next_year}_most_recent_dental_status"
+    headers << "#{current_coverage_period_year - 1}_most_recent_health_plan_id"
+    headers << "#{current_coverage_period_year - 1}_most_recent_health_status"
+    headers << "#{current_coverage_period_year}_most_recent_health_plan_id"
+    headers << "#{current_coverage_period_year}_most_recent_health_status"
+    headers << "#{current_coverage_period_year - 1}_most_recent_dental_plan_id"
+    headers << "#{current_coverage_period_year - 1}_most_recent_dental_status"
+    headers << "#{current_coverage_period_year}_most_recent_dental_plan_id"
+    headers << "#{current_coverage_period_year}_most_recent_dental_status"
   end
 
-  context 'family with application in current enrollment year' do
+  context 'family with determined and draft applications in current enrollment year' do
     before do
-      application.non_primary_applicants.each{|applicant| application.ensure_relationship_with_primary(applicant, applicant.relationship) }
-      application.update(workflow_state_transitions: [workflow_state_transition])
+      latest_application.non_primary_applicants.each{|applicant| latest_application.ensure_relationship_with_primary(applicant, applicant.relationship) }
+      latest_determined_application.non_primary_applicants.each{|applicant| latest_determined_application.ensure_relationship_with_primary(applicant, applicant.relationship) }
+      latest_determined_application.update(workflow_state_transitions: [workflow_state_transition])
       health_enrollment.update(hbx_enrollment_members: enrollment_members)
+      benefit_sponsorship.benefit_coverage_periods.map(&:save)
       invoke_member_outreach_report
       @file_content = CSV.read("#{Rails.root}/member_outreach_report.csv")
     end
@@ -203,18 +221,17 @@ describe 'member_outreach_report' do
     end
 
     context 'primary applicant' do
-      it 'should match with the programs that the applicant is eligible for' do
-        eligible_programs = "QHP without financial assistance"
-        expect(@file_content[1][16]).to eq(eligible_programs)
+      it 'should match with the applicant FPL percentage' do
+        expect(@file_content[1][19]).to eq(primary_applicant.magi_as_percentage_of_fpl.to_s)
       end
 
       it 'should match with the applicant access to health coverage response' do
-        expect(@file_content[1][22]).to eq(primary_applicant.has_eligible_health_coverage.present?.to_s)
+        expect(@file_content[1][20]).to eq(primary_applicant.has_eligible_health_coverage.present?.to_s)
       end
 
       it 'should match with the health coverage kinds applicant has access to' do
         insurance_kinds = primary_applicant.benefits.eligible.map(&:insurance_kind).join(", ")
-        expect(@file_content[1][23]).to eq(insurance_kinds)
+        expect(@file_content[1][21]).to eq(insurance_kinds)
       end
     end
 
@@ -269,41 +286,61 @@ describe 'member_outreach_report' do
     end
 
     context 'spouse applicant' do
-      it 'should match with the programs that the applicant is eligible for' do
-        eligible_programs = "MaineCare and Cub Care(Medicaid)"
-        expect(@file_content[2][16]).to eq(eligible_programs)
+      it 'should match with the applicant FPL percentage' do
+        expect(@file_content[2][19]).to eq(primary_applicant.magi_as_percentage_of_fpl.to_s)
       end
 
       it 'should match with the applicant access to health coverage response' do
-        expect(@file_content[2][22]).to eq(spouse_applicant.has_eligible_health_coverage.present?.to_s)
+        expect(@file_content[2][20]).to eq(spouse_applicant.has_eligible_health_coverage.present?.to_s)
       end
 
       it 'should match with the health coverage kinds applicant has access to' do
         insurance_kinds = spouse_applicant.benefits.eligible.map(&:insurance_kind).join(", ")
-        expect(@file_content[2][23]).to eq(insurance_kinds)
+        expect(@file_content[2][21]).to eq(insurance_kinds)
       end
     end
 
-    context 'application' do
-      it 'should match with the application aasm_state' do
-        expect(@file_content[1][17]).to eq(application.aasm_state)
-        expect(@file_content[2][17]).to eq(application.aasm_state)
+    context 'latest determined application' do
+      it 'should match with application id' do
+        expect(@file_content[1][16]).to eq(latest_determined_application.hbx_id)
+        expect(@file_content[2][16]).to eq(latest_determined_application.hbx_id)
       end
 
-      it 'should match with the date of the most recent aasm_state transition' do
-        expect(@file_content[1][18]).to eq(application.workflow_state_transitions.first.transition_at.to_s)
-        expect(@file_content[2][18]).to eq(application.workflow_state_transitions.first.transition_at.to_s)
+      it 'should match with the determination date' do
+        expect(@file_content[1][17]).to eq(latest_determined_application.submitted_at.to_s)
+        expect(@file_content[2][17]).to eq(latest_determined_application.submitted_at.to_s)
+      end
+
+      it 'should match with the programs that the applicants are eligible for' do
+        primary_eligible_programs = "QHP without financial assistance"
+        spouse_eligible_programs = "MaineCare and Cub Care(Medicaid)"
+        expect(@file_content[1][18]).to eq(primary_eligible_programs)
+        expect(@file_content[2][18]).to eq(spouse_eligible_programs)
+      end
+    end
+
+    context 'latest application (in any submission state)' do
+      it 'should match with the application aasm_state' do
+        expect(@file_content[1][22]).to eq(latest_application.aasm_state)
+        expect(@file_content[2][22]).to eq(latest_application.aasm_state)
+      end
+
+      context 'for the most recent aasm_state transition' do
+        it 'should match with the creation date if application is in draft state' do
+          expect(@file_content[1][23]).to eq(latest_application.created_at.to_s)
+          expect(@file_content[2][23]).to eq(latest_application.created_at.to_s)
+        end
       end
 
       it 'should match with the transfer id' do
-        expect(@file_content[1][19]).to eq(application.transfer_id)
-        expect(@file_content[2][19]).to eq(application.transfer_id)
+        expect(@file_content[1][24]).to eq(latest_application.transfer_id)
+        expect(@file_content[2][24]).to eq(latest_application.transfer_id)
       end
 
       it 'should match with the inbound transfer timestamp' do
-        transfer_timestamp = application.transferred_at
-        expect(@file_content[1][20]).to eq(transfer_timestamp.to_s)
-        expect(@file_content[2][20]).to eq(transfer_timestamp.to_s)
+        transfer_timestamp = latest_application.transferred_at
+        expect(@file_content[1][25]).to eq(transfer_timestamp.to_s)
+        expect(@file_content[2][25]).to eq(transfer_timestamp.to_s)
       end
     end
 
@@ -324,51 +361,51 @@ describe 'member_outreach_report' do
         end
 
         it 'should match with the current year most recent health plan hios id' do
-          health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == curr_year}.sort_by(&:submitted_at).reverse.first
-          expect(@file_content[1][24]).to eq(health_enrollment.product.hios_id)
-          expect(@file_content[2][24]).to eq(health_enrollment.product.hios_id)
-        end
-
-        it 'should match with the current year most recent health plan status' do
-          health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == curr_year}.sort_by(&:submitted_at).reverse.first
-          expect(@file_content[1][25]).to eq(health_enrollment.aasm_state)
-          expect(@file_content[2][25]).to eq(health_enrollment.aasm_state)
-        end
-
-        it 'should match with the prospective year most recent health plan hios id' do
-          health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == next_year}.sort_by(&:submitted_at).reverse.first
+          health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == current_coverage_period_year - 1}.sort_by(&:submitted_at).reverse.first
           expect(@file_content[1][26]).to eq(health_enrollment.product.hios_id)
           expect(@file_content[2][26]).to eq(health_enrollment.product.hios_id)
         end
 
-        it 'should match with the prospective year most recent health plan status' do
-          health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == next_year}.sort_by(&:submitted_at).reverse.first
+        it 'should match with the current year most recent health plan status' do
+          health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == current_coverage_period_year - 1}.sort_by(&:submitted_at).reverse.first
           expect(@file_content[1][27]).to eq(health_enrollment.aasm_state)
           expect(@file_content[2][27]).to eq(health_enrollment.aasm_state)
         end
 
+        it 'should match with the prospective year most recent health plan hios id' do
+          health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == current_coverage_period_year}.sort_by(&:submitted_at).reverse.first
+          expect(@file_content[1][28]).to eq(health_enrollment.product.hios_id)
+          expect(@file_content[2][28]).to eq(health_enrollment.product.hios_id)
+        end
+
+        it 'should match with the prospective year most recent health plan status' do
+          health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == current_coverage_period_year}.sort_by(&:submitted_at).reverse.first
+          expect(@file_content[1][29]).to eq(health_enrollment.aasm_state)
+          expect(@file_content[2][29]).to eq(health_enrollment.aasm_state)
+        end
+
         it 'should match with the current year most recent dental plan hios id' do
-          dental_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on.year == curr_year}.sort_by(&:submitted_at).reverse.first
-          expect(@file_content[1][28]).to eq(dental_enrollment.product.hios_id)
-          expect(@file_content[2][28]).to eq(dental_enrollment.product.hios_id)
-        end
-
-        it 'should match with the current year most recent dental plan status' do
-          dental_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on.year == curr_year}.sort_by(&:submitted_at).reverse.first
-          expect(@file_content[1][29]).to eq(dental_enrollment.aasm_state)
-          expect(@file_content[2][29]).to eq(dental_enrollment.aasm_state)
-        end
-
-        it 'should match with the prospective year most recent dental plan hios id' do
-          dental_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on.year == next_year}.sort_by(&:submitted_at).reverse.first
+          dental_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on.year == current_coverage_period_year - 1}.sort_by(&:submitted_at).reverse.first
           expect(@file_content[1][30]).to eq(dental_enrollment.product.hios_id)
           expect(@file_content[2][30]).to eq(dental_enrollment.product.hios_id)
         end
 
-        it 'should match with the prospective year most recent dental plan status' do
-          dental_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on.year == next_year}.sort_by(&:submitted_at).reverse.first
+        it 'should match with the current year most recent dental plan status' do
+          dental_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on.year == current_coverage_period_year - 1}.sort_by(&:submitted_at).reverse.first
           expect(@file_content[1][31]).to eq(dental_enrollment.aasm_state)
           expect(@file_content[2][31]).to eq(dental_enrollment.aasm_state)
+        end
+
+        it 'should match with the prospective year most recent dental plan hios id' do
+          dental_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on.year == current_coverage_period_year}.sort_by(&:submitted_at).reverse.first
+          expect(@file_content[1][32]).to eq(dental_enrollment.product.hios_id)
+          expect(@file_content[2][32]).to eq(dental_enrollment.product.hios_id)
+        end
+
+        it 'should match with the prospective year most recent dental plan status' do
+          dental_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on.year == current_coverage_period_year}.sort_by(&:submitted_at).reverse.first
+          expect(@file_content[1][33]).to eq(dental_enrollment.aasm_state)
+          expect(@file_content[2][33]).to eq(dental_enrollment.aasm_state)
         end
       end
     end
@@ -393,8 +430,70 @@ describe 'member_outreach_report' do
     end
   end
 
-  context 'family with no FAA application' do
-    # TODO
+  context 'enrollment is terminated or canceled' do
+    before do
+      health_enrollment.update(aasm_state: 'coverage_terminated')
+      dental_enrollment.update(aasm_state: 'coverage_canceled')
+      latest_application.non_primary_applicants.each{|applicant| latest_application.ensure_relationship_with_primary(applicant, applicant.relationship) }
+      latest_determined_application.non_primary_applicants.each{|applicant| latest_determined_application.ensure_relationship_with_primary(applicant, applicant.relationship) }
+      latest_determined_application.update(workflow_state_transitions: [workflow_state_transition])
+      health_enrollment.update(hbx_enrollment_members: enrollment_members)
+      invoke_member_outreach_report
+      @file_content = CSV.read("#{Rails.root}/member_outreach_report.csv")
+      @enrollments = family.active_household.hbx_enrollments
+    end
+
+    context 'for the terminated enrollment data' do
+      it 'should match with the current year most recent health plan hios id' do
+        health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == current_coverage_period_year - 1}.sort_by(&:submitted_at).reverse.first
+        expect(@file_content[1][26]).to eq(health_enrollment.product.hios_id)
+        expect(@file_content[2][26]).to eq(health_enrollment.product.hios_id)
+      end
+
+      it 'should match with the current year most recent health plan status' do
+        health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == current_coverage_period_year - 1}.sort_by(&:submitted_at).reverse.first
+        expect(@file_content[1][27]).to eq(health_enrollment.aasm_state)
+        expect(@file_content[2][27]).to eq(health_enrollment.aasm_state)
+      end
+
+      it 'should match with the prospective year most recent health plan hios id' do
+        health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == current_coverage_period_year}.sort_by(&:submitted_at).reverse.first
+        expect(@file_content[1][28]).to eq(health_enrollment.product.hios_id)
+        expect(@file_content[2][28]).to eq(health_enrollment.product.hios_id)
+      end
+
+      it 'should match with the prospective year most recent health plan status' do
+        health_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == current_coverage_period_year}.sort_by(&:submitted_at).reverse.first
+        expect(@file_content[1][29]).to eq(health_enrollment.aasm_state)
+        expect(@file_content[2][29]).to eq(health_enrollment.aasm_state)
+      end
+    end
+
+    context 'for the cancelled enrollment data' do
+      it 'should match with the current year most recent dental plan hios id' do
+        dental_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on.year == current_coverage_period_year - 1}.sort_by(&:submitted_at).reverse.first
+        expect(@file_content[1][30]).to eq(dental_enrollment.product.hios_id)
+        expect(@file_content[2][30]).to eq(dental_enrollment.product.hios_id)
+      end
+
+      it 'should match with the current year most recent dental plan status' do
+        dental_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on.year == current_coverage_period_year - 1}.sort_by(&:submitted_at).reverse.first
+        expect(@file_content[1][31]).to eq(dental_enrollment.aasm_state)
+        expect(@file_content[2][31]).to eq(dental_enrollment.aasm_state)
+      end
+
+      it 'should match with the prospective year most recent dental plan hios id' do
+        dental_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on.year == current_coverage_period_year}.sort_by(&:submitted_at).reverse.first
+        expect(@file_content[1][32]).to eq(dental_enrollment.product.hios_id)
+        expect(@file_content[2][32]).to eq(dental_enrollment.product.hios_id)
+      end
+
+      it 'should match with the prospective year most recent dental plan status' do
+        dental_enrollment = @enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on.year == current_coverage_period_year}.sort_by(&:submitted_at).reverse.first
+        expect(@file_content[1][33]).to eq(dental_enrollment.aasm_state)
+        expect(@file_content[2][33]).to eq(dental_enrollment.aasm_state)
+      end
+    end
   end
 
   after :each do

@@ -38,7 +38,9 @@ module Operations
           termination_date = values[:termination_date].to_date
           evidence_key = values[:evidence_key]
 
-          eligibilities = subject_instance.eligibilities.where(:'evidences.key' => evidence_key)
+          eligibilities =
+            subject_instance.eligibilities.with_evidence(evidence_key)
+
           eligibilities.each do |eligibility|
             evidence = eligibility.evidences.new
             evidence.title = "#{evidence_key.to_s.titleize} Evidence"
@@ -46,14 +48,21 @@ module Operations
             evidence.is_satisfied = false
             evidence.save!
 
-            eligibility.end_on = termination_date if update_end_on?(eligibility, termination_date)
+            eligibility.end_on = termination_date if update_end_on?(
+              eligibility,
+              termination_date
+            )
             eligibility.save! if eligibility.changed?
           end
           Success('Eligibilities have been terminated')
         end
 
         def update_end_on?(eligibility, termination_date)
-          eligibility.end_on.nil? || (eligibility.end_on.present? && eligibility.end_on > termination_date)
+          eligibility.end_on.nil? ||
+            (
+              eligibility.end_on.present? &&
+                eligibility.end_on > termination_date
+            )
         end
       end
     end
