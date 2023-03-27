@@ -189,7 +189,7 @@ namespace :reports do
                   enr.effective_on.blank? ? nil : enr.effective_on.strftime("%Y%m%d"),
                   enr.terminated_on.blank? ? nil : enr.terminated_on.strftime("%Y%m%d"),
                   enr.special_enrollment_period&.qualifying_life_event_kind&.reason,
-                  enr.termination_reason,
+                  enr.terminate_reason,
                   per.home_address&.full_address || enr.subscriber.person.home_address&.full_address,
                   per.mailing_address&.full_address || enr.subscriber.person.mailing_address&.full_address,
                   per.work_email&.address || enr.subscriber.person.work_email&.address,
