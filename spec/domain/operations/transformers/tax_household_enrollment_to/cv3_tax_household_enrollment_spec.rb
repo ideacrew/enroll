@@ -60,6 +60,26 @@ RSpec.describe Operations::Transformers::TaxHouseholdEnrollmentTo::Cv3TaxHouseho
           AcaEntities::PremiumCredits::TaxHouseholdEnrollment.new(contract_result.to_h)
         ).to be_a(AcaEntities::PremiumCredits::TaxHouseholdEnrollment)
       end
+
+      context 'when max_aptc is nil' do
+        let!(:thh) do
+          thhg.tax_households.create(
+            eligibility_determination_hbx_id: '7821',
+            yearly_expected_contribution: 100.00,
+            effective_starting_on: TimeKeeper.date_of_record,
+            max_aptc: nil
+          )
+        end
+
+        it 'should return success' do
+          expect(result.success?).to be_truthy
+          contract_result = AcaEntities::Contracts::PremiumCredits::TaxHouseholdEnrollmentContract.new.call(result.success)
+          expect(contract_result.success?).to be_truthy
+          expect(
+            AcaEntities::PremiumCredits::TaxHouseholdEnrollment.new(contract_result.to_h)
+          ).to be_a(AcaEntities::PremiumCredits::TaxHouseholdEnrollment)
+        end
+      end
     end
 
     context 'without slcsp info' do
