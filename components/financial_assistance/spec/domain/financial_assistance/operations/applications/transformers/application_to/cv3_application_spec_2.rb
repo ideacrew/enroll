@@ -92,8 +92,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       let(:result) { subject.call(application) }
       let!(:in_state_address_params) { { kind: 'home', address_1: '1 Awesome Street', address_2: '#100', city: 'Washington', state: 'DC', zip: '20001' } }
       let(:non_zero_output) do
-        {:health_only_lcsp_premiums => [{:cost => 100.0, :member_identifier => applicant.person_hbx_id.to_s, :monthly_premium => 100.0}],
-         :health_only_slcsp_premiums => [{:cost => 200.0, :member_identifier => applicant.person_hbx_id.to_s, :monthly_premium => 200.0}]}
+        {:health_only_lcsp_premiums => [{:member_identifier => applicant.person_hbx_id.to_s, :monthly_premium => 0.1e3}],
+         :health_only_slcsp_premiums => [{:member_identifier => applicant.person_hbx_id.to_s, :monthly_premium => 0.2e3}]}
       end
 
       before do
@@ -102,7 +102,11 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
 
       it "should build with non zero benchmark_premium values" do
-        applicant = result.success[:applicants][0]
+        params = result.success
+        app_contract = ::AcaEntities::MagiMedicaid::Contracts::ApplicationContract.new.call(params)
+        expect(result.success?).to be_truthy
+        app_entity = ::AcaEntities::MagiMedicaid::Application.new(app_contract.to_h).to_h
+        applicant = app_entity[:applicants][0]
         expect(applicant[:benchmark_premium]).to eq non_zero_output
       end
     end
@@ -111,8 +115,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       let(:result) { subject.call(application) }
       let!(:out_of_state_address_params) { { kind: 'home', address_1: '1 Awesome Street', address_2: '#100', city: 'Washington', state: 'FL', zip: '12345' } }
       let(:zero_permium_output) do
-        {:health_only_lcsp_premiums => [{:cost => 0.0, :member_identifier => applicant.person_hbx_id.to_s, :monthly_premium => 0.0}],
-         :health_only_slcsp_premiums => [{:cost => 0.0, :member_identifier => applicant.person_hbx_id.to_s, :monthly_premium => 0.0}]}
+        {:health_only_lcsp_premiums => [{:member_identifier => applicant.person_hbx_id.to_s, :monthly_premium => 0.0}],
+         :health_only_slcsp_premiums => [{:member_identifier => applicant.person_hbx_id.to_s, :monthly_premium => 0.0}]}
       end
 
       before do
@@ -124,7 +128,11 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
 
       it "should build with zero benchmark_premium values" do
-        applicant = result.success[:applicants][0]
+        params = result.success
+        app_contract = ::AcaEntities::MagiMedicaid::Contracts::ApplicationContract.new.call(params)
+        expect(result.success?).to be_truthy
+        app_entity = ::AcaEntities::MagiMedicaid::Application.new(app_contract.to_h).to_h
+        applicant = app_entity[:applicants][0]
         expect(applicant[:benchmark_premium]).to eq zero_permium_output
       end
     end
