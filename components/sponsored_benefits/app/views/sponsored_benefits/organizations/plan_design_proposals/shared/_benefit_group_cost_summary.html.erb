@@ -7,7 +7,10 @@
     </div>
     <div>
       <% unless benefit_group.sole_source? %>
-        <label>Employer Lowest/Reference/Highest - <%= number_to_currency(benefit_group_costs[:lowest_plan_employer_cost]) %>/<%= number_to_currency(benefit_group_costs[:ref_plan_employer_cost]) %>/<%= number_to_currency(benefit_group_costs[:highest_plan_employer_cost]) %></label>
+        <label>Employer Monthly Cost:</label><br/>
+          <div><%= l10n('lowest_cost_plan') %> - <%= benefit_group_costs[:lowest_plan_name] %> - <%= number_to_currency(benefit_group_costs[:lowest_plan_employer_cost]) %></div>
+          <div><%= l10n('reference_plan') %> - <%= benefit_group_costs[:ref_plan_name] %> - <%= number_to_currency(benefit_group_costs[:ref_plan_employer_cost]) %></div>
+          <div><%= l10n('highest_cost_plan') %> - <%= benefit_group_costs[:highest_plan_name] %> - <%= number_to_currency(benefit_group_costs[:highest_plan_employer_cost]) %></div>            
       <% end %>
     </div>
     <br />
@@ -15,13 +18,16 @@
       <thead>
         <tr>
           <th>Employee</th>
-          <th>Dependent Count</th>
+          <th><%= l10n('dependent_count')%></th>
           <% if (!benefit_group.single_plan_type?) %>
-            <th>Lowest Cost Available Plan</th>
+            <th><%= l10n('lowest_cost_available_plan') %></th>
           <% end %>
-          <th>Reference Plan</th>
+          <th><%= l10n('reference_plan') %></th>
           <% if (!benefit_group.single_plan_type?) %>
-            <th>Highest Cost Available Plan</th>
+            <th><%= l10n('highest_cost_available_plan') %></th>
+          <% end %>
+          <% if benefit_group.benefit_application&.osse_eligible? && kind == 'health' %>
+            <th><%= l10n('bqt.total_hc4cc_subcidy_applied') %></th>
           <% end %>
         </tr>
       </thead>

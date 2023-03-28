@@ -225,6 +225,11 @@ BROKER_AGENCIES_TRANSLATIONS = {
   "en.broker_agencies.broker_invitation.broker_steps" => "If you do not appear to meet all of our requirements, we will let you know which steps you will need to take before you can become a %{site_short_name}-certified broker.",
   "en.broker_agencies.broker_invitation.broker_questions" => "If you have questions, please visit the <a href='%{certification_url}'>broker certification section of our website</a>, or call us at %{contact_center_phone_number} (TTY: %{contact_center_tty_number}).",
   "en.broker_agencies.broker_invitation.thank_you_footer" => "Thank you,",
-  "en.new_prospect_employer" => "Fill in the information below to create an employer record for this prospect.  You only need to provide a legal name, SIC, Zip and County at this point, however any information you do not enter here will need to be populated later, or by the employer prior to claiming a quote.<br /><br />Once you have created the Prospective Employer record, you can create and manage quotes for this prospect from your Employers page."
-
-}
+  "en.new_prospect_employer" => "Fill in the information below to create an employer record for this prospect.  You only need to provide a legal name, SIC, Zip and County at this point, however any information you do not enter here will need to be populated later, or by the employer prior to claiming a quote.<br /><br />Once you have created the Prospective Employer record, you can create and manage quotes for this prospect from your Employers page.",
+  "en.bqt.total_hc4cc_subcidy_applied" => "Total HC4CC Subcidy Applied",
+  "en.lowest_cost_available_plan" => "Lowest Cost Available Plan",
+  "en.highest_cost_available_plan" => "Highest Cost Available Plan",
+  "en.lowest_cost_plan" => "Lowest Cost Plan",
+  "en.highest_cost_plan" => "Highest Cost Plan",
+  "en.dependent_count" => "Dependent Count"
+}.freeze

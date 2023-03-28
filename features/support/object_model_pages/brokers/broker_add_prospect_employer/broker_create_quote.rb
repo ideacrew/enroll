@@ -34,4 +34,12 @@ class BrokerCreateQuotePage
   def self.download_employee_roster_btn
     '.download-employees.btn.btn-default.interaction-click-control-download-employee-roster'
   end
+
+  def self.show_employee_details
+    '.interaction-click-control-show-details'
+  end
+
+  def self.reference_plan_radio
+    '.col-xs-12.reference-plan'
+  end
 end

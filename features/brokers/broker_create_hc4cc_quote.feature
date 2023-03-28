@@ -22,4 +22,8 @@ Feature: Broker HC4CC quote creation
     And Primary broker clicks on Select Health Benefits button
     And Primary broker should see metal level non bronze options
     And Primary broker selects plan offerings by metal level and enters 50 for employee and deps
+    And Primary broker selects reference plan
+    And Primary broker clicks on show details in employee costs section
+    Then Primary broker should see plan names in employee costs
+    Then Primary broker should see total HC4CC subcidy applied amount
     And Primary broker publishes the quote and sees successful message of published quote
