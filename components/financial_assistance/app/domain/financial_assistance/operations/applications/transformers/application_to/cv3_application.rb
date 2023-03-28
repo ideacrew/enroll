@@ -767,7 +767,7 @@ module FinancialAssistance
             # return zero premiums only when there is a failure monad
             def build_zero_member_premiums(applicant_hbx_ids)
               member_premiums = applicant_hbx_ids.collect do |applicant_hbx_id|
-                {"member_identifier": applicant_hbx_id, "monthly_premium": 0.0}
+                {"cost": 0.0, "member_identifier": applicant_hbx_id, "monthly_premium": 0.0}
               end.compact
 
               Success({ health_only_lcsp_premiums: member_premiums, health_only_slcsp_premiums: member_premiums })
