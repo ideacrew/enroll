@@ -480,3 +480,17 @@ end
 Then(/^The Employer's HC4CC eligibility should show (.*?)$/) do |status|
   expect(find(BrokerEmployersPage.hc4cc_eligibility).text).to eq status
 end
+
+When(/^Primary Broker selects (.*?) for HC4CC quote$/) do |status|
+  radio = if status.downcase == 'yes'
+            BrokerCreateQuotePage.osse_subsidy_radio_true
+          else
+            BrokerCreateQuotePage.osse_subsidy_radio_false
+          end
+  find(radio).click
+  wait_for_ajax
+end
+
+Then(/^the quote's HC4CC eligibility should show (.*?)$/) do |status|
+  expect(find(BrokerCreateQuotePage.quote_hc4cc_eligibility).text).to eq status
+end
