@@ -26,7 +26,7 @@ Feature: Employer HC4CC quote claim
     Given that a user with a HBX staff role with hbx staff subrole exists and is logged in
     And ABC Widgets goes to the benefits tab I should see plan year information
     And the employer clicks on claim quote
-    Then employer ABC Widgets enters claim code for HC4CC quote
+    Then employer enters claim code for HC4CC quote
     When the employer clicks claim code
     Then the employer sees a successful message
 
@@ -34,6 +34,6 @@ Feature: Employer HC4CC quote claim
     Given that a user with a HBX staff role with hbx staff subrole exists and is logged in
     And ABC Widgets goes to the benefits tab I should see plan year information
     And the employer clicks on claim quote
-    Then employer ABC Widgets enters claim code for HC4CC quote
+    Then employer enters claim code for HC4CC quote
     When the employer clicks claim code
     Then the employer sees a claim failure message

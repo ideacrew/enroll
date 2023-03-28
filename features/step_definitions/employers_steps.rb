@@ -923,7 +923,7 @@ Then(/^the employer enters claim code for his quote$/) do
   fill_in "claim_code", :with => @quote.claim_code
 end
 
-Then(/^employer (.+?) enters claim code for HC4CC quote$/) do
+Then(/^employer enters claim code for HC4CC quote$/) do
   quote = SponsoredBenefits::Organizations::PlanDesignOrganization.first.plan_design_proposals.first
   fill_in "claim_code", :with => quote.claim_code
 end
