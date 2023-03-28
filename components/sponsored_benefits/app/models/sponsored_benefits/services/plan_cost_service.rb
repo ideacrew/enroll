@@ -10,7 +10,6 @@ class SponsoredBenefits::Services::PlanCostService
     @monthly_employee_costs = {}
     @census_employee_costs = {}
     @multiple_rating_areas = multiple_market_rating_areas?
-    @is_osse_eligible = @benefit_group.benefit_application&.osse_eligible? || false
   end
 
   def reference_plan
@@ -115,7 +114,7 @@ class SponsoredBenefits::Services::PlanCostService
 
   def osse_subsidy_amount(member, census_employee)
     return 0.00 if plan.dental?
-    return 0.00 unless (census_employee.id == member.id) && @is_osse_eligible
+    return 0.00 unless (census_employee.id == member.id) && is_osse_eligible?
 
     Rails.cache.fetch("osse_subsidy_for_#{census_employee.id}_#{lcsp.id}", expires_in: 15.minutes) do
       coverage_age = age_of(census_employee)
@@ -247,5 +246,9 @@ class SponsoredBenefits::Services::PlanCostService
 
   def start_on
     @start_on ||= benefit_group.start_on
+  end
+
+  def is_osse_eligible?
+    @benefit_group.benefit_application&.osse_eligible?
   end
 end
