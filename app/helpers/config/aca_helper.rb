@@ -380,8 +380,10 @@ module Config::AcaHelper
   def display_enr_summary_is_enabled(enrollment)
     if EnrollRegistry.feature_enabled?(:display_enr_summary)
       return true if enrollment.hbx_enrollment_members.all? { |member| member.person != current_user.person }
+    elsif current_user.has_hbx_staff_role?
+      true
     else
-      return true if current_user.has_hbx_staff_role?
+      false
     end
   end
 end
