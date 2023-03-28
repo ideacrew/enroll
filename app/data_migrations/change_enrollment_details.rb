@@ -101,7 +101,13 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
 
   def terminate_enrollment(enrollments)
     terminated_on = Date.strptime(ENV['terminated_on'].to_s, "%m/%d/%Y")
+    if terminated_on.year < 1000
+      raise "Not a valid termination date.  Please format date as mm/dd/yyyy." unless Rails.env.test?
+    end
     enrollments.each do |enrollment|
+      if terminated_on <  enrollment.effective_on
+        raise "Termination date cannot be less than effective date for enrollment #{enrollment.hbx_id}." unless Rails.env.test?
+      end
       enrollment.update_attributes!(terminated_on: terminated_on, aasm_state: "coverage_terminated")
       puts "terminate enrollment on #{terminated_on}" unless Rails.env.test?
     end
