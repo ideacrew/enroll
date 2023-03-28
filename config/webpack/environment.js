@@ -1,5 +1,6 @@
 const { environment } = require('@rails/webpacker')
-const erb =  require('./loaders/erb')
+const babelConfig = require('../../babel.config.rb.js')
+const erb = require('./loaders/erb')
 const webpack = require('webpack')
 
 environment.plugins.append('Provide', new webpack.ProvidePlugin({
@@ -7,6 +8,12 @@ environment.plugins.append('Provide', new webpack.ProvidePlugin({
   jQuery: 'jquery',
   Popper: ['popper.js', 'default']
 }))
-
+environment.loaders.append('ruby', {
+  test: /\.rb$/,
+  use: {
+    loader: 'babel-loader',
+    options: babelConfig
+  }
+})
 environment.loaders.prepend('erb', erb)
 module.exports = environment
