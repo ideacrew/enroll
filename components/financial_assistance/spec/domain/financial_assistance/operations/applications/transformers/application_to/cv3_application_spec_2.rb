@@ -3,6 +3,7 @@
 require 'rails_helper'
 require "#{FinancialAssistance::Engine.root}/spec/dummy/app/domain/operations/individual/open_enrollment_start_on"
 
+# rubocop:disable Style/ExponentialNotation
 RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application, dbclean: :after_each do
   let!(:person) { FactoryBot.create(:person, hbx_id: "732020")}
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
@@ -138,3 +139,4 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
   end
 end
+# rubocop:enable Style/ExponentialNotation
