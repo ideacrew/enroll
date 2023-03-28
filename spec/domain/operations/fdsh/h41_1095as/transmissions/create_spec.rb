@@ -51,16 +51,16 @@ RSpec.describe ::Operations::Fdsh::H411095as::Transmissions::Create do
       end
     end
 
-    context 'with h41_and_1095a as report_kind' do
-      let(:report_kind) { 'h41_and_1095a' }
+    context 'with h41_1095a as report_kind' do
+      let(:report_kind) { 'h41_1095a' }
 
       it 'should publish event successfully' do
         expect(result.success).to eq(event_name)
       end
     end
 
-    context 'with h41_only as report_kind' do
-      let(:report_kind) { 'h41_only' }
+    context 'with h41 as report_kind' do
+      let(:report_kind) { 'h41' }
 
       it 'should publish event successfully' do
         expect(result.success).to eq(event_name)

@@ -11,12 +11,12 @@ module Operations
 
           REPORT_TYPES = %w[all original corrected void].freeze
 
-          REPORT_KINDS = %w[h41_and_1095a h41_only].freeze
+          REPORT_KINDS = %w[h41_1095a h41].freeze
 
           # @param [String] assistance_year
           # @param [Array] report_types
           # @param [Array] excluded_policies
-          # @param [String] report_kind default value 'h41_and_1095a'
+          # @param [String] report_kind default value 'h41_1095a'
           def call(params)
             values = yield validate(params)
             event = yield build_event(values)
@@ -29,7 +29,7 @@ module Operations
 
           def validate(params)
             params[:report_types]&.map!(&:to_s)
-            params[:report_kind] = 'h41_and_1095a' if params[:report_kind].blank?
+            params[:report_kind] = 'h41_1095a' if params[:report_kind].blank?
 
             errors = []
             errors << 'assistance_year required' unless params[:assistance_year]
