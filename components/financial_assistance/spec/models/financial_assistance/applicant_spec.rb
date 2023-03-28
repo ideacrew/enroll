@@ -1366,7 +1366,6 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
   describe 'enrolled_with' do
     let(:person) { FactoryBot.create(:person, :with_consumer_role)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-
     let(:product) {double(id: '123', csr_variant_id: '01')}
 
     let!(:enrollment) do
