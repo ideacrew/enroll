@@ -5,7 +5,6 @@ module BenefitSponsors
     module Employers
       # EmployerProfilesController
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
-
         include Config::AcaHelper
 
         before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :export_census_employees, :show_invoice, :coverage_reports, :download_invoice, :terminate_employee_roster_enrollments]
@@ -15,7 +14,6 @@ module BenefitSponsors
         before_action :set_flash_by_announcement, only: :show
         layout "two_column", except: [:new]
 
-        #New profile registration with existing organization and approval request submitted to employer
         def show_pending
           authorize BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new
           respond_to do |format|
@@ -24,7 +22,6 @@ module BenefitSponsors
           end
         end
 
-# TODO: - Each when clause should be a seperate action.
         def show
           authorize @employer_profile
           @tab = params['tab']
@@ -137,7 +134,7 @@ module BenefitSponsors
             roaster_upload_count = @roster_upload_form.census_records.length
             begin
               if @roster_upload_form.save
-                flash[:notice] = "#{roaster_upload_count } records uploaded from CSV"
+                flash[:notice] = "#{roaster_upload_count} records uploaded from CSV"
                 redirect_to URI.parse(@roster_upload_form.redirection_url).to_s
               else
                 render @roster_upload_form.redirection_url || default_url
@@ -148,7 +145,7 @@ module BenefitSponsors
             end
           else
             @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.new
-            @roster_upload_form.errors.add(:base, "Can't detect file type #{params[:file] &.original_filename}, please upload Excel/CSV format files only.")
+            @roster_upload_form.errors.add(:base, "Can't detect file type #{params[:file]&.original_filename}, please upload Excel/CSV format files only.")
             respond_to do |format|
               format.html {  render default_url}
             end
