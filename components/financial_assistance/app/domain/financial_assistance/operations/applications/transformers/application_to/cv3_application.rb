@@ -761,13 +761,13 @@ module FinancialAssistance
               applicant_hbx_ids = application.applicants.pluck(:person_hbx_id)
               # return Failure("Applicants do not match family members") unless  family_member_hbx_ids.to_set == applicant_hbx_ids.to_set
               premiums = ::Operations::Products::Fetch.new.call({family: family, effective_date: application.effective_date})
-              return premiums if premiums.failure?
+              return build_zero_member_premiums(applicant_hbx_ids) if premiums.failure?
 
               slcsp_info = ::Operations::Products::FetchSlcsp.new.call(member_silver_product_premiums: premiums.success)
-              return slcsp_info if slcsp_info.failure?
+              return build_zero_member_premiums(applicant_hbx_ids) if slcsp_info.failure?
 
               lcsp_info = ::Operations::Products::FetchLcsp.new.call(member_silver_product_premiums: premiums.success)
-              return lcsp_info if lcsp_info.failure?
+              return build_zero_member_premiums(applicant_hbx_ids) if lcsp_info.failure?
 
               slcsp_member_premiums = applicant_hbx_ids.each_with_object([]) do |applicant_hbx_id, result|
                 next applicant_hbx_id unless slcsp_info.success[applicant_hbx_id].present?
@@ -782,6 +782,15 @@ module FinancialAssistance
               end.compact
 
               Success({ health_only_lcsp_premiums: lcsp_member_premiums, health_only_slcsp_premiums: slcsp_member_premiums })
+            end
+
+            # return zero premiums only when there is a failure monad
+            def build_zero_member_premiums(applicant_hbx_ids)
+              member_premiums = applicant_hbx_ids.collect do |applicant_hbx_id|
+                {cost: 0.0, member_identifier: applicant_hbx_id, monthly_premium: 0.0}
+              end.compact
+
+              Success({ health_only_lcsp_premiums: member_premiums, health_only_slcsp_premiums: member_premiums })
             end
 
             # Physical households(mitc_households) are groups based on the member's Home Address.

@@ -21,6 +21,7 @@ module FinancialAssistance
           # @return [Dry::Monads::Result]
           def call(params)
             payload = yield load_data(params)
+            payload = yield load_missing_county_names(payload) if FinancialAssistanceRegistry.feature_enabled?(:load_county_on_inbound_transfer)
             family = yield build_family(payload["family"])
             application_id = yield build_application(payload, family)
             application = yield find_application(application_id)
@@ -56,8 +57,10 @@ module FinancialAssistance
               end
             end
 
-            return Failure("Unable to find county objects for zips #{@zips_with_missing_counties.uniq}") if @zips_with_missing_counties.present?
-            return Failure("Unable to match county for #{@zips_with_multiple_counties.uniq}, as multiple counties have this zip code.") if @zips_with_multiple_counties.present?
+            failure_message = "Unable to find county objects for zips #{@zips_with_missing_counties.uniq}" if @zips_with_missing_counties.present?
+            failure_message = "Unable to match county for #{@zips_with_multiple_counties.uniq}, as multiple counties have this zip code." if @zips_with_multiple_counties.present?
+            return Failure(failure_message) if failure_message.present?
+
             Success(payload)
           rescue StandardError => e
             Failure("load_missing_county_names #{e}")
@@ -85,12 +88,8 @@ module FinancialAssistance
           end
 
           def load_data(payload = {})
-            payload = payload.to_h.deep_stringify_keys!
-            result = load_missing_county_names(payload)
-            return result if result.failure?
-
-            updated_payload = result.value!
-            decrypt_ssns(updated_payload)
+            stringified_payload = payload.to_h.deep_stringify_keys!
+            decrypt_ssns(stringified_payload)
           rescue StandardError => e
             Failure("load_data #{e}")
           end

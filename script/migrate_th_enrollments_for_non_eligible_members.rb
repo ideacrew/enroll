@@ -81,7 +81,7 @@ def migrate_tax_household_enrollments(family)
 
     th_enrollments = TaxHouseholdEnrollment.where(enrollment_id: enrollment.id)
 
-    @logger.info "**** Processed EnrollmentHbxId - #{enrollment.hbx_id}; #{enrollment.effective_on}; #{enrollment.aasm_state}; Primary Hbx Id - #{primary_hbx_id}; Tax Households Count - #{th_enrollments.size} ****"
+    @logger.info "**** Processed EnrollmentHbxId - #{enrollment.hbx_id}; #{enrollment.effective_on}; #{enrollment.aasm_state}; Primary Hbx Id - #{primary_hbx_id}; Tax Households Count - #{th_enrollments.size}; APTC - #{th_enrollments.map(&:available_max_aptc)} ****"
     nil
   end
 end
