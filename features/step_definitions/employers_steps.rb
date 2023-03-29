@@ -324,6 +324,12 @@ When(/^(.*?) go[es]+ to the benefits tab I should see plan year information$/) d
   visit benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab => 'benefits')
 end
 
+When(/employer has correct reference plan id/) do
+  # temporary fix for failure when run as batch
+  hios_id = SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.plan_design_proposals.first.profile.benefit_application.benefit_groups.first.reference_plan.hios_id
+  BenefitMarkets::Products::HealthProducts::HealthProduct.where(:"application_period.min".in => [TimeKeeper.date_of_record.beginning_of_year]).first.update_attributes(hios_id: hios_id)
+end
+
 # Generic name for step for all versions of site
 # actual tab will be "My Health Connector" (with "Health Connector" referring to site sshort name)
 When(/^I go to my health tab$/) do
