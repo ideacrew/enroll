@@ -20,6 +20,13 @@ class SponsoredBenefits::Services::PlanCostService
     end
   end
 
+  def lcsp
+    return @lcsp if defined? @lcsp
+    effective_year_for_lcsp = @benefit_group&.start_on&.year
+    hios_id = EnrollRegistry["lowest_cost_silver_product_#{effective_year_for_lcsp}"].item
+    @lcsp = Plan.by_active_year(effective_year_for_lcsp).where(hios_id: hios_id).first
+  end
+
   def active_census_employees
     @active_census_employees ||= benefit_group.targeted_census_employees.active
   end
@@ -31,16 +38,14 @@ class SponsoredBenefits::Services::PlanCostService
   def monthly_employer_contribution_amount(plan = reference_plan)
     self.plan = plan
     active_census_employees.inject(0.00) do |acc, census_employee|
-      per_employee_cost = if census_employee.is_cobra_status?
-        0
-      elsif composite?
+      per_employee_cost = if composite?
         (composite_total_premium(census_employee) * employer_contribution_factor(census_employee)).round(2)
       else
         (members(census_employee).reduce(0.00) do |sum, member|
           (sum + employer_contribution_for(member, census_employee)).round(2)
         end).round(2)
       end
-      BigDecimal.new((acc + per_employee_cost).to_s).round(2)
+      BigDecimal((acc + per_employee_cost).to_s).round(2)
     end
   end
 
@@ -69,7 +74,7 @@ class SponsoredBenefits::Services::PlanCostService
           (sum + employee_cost_for(member, census_employee)).round(2)
         end).round(2)
       end
-      BigDecimal.new((per_employee_cost).to_s).round(2)
+      BigDecimal(per_employee_cost.to_s).round(2)
     end
   end
 
@@ -95,13 +100,27 @@ class SponsoredBenefits::Services::PlanCostService
   end
 
   def premium_for(member, census_employee)
-    Rails.cache.fetch("premium_for_#{member.id}_#{plan.id}") do
+    member_premium = Rails.cache.fetch("premium_for_#{member.id}_#{plan.id}", expires_in: 15.minutes) do
       if contribution_offered_hash[relationship_for(member)]
         value = rate_lookup(age_of(member), member, census_employee, plan)
-        BigDecimal.new("#{value}").round(2).to_f
+        BigDecimal(value.to_s).round(2).to_f
       else
         0.00
       end
+    end
+
+    [(member_premium - osse_subsidy_amount(member, census_employee)), 0.00].max
+  end
+
+  def osse_subsidy_amount(member, census_employee)
+    return 0.00 if plan.dental?
+    return 0.00 unless census_employee.id == member.id
+    return 0.00 unless @benefit_group.benefit_application&.osse_eligible?
+
+    Rails.cache.fetch("osse_subsidy_for_#{census_employee.id}_#{lcsp.id}", expires_in: 15.minutes) do
+      coverage_age = age_of(census_employee)
+      value = rate_lookup(coverage_age, member, census_employee, lcsp)
+      BigDecimal(value.to_s).round(2).to_f
     end
   end
 
@@ -154,7 +173,10 @@ class SponsoredBenefits::Services::PlanCostService
   end
 
   def reference_premium_for(member, census_employee)
-    reference_plan_member_premium(member, census_employee)
+    reference_premium = reference_plan_member_premium(member, census_employee)
+    subsidy_premium = osse_subsidy_amount(member, census_employee)
+
+    [(reference_premium - subsidy_premium), 0.00].max
   rescue
     0.00
   end

@@ -28,18 +28,19 @@ field_names = %w[
     latest_application_aasm_state
     latest_application_aasm_state_date
     latest_transfer_id
-    inbound_transfer_date
+    latest_inbound_transfer_date
   ]
-curr_year = TimeKeeper.date_of_record.year
-next_year = TimeKeeper.date_of_record.year + 1
-field_names << "#{curr_year}_most_recent_health_plan_id"
-field_names << "#{curr_year}_most_recent_health_status"
-field_names << "#{next_year}_most_recent_health_plan_id"
-field_names << "#{next_year}_most_recent_health_status"
-field_names << "#{curr_year}_most_recent_dental_plan_id"
-field_names << "#{curr_year}_most_recent_dental_status"
-field_names << "#{next_year}_most_recent_dental_plan_id"
-field_names << "#{next_year}_most_recent_dental_status"
+
+benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+current_coverage_period_year = benefit_sponsorship.current_benefit_period.start_on.year
+field_names << "#{current_coverage_period_year - 1}_most_recent_health_plan_id"
+field_names << "#{current_coverage_period_year - 1}_most_recent_health_status"
+field_names << "#{current_coverage_period_year}_most_recent_health_plan_id"
+field_names << "#{current_coverage_period_year}_most_recent_health_status"
+field_names << "#{current_coverage_period_year - 1}_most_recent_dental_plan_id"
+field_names << "#{current_coverage_period_year - 1}_most_recent_dental_status"
+field_names << "#{current_coverage_period_year}_most_recent_dental_plan_id"
+field_names << "#{current_coverage_period_year}_most_recent_dental_status"
 
 file_name = "#{Rails.root}/member_outreach_report.csv"
 all_families = Family.all
@@ -56,19 +57,6 @@ def program_eligible_for(applicant)
   eligible_programs << "QHP without financial assistance" if applicant.is_without_assistance
   eligible_programs << "Special Maine care eligible" if applicant.is_eligible_for_non_magi_reasons
   eligible_programs.join(",")
-end
-
-def fpl_percentage(enr, enr_member, effective_year)
-  return unless enr && enr_member
-  tax_households = if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-                     enr.family.tax_household_groups.active.by_year(effective_year).first&.tax_households
-                   else
-                     enr.household.latest_tax_households_with_year(effective_year).active_tax_household
-                   end
-  return "N/A" if tax_households.blank?
-
-  tax_household_member = tax_households.map(&:tax_household_members).flatten.detect{|mem| mem.applicant_id == enr_member.applicant_id}
-  tax_household_member&.magi_as_percentage_of_fpl
 end
 
 puts "Generating member outreach report...."
@@ -96,11 +84,13 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
                             else
                               mra_dental_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
                             end
-        curr_mr_health_enrollment = enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on&.year == curr_year}.sort_by(&:submitted_at).reverse.first
-        next_mr_health_enrollment = enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on&.year == next_year}.sort_by(&:submitted_at).reverse.first
-        curr_mr_dental_enrollment = enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on&.year == curr_year}.sort_by(&:submitted_at).reverse.first
-        next_mr_dental_enrollment = enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on&.year == next_year}.sort_by(&:submitted_at).reverse.first
+
+        curr_mr_health_enrollment = enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on&.year == current_coverage_period_year - 1}.sort_by(&:submitted_at).reverse.first
+        next_mr_health_enrollment = enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on&.year == current_coverage_period_year}.sort_by(&:submitted_at).reverse.first
+        curr_mr_dental_enrollment = enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on&.year == current_coverage_period_year - 1}.sort_by(&:submitted_at).reverse.first
+        next_mr_dental_enrollment = enrollments.select {|enr| enr.coverage_kind == 'dental' && enr.effective_on&.year == current_coverage_period_year}.sort_by(&:submitted_at).reverse.first
         inbound_transfer_date = latest_application.transferred_at if latest_application&.transferred_at.present? && latest_application&.transfer_id.present? && !latest_application&.account_transferred
+        aasm_state_date = latest_application&.aasm_state == 'draft' ? latest_application.created_at : latest_application&.workflow_state_transitions&.first&.transition_at
 
         csv << [
             family.primary_applicant.hbx_id,
@@ -122,12 +112,12 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
             latest_determined_application&.hbx_id,
             latest_determined_application&.submitted_at,
             program_eligible_for(applicant),
-            # fpl depends on enrollment; assumption: use most recent active health plan enrollment
-            fpl_percentage(mra_health_enrollment, enrollment_member, mra_health_enrollment&.effective_on&.year),
+            # Expected outcome is that FPL value populates for all FAA applicants based on most recent determined application
+            applicant&.magi_as_percentage_of_fpl,
             applicant&.has_eligible_health_coverage.present?,
             applicant&.benefits&.eligible&.map(&:insurance_kind)&.join(", "),
             latest_application&.aasm_state,
-            latest_application&.workflow_state_transitions&.first&.transition_at,
+            aasm_state_date,
             latest_application&.transfer_id,
             inbound_transfer_date,
             curr_mr_health_enrollment&.product&.hios_id,
