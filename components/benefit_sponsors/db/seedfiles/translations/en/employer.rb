@@ -5,6 +5,5 @@ EMPLOYER_TRANSLATIONS = {
   "en.employers.plan_years.coinsurance" => "COINSURANCE",
   "en.employers.plan_years.more_details" => "More Details",
   "en.employers.employer_profiles.my_account.important_documents_needed" => "Important Documents Needed",
-  "en.employers.employer_profiles.my_account.eligibility_documents_needed" => "After you complete your application, you will need to submit proof of your eligibility to shop as a small business through the Health Connector. You will need to submit this proof before you are able to shop for a plan. Please review our list of documents that can be used as proof and make sure that you have the right documentation available.",
-  "en.employers.employer_profiles.employee_bulk_upload" => "Your CSV file is being processing, you will receive an email once it's done."
+  "en.employers.employer_profiles.my_account.eligibility_documents_needed" => "After you complete your application, you will need to submit proof of your eligibility to shop as a small business through the Health Connector. You will need to submit this proof before you are able to shop for a plan. Please review our list of documents that can be used as proof and make sure that you have the right documentation available."
 }
