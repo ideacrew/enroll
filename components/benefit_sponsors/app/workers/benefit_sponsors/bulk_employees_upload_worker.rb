@@ -28,6 +28,8 @@ module BenefitSponsors
         end
       rescue StandardError => e
         # sending an error email
+        logger ||= Logger.new("#{Rails.root}/log/aca_shop_benefit_sponsorship_service.log")
+        logger.error("\n Failed to create plan: #{e.message}")
         EmployeeUploadMailer.error_email(user_email, e.message).deliver_now
       ensure
         FileUtils.rm file.tempfile

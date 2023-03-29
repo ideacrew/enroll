@@ -15,14 +15,14 @@ class EmployeeUploadMailer < ApplicationMailer
   def failure_email(recipient)
     message = l10n("employers.employer_profiles.mailer.failure")
     mail({to: recipient, subject: "Employees are not created."}) do |format|
-      format.html { render "success_email", locals: {message: message}}
+      format.html { render "failure_email", locals: {message: message}}
     end
   end
 
   def error_email(recipient, error_message)
     message = l10n("employers.employer_profiles.mailer.error")
     mail({to: recipient, subject: "Something went wrong."}) do |format|
-      format.html { render "success_email", locals: {message: message, error_message: error_message}}
+      format.html { render "error_email", locals: {message: message, error_message: error_message}}
     end
   end
 end
