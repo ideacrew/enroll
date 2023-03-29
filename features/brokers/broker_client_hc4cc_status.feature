@@ -29,3 +29,26 @@ Feature: Broker employers table displays the HC4CC status of clients
     Given employer ABC Widgets is a prospect client
     When Primary Broker clicks the Employers tab
     Then The Employer's HC4CC eligibility should show Ineligible
+
+  Scenario: Broker should be able to see eligible HC4CC status for quotes
+    Given employer ABC Widgets has OSSE eligibilities
+    When Primary Broker clicks the Employers tab
+    And Primary broker clicks Actions dropdown and clicks Create Quote
+    And Primary Broker enters a new quote name
+    And Primary Broker selects Yes for HC4CC quote
+    And Primary broker clicks on Select Health Benefits button
+    And Primary broker selects plan offerings by metal level and enters 50 for employee and deps
+    And Primary broker publishes the quote and sees successful message of published quote
+    When Primary Broker clicks Back to All Quotes
+    Then the quote's HC4CC eligibility should show Yes
+
+  Scenario: Broker should be able to see ineligible HC4CC status for quotes
+    When Primary Broker clicks the Employers tab
+    And Primary broker clicks Actions dropdown and clicks Create Quote
+    And Primary Broker enters a new quote name
+    And Primary Broker selects No for HC4CC quote
+    And Primary broker clicks on Select Health Benefits button
+    And Primary broker selects plan offerings by metal level and enters 50 for employee and deps
+    And Primary broker publishes the quote and sees successful message of published quote
+    When Primary Broker clicks Back to All Quotes
+    Then the quote's HC4CC eligibility should show No
