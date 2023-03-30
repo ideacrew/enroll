@@ -19,6 +19,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   let(:applicant1_has_unemployment_income) { false }
   let(:applicant1_has_other_income) { false }
 
+  let(:applicant1_has_deductions) { false }
+
   let!(:applicant) do
     applicant = FactoryBot.create(:applicant,
                                   :with_student_information,
@@ -42,7 +44,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                   has_self_employment_income: applicant1_has_self_employment_income,
                                   has_unemployment_income: applicant1_has_unemployment_income,
                                   has_other_income: applicant1_has_other_income,
-                                  has_deductions: false,
+                                  has_deductions: applicant1_has_deductions,
                                   is_self_attested_disabled: true,
                                   is_physically_disabled: false,
                                   citizen_status: 'us_citizen',
@@ -1890,6 +1892,22 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     it 'returns false for has_other_income for applicant entity' do
       expect(applicant.has_other_income).to eq(true)
       expect(applicant_entity.has_other_income).to eq(false)
+    end
+  end
+
+  describe 'applicant1_has_deductions' do
+    let(:applicant1_has_deductions) { true }
+    let(:applicant1_is_applying_coverage) { true }
+
+    let(:operation_result) { subject.call(application.reload) }
+    let(:application_entity) do
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
+    end
+    let(:applicant_entity) { application_entity.applicants.first }
+
+    it 'returns false for has_deductions for applicant entity' do
+      expect(applicant.has_deductions).to eq(true)
+      expect(applicant_entity.has_deductions).to eq(false)
     end
   end
 
