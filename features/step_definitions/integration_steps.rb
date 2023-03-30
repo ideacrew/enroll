@@ -1029,6 +1029,7 @@ end
 
 When(/Primary Broker clicks the Employers tab/) do
   find(BrokerHomePage.employers_tab, wait: 5).click
+  sleep 2
   wait_for_ajax
 end
 

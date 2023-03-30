@@ -16,5 +16,9 @@ module SponsoredBenefits
     def eligibility_criteria(employer)
       # toDo - See why do we have this dependency in DC.
     end
+
+    def disable_employee_costs_download?
+      %w[plan_exports plan_reviews].include?(controller_name)
+    end
   end
 end
