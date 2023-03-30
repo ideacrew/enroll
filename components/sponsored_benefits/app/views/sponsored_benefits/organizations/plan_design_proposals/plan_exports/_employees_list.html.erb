@@ -1,0 +1,25 @@
+<div class="row">
+  <div class="panel col-xs-12 no-pd">
+    <table class="table table-striped">
+      <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Relationship Name</th>
+      </tr>
+      <% plan_design_proposal.active_census_employees.each do |employee| %>
+          <tr class="employee">
+            <td><%= employee.first_name %></td>
+            <td><%= employee.last_name %></td>
+            <td><%= employee.employee_relationship %></td>
+          </tr>
+          <% employee.census_dependents.each do |dependent| %>
+            <tr class="dependent">
+              <td><%= dependent.first_name %></td>
+              <td><%= dependent.last_name %></td>
+              <td><%= dependent.employee_relationship %></td>
+            </tr>
+          <% end %>
+      <% end %>
+    </table>
+  </div>
+</div>

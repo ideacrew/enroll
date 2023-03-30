@@ -13,7 +13,7 @@ class SponsoredBenefits::Services::PlanCostService
   end
 
   def reference_plan
-    if plan &. dental? && @benefit_group &. dental_reference_plan_id.present?
+    if plan&.dental? && @benefit_group&.dental_reference_plan_id.present?
       @dental_reference_plan ||= Plan.find(@benefit_group.dental_reference_plan_id)
     else
       @reference_plan ||= Plan.find(@reference_plan_id)
@@ -114,14 +114,27 @@ class SponsoredBenefits::Services::PlanCostService
 
   def osse_subsidy_amount(member, census_employee)
     return 0.00 if plan.dental?
-    return 0.00 unless census_employee.id == member.id
-    return 0.00 unless @benefit_group.benefit_application&.osse_eligible?
+    return 0.00 unless (census_employee.id == member.id) && is_osse_eligible?
 
     Rails.cache.fetch("osse_subsidy_for_#{census_employee.id}_#{lcsp.id}", expires_in: 15.minutes) do
       coverage_age = age_of(census_employee)
       value = rate_lookup(coverage_age, member, census_employee, lcsp)
       BigDecimal(value.to_s).round(2).to_f
     end
+  end
+
+  def total_employee_cost(census_employee)
+    members(census_employee).reduce(0.00) do |sum, member|
+      (sum + employee_cost_for(member, census_employee)).round(2)
+    end.round(2)
+  end
+
+  def total_osse_subsidy_amount
+    subsidy_amount = active_census_employees.inject(0.00) do |acc, census_employee|
+      acc + osse_subsidy_amount(census_employee, census_employee)
+    end
+
+    BigDecimal(subsidy_amount.to_s).round(2)
   end
 
   def max_employer_contribution(member, census_employee)
@@ -233,5 +246,9 @@ class SponsoredBenefits::Services::PlanCostService
 
   def start_on
     @start_on ||= benefit_group.start_on
+  end
+
+  def is_osse_eligible?
+    @benefit_group.benefit_application&.osse_eligible?
   end
 end
