@@ -399,6 +399,10 @@ And(/^Primary broker clicks on show details in employee costs section$/) do
   find(BrokerCreateQuotePage.show_employee_details).click
 end
 
+And(/^Primary broker should see employee costs download pdf button$/) do
+  expect(find_all('a.downloadEmployeeCostsDetailsButton').count).to eq 1
+end
+
 And(/^Primary broker selects reference plan$/) do
   find(BrokerCreateQuotePage.reference_plan_radio).click
 end
