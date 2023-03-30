@@ -1,7 +1,9 @@
+<% plan_export_default_class ||= "plan-not-saved" %>
+<% plan ||= @service.reference_plan %>
 <% kind ||= "health" %>
 <% benefit_group_costs ||= @benefit_group_costs %>
 <div class="row">
-  <div id="scroll_container" class="col-xs-12">
+  <div id="scroll_container" class="col-md-8">
     <div>
       <label class="plan-offerings">Plan Offerings - <%= render_plan_offerings(benefit_group, kind) %></label>
     </div>
@@ -13,7 +15,13 @@
           <div><%= l10n('highest_cost_plan') %> - <%= benefit_group_costs[:highest_plan_name] %> - <%= number_to_currency(benefit_group_costs[:highest_plan_employer_cost]) %></div>            
       <% end %>
     </div>
-    <br />
+  </div>
+  <div id="scroll_container" class="col-md-4">
+    <div class="text-center">
+      <a class="btn btn-default <%= plan_export_default_class %> downloadEmployeeCostsDetailsButton <%= disable_employee_costs_download? ? " hidden" : " enabled" %>" data-kind=<%= plan.coverage_kind %> onclick="downloadPdf(event, this)" href=<%= sponsored_benefits.employee_costs_organizations_plan_design_proposal_plan_exports_path(@plan_design_proposal) %>>Download PDF</a>
+    </div>
+  </div>
+  <div id="scroll_container" class="col-md-12">
     <table class="table table-bg-white table-employee-2">
       <thead>
         <tr>
