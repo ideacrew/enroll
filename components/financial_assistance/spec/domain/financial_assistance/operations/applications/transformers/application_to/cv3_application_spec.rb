@@ -14,6 +14,11 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   let(:applicant2_has_eligible_health_coverage) { false }
   let(:applicant1_is_applying_coverage) { true }
 
+  let(:applicant1_has_job_income) { false }
+  let(:applicant1_has_self_employment_income) { false }
+  let(:applicant1_has_unemployment_income) { false }
+  let(:applicant1_has_other_income) { false }
+
   let!(:applicant) do
     applicant = FactoryBot.create(:applicant,
                                   :with_student_information,
@@ -33,10 +38,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                   is_pregnant: false,
                                   is_primary_caregiver: true,
                                   is_primary_caregiver_for: [],
-                                  has_job_income: false,
-                                  has_self_employment_income: false,
-                                  has_unemployment_income: false,
-                                  has_other_income: false,
+                                  has_job_income: applicant1_has_job_income,
+                                  has_self_employment_income: applicant1_has_self_employment_income,
+                                  has_unemployment_income: applicant1_has_unemployment_income,
+                                  has_other_income: applicant1_has_other_income,
                                   has_deductions: false,
                                   is_self_attested_disabled: true,
                                   is_physically_disabled: false,
@@ -1821,6 +1826,70 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     it 'returns false for has_eligible_health_coverage for applicant entity' do
       expect(applicant.has_eligible_health_coverage).to eq(true)
       expect(applicant_entity.has_eligible_health_coverage).to eq(false)
+    end
+  end
+
+  describe 'has_job_income' do
+    let(:applicant1_has_job_income) { true }
+    let(:applicant1_is_applying_coverage) { true }
+
+    let(:operation_result) { subject.call(application.reload) }
+    let(:application_entity) do
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
+    end
+    let(:applicant_entity) { application_entity.applicants.first }
+
+    it 'returns false for has_job_income for applicant entity' do
+      expect(applicant.has_job_income).to eq(true)
+      expect(applicant_entity.has_job_income).to eq(false)
+    end
+  end
+
+  describe 'has_self_employment_income' do
+    let(:applicant1_has_self_employment_income) { true }
+    let(:applicant1_is_applying_coverage) { true }
+
+    let(:operation_result) { subject.call(application.reload) }
+    let(:application_entity) do
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
+    end
+    let(:applicant_entity) { application_entity.applicants.first }
+
+    it 'returns false for has_self_employment_income for applicant entity' do
+      expect(applicant.has_self_employment_income).to eq(true)
+      expect(applicant_entity.has_self_employment_income).to eq(false)
+    end
+  end
+
+  describe 'has_unemployment_income' do
+    let(:applicant1_has_unemployment_income) { true }
+    let(:applicant1_is_applying_coverage) { true }
+
+    let(:operation_result) { subject.call(application.reload) }
+    let(:application_entity) do
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
+    end
+    let(:applicant_entity) { application_entity.applicants.first }
+
+    it 'returns false for has_unemployment_income for applicant entity' do
+      expect(applicant.has_unemployment_income).to eq(true)
+      expect(applicant_entity.has_unemployment_income).to eq(false)
+    end
+  end
+
+  describe 'has_other_income' do
+    let(:applicant1_has_other_income) { true }
+    let(:applicant1_is_applying_coverage) { true }
+
+    let(:operation_result) { subject.call(application.reload) }
+    let(:application_entity) do
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
+    end
+    let(:applicant_entity) { application_entity.applicants.first }
+
+    it 'returns false for has_other_income for applicant entity' do
+      expect(applicant.has_other_income).to eq(true)
+      expect(applicant_entity.has_other_income).to eq(false)
     end
   end
 
