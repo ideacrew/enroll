@@ -154,6 +154,8 @@ module FinancialAssistance
               application.applicants.inject([]) do |result, applicant|
                 mitc_eligible_incomes = eligible_incomes_for_mitc(applicant)
                 prior_insurance_benefit = prior_insurance(applicant)
+                enrolled_benefits = enrolled_health_coverage?(applicant)
+                eligible_benefits = eligible_health_coverage?(applicant)
                 result << {name: name(applicant),
                            identifying_information: identifying_information(applicant),
                            demographic: demographic(applicant),
@@ -203,8 +205,8 @@ module FinancialAssistance
                            has_unemployment_income: applicant.has_unemployment_income.present?,
                            has_other_income: applicant.has_other_income.present?,
                            has_deductions: applicant.has_deductions.present?,
-                           has_enrolled_health_coverage: applicant.has_enrolled_health_coverage.present?,
-                           has_eligible_health_coverage: applicant.has_eligible_health_coverage.present?,
+                           has_enrolled_health_coverage: enrolled_benefits,
+                           has_eligible_health_coverage: eligible_benefits,
                            job_coverage_ended_in_past_3_months: applicant.has_dependent_with_coverage.present?,
                            job_coverage_end_date: applicant.dependent_job_end_on,
                            medicaid_and_chip: medicaid_and_chip(applicant),
@@ -214,7 +216,7 @@ module FinancialAssistance
                            emails: emails(applicant),
                            phones: phones(applicant),
                            incomes: incomes(applicant),
-                           benefits: benefits(applicant),
+                           benefits: benefits(applicant, enrolled_benefits, eligible_benefits),
                            deductions: deductions(applicant),
                            is_medicare_eligible: applicant.enrolled_or_eligible_in_any_medicare?,
                            # Does this person need help with daily life activities, such as dressing or bathing?
@@ -677,12 +679,30 @@ module FinancialAssistance
               end
             end
 
-            def benefits_eligible_for_determination(applicant)
-              kinds_query = if applicant.has_enrolled_health_coverage? && applicant.has_eligible_health_coverage?
+            # Return false if
+            #  1. the has_enrolled_health_coverage is set to false (or)
+            #  2. the applicant does not have enrolled benefits
+            def enrolled_health_coverage?(applicant)
+              return false if applicant.has_enrolled_health_coverage.blank?
+
+              applicant.benefits.enrolled.present?
+            end
+
+            # Return false if
+            #  1. the has_eligible_health_coverage is set to false (or)
+            #  2. the applicant does not have eligible benefits
+            def eligible_health_coverage?(applicant)
+              return false if applicant.has_eligible_health_coverage.blank?
+
+              applicant.benefits.eligible.present?
+            end
+
+            def benefits_eligible_for_determination(applicant, enrolled_benefits, eligible_benefits)
+              kinds_query = if enrolled_benefits && eligible_benefits
                               {}
-                            elsif applicant.has_enrolled_health_coverage? && !applicant.has_eligible_health_coverage?
+                            elsif enrolled_benefits && !eligible_benefits
                               { kind: :is_enrolled }
-                            elsif !applicant.has_enrolled_health_coverage? && applicant.has_eligible_health_coverage?
+                            elsif !enrolled_benefits && eligible_benefits
                               { kind: :is_eligible }
                             else
                               { :kind.nin => [:is_enrolled, :is_eligible] }
@@ -691,8 +711,8 @@ module FinancialAssistance
               applicant.benefits.where(kinds_query)
             end
 
-            def benefits(applicant)
-              benefits_eligible_for_determination(applicant).inject([]) do |result, benefit|
+            def benefits(applicant, enrolled_benefits, eligible_benefits)
+              benefits_eligible_for_determination(applicant, enrolled_benefits, eligible_benefits).inject([]) do |result, benefit|
                 result << { name: benefit.title,
                             kind: benefit.insurance_kind,
                             status: benefit.kind,
@@ -741,13 +761,13 @@ module FinancialAssistance
               applicant_hbx_ids = application.applicants.pluck(:person_hbx_id)
               # return Failure("Applicants do not match family members") unless  family_member_hbx_ids.to_set == applicant_hbx_ids.to_set
               premiums = ::Operations::Products::Fetch.new.call({family: family, effective_date: application.effective_date})
-              return premiums if premiums.failure?
+              return build_zero_member_premiums(applicant_hbx_ids) if premiums.failure?
 
               slcsp_info = ::Operations::Products::FetchSlcsp.new.call(member_silver_product_premiums: premiums.success)
-              return slcsp_info if slcsp_info.failure?
+              return build_zero_member_premiums(applicant_hbx_ids) if slcsp_info.failure?
 
               lcsp_info = ::Operations::Products::FetchLcsp.new.call(member_silver_product_premiums: premiums.success)
-              return lcsp_info if lcsp_info.failure?
+              return build_zero_member_premiums(applicant_hbx_ids) if lcsp_info.failure?
 
               slcsp_member_premiums = applicant_hbx_ids.each_with_object([]) do |applicant_hbx_id, result|
                 next applicant_hbx_id unless slcsp_info.success[applicant_hbx_id].present?
@@ -762,6 +782,15 @@ module FinancialAssistance
               end.compact
 
               Success({ health_only_lcsp_premiums: lcsp_member_premiums, health_only_slcsp_premiums: slcsp_member_premiums })
+            end
+
+            # return zero premiums only when there is a failure monad
+            def build_zero_member_premiums(applicant_hbx_ids)
+              member_premiums = applicant_hbx_ids.collect do |applicant_hbx_id|
+                {cost: 0.0, member_identifier: applicant_hbx_id, monthly_premium: 0.0}
+              end.compact
+
+              Success({ health_only_lcsp_premiums: member_premiums, health_only_slcsp_premiums: member_premiums })
             end
 
             # Physical households(mitc_households) are groups based on the member's Home Address.

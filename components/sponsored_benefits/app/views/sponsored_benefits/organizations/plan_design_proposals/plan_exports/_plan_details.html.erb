@@ -10,57 +10,10 @@
       <p>Costs are based on the roster associated with this quote: <%= plan_design_proposal.active_census_employees.count %> employee(s) and <%= plan_design_proposal.active_census_familes.count %> families</p>
     </div>
   </div>
-  <div class="row">
-    <div class="panel col-xs-12">
-      <table class="table table-striped">
-        <tr>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>Relationship Name</th>
-        </tr>
-        <% plan_design_proposal.active_census_employees.each do |employee| %>
-          <tr class="employee">
-            <td><%= employee.first_name %></td>
-            <td><%= employee.last_name %></td>
-            <td><%= employee.employee_relationship %></td>
-          </tr>
-          <% employee.census_dependents.each do |dependent| %>
-            <tr class="dependent">
-              <td><%= dependent.first_name %></td>
-              <td><%= dependent.last_name %></td>
-              <td><%= dependent.employee_relationship %></td>
-            </tr>
-          <% end %>
-        <% end %>
-      </table>
-    </div>
-  </div>
 
-  <div class="row">
-    <div class="panel col-xs-12">
-      <h5>Coverage Year: <%= sponsorship.initial_enrollment_period_to_s %></h5>
-      <table class="table table-striped">
-        <tr>
-          <th>Reference Plan</th>
-          <th>Carrier</th>
-          <th>Type</th>
-          <th>Metal Level</th>
-          <th><%= l10n('standard_plan') %></th>
-          <th>Offering By</th>
-        </tr>
-        <tbody>
-          <tr>
-            <td><%= @plan.name %></td>
-            <td><%= @plan.carrier_profile.legal_name %></td>
-            <td><%= @plan.plan_type.upcase %></td>
-            <td><%= @plan.metal_level.capitalize %></td>
-            <td><%= display_standard_plan(@plan) %></td>
-            <td><%= Settings.plan_option_titles.send(@benefit_group.plan_option_kind.to_sym) %></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+  <%= render 'employees_list', plan_design_proposal: plan_design_proposal %>
+  <%= render 'reference_plan', sponsorship: sponsorship %>
+
   <div class="row">
     <div class="panel col-xs-12">
       <% if @benefit_group.plan_option_kind != 'sole_source' %>
@@ -98,6 +51,7 @@
       </div>
     </div>
   </div>
+
   <% if sbc_included %>
     <%= render 'sponsored_benefits/organizations/plan_design_proposals/plan_comparisons/export', qhps: @qhps, single_plan_displayed: true %>
   <% end %>
@@ -125,7 +79,6 @@
       </table>
     </div>
   </div>
-
   <div class="row">
     <div class="panel col-xs-12">
       <%= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_traditional_costs', relationship_benefits: @benefit_group.dental_relationship_benefits, coverage_kind: :dental %>

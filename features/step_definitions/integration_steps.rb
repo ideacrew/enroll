@@ -1029,6 +1029,12 @@ end
 
 When(/Primary Broker clicks the Employers tab/) do
   find(BrokerHomePage.employers_tab, wait: 5).click
+  sleep 2
+  wait_for_ajax
+end
+
+When(/Primary Broker clicks Back to All Quotes/) do
+  find(BrokerCreateQuotePage.back_to_all_quotes).click
   wait_for_ajax
 end
 
