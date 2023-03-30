@@ -387,6 +387,22 @@ And(/^Primary Broker should see HC4CC option$/) do
   expect(page).to have_css('.panel', text: 'Healthcare4Childcare (HC4CC) Program')
 end
 
+Then(/^Primary broker should see plan names in employee costs$/) do
+  expect(page).to have_content(/Lowest Cost Plan/)
+end
+
+Then(/^Primary broker should see total HC4CC subcidy applied amount$/) do
+  expect(page).to have_content(/Total HC4CC Subcidy Applied/)
+end
+
+And(/^Primary broker clicks on show details in employee costs section$/) do
+  find(BrokerCreateQuotePage.show_employee_details).click
+end
+
+And(/^Primary broker selects reference plan$/) do
+  find(BrokerCreateQuotePage.reference_plan_radio).click
+end
+
 Then(/^Primary Broker selects quote as HC4CCC quote$/) do
   find('#forms_plan_design_proposal_osse_eligibility_true').click
   wait_for_ajax
