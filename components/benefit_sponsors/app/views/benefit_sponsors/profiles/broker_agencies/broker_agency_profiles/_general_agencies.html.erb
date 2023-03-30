@@ -4,7 +4,7 @@
       <h3 class="title-inline"><%= l10n("general_agencies")%></h3>
 
       <%= pundit_span @broker_agency_profile, :set_default_ga?%>
-      <%= sanitize link_to "#{l10n("clear_default_ga")}", '#', data: {toggle: "modal", target: "#clear_ga_confirm"}, class: 'btn btn-default btn-default pull-right' %>
+      <%= link_to "#{l10n("clear_default_ga")}", '#', data: {toggle: "modal", target: "#clear_ga_confirm"}, class: 'btn btn-default btn-default pull-right' %>
       </span>
       <div class="modal fade" id="clear_ga_confirm" tabindex="-1" role="dialog" aria-labelledby="ClearGAConfirm" role="document">
         <div class="modal-dialog">
@@ -20,7 +20,7 @@
               </p>
             </div>
             <div class="modal-footer">
-              <%= sanitize link_to "#{l10n("confirm")}", sponsored_benefits.clear_default_organizations_general_agency_profiles_path(broker_agency_profile_id: @broker_agency_profile.id, type: 'clear'), method: :post, remote: true, class: 'btn btn-primary' %>
+              <%= link_to "#{l10n("confirm")}", sponsored_benefits.clear_default_organizations_general_agency_profiles_path(broker_agency_profile_id: @broker_agency_profile.id, type: 'clear'), method: :post, remote: true, class: 'btn btn-primary' %>
               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
 
