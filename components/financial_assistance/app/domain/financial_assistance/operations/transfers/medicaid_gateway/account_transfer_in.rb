@@ -296,6 +296,7 @@ module FinancialAssistance
               citizen_status_info = applicant_hash['citizenship_immigration_status_information']
               foster_info = applicant_hash['foster_care']
               address_result = same_address_with_primary(family_member, primary)
+              phones = valid_applicant_phones(applicant_hash['phones'])
               return address_result unless address_result.success?
               sanitize_params << {
                 family_member_id: family_member.id,
@@ -383,7 +384,7 @@ module FinancialAssistance
 
                 addresses: applicant_hash['addresses'],
                 emails: applicant_hash['emails'],
-                phones: applicant_hash['phones'],
+                phones: phones,
                 incomes: applicant_hash['incomes'],
                 benefits: applicant_hash['benefits'],
                 deductions: applicant_hash['deductions'],
@@ -404,6 +405,15 @@ module FinancialAssistance
             Success(sanitize_params)
           rescue StandardError => e
             Failure("sanitize_applicant_params: #{e}")
+          end
+
+          def valid_applicant_phones(phones)
+            phones.map do |phone|
+              valid_phone_params = phone.slice("kind", "country_code", "area_code", "number", "extension", "primary", "full_phone_number")
+              invalid_phone = FinancialAssistance::Locations::Phone.new(valid_phone_params).invalid? || phone['full_phone_number']&.first == '0' || phone['area_code']&.first == '0'
+              next if invalid_phone
+              valid_phone_params
+            end.compact
           end
 
           def sanitize_person_params(family_member_hash)
