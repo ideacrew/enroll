@@ -25,5 +25,6 @@ Feature: Broker HC4CC quote creation
     And Primary broker selects reference plan
     And Primary broker clicks on show details in employee costs section
     Then Primary broker should see plan names in employee costs
+    Then Primary broker should see employee costs download pdf button
     Then Primary broker should see total HC4CC subcidy applied amount
     And Primary broker publishes the quote and sees successful message of published quote
