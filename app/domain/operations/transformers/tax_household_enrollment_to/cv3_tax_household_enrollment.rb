@@ -23,7 +23,7 @@ module Operations
           {
             hbx_id: @tax_household.hbx_assigned_id.to_s,
             max_aptc: money_to_currency(@tax_household.max_aptc),
-            yearly_expected_contribution: @tax_household.yearly_expected_contribution&.to_hash
+            yearly_expected_contribution: money_to_currency(@tax_household.yearly_expected_contribution)
           }
         end
 
