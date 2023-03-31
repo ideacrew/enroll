@@ -155,11 +155,10 @@ module Effective
       end
 
       def check_employer_osse_eligibility(employer)
-        org = BenefitSponsors::Organizations::Organization.where(fein: employer.fein).first
-        bs = org&.active_benefit_sponsorship
-        effective_on = bs&.active_benefit_application&.effective_period&.min if org.present?
+        bs = employer.employer_profile.organization.active_benefit_sponsorship
+        effective_on = bs&.dt_display_benefit_application&.effective_period&.min if bs.present?
         osse_eligibility = bs&.eligibility_for(:osse_subsidy, effective_on) if effective_on.present?
-        osse_eligibility || false
+        osse_eligibility.present?
       end
     end
   end
