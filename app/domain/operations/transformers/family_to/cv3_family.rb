@@ -58,7 +58,7 @@ module Operations
           return unless EnrollRegistry.feature_enabled?(:financial_assistance)
           return [] if exclude_applications
 
-          applications = ::FinancialAssistance::Application.where(family_id: family.id).where(:aasm_state.in => ["determined"])
+          applications = ::FinancialAssistance::Application.where(family_id: family.id).determined
           transformed_applications = applications.collect do |application|
             ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
           end.compact
