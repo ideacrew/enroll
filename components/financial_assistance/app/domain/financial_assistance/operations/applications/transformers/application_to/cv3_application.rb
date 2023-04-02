@@ -246,6 +246,8 @@ module FinancialAssistance
             # rubocop:enable Metrics/MethodLength
 
             def evidence_info(applicant_evidence)
+              return if applicant_evidence.nil?
+
               {
                 key: applicant_evidence.key,
                 title: applicant_evidence.title,
