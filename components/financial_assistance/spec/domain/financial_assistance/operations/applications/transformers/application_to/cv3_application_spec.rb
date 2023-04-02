@@ -2208,4 +2208,54 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
     end
   end
+
+  describe 'with local_mec_evidence' do
+    let(:operation_result) { subject.call(application.reload) }
+    let(:application_entity) do
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
+    end
+    let(:applicant_entity) { application_entity.applicants.first }
+
+    let!(:local_mec_evidence) do
+      evidence = applicant.create_local_mec_evidence(
+        {
+          key: :local_mec,
+          title: "Local Mec",
+          aasm_state: 'pending',
+          due_on: Date.today,
+          verification_outstanding: true,
+          is_satisfied: false
+        }
+      )
+
+      evidence.request_results.create(
+        {
+          result: 'eligible',
+          source: 'CHIP',
+          code: '7314',
+          code_description: code_description
+        }
+      )
+    end
+
+    let(:result_code_description) { applicant_entity.local_mec_evidence.request_results.first.code_description }
+
+    context 'with code_description' do
+      let(:code_description) { TimeKeeper.date_of_record }
+
+      it 'returns success' do
+        expect(operation_result).to be_success
+        expect(result_code_description).to be_a(String)
+      end
+    end
+
+    context 'without code_description' do
+      let(:code_description) { nil }
+
+      it 'returns success' do
+        expect(operation_result).to be_success
+        expect(result_code_description).to be_nil
+      end
+    end
+  end
 end
