@@ -13,6 +13,8 @@ require 'xml_security/document'
 module OneLogin
   module RubySaml
     class SamlGenerator < SamlMessage
+      include FloatHelper
+
       REQUIRED_ATTRIBUTES = ['Payment Transaction ID', 'Market Indicator', 'Assigned QHP Identifier', 'Total Amount Owed', 'Premium Amount Total', 'APTC Amount',
                              'Proposed Coverage Effective Date', 'First Name', 'Last Name', 'Street Name 1', 'Street Name 2', 'City Name', 'State', 'Zip Code',
                              'Contact Email Address', 'Subscriber Identifier', 'Additional Information'].freeze
@@ -128,7 +130,7 @@ module OneLogin
         when 'Assigned QHP Identifier'
           hbx_enrollment.product.hios_id.gsub('-', '')
         when 'Total Amount Owed'
-          hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f
+          round_down_float_two_decimals(hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f)
         when 'Premium Amount Total'
           hbx_enrollment.total_premium
         when 'APTC Amount'
