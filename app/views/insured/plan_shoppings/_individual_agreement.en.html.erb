@@ -5,24 +5,29 @@
       <tr>
         <td>
           <h3><%= l10n("insured.individual_agreement.agreement.title") %></h3>
-          <p>
-            <%= l10n("insured.individual_agreement.non_aptc",
-              site_short_name: site_short_name,
-              coverage_year: locals[:coverage_year],
-              contact_center_name: contact_center_name,
-              contact_center_phone_number: contact_center_phone_number,
-              contact_center_tty_number: contact_center_tty_number) %>
-            <% if EnrollRegistry.feature_enabled?(:extended_aptc_individual_agreement_message) && locals[:aptc_present].present? == true %>
-                <%= l10n("insured.individual_agreement.aptc_present",
-                  site_short_name: site_short_name,
-                  coverage_year: locals[:coverage_year],
-                  contact_center_name: contact_center_name,
-                  contact_center_phone_number: contact_center_phone_number,
-                  contact_center_tty_number: contact_center_tty_number) %>
-            <% end %>
-            <%= check_box_tag 'terms_check_thank_you' %>
-            <h4 class="agree"><%= l10n("insured.individual_agreement.agreement.i_agree") %></h4>
-          </p>
+          <p><%= l10n("insured.individual_agreement.agreement.report_changes", contact_center_name: contact_center_name, contact_center_phone_number: contact_center_phone_number) %></p>
+          <p><%= l10n("insured.individual_agreement.agreement.i_am_signature") %></p>
+          <p><%= l10n("insured.individual_agreement.agreement.reviewed_info") %></p>
+          <% if EnrollRegistry.feature_enabled?(:extended_aptc_individual_agreement_message) && locals[:aptc_present].present? == true %>
+            <% cov_year = locals[:coverage_year] %>
+            <p><%= l10n("insured.individual_agreement.agreement.aptc.on_my_behalf") %></p>
+            <ul>
+              <li><%= l10n("insured.individual_agreement.agreement.aptc.on_my_behalf.file_return", coverage_year: cov_year)%></li>
+              <li><%= l10n("insured.individual_agreement.agreement.aptc.on_my_behalf.if_married_file", coverage_year: cov_year) %></li>
+            </ul>
+            <p><%= l10n("insured.individual_agreement.agreement.aptc.i_expect") %></p>
+            <ul>
+              <li><%= l10n("insured.individual_agreement.agreement.aptc.i_expect.not_dependent", coverage_year: cov_year) %></li>
+              <li><%= l10n("insured.individual_agreement.agreement.aptc.i_expect.claim_dependents", coverage_year: cov_year, site_short_name: site_short_name) %></li>
+            </ul>
+            <p><%= l10n("insured.individual_agreement.agreement.aptc.if_changes") %></p>
+            <ul>
+              <li><%= l10n("insured.individual_agreement.agreement.aptc.if_changes.impact_credit") %></li>
+              <li><%= l10n("insured.individual_agreement.agreement.aptc.if_changes.irs_compares", coverage_year: cov_year) %></li>
+            </ul>
+          <% end %>
+          <%= check_box_tag 'terms_check_thank_you' %>
+          <h4 class="agree"><%= l10n("insured.individual_agreement.agreement.i_agree") %></h4>
         </td>
       </tr>
 
