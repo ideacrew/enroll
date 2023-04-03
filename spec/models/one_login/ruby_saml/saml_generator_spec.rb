@@ -176,5 +176,20 @@ module OneLogin
         expect(saml_generator.send(:embed_custom_xml?)).to eq nil
       end
     end
+
+    context '#set_attribute_values' do
+      let(:premium_amount) { 454.80999999999995 }
+      let(:applied_aptc_amount) { 0.00 }
+      let(:expected_total_amount_owed) { 454.81 } # premium_amount - applied_aptc_amount
+
+      before :each do
+        allow(hbx_enrollment).to receive(:total_premium).and_return(premium_amount)
+        allow(hbx_enrollment).to receive(:applied_aptc_amount).and_return(applied_aptc_amount)
+      end
+
+      it 'should retun rounded total amount owed' do
+        expect(saml_generator.set_attribute_values('Total Amount Owed', hbx_enrollment)).to eq expected_total_amount_owed
+      end
+    end
   end
 end
