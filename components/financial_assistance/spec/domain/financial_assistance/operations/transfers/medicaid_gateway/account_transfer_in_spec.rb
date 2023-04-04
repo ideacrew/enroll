@@ -120,7 +120,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         end
       end
 
-      context 'applicant has an invalid phone number' do
+      context 'invalid phone number' do
         context 'where the phone number starts with 0' do
           before do
             zero_phone_xml = Nokogiri::XML(xml)
@@ -130,7 +130,16 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
             @result = subject.call(transformed)
           end
 
-          it 'should drop the invalid phone number' do
+          it 'should drop the invalid phone number for the person' do
+            person = Person.first
+            has_invalid_phone = person.phones.any? do |p|
+              p.area_code == '000' || p.full_phone_number == '0000000000'
+            end
+
+            expect(has_invalid_phone).to eq false
+          end
+
+          it 'should drop the invalid phone number for the applicant' do
             application = FinancialAssistance::Application.last
             has_invalid_phone = application.applicants.any? do |a|
               a.phones.detect { |p| p.area_code == '000' || p.full_phone_number == '0000000000' }
