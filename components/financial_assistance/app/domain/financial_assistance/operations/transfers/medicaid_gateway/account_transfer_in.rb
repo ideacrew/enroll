@@ -412,6 +412,7 @@ module FinancialAssistance
               valid_phone_params = phone.slice("kind", "country_code", "area_code", "number", "extension", "primary", "full_phone_number")
               invalid_phone = FinancialAssistance::Locations::Phone.new(valid_phone_params).invalid? || phone['full_phone_number']&.first == '0' || phone['area_code']&.first == '0'
               next if invalid_phone
+
               valid_phone_params
             end.compact
           end
@@ -453,11 +454,21 @@ module FinancialAssistance
               verification_types: person_hash['verification_types'],
               addresses: person_hash['addresses'],
               emails: person_hash['emails'],
-              phones: person_hash['phones']
+              phones: valid_person_phones(person_hash['phones'])
             }
             Success(phash)
           rescue StandardError => e
             Failure("build person hash #{e}")
+          end
+
+          def valid_person_phones(phones)
+            phones.map do |phone|
+              valid_phone_params = phone.slice("kind", "country_code", "area_code", "number", "extension", "primary", "full_phone_number")
+              invalid_phone = Phone.new(valid_phone_params).invalid? || phone['full_phone_number']&.first == '0' || phone['area_code']&.first == '0'
+              next if invalid_phone
+
+              valid_phone_params
+            end.compact
           end
 
           def transform_no_ssn(ssn)
