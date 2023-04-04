@@ -412,6 +412,7 @@ module FinancialAssistance
               valid_phone_params = phone.slice("kind", "country_code", "area_code", "number", "extension", "primary", "full_phone_number")
               invalid_phone = FinancialAssistance::Locations::Phone.new(valid_phone_params).invalid? || phone['full_phone_number']&.first == '0' || phone['area_code']&.first == '0'
               next if invalid_phone
+
               valid_phone_params
             end.compact
           end
@@ -465,6 +466,7 @@ module FinancialAssistance
               valid_phone_params = phone.slice("kind", "country_code", "area_code", "number", "extension", "primary", "full_phone_number")
               invalid_phone = Phone.new(valid_phone_params).invalid? || phone['full_phone_number']&.first == '0' || phone['area_code']&.first == '0'
               next if invalid_phone
+
               valid_phone_params
             end.compact
           end
