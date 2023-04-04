@@ -26,6 +26,26 @@ module SponsoredBenefits
                locals: { benefit_group: @benefit_group, plan_design_proposal: plan_design_proposal, qhps: @qhps, plan: @plan, visit_types: visit_types, sbc_included: sbc_included }
       end
 
+      def employee_costs
+        @plan_design_organization = plan_design_organization
+        find_or_build_benefit_group
+        @census_employees = sponsorship.census_employees
+        if @benefit_group
+          @service = SponsoredBenefits::Services::PlanCostService.new({benefit_group: @benefit_group})
+          @benefit_group.build_estimated_composite_rates if @benefit_group.sole_source?
+          @plan = @benefit_group.reference_plan
+          dental_plan = @benefit_group.dental_reference_plan
+          @benefit_group_costs = @benefit_group.employee_costs_for_reference_plan(@service)
+          @benefit_group_dental_costs = @benefit_group.employee_costs_for_reference_plan(@service, dental_plan) if dental_plan.present?
+          @qhps = ::Products::QhpCostShareVariance.find_qhp_cost_share_variances(plan_array(@plan), plan_design_proposal.effective_date.year, "Health")
+        end
+
+        render pdf: 'employee_cost_details_export', dpi: 72,
+               template: 'sponsored_benefits/organizations/plan_design_proposals/plan_exports/_employee_costs.html.erb',
+               disposition: 'attachment',
+               locals: { benefit_group: @benefit_group, plan_design_proposal: plan_design_proposal, qhps: @qhps, plan: @plan, visit_types: visit_types, sbc_included: sbc_included }
+      end
+
       private
         helper_method :plan_design_form, :plan_design_organization, :plan_design_proposal, :sponsorship, :visit_types
 

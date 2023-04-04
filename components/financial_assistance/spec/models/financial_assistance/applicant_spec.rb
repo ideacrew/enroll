@@ -1366,6 +1366,8 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
   describe 'enrolled_with' do
     let(:person) { FactoryBot.create(:person, :with_consumer_role)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let(:product) {double(id: '123', csr_variant_id: '01')}
+
     let!(:enrollment) do
       FactoryBot.create(
         :hbx_enrollment,
@@ -1391,6 +1393,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
+      allow(enrollment).to receive(:product).and_return(product)
       applicant.create_evidences
       applicant.create_eligibility_income_evidence
       applicant.income_evidence.move_to_pending!
@@ -1431,14 +1434,14 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       end
     end
 
-    context "when aptc is not applied on enrolment member" do
+    context "when aptc & csr are not applied on enrollment member" do
       context "when evidence is in pending state" do
-        it "move to unverified state" do
+        it "move to negative_response_received state" do
           applicant.enrolled_with(enrollment)
           FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
             evidence = applicant.send(evidence_type)
             expect(evidence.outstanding?).to eq false
-            expect(evidence.unverified?).to eq true
+            expect(evidence.negative_response_received?).to eq true
             expect(evidence.due_on).to eq nil
           end
         end
