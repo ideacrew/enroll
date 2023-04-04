@@ -27,6 +27,11 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         @result = subject.call(@transformed)
       end
 
+      it 'should set the transferred_at field'  do
+        app = FinancialAssistance::Application.find(@result.value!)
+        expect(app.transferred_at).not_to eq nil
+      end
+
       context 'load_county_on_inbound_transfer feature is enabled' do
         it 'should return success if zips with county are present in database' do
           expect(@result).to be_success
@@ -115,9 +120,25 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         end
       end
 
-      it 'should set the transferred_at field'  do
-        app = FinancialAssistance::Application.find(@result.value!)
-        expect(app.transferred_at).not_to eq nil
+      context 'applicant has an invalid phone number' do
+        context 'where the phone number starts with 0' do
+          before do
+            zero_phone_xml = Nokogiri::XML(xml)
+            zero_phone_xml.xpath("//ns3:TelephoneNumberFullID", {"ns3" => "http://niem.gov/niem/niem-core/2.0"}).first.content = '0000000000'
+            record = serializer.parse(zero_phone_xml)
+            transformed = transformer.transform(record.to_hash(identifier: true)).deep_stringify_keys!
+            @result = subject.call(transformed)
+          end
+
+          it 'should drop the invalid phone number' do
+            application = FinancialAssistance::Application.last
+            has_invalid_phone = application.applicants.any? do |a|
+              a.phones.detect { |p| p.area_code == '000' || p.full_phone_number == '0000000000' }
+            end
+
+            expect(has_invalid_phone).to eq false
+          end
+        end
       end
     end
   end
