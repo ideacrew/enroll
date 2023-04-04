@@ -138,6 +138,17 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
     let!(:primary_bp) { 500.00 }
     let!(:benchmark_premium) { primary_bp }
     let!(:enrollment) {FactoryBot.create(:hbx_enrollment, :individual_assisted, family: family, product: product, consumer_role_id: person.consumer_role.id, rating_area_id: rating_area.id)}
+    let!(:thhm_enrollment_members) do
+      enrollment.hbx_enrollment_members.each do |member|
+        tax_household_member = tax_household.tax_household_members.where(applicant_id: member.applicant_id).first
+        FactoryBot.build(:tax_household_member_enrollment_member, hbx_enrollment_member_id: member.id, family_member_id: member.applicant_id, tax_household_member_id: tax_household_member.id)
+      end
+    end
+    let!(:thhe) do
+      FactoryBot.create(:tax_household_enrollment, enrollment_id: enrollment.id, tax_household_id: tax_household.id,
+                                                   health_product_hios_id: enrollment.product.hios_id,
+                                                   dental_product_hios_id: nil, tax_household_members_enrollment_members: thhm_enrollment_members)
+    end
 
     before :each do
       allow(::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts).to receive(:new).and_return(
@@ -155,11 +166,19 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       family.save!
       EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
       allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1500, total_premium: 1600))
+      @reinstate_enrollment = enrollment.reinstate
     end
 
     it "should create tax household enrollment" do
-      reinstate_enrollment = enrollment.reinstate
-      expect(TaxHouseholdEnrollment.where(enrollment_id: reinstate_enrollment.id).present?).to be_truthy
+      expect(TaxHouseholdEnrollment.where(enrollment_id: @reinstate_enrollment.id).present?).to be_truthy
+    end
+
+    it "should not have same bson id" do
+      expect(TaxHouseholdEnrollment.where(enrollment_id: @reinstate_enrollment.id).first.id).not_to be thhe.id
+    end
+
+    it "should not have same tax household enrollment id"  do
+      expect(TaxHouseholdEnrollment.where(enrollment_id: @reinstate_enrollment.id).first.enrollment_id).not_to be thhe.enrollment_id
     end
 
     after do

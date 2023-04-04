@@ -2028,10 +2028,10 @@ class HbxEnrollment
       new_thhe = thhe.copy(:object)
       new_thhe.enrollment_id = reinstate_enrollment.id
 
-      reinstate_enrollment.hbx_enrollment_members.each do |hbx_enrollment_member|
-        new_thhm_enrollment_member = new_thhe.tax_household_members_enrollment_members.where(family_member_id: hbx_enrollment_member.applicant_id)&.first
+      reinstate_enrollment.hbx_enrollment_members.each do |reinstate_enrollment_member|
+        new_thhm_enrollment_member = new_thhe.tax_household_members_enrollment_members.where(family_member_id: reinstate_enrollment_member.applicant_id)&.first
         next unless new_thhm_enrollment_member
-        new_thhm_enrollment_member.hbx_enrollment_member_id = hbx_enrollment_member.id
+        new_thhm_enrollment_member.hbx_enrollment_member_id = reinstate_enrollment_member.id
       end
 
       new_thhe.save
