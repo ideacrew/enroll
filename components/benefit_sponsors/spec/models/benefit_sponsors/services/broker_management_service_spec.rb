@@ -28,6 +28,13 @@ module BenefitSponsors
                                               direct_terminate: 'true',
                                               termination_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'))
                                             }
+    let(:general_agency_profile) do
+      FactoryBot.create(
+        :benefit_sponsors_organizations_general_organization,
+        :with_site,
+        :with_general_agency_profile
+      ).profiles.first
+    end
 
     before :each do
       active_benefit_sponsorship.save!
@@ -38,6 +45,7 @@ module BenefitSponsors
 
     describe 'for assign_agencies' do
       before :each do
+        broker_agency_profile1.update_attributes!(default_general_agency_profile_id: general_agency_profile.id)
         subject.assign_agencies(broker_management_form_create)
       end
 
