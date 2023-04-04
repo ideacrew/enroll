@@ -137,11 +137,20 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
 
     let!(:primary_bp) { 500.00 }
     let!(:benchmark_premium) { primary_bp }
-    let!(:enrollment) {FactoryBot.create(:hbx_enrollment, :individual_assisted, family: family, product: product, consumer_role_id: person.consumer_role.id, rating_area_id: rating_area.id)}
+    let(:dependents) { family.dependents }
+    let(:hbx_en_members) do
+      dependents.collect do |dependent|
+        FactoryBot.build(:hbx_enrollment_member,
+                         applicant_id: dependent.id)
+      end
+    end
+
+    let!(:enrollment) do
+      FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :individual_assisted, family: family, product: product, consumer_role_id: person.consumer_role.id, rating_area_id: rating_area.id, hbx_enrollment_members: hbx_en_members)
+    end
     let!(:thhm_enrollment_members) do
-      enrollment.hbx_enrollment_members.each do |member|
-        tax_household_member = tax_household.tax_household_members.where(applicant_id: member.applicant_id).first
-        FactoryBot.build(:tax_household_member_enrollment_member, hbx_enrollment_member_id: member.id, family_member_id: member.applicant_id, tax_household_member_id: tax_household_member.id)
+      enrollment.hbx_enrollment_members.collect do |member|
+        FactoryBot.build(:tax_household_member_enrollment_member, hbx_enrollment_member_id: member.id, family_member_id: member.applicant_id, tax_household_member_id: "123")
       end
     end
     let!(:thhe) do

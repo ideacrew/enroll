@@ -42,14 +42,24 @@ class TaxHouseholdEnrollment
     enrollment.family.tax_household_groups.flat_map(&:tax_households).detect{ |th| th.id.to_s == tax_household_id.to_s }
   end
 
-  # copy accepts one parameter
-  # @param type[#to_sym] The input is a value of [:attributes|:object]
-  #   if type is :attributes it returns attributes hash along with embedded docs
-  #   if type is :object it returns non persisted duplicate object with new bson id and without timestamp (also applicable to embedded docs)
-  def copy(type = :attributes)
+  def build_tax_household_enrollment_for(hbx_enrollment)
+    new_thhe_attributes = self.copy
+    new_thhm_enrollment_members = new_thhe_attributes[:tax_household_members_enrollment_members]
+
+    hbx_enrollment.hbx_enrollment_members.each do |enrollment_member|
+      new_thhm_enrollment_member = new_thhm_enrollment_members.select{|thhm_enrollment_member| thhm_enrollment_member[:family_member_id].to_s == enrollment_member.applicant_id.to_s}&.first
+      next unless new_thhm_enrollment_member
+      new_thhm_enrollment_member[:hbx_enrollment_member_id] = enrollment_member.id
+    end
+
+    new_thhe_attributes[:enrollment_id] = hbx_enrollment.id
+    self.class.new(new_thhe_attributes)
+  end
+
+  def copy
     thhm_enrollment_members = tax_household_members_enrollment_members.collect(&:copy)
 
-    attrs = {
+    {
       enrollment_id: enrollment_id,
       tax_household_id: tax_household_id,
       household_benchmark_ehb_premium: household_benchmark_ehb_premium&.to_d,
@@ -62,8 +72,5 @@ class TaxHouseholdEnrollment
       group_ehb_premium: group_ehb_premium&.to_d,
       tax_household_members_enrollment_members: thhm_enrollment_members
     }
-
-    return self.class.new(attrs) if type == :object
-    attrs
   end
 end
