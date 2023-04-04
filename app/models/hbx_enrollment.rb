@@ -2020,11 +2020,22 @@ class HbxEnrollment
     end
   end
 
-  def create_or_update_mthh_data(effective_date, reinstatement, elected_aptc_pct)
+  def reinstate_tax_household_enrollments(reinstate_enrollment)
     return if is_shop?
     return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
-    ::Insured::Factories::SelfServiceFactory.mthh_update_enrollment_for_aptcs(effective_date, reinstatement, elected_aptc_pct, nil)
+    TaxHouseholdEnrollment.by_enrollment_id(self.id).each do |thhe|
+      new_thhe = thhe.copy(:object)
+      new_thhe.enrollment_id = reinstate_enrollment.id
+
+      reinstate_enrollment.hbx_enrollment_members.each do |hbx_enrollment_member|
+        new_thhm_enrollment_member = new_thhe.tax_household_members_enrollment_members.where(family_member_id: hbx_enrollment_member.applicant_id)&.first
+        next unless new_thhm_enrollment_member
+        new_thhm_enrollment_member.hbx_enrollment_member_id = hbx_enrollment_member.id
+      end
+
+      new_thhe.save
+    end
   end
 
   # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
@@ -2036,7 +2047,6 @@ class HbxEnrollment
     can_renew = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: reinstate_enrollment})
 
     return false unless can_renew.success?
-    create_or_update_mthh_data(new_effective_date, reinstate_enrollment, self.elected_aptc_pct)
 
     if self.is_shop? && !prior_plan_year_coverage?
       census_employee = benefit_group_assignment.census_employee
@@ -2045,6 +2055,7 @@ class HbxEnrollment
 
     if reinstate_enrollment.may_reinstate_coverage?
       reinstate_enrollment.reinstate_coverage!
+      reinstate_tax_household_enrollments(reinstate_enrollment)
       # Move reinstated enrollment to "coverage selected" status
       reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage?
 
