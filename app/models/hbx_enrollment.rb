@@ -2038,12 +2038,10 @@ class HbxEnrollment
     end
   end
 
-  # rubocop:disable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
   def reinstate(edi: false)
     return false unless can_be_reinstated?
     return false if has_active_term_or_expired_exists_for_reinstated_date?
-    new_effective_date = fetch_reinstatement_date
-    reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(self, new_effective_date).build
+    reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(self, fetch_reinstatement_date).build
     can_renew = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: reinstate_enrollment})
 
     return false unless can_renew.success?
@@ -2082,7 +2080,6 @@ class HbxEnrollment
     end
     reinstate_enrollment
   end
-  # rubocop:enable Metrics/PerceivedComplexity, Metrics/CyclomaticComplexity
 
   def self.find_by_benefit_groups(benefit_groups = [])
     id_list = benefit_groups.collect(&:_id).uniq
