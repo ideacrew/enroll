@@ -130,7 +130,6 @@ describe 'daily_faa_submission_report' do
     end
 
     it 'should match with the applicant age' do
-      binding.irb
       expect(@file_content[1][2]).to eq(primary_applicant.age_of_the_applicant.to_s)
     end
 
