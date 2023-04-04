@@ -8,7 +8,7 @@ describe 'daily_faa_submission_report' do
   end
 
   let(:person_dob_year) { Date.today.year - 48 }
-  let!(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: Date.new(person_dob_year, 4, 4)) }
+  let!(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: Date.new(person_dob_year)) }
   let!(:person2) do
     member = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: (person.dob - 10.years))
     person.ensure_relationship_with(member, 'spouse')
@@ -130,6 +130,7 @@ describe 'daily_faa_submission_report' do
     end
 
     it 'should match with the applicant age' do
+      binding.irb
       expect(@file_content[1][2]).to eq(primary_applicant.age_of_the_applicant.to_s)
     end
 
