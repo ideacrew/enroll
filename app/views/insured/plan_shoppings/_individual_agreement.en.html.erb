@@ -1,51 +1,63 @@
 <div class="table-border table-responsive">
   <table class="table">
-
     <tbody>
-<!--       <tr>
-        <td><%= check_box_tag 'vote_check_thank_you' %> &nbsp;Register to Vote</td>
-      </tr> -->
+      <!-- <tr><td><%= check_box_tag 'vote_check_thank_you' %>Register to Vote</td></tr> -->
       <tr>
-
         <td>
-           <h3>Agreement</h3>
-           <%= l10n("insured.individual_agreement_non_aptc", site_short_name: site_short_name, coverage_year: locals[:coverage_year], contact_center_name: contact_center_name, contact_center_phone_number: contact_center_phone_number, contact_center_tty_number: contact_center_tty_number).html_safe %>
-           <% if EnrollRegistry.feature_enabled?(:extended_aptc_individual_agreement_message) && locals[:aptc_present].present? == true %>
-              <%= l10n("insured.individual_agreement_aptc_present", site_short_name: site_short_name, coverage_year: locals[:coverage_year], contact_center_name: contact_center_name, contact_center_phone_number: contact_center_phone_number, contact_center_tty_number: contact_center_tty_number).html_safe %>
-           <% end %>
-          <%= check_box_tag 'terms_check_thank_you' %> <h4 class="agree">I Agree</h4>
-          <br/><br/>
+          <h3><%= l10n("insured.individual_agreement.agreement.title") %></h3>
+          <p><%= l10n("insured.individual_agreement.agreement.report_changes", contact_center_name: contact_center_name, contact_center_phone_number: contact_center_phone_number) %></p>
+          <p><%= l10n("insured.individual_agreement.agreement.i_am_signature") %></p>
+          <p><%= l10n("insured.individual_agreement.agreement.reviewed_info") %></p>
+          <% if EnrollRegistry.feature_enabled?(:extended_aptc_individual_agreement_message) && locals[:aptc_present].present? == true %>
+            <% cov_year = locals[:coverage_year] %>
+            <p><%= l10n("insured.individual_agreement.agreement.aptc.on_my_behalf") %></p>
+            <ul>
+              <li><%= l10n("insured.individual_agreement.agreement.aptc.on_my_behalf.file_return", coverage_year: cov_year)%></li>
+              <li><%= l10n("insured.individual_agreement.agreement.aptc.on_my_behalf.if_married_file", coverage_year: cov_year) %></li>
+            </ul>
+            <p><%= l10n("insured.individual_agreement.agreement.aptc.i_expect") %></p>
+            <ul>
+              <li><%= l10n("insured.individual_agreement.agreement.aptc.i_expect.not_dependent", coverage_year: cov_year) %></li>
+              <li><%= l10n("insured.individual_agreement.agreement.aptc.i_expect.claim_dependents", coverage_year: cov_year, site_short_name: site_short_name) %></li>
+            </ul>
+            <p><%= l10n("insured.individual_agreement.agreement.aptc.if_changes") %></p>
+            <ul>
+              <li><%= l10n("insured.individual_agreement.agreement.aptc.if_changes.impact_credit") %></li>
+              <li><%= l10n("insured.individual_agreement.agreement.aptc.if_changes.irs_compares", coverage_year: cov_year) %></li>
+            </ul>
+          <% end %>
+          <%= check_box_tag 'terms_check_thank_you' %>
+          <h4 class="agree"><%= l10n("insured.individual_agreement.agreement.i_agree") %></h4>
         </td>
-
       </tr>
+
       <tr>
         <td>
-          <h3>Terms and Conditions</h3>
+          <h3><%= l10n("insured.individual_agreement.terms_conditions.title") %></h3>
+          <p><%= l10n("insured.individual_agreement.terms_conditions.cant_change_terms") %></p>
+          <p><%= l10n("insured.individual_agreement.terms_conditions.limitations") %></p>
+          <p><%= l10n("insured.individual_agreement.terms_conditions.collect_info", aca_state_name: aca_state_name) %></p>
+          <p><%= l10n("insured.individual_agreement.terms_conditions.best_of_knowledge") %></p>
+          <p><%= l10n("insured.individual_agreement.terms_conditions.contract") %></p>
+          <p><%= l10n("insured.individual_agreement.terms_conditions.insurer_agreement") %></p>
+          <p><%= l10n("insured.individual_agreement.terms_conditions.fraud_warning") %></p>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <h3><%= l10n("insured.individual_agreement.electronic_signature.title") %></h3>
+          <p><%= l10n("insured.individual_agreement.electronic_signature.desc") %></p>
           <p>
-            I chose this plan based upon written information provided by the insurer and nobody has my permission to change the terms of the offer or to agree to changes to it.</br></br>
-            I know that some plan benefits have limitations or maximums.</br></br>
-            I know that some personal information may be collected from other sources, such as <%= aca_state_name %> or federal databases that can verify information I provided.</br></br>
-            All of the information I provided on this application is true and complete to the best of my knowledge.</br></br>
-            I know that the plan contract will have in it the details of our agreement, including procedures, exclusions and limitations. No benefit comparison, summary or other description of the plan should be considered more correct than the contract in describing the details of the plan's services.</br></br>
-            I know that this application is part of the agreement or policy issued by the insurer. When I sign below, it means I agree to the terms and conditions of that agreement or policy.<br><br>
-            <strong>WARNING:</strong> It's a crime to provide false or misleading information to an insurer for the purpose of defrauding the insurer or any other person. Penalties include imprisonment and/or fines.
-            <br/><br/>
+            <%= text_field_tag 'first_name_thank_you', "", :placeholder => 'First Name *', :class => "thank_you_field"%>
+            <%= text_field_tag 'last_name_thank_you', "", :placeholder => 'Last Name *', :class => "thank_you_field"%>
           </p>
         </td>
       </tr>
 
-      <tr>
-        <td>
-          <h3>Electronic Signature</h3>
-          When I type my name below, it means I sign the form and promise that all of the information in it is true and complete to the best of my knowledge.
-          <br><br><%= text_field_tag 'first_name_thank_you', "", :placeholder=>'First Name *', :class=>"thank_you_field"%>
-          <%= text_field_tag 'last_name_thank_you', "", :placeholder => 'Last Name *', :class=>"thank_you_field"%>
-          <br/><br/>
-        </td>
-      </tr>
       <% person = @enrollment.try(:household).try(:family).try(:primary_applicant).try(:person) || @person %>
       <%= hidden_field_tag 'subscriber_first_name', person.first_name.downcase %>
       <%= hidden_field_tag 'subscriber_last_name', person.last_name.downcase %>
     </tbody>
   </table>
-</div><br>
+</div>

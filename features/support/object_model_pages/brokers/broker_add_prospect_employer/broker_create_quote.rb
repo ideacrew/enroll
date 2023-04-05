@@ -35,6 +35,14 @@ class BrokerCreateQuotePage
     '.download-employees.btn.btn-default.interaction-click-control-download-employee-roster'
   end
 
+  def self.show_employee_details
+    '.interaction-click-control-show-details'
+  end
+
+  def self.reference_plan_radio
+    '.col-xs-12.reference-plan'
+  end
+
   def self.back_to_all_quotes
     "[data-cuke='back_to_all_quotes']"
   end

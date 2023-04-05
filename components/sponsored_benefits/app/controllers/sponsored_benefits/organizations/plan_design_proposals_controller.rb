@@ -8,6 +8,7 @@ module SponsoredBenefits
 
     include Config::BrokerAgencyHelper
     include DataTablesAdapter
+    include SponsoredBenefits::L10nHelper
     before_action :load_plan_design_organization, except: [:destroy, :publish, :claim, :show]
     before_action :load_plan_design_proposal, only: [:edit, :update, :destroy, :publish, :show]
     before_action :published_plans_are_view_only, only: [:edit]
@@ -19,7 +20,6 @@ module SponsoredBenefits
     end
 
     def claim
-      # TODO FIXME: Raghuram suggested to move this action into employer_profiles_controller.rb in main app as the button exists in the employer portal.
       employer_profile_id = params.fetch(:employer_profile_id, nil)
       employer_profile = EmployerProfile.find(employer_profile_id)
       employer_profile ||=  BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId.from_string(employer_profile_id)).first
@@ -27,6 +27,10 @@ module SponsoredBenefits
       quote_claim_code = params.fetch(:claim_code, nil).try(:upcase)
 
       claim_code_status, quote = SponsoredBenefits::Organizations::PlanDesignProposal.claim_code_status?(quote_claim_code)
+
+      osse_quote = quote.osse_eligibility&.present? && EnrollRegistry.feature_enabled?(:broker_quote_hc4cc_subsidy)
+      effective_on = quote.profile.benefit_application.effective_period.min
+      employer_osse_eligible = employer_profile.active_benefit_sponsorship&.eligibility_for(:osse_subsidy, effective_on).present?
 
       error_message = quote.present? && aca_state_abbreviation == "MA" ? check_if_county_zip_are_same(quote, employer_profile) : " "
 
@@ -38,8 +42,12 @@ module SponsoredBenefits
         flash[:error] = "Quote claim code already claimed."
       else
         begin
-          SponsoredBenefits::Organizations::PlanDesignProposal.build_plan_year_from_quote(employer_profile, quote)
-          flash[:notice] = "Code claimed with success. Your Plan Year has been created."
+          if osse_quote && !employer_osse_eligible
+            flash[:notice] = l10n('osse_subsidy.unable_to_claim', contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item)
+          else
+            SponsoredBenefits::Organizations::PlanDesignProposal.build_plan_year_from_quote(employer_profile, quote)
+            flash[:notice] = "Code claimed with success. Your Plan Year has been created."
+          end
         rescue Exception => e
           flash[:error] = "There was an issue claiming this quote. #{e.to_s}"
         end

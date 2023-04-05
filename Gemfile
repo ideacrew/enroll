@@ -179,7 +179,6 @@ group :test do
   gem 'watir',                        '~> 6.10.3'
   gem 'webdrivers', '~> 3.0'
   gem 'webmock',                      '~> 3.0.1'
-  gem 'rspec-sidekiq'
 end
 
 group :production do
