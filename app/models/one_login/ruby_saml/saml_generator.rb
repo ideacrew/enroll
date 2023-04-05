@@ -130,7 +130,7 @@ module OneLogin
         when 'Assigned QHP Identifier'
           hbx_enrollment.product.hios_id.gsub('-', '')
         when 'Total Amount Owed'
-          round_down_float_two_decimals(hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f)
+          float_fix(hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f)
         when 'Premium Amount Total'
           hbx_enrollment.total_premium
         when 'APTC Amount'
