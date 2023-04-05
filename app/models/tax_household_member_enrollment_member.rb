@@ -12,4 +12,13 @@ class TaxHouseholdMemberEnrollmentMember
   field :date_of_birth, type: Date
 
   embedded_in :tax_household_enrollment, class_name: "::TaxHouseholdEnrollment"
+
+  def copy_attributes
+    {hbx_enrollment_member_id: hbx_enrollment_member_id,
+     tax_household_member_id: tax_household_member_id,
+     age_on_effective_date: age_on_effective_date,
+     family_member_id: family_member_id,
+     relationship_with_primary: relationship_with_primary,
+     date_of_birth: date_of_birth}
+  end
 end

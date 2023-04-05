@@ -153,6 +153,14 @@ Given(/^employer (.*?) has OSSE eligibilities$/) do |legal_name|
   org.active_benefit_sponsorship.save!
 end
 
+Given(/^employer (.*?) is OSSE eligible$/) do |legal_name|
+  org = BenefitSponsors::Organizations::Organization.find_by(legal_name: legal_name)
+  bs = org.active_benefit_sponsorship
+  eligibility = FactoryBot.build(:eligibility, :with_evidences, :with_subject, start_on: TimeKeeper.date_of_record)
+  bs.eligibilities << eligibility
+  bs.save!
+end
+
 And(/^Hbx Admin is on Broker Index of the Admin Dashboard$/) do
   visit exchanges_hbx_profiles_path
   find('.interaction-click-control-brokers').click
