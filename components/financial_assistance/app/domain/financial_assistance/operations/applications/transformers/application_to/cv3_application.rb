@@ -204,7 +204,7 @@ module FinancialAssistance
                            has_self_employment_income: applicant.has_self_employment_income.present? ? applicant.incomes.present? : false,
                            has_unemployment_income: applicant.has_unemployment_income.present? ? applicant.incomes.present? : false,
                            has_other_income: applicant.has_other_income.present? ? applicant.incomes.present? : false,
-                           has_deductions: applicant.has_deductions.present?,
+                           has_deductions: applicant.has_deductions.present? ? applicant.deductions.present? : false,
                            has_enrolled_health_coverage: enrolled_benefits,
                            has_eligible_health_coverage: eligible_benefits,
                            job_coverage_ended_in_past_3_months: applicant.has_dependent_with_coverage.present?,
