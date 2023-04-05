@@ -41,4 +41,36 @@ class TaxHouseholdEnrollment
   def tax_household
     enrollment.family.tax_household_groups.flat_map(&:tax_households).detect{ |th| th.id.to_s == tax_household_id.to_s }
   end
+
+  def build_tax_household_enrollment_for(hbx_enrollment)
+    new_thhe_attributes = self.copy_attributes
+    new_thhm_enrollment_members = new_thhe_attributes[:tax_household_members_enrollment_members]
+
+    hbx_enrollment.hbx_enrollment_members.each do |enrollment_member|
+      new_thhm_enrollment_member = new_thhm_enrollment_members.select{|thhm_enrollment_member| thhm_enrollment_member[:family_member_id].to_s == enrollment_member.applicant_id.to_s}&.first
+      next unless new_thhm_enrollment_member
+      new_thhm_enrollment_member[:hbx_enrollment_member_id] = enrollment_member.id
+    end
+
+    new_thhe_attributes[:enrollment_id] = hbx_enrollment.id
+    self.class.new(new_thhe_attributes)
+  end
+
+  def copy_attributes
+    thhm_enrollment_members = tax_household_members_enrollment_members.collect(&:copy_attributes)
+
+    {
+      enrollment_id: enrollment_id,
+      tax_household_id: tax_household_id,
+      household_benchmark_ehb_premium: household_benchmark_ehb_premium&.to_d,
+      health_product_hios_id: health_product_hios_id,
+      dental_product_hios_id: dental_product_hios_id,
+      household_health_benchmark_ehb_premium: household_health_benchmark_ehb_premium&.to_d,
+      household_dental_benchmark_ehb_premium: household_dental_benchmark_ehb_premium&.to_d,
+      applied_aptc: applied_aptc&.to_d,
+      available_max_aptc: available_max_aptc&.to_d,
+      group_ehb_premium: group_ehb_premium&.to_d,
+      tax_household_members_enrollment_members: thhm_enrollment_members
+    }
+  end
 end
