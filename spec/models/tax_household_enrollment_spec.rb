@@ -85,7 +85,7 @@ RSpec.describe TaxHouseholdEnrollment, type: :model do
 
     context "#copy" do
       it 'should return attributes hash when type is :attributes' do
-        expect(thhe.copy.class).to be Hash
+        expect(thhe.copy_attributes.class).to be Hash
       end
     end
 

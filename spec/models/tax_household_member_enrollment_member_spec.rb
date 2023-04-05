@@ -8,7 +8,7 @@ RSpec.describe TaxHouseholdMemberEnrollmentMember, type: :model do
 
   context "#copy" do
     it 'should return attributes hash' do
-      expect(thhm_enrollment_member.copy.class).to be Hash
+      expect(thhm_enrollment_member.copy_attributes.class).to be Hash
     end
   end
 end

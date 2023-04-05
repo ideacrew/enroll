@@ -13,7 +13,7 @@ class TaxHouseholdMemberEnrollmentMember
 
   embedded_in :tax_household_enrollment, class_name: "::TaxHouseholdEnrollment"
 
-  def copy
+  def copy_attributes
     {hbx_enrollment_member_id: hbx_enrollment_member_id,
      tax_household_member_id: tax_household_member_id,
      age_on_effective_date: age_on_effective_date,

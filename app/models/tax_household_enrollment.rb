@@ -43,7 +43,7 @@ class TaxHouseholdEnrollment
   end
 
   def build_tax_household_enrollment_for(hbx_enrollment)
-    new_thhe_attributes = self.copy
+    new_thhe_attributes = self.copy_attributes
     new_thhm_enrollment_members = new_thhe_attributes[:tax_household_members_enrollment_members]
 
     hbx_enrollment.hbx_enrollment_members.each do |enrollment_member|
@@ -56,8 +56,8 @@ class TaxHouseholdEnrollment
     self.class.new(new_thhe_attributes)
   end
 
-  def copy
-    thhm_enrollment_members = tax_household_members_enrollment_members.collect(&:copy)
+  def copy_attributes
+    thhm_enrollment_members = tax_household_members_enrollment_members.collect(&:copy_attributes)
 
     {
       enrollment_id: enrollment_id,
