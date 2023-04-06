@@ -62,7 +62,7 @@ if EnrollRegistry[:enroll_app].setting(:site_key).item == :dc
     context 'for Kaiser' do
       before :each do
         allow(plan).to receive(:kind).and_return('health')
-        allow(issuer_profile).to receive(:legal_name).and_return('Kaiser')
+        allow(issuer_profile).to receive(:legal_name).and_return('Kaiser Permanente')
         render partial: "shared/dc_carrier_contact_information", locals: { plan: plan, hbx_enrollment: hbx_enrollment }
       end
 

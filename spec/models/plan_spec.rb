@@ -456,7 +456,7 @@ RSpec.describe Plan, dbclean: :after_each do
 
     let(:total_plan_count) { platinum_count + gold_count + shop_silver_count + individual_silver_count + bronze_count + catastrophic_count }
 
-    let(:organization) { FactoryBot.create(:organization, legal_name: "Kaiser Permanente, Inc.", dba: "Kaiser") }
+    let(:organization) { FactoryBot.create(:organization, legal_name: "Kaiser Permanente, Inc.", dba: "Kaiser Permanente") }
     let(:carrier_profile_0) { FactoryBot.create(:carrier_profile, abbrev: "KP", organization: organization, issuer_hios_ids: ['11111']) }
     let(:carrier_profile_1) { FactoryBot.create(:carrier_profile) }
     let(:carrier_service_area) { create(:carrier_service_area, issuer_hios_id: '11111', serves_entire_state: true, service_area_id: 'EX123') }

@@ -384,6 +384,7 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:generic_redirect).and_return(true)
       allow(EnrollRegistry[:generic_redirect].setting(:strict_tile_check)).to receive(:item).and_return(true)
       allow(EnrollRegistry[:kaiser_pay_now].setting(:enrollment_tile)).to receive(:item).and_return(false)
+      allow(EnrollRegistry[:kaiser_permanente_pay_now].setting(:enrollment_tile)).to receive(:item).and_return(false)
       expect(helper.show_generic_redirect?(hbx_enrollment)).to be_falsey
     end
   end
