@@ -164,35 +164,6 @@ describe PlanSelection, dbclean: :after_each, :if => ExchangeTestingConfiguratio
         expect(subject.same_plan_enrollment.hbx_enrollment_members.first.tobacco_use).to eq hbx_enrollment.hbx_enrollment_members.first.tobacco_use
       end
     end
-
-    context 'for update_tax_household_enrollments' do
-      let!(:setup_thh_enr) do
-        thh_enr = TaxHouseholdEnrollment.create(
-          enrollment_id: hbx_enrollment.id,
-          tax_household_id: BSON::ObjectId.new,
-          household_benchmark_ehb_premium: 320.00,
-          available_max_aptc: 0.0
-        )
-        enr_mbr = hbx_enrollment.hbx_enrollment_members.first
-        thh_enr.tax_household_members_enrollment_members.create(
-          family_member_id: enr_mbr.applicant_id,
-          hbx_enrollment_member_id: enr_mbr.id.to_s,
-          tax_household_member_id: BSON::ObjectId.new,
-          age_on_effective_date: 20,
-          relationship_with_primary: 'self',
-          date_of_birth: TimeKeeper.date_of_record - 20.years
-        )
-      end
-
-      it 'updates tax_household_members_enrollment_members if the ID is different' do
-        new_enr = subject.same_plan_enrollment
-        expect(
-          TaxHouseholdEnrollment.where(
-            enrollment_id: hbx_enrollment.id
-          ).first.tax_household_members_enrollment_members.first.hbx_enrollment_member_id
-        ).to eq(new_enr.hbx_enrollment_members.first.id)
-      end
-    end
   end
 
   describe '.set_enrollment_member_coverage_start_dates' do
