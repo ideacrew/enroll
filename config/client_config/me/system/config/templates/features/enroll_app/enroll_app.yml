@@ -237,9 +237,7 @@ registry:
           - key: :favicon_tab_icon
             item: 'image/vnd.microsoft.icon'
           - key: :eligibile_immigration_statuses_url
-            item: ''
-          - key: :eligibile_immigration_statuses_url
-            item: ''
+            item: 'https://www.healthcare.gov/immigrants/immigration-status/'
           - key: :geographic_rating_area_model
             item: 'county'
           - key: :assistance_estimate_url
@@ -427,7 +425,7 @@ registry:
         is_enabled: <%= ENV['VALIDATE_SAML_IS_ENABLED'] || false %>
       - key: :generic_redirect
         is_enabled: <%= ENV['GENERIC_REDIRECT_PAY_NOW_IS_ENABLED'] || false %>
-        settings: 
+        settings:
           - key: :strict_tile_check
             item: <%= ENV['STRICT_TILE_CHECK_PAY_NOW_IS_ENABLED'] || false %>
       - key: :kaiser_pay_now
