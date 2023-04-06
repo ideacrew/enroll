@@ -1554,8 +1554,16 @@ class HbxEnrollment
     new_plan ||= product
 
     plan_selection = PlanSelection.new(self, new_plan)
-    return unless plan_selection.existing_coverage.present?
-    self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members
+    return if plan_selection.existing_coverage.blank?
+    return self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members if is_shop?
+
+    plan_selection.same_plan_enrollment.hbx_enrollment_members.each do |enr_member|
+      member = hbx_enrollment_members.where(applicant_id: enr_member.applicant_id).first
+      next enr_member if member.blank? || enr_member.coverage_start_on == member.coverage_start_on
+
+      member.coverage_start_on = enr_member.coverage_start_on
+      member.save!
+    end
   end
 
   def display_make_changes_for_ivl?
