@@ -53,6 +53,22 @@ module BenefitSponsors
         expect(subject.assign_agencies(broker_management_form_create)).to be_truthy
       end
 
+      it 'should send a message to the general_agency' do
+        general_agency_profile.reload
+        subject = "You are associated to #{broker_agency_profile1.organization.legal_name}- #{general_agency_profile.legal_name} (Hire)"
+        body = "<br><p>Associated details<br>General Agency : #{general_agency_profile.legal_name}<br>Employer : #{employer_profile.legal_name}<br>Status : Hire</p>"
+        expect(general_agency_profile.inbox.messages.map(&:body)).to include(body)
+        expect(general_agency_profile.inbox.messages.map(&:subject)).to include(subject)
+      end
+
+      it 'should send a message to the employer' do
+        employer_profile.reload
+        subject = "You are associated to #{broker_agency_profile1.organization.legal_name}- #{general_agency_profile.legal_name} (Hire)"
+        body = "<br><p>Associated details<br>General Agency : #{general_agency_profile.legal_name}<br>Employer : #{employer_profile.legal_name}<br>Status : Hire</p>"
+        expect(employer_profile.inbox.messages.map(&:body)).to include(body)
+        expect(employer_profile.inbox.messages.map(&:subject)).to include(subject)
+      end
+
       it 'should succesfully assigns broker agency to the employer_profile' do
         active_benefit_sponsorship.reload
         expect(active_benefit_sponsorship.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id).to eq broker_agency_profile1.id
