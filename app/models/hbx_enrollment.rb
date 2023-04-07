@@ -2793,7 +2793,7 @@ class HbxEnrollment
     event = event('events.enrollment_saved', attributes: {gid: self.to_global_id.uri, payload: cv_enrollment.success})
     event.success.publish if event.success?
   rescue StandardError => e
-    Rails.logger.error { "Couldn't generate enrollment save event due to #{e.backtrace}" }
+    Rails.logger.error { "Couldn't generate enrollment #{self.hbx_id} save event due to #{e.backtrace}" }
   end
 
   def publish_event(event, payload)

@@ -30,7 +30,7 @@ module Services
           enrollment.expire_coverage! if enrollment.may_expire_coverage?
           @logger.info "Processed enrollment: #{enrollment.hbx_id}"
         rescue StandardError => e
-          @logger.info "Unable to expire enrollment#{enrollment.id}, error: #{e.backtrace}"
+          @logger.info "Unable to expire enrollment #{enrollment.id}, error: #{e.backtrace}"
         end
         offset += batch_size
       end
