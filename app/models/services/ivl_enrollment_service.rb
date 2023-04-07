@@ -25,6 +25,7 @@ module Services
         :kind.in => ["individual", "coverall"],
         :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ["coverage_termination_pending"]
       )
+      @logger.info "Total enrollments to expire count: #{ivl_enrollments.count}"
       while offset <= individual_market_enrollments.count
         individual_market_enrollments.offset(offset).limit(batch_size).no_timeout.each do |enrollment|
           enrollment.expire_coverage! if enrollment.may_expire_coverage?
@@ -34,6 +35,7 @@ module Services
         end
         offset += batch_size
       end
+      @logger.info "Total remaining enrollments from expire query count: #{ivl_enrollments.count}"
       @logger.info "Ended expire_individual_market_enrollments process at #{TimeKeeper.datetime_of_record}"
     end
 
