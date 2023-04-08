@@ -14,23 +14,19 @@ RSpec.describe HbxEnrollment, type: :model do
   let(:family) { create(:family, :with_primary_family_member, person: person) }
   let(:aasm_state) { 'coverage_selected' }
   let(:hbx_enrollment) do
-    create(:hbx_enrollment,
-            :individual_aptc,
-            :with_silver_health_product,
-            aasm_state: aasm_state,
-            applied_aptc_amount: applied_aptc_amount,
-            elected_aptc_pct: elected_aptc_pct,
-            family: family,
-            consumer_role_id: person.consumer_role.id,
-            ehb_premium: enrollment_ehb_premium)
+    create(:hbx_enrollment, :individual_aptc, :with_silver_health_product, aasm_state: aasm_state,
+                                                                           applied_aptc_amount: applied_aptc_amount,
+                                                                           elected_aptc_pct: elected_aptc_pct,
+                                                                           family: family,
+                                                                           consumer_role_id: person.consumer_role.id,
+                                                                           ehb_premium: enrollment_ehb_premium)
   end
 
   let(:hbx_enrollment_member) do
-    create(:hbx_enrollment_member,
-            hbx_enrollment: hbx_enrollment,
-            applicant_id: family.primary_applicant.id,
-            coverage_start_on: start_of_month,
-            eligibility_date: start_of_month)
+    create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment,
+                                   applicant_id: family.primary_applicant.id,
+                                   coverage_start_on: start_of_month,
+                                   eligibility_date: start_of_month)
   end
 
   let(:tax_household_group) do
@@ -67,12 +63,11 @@ RSpec.describe HbxEnrollment, type: :model do
   let(:family_member) { create(:family_member, person: person2, family: family) }
 
   let(:hbx_enrollment_member2) do
-    create(:hbx_enrollment_member,
-            is_subscriber: false,
-            hbx_enrollment: hbx_enrollment,
-            applicant_id: family_member.id,
-            coverage_start_on: start_of_month,
-            eligibility_date: start_of_month)
+    create(:hbx_enrollment_member, is_subscriber: false,
+                                   hbx_enrollment: hbx_enrollment,
+                                   applicant_id: family_member.id,
+                                   coverage_start_on: start_of_month,
+                                   eligibility_date: start_of_month)
   end
 
   let(:tax_household_group2) do
