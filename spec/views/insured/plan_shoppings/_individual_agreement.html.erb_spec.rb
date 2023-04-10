@@ -37,7 +37,7 @@ RSpec.describe "insured/plan_shoppings/_individual_agreement.html.erb" do
       assign(:person, person)
       assign(:hbx_enrollment, hbx_enrollment)
       EnrollRegistry[:extended_aptc_individual_agreement_message].feature.stub(:is_enabled).and_return(true)
-      change_target_translation_text("en.insured.individual_agreement_non_aptc", "me", "insured")
+      change_target_translation_text("en.insured.individual_agreement.agreement.aptc.on_my_behalf.file_return", "me", "insured")
       render "insured/plan_shoppings/individual_agreement", locals: {aptc_present: true, coverage_year: TimeKeeper.date_of_record.year.to_s}
     end
 

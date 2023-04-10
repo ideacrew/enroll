@@ -1554,8 +1554,16 @@ class HbxEnrollment
     new_plan ||= product
 
     plan_selection = PlanSelection.new(self, new_plan)
-    return unless plan_selection.existing_coverage.present?
-    self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members
+    return if plan_selection.existing_coverage.blank?
+    return self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members if is_shop?
+
+    plan_selection.same_plan_enrollment.hbx_enrollment_members.each do |enr_member|
+      member = hbx_enrollment_members.where(applicant_id: enr_member.applicant_id).first
+      next enr_member if member.blank? || enr_member.coverage_start_on == member.coverage_start_on
+
+      member.coverage_start_on = enr_member.coverage_start_on
+      member.save!
+    end
   end
 
   def display_make_changes_for_ivl?
@@ -2020,11 +2028,20 @@ class HbxEnrollment
     end
   end
 
+  def reinstate_tax_household_enrollments(reinstate_enrollment)
+    return if is_shop?
+    return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+
+    TaxHouseholdEnrollment.by_enrollment_id(self.id).each do |thhe|
+      new_thhe = thhe.build_tax_household_enrollment_for(reinstate_enrollment)
+      new_thhe.save
+    end
+  end
+
   def reinstate(edi: false)
     return false unless can_be_reinstated?
     return false if has_active_term_or_expired_exists_for_reinstated_date?
     reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(self, fetch_reinstatement_date).build
-
     can_renew = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: reinstate_enrollment})
 
     return false unless can_renew.success?
@@ -2036,6 +2053,7 @@ class HbxEnrollment
 
     if reinstate_enrollment.may_reinstate_coverage?
       reinstate_enrollment.reinstate_coverage!
+      reinstate_tax_household_enrollments(reinstate_enrollment)
       # Move reinstated enrollment to "coverage selected" status
       reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage?
 

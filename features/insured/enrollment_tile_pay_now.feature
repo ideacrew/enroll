@@ -17,9 +17,9 @@ Feature: User should be able to pay for plan
     Then I should see the <issuer> pop up text
 
   Examples:
-    |              issuer_pay_now                | issuer | site_key |
-    |              kaiser_pay_now                | Kaiser |  DC      |
-    | anthem_blue_cross_and_blue_shield_pay_now  | Anthm  |  ME      |
+    |              issuer_pay_now                |       issuer      | site_key |
+    |              kaiser_permanente_pay_now     | Kaiser Permanente |  DC      |
+    | anthem_blue_cross_and_blue_shield_pay_now  |       Anthm       |  ME      |
 
   Scenario: User can see make payments for enrollments with past effective date when generic redirect enabled
     Given a DC site exists
@@ -32,7 +32,7 @@ Feature: User should be able to pay for plan
     When person should be able to see Actions dropdown
     Then person clicks on the Actions button
     Then person should the the Make Payments button
-  
+
   Scenario: User cannot see make payments for enrollments with past effective date when generic redirect disabled
     Given a DC site exists
     Given the generic_redirect setting is disabled
