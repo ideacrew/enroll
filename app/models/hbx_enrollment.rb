@@ -1073,7 +1073,7 @@ class HbxEnrollment
     thh_enr_premiums = thh_enr_group_ehb_premium_of_aptc_members(aptc_tax_household_enrollments)
     populate_applied_aptc_for_thh_enrs(aptc_tax_household_enrollments, thh_enr_premiums)
   rescue StandardError => e
-    Rails.logger.error { "Couldn't generate enrollment save event due to #{e.backtrace}" }
+    Rails.logger.error { "Unable to update tax_household_enrollments due to #{e.backtrace}" }
   end
 
   def handle_coverage_selection
@@ -2146,7 +2146,7 @@ class HbxEnrollment
 
     # after_all_transitions :perform_employer_plan_year_count
 
-    event :renew_enrollment, :after => [:record_transition, :trigger_enrollment_notice] do
+    event :renew_enrollment, :after => [:record_transition, :update_tax_household_enrollment, :trigger_enrollment_notice] do
       transitions from: :shopping, to: :auto_renewing
     end
 
@@ -2154,7 +2154,7 @@ class HbxEnrollment
       transitions from: :shopping, to: :renewing_waived
     end
 
-    event :select_coverage, :after => [:record_transition, :propagate_selection, :update_reinstate_coverage, :generate_prior_py_shop_renewals, :publish_select_coverage_events, :update_tax_household_enrollment] do
+    event :select_coverage, :after => [:record_transition, :update_tax_household_enrollment, :propagate_selection, :update_reinstate_coverage, :generate_prior_py_shop_renewals, :publish_select_coverage_events] do
       transitions from: :shopping,
                   to: :coverage_selected, :guard => :can_select_coverage?
       transitions from: [:auto_renewing, :actively_renewing],
