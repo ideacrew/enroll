@@ -974,6 +974,7 @@ And(/^consumer is an indian_tribe_member$/) do
 end
 
 And(/^the consumer should see tribal name textbox without text$/) do
+  wait_for_ajax
   expect(page).to have_selector("#tribal-name", text: '')
 end
 
