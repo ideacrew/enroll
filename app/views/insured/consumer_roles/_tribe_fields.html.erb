@@ -96,7 +96,7 @@
       var tribe_codes_array = $('.tribe_codes:checked').map(function() {
         return $(this).val();
       }).get();
-      var tribal_name_container_show = (!is_featured_tribes_selection_enabled || (is_featured_tribes_selection_enabled && ((tribal_state != enroll_state_abbr) || ((tribal_state == enroll_state_abbr) && typeof tribe_codes_array != 'undefined' && tribe_codes_array.includes("OT"))));
+      var tribal_name_container_show = !is_featured_tribes_selection_enabled || (is_featured_tribes_selection_enabled && ((tribal_state != enroll_state_abbr) || ((tribal_state == enroll_state_abbr) && typeof tribe_codes_array != 'undefined' && tribe_codes_array.includes("OT"))));
 
       if (is_featured_tribes_selection_enabled && tribal_state == enroll_state_abbr) {
         $('.featured-tribe-container').removeClass('hide');
