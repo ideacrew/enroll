@@ -135,18 +135,29 @@ function applyListenersFor(target) {
     }
   });
 
-  $('select#tribal-state').change(function() {
-    if ($('.featured_tribes_selection').length > 0 && this.value == $('#enroll_state_abbr').val()) {
-      $('.featured-tribe-container').removeClass('hide');
-      var tribe_codes_array = $('.tribe_codes:checked').map(function(){ return $(this).val(); }).get();
-      if (tribe_codes_array.includes("OT")){
+  // tribal-state change - select from options
+  $('select#tribal-state').on("change", function() {
+    var enroll_state_abbr = $('#enroll_state_abbr').val();
+
+    if (enroll_state_abbr === 'ME') {
+      var is_featured_tribes_selection_enabled = ($('#is_featured_tribes_selection_enabled').val() === 'true');
+      var tribe_codes_array = $('.tribe_codes:checked').map(function() {
+        return $(this).val();
+      }).get();
+      var tribal_name_container_show_on_select = (!is_featured_tribes_selection_enabled || (is_featured_tribes_selection_enabled && ((this.value != enroll_state_abbr) || ((this.value == enroll_state_abbr) && typeof tribe_codes_array != 'undefined' && tribe_codes_array.includes("OT")))));
+
+      if (is_featured_tribes_selection_enabled && this.value == enroll_state_abbr) {
+        $('.featured-tribe-container').removeClass('hide');
+        if (tribe_codes_array.includes("OT")) {
+          $('.tribal-name-container').removeClass('hide');
+        } else {
+          $('#tribal-name').val("");
+          $('.tribal-name-container').addClass('hide');
+        }
+      } else if (tribal_name_container_show_on_select) {
         $('.tribal-name-container').removeClass('hide');
-      } else {
-        $('.tribal-name-container').addClass('hide');
+        $('.featured-tribe-container').addClass('hide');
       }
-    } else {
-      $('.tribal-name-container').removeClass('hide');
-      $('.featured-tribe-container').addClass('hide');
     }
   });
 
