@@ -204,7 +204,7 @@ module FinancialAssistance
                            has_self_employment_income: applicant.has_self_employment_income.present? ? applicant.incomes.present? : false,
                            has_unemployment_income: applicant.has_unemployment_income.present? ? applicant.incomes.present? : false,
                            has_other_income: applicant.has_other_income.present? ? applicant.incomes.present? : false,
-                           has_deductions: applicant.has_deductions.present?,
+                           has_deductions: applicant.has_deductions.present? ? applicant.deductions.present? : false,
                            has_enrolled_health_coverage: enrolled_benefits,
                            has_eligible_health_coverage: eligible_benefits,
                            job_coverage_ended_in_past_3_months: applicant.has_dependent_with_coverage.present?,
@@ -235,7 +235,7 @@ module FinancialAssistance
                            income_evidence: applicant&.income_evidence&.serializable_hash&.deep_symbolize_keys,
                            esi_evidence: applicant&.esi_evidence&.serializable_hash&.deep_symbolize_keys,
                            non_esi_evidence: applicant&.non_esi_evidence&.serializable_hash&.deep_symbolize_keys,
-                           local_mec_evidence: applicant&.local_mec_evidence&.serializable_hash&.deep_symbolize_keys,
+                           local_mec_evidence: evidence_info(applicant.local_mec_evidence),
                            mitc_relationships: mitc_relationships(applicant),
                            mitc_is_required_to_file_taxes: applicant_is_required_to_file_taxes(applicant, mitc_eligible_incomes),
                            mitc_state_resident: mitc_state_resident(applicant, application.us_state)}
@@ -244,6 +244,35 @@ module FinancialAssistance
             end
                         # rubocop:enable Metrics/AbcSize
             # rubocop:enable Metrics/MethodLength
+
+            def evidence_info(applicant_evidence)
+              return if applicant_evidence.nil?
+
+              {
+                key: applicant_evidence.key,
+                title: applicant_evidence.title,
+                aasm_state: applicant_evidence.aasm_state,
+                description: applicant_evidence.description,
+                received_at: applicant_evidence.received_at,
+                is_satisfied: applicant_evidence.is_satisfied,
+                verification_outstanding: applicant_evidence.verification_outstanding,
+                update_reason: applicant_evidence.update_reason,
+                due_on: applicant_evidence.due_on,
+                external_service: applicant_evidence.external_service,
+                updated_by: applicant_evidence.updated_by,
+                verification_histories: applicant_evidence.verification_histories.collect { |v_his| v_his.serializable_hash.symbolize_keys },
+                request_results: applicant_evidence.request_results.collect do |req_res|
+                  {
+                    result: req_res.result,
+                    source: req_res.source,
+                    source_transaction_id: req_res.source_transaction_id,
+                    code: req_res.code,
+                    code_description: req_res.code_description&.strftime('%F'),
+                    raw_payload: req_res.raw_payload
+                  }
+                end
+              }
+            end
 
             def native_american_information(applicant)
               if FinancialAssistanceRegistry.feature_enabled?(:indian_alaskan_tribe_details)

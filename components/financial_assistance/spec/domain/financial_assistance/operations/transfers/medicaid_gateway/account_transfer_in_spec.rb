@@ -7,7 +7,12 @@ require 'aca_entities/atp/transformers/cv/family'
 RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferIn, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
-  let(:xml) { File.read(::FinancialAssistance::Engine.root.join('spec', 'shared_examples', 'medicaid_gateway', 'Simple_Test_Case_E_New.xml')) }
+  let(:xml_file_path) { ::FinancialAssistance::Engine.root.join('spec', 'shared_examples', 'medicaid_gateway', 'Simple_Test_Case_E_New.xml') }
+  let(:xml) do
+    Rails.cache.fetch("test_xml_string") do
+      File.read(xml_file_path)
+    end
+  end
 
   let(:serializer) { ::AcaEntities::Serializers::Xml::Medicaid::Atp::AccountTransferRequest }
 
@@ -25,6 +30,11 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         record = serializer.parse(xml)
         @transformed = transformer.transform(record.to_hash(identifier: true))
         @result = subject.call(@transformed)
+      end
+
+      it 'should set the transferred_at field'  do
+        app = FinancialAssistance::Application.find(@result.value!)
+        expect(app.transferred_at).not_to eq nil
       end
 
       context 'load_county_on_inbound_transfer feature is enabled' do
@@ -115,9 +125,27 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         end
       end
 
-      it 'should set the transferred_at field'  do
-        app = FinancialAssistance::Application.find(@result.value!)
-        expect(app.transferred_at).not_to eq nil
+      context 'invalid phone number' do
+        context 'where the phone number starts with 0' do
+
+          it 'should drop the invalid phone number for the person' do
+            person = Person.first
+            has_invalid_phone = person.phones.any? do |p|
+              p.area_code == '000' || p.full_phone_number == '0000000000'
+            end
+
+            expect(has_invalid_phone).to eq false
+          end
+
+          it 'should drop the invalid phone number for the applicant' do
+            application = FinancialAssistance::Application.last
+            has_invalid_phone = application.applicants.any? do |a|
+              a.phones.detect { |p| p.area_code == '000' || p.full_phone_number == '0000000000' }
+            end
+
+            expect(has_invalid_phone).to eq false
+          end
+        end
       end
     end
   end
