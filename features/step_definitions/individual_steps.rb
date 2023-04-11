@@ -973,6 +973,10 @@ And(/^consumer is an indian_tribe_member$/) do
   user.person.update_attributes!(tribal_state: 'ME')
 end
 
+Given(/^site is (.*)$/) do |state|
+  EnrollRegistry[:enroll_app].setting(:state_abbreviation).stub(:item).and_return(state.upcase)
+end
+
 And(/^the consumer should see tribal name textbox without text$/) do
   wait_for_ajax
   expect(page).to have_selector("#tribal-name", text: '')
