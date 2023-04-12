@@ -1436,19 +1436,19 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
     context "when aptc & csr are not applied on enrollment member" do
       context "when evidence is in pending state" do
-        it "move to negative_response_received state" do
+        it "move to outstanding" do
           applicant.enrolled_with(enrollment)
           FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
             evidence = applicant.send(evidence_type)
-            expect(evidence.outstanding?).to eq false
-            expect(evidence.negative_response_received?).to eq true
-            expect(evidence.due_on).to eq nil
+            expect(evidence.outstanding?).to eq true
+            expect(evidence.negative_response_received?).to eq false
+            expect(evidence.due_on).to eq applicant.schedule_verification_due_on
           end
         end
       end
 
       context "when evidence is in negative_response_received state" do
-        it "will stay in negative_response_received state" do
+        it "will move to outstanding" do
           FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
             evidence = applicant.send(evidence_type)
             evidence.negative_response_received!
@@ -1458,9 +1458,9 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
           FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
             evidence = applicant.send(evidence_type)
-            expect(evidence.outstanding?).to eq false
-            expect(evidence.negative_response_received?).to eq true
-            expect(evidence.due_on).to eq nil
+            expect(evidence.outstanding?).to eq true
+            expect(evidence.negative_response_received?).to eq false
+            expect(evidence.due_on).to eq applicant.schedule_verification_due_on
           end
         end
       end
