@@ -144,17 +144,18 @@ function applyListenersFor(target) {
       var tribe_codes_array = $('.tribe_codes:checked').map(function() {
         return $(this).val();
       }).get();
-      var tribal_name_container_show_on_select = (!is_featured_tribes_selection_enabled || (is_featured_tribes_selection_enabled && ((this.value != enroll_state_abbr) || ((this.value == enroll_state_abbr) && typeof tribe_codes_array != 'undefined' && tribe_codes_array.includes("OT")))));
-
+      var tribal_name_container_show_on_select = (typeof tribe_codes_array != 'undefined' && tribe_codes_array.includes("OT"));
+debugger;
       if (is_featured_tribes_selection_enabled && this.value == enroll_state_abbr) {
         $('.featured-tribe-container').removeClass('hide');
-        if (tribe_codes_array.includes("OT")) {
+        if (tribal_name_container_show_on_select) {
           $('.tribal-name-container').removeClass('hide');
         } else {
           $('#tribal-name').val("");
           $('.tribal-name-container').addClass('hide');
         }
-      } else if (tribal_name_container_show_on_select) {
+      } else {
+        $('.tribe_codes:checked').removeAttr('checked');
         $('.tribal-name-container').removeClass('hide');
         $('.featured-tribe-container').addClass('hide');
       }
