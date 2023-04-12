@@ -242,7 +242,7 @@ module FinancialAssistance
           rescue Mongoid::Errors::Validations => e
             first_name = family_member_hash['person_name']['first_name']
             last_name = family_member_hash['person_name']['last_name']
-            Failure("create_or_update_family_member validation for #{first_name} #{last_name} due to: #{e.summary}")
+            Failure("Failed create_or_update_family_member validation for #{first_name} #{last_name} due to: #{e.summary}")
           rescue StandardError => e
             Failure("create_or_update_family_member: #{e}")
           end
