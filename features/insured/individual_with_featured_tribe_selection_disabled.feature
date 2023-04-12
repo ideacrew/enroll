@@ -2,7 +2,7 @@
 
 Feature: For the enabled AI/AN feature, existing consumer edits the personal info page
   Background:
-    When site is ME
+    When site is for ME
     Given AI AN Details feature is enabled
     Given Featured Tribe Selection feature is disabled
     Given Individual has not signed up as an HBX user

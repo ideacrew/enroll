@@ -973,7 +973,7 @@ And(/^consumer is an indian_tribe_member$/) do
   user.person.update_attributes!(tribal_state: 'ME')
 end
 
-Given(/^site is (.*)$/) do |state|
+Given(/^site is for (.*)$/) do |state|
   EnrollRegistry[:enroll_app].setting(:state_abbreviation).stub(:item).and_return(state.upcase)
 end
 
