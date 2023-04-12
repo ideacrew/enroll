@@ -145,7 +145,7 @@ function applyListenersFor(target) {
         return $(this).val();
       }).get();
       var tribal_name_container_show_on_select = (typeof tribe_codes_array != 'undefined' && tribe_codes_array.includes("OT"));
-debugger;
+
       if (is_featured_tribes_selection_enabled && this.value == enroll_state_abbr) {
         $('.featured-tribe-container').removeClass('hide');
         if (tribal_name_container_show_on_select) {
