@@ -56,7 +56,7 @@ module Operations
           Success(payload)
         rescue StandardError => e
           puts "Cv3HbxEnrollment error: #{e.message} | exception: #{e.inspect} | backtrace: #{e.backtrace.inspect}"
-          Rails.logger.error "Cv3HbxEnrollment error: #{e.message} | exception: #{e.inspect} | backtrace: #{e.backtrace.inspect}"
+          Rails.logger.error "Cv3HbxEnrollment id: #{enr&.hbx_id} | error: #{e.message} | exception: #{e.inspect} | backtrace: #{e.backtrace.inspect}"
         end
         # rubocop:enable Metrics/CyclomaticComplexity, Metrics/AbcSize
 
