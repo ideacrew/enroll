@@ -198,7 +198,9 @@ module FinancialAssistance
               consumer_role_params = family_member_hash['person']['consumer_role']
               create_or_update_consumer_role(consumer_role_params.merge(is_consumer_role: true), @family_member)
             else
-              person_result
+              first_name = family_member_hash['person_name']['first_name']
+              last_name = family_member_hash['person_name']['last_name']
+              Failure("Failed to create or update person #{first_name} #{last_name} due to: #{person_result.failure}")
             end
           rescue StandardError => e
             Failure("create_member: #{e}")
@@ -238,7 +240,9 @@ module FinancialAssistance
             family.save!
             Success(family_member)
           rescue Mongoid::Errors::Validations => e
-            Failure("create_or_update_family_member validation: #{e.summary}")
+            first_name = family_member_hash['person_name']['first_name']
+            last_name = family_member_hash['person_name']['last_name']
+            Failure("Failed create_or_update_family_member validation for #{first_name} #{last_name} due to: #{e.summary}")
           rescue StandardError => e
             Failure("create_or_update_family_member: #{e}")
           end
