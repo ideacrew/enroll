@@ -31,7 +31,7 @@ class SamlInformation
     'kaiser_pay_now_url',
     'kaiser_pay_now_relay_state',
     'kaiser_permanente_pay_now_url',
-    'kaiser_permamente_pay_now_relay_state',
+    'kaiser_permanente_pay_now_relay_state',
     'pay_now_private_key_location',
     'pay_now_x509_cert_location',
     'kaiser_pay_now_audience',

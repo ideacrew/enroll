@@ -11,7 +11,7 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: primary_applicant) }
   let(:family_member2) { FactoryBot.create(:family_member, family: family, person: dependent1) }
   let(:family_member3) { FactoryBot.create(:family_member, family: family, person: dependent2) }
-  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
+  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'determined', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
   let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: application, family_member_id: primary_applicant.id, is_primary_applicant: true, person_hbx_id: primary_applicant.hbx_id) }
   let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, application: application, family_member_id: family_member2.id, person_hbx_id: dependent1.hbx_id) }
   let!(:applicant3) { FactoryBot.create(:financial_assistance_applicant, application: application, family_member_id: family_member3.id, person_hbx_id: dependent2.hbx_id) }
@@ -90,21 +90,6 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
         expect(subject).to include(application)
       end
     end
-
-    # context "when a family member is deleted" do
-    #   before do
-    #     create_instate_addresses
-    #     create_relationships
-    #     application.save!
-    #     allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(::Dry::Monads::Result::Success.new(application))
-    #     family.family_members.last.delete
-    #     family.reload
-    #   end
-
-    #   it "should ignore the application and return an empty array" do
-    #     expect(subject).to be_empty
-    #   end
-    # end
   end
 
   describe '#transform_households' do
