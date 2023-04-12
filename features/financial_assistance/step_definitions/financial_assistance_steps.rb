@@ -441,16 +441,16 @@ Given(/^the FAA feature configuration is disabled$/) do
 end
 
 Given(/^the kaiser paynow feature configuration is enabled$/) do
-  enable_feature :kaiser_pay_now
+  enable_feature :kaiser_permanente_pay_now
 end
 
 Given(/^the kaiser paynow feature configuration is disabled$/) do
-  disable_feature :kaiser_pay_now
+  disable_feature :kaiser_permanente_pay_now
 end
 
 When(/kaiser pay now feature is enabled/) do
-  EnrollRegistry[:kaiser_pay_now].feature.stub(:is_enabled).and_return(true)
-  EnrollRegistry[:kaiser_pay_now].setting(:plan_shopping).stub(:item).and_return(true)
+  EnrollRegistry[:kaiser_permanente_pay_now].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry[:kaiser_permanente_pay_now].setting(:plan_shopping).stub(:item).and_return(true)
 end
 
 Given(/^the enrollment tile feature is enabled$/) do

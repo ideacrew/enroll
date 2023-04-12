@@ -372,7 +372,7 @@ RSpec.describe Plan, dbclean: :after_each do
           market: market,
           premium_tables: [{start_on: "2015-01-01",
                             end_on: "2015-12-31",
-                            cost: 500,
+                            cost: 45.45,
                             age: 32}]
       }
     end
@@ -406,8 +406,7 @@ RSpec.describe Plan, dbclean: :after_each do
       end
 
       it "should round premium amount" do
-        allow(BigDecimal).to receive_message_chain(:new, :round, :to_f).and_return("45.45")
-        expect(plan.premium_for(Date.parse("2015-10-01"), plan_params[:premium_tables][0][:age])).to eq "45.45"
+        expect(plan.premium_for(Date.parse("2015-10-01"), plan_params[:premium_tables][0][:age])).to eq 45.45
       end
     end
   end
@@ -456,7 +455,7 @@ RSpec.describe Plan, dbclean: :after_each do
 
     let(:total_plan_count) { platinum_count + gold_count + shop_silver_count + individual_silver_count + bronze_count + catastrophic_count }
 
-    let(:organization) { FactoryBot.create(:organization, legal_name: "Kaiser Permanente, Inc.", dba: "Kaiser") }
+    let(:organization) { FactoryBot.create(:organization, legal_name: "Kaiser Permanente, Inc.", dba: "Kaiser Permanente") }
     let(:carrier_profile_0) { FactoryBot.create(:carrier_profile, abbrev: "KP", organization: organization, issuer_hios_ids: ['11111']) }
     let(:carrier_profile_1) { FactoryBot.create(:carrier_profile) }
     let(:carrier_service_area) { create(:carrier_service_area, issuer_hios_id: '11111', serves_entire_state: true, service_area_id: 'EX123') }

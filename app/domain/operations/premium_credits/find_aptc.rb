@@ -68,7 +68,6 @@ module Operations
             th_member_enr_member = th_enrollment.tax_household_members_enrollment_members.find_or_create_by(
               family_member_id: family_member_id
             )
-
             th_member_enr_member.update!(
               hbx_enrollment_member_id: hbx_enrollment_member&.id,
               tax_household_member_id: tax_household_member_id,
