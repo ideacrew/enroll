@@ -83,7 +83,7 @@ module Operations
 
       def find_existing_person(params)
         inbound_hbx_id = params[:hbx_id]
-        unless payload_hbx_id.nil?
+        unless inbound_hbx_id.nil?
           person = Person.by_hbx_id(inbound_hbx_id).first
           return person if person.present?
         end
