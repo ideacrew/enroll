@@ -67,10 +67,7 @@ module FinancialAssistance
               when "verified"
                 applicant.set_income_evidence_verified
               when "outstanding"
-                enrollment_member = enrollments.flat_map(&:hbx_enrollment_members).first
-                aptc_or_csr_used = (defined?(enrollment_member.applied_aptc_amount) && enrollment_member.applied_aptc_amount > 0) || ['csr_73', 'csr_87', 'csr_94', 'csr_limited'].include?(applicant.csr_eligibility_kind)
-
-                if enrolled?(applicant, enrollments) && (aptc_or_csr_used || ['pending', 'negative_response_received'].include?(income_evidence.aasm_state))
+                if enrolled?(applicant, enrollments) || is_aptc_used?(applicant, enrollments)
                   applicant.set_evidence_outstanding(income_evidence)
                 else
                   applicant.set_evidence_to_negative_response(income_evidence)
@@ -81,6 +78,13 @@ module FinancialAssistance
                 income_evidence.request_results << Eligibilities::RequestResult.new(request_result.to_h)
               end
               applicant.save!
+            end
+
+            def is_aptc_used?(applicant, enrollments)
+              return false if enrollments.blank?
+
+              enrollment_members = enrollments.flat_map(&:hbx_enrollment_members)
+              enrollment_members.select{|member| member.hbx_id == applicant.person_hbx_id && member.applied_aptc_amount > 0}
             end
 
             def enrolled?(applicant, enrollments)

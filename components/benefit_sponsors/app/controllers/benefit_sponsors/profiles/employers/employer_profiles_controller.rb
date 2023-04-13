@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Profiles
     module Employers
+      # EmployerProfilesController
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
-
         include Config::AcaHelper
 
         before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :export_census_employees, :show_invoice, :coverage_reports, :download_invoice, :terminate_employee_roster_enrollments]
@@ -12,7 +14,6 @@ module BenefitSponsors
         before_action :set_flash_by_announcement, only: :show
         layout "two_column", except: [:new]
 
-        #New profile registration with existing organization and approval request submitted to employer
         def show_pending
           authorize BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new
           respond_to do |format|
@@ -21,63 +22,75 @@ module BenefitSponsors
           end
         end
 
-        def show # TODO - Each when clause should be a seperate action.
+        def show
           authorize @employer_profile
           @tab = params['tab']
           @broker_agency_profile = @employer_profile.active_broker_agency_account.broker_agency_profile if @employer_profile.active_broker_agency_account.present?
           if (params[:q] || params[:page] || params[:commit] || params[:status]).present?
             # paginate_employees
           else
-            case @tab
-            when 'benefits'
-              @benefit_sponsorship = @employer_profile.organization.active_benefit_sponsorship
-              @benefit_applications = @employer_profile.benefit_applications.non_imported.desc(:start_on, :created_at)
-            when 'documents'
-              @datatable = ::Effective::Datatables::BenefitSponsorsEmployerDocumentsDataTable.new({employer_profile_id: @employer_profile.id})
-              load_documents if employer_attestation_is_enabled?
-            when 'accounts'
-              collect_and_sort_invoices(params[:sort_order])
-              @benefit_sponsorship = @employer_profile.organization.active_benefit_sponsorship
-              @benefit_sponsorship_account = @benefit_sponsorship.benefit_sponsorship_account
-              @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
-              #only exists if coming from redirect from sso failing
-              @page_num = params[:page_num] if params[:page_num].present?
-              if @page_num.present?
-                retrieve_payments_for_page(@page_num)
-              else
-                retrieve_payments_for_page(1)
-              end
-              respond_to do |format|
-                format.js {render 'benefit_sponsors/profiles/employers/employer_profiles/my_account/accounts/payment_history'}
-                format.html
-                format.any { head :ok }
-              end
-            when 'employees'
-              @datatable = ::Effective::Datatables::EmployeeDatatable.new(employee_datatable_params)
-            when 'brokers'
-              @broker_agency_account = @employer_profile.active_broker_agency_account
-            when 'families'
-              @employees = EmployeeRole.find_by_employer_profile(@employer_profile).compact.select { |ee| CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include?(ee.census_employee.aasm_state)}
-            when 'inbox'
+            when_clause_block
+          end
+        end
 
-            else
-              @broker_agency_account = @employer_profile.active_broker_agency_account
-              @benefit_sponsorship = @employer_profile.latest_benefit_sponsorship
+        def when_clause_block
+          case @tab
+          when 'benefits'
+            @benefit_sponsorship = @employer_profile.organization.active_benefit_sponsorship
+            @benefit_applications = @employer_profile.benefit_applications.non_imported.desc(:start_on, :created_at)
+          when 'documents'
+            @datatable = ::Effective::Datatables::BenefitSponsorsEmployerDocumentsDataTable.new({employer_profile_id: @employer_profile.id})
+            load_documents if employer_attestation_is_enabled?
+          when 'accounts'
+            accounts_block
+          when 'employees'
+            @datatable = ::Effective::Datatables::EmployeeDatatable.new(employee_datatable_params)
+          when 'brokers'
+            @broker_agency_account = @employer_profile.active_broker_agency_account
+          when 'families'
+            @employees = EmployeeRole.find_by_employer_profile(@employer_profile).compact.select { |ee| CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include?(ee.census_employee.aasm_state)}
+          when 'inbox'
+              # do something
+          else
+            else_block
+          end
+        end
 
-              if @benefit_sponsorship.present?
-                @broker_agency_accounts = @benefit_sponsorship.broker_agency_accounts
-                @current_plan_year = @benefit_sponsorship.submitted_benefit_application(include_term_pending: false)
-              end
+        def accounts_block
+          collect_and_sort_invoices(params[:sort_order])
+          @benefit_sponsorship = @employer_profile.organization.active_benefit_sponsorship
+          @benefit_sponsorship_account = @benefit_sponsorship.benefit_sponsorship_account
+          @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
+          #only exists if coming from redirect from sso failing
+          @page_num = params[:page_num] if params[:page_num].present?
+          if @page_num.present?
+            retrieve_payments_for_page(@page_num)
+          else
+            retrieve_payments_for_page(1)
+          end
+          respond_to do |format|
+            format.js {render 'benefit_sponsors/profiles/employers/employer_profiles/my_account/accounts/payment_history'}
+            format.html
+            format.any { head :ok }
+          end
+        end
 
-              collect_and_sort_invoices(params[:sort_order])
-              @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
+        def else_block
+          @broker_agency_account = @employer_profile.active_broker_agency_account
+          @benefit_sponsorship = @employer_profile.latest_benefit_sponsorship
 
-              respond_to do |format|
-                format.html
-                format.js
-                format.any { head :ok }
-              end
-            end
+          if @benefit_sponsorship.present?
+            @broker_agency_accounts = @benefit_sponsorship.broker_agency_accounts
+            @current_plan_year = @benefit_sponsorship.submitted_benefit_application(include_term_pending: false)
+          end
+
+          collect_and_sort_invoices(params[:sort_order])
+          @sort_order = params[:sort_order].nil? || params[:sort_order] == "ASC" ? "DESC" : "ASC"
+
+          respond_to do |format|
+            format.html
+            format.js
+            format.any { head :ok }
           end
         end
 
@@ -121,7 +134,7 @@ module BenefitSponsors
             roaster_upload_count = @roster_upload_form.census_records.length
             begin
               if @roster_upload_form.save
-                flash[:notice] = "#{roaster_upload_count } records uploaded from CSV"
+                flash[:notice] = "#{roaster_upload_count} records uploaded from CSV"
                 redirect_to URI.parse(@roster_upload_form.redirection_url).to_s
               else
                 render @roster_upload_form.redirection_url || default_url
@@ -132,7 +145,7 @@ module BenefitSponsors
             end
           else
             @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.new
-            @roster_upload_form.errors.add(:base, "Can't detect file type #{params[:file] &.original_filename}, please upload Excel/CSV format files only.")
+            @roster_upload_form.errors.add(:base, "Can't detect file type #{params[:file]&.original_filename}, please upload Excel/CSV format files only.")
             respond_to do |format|
               format.html {  render default_url}
             end
@@ -140,7 +153,7 @@ module BenefitSponsors
         end
 
         def file_content_type
-          params[:file].content_type if params[:file]
+          params[:file]&.content_type
         end
 
         def roster_upload_file_type
@@ -162,10 +175,10 @@ module BenefitSponsors
         def download_invoice
           return unless @invoice.present?
 
-          options={}
+          options = {}
           options[:content_type] = @invoice.type
           options[:filename] = @invoice.title
-          send_data Aws::S3Storage.find(@invoice.identifier) , options
+          send_data Aws::S3Storage.find(@invoice.identifier), options
         end
 
         def generate_sic_tree
@@ -187,7 +200,7 @@ module BenefitSponsors
             flash[:error] = "No Active Plan Year present, unable to terminate employee enrollments."
           end
 
-          redirect_to profiles_employers_employer_profile_path(@employer_profile) + "?tab=employees"
+          redirect_to "#{profiles_employers_employer_profile_path(@employer_profile)}?tab=employees"
         end
 
         private
@@ -218,10 +231,11 @@ module BenefitSponsors
           @invoice = @employer_profile.documents.find(params[:invoice_id]) if params[:invoice_id]
         end
 
-        def collect_and_sort_invoices(sort_order='ASC')
+        def collect_and_sort_invoices(sort_order = 'ASC')
           @invoices = @employer_profile.invoices
           @invoice_years = (Settings.invoices.minimum_invoice_display_year..TimeKeeper.date_of_record.year).to_a.reverse
-          sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse! unless @documents
+          return unless @documents
+          sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse!
         end
 
         def find_employer
@@ -234,35 +248,18 @@ module BenefitSponsors
 
         def employee_datatable_params
           data_table_params = { id: params[:id], scopes: params[:scopes] }
-
-          data_table_params.merge!({
-            renewal: true
-          }) if @employer_profile.renewal_benefit_application.present?
-
-          if @employer_profile.off_cycle_benefit_application.present?
-            data_table_params.merge!(
-              {
-                off_cycle: true
-              }
-            )
-            data_table_params.merge!({current_py_terminated: true}) if @employer_profile.current_benefit_application&.terminated?
-          end
-
-          data_table_params.merge!({ future_reinstated: true }) if @employer_profile.future_active_reinstated_benefit_application.present?
+          data_table_params_block(data_table_params)
           data_table_params.merge!({reinstated: true}) if @employer_profile.current_benefit_application&.reinstated_id.present?
+          data_table_params.merge!({ is_submitted: true }) if @employer_profile&.renewal_benefit_application&.is_submitted?
+          data_table_params.merge!({ is_off_cycle_submitted: true }) if @employer_profile&.off_cycle_benefit_application&.is_submitted?
+          data_table_params
+        end
 
-          data_table_params.merge!({
-            is_submitted: true
-          }) if @employer_profile&.renewal_benefit_application&.is_submitted?
-
-          if @employer_profile&.off_cycle_benefit_application&.is_submitted?
-            data_table_params.merge!(
-              {
-                is_off_cycle_submitted: true
-              }
-            )
-          end
-
+        def data_table_params_block(data_table_params)
+          data_table_params.merge!({ renewal: true }) if @employer_profile.renewal_benefit_application.present?
+          data_table_params.merge!({ off_cycle: true }) if @employer_profile.off_cycle_benefit_application.present?
+          data_table_params.merge!({current_py_terminated: true}) if @employer_profile.off_cycle_benefit_application.present? && @employer_profile.current_benefit_application&.terminated?
+          data_table_params.merge!({ future_reinstated: true }) if @employer_profile.future_active_reinstated_benefit_application.present?
           data_table_params
         end
 
@@ -277,7 +274,7 @@ module BenefitSponsors
         def load_group_enrollments
           billing_date = Date.strptime(params[:billing_date], "%m/%d/%Y") if params[:billing_date]
           query = Queries::CoverageReportsQuery.new(@employer_profile, billing_date)
-          @group_enrollments =  query.execute
+          @group_enrollments = query.execute
           @product_info = load_products
         end
 
@@ -288,7 +285,7 @@ module BenefitSponsors
 
           plans = BenefitMarkets::Products::Product.aca_shop_market.by_state(Settings.aca.state_abbreviation)
 
-          current_possible_plans = plans.where(:"application_period.min".in =>[
+          current_possible_plans = plans.where(:"application_period.min".in => [
             Date.new(previous_year, 1, 1),
             Date.new(current_year, 1, 1),
             Date.new(next_year, 1, 1)
@@ -308,11 +305,15 @@ module BenefitSponsors
           "/benefit_sponsors/profiles/employers/employer_profiles/_employee_csv_upload_errors"
         end
 
+        def employees_upload_url(profile_id)
+          "/benefit_sponsors/profiles/employers/employer_profiles/#{profile_id}?tab=employees"
+        end
+
         def csv_for(groups)
           (output = "").tap do
             CSV.generate(output) do |csv|
               csv << ["Name", "SSN", "DOB", "Hired On", "Benefit Group", "Type", "Name", "Issuer", "Covered Ct", "Employer Contribution",
-              "Employee Premium", "Total Premium"]
+                      "Employee Premium", "Total Premium"]
               groups.each do |element|
                 primary = element.primary_member
                 census_employee = primary.employee_role.census_employee
@@ -340,10 +341,10 @@ module BenefitSponsors
 
         def csv_content_type
           case request.user_agent
-            when /windows/i
-              'application/vnd.ms-excel'
-            else
-              'text/csv'
+          when /windows/i
+            'application/vnd.ms-excel'
+          else
+            'text/csv'
           end
         end
 

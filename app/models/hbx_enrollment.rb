@@ -1073,7 +1073,7 @@ class HbxEnrollment
     thh_enr_premiums = thh_enr_group_ehb_premium_of_aptc_members(aptc_tax_household_enrollments)
     populate_applied_aptc_for_thh_enrs(aptc_tax_household_enrollments, thh_enr_premiums)
   rescue StandardError => e
-    Rails.logger.error { "Couldn't generate enrollment save event due to #{e.backtrace}" }
+    Rails.logger.error { "Unable to update tax_household_enrollments due to #{e.backtrace}" }
   end
 
   def handle_coverage_selection
@@ -1554,8 +1554,16 @@ class HbxEnrollment
     new_plan ||= product
 
     plan_selection = PlanSelection.new(self, new_plan)
-    return unless plan_selection.existing_coverage.present?
-    self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members
+    return if plan_selection.existing_coverage.blank?
+    return self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members if is_shop?
+
+    plan_selection.same_plan_enrollment.hbx_enrollment_members.each do |enr_member|
+      member = hbx_enrollment_members.where(applicant_id: enr_member.applicant_id).first
+      next enr_member if member.blank? || enr_member.coverage_start_on == member.coverage_start_on
+
+      member.coverage_start_on = enr_member.coverage_start_on
+      member.save!
+    end
   end
 
   def display_make_changes_for_ivl?
@@ -2020,11 +2028,20 @@ class HbxEnrollment
     end
   end
 
+  def reinstate_tax_household_enrollments(reinstate_enrollment)
+    return if is_shop?
+    return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+
+    TaxHouseholdEnrollment.by_enrollment_id(self.id).each do |thhe|
+      new_thhe = thhe.build_tax_household_enrollment_for(reinstate_enrollment)
+      new_thhe.save
+    end
+  end
+
   def reinstate(edi: false)
     return false unless can_be_reinstated?
     return false if has_active_term_or_expired_exists_for_reinstated_date?
     reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(self, fetch_reinstatement_date).build
-
     can_renew = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: reinstate_enrollment})
 
     return false unless can_renew.success?
@@ -2036,6 +2053,7 @@ class HbxEnrollment
 
     if reinstate_enrollment.may_reinstate_coverage?
       reinstate_enrollment.reinstate_coverage!
+      reinstate_tax_household_enrollments(reinstate_enrollment)
       # Move reinstated enrollment to "coverage selected" status
       reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage?
 
@@ -2128,7 +2146,7 @@ class HbxEnrollment
 
     # after_all_transitions :perform_employer_plan_year_count
 
-    event :renew_enrollment, :after => [:record_transition, :trigger_enrollment_notice] do
+    event :renew_enrollment, :after => [:record_transition, :update_tax_household_enrollment, :trigger_enrollment_notice] do
       transitions from: :shopping, to: :auto_renewing
     end
 
@@ -2136,7 +2154,7 @@ class HbxEnrollment
       transitions from: :shopping, to: :renewing_waived
     end
 
-    event :select_coverage, :after => [:record_transition, :propagate_selection, :update_reinstate_coverage, :generate_prior_py_shop_renewals, :publish_select_coverage_events, :update_tax_household_enrollment] do
+    event :select_coverage, :after => [:record_transition, :update_tax_household_enrollment, :propagate_selection, :update_reinstate_coverage, :generate_prior_py_shop_renewals, :publish_select_coverage_events] do
       transitions from: :shopping,
                   to: :coverage_selected, :guard => :can_select_coverage?
       transitions from: [:auto_renewing, :actively_renewing],
@@ -2775,7 +2793,7 @@ class HbxEnrollment
     event = event('events.enrollment_saved', attributes: {gid: self.to_global_id.uri, payload: cv_enrollment.success})
     event.success.publish if event.success?
   rescue StandardError => e
-    Rails.logger.error { "Couldn't generate enrollment save event due to #{e.backtrace}" }
+    Rails.logger.error { "Couldn't generate enrollment #{self.hbx_id} save event due to #{e.backtrace}" }
   end
 
   def publish_event(event, payload)
@@ -2862,13 +2880,13 @@ class HbxEnrollment
   def sum_of_member_ehb_premiums(thh_enr)
     aptc_family_member_ids = thh_enr.tax_household.aptc_members.map(&:applicant_id)
     hbx_enrollment_members.where(:applicant_id.in => aptc_family_member_ids).reduce(0) do |sum, member|
-      sum + ivl_decorated_hbx_enrollment.member_ehb_premium(member)
+      sum + round_down_float_two_decimals(ivl_decorated_hbx_enrollment.member_ehb_premium(member))
     end
   end
 
   def thh_enr_group_ehb_premium_of_aptc_members(thh_enrs)
     thh_enrs.inject({}) do |premiums, thh_enr|
-      premiums[thh_enr] = { group_ehb_premium: float_fix(sum_of_member_ehb_premiums(thh_enr)) }
+      premiums[thh_enr] = { group_ehb_premium: sum_of_member_ehb_premiums(thh_enr) }
       premiums
     end
   end

@@ -92,11 +92,29 @@ RSpec.describe Operations::SlcspCalculation, type: :model, dbclean: :after_each 
                      :name => "Mark",
                      :relationship => "self",
                      :dob => {:month => "1", :day => "1", :year => "1979"},
-                     :residences => [{:county => {:zipcode => person_rating_address.zip,
+                     :residences => [{ :absent => true,
+                                       :county => {:zipcode => "",
+                                                   :name => "",
+                                                   :fips => "",
+                                                   :state => ""},
+                                       :months => {:jan => true,
+                                                   :feb => false,
+                                                   :mar => false,
+                                                   :apr => false,
+                                                   :may => false,
+                                                   :jun => false,
+                                                   :jul => false,
+                                                   :aug => false,
+                                                   :sep => true,
+                                                   :oct => false,
+                                                   :nov => false,
+                                                   :dec => false}},
+                                     {:absent => false,
+                                      :county => {:zipcode => person_rating_address.zip,
                                                   :name => person_rating_address.county,
                                                   :fips => "23005",
                                                   :state => person_rating_address.state},
-                                      :months => {:jan => true,
+                                      :months => {:jan => false,
                                                   :feb => true,
                                                   :mar => true,
                                                   :apr => true,
@@ -104,7 +122,7 @@ RSpec.describe Operations::SlcspCalculation, type: :model, dbclean: :after_each 
                                                   :jun => true,
                                                   :jul => true,
                                                   :aug => true,
-                                                  :sep => true,
+                                                  :sep => false,
                                                   :oct => false,
                                                   :nov => false,
                                                   :dec => false}},
@@ -121,8 +139,24 @@ RSpec.describe Operations::SlcspCalculation, type: :model, dbclean: :after_each 
                                                   :jul => false,
                                                   :aug => false,
                                                   :sep => false,
-                                                  :oct => true,
+                                                  :oct => false,
                                                   :nov => true,
+                                                  :dec => false}},
+                                     {:county => {:zipcode => "43",
+                                                  :name => "The answer to life, the universe, and everything",
+                                                  :fips => "23005",
+                                                  :state => "NA"},
+                                      :months => {:jan => false,
+                                                  :feb => false,
+                                                  :mar => false,
+                                                  :apr => false,
+                                                  :may => false,
+                                                  :jun => false,
+                                                  :jul => false,
+                                                  :aug => false,
+                                                  :sep => false,
+                                                  :oct => false,
+                                                  :nov => false,
                                                   :dec => true}}],
                      :coverage => {:jan => true,
                                    :feb => true,
@@ -133,7 +167,7 @@ RSpec.describe Operations::SlcspCalculation, type: :model, dbclean: :after_each 
                                    :jul => false,
                                    :aug => true,
                                    :sep => true,
-                                   :oct => true,
+                                   :oct => false,
                                    :nov => true,
                                    :dec => true}},
                     {:primaryMember => false,
@@ -165,7 +199,7 @@ RSpec.describe Operations::SlcspCalculation, type: :model, dbclean: :after_each 
                                    :jul => false,
                                    :aug => true,
                                    :sep => true,
-                                   :oct => true,
+                                   :oct => false,
                                    :nov => true,
                                    :dec => true}}]}
 
@@ -178,10 +212,11 @@ RSpec.describe Operations::SlcspCalculation, type: :model, dbclean: :after_each 
 
     it 'should not be zero' do
       result = subject.call(uber_payload)
-      expect(result.value![:jan]).to eq(590)
+      expect(result.value![:jan]).to eq("Lived in another country or was deceased")
       expect(result.value![:jul]).to be_nil
       expect(result.value![:aug]).to eq(1180)
-      expect(result.value![:oct]).to eq(1180)
+      expect(result.value![:oct]).to be_nil
+      expect(result.value![:nov]).to eq(1180)
     end
   end
 end

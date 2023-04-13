@@ -32,7 +32,7 @@ module Operations
       Date.new(dob[:year], dob[:month], dob[:day])
     end
 
-    # rubocop:disable Metrics/CyclomaticComplexity,Metrics/AbcSize
+    # rubocop:disable Metrics/CyclomaticComplexity,Metrics/AbcSize,Metrics/PerceivedComplexity
     def process(params)
       result = {}
       primary_member = resolve_primary_member_data(params[:members])
@@ -53,10 +53,12 @@ module Operations
         else
           recalculate = true
           # something changed we need to recalculate
-          if prev_month_data[:residence] != current_month_data[:residence] && !last_full_result.nil?
+          if prev_month_data[:residence] != current_month_data[:residence] && !last_full_result.nil? && !current_month_data[:members].blank? && !current_month_data[:primary_absent]
             @logger.info "SLCSP ------------------------- residence changed"
             # figure it out if we are on a different rating area
-            seeker = calculate_month(current_month_data, params[:taxYear], i, month_key).value!
+            seeker = {}
+            seeker_call = calculate_month(current_month_data, params[:taxYear], i, month_key)
+            seeker = seeker_call.value! if seeker_call.success?
             if last_full_result[:rating_area_id] != seeker[:rating_area_id] && last_full_result[:service_area_ids] != seeker[:service_area_ids]
               # If the change is only to rating area, there's no change in SLCSP. If it's a change in rating + service area (meaning a different SLCSP)
               # then effective date of the new SLCSP is the month of the change.
@@ -77,6 +79,7 @@ module Operations
             current = last_full_result[:household_group_benchmark_ehb_premium]
           else
             current = nil
+            current = "Lived in another country or was deceased" if current_month_data[:primary_absent]
           end
         end
 
@@ -85,7 +88,7 @@ module Operations
       end
       Success(result)
     end
-    # rubocop:enable Metrics/CyclomaticComplexity,Metrics/AbcSize
+    # rubocop:enable Metrics/CyclomaticComplexity,Metrics/AbcSize,Metrics/PerceivedComplexity
 
     def calculate_month(current_month_data, assistance_year, month, month_key)
       payload = build_operation_payload(current_month_data, assistance_year, month)
@@ -133,9 +136,11 @@ module Operations
       result = {}
       (1..12).each do |i|
         month_key = Date::MONTHNAMES[i][0..2].downcase.to_sym
+        primary_residence = resolve_residence(primary_member, month_key)
         result[month_key] = {
           members: resolve_cohabitants(members, month_key),
-          residence: resolve_residence(primary_member, month_key)
+          residence: primary_residence&.dig(:county),
+          primary_absent: primary_residence&.dig(:absent)
         }
       end
       result
@@ -143,8 +148,9 @@ module Operations
 
     def resolve_residence(residences, month_key)
       residences.each do |residence|
-        return residence[:county] if residence[:months][month_key]
+        return residence if residence[:months][month_key]
       end
+      nil
     end
 
     def resolve_cohabitants(members, month_key)

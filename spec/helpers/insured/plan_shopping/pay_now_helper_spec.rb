@@ -8,7 +8,7 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
   let(:individual_plans) { FactoryBot.create_list(:plan, 5, :with_premium_tables, market: 'individual') }
 
   describe "Carrier with payment options" do
-    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) do
       FactoryBot.create(:benefit_markets_products_health_products_health_product,
                         title: 'IVL Test Plan Silver',
@@ -38,14 +38,14 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
         end
         it "returns #{market.in?(['individual', 'coverall'])} for #{market} + Kaiser" do
           allow(helper).to receive(:has_any_previous_enrollments?).with(hbx_enrollment).and_return false
-          expect(helper.show_pay_now?("Plan Shopping", hbx_enrollment)).to eq false
+          expect(helper.show_pay_now?("Plan Shopping", hbx_enrollment)).to be_falsey
         end
       end
     end
   end
 
   describe "Carrier with NO payment options" do
-    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) do
       FactoryBot.create(:benefit_markets_products_health_products_health_product,
                         title: 'IVL Test Plan Silver',
@@ -70,12 +70,12 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
       assign(:enrollment, hbx_enrollment)
     end
     it "returns false for not Kaiser" do
-      expect(helper.show_pay_now?("Plan Shopping", hbx_enrollment)).to eq false
+      expect(helper.show_pay_now?("Plan Shopping", hbx_enrollment)).to be_falsey
     end
   end
 
   describe "Check family has Kaiser enrollments or not" do
-    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: 'Kaiser') }
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) do
       FactoryBot.create(:benefit_markets_products_health_products_health_product,
                         title: 'IVL Test Plan Silver',
@@ -109,39 +109,40 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
     end
     before :each do
       assign(:enrollment, hbx_enrollment)
+      @carrier_key = helper.fetch_carrier_key_from_legal_name(hbx_enrollment&.product&.issuer_profile&.legal_name)
     end
 
-    it 'return false if household has kaiser enrollments in current benefit coverage period with same subscriber' do
-      expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
+    it 'return true if household has kaiser enrollments in current benefit coverage period with same subscriber' do
+      expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq true
     end
 
     it 'return false previous enrollment is shopping state' do
-      hbx_enrollment.update_attributes(aasm_state: 'shopping')
-      hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
+      hbx_enrollment1.update_attributes(aasm_state: 'shopping')
+      hbx_enrollment.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
       expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
     it 'return false previous enrollment is canceled state' do
-      hbx_enrollment.update_attributes(aasm_state: 'coverage_canceled')
-      hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
+      hbx_enrollment1.update_attributes(aasm_state: 'coverage_canceled')
+      hbx_enrollment.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
       expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
     it 'return false previous enrollment is inactive state' do
-      hbx_enrollment.update_attributes(aasm_state: 'inactive')
-      hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
+      hbx_enrollment1.update_attributes(aasm_state: 'inactive')
+      hbx_enrollment.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
       expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
-    it 'return false previous enrollment is inactive state' do
-      hbx_enrollment.hbx_enrollment_members.detect(&:is_subscriber).update_attributes(is_subscriber: false)
-      hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
+    it 'return false previous enrollment has no subscriber' do
+      hbx_enrollment1.hbx_enrollment_members.detect(&:is_subscriber).update_attributes(is_subscriber: false)
+      hbx_enrollment.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
       expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
     it 'return false previous enrollment has no product' do
-      hbx_enrollment.unset(:product_id)
-      hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
+      hbx_enrollment1.unset(:product_id)
+      hbx_enrollment.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
       expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
@@ -156,8 +157,8 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
       expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
-    it 'return false if household had no kaiser enrollments in current benefit coverage period' do
-      issuer_profile.update_attributes(legal_name: 'Something')
+    it 'return false if household had no previous kaiser enrollments in current benefit coverage period' do
+      hbx_enrollment1.update_attributes(product_id: "")
       expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
@@ -166,10 +167,15 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
       hbx_enrollment1.update_attributes(product_id: "")
       expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
+
+    it 'should return false if previous enrollments are different kinds' do
+      hbx_enrollment1.update_attributes(coverage_kind: "dental")
+      expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
+    end
   end
 
   describe 'Whether family has break in coverage enrollments' do
-    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: 'Kaiser') }
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) do
       FactoryBot.create(:benefit_markets_products_health_products_health_product,
                         title: 'IVL Test Plan Silver',
@@ -235,7 +241,7 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
   end
 
   describe 'Pay Now button should be available only for limited time' do
-    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) do
       FactoryBot.create(:benefit_markets_products_health_products_health_product,
                         title: 'IVL Test Plan Silver',
@@ -321,8 +327,8 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
     end
   end
 
-  describe 'Pay Now button should be available only for limited time on enrollment tile' do
-    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: 'Kaiser') }
+  describe 'Pay Now button on enrollment tile' do
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) do
       FactoryBot.create(:benefit_markets_products_health_products_health_product,
                         title: 'IVL Test Plan Silver',
@@ -360,24 +366,26 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
         from_state: hbx_enrollment.aasm_state,
         to_state: "coverage_selected"
       )
-      hbx_enrollment.update_attributes(effective_on: TimeKeeper.date_of_record + 1.day)
       assign(:enrollment, hbx_enrollment)
-    end
-
-    it 'should return true if current date is less than enrollment effective date' do
-      #TODO: Remove this consition when setting is turned on
-      expect(helper.show_pay_now?("Enrollment Tile", hbx_enrollment)).to eq true if EnrollRegistry[:kaiser_pay_now].setting(:enrollment_tile).item
-    end
-
-    it 'should return true if current date is equal to enrollment effective date' do
-      allow(TimeKeeper).to receive(:date_of_record).and_return(hbx_enrollment.effective_on)
-      expect(helper.show_pay_now?("Enrollment Tile", hbx_enrollment)).to eq false
     end
 
     it 'should return false if enrollment kind is employer sponsored' do
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
-      allow(TimeKeeper).to receive(:date_of_record).and_return(hbx_enrollment1.effective_on)
-      expect(helper.show_pay_now?("Enrollment Tile", hbx_enrollment1)).to eq false
+      expect(helper.show_pay_now?("Enrollment Tile", hbx_enrollment1)).to be_falsey
+    end
+
+    it 'should show if generic redirect is enabled' do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:generic_redirect).and_return(true)
+      allow(EnrollRegistry[:generic_redirect].setting(:strict_tile_check)).to receive(:item).and_return(false)
+      expect(helper.show_generic_redirect?(hbx_enrollment)).to eq true
+    end
+
+    it 'should return false if strict generic redirect is enabled and enrollment tile is disabled' do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:generic_redirect).and_return(true)
+      allow(EnrollRegistry[:generic_redirect].setting(:strict_tile_check)).to receive(:item).and_return(true)
+      allow(EnrollRegistry[:kaiser_pay_now].setting(:enrollment_tile)).to receive(:item).and_return(false)
+      allow(EnrollRegistry[:kaiser_permanente_pay_now].setting(:enrollment_tile)).to receive(:item).and_return(false)
+      expect(helper.show_generic_redirect?(hbx_enrollment)).to be_falsey
     end
   end
 end

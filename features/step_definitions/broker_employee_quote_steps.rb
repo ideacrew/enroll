@@ -92,6 +92,13 @@ And(/^Primary Broker enters quote name$/) do
   wait_for_ajax(3, 2)
 end
 
+And(/^Primary Broker enters a new quote name$/) do
+  fill_in BrokerCreateQuotePage.quote_name, :with => "Test Quote"
+  find(BrokerCreateQuotePage.select_start_on_dropdown).click
+  expect(page).to have_content((TimeKeeper.date_of_record + 2.months).strftime("%B %Y"))
+  wait_for_ajax(3, 2)
+end
+
 Then(/^.+ sees that publish button is (.*)$/) do |publish_btn|
   wait_for_ajax(3, 2)
   find(:xpath, "//*[@id='new_forms_plan_design_proposal']/div[9]", :visible => false).click
@@ -360,6 +367,7 @@ end
 
 And(/^Primary broker clicks Actions dropdown and clicks Create Quote$/) do
   find(BrokerEmployersPage.actions_dropdown).click
+  wait_for_ajax
   expect(page).to have_css('.btn.btn-xs', text: 'Create Quote')
   find(BrokerEmployersPage.create_quote).click
 end
@@ -370,3 +378,41 @@ And(/^Primary broker clicks Actions dropdown and clicks Assign General Agency$/)
   find(BrokerEmployersPage.assign_general_agency).click
 end
 
+And(/^Broker HC4CC feature enabled$/) do
+  EnrollRegistry[:broker_quote_hc4cc_subsidy].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry[:aca_shop_osse_subsidy].feature.stub(:is_enabled).and_return(true)
+end
+
+And(/^Primary Broker should see HC4CC option$/) do
+  expect(page).to have_css('.panel', text: 'Healthcare4Childcare (HC4CC) Program')
+end
+
+Then(/^Primary broker should see plan names in employee costs$/) do
+  expect(page).to have_content(/Lowest Cost Plan/)
+end
+
+Then(/^Primary broker should see total HC4CC subcidy applied amount$/) do
+  expect(page).to have_content(/Total HC4CC Subcidy Applied/)
+end
+
+And(/^Primary broker clicks on show details in employee costs section$/) do
+  find(BrokerCreateQuotePage.show_employee_details).click
+end
+
+And(/^Primary broker should see employee costs download pdf button$/) do
+  expect(find_all('a.downloadEmployeeCostsDetailsButton').count).to eq 1
+end
+
+And(/^Primary broker selects reference plan$/) do
+  find(BrokerCreateQuotePage.reference_plan_radio).click
+end
+
+Then(/^Primary Broker selects quote as HC4CCC quote$/) do
+  find('#forms_plan_design_proposal_osse_eligibility_true').click
+  wait_for_ajax
+end
+
+And(/^Primary broker should see metal level non bronze options$/) do
+  expect(find_all('.benefits-setup-tab-bqt ul li').count).to eq 1
+  expect(find_all("input[name='metal_level_for_elected_plan']").collect(&:value)).not_to include('bronze')
+end

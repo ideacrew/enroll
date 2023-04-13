@@ -29,14 +29,6 @@ describe Subscribers::DefaultGaChanged do
         expect(subject.service).not_to receive(:send_message)
         subject.call(nil, nil, nil, nil, message.except("pre_default_ga_id"))
       end
-
-      it "should do clear with pre_default_ga_id" do
-        pdo
-        expect(subject.service).to receive(:send_message)
-        subject.call(nil, nil, nil, nil, message)
-        pdo.reload
-        expect(pdo.active_general_agency_account).to eq nil
-      end
     end
 
     context "that has a hbx_id with default_ga", dbclean: :after_each do

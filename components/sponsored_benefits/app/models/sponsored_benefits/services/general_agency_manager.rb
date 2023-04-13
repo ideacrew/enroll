@@ -61,6 +61,20 @@ module SponsoredBenefits
         prev_default_ga_id = current_default_ga.id if current_default_ga
         broker_agency_profile.default_general_agency_profile = general_agency_profile
         broker_agency_profile.save!
+        employers = SponsoredBenefits::Organizations::PlanDesignOrganization.where(owner_profile_id: form.broker_agency_profile_id, has_active_broker_relationship: true)
+        employers.each do |employer|
+          if employer.general_agency_accounts.any?
+            employer.general_agency_accounts.update_all(:benefit_sponsrship_general_agency_profile_id => general_agency_profile.id)
+          else
+            employer_ga_account = employer.general_agency_accounts.new
+            employer_ga_account.benefit_sponsrship_general_agency_profile_id = general_agency_profile.id
+            employer_ga_account.aasm_state = :active
+            employer_ga_account.start_on = Time.zone.now
+            employer_ga_account.broker_role_id = broker_agency_profile.primary_broker_role_id
+            employer_ga_account.benefit_sponsrship_broker_agency_profile_id = broker_agency_profile.id
+            employer_ga_account.save!
+          end
+        end
         notify("acapi.info.events.broker.default_ga_changed", {:broker_id => broker_agency_profile.primary_broker_role.hbx_id, :pre_default_ga_id => prev_default_ga_id.to_s}) if broker_agency_profile.primary_broker_role
       end
 

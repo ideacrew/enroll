@@ -11,7 +11,7 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: primary_applicant) }
   let(:family_member2) { FactoryBot.create(:family_member, family: family, person: dependent1) }
   let(:family_member3) { FactoryBot.create(:family_member, family: family, person: dependent2) }
-  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
+  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'determined', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
   let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: application, family_member_id: primary_applicant.id, is_primary_applicant: true, person_hbx_id: primary_applicant.hbx_id) }
   let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, application: application, family_member_id: family_member2.id, person_hbx_id: dependent1.hbx_id) }
   let!(:applicant3) { FactoryBot.create(:financial_assistance_applicant, application: application, family_member_id: family_member3.id, person_hbx_id: dependent2.hbx_id) }
@@ -90,21 +90,6 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
         expect(subject).to include(application)
       end
     end
-
-    # context "when a family member is deleted" do
-    #   before do
-    #     create_instate_addresses
-    #     create_relationships
-    #     application.save!
-    #     allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(::Dry::Monads::Result::Success.new(application))
-    #     family.family_members.last.delete
-    #     family.reload
-    #   end
-
-    #   it "should ignore the application and return an empty array" do
-    #     expect(subject).to be_empty
-    #   end
-    # end
   end
 
   describe '#transform_households' do
@@ -125,7 +110,7 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
     let(:product) { create(:benefit_markets_products_health_products_health_product, :ivl_product, issuer_profile: issuer) }
     let(:issuer) { create(:benefit_sponsors_organizations_issuer_profile, abbrev: 'ANTHM') }
 
-    subject { Operations::Transformers::FamilyTo::Cv3Family.new.transform_households(family.households) }
+    subject { Operations::Transformers::FamilyTo::Cv3Family.new.transform_households(family.households, {exclude_seps: false}) }
 
     context 'when enrollment is in shopping state' do
       let(:aasm_state) { 'shopping' }
@@ -138,6 +123,58 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
       let(:aasm_state) { 'coverage_selected' }
       it 'should include hbx_enrollments in the hash' do
         expect(subject[0][:hbx_enrollments]).to be_present
+      end
+    end
+  end
+
+  describe '#transform hbx_enrollments' do
+    let(:aasm_state) { 'coverage_selected' }
+    let!(:coverage_selected_enrollment) do
+      create(
+        :hbx_enrollment,
+        :with_enrollment_members,
+        :individual_unassisted,
+        family: family,
+        aasm_state: aasm_state,
+        product_id: product.id,
+        applied_aptc_amount: Money.new(44_500),
+        consumer_role_id: primary_applicant.consumer_role.id,
+        enrollment_members: family.family_members,
+        enrollment_kind: "special_enrollment",
+        submitted_at: submitted_at
+      )
+    end
+
+    let(:submitted_at) { TimeKeeper.date_of_record }
+    let(:start_on) { submitted_at.prev_day }
+    let(:special_enrollment_period) do
+      build(
+        :special_enrollment_period,
+        family: family,
+        qualifying_life_event_kind_id: qle.id,
+        market_kind: "ivl",
+        start_on: start_on,
+        end_on: start_on,
+        created_at: submitted_at,
+        updated_at: submitted_at
+      )
+    end
+
+    let!(:add_special_enrollment_period) do
+      family.special_enrollment_periods = [special_enrollment_period]
+      family.save
+    end
+    let!(:qle)  { FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual") }
+
+    let(:product) { create(:benefit_markets_products_health_products_health_product, :ivl_product, issuer_profile: issuer) }
+    let(:issuer) { create(:benefit_sponsors_organizations_issuer_profile, abbrev: 'ANTHM') }
+
+    subject { Operations::Transformers::FamilyTo::Cv3Family.new.transform_households(family.households, {exclude_seps: true}) }
+
+    context 'when enrollment is outside of sep periods and exclude_seps is true' do
+      let(:aasm_state) { 'coverage_selected' }
+      it 'should not return special_enrollment_period_reference' do
+        expect(subject[0][:hbx_enrollments][0][:special_enrollment_period_reference]).to be_nil
       end
     end
   end
@@ -184,6 +221,22 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
       contract_result = AcaEntities::Contracts::Households::TaxHouseholdGroupContract.new.call(subject.first)
       result = AcaEntities::Households::TaxHouseholdGroup.new(contract_result.to_h)
       expect(result).to be_a AcaEntities::Households::TaxHouseholdGroup
+    end
+
+    context 'member has csr kind value of csr_limited' do
+      before do
+        member = family.tax_household_groups.first.tax_households.first.tax_household_members.first
+        member.update(csr_percent_as_integer: -1)
+      end
+
+      it 'should remove csr prefix in the hash' do
+        expect(family.tax_household_groups.first.tax_households.first.tax_household_members.first.csr_eligibility_kind).to eq 'csr_limited'
+        expect(subject.first[:tax_households].first[:tax_household_members].first[:product_eligibility_determination][:csr]).to eq 'limited'
+      end
+
+      it 'should validate the contract successfully' do
+        expect(AcaEntities::Contracts::Households::TaxHouseholdGroupContract.new.call(subject.first).success?).to be_truthy
+      end
     end
   end
 

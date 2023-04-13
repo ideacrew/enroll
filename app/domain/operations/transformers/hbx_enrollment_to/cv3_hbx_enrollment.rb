@@ -14,16 +14,20 @@ module Operations
         include Acapi::Notifiers
         require 'securerandom'
 
-        def call(enrollment)
-          request_payload = yield construct_payload(enrollment)
+        # !!!Important!!!
+        # options param is a temporary solution and currently accepts attribute (exclude_seps)in cv3_hbx_enrollment - developed for Pivotal-184575110,
+        # **Do not pass in options(exclude_seps) elsewhere unless approved from Dan/leadership team**
+        # !!!Important!!!
+        def call(enrollment, options = {})
+          request_payload = yield construct_payload(enrollment, options)
 
           Success(request_payload)
         end
 
         private
 
-        # rubocop:disable Metrics/CyclomaticComplexity
-        def construct_payload(enr)
+        # rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize
+        def construct_payload(enr, options)
           product = enr.product
           issuer = product&.issuer_profile
           consumer_role = enr&.consumer_role
@@ -46,15 +50,15 @@ module Operations
             payload.merge!(product_reference: product_reference(product, issuer, family_rated_info))
           end
           payload.merge!(issuer_profile_reference: issuer_profile_reference(issuer)) if issuer
-          payload.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment? && enr.special_enrollment_period
+          payload.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment? && !options[:exclude_seps]
           enr_tax_households = tax_household_enrollments(enr)
           payload.merge!(tax_households_references: transform_enr_tax_households(enr_tax_households)) if enr_tax_households.present?
           Success(payload)
         rescue StandardError => e
           puts "Cv3HbxEnrollment error: #{e.message} | exception: #{e.inspect} | backtrace: #{e.backtrace.inspect}"
-          Rails.logger.error "Cv3HbxEnrollment error: #{e.message} | exception: #{e.inspect} | backtrace: #{e.backtrace.inspect}"
+          Rails.logger.error "Cv3HbxEnrollment id: #{enr&.hbx_id} | error: #{e.message} | exception: #{e.inspect} | backtrace: #{e.backtrace.inspect}"
         end
-        # rubocop:enable Metrics/CyclomaticComplexity
+        # rubocop:enable Metrics/CyclomaticComplexity, Metrics/AbcSize
 
         def tax_household_enrollments(enr)
           TaxHouseholdEnrollment.where(enrollment_id: enr.id)
@@ -68,8 +72,18 @@ module Operations
           Operations::Transformers::TaxHouseholdEnrollmentTo::Cv3TaxHouseholdEnrollment.new.call(tax_household_enr).value!
         end
 
+        def fetch_special_enrollment_period(enrollment)
+          family = enrollment.family
+
+          seps = family.special_enrollment_periods.select do |sep|
+            (sep.start_on..sep.end_on).cover?(enrollment.submitted_at) if sep.start_on.present? && sep.end_on.present?
+          end
+
+          seps.max_by(&:created_at)
+        end
+
         def special_enrollment_period_reference(enrollment)
-          sep = enrollment.special_enrollment_period
+          sep = enrollment.special_enrollment_period || fetch_special_enrollment_period(enrollment)
           qle = sep.qualifying_life_event_kind
           {
             qualifying_life_event_kind_reference: construct_qle_reference(sep.qualifying_life_event_kind),
@@ -134,6 +148,7 @@ module Operations
             exchange_provided_code: exchange_provided_code,
             primary_enrollee: qhp_table.primary_enrollee,
             primary_enrollee_one_dependent: qhp_table.primary_enrollee_one_dependent,
+            primary_enrollee_two_dependents: qhp_table.primary_enrollee_two_dependent,
             primary_enrollee_many_dependent: qhp_table.primary_enrollee_many_dependent
           }
         end

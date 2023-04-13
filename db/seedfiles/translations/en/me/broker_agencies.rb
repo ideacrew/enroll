@@ -231,5 +231,11 @@ BROKER_AGENCIES_TRANSLATIONS = {
   "en.new_prospect_employer" => "Fill in the information below to create an employer record for this prospect. You only need to provide a legal name, SIC, Zip and County at this point, however any information you do not enter here will need to be populated later, or by the employer prior to claiming a quote.<br /><br />Once you have created the Prospective Employer record, you can create and manage quotes for this prospect from your Employers page.",
   "en.broker_attestation.required_trainings" => "I have completed all required <a href=%{trainings_link} target='_blank'> %{site_short_name} trainings</a>",
   "en.broker_attestation.active_license" => "I have an active license with health authority with the Maine Bureau of Insurance",
-  "en.broker_attestation.broker_agreement" => "I have read and agree to the <a href=%{agreement_pdf_url} target='_blank'>%{site_short_name} Broker Agreement</a>"
+  "en.broker_attestation.broker_agreement" => "I have read and agree to the <a href=%{agreement_pdf_url} target='_blank'>%{site_short_name} Broker Agreement</a>",
+  "en.bqt.total_hc4cc_subcidy_applied" => "Total HC4CC Subcidy Applied",
+  "en.lowest_cost_available_plan" => "Lowest Cost Available Plan",
+  "en.highest_cost_available_plan" => "Highest Cost Available Plan",
+  "en.lowest_cost_plan" => "Lowest Cost Plan",
+  "en.highest_cost_plan" => "Highest Cost Plan",
+  "en.dependent_count" => "Dependent Count"
 }.freeze

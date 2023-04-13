@@ -170,7 +170,7 @@ end
 
 Then(/I should see the (.*) pop up text/) do |issuer|
   case issuer
-  when 'Kaiser'
+  when 'Kaiser Permanente'
     carrier_name = 'Kaiser Permanente'
   when 'Anthm'
     carrier_name = 'Anthem Blue Cross and Blue Shield'

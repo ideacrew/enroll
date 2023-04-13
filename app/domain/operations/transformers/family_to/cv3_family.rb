@@ -16,8 +16,12 @@ module Operations
         require 'securerandom'
 
         # rubocop:disable Style/OptionalBooleanParameter
-        def call(family, exclude_applications = false)
-          request_payload = yield construct_payload(family, exclude_applications)
+        # !!!Important!!!
+        # Args param is a temporary solution and currently accepts attribute (exclude_seps)in cv3_hbx_enrollment - developed for Pivotal-184575110,
+        # **Do not pass in args(exclude_seps) elsewhere unless approved from Dan/leadership team**
+        # !!!Important!!!
+        def call(family, exclude_applications = false, *args)
+          request_payload = yield construct_payload(family, exclude_applications, args)
 
           Success(request_payload)
         end
@@ -25,7 +29,8 @@ module Operations
 
         private
 
-        def construct_payload(family, exclude_applications)
+        def construct_payload(family, exclude_applications, args)
+          options = args.first || {}
           payload = {
             hbx_id: family.hbx_assigned_id.to_s,
             family_members: transform_family_members(family.family_members),
@@ -42,7 +47,7 @@ module Operations
           }
           payload.merge!(min_verification_due_date: family.min_verification_due_date) if family.min_verification_due_date.present?
           payload.merge!(irs_groups: transform_irs_groups(family.irs_groups)) if family.irs_groups.present?
-          payload.merge!(households: transform_households(family.households)) if family.households.present?
+          payload.merge!(households: transform_households(family.households, options)) if family.households.present?
           payload.merge!(tax_household_groups: transform_tax_household_groups(family.tax_household_groups)) if family.tax_household_groups.present?
           failed_payloads = payload.values.select { |value| value.is_a?(Dry::Monads::Result::Failure) }
           return Failure("Unable to transform payload values: #{failed_payloads}") if failed_payloads.present?
@@ -52,11 +57,9 @@ module Operations
         def transform_applications(family, exclude_applications)
           return unless EnrollRegistry.feature_enabled?(:financial_assistance)
           return [] if exclude_applications
-          member_hbx_ids = family.active_family_members.collect {|family_member| family_member.person.hbx_id}
-          applications = ::FinancialAssistance::Application.where(family_id: family.id).where(:aasm_state.in => ["submitted", "determined"])
+
+          applications = ::FinancialAssistance::Application.where(family_id: family.id).determined
           transformed_applications = applications.collect do |application|
-            # applicant_person_hbx_ids = application.active_applicants.pluck(:person_hbx_id)
-            # next unless member_hbx_ids.to_set == applicant_person_hbx_ids.to_set
             ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
           end.compact
           return Failure("Could not transform applications for family with hbx_id #{family.hbx_assigned_id}: #{transformed_applications.select(&:failure?).map(&:failure)}") unless transformed_applications.all?(&:success?)
@@ -188,7 +191,7 @@ module Operations
           }
         end
 
-        def transform_households(households)
+        def transform_households(households, options)
           households.collect do |household|
             enrollments = household.hbx_enrollments.where(:aasm_state.ne => "shopping", :product_id.ne => nil)
             household_data = {
@@ -199,7 +202,7 @@ module Operations
               tax_households: transform_tax_households(household.tax_households),
               coverage_households: transform_coverage_households(household.coverage_households)
             }
-            household_data.merge!(hbx_enrollments: transform_hbx_enrollments(enrollments)) if enrollments.present?
+            household_data.merge!(hbx_enrollments: transform_hbx_enrollments(enrollments, options)) if enrollments.present?
             household_data
           end
         end
@@ -344,7 +347,7 @@ module Operations
             magi_medicaid_monthly_income_limit: member.magi_medicaid_monthly_income_limit&.to_hash,
             magi_as_percentage_of_fpl: member.magi_as_percentage_of_fpl,
             magi_medicaid_category: member.magi_medicaid_category,
-            csr: member.csr_percent_as_integer
+            csr: member.csr_eligibility_kind.split('_').last
           }
         end
 
@@ -364,16 +367,16 @@ module Operations
           end
         end
 
-        def transform_hbx_enrollments(enrollments)
-          enrollments.map { |enrollment| transform_hbx_enrollment(enrollment) }
+        def transform_hbx_enrollments(enrollments, options)
+          enrollments.map { |enrollment| transform_hbx_enrollment(enrollment, options) }
         end
 
         def construct_updated_by(updated_by)
           # To do
         end
 
-        def transform_hbx_enrollment(enrollment)
-          Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment.new.call(enrollment).value!
+        def transform_hbx_enrollment(enrollment, options)
+          Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment.new.call(enrollment, options).value!
         end
 
         def transform_person(person)
