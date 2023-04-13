@@ -109,7 +109,7 @@ class SponsoredBenefits::Services::PlanCostService
       end
     end
 
-    [(member_premium - osse_subsidy_amount(member, census_employee)), 0.00].max
+    [(member_premium - osse_subsidy_amount(member, census_employee)).round(2), 0.00].max
   end
 
   def osse_subsidy_amount(member, census_employee)
@@ -186,10 +186,7 @@ class SponsoredBenefits::Services::PlanCostService
   end
 
   def reference_premium_for(member, census_employee)
-    reference_premium = reference_plan_member_premium(member, census_employee)
-    subsidy_premium = osse_subsidy_amount(member, census_employee)
-
-    [(reference_premium - subsidy_premium), 0.00].max
+    reference_plan_member_premium(member, census_employee)
   rescue
     0.00
   end
