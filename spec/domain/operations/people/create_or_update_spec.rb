@@ -36,6 +36,16 @@ RSpec.describe Operations::People::CreateOrUpdate, type: :model, dbclean: :after
           expect(@result).to be_a(Dry::Monads::Result::Success)
         end
       end
+
+      context 'nil hbx id' do
+        before :each do
+          person_params.merge!({person_hbx_id: nil})
+          @result = subject.call(params: person_params)
+        end
+        it 'should return success' do
+          expect(@result).to be_a(Dry::Monads::Result::Success)
+        end
+      end
     end
 
     context 'for success case if person already exists in db and updating with same details' do
