@@ -84,7 +84,8 @@ module Operations
 
         def special_enrollment_period_reference(enrollment)
           sep = enrollment.special_enrollment_period || fetch_special_enrollment_period(enrollment)
-          qle = sep.qualifying_life_event_kind
+          return {} unless sep.present?
+
           {
             qualifying_life_event_kind_reference: construct_qle_reference(sep.qualifying_life_event_kind),
             qle_on: sep.qle_on,
