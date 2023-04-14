@@ -19,6 +19,7 @@ env:
 
 jobs:
   prep:
+    if: github.repository_owner == 'ideacrew' && ((github.event_name == 'push') || (github.event.pull_request.head.repo.owner.login == 'ideacrew'))
     runs-on: ubuntu-latest
     outputs:
       taggedImage: ${{ steps.prep.outputs.tagged_image }}
@@ -49,6 +50,7 @@ jobs:
 
   # Uses buildx to build and push the image
   build-and-upload-image:
+    if: github.repository_owner == 'ideacrew' && ((github.event_name == 'push') || (github.event.pull_request.head.repo.owner.login == 'ideacrew'))
     needs: [prep]
     strategy:
       matrix:
@@ -187,7 +189,7 @@ jobs:
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
   new-image-notification:
-    if: github.event_name != 'pull_request'
+    if: github.repository_owner == 'ideacrew' && github.event_name != 'pull_request'
     needs: [prep, build-and-upload-image]
     runs-on: ubuntu-latest
     steps:
@@ -214,7 +216,7 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
 
   notify-slack:
-    if: github.event_name != 'pull_request'
+    if: github.repository_owner == 'ideacrew' && github.event_name != 'pull_request'
     needs: [new-image-notification, prep, build-and-upload-image]
     runs-on: ubuntu-latest
     strategy:

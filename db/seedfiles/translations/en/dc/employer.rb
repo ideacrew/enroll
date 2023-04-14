@@ -39,5 +39,7 @@ EMPLOYER_TRANSLATIONS = {
   :'en.osse_eligibility' => 'HC4CC Eligibility',
   :'en.osse_subsidy_title_shortname' => 'HC4CC',
   :'en.standard_plan' => 'Standard Plan',
-  :'en.osse_subsidy.unable_to_claim' => "Unable to claim HC4CC quote. Please contact customer service at %{contact_center_phone_number}."
+  :'en.osse_subsidy.unable_to_claim' => "Unable to claim HC4CC quote. Please contact customer service at %{contact_center_phone_number}.",
+  :'en.quote.not_found' => 'No quote matching this code could be found. Please contact your broker representative.',
+  :'en.quote.already_claimed' => 'Quote claim code already claimed.'
 }.freeze
