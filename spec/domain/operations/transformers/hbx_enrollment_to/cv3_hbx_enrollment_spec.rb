@@ -193,14 +193,12 @@ RSpec.describe ::Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment, db
     end
 
     context "when exclude_seps is passed to cv3 builder" do
-      it 'should not return special enrollment period reference' do
-        expect(@validated_payload[:special_enrollment_period_reference]).to be({})
+      it 'should return hash block' do
+        expect(@validated_payload[:special_enrollment_period_reference].class).to be(Hash)
       end
-    end
 
-    context "when exclude_seps is passed to cv3 builder" do
       it 'should not return special enrollment period reference' do
-        expect(@validated_payload[:special_enrollment_period_reference]).to be({})
+        expect(@validated_payload[:special_enrollment_period_reference].present?).to be_falsy
       end
     end
   end
