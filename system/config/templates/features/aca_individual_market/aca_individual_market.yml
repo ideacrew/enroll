@@ -9,9 +9,9 @@ registry:
         is_enabled: true
         settings:
           - key: :effective_period_start
-            item: <%= ENV['RESIDENCY_SELF_ATTESTATION_EFFECTIVE_PERIOD_START'] || '' %>
+            item: <%= ENV['RESIDENCY_SELF_ATTESTATION_EFFECTIVE_PERIOD_START'] || '2020-6-6' %>
           - key: :effective_period_end
-            item: <%= ENV['RESIDENCY_SELF_ATTESTATION_EFFECTIVE_PERIOD_END'] || '' %>
+            item: <%= ENV['RESIDENCY_SELF_ATTESTATION_EFFECTIVE_PERIOD_END'] || '2023-1-11' %>
       - key: :consumer_role_hub_call
         item: :consumer_role_hub_call
         is_enabled: true
