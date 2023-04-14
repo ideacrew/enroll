@@ -139,6 +139,70 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
     end
   end
 
+  context '#max_employer_contribution' do
+    before :each do
+      allow(Caches::PlanDetails).to receive(:lookup_rate_with_area).and_return 78.0
+      allow(Caches::PlanDetails).to receive(:lookup_rate).and_return 78.0
+    end
+
+    context "when broker_quote_hc4cc_subsidy is disabled" do
+      before do
+        allow(benefit_application).to receive(:osse_eligible?).and_return false
+      end
+
+      it "should return max employer contribution amount without osse subsidy" do
+        plan_design_census_employee.each do |ce|
+          expect(subject.max_employer_contribution(ce, ce)).to eq 62.40
+        end
+      end
+    end
+
+    context "when broker_quote_hc4cc_subsidy is enabled" do
+      before do
+        allow(benefit_application).to receive(:osse_eligible?).and_return true
+      end
+
+      it "should return max monthly employer contribution amount without osse subsidy" do
+        plan_design_census_employee.each do |ce|
+          expect(subject.max_employer_contribution(ce, ce)).to eq 62.40
+        end
+      end
+    end
+  end
+
+  context '#premium_for' do
+    before :each do
+      allow(Caches::PlanDetails).to receive(:lookup_rate_with_area).and_return 78.0
+      allow(Caches::PlanDetails).to receive(:lookup_rate).and_return 78.0
+      allow(subject).to receive(:lcsp).and_return(reference_plan)
+      allow(subject).to receive(:plan).and_return(reference_plan)
+    end
+
+    context "when broker_quote_hc4cc_subsidy is disabled" do
+      before do
+        allow(benefit_application).to receive(:osse_eligible?).and_return false
+      end
+
+      it "should return employee premium amount without osse subsidy" do
+        plan_design_census_employee.each do |ce|
+          expect(subject.premium_for(ce, ce)).to eq 78.00
+        end
+      end
+    end
+
+    context "when broker_quote_hc4cc_subsidy is enabled" do
+      before do
+        allow(benefit_application).to receive(:osse_eligible?).and_return true
+      end
+
+      it "should return employee premium amount with osse subsidy" do
+        plan_design_census_employee.each do |ce|
+          expect(subject.premium_for(ce, ce)).to eq 0.00
+        end
+      end
+    end
+  end
+
   context "#osse_subsidy_amount" do
     before :each do
       allow(Caches::PlanDetails).to receive(:lookup_rate_with_area).and_return 78.0
