@@ -19,7 +19,7 @@ env:
 
 jobs:
   prep:
-    if: github.repository_owner == 'ideacrew' && ((github.event_name == 'push') || (github.event.pull_request.head.repo.owner.login == 'ideacrew'))
+    if: github.repository_owner == 'ideacrew' && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch') || (github.event.pull_request.head.repo.owner.login == 'ideacrew'))
     runs-on: ubuntu-latest
     outputs:
       taggedImage: ${{ steps.prep.outputs.tagged_image }}
@@ -37,9 +37,9 @@ jobs:
         id: prep
         run: |
           SHORT_SHA=$(echo $GITHUB_SHA | head -c7)
-          REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
+          REPO=$(echo 'ideacrew/enroll' | awk -F '/' '{print $2}')
           TAG=${{ env.GIT_BRANCH_NAME }}-$(echo $GITHUB_SHA | head -c7)
-          IMAGE=ideacrew/$REPO
+          IMAGE=ideacrew/enroll
           echo "tagged_image=${IMAGE}:${TAG}" >> $GITHUB_OUTPUT
           echo "short_sha=$SHORT_SHA" >> $GITHUB_OUTPUT
           echo "branch_name=${{ env.GIT_BRANCH_NAME }}" >> $GITHUB_OUTPUT
@@ -50,7 +50,7 @@ jobs:
 
   # Uses buildx to build and push the image
   build-and-upload-image:
-    if: github.repository_owner == 'ideacrew' && ((github.event_name == 'push') || (github.event.pull_request.head.repo.owner.login == 'ideacrew'))
+    if: github.repository_owner == 'ideacrew' && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch') || (github.event.pull_request.head.repo.owner.login == 'ideacrew'))
     needs: [prep]
     strategy:
       matrix:
