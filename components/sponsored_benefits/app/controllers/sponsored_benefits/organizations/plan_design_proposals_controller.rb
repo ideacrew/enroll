@@ -28,18 +28,20 @@ module SponsoredBenefits
 
       claim_code_status, quote = SponsoredBenefits::Organizations::PlanDesignProposal.claim_code_status?(quote_claim_code)
 
-      osse_quote = quote.osse_eligibility&.present? && EnrollRegistry.feature_enabled?(:broker_quote_hc4cc_subsidy)
-      effective_on = quote.profile.benefit_application.effective_period.min
-      employer_osse_eligible = employer_profile.active_benefit_sponsorship&.eligibility_for(:osse_subsidy, effective_on).present?
+      unless claim_code_status == "invalid"
+        osse_quote = quote.osse_eligibility&.present? && EnrollRegistry.feature_enabled?(:broker_quote_hc4cc_subsidy)
+        effective_on = quote.profile.benefit_application.effective_period.min
+        employer_osse_eligible = employer_profile.active_benefit_sponsorship&.eligibility_for(:osse_subsidy, effective_on).present?
 
-      error_message = quote.present? && aca_state_abbreviation == "MA" ? check_if_county_zip_are_same(quote, employer_profile) : " "
+        error_message = quote.present? && aca_state_abbreviation == "MA" ? check_if_county_zip_are_same(quote, employer_profile) : " "
+      end
 
-      if error_message.present?
+      if claim_code_status == "invalid"
+        flash[:error] = l10n('quote.not_found')
+      elsif error_message.present?
         flash[:error] = error_message
-      elsif claim_code_status == "invalid"
-        flash[:error] = "No quote matching this code could be found. Please contact your broker representative."
       elsif claim_code_status == "claimed"
-        flash[:error] = "Quote claim code already claimed."
+        flash[:error] = l10n('quote.already_claimed')
       else
         begin
           if osse_quote && !employer_osse_eligible
