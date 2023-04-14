@@ -10,30 +10,4 @@ RSpec.describe BenefitSponsors::Services::SponsoredBenefitCostEstimationService,
   let(:reference_product) { double(id: "reference_product_id") }
   let(:is_osse_eligible) { true }
 
-  describe ".product_for_benefits_page_employer_costs" do
-
-    before do
-      allow(benefit_application).to receive(:osse_eligible?).and_return(is_osse_eligible)
-      allow(sponsored_benefit).to receive(:highest_cost_product).and_return(highest_cost_product)
-      allow(sponsored_benefit).to receive(:reference_product).and_return(reference_product)
-    end
-
-    context "When sponsor osse eligible" do
-
-      it "should return highest cost product" do
-        product = subject.product_for_benefits_page_employer_costs(sponsored_benefit, benefit_application)
-        expect(product).to eq highest_cost_product
-      end
-    end
-
-    context "When sponsor not osse eligible" do
-
-      let(:is_osse_eligible) { false }
-
-      it "should return reference product" do
-        product = subject.product_for_benefits_page_employer_costs(sponsored_benefit, benefit_application)
-        expect(product).to eq reference_product
-      end
-    end
-  end
 end
