@@ -139,20 +139,59 @@ RSpec.describe SponsoredBenefits::Organizations::PlanDesignProposalsController, 
       end
     end
 
+    context "successful claim" do
+      before :each do
+        get :claim, params: { employer_profile_id: organization.employer_profile.id, claim_code: published_plan_design_proposal.claim_code}
+      end
 
-    before :each do
-      get :claim, params: { employer_profile_id: organization.employer_profile.id, claim_code: published_plan_design_proposal.claim_code}
-    end
+      if EnrollRegistry[:enroll_app].setting(:broker_quoting_enabled).item
+        it 'should claim the code successfully' do
+          sponsor_profile_benefit_sponsorship.organization.reload
+          expect(sponsor_profile_benefit_sponsorship.reload.benefit_applications.count).to eq 1
+        end
+      end
 
-    if EnrollRegistry[:enroll_app].setting(:broker_quoting_enabled).item
-      it 'should claim the code successfully' do
-        sponsor_profile_benefit_sponsorship.organization.reload
-        expect(sponsor_profile_benefit_sponsorship.reload.benefit_applications.count).to eq 1
+      it 'should show success flash message' do
+        expect(flash[:notice]).to eq 'Code claimed with success. Your Plan Year has been created.'
       end
     end
 
-    it 'should show success flash message' do
-      expect(flash[:notice]).to eq 'Code claimed with success. Your Plan Year has been created.'
+    context "failure to claim" do
+
+      let(:plan_design_proposal_2) do
+        FactoryBot.create(
+          :plan_design_proposal,
+          :with_profile,
+          plan_design_organization: plan_design_organization
+        ).tap do |proposal|
+          sponsorship = proposal.profile.benefit_sponsorships.first
+          sponsorship.initial_enrollment_period = benefit_sponsorship_enrollment_period
+          sponsorship.save
+        end
+      end
+
+      let(:published_plan_design_proposal_2) do
+        pdp = plan_design_proposal_2
+        pdp.publish!
+        pdp
+      end
+
+      let(:benefit_application_2) do
+        FactoryBot.create(
+          :plan_design_benefit_application,
+          :with_benefit_group,
+          effective_period: current_effective_date..current_effective_date.next_year.prev_day,
+          benefit_sponsorship: plan_design_proposal_2.profile.benefit_sponsorships.first
+        )
+      end
+
+      before :each do
+        get :claim, params: { employer_profile_id: organization.employer_profile.id, claim_code: "XXXXX"}
+      end
+
+      it 'should show not found error message' do
+        expect(flash[:error]).to eq l10n('quote.not_found')
+      end
     end
   end
 end
