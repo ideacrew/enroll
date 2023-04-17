@@ -11,7 +11,7 @@ module Subscribers
       pre_process_message(subscriber_logger, payload)
 
       # Add subscriber operations below this line
-      redetermine_family_eligibility(payload)
+      redetermine_family_eligibility(subscriber_logger, payload)
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
@@ -94,22 +94,26 @@ module Subscribers
       subject.eligibilities.max_by(&:created_at)
     end
 
-    def redetermine_family_eligibility(payload)
+    def redetermine_family_eligibility(subscriber_logger, payload)
       enrollment = GlobalID::Locator.locate(payload[:gid])
+      subscriber_logger.info "EnrollmentSubscriber, redetermine_family_eligibility start: #{enrollment.hbx_id}"
       return if enrollment.shopping? || Rails.env.test?
 
       family = enrollment.family
       assistance_year = enrollment.effective_on.year
 
       if HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(enrollment.aasm_state)
+        subscriber_logger.info "EnrollmentSubscriber, redetermine_family_eligibility - if condition start: #{enrollment.hbx_id}"
         family.fail_negative_and_pending_verifications
         application = family.active_financial_assistance_application(assistance_year)
         application&.enrolled_with(enrollment)
+        subscriber_logger.info "EnrollmentSubscriber, redetermine_family_eligibility - if condition end: #{enrollment.hbx_id}"
       end
 
       family.update_due_dates_on_vlp_docs_and_evidences(assistance_year)
 
       ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family, effective_date: enrollment.effective_on.to_date)
+      subscriber_logger.info "EnrollmentSubscriber, redetermine_family_eligibility end: #{enrollment.hbx_id}"
     end
 
     private
