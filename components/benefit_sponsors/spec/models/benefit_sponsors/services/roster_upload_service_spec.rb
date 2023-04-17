@@ -28,8 +28,26 @@ module BenefitSponsors
       end
     end
 
+    describe "parse_ssn" do
+      let(:params) {{first_name: ce.first_name, last_name: ce.last_name, gender: ce.gender, ssn: 123_456_789.0, dob: ce.dob, hired_on: ce.hired_on.strftime("%m/%d/%Y"), address: ini_address_form }}
+
+      before :each do
+        file = Dir.glob(File.join(Rails.root, "spec/test_data/census_employee_import/DCHL Employee Census.xlsx")).first
+        allow(user).to receive(:person).and_return(person)
+        @form = BenefitSponsors::Forms::CensusRecordForm.new(params)
+        @result = service_class.new({file: file, profile: benefit_sponsorship.profile}).init_census_record(ce, @form)
+      end
+
+      it "should return ssn" do
+        expect(@result.ssn).to eq "123456789"
+      end
+    end
+
     describe "terminate_census_record" do
-      let(:params) {{first_name: ce.first_name, last_name: ce.last_name, gender: ce.gender, ssn: ce.ssn, dob: ce.dob, hired_on: ce.hired_on.strftime("%m/%d/%Y"), employment_terminated_on: TimeKeeper.date_of_record.strftime("%m/%d/%Y"), address: ini_address_form }}
+      let(:params) do
+        {first_name: ce.first_name, last_name: ce.last_name, gender: ce.gender, ssn: ce.ssn, dob: ce.dob, hired_on: ce.hired_on.strftime("%m/%d/%Y"), employment_terminated_on: TimeKeeper.date_of_record.strftime("%m/%d/%Y"),
+         address: ini_address_form }
+      end
 
       before :each do
         termination_hash = {}
