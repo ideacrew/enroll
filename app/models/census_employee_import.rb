@@ -327,7 +327,7 @@ class CensusEmployeeImport
   end
 
   def parse_ssn(cell)
-    cell.blank? ? nil : prepend_zeros(cell.to_s.gsub(/\D/, ''), 9)
+    cell.blank? ? nil : prepend_zeros(cell.to_i.to_s.gsub(/\D/, ''), 9)
   end
 
   def parse_boolean(cell)
