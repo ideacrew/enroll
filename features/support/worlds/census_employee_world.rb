@@ -187,7 +187,6 @@ And(/^census employee (.*?) is a (.*) employee$/) do |named_person, state|
 end
 
 Given(/^there exists (.*?) employee for employer (.*?)(?: and (.*?))?$/) do |named_person, legal_name, legal_name2|
-  EnrollRegistry[:send_secure_purchase_confirmation_email].feature.stub(:is_enabled).and_return(true)
   person = people[named_person]
   sponsorship = employer(legal_name).benefit_sponsorships.first
   census_employees 1,

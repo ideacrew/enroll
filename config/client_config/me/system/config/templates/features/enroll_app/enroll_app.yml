@@ -800,9 +800,12 @@ registry:
         is_enabled: true
       - key: :zero_permium_policy
         is_enabled: true
-      - key: :send_secure_purchase_confirmation_email
-        item: :send_secure_purchase_confirmation_email
+      - key: :send_ivl_secure_purchase_confirmation_email
+        item: :send_ivl_secure_purchase_confirmation_email
         is_enabled: false
+      - key: :send_shop_secure_purchase_confirmation_email
+        item: :send_shop_secure_purchase_confirmation_email
+        is_enabled: true
       - key: :custom_exceptions_controller
         item: :custom_exceptions_controller
         is_enabled: true
