@@ -19,7 +19,7 @@ env:
 
 jobs:
   prep:
-    if: github.repository_owner == 'ideacrew' && ((github.event_name == 'push') || (github.event.pull_request.head.repo.owner.login == 'ideacrew'))
+    if: github.repository_owner == 'ideacrew' && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch') || (github.event.pull_request.head.repo.owner.login == 'ideacrew'))
     runs-on: ubuntu-latest
     outputs:
       taggedImage: ${{ steps.prep.outputs.tagged_image }}
@@ -50,7 +50,7 @@ jobs:
 
   # Uses buildx to build and push the image
   build-and-upload-image:
-    if: github.repository_owner == 'ideacrew' && ((github.event_name == 'push') || (github.event.pull_request.head.repo.owner.login == 'ideacrew'))
+    if: github.repository_owner == 'ideacrew' && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch') || (github.event.pull_request.head.repo.owner.login == 'ideacrew'))
     needs: [prep]
     strategy:
       matrix:
