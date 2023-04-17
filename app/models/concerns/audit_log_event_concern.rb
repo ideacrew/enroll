@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# module provides audit log helper methods for models
 module AuditLogEventConcern
   extend ActiveSupport::Concern
 
@@ -8,7 +11,7 @@ module AuditLogEventConcern
       audit_log_events.events_during(time_period)
     end
 
-    def audit_log_events 
+    def audit_log_events
       AuditLogEvent.by_subject("gid://#{GlobalID.app}/#{name}/")
     end
   end

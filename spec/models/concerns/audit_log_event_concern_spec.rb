@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 class DummyClass
@@ -18,7 +20,7 @@ RSpec.describe AuditLogEventConcern, type: :model, dbclean: :around_each do
   end
 
   let!(:audit_log_events) do
-    DummyClass.each_with_index do |subject, index|
+    DummyClass.each do |subject|
       create(
         :audit_log_event,
         subject_gid: subject.to_gid.to_s,
