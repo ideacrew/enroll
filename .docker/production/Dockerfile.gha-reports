@@ -20,3 +20,4 @@ RUN curl https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o "awscliv2.z
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.22.10/bin/linux/amd64/kubectl
 RUN chmod 744 ./kubectl
 RUN mv ./kubectl /usr/local/bin/kubectl
+RUN npm install -g secure-spreadsheet
