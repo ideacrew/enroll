@@ -116,12 +116,12 @@ module Config::AcaHelper
   def self_attest_residency_enabled?
     return unless ::EnrollRegistry.feature_enabled?(:residency_self_attestation)
 
-    start_day = EnrollRegistry[:residency_self_attestation].setting(:effective_period_start_day).item
-    start_month = EnrollRegistry[:residency_self_attestation].setting(:effective_period_start_month).item
-    start_year = EnrollRegistry[:residency_self_attestation].setting(:effective_period_start_year).item
-    end_day = EnrollRegistry[:residency_self_attestation].setting(:effective_period_end_day).item
-    end_month = EnrollRegistry[:residency_self_attestation].setting(:effective_period_end_month).item
-    end_year = EnrollRegistry[:residency_self_attestation].setting(:effective_period_end_year).item
+    start_day = EnrollRegistry[:residency_self_attestation].setting(:effective_period_start_day).item.to_i
+    start_month = EnrollRegistry[:residency_self_attestation].setting(:effective_period_start_month).item.to_i
+    start_year = EnrollRegistry[:residency_self_attestation].setting(:effective_period_start_year).item.to_i
+    end_day = EnrollRegistry[:residency_self_attestation].setting(:effective_period_end_day).item.to_i
+    end_month = EnrollRegistry[:residency_self_attestation].setting(:effective_period_end_month).item.to_i
+    end_year = EnrollRegistry[:residency_self_attestation].setting(:effective_period_end_year).item.to_i
     effective_start = Date.new(start_year, start_month, start_day)
     effective_end = Date.new(end_year, end_month, end_day)
 
