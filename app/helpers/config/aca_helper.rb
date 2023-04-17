@@ -116,10 +116,16 @@ module Config::AcaHelper
   def self_attest_residency_enabled?
     return unless ::EnrollRegistry.feature_enabled?(:residency_self_attestation)
 
-    effective_start = ::EnrollRegistry[:residency_self_attestation].setting(:effective_period_start).item
-    effective_end = ::EnrollRegistry[:residency_self_attestation].setting(:effective_period_end).item
+    start_day = EnrollRegistry[:residency_self_attestation].setting(:effective_period_start_day).item
+    start_month = EnrollRegistry[:residency_self_attestation].setting(:effective_period_start_month).item
+    start_year = EnrollRegistry[:residency_self_attestation].setting(:effective_period_start_year).item
+    end_day = EnrollRegistry[:residency_self_attestation].setting(:effective_period_end_day).item
+    end_month = EnrollRegistry[:residency_self_attestation].setting(:effective_period_end_month).item
+    end_year = EnrollRegistry[:residency_self_attestation].setting(:effective_period_end_year).item
+    effective_start = Date.new(start_year, start_month, start_day)
+    effective_end = Date.new(end_year, end_month, end_day)
 
-    Date.parse(effective_start)..Date.parse(effective_end).cover?(TimeKeeper.date_of_record) if effective_start.present? && effective_end.present?
+    (effective_start..effective_end).cover?(TimeKeeper.date_of_record)
   end
 
   def sep_carousel_message_enabled?
