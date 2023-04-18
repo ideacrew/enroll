@@ -467,13 +467,13 @@ module FinancialAssistance
     end
 
     def enrolled_with(subscriber_logger, enrollment)
-      subscriber_logger.info "EnrollmentSubscriber, application enrolled_with start: #{enrollment.hbx_id}"
+      subscriber_logger.info "EnrollmentSubscriber, application enrolled_with start: #{enrollment.hbx_id} | #{self.hbx_id}"
       enrollment.hbx_enrollment_members.each do |enrollment_member|
         applicant = applicants.where(family_member_id: enrollment_member.applicant_id).first
         result = applicant&.enrolled_with(subscriber_logger, enrollment)
-        subscriber_logger.info "EnrollmentSubscriber, application enrolled_with - hbx_enrollment_members start: #{enrollment.hbx_id} |#{applicant.person_hbx_id} |#{result}"
+        subscriber_logger.info "EnrollmentSubscriber, application enrolled_with - hbx_enrollment_members start: #{enrollment.hbx_id} |#{applicant.id} | #{applicant.person_hbx_id} |#{result}"
       end
-      subscriber_logger.info "EnrollmentSubscriber, application enrolled_with end: #{enrollment.hbx_id}"
+      subscriber_logger.info "EnrollmentSubscriber, application enrolled_with end: #{enrollment.hbx_id} | #{self.hbx_id}"
     end
 
     # fetch existing relationships matrix
