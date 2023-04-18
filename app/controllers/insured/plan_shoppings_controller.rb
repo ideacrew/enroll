@@ -443,12 +443,12 @@ class Insured::PlanShoppingsController < ApplicationController
   def send_receipt_emails
     email = @person.work_email_or_best
     UserMailer.generic_consumer_welcome(@person.first_name, @person.hbx_id, email).deliver_now
-    send_email_enabled = if @enrollment.is_shop?
-                           EnrollRegistry.feature_enabled?(:send_shop_secure_purchase_confirmation_email)
-                         else
-                           EnrollRegistry.feature_enabled?(:send_ivl_secure_purchase_confirmation_email)
-                         end
-    return unless send_email_enabled
+    is_confirmation_email_enabled = if @enrollment.is_shop?
+                                      EnrollRegistry.feature_enabled?(:send_shop_secure_purchase_confirmation_email)
+                                    else
+                                      EnrollRegistry.feature_enabled?(:send_ivl_secure_purchase_confirmation_email)
+                                    end
+    return unless is_confirmation_email_enabled
 
     body = render_to_string 'user_mailer/secure_purchase_confirmation.html.erb', layout: false
     from_provider = HbxProfile.current_hbx
