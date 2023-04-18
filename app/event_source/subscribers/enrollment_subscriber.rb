@@ -105,11 +105,18 @@ module Subscribers
       if HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(enrollment.aasm_state)
         subscriber_logger.info "EnrollmentSubscriber, redetermine_family_eligibility - if condition start: #{enrollment.hbx_id}"
         family.fail_negative_and_pending_verifications
-        output = ::FinancialAssistance::Application.where(family_id: family.id).by_year(assistance_year).determined.pluck(:created_at, :aasm_state)
-        subscriber_logger.info "EnrollmentSubscriber, redetermine_family_eligibility - if condition applications: #{enrollment.hbx_id} | #{output}"
-
         application = family.active_financial_assistance_application(assistance_year)
+
+        ::FinancialAssistance::Application.where(family_id: family.id).by_year(assistance_year).each do |app|
+          subscriber_logger.info "EnrollmentSubscriber, redetermine_family_eligibility for enrollment #{enrollment.hbx_id} - if condition before enrolled_with applications-#{app.hbx_id}: | #{app.created_at} | #{app.submitted_at} | #{app.aasm_state} "
+        end
+
         application&.enrolled_with(subscriber_logger, enrollment)
+
+        ::FinancialAssistance::Application.where(family_id: family.id).by_year(assistance_year).each do |app|
+          subscriber_logger.info "EnrollmentSubscriber, redetermine_family_eligibility for enrollment #{enrollment.hbx_id} - if condition after enrolled_with applications-#{app.hbx_id}: | #{app.created_at} | #{app.submitted_at} | #{app.aasm_state} "
+        end
+
         subscriber_logger.info "EnrollmentSubscriber, redetermine_family_eligibility - if condition end: #{enrollment.hbx_id}| #{application.hbx_id}"
       end
 

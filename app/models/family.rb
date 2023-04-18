@@ -325,7 +325,7 @@ class Family
 
   # It fetches active or renewal application for the family based on the year passed
   def active_financial_assistance_application(year = TimeKeeper.date_of_record.year)
-    ::FinancialAssistance::Application.where(family_id: self.id).by_year(year).determined.sort_by(&:submitted_at).last
+    ::FinancialAssistance::Application.where(family_id: self.id, :assistance_year => year, aasm_state: "determined").sort_by(&:submitted_at).last
   end
 
   # It fetches the most recent application for the curent enrollment year if the application is in draft state
