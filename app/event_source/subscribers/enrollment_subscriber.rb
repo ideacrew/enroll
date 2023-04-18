@@ -105,8 +105,8 @@ module Subscribers
       if HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(enrollment.aasm_state)
         subscriber_logger.info "EnrollmentSubscriber, redetermine_family_eligibility - if condition start: #{enrollment.hbx_id}"
         family.fail_negative_and_pending_verifications
-        application = family.active_financial_assistance_application(assistance_year)
-        application&.enrolled_with(enrollment)
+        application = family.active_financial_assistance_application(2023)
+        application&.enrolled_with(subscriber_logger, enrollment)
         subscriber_logger.info "EnrollmentSubscriber, redetermine_family_eligibility - if condition end: #{enrollment.hbx_id}"
       end
 

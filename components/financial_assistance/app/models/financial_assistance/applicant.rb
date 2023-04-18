@@ -1229,18 +1229,24 @@ module FinancialAssistance
       TimeKeeper.date_of_record + verification_document_due.days
     end
 
-    def enrolled_with(enrollment)
+    def enrolled_with(subscriber_logger, enrollment)
+      subscriber_logger.info "EnrollmentSubscriber, applicant  enrolled_with step 1: #{enrollment.hbx_id}"
       EVIDENCES.each do |evidence_type|
+        subscriber_logger.info "EnrollmentSubscriber, applicant  enrolled_with step 2: #{enrollment.hbx_id} | #{evidence_type}"
         evidence = self.send(evidence_type)
         next unless evidence.present?
+        subscriber_logger.info "EnrollmentSubscriber, applicant  enrolled_with step 3: #{enrollment.hbx_id} | #{evidence_type}"
         aptc_or_csr_used = enrollment.applied_aptc_amount > 0 || ['03', '04', '05', '06'].include?(enrollment.product.csr_variant_id)
-
+        subscriber_logger.info "EnrollmentSubscriber, applicant  enrolled_with step 4: #{enrollment.hbx_id} | #{evidence_type} | #{aptc_or_csr_used}"
         if aptc_or_csr_used && ['pending', 'negative_response_received'].include?(evidence.aasm_state)
+          subscriber_logger.info "EnrollmentSubscriber, applicant  enrolled_with step 5: #{enrollment.hbx_id} | #{evidence_type} | #{aptc_or_csr_used}"
           evidence.due_on = schedule_verification_due_on if evidence.due_on.blank?
           set_evidence_outstanding(evidence)
         elsif !aptc_or_csr_used
+          subscriber_logger.info "EnrollmentSubscriber, applicant  enrolled_with step 6: #{enrollment.hbx_id} | #{evidence_type} | #{aptc_or_csr_used}"
           set_evidence_to_negative_response(evidence)
         elsif evidence.pending?
+          subscriber_logger.info "EnrollmentSubscriber, applicant  enrolled_with step 7: #{enrollment.hbx_id} | #{evidence_type} | #{aptc_or_csr_used}"
           set_evidence_unverified(evidence)
         end
       end
