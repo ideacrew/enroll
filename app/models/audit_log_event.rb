@@ -35,6 +35,7 @@ class AuditLogEvent
   index({ log_level: 1 })
   index({ event_time: 1 })
 
+  scope :by_subject, ->(subject_id) { where(subject_gid: /#{subject_id}/i) }
   scope :by_event_category, ->(category) { where(event_category: category) }
   scope :by_session, ->(session_id) { where(session_id: session_id) }
   scope :by_account, ->(account_id) { where(account_id: account_id) }
