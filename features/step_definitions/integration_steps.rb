@@ -1187,8 +1187,9 @@ And(/Individual hits tab/) do
 end
 
 Then(/page should not automatically scroll to the continue button/) do
-  scroll_position = page.evaluate_script("window.pageYOffset")
-  expect(scroll_position).to eq(1028)
+  element = find_all(".thank_you_field")[1]
+  cursor_position = page.evaluate_script('arguments[0].selectionStart', element)
+  expect(cursor_position).to eql(0)
 end
 
 And(/(.*) should have a ER sponsored enrollment/) do |named_person|
