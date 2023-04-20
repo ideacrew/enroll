@@ -13,10 +13,6 @@ field_names = %w[family_id
 
 file_name = "#{Rails.root}/182598285_taxhousehold_members_report_after_data_fix_#{Time.new.strftime('%Y_%m_%d_%H_%M_%S')}.csv"
 
-families = Family.where('tax_household_groups.tax_households.tax_household_members': { :$elemMatch => {
-                          :magi_medicaid_monthly_household_income.exists => true, :"magi_medicaid_monthly_household_income.cents".ne => 0
-                        } })
-
 CSV.open(file_name, 'w+', headers: true) do |csv|
   csv << field_names
   families = Family.where('tax_household_groups.tax_households.tax_household_members': { :$elemMatch => {
