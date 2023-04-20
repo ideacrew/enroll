@@ -2,6 +2,7 @@ require 'rails_helper'
 
 module BenefitSponsors
   RSpec.describe ::BenefitSponsors::Services::BrokerManagementService, type: :model, :dbclean => :after_each do
+    include ::L10nHelper
 
     subject { BenefitSponsors::Services::BrokerManagementService.new }
 
