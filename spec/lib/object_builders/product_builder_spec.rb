@@ -70,7 +70,7 @@ describe "qhp builder" do
 
       it "should populate hsa_eligibility field on BenefitMarkets::Products" do
         expect(BenefitMarkets::Products::Product.count).to eq(3)
-        expect(BenefitMarkets::Products::Product.all.select{ |p| p.hsa_eligibility}.size).to eq(2)
+        expect(BenefitMarkets::Products::Product.all.select(&:hsa_eligibility).size).to eq(2)
       end
     end
   end
