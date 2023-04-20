@@ -55,16 +55,16 @@ module BenefitSponsors
 
       it 'should send a message to the general_agency' do
         general_agency_profile.reload
-        subject = "You are associated to #{broker_agency_profile1.organization.legal_name}- #{general_agency_profile.legal_name} (Hire)"
-        body = "<br><p>Associated details<br>General Agency : #{general_agency_profile.legal_name}<br>Employer : #{employer_profile.legal_name}<br>Status : Hire</p>"
+        subject = l10n("employers.broker_agency_notice.subject", broker_legal_name: broker_agency_profile1.organization.legal_name, agency_legal_name: general_agency_profile.legal_name)
+        body = l10n("employers.broker_agency_notice.body", agency_legal_name: general_agency_profile.legal_name, employer_legal_name: employer_profile.legal_name)
         expect(general_agency_profile.inbox.messages.map(&:body)).to include(body)
         expect(general_agency_profile.inbox.messages.map(&:subject)).to include(subject)
       end
 
       it 'should send a message to the employer' do
         employer_profile.reload
-        subject = "You are associated to #{broker_agency_profile1.organization.legal_name}- #{general_agency_profile.legal_name} (Hire)"
-        body = "<br><p>Associated details<br>General Agency : #{general_agency_profile.legal_name}<br>Employer : #{employer_profile.legal_name}<br>Status : Hire</p>"
+        subject = l10n("employers.broker_agency_notice.subject", broker_legal_name: broker_agency_profile1.organization.legal_name, agency_legal_name: general_agency_profile.legal_name)
+        body = l10n("employers.broker_agency_notice.body", agency_legal_name: general_agency_profile.legal_name, employer_legal_name: employer_profile.legal_name)
         expect(employer_profile.inbox.messages.map(&:body)).to include(body)
         expect(employer_profile.inbox.messages.map(&:subject)).to include(subject)
       end

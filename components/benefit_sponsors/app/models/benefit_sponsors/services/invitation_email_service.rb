@@ -1,6 +1,7 @@
 module BenefitSponsors
   module Services
     class InvitationEmailService
+      include ::L10nHelper
 
       attr_accessor :broker_role_id, :employer_profile, :broker_agency_profile_id
 
@@ -29,8 +30,8 @@ module BenefitSponsors
       def send_general_agency_successfully_associated_email
         broker_agency_profile = BenefitSponsors::Organizations::BrokerAgencyProfile.find(get_bson_id(broker_agency_profile_id))
         general_agency = broker_agency_profile.default_general_agency_profile
-        subject = "You are associated to #{broker_agency_profile.organization.legal_name}- #{general_agency.legal_name} (Hire)"
-        body = "<br><p>Associated details<br>General Agency : #{general_agency.legal_name}<br>Employer : #{employer_profile.legal_name}<br>Status : Hire</p>"
+        subject = l10n("employers.broker_agency_notice.subject", broker_legal_name: broker_agency_profile.organization.legal_name, agency_legal_name: general_agency.legal_name)
+        body = l10n("employers.broker_agency_notice.body", agency_legal_name: general_agency.legal_name, employer_legal_name: employer_profile.legal_name)
         secure_message(broker_agency_profile, general_agency, subject, body)
         secure_message(broker_agency_profile, employer_profile, subject, body)
       end
