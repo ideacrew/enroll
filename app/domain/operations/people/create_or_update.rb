@@ -82,8 +82,11 @@ module Operations
       end
 
       def find_existing_person(params)
-        person = Person.by_hbx_id(params[:hbx_id]).first
-        return person if person.present?
+        params_hbx_id = params[:hbx_id]
+        unless params_hbx_id.nil?
+          person = Person.by_hbx_id(params_hbx_id).first
+          return person if person.present?
+        end
 
         match_criteria, records = Operations::People::Match.new.call({:dob => params[:dob],
                                                                       :last_name => params[:last_name],

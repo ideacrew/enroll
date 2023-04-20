@@ -242,6 +242,10 @@ module SponsoredBenefits
         attributes
       end
 
+      def osse_eligible?
+        benefit_sponsorship.osse_eligible?(start_on)
+      end
+
       class << self
         def calculate_start_on_dates
           start_on = if TimeKeeper.date_of_record.day > open_enrollment_minimum_begin_day_of_month(true)

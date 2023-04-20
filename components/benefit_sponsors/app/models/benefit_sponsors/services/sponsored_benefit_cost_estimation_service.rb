@@ -14,8 +14,8 @@ module BenefitSponsors
           sorted_tiers = pd.pricing_determination_tiers.sort_by { |pdt| pdt.pricing_unit.order }
           tier_costs = pd.pricing_determination_tiers.map do |pdt|
             pdt_total = pdt.price
-            pdt_employer = BigDecimal.new((pdt_total * pdt.sponsor_contribution_factor).to_s).round(2)
-            BigDecimal.new((pdt_total - pdt_employer).to_s).round(2)
+            pdt_employer = BigDecimal((pdt_total * pdt.sponsor_contribution_factor).to_s).round(2)
+            BigDecimal((pdt_total - pdt_employer).to_s).round(2)
           end
           {
             estimated_total_cost: total,
@@ -32,11 +32,11 @@ module BenefitSponsors
           sponsored_benefit_with_highest_cost_product = group_cost_estimator.calculate(sponsor_contribution.sponsored_benefit, highest_cost_product, package)
   
           minimum_cost = sponsored_benefit_with_lowest_cost_product.lazy.map do |mg|
-            BigDecimal.new((mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total).to_s).round(2)
+            BigDecimal((mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total).to_s).round(2)
           end.min
   
           maximum_cost = sponsored_benefit_with_highest_cost_product.lazy.map do |mg|
-            BigDecimal.new((mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total).to_s).round(2)
+            BigDecimal((mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total).to_s).round(2)
           end.max
           {
             estimated_total_cost: total,
@@ -50,18 +50,19 @@ module BenefitSponsors
       def calculate_estimates_for_benefit_display(sponsored_benefit)
         benefit_application = sponsored_benefit.benefit_package.benefit_application
         package = sponsored_benefit.product_package
+        reference_product = sponsored_benefit.reference_product
         cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeCoverageCostEstimator.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
         sponsor_contribution, total, employer_costs = cost_estimator.calculate(
           sponsored_benefit,
-          product_for_benefits_page_employer_costs(sponsored_benefit, benefit_application),
+          reference_product,
           package)
         if sponsor_contribution.sponsored_benefit.pricing_determinations.any?
           pd = sponsor_contribution.sponsored_benefit.latest_pricing_determination
           sorted_tiers = pd.pricing_determination_tiers.sort_by { |pdt| pdt.pricing_unit.order }
           tier_costs = pd.pricing_determination_tiers.map do |pdt|
             pdt_total = pdt.price
-            pdt_employer = BigDecimal.new((pdt_total * pdt.sponsor_contribution_factor).to_s).round(2)
-            BigDecimal.new((pdt_total - pdt_employer).to_s).round(2)
+            pdt_employer = BigDecimal((pdt_total * pdt.sponsor_contribution_factor).to_s).round(2)
+            BigDecimal((pdt_total - pdt_employer).to_s).round(2)
           end
           {
             estimated_total_cost: total,
@@ -78,11 +79,11 @@ module BenefitSponsors
           sponsored_benefit_with_highest_cost_product = group_cost_estimator.calculate(sponsor_contribution.sponsored_benefit, highest_cost_product, package)
   
           minimum_cost = sponsored_benefit_with_lowest_cost_product.lazy.map do |mg|
-            BigDecimal.new((mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total).to_s).round(2)
+            BigDecimal((mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total).to_s).round(2)
           end.min
   
           maximum_cost = sponsored_benefit_with_highest_cost_product.lazy.map do |mg|
-            BigDecimal.new((mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total).to_s).round(2)
+            BigDecimal((mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total).to_s).round(2)
           end.max
   
           {
@@ -110,15 +111,6 @@ module BenefitSponsors
         calculate_estimates_for_package_action(benefit_application, sponsored_benefit, reference_product, package, build_objects: false)
       end
 
-      def product_for_benefits_page_employer_costs(sponsored_benefit, benefit_application)
-        if benefit_application.osse_eligible?
-          start_on = benefit_application.reinstated_id.present? ? benefit_application.benefit_sponsor_catalog.start_on : benefit_application.start_on
-          sponsored_benefit.highest_cost_product(start_on)
-        else
-          sponsored_benefit.reference_product
-        end
-      end
-
       protected
 
       def calculate_employee_estimates_for_package_action(benefit_application, sponsored_benefit, reference_product, package, build_objects: false)
@@ -134,8 +126,8 @@ module BenefitSponsors
           sorted_tiers = pd.pricing_determination_tiers.sort_by { |pdt| pdt.pricing_unit.order }
           tier_costs = pd.pricing_determination_tiers.lazy.map do |pdt|
             pdt_total = pdt.price
-            pdt_employer = BigDecimal.new((pdt_total * pdt.sponsor_contribution_factor).to_s).round(2)
-            BigDecimal.new((pdt_total - pdt_employer).to_s).round(2)
+            pdt_employer = BigDecimal((pdt_total * pdt.sponsor_contribution_factor).to_s).round(2)
+            BigDecimal((pdt_total - pdt_employer).to_s).round(2)
           end
           lowest_cost = tier_costs.min
           highest_cost = tier_costs.max
@@ -202,8 +194,8 @@ module BenefitSponsors
           sorted_tiers = pd.pricing_determination_tiers.sort_by { |pdt| pdt.pricing_unit.order }
           tier_costs = pd.pricing_determination_tiers.lazy.map do |pdt|
             pdt_total = pdt.price
-            pdt_employer = BigDecimal.new((pdt_total * pdt.sponsor_contribution_factor).to_s).round(2)
-            BigDecimal.new((pdt_total - pdt_employer).to_s).round(2)
+            pdt_employer = BigDecimal((pdt_total * pdt.sponsor_contribution_factor).to_s).round(2)
+            BigDecimal((pdt_total - pdt_employer).to_s).round(2)
           end
           {
             estimated_total_cost: total,
@@ -220,11 +212,11 @@ module BenefitSponsors
           sponsored_benefit_with_highest_cost_product = group_cost_estimator.calculate(sponsor_contribution.sponsored_benefit, highest_cost_product, package)
   
           minimum_cost = sponsored_benefit_with_lowest_cost_product.lazy.map do |mg|
-            BigDecimal.new((mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total).to_s).round(2)
+            BigDecimal((mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total).to_s).round(2)
           end.min
   
           maximum_cost = sponsored_benefit_with_highest_cost_product.lazy.map do |mg|
-            BigDecimal.new((mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total).to_s).round(2)
+            BigDecimal((mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total).to_s).round(2)
           end.max
   
           {
@@ -237,7 +229,7 @@ module BenefitSponsors
       end
 
       def employee_cost_from_group_enrollment(group_enrollment)
-        BigDecimal.new((group_enrollment.product_cost_total - group_enrollment.sponsor_contribution_total).to_s).round(2)
+        BigDecimal((group_enrollment.product_cost_total - group_enrollment.sponsor_contribution_total).to_s).round(2)
       end
     end
   end

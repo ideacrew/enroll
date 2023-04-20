@@ -527,6 +527,11 @@ module Insured
           params = subject.find(enrollment.id, family.id)
           expect(params[:available_aptc]).to eq 1500.0
         end
+
+        it 'should return max tax credit' do
+          params = subject.find(enrollment.id, family.id)
+          expect(params[:max_tax_credit]).to eq 1700.0
+        end
       end
     end
 

@@ -78,4 +78,8 @@ class BrokerEmployersPage
   def self.logout_btn
     '.header-text.interaction-click-control-logout'
   end
+
+  def self.hc4cc_eligibility
+    'tbody .col-hc4cc'
+  end
 end

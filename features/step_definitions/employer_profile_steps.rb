@@ -48,6 +48,20 @@ Then  /(\w+) signs in to portal/ do |name|
   find('.interaction-click-control-sign-in').click
 end
 
+When(/^Admin clicks Employers tab$/) do
+  visit exchanges_hbx_profiles_root_path
+  find(:xpath, "//li[contains(., 'Employers')]", :wait => 10).click
+  find('li', :text => 'Employers', :class => 'tab-second', :wait => 10).click
+end
+
+Then(/^the Admin is navigated to the Employers screen$/) do
+  expect(page).to have_selector 'h1', text: 'Employers'
+end
+
+And(/I click the name of (.*) from employers list/) do |named_employer|
+  find('a', :text => named_employer).click
+end
+
 Given /(\w+) is a user with no person who goes to the Employer Portal/ do |name|
   SicCode.where(sic_code: '0111').first || FactoryBot.create(:sic_code, sic_code: "0111")
 

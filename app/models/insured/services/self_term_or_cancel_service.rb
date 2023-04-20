@@ -44,6 +44,7 @@ module Insured
           available_aptc: attrs[:available_aptc],
           elected_aptc_pct: attrs[:elected_aptc_pct],
           default_tax_credit_value: attrs[:default_tax_credit_value],
+          max_tax_credit: attrs[:max_tax_credit],
           new_enrollment_premium: attrs[:new_enrollment_premium]
         }
       end

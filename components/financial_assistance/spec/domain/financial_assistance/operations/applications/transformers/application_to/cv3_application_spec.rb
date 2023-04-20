@@ -9,6 +9,18 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   let!(:person3) { FactoryBot.create(:person, hbx_id: "732022") }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
+
+  let(:applicant1_has_enrolled_health_coverage) { false }
+  let(:applicant2_has_eligible_health_coverage) { false }
+  let(:applicant1_is_applying_coverage) { true }
+
+  let(:applicant1_has_job_income) { false }
+  let(:applicant1_has_self_employment_income) { false }
+  let(:applicant1_has_unemployment_income) { false }
+  let(:applicant1_has_other_income) { false }
+
+  let(:applicant1_has_deductions) { false }
+
   let!(:applicant) do
     applicant = FactoryBot.create(:applicant,
                                   :with_student_information,
@@ -22,22 +34,22 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                   is_primary_applicant: true,
                                   person_hbx_id: person.hbx_id,
                                   is_self_attested_blind: false,
-                                  is_applying_coverage: true,
+                                  is_applying_coverage: applicant1_is_applying_coverage,
                                   is_required_to_file_taxes: true,
                                   is_filing_as_head_of_household: true,
                                   is_pregnant: false,
                                   is_primary_caregiver: true,
                                   is_primary_caregiver_for: [],
-                                  has_job_income: false,
-                                  has_self_employment_income: false,
-                                  has_unemployment_income: false,
-                                  has_other_income: false,
-                                  has_deductions: false,
+                                  has_job_income: applicant1_has_job_income,
+                                  has_self_employment_income: applicant1_has_self_employment_income,
+                                  has_unemployment_income: applicant1_has_unemployment_income,
+                                  has_other_income: applicant1_has_other_income,
+                                  has_deductions: applicant1_has_deductions,
                                   is_self_attested_disabled: true,
                                   is_physically_disabled: false,
                                   citizen_status: 'us_citizen',
-                                  has_enrolled_health_coverage: false,
-                                  has_eligible_health_coverage: false,
+                                  has_enrolled_health_coverage: applicant1_has_enrolled_health_coverage,
+                                  has_eligible_health_coverage: applicant2_has_eligible_health_coverage,
                                   has_eligible_medicaid_cubcare: false,
                                   is_claimed_as_tax_dependent: false,
                                   is_incarcerated: false,
@@ -48,8 +60,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   end
 
   let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
-
-  # let!(:products) { FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 5, :silver) }
 
   let(:premiums_hash) do
     {
@@ -1787,6 +1797,120 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
   end
 
+  describe 'has_enrolled_health_coverage' do
+    let(:applicant1_has_enrolled_health_coverage) { true }
+    let(:applicant2_has_eligible_health_coverage) { false }
+    let(:applicant1_is_applying_coverage) { true }
+
+    let(:operation_result) { subject.call(application.reload) }
+    let(:application_entity) do
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
+    end
+    let(:applicant_entity) { application_entity.applicants.first }
+
+    it 'returns false for has_enrolled_health_coverage for applicant entity' do
+      expect(applicant.has_enrolled_health_coverage).to eq(true)
+      expect(applicant_entity.has_enrolled_health_coverage).to eq(false)
+    end
+  end
+
+  describe 'has_eligible_health_coverage' do
+    let(:applicant1_has_enrolled_health_coverage) { false }
+    let(:applicant2_has_eligible_health_coverage) { true }
+    let(:applicant1_is_applying_coverage) { true }
+
+    let(:operation_result) { subject.call(application.reload) }
+    let(:application_entity) do
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
+    end
+    let(:applicant_entity) { application_entity.applicants.first }
+
+    it 'returns false for has_eligible_health_coverage for applicant entity' do
+      expect(applicant.has_eligible_health_coverage).to eq(true)
+      expect(applicant_entity.has_eligible_health_coverage).to eq(false)
+    end
+  end
+
+  describe 'has_job_income' do
+    let(:applicant1_has_job_income) { true }
+    let(:applicant1_is_applying_coverage) { true }
+
+    let(:operation_result) { subject.call(application.reload) }
+    let(:application_entity) do
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
+    end
+    let(:applicant_entity) { application_entity.applicants.first }
+
+    it 'returns false for has_job_income for applicant entity' do
+      expect(applicant.has_job_income).to eq(true)
+      expect(applicant_entity.has_job_income).to eq(false)
+    end
+  end
+
+  describe 'has_self_employment_income' do
+    let(:applicant1_has_self_employment_income) { true }
+    let(:applicant1_is_applying_coverage) { true }
+
+    let(:operation_result) { subject.call(application.reload) }
+    let(:application_entity) do
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
+    end
+    let(:applicant_entity) { application_entity.applicants.first }
+
+    it 'returns false for has_self_employment_income for applicant entity' do
+      expect(applicant.has_self_employment_income).to eq(true)
+      expect(applicant_entity.has_self_employment_income).to eq(false)
+    end
+  end
+
+  describe 'has_unemployment_income' do
+    let(:applicant1_has_unemployment_income) { true }
+    let(:applicant1_is_applying_coverage) { true }
+
+    let(:operation_result) { subject.call(application.reload) }
+    let(:application_entity) do
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
+    end
+    let(:applicant_entity) { application_entity.applicants.first }
+
+    it 'returns false for has_unemployment_income for applicant entity' do
+      expect(applicant.has_unemployment_income).to eq(true)
+      expect(applicant_entity.has_unemployment_income).to eq(false)
+    end
+  end
+
+  describe 'has_other_income' do
+    let(:applicant1_has_other_income) { true }
+    let(:applicant1_is_applying_coverage) { true }
+
+    let(:operation_result) { subject.call(application.reload) }
+    let(:application_entity) do
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
+    end
+    let(:applicant_entity) { application_entity.applicants.first }
+
+    it 'returns false for has_other_income for applicant entity' do
+      expect(applicant.has_other_income).to eq(true)
+      expect(applicant_entity.has_other_income).to eq(false)
+    end
+  end
+
+  describe 'applicant1_has_deductions' do
+    let(:applicant1_has_deductions) { true }
+    let(:applicant1_is_applying_coverage) { true }
+
+    let(:operation_result) { subject.call(application.reload) }
+    let(:application_entity) do
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
+    end
+    let(:applicant_entity) { application_entity.applicants.first }
+
+    it 'returns false for has_deductions for applicant entity' do
+      expect(applicant.has_deductions).to eq(true)
+      expect(applicant_entity.has_deductions).to eq(false)
+    end
+  end
+
   # Eligible Benefits based on answers to driver questions
   describe 'benefits' do
     context 'with enrolled benefit and without answer to driver question' do
@@ -2099,6 +2223,56 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
       it 'should include qualified_non_citizen in payload and defaults to true' do
         expect(@applicant_entity.qualified_non_citizen).to eq(true)
+      end
+    end
+  end
+
+  describe 'with local_mec_evidence' do
+    let(:operation_result) { subject.call(application.reload) }
+    let(:application_entity) do
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
+    end
+    let(:applicant_entity) { application_entity.applicants.first }
+
+    let!(:local_mec_evidence) do
+      evidence = applicant.create_local_mec_evidence(
+        {
+          key: :local_mec,
+          title: "Local Mec",
+          aasm_state: 'pending',
+          due_on: Date.today,
+          verification_outstanding: true,
+          is_satisfied: false
+        }
+      )
+
+      evidence.request_results.create(
+        {
+          result: 'eligible',
+          source: 'CHIP',
+          code: '7314',
+          code_description: code_description
+        }
+      )
+    end
+
+    let(:result_code_description) { applicant_entity.local_mec_evidence.request_results.first.code_description }
+
+    context 'with code_description' do
+      let(:code_description) { TimeKeeper.date_of_record }
+
+      it 'returns success' do
+        expect(operation_result).to be_success
+        expect(result_code_description).to be_a(String)
+      end
+    end
+
+    context 'without code_description' do
+      let(:code_description) { nil }
+
+      it 'returns success' do
+        expect(operation_result).to be_success
+        expect(result_code_description).to be_nil
       end
     end
   end

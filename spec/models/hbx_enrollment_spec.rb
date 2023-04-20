@@ -422,18 +422,45 @@ describe '.reset_dates_on_previously_covered_members' do
                       ])
   end
 
+  let(:tax_household_group) do
+    thhg = family.tax_household_groups.create!(
+      assistance_year: effective_on.year, source: 'Admin', start_on: effective_on.year,
+      tax_households: [FactoryBot.build(:tax_household, household: family.active_household)]
+    )
+    thhg.tax_households.first.tax_household_members.create!(
+      applicant_id: family.primary_applicant.id, is_ia_eligible: true
+    )
+    thhg
+  end
+
+  let!(:tax_household_enrollment) do
+    hbx_enrollment_member = shopping_enrollment.hbx_enrollment_members.first
+    thh_enr = TaxHouseholdEnrollment.create(
+      enrollment_id: shopping_enrollment.id, tax_household_id: tax_household_group.tax_households.first.id,
+      household_benchmark_ehb_premium: 500.00, available_max_aptc: 250.00
+    )
+
+    thh_enr.tax_household_members_enrollment_members.create(
+      family_member_id: hbx_enrollment_member.applicant_id, hbx_enrollment_member_id: hbx_enrollment_member.id,
+      tax_household_member_id: tax_household_group.tax_households.first.tax_household_members.first.id,
+      age_on_effective_date: 20, relationship_with_primary: 'self', date_of_birth: effective_on - 20.years
+    )
+    thh_enr
+  end
+
   let(:primary_enrollment_member) { shopping_enrollment.hbx_enrollment_members.detect{|enm| enm.applicant_id == family.primary_applicant.id} }
   let(:dependent_enrollment_member) { shopping_enrollment.hbx_enrollment_members.detect{|enm| enm.applicant_id != family.primary_applicant.id} }
 
   context 'when same product passed' do
     let(:new_product) { product }
 
-    it 'should reset coverage_start_on dates on previously enrolled members' do
+    it 'should reset coverage_start_on dates on previously enrolled members and should not create new enrollment member records' do
       expect(primary_enrollment_member.coverage_start_on).to eq new_effective_on
       expect(dependent_enrollment_member.coverage_start_on).to eq new_effective_on
-
+      thh_enrollment_member_id = tax_household_enrollment.tax_household_members_enrollment_members.first.hbx_enrollment_member_id
       shopping_enrollment.reset_dates_on_previously_covered_members(new_product)
 
+      expect(shopping_enrollment.hbx_enrollment_members.first.id).to eq thh_enrollment_member_id
       expect(primary_enrollment_member.reload.coverage_start_on).to eq effective_on
       expect(dependent_enrollment_member.reload.coverage_start_on).to eq new_effective_on
     end
@@ -443,12 +470,14 @@ describe '.reset_dates_on_previously_covered_members' do
 
     let(:new_product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '02')}
 
-    it 'should not reset coverage_start_on dates on previously enrolled members' do
+    it 'should not reset coverage_start_on dates on previously enrolled members and should not create new enrollment member records' do
       expect(primary_enrollment_member.coverage_start_on).to eq new_effective_on
       expect(dependent_enrollment_member.coverage_start_on).to eq new_effective_on
+      thh_enrollment_member_id = tax_household_enrollment.tax_household_members_enrollment_members.first.hbx_enrollment_member_id
 
       shopping_enrollment.reset_dates_on_previously_covered_members(new_product)
 
+      expect(shopping_enrollment.hbx_enrollment_members.first.id).to eq thh_enrollment_member_id
       expect(primary_enrollment_member.reload.coverage_start_on).to eq new_effective_on
       expect(dependent_enrollment_member.reload.coverage_start_on).to eq new_effective_on
     end

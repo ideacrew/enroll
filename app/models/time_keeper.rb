@@ -105,6 +105,7 @@ class TimeKeeper
   def push_date_of_record
     notify_logger("TimeKeeper advance day started at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M:%S')}")
 
+    publish_system_date_advanced_event
     FinancialAssistance::Application.advance_day(self.date_of_record)
     BenefitSponsorship.advance_day(self.date_of_record)
     BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.advance_day(self.date_of_record)
@@ -129,6 +130,25 @@ class TimeKeeper
   def notify_logger(message)
     Rails.logger.info(message)
     log(message)
+  end
+
+  # Event 'events.system_date.changed' is same as 'events.enterprise.date_advanced'.
+  # The subscriber of event 'events.enterprise.date_advanced' is processing DocumentReminderNotices
+  # which is totally dependent on 'Family.advance_day' which processes enrollment expirations and effectuations.
+  # Could not use the 'events.enterprise.date_advanced':
+  #   1. Event publish fails if one the processes above this fails
+  #   2. The processes above this publish might take huge amount of time around OpenEnrollment time
+  #      which might trigger race condition in other systems subscribing to the date change event
+  def publish_system_date_advanced_event
+    event = event(
+      'events.system_date.changed',
+      attributes: { payload: {} },
+      headers: { system_date: TimeKeeper.date_of_record.strftime('%Y-%m-%d') }
+    )
+
+    event.success.publish
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't trigger benefit application date change events due to #{e.inspect}" }
   end
 
   def send_date_advanced_event

@@ -48,7 +48,7 @@ RSpec.describe "employers/census_employees/show.html.erb", dbclean: :after_each 
   }
   let(:decorated_hbx_enrollment) { double(member_enrollments: [member_enrollment], product_cost_total: '', sponsor_contribution_total: '', employee_cost_total: 100.00) }
   let(:user) { FactoryBot.create(:user) }
-  let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile) }
+  let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile_kaiser) }
   let(:benefit_package) { double(is_congress: false) } #FIX ME: remove this when is_congress attribute added to benefit package
 
   context 'show' do
@@ -263,7 +263,7 @@ RSpec.describe "employers/census_employees/show.html.erb", dbclean: :after_each 
 
     context "with health, dental, and past enrollments" do
       let(:decorated_dental_hbx_enrollment) { double(member_enrollments: [member_enrollment], product_cost_total: '',sponsor_contribution_total: '') }
-      let(:dental_plan) { FactoryBot.create :benefit_markets_products_dental_products_dental_product, :with_issuer_profile }
+      let(:dental_plan) { FactoryBot.create :benefit_markets_products_dental_products_dental_product, :with_issuer_profile_kaiser }
       let(:dental_hbx_enrollment) do
         FactoryBot.create(
           :hbx_enrollment, :with_product,

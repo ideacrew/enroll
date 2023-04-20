@@ -55,7 +55,6 @@ class Insured::FamilyMembersController < ApplicationController
 
     if params[:sep_id].present?
       @sep = @family.special_enrollment_periods.find(params[:sep_id])
-      @sep = duplicate_sep(@sep) if @sep.submitted_at.to_date != TimeKeeper.date_of_record
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
       @change_plan = 'change_by_qle'
       @change_plan_date = @sep.qle_on
@@ -290,15 +289,6 @@ class Insured::FamilyMembersController < ApplicationController
       errors_array << result.errors.to_h if result.failure?
     end
     errors_array
-  end
-
-  def duplicate_sep(sep)
-    sp = SpecialEnrollmentPeriod.new(sep.attributes.except("effective_on", "submitted_at", "_id"))
-    sp.qualifying_life_event_kind = sep.qualifying_life_event_kind    # initiate sep dates
-    # TODO: Gotta make sure this is being set properly
-    @family.special_enrollment_periods << sp
-    sp.save
-    sp
   end
 
   def set_dependent_and_family

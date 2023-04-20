@@ -57,11 +57,9 @@ module Operations
         def transform_applications(family, exclude_applications)
           return unless EnrollRegistry.feature_enabled?(:financial_assistance)
           return [] if exclude_applications
-          member_hbx_ids = family.active_family_members.collect {|family_member| family_member.person.hbx_id}
-          applications = ::FinancialAssistance::Application.where(family_id: family.id).where(:aasm_state.in => ["submitted", "determined"])
+
+          applications = ::FinancialAssistance::Application.where(family_id: family.id).determined
           transformed_applications = applications.collect do |application|
-            # applicant_person_hbx_ids = application.active_applicants.pluck(:person_hbx_id)
-            # next unless member_hbx_ids.to_set == applicant_person_hbx_ids.to_set
             ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
           end.compact
           return Failure("Could not transform applications for family with hbx_id #{family.hbx_assigned_id}: #{transformed_applications.select(&:failure?).map(&:failure)}") unless transformed_applications.all?(&:success?)

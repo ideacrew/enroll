@@ -21,6 +21,7 @@ module FinancialAssistance
           # @return [Dry::Monads::Result]
           def call(params)
             payload = yield load_data(params)
+            payload = yield load_missing_county_names(payload) if FinancialAssistanceRegistry.feature_enabled?(:load_county_on_inbound_transfer)
             family = yield build_family(payload["family"])
             application_id = yield build_application(payload, family)
             application = yield find_application(application_id)
@@ -56,8 +57,10 @@ module FinancialAssistance
               end
             end
 
-            return Failure("Unable to find county objects for zips #{@zips_with_missing_counties.uniq}") if @zips_with_missing_counties.present?
-            return Failure("Unable to match county for #{@zips_with_multiple_counties.uniq}, as multiple counties have this zip code.") if @zips_with_multiple_counties.present?
+            failure_message = "Unable to find county objects for zips #{@zips_with_missing_counties.uniq}" if @zips_with_missing_counties.present?
+            failure_message = "Unable to match county for #{@zips_with_multiple_counties.uniq}, as multiple counties have this zip code." if @zips_with_multiple_counties.present?
+            return Failure(failure_message) if failure_message.present?
+
             Success(payload)
           rescue StandardError => e
             Failure("load_missing_county_names #{e}")
@@ -85,12 +88,8 @@ module FinancialAssistance
           end
 
           def load_data(payload = {})
-            payload = payload.to_h.deep_stringify_keys!
-            result = load_missing_county_names(payload)
-            return result if result.failure?
-
-            updated_payload = result.value!
-            decrypt_ssns(updated_payload)
+            stringified_payload = payload.to_h.deep_stringify_keys!
+            decrypt_ssns(stringified_payload)
           rescue StandardError => e
             Failure("load_data #{e}")
           end
@@ -199,7 +198,9 @@ module FinancialAssistance
               consumer_role_params = family_member_hash['person']['consumer_role']
               create_or_update_consumer_role(consumer_role_params.merge(is_consumer_role: true), @family_member)
             else
-              person_result
+              first_name = family_member_hash['person']['person_name']['first_name']
+              last_name = family_member_hash['person']['person_name']['last_name']
+              Failure("Failed to create or update person #{first_name} #{last_name} due to: #{person_result.failure}")
             end
           rescue StandardError => e
             Failure("create_member: #{e}")
@@ -239,7 +240,9 @@ module FinancialAssistance
             family.save!
             Success(family_member)
           rescue Mongoid::Errors::Validations => e
-            Failure("create_or_update_family_member validation: #{e.summary}")
+            first_name = family_member_hash['person']['person_name']['first_name']
+            last_name = family_member_hash['person']['person_name']['last_name']
+            Failure("Failed create_or_update_family_member validation for #{first_name} #{last_name} due to: #{e.summary}")
           rescue StandardError => e
             Failure("create_or_update_family_member: #{e}")
           end
@@ -297,6 +300,7 @@ module FinancialAssistance
               citizen_status_info = applicant_hash['citizenship_immigration_status_information']
               foster_info = applicant_hash['foster_care']
               address_result = same_address_with_primary(family_member, primary)
+              phones = valid_applicant_phones(applicant_hash['phones'])
               return address_result unless address_result.success?
               sanitize_params << {
                 family_member_id: family_member.id,
@@ -384,7 +388,7 @@ module FinancialAssistance
 
                 addresses: applicant_hash['addresses'],
                 emails: applicant_hash['emails'],
-                phones: applicant_hash['phones'],
+                phones: phones,
                 incomes: applicant_hash['incomes'],
                 benefits: applicant_hash['benefits'],
                 deductions: applicant_hash['deductions'],
@@ -405,6 +409,16 @@ module FinancialAssistance
             Success(sanitize_params)
           rescue StandardError => e
             Failure("sanitize_applicant_params: #{e}")
+          end
+
+          def valid_applicant_phones(phones)
+            phones.map do |phone|
+              valid_phone_params = phone.slice("kind", "country_code", "area_code", "number", "extension", "primary", "full_phone_number")
+              invalid_phone = FinancialAssistance::Locations::Phone.new(valid_phone_params).invalid? || phone['full_phone_number']&.first == '0' || phone['area_code']&.first == '0'
+              next if invalid_phone
+
+              valid_phone_params
+            end.compact
           end
 
           def sanitize_person_params(family_member_hash)
@@ -444,11 +458,21 @@ module FinancialAssistance
               verification_types: person_hash['verification_types'],
               addresses: person_hash['addresses'],
               emails: person_hash['emails'],
-              phones: person_hash['phones']
+              phones: valid_person_phones(person_hash['phones'])
             }
             Success(phash)
           rescue StandardError => e
             Failure("build person hash #{e}")
+          end
+
+          def valid_person_phones(phones)
+            phones.map do |phone|
+              valid_phone_params = phone.slice("kind", "country_code", "area_code", "number", "extension", "primary", "full_phone_number")
+              invalid_phone = Phone.new(valid_phone_params).invalid? || phone['full_phone_number']&.first == '0' || phone['area_code']&.first == '0'
+              next if invalid_phone
+
+              valid_phone_params
+            end.compact
           end
 
           def transform_no_ssn(ssn)

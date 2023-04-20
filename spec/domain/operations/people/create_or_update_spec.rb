@@ -39,10 +39,11 @@ RSpec.describe Operations::People::CreateOrUpdate, type: :model, dbclean: :after
     end
 
     context 'for success case if person already exists in db and updating with same details' do
-      let!(:person) {FactoryBot.create(:person)}
+      let!(:person) {FactoryBot.create(:person, ssn: '345343243')}
+      let!(:nil_person) {FactoryBot.create(:person)}
       let!(:person_params) do
         {first_name: person.first_name, last_name: person.last_name,
-         dob: person.dob, no_ssn: '1',
+         dob: person.dob, ssn: person.ssn,
          gender: 'male', is_incarcerated: false,
          person_hbx_id: person.hbx_id,
          same_with_primary: true, indian_tribe_member: true, citizen_status: 'true',
@@ -50,11 +51,22 @@ RSpec.describe Operations::People::CreateOrUpdate, type: :model, dbclean: :after
          phones: person.serializable_hash.deep_symbolize_keys[:phones], emails: person.serializable_hash.deep_symbolize_keys[:emails]}
       end
 
-      before :each do
-        @result = subject.call(params: person_params)
+      context 'valid params' do
+        before do
+          @result = subject.call(params: person_params)
+        end
+        it 'should return success' do
+          expect(@result).to be_a(Dry::Monads::Result::Success)
+        end
       end
 
-      context 'valid params' do
+      context 'nil hbx id' do
+        before do
+          person_params.merge!({person_hbx_id: nil})
+          nil_person.update_attributes!(first_name: "Nil Test")
+          Person.where(first_name: "Nil Test").update_all(hbx_id: nil)
+          @result = subject.call(params: person_params)
+        end
         it 'should return success' do
           expect(@result).to be_a(Dry::Monads::Result::Success)
         end

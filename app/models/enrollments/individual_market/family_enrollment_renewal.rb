@@ -28,6 +28,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
       if is_dependent_dropped?
         renewal_enrollment.aasm_state = 'coverage_selected'
         renewal_enrollment.workflow_state_transitions.build(from_state: 'shopping', to_state: 'coverage_selected')
+        renewal_enrollment.update_tax_household_enrollment
       else
         renewal_enrollment.renew_enrollment
       end

@@ -46,12 +46,12 @@ module BenefitSponsors
           @total = pricing_determination_tier.price
           members_total_price = 0.00
           @member_ids.each do |m_id|
-            member_price = BigDecimal.new((@total / @member_totals).to_s).floor(2)
-            members_total_price = BigDecimal.new((members_total_price + member_price).to_s).round(2)
+            member_price = BigDecimal((@total / @member_totals).to_s).floor(2)
+            members_total_price = BigDecimal((members_total_price + member_price).to_s).round(2)
             @member_pricing[m_id] = member_price
           end
-          member_discrepency = BigDecimal.new((@total - members_total_price).to_s).round(2)
-          @member_pricing[@primary_member_id] = BigDecimal.new((@member_pricing[@primary_member_id] + member_discrepency).to_s).round(2) 
+          member_discrepency = BigDecimal((@total - members_total_price).to_s).round(2)
+          @member_pricing[@primary_member_id] = BigDecimal((@member_pricing[@primary_member_id] + member_discrepency).to_s).round(2)
           self
         end
       end
