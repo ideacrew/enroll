@@ -14,7 +14,7 @@ Feature: IVL plan purchase
     And consumer clicked on shop for new plan
     Then consumer should see both dependent and primary
 
-    Scenario: when IVL purchase plan only for dependent
+  Scenario: when IVL purchase plan only for dependent
     Given a consumer exists
     And the consumer is logged in
     And consumer has a dependent in child relationship with age less than 26
