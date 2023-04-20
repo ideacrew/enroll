@@ -338,3 +338,4 @@ class ProductBuilder
   end
 
 end
+
