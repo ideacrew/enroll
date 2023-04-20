@@ -1182,6 +1182,15 @@ Then("user will click on New Employee Paper Application link") do
   find('.new_employee_paper_application').click
 end
 
+And(/Individual hits tab/) do
+  find_all(".thank_you_field")[1].send_keys(:tab)
+end
+
+Then(/page should not automatically scroll to the continue button/) do
+  scroll_position = page.evaluate_script("window.pageYOffset")
+  expect(scroll_position).to eq(1028)
+end
+
 And(/(.*) should have a ER sponsored enrollment/) do |named_person|
   person = people[named_person]
   ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first

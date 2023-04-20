@@ -14,7 +14,7 @@ Feature: IVL plan purchase
     And consumer clicked on shop for new plan
     Then consumer should see both dependent and primary
 
-  Scenario: when IVL purchase plan only for dependent
+  Scenario: when consumer selects a plan only primary should be able to confirm plan selection
     Given a consumer exists
     And the consumer is logged in
     And consumer has a dependent in child relationship with age less than 26
@@ -25,9 +25,10 @@ Feature: IVL plan purchase
     Then I should see confirmation and continue
     When ivl clicked continue on household info page
     Then consumer should see all the family members names
-    When consumer unchecks the primary person
     And consumer clicked on shop for new plan
-    Then consumer should only see the dependent name
+    And Individual selects a plan on plan shopping page
+    And Individual hits tab
+    Then page should not automatically scroll to the continue button
 
   Scenario: IVL having an ineligible family member & doing plan shop
     Given a consumer exists
