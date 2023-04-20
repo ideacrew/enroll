@@ -1,3 +1,8 @@
+# Execute this command to run the script
+# RAILS_ENV=production rails r script/trigger_renewal_plan_year.rb
+
+# Note: This is only a one time script for the ticket: pivotal-182598285 and cannot be used again.
+
 require 'csv'
 
 puts "Running data fix for taxhousehold_members magi_medicaid_monthly_household_income"
