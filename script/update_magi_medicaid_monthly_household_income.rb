@@ -63,7 +63,7 @@ file_name = "#{Rails.root}/182598285_applicants_report_after_data_fix_script_#{T
 CSV.open(file_name, 'w+', headers: true) do |csv|
   csv << field_names
 
-  applications = FinancialAssistance::Application.all.where(:"aasm_state".nin => ["draft"], applicants: { :$elemMatch => { :magi_medicaid_monthly_household_income.exists => true, :"magi_medicaid_monthly_household_income.cents".ne => 0.0 } })
+  applications = FinancialAssistance::Application.all.where(:aasm_state.nin => ["draft"], applicants: { :$elemMatch => { :magi_medicaid_monthly_household_income.exists => true, :"magi_medicaid_monthly_household_income.cents".ne => 0.0 } })
 
   FinancialAssistance::Application.where(:aasm_state.in => %w[determined submitted]).each do |app|
     app.applicants.each do |applicant|
@@ -83,6 +83,3 @@ CSV.open(file_name, 'w+', headers: true) do |csv|
     end
   end
 end
-
-
-
