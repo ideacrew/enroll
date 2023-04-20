@@ -119,22 +119,18 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::CreatePvcRe
 
   context 'success' do
     it 'should return success' do
-      expect(applicant.income_evidence.present?).to be_falsey
       expect(applicant.non_esi_evidence.present?).to be_falsey
-      result = subject.call(family_id: family.id, person: person, assistance_year: application.assistance_year, manifest: manifest)
+      result = subject.call(family_hbx_id: family.hbx_assigned_id, application_hbx_id: application.hbx_id, assistance_year: application.assistance_year)
       expect(result).to be_success
-      expect(applicant.reload.income_evidence.present?).to be_truthy
       expect(applicant.reload.non_esi_evidence.present?).to be_truthy
     end
   end
 
   it "when evidences are not created due to applicant ineligible" do
     applicant.update(is_applying_coverage: false, is_ia_eligible: false)
-    expect(applicant.income_evidence.present?).to be_falsey
     expect(applicant.non_esi_evidence.present?).to be_falsey
-    result = subject.call(family_id: family.id, person: person, assistance_year: application.assistance_year, manifest: manifest)
+    result = subject.call(family_hbx_id: family.hbx_assigned_id, application_hbx_id: application.hbx_id, assistance_year: application.assistance_year)
     expect(result).to be_success
-    expect(applicant.reload.income_evidence.present?).to be_falsey
     expect(applicant.reload.non_esi_evidence.present?).to be_falsey
   end
 end
