@@ -1,7 +1,7 @@
 # Execute this command to run the script
 # RAILS_ENV=production rails r script/update_magi_medicaid_monthly_household_income.rb
 
-# Note: This is only a one time script for the ticket: pivotal-182598285 and cannot be used again.
+# NOTE: This is only a one time script for the ticket: pivotal-182598285 and cannot be used again.
 
 require 'csv'
 
@@ -18,13 +18,20 @@ field_names = %w[family_id
 
 file_name = "#{Rails.root}/182598285_taxhousehold_members_report_after_data_fix_#{Time.new.strftime('%Y_%m_%d_%H_%M_%S')}.csv"
 
+def fetch_family_ids
+  Family.collection.aggregate([
+    {"$unwind" => "$tax_household_groups" },
+    {"$unwind" => "$tax_household_groups.tax_households" },
+    {"$unwind" => "$tax_household_groups.tax_households.tax_household_members" },
+    {"$match" => {"tax_household_groups.tax_households.tax_household_members.magi_medicaid_monthly_household_income.cents" => {"$nin" => [0.0, nil]}}},
+    {"$project" => {"_id" => 1}}
+    ],:allow_disk_use => true).collect{|h| h["_id"]}.uniq
+end
+
 CSV.open(file_name, 'w+', headers: true) do |csv|
   csv << field_names
-  families = Family.where('tax_household_groups.tax_households.tax_household_members': { :$elemMatch => {
-                            :magi_medicaid_monthly_household_income.exists => true, :"magi_medicaid_monthly_household_income.cents".ne => 0
-                          } })
 
-  families.each do |family|
+  Family.where(:id.in => fetch_family_ids).each do |family|
     family.tax_household_groups.each do |thhg|
       thhg.tax_households.each do |thh|
         thh.tax_household_members.each do |thhm|
