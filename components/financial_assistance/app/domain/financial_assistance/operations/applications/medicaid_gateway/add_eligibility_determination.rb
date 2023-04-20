@@ -74,7 +74,7 @@ module FinancialAssistance
           def update_http_code_and_aasm_state(application)
             # Tie http_status_code & aasm_state update together to aviod gap b/w both the actions.
             application.assign_attributes(determination_http_status_code: 200)
-            application.determine
+            application.determine!
             application.save
           end
 
