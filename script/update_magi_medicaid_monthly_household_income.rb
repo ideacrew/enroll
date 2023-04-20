@@ -18,24 +18,18 @@ field_names = %w[family_id
 
 file_name = "#{Rails.root}/182598285_taxhousehold_members_report_after_data_fix_#{Time.new.strftime('%Y_%m_%d_%H_%M_%S')}.csv"
 
-def fetch_family_ids
-  Family.collection.aggregate([
-    {"$unwind" => "$tax_household_groups" },
-    {"$unwind" => "$tax_household_groups.tax_households" },
-    {"$unwind" => "$tax_household_groups.tax_households.tax_household_members" },
-    {"$match" => {"tax_household_groups.tax_households.tax_household_members.magi_medicaid_monthly_household_income.cents" => {"$nin" => [0.0, nil]}}},
-    {"$project" => {"_id" => 1}}
-    ],:allow_disk_use => true).collect{|h| h["_id"]}.uniq
+def fetch_families
+  Family.exists(:"tax_household_groups.tax_households.tax_household_members.magi_medicaid_monthly_household_income" => true)
 end
 
 CSV.open(file_name, 'w+', headers: true) do |csv|
   csv << field_names
 
-  Family.where(:id.in => fetch_family_ids).each do |family|
+  fetch_families.each do |family|
     family.tax_household_groups.each do |thhg|
       thhg.tax_households.each do |thh|
         thh.tax_household_members.each do |thhm|
-          next if thhm.magi_medicaid_monthly_household_income.to_f <= 0.0
+          next if thhm.magi_medicaid_monthly_household_income.to_f == 0.0
 
           before_update = thhm.magi_medicaid_monthly_household_income.to_f
           updated_value = before_update / 12
@@ -75,7 +69,7 @@ CSV.open(file_name, 'w+', headers: true) do |csv|
 
   FinancialAssistance::Application.where(:aasm_state.in => %w[determined submitted]).each do |app|
     app.applicants.each do |applicant|
-      next if applicant.magi_medicaid_monthly_household_income.to_f <= 0.0
+      next if applicant.magi_medicaid_monthly_household_income.to_f == 0.0
 
       before_update = applicant.magi_medicaid_monthly_household_income.to_f
       updated_value = before_update / 12
