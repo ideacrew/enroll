@@ -14,10 +14,14 @@ Feature: IVL plan purchase
     And consumer clicked on shop for new plan
     Then consumer should see both dependent and primary
 
-  Scenario: when IVL purchase plan only for dependent
+    Scenario: when IVL purchase plan only for dependent
     Given a consumer exists
     And the consumer is logged in
     And consumer has a dependent in child relationship with age less than 26
+    And consumer has successful ridp
+    When consumer visits home page
+    And consumer clicked on "Married" qle
+    And I select a past qle date
     Then I should see confirmation and continue
     When ivl clicked continue on household info page
     Then consumer should see all the family members names
