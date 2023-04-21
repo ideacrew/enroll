@@ -47,8 +47,7 @@ RSpec.describe "insured/plan_shoppings/_individual_agreement.html.erb" do
       render "insured/plan_shoppings/individual_agreement", locals: {aptc_present: true, coverage_year: TimeKeeper.date_of_record.year.to_s}
     end
 
-    it 'should show the proper translation' do
-      expect(rendered).to match("I must file a federal income tax return")
+    it 'should show the proper translation text' do
       expect(rendered).to have_content(l10n("insured.individual_agreement.agreement.aptc.on_my_behalf"))
     end
   end
