@@ -11,7 +11,7 @@ module Subscribers
       pre_process_message(subscriber_logger, payload)
 
       # Add subscriber operations below this line
-      redetermine_family_eligibility(payload)
+      redetermine_family_eligibility(subscriber_logger, payload)
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
@@ -94,7 +94,7 @@ module Subscribers
       subject.eligibilities.max_by(&:created_at)
     end
 
-    def redetermine_family_eligibility(payload)
+    def redetermine_family_eligibility(subscriber_logger, payload)
       enrollment = GlobalID::Locator.locate(payload[:gid])
       return if enrollment.shopping? || Rails.env.test?
 
@@ -103,15 +103,18 @@ module Subscribers
 
       if HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(enrollment.aasm_state)
         family.fail_negative_and_pending_verifications
+
         if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
           thhe = TaxHouseholdEnrollment.where(enrollment_id: enrollment.id).first
           application_hbx_id = thhe&.tax_household&.tax_household_group&.application_id
         end
+
         application = if application_hbx_id.present?
                         ::FinancialAssistance::Application.where(hbx_id: application_hbx_id).first
                       else
                         family.active_financial_assistance_application(assistance_year)
                       end
+
         subscriber_logger.info "EnrollmentSubscriber, redetermine_family_eligibility for enrollment #{enrollment.hbx_id} with the application #{application&.hbx_id}"
         application&.enrolled_with(enrollment)
       end
