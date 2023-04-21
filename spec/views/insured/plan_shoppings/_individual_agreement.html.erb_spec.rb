@@ -44,7 +44,7 @@ RSpec.describe "insured/plan_shoppings/_individual_agreement.html.erb" do
       allow(@plan).to receive(:total_aptc_amount).and_return(50)
       EnrollRegistry[:extended_aptc_individual_agreement_message].feature.stub(:is_enabled).and_return(true)
       change_target_translation_text("en.insured.individual_agreement.agreement.aptc.on_my_behalf.file_return", "me", "insured")
-      render "insured/plan_shoppings/individual_agreement", locals: {aptc_present: true, coverage_year: TimeKeeper.date_of_record.year.to_s}
+      render "insured/plan_shoppings/individual_agreement", locals: { coverage_year: TimeKeeper.date_of_record.year.to_s}
     end
 
     it 'should show the proper translation text' do
