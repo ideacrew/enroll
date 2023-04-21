@@ -103,7 +103,16 @@ module Subscribers
 
       if HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(enrollment.aasm_state)
         family.fail_negative_and_pending_verifications
-        application = family.active_financial_assistance_application(assistance_year)
+        if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+          thhe = TaxHouseholdEnrollment.where(enrollment_id: enrollment.id).first
+          application_hbx_id = thhe&.tax_household&.tax_household_group&.application_id
+        end
+        application = if application_hbx_id.present?
+                        ::FinancialAssistance::Application.where(hbx_id: application_hbx_id).first
+                      else
+                        family.active_financial_assistance_application(assistance_year)
+                      end
+        subscriber_logger.info "EnrollmentSubscriber, redetermine_family_eligibility for enrollment #{enrollment.hbx_id} with the application #{application&.hbx_id}"
         application&.enrolled_with(enrollment)
       end
 
