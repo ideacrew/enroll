@@ -42,8 +42,8 @@ Feature: IVL plan purchase
     Then consumer should see all the family members names
     And consumer clicked on shop for new plan
     And Individual selects a plan on plan shopping page
-    And Individual hits tab
-    Then page should not automatically scroll to the continue button
+    And Individual hits tab and enter
+    Then Individual does not navigate to the enrollment submitted page
 
   Scenario: IVL having an ineligible family member & doing plan shop
     Given a consumer exists

@@ -1182,14 +1182,13 @@ Then("user will click on New Employee Paper Application link") do
   find('.new_employee_paper_application').click
 end
 
-And(/Individual hits tab/) do
+And(/Individual hits tab and enter/) do
   find_all(".thank_you_field")[1].send_keys(:tab)
+  find("#btn-continue").send_keys(:return)
 end
 
-Then(/page should not automatically scroll to the continue button/) do
-  element = find_all(".thank_you_field")[1]
-  cursor_position = page.evaluate_script('arguments[0].selectionStart', element)
-  expect(cursor_position).to eql(0)
+Then(/Individual does not navigate to the enrollment submitted page/) do
+  expect(page).to_not have_content IvlEnrollmentSubmitted.enrollment_submitted_text
 end
 
 And(/(.*) should have a ER sponsored enrollment/) do |named_person|
