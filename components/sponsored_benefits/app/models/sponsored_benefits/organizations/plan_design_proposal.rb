@@ -63,6 +63,12 @@ module SponsoredBenefits
         grant.value.run
       end
 
+      def all_contribution_levels_min_met_relaxed?
+        grant = osse_eligibility&.grant_for(:all_contribution_levels_min_met)
+        return false unless grant
+        grant.value.run
+      end
+
       # class methods
       class << self
 
