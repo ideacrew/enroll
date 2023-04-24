@@ -114,7 +114,18 @@ module Config::AcaHelper
   end
 
   def self_attest_residency_enabled?
-    ::EnrollRegistry.feature_enabled?(:residency_self_attestation) && ::EnrollRegistry[:residency_self_attestation].setting(:effective_period).item.cover?(TimeKeeper.date_of_record)
+    return unless ::EnrollRegistry.feature_enabled?(:residency_self_attestation)
+
+    start_day = EnrollRegistry[:residency_self_attestation].setting(:effective_period_start_day).item.to_i
+    start_month = EnrollRegistry[:residency_self_attestation].setting(:effective_period_start_month).item.to_i
+    start_year = EnrollRegistry[:residency_self_attestation].setting(:effective_period_start_year).item.to_i
+    end_day = EnrollRegistry[:residency_self_attestation].setting(:effective_period_end_day).item.to_i
+    end_month = EnrollRegistry[:residency_self_attestation].setting(:effective_period_end_month).item.to_i
+    end_year = EnrollRegistry[:residency_self_attestation].setting(:effective_period_end_year).item.to_i
+    effective_start = Date.new(start_year, start_month, start_day)
+    effective_end = Date.new(end_year, end_month, end_day)
+
+    (effective_start..effective_end).cover?(TimeKeeper.date_of_record)
   end
 
   def sep_carousel_message_enabled?
@@ -369,7 +380,21 @@ module Config::AcaHelper
     EnrollRegistry.feature?("aca_ivl_osse_subsidy_#{year}") && EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
   end
 
+  def eligibility_audit_log_is_enabled?
+    EnrollRegistry.feature?("eligibility_audit_log") && EnrollRegistry.feature_enabled?("eligibility_audit_log")
+  end
+
+  def display_eligibility_audit_log?(person)
+    (person.has_consumer_role? || person.has_active_employee_role?) && eligibility_audit_log_is_enabled?
+  end
+
   def display_enr_summary_is_enabled(enrollment)
-    EnrollRegistry.feature_enabled?(:display_enr_summary) && enrollment.hbx_enrollment_members.all? { |member| member.person != current_user.person }
+    if EnrollRegistry.feature_enabled?(:display_enr_summary)
+      return true if enrollment.hbx_enrollment_members.all? { |member| member.person != current_user.person }
+    elsif current_user.has_hbx_staff_role?
+      true
+    else
+      false
+    end
   end
 end

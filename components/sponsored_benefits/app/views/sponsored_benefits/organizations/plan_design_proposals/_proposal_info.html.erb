@@ -28,16 +28,44 @@
   <% end %>
 </div>
 
+<% if broker_can_create_hc4cc_quote? %>
+  <div class="row no-buffer row-form-wrapper">
+    <div class="col-xs-12">
+      <h4><%=l10n('osse_subsidy_title')%></h4>
+      <p><%=l10n('osse_eligibility_description')%></p>
+    </div>
+
+    <div class="row no-buffer vertically-aligned-row" style="width: 100%; padding: 15px 0;">
+      <div class="col-md-5 col-xs-12"><%=l10n('osse_eligibility_question')%></div>
+      <div class="form-check form-check-inline col-md-2 col-xs-12 form-group form-group-lg no-pd">
+          <label>
+            <%= f.radio_button :osse_eligibility, true, class: "n-radio", disabled: false %>
+          </label>
+          <span><%=l10n('yes')%></span>
+        </div>
+        <div class="form-check form-check-inline col-md-2 col-xs-12 form-group form-group-lg no-pd">
+          <label>
+            <%= f.radio_button :osse_eligibility, false, class: "n-radio", disabled: false %>
+          </label>
+            <span><%=l10n('no')%></span>
+        </div>
+      </div>
+  </div>
+<% end %>
+
 <script>
 
 $(function() {
 
   function submitPlanDesignProposalInfo() {
     if($("#forms_plan_design_proposal_title").val() != "" && $("#forms_plan_design_proposal_effective_date").val() != "") {
+      var formData = $("#new_forms_plan_design_proposal").serializeArray();
+      formData.push({ name: 'profile_id', value: $("#profile_id").val() });
+
       $.ajax({
         type: "POST",
         url: $("#new_forms_plan_design_proposal").attr('action'),
-        data: $("#new_forms_plan_design_proposal").serialize() + "profile_id=" + $("#profile_id").val(),
+        data: formData,
         dataType: "script",
         success: function(data) {
         }
@@ -47,6 +75,11 @@ $(function() {
       // $('.save-quote-btn').click();
     }
   }
+
+  $('input[type=radio][name="forms_plan_design_proposal[osse_eligibility]"]').change(function() {
+    console.log('triggered message');
+    submitPlanDesignProposalInfo();
+  })
 
   $("#new_forms_plan_design_proposal input[type=text]").each(function(){
     $(this).on("change", submitPlanDesignProposalInfo);

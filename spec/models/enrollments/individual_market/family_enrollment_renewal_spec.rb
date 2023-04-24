@@ -579,6 +579,17 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
 
           context 'when renewal grants present' do
+            let!(:tax_household_group) do
+              family.tax_household_groups.create!(
+                assistance_year: TimeKeeper.date_of_record.year + 1,
+                source: 'Admin',
+                start_on: TimeKeeper.date_of_record.beginning_of_year.next_year,
+                tax_households: [
+                  FactoryBot.build(:tax_household, household: family.active_household)
+                ]
+              )
+            end
+
             let!(:eligibility_determination) do
               determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
               determination.grants.create(

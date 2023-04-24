@@ -94,6 +94,8 @@ function fetchCarriers() {
   var active_year = $("#forms_plan_design_proposal_effective_date").val().substr(0,4);
   var selected_carrier_level = $(this).siblings('input').val();
   var plan_design_organization_id = $('#plan_design_organization_id').val();
+  var plan_design_proposal_id = $('#plan_design_proposal_id').val();
+
   var kind = $("#benefits_kind").val();
   $(this).closest('.plan-design').find('.nav-tabs li').removeClass('active');
   $(this).closest('li').addClass('active');
@@ -103,6 +105,7 @@ function fetchCarriers() {
     data:{
       active_year: active_year,
       selected_carrier_level: selected_carrier_level,
+      plan_design_proposal_id: plan_design_proposal_id,
       kind: kind
     },
     success: function() {

@@ -487,10 +487,10 @@ module SponsoredBenefits
       @crtp_cache[composite_rating_tier]
     end
 
-                        def lookup_cached_crtp_for(composite_rating_tier)
-                          ct_contribution = composite_tier_contributions.detect { |ctc| ctc.composite_rating_tier == composite_rating_tier }
-                          benefit_application.estimate_group_size? ? ct_contribution.estimated_tier_premium : ct_contribution.final_tier_premium
-                        end
+    def lookup_cached_crtp_for(composite_rating_tier)
+      ct_contribution = composite_tier_contributions.detect { |ctc| ctc.composite_rating_tier == composite_rating_tier }
+      benefit_application.estimate_group_size? ? ct_contribution.estimated_tier_premium : ct_contribution.final_tier_premium
+    end
 
     # Provide the contribution factor for a given composite rating tier.
     def composite_employer_contribution_factor_for(composite_rating_tier)

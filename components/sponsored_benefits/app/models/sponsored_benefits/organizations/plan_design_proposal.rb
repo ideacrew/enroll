@@ -31,24 +31,36 @@ module SponsoredBenefits
       scope :expired, -> { any_in(aasm_state: %w(expired renewing_expired)) }
       scope :claimed, -> { any_in(aasm_state: %w(claimed renewing_claimed)) }
 
+      # rubocop:disable Lint/SafeNavigationChain
       def active_benefit_group
-        return nil if profile.nil?
-        return nil if profile.benefit_sponsorships.empty?
-        sponsorship = profile.benefit_sponsorships.first
-        return nil if sponsorship.benefit_applications.empty?
-        application = sponsorship.benefit_applications.first
-        return nil if application.benefit_groups.empty?
-        application.benefit_groups.first
+        benefit_application&.benefit_groups.first
       end
 
+      def benefit_application
+        benefit_sponsorship&.benefit_applications.first
+      end
+
+      def benefit_sponsorship
+        profile&.benefit_sponsorships.first
+      end
+      # rubocop:enable Lint/SafeNavigationChain
+
       def active_census_employees
-        return nil if profile.benefit_sponsorships.empty?
-        sponsorship = profile.benefit_sponsorships.first
-        sponsorship.census_employees
+        benefit_sponsorship&.census_employees
       end
 
       def active_census_familes
         active_census_employees.where({ "census_dependents.0" => { "$exists" => true } })
+      end
+
+      def osse_eligibility
+        benefit_sponsorship.eligibility_for(:osse_subsidy, effective_date)
+      end
+
+      def metal_level_products_restricted?
+        grant = osse_eligibility&.grant_for(:employer_metal_level_products)
+        return false unless grant
+        grant.value.run
       end
 
       # class methods

@@ -87,10 +87,10 @@ Rails.application.routes.draw do
 
   namespace :exchanges do
 
-    resources :bulk_notices
+    resources :bulk_notices, format: false
 
     resources :inboxes, only: [:show, :destroy]
-    resources :announcements, only: [:index, :create, :destroy] do
+    resources :announcements, format: false, only: [:index, :create, :destroy] do
       get :dismiss, on: :collection
     end
     resources :agents_inboxes, only: [:show, :destroy]
@@ -109,7 +109,7 @@ Rails.application.routes.draw do
     resources :seeds, only: [:index, :new, :create, :edit, :update]
 
     if EnrollRegistry.feature_enabled?(:sep_types)
-      resources :manage_sep_types do
+      resources :manage_sep_types, format: false do
         root 'manage_sep_types#sep_types_dt'
         collection do
           get 'sep_types_dt'
@@ -279,14 +279,14 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :interactive_identity_verifications, only: [:create, :new, :update] do
+    resources :interactive_identity_verifications, format: false, only: [:create, :new, :update] do
       collection do
         get 'failed_validation'
         get 'service_unavailable'
       end
     end
 
-    resources :fdsh_ridp_verifications, only: [:create, :new, :update] do
+    resources :fdsh_ridp_verifications, format: false, only: [:create, :new, :update] do
       collection do
         get 'failed_validation'
         get 'service_unavailable'
@@ -300,8 +300,7 @@ Rails.application.routes.draw do
     end
 
     resources :inboxes, only: [:new, :create, :show, :destroy]
-    resources :families, only: [:show] do
-      get 'new'
+    resources :families, only: [:new] do
       member do
         delete 'delete_consumer_broker'
         get 'generate_out_of_pocket_url'
@@ -311,12 +310,12 @@ Rails.application.routes.draw do
         get 'home'
         get 'manage_family'
         get 'personal'
-        get 'inbox'
+        get 'inbox', format: false
         get 'healthcare_for_childcare_program'
         get 'healthcare_for_childcare_program_form'
         put 'update_healthcare_for_childcare_program_eligibility'
         get 'brokers'
-        get 'verification'
+        get 'verification', format: false
         get 'upload_application'
         get 'document_upload'
         get 'find_sep'
@@ -377,7 +376,7 @@ Rails.application.routes.draw do
       get :show_resident_dependent, on: :member
     end
 
-    resources :group_selections, controller: "group_selection", only: [:new, :create] do
+    resources :group_selections, format: false, controller: "group_selection", only: [:new, :create] do
       collection do
         post :cancel
         post :edit_aptc

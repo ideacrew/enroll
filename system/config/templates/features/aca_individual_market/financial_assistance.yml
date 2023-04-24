@@ -161,6 +161,8 @@ registry:
       is_enabled: <%= ENV['NON_MAGI_TRANSFER_IS_ENABLED'] || false %>
     - key: :block_renewal_application_transfers
       is_enabled: <%= ENV['ATP_ON_RENEWALS_IS_ENABLED'] || false %>
+    - key: :load_county_on_inbound_transfer
+      is_enabled: <%= ENV['LOAD_COUNTY_ON_INBOUND_TRANSFER_IS_ENABLED'] || false %>
   - namespace:
     - :documents
     features:

@@ -522,6 +522,10 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       expect(response).to have_http_status(:success)
     end
 
+    it "should error out" do
+      expect { get '/insured/families/verification.bac' }.to raise_error(ActionController::UrlGenerationError)
+    end
+
     it "renders verification template" do
       get :verification
       expect(response).to render_template("verification")
@@ -637,18 +641,24 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   describe "GET inbox" do
     before :each do
       allow(family).to receive(:active_family_members).and_return(family_members)
-      get :inbox
     end
 
     it "should be a success" do
+      get :inbox
       expect(response).to have_http_status(:success)
     end
 
+    it "should be a success" do
+      expect { get '/inbox.BAC' }.to raise_error(ActionController::UrlGenerationError)
+    end
+
     it "should render inbox" do
+      get :inbox
       expect(response).to render_template("inbox")
     end
 
     it "should assign variables" do
+      get :inbox
       expect(assigns(:folder)).to eq("Inbox")
     end
   end

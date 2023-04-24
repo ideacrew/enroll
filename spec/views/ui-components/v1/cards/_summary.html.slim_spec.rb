@@ -264,6 +264,35 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
       expect(rendered).to_not have_content(hbx_enrollment_member.person.full_name.titleize)
     end
   end
+
+  context 'for display of enrollment additional summary with consumer with feature disabled' do
+    before do
+      allow(view).to receive(:display_carrier_logo).and_return('logo/carrier/uhic.jpg')
+      sign_in user
+      render 'ui-components/v1/cards/summary', :qhp => mock_qhp_cost_share_variance
+    end
+
+    it 'should not include enrollment effective_on text' do
+      expect(rendered).to_not have_content(l10n('enrollment.effective_on'))
+    end
+
+    it 'should not include latest transition text' do
+      expect(rendered).to_not have_content(l10n('enrollment.latest_transition'))
+    end
+
+    it 'should not include Product HIOS ID text' do
+      expect(rendered).to_not have_content(l10n('product_hios_id'))
+    end
+
+    it 'should not include RatingArea text' do
+      expect(rendered).to_not have_content(l10n('rating_area.exchange_provided_code'))
+    end
+
+    it 'should not include full name of person' do
+      expect(rendered).to_not have_content(hbx_enrollment_member.person.full_name.titleize)
+    end
+  end
+
   context 'for display of enrollment additional summary with broker' do
     let(:broker_user) { FactoryBot.create(:user, person: broker_person) }
     let(:broker_person) {FactoryBot.create(:person, :with_broker_role)}
@@ -280,24 +309,54 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
       render 'ui-components/v1/cards/summary', :qhp => mock_qhp_cost_share_variance
     end
 
-    it 'should not include enrollment effective_on text' do
+    it 'should include enrollment effective_on text' do
       expect(rendered).to have_content(l10n('enrollment.effective_on'))
     end
 
-    it 'should not include latest transition text' do
+    it 'should include latest transition text' do
       expect(rendered).to have_content(l10n('enrollment.latest_transition'))
     end
 
-    it 'should not include Product HIOS ID text' do
+    it 'should include Product HIOS ID text' do
       expect(rendered).to have_content(l10n('product_hios_id'))
     end
 
-    it 'should not include RatingArea text' do
+    it 'should include RatingArea text' do
       expect(rendered).to have_content(l10n('rating_area.exchange_provided_code'))
     end
 
-    it 'should not include full name of person' do
+    it 'should include full name of person' do
       expect(rendered).to have_content(hbx_enrollment_member.person.full_name.titleize)
+    end
+  end
+
+  context 'for display of enrollment additional summary with broker and feature flag is disabled' do
+    let(:broker_user) { FactoryBot.create(:user, person: broker_person) }
+    let(:broker_person) {FactoryBot.create(:person, :with_broker_role)}
+    before do
+      allow(view).to receive(:display_carrier_logo).and_return('logo/carrier/uhic.jpg')
+      sign_in broker_user
+      render 'ui-components/v1/cards/summary', :qhp => mock_qhp_cost_share_variance
+    end
+
+    it 'should not include enrollment effective_on text' do
+      expect(rendered).to_not have_content(l10n('enrollment.effective_on'))
+    end
+
+    it 'should not include latest transition text' do
+      expect(rendered).to_not have_content(l10n('enrollment.latest_transition'))
+    end
+
+    it 'should not include Product HIOS ID text' do
+      expect(rendered).to_not have_content(l10n('product_hios_id'))
+    end
+
+    it 'should not include RatingArea text' do
+      expect(rendered).to_not have_content(l10n('rating_area.exchange_provided_code'))
+    end
+
+    it 'should not include full name of person' do
+      expect(rendered).to_not have_content(hbx_enrollment_member.person.full_name.titleize)
     end
   end
 end

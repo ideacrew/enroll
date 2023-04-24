@@ -2,9 +2,10 @@ require 'rails_helper'
 
 module OneLogin
   RSpec.describe RubySaml::SamlGenerator do
-    let(:transaction_id)   { '1234' }
+    let(:transaction_id) { '1234' }
+    let(:carrier_key) { :kaiser_pay_now }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
-    let!(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: 'Kaiser') }
+    let!(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: 'Kaiser Permanente') }
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
     let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, hbx_id: "123456789", household: family.active_household, aasm_state: 'shopping', family: family, product: product) }
     let!(:hbx_enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, is_subscriber: true, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment) }
@@ -12,11 +13,15 @@ module OneLogin
     let(:saml_generator) { OneLogin::RubySaml::SamlGenerator.new(transaction_id,hbx_enrollment) }
     let(:test_priv_key) { OpenSSL::PKey::RSA.new(File.read(Rails.root.join('spec', 'test_data').to_s + '/test_wfpk.pem')) }
     let(:test_x509_cert) { OpenSSL::X509::Certificate.new(File.read(Rails.root.join('spec', 'test_data').to_s + '/test_x509.pem')) }
+    let(:pay_now_double) { double }
+    let(:embed_xml_key) { :embed_xml }
+    let(:xml_settings_double) { double }
 
     before :each do
       saml_generator.instance_variable_set(:@private_key, test_priv_key)
       saml_generator.instance_variable_set(:@cert, test_x509_cert)
       hbx_enrollment.update_attributes(kind: 'individual')
+      allow(EnrollRegistry).to receive(:[]).and_call_original
       @saml_response = saml_generator.build_saml_response
       @noko = Nokogiri.parse(@saml_response.to_s) do
         XMLSecurity::BaseDocument::NOKOGIRI_OPTIONS
@@ -27,6 +32,13 @@ module OneLogin
       it 'should intialize the fields' do
         expect(saml_generator.transaction_id). to eq transaction_id
         expect(saml_generator.hbx_enrollment). to eq hbx_enrollment
+      end
+    end
+
+    context 'saml validator' do
+      it 'should generate a schema valid payload' do
+        result = AcaEntities::Serializers::Xml::PayNow::CareFirst::Operations::ValidatePayNowTransferPayloadSaml.new.call(@saml_response.to_s)
+        expect(result.success?).to be_truthy
       end
     end
 
@@ -118,12 +130,65 @@ module OneLogin
         expect(attr_stmt.children[15].attributes['Name'].value).to eq 'Subscriber Identifier'
         expect(attr_stmt.children[15].children[0].children.text).to eq hbx_enrollment.subscriber.hbx_id.rjust(10, '0')
       end
+
+      context 'carrier has embedded custom xml' do
+        let(:operation) { instance_double(Operations::PayNow::CareFirst::EmbeddedXml) }
+        let(:carrier_key) { :carefirst_pay_now }
+        let(:custom_xml) do
+          "<coverage_kind>urn:openhbx:terms:v1:qhp_benefit_coverage#health</coverage_kind><primary><exchange_assigned_member_id>12345678</exchange_assigned_member_id>"\
+          "<member_name><person_surname>Smith</person_surname><person_given_name>John</person_given_name><person_full_name>John Smith</person_full_name></member_name>"\
+          "</primary><members><member><exchange_assigned_member_id>12345678</exchange_assigned_member_id><member_name><person_surname>Smith</person_surname><person_given_name>"\
+          "John</person_given_name><person_full_name>John Smith</person_full_name></member_name><birth_date>19860401</birth_date><sex>M</sex><ssn>123456789</ssn><relationship>"\
+          "18</relationship><is_subscriber>false</is_subscriber></member></members>"
+        end
+
+        before do
+          allow(EnrollRegistry).to receive(:[]).with(carrier_key).and_return(pay_now_double)
+          allow(pay_now_double).to receive(:setting).with(embed_xml_key).and_return(xml_settings_double)
+          allow(xml_settings_double).to receive(:item).and_return(false)
+          allow(xml_settings_double).to receive(:item).and_return(true)
+          allow(Operations::PayNow::CareFirst::EmbeddedXml).to receive(:new).and_return(operation)
+          allow(operation).to receive(:call).and_return(::Dry::Monads::Result::Success.new(custom_xml))
+          issuer_profile.update(legal_name: 'CareFirst')
+          saml_generator.build_saml_response
+        end
+
+        it 'should call the external operation to generate xml' do
+          expect(operation).to have_received(:call)
+        end
+
+        it 'should generate a schema valid payload' do
+          result = AcaEntities::Serializers::Xml::PayNow::CareFirst::Operations::ValidatePayNowTransferPayloadSaml.new.call(@saml_response.to_s)
+          expect(result.success?).to be_truthy
+        end
+      end
     end
 
     context '#encode_response' do
       it 'should return encoded value with String class' do
         encoded_response = saml_generator.encode_saml_response(@saml_response)
         expect(encoded_response.class). to eq String
+      end
+    end
+
+    context '#embed_custom_xml?' do
+      it 'should retun nil if the carrier does not have the custom xml setting' do
+        expect(saml_generator.send(:embed_custom_xml?)).to eq nil
+      end
+    end
+
+    context '#set_attribute_values' do
+      let(:premium_amount) { 454.80999999999995 }
+      let(:applied_aptc_amount) { 0.00 }
+      let(:expected_total_amount_owed) { 454.81 } # premium_amount - applied_aptc_amount
+
+      before :each do
+        allow(hbx_enrollment).to receive(:total_premium).and_return(premium_amount)
+        allow(hbx_enrollment).to receive(:applied_aptc_amount).and_return(applied_aptc_amount)
+      end
+
+      it 'should retun rounded total amount owed' do
+        expect(saml_generator.set_attribute_values('Total Amount Owed', hbx_enrollment)).to eq expected_total_amount_owed
       end
     end
   end

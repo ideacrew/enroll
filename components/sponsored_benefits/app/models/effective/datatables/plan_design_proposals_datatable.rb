@@ -32,6 +32,16 @@
           }, :sortable => false, :filter => false
           table_column :state, :label => 'State', :proc => Proc.new { |row| row.aasm_state.capitalize }, :sortable => false, :filter => false
 
+          if EnrollRegistry.feature_enabled?(:aca_shop_osse_subsidy) && EnrollRegistry.feature_enabled?(:broker_quote_hc4cc_subsidy)
+            table_column :hc4cc, :label => "HC4CC", :proc => proc { |row|
+              if row.osse_eligibility.present?
+                l10n("yes")
+              else
+                l10n("no")
+              end
+            }, :sortable => false, :filter => false
+          end
+
           #table_column :claim_date, :label => 'Claim Date', :proc => Proc.new { |row| row.claim_date }, :sortable => false, :filter => false
           #table_column :broker, :label => 'Broker', :proc => Proc.new { |row| row.employer_profile.active_broker.full_name }, :sortable => false, :filter => false
 

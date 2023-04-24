@@ -1,9 +1,9 @@
 <% carrier = hbx_enrollment.product.carrier_profile.legal_name %>
 <% carrier_long_name = carrier_long_name(carrier) %>
-<% first_payment = carrier_paynow_enabled(carrier) && past_effective_on?(hbx_enrollment) %>
-<% plan_shopping = carrier_paynow_enabled(carrier) && source == "Plan Shopping"  %>
+<% first_payment = carrier_paynow_enabled?(carrier) && before_effective_date?(hbx_enrollment) %>
+<% plan_shopping = carrier_paynow_enabled?(carrier) && source == "Plan Shopping"  %>
 <% url = first_payment || plan_shopping ? pay_now_url(carrier) : carrier_url(carrier) %>
-<% carrier_key = carrier_paynow_enabled(carrier) ? fetch_issuer_name(carrier) : "other" %>
+<% carrier_key = carrier_paynow_enabled?(carrier) ? fetch_carrier_key_from_legal_name(carrier) : "other" %>
 <% translation_key = is_kaiser_translation_key?(carrier_key) %>
 <div class="modal fade" tabindex="-1" role="dialog" id="payNowModal<%= hbx_enrollment.hbx_id %>">
   <div class="modal-dialog" role="document">
@@ -17,10 +17,10 @@
         <p>
           <%= l10n("plans.issuer.pay_now.redirection_message", site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item, carrier_name: carrier_long_name) %><br/>
           <ul>
-            <% if past_effective_on?(hbx_enrollment) && carrier_key != 'other' %>
+            <% if before_effective_date?(hbx_enrollment) && carrier_key != 'other' %>
               <li><%= l10n("plans.issuer.pay_now.link_info")%></li>
             <% end %>
-            <% if !past_effective_on?(hbx_enrollment) %>
+            <% if !before_effective_date?(hbx_enrollment) %>
               <li><%= l10n("plans.issuer.pay_now.processing", carrier_name: carrier_long_name)%></li>
             <% end %>
             <li><%= l10n("plans.issuer.pay_now.collecting_info", carrier_name: carrier_long_name, site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item)%></li>

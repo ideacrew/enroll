@@ -7,8 +7,8 @@ require 'csv'
 class IvlEnrollmentReport < MongoidMigrationTask
   def migrate
     if ENV['purchase_date_start'].blank? && ENV['purchase_date_end'].blank?
-      # Purchase dates are from 10 weeks to todays date
-      purchase_date_start = (Time.now - 30.days).beginning_of_day
+      # Purchase dates are from 90 days to today
+      purchase_date_start = (Time.now - 90.days).beginning_of_day
       purchase_date_end = Time.now.end_of_day
     else
       purchase_date_start = Time.strptime(ENV['purchase_date_start'],'%m/%d/%Y').beginning_of_day

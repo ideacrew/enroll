@@ -379,4 +379,50 @@ RSpec.describe ::FinancialAssistance::Forms::Applicant, type: :model, dbclean: :
       end
     end
   end
+
+  context 'applicant without home addresses and same_with_primary as true' do
+    let(:params2) do
+      { same_with_primary: "true",
+        first_name: "test1",
+        last_name: "test",
+        middle_name: '',
+        name_sfx: '',
+        dob: (TimeKeeper.date_of_record - 20.years).strftime("%Y-%m-%d"),
+        ssn: "123152356",
+        gender: "male",
+        is_applying_coverage: 'true',
+        us_citizen: 'true',
+        naturalized_citizen: 'false',
+        indian_tribe_member: 'false',
+        tribal_id: '',
+        is_incarcerated: 'false',
+        relationship: "self",
+        is_consumer_role: 'true',
+        is_temporarily_out_of_state: '0',
+        is_homeless: '0',
+        no_ssn: '0',
+        addresses_attributes: { :'0' => { kind: 'home',
+                                          address_1: '',
+                                          address_2: '',
+                                          city: '',
+                                          state: '',
+                                          zip: '',
+                                          _destroy: 'false'}},
+        ethnicity: ['', '', '', '', '', '', '']}
+    end
+
+    before do
+      applicant.addresses << FinancialAssistance::Locations::Address.new({kind: 'home', city: 'Bar Harbor', county: 'Cumberland', state: 'ME', zip: '04401', address_1: '1600 Main St'})
+      @applicant_form = described_class.new(params2)
+      @applicant_form.application_id = application.id
+      @applicant_form.applicant_id = spouse_applicant.id
+      @applicant_form.is_dependent = "true"
+      @applicant_form.save
+    end
+
+    it 'should return true' do
+      spouse_applicant.reload
+      expect(spouse_applicant.addresses.first.present?).to be_truthy
+    end
+  end
 end
