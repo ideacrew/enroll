@@ -8,8 +8,18 @@ registry:
         item: :residency_attestation
         is_enabled: true
         settings:
-          - key: :effective_period
-            item: <%= Date.new(2020,6,6)..Date.new(2023,1,11) %>
+          - key: :effective_period_start_day
+            item: <%= ENV['RESIDENCY_SELF_ATTESTATION_EFFECTIVE_PERIOD_START_DAY'] || "6" %>
+          - key: :effective_period_start_month
+            item: <%= ENV['RESIDENCY_SELF_ATTESTATION_EFFECTIVE_PERIOD_START_MONTH'] || "6" %>
+          - key: :effective_period_start_year
+            item: <%= ENV['RESIDENCY_SELF_ATTESTATION_EFFECTIVE_PERIOD_START_YEAR'] || "2020" %>
+          - key: :effective_period_end_day
+            item: <%= ENV['RESIDENCY_SELF_ATTESTATION_EFFECTIVE_PERIOD_END_DAY'] || "11" %>
+          - key: :effective_period_end_month
+            item: <%= ENV['RESIDENCY_SELF_ATTESTATION_EFFECTIVE_PERIOD_END_MONTH'] || "1" %>
+          - key: :effective_period_end_year
+            item: <%= ENV['RESIDENCY_SELF_ATTESTATION_EFFECTIVE_PERIOD_END_YEAR'] || "2023" %>
       - key: :consumer_role_hub_call
         item: :consumer_role_hub_call
         is_enabled: true
