@@ -101,8 +101,6 @@ class Insured::PlanShoppingsController < ApplicationController
       set_aptcs_for_continuous_coverage
       @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc)
       @enrollment.update(eligible_child_care_subsidy: @plan.total_childcare_subsidy_amount)
-      # Used for determing whether or not to show the extended APTC message
-      @any_aptc_present = @enrollment.hbx_enrollment_members.any? { |member| @plan.aptc_amount(member) > 0 } if EnrollRegistry.feature_enabled?(:extended_aptc_individual_agreement_message)
     end
 
     @family = @person.primary_family
