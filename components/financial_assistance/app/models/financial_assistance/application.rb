@@ -1665,7 +1665,7 @@ module FinancialAssistance
     # When trying to find latest determine application in subsequent after call methods, previous application is fetched instead of current application.
     # Persisting the application right after the aasm_state change will avoid issues reated the fetching the latest application.
     def record_transition
-      self.save
+      self.save if self.aasm_state_changed?
       self.workflow_state_transitions << WorkflowStateTransition.new(
         from_state: aasm.from_state,
         to_state: aasm.to_state
