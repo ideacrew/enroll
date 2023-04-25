@@ -2213,4 +2213,18 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       expect(relationship_application.is_application_valid?).to be_falsey
     end
   end
+
+  describe "determine without '!'" do
+    let!(:applicant) { FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination1.id, application: application, family_member_id: BSON::ObjectId.new) }
+
+    before do
+      application.update_attributes(:aasm_state => 'submitted')
+    end
+
+    it 'should persist application' do
+      application.determine
+      application.reload
+      expect(application.aasm_state).to eq "determined"
+    end
+  end
 end
