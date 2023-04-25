@@ -135,18 +135,31 @@ function applyListenersFor(target) {
     }
   });
 
-  $('select#tribal-state').change(function() {
-    if ($('.featured_tribes_selection').length > 0 && this.value == $('#enroll_state_abbr').val()) {
-      $('.featured-tribe-container').removeClass('hide');
-      var tribe_codes_array = $('.tribe_codes:checked').map(function(){ return $(this).val(); }).get();
-      if (tribe_codes_array.includes("OT")){
-        $('.tribal-name-container').removeClass('hide');
+  // tribal-state change - select from options
+  $('select#tribal-state').on("change", function() {
+    var enroll_state_abbr = $('#enroll_state_abbr').val();
+    var is_indian_alaskan_tribe_details_enabled = ($('#is_indian_alaskan_tribe_details_enabled').val() === 'true');
+
+    if (is_indian_alaskan_tribe_details_enabled) {
+      var is_featured_tribes_selection_enabled = ($('#is_featured_tribes_selection_enabled').val() === 'true');
+      var tribe_codes_array = $('.tribe_codes:checked').map(function() {
+        return $(this).val();
+      }).get();
+      var tribal_name_container_show_on_select = (typeof tribe_codes_array != 'undefined' && tribe_codes_array.includes("OT"));
+
+      if (is_featured_tribes_selection_enabled && this.value == enroll_state_abbr) {
+        $('.featured-tribe-container').removeClass('hide');
+        if (tribal_name_container_show_on_select) {
+          $('.tribal-name-container').removeClass('hide');
+        } else {
+          $('#tribal-name').val("");
+          $('.tribal-name-container').addClass('hide');
+        }
       } else {
-        $('.tribal-name-container').addClass('hide');
+        $('.tribe_codes:checked').removeAttr('checked');
+        $('.tribal-name-container').removeClass('hide');
+        $('.featured-tribe-container').addClass('hide');
       }
-    } else {
-      $('.tribal-name-container').removeClass('hide');
-      $('.featured-tribe-container').addClass('hide');
     }
   });
 

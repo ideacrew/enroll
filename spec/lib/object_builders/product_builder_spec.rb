@@ -67,6 +67,11 @@ describe "qhp builder" do
           expect(Products::Qhp.all.where(:"qhp_cost_share_variances.hios_plan_and_variant_id" => product.hios_id).count).to eq 1
         end
       end
+
+      it "should populate hsa_eligibility field on BenefitMarkets::Products" do
+        expect(BenefitMarkets::Products::Product.count).to eq(3)
+        expect(BenefitMarkets::Products::Product.all.select(&:hsa_eligibility).size).to eq(2)
+      end
     end
   end
 
@@ -152,6 +157,10 @@ describe "qhp builder" do
 
       it "should load 2 QHP records from the file" do
         expect(Products::Qhp.all.count).to eq 2
+      end
+
+      it "should only have one QHP record with hsa_eligibility as Yes from xml file" do
+        expect(Products::Qhp.all.select {|p| p.hsa_eligibility == "Yes"}.size).to eq 1
       end
 
       it "should not create new qhp_cost_share_variances, but update from file to the existing one" do
