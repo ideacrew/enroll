@@ -1,5 +1,6 @@
 <div class="row no-buffer <%= "no_coverage_tribe_details" if FinancialAssistanceRegistry.feature_enabled?(:no_coverage_tribe_details) %>
 <%= "featured_tribes_selection" if FinancialAssistanceRegistry.feature_enabled?(:featured_tribes_selection) %>" id='indian_tribe_area'>
+  <input type="hidden" id="is_indian_alaskan_tribe_details_enabled" value="<%= EnrollRegistry[:indian_alaskan_tribe_details].enabled? %>">
 
   <div class="row row-form-wrapper no-buffer" id="tribal_container">
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
@@ -31,6 +32,9 @@
 
   <div class="tribal-container <%= 'hide' unless f.object.indian_tribe_member %>">
     <% if EnrollRegistry[:indian_alaskan_tribe_details].enabled? %>
+      <input type="hidden" id="is_featured_tribes_selection_enabled" value="<%= FinancialAssistanceRegistry[:featured_tribes_selection].enabled? %>">
+      <input type="hidden" id="enroll_state_abbr" value="<%= EnrollRegistry[:enroll_app].setting(:state_abbreviation).item %>">
+
       <div class="row row-form-wrapper no-buffer" id="tribal-state-container">
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 tribal-state">
         <label><%= l10n("insured.tribal_state") %></label>
@@ -46,7 +50,7 @@
         </div>
       </div>
 
-      <div class="row row-form-wrapper no-buffer featured-tribe-container <%= 'hide' unless FinancialAssistanceRegistry[:featured_tribes_selection].enabled? && f.object.tribal_state == EnrollRegistry[:enroll_app].setting(:state_abbreviation).item %>">
+      <div class="row row-form-wrapper no-buffer featured-tribe-container hide">
         <div class="col-md-12">
           <label><%= l10n("insured.tribal_name") %></label>
         </div>
@@ -56,10 +60,8 @@
           <% end %>
         </div>
       </div>
-   
-      <% tribe_name_show = f.object.tribal_state != EnrollRegistry[:enroll_app].setting(:state_abbreviation).item || (f.object.tribal_state == EnrollRegistry[:enroll_app].setting(:state_abbreviation).item && f.object.tribe_codes&.include?('OT'))%>
-      <div class="row row-form-wrapper no-buffer tribal-name-container <%= 'hide' unless tribe_name_show %>">
-        <input type="hidden" id="enroll_state_abbr" value="<%= EnrollRegistry[:enroll_app].setting(:state_abbreviation).item %>">
+
+      <div class="row row-form-wrapper no-buffer tribal-name-container hide">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd tribal-name">
           <%= f.text_field :tribal_name, class: "floatlabel form-control required", id: "tribal-name", placeholder: 'TRIBE NAME' %>
         </div>
@@ -86,3 +88,31 @@
   </div>
 
 </div>
+
+<script>
+    var enroll_state_abbr = $('#enroll_state_abbr').val();
+    var is_indian_alaskan_tribe_details_enabled = ($('#is_indian_alaskan_tribe_details_enabled').val() === 'true');
+
+    if (is_indian_alaskan_tribe_details_enabled) {
+      var is_featured_tribes_selection_enabled = ($('#is_featured_tribes_selection_enabled').val() === 'true');
+      var tribal_state = $('#tribal-state').val();
+      var tribe_codes_array = $('.tribe_codes:checked').map(function() {
+        return $(this).val();
+      }).get();
+      var tribal_name_container_show = (typeof tribe_codes_array != 'undefined' && tribe_codes_array.includes("OT"));
+
+      if (is_featured_tribes_selection_enabled && tribal_state == enroll_state_abbr) {
+        $('.featured-tribe-container').removeClass('hide');
+        if (tribal_name_container_show) {
+          $('.tribal-name-container').removeClass('hide');
+        } else {
+           $('#tribal-name').val("");
+          $('.tribal-name-container').addClass('hide');
+        }
+      } else {
+          $('.tribe_codes:checked').removeAttr('checked');
+          $('.tribal-name-container').removeClass('hide');
+          $('.featured-tribe-container').addClass('hide');
+      }
+    }
+</script>
