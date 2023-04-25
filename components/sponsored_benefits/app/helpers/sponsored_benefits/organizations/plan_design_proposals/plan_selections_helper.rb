@@ -3,8 +3,8 @@
 module SponsoredBenefits
   module Organizations
     module PlanDesignProposals
+      # helper for plan selections
       module PlanSelectionsHelper
-
         def employer_contribution_percent_minimum_for_application(plan_design_proposal)
           return 0 if plan_design_proposal.all_contribution_levels_min_met_relaxed?
 
