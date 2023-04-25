@@ -310,31 +310,29 @@ module BenefitSponsors
         end
 
         def csv_for(groups)
-          (output = "").tap do
-            CSV.generate(output) do |csv|
-              csv << ["Name", "SSN", "DOB", "Hired On", "Benefit Group", "Type", "Name", "Issuer", "Covered Ct", "Employer Contribution",
-                      "Employee Premium", "Total Premium"]
-              groups.each do |element|
-                primary = element.primary_member
-                census_employee = primary.employee_role.census_employee
-                sponsored_benefit = primary.sponsored_benefit
-                product = @product_info[element.group_enrollment.product[:id]]
-                next if census_employee.blank?
-                csv << [
-                          census_employee.full_name,
-                          census_employee.ssn,
-                          census_employee.dob,
-                          census_employee.hired_on,
-                          sponsored_benefit.benefit_package.title,
-                          product[:kind],
-                          product[:title],
-                          product[:issuer_name],
-                          (element.members.size - 1),
-                          view_context.number_to_currency(element.group_enrollment.sponsor_contribution_total.to_s),
-                          view_context.number_to_currency((element.group_enrollment.product_cost_total.to_f - element.group_enrollment.sponsor_contribution_total.to_f).to_s),
-                          view_context.number_to_currency(element.group_enrollment.product_cost_total.to_s)
-                        ]
-              end
+          CSV.generate do |csv|
+            csv << ["Name", "SSN", "DOB", "Hired On", "Benefit Group", "Type", "Name", "Issuer", "Covered Ct", "Employer Contribution",
+                    "Employee Premium", "Total Premium"]
+            groups.each do |element|
+              primary = element.primary_member
+              census_employee = primary.employee_role.census_employee
+              sponsored_benefit = primary.sponsored_benefit
+              product = @product_info[element.group_enrollment.product[:id]]
+              next if census_employee.blank?
+              csv << [
+                        census_employee.full_name,
+                        census_employee.ssn,
+                        census_employee.dob,
+                        census_employee.hired_on,
+                        sponsored_benefit.benefit_package.title,
+                        product[:kind],
+                        product[:title],
+                        product[:issuer_name],
+                        (element.members.size - 1),
+                        view_context.number_to_currency(element.group_enrollment.sponsor_contribution_total.to_s),
+                        view_context.number_to_currency((element.group_enrollment.product_cost_total.to_f - element.group_enrollment.sponsor_contribution_total.to_f).to_s),
+                        view_context.number_to_currency(element.group_enrollment.product_cost_total.to_s)
+                      ]
             end
           end
         end
