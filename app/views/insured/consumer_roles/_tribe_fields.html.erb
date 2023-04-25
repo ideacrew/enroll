@@ -1,5 +1,6 @@
 <div class="row no-buffer <%= "no_coverage_tribe_details" if FinancialAssistanceRegistry.feature_enabled?(:no_coverage_tribe_details) %>
 <%= "featured_tribes_selection" if FinancialAssistanceRegistry.feature_enabled?(:featured_tribes_selection) %>" id='indian_tribe_area'>
+  <input type="hidden" id="is_indian_alaskan_tribe_details_enabled" value="<%= EnrollRegistry[:indian_alaskan_tribe_details].enabled? %>">
 
   <div class="row row-form-wrapper no-buffer" id="tribal_container">
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
@@ -90,7 +91,9 @@
 
 <script>
     var enroll_state_abbr = $('#enroll_state_abbr').val();
-    if (enroll_state_abbr === 'ME') {
+    var is_indian_alaskan_tribe_details_enabled = ($('#is_indian_alaskan_tribe_details_enabled').val() === 'true');
+
+    if (is_indian_alaskan_tribe_details_enabled) {
       var is_featured_tribes_selection_enabled = ($('#is_featured_tribes_selection_enabled').val() === 'true');
       var tribal_state = $('#tribal-state').val();
       var tribe_codes_array = $('.tribe_codes:checked').map(function() {

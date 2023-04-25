@@ -138,8 +138,9 @@ function applyListenersFor(target) {
   // tribal-state change - select from options
   $('select#tribal-state').on("change", function() {
     var enroll_state_abbr = $('#enroll_state_abbr').val();
+    var is_indian_alaskan_tribe_details_enabled = ($('#is_indian_alaskan_tribe_details_enabled').val() === 'true');
 
-    if (enroll_state_abbr === 'ME') {
+    if (is_indian_alaskan_tribe_details_enabled) {
       var is_featured_tribes_selection_enabled = ($('#is_featured_tribes_selection_enabled').val() === 'true');
       var tribe_codes_array = $('.tribe_codes:checked').map(function() {
         return $(this).val();
