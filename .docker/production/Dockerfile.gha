@@ -233,6 +233,7 @@ COPY --chown=nonroot:nonroot --from=prod_gems_and_assets $BUNDLE_PATH $BUNDLE_PA
 
 # Copy freedesktop file
 RUN set -eux; \
+  apt-get clean; \
 	apt-get update; \
 	apt-get install -y --no-install-recommends shared-mime-info; \
 	mkdir -pv /usr/local/share/mime/packages; \
