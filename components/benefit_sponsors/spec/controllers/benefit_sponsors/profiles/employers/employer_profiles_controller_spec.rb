@@ -141,6 +141,26 @@ module BenefitSponsors
       end
     end
 
+    describe "GET coverage_reports as CSV" do
+      let!(:employees) {
+        FactoryBot.create_list(:census_employee, 2, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship)
+      }
+
+      before do
+        benefit_sponsorship.save!
+        allow(controller).to receive(:authorize).and_return(true)
+        sign_in user
+        get :coverage_reports, params: { employer_profile_id: benefit_sponsor.profiles.first.id, billing_date: TimeKeeper.date_of_record.next_month.beginning_of_month.strftime("%m/%d/%Y")}, format: :csv
+        allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
+      end
+
+      it "should download CSV report without errors" do
+        expect(response.header['Content-Type']).to include 'text/csv'
+        expect(response.body).to include('Name,SSN,DOB,Hired On,Benefit Group,Type,Name,Issuer,Covered Ct,Employer Contribution,Employee Premium,Total Premium')
+      end
+    end
+
+
     describe "POST terminate_employee_roster_enrollments", type: :controller, dbclean: :after_each do
 
       let(:hbx_staff_permission) { FactoryBot.create(:permission, :hbx_staff) }
