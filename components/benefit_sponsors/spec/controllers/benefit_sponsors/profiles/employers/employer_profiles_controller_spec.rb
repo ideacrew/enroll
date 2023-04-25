@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitSponsors
@@ -37,9 +39,9 @@ module BenefitSponsors
     end
 
     describe "GET show" do
-      let!(:employees) {
+      let!(:employees) do
         FactoryBot.create_list(:census_employee, 2, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship)
-      }
+      end
       context 'employee tab' do
         before do
           benefit_sponsorship.save!
@@ -120,9 +122,9 @@ module BenefitSponsors
 
 
     describe "GET coverage_reports" do
-      let!(:employees) {
+      let!(:employees) do
         FactoryBot.create_list(:census_employee, 2, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship)
-      }
+      end
 
       before do
         benefit_sponsorship.save!
@@ -142,9 +144,9 @@ module BenefitSponsors
     end
 
     describe "GET coverage_reports as CSV" do
-      let!(:employees) {
+      let!(:employees) do
         FactoryBot.create_list(:census_employee, 2, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship)
-      }
+      end
 
       before do
         benefit_sponsorship.save!
@@ -177,7 +179,7 @@ module BenefitSponsors
         it "should show an error message if no active plan year present" do
           error_message = "No Active Plan Year present, unable to terminate employee enrollments."
           expect(flash[:error]).to eq(error_message)
-          redirect_path = profiles_employers_employer_profile_path(employer_profile) + "?tab=employees"
+          redirect_path = "#{profiles_employers_employer_profile_path(employer_profile)}?tab=employees"
           expect(response).to redirect_to(redirect_path)
         end
       end
@@ -187,16 +189,16 @@ module BenefitSponsors
         let!(:service_area)          { FactoryBot.create_default :benefit_markets_locations_service_area, active_year: TimeKeeper.date_of_record.prev_year.year }
         let(:benefit_sponsorship) do
           create(
-              :benefit_sponsors_benefit_sponsorship,
-              :with_organization_cca_profile,
-              :with_renewal_benefit_application,
-              :with_rating_area,
-              :with_service_areas,
-              initial_application_state: :active,
-              renewal_application_state: :enrollment_open,
-              default_effective_period: ((TimeKeeper.date_of_record.end_of_month + 1.day)..(TimeKeeper.date_of_record.end_of_month + 1.year)),
-              site: site,
-              aasm_state: :active
+            :benefit_sponsors_benefit_sponsorship,
+            :with_organization_cca_profile,
+            :with_renewal_benefit_application,
+            :with_rating_area,
+            :with_service_areas,
+            initial_application_state: :active,
+            renewal_application_state: :enrollment_open,
+            default_effective_period: ((TimeKeeper.date_of_record.end_of_month + 1.day)..(TimeKeeper.date_of_record.end_of_month + 1.year)),
+            site: site,
+            aasm_state: :active
           )
         end
 
@@ -212,35 +214,40 @@ module BenefitSponsors
         let!(:employee_role) { FactoryBot.create(:employee_role, person: person, census_employee: census_employee, employer_profile: benefit_sponsorship.profile) }
         let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
 
-        let!(:active_enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
-                                                     household: family.latest_household,
-                                                     coverage_kind: "health",
-                                                     family: family,
-                                                     effective_on: employer_profile.active_benefit_application.start_on,
-                                                     enrollment_kind: "open_enrollment",
-                                                     kind: "employer_sponsored",
-                                                     aasm_state: 'coverage_selected',
-                                                     benefit_sponsorship_id: benefit_sponsorship.id,
-                                                     sponsored_benefit_package_id: active_benefit_package.id,
-                                                     sponsored_benefit_id: active_sponsored_benefit.id,
-                                                     employee_role_id: employee_role.id) }
-        let!(:renewal_enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
-                                                      household: family.latest_household,
-                                                      coverage_kind: "health",
-                                                      family: family,
-                                                      effective_on: employer_profile.renewal_benefit_application.start_on,
-                                                      enrollment_kind: "open_enrollment",
-                                                      kind: "employer_sponsored",
-                                                      aasm_state: 'auto_renewing',
-                                                      benefit_sponsorship_id: benefit_sponsorship.id,
-                                                      sponsored_benefit_package_id: renewal_benefit_package.id,
-                                                      employee_role_id: employee_role.id,
-                                                      sponsored_benefit_id: renewal_sponsored_benefit.id) }
+        let!(:active_enrollment) do
+          FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
+                            household: family.latest_household,
+                            coverage_kind: "health",
+                            family: family,
+                            effective_on: employer_profile.active_benefit_application.start_on,
+                            enrollment_kind: "open_enrollment",
+                            kind: "employer_sponsored",
+                            aasm_state: 'coverage_selected',
+                            benefit_sponsorship_id: benefit_sponsorship.id,
+                            sponsored_benefit_package_id: active_benefit_package.id,
+                            sponsored_benefit_id: active_sponsored_benefit.id,
+                            employee_role_id: employee_role.id)
+        end
+        let!(:renewal_enrollment) do
+          FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
+                            household: family.latest_household,
+                            coverage_kind: "health",
+                            family: family,
+                            effective_on: employer_profile.renewal_benefit_application.start_on,
+                            enrollment_kind: "open_enrollment",
+                            kind: "employer_sponsored",
+                            aasm_state: 'auto_renewing',
+                            benefit_sponsorship_id: benefit_sponsorship.id,
+                            sponsored_benefit_package_id: renewal_benefit_package.id,
+                            employee_role_id: employee_role.id,
+                            sponsored_benefit_id: renewal_sponsored_benefit.id)
+        end
         before do
           census_employee.update_attributes({employee_role_id: employee_role.id})
           allow(controller).to receive(:authorize).and_return(true)
           sign_in(user)
-          post :terminate_employee_roster_enrollments, params: {employer_profile_id: employer_profile.id.to_s, termination_reason: "nonpayment ", termination_date: employer_profile.active_benefit_application.end_on.strftime("%m/%d/%Y"), transmit_xml: true}, format: :js, xhr: true
+          post :terminate_employee_roster_enrollments,
+               params: {employer_profile_id: employer_profile.id.to_s, termination_reason: "nonpayment ", termination_date: employer_profile.active_benefit_application.end_on.strftime("%m/%d/%Y"), transmit_xml: true}, format: :js, xhr: true
         end
 
 
@@ -249,7 +256,7 @@ module BenefitSponsors
           expect(flash[:notice]).to eq(flash_message)
           active_enrollment.reload
           expect(active_enrollment.aasm_state).to eq('coverage_termination_pending')
-          redirect_path = profiles_employers_employer_profile_path(benefit_sponsorship.profile) + "?tab=employees"
+          redirect_path = "#{profiles_employers_employer_profile_path(benefit_sponsorship.profile)}?tab=employees"
           expect(response).to redirect_to(redirect_path)
         end
 
@@ -258,7 +265,7 @@ module BenefitSponsors
           expect(flash[:notice]).to eq(flash_message)
           renewal_enrollment.reload
           expect(renewal_enrollment.aasm_state).to eq('coverage_canceled')
-          redirect_path = profiles_employers_employer_profile_path(benefit_sponsorship.profile.id) + "?tab=employees"
+          redirect_path = "#{profiles_employers_employer_profile_path(benefit_sponsorship.profile.id)}?tab=employees"
           expect(response).to redirect_to(redirect_path)
         end
       end
