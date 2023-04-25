@@ -95,7 +95,7 @@ registry:
         is_enabled: :true
       - key: :extended_aptc_individual_agreement_message
         item: :extended_aptc_individual_agreement_message
-        is_enabled: true
+        is_enabled: <%= ENV['EXTENDED_APTC_INDIVIDUAL_AGREEMENT_MESSAGE_IS_ENABLED'] || false %>
       - key: :application_type_options
         item: ["Phone", "Paper", "State Medicaid Agency"]
         is_enabled: true
