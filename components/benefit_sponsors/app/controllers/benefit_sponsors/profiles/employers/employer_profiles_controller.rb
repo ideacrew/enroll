@@ -6,6 +6,7 @@ module BenefitSponsors
       # EmployerProfilesController
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
         include Config::AcaHelper
+        include EventSource::Command
 
         before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :export_census_employees, :show_invoice, :coverage_reports, :download_invoice, :terminate_employee_roster_enrollments]
         before_action :load_group_enrollments, only: [:coverage_reports], if: :is_format_csv?
@@ -130,19 +131,14 @@ module BenefitSponsors
           authorize @employer_profile, :show?
           if roster_upload_file_type.include?(file_content_type)
             file = params.require(:file)
-            @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, @employer_profile)
-            roaster_upload_count = @roster_upload_form.census_records.length
-            begin
-              if @roster_upload_form.save
-                flash[:notice] = "#{roaster_upload_count} records uploaded from CSV"
-                redirect_to URI.parse(@roster_upload_form.redirection_url).to_s
-              else
-                render @roster_upload_form.redirection_url || default_url
-              end
-            rescue StandardError => e
-              @roster_upload_form.errors.add(:base, e.message)
-              render @roster_upload_form.redirection_url || default_url
-            end
+            file_name = "#{file.original_filename}_#{Time.now.to_i}"
+            # preparing the file upload to s3
+            Aws::S3Storage.save(file.path,'employer_roster_upload',file_name)
+            # making call to subscriber
+            ev = event('events.file_upload.roster_parser_requested',attributes: {s3_reference_key: file_name, bucket_name: 'employer_roster_upload', employer_profile_id: @employer_profile._id})
+            ev.success.publish
+            # once we put file to s3 then redirecting user to the employees list page
+            redirect_to employees_upload_url(@employer_profile.id)
           else
             @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.new
             @roster_upload_form.errors.add(:base, "Can't detect file type #{params[:file]&.original_filename}, please upload Excel/CSV format files only.")
