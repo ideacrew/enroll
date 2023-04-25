@@ -804,7 +804,7 @@ $(document).on('keydown', '#btn-continue', function() {
   subscriber_first_name = $("#subscriber_first_name").val();
   subscriber_last_name = $("#subscriber_last_name").val();
 
-  if (first_name_thank_you != subscriber_first_name || last_name_thank_you != subscriber_last_name) {
+  if ((first_name_thank_you != subscriber_first_name || last_name_thank_you != subscriber_last_name) && event.code == 'Enter') {
     event.preventDefault();
   } 
 })
