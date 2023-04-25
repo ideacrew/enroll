@@ -2,6 +2,7 @@ require 'rails_helper'
 
 module BenefitSponsors
   RSpec.describe ::BenefitSponsors::Services::BrokerManagementService, type: :model, :dbclean => :after_each do
+    include ::L10nHelper
 
     subject { BenefitSponsors::Services::BrokerManagementService.new }
 
@@ -28,6 +29,13 @@ module BenefitSponsors
                                               direct_terminate: 'true',
                                               termination_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'))
                                             }
+    let(:general_agency_profile) do
+      FactoryBot.create(
+        :benefit_sponsors_organizations_general_organization,
+        :with_site,
+        :with_general_agency_profile
+      ).profiles.first
+    end
 
     before :each do
       active_benefit_sponsorship.save!
@@ -38,11 +46,28 @@ module BenefitSponsors
 
     describe 'for assign_agencies' do
       before :each do
+        broker_agency_profile1.update_attributes!(default_general_agency_profile_id: general_agency_profile.id)
         subject.assign_agencies(broker_management_form_create)
       end
 
       it 'should return true once it succesfully assigns broker agency to the employer_profile' do
         expect(subject.assign_agencies(broker_management_form_create)).to be_truthy
+      end
+
+      it 'should send a message to the general_agency' do
+        general_agency_profile.reload
+        subject = l10n("employers.broker_agency_notice.subject", broker_legal_name: broker_agency_profile1.organization.legal_name, agency_legal_name: general_agency_profile.legal_name)
+        body = l10n("employers.broker_agency_notice.body", agency_legal_name: general_agency_profile.legal_name, employer_legal_name: employer_profile.legal_name)
+        expect(general_agency_profile.inbox.messages.map(&:body)).to include(body)
+        expect(general_agency_profile.inbox.messages.map(&:subject)).to include(subject)
+      end
+
+      it 'should send a message to the employer' do
+        employer_profile.reload
+        subject = l10n("employers.broker_agency_notice.subject", broker_legal_name: broker_agency_profile1.organization.legal_name, agency_legal_name: general_agency_profile.legal_name)
+        body = l10n("employers.broker_agency_notice.body", agency_legal_name: general_agency_profile.legal_name, employer_legal_name: employer_profile.legal_name)
+        expect(employer_profile.inbox.messages.map(&:body)).to include(body)
+        expect(employer_profile.inbox.messages.map(&:subject)).to include(subject)
       end
 
       it 'should succesfully assigns broker agency to the employer_profile' do
