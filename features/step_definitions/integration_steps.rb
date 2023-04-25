@@ -1182,6 +1182,15 @@ Then("user will click on New Employee Paper Application link") do
   find('.new_employee_paper_application').click
 end
 
+And(/Individual hits tab and enter/) do
+  find_all(".thank_you_field")[1].send_keys(:tab)
+  find("#btn-continue").send_keys(:return)
+end
+
+Then(/Individual does not navigate to the enrollment submitted page/) do
+  expect(page).to_not have_content IvlEnrollmentSubmitted.enrollment_submitted_text
+end
+
 And(/(.*) should have a ER sponsored enrollment/) do |named_person|
   person = people[named_person]
   ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
