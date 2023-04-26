@@ -46,10 +46,10 @@ module Subscribers
 
         if generate_payload_result.success?
           subscriber_logger.info "Successfully generated valid family_cv for primary person with hbx_id: #{response[:person_hbx_id]}"
-          { errors: [], family: generate_payload_result.success }
+          { errors: [], family: generate_payload_result.success, primary_person_hbx_id: response[:person_hbx_id] }
         else
           subscriber_logger.error "Unable to generate valid family_cv for primary person with hbx_id: #{response[:person_hbx_id]}"
-          { errors: [generate_payload_result.failure], family: {} }
+          { errors: [generate_payload_result.failure], family: {}, primary_person_hbx_id: response[:person_hbx_id] }
         end
       end
 
