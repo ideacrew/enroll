@@ -7,8 +7,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: a6ff3970906729e388c1b1dfcaa7b849361f12b8
-  branch: trunk
+  revision: f9fc69d75156c76ccc93f704947ffeffe7a307e2
+  branch: 184084119-roster-upload-channels
   specs:
     aca_entities (0.10.0)
       deep_merge
