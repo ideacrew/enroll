@@ -19,7 +19,8 @@ class Account
   field :client_roles, type: Array
   field :groups, type: Array
   field :access, type: Hash
-  field :profiles, type: Array
   field :not_before, type: Integer
+
+  embeds_many :profiles, class_name: "Accounts::Profile", cascade_callbacks: true, validate: true 
 
 end
