@@ -131,11 +131,11 @@ module BenefitSponsors
           authorize @employer_profile, :show?
           if roster_upload_file_type.include?(file_content_type)
             file = params.require(:file)
-            file_name = "#{file.original_filename}_#{Time.now.to_i}"
+            file_name = file.original_filename
             # preparing the file upload to s3
             Aws::S3Storage.save(file.path,'employer_roster_upload',file_name)
             # making call to subscriber
-            ev = event('events.file_upload.roster_parser_requested',attributes: {s3_reference_key: file_name, bucket_name: 'employer_roster_upload', employer_profile_id: @employer_profile._id})
+            ev = event('events.file_upload.roster_parser_requested',attributes: {s3_reference_key: file_name, bucket_name: 'employer_roster_upload', employer_profile_id: @employer_profile._id, extension: File.extname(file_name)})
             ev.success.publish
             # once we put file to s3 then redirecting user to the employees list page
             redirect_to employees_upload_url(@employer_profile.id)

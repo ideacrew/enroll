@@ -12,7 +12,7 @@ module Operations
         include EventSource::Command
 
         def call(params)
-          file = yield fetch_s3_file(params[:uri])
+          file = yield fetch_s3_file(params[:uri], params[:extension])
           result = yield process_file(file, params[:employer_profile_id])
           model = yield persist(result)
 
@@ -21,8 +21,11 @@ module Operations
 
         private
 
-        def fetch_s3_file(uri)
-          file = Aws::S3Storage.find(uri)
+        def fetch_s3_file(uri,extension)
+          file = Tempfile.new(['temp',extension])
+          file.binmode
+          file.write Aws::S3Storage.find(uri)
+          file.close
           Success(file)
         end
 
