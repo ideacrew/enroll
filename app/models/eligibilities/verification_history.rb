@@ -21,6 +21,8 @@ module Eligibilities
 
     after_create :set_date_of_action
 
+    private
+
     def set_date_of_action
       write_attribute(:date_of_action, DateTime.now)
     end
