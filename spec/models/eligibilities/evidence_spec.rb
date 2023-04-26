@@ -192,7 +192,6 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
     before do
       create_embedded_docs_for_evidence(income_evidence)
       income_evidence.verification_histories.first.update_attributes!(date_of_action: TimeKeeper.date_of_record - 1.day)
-      binding.irb
       income_evidence.clone_embedded_documents(income_evidence2)
       @new_verification_history = income_evidence.verification_histories.first
       @new_request_result = income_evidence.request_results.first
