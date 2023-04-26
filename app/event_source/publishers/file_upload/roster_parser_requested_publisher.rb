@@ -5,7 +5,7 @@ module Publishers
     # Publishes changes to ConsumerRole and Family to Sugar CRM
     class RosterParserRequestedPublisher
       include ::EventSource::Publisher[amqp: 'enroll.file_upload']
-  
+
       register_event 'roster_parser_requested'
     end
   end
