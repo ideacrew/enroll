@@ -14,13 +14,13 @@ class Account
   field :first_name, type: String
   field :last_name, type: String
   field :password, type: String
-  field :attributes, type: Hash
+  # field :attributes, type: Hash # Not allowed
   field :realm_roles, type: Array
   field :client_roles, type: Array
   field :groups, type: Array
   field :access, type: Hash
   field :not_before, type: Integer
 
-  embeds_many :profiles, class_name: "Accounts::Profile", cascade_callbacks: true, validate: true 
+  embeds_many :profiles, class_name: "Accounts::Profile", cascade_callbacks: true, validate: true
 
 end
