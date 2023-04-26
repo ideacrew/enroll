@@ -191,6 +191,8 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
 
     before do
       create_embedded_docs_for_evidence(income_evidence)
+      income_evidence.verification_histories.first.update_attributes!(date_of_action: TimeKeeper.date_of_record - 1.day)
+      binding.irb
       income_evidence.clone_embedded_documents(income_evidence2)
       @new_verification_history = income_evidence.verification_histories.first
       @new_request_result = income_evidence.request_results.first
@@ -222,10 +224,8 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
       expect(@new_document.updated_at).not_to be_nil
     end
 
-    it 'should maintain the created_at of the cloned document' do
-      income_evidence2.save
-      income_evidence2.reload
-      expect(income_evidence.verification_histories.first.created_at).to eql(income_evidence2.verification_histories.first.created_at)
+    it 'should copy the date_of_action of the copied document' do
+      expect(income_evidence.verification_histories.first.date_of_action).to eql(income_evidence2.verification_histories.first.date_of_action)
     end
   end
 end
@@ -238,7 +238,7 @@ def create_embedded_docs_for_evidence(evidence)
 end
 
 def create_verification_history(evidence)
-  evidence.verification_histories.create(created_at: Date.today - 1.day, action: 'verify', update_reason: 'Document in EnrollApp', updated_by: 'admin@user.com')
+  evidence.verification_histories.create(date_of_action: Date.today - 1.day, action: 'verify', update_reason: 'Document in EnrollApp', updated_by: 'admin@user.com')
 end
 
 def create_request_result(evidence)
