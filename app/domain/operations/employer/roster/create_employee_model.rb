@@ -34,8 +34,6 @@ module Operations
           employer_profile = organization.employer_profile
           roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, employer_profile)
           Success(roster_upload_form)
-          # result = ::Validators::EmployeeRosterContract.new.call(params.value!)
-          # result.success? ? Success(result) : Failure("Invalid EmployeeRoster due to #{result.errors.to_h}")
         end
 
         def persist(object)
