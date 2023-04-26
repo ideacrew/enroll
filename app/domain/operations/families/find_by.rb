@@ -19,7 +19,7 @@ module Operations
         person     = yield find_person(params[:response][:person_hbx_id])
         family     = yield find_primary_family(person)
         cv3_family = yield transform_family(family)
-        payload    = yield generate_payload(cv3_family, person)
+        payload    = yield generate_payload(cv3_family)
 
         Success(payload)
       end
@@ -48,7 +48,7 @@ module Operations
         Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
       end
 
-      def generate_payload(cv3_family, person)
+      def generate_payload(cv3_family)
         result = AcaEntities::Contracts::Families::FamilyContract.new.call(cv3_family)
 
         if result.success?
