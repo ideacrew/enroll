@@ -86,7 +86,7 @@
 <div class="row">
   <div class="view-history col-md-12" id=<%="#{applicant.id}-#{evidence_type.downcase.split.join('-')}-history"%>>
     <div>
-      <h5>Verification History</h5>
+      <h5>Verification Historyyyy</h5>
       <table class="table table-bordered table-hover table-responsive">
         <thead>
         <tr>
@@ -103,7 +103,7 @@
           <% records.each_with_index do |record, index| %>
             <tr>
               <th scope="row"><%= index + 1 %></th>
-              <td><%= (record.is_a?(Eligibilities::RequestResult) ? record.created_at : record&.date_of_action).in_time_zone('Eastern Time (US & Canada)') %></td>
+              <td><%= (record.is_a?(Eligibilities::RequestResult) ? record.created_at : record&.date_of_action)&.in_time_zone('Eastern Time (US & Canada)') %></td>
               <td><%= record.is_a?(Eligibilities::RequestResult) ? 'Hub Call' : record.action.capitalize %></td>
               <td><%= record.is_a?(Eligibilities::RequestResult) ? record.source_transaction_id : record.updated_by %></td>
               <td><%= record.is_a?(Eligibilities::RequestResult) ? 'Fdsh Hub Call' : record.update_reason %></td>
