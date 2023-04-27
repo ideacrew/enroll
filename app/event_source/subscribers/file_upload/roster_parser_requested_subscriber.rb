@@ -21,6 +21,8 @@ module Subscribers
           end
         rescue StandardError => e
           logger.info "FileUpload::RosterParserSubscriber: on_primary_determination error: #{e.backtrace}"
+        ensure
+          Aws::S3Storage.delete_file(parsed_response['bucket_name'], parsed_response['s3_reference_key'])
         end
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e

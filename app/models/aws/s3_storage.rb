@@ -27,6 +27,16 @@ module Aws
       end
     end
 
+    def delete_file(bucket_name, key)
+      bucket_name = env_bucket_name(bucket_name)
+      begin
+        @resource.delete_object({bucket: bucket_name, key: key})
+      rescue StandardError => e
+        log("ERROR: Unable to remove the file #{e.backtrace}")
+        nil
+      end
+    end
+
     # If success, return URI which has the s3 bucket key
     # else return nil
     def self.save(file_path, bucket_name, key=SecureRandom.uuid)
@@ -57,6 +67,10 @@ module Aws
     # e.g. send_data Aws::S3Storage.find(uri), :stream => true, :buffer_size => ‘4096’
     def self.find(uri)
       Aws::S3Storage.new.find(uri)
+    end
+
+    def self.delete_file(bucket_name,key)
+      Aws::S3Storage.new.delete_file(bucket_name,key)
     end
 
     private

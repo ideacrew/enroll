@@ -131,20 +131,51 @@ module BenefitSponsors
           authorize @employer_profile, :show?
           if roster_upload_file_type.include?(file_content_type)
             file = params.require(:file)
-            file_name = file.original_filename
-            # preparing the file upload to s3
-            Aws::S3Storage.save(file.path,'employer_roster_upload',file_name)
-            # making call to subscriber
-            ev = event('events.file_upload.roster_parser_requested',attributes: {s3_reference_key: file_name, bucket_name: 'employer_roster_upload', employer_profile_id: @employer_profile._id, extension: File.extname(file_name)})
-            ev.success.publish
-            # once we put file to s3 then redirecting user to the employees list page
-            redirect_to employees_upload_url(@employer_profile.id)
+            if USE_EVENT_SOURCE
+              event_source_block(file)
+            else
+              plain_upload_block(file)
+            end
           else
             @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.new
             @roster_upload_form.errors.add(:base, "Can't detect file type #{params[:file]&.original_filename}, please upload Excel/CSV format files only.")
             respond_to do |format|
               format.html {  render default_url}
             end
+          end
+        end
+
+        def event_source_block(file)
+          file_name = file.original_filename
+          # preparing the file upload to s3
+          uri = Aws::S3Storage.save(file.path,'employer_roster_upload',file_name)
+          if uri.present?
+            # making call to subscriber
+            ev = event('events.file_upload.roster_parser_requested',attributes: {s3_reference_key: file_name, bucket_name: 'employer_roster_upload', employer_profile_id: @employer_profile._id, extension: File.extname(file_name)})
+            ev.success.publish
+            # once we put file to s3 then redirecting user to the employees list page
+            redirect_to employees_upload_url(@employer_profile.id)
+          else
+            flash[:notice] = 'File not uploaded to S3'
+            respond_to do |format|
+              format.html {  render default_url}
+            end
+          end
+        end
+
+        def plain_upload_block(file)
+          @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, @employer_profile)
+          roaster_upload_count = @roster_upload_form.census_records.length
+          begin
+            if @roster_upload_form.save
+              flash[:notice] = "#{roaster_upload_count} records uploaded from CSV"
+              redirect_to URI.parse(@roster_upload_form.redirection_url).to_s
+            else
+              render @roster_upload_form.redirection_url || default_url
+            end
+          rescue StandardError => e
+            @roster_upload_form.errors.add(:base, e.message)
+            render @roster_upload_form.redirection_url || default_url
           end
         end
 
