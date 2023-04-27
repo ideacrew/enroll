@@ -98,7 +98,7 @@
 
               <div class="collapse" id="collapseDentalCosts">
                 <div class="employee-costs">
-                  <% if @benefit_group.dental_reference_plan.present? %>
+                  <% if @benefit_group&.dental_reference_plan.present? %>
                     <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/benefit_group_cost_summary", locals: {benefit_group: @benefit_group, kind: 'dental', benefit_group_costs: @benefit_group_dental_costs } %>
                   <% else %>
                     <div class="row">

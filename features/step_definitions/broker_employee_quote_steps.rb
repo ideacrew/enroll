@@ -168,13 +168,16 @@ And(/^.+ publishes the quote and sees successful message of published quote$/) d
   find(BrokerHealthBenefitsPage.select_refrence_plan).click
   wait_for_ajax(3, 2)
   Capybara.ignore_hidden_elements = false
-  if page.find("#forms_plan_design_proposal_profile_benefit_sponsorship_benefit_application_benefit_group_relationship_benefits_attributes_0_premium_pct").value.to_i >= 50
+
+  if page.find("#all_contribution_levels_min_met_relaxed").value == 'true' || page.find("#forms_plan_design_proposal_profile_benefit_sponsorship_benefit_application_benefit_group_relationship_benefits_attributes_0_premium_pct").value.to_i >= 50
+    expect(find(BrokerHealthBenefitsPage.publish_quote_btn).disabled?).to eql false
     find(BrokerHealthBenefitsPage.publish_quote_btn).click
     wait_for_ajax(3, 2)
     expect(page).to have_content("Quote Published")
   else
     expect(find(BrokerHealthBenefitsPage.publish_quote_btn).disabled?).to eql true
   end
+
   Capybara.ignore_hidden_elements = true
 end
 
