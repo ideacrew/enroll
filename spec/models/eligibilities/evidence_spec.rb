@@ -224,6 +224,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
     end
 
     it 'should copy the date_of_action of the copied document' do
+      income_evidence2.verification_histories.first.save
       expect(income_evidence.verification_histories.first.date_of_action).to eql(income_evidence2.verification_histories.first.date_of_action)
     end
   end
@@ -237,7 +238,7 @@ def create_embedded_docs_for_evidence(evidence)
 end
 
 def create_verification_history(evidence)
-  evidence.verification_histories.create(date_of_action: Date.today - 1.day, action: 'verify', update_reason: 'Document in EnrollApp', updated_by: 'admin@user.com')
+  evidence.verification_histories.create(action: 'verify', update_reason: 'Document in EnrollApp', updated_by: 'admin@user.com')
 end
 
 def create_request_result(evidence)
