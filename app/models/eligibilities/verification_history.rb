@@ -17,6 +17,14 @@ module Eligibilities
     field :verification_outstanding, type: Boolean
     field :due_on, type: Date
     field :aasm_state, type: String
+    field :date_of_action, type: DateTime
 
+    after_create :set_date_of_action
+
+    private
+
+    def set_date_of_action
+      write_attribute(:date_of_action, DateTime.now) unless date_of_action.present?
+    end
   end
 end

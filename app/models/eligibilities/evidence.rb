@@ -308,7 +308,7 @@ module Eligibilities
 
     def clone_verification_histories(new_evidence)
       verification_histories.each do |verification|
-        verification_attrs = verification.attributes.deep_symbolize_keys.slice(:action, :modifier, :update_reason, :updated_by, :is_satisfied, :verification_outstanding, :due_on, :aasm_state)
+        verification_attrs = verification.attributes.deep_symbolize_keys.slice(:action, :modifier, :update_reason, :updated_by, :is_satisfied, :verification_outstanding, :due_on, :aasm_state, :date_of_action)
         new_evidence.verification_histories.build(verification_attrs)
       end
     end
