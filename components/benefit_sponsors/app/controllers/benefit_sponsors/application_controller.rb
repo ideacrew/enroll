@@ -21,6 +21,10 @@ module BenefitSponsors
       response.headers["Pragma"] = "no-cache"
     end
 
+    def process_event_source_is_enabled?
+      EnrollRegistry.feature?("process_event_source") && EnrollRegistry.feature_enabled?("process_event_source")
+    end
+
     protected
 
     def set_current_person(required: true)

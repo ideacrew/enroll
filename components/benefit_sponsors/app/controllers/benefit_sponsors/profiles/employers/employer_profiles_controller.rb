@@ -131,7 +131,7 @@ module BenefitSponsors
           authorize @employer_profile, :show?
           if roster_upload_file_type.include?(file_content_type)
             file = params.require(:file)
-            if USE_EVENT_SOURCE
+            if process_event_source_is_enabled?
               event_source_block(file)
             else
               plain_upload_block(file)
