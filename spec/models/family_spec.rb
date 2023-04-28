@@ -2231,3 +2231,59 @@ shared_examples_for 'has aptc enrollment' do |created_at, applied_aptc, market_k
     it_behaves_like "has aptc enrollment", Date.new(1,1, (TimeKeeper.date_of_record.year - 1)), 50.0, 'individual', false
   end
 end
+
+describe '#deactivate_financial_assistance' do
+  let(:person) { FactoryBot.create(:person) }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+  let(:tax_household_group) { FactoryBot.create(:tax_household_group, family: family) }
+
+  context 'with valid params' do
+    before do
+      EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+    end
+
+    it 'deactivates active tax household group' do
+      expect(tax_household_group.end_on).to be_nil
+      family.deactivate_financial_assistance(TimeKeeper.date_of_record)
+      expect(tax_household_group.reload.end_on).not_to be_nil
+    end
+  end
+
+  context 'with invalid params' do
+    context 'bad date input and multi tax household feature is enabled' do
+      before do
+        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+      end
+
+      it 'does not deactivate active tax household group' do
+        expect(tax_household_group.end_on).to be_nil
+        family.deactivate_financial_assistance(nil)
+        expect(tax_household_group.reload.end_on).to be_nil
+      end
+    end
+
+    context 'bad date input and multi tax household feature is disabled' do
+      before do
+        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(false)
+      end
+
+      it 'does not deactivate active tax household group' do
+        expect(tax_household_group.end_on).to be_nil
+        family.deactivate_financial_assistance(nil)
+        expect(tax_household_group.reload.end_on).to be_nil
+      end
+    end
+
+    context 'multi tax households feature is disabled' do
+      before do
+        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(false)
+      end
+
+      it 'does not deactivate active tax household group' do
+        expect(tax_household_group.end_on).to be_nil
+        family.deactivate_financial_assistance(TimeKeeper.date_of_record)
+        expect(tax_household_group.reload.end_on).to be_nil
+      end
+    end
+  end
+end
