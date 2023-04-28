@@ -1382,6 +1382,23 @@ class Family
     tax_household_groups.active.by_year(year).first
   end
 
+  # Currently implemented to handle only when Multi Tax Household feature is enabled
+  def deactivate_financial_assistance(effective_date)
+    return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+    return if !effective_date.is_a?(Date) || active_thhg(effective_date.year).blank?
+
+    deactivated = ::Operations::TaxHouseholdGroups::Deactivate.new.call({ family: self, new_effective_date: effective_date })
+
+    if deactivated.failure?
+      Rails.logger.error { "Failed to deactivate tax household groups for family with hbx_id: #{hbx_assigned_id}, Failure: #{deactivated.failure}" }
+    else
+      build_determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: self.reload, effective_date: effective_date)
+      return if build_determination.success?
+
+      Rails.logger.error { "Failed to build family determination for family with hbx_id: #{hbx_assigned_id}, Failure: #{build_determination.failure}" }
+    end
+  end
+
 private
   def build_household
     if households.size == 0
