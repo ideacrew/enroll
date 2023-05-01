@@ -67,7 +67,7 @@
                 <%= l10n('faa.deductions.divorce_agreement') if deduction_kind == "alimony_paid" && FinancialAssistanceRegistry.feature_enabled?(:divorce_agreement_year) %>
               </div>
             <%else%>
-              <div class="col-md-9 no-pd">
+              <div class="col-md-9 no-pd <%= deduction_kind %>">
                 <%= label %> <%= l10n('faa.deductions.divorce_agreement') if deduction_kind == "alimony_paid" && FinancialAssistanceRegistry.feature_enabled?(:divorce_agreement_year) %>
               </div>
             <%end%>
