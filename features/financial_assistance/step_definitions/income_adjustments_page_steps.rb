@@ -97,6 +97,7 @@ Then(/^the health_savings_account have glossary content$/) do
 end
 
 Then(/^the alimony_paid does not have glossary link$/) do
+  sleep 1
   expect(page.has_css?(IvlIapIncomeAdjustmentsPage.alimony_paid)).to be_truthy
   expect(page.has_css?(IvlIapIncomeAdjustmentsPage.alimony_paid_glossary_link)).to be_falsy
 end
