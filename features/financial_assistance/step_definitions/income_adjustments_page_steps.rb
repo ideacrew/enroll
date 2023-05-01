@@ -87,16 +87,18 @@ Then(/^the divorce agreement copy should show$/) do
 end
 
 Then(/^the health_savings_account have glossary link$/) do
-  expect(page.has_xpath?("//*[@id='health_savings_account']/div[1]/div[2]/span")).to be_truthy
+  expect(page.has_css?(IvlIapIncomeAdjustmentsPage.health_savings_account)).to be_truthy
+  expect(page.has_css?(IvlIapIncomeAdjustmentsPage.health_savings_account_glossary_link)).to be_truthy
 end
 
 Then(/^the health_savings_account have glossary content$/) do
-  find(:xpath, "//*[@id='health_savings_account']/div[1]/div[2]/span").click
+  find(IvlIapIncomeAdjustmentsPage.health_savings_account_glossary_link).click
   expect(page).to have_content 'If you have a High Deductible Health Plan, you may be eligible for a Health Savings Account'
 end
 
 Then(/^the alimony_paid does not have glossary link$/) do
-  expect(page.has_xpath?("//*[@id='alimony_paid']/div[1]/div[2]/span")).to be_falsy
+  expect(page.has_css?(IvlIapIncomeAdjustmentsPage.alimony_paid)).to be_truthy
+  expect(page.has_css?(IvlIapIncomeAdjustmentsPage.alimony_paid_glossary_link)).to be_falsy
 end
 
 Then(/^the divorce agreement copy should not show$/) do
