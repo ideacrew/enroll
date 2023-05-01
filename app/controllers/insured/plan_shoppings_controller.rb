@@ -374,6 +374,8 @@ class Insured::PlanShoppingsController < ApplicationController
     percentage = @elected_aptc / @max_aptc
     @max_aptc = ::Operations::PremiumCredits::FindAptc.new.call({ hbx_enrollment: @enrollment, effective_on: @enrollment.effective_on }).value!
     @elected_aptc = percentage * @max_aptc
+    session[:elected_aptc] = @elected_aptc.to_f if session[:elected_aptc].to_d != @elected_aptc.to_d
+    session[:max_aptc] = @max_aptc.to_f if session[:max_aptc].to_d != @max_aptc.to_d
   end
 
   def dependents_with_existing_coverage(enrollment)

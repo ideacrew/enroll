@@ -237,9 +237,12 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       {
         id: hbx_enrollment11.id,
         plan_id: hbx_enrollment11.product_id,
-        elected_aptc: 300.00
+        elected_aptc: aptc_value1
       }
     end
+
+    let(:aptc_value1) { 300.00 }
+    let(:aptc_value2) { 200.00 }
 
     before do
       allow(TimeKeeper).to receive(:date_of_record).and_return(start_of_year)
@@ -249,33 +252,36 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         double(
           call: double(
             success?: true,
-            value!: 200.00
+            value!: aptc_value2
           )
         )
       )
     end
 
-    context 'with continuous coverage' do
-      let(:session_variables) { { elected_aptc: 300.00, max_aptc: 300.00, aptc_grants: double } }
+    let(:session_variables) { { elected_aptc: aptc_value1, max_aptc: aptc_value1, aptc_grants: double } }
 
+    context 'with continuous coverage' do
       before do
-        controller.instance_variable_set(:@elected_aptc, 300.00)
-        controller.instance_variable_set(:@max_aptc, 300.00)
+        controller.instance_variable_set(:@elected_aptc, aptc_value1)
+        controller.instance_variable_set(:@max_aptc, aptc_value1)
         controller.instance_variable_set(:@aptc_grants, double)
         sign_in(user)
         get :thankyou, params: input_params, session: session_variables
       end
 
-      it 'resets max_aptc and elected_aptc' do
+      it 'changes instance variables max_aptc and elected_aptc' do
         expect(response).to have_http_status(:success)
-        expect(assigns(:elected_aptc)).to eq(200.00)
-        expect(assigns(:max_aptc)).to eq(200.00)
+        expect(assigns(:elected_aptc)).to eq(aptc_value2)
+        expect(assigns(:max_aptc)).to eq(aptc_value2)
+      end
+
+      it 'changes session variables elected_aptc and max_aptc' do
+        expect(request.session[:elected_aptc]).to eq(aptc_value2)
+        expect(request.session[:max_aptc]).to eq(aptc_value2)
       end
     end
 
     context 'with continuous coverage without APTC(UQHP)' do
-      let(:session_variables) { {} }
-
       before do
         sign_in(user)
         get :thankyou, params: input_params, session: session_variables
@@ -283,16 +289,22 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
       it 'returns success' do
         expect(response).to have_http_status(:success)
+        expect(assigns(:elected_aptc)).to be_zero
+        expect(assigns(:max_aptc)).to be_zero
+      end
+
+      it 'does not change session variables elected_aptc and max_aptc' do
+        expect(request.session[:elected_aptc]).to eq(aptc_value1)
+        expect(request.session[:max_aptc]).to eq(aptc_value1)
       end
     end
 
     context 'without continuous coverage' do
       let(:product11) { FactoryBot.create(:benefit_markets_products_health_products_health_product, metal_level_kind: :silver) }
-      let(:session_variables) { { elected_aptc: 300.00, max_aptc: 300.00, aptc_grants: double } }
 
       before do
-        controller.instance_variable_set(:@elected_aptc, 300.00)
-        controller.instance_variable_set(:@max_aptc, 300.00)
+        controller.instance_variable_set(:@elected_aptc, aptc_value1)
+        controller.instance_variable_set(:@max_aptc, aptc_value1)
         controller.instance_variable_set(:@aptc_grants, double)
         hbx_enrollment11.update_attributes!(product_id: product11.id)
         sign_in(user)
@@ -301,8 +313,13 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
       it 'does not reset max_aptc and elected_aptc' do
         expect(response).to have_http_status(:success)
-        expect(assigns(:elected_aptc)).to eq(300.00)
-        expect(assigns(:max_aptc)).to eq(300.00)
+        expect(assigns(:elected_aptc)).to eq(aptc_value1)
+        expect(assigns(:max_aptc)).to eq(aptc_value1)
+      end
+
+      it 'does not change session variables elected_aptc and max_aptc' do
+        expect(request.session[:elected_aptc]).to eq(aptc_value1)
+        expect(request.session[:max_aptc]).to eq(aptc_value1)
       end
     end
   end
@@ -881,6 +898,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
           allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
           allow(hbx_enrollment).to receive(:is_coverall?).and_return(false)
           allow(hbx_enrollment).to receive(:decorated_elected_plans).and_return([])
+          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(false)
         end
 
         context "with tax_household" do
