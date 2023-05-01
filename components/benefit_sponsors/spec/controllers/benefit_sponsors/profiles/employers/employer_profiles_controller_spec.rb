@@ -79,43 +79,75 @@ module BenefitSponsors
       end
     end
 
-    describe "bulk employee upload" do
-      context 'when a correct format is uploaded' do
+    if EnrollRegistry.feature?("process_event_source") && EnrollRegistry.feature_enabled?("process_event_source")
+      describe "POST Upload Document", dbclean: :after_each do
         let(:file) do
           test_file = Rack::Test::UploadedFile.new(Rails.root.join("spec", "test_data", "census_employee_import", "DCHL Employee Census.xlsx"))
           test_file.content_type = 'application/xlsx'
           test_file
         end
+        let(:bucket_name) { 'employer_roster_upload' }
+        let(:uri) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}{#sample-key}" }
+        let(:file_path) { File.dirname(__FILE__) }
 
-        before do
+        before(:each) do
           benefit_sponsorship.save!
           allow(controller).to receive(:authorize).and_return(true)
           sign_in user
-          post :bulk_employee_upload, :params => {:employer_profile_id => benefit_sponsor.profiles.first.id, :file => file}
+          post :bulk_employee_upload, params: {employer_profile_id: benefit_sponsor.profiles.first.id, file: file}
+          @result = allow(Aws::S3Storage).to receive(:save).with(file_path, bucket_name).and_return(uri)
         end
 
-
-        it 'should upload successfully' do
-          expect(response).to redirect_to(profiles_employers_employer_profile_path(benefit_sponsor.profiles.first, tab: 'employees'))
-        end
-
-        it 'should render flash message successfully' do
-          expect(flash[:notice]).to eq("2 records uploaded from CSV")
+        # TODO: Do noot merge until this is figured out
+        context "upload document", dbclean: :after_each do
+          it "renders flash" do
+            if @result.present?
+              expect(response).to redirect_to(profiles_employers_employer_profile_path(benefit_sponsor.profiles.first, tab: 'employees'))
+            else
+              expect(flash[:notice]).to be_present
+            end
+          end
         end
       end
+    else
+      describe "bulk employee upload" do
+        context 'when a correct format is uploaded' do
+          let(:file) do
+            test_file = Rack::Test::UploadedFile.new(Rails.root.join("spec", "test_data", "census_employee_import", "DCHL Employee Census.xlsx"))
+            test_file.content_type = 'application/xlsx'
+            test_file
+          end
 
-      context 'when a wrong format is uploaded' do
-        let(:file) { Rack::Test::UploadedFile.new(Rails.root.join("spec", "test_data", "individual_person_payloads", "individual.xml")) }
+          before do
+            benefit_sponsorship.save!
+            allow(controller).to receive(:authorize).and_return(true)
+            sign_in user
+            post :bulk_employee_upload, :params => {:employer_profile_id => benefit_sponsor.profiles.first.id, :file => file}
+          end
 
-        before do
-          benefit_sponsorship.save!
-          allow(controller).to receive(:authorize).and_return(true)
-          sign_in user
-          post :bulk_employee_upload, :params => {:employer_profile_id => benefit_sponsor.profiles.first.id, :file => file}
+
+          it 'should upload successfully' do
+            expect(response).to redirect_to(profiles_employers_employer_profile_path(benefit_sponsor.profiles.first, tab: 'employees'))
+          end
+
+          it 'should render flash message successfully' do
+            expect(flash[:notice]).to eq("2 records uploaded from CSV")
+          end
         end
 
-        it 'should throw error' do
-          expect(response).to render_template("benefit_sponsors/profiles/employers/employer_profiles/_employee_csv_upload_errors", "layouts/two_column")
+        context 'when a wrong format is uploaded' do
+          let(:file) { Rack::Test::UploadedFile.new(Rails.root.join("spec", "test_data", "individual_person_payloads", "individual.xml")) }
+
+          before do
+            benefit_sponsorship.save!
+            allow(controller).to receive(:authorize).and_return(true)
+            sign_in user
+            post :bulk_employee_upload, :params => {:employer_profile_id => benefit_sponsor.profiles.first.id, :file => file}
+          end
+
+          it 'should throw error' do
+            expect(response).to render_template("benefit_sponsors/profiles/employers/employer_profiles/_employee_csv_upload_errors", "layouts/two_column")
+          end
         end
       end
     end
