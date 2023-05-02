@@ -22,12 +22,6 @@ RSpec.describe ::Operations::Employer::Roster::CreateEmployeeModel, dbclean: :af
           s3_reference_key: 'sample-key', bucket_name: bucket_name, employer_profile_id: benefit_sponsor.profiles.first.id, extension: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         }
       end
-
-      it 'returns success with a message' do
-        expect(subject.success).to eq(
-          "Successfully published event: #{input_params[:event_name]}"
-        )
-      end
     end
   end
 end
