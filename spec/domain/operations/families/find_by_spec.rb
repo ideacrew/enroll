@@ -16,8 +16,9 @@ RSpec.describe ::Operations::Families::FindBy, dbclean: :after_each do
       let(:year) { TimeKeeper.date_of_record.year }
       let(:correlation_id) { "12345" }
 
-      it 'returns a success' do
-        expect(subject.success).to be_truthy
+      it 'returns a success with family cv hash' do
+        expect(subject.success).to be_a(Hash)
+        expect(subject.success.keys).to include(:family_members)
       end
     end
 
