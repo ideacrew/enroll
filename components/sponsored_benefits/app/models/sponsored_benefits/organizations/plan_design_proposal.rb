@@ -55,8 +55,8 @@ module SponsoredBenefits
 
       def osse_eligibility
         org_eligibilities = if plan_design_organization.fein.present?
-                              org = BenefitSponsors::Organizations::Organization.find_by(fein: plan_design_organization.fein)
-                              org.active_benefit_sponsorship.eligibility_for(:osse_subsidy, effective_date)
+                              org = BenefitSponsors::Organizations::Organization.where(fein: plan_design_organization.fein)&.first
+                              org&.active_benefit_sponsorship&.eligibility_for(:osse_subsidy, effective_date)
                             end
         pdo_eligibilities = benefit_sponsorship.eligibility_for(:osse_subsidy, effective_date)
 
