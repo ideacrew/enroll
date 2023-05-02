@@ -7,5 +7,9 @@ EMPLOYER_TRANSLATIONS = {
   "en.employers.employer_profiles.my_account.important_documents_needed" => "Important Documents Needed",
   "en.employers.employer_profiles.my_account.eligibility_documents_needed" => "After you complete your application, you will need to submit proof of your eligibility to shop as a small business through the Health Connector. You will need to submit this proof before you are able to shop for a plan. Please review our list of documents that can be used as proof and make sure that you have the right documentation available.",
   "en.employers.broker_agency_notice.subject" => "You are associated to %{broker_legal_name}- %{agency_legal_name} (Hire)",
-  "en.employers.broker_agency_notice.body" => "<br><p>Associated details<br>General Agency : %{agency_legal_name}<br>Employer : %{employer_legal_name}<br>Status : Hire</p>"
+  "en.employers.broker_agency_notice.body" => "<br><p>Associated details<br>General Agency : %{agency_legal_name}<br>Employer : %{employer_legal_name}<br>Status : Hire</p>",
+  "en.employers.file_upload_success.subject" => "employees created from file upload",
+  "en.employers.file_upload_success.body" => "%{employees_count} employees created successfully",
+  "en.employers.file_upload_error.subject" => "employees are not created",
+  "en.employers.file_upload_success.body" => "Employees are not created"
 }

@@ -30,20 +30,23 @@ module Operations
         end
 
         def process_file(file, employer_profile_id)
-          organization = BenefitSponsors::Organizations::Organization.employer_profiles.where(_id: BSON::ObjectId.from_string(employer_profile_id)).first
+          organization = ::BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(employer_profile_id)).first
           employer_profile = organization.employer_profile
-          roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, employer_profile)
-          Success(roster_upload_form)
+          roster_upload_form = ::BenefitSponsors::Forms::RosterUploadForm.call(file, employer_profile)
+          Success(roster_upload_form,employer_profile)
         end
 
-        def persist(object)
+        def persist(object,employer_profile)
+          invitation = ::BenefitSponsors::Services::InvitationEmailService.new({employer_profile: employer_profile})
           result = Try do
             Rails.logger.info("Persisting EmployeeModel with #{object}")
             object.save
             object.census_records.length
+            invitation.send_employee_file_upload_message(object.census_records.length)
           end
 
           result.or do
+            invitation.send_employee_file_upload_error_message
             Failure(:invalid_file)
           end
         end

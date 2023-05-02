@@ -36,6 +36,40 @@ module BenefitSponsors
         secure_message(broker_agency_profile, employer_profile, subject, body)
       end
 
+      def send_employee_file_upload_message(employees_count)
+        subject = l10n("employers.file_upload_success.subject")
+        body = l10n("employers.file_upload_success.body", employees_count: employees_count)
+        from = ""
+
+        message_params = {
+          sender_id: from,
+          parent_message_id: employer_profile.id,
+          from: "DC Health Link",
+          to: employer_profile.legal_name,
+          body: body,
+          subject: subject
+        }
+
+        create_secure_message(message_params, employer_profile, :inbox)
+      end
+
+      def send_employee_file_upload_error_message
+        subject = l10n("employers.file_upload_error.subject")
+        body = l10n("employers.file_upload_error.body")
+        from = ""
+
+        message_params = {
+          sender_id: from,
+          parent_message_id: employer_profile.id,
+          from: "DC Health Link",
+          to: employer_profile.legal_name,
+          body: body,
+          subject: subject
+        }
+
+        create_secure_message(message_params, employer_profile, :inbox)
+      end
+
       def create_secure_message(message_params, inbox_provider, folder)
         message = Message.new(message_params)
         message.folder =  Message::FOLDER_TYPES[folder]
