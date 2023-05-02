@@ -15,6 +15,8 @@ class Insured::PlanShoppingsController < ApplicationController
   before_action :validate_rating_address, only: [:show]
 
   def checkout
+    puts "CHECKOUT ENTER 1111 --------- #{@enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on)}"
+
     @enrollment = HbxEnrollment.find(params.require(:id))
     plan_selection = PlanSelection.for_enrollment_id_and_plan_id(params.require(:id), params.require(:plan_id))
 
@@ -24,6 +26,8 @@ class Insured::PlanShoppingsController < ApplicationController
       redirect_to family_account_path
       return
     end
+
+    puts "CHECKOUT ENTER 2222 --------- #{@enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on)}"
 
     qle = (plan_selection.hbx_enrollment.enrollment_kind == "special_enrollment")
 
@@ -35,19 +39,32 @@ class Insured::PlanShoppingsController < ApplicationController
       return
     end
 
+    puts "CHECKOUT ENTER 3333 --------- #{@enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on)}"
+
+
     get_aptc_info_from_session(plan_selection.hbx_enrollment)
     plan_selection.apply_aptc_if_needed(@elected_aptc, @max_aptc) if can_apply_aptc?(plan_selection.plan)
     previous_enrollment_id = session[:pre_hbx_enrollment_id]
 
     plan_selection.verify_and_set_member_coverage_start_dates
+
+    puts "CHECKOUT ENTER 4444 --------- #{@enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on)}"
+
+
     plan_selection.select_plan_and_deactivate_other_enrollments(previous_enrollment_id,params[:market_kind])
+
+    puts "CHECKOUT ENTER 5555 --------- #{@enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on)}"
 
     session.delete(:pre_hbx_enrollment_id)
     redirect_to receipt_insured_plan_shopping_path(change_plan: params[:change_plan], enrollment_kind: params[:enrollment_kind])
   end
 
   def receipt
+
     @enrollment = HbxEnrollment.find(params.require(:id))
+    puts "RECEIPT ENTER 1111 --------- #{@enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on)}"
+
+
     @plan = @enrollment.product
 
     if @enrollment.is_shop?
@@ -56,11 +73,20 @@ class Insured::PlanShoppingsController < ApplicationController
       applied_aptc = @enrollment.applied_aptc_amount if @enrollment.applied_aptc_amount > 0
       @market_kind = "individual"
     end
+
+    puts "RECEIPT ENTER 2222 --------- #{@enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on)}"
+
     if @enrollment.is_shop?
       @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
     else
+      puts "RECEIPT ENTER 3333 --------- #{@enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on)}"
+
       @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: applied_aptc.present?, elected_aptc: applied_aptc)
+
+      puts "RECEIPT ENTER 4444 --------- #{@enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on)}"
     end
+
+      puts "RECEIPT ENTER 5555 --------- #{@enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on)}"
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
@@ -79,6 +105,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def thankyou
+    puts "THANKYOU ENTER 1111 --------- #{@enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on)}"
     set_elected_aptc_by_params(params[:elected_aptc]) if params[:elected_aptc].present?
     set_consumer_bookmark_url(family_account_path)
     set_admin_bookmark_url(family_account_path)
@@ -97,9 +124,20 @@ class Insured::PlanShoppingsController < ApplicationController
       @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
       @enrollment.verify_and_reset_osse_subsidy_amount(@member_group)
     else
+      puts "THANKYOU ENTER 2222 --------- #{@enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on)}"
+
       @enrollment.reset_dates_on_previously_covered_members(@plan)
+
+      puts "THANKYOU ENTER 3333 --------- #{@enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on)}"
+
       set_aptcs_for_continuous_coverage
+
+      puts "THANKYOU ENTER 4444 --------- #{@enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on)}"
+
       @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc)
+
+      puts "THANKYOU ENTER 5555 --------- #{@enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on)}"
+
       @enrollment.update(eligible_child_care_subsidy: @plan.total_childcare_subsidy_amount)
     end
 
@@ -372,7 +410,12 @@ class Insured::PlanShoppingsController < ApplicationController
     return if @max_aptc.zero?
 
     percentage = @elected_aptc / @max_aptc
+    puts "SETAPTCS ENTER 1111 --------- #{@enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on)}"
+
     @max_aptc = ::Operations::PremiumCredits::FindAptc.new.call({ hbx_enrollment: @enrollment, effective_on: @enrollment.effective_on }).value!
+
+    puts "SETAPTCS ENTER 2222 --------- #{@enrollment.hbx_enrollment_members.pluck(:eligibility_date, :coverage_start_on)}"
+
     @elected_aptc = percentage * @max_aptc
   end
 
