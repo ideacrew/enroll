@@ -52,7 +52,7 @@ module Operations
         result = AcaEntities::Contracts::Families::FamilyContract.new.call(cv3_family)
 
         if result.success?
-          Success(result)
+          Success(result.to_h)
         else
           Failure(result.errors.to_h)
         end
