@@ -85,7 +85,7 @@ end
 
 Then(/^the medicare have glossary content$/) do
   find(IvlIapHealthCoveragePage.medicare_glossary_link).click
-  expect(page).to have_content 'If you have a High Deductible Health Plan, you may be eligible for a Health Savings Account'
+  expect(page).to have_content 'Medicare is a federal health insurance program for people who are 65 or older'
 end
 
 Then(/^the coverage_obtained_through_another_exchange does not have glossary link$/) do
