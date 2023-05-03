@@ -24,7 +24,7 @@ module Eligibilities
     private
 
     def set_date_of_action
-      write_attribute(:date_of_action, DateTime.now) unless date_of_action.present?
+      update_attributes!(date_of_action: DateTime.now) unless date_of_action.present?
     end
   end
 end
