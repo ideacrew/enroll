@@ -827,7 +827,13 @@ class BenefitGroup
     end
   end
 
+  def all_contribution_levels_min_met_relaxed?
+    false
+  end
+
   def check_employer_contribution_for_employee
+    return if all_contribution_levels_min_met_relaxed?
+
     start_on = self.plan_year.try(:start_on)
     return if start_on.try(:at_beginning_of_year) == start_on
     # all employee contribution < 50% for 1/1 employers

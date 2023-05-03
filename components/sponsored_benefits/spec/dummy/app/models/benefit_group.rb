@@ -3,6 +3,7 @@ class BenefitGroup
   include Mongoid::Document
   include Mongoid::Timestamps
   include Config::AcaModelConcern
+  include Config::AcaHelper
 
   embedded_in :plan_year
 
@@ -74,6 +75,36 @@ class BenefitGroup
   field :carrier_for_elected_dental_plan, type: BSON::ObjectId
   embeds_many :composite_tier_contributions, cascade_callbacks: true
   accepts_nested_attributes_for :composite_tier_contributions, reject_if: :all_blank, allow_destroy: true
+
+  validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset,
+  :reference_plan_id, :plan_option_kind, :elected_plan_ids
+
+  validates_uniqueness_of :title
+
+  validates :plan_option_kind,
+    allow_blank: false,
+    inclusion: {
+      in: PLAN_OPTION_KINDS,
+      message: "%{value} is not a valid plan option kind"
+    }
+
+  validates :effective_on_kind,
+    allow_blank: false,
+    inclusion: {
+      in: EFFECTIVE_ON_KINDS,
+      message: "%{value} is not a valid effective date kind"
+    }
+
+  validates :effective_on_offset,
+    allow_blank: false,
+    inclusion: {
+      in: OFFSET_KINDS,
+      message: "%{value} is not a valid effective date offset kind"
+    }
+
+  validate :plan_integrity
+  validate :check_employer_contribution_for_employee
+  validate :check_offered_for_employee
 
   def reference_plan=(new_reference_plan)
     raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
@@ -279,5 +310,61 @@ class BenefitGroup
 
   def group_size_factor_for(plan)
     return 1.0
+  end
+
+  def all_contribution_levels_min_met_relaxed?
+    false
+  end
+
+  def check_employer_contribution_for_employee
+    return if all_contribution_levels_min_met_relaxed?
+
+    start_on = self.plan_year.try(:start_on)
+    return if start_on.try(:at_beginning_of_year) == start_on
+    # all employee contribution < 50% for 1/1 employers
+    return if start_on.yday == 1
+
+    if self.sole_source?
+      if composite_tier_contributions.present?
+        employee_tier = composite_tier_contributions.find_by(composite_rating_tier: 'employee_only')
+        family_tier = composite_tier_contributions.find_by(composite_rating_tier: 'family')
+        if employer_contribution_percent_minimum_for_application_start_on(start_on, employer_profile.is_renewing_employer?) > (employee_tier.try(:employer_contribution_percent) || 0)
+          self.errors.add(:composite_tier_contributions, "Employer contribution for employee must be ≥ #{employer_contribution_percent_minimum_for_application_start_on(start_on, employer_profile.is_renewing_employer?)}%")
+        elsif family_tier.offered? && (family_tier.try(:employer_contribution_percent) || 0) < family_contribution_percent_minimum_for_application_start_on(start_on, employer_profile.is_renewing_employer?)
+          self.errors.add(:composite_tier_contributions, "Employer contribution for family plans must be ≥ #{family_contribution_percent_minimum_for_application_start_on(start_on, employer_profile.is_renewing_employer?)}")
+        end
+      else
+        self.errors.add(:composite_rating_tier, "Employer must set contribution percentages")
+      end
+    elsif relationship_benefits.present? && (relationship_benefits.find_by(relationship: "employee").try(:premium_pct) || 0) < employer_contribution_percent_minimum_for_application_start_on(start_on, employer_profile.is_renewing_employer?)
+      self.errors.add(:relationship_benefits, "Employer contribution must be ≥ #{employer_contribution_percent_minimum_for_application_start_on(start_on, employer_profile.is_renewing_employer?)}% for employee")
+    end
+  end
+
+  def check_offered_for_employee
+    if relationship_benefits.present? && (relationship_benefits.find_by(relationship: "employee").try(:offered) != true)
+      self.errors.add(:relationship_benefits, "employee must be offered")
+    end
+  end
+
+  def plan_integrity
+    return if elected_plan_ids.blank?
+
+    if (plan_option_kind == "single_plan") && (elected_plan_ids.first != reference_plan_id)
+      self.errors.add(:elected_plans, "single plan must be the reference plan")
+    end
+
+    if (plan_option_kind == "single_carrier")
+      if !(elected_plan_ids.include? reference_plan_id)
+        self.errors.add(:elected_plans, "single carrier must include reference plan")
+      end
+      if elected_plans.detect { |plan| plan.carrier_profile_id != reference_plan.try(:carrier_profile_id) }
+        self.errors.add(:elected_plans, "not all from the same carrier as reference plan")
+      end
+    end
+
+    if (plan_option_kind == "metal_level") && !(elected_plan_ids.include? reference_plan_id)
+      self.errors.add(:elected_plans, "not all of the same metal level as reference plan")
+    end
   end
 end
