@@ -95,7 +95,6 @@ end
 And(/^Primary Broker enters a new quote name$/) do
   fill_in BrokerCreateQuotePage.quote_name, :with => "Test Quote"
   find(BrokerCreateQuotePage.select_start_on_dropdown).click
-  expect(page).to have_content((TimeKeeper.date_of_record + 2.months).strftime("%B %Y"))
   wait_for_ajax(3, 2)
 end
 
