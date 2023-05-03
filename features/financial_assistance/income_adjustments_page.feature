@@ -79,3 +79,12 @@ Feature: Start a new Financial Assistance Application and fills out Income Adjus
     And they visit the income adjustments page via the left nav
     Given the user answers yes to having income adjustments
     Then the divorce agreement copy should show
+
+  Scenario: Health Savings Account glossary display
+    Given the user answers yes to having income adjustments
+    Then the health_savings_account have glossary link
+    Then the health_savings_account have glossary content
+
+  Scenario: Alimony Paid glossary does not display
+    Given the user answers yes to having income adjustments
+    Then the alimony_paid does not have glossary link
