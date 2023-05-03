@@ -131,10 +131,6 @@ Then(/^Individual should see verification history timestamp/) do
   expect(find_all('td')[0].text).not_to eql("")
 end
 
-Then(/^Individual should see view history option/) do
-  expect(page).to have_content('View History')
-end
-
 And(/^Individual clicks on view history$/) do
   find(:xpath, IvlDocumentsPage.view_history_option).click
 end
