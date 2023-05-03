@@ -246,7 +246,7 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
     set_admin_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
     set_resident_bookmark_url(family_account_path) if params[:market_kind] == 'coverall'
-
+    reset_coverage_start_dates
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
     collect_shopping_filters
 
@@ -256,6 +256,14 @@ class Insured::PlanShoppingsController < ApplicationController
     @waivable = @hbx_enrollment.try(:can_complete_shopping?)
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
     @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.is_a?(String) ? d.gsub(/[$,]/, '').to_i : 0}.max)
+  end
+
+  def reset_coverage_start_dates
+    effective_on = @hbx_enrollment.effective_on
+    members = @hbx_enrollment.hbx_enrollment_members
+    return if members.pluck(:coverage_start_on).all?(effective_on)
+
+    members.update_all(coverage_start_on: effective_on)
   end
 
   def show_shop(hbx_enrollment_id)
