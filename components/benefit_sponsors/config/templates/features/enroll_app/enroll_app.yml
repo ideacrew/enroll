@@ -323,3 +323,6 @@ registry:
         settings:
           - key: :days
             item: 60
+      - key: :process_event_source
+        item: :process_event_source
+        is_enabled: <%= ENV['PROCESS_EVENT_SOURCE_IS_ENABLED'] || false %>
