@@ -140,11 +140,3 @@ registry:
             item: 15
           - key: :year_offset
             item: 0
-  - namespace:
-    - :features
-    - :enroll_app
-    - :aca_individual_market
-    - :service_and_rating_area_change
-    features:
-      - key: :address_compare
-        is_enabled: <%= ENV['ADDRESS_COMPARE_IS_ENABLED'] || false %>
