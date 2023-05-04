@@ -531,8 +531,8 @@ $(document).ready(function(){
 
   /* Preference Application Form Related */
 
-  /* enable or disable submit application button by electronic siganture (first/last name match)*/
-  function enable_submit_button_by_electronic_signature() {
+  /* enable or disable submit application button by checkboxes & electronic siganture (first/last name match)*/
+  function enable_submit_button() {
     first_name_thank_you = $("#first_name_thank_you").val() ? $("#first_name_thank_you").val().toString().toLowerCase().trim() : '';
     last_name_thank_you = $("#last_name_thank_you").val() ? $("#last_name_thank_you").val().toString().toLowerCase().trim() : '';
     subscriber_first_name = $("#subscriber_first_name").val();
@@ -549,9 +549,7 @@ $(document).ready(function(){
     living_outside_checked = living_outside_no || (living_outside_yes && attestation_terms)
     signature_valid = (first_name_thank_you == subscriber_first_name) && (last_name_thank_you == subscriber_last_name)
     checks_complete = boxes_checked && living_outside_checked && signature_valid
-    // if(!checks_complete){
-    //   $('.interaction-click-control-submit-application').addClass('disabled');
-    // }
+
     if(checks_complete){
       $('.interaction-click-control-submit-application').removeClass('disabled');
     } 
@@ -559,13 +557,13 @@ $(document).ready(function(){
 
   $(window).load(function() {
     $('.interaction-click-control-submit-application').addClass('disabled');
-    enable_submit_button_by_electronic_signature();
+    enable_submit_button();
   });
 
   $(document).on('click',  function() {
     $('.interaction-click-control-submit-application').addClass('disabled');
-    enable_submit_button_by_electronic_signature();
+    enable_submit_button();
   });
 
- /* enable or disable submit application button by electronic siganture (first/last name match)*/
+ /* enable or disable submit application button by checkboxes & electronic siganture (first/last name match)*/
 });
