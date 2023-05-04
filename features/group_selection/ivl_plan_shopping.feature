@@ -29,6 +29,22 @@ Feature: IVL plan purchase
     And consumer clicked on shop for new plan
     Then consumer should only see the dependent name
 
+  Scenario: when consumer selects a plan only primary should be able to confirm plan selection
+    Given a consumer exists
+    And the consumer is logged in
+    And consumer has a dependent in child relationship with age less than 26
+    And consumer has successful ridp
+    When consumer visits home page
+    And consumer clicked on "Married" qle
+    And I select a past qle date
+    Then I should see confirmation and continue
+    When ivl clicked continue on household info page
+    Then consumer should see all the family members names
+    And consumer clicked on shop for new plan
+    And Individual selects a plan on plan shopping page
+    And Individual hits tab and enter
+    Then Individual does not navigate to the enrollment submitted page
+
   Scenario: IVL having an ineligible family member & doing plan shop
     Given a consumer exists
     And the consumer is logged in

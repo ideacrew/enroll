@@ -222,6 +222,36 @@ describe FamilyMember, 'call back deactivate_tax_households on update', dbclean:
   end
 end
 
+describe '#deactivate_tax_households' do
+  let(:person) { FactoryBot.create(:person) }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+  let(:primary_family_member) { family.primary_applicant }
+
+  context 'when Multi Tax Households feature is enabled' do
+    let(:tax_household_group) { FactoryBot.create(:tax_household_group, family: family) }
+
+    before do
+      EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+    end
+
+    context 'family member is deleted' do
+      it 'deactivates active tax household group' do
+        expect(tax_household_group.end_on).to be_nil
+        primary_family_member.update_attributes!(is_active: false)
+        expect(tax_household_group.reload.end_on).not_to be_nil
+      end
+    end
+
+    context 'family member is updated' do
+      it 'does not deactivate active tax household group' do
+        expect(tax_household_group.end_on).to be_nil
+        primary_family_member.update_attributes!(external_member_id: '100992')
+        expect(tax_household_group.reload.end_on).to be_nil
+      end
+    end
+  end
+end
+
 describe FamilyMember, 'callback set crm_notifiction_needed', dbclean: :after_each do
   let!(:person) {FactoryBot.create(:person)}
   let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}

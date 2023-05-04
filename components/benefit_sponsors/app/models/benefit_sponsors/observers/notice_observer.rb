@@ -276,7 +276,7 @@ module BenefitSponsors
         policy = enrollment_policy_for(benefit_application, :end_open_enrollment)
         return if policy.is_satisfied?(benefit_application)
 
-        return unless policy.fail_results.include?(:minimum_participation_rule) || policy.fail_results.include?(:non_business_owner_enrollment_count)
+        return unless policy.fail_results.include?(:minimum_participation_rule) || policy.fail_results.include?(:non_business_owner_enrollment_count) || policy.fail_results.include?(:all_waived_members_eligiblity)
 
         employer_notice_event = benefit_application.is_renewing? ? "renewal_employer_ineligibility_notice" : "initial_employer_application_denied"
         employee_notice_event = benefit_application.is_renewing? ? "employee_renewal_employer_ineligibility_notice" : "group_ineligibility_notice_to_employee"
