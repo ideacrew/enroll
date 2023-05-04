@@ -1010,6 +1010,77 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
   end
 
+  context 'GET show for IVL  - reset coverage dates', :dbclean => :around_each do
+    let(:person) {FactoryBot.create(:person, :with_active_consumer_role, :with_consumer_role)}
+    let(:family) {FactoryBot.create(:family, :with_primary_family_member, :person => person)}
+    let(:household) {FactoryBot.create(:household, family: family)}
+    let(:year) {TimeKeeper.date_of_record.year}
+    let(:effective_on) {Date.new(year, 3, 1)}
+    let(:previous_enrollment_status) {'coverage_selected'}
+    let(:terminated_on) {nil}
+    let(:covered_individuals) {family.family_members}
+    let(:newly_covered_individuals) {family.family_members}
+    let(:start_on) {TimeKeeper.date_of_record.beginning_of_month}
+    let(:qualifying_life_event_kind) {FactoryBot.create(:qualifying_life_event_kind)}
+    let(:special_enrollment_period) do
+      special_enrollment = person.primary_family.special_enrollment_periods.build({effective_on_kind: 'first_of_month'})
+      special_enrollment.qualifying_life_event_kind = qualifying_life_event_kind
+      special_enrollment.start_on = TimeKeeper.date_of_record.prev_day
+      special_enrollment.end_on = TimeKeeper.date_of_record + 30.days
+      special_enrollment.save
+      special_enrollment
+    end
+
+    let(:product) do
+      FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                        hios_id: '11111111122301-01',
+                        csr_variant_id: '01',
+                        metal_level_kind: :silver,
+                        benefit_market_kind: :aca_individual,
+                        application_period: Date.new(year, 1, 1)..Date.new(year, 12, 31))
+    end
+
+    let!(:previous_coverage) do
+      FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
+                        enrollment_members: covered_individuals,
+                        family: family,
+                        household: family.latest_household,
+                        coverage_kind: 'health',
+                        effective_on: effective_on.beginning_of_year,
+                        enrollment_kind: 'open_enrollment',
+                        kind: 'individual',
+                        consumer_role: person.consumer_role,
+                        product: product,
+                        aasm_state: previous_enrollment_status,
+                        terminated_on: terminated_on,
+                        rating_area_id: rating_area.id)
+    end
+
+    let!(:hbx_enrollment) do
+      FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
+                        enrollment_members: newly_covered_individuals,
+                        family: family,
+                        household: family.latest_household,
+                        coverage_kind: 'health',
+                        effective_on: effective_on,
+                        enrollment_kind: 'open_enrollment',
+                        kind: 'individual',
+                        consumer_role: person.consumer_role,
+                        product: product,
+                        rating_area_id: rating_area.id)
+    end
+
+    it 'should update the member coverage start on' do
+      sign_in(user)
+      allow_any_instance_of(HbxEnrollment).to receive(:decorated_elected_plans).and_return([])
+      hbx_enrollment.hbx_enrollment_members.update_all(coverage_start_on: previous_coverage.effective_on)
+      get :show, params: {id: hbx_enrollment.id, market_kind: "individual"}
+      hbx_enrollment.reload
+      expect(hbx_enrollment.hbx_enrollment_members.first.coverage_start_on).to eq hbx_enrollment.effective_on
+    end
+  end
+
+
   if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     describe "plan_selection_callback" do
       let(:coverage_kind){"health"}
