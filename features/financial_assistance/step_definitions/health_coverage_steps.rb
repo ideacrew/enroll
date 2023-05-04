@@ -78,6 +78,21 @@ Then(/^the user should be see proper text in the modal popup$/) do
   expect(page).to have_content('The minimum value is a standard used to see if a health plan offered by your employer meets the basic requirements of the Affordable Care Act.')
 end
 
+Then(/^the medicare have glossary link$/) do
+  expect(page.has_css?(IvlIapHealthCoveragePage.medicare)).to be_truthy
+  expect(page.has_css?(IvlIapHealthCoveragePage.medicare_glossary_link)).to be_truthy
+end
+
+Then(/^the medicare have glossary content$/) do
+  find(IvlIapHealthCoveragePage.medicare_glossary_link).click
+  expect(page).to have_content 'A federal health insurance program for people who are 65 or older'
+end
+
+Then(/^the coverage_obtained_through_another_exchange does not have glossary link$/) do
+  expect(page.has_css?(IvlIapHealthCoveragePage.coverage_obtained_through_another_exchange)).to be_truthy
+  expect(page.has_css?(IvlIapHealthCoveragePage.coverage_obtained_through_another_exchange_glossary_link)).to be_falsy
+end
+
 Then(/^the health coverage form should show$/) do
   expect(page).to have_xpath("//*[@id='acf_refugee_medical_assistance']/div[2]/div")
 end
