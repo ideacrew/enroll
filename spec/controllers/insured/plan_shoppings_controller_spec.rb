@@ -1053,8 +1053,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
                         product: product,
                         aasm_state: previous_enrollment_status,
                         terminated_on: terminated_on,
-                        rating_area_id: rating_area.id
-                      )
+                        rating_area_id: rating_area.id)
     end
 
     let!(:hbx_enrollment) do
@@ -1068,8 +1067,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
                         kind: 'individual',
                         consumer_role: person.consumer_role,
                         product: product,
-                        rating_area_id: rating_area.id
-                      )
+                        rating_area_id: rating_area.id)
     end
 
     it 'should update the member coverage start on' do
