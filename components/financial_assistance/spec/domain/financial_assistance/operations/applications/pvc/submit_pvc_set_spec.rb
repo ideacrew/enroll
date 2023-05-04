@@ -51,7 +51,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::SubmitPvcSe
                                   is_claimed_as_tax_dependent: false,
                                   is_incarcerated: false,
                                   net_annual_income: 10_078.90,
-                                  is_post_partum_period: false)
+                                  is_post_partum_period: false,
+                                  is_ia_eligible: true)
     applicant
   end
 
@@ -119,5 +120,4 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::SubmitPvcSe
       expect(result).to be_success
     end
   end
-
 end

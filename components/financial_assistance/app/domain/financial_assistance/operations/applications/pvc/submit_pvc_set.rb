@@ -46,16 +46,18 @@ module FinancialAssistance
           end
 
           def fetch_application(family, assistance_year)
-            applications = ::FinancialAssistance::Application.where(:family_id => family.id,
-                                                                    :assistance_year => assistance_year,
-                                                                    :aasm_state => 'determined',
-                                                                    :"applicants.is_ia_eligible" => true)
+            applications = ::FinancialAssistance::Application.where(family_id: family.id,
+                                                                    assistance_year: assistance_year,
+                                                                    aasm_state: 'determined',
+                                                                    "applicants.is_ia_eligible": true)
+
 
             applications.exists(:predecessor_id => true).max_by(&:created_at)
           end
 
           def submit(params, family_ids)
             families = Family.where(:_id.in => family_ids)
+
             count = 0
             pvc_logger = Logger.new("#{Rails.root}/log/pvc_non_esi_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
 
