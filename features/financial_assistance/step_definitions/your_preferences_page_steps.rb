@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 Then(/^the user is on the Your Preferences page$/) do
-  find('#mailed_yes').click
   expect(page).to have_content('Your Preferences')
 end
 

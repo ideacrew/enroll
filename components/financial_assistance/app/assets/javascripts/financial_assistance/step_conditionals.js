@@ -552,16 +552,16 @@ $(document).ready(function(){
 
     if(checks_complete){
       $('.interaction-click-control-submit-application').removeClass('disabled');
-    } 
+    } else {
+      $('.interaction-click-control-submit-application').add('disabled');
+    }
   }
 
   $(window).load(function() {
-    $('.interaction-click-control-submit-application').addClass('disabled');
     enable_submit_button();
   });
 
-  $(document).on('click',  function() {
-    $('.interaction-click-control-submit-application').addClass('disabled');
+  $(document).on('change click blur keyup',  function() {
     enable_submit_button();
   });
 
