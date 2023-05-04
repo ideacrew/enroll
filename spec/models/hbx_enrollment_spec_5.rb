@@ -212,7 +212,7 @@ RSpec.describe HbxEnrollment, type: :model do
     end
   end
 
-  describe ".update_member_start_dates_to_match_with_effective_date" do
+  describe ".reset_member_coverage_start_dates" do
     context "for one member coverage_start_on update" do
       let!(:effective_on) {hbx_enrollment.effective_on}
       let!(:beginning_of_year) {effective_on.beginning_of_year}
@@ -223,7 +223,7 @@ RSpec.describe HbxEnrollment, type: :model do
       it 'should match with enrollment effective on' do
         enrollment_effective_on = hbx_enrollment.effective_on
         expect(hbx_enrollment.hbx_enrollment_members.pluck(:coverage_start_on)).to eq([enrollment_effective_on, beginning_of_year])
-        hbx_enrollment.update_member_start_dates_to_match_with_effective_date
+        hbx_enrollment.reset_member_coverage_start_dates
         expect(hbx_enrollment.hbx_enrollment_members.pluck(:coverage_start_on)).to eq([enrollment_effective_on, enrollment_effective_on])
       end
     end
@@ -238,7 +238,7 @@ RSpec.describe HbxEnrollment, type: :model do
       it 'should match with enrollment effective on' do
         enrollment_effective_on = hbx_enrollment.effective_on
         expect(hbx_enrollment.hbx_enrollment_members.pluck(:coverage_start_on)).to eq([beginning_of_year, beginning_of_year])
-        hbx_enrollment.update_member_start_dates_to_match_with_effective_date
+        hbx_enrollment.reset_member_coverage_start_dates
         expect(hbx_enrollment.hbx_enrollment_members.pluck(:coverage_start_on)).to eq([enrollment_effective_on, enrollment_effective_on])
       end
     end
@@ -253,7 +253,7 @@ RSpec.describe HbxEnrollment, type: :model do
       it 'should not update coverage_start_on' do
         enrollment_effective_on = hbx_enrollment.effective_on
         expect(hbx_enrollment.hbx_enrollment_members.pluck(:coverage_start_on)).to eq([enrollment_effective_on, enrollment_effective_on])
-        hbx_enrollment.update_member_start_dates_to_match_with_effective_date
+        hbx_enrollment.reset_member_coverage_start_dates
         expect(hbx_enrollment.hbx_enrollment_members.pluck(:coverage_start_on)).to eq([enrollment_effective_on, enrollment_effective_on])
       end
     end

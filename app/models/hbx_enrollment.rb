@@ -1566,7 +1566,7 @@ class HbxEnrollment
     end
   end
 
-  def update_member_start_dates_to_match_with_effective_date
+  def reset_member_coverage_start_dates
     return if hbx_enrollment_members.pluck(:coverage_start_on).all?(effective_on)
 
     hbx_enrollment_members.update_all(coverage_start_on: effective_on)
