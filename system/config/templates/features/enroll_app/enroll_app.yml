@@ -415,6 +415,12 @@ registry:
         is_enabled: <%= ENV['ELIGIBILITY_AUDIT_LOG_IS_ENABLED'] || false %>
       - key: :notify_address_changed
         is_enabled: <%= ENV['NOTIFY_ADDRESS_CHANGED_IS_ENABLED'] || false %>
+      - key: :process_event_source
+        item: :process_event_source
+        is_enabled: <%= ENV['PROCESS_EVENT_SOURCE_IS_ENABLED'] || false %>        
+      - key: :process_event_source
+        item: :process_event_source
+        is_enabled: <%= ENV['PROCESS_EVENT_SOURCE_IS_ENABLED'] || false %>
   - namespace:
       - :pay_now_feature
     features:
