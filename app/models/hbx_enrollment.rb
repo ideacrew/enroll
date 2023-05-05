@@ -1566,6 +1566,12 @@ class HbxEnrollment
     end
   end
 
+  def reset_member_coverage_start_dates
+    return if hbx_enrollment_members.pluck(:coverage_start_on).all?(effective_on)
+
+    hbx_enrollment_members.update_all(coverage_start_on: effective_on)
+  end
+
   def display_make_changes_for_ivl?
     return true if is_shop?
 

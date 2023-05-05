@@ -211,4 +211,51 @@ RSpec.describe HbxEnrollment, type: :model do
       end
     end
   end
+
+  describe ".reset_member_coverage_start_dates" do
+    context "for one member coverage_start_on update" do
+      let!(:effective_on) {hbx_enrollment.effective_on}
+      let!(:beginning_of_year) {effective_on.beginning_of_year}
+      let!(:enrollment_update) {hbx_enrollment.update_attributes(effective_on: beginning_of_year + 3.months)}
+      let!(:member1_update) {hbx_enrollment.hbx_enrollment_members[0].update_attributes(coverage_start_on: beginning_of_year + 3.months)}
+      let!(:member2_update) {hbx_enrollment.hbx_enrollment_members[1].update_attributes(coverage_start_on: beginning_of_year)}
+
+      it 'should match with enrollment effective on' do
+        enrollment_effective_on = hbx_enrollment.effective_on
+        expect(hbx_enrollment.hbx_enrollment_members.pluck(:coverage_start_on)).to eq([enrollment_effective_on, beginning_of_year])
+        hbx_enrollment.reset_member_coverage_start_dates
+        expect(hbx_enrollment.hbx_enrollment_members.pluck(:coverage_start_on)).to eq([enrollment_effective_on, enrollment_effective_on])
+      end
+    end
+
+    context "for all members coverage_start_on update" do
+      let!(:effective_on) {hbx_enrollment.effective_on}
+      let!(:beginning_of_year) {effective_on.beginning_of_year}
+      let!(:enrollment_update) {hbx_enrollment.update_attributes(effective_on: beginning_of_year + 3.months)}
+      let!(:member1_update) {hbx_enrollment.hbx_enrollment_members[0].update_attributes(coverage_start_on: beginning_of_year)}
+      let!(:member2_update) {hbx_enrollment.hbx_enrollment_members[1].update_attributes(coverage_start_on: beginning_of_year)}
+
+      it 'should match with enrollment effective on' do
+        enrollment_effective_on = hbx_enrollment.effective_on
+        expect(hbx_enrollment.hbx_enrollment_members.pluck(:coverage_start_on)).to eq([beginning_of_year, beginning_of_year])
+        hbx_enrollment.reset_member_coverage_start_dates
+        expect(hbx_enrollment.hbx_enrollment_members.pluck(:coverage_start_on)).to eq([enrollment_effective_on, enrollment_effective_on])
+      end
+    end
+
+    context "when coverage_start_on matches with effective_on" do
+      let!(:effective_on) {hbx_enrollment.effective_on}
+      let!(:beginning_of_year) {effective_on.beginning_of_year}
+      let!(:enrollment_update) {hbx_enrollment.update_attributes(effective_on: beginning_of_year + 3.months)}
+      let!(:member1_update) {hbx_enrollment.hbx_enrollment_members[0].update_attributes(coverage_start_on: beginning_of_year + 3.months)}
+      let!(:member2_update) {hbx_enrollment.hbx_enrollment_members[1].update_attributes(coverage_start_on: beginning_of_year + 3.months)}
+
+      it 'should not update coverage_start_on' do
+        enrollment_effective_on = hbx_enrollment.effective_on
+        expect(hbx_enrollment.hbx_enrollment_members.pluck(:coverage_start_on)).to eq([enrollment_effective_on, enrollment_effective_on])
+        hbx_enrollment.reset_member_coverage_start_dates
+        expect(hbx_enrollment.hbx_enrollment_members.pluck(:coverage_start_on)).to eq([enrollment_effective_on, enrollment_effective_on])
+      end
+    end
+  end
 end
