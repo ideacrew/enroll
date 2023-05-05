@@ -24,17 +24,14 @@ Feature: Review your application page functionality 1
     Then the user is on the Your Preferences page
     When the user clicks CONTINUE
     Then the user is on the Submit Your Application page
-    And all required questions are answered
-    And the user has not signed their name
     Then the submit button will be disabled
 
-  Scenario: Submit button is disabled when required checkboxes are checked but name is not signed
+  Scenario: Submit button is disabled when checkboxes are not checked but name is signed
     Given the user clicks CONTINUE
     Then the user is on the Your Preferences page
     When the user clicks CONTINUE
     Then the user is on the Submit Your Application page
-    Given all required questions are answered including report change terms field
-    And the user has not signed their name
+    And the user has signed their name
     Then the submit button will be disabled
 
   Scenario: Editing Income Adjustments
