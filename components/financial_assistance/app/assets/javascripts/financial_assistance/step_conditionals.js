@@ -558,6 +558,7 @@ $(document).ready(function(){
   }
 
   $(window).load(function() {
+    $('.interaction-click-control-submit-application').add('disabled');
     enable_submit_button();
   });
 
