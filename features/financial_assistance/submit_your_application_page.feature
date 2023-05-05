@@ -12,15 +12,19 @@ Feature: This is the final review page before submiting an application
     When the user clicks CONTINUE
     Then the user is on the Submit Your Application page
 
-  @flaky
+  Scenario: Submit button is enabled when required checkboxes are checked and name is signed
+    Given the user has signed their name
+    And all required questions are answered including report change terms field
+    And the user should be able to see medicaid determination question
+    Then the submit button will be enabled
+
   Scenario: Submit button is disabled when a required checkbox is not checked and name is not signed
     Given a required question is not answered
     And the user has not signed their name
     Then the submit button will be disabled
 
-  @flaky
   Scenario: Submit button is disabled when required checkboxes are checked but name is not signed
-    Given all required questions are answered
+    Given all required questions are answered including report change terms field
     And the user has not signed their name
     Then the submit button will be disabled
 
@@ -30,12 +34,7 @@ Feature: This is the final review page before submiting an application
     And the user has signed their name
     Then the submit button will be enabled
 
-  Scenario: Submit button is enabled when required checkboxes are checked and name is signed
-    Given all required questions are answered
-    And the user should be able to see medicaid determination question
-    And the user has signed their name
-    Then the submit button will be enabled
-
+  @flaky
   Scenario: User does not continue when a question is unanswered
     Given a required question is not answered
     And the user should be able to see medicaid determination question
@@ -43,6 +42,7 @@ Feature: This is the final review page before submiting an application
     And the user clicks SUBMIT
     Then the user is on the Submit Your Application page
 
+  @flaky
   Scenario: User continues when a question name is signed all questions are answered
     Given all required questions are answered
     And the user should be able to see medicaid determination question
