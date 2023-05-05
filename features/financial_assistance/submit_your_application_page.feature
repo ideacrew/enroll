@@ -4,7 +4,7 @@ Feature: This is the final review page before submiting an application
     Given the FAA feature configuration is enabled
     Given the date is within open enrollment
     And the user is on FAA Household Info: Family Members page
-    And all applicants are in Info Completed state with valid types of income
+    And all applicants are in Info Completed state with all types of income
     And the user clicks CONTINUE
     Then the user is on the Review Your Application page
     When the user clicks CONTINUE

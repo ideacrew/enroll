@@ -32,7 +32,7 @@ class IvlIapJobIncomeInformationPage
   end
 
   def self.select_yearly
-    'li[class="interaction-choice-control-income-frequency-kind-7 last"]'
+    'li[class="interaction-choice-control-income-frequency-kind-7 last interaction-choice-control-income-employer-address-state-7"]'
   end
 
   def self.income_from
