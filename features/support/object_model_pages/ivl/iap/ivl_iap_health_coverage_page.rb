@@ -190,7 +190,7 @@ class IvlIapHealthCoveragePage
   def self.has_eligibility_changed_false_radiobtn
     'has_eligibility_changed_false'
   end
-  
+
   def self.not_sure_has_eligible_health_coverage_link
     'a[href="#has_eligible_health_coverage"]'
   end
