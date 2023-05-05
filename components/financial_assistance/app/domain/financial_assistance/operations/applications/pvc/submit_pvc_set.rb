@@ -21,16 +21,14 @@ module FinancialAssistance
 
           # @param [Int] assistance_year
           # @param [Array] csr_list
+          # @param [Int] families_per_event
+          # @param [Int] skip
           # @return [ Success ] Job successfully completed
           def call(params)
-            start_time = process_start_time
             values = yield validate(params)
             families = find_families(values)
-            manifest = make_manifest(families, values[:assistance_year])
-            submit(params, families, manifest)
-            end_time = process_end_time_formatted(start_time)
-            logger.info "Successfully submitted #{manifest[:count]} members for PVC in #{end_time}"
-            puts "Successfully submitted #{manifest[:count]} members for PVC in #{end_time}"
+            submit(params, families)
+
             Success("Successfully Submitted PVC Set")
           end
 
@@ -43,32 +41,38 @@ module FinancialAssistance
             errors.empty? ? Success(params) : Failure(errors)
           end
 
-          def get_count(families)
-            match_stage = { '$match' => { '_id' => { '$in' => families }} }
-            unwind_stage = { '$unwind' => { "path" => "$family_members" } }
-            count_stage = { '$count' => 'total' }
-            Family.collection.aggregate([match_stage, unwind_stage, count_stage]).first&.dig("total")
-          end
-
-          def make_manifest(families, assistance_year)
-            params = {
-              type: "pvc_manifest_type",
-              assistance_year: assistance_year,
-              initial_count: get_count(families)
-            }
-            ::AcaEntities::Pdm::Contracts::ManifestContract.new.call(params).to_h
-          end
-
           def find_families(params)
             Family.periodic_verifiable_for_assistance_year(params[:assistance_year], params[:csr_list]).distinct(:_id)
           end
 
-          def submit(_params, family_ids, manifest)
+          def fetch_application(family, assistance_year)
+            applications = ::FinancialAssistance::Application.where(family_id: family.id,
+                                                                    assistance_year: assistance_year,
+                                                                    aasm_state: 'determined',
+                                                                    "applicants.is_ia_eligible": true)
+
+
+            applications.exists(:predecessor_id => true).max_by(&:created_at)
+          end
+
+          def submit(params, family_ids)
             families = Family.where(:_id.in => family_ids)
-            families.each do |family|
-              family.family_members.each do |member|
-                publish({manifest: manifest, person: member.person, family_id: family.id})
+
+            count = 0
+            pvc_logger = Logger.new("#{Rails.root}/log/pvc_non_esi_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+
+            families.no_timeout.each do |family|
+              determined_application = fetch_application(family, params[:assistance_year])
+
+              if determined_application.present?
+                publish({family_hbx_id: family.hbx_assigned_id, application_hbx_id: determined_application.hbx_id, assistance_year: params[:assistance_year]})
+                count += 1
+                pvc_logger.info("********************************* processed #{count} families *********************************") if count % 100 == 0
+              else
+                pvc_logger.error("No Determined application found for family with primary person hbx_id #{family.primary_person.hbx_id}")
               end
+            rescue StandardError => e
+              pvc_logger.error("failed to process for person with hbx_id #{family.primary_person.hbx_id} due to #{e.inspect}")
             end
           end
 

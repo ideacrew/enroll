@@ -194,4 +194,20 @@ class IvlIapHealthCoveragePage
   def self.back_to_all_house_members
     'a[class=interaction-click-control-back-to-all-household-members]'
   end
+
+  def self.medicare
+    '.medicare'
+  end
+
+  def self.medicare_glossary_link
+    '.medicare span'
+  end
+
+  def self.coverage_obtained_through_another_exchange
+    '.coverage_obtained_through_another_exchange'
+  end
+
+  def self.coverage_obtained_through_another_exchange_glossary_link
+    '.coverage_obtained_through_another_exchange span'
+  end
 end
