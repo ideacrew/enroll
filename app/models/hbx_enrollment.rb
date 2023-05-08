@@ -2878,7 +2878,7 @@ class HbxEnrollment
   end
 
   def aptc_tax_household_enrollments
-    TaxHouseholdEnrollment.by_enrollment_id(id).select do |thh_enr|
+    tax_household_enrollments.select do |thh_enr|
       thh_enr.tax_household_members_enrollment_members.where(
         :family_member_id.in => thh_enr.tax_household.aptc_members.map(&:applicant_id)
       ).present?
