@@ -160,7 +160,6 @@ Given(/^the user has not signed their name$/) do
 end
 
 Then(/^the submit button will be disabled$/) do
-  sleep 5
   expect(find('.interaction-click-control-submit-application')[:class].include?('disabled')).to be(true)
 end
 
