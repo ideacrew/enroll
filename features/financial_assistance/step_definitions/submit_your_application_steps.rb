@@ -160,14 +160,12 @@ Given(/^the user has not signed their name$/) do
 end
 
 Then(/^the submit button will be disabled$/) do
-  sleep 5
   expect(find('.interaction-click-control-submit-application')[:class].include?('disabled')).to be(true)
 end
 
 Given(/^all required questions are answered$/) do
   find_all("input[type='checkbox']").each {|checkbox| checkbox.set(true)}
   find('#living_outside_no').set(true)
-  find('#application_report_change_terms').click
 end
 
 And(/^the user should be able to see medicaid determination question$/) do

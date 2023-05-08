@@ -111,14 +111,6 @@ class IvlIapOtherQuestions
     'input[id="radio_physically_disabled_yes"]'
   end
 
-  def self.is_primary_caregiver_yes_radiobtn
-    'is_primary_caregiver_yes'
-  end
-
-  def self.is_primary_caregiver_no_radiobtn
-    'is_primary_caregiver_no'
-  end
-
   def self.not_sure_physically_disabled_link
     'a[data-target="#is_physically_disabled"]'
   end
