@@ -24,6 +24,7 @@ Feature: Review your application page functionality 1
     Then the user is on the Your Preferences page
     When the user clicks CONTINUE
     Then the user is on the Submit Your Application page
+    And all required questions are answered
     Then the submit button will be disabled
 
   Scenario: Editing Income Adjustments
