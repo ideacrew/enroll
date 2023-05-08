@@ -1070,8 +1070,10 @@ class HbxEnrollment
     return if is_shop? || dental? || applied_aptc_amount.zero?
     return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
-    thh_enr_premiums = thh_enr_group_ehb_premium_of_aptc_members(aptc_tax_household_enrollments)
-    populate_applied_aptc_for_thh_enrs(aptc_tax_household_enrollments, thh_enr_premiums)
+    eligible_tax_hh_enrs = aptc_tax_household_enrollments
+    group_ehb_premiums = thh_enr_group_ehb_premium_of_aptc_members(eligible_tax_hh_enrs)
+    calculated_applied_aptcs = calculate_applied_aptc_for_thh_enrs(eligible_tax_hh_enrs, group_ehb_premiums)
+    populate_applied_aptc_for_thh_enrs(calculated_applied_aptcs)
   rescue StandardError => e
     Rails.logger.error { "Unable to update tax_household_enrollments due to #{e.backtrace}" }
   end
@@ -2871,23 +2873,26 @@ class HbxEnrollment
     end
   end
 
-  private
+  def tax_household_enrollments
+    TaxHouseholdEnrollment.by_enrollment_id(id)
+  end
 
   def aptc_tax_household_enrollments
-    @aptc_tax_household_enrollments ||=
-      TaxHouseholdEnrollment.by_enrollment_id(id).select do |thh_enr|
-        thh_enr.tax_household_members_enrollment_members.where(
-          :family_member_id.in => thh_enr.tax_household.aptc_members.map(&:applicant_id)
-        ).present?
-      end
+    tax_household_enrollments.select do |thh_enr|
+      thh_enr.tax_household_members_enrollment_members.where(
+        :family_member_id.in => thh_enr.tax_household.aptc_members.map(&:applicant_id)
+      ).present?
+    end
   end
+
+  private
 
   # Calculates sum of enrolled aptc member's of TaxHouseholdEnrollment ehb_premiums including Minimum Responsibility.
   def sum_of_member_ehb_premiums(thh_enr)
     aptc_family_member_ids = thh_enr.tax_household.aptc_members.map(&:applicant_id)
     hbx_enrollment_members.where(:applicant_id.in => aptc_family_member_ids).reduce(0) do |sum, member|
       sum + round_down_float_two_decimals(ivl_decorated_hbx_enrollment.member_ehb_premium(member))
-    end
+    end.to_money
   end
 
   def thh_enr_group_ehb_premium_of_aptc_members(thh_enrs)
@@ -2897,29 +2902,62 @@ class HbxEnrollment
     end
   end
 
-  # Incase of MultipleTaxHouseholdEnrollments, applied_aptc is either
-  #   1. group_ehb_premium (or)
-  #   2. thh_enr.available_max_aptc * elected_aptc_pct
-  # To make this inline with plan shopping logic we are considering tax_household_enrollment level ehb_premium.
-  def populate_applied_aptc_for_thh_enrs(thh_enrs, thh_enr_premiums)
-    if applied_aptc_amount == total_ehb_premium.to_money
-      thh_enrs.each do |thh_enr|
-        thh_enr.update_attributes!(
-          {
-            applied_aptc: thh_enr_premiums[thh_enr][:group_ehb_premium],
-            group_ehb_premium: thh_enr_premiums[thh_enr][:group_ehb_premium]
-          }
-        )
-      end
+  # calculate_applied_aptcs_by_available_aptc_ratio_using_ratio by comapring available_max_aptcs of Tax Household Enrollments
+  def calculate_applied_aptcs_by_available_aptc_ratio(thh_enrs)
+    total_available_max_aptc = thh_enrs.reduce(0) do |total, tax_hh_enr|
+      total + (tax_hh_enr.available_max_aptc.positive? ? tax_hh_enr.available_max_aptc : 0)
+    end
+
+    thh_enrs.inject({}) do |applied_aptcs_by_ratio, thh_enr|
+      applied_aptcs_by_ratio[thh_enr] = (((thh_enr.available_max_aptc.positive? ? thh_enr.available_max_aptc.to_f : 0) / total_available_max_aptc.to_f) * applied_aptc_amount.to_f).to_money
+      applied_aptcs_by_ratio
+    end
+  end
+
+  # Assumed Applied Aptcs are less than or equal to both group_ehb_premium and available_max_aptc for each Aptc Tax Household
+  def valid_applied_aptcs_by_ratio?(applied_aptcs_by_available_aptc_ratio, group_ehb_premiums)
+    applied_aptcs_by_available_aptc_ratio.all? do |tax_hh_enr, assumed_aptc|
+      assumed_aptc <= group_ehb_premiums[tax_hh_enr][:group_ehb_premium] &&
+        assumed_aptc <= (tax_hh_enr.available_max_aptc.positive? ? tax_hh_enr.available_max_aptc : 0)
+    end
+  end
+
+  def calculate_applied_aptc_for_thh_enrs(thh_enrs, group_ehb_premiums)
+    if thh_enrs.count == 1
+      group_ehb_premiums[thh_enrs.first][:applied_aptc] = applied_aptc_amount
+      return group_ehb_premiums
+    end
+
+    applied_aptcs_by_available_aptc_ratio = calculate_applied_aptcs_by_available_aptc_ratio(thh_enrs)
+    if valid_applied_aptcs_by_ratio?(applied_aptcs_by_available_aptc_ratio, group_ehb_premiums)
+      applied_aptcs_by_available_aptc_ratio.each { |tax_hh_enr, applied_aptc| group_ehb_premiums[tax_hh_enr][:applied_aptc] = applied_aptc }
     else
-      thh_enrs.each do |thh_enr|
-        thh_enr.update_attributes!(
-          {
-            applied_aptc: thh_enr.available_max_aptc * elected_aptc_pct,
-            group_ehb_premium: thh_enr_premiums[thh_enr][:group_ehb_premium]
-          }
-        )
+      total_thh_enrs_count = thh_enrs.count
+      total_remaining_consumed_aptc = applied_aptc_amount
+      thh_enrs.each_with_index do |tax_hh_enr, indx|
+        break unless total_remaining_consumed_aptc.positive?
+
+        applied_aptc = [applied_aptcs_by_available_aptc_ratio[tax_hh_enr], group_ehb_premiums[tax_hh_enr][:group_ehb_premium]].min
+        group_ehb_premiums[tax_hh_enr][:applied_aptc] = if indx.next == total_thh_enrs_count
+                                                          total_remaining_consumed_aptc
+                                                        else
+                                                          total_remaining_consumed_aptc -= applied_aptc
+                                                          applied_aptc
+                                                        end
       end
+    end
+
+    group_ehb_premiums
+  end
+
+  def populate_applied_aptc_for_thh_enrs(calculated_applied_aptcs)
+    calculated_applied_aptcs.each do |thh_enr, premium_info|
+      thh_enr.update_attributes!(
+        {
+          applied_aptc: premium_info[:applied_aptc] || 0.0,
+          group_ehb_premium: premium_info[:group_ehb_premium]
+        }
+      )
     end
   end
 
