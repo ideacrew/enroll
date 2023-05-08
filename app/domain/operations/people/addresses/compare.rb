@@ -3,6 +3,7 @@
 module Operations
   module People
     module Addresses
+      # Class to compare address changes and publish payload
       class Compare
         include Dry::Monads[:result, :do]
 
