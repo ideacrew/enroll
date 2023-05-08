@@ -2902,21 +2902,21 @@ class HbxEnrollment
     end
   end
 
-  # calculate_assumed_applied_aptcs_using_ratio by comapring available_max_aptcs of Tax Household Enrollments
-  def calculate_assumed_applied_aptcs(thh_enrs)
+  # calculate_applied_aptcs_by_available_aptc_ratio_using_ratio by comapring available_max_aptcs of Tax Household Enrollments
+  def calculate_applied_aptcs_by_available_aptc_ratio(thh_enrs)
     total_available_max_aptc = thh_enrs.reduce(0) do |total, tax_hh_enr|
       total + (tax_hh_enr.available_max_aptc.positive? ? tax_hh_enr.available_max_aptc : 0)
     end
 
-    thh_enrs.inject({}) do |assumed_aptcs, thh_enr|
-      assumed_aptcs[thh_enr] = (((thh_enr.available_max_aptc.positive? ? thh_enr.available_max_aptc.to_f : 0) / total_available_max_aptc.to_f) * applied_aptc_amount.to_f).to_money
-      assumed_aptcs
+    thh_enrs.inject({}) do |applied_aptcs_by_ratio, thh_enr|
+      applied_aptcs_by_ratio[thh_enr] = (((thh_enr.available_max_aptc.positive? ? thh_enr.available_max_aptc.to_f : 0) / total_available_max_aptc.to_f) * applied_aptc_amount.to_f).to_money
+      applied_aptcs_by_ratio
     end
   end
 
   # Assumed Applied Aptcs are less than or equal to both group_ehb_premium and available_max_aptc for each Aptc Tax Household
-  def valid_assumed_aptcs?(assumed_applied_aptcs, group_ehb_premiums)
-    assumed_applied_aptcs.all? do |tax_hh_enr, assumed_aptc|
+  def valid_applied_aptcs_by_ratio?(applied_aptcs_by_available_aptc_ratio, group_ehb_premiums)
+    applied_aptcs_by_available_aptc_ratio.all? do |tax_hh_enr, assumed_aptc|
       assumed_aptc <= group_ehb_premiums[tax_hh_enr][:group_ehb_premium] &&
         assumed_aptc <= (tax_hh_enr.available_max_aptc.positive? ? tax_hh_enr.available_max_aptc : 0)
     end
@@ -2928,16 +2928,16 @@ class HbxEnrollment
       return group_ehb_premiums
     end
 
-    assumed_applied_aptcs = calculate_assumed_applied_aptcs(thh_enrs)
-    if valid_assumed_aptcs?(assumed_applied_aptcs, group_ehb_premiums)
-      assumed_applied_aptcs.each { |tax_hh_enr, applied_aptc| group_ehb_premiums[tax_hh_enr][:applied_aptc] = applied_aptc }
+    applied_aptcs_by_available_aptc_ratio = calculate_applied_aptcs_by_available_aptc_ratio(thh_enrs)
+    if valid_applied_aptcs_by_ratio?(applied_aptcs_by_available_aptc_ratio, group_ehb_premiums)
+      applied_aptcs_by_available_aptc_ratio.each { |tax_hh_enr, applied_aptc| group_ehb_premiums[tax_hh_enr][:applied_aptc] = applied_aptc }
     else
       total_thh_enrs_count = thh_enrs.count
       total_remaining_consumed_aptc = applied_aptc_amount
       thh_enrs.each_with_index do |tax_hh_enr, indx|
         break unless total_remaining_consumed_aptc.positive?
 
-        applied_aptc = [assumed_applied_aptcs[tax_hh_enr], group_ehb_premiums[tax_hh_enr][:group_ehb_premium]].min
+        applied_aptc = [applied_aptcs_by_available_aptc_ratio[tax_hh_enr], group_ehb_premiums[tax_hh_enr][:group_ehb_premium]].min
         group_ehb_premiums[tax_hh_enr][:applied_aptc] = if indx.next == total_thh_enrs_count
                                                           total_remaining_consumed_aptc
                                                         else
