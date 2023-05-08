@@ -117,6 +117,20 @@ Then(/^Individual should see view history option/) do
   expect(page).to have_content('View History')
 end
 
+And(/^Individual clicks on verify/) do
+  find(:xpath, IvlDocumentsPage.verify_option).click
+end
+
+And(/^Individual Selects Reason/) do
+  find('.col-md-3', text: 'Select Reason').click
+  find('li', :text => 'Document in EnrollApp').click
+  find('.v-type-confirm-button').click
+end
+
+Then(/^Individual should see verification history timestamp/) do
+  expect(find_all('td')[0].text).not_to eql("")
+end
+
 And(/^Individual clicks on view history$/) do
   find(:xpath, IvlDocumentsPage.view_history_option).click
 end
