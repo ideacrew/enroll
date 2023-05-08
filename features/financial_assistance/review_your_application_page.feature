@@ -9,6 +9,13 @@ Feature: Review your application page functionality 1
     And the user clicks CONTINUE
     Then the user is on the Review Your Application page
 
+  Scenario: Submit button is disabled when a checkbox is not checked and name is not signed
+    Given the user clicks CONTINUE
+    Then the user is on the Your Preferences page
+    When the user clicks CONTINUE
+    Then the user is on the Submit Your Application page
+    Then the submit button will be disabled
+
   Scenario: Editing Income Adjustments
     Given the pencil icon displays for each instance of income adjustments
     And the user clicks the pencil icon for INCOME ADJUSTMENTS
