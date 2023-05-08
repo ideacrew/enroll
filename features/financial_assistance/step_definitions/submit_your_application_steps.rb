@@ -166,7 +166,6 @@ end
 Given(/^all required questions are answered$/) do
   find_all("input[type='checkbox']").each {|checkbox| checkbox.set(true)}
   find('#living_outside_no').set(true)
-  find('#application_report_change_terms').click
 end
 
 And(/^the user should be able to see medicaid determination question$/) do
