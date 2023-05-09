@@ -531,18 +531,26 @@ $(document).ready(function(){
 
   /* Preference Application Form Related */
 
-  /* enable or disable submit application button by electronic siganture (first/last name match)*/
-
-  function enable_submit_button_by_electronic_signature() {
+  /* enable or disable submit application button by checkboxes & electronic siganture (first/last name match)*/
+  function enable_submit_button() {
     first_name_thank_you = $("#first_name_thank_you").val() ? $("#first_name_thank_you").val().toString().toLowerCase().trim() : '';
     last_name_thank_you = $("#last_name_thank_you").val() ? $("#last_name_thank_you").val().toString().toLowerCase().trim() : '';
     subscriber_first_name = $("#subscriber_first_name").val();
     subscriber_last_name = $("#subscriber_last_name").val();
+    living_outside_no = $('#living_outside_no').is(':checked');
+    living_outside_yes = $('#living_outside_yes').is(':checked');
+    medicare_review_box = $('#application_medicaid_terms').is(':checked');
+    medicaid_insurance_box = $('#application_medicaid_insurance_collection_terms').is(':checked');
+    report_change_box = $('#application_report_change_terms').is(':checked');
+    medicaid_terms_box = $('#application_submission_terms').is(':checked');
+    attestation_terms = $('#application_attestation_terms').is(':checked');
 
-    if(last_name_thank_you == ""){
-      $('.interaction-click-control-submit-application').addClass('disabled');
-    }
-    if( first_name_thank_you == subscriber_first_name && last_name_thank_you == subscriber_last_name){
+    boxes_checked = medicare_review_box && medicaid_insurance_box && report_change_box && medicaid_terms_box
+    living_outside_checked = living_outside_no || (living_outside_yes && attestation_terms)
+    signature_valid = (first_name_thank_you == subscriber_first_name) && (last_name_thank_you == subscriber_last_name)
+    checks_complete = boxes_checked && living_outside_checked && signature_valid
+
+    if(checks_complete){
       $('.interaction-click-control-submit-application').removeClass('disabled');
     } else {
       $('.interaction-click-control-submit-application').addClass('disabled');
@@ -550,12 +558,13 @@ $(document).ready(function(){
   }
 
   $(window).load(function() {
-    if ($("#first_name_thank_you").length) enable_submit_button_by_electronic_signature();
+    $('.interaction-click-control-submit-application').addClass('disabled');
+    enable_submit_button();
   });
 
-  $(document).on('blur keyup', 'input.thank_you_field', function() {
-    enable_submit_button_by_electronic_signature();
+  $(document).on('change click blur keyup',  function() {
+    enable_submit_button();
   });
 
- /* enable or disable submit application button by electronic siganture (first/last name match)*/
+ /* enable or disable submit application button by checkboxes & electronic siganture (first/last name match)*/
 });
