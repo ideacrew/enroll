@@ -35,7 +35,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/event_source.git
-  revision: 0b6caf36d842f1419714bedd492868be66876cac
+  revision: cc7f28b6117aa5180afe709940d12d31061a5771
   branch: 184806765_exchange_to_exchange_bindings
   specs:
     event_source (0.5.7)
