@@ -178,7 +178,7 @@ describe Address, "with proper validations" do
   end
 
   context "#notify_address_changed" do
-    let!(:person) { FactoryBot.create(:person, :with_consumer_role, :male, first_name: 'john', last_name: 'adams', dob: 40.years.ago, ssn: '472743442') }
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
     let!(:delete_address) do
       person.addresses.first.delete
