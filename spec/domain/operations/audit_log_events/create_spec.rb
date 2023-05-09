@@ -12,11 +12,13 @@ RSpec.describe ::Operations::AuditLogEvents::Create,
 
   context 'when required attributes passed' do
     it 'should persist audit event' do
+      # todo
     end
   end
 
   context 'when required attributes not passed' do
     it 'should fail to persist audit event' do
+      # todo
     end
   end
 end

@@ -29,13 +29,13 @@ module Operations
 
       def construct_params(params)
         Success({
-           subject_gid: params[:subject_gid],
-           correlation_id: params[:correlation_id],
-           event_category: params[:event_category],
-           trigger: params[:trigger],
-           response: params[:response],
-           event_time: params[:event_time]
-        })
+                  subject_gid: params[:subject_gid],
+                  correlation_id: params[:correlation_id],
+                  event_category: params[:event_category],
+                  trigger: params[:trigger],
+                  response: params[:response],
+                  event_time: params[:event_time]
+                })
       end
 
       def build(params)
