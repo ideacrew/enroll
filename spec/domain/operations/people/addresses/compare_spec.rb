@@ -3,7 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe ::Operations::People::Addresses::Compare, dbclean: :after_each do
-
   let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:params) do

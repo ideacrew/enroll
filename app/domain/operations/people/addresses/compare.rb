@@ -3,9 +3,8 @@
 module Operations
   module People
     module Addresses
-      # Class to compare address changes and publish payload
+      # Class to compare address changes and build payload
       class Compare
-        include EventSource::Command
         include Dry::Monads[:result, :do]
 
         # params: {person_hbx_id: , address_id: }
@@ -15,8 +14,8 @@ module Operations
           address = yield find_address(address_id, person)
           change_set = yield build_change_set(address)
           payload = yield build_payload(change_set, person)
-          event = yield build_event(payload, person)
-          publish_event(event)
+
+          Success(payload)
         end
 
         private
@@ -51,22 +50,6 @@ module Operations
           primary_family = person.primary_family
           payload.merge!(change_set: change_set, person_hbx_id: person.hbx_id, family_id: primary_family&.id, is_primary: primary_family.present?)
           Success(payload)
-        end
-
-        def build_event(payload, person)
-          headers = { correlation_id: person.hbx_id }
-          event_key = if payload["is_dependent"]
-                        "member_address_relocated"
-                      else
-                        "primary_member_address_relocated"
-                      end
-
-          event("events.families.family_members.#{event_key}", attributes: { payload: payload.to_h }, headers: headers)
-        end
-
-        def publish_event(event)
-          event.publish
-          Success("Successfully published #{event.name}")
         end
       end
     end
