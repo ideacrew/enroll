@@ -4,6 +4,9 @@ require 'rails_helper'
 require 'sidekiq/testing'
 
 RSpec.describe AddressWorker, type: :worker, :dbclean => :after_each do
+  before do
+    Sidekiq::Worker.clear_all
+  end
   let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:params) do
@@ -16,14 +19,16 @@ RSpec.describe AddressWorker, type: :worker, :dbclean => :after_each do
   end
 
   context "for valid params" do
-    before do
-      Sidekiq::Worker.clear_all
-    end
+
 
     it "should enqueue address compare job" do
       expect(AddressWorker.jobs.size).to eq 0
       AddressWorker.perform_async(params)
       expect(AddressWorker.jobs.size).to eq 1
     end
+  end
+
+  after do
+    Sidekiq::Worker.clear_all
   end
 end

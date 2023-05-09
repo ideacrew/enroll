@@ -39,6 +39,8 @@ module Operations
         def build_change_set(address)
           change_set = {}
           history_track = address.history_tracks.last
+          Failure("change set payload is only applicable for action :update") unless history_track.action.to_sym == :update
+          Failure("No address changes present") unless history_track.original.present? && history_track.modified.present?
 
           change_set.merge!(old_set: history_track.original, new_set: history_track.modified)
           Success(change_set)
