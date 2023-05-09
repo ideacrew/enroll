@@ -25,7 +25,7 @@ registry:
         is_enabled: true
         item: "https://coverme.inquisiqlms.com/"
       - key: :allow_edit_broker_email
-        is_enabled: <%= ENV['ALLOW_EDIT_BROKER_EMAIL_IS_ENABLED'] || true %>
+        is_enabled: <%= ENV['ALLOW_EDIT_BROKER_EMAIL_IS_ENABLED'] || false %>
       - key: :allow_edit_broker_npn
         is_enabled: <%= ENV['ALLOW_EDIT_BROKER_NPN_IS_ENABLED'] || false %>
       - key: :send_broker_hired_event_to_edi
