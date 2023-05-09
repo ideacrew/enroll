@@ -5,6 +5,7 @@ module Operations
     module Addresses
       # Class to compare address changes and publish payload
       class Compare
+        include EventSource::Command
         include Dry::Monads[:result, :do]
 
         # params: {person_hbx_id: , address_id: }
