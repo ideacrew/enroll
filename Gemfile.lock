@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 9447682722e2a9c403ed300305afe19eaeeec950
+  revision: f6600a2aaeb229a0dbf6f89a197d0eaabb4d641d
   branch: 184806765_audit_logs
   specs:
     aca_entities (0.10.0)
@@ -38,7 +38,7 @@ GIT
   revision: 0b6caf36d842f1419714bedd492868be66876cac
   branch: 184806765_exchange_to_exchange_bindings
   specs:
-    event_source (0.5.5)
+    event_source (0.5.7)
       bunny (>= 2.14)
       deep_merge (~> 1.2.0)
       dry-events (~> 0.3)
