@@ -9,6 +9,31 @@ Feature: Review your application page functionality 1
     And the user clicks CONTINUE
     Then the user is on the Review Your Application page
 
+  Scenario: Submit button is enabled when required checkboxes are checked and name is signed
+    Given the user clicks CONTINUE
+    Then the user is on the Your Preferences page
+    When the user clicks CONTINUE
+    Then the user is on the Submit Your Application page
+    And the user has signed their name
+    And all required questions are answered including report change terms field
+    And the user should be able to see medicaid determination question
+    Then the submit button will be enabled
+
+  Scenario: Submit button is disabled when a checkbox is not checked and name is not signed
+    Given the user clicks CONTINUE
+    Then the user is on the Your Preferences page
+    When the user clicks CONTINUE
+    Then the user is on the Submit Your Application page
+    Then the submit button will be disabled
+
+  Scenario: Submit button is disabled when checkboxes are not checked but name is signed
+    Given the user clicks CONTINUE
+    Then the user is on the Your Preferences page
+    When the user clicks CONTINUE
+    Then the user is on the Submit Your Application page
+    And the user has signed their name
+    Then the submit button will be disabled
+
   Scenario: Editing Income Adjustments
     Given the pencil icon displays for each instance of income adjustments
     And the user clicks the pencil icon for INCOME ADJUSTMENTS
