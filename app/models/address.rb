@@ -339,7 +339,7 @@ class Address
   private
 
   def notify_address_changed
-    AddressWorker.perform_async({address_id: self.id.to_s, person_hbx_id: self.person.hbx_id})
+    AddressWorker.perform_async({address_id: self.id.to_s, person_hbx_id: self.person.hbx_id}) if self.person.present?
   end
 
   def attribute_matches?(attribute, other)
