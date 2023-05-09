@@ -9,6 +9,7 @@ class Address
   embedded_in :person
   embedded_in :office_location
   embedded_in :census_member, class_name: "CensusMember"
+  has_many :address_jobs
 
   KINDS = %w[home work mailing].freeze
   OFFICE_KINDS = %w[primary mailing branch].freeze
@@ -49,6 +50,8 @@ class Address
 
   before_save :set_crm_updates
   before_destroy :set_crm_updates
+
+  after_save :notify_address_changed, if: :changed?
 
   track_history :on => [:fields],
                 :scope => :person,
@@ -335,6 +338,10 @@ class Address
   end
 
   private
+
+  def notify_address_changed
+    AddressWorker.perform_async({address_id: self.id.to_s, person_hbx_id: self.person.hbx_id})
+  end
 
   def attribute_matches?(attribute, other)
     self[attribute].to_s.downcase == other[attribute].to_s.downcase
