@@ -7,8 +7,8 @@ module Publishers
       class AddressUpdatedPublisher < EventSource::Event
         include ::EventSource::Publisher[amqp: 'enroll.families.family_members']
 
-        register_event 'primary_member_address_updated'
-        register_event 'member_address_updated'
+        register_event 'primary_member_address_relocated'
+        register_event 'member_address_relocated'
       end
     end
   end

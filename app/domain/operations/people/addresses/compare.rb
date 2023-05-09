@@ -56,9 +56,9 @@ module Operations
         def build_event(payload, person)
           headers = { correlation_id: person.hbx_id }
           event_key = if payload["is_dependent"]
-                        "member_address_updated"
+                        "member_address_relocated"
                       else
-                        "primary_member_address_updated"
+                        "primary_member_address_relocated"
                       end
 
           event("events.families.family_members.#{event_key}", attributes: { payload: payload.to_h }, headers: headers)
@@ -66,7 +66,7 @@ module Operations
 
         def publish_event(event)
           event.publish
-          Success("Successfully published Family")
+          Success("Successfully published #{event.name}")
         end
       end
     end

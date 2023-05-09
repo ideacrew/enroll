@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe ::Operations::People::Addresses::Compare, dbclean: :after_each do
 
-  let!(:person) { FactoryBot.create(:person, :with_consumer_role, :male, first_name: 'john', last_name: 'adams', dob: 40.years.ago, ssn: '472743442') }
+  let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:params) do
     person.addresses.first.delete
