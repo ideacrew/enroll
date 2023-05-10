@@ -25,9 +25,9 @@ registry:
         is_enabled: true
         item: ""
       - key: :allow_edit_broker_email
-        is_enabled: false
+        is_enabled: <%= ENV['ALLOW_EDIT_BROKER_EMAIL_IS_ENABLED'] || false %>
       - key: :allow_edit_broker_npn
-        is_enabled: false
+        is_enabled: <%= ENV['ALLOW_EDIT_BROKER_NPN_IS_ENABLED'] || false %>
       - key: :send_broker_hired_event_to_edi
         is_enabled: <%= ENV['BROKER_HIRED_EVENT_TO_EDI_IS_ENABLED'] || false %>
       - key: :send_broker_fired_event_to_edi
