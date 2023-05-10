@@ -246,7 +246,7 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
     set_admin_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
     set_resident_bookmark_url(family_account_path) if params[:market_kind] == 'coverall'
-
+    @hbx_enrollment.reset_member_coverage_start_dates # Fixes coverage start date and aptc slider calculation issues related to browser navigation and page reload
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
     collect_shopping_filters
 

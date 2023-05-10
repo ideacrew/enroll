@@ -340,7 +340,9 @@ module BenefitSponsors
       end
 
       def parse_ssn(cell)
-        cell.blank? ? nil : cell.to_i.to_s.gsub(/\D/, '')
+        return nil if cell.blank?
+        value = cell.to_i.to_s.gsub(/\D/, '')
+        value.length.between?(7,8) ? value.rjust(9, "0") : value
       end
 
       def parse_boolean(cell)
