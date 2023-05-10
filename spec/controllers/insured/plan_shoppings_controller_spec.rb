@@ -839,8 +839,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(hbx_enrollment).to receive(:coverage_kind).and_return('health')
       allow(hbx_enrollment).to receive(:sponsored_benefit).and_return(sponsored_benefit)
       allow(hbx_enrollment).to receive(:employee_role).and_return employee_role
-      allow(cost_calculator).to receive(:groups_for_products).with(products).and_return(product_groups)
-      allow_any_instance_of(Insured::PlanShoppingsController).to receive(:sort_member_groups).with(product_groups).and_return(member_group)
       allow(hbx_enrollment).to receive(:product).and_return(product_1)
       allow(sponsored_benefit).to receive(:rate_schedule_date).and_return(rate_schedule_date)
       allow(HbxEnrollmentSponsoredCostCalculator).to receive(:new).with(hbx_enrollment).and_return(cost_calculator)
@@ -849,6 +847,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
     context "normal" do
       before :each do
+        allow(cost_calculator).to receive(:groups_for_products).with(products).and_return(product_groups)
+        allow_any_instance_of(Insured::PlanShoppingsController).to receive(:sort_member_groups).with(product_groups).and_return(member_group)
         allow(hbx_enrollment).to receive(:can_waive_enrollment?).and_return(true)
         get :show, params: {id: "hbx_id", market_kind: 'shop'}
       end
@@ -866,21 +866,25 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       end
     end
 
-    it "should load data from original products" do
-      allow(hbx_enrollment).to receive(:can_waive_enrollment?).and_return(true)
-      # get sponsored benefit reference product hsa value
-      sponsored_benefit_product_hsa_value = hbx_enrollment.sponsored_benefit.reference_product.hsa_eligibility
-      product = BenefitMarkets::Products::Product.find(hbx_enrollment.sponsored_benefit.reference_product.id)
-      # update hsa value to the original product
-      hsa_value_to_update = !sponsored_benefit_product_hsa_value
-      product.hsa_eligibility = hsa_value_to_update
-      product.save
+    context "fetch updated data from original products" do
+      before do
+        allow(hbx_enrollment).to receive(:can_waive_enrollment?).and_return(true)
+        sponsored_benefit_product_packages_product = hbx_enrollment.sponsored_benefit.products(hbx_enrollment.sponsored_benefit.rate_schedule_date).first
+        sponsored_benefit_product_packages_product.update_attributes(hsa_eligibility: false)
+        @original_product = BenefitMarkets::Products::Product.find(sponsored_benefit_product_packages_product.id)
+        @original_product.update_attributes(hsa_eligibility: true)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
+          @original_product,
+          Date.new(2022, 07, 01),
+          51,
+          "R-DC001"
+        ).and_return(100.00)
+      end
 
-      hbx_enrollment.sponsored_benefit.reference_product.reload
-      allow(hbx_enrollment).to receive(:can_waive_enrollment?).and_return(true)
-      allow_any_instance_of(Insured::PlanShoppingsController).to receive(:sort_member_groups).with(product_groups).and_return(member_group)
-      get :show, params: {id: "hbx_id", market_kind: 'shop'}
-      expect(controller.instance_variable_get(:@member_groups).group_enrollment.first.product.first.hsa_eligibility).to eq(hsa_value_to_update)
+      it "should fetch data from original products" do
+        get :show, params: {id: "hbx_id", market_kind: 'shop'}
+        expect(controller.instance_variable_get(:@member_groups).first.group_enrollment.product.hsa_eligibility).to eq(@original_product.hsa_eligibility)
+      end
     end
 
     context "when not eligible to complete shopping" do
