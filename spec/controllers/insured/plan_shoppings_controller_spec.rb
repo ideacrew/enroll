@@ -871,7 +871,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       end
     end
 
-    context "fetch updated data from original products" do
+    context "when sponsored_benefit package products are available" do
       before do
         allow(hbx_enrollment).to receive(:can_waive_enrollment?).and_return(true)
         sponsored_benefit_product_packages_product = hbx_enrollment.sponsored_benefit.products(hbx_enrollment.sponsored_benefit.rate_schedule_date).first
