@@ -695,8 +695,8 @@ class HbxEnrollment
       #     end
       #   end
       # end
-      HbxEnrollment.terminate_dep_age_off_enrollments if TimeKeeper.date_of_record == TimeKeeper.date_of_record.beginning_of_month
       HbxEnrollment.terminate_scheduled_enrollments
+      HbxEnrollment.terminate_dep_age_off_enrollments if TimeKeeper.date_of_record == TimeKeeper.date_of_record.beginning_of_month
     end
 
     def update_individual_eligibilities_for(consumer_role)
