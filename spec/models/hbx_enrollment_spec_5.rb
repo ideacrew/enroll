@@ -208,6 +208,52 @@ RSpec.describe HbxEnrollment, type: :model do
           ).to eq(applied_aptc_amount.to_money)
         end
       end
+
+      context "one of the applied_aptcs_by_ratio's are greater than the group_ehb_premium" do
+        let(:member1_ehb_premium) { 1054.31 }
+        let(:member2_ehb_premium) { 302.19 }
+        let(:available_max_aptc) { 1126.00 }
+        let(:available_max_aptc2) { 343.00 }
+        let(:applied_aptc_amount) { 1356.50 }
+
+        it 'returns applied_aptc for aptc tax household enrollments which are below group_ehb_premium and available_max_aptc' do
+          subject
+          expect(
+            tax_household_enrollment.reload.applied_aptc.to_f <= tax_household_enrollment.group_ehb_premium.to_f &&
+              tax_household_enrollment.applied_aptc.to_f <= tax_household_enrollment.available_max_aptc.to_f
+          ).to be_truthy
+          expect(
+            tax_household_enrollment2.reload.applied_aptc.to_f <= tax_household_enrollment2.group_ehb_premium.to_f &&
+              tax_household_enrollment2.applied_aptc.to_f <= tax_household_enrollment2.available_max_aptc.to_f
+          ).to be_truthy
+          expect(
+            tax_household_enrollment.applied_aptc + tax_household_enrollment2.applied_aptc
+          ).to eq(applied_aptc_amount.to_money)
+        end
+      end
+
+      context "applied_aptc_amount is less than both aptc tax household enrollment's group_ehb_premium, available_max_aptc" do
+        let(:member1_ehb_premium) { 1054.31 }
+        let(:member2_ehb_premium) { 302.19 }
+        let(:available_max_aptc) { 1126.00 }
+        let(:available_max_aptc2) { 343.00 }
+        let(:applied_aptc_amount) { 100.00 }
+
+        it 'returns applied_aptc for aptc tax household enrollments which are below group_ehb_premium and available_max_aptc' do
+          subject
+          expect(
+            tax_household_enrollment.reload.applied_aptc.to_f <= tax_household_enrollment.group_ehb_premium.to_f &&
+              tax_household_enrollment.applied_aptc.to_f <= tax_household_enrollment.available_max_aptc.to_f
+          ).to be_truthy
+          expect(
+            tax_household_enrollment2.reload.applied_aptc.to_f <= tax_household_enrollment2.group_ehb_premium.to_f &&
+              tax_household_enrollment2.applied_aptc.to_f <= tax_household_enrollment2.available_max_aptc.to_f
+          ).to be_truthy
+          expect(
+            tax_household_enrollment.applied_aptc + tax_household_enrollment2.applied_aptc
+          ).to eq(applied_aptc_amount.to_money)
+        end
+      end
     end
   end
 
