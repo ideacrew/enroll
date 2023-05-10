@@ -2937,7 +2937,12 @@ class HbxEnrollment
       thh_enrs.each_with_index do |tax_hh_enr, indx|
         break unless total_remaining_consumed_aptc.positive?
 
-        applied_aptc = [applied_aptcs_by_available_aptc_ratio[tax_hh_enr], group_ehb_premiums[tax_hh_enr][:group_ehb_premium]].min
+        applied_aptc = [
+          group_ehb_premiums[tax_hh_enr][:group_ehb_premium],
+          tax_hh_enr.available_max_aptc,
+          total_remaining_consumed_aptc
+        ].min
+
         group_ehb_premiums[tax_hh_enr][:applied_aptc] = if indx.next == total_thh_enrs_count
                                                           total_remaining_consumed_aptc
                                                         else
