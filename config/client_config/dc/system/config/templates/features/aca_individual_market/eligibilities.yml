@@ -93,7 +93,7 @@ registry:
           - key: :evidence_ref
             item: 'gid://enroll_app/FinancialAssitance::Application'
       - key: :local_mec_evidence
-        is_enabled: false
+        is_enabled: <%= ENV['LOCAL_MEC_EVIDENCE_IS_ENABLED'] || false %>
         settings:
           - key: :subject_ref
             item: 'gid://enroll_app/Family::FamilyMember'
