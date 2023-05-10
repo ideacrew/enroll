@@ -22,7 +22,7 @@ class AddressWorker
       logger.debug(payload[:person_hbx_id]) { output }
     end
   rescue StandardError => e
-    logger.error(payload[:person_hbx_id]) { {Error: e.inspect} }
+    logger.error(params["person_hbx_id"]) { {Error: e.inspect} }
   end
 
   def build_event_payload(payload)

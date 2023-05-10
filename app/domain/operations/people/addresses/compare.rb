@@ -13,7 +13,8 @@ module Operations
           person = yield find_person(person_hbx_id)
           address = yield find_address(address_id, person)
           change_set = yield build_change_set(address)
-          payload = yield build_payload(change_set, person)
+          address_versions = yield summarized_changes(address, change_set)
+          payload = yield build_payload(address_id, address_versions, change_set, person)
 
           Success(payload)
         end
@@ -27,7 +28,9 @@ module Operations
         end
 
         def find_person(person_hbx_id)
-          Operations::People::Find.new.call({person_hbx_id: person_hbx_id})
+          person = Person.by_hbx_id(person_hbx_id).first
+          return Success(person) if person.present?
+          Failure("No person found")
         end
 
         def find_address(address_id, person)
@@ -46,11 +49,26 @@ module Operations
           Success(change_set)
         end
 
-        def build_payload(change_set, person)
+        def summarized_changes(address, change_set)
+          original_set = {}
+          modified_set = {}
+          address.attributes.slice("address_1", "address_2", "address_3", "county", "kind", "city", "state", "zip").each_key do |field|
+            if change_set[:new_set][field].present? && change_set[:old_set][field].present?
+              original_set[field] = change_set[:old_set][field]
+              modified_set[field] = change_set[:new_set][field]
+            else
+              original_set[field] = address.send(field)
+              modified_set[field] = address.send(field)
+            end
+          end
+          Success({original_address: original_set, modified_address: modified_set})
+        end
+
+        def build_payload(address_id, address_versions, change_set, person)
           payload = {}
 
           primary_family = person.primary_family
-          payload.merge!(change_set: change_set, person_hbx_id: person.hbx_id, family_id: primary_family&.id, is_primary: primary_family.present?)
+          payload.merge!(address_id: address_id, address_set: address_versions, change_set: change_set, person_hbx_id: person.hbx_id, family_id: primary_family&.id, is_primary: primary_family.present?)
           Success(payload)
         end
       end
