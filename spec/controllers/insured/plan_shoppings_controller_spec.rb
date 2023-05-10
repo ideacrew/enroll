@@ -774,8 +774,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       expect(flash[:notice]).to eq "Waive Coverage Successful"
       expect(response).to be_redirect
     end
-    
-    it "#post enrollment termination" do 
+
+    it "#post enrollment termination" do
       allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(true)
       allow(hbx_enrollment).to receive(:waiver_reason=).with("Because").and_return(true)
       allow(hbx_enrollment).to receive(:valid?).and_return(true)
@@ -864,6 +864,23 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       it "should get the checkbook_url" do
         expect(assigns(:plan_comparison_checkbook_url)).to eq "http://checkbook_url"
       end
+    end
+
+    it "should load data from original products" do
+      allow(hbx_enrollment).to receive(:can_waive_enrollment?).and_return(true)
+      # get sponsored benefit reference product hsa value
+      sponsored_benefit_product_hsa_value = hbx_enrollment.sponsored_benefit.reference_product.hsa_eligibility
+      product = BenefitMarkets::Products::Product.find(hbx_enrollment.sponsored_benefit.reference_product.id)
+      # update hsa value to the original product
+      hsa_value_to_update = !sponsored_benefit_product_hsa_value
+      product.hsa_eligibility = hsa_value_to_update
+      product.save
+
+      hbx_enrollment.sponsored_benefit.reference_product.reload
+      allow(hbx_enrollment).to receive(:can_waive_enrollment?).and_return(true)
+      allow_any_instance_of(Insured::PlanShoppingsController).to receive(:sort_member_groups).with(product_groups).and_return(member_group)
+      get :show, params: {id: "hbx_id", market_kind: 'shop'}
+      expect(controller.instance_variable_get(:@member_groups).group_enrollment.first.product.first.hsa_eligibility).to eq(hsa_value_to_update)
     end
 
     context "when not eligible to complete shopping" do
