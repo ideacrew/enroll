@@ -30,16 +30,30 @@ module BenefitSponsors
 
     describe "parse_ssn" do
       let(:params) {{first_name: ce.first_name, last_name: ce.last_name, gender: ce.gender, ssn: 123_456_789.0, dob: ce.dob, hired_on: ce.hired_on.strftime("%m/%d/%Y"), address: ini_address_form }}
+      let(:params_2) {{first_name: ce.first_name, last_name: ce.last_name, gender: ce.gender, ssn: "1234567", dob: ce.dob, hired_on: ce.hired_on.strftime("%m/%d/%Y"), address: ini_address_form }}
+      let(:params_3) {{first_name: ce.first_name, last_name: ce.last_name, gender: ce.gender, ssn: "123456", dob: ce.dob, hired_on: ce.hired_on.strftime("%m/%d/%Y"), address: ini_address_form }}
 
       before :each do
-        file = Dir.glob(File.join(Rails.root, "spec/test_data/census_employee_import/DCHL Employee Census.xlsx")).first
+        @file = Dir.glob(File.join(Rails.root, "spec/test_data/census_employee_import/DCHL Employee Census.xlsx")).first
         allow(user).to receive(:person).and_return(person)
-        @form = BenefitSponsors::Forms::CensusRecordForm.new(params)
-        @result = service_class.new({file: file, profile: benefit_sponsorship.profile}).init_census_record(ce, @form)
       end
 
       it "should return ssn" do
-        expect(@result.ssn).to eq "123456789"
+        form = BenefitSponsors::Forms::CensusRecordForm.new(params)
+        result = service_class.new({file: @file, profile: benefit_sponsorship.profile}).init_census_record(ce, form)
+        expect(result.ssn).to eq "123456789"
+      end
+
+      it "should prepend 0 if given ssn is 7 or 8 digits" do
+        form = BenefitSponsors::Forms::CensusRecordForm.new(params_2)
+        result = service_class.new({file: @file, profile: benefit_sponsorship.profile}).init_census_record(ce, form)
+        expect(result.ssn).to eq "001234567"
+      end
+
+      it "shouldn't prepend 0 if given ssn less than 7 digits" do
+        form = BenefitSponsors::Forms::CensusRecordForm.new(params_3)
+        result = service_class.new({file: @file, profile: benefit_sponsorship.profile}).init_census_record(ce, form)
+        expect(result.ssn).to eq "123456"
       end
     end
 
