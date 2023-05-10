@@ -418,6 +418,8 @@ registry:
       - key: :eligibility_audit_log
         item: :eligibility_audit_log
         is_enabled: <%= ENV['ELIGIBILITY_AUDIT_LOG_IS_ENABLED'] || false %>
+      - key: :notify_address_changed
+        is_enabled: <%= ENV['NOTIFY_ADDRESS_CHANGED_IS_ENABLED'] || false %>
   - namespace:
       - :pay_now_feature
     features:
@@ -691,7 +693,7 @@ registry:
       - key: :document_reminder_notice_trigger
         is_enabled: true
       - key: :account_transfer_notice_trigger
-        is_enabled: true
+        is_enabled: <%= ENV['ACCOUNT_TRANSFER_NOTICE_IS_ENABLED'] || true %>
       - key: :verification_type_income_verification
         is_enabled: true
       - key: :tobacco_user_field
