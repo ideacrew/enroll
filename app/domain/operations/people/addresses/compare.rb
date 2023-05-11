@@ -66,7 +66,7 @@ module Operations
           payload = {}
 
           primary_family = person.primary_family
-          payload.merge!(address_id: address_id, address_set: address_versions, change_set: change_set, person_hbx_id: person.hbx_id, family_id: primary_family&.id, is_primary: primary_family.present?)
+          payload.merge!(address_id: address_id, address_set: address_versions, change_set: change_set, person_hbx_id: person.hbx_id, primary_family_id: primary_family&.id, is_primary: primary_family.present?)
           Success(payload)
         end
       end
