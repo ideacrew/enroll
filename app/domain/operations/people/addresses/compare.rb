@@ -28,9 +28,7 @@ module Operations
         end
 
         def find_person(person_hbx_id)
-          person = Person.by_hbx_id(person_hbx_id).first
-          return Success(person) if person.present?
-          Failure("No person found")
+          Operations::People::Find.new.call({person_hbx_id: person_hbx_id})
         end
 
         def find_address(address_id, person)
