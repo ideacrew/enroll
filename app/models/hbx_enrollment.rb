@@ -1070,7 +1070,7 @@ class HbxEnrollment
     return if is_shop? || dental? || applied_aptc_amount.zero?
     return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
-    eligible_tax_hh_enrs = aptc_tax_household_enrollments
+    eligible_tax_hh_enrs = aptc_tax_household_enrollments.select { |thh_enr| thh_enr.available_max_aptc.positive? }
     group_ehb_premiums = thh_enr_group_ehb_premium_of_aptc_members(eligible_tax_hh_enrs)
     calculated_applied_aptcs = calculate_applied_aptc_for_thh_enrs(eligible_tax_hh_enrs, group_ehb_premiums)
     populate_applied_aptc_for_thh_enrs(calculated_applied_aptcs)
