@@ -333,7 +333,10 @@ module SponsoredBenefits
       end
 
       def parse_ssn(cell)
-        cell.blank? ? nil : prepend_zeros(cell.to_i.to_s.gsub(/\D/, ''), 9)
+        return nil if cell.blank?
+
+        value = cell.to_i.to_s.gsub(/\D/, '')
+        value.length.between?(7,8) ? value.rjust(9, "0") : value
       end
 
       def parse_boolean(cell)

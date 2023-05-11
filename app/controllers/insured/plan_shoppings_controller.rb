@@ -246,7 +246,7 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
     set_admin_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
     set_resident_bookmark_url(family_account_path) if params[:market_kind] == 'coverall'
-
+    @hbx_enrollment.reset_member_coverage_start_dates # Fixes coverage start date and aptc slider calculation issues related to browser navigation and page reload
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
     collect_shopping_filters
 
@@ -263,6 +263,9 @@ class Insured::PlanShoppingsController < ApplicationController
     @hbx_enrollment.update_osse_childcare_subsidy
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
     products = @hbx_enrollment.sponsored_benefit.products(@hbx_enrollment.sponsored_benefit.rate_schedule_date)
+    product_ids = products.map(&:id)
+    # Fetch latest data from product that might not be updated with product_package.products
+    products = BenefitMarkets::Products::Product.where(:id.in => product_ids)
     @issuer_profiles = []
     @issuer_profile_ids = products.map(&:issuer_profile_id).uniq
     ip_lookup_table = {}
