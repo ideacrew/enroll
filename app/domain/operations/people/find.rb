@@ -24,7 +24,7 @@ module Operations
 
       def fetch_person(params)
         person = if params[:person_id]
-                   Person.where(id: person_id).first
+                   Person.where(id: params[:person_id]).first
                  elsif params[:person_hbx_id]
                    Person.by_hbx_id(params[:person_hbx_id]).first
                  end
