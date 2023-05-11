@@ -254,6 +254,19 @@ RSpec.describe HbxEnrollment, type: :model do
           ).to eq(applied_aptc_amount.to_money)
         end
       end
+
+      context "available_max_aptc of one aptc tax household is not positive" do
+        let(:member1_ehb_premium) { 500.00 }
+        let(:member2_ehb_premium) { 300.00 }
+        let(:available_max_aptc) { -100.00 }
+        let(:available_max_aptc2) { 400.00 }
+        let(:applied_aptc_amount) { 350.00 }
+
+        it 'returns applied_aptc of second tax household same as applied_aptc_amount' do
+          subject
+          expect(tax_household_enrollment2.reload.applied_aptc).to eq(applied_aptc_amount.to_money)
+        end
+      end
     end
   end
 
