@@ -538,6 +538,12 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
           allow(census_employee).to receive(:has_cobra_hbx_enrollment?).and_return false
           expect(helper.employee_state_format(census_employee, census_employee.aasm_state, nil)).to eq "Cobra linked"
         end
+
+        it "when cobra employee has no cobra enrollments" do
+          allow(census_employee).to receive(:active_benefit_group_enrollments).and_return [health_enrollment]
+          allow(census_employee).to receive(:cobra_begin_date).and_return TimeKeeper.date_of_record.prev_month.beginning_of_month
+          expect(helper.employee_state_format(census_employee, census_employee.aasm_state, nil)).to eq "Cobra linked"
+        end
       end
     end
 
