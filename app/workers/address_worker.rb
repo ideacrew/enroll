@@ -27,9 +27,9 @@ class AddressWorker
 
   def build_event_payload(payload)
     headers = { correlation_id: payload[:person_hbx_id] }
-    event_key = payload["is_primary"] ? "primary_member_address_relocated" :  "member_address_relocated"
+    event_key = payload[:is_primary] ? "primary_member_address_relocated" :  "member_address_relocated"
 
-    {event_name: "events.families.family_members.#{event_key}", attributes: { payload: payload.to_h }, headers: headers}
+    {event_name: "events.families.family_members.#{event_key}", attributes:  payload.to_h, headers: headers}
   end
 
   def logger
