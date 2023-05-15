@@ -62,7 +62,8 @@
                     <% end %>
                     <div style="align='left'; "class="ivl_errors top-buffer">
                       <% if errors.present? %>
-                        <div style="width:700px; margin-bottom: 5px; align='left'; text-align-last:right"><%= raw(errors.join(', '))%></div>
+                        <% @err = raw(errors.join(', ')) %>
+                        <div style="width:700px; margin-bottom: 5px; align='left'; text-align-last:right"><%= sanitize @err%></div>
                       <% end%>
                     </div>
                   </div>
