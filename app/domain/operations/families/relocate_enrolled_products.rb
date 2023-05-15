@@ -5,6 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   module Families
+    # RelocateEnrolledProducts is a service class that will be used to relocate enrolled products for a given person, new address and existing coverage
     class RelocateEnrolledProducts
       send(:include, Dry::Monads[:result, :do])
 
@@ -12,26 +13,34 @@ module Operations
                                :rating_area_changed => "premium_rating_area_relocated",
                                :no_change => "product_unavailable_relocated"}.freeze
 
-      #{"change_set":{"old_set":{"state":"MT"},"new_set":{"state":"MA"}},:person_hbx_id:"750684","primary_family_id":"635d3c61fcbfd93005ee29dd","is_primary":true}}
+
+      # @param [Hash] params
+      # @option params [String] :person_hbx_id
+      # @option params [String] :primary_family_id
+      # @option params [Hash] :address_set
+      # @option params [Hash] :modified_address
+      # @option params [Hash] :original_address
+      # @return [Dry::Monads::Result]
+      #  Success => {enrollments_hash}
       def call(params)
         valid_params = yield validate(params)
         person = yield find_person(valid_params)
         families = yield find_families(person)
-        all_enrollments = yield fetch_all_enrollments_by_families(families.map(&:id))
-        filtered_enrollments = yield filter_enrollments(all_enrollments, valid_params[:primary_family_id])
+        all_enrollments = yield fetch_existing_coverage_by_families(families.map(&:id))
+        filtered_enrollments = yield filter_enrollments(all_enrollments, valid_params[:primary_family_id], valid_params[:person_hbx_id])
         enrollments_hash = yield  check_service_area_change_for_enrollments(filtered_enrollments, valid_params[:address_set])
         enrollments_hash = yield  check_rating_area_change_for_enrollments(filtered_enrollments, enrollments_hash, valid_params[:address_set][:modified_address])
         find_event_outcome(enrollments_hash)
         action_on_enrollment(enrollments_hash)
-        build_and_publish_enrollment_event(enrollments_hash)
+        result = yield build_and_publish_enrollment_event(enrollments_hash)
+
+        Success(result)
       end
 
       private
 
       def validate(params)
-        return Failure("Change_set is missing") unless params[:change_set].present?
         return Failure("Person_hbx_id is missing") unless params[:person_hbx_id].present?
-        return Failure("primary_family_id is missing") unless params[:primary_family_id].present?
         return Failure("address_set is missing") unless params[:address_set].present?
 
         Success(params)
@@ -48,19 +57,13 @@ module Operations
         Success(families)
       end
 
-      def fetch_all_enrollments_by_families(family_ids)
+      def fetch_existing_coverage_by_families(family_ids)
         all_enrollments = HbxEnrollment.where({:family_id.in => family_ids, :aasm_state => {"$in" => HbxEnrollment::ENROLLED_STATUSES }})
         Success(all_enrollments)
       end
 
-      def filter_enrollments(all_enrollments, primary_family_id)
-        all_enrollments = all_enrollments.where(kind: "individual") if true
-        all_enrollments = if false
-                            all_enrollments
-                          elsif primary_family_id.present?
-                            all_enrollments.where(family_id: primary_family_id)
-                          end
-
+      def filter_enrollments(all_enrollments, primary_family_id, _person_hbx_id)
+        all_enrollments = all_enrollments.where(family_id: primary_family_id, kind: "individual")
         return Failure("No enrollments found for a given criteria") if all_enrollments.blank?
 
         Success(all_enrollments)
@@ -70,18 +73,14 @@ module Operations
         hash = all_enrollments.each_with_object({}) do |enrollment, result|
           new_service_areas = fetch_service_area(address_set[:modified_address], enrollment)
           old_service_areas = fetch_service_area(address_set[:original_address], enrollment)
-          result[enrollment.hbx_id] = {is_service_area_changed: old_service_areas != new_service_areas, product_offered_in_new_service_area: is_the_enrolled_product_available_in_new_service_area?(enrollment, new_service_areas)}
+          result[enrollment.hbx_id] = {is_service_area_changed: old_service_areas != new_service_areas, product_offered_in_new_service_area: new_service_areas.include?(enrollment.product.service_area_id)}
         end
         Success(hash)
       end
 
-      def is_the_enrolled_product_available_in_new_service_area?(enrollment, new_service_areas)
-        new_service_areas.include?(enrollment.product.service_area_id)
-      end
-
-      def fetch_service_area(rating_address, enrollment)
+      def fetch_service_area(address, enrollment)
         ::BenefitMarkets::Locations::ServiceArea.service_areas_for(
-          Address.new(rating_address),
+          Address.new(address),
           during: enrollment.effective_on
         ).map(&:id)
       end
@@ -106,38 +105,17 @@ module Operations
 
       def find_event_outcome(enrollments_hash)
         enrollments_hash.each do |k,v|
-          result = if v[:is_service_area_changed] == true
-                     if v[:product_offered_in_new_service_area] == true
-                       if v[:enrollment_valid_in_new_rating_area] == true
-                         'rating_area_changed'
-                       else
-                         'service_area_changed'
-                       end
-                     elsif v[:enrollment_valid_in_new_rating_area] == true
-                       'rating_area_changed'
-                     else
-                       'service_area_changed'
-                     end
-                   elsif v[:enrollment_valid_in_new_rating_area] == true
-                     'rating_area_changed'
-                   else
-                     'no_change'
-                   end
-          enrollments_hash[k].merge!({ event_outcome: result })
+          result = FindEventOutcome.call(is_service_area_changed: v[:is_service_area_changed], product_offered_in_new_service_area: v[:product_offered_in_new_service_area], enrollment_valid_in_new_rating_area: v[:enrollment_valid_in_new_rating_area])
+          enrollments_hash[k].merge!({ event_outcome: result.event_outcome })
         end
         enrollments_hash
       end
 
       def action_on_enrollment(enrollments_hash)
         enrollments_hash.each do |k,v|
-          case v[:event_outcome]
-          when "service_area_changed"
-            enrollments_hash[k].merge!({expected_enrollment_action: "Terminate Enrollment Effective End of the Month"})
-          when "rating_area_changed"
-            enrollments_hash[k].merge!({expected_enrollment_action: "Generate Rerated Enrollment with same product ID "})
-          else
-            enrollments_hash[k].merge!({expected_enrollment_action: "No Action Required"})
-          end
+          result = SetActionOnEnrollment.call(is_service_area_changed: v[:is_service_area_changed], product_offered_in_new_service_area: v[:product_offered_in_new_service_area],
+                                              enrollment_valid_in_new_rating_area: v[:enrollment_valid_in_new_rating_area], event_outcome: v[:event_outcome])
+          enrollments_hash[k].merge!({ expected_enrollment_action: result.expected_enrollment_action })
         end
       end
 
@@ -145,12 +123,12 @@ module Operations
         enrollments_hash.each do |k,v|
           event_key = EVENT_OUTCOME_MAPPING[v[:event_outcome].to_sym]
           event_payload = build_event_payload(enrollments_hash[k].merge!(enrollment_hbx_id: k), event_key)
+
           publish_event(event_payload)
         end
-        Success(true)
+        Success(enrollments_hash)
       end
 
-      # loop enrollments_hash and publish event if service area is changed
       def publish_event(payload)
         ::Operations::Events::BuildAndPublish.new.call(payload)
       end

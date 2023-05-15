@@ -3,11 +3,11 @@
 module Subscribers
   module Families
     module FamilyMembers
-      # Subscriber will receive request payload contains family id from EA to generate service or rating area events
+      # This class will subscribe to event 'member_address_relocated'/ 'primary_member_address_relocated' from EA and call operation to relocate enrolled products
       class AddressRelocatedSubscriber
-        include ::EventSource::Subscriber[amqp: 'enroll.families.family_members.primary_member_address_relocated']
+        include ::EventSource::Subscriber[amqp: 'enroll.families.family_members']
 
-        subscribe(:on_enroll_families_family_members_primary_member_address_relocated) do |delivery_info, _metadata, response|
+        subscribe(:on_primary_member_address_relocated) do |delivery_info, _metadata, response|
           payload = JSON.parse(response, symbolize_names: true)
 
           subscriber_logger =
