@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -11,23 +13,26 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   let(:family){ FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
   let(:family_members){ family.family_members.where(is_primary_applicant: false).to_a }
   let(:household){ family.active_household }
-  let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, is_subscriber:true,  applicant_id: family.family_members.first.id, coverage_start_on: (TimeKeeper.date_of_record).beginning_of_month, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
+  let(:hbx_enrollment_member) do
+    FactoryBot.build(:hbx_enrollment_member, is_subscriber: true,  applicant_id: family.family_members.first.id, coverage_start_on: TimeKeeper.date_of_record.beginning_of_month, eligibility_date: TimeKeeper.date_of_record.beginning_of_month)
+  end
   let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
   let(:reference_plan) {double("Product")}
-  let(:member_enrollment) {BenefitSponsors::Enrollments::MemberEnrollment.new(member_id:hbx_enrollment_member.id, product_price:BigDecimal(100),sponsor_contribution:BigDecimal(100))}
-  let(:group_enrollment) {BenefitSponsors::Enrollments::GroupEnrollment.new(product: product, member_enrollments:[member_enrollment], product_cost_total:'')}
-  let(:hbx_enrollment){ FactoryBot.create(:hbx_enrollment, :with_product, sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id,
-                                           family: household.family,
-                                           household: household,
-                                           hbx_enrollment_members: [hbx_enrollment_member],
-                                           coverage_kind: "health",
-                                           external_enrollment: false,
-                                           sponsored_benefit_id: sponsored_benefit.id,
-                                           rating_area_id: rating_area.id)
-  }
+  let(:member_enrollment) {BenefitSponsors::Enrollments::MemberEnrollment.new(member_id: hbx_enrollment_member.id, product_price: BigDecimal(100),sponsor_contribution: BigDecimal(100))}
+  let(:group_enrollment) {BenefitSponsors::Enrollments::GroupEnrollment.new(product: product, member_enrollments: [member_enrollment], product_cost_total: '')}
+  let(:hbx_enrollment) do
+    FactoryBot.create(:hbx_enrollment, :with_product, sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id,
+                                                      family: household.family,
+                                                      household: household,
+                                                      hbx_enrollment_members: [hbx_enrollment_member],
+                                                      coverage_kind: "health",
+                                                      external_enrollment: false,
+                                                      sponsored_benefit_id: sponsored_benefit.id,
+                                                      rating_area_id: rating_area.id)
+  end
   let(:benefit_group) { current_benefit_package }
   let(:usermailer) {double("UserMailer")}
-  let!(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: current_benefit_package ) }
+  let!(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: current_benefit_package) }
   let(:benefit_group_assignment) { census_employee.active_benefit_group_assignment }
   let!(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id) }
   let!(:sponsored_benefit) { initial_application.benefit_packages.first.sponsored_benefits.first }
@@ -417,9 +422,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
     it "returns http success as BROKER" do
       person = create(:person)
-      f=FactoryBot.create(:family,:family_members=>[{:is_primary_applicant=>true, :is_active=>true, :person_id => person.id}])
+      FactoryBot.create(:family,:family_members => [{:is_primary_applicant => true, :is_active => true, :person_id => person.id}])
       current_broker_user = FactoryBot.create(:user, :roles => ['broker_agency_staff'],
-                                               :person => person )
+                                                     :person => person)
       current_broker_user.person.broker_role = BrokerRole.new({:broker_agency_profile_id => 99})
       allow(session).to receive(:[]).and_return(person.id.to_s)
       sign_in(current_broker_user)
@@ -774,8 +779,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       expect(flash[:notice]).to eq "Waive Coverage Successful"
       expect(response).to be_redirect
     end
-    
-    it "#post enrollment termination" do 
+
+    it "#post enrollment termination" do
       allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(true)
       allow(hbx_enrollment).to receive(:waiver_reason=).with("Because").and_return(true)
       allow(hbx_enrollment).to receive(:valid?).and_return(true)
@@ -806,18 +811,18 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     let(:product_groups) { products }
     let(:family_group_enrollment) do
       BenefitSponsors::Enrollments::GroupEnrollment.new(
-          member_enrollments: [],
-          rate_schedule_date: '',
-          coverage_start_on: '',
-          previous_product: nil,
-          product: products,
-          rating_area: '',
-          product_cost_total: ''
+        member_enrollments: [],
+        rate_schedule_date: '',
+        coverage_start_on: '',
+        previous_product: nil,
+        product: products,
+        rating_area: '',
+        product_cost_total: ''
       )
     end
     let(:member_group) do
       ::BenefitSponsors::Members::MemberGroup.new(
-          group_enrollment: [family_group_enrollment]
+        group_enrollment: [family_group_enrollment]
       )
     end
     let!(:update_sponsored_benefit) { sponsored_benefit.update_attributes(product_package_kind: "single_product") }
@@ -839,8 +844,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(hbx_enrollment).to receive(:coverage_kind).and_return('health')
       allow(hbx_enrollment).to receive(:sponsored_benefit).and_return(sponsored_benefit)
       allow(hbx_enrollment).to receive(:employee_role).and_return employee_role
-      allow(cost_calculator).to receive(:groups_for_products).with(products).and_return(product_groups)
-      allow_any_instance_of(Insured::PlanShoppingsController).to receive(:sort_member_groups).with(product_groups).and_return(member_group)
       allow(hbx_enrollment).to receive(:product).and_return(product_1)
       allow(sponsored_benefit).to receive(:rate_schedule_date).and_return(rate_schedule_date)
       allow(HbxEnrollmentSponsoredCostCalculator).to receive(:new).with(hbx_enrollment).and_return(cost_calculator)
@@ -849,6 +852,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
     context "normal" do
       before :each do
+        allow(cost_calculator).to receive(:groups_for_products).with(products).and_return(product_groups)
+        allow_any_instance_of(Insured::PlanShoppingsController).to receive(:sort_member_groups).with(product_groups).and_return(member_group)
         allow(hbx_enrollment).to receive(:can_waive_enrollment?).and_return(true)
         get :show, params: {id: "hbx_id", market_kind: 'shop'}
       end
@@ -866,8 +871,32 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       end
     end
 
+    context "when sponsored_benefit package products are available" do
+      before do
+        allow(hbx_enrollment).to receive(:can_waive_enrollment?).and_return(true)
+        sponsored_benefit_product_packages_product = hbx_enrollment.sponsored_benefit.products(hbx_enrollment.sponsored_benefit.rate_schedule_date).first
+        sponsored_benefit_product_packages_product.update_attributes(hsa_eligibility: false)
+        @original_product = BenefitMarkets::Products::Product.find(sponsored_benefit_product_packages_product.id)
+        @original_product.update_attributes(hsa_eligibility: true)
+        slug = Struct.new(:dob, :member_id)
+        family_member = family_members.last
+        age = ::BenefitSponsors::CoverageAgeCalculator.new.calc_coverage_age_for(slug.new(family_member.person.dob, family_member.person.id), nil, effective_period.max, {}, nil)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
+          @original_product,
+          effective_period.min,
+          age,
+          "R-DC001"
+        ).and_return(100.00)
+      end
+
+      it "should fetch data from original products" do
+        get :show, params: {id: "hbx_id", market_kind: 'shop'}
+        expect(controller.instance_variable_get(:@member_groups).first.group_enrollment.product.hsa_eligibility).to eq(@original_product.hsa_eligibility)
+      end
+    end
+
     context "when not eligible to complete shopping" do
-      let(:group_enrollment) {BenefitSponsors::Enrollments::GroupEnrollment.new(product: product, member_enrollments:[member_enrollment], product_cost_total:'')}
+      let(:group_enrollment) {BenefitSponsors::Enrollments::GroupEnrollment.new(product: product, member_enrollments: [member_enrollment], product_cost_total: '')}
 
       before :each do
         allow(hbx_enrollment).to receive(:can_waive_enrollment?).and_return(false)
