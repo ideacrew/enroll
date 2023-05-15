@@ -259,7 +259,7 @@ describe ".current_coverage_expired_coverages", dbclean: :after_each do
   let(:spec_date) { Date.new(TimeKeeper.date_of_record.year - 1, 1, 1) }
   let(:new_coverage_effective_on) { spec_date.beginning_of_month }
 
-  let(:current_year_date) { Date.new(TimeKeeper.date_of_record.year , 1, 1) }
+  let(:current_year_date) { Date.new(TimeKeeper.date_of_record.year, 1, 1) }
   let(:current_coverage_effective_on) { current_year_date.beginning_of_month }
 
 
@@ -305,7 +305,7 @@ describe ".current_coverage_expired_coverages", dbclean: :after_each do
         let!(:enrollment_3) do
           FactoryBot.create(:hbx_enrollment,
                             family: family,
-                            effective_on: Date.new(TimeKeeper.date_of_record.year - 1, 12, 1),
+                            effective_on: Date.new(TimeKeeper.date_of_record.year - 1,12, 1),
                             household: family.active_household,
                             product: product,
                             coverage_kind: "health",
