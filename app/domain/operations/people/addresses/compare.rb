@@ -7,7 +7,12 @@ module Operations
       class Compare
         include Dry::Monads[:result, :do]
 
-        # params: {person_hbx_id: , address_id: }
+        # @param [Hash] params
+        # @return [Dry::Monads::Result]
+        #  Success => {address_id: address_id,
+        #   address_set: {original_address: original_set, modified_address: modified_set},
+        #   change_set: {old_set: old_set, new_set: new_set}, person_hbx_id: person_hbx_id,
+        #   primary_family_id: primary_family_id, is_primary: is_primary}
         def call(params)
           address_id, person_hbx_id = yield validate(params)
           person = yield find_person(person_hbx_id)

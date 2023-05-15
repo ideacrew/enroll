@@ -338,6 +338,10 @@ class Address
 
   private
 
+  # @api private
+  # @return [ job ID ]
+  # @note This method is called by Mongoid after the document is saved.
+  #  It enqueues a job to notify the AddressWorker of the address change.
   def notify_address_changed
     return unless EnrollRegistry.feature_enabled?(:notify_address_changed)
     return unless self.person.present?
