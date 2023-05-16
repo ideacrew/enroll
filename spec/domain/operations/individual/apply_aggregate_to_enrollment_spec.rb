@@ -258,6 +258,7 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
       allow(settings).to receive(:setting).with(:default_applied_aptc_percentage).and_return(double(item: default_applied_aptc_percentage))
       allow(settings).to receive(:setting).with(:minimum_applied_aptc_percentage_for_osse).and_return(double(item: minimum_applied_aptc_percentage_for_osse))
       allow(EnrollRegistry).to receive(:[]).with(:aca_individual_assistance_benefits).and_return(settings)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_osse_aptc_minimum).and_return(true)
     end
 
     context 'enrollment with osse plan' do

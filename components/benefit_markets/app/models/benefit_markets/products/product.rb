@@ -418,7 +418,7 @@ module BenefitMarkets
       end
 
       def is_osse_plan?
-        return true # TODO: delete this line after is_osse_plan field populated for health products
+        return true if EnrollRegistry.feature_enabled?(:aca_individual_osse_aptc_minimum) # TODO: delete this line after is_osse_plan field populated for health products
         return is_osse_plan if health?
         false
       end

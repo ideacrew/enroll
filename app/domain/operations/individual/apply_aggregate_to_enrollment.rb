@@ -51,12 +51,16 @@ module Operations
       def applied_aptc_pct_for(enrollment, new_effective_date)
         subscriber = enrollment.subscriber || enrollment.hbx_enrollment_members.first
 
-        if enrollment.product.is_osse_plan? && subscriber.role_for_subsidy.osse_eligible?(new_effective_date)
+        if osse_aptc_minimum_enabled? && enrollment.product.is_osse_plan? && subscriber.role_for_subsidy.osse_eligible?(new_effective_date)
           return enrollment.elected_aptc_pct if enrollment.elected_aptc_pct >= minimum_applied_aptc_for_osse.to_f
           minimum_applied_aptc_for_osse
         else
           enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_applied_aptc
         end
+      end
+
+      def osse_aptc_minimum_enabled?
+        EnrollRegistry.feature_enabled?(:aca_individual_osse_aptc_minimum)
       end
 
       def default_applied_aptc
