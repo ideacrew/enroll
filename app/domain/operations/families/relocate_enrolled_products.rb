@@ -113,9 +113,9 @@ module Operations
 
       def action_on_enrollment(enrollments_hash)
         enrollments_hash.each do |k,v|
-          result = SetActionOnEnrollment.call(is_service_area_changed: v[:is_service_area_changed], product_offered_in_new_service_area: v[:product_offered_in_new_service_area],
-                                              enrollment_valid_in_new_rating_area: v[:enrollment_valid_in_new_rating_area], event_outcome: v[:event_outcome])
-          enrollments_hash[k].merge!({ expected_enrollment_action: result.expected_enrollment_action })
+          result = ExpectedEnrollmentAction.call(is_service_area_changed: v[:is_service_area_changed], product_offered_in_new_service_area: v[:product_offered_in_new_service_area],
+                                                 enrollment_valid_in_new_rating_area: v[:enrollment_valid_in_new_rating_area], event_outcome: v[:event_outcome])
+          enrollments_hash[k].merge!({ expected_enrollment_action: result.action_on_enrollment })
         end
       end
 
