@@ -17,7 +17,7 @@ class FindEventOutcome
     return "rating_area_changed" if (is_service_area_changed && product_offered_in_new_service_area && enrollment_valid_in_new_rating_area) ||
                                     (is_service_area_changed == false && enrollment_valid_in_new_rating_area)
 
-    return "service_area_changed" if is_service_area_changed && [product_offered_in_new_service_area, enrollment_valid_in_new_rating_area].any? == false
+    return "service_area_changed" if is_service_area_changed && [product_offered_in_new_service_area, enrollment_valid_in_new_rating_area].any?(false)
 
     return "no_change" if is_service_area_changed == false && enrollment_valid_in_new_rating_area == false
   end
