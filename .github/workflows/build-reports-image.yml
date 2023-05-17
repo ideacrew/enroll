@@ -28,7 +28,6 @@ concurrency:
 
 jobs:
   prep:
-    if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     outputs:
       client: ${{ steps.prep.outputs.client }}
@@ -36,7 +35,6 @@ jobs:
       commit_sha: ${{ steps.prep.outputs.commit_sha }}
     steps:
       - name: Set variables from workflow dispatch
-        if: ${{ github.event_name == 'workflow_dispatch' }}
         id: prep
         run: |
           if [[ "${{github.event_name}}" == "repository_dispatch" ]]; then 
