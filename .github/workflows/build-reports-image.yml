@@ -18,12 +18,37 @@ on:
       commit_sha:
         description: 'Commit sha to build'
         required: true
+  repository_dispatch:
+    types:
+      - build-reports-image
 
 concurrency:
   group: reports-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  prep:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    outputs:
+      client: ${{ steps.prep.outputs.client }}
+      branch: ${{ steps.prep.outputs.branch}}
+      commit_sha: ${{ steps.prep.outputs.commit_sha }}
+    steps:
+      - name: Set variables from workflow dispatch
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        id: prep
+        run: |
+          if [[ "${{github.event_name}}" == "repository_dispatch" ]]; then 
+            echo ::set-output name=client::${{ github.event.client_payload.client }}
+            echo ::set-output name=client::${{ github.event.client_payload.branch }}
+            echo ::set-output name=client::${{ github.event.client_payload.commit_sha }}
+          else
+            echo ::set-output name=client::${{ github.event.inputs.client }}
+            echo ::set-output name=client::${{ github.event.inputs.branch }}
+            echo ::set-output name=client::${{ github.event.inputs.commit_sha }}       
+          fi 
+
   build-and-upload-image:
     runs-on: ubuntu-latest
     steps:
@@ -65,8 +90,8 @@ jobs:
           push: true
           builder: ${{ steps.buildx.outputs.name }}
           file: .docker/production/Dockerfile.gha-reports
-          tags: public.ecr.aws/ideacrew/enroll:${{ github.event.inputs.client }}-reports
+          tags: public.ecr.aws/ideacrew/enroll:${{ needs.prep.outputs.client }}-reports
           build-args: |
-            CLIENT=${{ github.event.inputs.client }}
-            COMMIT_SHA=${{ github.event.inputs.commit_sha }}
-            BRANCH=${{ github.event.inputs.branch }}
+            CLIENT=${{ needs.prep.outputs.client }}
+            COMMIT_SHA=${{ needs.prep.outputs.commit_sha }}
+            BRANCH=${{ needs.prep.outputs.branch }}
