@@ -15,7 +15,7 @@ class ExpectedEnrollmentAction
   private
 
   def action_on_enrollment
-    return "No Action Required" if (event_outcome == "service_area_changed" && product_offered_in_new_service_area && enrollment_valid_in_new_rating_area == false) || event_outcome == "no_change"
+    return "No Action Required" if (event_outcome == "service_area_changed" && product_offered_in_new_service_area && is_rating_area_changed == false) || event_outcome == "no_change"
     return "Terminate Enrollment Effective End of the Month" if event_outcome == "service_area_changed"
 
     return "Generate Rerated Enrollment with same product ID" if event_outcome == "rating_area_changed"
@@ -29,8 +29,8 @@ class ExpectedEnrollmentAction
     context.product_offered_in_new_service_area
   end
 
-  def enrollment_valid_in_new_rating_area
-    context.enrollment_valid_in_new_rating_area
+  def is_rating_area_changed
+    context.is_rating_area_changed
   end
 
   def event_outcome

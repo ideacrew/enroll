@@ -87,25 +87,25 @@ module Operations
 
       def check_rating_area_change_for_enrollments(all_enrollments, enrollments_hash, modified_address)
         all_enrollments.each do |enrollment|
-          enrollments_hash[enrollment.hbx_id].merge!({enrollment_valid_in_new_rating_area:  is_the_enrollment_valid_in_new_rating_area?(enrollment, modified_address)})
+          enrollments_hash[enrollment.hbx_id].merge!({is_rating_area_changed:  is_rating_area_changed?(enrollment, modified_address)})
         end
 
         Success(enrollments_hash)
       end
 
-      def is_the_enrollment_valid_in_new_rating_area?(enrollment, rating_address)
+      def is_rating_area_changed?(enrollment, rating_address)
         enrollment_rating_area = enrollment.rating_area.exchange_provided_code
         address_rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(
           Address.new(rating_address),
           during: enrollment.effective_on
         )&.exchange_provided_code
 
-        (enrollment_rating_area == address_rating_area)
+        (enrollment_rating_area != address_rating_area)
       end
 
       def find_event_outcome(enrollments_hash)
         enrollments_hash.each do |k,v|
-          result = FindEventOutcome.call(is_service_area_changed: v[:is_service_area_changed], product_offered_in_new_service_area: v[:product_offered_in_new_service_area], enrollment_valid_in_new_rating_area: v[:enrollment_valid_in_new_rating_area])
+          result = FindEventOutcome.call(is_service_area_changed: v[:is_service_area_changed], product_offered_in_new_service_area: v[:product_offered_in_new_service_area], is_rating_area_changed: v[:is_rating_area_changed])
           enrollments_hash[k].merge!({ event_outcome: result.event_outcome })
         end
         enrollments_hash
@@ -114,7 +114,7 @@ module Operations
       def action_on_enrollment(enrollments_hash)
         enrollments_hash.each do |k,v|
           result = ExpectedEnrollmentAction.call(is_service_area_changed: v[:is_service_area_changed], product_offered_in_new_service_area: v[:product_offered_in_new_service_area],
-                                                 enrollment_valid_in_new_rating_area: v[:enrollment_valid_in_new_rating_area], event_outcome: v[:event_outcome])
+                                                 is_rating_area_changed: v[:is_rating_area_changed], event_outcome: v[:event_outcome])
           enrollments_hash[k].merge!({ expected_enrollment_action: result.action_on_enrollment })
         end
       end
