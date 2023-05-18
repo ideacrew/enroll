@@ -125,7 +125,7 @@ module BenefitSponsors
           ],
           is_reference_plan_eligible: true,
           is_standard_plan: true,
-          is_osse_plan: false,
+          is_hc4cc_plan: false,
           hsa_eligibility: true,
           renewal_product_id: renewal_product_id
         }

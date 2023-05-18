@@ -417,9 +417,8 @@ module BenefitMarkets
         rating_method == FAMILY_BASED_RATING
       end
 
-      def is_osse_plan?
-        return true if EnrollRegistry.feature_enabled?(:aca_individual_osse_aptc_minimum) # TODO: delete this line after is_osse_plan field populated for health products
-        return is_osse_plan if health?
+      def is_hc4cc_plan?
+        return self.is_hc4cc_plan if health?
         false
       end
 

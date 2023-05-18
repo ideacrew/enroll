@@ -246,7 +246,7 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
 
     let(:year) { Date.today.year }
     let(:new_effective_date) { Date.new(year, 5, 1) }
-    let(:product) { double(is_osse_plan?: false) }
+    let(:product) { double(is_hc4cc_plan?: false) }
     let(:subscriber) { double(role_for_subsidy: role_for_subsidy) }
     let(:role_for_subsidy) { double }
     let(:elected_aptc_pct) { 0.5 }
@@ -262,7 +262,7 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
     end
 
     context 'enrollment with osse plan' do
-      let(:product) { double(is_osse_plan?: true) }
+      let(:product) { double(is_hc4cc_plan?: true) }
 
       context 'subscriber has osse subsidy enabled' do
         before do
@@ -321,7 +321,7 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
         allow(role_for_subsidy).to receive(:osse_eligible?).and_return(true)
       end
 
-      let(:product) { double(is_osse_plan?: false) }
+      let(:product) { double(is_hc4cc_plan?: false) }
 
       context 'when elected aptc pct is zero' do
         let(:elected_aptc_pct) { 0.0 }
