@@ -25,9 +25,13 @@ RSpec.describe ::Operations::Families::RelocateEnrolledProducts, dbclean: :after
   end
   let!(:enrollment_members2) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment2, is_subscriber: true, family_member: family.family_members[0]) }
   let!(:county_zip) do
-    ::BenefitMarkets::Locations::CountyZip.all.update_all(county_name: 'york',zip: "04007", state: "ME")
+    ::BenefitMarkets::Locations::CountyZip.all.update_all(county_name: 'York',zip: "04007", state: "ME")
     ::BenefitMarkets::Locations::CountyZip.all.first
   end
+
+  let!(:county_zip2) { FactoryBot.create(:benefit_markets_locations_county_zip, zip: '04471', county_name: 'Aroostook', state: "ME") }
+  let!(:rating_area2) {FactoryBot.create(:benefit_markets_locations_rating_area, active_year: start_date.year, county_zip_ids: [county_zip2.id], exchange_provided_code: "R-ME004", covered_states: nil)}
+
   let!(:original_address) do
     person.home_address.update_attributes(zip: county_zip.zip, county: county_zip.county_name, state: county_zip.state)
     person.home_address.attributes.slice("address_1", "address_2", "address_3", "county", "kind", "city", "state", "zip")
@@ -37,18 +41,19 @@ RSpec.describe ::Operations::Families::RelocateEnrolledProducts, dbclean: :after
     before do
       allow(EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model)).to receive(:item).and_return('county')
       allow(EnrollRegistry[:enroll_app].setting(:rating_areas)).to receive(:item).and_return('county')
-      BenefitMarkets::Locations::RatingArea.update_all(covered_states: ['ME'])
+      BenefitMarkets::Locations::RatingArea.update_all(covered_states: nil)
+      BenefitMarkets::Locations::RatingArea.where(:exchange_provided_code.nin => ["R-ME004"]).first.update_attributes(covered_states: nil, active_year: start_date.year, county_zip_ids: [county_zip.id], exchange_provided_code: "R-ME001")
       BenefitMarkets::Locations::ServiceArea.update_all(covered_states: ['ME'])
 
       rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(person.home_address)
       enrollment.update_attributes!(rating_area_id: rating_area.id)
       enrollment2.update_attributes!(rating_area_id: rating_area.id)
-      person.home_address.update_attributes(zip: "04001", county: "York", state: "ME")
+      person.home_address.update_attributes(zip: "04771", county: "Aroostook", state: "ME")
       modified_address = person.home_address.attributes.slice("address_1", "address_2", "address_3", "county", "kind", "city", "state", "zip")
       @params = {
         address_set: {original_address: original_address,
                       modified_address: modified_address},
-        change_set: {"old_set": {zip: county_zip.zip, county: county_zip.county_name},"new_set": {zip: "04001", county: "York"}},
+        change_set: {"old_set": {zip: county_zip.zip, county: county_zip.county_name},"new_set": {zip: "04771", county: "Aroostook"}},
         person_hbx_id: person.hbx_id,
         primary_family_id: person.primary_family.id,
         is_primary: person.primary_family.present?

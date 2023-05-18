@@ -5,7 +5,7 @@ RSpec.describe ExpectedEnrollmentAction, type: :request do
     let!(:params) do
       {:event_outcome => "service_area_changed",
        :product_offered_in_new_service_area => true,
-       :enrollment_valid_in_new_rating_area => true}
+       :is_rating_area_changed => true}
     end
 
     context "when product is offered in new service area" do
@@ -13,7 +13,7 @@ RSpec.describe ExpectedEnrollmentAction, type: :request do
         let!(:params) do
           {:event_outcome => "service_area_changed",
            :product_offered_in_new_service_area => true,
-           :enrollment_valid_in_new_rating_area => false}
+           :is_rating_area_changed => false}
         end
 
         it "should return enrollment action as No Action Required" do
@@ -31,7 +31,7 @@ RSpec.describe ExpectedEnrollmentAction, type: :request do
     let!(:params) do
       {:event_outcome => "rating_area_changed",
        :product_offered_in_new_service_area => true,
-       :enrollment_valid_in_new_rating_area => true}
+       :is_rating_area_changed => true}
     end
     it "should return enrollment action as Generate Rerated Enrollment with same product ID" do
       expect(described_class.call(params).action_on_enrollment).to eq "Generate Rerated Enrollment with same product ID"
@@ -42,7 +42,7 @@ RSpec.describe ExpectedEnrollmentAction, type: :request do
     let!(:params) do
       {:event_outcome => "no_change",
        :is_service_area_changed => false,
-       :enrollment_valid_in_new_rating_area => false}
+       :is_rating_area_changed => false}
     end
     it "should return enrollment action as No Action Required" do
       expect(described_class.call(params).action_on_enrollment).to eq "No Action Required"
