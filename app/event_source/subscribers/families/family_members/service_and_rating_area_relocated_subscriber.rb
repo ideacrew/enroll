@@ -14,7 +14,8 @@ module Subscribers
             Logger.new("#{Rails.root}/log/ServiceAndRatingAreaRelocatedSubscriber#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
           subscriber_logger.info "on_product_service_area_relocated, response: #{payload}"
 
-          # result = Operations::Families::RelocateEnrolledProducts.new.call(payload)
+
+          result = Operations::HbxEnrollments::RelocateEnrollment.new.call(payload)
 
           if result.success?
             subscriber_logger.info "on_product_service_area_relocated, success: person_hbx_id: #{person_hbx_id} | result: #{result.value!}"
@@ -42,7 +43,7 @@ module Subscribers
             Logger.new("#{Rails.root}/log/ServiceAndRatingAreaRelocatedSubscriber#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
           subscriber_logger.info "on_premium_rating_area_relocated, response: #{payload}"
 
-          # result = Operations::Families::RelocateEnrolledProducts.new.call(payload)
+          result = Operations::HbxEnrollments::RelocateEnrollment.new.call(payload)
 
           if result.success?
             subscriber_logger.info "on_premium_rating_area_relocated, success: person_hbx_id: #{person_hbx_id} | result: #{result.value!}"
