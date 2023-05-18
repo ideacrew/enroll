@@ -14,12 +14,12 @@ class FindEventOutcome
   private
 
   def event_outcome
-    return "rating_area_changed" if (is_service_area_changed && product_offered_in_new_service_area && enrollment_valid_in_new_rating_area) ||
-                                    (is_service_area_changed == false && enrollment_valid_in_new_rating_area)
+    return "rating_area_changed" if (is_service_area_changed && product_offered_in_new_service_area && is_rating_area_changed) ||
+                                    (is_service_area_changed == false && is_rating_area_changed)
 
-    return "service_area_changed" if is_service_area_changed && [product_offered_in_new_service_area, enrollment_valid_in_new_rating_area].any?(false)
+    return "service_area_changed" if is_service_area_changed && [product_offered_in_new_service_area, is_rating_area_changed].any?(false)
 
-    return "no_change" if is_service_area_changed == false && enrollment_valid_in_new_rating_area == false
+    return "no_change" if is_service_area_changed == false && is_rating_area_changed == false
   end
 
   def is_service_area_changed
@@ -30,7 +30,7 @@ class FindEventOutcome
     context.product_offered_in_new_service_area
   end
 
-  def enrollment_valid_in_new_rating_area
-    context.enrollment_valid_in_new_rating_area
+  def is_rating_area_changed
+    context.is_rating_area_changed
   end
 end
