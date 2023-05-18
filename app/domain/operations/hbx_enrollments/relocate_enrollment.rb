@@ -39,7 +39,7 @@ module Operations
       end
 
       def terminate_enrollment(enrollment)
-        Operations::HbxEnrollments::Terminate.new.call(enrollment)
+        Operations::HbxEnrollments::Terminate.new.call({enrollment_hbx_id: enrollment.hbx_id})
       end
 
       def generate_new_enrollment(enrollment)
