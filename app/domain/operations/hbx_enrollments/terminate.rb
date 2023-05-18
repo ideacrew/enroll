@@ -12,7 +12,7 @@ module Operations
       def call(params)
         enrollment_hbx_id = yield validate(params)
         hbx_enrollment    = yield find_enrollment(enrollment_hbx_id)
-        result            = yield terminate_enrollment(hbx_enrollment)
+        result            = yield terminate_enrollment(hbx_enrollment, params)
 
         Success(result)
       end
@@ -29,9 +29,9 @@ module Operations
         Operations::HbxEnrollments::Find.new.call({hbx_id: enrollment_hbx_id})
       end
 
-      def terminate_enrollment(enrollment)
+      def terminate_enrollment(enrollment, params)
         if enrollment.is_shop?
-          terminate_employment_term_enrollment(enrollment)
+          terminate_employment_term_enrollment(enrollment, params)
         elsif enrollment.kind == "individual" && enrollment.may_terminate_coverage?
           terminate_ivl_enrollment(enrollment)
         else
@@ -44,7 +44,7 @@ module Operations
         Success({enrollment_hbx_id: enrollment.hbx_id, enrollment_state: enrollment.aasm_state})
       end
 
-      def terminate_employment_term_enrollment(hbx_enrollment)
+      def terminate_employment_term_enrollment(hbx_enrollment, params)
         return Failure("Missing census employee") unless hbx_enrollment.census_employee
         census_employee = hbx_enrollment.census_employee
         employment_term_date = census_employee.employment_terminated_on
