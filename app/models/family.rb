@@ -396,7 +396,8 @@ class Family
     query_expr = existing_coverage_query_expr(enrollment, include_matching_effective_date)
     coverages.where(query_expr).or(
       {:aasm_state.in => HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES},
-      {:aasm_state.in => HbxEnrollment::TERMINATED_STATUSES, :terminated_on.gte => enrollment.effective_on.prev_day}
+      {:aasm_state.in => HbxEnrollment::TERMINATED_STATUSES, :terminated_on.gte => enrollment.effective_on.prev_day},
+      {:aasm_state.in => ['coverage_expired'], effective_on: { "$gte" => enrollment.effective_on.beginning_of_year, "$lte" => enrollment.effective_on.end_of_year} }
     ).order('effective_on DESC')
   end
   # rubocop:enable Style/OptionalBooleanParameter
