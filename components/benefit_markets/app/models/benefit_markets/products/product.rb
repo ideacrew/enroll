@@ -173,6 +173,7 @@ module BenefitMarkets
     #Products retrieval by type
       scope :health_products,            ->{ where(:_type => /.*HealthProduct$/) }
       scope :dental_products,            ->{ where(:_type => /.*DentalProduct$/)}
+      scope :hc4cc_plans,                ->{ where(is_hc4cc_plan: true) }
 
       alias name title
 

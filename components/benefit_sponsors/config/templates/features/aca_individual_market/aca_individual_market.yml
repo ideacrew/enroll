@@ -23,10 +23,14 @@ registry:
             item: 20
           - key: :fifteenth_of_the_month
             item: 15
+      - key: :aca_individual_osse_aptc_minimum
+        is_enabled: <%= ENV['ACA_INDIVIDUAL_OSSE_APTC_MINIMUM'] || false %>
       - key: :aca_individual_assistance_benefits
         is_enabled: true
         settings:
           - key: :default_applied_aptc_percentage
+            item: 0.85
+          - key: :minimum_applied_aptc_percentage_for_osse
             item: 0.85
       - key: :cancel_renewals_for_term
         item: Operations::Individual::CancelRenewalEnrollment.new

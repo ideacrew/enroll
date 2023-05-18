@@ -13,6 +13,7 @@ module BenefitMarkets
 
       field :hsa_eligibility,             type: Boolean,  default: false
       field :is_standard_plan,            type: Boolean,  default: false
+      field :is_hc4cc_plan,               type: Boolean,  default: false
 
       field :metal_level_kind,            type: Symbol
       field :ehb,                         type: Float,    default: 0.0
@@ -45,6 +46,9 @@ module BenefitMarkets
           name: "dental_products_premium_tables_for_benchmark_premiums_search_index"
         }
       )
+
+      scope :hc4cc_plans,         ->{ where(is_hc4cc_plan: true) }
+
 
       alias_method :is_standard_plan?, :is_standard_plan
 
