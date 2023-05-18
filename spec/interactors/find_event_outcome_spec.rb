@@ -8,7 +8,7 @@ RSpec.describe FindEventOutcome, :dbclean => :after_each do
         let!(:params) do
           {:is_service_area_changed => true,
            :product_offered_in_new_service_area => true,
-           :enrollment_valid_in_new_rating_area => true}
+           :is_rating_area_changed => true}
         end
 
         it "should set event_outcome as rating_area_changed" do
@@ -20,7 +20,7 @@ RSpec.describe FindEventOutcome, :dbclean => :after_each do
         let!(:params) do
           {:is_service_area_changed => true,
            :product_offered_in_new_service_area => true,
-           :enrollment_valid_in_new_rating_area => false}
+           :is_rating_area_changed => false}
         end
 
         it "should set event_outcome as service_area_changed" do
@@ -35,7 +35,7 @@ RSpec.describe FindEventOutcome, :dbclean => :after_each do
         let!(:params) do
           {:is_service_area_changed => true,
            :product_offered_in_new_service_area => false,
-           :enrollment_valid_in_new_rating_area => true}
+           :is_rating_area_changed => true}
         end
 
         it "should set event_outcome as service_area_changed" do
@@ -47,7 +47,7 @@ RSpec.describe FindEventOutcome, :dbclean => :after_each do
         let!(:params) do
           {:is_service_area_changed => true,
            :product_offered_in_new_service_area => false,
-           :enrollment_valid_in_new_rating_area => false}
+           :is_rating_area_changed => false}
         end
 
         it 'should set event_outcome as no_change' do
@@ -62,7 +62,7 @@ RSpec.describe FindEventOutcome, :dbclean => :after_each do
       let!(:params) do
         {:is_service_area_changed => false,
          :product_offered_in_new_service_area => false,
-         :enrollment_valid_in_new_rating_area => true}
+         :is_rating_area_changed => true}
       end
 
       it "should set event_outcome as rating_area_changed" do
@@ -75,7 +75,7 @@ RSpec.describe FindEventOutcome, :dbclean => :after_each do
       let!(:params) do
         {:is_service_area_changed => false,
          :product_offered_in_new_service_area => false,
-         :enrollment_valid_in_new_rating_area => false}
+         :is_rating_area_changed => false}
       end
 
       it "should set event_outcome as no_change" do
