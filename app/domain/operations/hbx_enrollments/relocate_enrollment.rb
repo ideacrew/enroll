@@ -20,7 +20,7 @@ module Operations
       def call(payload)
         valid_params = yield validate(payload)
         enrollment = yield find_enrollment(valid_params)
-        result = yield send(ENROLLMENT_ACTION_MAPPING[valid_params[:expected_enrollment_action]], enrollment)
+        result = yield send(ENROLLMENT_ACTION_MAPPING[valid_params[:expected_enrollment_action]].to_sym, enrollment)
 
         Success(result)
       end
@@ -43,8 +43,11 @@ module Operations
       end
 
       def generate_new_enrollment(enrollment)
-        generate_new_enrollment_for_ivl(enrollment) unless enrollment.is_shop?
-        generate_new_enrollment_for_shop(enrollment) if enrollment.is_shop?
+        if enrollment.is_shop?
+          generate_new_enrollment_for_shop(enrollment)
+        elsif enrollment.kind == "individual"
+          generate_new_enrollment_for_ivl(enrollment)
+        end
       end
 
       def generate_new_enrollment_for_ivl(base_enrollment)
@@ -53,12 +56,12 @@ module Operations
 
         if reinstatement.save!
           result = if base_enrollment.applied_aptc_amount > 0
-            default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
-            elected_aptc_pct = base_enrollment.elected_aptc_pct > 0 ? base_enrollment.elected_aptc_pct : default_percentage
-            ::Insured::Factories::SelfServiceFactory.mthh_update_enrollment_for_aptcs(new_effective_date, reinstatement, elected_aptc_pct, nil)
-          else
-            true
-          end
+                     default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
+                     elected_aptc_pct = base_enrollment.elected_aptc_pct > 0 ? base_enrollment.elected_aptc_pct : default_percentage
+                     ::Insured::Factories::SelfServiceFactory.mthh_update_enrollment_for_aptcs(new_effective_date, reinstatement, elected_aptc_pct, nil)
+                   else
+                     true
+                   end
 
           if result == true
             reinstatement.select_coverage!
