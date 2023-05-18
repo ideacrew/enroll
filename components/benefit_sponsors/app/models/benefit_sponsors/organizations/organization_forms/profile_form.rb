@@ -44,7 +44,7 @@ module BenefitSponsors
       validates_presence_of :referred_reason, if: :is_referred_by_other?
 
       def initialize(params = {})
-        @osse_eligibility = params[:osse_eligibility]
+        @osse_eligibility = params[:osse_eligibility] || false
         super(params)
       end
 
