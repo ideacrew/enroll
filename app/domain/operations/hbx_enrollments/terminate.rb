@@ -33,7 +33,7 @@ module Operations
         if enrollment.is_shop?
           terminate_employment_term_enrollment(enrollment, params)
         elsif enrollment.kind == "individual" && enrollment.may_terminate_coverage?
-          terminate_ivl_enrollment(enrollment)
+          terminate_enrollment_for_ivl(enrollment)
         else
           Failure("Unable to terminate enrollment - does not meet the enrollment kind criteria: #{enrollment.hbx_id}.")
         end

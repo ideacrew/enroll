@@ -28,8 +28,8 @@ module Operations
       private
 
       def validate(payload)
-        return Failure("Expected enrollment action is missing") unless payload[:expected_enrollment_action].present?
-        return Failure("Enrollment hbx_id is missing") unless payload[:enrollment_hbx_id].present?
+        return Failure("RelocateEnrollment: Expected enrollment action is missing") unless payload[:expected_enrollment_action].present?
+        return Failure("RelocateEnrollment: Enrollment hbx_id is missing") unless payload[:enrollment_hbx_id].present?
 
         Success(payload)
       end
@@ -51,14 +51,18 @@ module Operations
       end
 
       def generate_new_enrollment_for_ivl(base_enrollment)
-        new_effective_date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), base_enrollment.effective_on).to_date
+        date_context = ::HbxEnrollments::CalculateEffectiveOnForEnrollment.call(base_enrollment_effective_on: base_enrollment.effective_on, system_date: TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'))
+        return Failure(date_context.message) if date_context.failure?
+
+        new_effective_date = date_context.new_effective_on.to_date
         reinstatement = Enrollments::Replicator::Reinstatement.new(base_enrollment, new_effective_date, base_enrollment.applied_aptc_amount).build
 
         if reinstatement.save!
-          result = if base_enrollment.applied_aptc_amount > 0
+          result = if base_enrollment.has_aptc? && EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
                      default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
                      elected_aptc_pct = base_enrollment.elected_aptc_pct > 0 ? base_enrollment.elected_aptc_pct : default_percentage
-                     ::Insured::Factories::SelfServiceFactory.mthh_update_enrollment_for_aptcs(new_effective_date, reinstatement, elected_aptc_pct, nil)
+                     aptc_context = ::HbxEnrollments::UpdateMthhAptcValuesOnEnrollment.call(enrollment: reinstatement, elected_aptc_pct: elected_aptc_pct, new_effective_date: new_effective_date)
+                     aptc_context.success? ? true : aptc_context.message
                    else
                      true
                    end
@@ -67,6 +71,7 @@ module Operations
             reinstatement.select_coverage!
             return Success({:reinstatement_hbx_id => reinstatement.hbx_id, :reinstatement_aasm_state => reinstatement.aasm_state})
           end
+
           return result if result.is_a?(Failure)
           Failure(result)
         else
@@ -74,7 +79,10 @@ module Operations
         end
       end
 
-      def generate_new_enrollment_for_shop(enrollment); end
+      # TODO: Implement this method for SHOP enrollments
+      def generate_new_enrollment_for_shop(_enrollment)
+        Success()
+      end
     end
   end
 end
