@@ -124,7 +124,7 @@ module Operations
       end
 
       def terminate_employment_term_enrollment(hbx_enrollment)
-        ::Operations::HbxEnrollments::Terminate.new.call({hbx_enrollment: hbx_enrollment, options: {notify: @notify}})
+        ::Operations::HbxEnrollments::Terminate.new.call({enrollment_hbx_id: hbx_enrollment.hbx_id, options: {notify: @notify}})
       end
 
       def reinstate_after_effects(hbx_enrollment)
