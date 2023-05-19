@@ -32,7 +32,7 @@ module BenefitMarkets
       field :ehb,                         type: Float,    default: 0.0
       field :is_standard_plan,            type: Boolean,  default: false
       field :is_hc4cc_plan,               type: Boolean,  default: false
- 
+
       field :rx_formulary_url,            type: String
       field :hsa_eligibility,             type: Boolean,  default: false
       field :network_information,         type: String
