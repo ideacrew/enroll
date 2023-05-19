@@ -10,4 +10,12 @@ class EditAptc
   def self.edit_aptc_csr_action
     '.edit-aptc-csr-enabled'
   end
+
+  def self.aptc_slider
+    '[data-cuke="aptc_slider"]'
+  end
+
+  def self.applied_aptc_field
+    '[data-cuke="applied_aptc_field"]'
+  end
 end

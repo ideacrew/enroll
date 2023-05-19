@@ -12,6 +12,7 @@ module BenefitMarkets
           required(:metal_level_kind).filled(:symbol)
           required(:ehb).filled(:float)
           required(:is_standard_plan).filled(:bool)
+          optional(:is_hc4cc_plan).maybe(:bool)
           optional(:rx_formulary_url).maybe(:string)
           required(:hsa_eligibility).filled(:bool)
           optional(:provider_directory_url).maybe(:string)
