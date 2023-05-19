@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe ExpectedEnrollmentAction, type: :request do
+RSpec.describe ::HbxEnrollments::ExpectedEnrollmentAction, type: :request do
   context "when event outcome is service_area_changed" do
     let!(:params) do
       {:event_outcome => "service_area_changed",
@@ -46,6 +46,17 @@ RSpec.describe ExpectedEnrollmentAction, type: :request do
     end
     it "should return enrollment action as No Action Required" do
       expect(described_class.call(params).action_on_enrollment).to eq "No Action Required"
+    end
+  end
+
+  context "when event outcome is nil" do
+    let!(:params) do
+      {:event_outcome => nil,
+       :is_service_area_changed => false,
+       :is_rating_area_changed => false}
+    end
+    it "should return enrollment action as No Action Required" do
+      expect(described_class.call(params).action_on_enrollment).to eq nil
     end
   end
 end

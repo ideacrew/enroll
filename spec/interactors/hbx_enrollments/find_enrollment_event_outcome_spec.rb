@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe FindEventOutcome, :dbclean => :after_each do
+RSpec.describe ::HbxEnrollments::FindEnrollmentEventOutcome, :dbclean => :after_each do
 
   context "when service area is changed" do
     context 'when product is offered in new service area' do
@@ -81,6 +81,18 @@ RSpec.describe FindEventOutcome, :dbclean => :after_each do
       it "should set event_outcome as no_change" do
         expect(described_class.call(params).event_outcome).to eq "no_change"
       end
+    end
+  end
+
+  context "when there are nil params" do
+    let!(:params) do
+      {:is_service_area_changed => nil,
+       :product_offered_in_new_service_area => nil,
+       :enrollment_valid_in_new_rating_area => nil}
+    end
+
+    it "should set event_outcome as no_change" do
+      expect(described_class.call(params).event_outcome).to eq nil
     end
   end
 end

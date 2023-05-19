@@ -11,8 +11,7 @@ module Operations
 
       EVENT_OUTCOME_MAPPING = {:service_area_changed => "product_service_area_relocated",
                                :rating_area_changed => "premium_rating_area_relocated",
-                               :no_change => "product_unavailable_relocated"}.freeze
-
+                               :no_change => "no_change"}.freeze
 
       # @param [Hash] params
       # @option params [String] :person_hbx_id
@@ -40,8 +39,8 @@ module Operations
       private
 
       def validate(params)
-        return Failure("Person_hbx_id is missing") unless params[:person_hbx_id].present?
-        return Failure("address_set is missing") unless params[:address_set].present?
+        return Failure("RelocateEnrolledProducts: Person_hbx_id is missing") unless params[:person_hbx_id].present?
+        return Failure("RelocateEnrolledProducts: address_set is missing") unless params[:address_set].present?
 
         Success(params)
       end
@@ -52,7 +51,7 @@ module Operations
 
       def find_families(person)
         families = person.families
-        return Failure("No families found for a given person") if families.blank?
+        return Failure("RelocateEnrolledProducts: No families found for a given person") if families.blank?
 
         Success(families)
       end
@@ -64,7 +63,7 @@ module Operations
 
       def filter_enrollments(all_enrollments, primary_family_id, _person_hbx_id)
         all_enrollments = all_enrollments.where(family_id: primary_family_id, kind: "individual")
-        return Failure("No enrollments found for a given criteria") if all_enrollments.blank?
+        return Failure("RelocateEnrolledProducts: No enrollments found for a given criteria") if all_enrollments.blank?
 
         Success(all_enrollments)
       end
@@ -75,6 +74,7 @@ module Operations
           old_service_areas = fetch_service_area(address_set[:original_address], enrollment)
           result[enrollment.hbx_id] = {is_service_area_changed: old_service_areas != new_service_areas, product_offered_in_new_service_area: new_service_areas.include?(enrollment.product.service_area_id)}
         end
+
         Success(hash)
       end
 
@@ -105,7 +105,7 @@ module Operations
 
       def find_event_outcome(enrollments_hash)
         enrollments_hash.each do |k,v|
-          result = FindEventOutcome.call(is_service_area_changed: v[:is_service_area_changed], product_offered_in_new_service_area: v[:product_offered_in_new_service_area], is_rating_area_changed: v[:is_rating_area_changed])
+          result = ::HbxEnrollments::FindEnrollmentEventOutcome.call(is_service_area_changed: v[:is_service_area_changed], product_offered_in_new_service_area: v[:product_offered_in_new_service_area], is_rating_area_changed: v[:is_rating_area_changed])
           enrollments_hash[k].merge!({ event_outcome: result.event_outcome })
         end
         enrollments_hash
@@ -113,7 +113,7 @@ module Operations
 
       def action_on_enrollment(enrollments_hash)
         enrollments_hash.each do |k,v|
-          result = ExpectedEnrollmentAction.call(is_service_area_changed: v[:is_service_area_changed], product_offered_in_new_service_area: v[:product_offered_in_new_service_area],
+          result = ::HbxEnrollments::ExpectedEnrollmentAction.call(is_service_area_changed: v[:is_service_area_changed], product_offered_in_new_service_area: v[:product_offered_in_new_service_area],
                                                  is_rating_area_changed: v[:is_rating_area_changed], event_outcome: v[:event_outcome])
           enrollments_hash[k].merge!({ expected_enrollment_action: result.action_on_enrollment })
         end
@@ -122,8 +122,10 @@ module Operations
       def build_and_publish_enrollment_event(enrollments_hash)
         enrollments_hash.each do |k,v|
           event_key = EVENT_OUTCOME_MAPPING[v[:event_outcome].to_sym]
-          event_payload = build_event_payload(enrollments_hash[k].merge!(enrollment_hbx_id: k), event_key)
+          return Failure(["RelocateEnrolledProducts: Event key is invalid", {request_payload: enrollments_hash}]) unless event_key.present?
+          return Success(["RelocateEnrolledProducts: No action on Enrollments for this address change", {request_payload: enrollments_hash}]) if event_key == "no_change"
 
+          event_payload = build_event_payload(enrollments_hash[k].merge!(enrollment_hbx_id: k), event_key)
           publish_event(event_payload)
         end
         Success(enrollments_hash)

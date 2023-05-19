@@ -9,15 +9,45 @@ module Subscribers
 
         subscribe(:on_primary_member_address_relocated) do |delivery_info, _metadata, response|
           payload = JSON.parse(response, symbolize_names: true)
-
-          subscriber_logger =
-            Logger.new("#{Rails.root}/log/AddressRelocatedSubscriber#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
-          subscriber_logger.info "on_enroll_families_family_members_primary_member_address_relocated, response: #{payload}"
+          key = delivery_info.routing_key.split('.').last
+          person_hbx_id = payload[:person_hbx_id]
+          subscriber_logger << "\n"
+          subscriber_logger.info(subscriber_key(key, person_hbx_id)) { "*" * 100 }
+          subscriber_logger.info(subscriber_key(key, person_hbx_id)) { {response: payload}}
 
           result = Operations::Families::RelocateEnrolledProducts.new.call(payload)
+          message = fetch_logger_message_for(result)
+          subscriber_logger.info(subscriber_key(key, person_hbx_id)) { message }
 
+          ack(delivery_info.delivery_tag)
+        rescue StandardError, SystemStackError => e
+          subscriber_logger.info(subscriber_key(key, person_hbx_id)) { {payload: payload, error_message: e.message, backtrace: e.backtrace} }
+          ack(delivery_info.delivery_tag)
+        end
+
+        subscribe(:on_member_address_relocated) do |delivery_info, _metadata, response|
+          payload = JSON.parse(response, symbolize_names: true)
+          key = delivery_info.routing_key.split('.').last
+          subscriber_logger << "\n"
+          subscriber_logger.info(subscriber_key(key, person_hbx_id)) { "*" * 100 }
+          subscriber_logger.info(subscriber_key(key, person_hbx_id)) { {response: payload}}
+
+          # result = Operations::Families::RelocateEnrolledProducts.new.call(payload)
+          # message = fetch_logger_message_for(result)
+          # subscriber_logger.info(subscriber_key(key, person_hbx_id)) { message }
+          subscriber_logger.info(subscriber_key(key, person_hbx_id)) { { Message: "Currently rating area change feature is disabled for dependent address changes dependent_person_hbx_id: #{payload[:person_hbx_id]}"}}
+
+          ack(delivery_info.delivery_tag)
+        rescue StandardError, SystemStackError => e
+          subscriber_logger.info(subscriber_key(key, person_hbx_id)) { {payload: payload, error_message: e.message, backtrace: e.backtrace} }
+          ack(delivery_info.delivery_tag)
+        end
+
+        private
+
+        def fetch_logger_message_for(result)
           if result.success?
-            subscriber_logger.info "on_enroll_families_family_members_primary_member_address_relocated, success: person_hbx_id: #{person_hbx_id} | result: #{result.value!}"
+            "success - result: #{result.value!}"
           else
             errors =
               if result.failure.is_a?(Dry::Validation::Result)
@@ -26,13 +56,16 @@ module Subscribers
                 result.failure
               end
 
-            subscriber_logger.info "on_enroll_families_family_members_primary_member_address_relocated, failure: person_hbx_id: #{person_hbx_id} | #{errors}"
+            "failure: #{errors}"
           end
+        end
 
-          ack(delivery_info.delivery_tag)
-        rescue StandardError, SystemStackError => e
-          subscriber_logger.info "on_enroll_families_family_members_primary_member_address_relocated, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-          ack(delivery_info.delivery_tag)
+        def subscriber_key(key, person_hbx_id)
+          @subscriber_key ||= "#{key} | person_hbx_id: #{person_hbx_id}"
+        end
+
+        def subscriber_logger
+          @subscriber_logger ||= Logger.new("#{Rails.root}/log/address_relocated_subscriber#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
         end
       end
     end
