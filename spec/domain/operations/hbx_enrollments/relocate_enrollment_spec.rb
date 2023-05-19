@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe ::Operations::HbxEnrollments::RelocateEnrollment, dbclean: :after_each do
