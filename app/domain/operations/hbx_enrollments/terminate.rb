@@ -41,7 +41,7 @@ module Operations
 
       def terminate_enrollment_for_ivl(enrollment)
         enrollment.terminate_coverage!(TimeKeeper.date_of_record.end_of_month)
-        Success({enrollment_hbx_id: enrollment.hbx_id, enrollment_state: enrollment.aasm_state})
+        Success({hbx_id: enrollment.hbx_id, aasm_state: enrollment.aasm_state, coverage_kind: enrollment.coverage_kind, :kind => reinstatement.kind})
       end
 
       def terminate_employment_term_enrollment(hbx_enrollment, params)

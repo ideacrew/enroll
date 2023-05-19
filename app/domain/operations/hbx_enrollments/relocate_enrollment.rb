@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Operations
   module HbxEnrollments
     # Relocate enrollment operation for SHOP and IVL enrollments based on the given payload
@@ -17,10 +19,15 @@ module Operations
       # @option payload [Boolean] :is_rating_area_changed
       # @option payload [String] :event_outcome
       # @return [Dry::Monads::Result]
+       # For Terminated only Success({base_enrollment: {:hbx_id => 123, :aasm_state => 'coverage_terminated', :coverage_kind => 'health'}})
+       # For Add/Term Success({base_enrollment: {:hbx_id => 123, :aasm_state => 'coverage_terminated', :coverage_kind => 'health'}, :relocated_enrollment => {:hbx_id => 456, :aasm_state => 'coverage_selected', :coverage_kind => 'health'}})
       def call(payload)
         valid_params = yield validate(payload)
         enrollment = yield find_enrollment(valid_params)
         result = yield send(ENROLLMENT_ACTION_MAPPING[valid_params[:expected_enrollment_action]].to_sym, enrollment)
+
+        # TODO: Uncomment below lines once enrollment_relocated event is ready
+        # build_and_publish_enrollment_relocated_event(result)
 
         Success(result)
       end
@@ -39,7 +46,10 @@ module Operations
       end
 
       def terminate_enrollment(enrollment)
-        Operations::HbxEnrollments::Terminate.new.call({enrollment_hbx_id: enrollment.hbx_id})
+        result = Operations::HbxEnrollments::Terminate.new.call({enrollment_hbx_id: enrollment.hbx_id})
+        return result if result.failure?
+
+        Success({base_enrollment: result.success})
       end
 
       def generate_new_enrollment(enrollment)
@@ -69,14 +79,49 @@ module Operations
 
           if result == true
             reinstatement.select_coverage!
-            return Success({:reinstatement_hbx_id => reinstatement.hbx_id, :reinstatement_aasm_state => reinstatement.aasm_state})
+            result_hash = {}
+            result_hash[:base_enrollment] = {:hbx_id => base_enrollment.hbx_id, :aasm_state => base_enrollment.aasm_state, :coverage_kind => base_enrollment.coverage_kind, :kind => reinstatement.kind}
+            result_hash.merge!(:relocated_enrollment => {:hbx_id => reinstatement.hbx_id, :aasm_state => reinstatement.aasm_state, :coverage_kind => reinstatement.coverage_kind, :kind => reinstatement.kind})
+            Success(result_hash)
+          else
+            Failure(result)
           end
-
-          return result if result.is_a?(Failure)
-          Failure(result)
         else
           Failure(reinstatement.errors.full_messages)
         end
+      end
+
+      # families.individual_market.hbx_enrollments.dental_product_terminated
+      # families.individual_market.hbx_enrollments.health_product_terminated
+      # families.individual_market.hbx_enrollments.dental_product_relocated
+      # families.individual_market.hbx_enrollments.health_product_relocated
+      def build_and_publish_enrollment_relocated_event(enrollments_hash)
+        enrollments_hash.each do |k,v|
+          event_key = if v[:coverage_kind] == "health" && v[:aasm_state] == "coverage_terminated"
+                        "health_product_terminated"
+                      elsif v[:coverage_kind] == "dental" && v[:aasm_state] == "coverage_terminated"
+                        "dental_product_terminated"
+                      elsif v[:coverage_kind] == "health" && v[:aasm_state] == "coverage_selected"
+                        "health_product_relocated"
+                      elsif v[:coverage_kind] == "dental" && v[:aasm_state] == "coverage_selected"
+                        "dental_product_relocated"
+                      end
+
+          event_payload = build_event_payload(enrollments_hash[k], event_key)
+
+          publish_event(event_payload)
+        end
+        Success(enrollments_hash)
+      end
+
+      def publish_event(payload)
+        ::Operations::Events::BuildAndPublish.new.call(payload)
+      end
+
+      def build_event_payload(payload, event_key)
+        headers = { correlation_id: payload[:hbx_id] }
+
+        {event_name: "events.families.individual_market.hbx_enrollments.#{event_key}", attributes:  payload.to_h, headers: headers}
       end
 
       # TODO: Implement this method for SHOP enrollments
