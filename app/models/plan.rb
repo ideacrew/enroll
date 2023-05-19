@@ -34,6 +34,7 @@ class Plan
   field :renewal_plan_id, type: BSON::ObjectId
   field :cat_age_off_renewal_plan_id, type: BSON::ObjectId
   field :is_standard_plan, type: Boolean, default: false
+  field :is_hc4cc_plan, type: Boolean, default: false
 
   field :minimum_age, type: Integer, default: 0
   field :maximum_age, type: Integer, default: 120

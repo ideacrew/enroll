@@ -201,6 +201,84 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
   end
 
+  describe 'get revise_applied_aptc_for_osse for thankyou', :dbclean => :around_each do
+    let!(:start_of_year) { Date.new(Date.today.year) }
+    let!(:person10) { FactoryBot.create(:person, :with_consumer_role, dob: Date.new(Date.today.year - 25, 1, 19)) }
+    let!(:family10) { FactoryBot.create(:family, :with_primary_family_member, person: person10) }
+    let!(:hbx_enrollment10) do
+      FactoryBot.create(:hbx_enrollment,
+                        :with_silver_health_product,
+                        :individual_unassisted,
+                        effective_on: start_of_year,
+                        family: family10,
+                        household: family10.active_household,
+                        coverage_kind: "health",
+                        rating_area_id: rating_area.id)
+    end
+    let!(:hbx_enrollment_member10) do
+      FactoryBot.create(:hbx_enrollment_member, is_subscriber: true, hbx_enrollment: hbx_enrollment10, applicant_id: family10.primary_applicant.id,
+                                                coverage_start_on: start_of_year, eligibility_date: start_of_year)
+    end
+
+    let(:plan) { BenefitMarkets::Products::Product.find(hbx_enrollment10.product_id) }
+
+    let(:input_params) do
+      {
+        id: hbx_enrollment10.id,
+        plan_id: hbx_enrollment10.product_id,
+        elected_aptc: elected_aptc
+      }
+    end
+
+    let(:max_aptc) { 300.0 }
+    let(:elected_aptc) { 200.0 }
+
+    let(:session_variables) { { elected_aptc: elected_aptc, max_aptc: max_aptc, aptc_grants: double } }
+
+    context 'with aca_individual_osse_aptc_minimum enabled' do
+      before do
+        controller.instance_variable_set(:@elected_aptc, elected_aptc)
+        controller.instance_variable_set(:@max_aptc, max_aptc)
+        controller.instance_variable_set(:@aptc_grants, double)
+        EnrollRegistry[:aca_individual_osse_aptc_minimum].feature.stub(:is_enabled).and_return(true)
+        allow_any_instance_of(HbxEnrollment).to receive(:ivl_osse_eligible?).and_return(true)
+        sign_in(user)
+      end
+
+      it 'changes elected_aptc to min 85 percent for hc4cc plan' do
+        plan.update!(is_hc4cc_plan: true)
+        get :thankyou, params: input_params, session: session_variables
+        expect(response).to have_http_status(:success)
+        expect(assigns(:elected_aptc)).to eq(max_aptc * 0.85)
+      end
+
+      it 'does not change elected_aptc for non hc4cc plan' do
+        plan.update!(is_hc4cc_plan: false)
+        get :thankyou, params: input_params, session: session_variables
+        expect(response).to have_http_status(:success)
+        expect(assigns(:elected_aptc)).to eq(elected_aptc)
+      end
+    end
+
+    context 'with aca_individual_osse_aptc_minimum disabled' do
+      before do
+        controller.instance_variable_set(:@elected_aptc, elected_aptc)
+        controller.instance_variable_set(:@max_aptc, max_aptc)
+        controller.instance_variable_set(:@aptc_grants, double)
+        EnrollRegistry[:aca_individual_osse_aptc_minimum].feature.stub(:is_enabled).and_return(false)
+        plan.update!(is_hc4cc_plan: true)
+        allow_any_instance_of(HbxEnrollment).to receive(:ivl_osse_eligible?).and_return(true)
+        sign_in(user)
+        get :thankyou, params: input_params, session: session_variables
+      end
+
+      it 'changes elected_aptc to min 85 percent' do
+        expect(response).to have_http_status(:success)
+        expect(assigns(:elected_aptc)).to eq(elected_aptc)
+      end
+    end
+  end
+
   describe 'GET thankyou for set_aptcs_for_continuous_coverage', :dbclean => :around_each do
     let!(:system_year) { Date.today.year }
     let!(:start_of_year) { Date.new(system_year) }
