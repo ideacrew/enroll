@@ -6,7 +6,7 @@ on:
       - tag-latest-prod-image
 
 concurrency:
-  group: reports-${{ github.ref }}
+  group: tag-latest-prod-image-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
