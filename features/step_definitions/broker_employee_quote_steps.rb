@@ -386,7 +386,7 @@ And(/^Broker HC4CC feature enabled$/) do
 end
 
 And(/^Primary Broker should see HC4CC option$/) do
-  expect(page).to have_css('.panel', text: 'Healthcare4Childcare (HC4CC) Program')
+  expect(page).to have_css('.panel', text: 'HealthCare4ChildCare (HC4CC) Program')
 end
 
 Then(/^Primary broker should see plan names in employee costs$/) do
