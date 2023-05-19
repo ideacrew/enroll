@@ -1,0 +1,87 @@
+name: Tag latest prod image
+
+on:
+  repository_dispatch:
+    types:
+      - tag-latest-prod-image
+
+concurrency:
+  group: reports-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prep:
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.prep.outputs.image_tag }}
+      registry_ecr: ${{ steps.prep.outputs.registry_ecr }}
+      registry_ghcr: ${{ steps.prep.outputs.registry_ghcr }}
+      short_sha: ${{ steps.prep.outputs.short_sha}}
+      branch: ${{ steps.prep.outputs.branch }}
+      latest_prod_tag: ${{ steps.prep.outputs.latest_prod_tag }}
+    steps:
+      - name: Git branch name
+        id: git-branch-name
+        uses: EthanSK/git-branch-name-action@v1
+      - name: Prepare info
+        id: prep
+        run: |
+          repo=ideacrew/${{ github.event.client_payload.app }}
+          image_tag=${ repo }:${{ github.event.client_payload.image }}
+          echo ::set-output name=repo::${ repo }
+          echo ::set-output name=image_tag::${ image_tag }
+          echo ::set-output name=registry_ecr::public.ecr.aws
+          echo ::set-output name=registry_ghcr::ghcr.io
+          echo ::set-output name=short_sha::${{ github.event.client_payload.commit_sha }}
+          echo ::set-output name=branch::${{ github.event.client_payload.branch }}
+          echo ::set-output name=latest_prod_tag::${ repo }:latest-prod-${{ github.event.client_payload.client }} 
+
+  build-and-upload-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          install: true
+
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          # Key is named differently to avoid collision
+          key: ${{ runner.os }}-multi-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-multi-buildx
+
+      # Provide credentials for AWS
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      # Must use docker login in order to specify public registry
+      - name: Login to Public ECR
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ needs.prep.outputs.registry_ecr }}
+          username: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ needs.prep.outputs.registry_ghcr }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull, Tag, and Push Image 
+        run: |
+          docker pull ${{ needs.prep.outputs.registry_ecr }}/${{ needs.prep.outputs.image_tag }} 
+          docker tag ${{ needs.prep.outputs.registry_ecr }}/${{ needs.prep.outputs.image_tag }} ${{ needs.prep.outputs.registry_ecr }}/${{ needs.prep.outputs.latest_prod_tag }}  
+          docker push ${{ needs.prep.outputs.registry_ecr }}/${{ needs.prep.outputs.latest_prod_tag }}
+          docker tag ${{ needs.prep.outputs.registry_ecr }}/${{ needs.prep.outputs.image_tag }} ${{ needs.prep.outputs.registry_ghcr }}/${{ needs.prep.outputs.latest_prod_tag }}
+          docker push ${{ needs.prep.outputs.registry_ghcr }}/${{ needs.prep.outputs.latest_prod_tag }}
+
