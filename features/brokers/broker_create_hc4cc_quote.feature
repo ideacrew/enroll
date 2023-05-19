@@ -12,8 +12,6 @@ Feature: Broker HC4CC quote creation
     And Primary Broker clicks on the Add Prospect Employer button
     And Primary Broker creates new Prospect Employer with default_office_location
     Then Primary Broker should see successful message
-
-  Scenario: Broker should be able to create a quote for prospect employer with flexible rules
     Given prospect employer exist for District Brokers Inc
     And Primary broker clicks Actions dropdown and clicks Create Quote
     And Primary Broker enters quote name
@@ -21,6 +19,8 @@ Feature: Broker HC4CC quote creation
     Then Primary Broker selects quote as HC4CCC quote
     And Primary broker clicks on Select Health Benefits button
     And Primary broker should see metal level non bronze options
+
+  Scenario: Broker should be able to create a quote for prospect employer with flexible rules
     And Primary broker selects plan offerings by metal level and enters 50 for employee and deps
     And Primary broker selects reference plan
     And Primary broker clicks on show details in employee costs section
@@ -30,13 +30,6 @@ Feature: Broker HC4CC quote creation
     And Primary broker publishes the quote and sees successful message of published quote
 
   Scenario: Broker should be able to create a quote for prospect employer with no employee and dep contribution
-    Given prospect employer exist for District Brokers Inc
-    And Primary broker clicks Actions dropdown and clicks Create Quote
-    And Primary Broker enters quote name
-    And Primary Broker should see HC4CC option
-    Then Primary Broker selects quote as HC4CCC quote
-    And Primary broker clicks on Select Health Benefits button
-    And Primary broker should see metal level non bronze options
     And Primary broker selects plan offerings by metal level and enters 0 for employee and deps
     And Primary broker selects reference plan
     And Primary broker clicks on show details in employee costs section
@@ -46,13 +39,6 @@ Feature: Broker HC4CC quote creation
     And Primary broker publishes the quote and sees successful message of published quote
 
   Scenario: Broker should be able to create a copy of a quote with OSSE eligibility
-    Given prospect employer exist for District Brokers Inc
-    And Primary broker clicks Actions dropdown and clicks Create Quote
-    And Primary Broker enters quote name
-    And Primary Broker should see HC4CC option
-    Then Primary Broker selects quote as HC4CCC quote
-    And Primary broker clicks on Select Health Benefits button
-    And Primary broker should see metal level non bronze options
     And Primary broker selects plan offerings by metal level and enters 50 for employee and deps
     And Primary broker selects reference plan
     And Primary broker clicks on show details in employee costs section
