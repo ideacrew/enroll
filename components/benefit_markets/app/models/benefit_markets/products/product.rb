@@ -417,6 +417,11 @@ module BenefitMarkets
         rating_method == FAMILY_BASED_RATING
       end
 
+      def is_hc4cc_plan?
+        return self.is_hc4cc_plan if health?
+        false
+      end
+
       def is_same_plan_by_hios_id_and_active_year?(product)
         #a combination of hios_id and active_year has to be considered as a Primary Key as hios_id alone cannot be considered as primary
         ((self.hios_id.split("-")[0] == product.hios_id.split("-")[0]) && self.active_year == product.active_year)
