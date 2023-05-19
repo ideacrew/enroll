@@ -31,12 +31,12 @@
 <% if broker_can_create_hc4cc_quote? %>
   <div class="row no-buffer row-form-wrapper">
     <div class="col-xs-12">
-      <h4><%=l10n('osse_subsidy_title')%></h4>
-      <p><%=l10n('osse_eligibility_description')%></p>
+      <h4><strong><%=l10n('osse_subsidy_title')%></strong></h4>
+      <p><%=l10n('osse_bqt_eligibility_description')%></p>
     </div>
 
     <div class="row no-buffer vertically-aligned-row" style="width: 100%; padding: 15px 0;">
-      <div class="col-md-5 col-xs-12"><%=l10n('osse_eligibility_question')%></div>
+      <div class="col-md-5 col-xs-12"><%=l10n('osse_bqt_eligibility_question')%></div>
       <div class="form-check form-check-inline col-md-2 col-xs-12 form-group form-group-lg no-pd">
           <label>
             <%= f.radio_button :osse_eligibility, true, class: "n-radio", disabled: false %>
