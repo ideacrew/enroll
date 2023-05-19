@@ -31,7 +31,7 @@ module BenefitMarkets
       # Essential Health Benefit (EHB) percentage
       field :ehb,                         type: Float,    default: 0.0
       field :is_standard_plan,            type: Boolean,  default: false
-      field :is_hc4cc_plan,                type: Boolean,  default: false
+      field :is_hc4cc_plan,               type: Boolean,  default: false
 
       field :rx_formulary_url,            type: String
       field :hsa_eligibility,             type: Boolean,  default: false
@@ -75,6 +75,7 @@ module BenefitMarkets
       )
 
       scope :standard_plans,      ->{ where(is_standard_plan: true) }
+      scope :hc4cc_plans,         ->{ where(is_hc4cc_plan: true) }
 
       scope :ppo_plans,           ->{ where(health_plan_kind: :ppo) }
       scope :pos_plans,           ->{ where(health_plan_kind: :pos) }

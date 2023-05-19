@@ -99,6 +99,7 @@ class Insured::PlanShoppingsController < ApplicationController
     else
       @enrollment.reset_dates_on_previously_covered_members(@plan)
       set_aptcs_for_continuous_coverage
+      revise_applied_aptc_for_osse
       @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc)
       @enrollment.update(eligible_child_care_subsidy: @plan.total_childcare_subsidy_amount)
     end
@@ -379,6 +380,23 @@ class Insured::PlanShoppingsController < ApplicationController
     @elected_aptc = percentage * @max_aptc
     session[:elected_aptc] = @elected_aptc.to_f
     session[:max_aptc] = @max_aptc.to_f
+  end
+
+  def revise_applied_aptc_for_osse
+    return unless osse_aptc_minimum_enabled? && @enrollment.ivl_osse_eligible? && @plan.is_hc4cc_plan
+    return if @max_aptc.zero?
+
+    applied_percentage = (@elected_aptc / @max_aptc).to_f
+    minimum_applied_aptc_for_osse = EnrollRegistry[:aca_individual_assistance_benefits].setting(:minimum_applied_aptc_percentage_for_osse).item.to_f
+
+    return unless applied_percentage < minimum_applied_aptc_for_osse
+
+    @elected_aptc = minimum_applied_aptc_for_osse * @max_aptc
+    session[:elected_aptc] = @elected_aptc.to_f
+  end
+
+  def osse_aptc_minimum_enabled?
+    EnrollRegistry.feature_enabled?(:aca_individual_osse_aptc_minimum)
   end
 
   def dependents_with_existing_coverage(enrollment)

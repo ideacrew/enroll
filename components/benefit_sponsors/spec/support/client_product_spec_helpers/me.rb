@@ -67,6 +67,7 @@ module BenefitSponsors
           is_reference_plan_eligible: true,
           renewal_product_id: renewal_product_id,
           is_standard_plan: true,
+          is_hc4cc_plan: false,
           hsa_eligibility: true
         }
       end
