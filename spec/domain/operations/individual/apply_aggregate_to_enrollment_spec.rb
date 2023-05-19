@@ -232,4 +232,116 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
       expect(@new_enrollment.effective_on).to eq(Date.today.next_year.beginning_of_year)
     end
   end
+
+  context '.applied_aptc_pct_for' do
+
+    let(:enrollment) do
+      double(
+        effective_date: Date.new(year, 1, 1),
+        product: product,
+        subscriber: subscriber,
+        elected_aptc_pct: elected_aptc_pct
+      )
+    end
+
+    let(:year) { Date.today.year }
+    let(:new_effective_date) { Date.new(year, 5, 1) }
+    let(:product) { double(is_hc4cc_plan?: false) }
+    let(:subscriber) { double(role_for_subsidy: role_for_subsidy) }
+    let(:role_for_subsidy) { double }
+    let(:elected_aptc_pct) { 0.5 }
+    let(:minimum_applied_aptc_percentage_for_osse) { 0.85 }
+    let(:default_applied_aptc_percentage) { 0.8 }
+    let(:settings) { double }
+
+    before do
+      allow(settings).to receive(:setting).with(:default_applied_aptc_percentage).and_return(double(item: default_applied_aptc_percentage))
+      allow(settings).to receive(:setting).with(:minimum_applied_aptc_percentage_for_osse).and_return(double(item: minimum_applied_aptc_percentage_for_osse))
+      allow(EnrollRegistry).to receive(:[]).with(:aca_individual_assistance_benefits).and_return(settings)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_osse_aptc_minimum).and_return(true)
+    end
+
+    context 'enrollment with osse plan' do
+      let(:product) { double(is_hc4cc_plan?: true) }
+
+      context 'subscriber has osse subsidy enabled' do
+        before do
+          allow(role_for_subsidy).to receive(:osse_eligible?).and_return(true)
+        end
+
+        context 'when elected aptc pct is less the osse minimum' do
+
+          it 'should return minimum aptc pct for osse' do
+            aptc_pct = described_class.new.applied_aptc_pct_for(enrollment, new_effective_date)
+
+            expect(aptc_pct).to eq(minimum_applied_aptc_percentage_for_osse)
+          end
+        end
+
+        context 'when elected aptc pct is greater than osse minimum' do
+          let(:elected_aptc_pct) { 0.90 }
+
+          it 'should return elected aptc pct' do
+            aptc_pct = described_class.new.applied_aptc_pct_for(enrollment, new_effective_date)
+
+            expect(aptc_pct).to eq(elected_aptc_pct)
+          end
+        end
+      end
+
+      context 'subscriber has no osse subsidy enabled' do
+        before do
+          allow(role_for_subsidy).to receive(:osse_eligible?).and_return(false)
+        end
+
+        context 'when elected aptc pct is zero' do
+          let(:elected_aptc_pct) { 0.0 }
+
+          it 'should return default applied aptc pct' do
+            aptc_pct = described_class.new.applied_aptc_pct_for(enrollment, new_effective_date)
+
+            expect(aptc_pct).to eq(default_applied_aptc_percentage)
+          end
+        end
+
+        context 'when elected aptc pct greater than zero' do
+          let(:elected_aptc_pct) { 0.70 }
+
+          it 'should return elected aptc pct' do
+            aptc_pct = described_class.new.applied_aptc_pct_for(enrollment, new_effective_date)
+
+            expect(aptc_pct).to eq(elected_aptc_pct)
+          end
+        end
+      end
+    end
+
+    context 'enrollment with non osse plan' do
+      before do
+        allow(role_for_subsidy).to receive(:osse_eligible?).and_return(true)
+      end
+
+      let(:product) { double(is_hc4cc_plan?: false) }
+
+      context 'when elected aptc pct is zero' do
+        let(:elected_aptc_pct) { 0.0 }
+
+        it 'should return default applied aptc pct' do
+          aptc_pct = described_class.new.applied_aptc_pct_for(enrollment, new_effective_date)
+
+          expect(aptc_pct).to eq(default_applied_aptc_percentage)
+        end
+      end
+
+      context 'when elected aptc pct greater than zero' do
+        let(:elected_aptc_pct) { 0.70 }
+
+        it 'should return elected aptc pct' do
+          aptc_pct = described_class.new.applied_aptc_pct_for(enrollment, new_effective_date)
+
+          expect(aptc_pct).to eq(elected_aptc_pct)
+        end
+      end
+    end
+  end
 end
