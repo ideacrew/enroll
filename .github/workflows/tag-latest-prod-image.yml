@@ -27,14 +27,14 @@ jobs:
         id: prep
         run: |
           repo=ideacrew/${{ github.event.client_payload.app }}
-          image_tag=${ repo }:${{ github.event.client_payload.image }}
-          echo ::set-output name=repo::${ repo }
-          echo ::set-output name=image_tag::${ image_tag }
+          image_tag=${repo}:${{ github.event.client_payload.image }}
+          echo ::set-output name=repo::${repo}
+          echo ::set-output name=image_tag::${image_tag}
           echo ::set-output name=registry_ecr::public.ecr.aws
           echo ::set-output name=registry_ghcr::ghcr.io
           echo ::set-output name=short_sha::${{ github.event.client_payload.commit_sha }}
           echo ::set-output name=branch::${{ github.event.client_payload.branch }}
-          echo ::set-output name=latest_prod_tag::${ repo }:latest-prod-${{ github.event.client_payload.client }} 
+          echo ::set-output name=latest_prod_tag::${repo}:latest-prod-${{ github.event.client_payload.client }} 
 
   build-and-upload-image:
     runs-on: ubuntu-latest
