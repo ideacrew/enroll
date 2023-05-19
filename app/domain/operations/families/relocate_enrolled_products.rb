@@ -105,7 +105,8 @@ module Operations
 
       def find_event_outcome(enrollments_hash)
         enrollments_hash.each do |k,v|
-          result = ::HbxEnrollments::FindEnrollmentEventOutcome.call(is_service_area_changed: v[:is_service_area_changed], product_offered_in_new_service_area: v[:product_offered_in_new_service_area], is_rating_area_changed: v[:is_rating_area_changed])
+          result = ::HbxEnrollments::FindEnrollmentEventOutcome.call(is_service_area_changed: v[:is_service_area_changed], product_offered_in_new_service_area: v[:product_offered_in_new_service_area],
+                                                                     is_rating_area_changed: v[:is_rating_area_changed])
           enrollments_hash[k].merge!({ event_outcome: result.event_outcome })
         end
         enrollments_hash
@@ -114,7 +115,7 @@ module Operations
       def action_on_enrollment(enrollments_hash)
         enrollments_hash.each do |k,v|
           result = ::HbxEnrollments::ExpectedEnrollmentAction.call(is_service_area_changed: v[:is_service_area_changed], product_offered_in_new_service_area: v[:product_offered_in_new_service_area],
-                                                 is_rating_area_changed: v[:is_rating_area_changed], event_outcome: v[:event_outcome])
+                                                                   is_rating_area_changed: v[:is_rating_area_changed], event_outcome: v[:event_outcome])
           enrollments_hash[k].merge!({ expected_enrollment_action: result.action_on_enrollment })
         end
       end

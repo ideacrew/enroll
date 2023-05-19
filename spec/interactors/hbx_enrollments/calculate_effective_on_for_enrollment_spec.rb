@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 # referred spec examples from self_service_factory_spec.rb
