@@ -32,7 +32,7 @@ module Operations
       def terminate_enrollment(enrollment, params)
         if enrollment.is_shop?
           terminate_employment_term_enrollment(enrollment, params)
-        elsif enrollment.kind == "individual" && enrollment.may_terminate_coverage?
+        elsif enrollment.kind == "individual"
           terminate_enrollment_for_ivl(enrollment)
         else
           Failure("Unable to terminate enrollment - does not meet the enrollment kind criteria: #{enrollment.hbx_id}.")
@@ -40,8 +40,15 @@ module Operations
       end
 
       def terminate_enrollment_for_ivl(enrollment)
-        enrollment.terminate_coverage!(TimeKeeper.date_of_record.end_of_month)
-        Success({hbx_id: enrollment.hbx_id, aasm_state: enrollment.aasm_state, coverage_kind: enrollment.coverage_kind, :kind => reinstatement.kind})
+        if enrollment.effective_on > TimeKeeper.date_of_record && enrollment.may_cancel_coverage?
+          enrollment.cancel_coverage!
+        elsif enrollment.may_terminate_coverage?
+          enrollment.terminate_coverage!(TimeKeeper.date_of_record.end_of_month)
+        else
+          return Failure("Unable to terminate/cancel enrollment - does not meet the enrollment kind criteria: #{enrollment.hbx_id}.")
+        end
+
+        Success({hbx_id: enrollment.hbx_id, aasm_state: enrollment.aasm_state, coverage_kind: enrollment.coverage_kind, :kind => enrollment.kind})
       end
 
       def terminate_employment_term_enrollment(hbx_enrollment, params)
