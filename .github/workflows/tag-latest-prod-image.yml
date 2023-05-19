@@ -38,6 +38,7 @@ jobs:
 
   build-and-upload-image:
     runs-on: ubuntu-latest
+    needs: [prep]
     steps:
       - uses: actions/checkout@v3
       - name: Set up Docker Buildx
