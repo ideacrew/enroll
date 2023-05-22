@@ -211,7 +211,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
 
   # For the case of reinstated enrollments, when a hc4cc subsidy propagated from base enrollment, we should apply the subsidy.
   def total_childcare_subsidy_amount
-    return @hbx_enrollment.eligible_child_care_subsidy if @hbx_enrollment.eligible_child_care_subsidy > 0
+    return hbx_enrollment.eligible_child_care_subsidy.to_f if hbx_enrollment.is_reinstated_enrollment?
 
     if ivl_osse_eligible?
       total_premium - total_aptc_amount

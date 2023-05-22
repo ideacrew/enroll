@@ -150,6 +150,7 @@ module Insured
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, "R-#{site_key}001", 'N').and_return(679.8)
         person.update_attributes!(dob: (enrollment.effective_on - 61.years))
         family.family_members[1].person.update_attributes!(dob: (enrollment.effective_on - 59.years))
+        allow(enrollment).to receive(:ivl_osse_eligible?).and_return(true)
       end
 
       it 'should return updated enrollment with aptc fields' do
@@ -171,6 +172,13 @@ module Insured
         enrollment.reload
         expect(enrollment.applied_aptc_amount.to_f).to eq 500
         expect(enrollment.elected_aptc_pct).to eq 0.25
+      end
+
+      it 'should set eligible child care subsidy amount' do
+        subject.update_enrollment_for_apcts(enrollment, 500)
+        enrollment.reload
+        expected_subsidy = enrollment.total_premium.to_f - enrollment.applied_aptc_amount.to_f
+        expect(enrollment.eligible_child_care_subsidy.to_f).to eq expected_subsidy.round(2)
       end
     end
 

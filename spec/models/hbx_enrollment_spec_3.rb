@@ -6,7 +6,7 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 require File.join(Rails.root, 'spec/shared_contexts/dchbx_product_selection')
 
-describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean => :around_each do
+describe HbxEnrollment, "reinstate and change end date", type: :model, :dbclean => :around_each do
   before do
     allow(::Operations::Products::ProductOfferedInServiceArea).to receive(:new).and_return(double(call: double(:success? => true)))
   end
@@ -49,7 +49,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
     end
   end
 
-  context "reinstate aptc enrollment" do
+  describe "reinstate aptc enrollment" do
     before :all do
       TimeKeeper.set_date_of_record_unprotected!(Date.new((Date.today.year - 1), 6, 1))
     end
@@ -159,7 +159,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
                                                    dental_product_hios_id: nil, tax_household_members_enrollment_members: thhm_enrollment_members)
     end
 
-    before :each do
+    before do
       allow(::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts).to receive(:new).and_return(
         double('IdentifySlcspWithPediatricDentalCosts',
                call: double(:value! => slcsp_info, :success? => true))
@@ -174,20 +174,70 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
       family.family_members[2].person.consumer_role = cr2
       family.save!
       EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
-      allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1500, total_premium: 1600))
-      @reinstate_enrollment = enrollment.reinstate
     end
 
-    it "should create tax household enrollment" do
-      expect(TaxHouseholdEnrollment.where(enrollment_id: @reinstate_enrollment.id).present?).to be_truthy
+    context "success" do
+      before do
+        allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1500, total_premium: 1600))
+      end
+
+      it "should create tax household enrollment" do
+        reinstate_enrollment = enrollment.reinstate
+
+        expect(TaxHouseholdEnrollment.where(enrollment_id: reinstate_enrollment.id).present?).to be_truthy
+      end
+
+      it "should not have same bson id" do
+        reinstate_enrollment = enrollment.reinstate
+
+        expect(TaxHouseholdEnrollment.where(enrollment_id: reinstate_enrollment.id).first.id).not_to be thhe.id
+      end
+
+      it "should not have same tax household enrollment id"  do
+        reinstate_enrollment = enrollment.reinstate
+
+        expect(TaxHouseholdEnrollment.where(enrollment_id: reinstate_enrollment.id).first.enrollment_id).not_to be thhe.enrollment_id
+      end
     end
 
-    it "should not have same bson id" do
-      expect(TaxHouseholdEnrollment.where(enrollment_id: @reinstate_enrollment.id).first.id).not_to be thhe.id
-    end
+    context 'when osse eligibility changed' do
 
-    it "should not have same tax household enrollment id"  do
-      expect(TaxHouseholdEnrollment.where(enrollment_id: @reinstate_enrollment.id).first.enrollment_id).not_to be thhe.enrollment_id
+      before do
+        enrollment.update(applied_aptc_amount: 750, eligible_child_care_subsidy: eligible_child_care_subsidy)
+
+        allow_any_instance_of(UnassistedPlanCostDecorator).to receive(:total_premium).and_return(1600)
+        allow_any_instance_of(UnassistedPlanCostDecorator).to receive(:total_ehb_premium).and_return(1500)
+        allow_any_instance_of(UnassistedPlanCostDecorator).to receive(:total_aptc_amount).and_return(750)
+      end
+
+      context "when termed enrollment has osse subsidy" do
+        let(:eligible_child_care_subsidy) { 850.0 }
+
+        before do
+          allow_any_instance_of(UnassistedPlanCostDecorator).to receive(:ivl_osse_eligible?).and_return(false)
+        end
+
+        it 'should have same amount of subsidy on reinstated enrollment' do
+          reinstate_enrollment = enrollment.reinstate
+
+          expect(reinstate_enrollment.eligible_child_care_subsidy.to_f).to eq eligible_child_care_subsidy
+          expect(reinstate_enrollment.total_employee_cost.to_f).to eq 0.0
+        end
+      end
+
+      context "when termed enrollment has no osse subsidy" do
+        let(:eligible_child_care_subsidy) { 0.0 }
+
+        before do
+          allow_any_instance_of(UnassistedPlanCostDecorator).to receive(:ivl_osse_eligible?).and_return(true)
+        end
+
+        it 'should not have subsidy on reinstated enrollment' do
+          reinstate_enrollment = enrollment.reinstate
+          expect(reinstate_enrollment.eligible_child_care_subsidy.to_f).to eq eligible_child_care_subsidy
+          expect(reinstate_enrollment.total_employee_cost.to_f).to eq 850.0
+        end
+      end
     end
 
     after do
