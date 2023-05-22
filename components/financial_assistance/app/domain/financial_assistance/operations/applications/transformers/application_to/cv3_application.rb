@@ -501,7 +501,6 @@ module FinancialAssistance
             end
 
             def other_income(current_incomes)
-              binding.pry
               other_kinds = ["net_self_employment", "dividend", "rental_and_royalty", "social_security_benefit", "american_indian_and_alaskan_native",
                              "employer_funded_disability", "estate_trust", "foreign", "other", "prizes_and_awards"]
               otr_incomes = current_incomes.select do |inc|
