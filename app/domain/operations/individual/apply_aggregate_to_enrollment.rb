@@ -51,7 +51,7 @@ module Operations
       def applied_aptc_pct_for(enrollment, new_effective_date)
         subscriber = enrollment.subscriber || enrollment.hbx_enrollment_members.first
 
-        if osse_aptc_minimum_enabled? && enrollment.product.is_hc4cc_plan? && subscriber.role_for_subsidy.osse_eligible?(new_effective_date)
+        if osse_aptc_minimum_enabled? && subscriber.role_for_subsidy.osse_eligible?(new_effective_date)
           return enrollment.elected_aptc_pct if enrollment.elected_aptc_pct >= minimum_applied_aptc_for_osse.to_f
           minimum_applied_aptc_for_osse
         else

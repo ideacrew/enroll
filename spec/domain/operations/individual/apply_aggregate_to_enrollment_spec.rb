@@ -326,20 +326,20 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
       context 'when elected aptc pct is zero' do
         let(:elected_aptc_pct) { 0.0 }
 
-        it 'should return default applied aptc pct' do
+        it 'should return minimum osse aptc percent' do
           aptc_pct = described_class.new.applied_aptc_pct_for(enrollment, new_effective_date)
 
-          expect(aptc_pct).to eq(default_applied_aptc_percentage)
+          expect(aptc_pct).to eq(minimum_applied_aptc_percentage_for_osse)
         end
       end
 
       context 'when elected aptc pct greater than zero' do
         let(:elected_aptc_pct) { 0.70 }
 
-        it 'should return elected aptc pct' do
+        it 'should return minimum osse aptc percent' do
           aptc_pct = described_class.new.applied_aptc_pct_for(enrollment, new_effective_date)
 
-          expect(aptc_pct).to eq(elected_aptc_pct)
+          expect(aptc_pct).to eq(minimum_applied_aptc_percentage_for_osse)
         end
       end
     end
