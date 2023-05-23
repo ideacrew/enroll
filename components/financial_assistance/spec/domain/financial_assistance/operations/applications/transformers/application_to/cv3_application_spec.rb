@@ -1182,7 +1182,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
 
     it 'should be able to successfully return mitc_income with amount' do
-      expect(@mitc_income[:amount]).to eq(30000)
+      expect(@mitc_income[:amount]).to eq(30_000)
     end
 
     it 'should return taxable_interest for mitc_income as zero' do
@@ -1211,7 +1211,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     it 'should return other_income for mitc_income as zero' do
       expect(@mitc_income[:other_income]).not_to be_zero
-      expect(@mitc_income[:other_income]).to eq(30000)
+      expect(@mitc_income[:other_income]).to eq(30_000)
     end
   end
 
