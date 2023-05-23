@@ -179,7 +179,7 @@ module BenefitSponsors
       end
 
       def verify_recaptcha_if_needed
-        return true unless true#Settings.aca.recaptcha_enabled
+        return true unless display_registration_recaptcha
         verify_recaptcha(model: @agency)
       end
     end
