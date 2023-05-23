@@ -1,5 +1,5 @@
 class Users::RegistrationsController < Devise::RegistrationsController
-  # include RecaptchaConcern
+  include RecaptchaConcern
   layout 'bootstrap_4'
   before_action :configure_sign_up_params, only: [:create]
   before_action :set_ie_flash_by_announcement, only: [:new]

@@ -30,9 +30,6 @@ module BenefitSponsors
         authorize @agency
         begin
           saved, result_url = verify_captcha_if_needed && @agency.save
-          error_messages = @agency.errors.full_messages
-          render 'new', :flash => { :error => error_messages } and return if error_messages.present?
-          result_url = self.send(result_url)
           if saved && is_employer_profile?
               person = current_person
               create_sso_account(current_user, current_person, 15, "employer") do
@@ -50,6 +47,7 @@ module BenefitSponsors
             render template_filename, :layout => 'single_column'
             return
           elsif saved
+            result_url = self.send(result_url)
             redirect_to result_url
             return
           end
