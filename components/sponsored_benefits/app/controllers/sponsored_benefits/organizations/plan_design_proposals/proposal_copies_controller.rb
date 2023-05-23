@@ -4,6 +4,7 @@ module SponsoredBenefits
 
       def create
         new_plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new({ organization: plan_design_organization }.merge(plan_design_form.to_h))
+        new_plan_design_proposal.osse_eligibility = plan_design_form.osse_eligibility if plan_design_form.osse_eligibility.present?
         existing_roster = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee.find_by_benefit_sponsor(plan_design_form.proposal.profile.benefit_sponsorships.first)
 
         if new_plan_design_proposal.save

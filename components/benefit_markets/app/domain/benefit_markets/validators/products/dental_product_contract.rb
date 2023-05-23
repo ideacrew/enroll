@@ -12,6 +12,7 @@ module BenefitMarkets
           required(:dental_plan_kind).filled(:symbol)
           required(:ehb).filled(:float)
           required(:is_standard_plan).filled(:bool)
+          optional(:is_hc4cc_plan).maybe(:bool)
           required(:hsa_eligibility).filled(:bool)
           required(:metal_level_kind).filled(:symbol)
         end

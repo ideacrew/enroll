@@ -173,6 +173,7 @@ module BenefitMarkets
     #Products retrieval by type
       scope :health_products,            ->{ where(:_type => /.*HealthProduct$/) }
       scope :dental_products,            ->{ where(:_type => /.*DentalProduct$/)}
+      scope :hc4cc_plans,                ->{ where(is_hc4cc_plan: true) }
 
       alias name title
 
@@ -415,6 +416,11 @@ module BenefitMarkets
 
       def family_based_rating?
         rating_method == FAMILY_BASED_RATING
+      end
+
+      def is_hc4cc_plan?
+        return self.is_hc4cc_plan if health?
+        false
       end
 
       def is_same_plan_by_hios_id_and_active_year?(product)

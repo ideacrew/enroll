@@ -40,13 +40,35 @@ module Operations
         enrollments.each do |enrollment|
           date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date
           max_aptc = latest_tax_household.monthly_max_aptc(enrollment, date)
-          default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
-          applied_percentage = enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_percentage
+          applied_percentage = applied_aptc_pct_for(enrollment, date)
           applied_aptc = float_fix(max_aptc * applied_percentage)
           attrs = {enrollment_id: enrollment.id, elected_aptc_pct: applied_percentage, aptc_applied_total: applied_aptc}
           ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
         end
         Success("Aggregate amount applied on to enrollments")
+      end
+
+      def applied_aptc_pct_for(enrollment, new_effective_date)
+        subscriber = enrollment.subscriber || enrollment.hbx_enrollment_members.first
+
+        if osse_aptc_minimum_enabled? && enrollment.product.is_hc4cc_plan? && subscriber.role_for_subsidy.osse_eligible?(new_effective_date)
+          return enrollment.elected_aptc_pct if enrollment.elected_aptc_pct >= minimum_applied_aptc_for_osse.to_f
+          minimum_applied_aptc_for_osse
+        else
+          enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_applied_aptc
+        end
+      end
+
+      def osse_aptc_minimum_enabled?
+        EnrollRegistry.feature_enabled?(:aca_individual_osse_aptc_minimum)
+      end
+
+      def default_applied_aptc
+        EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
+      end
+
+      def minimum_applied_aptc_for_osse
+        EnrollRegistry[:aca_individual_assistance_benefits].setting(:minimum_applied_aptc_percentage_for_osse).item
       end
     end
   end
