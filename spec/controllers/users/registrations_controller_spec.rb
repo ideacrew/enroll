@@ -85,7 +85,7 @@ RSpec.describe Users::RegistrationsController do
     end
 
     context "with invalid captcha" do
-      let(:email) { "devise@test.com" }
+      let(:email) { "devise+123@test.com" }
       let!(:user) { FactoryBot.create(:user, email: email, oim_id: email) }
 
       before do

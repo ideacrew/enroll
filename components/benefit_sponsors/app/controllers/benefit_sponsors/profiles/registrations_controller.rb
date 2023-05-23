@@ -29,7 +29,7 @@ module BenefitSponsors
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_create(registration_params)
         authorize @agency
         begin
-          saved, result_url = verify_captcha_if_needed && @agency.save
+          saved, result_url = verify_recaptcha_if_needed && @agency.save
           if saved && is_employer_profile?
               person = current_person
               create_sso_account(current_user, current_person, 15, "employer") do
@@ -178,7 +178,7 @@ module BenefitSponsors
         end
       end
 
-      def verify_captcha_if_needed
+      def verify_recaptcha_if_needed
         return true unless true#Settings.aca.recaptcha_enabled
         verify_recaptcha(model: @agency)
       end
