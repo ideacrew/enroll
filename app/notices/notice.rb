@@ -36,10 +36,6 @@ class Notice
     @random_str ||= rand(10**10).to_s
   end
 
-  def pdf
-    WickedPdf.new.pdf_from_string(self.html({kind: 'pdf'}), pdf_options)
-  end
-
   def layout
     if market_kind == 'individual'
       'ivl_pdf_notice'
