@@ -397,11 +397,11 @@ module BenefitSponsors
           }
         end
 
-        it "should render an error" do
+        it "should not redirect" do
           allow(controller).to receive(:verify_recaptcha_if_needed).and_return(false)
           post :create, params: {:agency => general_agency_params}
 
-          expect(response).to_not be_success
+          expect(response).to render_template :new
         end
       end
     end
