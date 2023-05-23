@@ -1,5 +1,5 @@
 class Users::RegistrationsController < Devise::RegistrationsController
-  include RecaptchaConcern
+  # include RecaptchaConcern
   layout 'bootstrap_4'
   before_action :configure_sign_up_params, only: [:create]
   before_action :set_ie_flash_by_announcement, only: [:new]
@@ -32,8 +32,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
     resource.email = resource.oim_id if resource.email.blank? && resource.oim_id =~ Devise.email_regexp
     resource.handle_headless_records
-
-    resource_saved = resource.save
+    resource_saved = verify_recaptcha_if_needed && resource.save
     yield resource if block_given?
     if resource_saved
       # FIXME: DON'T EVER DO THIS!
@@ -60,6 +59,11 @@ class Users::RegistrationsController < Devise::RegistrationsController
       end
       render :new
     end
+  end
+
+  def verify_recaptcha_if_needed
+    return true unless true#Settings.aca.recaptcha_enabled
+    verify_recaptcha(model: resource)
   end
 
   # GET /resource/edit

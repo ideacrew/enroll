@@ -387,6 +387,23 @@ module BenefitSponsors
         # it_behaves_like "fail store profile for create if params invalid", "contact_center"
         # it_behaves_like "fail store profile for create if params invalid", "fedhb"
       end
+
+      context "with invalid captcha" do
+        let(:general_agency_params) do
+          {
+            :profile_type => "general_agency",
+            :staff_roles_attributes => staff_roles_attributes,
+            :organization => general_agency_organization
+          }
+        end
+
+        it "should render an error" do
+          allow(controller).to receive(:verify_recaptcha_if_needed).and_return(false)
+          post :create, params: {:agency => general_agency_params}
+
+          expect(response).to_not be_success
+        end
+      end
     end
 
     describe "GET edit", dbclean: :after_each do

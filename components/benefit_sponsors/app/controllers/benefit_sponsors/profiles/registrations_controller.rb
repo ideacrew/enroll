@@ -29,7 +29,9 @@ module BenefitSponsors
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_create(registration_params)
         authorize @agency
         begin
-          saved, result_url = @agency.save
+          saved, result_url = verify_captcha_if_needed && @agency.save
+          error_messages = @agency.errors.full_messages
+          render 'new', :flash => { :error => error_messages } and return if error_messages.present?
           result_url = self.send(result_url)
           if saved && is_employer_profile?
               person = current_person
@@ -176,6 +178,11 @@ module BenefitSponsors
           session[:custom_url] = main_app.new_user_registration_path unless current_user
           super
         end
+      end
+
+      def verify_captcha_if_needed
+        return true unless true#Settings.aca.recaptcha_enabled
+        verify_recaptcha(model: @agency)
       end
     end
   end
