@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Users::RegistrationsController do
@@ -85,7 +87,7 @@ RSpec.describe Users::RegistrationsController do
     end
 
     context "with invalid captcha" do
-      let(:email) { "devise+123@test.com" }
+      let(:email) { "devise9998@test.com" }
       let!(:user) { FactoryBot.create(:user, email: email, oim_id: email) }
 
       before do
