@@ -78,11 +78,11 @@ class InsuredEligibleForBenefitRule
     short_name = EnrollRegistry[:enroll_app].setting(:short_name).item
     case element
     when "citizenship_status"
-      "Since #{name} did not attest to being a US citizen or having an eligible immigration status,#{pronoun}is not eligible to purchase a plan on #{short_name}. Other family members may still be <br/> eligible to enroll."
+      "Since #{name} did not attest to being a US citizen or having an eligible immigration status,#{pronoun}is not eligible to purchase a plan on #{short_name}.<br/> Other family members may still be eligible to enroll."
     when "residency_status"
-      "Since #{name} is not currently a state resident,#{pronoun} is <br/> not eligible to purchase a plan on #{short_name}.<br/> Other family members may still be eligible to enroll."
+      "Since #{name} is not currently a state resident,#{pronoun} is not eligible to purchase a plan on #{short_name}.<br/> Other family members may still be eligible to enroll."
     when "incarceration_status"
-      "Since #{name} is currently incarcerated, #{pronoun} is not <br/> eligible to purchase a plan on #{short_name}.<br/> Other family members may still be eligible to enroll."
+      "Since #{name} is currently incarcerated, #{pronoun} is not eligible to purchase a plan on #{short_name}.<br/> Other family members may still be eligible to enroll."
     else
       "eligibility failed on #{element}"
     end

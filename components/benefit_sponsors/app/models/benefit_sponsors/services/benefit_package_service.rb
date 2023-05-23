@@ -288,7 +288,8 @@ module BenefitSponsors
           metal_level_kind: reference_product.metal_level,
           network_information: reference_product.network_information,
           network: reference_product.network,
-          is_standard_plan: reference_product.is_standard_plan
+          is_standard_plan: reference_product.is_standard_plan,
+          is_hc4cc_plan: reference_product.is_hc4cc_plan
         })
       end
 
