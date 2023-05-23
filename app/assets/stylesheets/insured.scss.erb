@@ -629,6 +629,16 @@ span.glossary:hover, span.hover-glossary:hover {
   padding-right: 5px;
 }
 
+.coverage-container {
+  display: flex;
+}
+
+.coverage-message-row{
+  margin-bottom:0;
+  white-space: nowrap;
+  margin-right: 5rem;
+}
+
 .group-selection-table{
   .text-dk-grey{
     color: #595959;
@@ -648,12 +658,8 @@ span.glossary:hover, span.hover-glossary:hover {
 
       .coverage-name-and-errors{
         display:flex; 
-        flex-direction:column; 
+        flex-direction:row; 
         padding:10px 0;
-
-        .coverage-message-row{
-          margin-bottom:0;
-        }
       }
     } 
   }
