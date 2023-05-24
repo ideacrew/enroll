@@ -91,12 +91,12 @@ jobs:
           tags: ${{ needs.prep.outputs.latest_prod_tag }}
 
       - name: Tag ECR images
-        uses: shrink/actions-docker-registry-tag@v3
+        uses: abronin/ecr-retag-action@v1
         with:
-          registry:  ${{ needs.prep.outputs.registry_ecr }}
           repository: ${{ needs.prep.outputs.repo }}
-          target: ${{ needs.prep.outputs.image_tag }}
-          tags: ${{ needs.prep.outputs.latest_prod_tag }}
+          tag: ${{ needs.prep.outputs.image_tag }}
+          new-tags: ${{ needs.prep.outputs.latest_prod_tag }}
+
 
 #      - name: Pull, Tag, and Push Image
 #        run: |
