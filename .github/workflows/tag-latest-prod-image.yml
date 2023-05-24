@@ -13,6 +13,7 @@ jobs:
   prep:
     runs-on: ubuntu-latest
     outputs:
+      repo: ${{ steps.prep.outputs.repo }}
       image_tag: ${{ steps.prep.outputs.image_tag }}
       registry_ecr: ${{ steps.prep.outputs.registry_ecr }}
       registry_ghcr: ${{ steps.prep.outputs.registry_ghcr }}
