@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'sidekiq/testing'
 
 describe Address, "with proper validations" do
   let(:address_kind) { "home" }
@@ -172,6 +173,27 @@ describe Address, "with proper validations" do
             expect(address.valid?).to eq false
           end
         end
+      end
+    end
+  end
+
+  context "#notify_address_changed" do
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let!(:delete_address) do
+      person.addresses.first.delete
+    end
+
+    before do
+      EnrollRegistry[:notify_address_changed].feature.stub(:is_enabled).and_return(true)
+    end
+
+    context "when address is updated" do
+      it "should notify_address_changed callback and queue the job" do
+        AddressWorker.clear
+        person.home_address.update_attributes(state: "OT")
+        expect(AddressWorker.jobs.size).to eq 1
+        AddressWorker.clear
       end
     end
   end

@@ -5,6 +5,10 @@ require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "products", "mark_products_as_hc4cc_eligible")
 
 describe MarkProductsAsHc4ccEligible, dbclean: :after_each do
+  before :all do
+    DatabaseCleaner.clean
+  end
+
   let(:given_task_name) { "mark_products_as_hc4cc_eligible" }
   subject { MarkProductsAsHc4ccEligible.new(given_task_name, double(:current_scope => nil)) }
 
