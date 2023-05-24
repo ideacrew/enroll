@@ -2,6 +2,7 @@
 
 # Handles custom exceptions if enabled, otherwise just loads files from the public folder
 class ExceptionsController < ApplicationController
+  before_action :recover_exception_code
 
   ## Devise filters
   skip_before_action :require_login, unless: :authentication_not_required?
@@ -10,17 +11,18 @@ class ExceptionsController < ApplicationController
 
   # for i18L
   skip_before_action :set_locale
-
   # for current_user
   skip_before_action :set_current_user
   def show
-    status_code = params[:code] || 500
-    if EnrollRegistry.feature_enabled?(:custom_exceptions_controller)
-      render 'show', status: status_code
-    else
-      render file: "public/#{status_code}.html",
-             status: status_code,
-             layout: false
-    end
+    render 'show', status: @exception_code if EnrollRegistry.feature_enabled?(:custom_exceptions_controller)
+
+    render file: "public/#{@exception_code}.html", status: @exception_code, layout: false
+  end
+
+  private
+
+  def recover_exception_code
+    exception = request.env["action_dispatch.exception"]
+    @exception_code = ActionDispatch::ExceptionWrapper.new(request.env, exception).status_code
   end
 end

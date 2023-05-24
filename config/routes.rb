@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   # https://gist.github.com/mlanett/a31c340b132ddefa9cca
   # Make sure all exception throwing status codes get sent to the "friendly" exception page
   (400..510).to_a.map(&:to_s).each do |code|
-    get code, :to => "exceptions#show", :code => code
+    get code, :to => "exceptions#show"
   end
 
   default_url_options Rails.application.config.action_mailer.default_url_options
