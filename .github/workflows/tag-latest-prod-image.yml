@@ -41,6 +41,9 @@ jobs:
     needs: [prep]
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.prep.outputs.branch }}
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
         with:
