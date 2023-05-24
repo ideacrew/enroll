@@ -34,7 +34,7 @@ jobs:
           echo ::set-output name=registry_ghcr::ghcr.io
           echo ::set-output name=short_sha::${{ github.event.client_payload.commit_sha }}
           echo ::set-output name=branch::${{ github.event.client_payload.branch }}
-          echo ::set-output name=latest_prod_tag::${repo}:latest-prod-${{ github.event.client_payload.client }} 
+          echo ::set-output name=latest_prod_tag::${repo}:latest-prod-${{ github.event.client_payload.client }}
 
   build-and-upload-image:
     runs-on: ubuntu-latest
@@ -81,11 +81,27 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Pull, Tag, and Push Image 
-        run: |
-          docker pull ${{ needs.prep.outputs.registry_ecr }}/${{ needs.prep.outputs.image_tag }} 
-          docker tag ${{ needs.prep.outputs.registry_ecr }}/${{ needs.prep.outputs.image_tag }} ${{ needs.prep.outputs.registry_ecr }}/${{ needs.prep.outputs.latest_prod_tag }}  
-          docker push ${{ needs.prep.outputs.registry_ecr }}/${{ needs.prep.outputs.latest_prod_tag }}
-          docker tag ${{ needs.prep.outputs.registry_ecr }}/${{ needs.prep.outputs.image_tag }} ${{ needs.prep.outputs.registry_ghcr }}/${{ needs.prep.outputs.latest_prod_tag }}
-          docker push ${{ needs.prep.outputs.registry_ghcr }}/${{ needs.prep.outputs.latest_prod_tag }}
+      - name: Tag GHCR images
+        uses: shrink/actions-docker-registry-tag@v3
+        with:
+          registry:  ${{ needs.prep.outputs.registry_ghcr }}
+          repository: ${{ needs.prep.outputs.repo }}
+          target: ${{ needs.prep.outputs.image_tag }}
+          tags: ${{ needs.prep.outputs.latest_prod_tag }}
+
+      - name: Tag ECR images
+        uses: shrink/actions-docker-registry-tag@v3
+        with:
+          registry:  ${{ needs.prep.outputs.registry_ecr }}
+          repository: ${{ needs.prep.outputs.repo }}
+          target: ${{ needs.prep.outputs.image_tag }}
+          tags: ${{ needs.prep.outputs.latest_prod_tag }}
+
+#      - name: Pull, Tag, and Push Image
+#        run: |
+#          docker pull ${{ needs.prep.outputs.registry_ecr }}/${{ needs.prep.outputs.image_tag }}
+#          docker tag ${{ needs.prep.outputs.registry_ecr }}/${{ needs.prep.outputs.image_tag }} ${{ needs.prep.outputs.registry_ecr }}/${{ needs.prep.outputs.latest_prod_tag }}
+#          docker push ${{ needs.prep.outputs.registry_ecr }}/${{ needs.prep.outputs.latest_prod_tag }}
+#          docker tag ${{ needs.prep.outputs.registry_ecr }}/${{ needs.prep.outputs.image_tag }} ${{ needs.prep.outputs.registry_ghcr }}/${{ needs.prep.outputs.latest_prod_tag }}
+#          docker push ${{ needs.prep.outputs.registry_ghcr }}/${{ needs.prep.outputs.latest_prod_tag }}
 
