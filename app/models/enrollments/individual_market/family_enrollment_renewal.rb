@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   include FloatHelper
+  include Config::AcaHelper
   attr_accessor :enrollment, :renewal_coverage_start, :assisted, :aptc_values
 
   CAT_AGE_OFF_HIOS_IDS = ["94506DC0390008", "86052DC0400004"]
@@ -22,6 +23,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
       raise "Cannot renew enrollment #{enrollment.hbx_id}. Error: #{can_renew.failure}" unless can_renew.success?
 
       save_renewal_enrollment(renewal_enrollment)
+
       # elected aptc should be the minimun between applied_aptc and EHB premium.
       renewal_enrollment = assisted_enrollment(renewal_enrollment) if @assisted.present? && renewal_enrollment.is_health_enrollment?
 
@@ -32,6 +34,9 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
       else
         renewal_enrollment.renew_enrollment
       end
+
+      verify_and_set_osse_minimum_aptc(renewal_enrollment)
+      renewal_enrollment.update_eligible_child_care_subsidy_amount
 
       # renewal_enrollment.decorated_hbx_enrollment
       @dependent_age_off = nil
@@ -108,6 +113,33 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
                           max_aptc: max_aptc,
                           ehb_premium: ehb_premium
                         })
+  end
+
+  def verify_and_set_osse_minimum_aptc(enrollment)
+    applied_aptc_pct = applied_aptc_pct_for(enrollment)
+    return if applied_aptc_pct == enrollment.elected_aptc_pct
+
+    calculated_aptc_pct = enrollment.applied_aptc_amount.to_f / aptc_values[:max_aptc].to_f
+    if calculated_aptc_pct == enrollment.elected_aptc_pct
+      applied_aptc = @aptc_values[:max_aptc] * applied_aptc_pct
+    else
+      ehb_premium = enrollment.total_ehb_premium
+      applied_aptc = [(@aptc_values[:max_aptc] * applied_aptc_pct), ehb_premium].min
+    end
+
+    enrollment.update(
+      applied_aptc_amount: float_fix(applied_aptc),
+      elected_aptc_pct: applied_aptc_pct
+    )
+  end
+
+  def applied_aptc_pct_for(enrollment)
+    if enrollment.ivl_osse_eligible? && osse_aptc_minimum_enabled?
+      return enrollment.elected_aptc_pct if enrollment.elected_aptc_pct >= minimum_applied_aptc_for_osse.to_f
+      minimum_applied_aptc_for_osse
+    else
+      enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_applied_aptc_pct
+    end
   end
 
   def can_renew_assisted_product?(renewal_enrollment)

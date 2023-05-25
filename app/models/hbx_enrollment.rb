@@ -2641,6 +2641,14 @@ class HbxEnrollment
     )
   end
 
+  def update_eligible_child_care_subsidy_amount
+    return if is_shop?
+    return unless ivl_osse_eligible?
+
+    cost_calculator = build_plan_premium(qhp_plan: product, elected_aptc: applied_aptc_amount, apply_aptc: applied_aptc_amount > 0)
+    update(eligible_child_care_subsidy: cost_calculator.total_childcare_subsidy_amount)
+  end
+
   def cancel_ivl_enrollment
     return if is_shop?
 
