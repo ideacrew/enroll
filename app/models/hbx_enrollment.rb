@@ -2641,14 +2641,6 @@ class HbxEnrollment
     )
   end
 
-  def update_eligible_child_care_subsidy_amount
-    return if is_shop?
-    return unless ivl_osse_eligible?
-
-    cost_calculator = build_plan_premium(qhp_plan: product, elected_aptc: applied_aptc_amount, apply_aptc: applied_aptc_amount > 0)
-    update(eligible_child_care_subsidy: cost_calculator.total_childcare_subsidy_amount)
-  end
-
   def cancel_ivl_enrollment
     return if is_shop?
 
@@ -2835,13 +2827,21 @@ class HbxEnrollment
   end
 
   def update_osse_childcare_subsidy
-    effective_year = sponsored_benefit_package.start_on.year
-    return if coverage_kind.to_s == 'dental'
-    return unless employee_role&.osse_eligible?(effective_on)
-    return unless shop_osse_eligibility_is_enabled?(effective_year)
+    if is_shop?
+      effective_year = sponsored_benefit_package.start_on.year
+      return if coverage_kind.to_s == 'dental'
+      return unless employee_role&.osse_eligible?(effective_on)
+      return unless shop_osse_eligibility_is_enabled?(effective_year)
 
-    osse_childcare_subsidy = osse_subsidy_for_member(primary_hbx_enrollment_member)
-    update_attributes(eligible_child_care_subsidy: osse_childcare_subsidy)
+      osse_childcare_subsidy = osse_subsidy_for_member(primary_hbx_enrollment_member)
+    else
+      return unless ivl_osse_eligible?
+
+      cost_calculator = build_plan_premium(qhp_plan: product, elected_aptc: applied_aptc_amount, apply_aptc: applied_aptc_amount > 0)
+      osse_childcare_subsidy = cost_calculator.total_childcare_subsidy_amount
+    end
+
+    update(eligible_child_care_subsidy: osse_childcare_subsidy)
   end
 
   def osse_subsidy_for_member(hbx_enrollment_member)

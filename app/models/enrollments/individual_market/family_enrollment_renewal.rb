@@ -36,7 +36,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
       end
 
       verify_and_set_osse_minimum_aptc(renewal_enrollment)
-      renewal_enrollment.update_eligible_child_care_subsidy_amount
+      renewal_enrollment.update_osse_childcare_subsidy
 
       # renewal_enrollment.decorated_hbx_enrollment
       @dependent_age_off = nil
