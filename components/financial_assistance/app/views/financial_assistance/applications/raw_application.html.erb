@@ -35,7 +35,6 @@
                   <%else%>
                     <td> <%= l10n("faa.#{embedded_document.class.name.demodulize.downcase}.#{embedded_document.kind}") %> </td>
                   <%end%>
-                  <%binding.pry%>
                   <td> <%= embedded_document.frequency_kind.humanize %> </td>
                   <td>
                     <b>

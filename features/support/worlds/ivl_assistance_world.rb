@@ -181,6 +181,38 @@ module IvlAssistanceWorld
     @application.save!
   end
 
+  def create_application_applicant_with_other_income(state)
+    create_family_faa_application(state)
+    eligibility_determination1 = FactoryBot.create(:financial_assistance_eligibility_determination, application: @application)
+    @applicant = FactoryBot.create(:financial_assistance_applicant, eligibility_determination_id: eligibility_determination1.id, is_primary_applicant: true, gender: "male", application: @application, family_member_id: BSON::ObjectId.new)
+    @application.applicants.each do |appl|
+      social_security_benefit_params = {kind: "social_security_benefit",
+                                        amount: 3400.0,
+                                        amount_tax_exempt: 0,
+                                        frequency_kind: "quarterly",
+                                        start_on: Date.new(TimeKeeper.date_of_record.year,0o1,0o1),
+                                        end_on: nil,
+                                        is_projected: false,
+                                        ssi_type: "retirement",
+                                        submitted_at: TimeKeeper.date_of_record}
+
+      appl.incomes << FinancialAssistance::Income.new(social_security_benefit_params)
+
+      appl.addresses = [FactoryBot.build(:financial_assistance_address,
+                                         :address_1 => '1111 Awesome Street NE',
+                                         :address_2 => '#111',
+                                         :address_3 => '',
+                                         :city => 'Washington',
+                                         :country_name => '',
+                                         :kind => 'home',
+                                         :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                         :zip => '20001',
+                                         county: 'Cumberland')]
+      appl.save!
+    end
+    @application.save!
+  end
+
   def create_family_faa_application_with_applicants_and_evidences(state)
     create_family_faa_application_with_applicants(state)
 
