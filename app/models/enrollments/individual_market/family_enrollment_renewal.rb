@@ -35,7 +35,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
         renewal_enrollment.renew_enrollment
       end
 
-      verify_and_set_osse_minimum_aptc(renewal_enrollment)
+      verify_and_set_osse_minimum_aptc(renewal_enrollment) if @assisted
       renewal_enrollment.update_osse_childcare_subsidy
 
       # renewal_enrollment.decorated_hbx_enrollment
@@ -115,30 +115,30 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
                         })
   end
 
-  def verify_and_set_osse_minimum_aptc(enrollment)
-    applied_aptc_pct = applied_aptc_pct_for(enrollment)
-    return if applied_aptc_pct == enrollment.elected_aptc_pct
+  def verify_and_set_osse_minimum_aptc(renewal_enrollment)
+    applied_aptc_pct = applied_aptc_pct_for(renewal_enrollment)
+    # return if applied_aptc_pct == renewal_enrollment.elected_aptc_pct
 
-    calculated_aptc_pct = enrollment.applied_aptc_amount.to_f / aptc_values[:max_aptc].to_f
-    if calculated_aptc_pct == enrollment.elected_aptc_pct
+    calculated_aptc_pct = renewal_enrollment.applied_aptc_amount.to_f / aptc_values[:max_aptc].to_f
+    if calculated_aptc_pct == renewal_enrollment.elected_aptc_pct
       applied_aptc = @aptc_values[:max_aptc] * applied_aptc_pct
     else
-      ehb_premium = enrollment.total_ehb_premium
+      ehb_premium = renewal_enrollment.total_ehb_premium
       applied_aptc = [(@aptc_values[:max_aptc] * applied_aptc_pct), ehb_premium].min
     end
 
-    enrollment.update(
+    renewal_enrollment.update(
       applied_aptc_amount: float_fix(applied_aptc),
       elected_aptc_pct: applied_aptc_pct
     )
   end
 
-  def applied_aptc_pct_for(enrollment)
-    if enrollment.ivl_osse_eligible? && osse_aptc_minimum_enabled?
-      return enrollment.elected_aptc_pct if enrollment.elected_aptc_pct >= minimum_applied_aptc_for_osse.to_f
+  def applied_aptc_pct_for(renewal_enrollment)
+    if renewal_enrollment.ivl_osse_eligible? && osse_aptc_minimum_enabled?
+      return renewal_enrollment.elected_aptc_pct if renewal_enrollment.elected_aptc_pct >= minimum_applied_aptc_for_osse.to_f
       minimum_applied_aptc_for_osse
     else
-      enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_applied_aptc_pct
+      renewal_enrollment.elected_aptc_pct > 0 ? renewal_enrollment.elected_aptc_pct : default_applied_aptc_pct
     end
   end
 
