@@ -844,7 +844,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
           it "should renew and apply child care subsidy" do
             allow_any_instance_of(HbxEnrollment).to receive(:ivl_osse_eligible?).and_return(true)
-            enrollment.update_osse_childcare_subsidy 
+            enrollment.update_osse_childcare_subsidy
             expect(enrollment.eligible_child_care_subsidy.to_f).to be > 0
 
             renewal = subject.renew
@@ -858,7 +858,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
           it "should renew and don't apply child care subsidy" do
             allow(enrollment).to receive(:ivl_osse_eligible?).and_return(true)
-            enrollment.update_osse_childcare_subsidy 
+            enrollment.update_osse_childcare_subsidy
             expect(enrollment.eligible_child_care_subsidy.to_f).to be > 0
 
             renewal = subject.renew
@@ -893,10 +893,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             enrollment.update_osse_childcare_subsidy
           end
 
-          context 'when osse minimum aptc enabled' do 
+          context 'when osse minimum aptc enabled' do
             before do
               allow(subject).to receive(:osse_aptc_minimum_enabled?).and_return(true)
-              allow(subject).to receive(:minimum_applied_aptc_for_osse).and_return(0.85)   
+              allow(subject).to receive(:minimum_applied_aptc_for_osse).and_return(0.85)
               allow(subject).to receive(:can_renew_assisted_product?).and_return(true)
               allow(subject).to receive(:eligible_to_get_covered?).and_return(true)
             end
@@ -918,10 +918,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             end
           end
 
-          context 'when osse minimum aptc not enabled' do 
+          context 'when osse minimum aptc not enabled' do
             before do
               allow(subject).to receive(:osse_aptc_minimum_enabled?).and_return(false)
-              allow(subject).to receive(:minimum_applied_aptc_for_osse).and_return(0.85)   
+              allow(subject).to receive(:minimum_applied_aptc_for_osse).and_return(0.85)
               allow(subject).to receive(:can_renew_assisted_product?).and_return(true)
               allow(subject).to receive(:eligible_to_get_covered?).and_return(true)
             end

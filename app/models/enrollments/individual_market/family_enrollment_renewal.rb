@@ -119,7 +119,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     applied_aptc_pct = applied_aptc_pct_for(renewal_enrollment)
     # return if applied_aptc_pct == renewal_enrollment.elected_aptc_pct
 
-    calculated_aptc_pct = renewal_enrollment.applied_aptc_amount.to_f / aptc_values[:max_aptc].to_f
+    calculated_aptc_pct = renewal_enrollment.applied_aptc_amount.to_f / aptc_values[:max_aptc]
     if calculated_aptc_pct == renewal_enrollment.elected_aptc_pct
       applied_aptc = @aptc_values[:max_aptc] * applied_aptc_pct
     else
