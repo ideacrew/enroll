@@ -888,7 +888,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         context 'when osse eligibility present for renewal year' do
           before do
             allow_any_instance_of(HbxEnrollment).to receive(:ivl_osse_eligible?).and_return(true)
-            allow(EnrollRegistry).to receive(:feature_enabled?).with(:temporary_configuration_enable_multi_tax_household_feature).and_return(false)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:temporary_configuration_enable_multi_tax_household_feature).and_return(true)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:total_minimum_responsibility).and_return(false)
             enrollment.update_osse_childcare_subsidy
           end
@@ -899,6 +899,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               allow(subject).to receive(:minimum_applied_aptc_pct_for_osse).and_return(0.85)
               allow(subject).to receive(:can_renew_assisted_product?).and_return(true)
               allow(subject).to receive(:eligible_to_get_covered?).and_return(true)
+              allow(subject).to receive(:populate_aptc_hash).and_return(true)
             end
 
             it "should renew and apply child care subsidy" do
@@ -906,7 +907,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               renewal = subject.renew
               expect(renewal.auto_renewing?).to be_truthy
               expect(renewal.eligible_child_care_subsidy.to_f).to be > 0
-              # expect(renewal.eligible_child_care_subsidy.to_f).to eq(renewal.total_premium.to_f - renewal.applied_aptc_amount.to_f)
+              expect(renewal.eligible_child_care_subsidy.to_f).to eq(renewal.total_premium.to_f - renewal.applied_aptc_amount.to_f)
             end
 
             it "should apply minimum aptc pct" do
@@ -924,6 +925,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               allow(subject).to receive(:minimum_applied_aptc_pct_for_osse).and_return(0.85)
               allow(subject).to receive(:can_renew_assisted_product?).and_return(true)
               allow(subject).to receive(:eligible_to_get_covered?).and_return(true)
+              allow(subject).to receive(:populate_aptc_hash).and_return(true)
             end
 
             it "should renew and apply child care subsidy" do
@@ -931,15 +933,15 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               renewal = subject.renew
               expect(renewal.auto_renewing?).to be_truthy
               expect(renewal.eligible_child_care_subsidy.to_f).to be > 0
-              # expect(renewal.eligible_child_care_subsidy.to_f).to eq(renewal.total_premium.to_f - renewal.applied_aptc_amount.to_f)
+              expect(renewal.eligible_child_care_subsidy.to_f).to eq(renewal.total_premium.to_f - renewal.applied_aptc_amount.to_f)
             end
 
             it "should not apply minimum aptc pct" do
               expect(enrollment.eligible_child_care_subsidy.to_f).to be > 0
               renewal = subject.renew
               expect(renewal.auto_renewing?).to be_truthy
-              # expect(renewal.elected_aptc_pct).to be 0.75
-              # expect(renewal.applied_aptc_amount.to_f).to eq(730.0 * 0.75)
+              expect(renewal.elected_aptc_pct).to be 0.75
+              expect(renewal.applied_aptc_amount.to_f).to eq(730.0 * 0.75)
             end
           end
         end
