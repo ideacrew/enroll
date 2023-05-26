@@ -135,8 +135,8 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   def applied_aptc_pct_for(renewal_enrollment)
     if renewal_enrollment.ivl_osse_eligible? && osse_aptc_minimum_enabled?
-      return renewal_enrollment.elected_aptc_pct if renewal_enrollment.elected_aptc_pct >= minimum_applied_aptc_for_osse.to_f
-      minimum_applied_aptc_for_osse
+      return renewal_enrollment.elected_aptc_pct if renewal_enrollment.elected_aptc_pct >= minimum_applied_aptc_pct_for_osse.to_f
+      minimum_applied_aptc_pct_for_osse
     else
       renewal_enrollment.elected_aptc_pct > 0 ? renewal_enrollment.elected_aptc_pct : default_applied_aptc_pct
     end

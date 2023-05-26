@@ -896,7 +896,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           context 'when osse minimum aptc enabled' do
             before do
               allow(subject).to receive(:osse_aptc_minimum_enabled?).and_return(true)
-              allow(subject).to receive(:minimum_applied_aptc_for_osse).and_return(0.85)
+              allow(subject).to receive(:minimum_applied_aptc_pct_for_osse).and_return(0.85)
               allow(subject).to receive(:can_renew_assisted_product?).and_return(true)
               allow(subject).to receive(:eligible_to_get_covered?).and_return(true)
             end
@@ -921,7 +921,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           context 'when osse minimum aptc not enabled' do
             before do
               allow(subject).to receive(:osse_aptc_minimum_enabled?).and_return(false)
-              allow(subject).to receive(:minimum_applied_aptc_for_osse).and_return(0.85)
+              allow(subject).to receive(:minimum_applied_aptc_pct_for_osse).and_return(0.85)
               allow(subject).to receive(:can_renew_assisted_product?).and_return(true)
               allow(subject).to receive(:eligible_to_get_covered?).and_return(true)
             end
