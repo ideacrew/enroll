@@ -368,7 +368,7 @@ module BenefitSponsors
       # returns latest eligibility without an end date
       eligibilities.select do |eligibility|
         el = eligibility.evidences.by_key(evidence_key).max_by(&:created_at)
-        eligibility.end_on == nil && el&.is_satisfied == true
+        eligibility.end_on.nil? && el&.is_satisfied == true
       end.last
     end
 
