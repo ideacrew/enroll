@@ -47,7 +47,6 @@ module Notifier
       let(:notice_kind) do
         ::Notifier::NoticeKind.create("title" => "title", "aasm_state" => "draft", "description" => "description", "event_name" => "evene", "market_kind" => :aca_shop, "notice_number" => "number", "recipient" => "recipient")
       end
-      # let(:notice_kind) { FactoryBot.create(:notifier_notice_kind) }
       before do
         sign_in user
         get :edit, params: { id: notice_kind.id }, format: :js
