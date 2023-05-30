@@ -239,7 +239,6 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
       double(
         effective_date: Date.new(year, 1, 1),
         product: product,
-        subscriber: subscriber,
         elected_aptc_pct: elected_aptc_pct
       )
     end
@@ -247,8 +246,6 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
     let(:year) { Date.today.year }
     let(:new_effective_date) { Date.new(year, 5, 1) }
     let(:product) { double(is_hc4cc_plan?: false) }
-    let(:subscriber) { double(role_for_subsidy: role_for_subsidy) }
-    let(:role_for_subsidy) { double }
     let(:elected_aptc_pct) { 0.5 }
     let(:minimum_applied_aptc_percentage_for_osse) { 0.85 }
     let(:default_applied_aptc_percentage) { 0.8 }
@@ -266,7 +263,7 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
 
       context 'subscriber has osse subsidy enabled' do
         before do
-          allow(role_for_subsidy).to receive(:osse_eligible?).and_return(true)
+          allow(enrollment).to receive(:ivl_osse_eligible?).with(new_effective_date).and_return(true)
         end
 
         context 'when elected aptc pct is less the osse minimum' do
@@ -291,7 +288,7 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
 
       context 'subscriber has no osse subsidy enabled' do
         before do
-          allow(role_for_subsidy).to receive(:osse_eligible?).and_return(false)
+          allow(enrollment).to receive(:ivl_osse_eligible?).with(new_effective_date).and_return(false)
         end
 
         context 'when elected aptc pct is zero' do
@@ -318,7 +315,7 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
 
     context 'enrollment with non osse plan' do
       before do
-        allow(role_for_subsidy).to receive(:osse_eligible?).and_return(true)
+        allow(enrollment).to receive(:ivl_osse_eligible?).with(new_effective_date).and_return(true)
       end
 
       let(:product) { double(is_hc4cc_plan?: false) }
