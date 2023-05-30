@@ -112,6 +112,7 @@ Feature: IVL plan purchase
     Then employee should see Go To Plan Compare button
 
   Scenario: Filters HC4CC plans while plan shopping
+    Given the osse subsidy feature is enabled
     Given a consumer exists
     And the consumer is logged in
     And consumer has a dependent in child relationship with age less than 26
