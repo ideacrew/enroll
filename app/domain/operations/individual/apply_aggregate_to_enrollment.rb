@@ -9,6 +9,8 @@ module Operations
     class ApplyAggregateToEnrollment
       include Dry::Monads[:result, :do]
       include FloatHelper
+      include Config::AcaHelper
+
       def call(params)
         validated_eligibility   = yield validate(params)
         eligible_enrollments    = yield fetch_enrollments_to_renew(validated_eligibility)
@@ -49,26 +51,12 @@ module Operations
       end
 
       def applied_aptc_pct_for(enrollment, new_effective_date)
-        subscriber = enrollment.subscriber || enrollment.hbx_enrollment_members.first
-
-        if osse_aptc_minimum_enabled? && subscriber.role_for_subsidy.osse_eligible?(new_effective_date)
-          return enrollment.elected_aptc_pct if enrollment.elected_aptc_pct >= minimum_applied_aptc_for_osse.to_f
-          minimum_applied_aptc_for_osse
+        if osse_aptc_minimum_enabled? && enrollment.ivl_osse_eligible?(new_effective_date)
+          return enrollment.elected_aptc_pct if enrollment.elected_aptc_pct >= minimum_applied_aptc_pct_for_osse.to_f
+          minimum_applied_aptc_pct_for_osse
         else
-          enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_applied_aptc
+          enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_applied_aptc_pct
         end
-      end
-
-      def osse_aptc_minimum_enabled?
-        EnrollRegistry.feature_enabled?(:aca_individual_osse_aptc_minimum)
-      end
-
-      def default_applied_aptc
-        EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
-      end
-
-      def minimum_applied_aptc_for_osse
-        EnrollRegistry[:aca_individual_assistance_benefits].setting(:minimum_applied_aptc_percentage_for_osse).item
       end
     end
   end
