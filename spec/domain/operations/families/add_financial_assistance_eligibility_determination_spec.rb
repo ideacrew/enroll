@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDetermination, type: :model, dbclean: :after_each do
+RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDetermination, dbclean: :after_each do
 
   let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, :ivl_product)}
   let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}

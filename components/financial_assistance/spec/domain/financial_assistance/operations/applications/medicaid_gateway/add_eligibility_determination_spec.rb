@@ -138,9 +138,26 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
           expect(@applicant.csr_eligibility_kind).to eq("csr_limited")
         end
 
-        it 'should update member_determination value' do
-          member_determinations = response_payload[:tax_households].first[:tax_household_members].first[:member_determinations]
-          expect(@applicant.member_determinations).to eq(member_determinations)
+        context 'member_determinations' do
+          before do
+            ped = response_payload[:tax_households].first[:tax_household_members].first[:product_eligibility_determination]
+            @payload_member_determinations = ped[:member_determinations]
+          end
+
+          it 'should create a single member_determination for each kind' do
+            @payload_member_determinations.each do |payload_member_determination|
+              member_determination = @applicant.member_determinations.select { |md| md.kind == payload_member_determination[:kind] }
+              expect(member_determination.count).to eq(1)
+            end
+          end
+
+          it 'should update member_determination value' do
+            @payload_member_determinations.each do |payload_member_determination|
+              member_determination = @applicant.member_determinations.detect { |md| md.kind == payload_member_determination[:kind] }
+              expect(member_determination.is_eligible).to eq(payload_member_determination[:is_eligible])
+              expect(member_determination.determination_reasons).to eq(payload_member_determination[:determination_reasons])
+            end
+          end
         end
       end
     end

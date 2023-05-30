@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Operations::Families::TaxHouseholdGroups::CreateOnFaDetermination, type: :model, dbclean: :after_each do
+RSpec.describe Operations::Families::TaxHouseholdGroups::CreateOnFaDetermination, dbclean: :after_each do
 
   let!(:person) { FactoryBot.create(:person)}
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
