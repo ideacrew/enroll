@@ -676,9 +676,17 @@ Then(/^a family with financial application and applicants in (.*) state exists w
   create_family_faa_application_with_applicants_and_evidences(state)
 end
 
+When(/^an applicant with other income exists for a (.*) financial application$/) do |state|
+  create_application_applicant_with_other_income(state)
+end
+
 Then(/^the user with (.*) role is logged in$/) do |role|
   @user.roles << role
   login_as @user
+end
+
+And(/^the ssi_income_types feature is enabled$/) do
+  enable_feature :ssi_income_types, {registry_name: FinancialAssistanceRegistry}
 end
 
 And(/^.+ clicks on Cost Savings link$/) do
@@ -699,6 +707,10 @@ end
 
 Then(/^.+ clicks on Full application action$/) do
   click_link 'Full Application'
+end
+
+Then(/^the social security type - (.*) benefits should show$/) do |ssi_type|
+  expect(page).to have_content(l10n("faa.income.social_security_benefit.#{ssi_type}"))
 end
 
 Then(/^.+ should see county under Mailing and Home address$/) do

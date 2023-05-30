@@ -80,11 +80,12 @@ class HbxEnrollmentMember
     @age_on_effective_date = age
   end
 
-  def osse_eligible_on_effective_date?
-    return false unless coverage_start_on.present?
-    return false unless ivl_osse_eligibility_is_enabled?(coverage_start_on.year)
+  def osse_eligible_on_effective_date?(new_effective_date = nil)
+    date_for_eligibility = new_effective_date || coverage_start_on
+    return false unless date_for_eligibility.present?
+    return false unless ivl_osse_eligibility_is_enabled?(date_for_eligibility.year)
 
-    role_for_subsidy&.osse_eligible?(coverage_start_on)
+    role_for_subsidy&.osse_eligible?(date_for_eligibility)
   end
 
   def role_for_subsidy
