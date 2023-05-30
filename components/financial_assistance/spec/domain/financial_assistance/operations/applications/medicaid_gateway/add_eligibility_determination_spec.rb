@@ -137,6 +137,11 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
         it 'should update csr_percent_as_integer value' do
           expect(@applicant.csr_eligibility_kind).to eq("csr_limited")
         end
+
+        it 'should update member_determination value' do
+          member_determinations = response_payload[:tax_households].first[:tax_household_members].first[:member_determinations]
+          expect(@applicant.member_determinations).to eq(member_determinations)
+        end
       end
     end
   end
