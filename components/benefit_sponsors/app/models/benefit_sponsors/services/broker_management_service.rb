@@ -27,8 +27,7 @@ module BenefitSponsors
       def assign_agencies_for_employer(form)
         @employer_profile = BenefitSponsors::Organizations::Profile.find(form.employer_profile_id)
         assign_broker_agency_for_emp(form.broker_agency_profile_id, form.broker_role_id)
-        # # TODO fix this during notices implementation
-        # send_notices_associated_to_employer_profile
+        send_notices_associated_to_employer_profile(form.broker_agency_profile_id)
       end
 
       def send_notification(broker_role_id)
@@ -38,6 +37,15 @@ module BenefitSponsors
         rescue Exception => e
           puts e.inspect
           puts e.backtrace
+        end
+      end
+
+      def send_notices_associated_to_employer_profile(broker_agency_profile_id)
+        invitation = BenefitSponsors::Services::InvitationEmailService.new({broker_agency_profile_id: broker_agency_profile_id, employer_profile: @employer_profile})
+        invitation.send_general_agency_successfully_associated_email
+      rescue StandardError => e
+        Rails.logger.error do
+          "#{e.inspect} #{e.backtrace}"
         end
       end
 

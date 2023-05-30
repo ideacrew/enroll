@@ -12,7 +12,7 @@ module BenefitSponsors
       attribute :network_information, String
       attribute :network, String
       attribute :is_standard_plan, Boolean
-
+      attribute :is_hc4cc_plan, Boolean
     end
   end
 end

@@ -8579,7 +8579,7 @@
               </sbc>
               <hsa>
                 <hsaEligibility cellLocation="Cost_Share_Variances_2-BZ.4">
-                  <cellValue>No</cellValue>
+                  <cellValue>Yes</cellValue>
                 </hsaEligibility>
                 <employerHSAHRAContributionIndicator cellLocation="Cost_Share_Variances_2-CA.4">
                   <cellValue>No</cellValue>
@@ -9939,7 +9939,7 @@
               </sbc>
               <hsa>
                 <hsaEligibility cellLocation="Cost_Share_Variances_2-BZ.5">
-                  <cellValue>No</cellValue>
+                  <cellValue>Yes</cellValue>
                 </hsaEligibility>
                 <employerHSAHRAContributionIndicator cellLocation="Cost_Share_Variances_2-CA.5">
                   <cellValue>No</cellValue>

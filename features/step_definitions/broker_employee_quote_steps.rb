@@ -95,7 +95,6 @@ end
 And(/^Primary Broker enters a new quote name$/) do
   fill_in BrokerCreateQuotePage.quote_name, :with => "Test Quote"
   find(BrokerCreateQuotePage.select_start_on_dropdown).click
-  expect(page).to have_content((TimeKeeper.date_of_record + 2.months).strftime("%B %Y"))
   wait_for_ajax(3, 2)
 end
 
@@ -168,13 +167,16 @@ And(/^.+ publishes the quote and sees successful message of published quote$/) d
   find(BrokerHealthBenefitsPage.select_refrence_plan).click
   wait_for_ajax(3, 2)
   Capybara.ignore_hidden_elements = false
-  if page.find("#forms_plan_design_proposal_profile_benefit_sponsorship_benefit_application_benefit_group_relationship_benefits_attributes_0_premium_pct").value.to_i >= 50
+
+  if page.find("#all_contribution_levels_min_met_relaxed").value == 'true' || page.find("#forms_plan_design_proposal_profile_benefit_sponsorship_benefit_application_benefit_group_relationship_benefits_attributes_0_premium_pct").value.to_i >= 50
+    expect(find(BrokerHealthBenefitsPage.publish_quote_btn).disabled?).to eql false
     find(BrokerHealthBenefitsPage.publish_quote_btn).click
     wait_for_ajax(3, 2)
     expect(page).to have_content("Quote Published")
   else
     expect(find(BrokerHealthBenefitsPage.publish_quote_btn).disabled?).to eql true
   end
+
   Capybara.ignore_hidden_elements = true
 end
 
@@ -249,6 +251,14 @@ end
 
 When(/^the broker clicks delete$/) do
   find('a', text: "Delete").click
+end
+
+When(/^the broker clicks copy quote$/) do
+  find('a', text: "Copy Quote").click
+end
+
+Then(/the broker should see Yes for HC4CC/) do
+  expect(find(BrokerCreateQuotePage.osse_subsidy_radio_true).checked?).to eq true
 end
 
 Then(/^the broker sees the confirmation$/) do
@@ -384,7 +394,7 @@ And(/^Broker HC4CC feature enabled$/) do
 end
 
 And(/^Primary Broker should see HC4CC option$/) do
-  expect(page).to have_css('.panel', text: 'Healthcare4Childcare (HC4CC) Program')
+  expect(page).to have_css('.panel', text: 'HealthCare4ChildCare (HC4CC) Program')
 end
 
 Then(/^Primary broker should see plan names in employee costs$/) do

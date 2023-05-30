@@ -99,6 +99,7 @@ class Insured::PlanShoppingsController < ApplicationController
     else
       @enrollment.reset_dates_on_previously_covered_members(@plan)
       set_aptcs_for_continuous_coverage
+      revise_applied_aptc_for_osse
       @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc)
       @enrollment.update(eligible_child_care_subsidy: @plan.total_childcare_subsidy_amount)
     end
@@ -246,7 +247,7 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
     set_admin_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
     set_resident_bookmark_url(family_account_path) if params[:market_kind] == 'coverall'
-
+    @hbx_enrollment.reset_member_coverage_start_dates # Fixes coverage start date and aptc slider calculation issues related to browser navigation and page reload
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
     collect_shopping_filters
 
@@ -263,6 +264,9 @@ class Insured::PlanShoppingsController < ApplicationController
     @hbx_enrollment.update_osse_childcare_subsidy
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
     products = @hbx_enrollment.sponsored_benefit.products(@hbx_enrollment.sponsored_benefit.rate_schedule_date)
+    product_ids = products.map(&:id)
+    # Fetch latest data from product that might not be updated with product_package.products
+    products = BenefitMarkets::Products::Product.where(:id.in => product_ids)
     @issuer_profiles = []
     @issuer_profile_ids = products.map(&:issuer_profile_id).uniq
     ip_lookup_table = {}
@@ -374,6 +378,25 @@ class Insured::PlanShoppingsController < ApplicationController
     percentage = @elected_aptc / @max_aptc
     @max_aptc = ::Operations::PremiumCredits::FindAptc.new.call({ hbx_enrollment: @enrollment, effective_on: @enrollment.effective_on }).value!
     @elected_aptc = percentage * @max_aptc
+    session[:elected_aptc] = @elected_aptc.to_f
+    session[:max_aptc] = @max_aptc.to_f
+  end
+
+  def revise_applied_aptc_for_osse
+    return unless osse_aptc_minimum_enabled? && @enrollment.ivl_osse_eligible? && @plan.is_hc4cc_plan
+    return if @max_aptc.zero?
+
+    applied_percentage = (@elected_aptc / @max_aptc).to_f
+    minimum_applied_aptc_for_osse = EnrollRegistry[:aca_individual_assistance_benefits].setting(:minimum_applied_aptc_percentage_for_osse).item.to_f
+
+    return unless applied_percentage < minimum_applied_aptc_for_osse
+
+    @elected_aptc = minimum_applied_aptc_for_osse * @max_aptc
+    session[:elected_aptc] = @elected_aptc.to_f
+  end
+
+  def osse_aptc_minimum_enabled?
+    EnrollRegistry.feature_enabled?(:aca_individual_osse_aptc_minimum)
   end
 
   def dependents_with_existing_coverage(enrollment)

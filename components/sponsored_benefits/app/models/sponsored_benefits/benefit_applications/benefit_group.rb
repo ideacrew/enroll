@@ -18,6 +18,24 @@ module SponsoredBenefits
         plan_design_organization
       end
 
+      def benefit_sponsorship
+        benefit_application&.benefit_sponsorship
+      end
+
+      def profile
+        benefit_sponsorship&.benefit_sponsorable
+      end
+
+      def plan_design_proposal
+        profile&.plan_design_proposal
+      end
+
+      def all_contribution_levels_min_met_relaxed?
+        return false unless plan_design_proposal
+
+        plan_design_proposal.all_contribution_levels_min_met_relaxed?
+      end
+
       def plan_year
         OpenStruct.new(
           :start_on => effective_period.begin,

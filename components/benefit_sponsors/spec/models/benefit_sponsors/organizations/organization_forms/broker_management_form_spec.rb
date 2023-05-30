@@ -43,6 +43,14 @@ module BenefitSponsors
 
     let(:broker_management_form_terminate) { broker_management_form_class.for_terminate(terminate_params) }
 
+    let(:general_agency_profile) do
+      FactoryBot.create(
+        :benefit_sponsors_organizations_general_organization,
+        :with_site,
+        :with_general_agency_profile
+      ).profiles.first
+    end
+
     before :each do
       broker_agency_profile1.update_attributes!(primary_broker_role_id: broker_role1.id)
       broker_agency_profile1.approve!
@@ -72,6 +80,7 @@ module BenefitSponsors
 
     describe 'save/persist!' do
       before :each do
+        broker_agency_profile1.update_attributes!(default_general_agency_profile_id: general_agency_profile.id)
         broker_management_form_create.save
         organization.reload
       end
