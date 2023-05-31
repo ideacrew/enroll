@@ -9,6 +9,7 @@ require 'ckeditor'
 require "redcarpet"
 require "config"
 require "money-rails"
+require 'pundit'
 
 module Notifier
   class Engine < ::Rails::Engine
