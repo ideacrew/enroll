@@ -36,9 +36,7 @@ module Operations
           if params[:effective_date]
             subject = GlobalID::Locator.locate(params[:subject_gid])
 
-            if ['ConsumerRole', 'ResidentRole'].include?(subject.klass.to_s)
-              params[:effective_date] = params[:effective_date].beginning_of_year
-            end
+            params[:effective_date] = params[:effective_date].beginning_of_year if ['ConsumerRole', 'ResidentRole'].include?(subject.class.to_s)
           end
 
           errors.empty? ? Success(params) : Failure(errors)
