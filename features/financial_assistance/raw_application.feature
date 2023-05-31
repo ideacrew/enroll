@@ -57,3 +57,15 @@ Feature: Cost Savings Raw Application
     And the consumer has an esi benefit
     When admin clicks on Full application action
     Then the health plan meets mvs and affordable question should show
+
+  Scenario: Admin clicks on Full application action, sees TYPES of other income
+    When the ssi_income_types feature is enabled
+    When an applicant with other income exists for a determined financial application
+    And the user with hbx_staff role is logged in
+    When admin visits home page
+    And the Cost Savings link is visible
+    And admin clicks on Cost Savings link
+    When admin clicks on Action dropdown
+    And the admin should see text Full Application
+    When admin clicks on Full application action
+    Then the social security type - retirement benefits should show
