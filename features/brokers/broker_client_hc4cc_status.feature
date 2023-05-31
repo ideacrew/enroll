@@ -25,6 +25,11 @@ Feature: Broker employers table displays the HC4CC status of clients
     When Primary Broker clicks the Employers tab
     Then The Employer's HC4CC eligibility should show Eligible
 
+  Scenario: Broker should be able to see HC4CC status for employers with eligibility created during effective period
+    Given employer ABC Widgets has OSSE eligibilities created during effective period
+    When Primary Broker clicks the Employers tab
+    Then The Employer's HC4CC eligibility should show Eligible
+
   Scenario: Employer is a prospect client
     Given employer ABC Widgets is a prospect client
     When Primary Broker clicks the Employers tab
