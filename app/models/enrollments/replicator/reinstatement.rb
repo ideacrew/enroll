@@ -117,9 +117,11 @@ module Enrollments
           assign_attributes_to_reinstate_enrollment(reinstated_enrollment, form_shop_params) if can_be_reinstated?
         elsif base_enrollment.is_ivl_by_kind?
           assign_attributes_to_reinstate_enrollment(reinstated_enrollment, form_ivl_params)
+
           if new_aptc.blank?
             reinstated_enrollment.elected_aptc_pct = base_enrollment.elected_aptc_pct
             reinstated_enrollment.applied_aptc_amount = base_enrollment.applied_aptc_amount
+            reinstated_enrollment.eligible_child_care_subsidy = base_enrollment.eligible_child_care_subsidy
           end
         end
       end
