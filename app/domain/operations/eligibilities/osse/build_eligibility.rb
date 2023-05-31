@@ -33,6 +33,14 @@ module Operations
           errors << 'evidence value missing' unless params[:evidence_value]
           errors << 'effective date missing' unless params[:effective_date]
 
+          if params[:effective_date]
+            subject = GlobalID::Locator.locate(params[:subject_gid])
+
+            if ['ConsumerRole', 'ResidentRole'].include?(subject.klass.to_s)
+              params[:effective_date] = params[:effective_date].beginning_of_year
+            end
+          end
+
           errors.empty? ? Success(params) : Failure(errors)
         end
 
