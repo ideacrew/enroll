@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-RSpec.describe Operations::Families::TaxHouseholdGroups::CreateOnFaDetermination, type: :model, dbclean: :after_each do
+RSpec.describe Operations::Families::TaxHouseholdGroups::CreateOnFaDetermination, dbclean: :after_each do
 
-  let!(:person) { FactoryBot.create(:person)}
-  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-  let!(:application) do
+  let(:person) { FactoryBot.create(:person)}
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+  let(:application) do
     FactoryBot.create(:financial_assistance_application,
                       family_id: family.id,
                       aasm_state: 'determined',
@@ -14,7 +14,7 @@ RSpec.describe Operations::Families::TaxHouseholdGroups::CreateOnFaDetermination
                       created_at: Date.new(2021, 10, 1))
   end
 
-  let!(:applicant) do
+  let(:applicant) do
     FactoryBot.create(:applicant,
                       first_name: person.first_name,
                       last_name: person.last_name,
@@ -51,7 +51,7 @@ RSpec.describe Operations::Families::TaxHouseholdGroups::CreateOnFaDetermination
                       member_determinations: member_determinations)
   end
 
-  let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application, csr_percent_as_integer: 73) }
+  let(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application, csr_percent_as_integer: 73) }
   let(:member_determinations) do
     [{
       'kind' => 'Medicaid/CHIP Determination',
@@ -64,24 +64,24 @@ RSpec.describe Operations::Families::TaxHouseholdGroups::CreateOnFaDetermination
     expect(subject.respond_to?(:call)).to be_truthy
   end
 
-  context 'success' do
+  xcontext 'success' do
     before do
       @result = subject.call(application)
     end
 
-    xit 'should return success' do
+    it 'should return success' do
       expect(@result).to be_a Dry::Monads::Result::Success
     end
 
-    xit 'should return a Tax Household Group object' do
+    it 'should return a Tax Household Group object' do
       expect(@result.value!).to be_a TaxHouseholdGroup
     end
 
-    xit 'should create Tax Household Member object' do
+    it 'should create Tax Household Member object' do
       expect(@result.value!.tax_households.first.tax_household_members.first.applicant_id).to eq(family.primary_applicant.id)
     end
 
-    xit 'should create Member Determination object' do
+    it 'should create Member Determination object' do
       member_determination = @result.value!.tax_households.first.tax_household_members.first.member_determinations.first
       expect(member_determination.kind).to eq(applicant['member_determinations'].first['kind'])
       expect(member_determination.is_eligible).to eq(applicant['member_determinations'].first['is_eligible'])
