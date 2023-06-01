@@ -13,7 +13,7 @@
 <% insurance_kinds.each do |insurance_kind| %>
   <div id="<%= insurance_kind %>"class="benefit-kind">
     <div class="row row-form-wrapper radio-align fa-text-color lightgray no-buffer row-height">
-      <div class="col-md-10 benefits-check">
+      <div class="col-md-10 benefits-check <%= insurance_kind %>">
         <%=check_box_tag "insurance_kind", insurance_kind, @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).present?, class: "benefit-checkbox", data: {cuke: "#{insurance_kind}_benefit_checkbox"} %>
         <% eligible_esi = kind == "is_eligible" && insurance_kind == 'employer_sponsored_insurance' && FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question) %>
         <% term = eligible_esi ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}" %>

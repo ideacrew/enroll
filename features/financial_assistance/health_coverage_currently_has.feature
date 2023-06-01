@@ -63,6 +63,7 @@ Feature: Start a new Financial Assistance Application and answers questions on h
     Then the save button should be enabled
     And the user saves the health coverage information
     Then the health coverage should be saved on the page
+
   Scenario: Health coverage form shows after checking an option (currently have coverage)
     Given the user answers yes to currently having health coverage
     Then the medicare have glossary link
