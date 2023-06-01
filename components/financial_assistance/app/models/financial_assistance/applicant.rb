@@ -904,7 +904,7 @@ module FinancialAssistance
           return false if has_unemployment_income.nil? || has_other_income.nil?
           return true if has_unemployment_income == false && has_other_income == false
           return true if has_unemployment_income == true && incomes.unemployment.present? && has_other_income == false
-          return true if has_unemployment_income == false && has_other_income == true && incomes.other.present?
+          return true if has_unemployment_income == false && is_other_income_valid?
           return incomes.unemployment.present? && unemployment_fields_complete && incomes.other.present? if incomes.unemployment && incomes.other
           return incomes.unemployment.present? && unemployment_fields_complete && incomes.other.blank? if incomes.unemployment && !incomes.other
           return incomes.unemployment.blank? && unemployment_fields_complete && incomes.other.present? if !incomes.unemployment && incomes.other
@@ -966,10 +966,15 @@ module FinancialAssistance
       !validations.include?(false)
     end
 
+    def is_other_income_valid?
+      has_other_income == false || (has_other_income == true && incomes.other.present? && other_income_fields_complete)
+    end
+
     def other_income_fields_complete
       validations = []
       incomes.other.each do |other|
         validations << (other[:amount].present? && other[:frequency_kind].present? && other[:start_on].present?)
+        validations << other.ssi_type.present? if other.kind == "social_security_benefit" && FinancialAssistanceRegistry.feature_enabled?(:ssi_income_types)
       end
       !validations.include?(false)
     end
