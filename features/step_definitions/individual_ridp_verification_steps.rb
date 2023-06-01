@@ -218,7 +218,7 @@ end
 When(/^HBX admin click on none of the situations listed above apply checkbox$/) do
   expect(page).to have_content 'None of the situations listed above apply'
   find(IvlSpecialEnrollmentPeriod.none_apply_checkbox).click
-  expect(page).to have_content 'To enroll before open enrollment'
+  expect(page).to have_content 'To enroll before Open Enrollment'
 end
 
 And(/^HBX admin click on back to my account button$/) do
