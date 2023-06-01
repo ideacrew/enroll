@@ -9,6 +9,7 @@ module Validators
         required(:family_id).filled(Types::Bson)
         required(:broker_account_id).filled(Types::Bson)
         required(:terminate_date).filled(:date)
+        optional(:notify_edi).maybe(:bool)
       end
 
       rule(:broker_account_id) do

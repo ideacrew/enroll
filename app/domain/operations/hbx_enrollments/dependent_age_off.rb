@@ -60,13 +60,11 @@ module Operations
       end
 
       def shop_age_off(dao_date, enrollment_query)
-        shop_dao = Operations::Shop::DependentAgeOff.new
-        shop_dao.call(new_date: dao_date, enrollment_query: enrollment_query)
+        ::EnrollRegistry[:aca_shop_dependent_age_off] { { new_date: dao_date, enrollment_query: enrollment_query } }
       end
 
       def fehb_age_off(dao_date, enrollment)
-        fehb_dao = Operations::Fehb::DependentAgeOff.new
-        fehb_dao.call(new_date: dao_date, enrollment: enrollment)
+        ::EnrollRegistry[:aca_fehb_dependent_age_off] { { new_date: dao_date, enrollment: enrollment } }
       end
     end
   end

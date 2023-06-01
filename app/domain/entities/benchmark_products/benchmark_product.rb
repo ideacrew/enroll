@@ -3,7 +3,8 @@
 module Entities
   module BenchmarkProducts
     class BenchmarkProduct < Dry::Struct
-      attribute :family_id, Types::Bson.meta(omittable: false)
+      attribute :family_id, Types::Bson.optional.meta(omittable: true)
+      attribute :rating_address, RatingAddress.optional.meta(omittable: true)
       attribute :effective_date, Types::Date.meta(omittable: false)
       attribute :primary_rating_address_id, Types::Bson.optional.meta(omittable: true)
       attribute :rating_area_id, Types::Bson.optional.meta(omittable: true)

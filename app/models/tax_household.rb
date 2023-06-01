@@ -30,6 +30,7 @@ class TaxHousehold
   field :max_aptc, type: Money
   # field :monthly_expected_contribution, type: Money
   field :eligibility_determination_hbx_id, type: BSON::ObjectId
+  field :legacy_hbx_assigned_id, type: Integer
 
   index({ "effective_ending_on" => 1, "effective_starting_on" => 1 })
 
@@ -345,6 +346,12 @@ class TaxHousehold
   # TODO: Refactor this to return Applicants vs TaxHouseholdMembers after FAA merge.
   def tax_members
     tax_household_members
+  end
+
+  def thhm_by(family_member)
+    return nil unless family_member.is_a?(FamilyMember)
+
+    tax_household_members.where(applicant_id: family_member.id).first
   end
 
   private

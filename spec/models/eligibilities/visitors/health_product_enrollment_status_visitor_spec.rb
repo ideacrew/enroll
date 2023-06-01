@@ -120,6 +120,17 @@ RSpec.describe ::Eligibilities::Visitors::HealthProductEnrollmentStatusVisitor,
     end
   end
 
+  context "when the enrollment is in the future" do
+    before do
+      hbx_enrollment1.update_attributes(effective_on: hbx_enrollment1.effective_on + 2.months)
+    end
+
+    it 'should build evidence state for the given eligibility item' do
+      subject.call
+      expect(subject.evidence.key?(evidence_item.key.to_sym)).to be_truthy
+    end
+  end
+
   context 'when there are more than one health enrollments' do
     let(:visitor_subject) { family.family_members[1] }
 

@@ -1,0 +1,33 @@
+<label>Plan Offerings - <%= benefit_group.dental_reference_plan.name %></label><br />
+<!-- For dental we allow single_plan choice only. lowest cost plan and highest cost plan are same -->        
+<label>Employer Lowest/Reference/Highest - <%= number_to_currency(benefit_group_dental_costs[:lowest_plan_employer_cost]) %>/<%= number_to_currency(benefit_group_dental_costs[:ref_plan_employer_cost]) %>/<%= number_to_currency(benefit_group_dental_costs[:highest_plan_employer_cost]) %></label>
+<table class="table table-bg-white table-employee-2">
+    <thead>
+    <tr>
+        <th class="text-left">Employee</th>
+        <th class="text-center">Dependent Count</th>
+    <% if benefit_group.dental_plan_option_kind != "single_plan" %>
+    <th class="text-right">Lowest Cost Available Plan</th>
+    <% end %>
+        <th class="text-right">Reference Plan</th>
+    <% if benefit_group.dental_plan_option_kind != "single_plan" %>
+    <th class="text-right">Highest Cost Available Plan</th>
+    <% end %>
+    </tr>
+    </thead>
+    <tbody id="employee_index_scroll">
+<% benefit_group.census_employees.active.each do |census_employee| %>
+    <tr>
+    <td class="text-left"> <%= census_employee.full_name %></td>
+    <td class="text-center"> <%= census_employee.census_dependents.count %></td>
+    <% if benefit_group.dental_plan_option_kind != "single_plan" %>
+        <td class="text-right"> <%= number_to_currency(benefit_group_dental_costs[census_employee.id][:lowest_plan_cost]) %></td>
+    <% end %>
+    <td class="text-right"> <%= number_to_currency(benefit_group_dental_costs[census_employee.id][:ref_plan_cost]) %></td>
+    <% if benefit_group.dental_plan_option_kind != "single_plan" %>
+        <td class="text-right"> <%= number_to_currency(benefit_group_dental_costs[census_employee.id][:highest_plan_cost]) %></td>
+    <% end %>
+    </tr>
+<% end %>
+</tbody>
+</table>

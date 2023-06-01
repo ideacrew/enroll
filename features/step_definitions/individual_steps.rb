@@ -888,7 +888,34 @@ Then(/^taxhousehold info is prepared for aptc user with selected eligibility$/) 
   benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
   benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(start_on)}.update_attributes!(slcsp_id: current_product.id)
   benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(future_start_on)}.update_attributes!(slcsp_id: future_product.id)
-  # screenshot("aptc_householdinfo")
+end
+
+Then(/^multi tax household info is prepared for aptc user with selected eligibility$/) do
+  person = User.find_by(email: 'aptc@dclink.com').person
+  family = person.primary_family
+  current_year = TimeKeeper.date_of_record.beginning_of_year
+  future_year = Date.new(TimeKeeper.date_of_record.year + 1, 1,1)
+  day_of_month = FinancialAssistanceRegistry[:enrollment_dates].settings(:application_new_year_effective_date_day_of_month).item
+  month_of_year = FinancialAssistanceRegistry[:enrollment_dates].settings(:application_new_year_effective_date_month_of_year).item
+  start_on = TimeKeeper.date_of_record > Date.new(current_year.year, month_of_year, day_of_month) ? future_year : current_year
+  create_mthh_for_family_with_aptc_csr(family, start_on, '73')
+end
+
+Then(/^multi tax household info is prepared for aptc user with selected eligibility for future year$/) do
+  person = User.find_by(email: 'aptc@dclink.com').person
+  family = person.primary_family
+  future_year = Date.new(TimeKeeper.date_of_record.year + 1, 1,1)
+  create_mthh_for_family_with_aptc_csr(family, future_year, 73)
+end
+
+And(/has valid csr 73 benefit package without silver plans/) do
+  create_csr_73_bp_without_silver_plans
+  BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+end
+
+And(/has valid csr 0 benefit package with silver plans/) do
+  create_csr_0_bp_with_silver_plans
+  BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
 end
 
 And(/the individual sets APTC amount/) do
@@ -940,6 +967,19 @@ Then(/the individual should see the elected aptc amount applied to enrollment in
   expect(page).to have_content '$50.00'
   expect(page).to have_content IvlHomepage.aptc_amount_text
   screenshot("my_account")
+end
+
+And(/^consumer is an indian_tribe_member$/) do
+  user.person.update_attributes!(tribal_state: 'ME')
+end
+
+Given(/^site is for (.*)$/) do |state|
+  EnrollRegistry[:enroll_app].setting(:state_abbreviation).stub(:item).and_return(state.upcase)
+end
+
+And(/^the consumer should see tribal name textbox without text$/) do
+  wait_for_ajax
+  expect(page).to have_selector("#tribal-name", text: '')
 end
 
 And(/consumer has successful ridp/) do
@@ -1177,4 +1217,8 @@ When(/Individual creates an HBX account with SSN already in use$/) do
   find(IvlPersonalInformation.male_radiobtn).click
   find(IvlPersonalInformation.need_coverage_yes).click
   find(IvlPersonalInformation.continue_btn).click
+end
+
+And(/the extended_aptc_individual_agreement_message configuration is enabled/) do
+  enable_feature :extended_aptc_individual_agreement_message
 end

@@ -599,13 +599,13 @@ module FinancialAssistance
 
     def is_transferrable?
       return false if FinancialAssistanceRegistry.feature_enabled?(:block_renewal_application_transfers) && previously_renewal_draft?
+      return false unless active_applicants.any?(&:is_applying_coverage)
       unless FinancialAssistanceRegistry.feature_enabled?(:non_magi_transfer)
-        # legally required to send application for full assessment if consumer requests it
-        return true if full_medicaid_determination
-        # otherwise block transfer if any applicant is eligible for non-MAGI reasons
+        # block transfer if any applicant is eligible for non-MAGI reasons
         return false if has_non_magi_referrals?
+        return true if full_medicaid_determination
       end
-      applicants.any? do |applicant|
+      active_applicants.any? do |applicant|
         applicant.is_medicaid_chip_eligible || applicant.is_magi_medicaid || applicant.is_non_magi_medicaid_eligible || applicant.is_medicare_eligible || applicant.is_eligible_for_non_magi_reasons
       end
     end
@@ -1027,11 +1027,16 @@ module FinancialAssistance
 
     def apply_aggregate_to_enrollment
       return unless EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment) || !previously_renewal_draft?
+      return if retro_application
       on_new_determination = ::Operations::Individual::OnNewDetermination.new.call({family: self.family, year: self.effective_date.year})
 
       Rails.logger.error { "Failed while creating enrollment on_new_determination: #{self.hbx_id}, Error: #{on_new_determination.failure}" } unless on_new_determination.success?
     rescue StandardError => e
       Rails.logger.error { "Failed while creating enrollment on_new_determination: #{self.hbx_id}, Error: #{e.message}" }
+    end
+
+    def retro_application
+      self.effective_date.year < TimeKeeper.date_of_record.year
     end
 
     # rubocop:disable Metrics/AbcSize
@@ -1047,7 +1052,7 @@ module FinancialAssistance
 
       rt_transfer
 
-      family_determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: self.family.reload, effective_date: TimeKeeper.date_of_record)
+      family_determination = ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: self.family.reload, effective_date: self.effective_date.to_date)
 
       if family_determination.success?
         apply_aggregate_to_enrollment
@@ -1418,6 +1423,29 @@ module FinancialAssistance
       applicants.applying_coverage
     end
 
+    def dependents
+      active_applicants.where(is_primary_applicant: false)
+    end
+
+    def update_dependents_home_address
+      address_keys = ["address_1", "address_2", "address_3", "city", "state", "zip", "kind"]
+      address_keys << "county" if EnrollRegistry.feature_enabled?(:display_county)
+      primary_applicant = applicants.where(is_primary_applicant: true).first
+      home_address_attributes = primary_applicant.home_address.attributes.slice(*address_keys)
+      no_state_address_attributes = primary_applicant.attributes.slice("is_homeless", "is_temporarily_out_of_state")
+
+      dependents.where(same_with_primary: true).each do |dependent|
+        if dependent.home_address
+          dependent.home_address.assign_attributes(home_address_attributes)
+        else
+          address = ::FinancialAssistance::Locations::Address.new(home_address_attributes)
+          dependent.addresses << address
+        end
+        dependent.assign_attributes(no_state_address_attributes)
+        dependent.save!
+      end
+    end
+
     private
 
     # If MemberA is parent to MemberB,
@@ -1633,7 +1661,11 @@ module FinancialAssistance
       #TODO: Invalid Report here
     end
 
+    # Example: application.determine will change the aasm_state in-memory, data is not persisted at this point.
+    # When trying to find latest determine application in subsequent after call methods, previous application is fetched instead of current application.
+    # Persisting the application right after the aasm_state change will avoid issues reated the fetching the latest application.
     def record_transition
+      self.save if self.aasm_state_changed?
       self.workflow_state_transitions << WorkflowStateTransition.new(
         from_state: aasm.from_state,
         to_state: aasm.to_state

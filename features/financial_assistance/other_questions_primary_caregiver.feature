@@ -2,7 +2,6 @@ Feature: Start a new Financial Assistance Application and answers questions on O
 
   Background: User logs in and visits applicant's other questions page
     And the FAA feature configuration is enabled
-    
     And the primary caretaker question configuration is enabled
     And FAA primary_caregiver_relationship_other_question feature is enabled
     Given a consumer, with a family, exists
@@ -28,3 +27,7 @@ Feature: Start a new Financial Assistance Application and answers questions on O
     And the user selects an applicant they are the primary caregiver for
     Then an applicant is selected as a caregivee
 
+  Scenario: User should see relationship options for caregiver
+    Given the user answers yes to being a primary caregiver
+    Then the caregiver relationships should display
+    And the None of the above option should display

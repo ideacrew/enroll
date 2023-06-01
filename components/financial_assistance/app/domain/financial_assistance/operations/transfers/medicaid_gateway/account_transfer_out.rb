@@ -44,7 +44,7 @@ module FinancialAssistance
           end
 
           def construct_payload(family, application)
-            result = FinancialAssistance::Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
+            result = ::Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
             return result unless result.success?
             family_hash = result.value!
             app_hash = family_hash[:magi_medicaid_applications].find{ |a| a[:hbx_id] == application.hbx_id }

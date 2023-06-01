@@ -16,6 +16,7 @@ FactoryBot.define do
     nationwide           { true }
     deductible           { "$500 per person" }
     family_deductible    { "$500 per person | $1000 per group" }
+    is_hc4cc_plan        { false }
 
     product_package_kinds { [:single_product, :single_issuer, :metal_level] }
     sequence(:hios_id, (10..99).cycle)  { |n| "41842DC04000#{n}-01" }
@@ -52,18 +53,33 @@ FactoryBot.define do
     end
 
     trait :catastrophic do
-      metal_level_kind        { :catastrophic }
-      benefit_market_kind     { :aca_individual }
+      kind                { :health }
+      metal_level_kind    { :catastrophic }
+      benefit_market_kind { :aca_individual }
     end
 
     trait :gold do
-      metal_level_kind        { :gold }
-      benefit_market_kind     { :aca_individual }
+      kind                { :health }
+      metal_level_kind    { :gold }
+      benefit_market_kind { :aca_individual }
+    end
+
+    trait :bronze do
+      kind                { :health }
+      metal_level_kind    { :bronze }
+      benefit_market_kind { :aca_individual }
+    end
+
+    trait :platinum do
+      kind                { :health }
+      metal_level_kind    { :platinum }
+      benefit_market_kind { :aca_individual }
     end
 
     trait :silver do
-      metal_level_kind        { :silver }
-      benefit_market_kind     { :aca_individual }
+      kind                { :health }
+      metal_level_kind    { :silver }
+      benefit_market_kind { :aca_individual }
     end
 
     trait :with_issuer_profile do
@@ -72,6 +88,10 @@ FactoryBot.define do
       end
 
       issuer_profile { create(:benefit_sponsors_organizations_issuer_profile, assigned_site: assigned_site, abbrev: 'BCBS') }
+    end
+
+    trait :with_issuer_profile_kaiser do
+      issuer_profile { create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     end
 
     trait :with_renewal_product do

@@ -79,6 +79,27 @@ Then(/information should be saved successfully/) do
   expect(find_field(IvlPersonalInformation.address_line_one).value).to eq "123 New St"
 end
 
+Then(/Individual clicks yes and clicks continue/) do
+  expect(page).to have_css('.special_qle_reasons')
+  find(IvlPersonalInformation.reason_yes_radiobtn).click
+  within '#qle_reason' do
+    find('#qle_submit_reason').click
+  end
+
+end
+
+Then(/Individual clicks no and clicks continue/) do
+  expect(page).to have_css('.special_qle_reasons')
+  find(IvlPersonalInformation.reason_no_radiobtn).click
+  within '#qle_reason' do
+    find('#qle_submit_reason').click
+  end
+end
+
+Given(/is your health coverage expanded question is enabled/) do
+  enable_feature :is_your_health_coverage_ending_expanded_question
+end
+
 Then(/^.+ enter personal information with american indian alaska native status with featured tribe$/) do
   find(IvlPersonalInformation.us_citizen_or_national_yes_radiobtn).click
   find(IvlPersonalInformation.naturalized_citizen_no_radiobtn).click

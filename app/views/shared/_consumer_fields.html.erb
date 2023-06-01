@@ -1,7 +1,7 @@
 <% vlp_doc_subject = (defined? @vlp_doc_subject) ? @vlp_doc_subject : nil %>
 
 <% if individual_market_is_enabled? %>
-  <div id="consumer_fields" class="focus_effect">
+  <div data-cuke="consumer_fields" id="consumer_fields" class="focus_effect">
     <% if FinancialAssistanceRegistry.feature_enabled?(:optional_document_fields) %>
       <%= render :partial => 'shared/optional_field_warning' %>
     <% end %>

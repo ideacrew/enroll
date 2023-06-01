@@ -441,15 +441,28 @@ Given(/^the FAA feature configuration is disabled$/) do
 end
 
 Given(/^the kaiser paynow feature configuration is enabled$/) do
-  enable_feature :kaiser_pay_now
+  enable_feature :kaiser_permanente_pay_now
 end
 
 Given(/^the kaiser paynow feature configuration is disabled$/) do
-  disable_feature :kaiser_pay_now
+  disable_feature :kaiser_permanente_pay_now
+end
+
+When(/kaiser pay now feature is enabled/) do
+  EnrollRegistry[:kaiser_permanente_pay_now].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry[:kaiser_permanente_pay_now].setting(:plan_shopping).stub(:item).and_return(true)
 end
 
 Given(/^the enrollment tile feature is enabled$/) do
   skip_this_scenario unless EnrollRegistry[:kaiser_pay_now].setting(:enrollment_tile).item || EnrollRegistry[:anthem_blue_cross_and_blue_shield_pay_now].setting(:enrollment_tile).item
+end
+
+Given(/^the generic_redirect setting is enabled$/) do
+  EnrollRegistry[:generic_redirect].feature.stub(:is_enabled).and_return(true)
+end
+
+Given(/^the generic_redirect setting is disabled$/) do
+  EnrollRegistry[:generic_redirect].feature.stub(:is_enabled).and_return(false)
 end
 
 Given(/^the FAA feature configuration is enabled$/) do
@@ -514,6 +527,16 @@ end
 Given(/the iap year selection feature is enabled/) do
   enable_feature :iap_year_selection, {registry_name: FinancialAssistanceRegistry}
   enable_feature :iap_year_selection
+end
+
+Given(/the iap year selection form feature is enabled/) do
+  enable_feature :iap_year_selection_form, {registry_name: FinancialAssistanceRegistry}
+  enable_feature :iap_year_selection_form
+end
+
+Given(/the iap year selection form feature is disabled/) do
+  disable_feature :iap_year_selection_form, {registry_name: FinancialAssistanceRegistry}
+  disable_feature :iap_year_selection_form
 end
 
 Given(/the oe application warning display feature is enabled/) do
@@ -653,9 +676,17 @@ Then(/^a family with financial application and applicants in (.*) state exists w
   create_family_faa_application_with_applicants_and_evidences(state)
 end
 
+When(/^an applicant with other income exists for a (.*) financial application$/) do |state|
+  create_application_applicant_with_other_income(state)
+end
+
 Then(/^the user with (.*) role is logged in$/) do |role|
   @user.roles << role
   login_as @user
+end
+
+And(/^the ssi_income_types feature is enabled$/) do
+  enable_feature :ssi_income_types, {registry_name: FinancialAssistanceRegistry}
 end
 
 And(/^.+ clicks on Cost Savings link$/) do
@@ -676,6 +707,10 @@ end
 
 Then(/^.+ clicks on Full application action$/) do
   click_link 'Full Application'
+end
+
+Then(/^the social security type - (.*) benefits should show$/) do |ssi_type|
+  expect(page).to have_content(l10n("faa.income.social_security_benefit.#{ssi_type}"))
 end
 
 Then(/^.+ should see county under Mailing and Home address$/) do

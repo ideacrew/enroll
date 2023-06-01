@@ -3,6 +3,7 @@ class HbxAdminController < ApplicationController
 
   before_action :find_values, only: [:update_aptc_csr, :calculate_aptc_csr, :edit_aptc_csr]
   before_action :validate_aptc, only: [:update_aptc_csr, :calculate_aptc_csr]
+  before_action :set_cache_headers, only: [:edit_aptc_csr]
 
   def registry
     redirect_to main_app.root_path if ENV['AWS_ENV'] == 'prod'
@@ -15,6 +16,7 @@ class HbxAdminController < ApplicationController
     @household_members = Admin::Aptc.build_household_members(@current_year, @family)
     @household_info = Admin::Aptc.build_household_level_aptc_csr_data(@current_year, @family, @hbxs)
     @enrollments_info = Admin::Aptc.build_enrollments_data(@current_year, @family, @hbxs) if @hbxs.present?
+    check_osse_eligibility
     @current_aptc_applied_hash =  Admin::Aptc.build_current_aptc_applied_hash(@hbxs)
     @plan_premium_for_enrollments = Admin::Aptc.build_plan_premium_hash_for_enrollments(@hbxs)
     @active_tax_household_for_current_year = @family.active_household.latest_active_tax_household_with_year(@current_year)
@@ -89,6 +91,13 @@ class HbxAdminController < ApplicationController
     tax_household.tax_household_members.inject({}) do |hash, thhm|
       hash[thhm.person.id.to_s] = thhm.csr_percent_as_integer
       hash
+    end
+  end
+
+  def check_osse_eligibility
+    return unless EnrollRegistry.feature_enabled?(:self_service_osse_subsidy)
+    @hbxs.each do |hbx|
+      @enrollments_info[hbx.id]['osse_eligible'] = hbx.ivl_osse_eligible?
     end
   end
 end

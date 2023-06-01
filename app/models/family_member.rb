@@ -10,7 +10,9 @@ class FamilyMember
 
   # Responsible for updating eligibility when family member is created/updated
   after_create :family_member_created
+  before_create :notify_family
   after_update :family_member_updated, if: :is_active_changed?
+  after_destroy :notify_family
 
   # Person responsible for this family
   field :is_primary_applicant, type: Boolean, default: false
@@ -74,6 +76,7 @@ class FamilyMember
   delegate :is_dc_resident?, to: :person, allow_nil: true
   delegate :ivl_coverage_selected, to: :person
   delegate :is_applying_coverage, to: :person, allow_nil: true
+  delegate :age_off_excluded, to: :person, allow_nil: true
 
   validates_presence_of :person_id, :is_primary_applicant, :is_coverage_applicant
 
@@ -170,6 +173,12 @@ class FamilyMember
     create_financial_assistance_applicant
   end
 
+  def notify_family
+    return unless EnrollRegistry.feature_enabled?(:check_for_crm_updates)
+    return unless family
+    family.set(crm_notifiction_needed: true)
+  end
+
   def create_financial_assistance_applicant
     ::Operations::FinancialAssistance::CreateOrUpdateApplicant.new.call({family_member: self, event: :family_member_created}) if ::EnrollRegistry.feature_enabled?(:financial_assistance)
   rescue StandardError => e
@@ -189,7 +198,10 @@ class FamilyMember
   end
 
   def deactivate_tax_households
-    return unless family.persisted? && family.active_household.tax_households.present?
+    return unless family.persisted?
+
+    family.deactivate_financial_assistance(TimeKeeper.date_of_record)
+    return if family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year).blank?
 
     Operations::Households::DeactivateFinancialAssistanceEligibility.new.call(params: {family_id: family.id, date: TimeKeeper.date_of_record})
   rescue StandardError => e

@@ -4,10 +4,13 @@ field_names = %w[
     primary_hbx_id
     first_name
     last_name
+    dob
     communication_preference
     primary_email_address
     home_address
     mailing_address
+    primary_phone
+    secondary_phones
     application_aasm_state
     application_aasm_state_date
     external_id
@@ -18,7 +21,20 @@ field_names = %w[
     most_recent_active_dental_plan_id
     subscriber_indicator
     transfer_id
+    FPL_year
+    subscriber_hbx_id
+    has_access_to_health_coverage
+    has_access_to_health_coverage_kinds
   ]
+curr_year = TimeKeeper.date_of_record.year
+next_year = TimeKeeper.date_of_record.year + 1
+field_names << "#{curr_year}_most_recent_health_plan_id"
+field_names << "#{curr_year}_most_recent_health_status"
+field_names << "#{next_year}_most_recent_health_plan_id"
+field_names << "#{next_year}_most_recent_health_status"
+field_names << "inbound_transfer_date"
+
+
 file_name = "#{Rails.root}/applicant_outreach_report.csv"
 enrollment_year = FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value!
 # Target all families with an application in the current enrollment year
@@ -51,30 +67,58 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
         person = family_member&.person
         next unless applicant.is_applying_coverage && person
 
-        health_enrollment = family.active_household.hbx_enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'health'}
-        dental_enrollment = family.active_household.hbx_enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'dental'}
-        enrollment_member = if health_enrollment
-                              health_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
+        primary_phone = applicant.phones.detect { |phone| phone.primary }
+        secondary_phones = applicant.phones.each_with_object("") do |phone, collect|
+            next if phone.primary
+            collect.concat("#{phone}, ")
+          end.chop.chop
+        enrollments = family.active_household.hbx_enrollments
+        mra_health_enrollment = enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'health'}
+        mra_dental_enrollment = enrollments.enrolled_and_renewal.detect {|enr| enr.coverage_kind == 'dental'}
+        enrollment_member = if mra_health_enrollment
+                              mra_health_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
                             else
-                              enrollment_member = dental_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
+                              mra_dental_enrollment&.hbx_enrollment_members&.detect {|member| member.applicant_id == family_member.id}
                             end
+        fpl_year = application&.assistance_year - 1
+        subscriber_id = if mra_health_enrollment
+                          mra_health_enrollment&.subscriber&.hbx_id
+                        else
+                          mra_dental_enrollment&.subscriber&.hbx_id
+                        end
+        curr_mr_health_enrollment = enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == curr_year}.sort_by(&:submitted_at).reverse.first
+        next_mr_health_enrollment = enrollments.select {|enr| enr.coverage_kind == 'health' && enr.effective_on.year == next_year}.sort_by(&:submitted_at).reverse.first
+        inbound_transfer_date = application.transferred_at if application.transferred_at.present? && application.transfer_id.present? && !application.account_transferred
         csv << [person.hbx_id,
                 person.first_name,
                 person.last_name,
+                person&.dob,
                 person&.consumer_role&.contact_method,
                 person.work_email_or_best,
                 applicant.home_address.to_s,
                 applicant.addresses.where(kind: 'mailing').first,
+                primary_phone,
+                secondary_phones,
                 application&.aasm_state,
                 application&.workflow_state_transitions&.first&.transition_at,
                 family.external_app_id,
                 primary_person.user&.email, # only primary person has a User account
                 primary_person.user&.last_portal_visited,
                 program_eligible_for(applicant),
-                health_enrollment&.product&.hios_id,
-                dental_enrollment&.product&.hios_id,
+                mra_health_enrollment&.product&.hios_id,
+                mra_dental_enrollment&.product&.hios_id,
                 enrollment_member&.is_subscriber,
-                application.transfer_id]
+                application.transfer_id,
+                fpl_year,
+                subscriber_id,
+                applicant.has_eligible_health_coverage,
+                applicant.benefits.eligible.map(&:insurance_kind).join(", "),
+                curr_mr_health_enrollment&.product&.hios_id,
+                curr_mr_health_enrollment&.aasm_state,
+                next_mr_health_enrollment&.product&.hios_id,
+                next_mr_health_enrollment&.aasm_state,
+                inbound_transfer_date
+              ]
       end
     rescue StandardError => e
       puts "error for family #{family.id} due to #{e}"

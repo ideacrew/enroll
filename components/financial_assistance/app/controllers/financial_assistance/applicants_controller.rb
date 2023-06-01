@@ -20,6 +20,7 @@ module FinancialAssistance
     def create
       @applicant = FinancialAssistance::Forms::Applicant.new(params.require(:applicant).permit(*applicant_parameters))
       @applicant.application_id = params[:application_id]
+      @applicant.is_dependent = params[:is_dependent]
       success, _result = @applicant.save
 
       respond_to do |format|
@@ -49,6 +50,7 @@ module FinancialAssistance
         head :ok, content_type: "text/html"
       else
         @applicant = FinancialAssistance::Forms::Applicant.new(params.require(:applicant).permit(*applicant_parameters))
+        @applicant.is_dependent = params[:is_dependent]
         @applicant.application_id = params[:application_id]
         @applicant.applicant_id = params[:id]
         @applicant.save

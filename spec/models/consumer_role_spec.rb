@@ -386,12 +386,14 @@ context 'Verification process and notices' do
     let(:subject) { consumer_role.can_receive_paper_communication? }
 
     before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:contact_method_via_dropdown).and_return(contact_method_via_dropdown)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:location_residency_verification_type).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(false)
     end
 
     context 'when contact_method_via_dropdown feature is enabled' do
@@ -435,6 +437,7 @@ context 'Verification process and notices' do
     let(:subject) { consumer_role.can_receive_electronic_communication? }
 
     before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:contact_method_via_dropdown).and_return(contact_method_via_dropdown)
@@ -1939,10 +1942,36 @@ describe 'vlp documents' do
       end
     end
 
+    context 'when admin verifies and consumer has ridp documents' do
+
+      before do
+        EnrollRegistry[:show_people_with_no_evidence].feature.stub(:is_enabled).and_return(false)
+      end
+
+      it "should delete the ridp documents" do
+        expect(consumer_role.ridp_documents.where(ridp_verification_type: 'Identity').present?).to be_truthy
+        consumer_role.admin_ridp_verification_action('verify', 'Identity', 'Document in EnrollApp', person)
+        expect(consumer_role.ridp_documents.where(ridp_verification_type: 'Identity').present?).to be_falsey
+      end
+    end
+
     context 'when admin rejects' do
 
       it 'returns rejected message' do
         expect(consumer_role.admin_ridp_verification_action('return_for_deficiency', 'Identity', 'Other', person)).to eq 'Identity successfully rejected.'
+      end
+    end
+
+    context 'when admin rejects and consumer has ridp documents' do
+
+      before do
+        EnrollRegistry[:show_people_with_no_evidence].feature.stub(:is_enabled).and_return(false)
+      end
+
+      it "should delete the ridp documents" do
+        expect(consumer_role.ridp_documents.where(ridp_verification_type: 'Identity').present?).to be_truthy
+        consumer_role.admin_ridp_verification_action('return_for_deficiency', 'Identity', 'Other', person)
+        expect(consumer_role.ridp_documents.where(ridp_verification_type: 'Identity').present?).to be_falsey
       end
     end
   end

@@ -34,6 +34,34 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
       }
     end
 
+    let(:person_rating_address) { person1.rating_address }
+
+    let(:one_household_without_family) do
+      {
+        rating_address: {
+          county: person_rating_address.county,
+          zip: person_rating_address.zip,
+          state: person_rating_address.state
+        },
+        effective_date: start_of_year,
+        households: [
+          {
+            household_id: 'a12bs6dbs1',
+            members: [
+              {
+                relationship_with_primary: 'self',
+                date_of_birth: family_member1.dob
+              },
+              {
+                relationship_with_primary: 'spouse',
+                date_of_birth: family_member2.dob
+              }
+            ]
+          }
+        ]
+      }
+    end
+
     let(:two_households) do
       {
         family_id: family.id,
@@ -54,6 +82,37 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
               {
                 family_member_id: family_member2.id,
                 relationship_with_primary: 'spouse'
+              }
+            ]
+          }
+        ]
+      }
+    end
+
+    let(:two_households_without_family) do
+      {
+        effective_date: start_of_year,
+        rating_address: {
+          county: person_rating_address.county,
+          zip: person_rating_address.zip,
+          state: person_rating_address.state
+        },
+        households: [
+          {
+            household_id: 'a12bs6dbs1',
+            members: [
+              {
+                relationship_with_primary: 'self',
+                date_of_birth: family_member1.dob
+              }
+            ]
+          },
+          {
+            household_id: 'a12bs6dbs2',
+            members: [
+              {
+                relationship_with_primary: 'spouse',
+                date_of_birth: family_member2.dob
               }
             ]
           }
@@ -86,6 +145,25 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
           expect(@result.success.households.map(&:household_dental_benchmark_ehb_premium)).not_to include(nil)
           expect(@result.success.households.map(&:dental_product_hios_id)).to eq(['48396ME0860005', '48396ME0860005'])
           expect(@result.success.households.map(&:health_product_hios_id)).to eq(['48396ME0860011', '48396ME0860011'])
+        end
+      end
+
+      context 'without family' do
+        context 'household_type: child_only' do
+          before do
+            allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) { |_id, _start, age| age * 1.0 }
+            @result = subject.call(two_households_without_family)
+          end
+
+          it 'should return success with dental and health hios_ids' do
+            expect(::BenchmarkProduct.all.count).to eq(1)
+            expect(@result.success.household_group_benchmark_ehb_premium).not_to be_nil
+            expect(@result.success.households.map(&:household_benchmark_ehb_premium)).not_to include(nil)
+            expect(@result.success.households.map(&:household_health_benchmark_ehb_premium)).not_to include(nil)
+            expect(@result.success.households.map(&:household_dental_benchmark_ehb_premium)).not_to include(nil)
+            expect(@result.success.households.map(&:dental_product_hios_id)).to eq(['48396ME0860005', '48396ME0860005'])
+            expect(@result.success.households.map(&:health_product_hios_id)).to eq(['48396ME0860011', '48396ME0860011'])
+          end
         end
       end
     end
@@ -149,6 +227,64 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
           expect(@result.success.households.map(&:household_health_benchmark_ehb_premium)).not_to include(nil)
           expect(@result.success.households.map(&:household_dental_benchmark_ehb_premium).compact).to be_empty
           expect(@result.success.households.first.dental_product_hios_id).to eq(nil)
+        end
+      end
+
+      context 'without family' do
+        context 'household_type: child_only' do
+          before do
+            allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) { |_id, _start, age| age * 1.0 }
+            @result = subject.call(one_household_without_family)
+          end
+
+          it 'should return success with dental_hios_id' do
+            expect(::BenchmarkProduct.all.count).to eq(1)
+            expect(@result.success).to be_a(::Entities::BenchmarkProducts::BenchmarkProduct)
+            expect(@result.success.household_group_benchmark_ehb_premium).not_to be_nil
+            expect(@result.success.households.map(&:household_benchmark_ehb_premium)).not_to include(nil)
+            expect(@result.success.households.map(&:household_health_benchmark_ehb_premium)).not_to include(nil)
+            expect(@result.success.households.map(&:household_dental_benchmark_ehb_premium)).not_to include(nil)
+            expect(@result.success.households.first.dental_product_hios_id).to eq('48396ME0860005')
+          end
+        end
+
+        context 'household_type: adult_and_child' do
+          let(:person1_age) { 37 }
+
+          before do
+            allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) { |_id, _start, age| age * 1.0 }
+            @result = subject.call(one_household_without_family)
+          end
+
+          it 'should return success with dental_hios_id' do
+            expect(::BenchmarkProduct.all.count).to eq(1)
+            expect(@result.success).to be_a(::Entities::BenchmarkProducts::BenchmarkProduct)
+            expect(@result.success.household_group_benchmark_ehb_premium).not_to be_nil
+            expect(@result.success.households.map(&:household_benchmark_ehb_premium)).not_to include(nil)
+            expect(@result.success.households.map(&:household_health_benchmark_ehb_premium)).not_to include(nil)
+            expect(@result.success.households.map(&:household_dental_benchmark_ehb_premium)).not_to include(nil)
+            expect(@result.success.households.first.dental_product_hios_id).to eq('48396ME0860007')
+          end
+        end
+
+        context 'household_type: adult_only' do
+          let(:person1_age) { 37 }
+          let(:person2_age) { 36 }
+
+          before do
+            allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) { |_id, _start, age| age * 1.0 }
+            @result = subject.call(one_household_without_family)
+          end
+
+          it 'should return success without dental_hios_id' do
+            expect(::BenchmarkProduct.all.count).to eq(1)
+            expect(@result.success).to be_a(::Entities::BenchmarkProducts::BenchmarkProduct)
+            expect(@result.success.household_group_benchmark_ehb_premium).not_to be_nil
+            expect(@result.success.households.map(&:household_benchmark_ehb_premium)).not_to include(nil)
+            expect(@result.success.households.map(&:household_health_benchmark_ehb_premium)).not_to include(nil)
+            expect(@result.success.households.map(&:household_dental_benchmark_ehb_premium).compact).to be_empty
+            expect(@result.success.households.first.dental_product_hios_id).to eq(nil)
+          end
         end
       end
 

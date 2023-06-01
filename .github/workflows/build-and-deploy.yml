@@ -19,6 +19,7 @@ env:
 
 jobs:
   prep:
+    if: github.repository_owner == 'ideacrew' && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch') || (github.event.pull_request.head.repo.owner.login == 'ideacrew'))
     runs-on: ubuntu-latest
     outputs:
       taggedImage: ${{ steps.prep.outputs.tagged_image }}
@@ -49,6 +50,7 @@ jobs:
 
   # Uses buildx to build and push the image
   build-and-upload-image:
+    if: github.repository_owner == 'ideacrew' && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch') || (github.event.pull_request.head.repo.owner.login == 'ideacrew'))
     needs: [prep]
     strategy:
       matrix:
@@ -98,6 +100,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
         with:
           install: true
+          version: v0.9.1
 
       - name: Cache Docker layers
         uses: actions/cache@v3
@@ -186,14 +189,14 @@ jobs:
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
   new-image-notification:
-    if: github.event_name != 'pull_request'
+    if: github.repository_owner == 'ideacrew' && github.event_name != 'pull_request'
     needs: [prep, build-and-upload-image]
     runs-on: ubuntu-latest
     steps:
       - name: Git Commit Data w/ Message
         uses: jcputney/git-commit-data-action@1.0.2
       - name: Post to a Slack channel
-        id: slack
+        id: ic-slack
         uses: slackapi/slack-github-action@v1
         with:
           channel-id: 'docker-images-${{ needs.prep.outputs.repositoryName }}'
@@ -213,7 +216,7 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
 
   notify-slack:
-    if: github.event_name != 'pull_request'
+    if: github.repository_owner == 'ideacrew' && github.event_name != 'pull_request'
     needs: [new-image-notification, prep, build-and-upload-image]
     runs-on: ubuntu-latest
     strategy:
@@ -225,7 +228,7 @@ jobs:
           MATRIX_CLIENT=$(echo ${{ matrix.client }} | tr '[:lower:]' '[:upper:]')
           echo "CLIENT=${MATRIX_CLIENT}" >> ${GITHUB_ENV}
       - name: Post to a Slack channel
-        id: slack
+        id: dc-slack
         uses: slackapi/slack-github-action@v1
         with:
           channel-id: 'docker-images-${{ needs.prep.outputs.repositoryName }}'
@@ -246,3 +249,27 @@ jobs:
             }
         env:
           SLACK_BOT_TOKEN: ${{ secrets.YELLR_BOT_TOKEN }}
+      - name: Post to DC slack
+        # Only run if matrix client is DC
+        if: matrix.client == 'dc-pause'
+        id: slack
+        uses: slackapi/slack-github-action@v1
+        with:
+          channel-id: 'docker-images-${{ needs.prep.outputs.repositoryName }}'
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*${{ format('{0} {1} image*:\n`{2}/{3}-{4}`', env.CLIENT, matrix.registry, matrix.registry, needs.prep.outputs.taggedImage, matrix.client) }}"
+                  }
+                },
+                {
+                  "type": "divider"
+                }
+              ]
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.DC_DEPLOY_SLACK_BOT_TOKEN }}

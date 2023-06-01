@@ -12,6 +12,8 @@ module Operations
       include EventSource::Logging
       include ActionView::Helpers::NumberHelper
 
+      # @param [HbxEnrollment] :enrollment HbxEnrollment #required
+      # @return [Dry::Monads::Result]
       def call(params)
         values = yield validate(params)
         family = yield fetch_family(values[:enrollment])
@@ -38,8 +40,10 @@ module Operations
         Success(enrollment.family)
       end
 
-      def build_addresses(person)
+      def build_addresses(person, is_primary)
         address = person.mailing_address
+
+        return [] if address.nil? && !is_primary
         [
           {
             :kind => address.kind,
@@ -69,17 +73,18 @@ module Operations
         family_members_hash = members.collect do |fm|
           person = fm.person
           outstanding_verification_types = person.consumer_role.types_include_to_notices
+          is_incarcerated = person.is_incarcerated || false
           member_hash = {
             is_primary_applicant: fm.is_primary_applicant,
             person: {
               hbx_id: person.hbx_id,
               person_name: { first_name: person.first_name, last_name: person.last_name },
-              person_demographics: { ssn: person.ssn, gender: person.gender, dob: person.dob, is_incarcerated: person.is_incarcerated },
+              person_demographics: { ssn: person.ssn, gender: person.gender, dob: person.dob, is_incarcerated: is_incarcerated },
               person_health: { is_tobacco_user: person.is_tobacco_user },
               is_active: person.is_active,
               is_disabled: person.is_disabled,
               consumer_role: build_consumer_role(person.consumer_role),
-              addresses: build_addresses(person)
+              addresses: build_addresses(person, fm.is_primary_applicant)
             }
           }
           member_hash[:person].merge!(verification_types: update_and_build_verification_types(person)) if outstanding_verification_types.present?
@@ -117,11 +122,20 @@ module Operations
             product_reference: product_reference(product, issuer),
             issuer_profile_reference: issuer_profile_reference(issuer),
             consumer_role_reference: consumer_role_reference(consumer_role),
-            is_receiving_assistance: (enr.applied_aptc_amount > 0 || (product.is_csr? ? true : false))
+            is_receiving_assistance: (enr.applied_aptc_amount > 0 || (product.is_csr? ? true : false)),
+            timestamp: timestamp(enr)
           }
           enrollment_hash.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment?
           enrollment_hash
         end
+      end
+
+      def timestamp(enrollment)
+        {
+          submitted_at: enrollment.submitted_at.to_datetime,
+          created_at: enrollment.created_at.to_datetime,
+          modified_at: enrollment.updated_at.to_datetime
+        }
       end
 
       def qualifying_life_event_kind_reference(qle)

@@ -12,6 +12,8 @@ module BenefitMarkets
       attribute :metal_level_kind,                Types::Strict::Symbol
       attribute :ehb,                             Types::Strict::Float
       attribute :is_standard_plan,                Types::Strict::Bool
+      attribute :is_hc4cc_plan,                   Types::Bool.optional
+
       attribute :rx_formulary_url,                Types::String.optional
       attribute :hsa_eligibility,                 Types::Strict::Bool
       attribute :provider_directory_url,          Types::String.optional

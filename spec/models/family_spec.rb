@@ -254,78 +254,62 @@ describe Family, type: :model, dbclean: :around_each do
       end
     end
 
-    context "when a broker account is created for the Family" do
+    context "when a broker agency is hired or terminated for a family" do
       let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
       let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
-      let(:broker_agency_profile2) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile)}
-      let(:writing_agent2)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile2.id) }
 
-      it "adds a broker agency account" do
+      it "trigger broker broker hired event" do
+        expect_any_instance_of(Events::Family::Brokers::BrokerHired).to receive(:publish)
         carols_family.hire_broker_agency(writing_agent.id)
-        carols_family.reload
-        expect(carols_family.broker_agency_accounts.length).to eq(1)
       end
 
-      it "adding twice only gives two broker agency accounts" do
-        carols_family.hire_broker_agency(writing_agent.id)
-        carols_family.hire_broker_agency(writing_agent.id)
-        carols_family.reload
-        expect(carols_family.broker_agency_accounts.unscoped.length).to eq(2)
-        expect(Family.by_writing_agent_id(writing_agent.id).count).to eq(1)
+      it "trigger broker fired event" do
+        carols_family.broker_agency_accounts.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                 writing_agent_id: writing_agent.id,
+                                                 start_on: Time.now,
+                                                 is_active: true)
+        expect_any_instance_of(Events::Family::Brokers::BrokerFired).to receive(:publish)
+        carols_family.terminate_broker_agency(writing_agent.id)
+      end
+    end
+  end
+
+  context "notify_broker_update_on_impacted_enrollments_to_edi" do
+    let(:person)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+    let(:family)       { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let(:enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        household: family.active_household,
+        effective_on: TimeKeeper.date_of_record.beginning_of_year,
+        family: family,
+        kind: "individual",
+        is_any_enrollment_member_outstanding: true,
+        aasm_state: "coverage_selected"
+      )
+    end
+
+    context "send broker events to edi if feature is enabled" do
+      before do
+        EnrollRegistry[:send_broker_hired_event_to_edi].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:send_broker_fired_event_to_edi].feature.stub(:is_enabled).and_return(true)
       end
 
-      it "new broker adds a broker_agency_account" do
-        carols_family.hire_broker_agency(writing_agent.id)
-        carols_family.reload
-        carols_family.hire_broker_agency(writing_agent2.id)
-        carols_family.reload
-        expect(carols_family.broker_agency_accounts.unscoped.length).to eq(2)
-        expect(carols_family.broker_agency_accounts.unscoped[0].is_active).to be_falsey
-        expect(carols_family.broker_agency_accounts.unscoped[1].is_active).to be_truthy
-        expect(carols_family.broker_agency_accounts.unscoped[1].writing_agent_id).to eq(writing_agent2.id)
+      it "should notify edi on impacted enrollments if feature is enabled" do
+        result = family.notify_broker_update_on_impacted_enrollments_to_edi(BSON::ObjectId.new)
+        expect(result).to eq true
+      end
+    end
+
+    context "send broker events to edi if feature is disabled" do
+      before do
+        EnrollRegistry[:send_broker_hired_event_to_edi].feature.stub(:is_enabled).and_return(false)
+        EnrollRegistry[:send_broker_fired_event_to_edi].feature.stub(:is_enabled).and_return(false)
       end
 
-      it "carol changes brokers" do
-        carols_family.hire_broker_agency(writing_agent.id)
-        carols_family.reload
-        carols_family.hire_broker_agency(writing_agent2.id)
-        carols_family.reload
-        expect(Family.by_writing_agent_id(writing_agent.id).count).to eq(0)
-        expect(Family.by_writing_agent_id(writing_agent2.id).count).to eq(1)
-      end
-
-      it "writing_agent is popular" do
-        carols_family.hire_broker_agency(writing_agent.id)
-        carols_family.reload
-        carols_family.hire_broker_agency(writing_agent2.id)
-        carols_family.reload
-        carols_family.hire_broker_agency(writing_agent.id)
-        carols_family.reload
-        mikes_family.hire_broker_agency(writing_agent.id)
-        mikes_family.reload
-        expect(Family.by_writing_agent_id(writing_agent.id).count).to eq(2)
-        expect(Family.by_writing_agent_id(writing_agent2.id).count).to eq(0)
-      end
-
-      it "broker agency profile is popular" do
-        carols_family.hire_broker_agency(writing_agent.id)
-        carols_family.reload
-        carols_family.hire_broker_agency(writing_agent2.id)
-        carols_family.reload
-        carols_family.hire_broker_agency(writing_agent.id)
-        carols_family.reload
-        mikes_family.hire_broker_agency(writing_agent.id)
-        mikes_family.reload
-        expect(Family.by_broker_agency_profile_id(broker_agency_profile.id).count).to eq(2)
-        expect(Family.by_broker_agency_profile_id(broker_agency_profile2.id).count).to eq(0)
-      end
-
-      it "should not rehire already existing active broker" do
-        carols_family.hire_broker_agency(writing_agent.id)
-        carols_family.reload
-        carols_family.hire_broker_agency(writing_agent.id)
-        carols_family.reload
-        expect(carols_family.broker_agency_accounts.unscoped.length).to eq(1)
+      it "should notify edi on impacted enrollments if feature is enabled" do
+        result = family.notify_broker_update_on_impacted_enrollments_to_edi(BSON::ObjectId.new)
+        expect(result).to eq false
       end
     end
   end
@@ -1497,15 +1481,6 @@ describe "has_valid_e_case_id" do
     expect(family1000.has_valid_e_case_id?).to be_truthy
   end
 end
-#TODO: fix me when ivl plans refactored to products
-# describe "currently_enrolled_plans_ids" do
-#   let!(:family100) { FactoryBot.create(:family, :with_primary_family_member) }
-#   let!(:enrollment100) { FactoryBot.create(:hbx_enrollment, household: family100.active_household, kind: "individual") }
-#
-#   it "should return a non-empty array of plan ids" do
-#     expect(family100.currently_enrolled_plans_ids(enrollment100).present?).to be_truthy
-#   end
-# end
 
 describe "set_due_date_on_verification_types" do
   let!(:person)           { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
@@ -2138,134 +2113,87 @@ describe "terminated_enrollments", dbclean: :after_each do
   end
 end
 
-describe "#currently_enrolled_products", dbclean: :after_each do
+describe 'trigger_async_publish with critical changes' do
   let!(:person) { FactoryBot.create(:person)}
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-  let!(:household) { FactoryBot.create(:household, family: family) }
-  let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
-  let!(:effective_on) { TimeKeeper.date_of_record.beginning_of_month}
-  let!(:hbx_enrollment_member) { FactoryBot.build(:hbx_enrollment_member, applicant_id: family.primary_applicant.id) }
 
-  let!(:active_enrollment) {
-    FactoryBot.create(:hbx_enrollment,
-                      family: family,
-                      household: family.active_household,
-                      coverage_kind: "health",
-                      product: product,
-                      aasm_state: 'coverage_selected',
-                      hbx_enrollment_members: [hbx_enrollment_member]
-    )}
-  let!(:shopping_enrollment) {
-    FactoryBot.create(:hbx_enrollment,
-                      family: family,
-                      effective_on: effective_on,
-                      household: family.active_household,
-                      coverage_kind: "health",
-                      aasm_state: 'shopping',
-                      hbx_enrollment_members: [hbx_enrollment_member]
-    )}
-
-
-  context "when consumer has active enrollment" do
-    it "should return current active enrolled product" do
-      expect(family.currently_enrolled_products(shopping_enrollment)).to eq [active_enrollment.product]
-    end
+  before do
+    allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
+    person.crm_notifiction_needed = true
+    person.save!
   end
 
-  context "when consumer has contionus coverage" do
-
-    let!(:term_enrollment) {
-      FactoryBot.create(:hbx_enrollment,
-                        family: family,
-                        household: family.active_household,
-                        coverage_kind: "health",
-                        product: product,
-                        terminated_on: effective_on - 1.day,
-                        aasm_state: 'coverage_terminated',
-                        hbx_enrollment_members: [hbx_enrollment_member]
-      )}
-
-    before do
-      active_enrollment.cancel_coverage!
-    end
-
-    it "should return contionus coverage product" do
-      expect(family.currently_enrolled_products(shopping_enrollment)).to eq [term_enrollment.product]
-    end
+  it 'should no longer have a person how needs a crm notification' do
+    family.send(:trigger_async_publish)
+    expect(person.reload.crm_notifiction_needed).to eq false
   end
 
-  context "when consumer no contionus coverage" do
-
-    let!(:term_enrollment) {
-      FactoryBot.create(:hbx_enrollment,
-                        family: family,
-                        household: family.active_household,
-                        coverage_kind: "health",
-                        product: product,
-                        terminated_on: effective_on - 2.day,
-                        aasm_state: 'coverage_terminated',
-                        hbx_enrollment_members: [hbx_enrollment_member]
-      )}
-
-    before do
-      active_enrollment.cancel_coverage!
-    end
-
-    it "should return []" do
-      expect(family.currently_enrolled_products(shopping_enrollment)).to eq []
-    end
+  it 'should no longer need a crm notification' do
+    family.send(:trigger_async_publish)
+    expect(family.reload.crm_notifiction_needed).to eq false
   end
 
-  describe 'application_applicable_year' do
-    let(:current_year) { TimeKeeper.date_of_record.year }
-    let!(:hbx_profile) do
-      FactoryBot.create(:hbx_profile,
-                        :normal_ivl_open_enrollment,
-                        us_state_abbreviation: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
-                        cms_id: "#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.upcase}0")
-    end
+  it 'should trigger the first time' do
+    expect(family.send(:trigger_async_publish)).not_to eq nil
+  end
 
-    context 'system date within OE' do
-      context 'after start of OE and end of current year i.e usually b/w 11/1, 12/31' do
-        before do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 5))
-        end
+  it 'should not trigger a second time' do
+    family.send(:trigger_async_publish)
+    expect(family.reload.send(:trigger_async_publish)).to eq nil
+  end
+end
 
-        it 'should return benefit_coverage_period with start_on year as current_year + 1' do
-          expect(Family.application_applicable_year).to eq(current_year.next)
-        end
+describe 'application_applicable_year' do
+  let(:current_year) { TimeKeeper.date_of_record.year }
+  let!(:hbx_profile) do
+    FactoryBot.create(:hbx_profile,
+                      :normal_ivl_open_enrollment,
+                      us_state_abbreviation: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
+                      cms_id: "#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.upcase}0")
+  end
+
+  context 'system date within OE' do
+    context 'after start of OE and end of current year i.e usually b/w 11/1, 12/31' do
+      before do
+        allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 5))
       end
 
-      context 'after start of prospective year and end of OE end on i.e usually b/w 1/1, 1/31' do
-        before do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year.next, 1, 5))
-        end
-
-        it 'should return benefit_coverage_period with start_on year as current_year + 1' do
-          expect(Family.application_applicable_year).to eq(current_year.next)
-        end
+      it 'should return benefit_coverage_period with start_on year as current_year + 1' do
+        expect(Family.application_applicable_year).to eq(current_year.next)
       end
     end
 
-    context 'system date outside OE' do
-      context 'before start of OE start i.e usually before 11/1' do
-        before do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 9, 5))
-        end
-
-        it 'should return benefit_coverage_period with start_on year same as current_year' do
-          expect(Family.application_applicable_year).to eq(current_year)
-        end
+    context 'after start of prospective year and end of OE end on i.e usually b/w 1/1, 1/31' do
+      before do
+        allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year.next, 1, 5))
       end
 
-      context 'after end of OE i.e usually after 1/31' do
-        before do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year.next, 4, 5))
-        end
+      it 'should return benefit_coverage_period with start_on year as current_year + 1' do
+        expect(Family.application_applicable_year).to eq(current_year.next)
+      end
+    end
+  end
 
-        it 'should return benefit_coverage_period with start_on year as current_year + 1' do
-          expect(Family.application_applicable_year).to eq(current_year.next)
-        end
+  context 'system date outside OE' do
+    context 'before start of OE start i.e usually before 11/1' do
+      before do
+        allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 9, 5))
+      end
+
+      it 'should return benefit_coverage_period with start_on year same as current_year' do
+        expect(Family.application_applicable_year).to eq(current_year)
+      end
+    end
+
+    context 'after end of OE i.e usually after 1/31' do
+      before do
+        allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year.next, 4, 5))
+      end
+
+      it 'should return benefit_coverage_period with start_on year as current_year + 1' do
+        expect(Family.application_applicable_year).to eq(current_year.next)
       end
     end
   end
@@ -2301,5 +2229,61 @@ shared_examples_for 'has aptc enrollment' do |created_at, applied_aptc, market_k
 
   context 'previous year individual applied aptc enrollment' do
     it_behaves_like "has aptc enrollment", Date.new(1,1, (TimeKeeper.date_of_record.year - 1)), 50.0, 'individual', false
+  end
+end
+
+describe '#deactivate_financial_assistance' do
+  let(:person) { FactoryBot.create(:person) }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+  let(:tax_household_group) { FactoryBot.create(:tax_household_group, family: family) }
+
+  context 'with valid params' do
+    before do
+      EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+    end
+
+    it 'deactivates active tax household group' do
+      expect(tax_household_group.end_on).to be_nil
+      family.deactivate_financial_assistance(TimeKeeper.date_of_record)
+      expect(tax_household_group.reload.end_on).not_to be_nil
+    end
+  end
+
+  context 'with invalid params' do
+    context 'bad date input and multi tax household feature is enabled' do
+      before do
+        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+      end
+
+      it 'does not deactivate active tax household group' do
+        expect(tax_household_group.end_on).to be_nil
+        family.deactivate_financial_assistance(nil)
+        expect(tax_household_group.reload.end_on).to be_nil
+      end
+    end
+
+    context 'bad date input and multi tax household feature is disabled' do
+      before do
+        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(false)
+      end
+
+      it 'does not deactivate active tax household group' do
+        expect(tax_household_group.end_on).to be_nil
+        family.deactivate_financial_assistance(nil)
+        expect(tax_household_group.reload.end_on).to be_nil
+      end
+    end
+
+    context 'multi tax households feature is disabled' do
+      before do
+        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(false)
+      end
+
+      it 'does not deactivate active tax household group' do
+        expect(tax_household_group.end_on).to be_nil
+        family.deactivate_financial_assistance(TimeKeeper.date_of_record)
+        expect(tax_household_group.reload.end_on).to be_nil
+      end
+    end
   end
 end

@@ -14,7 +14,7 @@
     <% end -%>
 
     <%- if devise_mapping.registerable? && controller_name != 'registrations' && can_register_new_account %>
-      <%= link_to l10n(".create_account"), site_registration_path(resource_name, params), class: "btn btn-outline-primary", data: { no_turbolink: true } %>
+      <%= link_to_with_noopener_noreferrer(l10n(".create_account"), site_registration_path(resource_name, params), class: "btn btn-outline-primary", data: { no_turbolink: true }) %>
     <% end -%>
 
     <%- if devise_mapping.lockable? && resource_class.unlock_strategy_enabled?(:email) && controller_name != 'unlocks' %>

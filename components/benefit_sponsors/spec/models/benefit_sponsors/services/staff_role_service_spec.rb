@@ -307,6 +307,16 @@ module BenefitSponsors
         end
       end
 
+      context 'when broker profile is in decertified state' do
+        let(:staff_role_form) do
+          BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.new(filter_criteria: {"q" => broker_agency_profile.legal_name},
+                                                                               is_broker_registration_page: "true")
+        end
+        it "should return blank search" do
+          broker_agency_profile.primary_broker_role.update_attributes!(aasm_state: "decertified")
+          expect(subject.broker_agency_search!(staff_role_form)).to eq []
+        end
+      end
     end
 
     describe ".general_agency_search!", dbclean: :after_each do

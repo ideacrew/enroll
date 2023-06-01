@@ -6,7 +6,7 @@ module Operations
     class DropEnrollmentMembers
       include Dry::Monads[:result, :do]
 
-      attr_reader :new_effective_date, :termination_date, :base_enrollment, :new_enrollment
+      attr_reader :new_effective_date, :termination_date, :base_enrollment, :new_enrollment, :future_effective
 
       # @param [ HbxEnrollment ] hbx_enrollment
       # @return [ Array ] dropped_members
@@ -30,8 +30,9 @@ module Operations
         return Failure('Member(s) have not been selected for termination.') if params[:options].select{|string| string.include?("terminate_member")}.empty?
         return Failure('Termination date has not been selected.') if params[:options].select{|string| string.include?("termination_date")}.empty?
         @termination_date = Date.strptime(params[:options]["termination_date_#{params[:hbx_enrollment].id}"], "%m/%d/%Y")
-        @new_effective_date = (termination_date > base_enrollment.effective_on) ? termination_date + 1.day : base_enrollment.effective_on
-        return Failure('Termination date must be in current calendar year.') unless new_effective_date.year == termination_date.year
+        @future_effective = termination_date > base_enrollment.effective_on
+        @new_effective_date = future_effective ? termination_date + 1.day : base_enrollment.effective_on
+        return Failure('Termination date must be in current calendar year.') unless future_effective || (new_effective_date.year == termination_date.year)
         return Failure('Termination date cannot be outside of the current calendar year.') unless termination_date.year == TimeKeeper.date_of_record.year
         return Failure('Unable to disenroll member(s) because of retroactive date selection.') if termination_date < TimeKeeper.date_of_record && EnrollRegistry[:drop_retro_scenario].disabled?
 

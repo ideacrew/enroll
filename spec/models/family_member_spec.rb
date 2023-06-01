@@ -27,6 +27,8 @@ describe FamilyMember, "given a person", dbclean: :after_each do
     expect(person).to receive(:ivl_coverage_selected)
     subject.ivl_coverage_selected
   end
+
+  it { should delegate_method(:age_off_excluded).to(:person) }
 end
 
 
@@ -217,6 +219,74 @@ describe FamilyMember, 'call back deactivate_tax_households on update', dbclean:
     family.primary_applicant.update_attributes!(is_active: false)
     family.reload
     expect(family.active_household.tax_households.first.effective_ending_on).not_to eq nil
+  end
+end
+
+describe '#deactivate_tax_households' do
+  let(:person) { FactoryBot.create(:person) }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+  let(:primary_family_member) { family.primary_applicant }
+
+  context 'when Multi Tax Households feature is enabled' do
+    let(:tax_household_group) { FactoryBot.create(:tax_household_group, family: family) }
+
+    before do
+      EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+    end
+
+    context 'family member is deleted' do
+      it 'deactivates active tax household group' do
+        expect(tax_household_group.end_on).to be_nil
+        primary_family_member.update_attributes!(is_active: false)
+        expect(tax_household_group.reload.end_on).not_to be_nil
+      end
+    end
+
+    context 'family member is updated' do
+      it 'does not deactivate active tax household group' do
+        expect(tax_household_group.end_on).to be_nil
+        primary_family_member.update_attributes!(external_member_id: '100992')
+        expect(tax_household_group.reload.end_on).to be_nil
+      end
+    end
+  end
+end
+
+describe FamilyMember, 'callback set crm_notifiction_needed', dbclean: :after_each do
+  let!(:person) {FactoryBot.create(:person)}
+  let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
+  let!(:dependent_person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:dependent_family_member) do
+    FamilyMember.new(is_primary_applicant: false, is_consent_applicant: false, person: dependent_person)
+  end
+
+  before do
+    allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+    # have to run save an extra time due to the encrytped ssn
+    person.is_incarcerated = true
+    person.save!
+    person.set(crm_notifiction_needed: false)
+    dependent_person.is_incarcerated = true
+    dependent_person.save!
+    dependent_person.set(crm_notifiction_needed: false)
+    family.set(crm_notifiction_needed: false)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
+    family.family_members << dependent_family_member
+    person.person_relationships << PersonRelationship.new(relative: person, kind: "self")
+    person.person_relationships.build(relative: dependent_person, kind: "spouse")
+    person.save!
+  end
+
+  it 'should set to true on create' do
+    family.reload
+    expect(family.crm_notifiction_needed).to eq true
+  end
+
+  it 'should set to true on destroy' do
+    family.set(crm_notifiction_needed: false)
+    dependent_family_member.destroy
+    family.reload
+    expect(family.crm_notifiction_needed).to eq true
   end
 end
 

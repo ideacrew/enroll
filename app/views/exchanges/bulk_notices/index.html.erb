@@ -6,7 +6,7 @@
       <h2>Sent Messages</h2>
     </div>
     <div class='col-3 offset-6 text-right pr-0'>
-      <%= link_to 'New Message', main_app.new_exchanges_bulk_notice_path, class: 'btn btn-alt-blue' %>
+      <%= link_to_with_noopener_noreferrer('New Message', main_app.new_exchanges_bulk_notice_path, class: 'btn btn-alt-blue') %>
     </div>
   </div>
 
@@ -34,7 +34,7 @@
         <% if !bulk_notice.documents.empty? %>
           <i class="fas fa-paperclip"></i>&nbsp;
         <% end %>
-        <%= link_to bulk_notice.subject, exchanges_bulk_notice_path(bulk_notice) %>
+        <%= link_to_with_noopener_noreferrer(bulk_notice.subject, exchanges_bulk_notice_path(bulk_notice)) %>
       </div>
       <div class='col-2 text-right'>
         <%= bulk_notice.audience_ids&.count || 0 %>

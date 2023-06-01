@@ -233,7 +233,10 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
       families = []
       30.times.each do
         family = FactoryBot.create(:family, :with_primary_family_member)
-        family.hire_broker_agency(broker_role.id)
+        family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: @broker_agency_profile1.id,
+                                                                                            writing_agent_id: broker_role.id,
+                                                                                            start_on: Time.now,
+                                                                                            is_active: true)
         families << family
       end
       families[0].primary_applicant.person.update_attributes!(last_name: 'Jones1')

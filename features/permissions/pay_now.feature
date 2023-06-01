@@ -9,6 +9,7 @@ Feature: Hbx Admin creates a New Consumer Application for ivl users
     And Hbx Admin logs on to the Hbx Portal
     And creates a consumer with SEP
     When the person enrolls in a Kaiser plan
+    When kaiser pay now feature is enabled
     And I click on purchase confirm button for matched person
     Then I should <action> pay now button
 

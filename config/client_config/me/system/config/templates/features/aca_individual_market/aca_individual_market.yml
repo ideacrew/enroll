@@ -8,8 +8,18 @@ registry:
         item: :residency_attestation
         is_enabled: true
         settings:
-          - key: :effective_period
-            item: <%= Date.new(2020,6,6)..Date.new(2021,7,24) %>
+          - key: :effective_period_start_day
+            item: <%= ENV['RESIDENCY_SELF_ATTESTATION_EFFECTIVE_PERIOD_START_DAY'] || "6" %>
+          - key: :effective_period_start_month
+            item: <%= ENV['RESIDENCY_SELF_ATTESTATION_EFFECTIVE_PERIOD_START_MONTH'] || "6" %>
+          - key: :effective_period_start_year
+            item: <%= ENV['RESIDENCY_SELF_ATTESTATION_EFFECTIVE_PERIOD_START_YEAR'] || "2020" %>
+          - key: :effective_period_end_day
+            item: <%= ENV['RESIDENCY_SELF_ATTESTATION_EFFECTIVE_PERIOD_END_DAY'] || "11" %>
+          - key: :effective_period_end_month
+            item: <%= ENV['RESIDENCY_SELF_ATTESTATION_EFFECTIVE_PERIOD_END_MONTH'] || "1" %>
+          - key: :effective_period_end_year
+            item: <%= ENV['RESIDENCY_SELF_ATTESTATION_EFFECTIVE_PERIOD_END_YEAR'] || "2023" %>
       - key: :consumer_role_hub_call
         item: :consumer_role_hub_call
         is_enabled: true
@@ -27,11 +37,17 @@ registry:
             item: 20
           - key: :fifteenth_of_the_month
             item: 15
+      - key: :fifteenth_of_the_month_rule_overridden
+        is_enabled: true
+      - key: :aca_individual_osse_aptc_minimum
+        is_enabled: <%= ENV['ACA_INDIVIDUAL_OSSE_APTC_MINIMUM'] || false %>
       - key: :aca_individual_assistance_benefits
         is_enabled: true
         settings:
           - key: :default_applied_aptc_percentage
             item: 1
+          - key: :minimum_applied_aptc_percentage_for_osse
+            item: 0
       - key: :cancel_renewals_for_term
         item: Operations::Individual::CancelRenewalEnrollment.new
         is_enabled: true
@@ -59,10 +75,12 @@ registry:
                     "Other (With Alien Number)", "Other (With I-94 Number)" ]
       - key: :indian_alaskan_tribe_details
         is_enabled: true
+      - key: :check_for_crm_updates
+        is_enabled: <%= ENV['CHECK_FOR_CRM_UPDATES_IS_ENABLED'] || false %>
       - key: :prior_plan_year_ivl_sep
-        is_enabled: :false
+        is_enabled: <%= ENV['PRIOR_PLAN_YEAR_SEP_IS_ENABLED'] || false %>
       - key: :admin_ivl_end_date_changes
-        is_enabled: :false
+        is_enabled: <%= ENV['ADMIN_IVL_END_DATE_CHANGES_IS_ENABLED'] || false %>
       - key: :display_external_id_in_family_datatable
         is_enabled: :true
       - key: :contact_method_via_dropdown
@@ -97,6 +115,10 @@ registry:
         is_enabled: true
       - key: :reinstate_nonpayment_ivl_enrollment
         is_enabled: false
+      - key: :qhp_product_for_include_aca_individual
+        is_enabled: <%= ENV['QHP_PRODUCT_FOR_INCLUDE_ACA_INDIVIDUAL_IS_ENABLED'] || false %>
+      - key: :display_you_pay
+        is_enabled: <%= ENV['DISPLAY_YOU_PAY_IS_ENABLED'] || false %>
   - namespace:
     - :enroll_app
     - :aca_individual_market

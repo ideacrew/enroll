@@ -29,7 +29,7 @@ module Notifier
     end
 
     def fetch_enrollment(enrollment_id)
-       HbxEnrollment.find enrollment_id
+      HbxEnrollment.find enrollment_id
     end
 
     def build_enrollments(enrollments)
@@ -40,6 +40,8 @@ module Notifier
         enrollment_model.employer_responsible_amount = enr.total_employer_contribution
         enrollment_model.employee_responsible_amount = enr.total_employee_cost
         enrollment_model.premium_amount = enr.total_premium
+        enrollment_model.coverage_kind = enr.coverage_kind
+        enrollment_model.eligible_child_care_subsidy = enr.eligible_child_care_subsidy
 
         employee = enr.subscriber.person
         enrollment_model.subscriber = MergeDataModels::Person.new(first_name: employee.first_name, last_name: employee.last_name)

@@ -40,7 +40,7 @@ describe "Client Config Storage Enforcement" do
       filepath_without_root = full_filepath.sub("#{Rails.root}/", '')
       stored_filepath = "#{committed_config_folder}/#{filepath_without_root}"
       result = FileUtils.identical?(full_filepath, stored_filepath)
-      raise("#{warning_message}. Unstored changed file is #{full_filepath}") unless result == true
+      raise("#{warning_message}. Unstored changed file is #{full_filepath} stored is #{stored_filepath}") unless result == true
       expect(result).to eq(true)
     end
   end

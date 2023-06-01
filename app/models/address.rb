@@ -47,6 +47,11 @@ class Address
   # The name of the quadrant where this address is located
   field :quadrant, type: String, default: ""
 
+  before_save :set_crm_updates
+  before_destroy :set_crm_updates
+
+  after_save :notify_address_changed, if: :changed?
+
   track_history :on => [:fields],
                 :scope => :person,
                 :modifier_field => :modifier,
@@ -325,7 +330,24 @@ class Address
     attrs_to_match.all? { |attr| attribute_matches?(attr, another_address) }
   end
 
+  def set_crm_updates
+    return unless EnrollRegistry[:check_for_crm_updates].enabled?
+    return unless person
+    person.set(crm_notifiction_needed: true) if changes&.any?
+  end
+
   private
+
+  # @api private
+  # @return [ job ID ]
+  # @note This method is called by Mongoid after the document is saved.
+  #  It enqueues a job to notify the AddressWorker of the address change.
+  def notify_address_changed
+    return unless EnrollRegistry.feature_enabled?(:notify_address_changed)
+    return unless self.person.present?
+
+    AddressWorker.perform_async({address_id: self.id.to_s, person_hbx_id: self.person.hbx_id})
+  end
 
   def attribute_matches?(attribute, other)
     self[attribute].to_s.downcase == other[attribute].to_s.downcase

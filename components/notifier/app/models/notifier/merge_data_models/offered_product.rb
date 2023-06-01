@@ -23,5 +23,13 @@ module Notifier
     def total_charges
       number_to_currency(enrollments.sum{|enrollment| enrollment.premium_amount.to_f })
     end
+
+    def total_charges_after_subsidy
+      number_to_currency(enrollments.sum{|enrollment| enrollment.premium_amount.to_f } - enrollments.sum{|enrollment| enrollment.eligible_child_care_subsidy.to_f })
+    end
+
+    def total_employer_responsible_amount
+      number_to_currency(enrollments.sum{|enrollment| enrollment.employer_responsible_amount.to_f })
+    end
   end
 end

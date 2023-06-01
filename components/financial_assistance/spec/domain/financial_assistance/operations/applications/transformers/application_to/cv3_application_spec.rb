@@ -9,6 +9,18 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   let!(:person3) { FactoryBot.create(:person, hbx_id: "732022") }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
+
+  let(:applicant1_has_enrolled_health_coverage) { false }
+  let(:applicant2_has_eligible_health_coverage) { false }
+  let(:applicant1_is_applying_coverage) { true }
+
+  let(:applicant1_has_job_income) { false }
+  let(:applicant1_has_self_employment_income) { false }
+  let(:applicant1_has_unemployment_income) { false }
+  let(:applicant1_has_other_income) { false }
+
+  let(:applicant1_has_deductions) { false }
+
   let!(:applicant) do
     applicant = FactoryBot.create(:applicant,
                                   :with_student_information,
@@ -18,26 +30,26 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
                                   gender: person.gender,
                                   ssn: person.ssn,
                                   application: application,
-                                  ethnicity: [],
+                                  ethnicity: nil,
                                   is_primary_applicant: true,
                                   person_hbx_id: person.hbx_id,
                                   is_self_attested_blind: false,
-                                  is_applying_coverage: true,
+                                  is_applying_coverage: applicant1_is_applying_coverage,
                                   is_required_to_file_taxes: true,
                                   is_filing_as_head_of_household: true,
                                   is_pregnant: false,
                                   is_primary_caregiver: true,
                                   is_primary_caregiver_for: [],
-                                  has_job_income: false,
-                                  has_self_employment_income: false,
-                                  has_unemployment_income: false,
-                                  has_other_income: false,
-                                  has_deductions: false,
+                                  has_job_income: applicant1_has_job_income,
+                                  has_self_employment_income: applicant1_has_self_employment_income,
+                                  has_unemployment_income: applicant1_has_unemployment_income,
+                                  has_other_income: applicant1_has_other_income,
+                                  has_deductions: applicant1_has_deductions,
                                   is_self_attested_disabled: true,
                                   is_physically_disabled: false,
                                   citizen_status: 'us_citizen',
-                                  has_enrolled_health_coverage: false,
-                                  has_eligible_health_coverage: false,
+                                  has_enrolled_health_coverage: applicant1_has_enrolled_health_coverage,
+                                  has_eligible_health_coverage: applicant2_has_eligible_health_coverage,
                                   has_eligible_medicaid_cubcare: false,
                                   is_claimed_as_tax_dependent: false,
                                   is_incarcerated: false,
@@ -48,8 +60,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   end
 
   let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
-
-  # let!(:products) { FactoryBot.create_list(:benefit_markets_products_health_products_health_product, 5, :silver) }
 
   let(:premiums_hash) do
     {
@@ -173,6 +183,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
       it 'should not return nil for is_primary_applicant' do
         expect(@applicant[:is_primary_applicant]).not_to be_nil
+      end
+
+      it 'should not return nil for ethnicity' do
+        expect(@applicant[:demographic][:ethnicity]).not_to be_nil
       end
 
       it 'should not return nil for is_consumer_role' do
@@ -379,6 +393,21 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
       it 'should not return nil for mitc_state_resident' do
         expect(@applicant[:mitc_state_resident]).not_to be_nil
+      end
+    end
+
+    context 'identifying_information' do
+      let(:request_payload) { result.success }
+
+      context 'applicant no_ssn field is nil' do
+        before do
+          applicant.set(no_ssn: nil)
+        end
+
+        it 'should not return nil for has_ssn' do
+          applicant = request_payload[:applicants].first
+          expect(applicant[:identifying_information][:has_ssn]).not_to be_nil
+        end
       end
     end
 
@@ -922,6 +951,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       application.add_relationship(applicant, applicant2, 'parent')
     end
     let(:address_1_params) { { kind: 'home', address_1: '1 Awesome Street', address_2: '#100', city: 'Washington', state: 'DC', zip: '20001' } }
+    let(:address_1_upcase_params) { { kind: 'home', address_1: '1 AWESOME STREET', address_2: '#100', city: 'WASHINGTON', state: 'DC', zip: '20001' } }
     let(:address_2_params) { { kind: 'home', address_1: '2 Awesome Street', address_2: '#200', city: 'Washington', state: 'DC', zip: '20001' } }
     let(:address_3_params) { { kind: 'home', address_1: '3 Awesome Street', address_2: '#300', city: 'Washington', state: 'DC', zip: '20001' } }
     let!(:home_address1) do
@@ -934,6 +964,32 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       let!(:home_address2) do
         applicant2.addresses.destroy_all
         applicant2.addresses.create!(address_1_params)
+        applicant2.save!
+      end
+
+      before do
+        @result = subject.call(application.reload)
+        @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(@result.success)
+        @mitc_household = @result.success[:mitc_households].first
+      end
+
+      it 'should return success for result' do
+        expect(@result).to be_success
+      end
+
+      it 'should be able to successfully init Application Entity' do
+        expect(@entity_init).to be_success
+      end
+
+      it 'should populate correct mitc_household' do
+        expect(@mitc_household).to eq({ household_id: '1', people: [{ person_id: '732020'}, { person_id: '732021' }] })
+      end
+    end
+
+    context 'same address for both applicants applicant_1 address downcase applicant_2 address upcase' do
+      let!(:home_address2) do
+        applicant2.addresses.destroy_all
+        applicant2.addresses.create!(address_1_upcase_params)
         applicant2.save!
       end
 
@@ -1126,7 +1182,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
 
     it 'should be able to successfully return mitc_income with amount' do
-      expect(@mitc_income[:amount]).to eq(60_000.00)
+      expect(@mitc_income[:amount]).to eq(30_000)
     end
 
     it 'should return taxable_interest for mitc_income as zero' do
@@ -1154,7 +1210,100 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
 
     it 'should return other_income for mitc_income as zero' do
-      expect(@mitc_income[:other_income]).to be_zero
+      expect(@mitc_income[:other_income]).not_to be_zero
+      expect(@mitc_income[:other_income]).to eq(30_000)
+    end
+  end
+
+  context 'for mitc_income negative income' do
+    let!(:create_job_income1) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'yearly',
+                                                amount: 30_000.00,
+                                                start_on: TimeKeeper.date_of_record.beginning_of_month,
+                                                employer_name: 'Testing employer' })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    let!(:income2) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'net_self_employment',
+                                                frequency_kind: 'monthly',
+                                                amount: -100.00,
+                                                start_on: TimeKeeper.date_of_record.beginning_of_month })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    before do
+      result = subject.call(application.reload)
+      @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+      @mitc_income = result.success[:applicants].first[:mitc_income]
+    end
+
+    it 'should be able to successfully init Application Entity' do
+      expect(@entity_init).to be_success
+    end
+
+    it 'should be able to successfully return mitc_income with amount' do
+      expect(@mitc_income[:amount]).to eq(30_000.00)
+    end
+
+    it 'should return taxable_interest for mitc_income as zero' do
+      expect(@mitc_income[:taxable_interest]).to be_zero
+    end
+
+    it 'should return alimony for mitc_income as zero' do
+      expect(@mitc_income[:alimony]).to be_zero
+    end
+
+    it 'should return other_income for mitc_income as zero' do
+      expect(@mitc_income[:other_income]).not_to be_zero
+      expect(@mitc_income[:other_income]).to eq(-1200.00)
+    end
+  end
+
+  context 'mitc_income with prior year assistance year' do
+    let!(:job_income) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'yearly',
+                                                amount: 30_000.00,
+                                                start_on: (TimeKeeper.date_of_record - 1.year).beginning_of_year,
+                                                employer_name: 'Testing employer' })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    before :each do
+      application.update_attributes!(assistance_year: application.assistance_year - 1)
+      result = subject.call(application.reload)
+      @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+      @mitc_income = result.success[:applicants].first[:mitc_income]
+    end
+    it "should return income of 30_000" do
+      expect(@mitc_income[:amount]).to eql(30_000)
+    end
+  end
+
+  context 'mitc_income with future year assistance year' do
+    let!(:job_income) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'yearly',
+                                                amount: 30_000.00,
+                                                start_on: TimeKeeper.date_of_record,
+                                                employer_name: 'Testing employer' })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    before :each do
+      application.update_attributes!(assistance_year: application.assistance_year + 1)
+      result = subject.call(application.reload)
+      @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+      @mitc_income = result.success[:applicants].first[:mitc_income]
+    end
+    it "should return income of 30_000" do
+      expect(@mitc_income[:amount]).to eql(30_000)
     end
   end
 
@@ -1287,6 +1436,86 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
         end
       end
     end
+  end
+
+  describe 'magi deduction calculations' do
+    let!(:deduction) do
+      deduction = ::FinancialAssistance::Deduction.new({ kind: 'moving_expenses',
+                                                         amount: 100.00,
+                                                         start_on: Date.new(application.assistance_year),
+                                                         frequency_kind: 'weekly' })
+      applicant.deductions << deduction
+      applicant.save!
+    end
+
+    context 'deduction with end_on in previous year than assistance year' do
+      before do
+        applicant.deductions.first.update_attributes!(start_on: (Date.new(application.assistance_year) - 1).beginning_of_year, end_on: (Date.new(application.assistance_year) - 1).end_of_year)
+      end
+
+      it 'should have magi deductions be zero' do
+        result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
+        expect(result.to_i).to eql(0)
+      end
+
+    end
+
+    context 'deduction with end_on in future year than assistance year' do
+      before do
+        applicant.deductions.first.update_attributes!(end_on: (Date.new(application.assistance_year) + 1.year))
+      end
+
+      it "should have deduction end on be at the end of the application assistance year" do
+        result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
+        expect(result.to_i).to eql(5200)
+      end
+    end
+
+    context 'deduction with end_on in same year as assistance year' do
+      before do
+        applicant.deductions.first.update_attributes!(end_on: Date.new(application.assistance_year,3,1))
+      end
+
+      it "should return deduction amount until the end date within the assistance year" do
+        result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
+        expect(result.to_i).to eql(854)
+      end
+    end
+
+    context 'deduction with  nil end_on' do
+      it "should return deduction for the entire assistance year" do
+        result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
+        expect(result.to_i).to eql(5200)
+      end
+
+    end
+
+    context 'with no deductions' do
+      before do
+        applicant.deductions = []
+        applicant.save
+      end
+      it "should return 0" do
+        result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
+        expect(result.to_i).to eql(0)
+      end
+    end
+
+    context "with multiple deductions" do
+      let!(:deduction2) do
+        deduction = ::FinancialAssistance::Deduction.new({ kind: 'moving_expenses',
+                                                           amount: 1000.00,
+                                                           start_on: Date.new(application.assistance_year),
+                                                           frequency_kind: 'monthly' })
+        applicant.deductions << deduction
+        applicant.save!
+      end
+      it "should add the deductions together" do
+        result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
+        expect(result.to_i).to eql(17_200)
+      end
+    end
+
   end
 
   context 'with deductable_part_of_self_employment_taxes deduction' do
@@ -1617,6 +1846,120 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
   end
 
+  describe 'has_enrolled_health_coverage' do
+    let(:applicant1_has_enrolled_health_coverage) { true }
+    let(:applicant2_has_eligible_health_coverage) { false }
+    let(:applicant1_is_applying_coverage) { true }
+
+    let(:operation_result) { subject.call(application.reload) }
+    let(:application_entity) do
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
+    end
+    let(:applicant_entity) { application_entity.applicants.first }
+
+    it 'returns false for has_enrolled_health_coverage for applicant entity' do
+      expect(applicant.has_enrolled_health_coverage).to eq(true)
+      expect(applicant_entity.has_enrolled_health_coverage).to eq(false)
+    end
+  end
+
+  describe 'has_eligible_health_coverage' do
+    let(:applicant1_has_enrolled_health_coverage) { false }
+    let(:applicant2_has_eligible_health_coverage) { true }
+    let(:applicant1_is_applying_coverage) { true }
+
+    let(:operation_result) { subject.call(application.reload) }
+    let(:application_entity) do
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
+    end
+    let(:applicant_entity) { application_entity.applicants.first }
+
+    it 'returns false for has_eligible_health_coverage for applicant entity' do
+      expect(applicant.has_eligible_health_coverage).to eq(true)
+      expect(applicant_entity.has_eligible_health_coverage).to eq(false)
+    end
+  end
+
+  describe 'has_job_income' do
+    let(:applicant1_has_job_income) { true }
+    let(:applicant1_is_applying_coverage) { true }
+
+    let(:operation_result) { subject.call(application.reload) }
+    let(:application_entity) do
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
+    end
+    let(:applicant_entity) { application_entity.applicants.first }
+
+    it 'returns false for has_job_income for applicant entity' do
+      expect(applicant.has_job_income).to eq(true)
+      expect(applicant_entity.has_job_income).to eq(false)
+    end
+  end
+
+  describe 'has_self_employment_income' do
+    let(:applicant1_has_self_employment_income) { true }
+    let(:applicant1_is_applying_coverage) { true }
+
+    let(:operation_result) { subject.call(application.reload) }
+    let(:application_entity) do
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
+    end
+    let(:applicant_entity) { application_entity.applicants.first }
+
+    it 'returns false for has_self_employment_income for applicant entity' do
+      expect(applicant.has_self_employment_income).to eq(true)
+      expect(applicant_entity.has_self_employment_income).to eq(false)
+    end
+  end
+
+  describe 'has_unemployment_income' do
+    let(:applicant1_has_unemployment_income) { true }
+    let(:applicant1_is_applying_coverage) { true }
+
+    let(:operation_result) { subject.call(application.reload) }
+    let(:application_entity) do
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
+    end
+    let(:applicant_entity) { application_entity.applicants.first }
+
+    it 'returns false for has_unemployment_income for applicant entity' do
+      expect(applicant.has_unemployment_income).to eq(true)
+      expect(applicant_entity.has_unemployment_income).to eq(false)
+    end
+  end
+
+  describe 'has_other_income' do
+    let(:applicant1_has_other_income) { true }
+    let(:applicant1_is_applying_coverage) { true }
+
+    let(:operation_result) { subject.call(application.reload) }
+    let(:application_entity) do
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
+    end
+    let(:applicant_entity) { application_entity.applicants.first }
+
+    it 'returns false for has_other_income for applicant entity' do
+      expect(applicant.has_other_income).to eq(true)
+      expect(applicant_entity.has_other_income).to eq(false)
+    end
+  end
+
+  describe 'applicant1_has_deductions' do
+    let(:applicant1_has_deductions) { true }
+    let(:applicant1_is_applying_coverage) { true }
+
+    let(:operation_result) { subject.call(application.reload) }
+    let(:application_entity) do
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
+    end
+    let(:applicant_entity) { application_entity.applicants.first }
+
+    it 'returns false for has_deductions for applicant entity' do
+      expect(applicant.has_deductions).to eq(true)
+      expect(applicant_entity.has_deductions).to eq(false)
+    end
+  end
+
   # Eligible Benefits based on answers to driver questions
   describe 'benefits' do
     context 'with enrolled benefit and without answer to driver question' do
@@ -1929,6 +2272,56 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
       it 'should include qualified_non_citizen in payload and defaults to true' do
         expect(@applicant_entity.qualified_non_citizen).to eq(true)
+      end
+    end
+  end
+
+  describe 'with local_mec_evidence' do
+    let(:operation_result) { subject.call(application.reload) }
+    let(:application_entity) do
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(operation_result.success).success
+    end
+    let(:applicant_entity) { application_entity.applicants.first }
+
+    let!(:local_mec_evidence) do
+      evidence = applicant.create_local_mec_evidence(
+        {
+          key: :local_mec,
+          title: "Local Mec",
+          aasm_state: 'pending',
+          due_on: Date.today,
+          verification_outstanding: true,
+          is_satisfied: false
+        }
+      )
+
+      evidence.request_results.create(
+        {
+          result: 'eligible',
+          source: 'CHIP',
+          code: '7314',
+          code_description: code_description
+        }
+      )
+    end
+
+    let(:result_code_description) { applicant_entity.local_mec_evidence.request_results.first.code_description }
+
+    context 'with code_description' do
+      let(:code_description) { TimeKeeper.date_of_record }
+
+      it 'returns success' do
+        expect(operation_result).to be_success
+        expect(result_code_description).to be_a(String)
+      end
+    end
+
+    context 'without code_description' do
+      let(:code_description) { nil }
+
+      it 'returns success' do
+        expect(operation_result).to be_success
+        expect(result_code_description).to be_nil
       end
     end
   end

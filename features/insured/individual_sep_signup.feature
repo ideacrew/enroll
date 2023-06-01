@@ -49,4 +49,18 @@ Feature: Insured Plan Shopping on Individual market
     And Individual clicks on the Continue button of the Family Information page
     When Individual click the "Losing other health insurance" in qle carousel
     And Individual selects a past qle date
+    Then Individual clicks no and clicks continue
+    Then Individual should see confirmation and continue
+
+  Scenario: New insured user purchases on individual market thru lose of coverage QLE with expanded question
+    Given is your health coverage expanded question is enabled
+    When Individual clicks on continue
+    And Individual agrees to the privacy agreeement
+    And Individual answers the questions of the Identity Verification page and clicks on submit
+    Then Individual is on the Help Paying for Coverage page
+    Then Individual does not apply for assistance and clicks continue
+    And Individual clicks on the Continue button of the Family Information page
+    When Individual click the "Losing other health insurance" in qle carousel
+    And Individual selects a past qle date
+    Then Individual clicks yes and clicks continue
     Then Individual should see confirmation and continue

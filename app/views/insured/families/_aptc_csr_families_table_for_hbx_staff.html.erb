@@ -32,7 +32,7 @@ $(document).ready(function(){
 
         <tr id="family_<%= family.id %>">
 
-          <td><%#= pp.hbx_id %> <%= link_to pp.hbx_id, resume_enrollment_exchanges_agents_path(person_id: pp.id) %></td>
+          <td><%#= pp.hbx_id %> <%= link_to_with_noopener_noreferrer(pp.hbx_id, resume_enrollment_exchanges_agents_path(person_id: pp.id)) %></td>
           <td><%= pp.last_name%></td>
           <td><%= pp.first_name%></td>
           <td><%= format_date(pp.dob) %></td>
@@ -44,7 +44,7 @@ $(document).ready(function(){
                 <a href="#" class="toggler" data-prod-cat="<%=ind%>">+ <%= l10n("enrollments") %></a>
               <%else%>
                 <span class="glyphicon glyphicon-unchecked">
-              <%end%> 
+              <%end%>
           </td>
           <td>
                 <%if all_active_enrollment_with_aptc(family).blank?%>
@@ -62,8 +62,7 @@ $(document).ready(function(){
         </tr>
         <%end%>
       <% end %>
-      
+
     </tbody>
   </table>
 </div>
-

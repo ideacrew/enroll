@@ -44,7 +44,7 @@
         <span class="field_value phone_number floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_phone.try(:full_phone_number) %></span>
       </div>
       <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
-        <label class="static_label label-floatlabel">EMPLOYER IDENTIFICATION NUMBER *</label>
+        <label class="static_label label-floatlabel" data-cuke="benefit_esi_ein_label">EMPLOYER IDENTIFICATION NUMBER <%= "*" unless EnrollRegistry[:skip_employer_id_validation].enabled? %></label>
         <span class="field_value fien_field floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_id %></span>
       </div>
     </div>

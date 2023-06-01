@@ -1,3 +1,6 @@
+<%= javascript_pack_tag "enrollment" %>
+<%= stylesheet_pack_tag "enrollment" %>
+
 <% content_for :navigation do %>
   <%= render partial: 'ui-components/v1/navs/families_navigation' %>
 <% end %>
@@ -30,7 +33,7 @@
       <% end %>
 
       <% if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update) %>
-        <%= render partial: "enrollment_refactored", :collection => enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
+        <%= render partial: "enrollment_refactored", :collection => enrollments, :as => :hbx_enrollment, :layout => "insured/families/partial_layouts/wrap_enrollments_by_year" , locals: { read_only: false } %>
       <% else %>
         <%= render partial: "enrollment", :collection => enrollments, :as => :hbx_enrollment, locals: { read_only: false } %>
       <% end %>

@@ -163,14 +163,9 @@ class BenefitCoveragePeriod
     american_indian_members = extract_american_indian_status(hbx_enrollment, shopping_family_member_ids)
 
     if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-      subjects = hbx_enrollment.family.eligibility_determination&.subjects
-
-      csr_kind = if subjects&.where(:"eligibility_states.eligibility_item_key" => 'aptc_csr_credit').present?
-                   result = ::Operations::PremiumCredits::FindCsrValue.new.call({ family: hbx_enrollment.family, year: hbx_enrollment.effective_on.year, family_member_ids: shopping_family_member_ids })
-                   result.value!
-                 elsif american_indian_members && FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
-                   'csr_limited'
-                 end
+      csr_kind = ::Operations::PremiumCredits::FindCsrValue.new.call({ family: hbx_enrollment.family,
+                                                                       year: hbx_enrollment.effective_on.year,
+                                                                       family_member_ids: shopping_family_member_ids }).value!
     else
       csr_kind = if tax_household
                    extract_csr_kind(tax_household, shopping_family_member_ids)
@@ -180,6 +175,7 @@ class BenefitCoveragePeriod
     end
 
     ivl_bgs = get_benefit_packages({family_members: family_members, coverage_kind: coverage_kind, family: hbx_enrollment.family, american_indian_members: american_indian_members,
+                                    hbx_enrollment: hbx_enrollment,
                                     effective_on: hbx_enrollment.effective_on, market: market, shopping_family_members_ids: shopping_family_member_ids, csr_kind: csr_kind }).uniq
     elected_product_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
     market = market.nil? || market == 'coverall' ? 'individual' : market
@@ -188,7 +184,8 @@ class BenefitCoveragePeriod
   # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Style/ConditionalAssignment
 
   def get_benefit_packages(**attrs)
-    fetch_benefit_packages(attrs[:american_indian_members], attrs[:csr_kind], attrs[:coverage_kind]).inject([]) do |result, bg|
+    any_member_greater_than_30 = attrs[:hbx_enrollment].any_member_greater_than_30?
+    fetch_benefit_packages(any_member_greater_than_30, attrs[:csr_kind], attrs[:coverage_kind]).inject([]) do |result, bg|
       satisfied = true
       attrs[:family_members].each do |family_member|
         consumer_role = family_member.person.consumer_role if family_member.person.is_consumer_role_active?
@@ -221,12 +218,22 @@ class BenefitCoveragePeriod
     end
   end
 
-  def fetch_benefit_packages(american_indian_members, csr_kind, coverage_kind = "health")
-    american_indian_status = american_indian_members && FinancialAssistanceRegistry.feature_enabled?(:native_american_csr)
+  def dental_benefit_package
+    benefit_packages.detect { |bp| bp.benefit_categories.include?('dental') }
+  end
 
-    return benefit_packages unless american_indian_status && coverage_kind == "health"
+  def fetch_benefit_packages(any_member_greater_than_30, csr_kind, coverage_kind = "health")
+    return [dental_benefit_package] if coverage_kind == 'dental'
 
-    benefit_packages.select{|bg| bg.cost_sharing == csr_kind}
+    return benefit_packages.select { |bp| bp.cost_sharing == '' && bp.benefit_categories.include?('health') } if csr_kind.blank?
+
+    eligible_packages = benefit_packages.select { |bp| [csr_kind, 'csr_0'].include?(bp.cost_sharing) }
+    return eligible_packages if any_member_greater_than_30
+
+    cat_benefit_package = benefit_packages.select { |bp| bp.title.match?(/catastrophic_health_benefits/i) }.last
+    return eligible_packages if cat_benefit_package.blank?
+
+    eligible_packages.push(cat_benefit_package)
   end
 
   ## Class methods

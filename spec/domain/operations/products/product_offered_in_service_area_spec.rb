@@ -22,7 +22,17 @@ RSpec.describe ::Operations::Products::ProductOfferedInServiceArea, dbclean: :af
 
   describe 'valid params' do
 
-    let(:enrollment) { FactoryBot.build(:hbx_enrollment, :individual_shopping, :with_health_product, family: family, consumer_role_id: consumer_role.id, rating_area_id: rating_area.id) }
+    let(:enrollment) do
+      FactoryBot.build(
+        :hbx_enrollment,
+        :individual_shopping,
+        :with_health_product,
+        family: family,
+        consumer_role_id: consumer_role.id,
+        rating_area_id: rating_area.id,
+        effective_on: TimeKeeper.date_of_record.beginning_of_month
+      )
+    end
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
     let(:person) { FactoryBot.create(:person, :with_consumer_role)}
     let(:consumer_role) { person.consumer_role }

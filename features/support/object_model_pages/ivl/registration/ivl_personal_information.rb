@@ -60,6 +60,14 @@ class IvlPersonalInformation
     'label[for="radio_female"] span'
   end
 
+  def self.reason_yes_radiobtn
+    'label[for="reason_accept"] span'
+  end
+
+  def self.reason_no_radiobtn
+    'label[for="reason_accept1"] span'
+  end
+
   def self.continue_btn
     'span.no-op span.btn-lg, a.interaction-click-control-continue'
   end

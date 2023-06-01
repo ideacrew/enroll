@@ -208,7 +208,10 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def edit_aptc
-    attrs = {enrollment_id: params.require(:hbx_enrollment_id), elected_aptc_pct: params[:applied_pct_1], aptc_applied_total: params[:aptc_applied_total].delete_prefix('$')}
+    aptc_applied_total = params[:aptc_applied_total].delete_prefix('$')
+    applied_aptc_pct = EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature) ? calculate_elected_aptc_pct(aptc_applied_total.to_f, params[:max_aptc].to_f) : params[:applied_pct_1]
+    attrs = {enrollment_id: params.require(:hbx_enrollment_id), elected_aptc_pct: applied_aptc_pct, aptc_applied_total: aptc_applied_total}
+
     begin
       message = ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
       flash[:notice] = message
@@ -220,6 +223,10 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   private
+
+  def calculate_elected_aptc_pct(aptc_applied_amount, aggregate_aptc_amount)
+    aptc_applied_amount / aggregate_aptc_amount
+  end
 
   def family_member_eligibility_check(family_member)
     return unless @adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person)
@@ -239,9 +246,10 @@ class Insured::GroupSelectionController < ApplicationController
     person = family_member.person
     incarcerated = person.is_consumer_role_active? && family_member.is_applying_coverage && person.is_incarcerated.nil? ? "incarcerated_not_answered" : family_member.person.is_incarcerated
 
-    if EnrollRegistry.feature_enabled?(:choose_coverage_mdcr_warning)
-      is_eligible_for_mdcr = family_member_eligible_for_mdcr(family_member, @family, @new_effective_on&.year)
-      errors << l10n("insured.group_selection.mdcr_eligible_warning") if is_eligible_for_mdcr
+    if EnrollRegistry.feature_enabled?(:choose_coverage_medicaid_warning)
+      is_eligible_for_medicaid = family_member_eligible_for_medicaid(family_member, @family, @new_effective_on&.year)
+      translation_keys = { medicaid_or_chip_program_short_name: FinancialAssistanceRegistry[:medicaid_or_chip_program_short_name].setting(:name).item }
+      errors << l10n("insured.group_selection.medicaid_eligible_warning", translation_keys) if is_eligible_for_medicaid
     end
 
     @fm_hash[family_member.id] = [is_ivl_coverage, rule, errors, incarcerated]

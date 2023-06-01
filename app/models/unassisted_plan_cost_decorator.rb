@@ -78,6 +78,14 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     0
   end
 
+  def premium_for_non_tobacco_use(member)
+    (::BenefitMarkets::Products::ProductRateCache.lookup_rate(__getobj__, schedule_date, age_of(member), rating_area) * large_family_factor(member)).round(2)
+  rescue StandardError => e
+    warn e.inspect unless Rails.env.test?
+    warn e.backtrace unless Rails.env.test?
+    0
+  end
+
   def employer_contribution_for(_member)
     0.00
   end
@@ -201,9 +209,15 @@ class UnassistedPlanCostDecorator < SimpleDelegator
     (mem_premium - result >= 1) ? result : (mem_premium - 1)
   end
 
+  # For the case of reinstated enrollments, when a hc4cc subsidy propagated from base enrollment, we should apply the subsidy.
   def total_childcare_subsidy_amount
-    return 0.00 unless ivl_osse_eligible?
-    total_premium - total_aptc_amount
+    return hbx_enrollment.eligible_child_care_subsidy.to_f if hbx_enrollment.is_reinstated_enrollment?
+
+    if ivl_osse_eligible?
+      total_premium - total_aptc_amount
+    else
+      0.0
+    end
   end
 
   def ivl_osse_eligible?

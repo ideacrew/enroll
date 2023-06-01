@@ -40,4 +40,7 @@ module ApplicationHelper
     "dchbx-enroll-#{bucket_name}-#{aws_env}"
   end
 
+  def link_to_with_noopener_noreferrer(name, path, options = {})
+    link_to(name, path, options.merge(rel: 'noopener noreferrer'))
+  end
 end

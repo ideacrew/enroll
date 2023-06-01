@@ -1653,4 +1653,55 @@ describe Person, :dbclean => :after_each do
       person.save!
     end
   end
+
+  context 'check_crm_updates' do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
+      # have to run save an extra time due to the encrytped ssn
+      person.is_incarcerated = true
+      person.save!
+    end
+
+    it 'should set crm_notifiction_needed due to create' do
+      expect(person.crm_notifiction_needed).to eq true
+    end
+
+    it 'should set crm_notifiction_needed for critical fields' do
+      person.set(crm_notifiction_needed: false)
+      person.first_name = 'updated'
+      person.save!
+      expect(person.crm_notifiction_needed).to eq true
+    end
+
+    it 'should not set crm_notifiction_needed for non-critical fields' do
+      person.set(crm_notifiction_needed: false)
+      person.is_incarcerated = false
+      person.save!
+      expect(person.crm_notifiction_needed).not_to eq true
+    end
+  end
+
+  describe 'trigger_async_publish with critical changes' do
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role)}
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
+    end
+
+    it 'should trigger if crm_notifiction_needed' do
+      person.set(crm_notifiction_needed: true)
+      expect(person.reload.send(:trigger_async_publish)).not_to eq nil
+    end
+
+    it 'should not trigger unless crm_notifiction_needed' do
+      person.set(crm_notifiction_needed: false)
+      expect(person.reload.send(:trigger_async_publish)).to eq nil
+    end
+  end
 end

@@ -61,3 +61,33 @@ Then(/^Hbx Admin should see cat plan error message$/) do
   wait_for_ajax(3,2)
   expect(page).to have_content(Settings.aptc_errors.cat_plan_error)
 end
+
+Given(/self service osse feature is enabled/) do
+  year = TimeKeeper.date_of_record.year
+  EnrollRegistry[:aca_ivl_osse_subsidy].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry["aca_ivl_osse_subsidy_#{year}"].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry["aca_ivl_osse_subsidy_#{year - 1}"].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry[:self_service_osse_subsidy].feature.stub(:is_enabled).and_return(true)
+end
+
+Given(/active enrollment is OSSE eligible with APTC/) do
+  hbx = HbxEnrollment.first
+  member = hbx.hbx_enrollment_members.first
+  hbx.update_attributes!(applied_aptc_amount: 476)
+  member.person.consumer_role.eligibilities << FactoryBot.build(:eligibility, :with_evidences, :with_subject, start_on: member.coverage_start_on)
+end
+
+Then(/APTC slider should show minimum 85%/) do
+  wait_for_ajax
+  expect(page.has_css?(EditAptc.aptc_slider)).to eq true
+  expect(find(EditAptc.aptc_slider)[:min]).to eq "0.85"
+end
+
+When(/Hbx Admin enters an APTC amount below 85%/) do
+  find(EditAptc.applied_aptc_field).native.clear
+end
+
+Then(/Hbx Admin should see the OSSE APTC error message/) do
+  wait_for_ajax
+  expect(page).to have_content(Settings.aptc_errors.below_85_for_osse)
+end

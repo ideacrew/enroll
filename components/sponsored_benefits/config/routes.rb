@@ -55,8 +55,10 @@ SponsoredBenefits::Engine.routes.draw do
       post :publish
 
       resources :plan_exports, controller: 'plan_design_proposals/plan_exports', only: [:create] do
+        collection do
+          post :employee_costs
+        end
       end
-
     end
 
     resource :office_locations do

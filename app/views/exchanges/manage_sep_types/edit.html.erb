@@ -1,5 +1,5 @@
 <% if EnrollRegistry.feature_enabled?(:sep_types) %>
-  <%= form_for @qle, url: exchanges_manage_sep_type_path(@qle._id), method: :patch do |f| %>
+  <%= form_for @qle, url: exchanges_manage_sep_type_path(@qle._id), rel: 'noopener noreferrer', method: :patch do |f| %>
     <div class="container" style="margin-top: 15px; height: 100px; padding-left: 50px;" data-controller="sep-types">
       <meta data-target='sep-types.metadata'
         data-qle-reason="<%= @qle.reason%>"

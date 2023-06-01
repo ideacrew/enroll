@@ -20,6 +20,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
+        with:
+          rubygems: 3.3.26
       - uses: actions/setup-node@v1
         with:
           node-version: '10'
@@ -42,7 +44,7 @@ jobs:
             v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
       - name: Install project gems
         run: |
-          gem update --system
+          gem update --system 3.3.26
           bundle config path vendor/bundle
           bundle install
       - name: Run Client Swap Suite
@@ -80,6 +82,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
+        with:
+          rubygems: 3.3.26
       - uses: actions/setup-node@v1
         with:
           node-version: '10'
@@ -102,7 +106,7 @@ jobs:
             v5-${{ matrix.engine-name }}-
       - name: bundle install
         run: |
-          gem update --system --quiet --silent
+          gem update --system 3.3.26 --quiet --silent
           bundle config path vendor/bundle
           bundle install
           bundle exec rake configuration:client_configuration_toggler client='${{ matrix.client-name }}'
@@ -145,6 +149,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
+        with:
+          rubygems: 3.3.26
       - uses: actions/setup-node@v1
         with:
           node-version: '10'
@@ -167,7 +173,7 @@ jobs:
             benefit_sponsors-
       - name: bundle install
         run: |
-          gem update --system --quiet --silent
+          gem update --system 3.3.26 --quiet --silent
           bundle config path vendor/bundle
           bundle install
           bundle exec rake configuration:client_configuration_toggler client='${{ matrix.client-name }}'
@@ -207,6 +213,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
+        with:
+          rubygems: 3.3.26
       - uses: actions/setup-node@v1
         with:
           node-version: '10'
@@ -229,7 +237,7 @@ jobs:
             v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
       - name: Install project gems
         run: |
-          gem update --system
+          gem update --system 3.3.26
           bundle config path vendor/bundle
           bundle install
           gem install treye-semaphore_test_boosters --version '2.5.2'
@@ -260,6 +268,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ruby/setup-ruby@v1
+        with:
+          rubygems: 3.3.26
       - uses: actions/setup-node@v1
         with:
           node-version: '10'
@@ -282,7 +292,7 @@ jobs:
             v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
       - name: Install project gems
         run: |
-          gem update --system
+          gem update --system 3.3.26
           bundle config path vendor/bundle
           bundle install
           gem install treye-semaphore_test_boosters --version '2.5.2'

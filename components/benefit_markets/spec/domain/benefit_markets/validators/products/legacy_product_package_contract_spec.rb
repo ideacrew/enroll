@@ -62,7 +62,7 @@ RSpec.describe BenefitMarkets::Validators::Products::LegacyProductPackageContrac
   let(:product) do
     {
       _id: BSON::ObjectId.new, hios_id: '9879', hios_base_id: '34985', metal_level_kind: :silver,
-      ehb: 0.9, is_standard_plan: true, hsa_eligibility: true, csr_variant_id: '01', health_plan_kind: :health_plan_kind,
+      ehb: 0.9, is_standard_plan: true, is_hc4cc_plan: false, hsa_eligibility: true, csr_variant_id: '01', health_plan_kind: :health_plan_kind,
       benefit_market_kind: :benefit_market_kind, application_period: application_period, kind: :health,
       hbx_id: 'hbx_id', title: 'title', description: 'description', product_package_kinds: [:product_package_kinds],
       issuer_profile_id: BSON::ObjectId.new, premium_ages: 19..60, provider_directory_url: 'provider_directory_url',

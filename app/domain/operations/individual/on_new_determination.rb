@@ -39,9 +39,14 @@ module Operations
       def generate_enrollments(enrollments)
         exclude_enrollments_list = enrollments.map(&:hbx_id)
         enrollments.each do |enrollment|
+          elected_aptc_pct = if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+                               default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
+                               enrollment.elected_aptc_pct.to_f > 0.0 ? enrollment.elected_aptc_pct.to_f : default_percentage
+                             end
 
           attrs = {
             enrollment_id: enrollment.id,
+            elected_aptc_pct: elected_aptc_pct,
             exclude_enrollments_list: exclude_enrollments_list
           }
 

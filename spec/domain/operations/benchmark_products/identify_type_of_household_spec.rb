@@ -28,12 +28,14 @@ RSpec.describe Operations::BenchmarkProducts::IdentifyTypeOfHousehold do
                 family_member_id: family_member1.id,
                 relationship_with_primary: 'self',
                 date_of_birth: family_member1.dob,
+                coverage_start_on: start_of_year,
                 age_on_effective_date: family_member1_age
               },
               {
                 family_member_id: family_member2.id,
                 relationship_with_primary: 'spouse',
                 date_of_birth: family_member2.dob,
+                coverage_start_on: start_of_year,
                 age_on_effective_date: family_member2_age
               }
             ]
@@ -56,9 +58,66 @@ RSpec.describe Operations::BenchmarkProducts::IdentifyTypeOfHousehold do
         per
       end
       let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person1) }
-      let(:family_member1) { family.primary_applicant }
-      let(:family_member2) { FactoryBot.create(:family_member, family: family, person: person2) }
+      let(:family_member1) do
+        fm = family.primary_applicant
+        fm.update_attributes!(is_active: false)
+        fm
+      end
+      let(:family_member2) { FactoryBot.create(:family_member, family: family, person: person2, is_active: false) }
       let(:family_id) { family.id }
+
+      context 'effective_on not same as coverage_start_on' do
+        let(:family_member1_age) { 35 }
+        let(:family_member2_age) { 35 }
+
+        let(:input_params) do
+          params[:households].first[:members].each do |mmbr|
+            mmbr[:coverage_start_on] = start_of_year - 30.years
+          end
+          params
+        end
+
+        it 'should return entity object' do
+          expect(
+            subject.call(input_params).success[1].households.first.type_of_household
+          ).to eq('child_only')
+        end
+      end
+
+      context 'without member coverage_start_on' do
+        let(:family_member1_age) { 35 }
+        let(:family_member2_age) { 35 }
+
+        let(:input_params) do
+          params[:households].first[:members].each do |mmbr|
+            mmbr[:coverage_start_on] = nil
+          end
+          params
+        end
+
+        it 'should return entity object' do
+          expect(
+            subject.call(input_params).success[1].households.first.type_of_household
+          ).to eq('adult_only')
+        end
+      end
+
+      context 'without member coverage_start_on' do
+        let(:family_member1_age) { 35 }
+        let(:family_member2_age) { 35 }
+
+        let(:input_params) do
+          params[:households].first[:members][0][:coverage_start_on] = nil
+          params[:households].first[:members][1][:coverage_start_on] = start_of_year - 30.years
+          params
+        end
+
+        it 'should return entity object' do
+          expect(
+            subject.call(input_params).success[1].households.first.type_of_household
+          ).to eq('adult_and_child')
+        end
+      end
 
       context 'adult_only' do
         let(:family_member1_age) { 35 }

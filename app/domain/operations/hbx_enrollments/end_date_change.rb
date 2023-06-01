@@ -170,7 +170,7 @@ module Operations
       # rubocop:enable Metrics/PerceivedComplexity
 
       def cancel_shop_enrollments(updated_enrollment)
-        eligible_state = BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES
+        eligible_state = ::BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES
         successor_application = updated_enrollment.sponsored_benefit_package.benefit_application.successors.select{ |app| eligible_state.include?(app.aasm_state)}.first
         return if successor_application.blank?
 

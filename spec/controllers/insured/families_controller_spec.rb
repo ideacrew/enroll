@@ -86,6 +86,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     allow(hbx_enrollments).to receive(:waived).and_return([])
     allow(hbx_enrollments).to receive(:any?).and_return(false)
     allow(hbx_enrollments).to receive(:non_external).and_return(hbx_enrollments)
+    allow(hbx_enrollments).to receive(:sort_by!).and_return(hbx_enrollments)
+    allow(hbx_enrollments).to receive(:reverse!).and_return(hbx_enrollments)
     allow(user).to receive(:person).and_return(person)
     allow(user).to receive(:last_portal_visited).and_return("test.com")
     allow(person).to receive(:primary_family).and_return(family)
@@ -520,6 +522,10 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       expect(response).to have_http_status(:success)
     end
 
+    it "should error out" do
+      expect { get '/insured/families/verification.bac' }.to raise_error(ActionController::UrlGenerationError)
+    end
+
     it "renders verification template" do
       get :verification
       expect(response).to render_template("verification")
@@ -635,18 +641,24 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   describe "GET inbox" do
     before :each do
       allow(family).to receive(:active_family_members).and_return(family_members)
-      get :inbox
     end
 
     it "should be a success" do
+      get :inbox
       expect(response).to have_http_status(:success)
     end
 
+    it "should be a success" do
+      expect { get '/inbox.BAC' }.to raise_error(ActionController::UrlGenerationError)
+    end
+
     it "should render inbox" do
+      get :inbox
       expect(response).to render_template("inbox")
     end
 
     it "should assign variables" do
+      get :inbox
       expect(assigns(:folder)).to eq("Inbox")
     end
   end
@@ -1028,16 +1040,18 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     context "delete delete_consumer_broker" do
       let(:family) {FactoryBot.build(:family)}
       before :each do
+        EnrollRegistry[:send_broker_fired_event_to_edi].feature.stub(:is_enabled).and_return(true)
         allow(person).to receive(:hbx_staff_role).and_return(double('hbx_staff_role', permission: double('permission',modify_family: true)))
         allow(person).to receive(:agent?).and_return(true)
         family.broker_agency_accounts = [
           FactoryBot.build(:broker_agency_account, family: family, employer_profile: nil)
         ]
         allow(Family).to receive(:find).and_return family
-        delete :delete_consumer_broker , params: {:id => family.id}
       end
 
       it "should delete consumer broker" do
+        expect(family).to receive(:notify_broker_update_on_impacted_enrollments_to_edi)
+        delete :delete_consumer_broker, params: {:id => family.id }
         expect(response).to have_http_status(:redirect)
         expect(family.current_broker_agency).to be nil
       end
@@ -1423,5 +1437,120 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         expect(assigns(:plan)).to be_kind_of(UnassistedPlanCostDecorator)
       end
     end
+  end
+end
+
+
+RSpec.describe Insured::FamiliesController, dbclean: :after_each do
+  describe "testing controller without doubles" do
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+    let!(:spon_cal) { double('HbxEnrollmentSponsoredCostCalculator') }
+    let(:ivl_person)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+    let(:ivl_family)       { FactoryBot.create(:family, :with_primary_family_member, person: ivl_person) }
+    let(:user) { FactoryBot.create(:user, person: person, identity_final_decision_code: "acc") }
+    let(:ivl_user) { FactoryBot.create(:user, person: ivl_person, identity_final_decision_code: "acc") }
+    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+    let!(:ivl_hbx_enrollment_member) { FactoryBot.build(:hbx_enrollment_member, applicant_id: ivl_family.primary_applicant.id) }
+    let!(:ivl_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: ivl_family,
+                        household: ivl_family.latest_household,
+                        coverage_kind: "health",
+                        enrollment_kind: "open_enrollment",
+                        kind: "individual",
+                        product: product,
+                        aasm_state: "coverage_selected",
+                        effective_on: TimeKeeper.date_of_record.beginning_of_year,
+                        hbx_enrollment_members: [ivl_hbx_enrollment_member])
+    end
+
+    let!(:previous_year_ivl) do
+      FactoryBot.create(:hbx_enrollment, :older_effective_date, :terminated,
+                        family: ivl_family,
+                        household: ivl_family.latest_household,
+                        coverage_kind: "health",
+                        enrollment_kind: "open_enrollment",
+                        kind: "individual",
+                        product: product,
+                        aasm_state: "coverage_selected",
+                        is_active: false,
+                        effective_on: TimeKeeper.date_of_record - 2.years,
+                        hbx_enrollment_members: [ivl_hbx_enrollment_member])
+    end
+
+    let!(:this_year_cancelled) do
+      FactoryBot.create(:hbx_enrollment, :older_effective_date, :terminated,
+                        family: ivl_family,
+                        household: ivl_family.latest_household,
+                        coverage_kind: "health",
+                        enrollment_kind: "open_enrollment",
+                        kind: "individual",
+                        product: product,
+                        aasm_state: "coverage_canceled",
+                        terminate_reason: "non_payment",
+                        is_active: false,
+                        effective_on: TimeKeeper.date_of_record,
+                        hbx_enrollment_members: [ivl_hbx_enrollment_member])
+    end
+
+
+    before :each do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:location_residency_verification_type).and_call_original
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:indian_alaskan_tribe_details).and_call_original
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:include_faa_outstanding_verifications).and_call_original
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_call_original
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_call_original
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_call_original
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_call_original
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_call_original
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_call_original
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_call_original
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_call_original
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:include_external_enrollment_in_display_all_enrollments).and_call_original
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:show_non_pay_enrollments).and_call_original
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:home_tiles_current_and_future_only).and_call_original
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:show_non_pay_enrollments).and_call_original
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:show_non_pay_enrollments)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
+    end
+
+    context "without any FF " do
+      before :each do
+        sign_in(ivl_user)
+        get :home, params: {:family => ivl_family.id.to_s}
+      end
+      it "should previous year and this year" do
+        expect(assigns(:hbx_enrollments)).to eq([previous_year_ivl, ivl_enrollment])
+      end
+    end
+
+
+    context "ivl with 'current and future only' FF " do
+      before :each do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:home_tiles_current_and_future_only).and_return(true)
+        sign_in(ivl_user)
+        get :home, params: {:family => ivl_family.id.to_s}
+      end
+      it "should only return this year enrollment" do
+        expect(assigns(:hbx_enrollments)).to eq([ivl_enrollment])
+      end
+      it "admin should see all enrollments for this year" do
+        expect(assigns(:all_hbx_enrollments_for_admin)).to eq([this_year_cancelled, ivl_enrollment])
+      end
+    end
+
+    context "ivl with 'show non pay enrollments' FF " do
+      before :each do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:show_non_pay_enrollments).and_return(true)
+        sign_in(ivl_user)
+        get :home, params: {:family => ivl_family.id.to_s}
+      end
+      it "should only return this year enrollment" do
+        expect(assigns(:hbx_enrollments)).to eq([this_year_cancelled, ivl_enrollment, previous_year_ivl])
+      end
+    end
+
   end
 end

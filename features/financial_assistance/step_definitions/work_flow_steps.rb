@@ -126,8 +126,22 @@ And(/^the date is within open enrollment$/) do
   allow(Settings.aca.individual_market.open_enrollment).to receive(:end_on).and_return(TimeKeeper.date_of_record + 1.day)
 end
 
+And(/^the date is after open enrollment$/) do
+  allow(Settings.aca.individual_market.open_enrollment).to receive(:end_on).and_return(TimeKeeper.date_of_record - 1.day)
+end
+
 And(/^current hbx is under open enrollment$/) do
   HbxProfile.any_instance.stub(:under_open_enrollment?).and_return(true)
+end
+
+And(/^it is before open enrollment$/) do
+  oe_start_on = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.start_on.year == Date.today.year}.open_enrollment_start_on
+  allow(TimeKeeper).to receive(:date_of_record).and_return Date.new(oe_start_on.year,10,27)
+end
+
+And(/^it is after open enrollment$/) do
+  oe_end_on = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.open_enrollment_end_on
+  allow(TimeKeeper).to receive(:date_of_record).and_return Date.new(oe_end_on.year,2,15)
 end
 
 And(/^current hbx is not under open enrollment$/) do
@@ -136,6 +150,18 @@ end
 
 Then(/^the oe application warning will display$/) do
   expect(page.has_css?(CostSavingsApplicationPage.oe_application_warning_display)).to eq true
+end
+
+Then(/^the oe application warning will not display$/) do
+  expect(page.has_css?(CostSavingsApplicationPage.oe_application_warning_display)).to eq false
+end
+
+Then(/^the coverage update reminder warning will display$/) do
+  expect(page.has_css?(CostSavingsApplicationPage.coverage_update_reminder_display)).to eq true
+end
+
+Then(/^the coverage update reminder warning will not display$/) do
+  expect(page.has_css?(CostSavingsApplicationPage.coverage_update_reminder_display)).to eq false
 end
 
 Then(/^the index filter will display$/) do

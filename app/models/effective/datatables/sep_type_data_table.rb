@@ -5,9 +5,12 @@ module Effective
     class SepTypeDataTable < Effective::MongoidDatatable
       include Config::AcaModelConcern
       include Config::SiteModelConcern
+      include ApplicationHelper
 
       datatable do
-        table_column :title, :label => l10n("datatables.sep_type_data_table.title"), :proc => proc { |row| link_to(row.title, edit_exchanges_manage_sep_type_path(row.id), data: {turbolinks: false})}, :filter => false, :sortable => true
+        table_column :title, :label => l10n("datatables.sep_type_data_table.title"), :proc => proc { |row|
+          link_to_with_noopener_noreferrer(row.title, edit_exchanges_manage_sep_type_path(row.id), data: {turbolinks: false})
+        }, :filter => false, :sortable => true
         table_column :Market, :label => l10n("datatables.sep_type_data_table.market"), :proc => proc { |row|  market_kind(row)}, :filter => false, :sortable => false
         table_column :start_date, :label => l10n("datatables.sep_type_data_table.start_date"), :proc => proc { |row| row.start_on }, :filter => false, :sortable => false
         table_column :state, :label => l10n("datatables.sep_type_data_table.state"), :proc => proc { |row| row.aasm_state}, :filter => false, :sortable => false

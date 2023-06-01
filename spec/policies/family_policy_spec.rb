@@ -222,6 +222,32 @@ describe 'can_broker_modify_family' do
       expect(subject.can_broker_modify_family?(nil, person.active_broker_staff_roles)).to be_truthy
     end
   end
+
+  context 'person with broker role and broker staff roles' do
+    let(:person) { FactoryBot.create(:person, :with_family) }
+    let(:person1) { FactoryBot.create(:person, :with_family) }
+    let(:user) { FactoryBot.create(:user, person: person) }
+    let(:family) { person.primary_family }
+    let(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person) }
+    let(:broker_role1) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: person1) }
+    let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
+    let(:broker_agency_profile1) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
+    let(:broker_agency_account) { FactoryBot.create(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, writing_agent_id: broker_role1.id, is_active: true) }
+    let(:user) { FactoryBot.create(:user, person: person) }
+    let(:broker_agency_account1) { FactoryBot.create(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile1, writing_agent_id: broker_role1.id, is_active: true) }
+    let!(:broker_agency_staff_role1) { FactoryBot.create(:broker_agency_staff_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person) }
+    let!(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: person1) }
+
+    it "should return true if broker has a broker role and a broker staff role for a different agency" do
+      allow(family).to receive(:active_broker_agency_account).and_return broker_agency_account
+      expect(subject.can_broker_modify_family?(broker_role1, person.active_broker_staff_roles)).to be_truthy
+    end
+
+    it "should return true if broker has a broker role and a staff role for the same agency" do
+      allow(family).to receive(:active_broker_agency_account).and_return broker_agency_account1
+      expect(subject.can_broker_modify_family?(broker_role1, person1.active_broker_staff_roles)).to be_truthy
+    end
+  end
 end
 
 describe 'user permission' do

@@ -154,8 +154,10 @@ module FinancialAssistance
               application.applicants.inject([]) do |result, applicant|
                 mitc_eligible_incomes = eligible_incomes_for_mitc(applicant)
                 prior_insurance_benefit = prior_insurance(applicant)
+                enrolled_benefits = enrolled_health_coverage?(applicant)
+                eligible_benefits = eligible_health_coverage?(applicant)
                 result << {name: name(applicant),
-                           identifying_information: {has_ssn: applicant.no_ssn, encrypted_ssn: encrypt(applicant.ssn)},
+                           identifying_information: identifying_information(applicant),
                            demographic: demographic(applicant),
                            attestation: attestation(applicant),
                            is_primary_applicant: applicant.is_primary_applicant.present?,
@@ -198,13 +200,13 @@ module FinancialAssistance
                            is_currently_enrolled_in_health_plan: applicant.is_currently_enrolled_in_health_plan.present?,
                            has_daily_living_help: applicant.has_daily_living_help.present?,
                            need_help_paying_bills: applicant.need_help_paying_bills.present?,
-                           has_job_income: applicant.has_job_income.present?,
-                           has_self_employment_income: applicant.has_self_employment_income.present?,
-                           has_unemployment_income: applicant.has_unemployment_income.present?,
-                           has_other_income: applicant.has_other_income.present?,
-                           has_deductions: applicant.has_deductions.present?,
-                           has_enrolled_health_coverage: applicant.has_enrolled_health_coverage.present?,
-                           has_eligible_health_coverage: applicant.has_eligible_health_coverage.present?,
+                           has_job_income: applicant.has_job_income.present? ? applicant.incomes.present? : false,
+                           has_self_employment_income: applicant.has_self_employment_income.present? ? applicant.incomes.present? : false,
+                           has_unemployment_income: applicant.has_unemployment_income.present? ? applicant.incomes.present? : false,
+                           has_other_income: applicant.has_other_income.present? ? applicant.incomes.present? : false,
+                           has_deductions: applicant.has_deductions.present? ? applicant.deductions.present? : false,
+                           has_enrolled_health_coverage: enrolled_benefits,
+                           has_eligible_health_coverage: eligible_benefits,
                            job_coverage_ended_in_past_3_months: applicant.has_dependent_with_coverage.present?,
                            job_coverage_end_date: applicant.dependent_job_end_on,
                            medicaid_and_chip: medicaid_and_chip(applicant),
@@ -214,7 +216,7 @@ module FinancialAssistance
                            emails: emails(applicant),
                            phones: phones(applicant),
                            incomes: incomes(applicant),
-                           benefits: benefits(applicant),
+                           benefits: benefits(applicant, enrolled_benefits, eligible_benefits),
                            deductions: deductions(applicant),
                            is_medicare_eligible: applicant.enrolled_or_eligible_in_any_medicare?,
                            # Does this person need help with daily life activities, such as dressing or bathing?
@@ -233,7 +235,7 @@ module FinancialAssistance
                            income_evidence: applicant&.income_evidence&.serializable_hash&.deep_symbolize_keys,
                            esi_evidence: applicant&.esi_evidence&.serializable_hash&.deep_symbolize_keys,
                            non_esi_evidence: applicant&.non_esi_evidence&.serializable_hash&.deep_symbolize_keys,
-                           local_mec_evidence: applicant&.local_mec_evidence&.serializable_hash&.deep_symbolize_keys,
+                           local_mec_evidence: evidence_info(applicant.local_mec_evidence),
                            mitc_relationships: mitc_relationships(applicant),
                            mitc_is_required_to_file_taxes: applicant_is_required_to_file_taxes(applicant, mitc_eligible_incomes),
                            mitc_state_resident: mitc_state_resident(applicant, application.us_state)}
@@ -242,6 +244,35 @@ module FinancialAssistance
             end
                         # rubocop:enable Metrics/AbcSize
             # rubocop:enable Metrics/MethodLength
+
+            def evidence_info(applicant_evidence)
+              return if applicant_evidence.nil?
+
+              {
+                key: applicant_evidence.key,
+                title: applicant_evidence.title,
+                aasm_state: applicant_evidence.aasm_state,
+                description: applicant_evidence.description,
+                received_at: applicant_evidence.received_at,
+                is_satisfied: applicant_evidence.is_satisfied,
+                verification_outstanding: applicant_evidence.verification_outstanding,
+                update_reason: applicant_evidence.update_reason,
+                due_on: applicant_evidence.due_on,
+                external_service: applicant_evidence.external_service,
+                updated_by: applicant_evidence.updated_by,
+                verification_histories: applicant_evidence.verification_histories.collect { |v_his| v_his.serializable_hash.symbolize_keys },
+                request_results: applicant_evidence.request_results.collect do |req_res|
+                  {
+                    result: req_res.result,
+                    source: req_res.source,
+                    source_transaction_id: req_res.source_transaction_id,
+                    code: req_res.code,
+                    code_description: req_res.code_description&.strftime('%F'),
+                    raw_payload: req_res.raw_payload
+                  }
+                end
+              }
+            end
 
             def native_american_information(applicant)
               if FinancialAssistanceRegistry.feature_enabled?(:indian_alaskan_tribe_details)
@@ -337,10 +368,15 @@ module FinancialAssistance
                is_self_attested_long_term_care: applicant.is_self_attested_long_term_care.present?}
             end
 
+            def identifying_information(applicant)
+              has_ssn = applicant.no_ssn == "0" || applicant.ssn.present?
+              {has_ssn: has_ssn, encrypted_ssn: encrypt(applicant.ssn)}
+            end
+
             def demographic(applicant)
               {gender: applicant.gender.capitalize,
                dob: applicant.dob,
-               ethnicity: applicant.ethnicity,
+               ethnicity: applicant.ethnicity || [],
                race: applicant.race,
                is_veteran_or_active_military: applicant.is_veteran_or_active_military.present?,
                is_vets_spouse_or_child: applicant.is_vets_spouse_or_child.present?}
@@ -389,7 +425,7 @@ module FinancialAssistance
             # JobIncome(wages_and_salaries) & SelfEmploymentIncome(net_self_employment)
             def wages_and_salaries(current_incomes)
               ws_incomes = current_incomes.select do |inc|
-                ['wages_and_salaries', 'net_self_employment'].include?(inc.kind)
+                ['wages_and_salaries'].include?(inc.kind)
               end
               ws_incomes.inject(0) do |result, income|
                 frequency = income.frequency_kind
@@ -465,7 +501,7 @@ module FinancialAssistance
             end
 
             def other_income(current_incomes)
-              other_kinds = ["dividend", "rental_and_royalty", "social_security_benefit", "american_indian_and_alaskan_native",
+              other_kinds = ["net_self_employment", "dividend", "rental_and_royalty", "social_security_benefit", "american_indian_and_alaskan_native",
                              "employer_funded_disability", "estate_trust", "foreign", "other", "prizes_and_awards"]
               otr_incomes = current_incomes.select do |inc|
                 other_kinds.include?(inc.kind)
@@ -478,14 +514,44 @@ module FinancialAssistance
             end
 
             def magi_deductions(applicant)
+              assistance_year_start = Date.new(applicant.application.assistance_year)
+              assistance_year_end = assistance_year_start.end_of_year
               other_kinds = ["alimony_paid", "domestic_production_activities", "penalty_on_early_withdrawal_of_savings",
                              "educator_expenses", "self_employment_sep_simple_and_qualified_plans", "self_employed_health_insurance",
                              "moving_expenses", "health_savings_account", "reservists_performing_artists_and_fee_basis_government_official_expenses"]
               applicant.deductions.where(:kind.in => other_kinds).inject(0) do |result, deduction|
                 frequency = deduction.frequency_kind
-                result += annual_amount(frequency(frequency), deduction.amount.to_i)
+                deduction_end_date = calculate_end_date(deduction, assistance_year_end)
+                deduction_start_date = calculate_start_date(deduction, deduction_end_date, assistance_year_start, assistance_year_end)
+                return BigDecimal('0') unless (assistance_year_start..assistance_year_end).cover?(deduction_start_date)
+                result += calculate_magi_deductions(deduction, deduction_start_date, deduction_end_date, assistance_year_end).to_i
                 result
               end
+            end
+
+            def calculate_magi_deductions(deduction, deduction_start_date, deduction_end_date, assistance_year_end)
+              end_date_year = deduction_end_date.year
+              start_date_year = deduction_start_date.year
+              start_day_of_year = deduction_start_date.yday
+              year_difference = end_date_year - start_date_year
+              days_in_start_year = Date.gregorian_leap?(deduction.start_on.year) ? 366 : 365
+              end_day_of_year = deduction_end_date.yday + (year_difference * days_in_start_year)
+              frequency = deduction.frequency_kind
+              amount_per_day = annual_amount(frequency(frequency), deduction.amount.to_i).to_f / assistance_year_end.yday
+              ((end_day_of_year - start_day_of_year + 1) * amount_per_day).round(2)
+            end
+
+            def calculate_start_date(deduction, deduction_end_date, assistance_year_start, assistance_year_end)
+              if (assistance_year_start..assistance_year_end).cover?(deduction_end_date) && assistance_year_start > deduction.start_on
+                assistance_year_start
+              else
+                deduction.start_on
+              end
+            end
+
+            def calculate_end_date(deduction, assistance_year_end)
+              return deduction.end_on if deduction.end_on.present? && (deduction.end_on <= assistance_year_end)
+              assistance_year_end
             end
 
             def deductible_part_of_self_employment_tax(applicant)
@@ -642,12 +708,30 @@ module FinancialAssistance
               end
             end
 
-            def benefits_eligible_for_determination(applicant)
-              kinds_query = if applicant.has_enrolled_health_coverage? && applicant.has_eligible_health_coverage?
+            # Return false if
+            #  1. the has_enrolled_health_coverage is set to false (or)
+            #  2. the applicant does not have enrolled benefits
+            def enrolled_health_coverage?(applicant)
+              return false if applicant.has_enrolled_health_coverage.blank?
+
+              applicant.benefits.enrolled.present?
+            end
+
+            # Return false if
+            #  1. the has_eligible_health_coverage is set to false (or)
+            #  2. the applicant does not have eligible benefits
+            def eligible_health_coverage?(applicant)
+              return false if applicant.has_eligible_health_coverage.blank?
+
+              applicant.benefits.eligible.present?
+            end
+
+            def benefits_eligible_for_determination(applicant, enrolled_benefits, eligible_benefits)
+              kinds_query = if enrolled_benefits && eligible_benefits
                               {}
-                            elsif applicant.has_enrolled_health_coverage? && !applicant.has_eligible_health_coverage?
+                            elsif enrolled_benefits && !eligible_benefits
                               { kind: :is_enrolled }
-                            elsif !applicant.has_enrolled_health_coverage? && applicant.has_eligible_health_coverage?
+                            elsif !enrolled_benefits && eligible_benefits
                               { kind: :is_eligible }
                             else
                               { :kind.nin => [:is_enrolled, :is_eligible] }
@@ -656,8 +740,8 @@ module FinancialAssistance
               applicant.benefits.where(kinds_query)
             end
 
-            def benefits(applicant)
-              benefits_eligible_for_determination(applicant).inject([]) do |result, benefit|
+            def benefits(applicant, enrolled_benefits, eligible_benefits)
+              benefits_eligible_for_determination(applicant, enrolled_benefits, eligible_benefits).inject([]) do |result, benefit|
                 result << { name: benefit.title,
                             kind: benefit.insurance_kind,
                             status: benefit.kind,
@@ -706,13 +790,13 @@ module FinancialAssistance
               applicant_hbx_ids = application.applicants.pluck(:person_hbx_id)
               # return Failure("Applicants do not match family members") unless  family_member_hbx_ids.to_set == applicant_hbx_ids.to_set
               premiums = ::Operations::Products::Fetch.new.call({family: family, effective_date: application.effective_date})
-              return premiums if premiums.failure?
+              return build_zero_member_premiums(applicant_hbx_ids) if premiums.failure?
 
               slcsp_info = ::Operations::Products::FetchSlcsp.new.call(member_silver_product_premiums: premiums.success)
-              return slcsp_info if slcsp_info.failure?
+              return build_zero_member_premiums(applicant_hbx_ids) if slcsp_info.failure?
 
               lcsp_info = ::Operations::Products::FetchLcsp.new.call(member_silver_product_premiums: premiums.success)
-              return lcsp_info if lcsp_info.failure?
+              return build_zero_member_premiums(applicant_hbx_ids) if lcsp_info.failure?
 
               slcsp_member_premiums = applicant_hbx_ids.each_with_object([]) do |applicant_hbx_id, result|
                 next applicant_hbx_id unless slcsp_info.success[applicant_hbx_id].present?
@@ -727,6 +811,15 @@ module FinancialAssistance
               end.compact
 
               Success({ health_only_lcsp_premiums: lcsp_member_premiums, health_only_slcsp_premiums: slcsp_member_premiums })
+            end
+
+            # return zero premiums only when there is a failure monad
+            def build_zero_member_premiums(applicant_hbx_ids)
+              member_premiums = applicant_hbx_ids.collect do |applicant_hbx_id|
+                {cost: 0.0, member_identifier: applicant_hbx_id, monthly_premium: 0.0}
+              end.compact
+
+              Success({ health_only_lcsp_premiums: member_premiums, health_only_slcsp_premiums: member_premiums })
             end
 
             # Physical households(mitc_households) are groups based on the member's Home Address.
@@ -855,13 +948,15 @@ module FinancialAssistance
             end
 
             # Eligible month for selecting matching incomes
-            def month_date_range(assistance_year)
+            def month_date_range(assistance_year, income_start_on)
               system_date = TimeKeeper.date_of_record
               if assistance_year > system_date.year
                 start_of_year = Date.new(assistance_year).beginning_of_year
                 start_of_year..start_of_year.end_of_month
-              else
+              elsif assistance_year == system_date.year
                 system_date.beginning_of_month..system_date.end_of_month
+              else
+                income_start_on..income_start_on.end_of_month
               end
             end
 
@@ -872,7 +967,7 @@ module FinancialAssistance
                 next inc unless assistance_year
                 end_on = inc.end_on || Date.new(assistance_year).end_of_year
                 income_date_range = (inc.start_on)..end_on
-                date_ranges_overlap?(income_date_range, month_date_range(assistance_year))
+                date_ranges_overlap?(income_date_range, month_date_range(assistance_year, inc.start_on))
               end
             end
 

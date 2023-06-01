@@ -87,11 +87,11 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "#display_carrier_logo" do
-    let(:carrier_profile){ FactoryBot.build(:carrier_profile, legal_name: "Kaiser")}
+    let(:carrier_profile){ FactoryBot.build(:carrier_profile, legal_name: "Kaiser Permanente")}
     let(:plan){ Maybe.new(FactoryBot.build(:plan, hios_id: "94506DC0350001-01", carrier_profile: carrier_profile)) }
 
     it "should return the named logo" do
-      expect(helper.display_carrier_logo(plan)).to match %r{<img width="50" alt="Kaiser logo" src="/assets/logo/carrier/kaiser-.*\.jpg" />}
+      expect(helper.display_carrier_logo(plan)).to match %r{<img width="50" alt="Kaiser Permanente logo" src="/assets/logo/carrier/kaiser_permanente.*\.jpg" />}
     end
 
   end
@@ -568,6 +568,18 @@ RSpec.describe ApplicationHelper, :type => :helper do
           expect(helper.shopping_group_premium(100, 98.44, 1.56, true)).to eq(0)
         end
       end
+    end
+  end
+
+  describe 'link_to_with_noopener_noreferrer' do
+    it 'should return link with out options' do
+      expect(helper.link_to_with_noopener_noreferrer('name', new_exchanges_bulk_notice_path)).to eq "<a rel=\"noopener noreferrer\" href=\"/exchanges/bulk_notices/new\">name</a>"
+    end
+
+    it 'should return link with options' do
+      expect(
+        helper.link_to_with_noopener_noreferrer('name', new_exchanges_bulk_notice_path, class: 'test', id: 'test-id', disabled: false)
+      ).to eq "<a class=\"test\" id=\"test-id\" rel=\"noopener noreferrer\" href=\"/exchanges/bulk_notices/new\">name</a>"
     end
   end
 

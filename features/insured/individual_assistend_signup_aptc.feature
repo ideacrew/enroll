@@ -3,6 +3,7 @@ Feature: Insured Plan Shopping on Individual Assisted market
  Background: Individual market setup
     Given EnrollRegistry contact_method_via_dropdown feature is enabled
     And the FAA feature configuration is enabled
+    And the extended_aptc_individual_agreement_message configuration is enabled
     Given EnrollRegistry extended_aptc_individual_agreement_message feature is enabled
     Given an Individual has not signed up as an HBX user
     Given the user visits the Consumer portal during open enrollment
@@ -21,6 +22,7 @@ Feature: Insured Plan Shopping on Individual Assisted market
     And the individual clicks on the Continue button of the Household Info page
     # And the individual enters a SEP
     And taxhousehold info is prepared for aptc user
+    And has valid csr 0 benefit package with silver plans
     When the individual clicks the Continue button of the Group Selection page
     And the individual is in the Plan Selection page
     Then the individual sees the new APTC tool UI changes

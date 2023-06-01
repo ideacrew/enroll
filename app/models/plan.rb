@@ -34,6 +34,7 @@ class Plan
   field :renewal_plan_id, type: BSON::ObjectId
   field :cat_age_off_renewal_plan_id, type: BSON::ObjectId
   field :is_standard_plan, type: Boolean, default: false
+  field :is_hc4cc_plan, type: Boolean, default: false
 
   field :minimum_age, type: Integer, default: 0
   field :maximum_age, type: Integer, default: 120
@@ -412,7 +413,7 @@ class Plan
     bound_age_val = bound_age(age)
     begin
       value = premium_table_for(schedule_date).detect {|pt| pt.age == bound_age_val }.cost
-      BigDecimal.new("#{value}").round(2).to_f
+      BigDecimal(value.to_s).round(2).to_f
     rescue
       raise [self.id, bound_age_val, schedule_date, age].inspect
     end

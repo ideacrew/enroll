@@ -334,5 +334,20 @@ RSpec.describe Exchanges::BrokerApplicantsController do
         end
       end
     end
+    context 'when broker invitation email is resent' do
+      let(:invitation) { Invitation.new }
+      before :each do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:resend_broker_email_button).and_return(true)
+        put :update, params: {id: broker_role.person.id, sendemail: true}, format: :js
+      end
+
+      it "should call send_broker_invitation" do
+        allow(Invitation).to receive(:create).and_return invitation
+        expect(invitation).to receive(:send_broker_invitation!)
+        Invitation.invite_broker!(broker_role)
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to('/exchanges/hbx_profiles')
+      end
+    end
   end
 end

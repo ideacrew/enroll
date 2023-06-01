@@ -18,22 +18,9 @@
       },
       "user_input": "params[:evidence_kind]",
       "confidence": "High",
-      "note": ""
-    },
-    {
-      "warning_type": "Unmaintained Dependency",
-      "warning_code": 122,
-      "fingerprint": "21ab0fe00fdd5899ffc405cff75aadb91b805ee996a614f7e27b08a287e9062d",
-      "check_name": "EOLRails",
-      "message": "Support for Rails 5.2.4.3 ends on 2022-06-01",
-      "file": "Gemfile.lock",
-      "line": 380,
-      "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
-      "code": null,
-      "render_path": null,
-      "location": null,
-      "user_input": null,
-      "confidence": "Weak",
+      "cwe_id": [
+        77
+      ],
       "note": ""
     },
     {
@@ -54,38 +41,9 @@
       },
       "user_input": "params[:evidence_kind]",
       "confidence": "High",
-      "note": ""
-    },
-    {
-      "warning_type": "Unmaintained Dependency",
-      "warning_code": 122,
-      "fingerprint": "98b26f60d776fd41ee6f088c833725145be9aac2d7c5b33780241c273622db42",
-      "check_name": "EOLRails",
-      "message": "Support for Rails 5.2.4.3 ends on 2022-06-01",
-      "file": "Gemfile.lock",
-      "line": 380,
-      "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
-      "code": null,
-      "render_path": null,
-      "location": null,
-      "user_input": null,
-      "confidence": "Medium",
-      "note": ""
-    },
-    {
-      "warning_type": "Unmaintained Dependency",
-      "warning_code": 121,
-      "fingerprint": "9a3951031616a07c8e02c86652f537e92c08685da97f5ec2b12d5d3602b55bb8",
-      "check_name": "EOLRuby",
-      "message": "Support for Ruby 2.5.1 ended on 2021-03-31",
-      "file": "Gemfile.lock",
-      "line": 770,
-      "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
-      "code": null,
-      "render_path": null,
-      "location": null,
-      "user_input": null,
-      "confidence": "High",
+      "cwe_id": [
+        77
+      ],
       "note": ""
     },
     {
@@ -102,9 +60,12 @@
       "location": null,
       "user_input": null,
       "confidence": "High",
+      "cwe_id": [
+        1104
+      ],
       "note": ""
     }
   ],
-  "updated": "2022-06-02 12:05:40 -0400",
-  "brakeman_version": "5.2.3"
+  "updated": "2023-02-22 16:32:09 +0000",
+  "brakeman_version": "5.4.1"
 }

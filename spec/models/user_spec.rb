@@ -104,14 +104,14 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
 
     context 'when password' do
       let(:params){valid_params.deep_merge!({password: "123456 6746464DDss"})}
-      it 'does not contain valid complexity' do
+      it 'has white spaces' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
-        expect(User.create(**params).errors[:password]).to eq ["Your password must include at least 1 lowercase letter, 1 uppercase letter, 1 number, and 1 character that’s not a number, letter, or space."]
+        expect(User.create(**params).errors[:password]).to eq ["Your password must include at least 1 lowercase letter, 1 uppercase letter, 1 number, and 1 character that’s not a number, letter, or space.", "Password must not contain spaces"]
       end
     end
 
     context 'when password' do
-      let(:params){valid_params.deep_merge!({password: "11E11@1ss"})}
+      let(:params){valid_params.deep_merge!({password: "11E11@1ssA"})}
       it 'has a character more than 4 times' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
         expect(User.create(**params).errors[:password]).to eq ["Password cannot repeat any character more than 4 times"]
@@ -131,6 +131,14 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       it 'repeats a consecutive character more than once' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
         expect(User.create(**params).errors[:password]).to eq ["Password must not repeat consecutive characters more than once"]
+      end
+    end
+
+    context 'when password has white spaces' do
+      let(:params){valid_params.deep_merge!({password: "Test@1234 "})}
+      it 'should return error' do
+        expect(User.create(**params).errors[:password].any?).to be_truthy
+        expect(User.create(**params).errors[:password]).to eq ["Password must not contain spaces"]
       end
     end
 

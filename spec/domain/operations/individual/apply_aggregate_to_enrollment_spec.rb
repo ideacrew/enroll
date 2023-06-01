@@ -182,6 +182,8 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
     let(:new_sample_max_aptc_1) {1500}
     let(:new_sample_csr_percent_1) {87}
     let!(:new_eligibility_determination) {FactoryBot.create(:eligibility_determination, tax_household: new_tax_household, max_aptc: new_sample_max_aptc_1, csr_percent_as_integer: new_sample_csr_percent_1)}
+    let(:enrollment) { family.hbx_enrollments.first }
+    let(:future_effective_date) { Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date }
 
     before do
       tax_household.update_attributes(effective_ending_on: new_tax_household.effective_starting_on - 1.day)
@@ -190,9 +192,16 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
 
     it 'returns monthly aggregate amount' do
       input_params = {eligibility_determination: new_eligibility_determination}
+      enrollment_count = family.hbx_enrollments.count
       @result = subject.call(input_params)
-      expect(@result.success).to eq "Aggregate amount applied on to enrollments"
-      expect(family.hbx_enrollments.to_a.first.applied_aptc_amount).not_to eq family.hbx_enrollments.last.applied_aptc_amount
+      if future_effective_date.year == enrollment.effective_on.year
+        expect(@result.success).to eq "Aggregate amount applied on to enrollments"
+        expect(family.hbx_enrollments.count).to eq(enrollment_count + 1)
+        expect(enrollment.applied_aptc_amount).not_to eq family.hbx_enrollments.to_a.last.applied_aptc_amount
+      else
+        # monthly aggregate should not be applied for perspective year enrollment
+        expect(family.hbx_enrollments.count).to eq(enrollment_count)
+      end
     end
   end
 
@@ -221,6 +230,115 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
 
     it 'should return enrollment with effective_on as start of prospective year' do
       expect(@new_enrollment.effective_on).to eq(Date.today.next_year.beginning_of_year)
+    end
+  end
+
+  context '.applied_aptc_pct_for' do
+
+    let(:enrollment) do
+      double(
+        effective_date: Date.new(year, 1, 1),
+        product: product,
+        elected_aptc_pct: elected_aptc_pct
+      )
+    end
+
+    let(:year) { Date.today.year }
+    let(:new_effective_date) { Date.new(year, 5, 1) }
+    let(:product) { double(is_hc4cc_plan?: false) }
+    let(:elected_aptc_pct) { 0.5 }
+    let(:minimum_applied_aptc_percentage_for_osse) { 0.85 }
+    let(:default_applied_aptc_percentage) { 0.8 }
+    let(:settings) { double }
+
+    before do
+      allow(settings).to receive(:setting).with(:default_applied_aptc_percentage).and_return(double(item: default_applied_aptc_percentage))
+      allow(settings).to receive(:setting).with(:minimum_applied_aptc_percentage_for_osse).and_return(double(item: minimum_applied_aptc_percentage_for_osse))
+      allow(EnrollRegistry).to receive(:[]).with(:aca_individual_assistance_benefits).and_return(settings)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_osse_aptc_minimum).and_return(true)
+    end
+
+    context 'enrollment with osse plan' do
+      let(:product) { double(is_hc4cc_plan?: true) }
+
+      context 'subscriber has osse subsidy enabled' do
+        before do
+          allow(enrollment).to receive(:ivl_osse_eligible?).with(new_effective_date).and_return(true)
+        end
+
+        context 'when elected aptc pct is less the osse minimum' do
+
+          it 'should return minimum aptc pct for osse' do
+            aptc_pct = described_class.new.applied_aptc_pct_for(enrollment, new_effective_date)
+
+            expect(aptc_pct).to eq(minimum_applied_aptc_percentage_for_osse)
+          end
+        end
+
+        context 'when elected aptc pct is greater than osse minimum' do
+          let(:elected_aptc_pct) { 0.90 }
+
+          it 'should return elected aptc pct' do
+            aptc_pct = described_class.new.applied_aptc_pct_for(enrollment, new_effective_date)
+
+            expect(aptc_pct).to eq(elected_aptc_pct)
+          end
+        end
+      end
+
+      context 'subscriber has no osse subsidy enabled' do
+        before do
+          allow(enrollment).to receive(:ivl_osse_eligible?).with(new_effective_date).and_return(false)
+        end
+
+        context 'when elected aptc pct is zero' do
+          let(:elected_aptc_pct) { 0.0 }
+
+          it 'should return default applied aptc pct' do
+            aptc_pct = described_class.new.applied_aptc_pct_for(enrollment, new_effective_date)
+
+            expect(aptc_pct).to eq(default_applied_aptc_percentage)
+          end
+        end
+
+        context 'when elected aptc pct greater than zero' do
+          let(:elected_aptc_pct) { 0.70 }
+
+          it 'should return elected aptc pct' do
+            aptc_pct = described_class.new.applied_aptc_pct_for(enrollment, new_effective_date)
+
+            expect(aptc_pct).to eq(elected_aptc_pct)
+          end
+        end
+      end
+    end
+
+    context 'enrollment with non osse plan' do
+      before do
+        allow(enrollment).to receive(:ivl_osse_eligible?).with(new_effective_date).and_return(true)
+      end
+
+      let(:product) { double(is_hc4cc_plan?: false) }
+
+      context 'when elected aptc pct is zero' do
+        let(:elected_aptc_pct) { 0.0 }
+
+        it 'should return minimum osse aptc percent' do
+          aptc_pct = described_class.new.applied_aptc_pct_for(enrollment, new_effective_date)
+
+          expect(aptc_pct).to eq(minimum_applied_aptc_percentage_for_osse)
+        end
+      end
+
+      context 'when elected aptc pct greater than zero' do
+        let(:elected_aptc_pct) { 0.70 }
+
+        it 'should return minimum osse aptc percent' do
+          aptc_pct = described_class.new.applied_aptc_pct_for(enrollment, new_effective_date)
+
+          expect(aptc_pct).to eq(minimum_applied_aptc_percentage_for_osse)
+        end
+      end
     end
   end
 end

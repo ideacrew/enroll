@@ -70,11 +70,6 @@ module Insured
         reinstatement.save!
 
         if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-          if elected_aptc_pct.to_f <= 0.0
-            default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
-            elected_aptc_pct = enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_percentage
-          end
-
           mthh_update_enrollment_for_aptcs(new_effective_date, reinstatement, elected_aptc_pct.to_f, exclude_enrollments_list)
         else
           update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
@@ -105,6 +100,11 @@ module Insured
         @invalid_family_member_ids << (all_family_member_ids | reinstatement_family_member_ids) - (all_family_member_ids & reinstatement_family_member_ids)
       end
 
+      def self.update_child_care_subsidy_amount_for(enrollment)
+        cost_calculator = enrollment.build_plan_premium(qhp_plan: enrollment.product, elected_aptc: enrollment.applied_aptc_amount, apply_aptc: true)
+        enrollment.update(eligible_child_care_subsidy: cost_calculator.total_childcare_subsidy_amount)
+      end
+
       def self.mthh_update_enrollment_for_aptcs(new_effective_date, reinstatement, elected_aptc_pct, exclude_enrollments_list)
         result = ::Operations::PremiumCredits::FindAptc.new.call({
                                                                    hbx_enrollment: reinstatement,
@@ -119,6 +119,7 @@ module Insured
         applied_aptc_amount = float_fix([(aggregate_aptc_amount * elected_aptc_pct), ehb_premium].min)
 
         reinstatement.update_attributes(elected_aptc_pct: elected_aptc_pct, applied_aptc_amount: applied_aptc_amount, aggregate_aptc_amount: aggregate_aptc_amount, ehb_premium: ehb_premium)
+        update_child_care_subsidy_amount_for(reinstatement)
       end
 
       def self.update_enrollment_for_apcts(reinstatement, applied_aptc_amount, age_as_of_coverage_start: false)
@@ -147,6 +148,7 @@ module Insured
 
         cd_total_aptc = cost_decorator.total_aptc_amount
         reinstatement.update_attributes!(elected_aptc_pct: (cd_total_aptc / max_applicable_aptc), applied_aptc_amount: cd_total_aptc, aggregate_aptc_amount: max_applicable_aptc)
+        update_child_care_subsidy_amount_for(reinstatement)
       end
 
       def self.member_level_aptc_breakdown(new_enrollment, applied_aptc_amount, age_as_of_coverage_start: false)
@@ -181,7 +183,8 @@ module Insured
         sep                       = SpecialEnrollmentPeriod.find(BSON::ObjectId.from_string(family.latest_active_sep.id)) if family.latest_active_sep.present?
         qle                       = QualifyingLifeEventKind.find(BSON::ObjectId.from_string(sep.qualifying_life_event_kind_id))  if sep.present?
         available_aptc            = calculate_max_applicable_aptc(enrollment, new_effective_on)
-        elected_aptc_pct          = calculate_elected_aptc_pct(enrollment, available_aptc)
+        max_tax_credit            = calculate_max_tax_credit(enrollment, new_effective_on)
+        elected_aptc_pct          = calculate_elected_aptc_pct(enrollment, available_aptc, max_tax_credit)
         default_tax_credit_value  = default_tax_credit_value(enrollment, available_aptc)
         {
           enrollment: enrollment,
@@ -190,6 +193,7 @@ module Insured
           is_aptc_eligible: is_aptc_eligible(enrollment, family),
           new_effective_on: new_effective_on,
           available_aptc: available_aptc,
+          max_tax_credit: max_tax_credit,
           default_tax_credit_value: default_tax_credit_value,
           elected_aptc_pct: elected_aptc_pct,
           new_enrollment_premium: new_enrollment_premium(default_tax_credit_value, enrollment)
@@ -198,11 +202,20 @@ module Insured
 
       def calculate_max_applicable_aptc(enrollment, new_effective_on)
         if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-          ::Operations::PremiumCredits::FindAptc.new.call({hbx_enrollment: enrollment, effective_on: new_effective_on}).value!
+          max_aptc = fetch_aptc_value(enrollment, new_effective_on)
+          float_fix([max_aptc, enrollment.total_ehb_premium].min)
         else
           selected_aptc = ::Services::AvailableEligibilityService.new(enrollment.id, new_effective_on, enrollment.id).available_eligibility[:total_available_aptc]
           Insured::Factories::SelfServiceFactory.fetch_applicable_aptc(enrollment, selected_aptc, new_effective_on, enrollment.id)
         end
+      end
+
+      def calculate_max_tax_credit(enrollment, new_effective_on)
+        if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+          max_aptc = fetch_aptc_value(enrollment, new_effective_on)
+          return float_fix(max_aptc)
+        end
+        0.0
       end
 
       def self.find_enrollment_effective_on_date(hbx_created_datetime, current_enrollment_effective_on)
@@ -210,18 +223,19 @@ module Insured
         hour = hbx_created_datetime.hour
         min = hbx_created_datetime.min
         sec = hbx_created_datetime.sec
+        override_enabled = EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature.is_enabled
         # this condition is for self service APTC feature ONLY.
         if eligible_for_1_1_effective_date?(hbx_created_datetime, current_enrollment_effective_on)
           year = current_enrollment_effective_on.year
           month = day = 1
         elsif current_enrollment_effective_on.year != hbx_created_datetime.year
-          monthly_enrollment_due_on = Settings.aca.individual_market.monthly_enrollment_due_on
+          monthly_enrollment_due_on = override_enabled ? 31 : Settings.aca.individual_market.monthly_enrollment_due_on
           condition = (Date.new(hbx_created_datetime.year, 11, 1)..Date.new(hbx_created_datetime.year, 12, monthly_enrollment_due_on)).include?(hbx_created_datetime.to_date)
           offset_month = condition ? 0 : 1
           year = current_enrollment_effective_on.year
           month = hbx_created_datetime.next_month.month + offset_month
         else
-          offset_month = hbx_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? 1 : 2
+          offset_month = (hbx_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth || override_enabled) ? 1 : 2
           year = hbx_created_datetime.year
           month = hbx_created_datetime.month + offset_month
         end
@@ -241,12 +255,20 @@ module Insured
 
       private
 
+      def fetch_aptc_value(enrollment, effective_on)
+        @fetch_aptc_value ||= ::Operations::PremiumCredits::FindAptc.new.call({hbx_enrollment: enrollment, effective_on: effective_on}).value!
+      end
+
       def default_tax_credit_value(enrollment, available_aptc)
         enrollment.applied_aptc_amount.to_f > available_aptc ? available_aptc : enrollment.applied_aptc_amount.to_f
       end
 
-      def calculate_elected_aptc_pct(enrollment, available_aptc)
-        pct = float_fix(enrollment.applied_aptc_amount.to_f / available_aptc).round(2)
+      def calculate_elected_aptc_pct(enrollment, available_aptc, max_aptc)
+        pct = if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+                float_fix(enrollment.applied_aptc_amount.to_f / max_aptc).round(2)
+              else
+                float_fix(enrollment.applied_aptc_amount.to_f / available_aptc).round(2)
+              end
         pct > 1 ? 1 : pct
       end
 

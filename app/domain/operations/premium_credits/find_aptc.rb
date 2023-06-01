@@ -39,6 +39,9 @@ module Operations
 
       def not_eligible?
         return true if @hbx_enrollment.dental?
+        return true if tax_household_group&.tax_households.blank?
+
+        build_taxhousehold_enrollments
 
         result = ::Operations::PremiumCredits::FindAll.new.call({ family: @hbx_enrollment.family, year: @effective_on.year, kind: 'AdvancePremiumAdjustmentGrant' })
         return true if result.failure?
@@ -48,6 +51,36 @@ module Operations
         return true if @current_enrolled_aptc_grants.blank?
 
         false
+      end
+
+      def build_taxhousehold_enrollments
+        return if @hbx_enrollment.effective_on.to_date != @effective_on.to_date
+
+        tax_household_group.tax_households.where(:'tax_household_members.applicant_id'.in => @hbx_enrollment.hbx_enrollment_members.map(&:applicant_id)).each do |tax_household|
+          th_enrollment = TaxHouseholdEnrollment.find_or_create_by(enrollment_id: @hbx_enrollment.id, tax_household_id: tax_household.id)
+          hbx_enrollment_members = @hbx_enrollment.hbx_enrollment_members
+          tax_household_members = tax_household.tax_household_members
+
+          (tax_household_members.map(&:applicant_id).map(&:to_s) & enrolled_family_member_ids).each do |family_member_id|
+            hbx_enrollment_member = hbx_enrollment_members.where(applicant_id: family_member_id).first
+            tax_household_member_id = tax_household_members.where(applicant_id: family_member_id).first&.id
+
+            th_member_enr_member = th_enrollment.tax_household_members_enrollment_members.find_or_create_by(
+              family_member_id: family_member_id
+            )
+            th_member_enr_member.update!(
+              hbx_enrollment_member_id: hbx_enrollment_member&.id,
+              tax_household_member_id: tax_household_member_id,
+              age_on_effective_date: hbx_enrollment_member&.age_on_effective_date,
+              relationship_with_primary: hbx_enrollment_member&.primary_relationship,
+              date_of_birth: hbx_enrollment_member&.person&.dob
+            )
+          end
+        end
+      end
+
+      def tax_household_group
+        @tax_household_group ||= @family.tax_household_groups.by_year(@effective_on.year).order_by(created_at: :desc).first
       end
 
       def available_aptc
@@ -75,6 +108,10 @@ module Operations
       end
 
       def persist_tax_household_enrollment(aptc_grant, available_max_aptc)
+        # To avoid creation of TaxHouseholdEnrollment when operation is called with EffectiveOn Date not same as .
+        # Where we try to get Available APTC for same composition with future effective on date.
+        return if @hbx_enrollment.effective_on.to_date != @effective_on.to_date
+
         th_enrollment = TaxHouseholdEnrollment.find_or_create_by(enrollment_id: @hbx_enrollment.id, tax_household_id: aptc_grant.tax_household_id)
         household_info = benchmark_premiums.households.find {|household| household.household_id == aptc_grant.tax_household_id } if benchmark_premiums.present?
 
@@ -94,7 +131,7 @@ module Operations
         return if household_info.blank?
 
         th_id = BSON::ObjectId.from_string(aptc_grant.tax_household_id.to_s)
-        tax_household_group = @family.tax_household_groups.active.order_by(created_at: :desc).where(:"tax_households._id" => th_id).first
+        tax_household_group = @family.tax_household_groups.order_by(created_at: :desc).where(:"tax_households._id" => th_id).first
         tax_household = tax_household_group.tax_households.where(_id: th_id).first
         hbx_enrollment_members = @hbx_enrollment.hbx_enrollment_members
         tax_household_members = tax_household.tax_household_members
@@ -107,12 +144,12 @@ module Operations
           next if member_info.blank?
 
           th_member_enr_member = th_enrollment.tax_household_members_enrollment_members.find_or_create_by(
-            hbx_enrollment_member_id: hbx_enrollment_member_id&.to_s,
-            tax_household_member_id: tax_household_member_id&.to_s
+            family_member_id: family_member_id
           )
 
           th_member_enr_member.update!(
-            family_member_id: family_member_id,
+            hbx_enrollment_member_id: hbx_enrollment_member_id&.to_s,
+            tax_household_member_id: tax_household_member_id&.to_s,
             age_on_effective_date: member_info.age_on_effective_date,
             relationship_with_primary: member_info.relationship_with_primary,
             date_of_birth: member_info.date_of_birth
@@ -169,7 +206,7 @@ module Operations
       end
 
       def enrolled_family_member_ids
-        @hbx_enrollment.hbx_enrollment_members.map(&:applicant_id).map(&:to_s)
+        @enrolled_family_member_ids ||= @hbx_enrollment.hbx_enrollment_members.map(&:applicant_id).map(&:to_s)
       end
 
       def active_enrollments
@@ -191,6 +228,7 @@ module Operations
 
             member_result << {
               family_member_id: member_id,
+              coverage_start_on: @hbx_enrollment.hbx_enrollment_members.where(applicant_id: member_id).first&.coverage_start_on,
               relationship_with_primary: family_member.primary_relationship
             }
 

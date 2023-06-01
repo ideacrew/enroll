@@ -15,7 +15,7 @@ module FinancialAssistance
 
     before_action :check_eligibility, only: [:create, :get_help_paying_coverage_response, :copy]
     before_action :init_cfl_service, only: [:review_and_submit, :raw_application]
-    before_action :set_cache_headers, only: [:index, :relationships, :review_and_submit]
+    before_action :set_cache_headers, only: [:index, :relationships, :review_and_submit, :index_with_filter]
 
     layout "financial_assistance_nav", only: %i[edit step review_and_submit eligibility_response_error application_publish_error]
 
@@ -107,7 +107,7 @@ module FinancialAssistance
       if copy_result.success?
         @application = copy_result.success
         @application.set_assistance_year
-        assistance_year_page = HbxProfile.current_hbx.under_open_enrollment? && EnrollRegistry.feature_enabled?(:iap_year_selection)
+        assistance_year_page = EnrollRegistry.feature_enabled?(:iap_year_selection) && (HbxProfile.current_hbx.under_open_enrollment? || EnrollRegistry.feature_enabled?(:iap_year_selection_form))
         redirect_path = assistance_year_page ? application_year_selection_application_path(@application) : edit_application_path(@application)
 
         redirect_to redirect_path

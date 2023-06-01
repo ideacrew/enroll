@@ -207,14 +207,26 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
     let(:family2) {FactoryBot.create(:family,:with_primary_family_member, e_case_id: rand(10000))}
 
     it "should find a consumer family" do
-      family1.hire_broker_agency(writing_agent.id)
-      family2.hire_broker_agency(writing_agent2.id)
+      family1.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                           writing_agent_id: writing_agent.id,
+                                                                                           start_on: Time.now,
+                                                                                           is_active: true)
+      family2.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile2.id,
+                                                                                           writing_agent_id: writing_agent2.id,
+                                                                                           start_on: Time.now,
+                                                                                           is_active: true)
       expect(broker_agency_profile.families.count).to be(1)
     end
 
     it "should find the specific consumer family" do
-      family1.hire_broker_agency(writing_agent.id)
-      family2.hire_broker_agency(writing_agent.id)
+      family1.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                           writing_agent_id: writing_agent.id,
+                                                                                           start_on: Time.now,
+                                                                                           is_active: true)
+      family2.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                           writing_agent_id: writing_agent.id,
+                                                                                           start_on: Time.now,
+                                                                                           is_active: true)
       expect(broker_agency_profile.families.count).to be(2)
     end
 
@@ -234,7 +246,10 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
     end
 
     it "should find both consumers and employees" do
-      family2.hire_broker_agency(writing_agent.id)
+      family2.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                           writing_agent_id: writing_agent.id,
+                                                                                           start_on: Time.now,
+                                                                                           is_active: true)
       allow(Person).to receive(:where).and_return([person])
       allow(person).to receive(:has_active_employee_role?).and_return(true)
       allow(person).to receive(:primary_family).and_return(family1)
@@ -242,7 +257,10 @@ RSpec.describe BrokerAgencyProfile, dbclean: :after_each do
     end
 
     it "should find unique consumers and employees" do
-      family1.hire_broker_agency(writing_agent.id)
+      family1.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                           writing_agent_id: writing_agent.id,
+                                                                                           start_on: Time.now,
+                                                                                           is_active: true)
       allow(Person).to receive(:where).and_return([person])
       allow(person).to receive(:primary_family).and_return(family1)
       expect(broker_agency_profile.families.count).to eq(1)

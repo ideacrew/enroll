@@ -40,14 +40,20 @@ class Insured::FamiliesController < FamiliesController
       valid_display_enrollments = Array.new
       @enrollment_filter.each  { |e| valid_display_enrollments.push e['_id'] }
 
-      # log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| !hbx.is_coverage_waived? && hbx.product.blank?}
+      log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| !hbx.is_coverage_waived? && hbx.product.blank?}
       update_changing_hbxs(@hbx_enrollments)
 
-      # @hbx_enrollments = @hbx_enrollments.reject{ |r| !valid_display_enrollments.include? r._id }
+      @hbx_enrollments += HbxEnrollment.family_non_pay_enrollments(@family) if EnrollRegistry.feature_enabled?(:show_non_pay_enrollments)
+      @hbx_enrollments.sort_by!(&:effective_on).reverse!
 
       @employee_role = @person.active_employee_roles.first if is_shop_or_fehb_market_enabled?
       @tab = params['tab']
       @family_members = @family.active_family_members
+
+      if EnrollRegistry.feature_enabled?(:home_tiles_current_and_future_only)
+        @hbx_enrollments = @hbx_enrollments.select { |d| d["effective_on"] >= TimeKeeper.date_of_record.beginning_of_year }
+        @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.select { |d| d["effective_on"] >= TimeKeeper.date_of_record.beginning_of_year }
+      end
 
       respond_to do |format|
         format.html
@@ -62,6 +68,8 @@ class Insured::FamiliesController < FamiliesController
     authorize @family, :show?
 
     @hbx_enrollments = @family.enrollments.non_external.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
+    @hbx_enrollments += HbxEnrollment.family_non_pay_enrollments(@family)
+    @hbx_enrollments.sort_by!(&:effective_on).reverse!
 
     @all_hbx_enrollments_for_admin = if EnrollRegistry.feature_enabled?(:include_external_enrollment_in_display_all_enrollments)
                                        @hbx_enrollments + HbxEnrollment.family_canceled_enrollments(@family) + HbxEnrollment.family_external_enrollments(@family)
@@ -69,7 +77,7 @@ class Insured::FamiliesController < FamiliesController
                                        @hbx_enrollments + HbxEnrollment.family_canceled_enrollments(@family)
                                      end
     # Sort by effective_on again. The latest enrollment will display at the top.
-    @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.sort_by(&:effective_on).reverse
+    @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.uniq.sort_by(&:effective_on).reverse
 
     respond_to do |format|
       format.html
@@ -336,8 +344,14 @@ class Insured::FamiliesController < FamiliesController
 
   def delete_consumer_broker
     @family = Family.find(params[:id])
-    if @family.current_broker_agency.destroy
-      redirect_to :action => "home" , flash: {notice: "Successfully deleted."}
+    broker_agency = @family&.current_broker_agency
+
+    if broker_agency.present?
+      @family&.notify_broker_update_on_impacted_enrollments_to_edi({family_id: @family&.id.to_s})
+      broker_agency.destroy
+      redirect_to :action => "home", flash: {notice: "Successfully deleted."}
+    else
+      redirect_to :action => "home", flash: {notice: "Unable to remove expert from this account"}
     end
   end
 

@@ -324,6 +324,12 @@ When(/^(.*?) go[es]+ to the benefits tab I should see plan year information$/) d
   visit benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab => 'benefits')
 end
 
+When(/employer has correct reference plan id/) do
+  # temporary fix for failure when run as batch
+  hios_id = SponsoredBenefits::Organizations::PlanDesignOrganization.all.first.plan_design_proposals.first.profile.benefit_application.benefit_groups.first.reference_plan.hios_id
+  BenefitMarkets::Products::HealthProducts::HealthProduct.where(:"application_period.min".in => [TimeKeeper.date_of_record.beginning_of_year]).first.update_attributes(hios_id: hios_id)
+end
+
 # Generic name for step for all versions of site
 # actual tab will be "My Health Connector" (with "Health Connector" referring to site sshort name)
 When(/^I go to my health tab$/) do
@@ -923,6 +929,11 @@ Then(/^the employer enters claim code for his quote$/) do
   fill_in "claim_code", :with => @quote.claim_code
 end
 
+Then(/^employer enters claim code for HC4CC quote$/) do
+  quote = SponsoredBenefits::Organizations::PlanDesignOrganization.first.plan_design_proposals.first
+  fill_in "claim_code", :with => quote.claim_code
+end
+
 When(/^the employer clicks claim code$/) do
   find('.interaction-click-control-claim-code').click
 end
@@ -931,6 +942,9 @@ Then(/^the employer sees a successful message$/) do
   expect(page).to have_content('Code claimed with success. Your Plan Year has been created.')
 end
 
+Then(/^the employer sees a claim failure message$/) do
+  expect(page).to have_content(l10n('osse_subsidy.unable_to_claim', contact_center_phone_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item))
+end
 
 When(/^.+ go(?:es)? to the documents tab directly$/) do
   #interaction-click-control-documents

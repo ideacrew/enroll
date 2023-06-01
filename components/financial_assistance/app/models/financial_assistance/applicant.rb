@@ -311,13 +311,15 @@ module FinancialAssistance
 
     # depricated, need to remove this after after data migration
     embeds_many :evidences,     class_name: "::FinancialAssistance::Evidence"
+    # stores eligibility determinations with determination reasons
+    embeds_many :member_determinations, class_name: "::FinancialAssistance::MemberDetermination"
 
     embeds_one :income_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
     embeds_one :esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
     embeds_one :non_esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
     embeds_one :local_mec_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
 
-    accepts_nested_attributes_for :incomes, :deductions, :benefits, :income_evidence, :esi_evidence, :non_esi_evidence, :local_mec_evidence
+    accepts_nested_attributes_for :incomes, :deductions, :benefits, :income_evidence, :esi_evidence, :non_esi_evidence, :local_mec_evidence, :member_determinations
     accepts_nested_attributes_for :phones, :reject_if => proc { |addy| addy[:full_phone_number].blank? }, allow_destroy: true
     accepts_nested_attributes_for :addresses, :reject_if => proc { |addy| addy[:address_1].blank? && addy[:city].blank? && addy[:state].blank? && addy[:zip].blank? }, allow_destroy: true
     accepts_nested_attributes_for :emails, :reject_if => proc { |addy| addy[:address].blank? }, allow_destroy: true
@@ -823,7 +825,6 @@ module FinancialAssistance
       questions_array << (non_ssn_apply_reason == "" ? nil : non_ssn_apply_reason) if FinancialAssistanceRegistry.feature_enabled?(:no_ssn_reason_dropdown) && is_ssn_applied == false && is_applying_coverage
       questions_array << is_former_foster_care if foster_age_satisfied? && is_applying_coverage
       questions_array << is_post_partum_period unless is_pregnant
-      questions_array << has_unemployment_income if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income)
       questions_array << is_physically_disabled if is_applying_coverage && FinancialAssistanceRegistry.feature_enabled?(:question_required)
       questions_array << pregnancy_due_on if is_pregnant && FinancialAssistanceRegistry.feature_enabled?(:pregnancy_due_on_required)
       questions_array << children_expected_count if is_pregnant
@@ -831,7 +832,6 @@ module FinancialAssistance
         questions_array << pregnancy_end_on
         questions_array << is_enrolled_on_medicaid if FinancialAssistanceRegistry.feature_enabled?(:is_enrolled_on_medicaid)
       end
-
 
       (other_questions_answers << questions_array).flatten.include?(nil) ? false : true
     end
@@ -1235,12 +1235,13 @@ module FinancialAssistance
       EVIDENCES.each do |evidence_type|
         evidence = self.send(evidence_type)
         next unless evidence.present?
-        enrollment_member = enrollment.hbx_enrollment_members.where(:applicant_id => family_member_id).first
-        aptc_or_csr_used = enrollment_member.applied_aptc_amount > 0 || ['csr_73', 'csr_87', 'csr_94', 'csr_limited'].include?(csr_eligibility_kind)
+        aptc_or_csr_used = enrollment.applied_aptc_amount > 0 || ['03', '04', '05', '06'].include?(enrollment.product.csr_variant_id)
 
         if aptc_or_csr_used && ['pending', 'negative_response_received'].include?(evidence.aasm_state)
           evidence.due_on = schedule_verification_due_on if evidence.due_on.blank?
           set_evidence_outstanding(evidence)
+        elsif !aptc_or_csr_used
+          set_evidence_to_negative_response(evidence)
         elsif evidence.pending?
           set_evidence_unverified(evidence)
         end
@@ -1361,6 +1362,10 @@ module FinancialAssistance
       clone_local_mec_evidence(new_applicant) if local_mec_evidence.present?
     end
 
+    def is_dependent?
+      !is_primary_applicant?
+    end
+
     private
 
     def fetch_evidence_params(evidence)
@@ -1407,8 +1412,7 @@ module FinancialAssistance
           array
         end
       else
-        update_attributes!(is_post_partum_period: false) if is_pregnant
-        [:is_pregnant, :is_post_partum_period].collect{|question| send(question)}
+        is_pregnant ? [is_pregnant] : [is_post_partum_period]
       end
     end
 
@@ -1558,9 +1562,14 @@ module FinancialAssistance
           response_family_member_id = create_or_update_result.success[:family_member_id]
           update_attributes!(family_member_id: response_family_member_id) if family_member_id.nil?
         end
+        application.update_dependents_home_address if is_primary_applicant? && address_info_changed?
       end
     rescue StandardError => e
       e.message
+    end
+
+    def address_info_changed?
+      home_address.changed? || no_dc_address_changed? || is_homeless_changed? || is_temporarily_out_of_state_changed?
     end
 
     # Changes should flow to Main App only when application is in draft state.

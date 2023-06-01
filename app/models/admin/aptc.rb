@@ -439,6 +439,10 @@ class Admin::Aptc < ApplicationController
           aptc_errors['CATASTROHPHIC_PLAN_ERROR'] = Settings.aptc_errors.cat_plan_error unless hbx_enrollment.product.can_use_aptc?
           plan_premium = hbx_enrollment.total_premium
           aptc_errors["PREMIUM_SMALLER_THAN_APPLIED"] = Settings.aptc_errors.plan_premium_smaller_than_applied + "[PLAN_PREMIUM (#{'%.2f' % plan_premium.to_s}) < APPLIED_APTC (#{'%.2f' % applied_aptc.to_s})] " if applied_aptc > plan_premium
+          if EnrollRegistry.feature_enabled?(:self_service_osse_subsidy) && (applied_aptc / max_for_hbx) < 0.85
+            aptc_errors["APPLIED_BELOW_85_PERCENT_FOR_OSSE"] =
+              Settings.aptc_errors.below_85_for_osse + "[APPLIED_APTC (#{format('%.2f', applied_aptc.to_s)}) / MAX_APTC (#{format('%.2f', max_for_hbx.to_s)}) = #{format('%.0f', ((applied_aptc / max_for_hbx) * 100))}%] "
+          end
           sum_of_all_applied += hbx[1]["aptc_applied"].to_f
           sum_of_all_max_for_hbx += max_for_hbx
         end

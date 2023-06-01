@@ -27,3 +27,5 @@ registry:
           is_enabled: <%= ENV['DROP_ENROLLMENT_FEATURE_IS_ENABLED'] || true %>
         - key: :drop_retro_scenario
           is_enabled: <%= ENV['RETRO_FEATURE_IS_ENABLED'] || false %>
+        - key: :resend_broker_email_button
+          is_enabled: <%= ENV['RESEND_BROKER_EMAIL_BUTTON_IS_ENABLED'] || false %>

@@ -78,7 +78,7 @@ class InsuredEligibleForBenefitRule
     short_name = EnrollRegistry[:enroll_app].setting(:short_name).item
     case element
     when "citizenship_status"
-      "Since #{name} did not attest to being a US citizen or having an eligible immigration status,#{pronoun}is not eligible to purchase a plan on #{short_name}.<br/> Other family members may still be eligible to enroll"
+      "Since #{name} did not attest to being a US citizen or having an eligible immigration status,#{pronoun}is not eligible to purchase a plan on #{short_name}.<br/> Other family members may still be eligible to enroll."
     when "residency_status"
       "Since #{name} is not currently a state resident,#{pronoun} is not eligible to purchase a plan on #{short_name}.<br/> Other family members may still be eligible to enroll."
     when "incarceration_status"
@@ -130,7 +130,7 @@ class InsuredEligibleForBenefitRule
       csr_kind = tax_household.eligibile_csr_kind(@shopping_family_member_ids)
     end
     return true if csr_kind.blank? || cost_sharing.blank?
-    csr_kind == cost_sharing
+    [csr_kind, 'csr_0'].include?(cost_sharing)
   end
 
   def is_market_places_satisfied?

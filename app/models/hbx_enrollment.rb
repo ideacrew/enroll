@@ -17,6 +17,8 @@ class HbxEnrollment
   include EventSource::Command
   include ::Employers::EmployerHelper
 
+  include FloatHelper
+
   belongs_to :household
   # Override attribute accessor as well
   # Migrate all the family ids to that
@@ -191,7 +193,7 @@ class HbxEnrollment
   associated_with_one :broker, :writing_agent_id, "BrokerRole"
 
   delegate :total_premium, :total_employer_contribution, :total_employee_cost, :total_ehb_premium, to: :decorated_hbx_enrollment, allow_nil: true
-  delegate :premium_for, to: :decorated_hbx_enrollment, allow_nil: true
+  delegate :premium_for, :premium_for_non_tobacco_use, to: :decorated_hbx_enrollment, allow_nil: true
 
   #indexes
   index({"household_id" => 1})
@@ -336,6 +338,7 @@ class HbxEnrollment
   scope :non_enrolled,        ->{ where(:"aasm_state".nin => HbxEnrollment::ENROLLED_STATUSES) }
   scope :can_terminate,       ->{ where(:aasm_state.in =>  CAN_TERMINATE_ENROLLMENTS) }
   scope :enrolled_and_terminated,->{ where(:aasm_state.in => ENROLLED_STATUSES + TERMINATED_STATUSES) }
+  scope :terminated,          ->{ where(:aasm_state.in => ["coverage_terminated", "coverage_termination_pending"]) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
   scope :enrolled_and_renewal, ->{where(:aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES )}
   scope :enrolled_waived_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + WAIVED_STATUSES)) }
@@ -365,6 +368,15 @@ class HbxEnrollment
       effective_on: :desc, submitted_at: :desc, coverage_kind: :desc
     )
   end
+  scope :family_non_pay_canceled_enrollments, lambda { |family|
+    where(
+      :family_id => family.id,
+      :aasm_state => "coverage_canceled",
+      :terminate_reason => "non_payment"
+    ).order(
+      effective_on: :desc, submitted_at: :desc, coverage_kind: :desc
+    )
+  }
   scope :family_home_page_hidden_external_enrollments, lambda { |family|
     where(:family_id => family.id,
           :aasm_state.nin => ["shopping"],
@@ -683,8 +695,8 @@ class HbxEnrollment
       #     end
       #   end
       # end
-      HbxEnrollment.terminate_dep_age_off_enrollments if TimeKeeper.date_of_record == TimeKeeper.date_of_record.beginning_of_month
       HbxEnrollment.terminate_scheduled_enrollments
+      HbxEnrollment.terminate_dep_age_off_enrollments if TimeKeeper.date_of_record == TimeKeeper.date_of_record.beginning_of_month
     end
 
     def update_individual_eligibilities_for(consumer_role)
@@ -1009,7 +1021,7 @@ class HbxEnrollment
 
   def terminate_coverage_with(termination_date)
     # IVL enrollments go automatically to coverage_terminated
-    if termination_date.to_date >= TimeKeeper.date_of_record && is_shop?
+    if is_shop? && termination_date.to_date >= TimeKeeper.date_of_record
       schedule_coverage_termination!(termination_date) if may_schedule_coverage_termination?
     else
       if may_terminate_coverage?
@@ -1055,14 +1067,15 @@ class HbxEnrollment
   end
 
   def update_tax_household_enrollment
-    return if is_shop?
+    return if is_shop? || dental? || applied_aptc_amount.zero?
     return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
-    TaxHouseholdEnrollment.where(enrollment_id: id).each do |th_enrollment|
-      th_enrollment.update_attributes(applied_aptc: (th_enrollment.available_max_aptc * elected_aptc_pct))
-    end
+    eligible_tax_hh_enrs = aptc_tax_household_enrollments.select { |thh_enr| thh_enr.available_max_aptc.positive? }
+    group_ehb_premiums = thh_enr_group_ehb_premium_of_aptc_members(eligible_tax_hh_enrs)
+    calculated_applied_aptcs = calculate_applied_aptc_for_thh_enrs(eligible_tax_hh_enrs, group_ehb_premiums)
+    populate_applied_aptc_for_thh_enrs(calculated_applied_aptcs)
   rescue StandardError => e
-    Rails.logger.error { "Couldn't generate enrollment save event due to #{e.backtrace}" }
+    Rails.logger.error { "Unable to update tax_household_enrollments due to #{e.backtrace}" }
   end
 
   def handle_coverage_selection
@@ -1092,8 +1105,11 @@ class HbxEnrollment
     return unless successor_application&.is_submitted?
     return unless enrollment_benefit_application.successors.include?(successor_application)
 
-    passive_renewals_under(successor_application).each{|en| en.cancel_coverage! if en.may_cancel_coverage? }
-    renew_benefit(successor_benefit_package) if active_renewals_under(successor_application).blank? && successor_application.coverage_renewable? && non_inactive_transition? && non_terminated_enrollment?
+    passive_renewals = passive_renewals_under(successor_application).to_a
+    passive_renewals.select!(&:renewing_waived?) if dummy_inactive_transition? # cancel only renewal waivers for waived enrollment updates
+    passive_renewals.each {|en| en.cancel_coverage! if en.may_cancel_coverage? }
+
+    renew_benefit(successor_benefit_package) if active_renewals_under(successor_application).blank? && successor_application.coverage_renewable? && !dummy_inactive_transition? && non_terminated_enrollment?
   end
 
   def reinstated_app
@@ -1144,8 +1160,8 @@ class HbxEnrollment
                                    :effective_on.gte => benefit_application.start_on })
   end
 
-  def non_inactive_transition?
-    !(aasm.from_state == :inactive && aasm.to_state == :inactive)
+  def dummy_inactive_transition?
+    (aasm.from_state == :inactive && aasm.to_state == :inactive)
   end
 
   def non_terminated_enrollment?
@@ -1444,7 +1460,9 @@ class HbxEnrollment
   end
 
   def can_make_changes_for_ivl_enrollment?
-    return true if ENROLLED_AND_RENEWAL_STATUSES.include?(aasm_state)
+    allowed_statuses = ENROLLED_AND_RENEWAL_STATUSES
+    allowed_statuses << 'coverage_terminated' if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update)
+    return true if allowed_statuses.include?(aasm_state)
     false
   end
 
@@ -1538,8 +1556,22 @@ class HbxEnrollment
     new_plan ||= product
 
     plan_selection = PlanSelection.new(self, new_plan)
-    return unless plan_selection.existing_coverage.present?
-    self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members
+    return if plan_selection.existing_coverage.blank?
+    return self.hbx_enrollment_members = plan_selection.same_plan_enrollment.hbx_enrollment_members if is_shop?
+
+    plan_selection.same_plan_enrollment.hbx_enrollment_members.each do |enr_member|
+      member = hbx_enrollment_members.where(applicant_id: enr_member.applicant_id).first
+      next enr_member if member.blank? || enr_member.coverage_start_on == member.coverage_start_on
+
+      member.coverage_start_on = enr_member.coverage_start_on
+      member.save!
+    end
+  end
+
+  def reset_member_coverage_start_dates
+    return if hbx_enrollment_members.pluck(:coverage_start_on).all?(effective_on)
+
+    hbx_enrollment_members.update_all(coverage_start_on: effective_on)
   end
 
   def display_make_changes_for_ivl?
@@ -1641,6 +1673,11 @@ class HbxEnrollment
   def self.family_canceled_enrollments(family)
     canceled_enrollments = HbxEnrollment.family_home_page_hidden_enrollments(family)
     canceled_enrollments.reject{|enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? }
+  end
+
+  def self.family_non_pay_enrollments(family)
+    non_pay_enrollments = HbxEnrollment.family_non_pay_canceled_enrollments(family)
+    non_pay_enrollments.reject{|enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? }
   end
 
   def self.family_external_enrollments(family)
@@ -1959,6 +1996,23 @@ class HbxEnrollment
     )
   end
 
+  def notify_of_broker_update(opts)
+    return if is_shop?
+    return if %w[coverage_canceled coverage_expired].include?(aasm_state)
+    return if aasm_state == "coverage_terminated" && terminated_on <= TimeKeeper.date_of_record
+
+    notify(
+      "acapi.info.events.family.broker_updates",
+      {
+        "hbx_enrollment_id" => hbx_id,
+        "family_id" => opts[:family_id],
+        "new_broker_id" => opts[:broker_role_id],
+        "new_broker_npn" => opts[:broker_role_npn],
+        "timestamp" => Time.now.to_i
+      }
+    )
+  end
+
   def term_or_expire_enrollment(term_date = nil)
     if is_shop?
       enrollment_benefit_application = sponsored_benefit_package.benefit_application
@@ -1982,11 +2036,20 @@ class HbxEnrollment
     end
   end
 
+  def reinstate_tax_household_enrollments(reinstate_enrollment)
+    return if is_shop?
+    return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+
+    TaxHouseholdEnrollment.by_enrollment_id(self.id).each do |thhe|
+      new_thhe = thhe.build_tax_household_enrollment_for(reinstate_enrollment)
+      new_thhe.save
+    end
+  end
+
   def reinstate(edi: false)
     return false unless can_be_reinstated?
     return false if has_active_term_or_expired_exists_for_reinstated_date?
     reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(self, fetch_reinstatement_date).build
-
     can_renew = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: reinstate_enrollment})
 
     return false unless can_renew.success?
@@ -1998,6 +2061,7 @@ class HbxEnrollment
 
     if reinstate_enrollment.may_reinstate_coverage?
       reinstate_enrollment.reinstate_coverage!
+      reinstate_tax_household_enrollments(reinstate_enrollment)
       # Move reinstated enrollment to "coverage selected" status
       reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage?
 
@@ -2090,7 +2154,7 @@ class HbxEnrollment
 
     # after_all_transitions :perform_employer_plan_year_count
 
-    event :renew_enrollment, :after => [:record_transition, :trigger_enrollment_notice] do
+    event :renew_enrollment, :after => [:record_transition, :update_tax_household_enrollment, :trigger_enrollment_notice] do
       transitions from: :shopping, to: :auto_renewing
     end
 
@@ -2098,7 +2162,7 @@ class HbxEnrollment
       transitions from: :shopping, to: :renewing_waived
     end
 
-    event :select_coverage, :after => [:record_transition, :propagate_selection, :update_reinstate_coverage, :generate_prior_py_shop_renewals, :publish_select_coverage_events, :update_tax_household_enrollment] do
+    event :select_coverage, :after => [:record_transition, :update_tax_household_enrollment, :propagate_selection, :update_reinstate_coverage, :generate_prior_py_shop_renewals, :publish_select_coverage_events] do
       transitions from: :shopping,
                   to: :coverage_selected, :guard => :can_select_coverage?
       transitions from: [:auto_renewing, :actively_renewing],
@@ -2737,7 +2801,7 @@ class HbxEnrollment
     event = event('events.enrollment_saved', attributes: {gid: self.to_global_id.uri, payload: cv_enrollment.success})
     event.success.publish if event.success?
   rescue StandardError => e
-    Rails.logger.error { "Couldn't generate enrollment save event due to #{e.backtrace}" }
+    Rails.logger.error { "Couldn't generate enrollment #{self.hbx_id} save event due to #{e.backtrace}" }
   end
 
   def publish_event(event, payload)
@@ -2756,21 +2820,30 @@ class HbxEnrollment
     workflow_state_transitions.order(created_at: :desc).first
   end
 
-  def ivl_osse_eligible?
+  def ivl_osse_eligible?(new_effective_date = nil)
     return false if is_shop? || dental?
 
-    hbx_enrollment_members.any?(&:osse_eligible_on_effective_date?)
+    hbx_enrollment_members.any? do |member|
+      member.osse_eligible_on_effective_date?(new_effective_date)
+    end
   end
 
   def update_osse_childcare_subsidy
-    effective_year = sponsored_benefit_package.start_on.year
+    if is_shop?
+      effective_year = sponsored_benefit_package.start_on.year
+      return if coverage_kind.to_s == 'dental'
+      return unless employee_role&.osse_eligible?(effective_on)
+      return unless shop_osse_eligibility_is_enabled?(effective_year)
 
-    return if coverage_kind.to_s == 'dental'
-    return unless employee_role&.osse_eligible?(effective_on)
-    return unless shop_osse_eligibility_is_enabled?(effective_year)
+      osse_childcare_subsidy = osse_subsidy_for_member(primary_hbx_enrollment_member)
+    else
+      return unless ivl_osse_eligible?
 
-    osse_childcare_subsidy = osse_subsidy_for_member(primary_hbx_enrollment_member)
-    update_attributes(eligible_child_care_subsidy: osse_childcare_subsidy)
+      cost_calculator = build_plan_premium(qhp_plan: product, elected_aptc: applied_aptc_amount, apply_aptc: applied_aptc_amount > 0)
+      osse_childcare_subsidy = cost_calculator.total_childcare_subsidy_amount
+    end
+
+    update(eligible_child_care_subsidy: osse_childcare_subsidy)
   end
 
   def osse_subsidy_for_member(hbx_enrollment_member)
@@ -2799,7 +2872,109 @@ class HbxEnrollment
     end
   end
 
+  def any_member_greater_than_30?
+    @any_member_greater_than_30 ||= hbx_enrollment_members.any? { |member| member.age_on_effective_date > 30 }
+  end
+
+  def continuous_coverage?
+    hbx_enrollment_members.any? do |member|
+      next member if member.coverage_start_on.blank?
+      member.coverage_start_on != effective_on
+    end
+  end
+
+  def tax_household_enrollments
+    TaxHouseholdEnrollment.by_enrollment_id(id)
+  end
+
+  def aptc_tax_household_enrollments
+    tax_household_enrollments.select do |thh_enr|
+      thh_enr.tax_household_members_enrollment_members.where(
+        :family_member_id.in => thh_enr.tax_household.aptc_members.map(&:applicant_id)
+      ).present?
+    end
+  end
+
   private
+
+  # Calculates sum of enrolled aptc member's of TaxHouseholdEnrollment ehb_premiums including Minimum Responsibility.
+  def sum_of_member_ehb_premiums(thh_enr)
+    aptc_family_member_ids = thh_enr.tax_household.aptc_members.map(&:applicant_id)
+    hbx_enrollment_members.where(:applicant_id.in => aptc_family_member_ids).reduce(0) do |sum, member|
+      sum + round_down_float_two_decimals(ivl_decorated_hbx_enrollment.member_ehb_premium(member))
+    end.to_money
+  end
+
+  def thh_enr_group_ehb_premium_of_aptc_members(thh_enrs)
+    thh_enrs.inject({}) do |premiums, thh_enr|
+      premiums[thh_enr] = { group_ehb_premium: sum_of_member_ehb_premiums(thh_enr) }
+      premiums
+    end
+  end
+
+  # calculate_applied_aptcs_by_available_aptc_ratio_using_ratio by comapring available_max_aptcs of Tax Household Enrollments
+  def calculate_applied_aptcs_by_available_aptc_ratio(thh_enrs)
+    total_available_max_aptc = thh_enrs.reduce(0) do |total, tax_hh_enr|
+      total + (tax_hh_enr.available_max_aptc.positive? ? tax_hh_enr.available_max_aptc : 0)
+    end
+
+    thh_enrs.inject({}) do |applied_aptcs_by_ratio, thh_enr|
+      applied_aptcs_by_ratio[thh_enr] = (((thh_enr.available_max_aptc.positive? ? thh_enr.available_max_aptc.to_f : 0) / total_available_max_aptc.to_f) * applied_aptc_amount.to_f).to_money
+      applied_aptcs_by_ratio
+    end
+  end
+
+  # Assumed Applied Aptcs are less than or equal to both group_ehb_premium and available_max_aptc for each Aptc Tax Household
+  def valid_applied_aptcs_by_ratio?(applied_aptcs_by_available_aptc_ratio, group_ehb_premiums)
+    applied_aptcs_by_available_aptc_ratio.all? do |tax_hh_enr, assumed_aptc|
+      assumed_aptc <= group_ehb_premiums[tax_hh_enr][:group_ehb_premium] &&
+        assumed_aptc <= (tax_hh_enr.available_max_aptc.positive? ? tax_hh_enr.available_max_aptc : 0)
+    end
+  end
+
+  def calculate_applied_aptc_for_thh_enrs(thh_enrs, group_ehb_premiums)
+    if thh_enrs.count == 1
+      group_ehb_premiums[thh_enrs.first][:applied_aptc] = applied_aptc_amount
+      return group_ehb_premiums
+    end
+
+    applied_aptcs_by_available_aptc_ratio = calculate_applied_aptcs_by_available_aptc_ratio(thh_enrs)
+    if valid_applied_aptcs_by_ratio?(applied_aptcs_by_available_aptc_ratio, group_ehb_premiums)
+      applied_aptcs_by_available_aptc_ratio.each { |tax_hh_enr, applied_aptc| group_ehb_premiums[tax_hh_enr][:applied_aptc] = applied_aptc }
+    else
+      total_thh_enrs_count = thh_enrs.count
+      total_remaining_consumed_aptc = applied_aptc_amount
+      thh_enrs.each_with_index do |tax_hh_enr, indx|
+        break unless total_remaining_consumed_aptc.positive?
+
+        applied_aptc = [
+          group_ehb_premiums[tax_hh_enr][:group_ehb_premium],
+          tax_hh_enr.available_max_aptc,
+          total_remaining_consumed_aptc
+        ].min
+
+        group_ehb_premiums[tax_hh_enr][:applied_aptc] = if indx.next == total_thh_enrs_count
+                                                          total_remaining_consumed_aptc
+                                                        else
+                                                          total_remaining_consumed_aptc -= applied_aptc
+                                                          applied_aptc
+                                                        end
+      end
+    end
+
+    group_ehb_premiums
+  end
+
+  def populate_applied_aptc_for_thh_enrs(calculated_applied_aptcs)
+    calculated_applied_aptcs.each do |thh_enr, premium_info|
+      thh_enr.update_attributes!(
+        {
+          applied_aptc: premium_info[:applied_aptc] || 0.0,
+          group_ehb_premium: premium_info[:group_ehb_premium]
+        }
+      )
+    end
+  end
 
   def set_is_any_enrollment_member_outstanding
     if kind == "individual"

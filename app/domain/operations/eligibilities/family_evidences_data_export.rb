@@ -37,7 +37,7 @@ module Operations
         primary_person = values[:family].primary_person
 
         results =
-          values[:family].family_members.collect do |family_member|
+          values[:family].active_family_members.collect do |family_member|
             if application
               applicant =
                 find_matching_applicant(application, family_member)
@@ -153,26 +153,25 @@ module Operations
         end.flatten
       end
 
-      def tax_household_for(family_member, year)
-        household = family_member.family.active_household
-        tax_households = household.latest_tax_households_with_year(year).order('created DESC')
+      def tax_household_information(family_member, year)
+        if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+          thhg = family_member.family.active_thhg(year)
+          return append_nil(2) if thhg.blank?
 
-        tax_households.detect{|th| th.tax_household_members.any?{|thm| thm.family_member == family_member}}
-      end
+          thh = thhg.tax_households.where(:'tax_household_members.applicant_id' => family_member.id).first
+          return append_nil(2) if thhg.blank?
 
-      def tax_household_eligibility_determination(family_member, year)
-        tax_household = tax_household_for(family_member, year)
+          [thh.max_aptc&.to_f, thh.thhm_by(family_member)&.csr_percent_as_integer]
+        else
+          thh = family_member.family.active_household.latest_active_thh_with_year(year)
+          return append_nil(2) if thh.blank?
 
-        tax_household&.eligibility_determinations&.last
+          [thh.latest_eligibility_determination&.max_aptc&.to_f, thh.thhm_by(family_member)&.csr_percent_as_integer]
+        end
       end
 
       def get_aptc_csr_evidence_data(family_member, year, applicant = nil)
-        determination = tax_household_eligibility_determination(family_member, year)
-
-        data = [
-          determination&.max_aptc&.to_f,
-          determination&.csr_percent_as_integer
-        ]
+        data = tax_household_information(family_member, year)
 
         return (data + append_nil(19)) unless applicant
 

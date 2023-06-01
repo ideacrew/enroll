@@ -135,18 +135,31 @@ function applyListenersFor(target) {
     }
   });
 
-  $('select#tribal-state').change(function() {
-    if ($('.featured_tribes_selection').length > 0 && this.value == $('#enroll_state_abbr').val()) {
-      $('.featured-tribe-container').removeClass('hide');
-      var tribe_codes_array = $('.tribe_codes:checked').map(function(){ return $(this).val(); }).get();
-      if (tribe_codes_array.includes("OT")){
-        $('.tribal-name-container').removeClass('hide');
+  // tribal-state change - select from options
+  $('select#tribal-state').on("change", function() {
+    var enroll_state_abbr = $('#enroll_state_abbr').val();
+    var is_indian_alaskan_tribe_details_enabled = ($('#is_indian_alaskan_tribe_details_enabled').val() === 'true');
+
+    if (is_indian_alaskan_tribe_details_enabled) {
+      var is_featured_tribes_selection_enabled = ($('#is_featured_tribes_selection_enabled').val() === 'true');
+      var tribe_codes_array = $('.tribe_codes:checked').map(function() {
+        return $(this).val();
+      }).get();
+      var tribal_name_container_show_on_select = (typeof tribe_codes_array != 'undefined' && tribe_codes_array.includes("OT"));
+
+      if (is_featured_tribes_selection_enabled && this.value == enroll_state_abbr) {
+        $('.featured-tribe-container').removeClass('hide');
+        if (tribal_name_container_show_on_select) {
+          $('.tribal-name-container').removeClass('hide');
+        } else {
+          $('#tribal-name').val("");
+          $('.tribal-name-container').addClass('hide');
+        }
       } else {
-        $('.tribal-name-container').addClass('hide');
+        $('.tribe_codes:checked').removeAttr('checked');
+        $('.tribal-name-container').removeClass('hide');
+        $('.featured-tribe-container').addClass('hide');
       }
-    } else {
-      $('.tribal-name-container').removeClass('hide');
-      $('.featured-tribe-container').addClass('hide');
     }
   });
 
@@ -271,8 +284,9 @@ var PersonValidations = (function (window, undefined) {
 
     var tribe_member_yes = $("input#indian_tribe_member_yes").is(':checked');
     var tribe_member_no = $("input#indian_tribe_member_no").is(':checked');
+    var tribe_member_visible = $(".no_coverage_tribe_details").is(':visible')
 
-    if (!tribe_member_yes && !tribe_member_no){
+    if (!tribe_member_yes && !tribe_member_no && tribe_member_visible){
       alert("Please select the option for 'Are you a member of an American Indian or Alaska Native Tribe?'");
       PersonValidations.restoreRequiredAttributes(e);
     };

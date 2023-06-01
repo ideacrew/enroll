@@ -34,6 +34,15 @@ module BenefitSponsors
         super(val.strftime("%m/%d/%Y")) if val
       end
 
+      def ssn=(val)
+        super(parse_ssn(val)) if val
+      end
+
+      def parse_ssn(val)
+        result = val.to_i.to_s.gsub(/\D/, '')
+        result.length.between?(7,8) ? result.rjust(9, "0") : result
+      end
+
       def date_format
         errors.add(:base, "DOB: #{dob}") if dob &.include?('Invalid Format')
         errors.add(:base, "Hired On: #{hired_on}") if hired_on &.include?('Invalid Format')

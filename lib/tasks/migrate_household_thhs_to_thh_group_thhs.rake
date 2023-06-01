@@ -4,6 +4,9 @@
 # to TaxHouseholdGroups, TaxHouseholds, and TaxHouseholdMembers.
 # To run rake task: RAILS_ENV=production bundle exec rake migrations:migrate_household_thhs_to_thh_group_thhs
 
+# To run this on specific accounts
+# To run rake task: RAILS_ENV=production bundle exec rake migrations:migrate_household_thhs_to_thh_group_thhs person_hbx_ids=1234, 2345
+
 require File.join(Rails.root, 'app', 'data_migrations', 'migrate_household_thhs_to_thh_group_thhs')
 
 namespace :migrations do

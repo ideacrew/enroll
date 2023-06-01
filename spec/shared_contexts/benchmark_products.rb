@@ -20,12 +20,13 @@ RSpec.shared_context 'family with 2 family members', :shared_context => :metadat
   let(:family_member2) { FactoryBot.create(:family_member, family: family, person: person2) }
 end
 
-RSpec.shared_context 'family with 5 family members', :shared_context => :metadata do
+RSpec.shared_context 'family with 6 family members', :shared_context => :metadata do
   let(:person1_age) { 30 }
   let(:person2_age) { 16 }
   let(:person3_age) { 14 }
   let(:person4_age) { 12 }
   let(:person5_age) { 2 }
+  let(:person6_age) { 9 }
 
   let(:start_of_year) { TimeKeeper.date_of_record.beginning_of_year }
   let(:person1) do
@@ -53,6 +54,11 @@ RSpec.shared_context 'family with 5 family members', :shared_context => :metadat
     person1.ensure_relationship_with(per, 'child')
     per
   end
+  let(:person6) do
+    per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: start_of_year - person6_age.years)
+    person1.ensure_relationship_with(per, 'child')
+    per
+  end
 
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person1) }
   let(:family_member1) { family.primary_applicant }
@@ -60,6 +66,7 @@ RSpec.shared_context 'family with 5 family members', :shared_context => :metadat
   let(:family_member3) { FactoryBot.create(:family_member, family: family, person: person3) }
   let(:family_member4) { FactoryBot.create(:family_member, family: family, person: person4) }
   let(:family_member5) { FactoryBot.create(:family_member, family: family, person: person5) }
+  let(:family_member6) { FactoryBot.create(:family_member, family: family, person: person6) }
 
   let!(:county_zip) { ::BenefitMarkets::Locations::CountyZip.create!(county_name: 'York', zip: '04001', state: 'ME') }
   let!(:rating_area) do

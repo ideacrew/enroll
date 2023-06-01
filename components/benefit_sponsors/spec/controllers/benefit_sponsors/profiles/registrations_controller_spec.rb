@@ -120,6 +120,7 @@ module BenefitSponsors
     let(:setting) { double }
 
     before :each do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
@@ -228,6 +229,7 @@ module BenefitSponsors
         context "for new on broker_agency_portal click without user" do
 
           before :each do
+            allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(true)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
@@ -252,6 +254,7 @@ module BenefitSponsors
           let(:broker_agency_id) { broker_agency_organization.broker_agency_profile.id }
 
           before :each do
+            allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
             broker_person.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
             sign_in broker_user
@@ -300,12 +303,14 @@ module BenefitSponsors
         shared_examples_for "store profile for create" do |profile_type|
 
           before :each do
+            allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:general_agency).and_return(true) if profile_type == 'general_agency'
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_individual_market).and_return(true)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:employer_attestation).and_return(true)
             # allow(EnrollRegistry).to receive(:feature_enabled?).with(:redirect_to_requirements_page_after_confirmation).and_return(true)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(false)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_approval_period).and_return(true)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_alphanumeric_npn).and_return(false) if profile_type == 'broker_agency'
             BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS << :shop if profile_type == 'broker_agency'
@@ -386,6 +391,7 @@ module BenefitSponsors
 
     describe "GET edit", dbclean: :after_each do
       before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
       end
 
@@ -449,6 +455,7 @@ module BenefitSponsors
 
     describe "PUT update", dbclean: :after_each do
       before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_edit_broker_npn).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_edit_broker_email).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)

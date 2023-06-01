@@ -218,43 +218,169 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
             expect(passive_waivers).to be_empty
           end
         end
-
-
-        # rubocop:disable Naming/MethodParameterName
-        def create_person(ce, employer_profile)
-          person = FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name)
-          employee_role = FactoryBot.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
-          ce.update_attributes!({employee_role_id: employee_role.id})
-          Family.find_or_build_from_employee_role(employee_role)
-          employee_role
-        end
-        # rubocop:enable Naming/MethodParameterName
-
-        # rubocop:disable Metrics/ParameterLists
-        def create_enrollment(family: nil, benefit_group_assignment: nil, employee_role: nil, status: 'coverage_selected', submitted_at: nil, enrollment_kind: 'open_enrollment', coverage_kind: 'health')
-          benefit_package = benefit_group_assignment.benefit_package
-          sponsored_benefit = benefit_package.sponsored_benefit_for(coverage_kind.to_sym)
-          FactoryBot.create(:hbx_enrollment,:with_enrollment_members,
-                            enrollment_members: [family.primary_applicant],
-                            household: family.active_household,
-                            coverage_kind: coverage_kind,
-                            effective_on: benefit_package.start_on,
-                            family: family,
-                            enrollment_kind: enrollment_kind,
-                            kind: "employer_sponsored",
-                            submitted_at: submitted_at,
-                            employee_role_id: employee_role.id,
-                            benefit_sponsorship: benefit_package.benefit_sponsorship,
-                            sponsored_benefit_package: benefit_package,
-                            sponsored_benefit: sponsored_benefit,
-                            benefit_group_assignment_id: benefit_group_assignment.id,
-                            product: sponsored_benefit.reference_product,
-                            aasm_state: status)
-        end
-         # rubocop:enable Metrics/ParameterLists
       end
     end
   end
+
+  describe '.select_coverage for shop', dbclean: :after_each do
+
+    describe "given an renewing employer just entered open enrollment", dbclean: :after_each do
+      describe "with employees who have following plan selections previous year:
+        - employee A has purchased:
+          - One health waiver enrollment (Enrollment 1)
+          - One dental enrollment (Enrollment 2)
+        - employee B has purchased:
+          - One health enrollment (Enrollment 3)
+          - One dental waiver (Enrollment 4)
+      ", dbclean: :after_each do
+
+        let(:current_effective_date)  { TimeKeeper.date_of_record.beginning_of_year }
+        let(:open_enrollment_period)    { current_effective_date.prev_month..(current_effective_date.prev_month + 12.days) }
+
+        let(:census_employees) do
+          create_list(:census_employee, 2, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
+        end
+
+        let(:employee_A) do
+          ce = census_employees[0]
+          create_person(ce, abc_profile)
+        end
+
+        let!(:enrollment_1) do
+          create_enrollment(family: employee_A.person.primary_family, benefit_group_assignment: employee_A.census_employee.active_benefit_group_assignment, employee_role: employee_A,
+                            submitted_at: current_effective_date - 10.days, status: 'inactive')
+        end
+
+        let!(:enrollment_2) do
+          create_enrollment(family: employee_A.person.primary_family, benefit_group_assignment: employee_A.census_employee.active_benefit_group_assignment, employee_role: employee_A,
+                            submitted_at: current_effective_date - 10.days, coverage_kind: 'dental', status: 'inactive')
+        end
+
+        let(:initial_benefit_package) { initial_application.benefit_packages[0] }
+        let(:renewal_application) { application_service.new(initial_application).renew_application[1] }
+        let(:renewal_benefit_package) { renewal_application.benefit_packages[0] }
+        let(:application_service) { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService }
+        let(:current_year) { Time.now.year }
+        let(:operation_setting) { "::Operations::ProductSelectionEffects::DchbxProductSelectionEffects" }
+
+        before do
+          TimeKeeper.set_date_of_record_unprotected!(Date.new(current_year, 11, 5))
+          EnrollRegistry[:product_selection_effects].feature.stub(:settings).and_return([double(key: :operation, item: operation_setting)])
+
+          allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(100.0)
+          renewal_benefit_package.update_attributes(title: initial_benefit_package.title + "(#{renewal_application.effective_period.min.year})")
+          renewal_benefit_package.sponsored_benefits.each do |sponsored_benefit|
+            allow(sponsored_benefit).to receive(:products).and_return(sponsored_benefit.product_package.products)
+          end
+
+          renewal_application.update(open_enrollment_period: Date.new(current_year, 11, 1)..Date.new(current_year, 12, 13))
+          application_service.new(renewal_application).submit_application
+        end
+
+        after {TimeKeeper.set_date_of_record_unprotected!(Date.today)}
+
+        context 'renewing employee A creates a sep enrollment under current plan year', dbclean: :after_each do
+
+          let(:family) { employee_A.person.primary_family }
+          let(:health_renewal_waivers) { family.reload.active_household.hbx_enrollments.renewing_waived.by_coverage_kind(:health) }
+          let(:dental_renewal_waivers) { family.reload.active_household.hbx_enrollments.renewing_waived.by_coverage_kind(:dental) }
+          let(:health_renewals) { family.reload.active_household.hbx_enrollments.renewing.by_coverage_kind(:health) }
+
+          let(:sep_enrollment) do
+            benefit_group_assignment = employee_A.census_employee.active_benefit_group_assignment
+            benefit_package = benefit_group_assignment.benefit_package
+            sponsored_benefit = benefit_package.sponsored_benefit_for(:health)
+
+            FactoryBot.build(:hbx_enrollment,:with_enrollment_members,
+                             enrollment_members: [family.primary_applicant],
+                             household: family.active_household,
+                             coverage_kind: 'health',
+                             effective_on: sep_effective_date,
+                             family: family,
+                             enrollment_kind: '',
+                             kind: "employer_sponsored",
+                             submitted_at: TimeKeeper.date_of_record,
+                             employee_role_id: employee_A.id,
+                             benefit_sponsorship: benefit_package.benefit_sponsorship,
+                             sponsored_benefit_package: benefit_package,
+                             sponsored_benefit: sponsored_benefit,
+                             benefit_group_assignment_id: benefit_group_assignment.id,
+                             product: sponsored_benefit.reference_product,
+                             aasm_state: 'shopping')
+          end
+
+          before do
+            allow(sep_enrollment).to receive(:parent_enrollment).and_return(enrollment_1)
+          end
+
+          context 'with future effective date' do
+            let(:sep_effective_date) { Date.new(current_year, 12, 1) }
+
+            it 'should create renewal enrollment' do
+              expect(health_renewal_waivers.size).to eq 1
+              expect(dental_renewal_waivers.size).to eq 1
+              expect(health_renewals.size).to eq 0
+
+              sep_enrollment.select_coverage!
+
+              expect(family.reload.active_household.hbx_enrollments.renewing_waived.by_coverage_kind(:health).empty?).to be_truthy
+              expect(family.reload.active_household.hbx_enrollments.renewing_waived.by_coverage_kind(:dental).size).to eq 1
+              expect(family.reload.active_household.hbx_enrollments.renewing.by_coverage_kind(:health).size).to eq 1
+            end
+          end
+
+          context 'with past effective date' do
+            let(:sep_effective_date) { initial_benefit_package.start_on + 2.months }
+
+            it 'should create renewal enrollment' do
+              expect(health_renewal_waivers.size).to eq 1
+              expect(dental_renewal_waivers.size).to eq 1
+              expect(health_renewals.size).to eq 0
+
+              sep_enrollment.select_coverage!
+
+              expect(family.reload.active_household.hbx_enrollments.renewing_waived.by_coverage_kind(:health).empty?).to be_truthy
+              expect(family.reload.active_household.hbx_enrollments.renewing_waived.by_coverage_kind(:dental).size).to eq 1
+              expect(family.reload.active_household.hbx_enrollments.renewing.by_coverage_kind(:health).size).to eq 1
+            end
+          end
+        end
+      end
+    end
+  end
+
+  # rubocop:disable Naming/MethodParameterName
+  def create_person(ce, employer_profile)
+    person = FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name)
+    employee_role = FactoryBot.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+    ce.update_attributes!({employee_role_id: employee_role.id})
+    Family.find_or_build_from_employee_role(employee_role)
+    employee_role
+  end
+  # rubocop:enable Naming/MethodParameterName
+
+  # rubocop:disable Metrics/ParameterLists
+  def create_enrollment(family: nil, benefit_group_assignment: nil, employee_role: nil, status: 'coverage_selected', submitted_at: nil, enrollment_kind: 'open_enrollment', coverage_kind: 'health')
+    benefit_package = benefit_group_assignment.benefit_package
+    sponsored_benefit = benefit_package.sponsored_benefit_for(coverage_kind.to_sym)
+    FactoryBot.create(:hbx_enrollment,:with_enrollment_members,
+                      enrollment_members: [family.primary_applicant],
+                      household: family.active_household,
+                      coverage_kind: coverage_kind,
+                      effective_on: benefit_package.start_on,
+                      family: family,
+                      enrollment_kind: enrollment_kind,
+                      kind: "employer_sponsored",
+                      submitted_at: submitted_at,
+                      employee_role_id: employee_role.id,
+                      benefit_sponsorship: benefit_package.benefit_sponsorship,
+                      sponsored_benefit_package: benefit_package,
+                      sponsored_benefit: sponsored_benefit,
+                      benefit_group_assignment_id: benefit_group_assignment.id,
+                      product: sponsored_benefit.reference_product,
+                      aasm_state: status)
+  end
+  # rubocop:enable Metrics/ParameterLists
 end
 
 describe '#can_make_changes?', :dbclean => :after_each do

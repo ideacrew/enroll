@@ -177,7 +177,7 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
   let(:product_params) do
     {
       _id: BSON::ObjectId.new, hios_id: '9879', hios_base_id: '34985', metal_level_kind: :silver,
-      ehb: 0.9, is_standard_plan: true, hsa_eligibility: true, csr_variant_id: '01', health_plan_kind: :pos,
+      ehb: 0.9, is_standard_plan: true, is_hc4cc_plan: false, hsa_eligibility: true, csr_variant_id: '01', health_plan_kind: :pos,
       benefit_market_kind: :aca_shop, application_period: application_period, kind: :health, renewal_product_id: nil,
       hbx_id: 'hbx_id', title: 'title', description: 'description', product_package_kinds: [:multi_product, :single_issuer],
       issuer_profile_id: BSON::ObjectId.new, premium_ages: 19..60, provider_directory_url: 'provider_directory_url',
@@ -214,8 +214,7 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
       result = subject.call(params)
       expect(result.success?).to be_truthy
       key = result.success[:product_package_values][:assigned_contribution_model].key
-
-      expect(key).to eq :zero_percent_sponsor_fixed_percent_contribution_model
+      expect(key).to eq EnrollRegistry["initial_sponsor_default_#{enrollment_eligibility_initial.effective_date.year}"].setting(:contribution_model_key).item
     end
 
     context 'when employer does not have relaxed rules, but osse eligible' do

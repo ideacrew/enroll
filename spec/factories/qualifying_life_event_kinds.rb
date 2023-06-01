@@ -57,6 +57,7 @@ FactoryBot.define do
       reason { "lost_access_to_mec" }
       effective_on_kinds { ["fixed_first_of_next_month"] }
       tool_tip { "Someone in the household is losing other health insurance involuntarily" }
+      event_kind_label {"Coverage end date"}
     end
 
     trait :effective_on_event_date_and_first_month do

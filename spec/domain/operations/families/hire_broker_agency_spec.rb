@@ -8,6 +8,11 @@ RSpec.describe ::Operations::Families::HireBrokerAgency, dbclean: :after_each do
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
   let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
+  let(:assister)  do
+    assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00")
+    assister.save(validate: false)
+    assister
+  end
   let(:broker_agency_profile2) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile)}
   let(:writing_agent2)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile2.id) }
 
@@ -30,7 +35,10 @@ RSpec.describe ::Operations::Families::HireBrokerAgency, dbclean: :after_each do
 
     context 'rehiring same active broker' do
       before(:each) do
-        family.hire_broker_agency(writing_agent.id)
+        family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                            writing_agent_id: writing_agent.id,
+                                                                                            start_on: Time.now,
+                                                                                            is_active: true)
         family.reload
       end
 
@@ -39,7 +47,7 @@ RSpec.describe ::Operations::Families::HireBrokerAgency, dbclean: :after_each do
         hire_params = { family_id: family.id,
                         terminate_date: TimeKeeper.date_of_record,
                         broker_role_id: writing_agent.id,
-                        start_date: DateTime.now,
+                        start_date: DateTime.now.utc.to_datetime,
                         current_broker_account_id: family&.current_broker_agency&.id }
 
         result = subject.call(hire_params)
@@ -52,11 +60,14 @@ RSpec.describe ::Operations::Families::HireBrokerAgency, dbclean: :after_each do
 
     context 'hiring new broker' do
       before(:each) do
-        family.hire_broker_agency(writing_agent.id)
+        family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                            writing_agent_id: writing_agent.id,
+                                                                                            start_on: Time.now,
+                                                                                            is_active: true)
         family.reload
       end
 
-      it 'should termiante old broker and create broker agency account for new broker' do
+      it 'should terminate old broker and create broker agency account for new broker' do
         expect(family.broker_agency_accounts.unscoped.length).to eq(1)
         hire_params = { family_id: family.id,
                         terminate_date: TimeKeeper.date_of_record,

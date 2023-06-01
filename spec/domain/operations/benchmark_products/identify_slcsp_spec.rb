@@ -124,7 +124,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsp do
   end
 
   describe "with more than 3 children", dbclean: :around_each do
-    include_context "family with 5 family members"
+    include_context "family with 6 family members"
     include_context '3 dental products with different rating_methods, different child_only_offerings and 3 health products'
 
     let(:input_params) do
@@ -154,6 +154,10 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsp do
               },
               {
                 family_member_id: family_member5.id,
+                relationship_with_primary: 'child'
+              },
+              {
+                family_member_id: family_member6.id,
                 relationship_with_primary: 'child'
               }
             ]
@@ -197,7 +201,7 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsp do
         expect(@result.success[:health_product_id]).not_to be_nil
         expect(@result.success[:health_product_csr_variant_id]).not_to be_nil
         expect(@result.success[:health_product_covers_pediatric_dental_costs]).not_to be_nil
-        expect(@result.success[:household_health_benchmark_ehb_premium]).not_to be_nil
+        expect(@result.success[:household_health_benchmark_ehb_premium]).to eq(72.00)
         expect(@result.success[:household_benchmark_ehb_premium]).not_to be_nil
       end
     end

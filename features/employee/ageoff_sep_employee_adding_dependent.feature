@@ -26,6 +26,7 @@ Feature: Non-congressional EE adding non-diabled 26 years old dependent
     And employee should see the "my account" page
     When employee clicks "Losing other health insurance" link in the qle carousel
     And employee selects a current qle date
+    Then Individual clicks no and clicks continue
     And employee sees the QLE confirmation message and clicks on continue
     And employee clicks Add Member
     And Employee should not see the Ageoff Exclusion checkbox

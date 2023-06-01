@@ -88,7 +88,7 @@ module FinancialAssistance
         end
 
         def calculate_end_date(income)
-          return income.end_on if income.end_on.present?
+          return income.end_on if income.end_on.present? && (income.end_on <= @assistance_year_end)
           @assistance_year_end
         end
 

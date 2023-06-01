@@ -1,0 +1,64 @@
+<%= stylesheet_link_tag wicked_pdf_asset_base64("plan_review_pdf") %>
+
+<div class="container plan-details-export">
+  <div class="row">
+    <div class="col-md-12 no-pd">
+        <div class="panel">
+          <div class="panel-body">
+            <h1 class="main-title">Quote Name: <%= plan_design_proposal.title %></h1>
+            <h5>Claim Code: <% plan_design_proposal.claim_code %></h5>
+            <h5>Effective Date: <%= plan_design_proposal.effective_date.strftime('%d %B %Y') %></h5>
+
+            <p>Costs are based on the roster associated with this quote: <%= plan_design_proposal.active_census_employees.count %> employee(s) and <%= plan_design_proposal.active_census_familes.count %> families</p>
+          </div>
+        </div>
+    </div>
+  </div>
+
+  <%= render 'reference_plan', sponsorship: sponsorship %>
+  <% unless @benefit_group.sole_source? %>
+    <%= render 'employee_premiums_table', benefit_group: @benefit_group %>
+  <% end %>
+
+  <% if @dental_plan = @benefit_group.dental_reference_plan %>
+  <div class="row">
+    <div class="col-md-12 no-pd">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <table class="table table-striped">
+            <tr>
+              <th>Reference Plan</th>
+              <th>Carrier</th>
+              <th>Type</th>
+              <th>Metal Level</th>
+              <th>Offering By</th>
+            </tr>
+            <tbody>
+              <tr>
+                <td><%= @dental_plan.name %></td>
+                <td><%= @dental_plan.carrier_profile.legal_name %></td>
+                <td><%= @dental_plan.plan_type.upcase %></td>
+                <td><%= @dental_plan.metal_level.capitalize %></td>
+                <td><%= Settings.plan_option_titles.send(@benefit_group.dental_plan_option_kind.to_sym) %></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12 no-pd">
+      <div class="panel panel-default">
+        <div class="panel-heading custom-heading">
+          <h3 class="panel-title">Employee Costs - Dental Benefits</h3>
+        </div>
+        <div class="panel-body">
+          <%= render 'sponsored_benefits/organizations/plan_design_proposals/shared/dental_benefit_group_cost_summary', benefit_group: @benefit_group,  benefit_group_dental_costs: @benefit_group_dental_costs %>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% end %>
+</div>

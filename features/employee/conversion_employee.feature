@@ -166,6 +166,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
     When Employee click the "Losing other health insurance" in qle carousel
     And Employee select a current qle date
+    Then Individual clicks no and clicks continue
     Then Employee should see confirmation and clicks continue
     Then Employee should see family members page and clicks continue
     Then Employee should see the group selection page

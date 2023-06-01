@@ -78,6 +78,14 @@ Then(/Dual Role Person should not see any button to enroll in ivl market/) do
   expect(page).not_to have_link "Enroll"
 end
 
+Then(/Dual Role Person should not see Audit-Log button/) do
+  expect(page).not_to have_content(l10n("audit_log"))
+end
+
+Then(/the Admin should see Audit-Log button/) do
+  expect(page).to have_content(l10n("audit_log"))
+end
+
 And(/Employee clicks on Enroll/) do
   within ".shop-for-plans-widget" do
     click_link "Enroll"

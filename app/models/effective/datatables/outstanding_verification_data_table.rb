@@ -4,6 +4,8 @@ module Effective
   module Datatables
     # datatable for outstanding verifications
     class OutstandingVerificationDataTable < Effective::MongoidDatatable
+      include ApplicationHelper
+
       datatable do
         if EnrollRegistry.feature_enabled?(:include_faa_outstanding_verifications)
           load_eligibility_determination_columns
@@ -13,7 +15,9 @@ module Effective
       end
 
       def load_verification_type_columns
-        table_column :name, :label => 'Name', :proc => proc { |row| link_to row.primary_applicant.person.full_name, resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id)}, :filter => false, :sortable => true
+        table_column :name, :label => 'Name', :proc => proc { |row|
+          link_to_with_noopener_noreferrer(row.primary_applicant.person.full_name, resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id))
+        }, :filter => false, :sortable => true
         table_column :ssn, :label => 'SSN', :proc => proc { |row| truncate(number_to_obscured_ssn(row.primary_applicant.person.ssn)) }, :filter => false, :sortable => false
         table_column :dob, :label => 'DOB', :proc => proc { |row| format_date(row.primary_applicant.person.dob)}, :filter => false, :sortable => false
         table_column :hbx_id, :label => 'HBX ID', :proc => proc { |row| row.primary_applicant.person.hbx_id }, :filter => false, :sortable => false
@@ -30,7 +34,9 @@ module Effective
       end
 
       def load_eligibility_determination_columns
-        table_column :name, :label => 'Name', :proc => proc { |row| link_to eligibility_primary_name(row), resume_enrollment_exchanges_agents_path(person_id: eligibility_primary_family_member(row).person_id)}, :filter => false, :sortable => true
+        table_column :name, :label => 'Name', :proc => proc { |row|
+          link_to_with_noopener_noreferrer(eligibility_primary_name(row), resume_enrollment_exchanges_agents_path(person_id: eligibility_primary_family_member(row).person_id))
+        }, :filter => false, :sortable => true
         table_column :ssn, :label => 'SSN', :proc => proc { |row| truncate(number_to_obscured_ssn(eligibility_primary_ssn(row))) }, :filter => false, :sortable => false
         table_column :dob, :label => 'DOB', :proc => proc { |row| format_date(eligibility_primary_family_member(row).dob)}, :filter => false, :sortable => false
         table_column :hbx_id, :label => 'HBX ID', :proc => proc { |row| eligibility_primary_family_member(row).hbx_id }, :filter => false, :sortable => false

@@ -288,6 +288,21 @@ registry:
                     {"2022-01-01": '2021,12,14'},
                     {"2022-02-01": '2022,1,12'},
                     {"2022-03-01": '2022,2,14'},
+                    {"2023-01-01": '2022,12,13'},
+                    {"2023-02-01": '2023,1,12'},
+                    {"2023-03-01": '2023,2,14'},
+                    {"2023-04-01": '2023,3,14'},
+                    {"2023-05-01": '2023,4,12'},
+                    {"2023-06-01": '2023,5,12'},
+                    {"2023-07-01": '2023,6,13'},
+                    {"2023-08-01": '2023,7,12'},
+                    {"2023-09-01": '2023,8,14'},
+                    {"2023-10-01": '2023,9,12'},
+                    {"2023-11-01": '2023,10,12'},
+                    {"2023-12-01": '2023,11,14'},
+                    {"2024-01-01": '2023,12,12'},
+                    {"2024-02-01": '2024,1,12'},
+                    {"2024-03-01": '2024,2,13'}
                   ]
           - key: :default_aptc_percentage
             item: 85
@@ -335,9 +350,9 @@ registry:
       - key: :tobacco_cost
         item: :tobacco_cost
         is_enabled: false
-      - key: :choose_coverage_mdcr_warning
-        item: :choose_coverage_mdcr_warning
-        is_enabled: <%= ENV['CHOOSE_COVERAGE_MDCR_WARNING_IS_ENABLED'] || false %>
+      - key: :choose_coverage_medicaid_warning
+        item: :choose_coverage_medicaid_warning
+        is_enabled: <%= ENV['CHOOSE_COVERAGE_MEDICAID_WARNING_IS_ENABLED'] || false %>
       - key: :adtl_contact_required_for_text
         item: :adtl_contact_required_for_text
         is_enabled: <%= ENV['ADTL_CONTACT_REQUIRED_FOR_TEXT_IS_ENABLED'] || false %>
@@ -395,31 +410,54 @@ registry:
       - key: :address_verification
         item: :address_verification
         is_enabled: <%= ENV['ADDRESS_VERIFICATION_IS_ENABLED'] || false %>
+      - key: :eligibility_audit_log
+        item: :eligibility_audit_log
+        is_enabled: <%= ENV['ELIGIBILITY_AUDIT_LOG_IS_ENABLED'] || false %>
+      - key: :notify_address_changed
+        is_enabled: <%= ENV['NOTIFY_ADDRESS_CHANGED_IS_ENABLED'] || false %>
   - namespace:
       - :pay_now_feature
     features:
-      - key: :kaiser_pay_now
-        is_enabled: true
+      - key: :validate_saml
+        is_enabled: <%= ENV['VALIDATE_SAML_IS_ENABLED'] || false %>
+      - key: :generic_redirect
+        is_enabled: <%= ENV['GENERIC_REDIRECT_PAY_NOW_IS_ENABLED'] || false %>
+        settings:
+          - key: :strict_tile_check
+            item: <%= ENV['STRICT_TILE_CHECK_PAY_NOW_IS_ENABLED'] || false %>
+      - key: :kaiser_permanente_pay_now
+        is_enabled: <%= ENV['KAISER_PERMANENTE_PAY_NOW_IS_ENABLED'] || false %>
         settings:
           - key: :plan_shopping
-            item: true
+            item: <%= ENV['KAISER_PERMANENTE_PAY_NOW_PLAN_SHOPPING_IS_ENABLED'] || false %>
           - key: :enrollment_tile
-            item: false
+            item: <%= ENV['KAISER_PERMANENTE_PAY_NOW_ENROLLMENT_TILE_IS_ENABLED'] || false %>
           - key: :carriers_long_name
             item: 'Kaiser Permanente'
           - key: :connect_test
-            item: true
-      - key: :delta_dental_pay_now
-        is_enabled: false
+            item: <%= ENV['KAISER_PERMANENTE_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
+      - key: :kaiser_pay_now
+        is_enabled: <%= ENV['KAISER_PERMANENTE_PAY_NOW_IS_ENABLED'] || false %>
         settings:
           - key: :plan_shopping
-            item: false
+            item: <%= ENV['KAISER_PERMANENTE_PAY_NOW_PLAN_SHOPPING_IS_ENABLED'] || false %>
           - key: :enrollment_tile
-            item: false
+            item: <%= ENV['KAISER_PERMANENTE_PAY_NOW_ENROLLMENT_TILE_IS_ENABLED'] || false %>
+          - key: :carriers_long_name
+            item: 'Kaiser Permanente'
+          - key: :connect_test
+            item: <%= ENV['KAISER_PERMANENTE_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
+      - key: :delta_dental_pay_now
+        is_enabled: <%= ENV['DELTA_DENTAL_PAY_NOW_IS_ENABLED'] || false %>
+        settings:
+          - key: :plan_shopping
+            item: <%= ENV['DELTA_DENTAL_PAY_NOW_PLAN_SHOPPING_IS_ENABLED'] || false %>
+          - key: :enrollment_tile
+            item: <%= ENV['DELTA_DENTAL_PAY_NOW_ENROLLMENT_TILE_IS_ENABLED'] || false %>
           - key: :carriers_long_name
             item: 'Delta Dental'
           - key: :connect_test
-            item: false
+            item: <%= ENV['DELTA_DENTAL_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
       - key: :dentegra_pay_now
         is_enabled: false
         settings:
@@ -432,27 +470,27 @@ registry:
           - key: :connect_test
             item: false
       - key: :dominion_national_pay_now
-        is_enabled: false
+        is_enabled: <%= ENV['DOMINION_PAY_NOW_IS_ENABLED'] || false %>
         settings:
           - key: :plan_shopping
-            item: false
+            item: <%= ENV['DOMINION_PAY_NOW_PLAN_SHOPPING_IS_ENABLED'] || false %>
           - key: :enrollment_tile
-            item: false
+            item: <%= ENV['DOMINION_PAY_NOW_ENROLLMENT_TILE_IS_ENABLED'] || false %>
           - key: :carriers_long_name
             item: 'Dominion National'
           - key: :connect_test
-            item: false
+            item: <%= ENV['DOMINION_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
       - key: :best_life_pay_now
-        is_enabled: false
+        is_enabled: <%= ENV['BEST_LIFE_PAY_NOW_IS_ENABLED'] || false %>
         settings:
           - key: :plan_shopping
-            item: false
+            item: <%= ENV['BEST_LIFE_PAY_NOW_PLAN_SHOPPING_IS_ENABLED'] || false %>
           - key: :enrollment_tile
-            item: false
+            item: <%= ENV['BEST_LIFE_PAY_NOW_ENROLLMENT_TILE_IS_ENABLED'] || false %>
           - key: :carriers_long_name
             item: 'BEST Life'
           - key: :connect_test
-            item: false
+            item: <%= ENV['BEST_LIFE_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
       - key: :metlife_pay_now
         is_enabled: false
         settings:
@@ -465,16 +503,18 @@ registry:
           - key: :connect_test
             item: false
       - key: :carefirst_pay_now
-        is_enabled: false
+        is_enabled: <%= ENV['CAREFIRST_PAY_NOW_IS_ENABLED'] || false %>
         settings:
           - key: :plan_shopping
-            item: false
+            item: <%= ENV['CAREFIRST_PAY_NOW_PLAN_SHOPPING_IS_ENABLED'] || false %>
           - key: :enrollment_tile
-            item: false
+            item: <%= ENV['CAREFIRST_PAY_NOW_ENROLLMENT_TILE_IS_ENABLED'] || false %>
           - key: :carriers_long_name
             item: 'CareFirst'
           - key: :connect_test
-            item: false
+            item: <%= ENV['CAREFIRST_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
+          - key: :embed_xml
+            item: <%= ENV['CAREFIRST_PAY_NOW_EMBED_XML_IS_ENABLED'] || false %>
       - key: :aetna_pay_now
         is_enabled: false
         settings:
@@ -565,7 +605,7 @@ registry:
       - :aca_shop
     features:
       - key: :aca_shop_dependent_age_off
-        item: Operations::Shop::DependentAgeOff.new
+        item: Operations::BenefitSponsors::DependentAgeOff::Process.new
         is_enabled: true
         settings:
           - key: :period
@@ -648,7 +688,7 @@ registry:
       - key: :document_reminder_notice_trigger
         is_enabled: false
       - key: :account_transfer_notice_trigger
-        is_enabled: false
+        is_enabled: <%= ENV['ACCOUNT_TRANSFER_NOTICE_IS_ENABLED'] || false %>
       - key: :verification_type_income_verification
         is_enabled: false
       - key: :show_download_tax_documents
@@ -672,6 +712,9 @@ registry:
       - key: :location_residency_verification_type
         item: :location_residency_verification_type
         is_enabled: true
+      - key: :complete_verification_for_enrollment
+        item: :complete_verification_for_enrollment
+        is_enabled: false
       - key: :trigger_verifications_before_enrollment_purchase
         item: trigger_verifications_before_enrollment_purchase
         is_enabled: <%= ENV['TRIGGER_VERIFICATIONS_BEFORE_ENROLLMENT_PURCHASE_IS_ENABLED'] || false %>
@@ -682,13 +725,58 @@ registry:
         is_enabled: true
         settings:
           - key: :saml_info_required_keys
-            item: ['assertion_consumer_service_url', 'assertion_consumer_logout_service_url', 'issuer', 'idp_entity_id', 'idp_sso_target_url', 'idp_slo_target_url', 'idp_cert', 'name_identifier_format',
-                   'idp_cert_fingerprint', 'idp_cert_fingerprint_algorithm', 'curam_landing_page_url', 'saml_logout_url', 'account_conflict_url', 'account_recovery_url', 'iam_login_url', 'curam_broker_dashboard',
-                    'pay_now_issuer', 'pay_now_private_key_location', 'pay_now_x509_cert_location', 'kaiser_pay_now_url', 'kaiser_pay_now_relay_state', 'kaiser_pay_now_audience', 'delta_dental_pay_now_url',
-                    'delta_dental_pay_now_audience', 'delta_dental_pay_now_relay_state', 'dentegra_pay_now_url','dentegra_pay_now_audience', 'dentegra_pay_now_relay_state', 'dominion_national_pay_now_url',
-                    'dominion_national_pay_now_audience', 'dominion_national_pay_now_relay_state', 'best_life_pay_now_url', 'best_life_pay_now_audience', 'best_life_pay_now_relay_state', 'metlife_pay_now_url',
-                    'metlife_pay_now_audience', 'metlife_pay_now_relay_state', 'carefirst_pay_now_url', 'carefirst_pay_now_audience', 'carefirst_pay_now_relay_state', 'aetna_pay_now_url', 'aetna_pay_now_audience',
-                    'aetna_pay_now_relay_state', 'unitedhealthcare_pay_now_url', 'unitedhealthcare_pay_now_audience', 'unitedhealthcare_pay_now_relay_state']
+            item:
+              [
+                'assertion_consumer_service_url',
+                'assertion_consumer_logout_service_url',
+                'issuer',
+                'idp_entity_id',
+                'idp_sso_target_url',
+                'idp_slo_target_url',
+                'idp_cert',
+                'name_identifier_format',
+                'idp_cert_fingerprint',
+                'idp_cert_fingerprint_algorithm',
+                'curam_landing_page_url',
+                'saml_logout_url',
+                'account_conflict_url',
+                'account_recovery_url',
+                'iam_login_url',
+                'curam_broker_dashboard',
+                'pay_now_issuer',
+                'pay_now_private_key_location',
+                'pay_now_x509_cert_location',
+                'kaiser_permanente_pay_now_url',
+                'kaiser_permanente_pay_now_relay_state',
+                'kaiser_permanente_pay_now_audience',
+                'kaiser_pay_now_url',
+                'kaiser_pay_now_relay_state',
+                'kaiser_pay_now_audience',
+                'delta_dental_pay_now_url',
+                'delta_dental_pay_now_audience',
+                'delta_dental_pay_now_relay_state',
+                'dentegra_pay_now_url',
+                'dentegra_pay_now_audience',
+                'dentegra_pay_now_relay_state',
+                'dominion_national_pay_now_url',
+                'dominion_national_pay_now_audience',
+                'dominion_national_pay_now_relay_state',
+                'best_life_pay_now_url',
+                'best_life_pay_now_audience',
+                'best_life_pay_now_relay_state',
+                'metlife_pay_now_url',
+                'metlife_pay_now_audience',
+                'metlife_pay_now_relay_state',
+                'carefirst_pay_now_url',
+                'carefirst_pay_now_audience',
+                'carefirst_pay_now_relay_state',
+                'aetna_pay_now_url',
+                'aetna_pay_now_audience',
+                'aetna_pay_now_relay_state',
+                'unitedhealthcare_pay_now_url',
+                'unitedhealthcare_pay_now_audience',
+                'unitedhealthcare_pay_now_relay_state'
+              ]
       - key: :crm_update_family_save
         item: :crm_update_family_save
         is_enabled: false
@@ -727,9 +815,12 @@ registry:
         is_enabled: false
       - key: :zero_permium_policy
         is_enabled: false
-      - key: :send_secure_purchase_confirmation_email
-        item: :send_secure_purchase_confirmation_email
+      - key: :send_ivl_secure_purchase_confirmation_email
+        item: :send_ivl_secure_purchase_confirmation_email
         is_enabled: false
+      - key: :send_shop_secure_purchase_confirmation_email
+        item: :send_shop_secure_purchase_confirmation_email
+        is_enabled: true
       - key: :custom_exceptions_controller
         item: :custom_exceptions_controller
         is_enabled: false
@@ -777,6 +868,18 @@ registry:
       - key: :enrollment_plan_tile_update
         item: :enrollment_plan_tile_update
         is_enabled: <%= ENV['ENROLLMENT_PLAN_TILE_UPDATE_IS_ENABLED'] || false %>
-      - key: :hide_enrollment_hbx_id
-        item: :hide_enrollment_hbx_id
-        is_enabled: <%= ENV['HIDE_ENROLLMENT_HBX_ID_IS_ENABLED'] || false %>
+      - key: :show_non_pay_enrollments
+        item: :show_non_pay_enrollments
+        is_enabled: <%= ENV['SHOW_NON_PAY_ENROLLMENTS_IS_ENABLED'] || false %>
+      - key: :home_tiles_current_and_future_only
+        item: :home_tiles_current_and_future_only
+        is_enabled: <%= ENV['TILES_CURRENT_AND_FUTURE_ONLY_IS_ENABLED'] || false %>
+      - key: :home_tiles_group_by_year
+        item: :home_tiles_group_by_year
+        is_enabled: <%= ENV['TILES_GROUP_BY_YEAR_IS_ENABLED'] || false %>
+      - key: :show_people_with_no_evidence
+        item: :show_people_with_no_evidence
+        is_enabled: <%= ENV['SHOW_PEOPLE_WITH_NO_EVIDENCE_IS_ENABLED'] || true %>
+      - key: :ivl_tax_form_notice
+        item: :ivl_tax_form_notice
+        is_enabled: <%= ENV['IVL_TAX_FORM_NOTICE_IS_ENABLED'] || false %>

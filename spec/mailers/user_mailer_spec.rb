@@ -11,6 +11,27 @@ RSpec.describe UserMailer do
     )
     person
   end
+
+  describe 'tax_form_notice_alert' do
+    let(:subject) {"You have a new tax document from #{site_short_name}" }
+    let(:file){ Rails.root.join("spec","mailers","user_mailer_spec.rb").to_s }
+    let(:contact_center_phone_number) { EnrollRegistry[:enroll_app].setting(:health_benefit_exchange_authority_phone_number)&.item }
+    let(:email){UserMailer.tax_form_notice_alert(person_with_work_email.first_name,'john@example.com')}
+    let(:email_body) { l10n('user_mailer.tax_form_notice_alert.full_text', first_name: 'John', site_short_name: site_short_name,  contact_center_phone_number: contact_center_phone_number, site_home_business_url: site_home_business_url) }
+
+    it 'should not allow a reply' do
+      expect(email.from).to match(["no-reply@individual.#{site_domain_name}"])
+    end
+
+    it 'should deliver to John' do
+      expect(email.to).to match(['john@example.com'])
+    end
+
+    it "should have body" do
+      expect(email.body.include?(email_body)).to be_truthy
+    end
+  end
+
   describe 'generic_notice_alert' do
     let(:hbx_id) { rand(10_000)}
     let(:file){ Rails.root.join("spec","mailers","user_mailer_spec.rb").to_s }

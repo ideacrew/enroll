@@ -104,7 +104,7 @@ RSpec.describe ::Operations::Eligibilities::UpdateVerificationDueDates,
   let(:due_on) { TimeKeeper.date_of_record + verification_document_due.days }
 
   let(:required_params) do
-    { family: family, assistance_year: 2022, due_on: due_on }
+    { family: family, assistance_year: TimeKeeper.date_of_record.year, due_on: due_on }
   end
 
   it 'should be a container-ready operation' do

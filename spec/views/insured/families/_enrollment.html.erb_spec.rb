@@ -48,6 +48,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   let(:sbc_document) { nil }
 
   before(:each) do
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(any_args).and_call_original
     allow(view).to receive(:policy_helper).and_return(family)
     @family = family
     @person = person
@@ -94,6 +95,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     before :each do
       allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
+      allow(view).to receive(:initially_hide_enrollment?).with(hbx_enrollment).and_return(false)
     end
 
     it "when kind is employer_sponsored" do
@@ -130,9 +132,9 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
           allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
           allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
           allow(hbx_enrollment).to receive(:applied_aptc_amount).and_return(100.0)
-          allow(view).to receive(:individual?).and_return(true)
-          allow(view).to receive(:past_effective_on?).and_return(true)
-          allow(view).to receive(:can_pay_now?).and_return(true)
+          allow(view).to receive(:enrollment_is_ivl_or_coverall?).and_return(true)
+          allow(view).to receive(:before_effective_date?).and_return(true)
+          allow(view).to receive(:enrollment_can_pay_now?).and_return(true)
           allow(hbx_enrollment).to receive(:is_any_enrollment_member_outstanding).and_return false
           allow(hbx_enrollment).to receive(:terminate_reason).and_return 'non_payment'
           render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
@@ -140,7 +142,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
         it "should have all expected renders" do
           expect(rendered).to have_content('Individual & Family')
-          expect(rendered).to have_selector('strong', text: HbxProfile::ShortName.to_s)
+          expect(rendered).to have_selector('strong', text: "#{HbxProfile::ShortName} ID")
           expect(rendered).to have_content(/#{hbx_enrollment.hbx_id}/)
           expect(rendered).to have_content('Make a first payment') if EnrollRegistry[:carefirst_pay_now].enabled?
         end
@@ -230,6 +232,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:carefirst_pay_now).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:hide_enrollment_market_type).and_return(false)
+      allow(view).to receive(:initially_hide_enrollment?).with(hbx_enrollment).and_return(false)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
@@ -318,7 +321,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   context "reinstated enrollment" do
     let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
-    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
     let!(:hbx_enrollment) do
       FactoryBot.create(
@@ -349,7 +352,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   context "Termination Indicator display for terminated enrollments" do
     let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
-    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
     let!(:hbx_enrollment) do
       FactoryBot.create(
@@ -424,7 +427,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   context "Termination Indicator display for terminated enrollments" do
     let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
-    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
     let!(:hbx_enrollment) do
       FactoryBot.create(
@@ -462,7 +465,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
   context "when the enrollment is coverage_selected" do
     let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
-    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
     let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
     let!(:hbx_enrollment) do
       FactoryBot.create(
@@ -483,6 +486,38 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     it "should display Actions button" do
       expect(rendered).to have_text("Actions")
+    end
+  end
+
+  context "when the enrollment is auto-renewing" do
+    let!(:person) { FactoryBot.create(:person, last_name: 'John', first_name: 'Doe') }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
+    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile) }
+    let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
+    let!(:hbx_enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days),
+        family: family,
+        household: family.households.first,
+        coverage_kind: "health",
+        kind: "individual",
+        aasm_state: 'auto-renewing',
+        product: product
+      )
+    end
+
+    before :each do
+      allow(view).to receive(:enrollment_can_pay_now?).with(hbx_enrollment).and_return(false)
+      render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+    end
+
+    it "should display Actions button" do
+      expect(rendered).to have_text("Actions")
+    end
+
+    it "should not display the Payments button in the actions drop down" do
+      expect(rendered).to_not have_text("Make payments for my plan")
     end
   end
 
@@ -527,6 +562,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     before :each do
+      allow(view).to receive(:initially_hide_enrollment?).with(waived_hbx_enrollment).and_return(false)
       allow(waived_hbx_enrollment).to receive(:can_make_changes?).and_return(true)
     end
 
@@ -606,6 +642,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
+      allow(view).to receive(:initially_hide_enrollment?).with(hbx_enrollment).and_return(false)
     end
 
     context "osse_eligibility is present" do
@@ -666,6 +703,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
         allow(hbx_enrollment1).to receive(:is_shop?).and_return(true)
         allow(hbx_enrollment1).to receive(:is_cobra_status?).and_return(false)
         allow(hbx_enrollment1).to receive(:can_make_changes?).and_return(true)
+        allow(view).to receive(:initially_hide_enrollment?).with(hbx_enrollment1).and_return(false)
         render partial: "insured/families/enrollment", collection: [hbx_enrollment1], as: :hbx_enrollment, locals: { read_only: false }
       end
 

@@ -34,13 +34,8 @@ module AuthorizationConcern
     field :unlock_token,    type: String # Only if unlock strategy is :email or :both
     field :locked_at,       type: Time
 
-    ## Confirmable
-    # field :confirmation_token,   type: String
-    # field :confirmed_at,         type: Time
-    # field :confirmation_sent_at, type: Time
-    # field :unconfirmed_email,    type: String # Only if using reconfirmable
-
     validate :password_complexity
+    validates :password, format: { without: /\s/, message: "Password must not contain spaces"}
     validates_presence_of     :password, if: :password_required?
     validates_confirmation_of :password, if: :password_required?
     validates_length_of       :password, within: Devise.password_length, allow_blank: true

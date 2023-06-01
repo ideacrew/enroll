@@ -193,16 +193,19 @@ module Operations
 
         def construct_resident_role(resident_role)
           return if resident_role.nil?
-          {
+          residency_determined_at = resident_role.residency_determined_at
+          result = {
             is_applicant: resident_role.is_applicant,
             is_active: resident_role.is_active,
             is_state_resident: resident_role.is_state_resident,
-            residency_determined_at: resident_role.residency_determined_at,
             contact_method: resident_role.contact_method,
             language_preference: resident_role.language_preference,
             local_residency_responses: resident_role.local_residency_responses,
             lawful_presence_determination: construct_lawful_presence_determination(resident_role.lawful_presence_determination)
           }
+          # only include residency_determined_at key if value is present in order to pass ResidentRoleContract fvalidations
+          result.merge!(residency_determined_at: residency_determined_at) if residency_determined_at.present?
+          result
         end
 
         def construct_consumer_role(consumer_role)
@@ -243,9 +246,7 @@ module Operations
               verification_type: element.verification_type,
               action: element.action,
               modifier: element.modifier,
-              update_reason: element.update_reason,
-              event_response_record: element.event_response_record_id,
-              event_request_record: element.event_request_record_id
+              update_reason: element.update_reason
             }
           end
         end
@@ -310,6 +311,8 @@ module Operations
         end
 
         def construct_person_demographics(person)
+          # is_incarcerated field is nil when person is NOT applying for coverage but is required in cv3 contract
+          is_incarcerated = person.is_incarcerated || false
           {
             encrypted_ssn: encrypt(person.ssn),
             no_ssn: person.no_ssn == "0" || person.ssn.present? ? false : true,
@@ -317,7 +320,7 @@ module Operations
             dob: person.dob,
             date_of_death: person.date_of_death,
             dob_check: person.dob_check,
-            is_incarcerated: person.is_incarcerated,
+            is_incarcerated: is_incarcerated,
             ethnicity: person.ethnicity,
             race: person.race,
             tribal_id: person.tribal_id,

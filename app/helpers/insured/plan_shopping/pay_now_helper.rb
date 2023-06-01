@@ -10,34 +10,46 @@ module Insured
         "Delta Dental" => "https://www1.deltadentalins.com/login.html",
         "Dominion National" => "https://www.dominionmembers.com/",
         "Kaiser" => "https://kp.org/paypremium",
+        "Kaiser Permanente" => "https://kp.org/paypremium",
         "Community Health Options" => "https://healthoptions.org",
         "Harvard Pilgrim Health Care" => "https://www.harvardpilgrim.org/public/home",
         "Anthem Blue Cross and Blue Shield" => "https://www.anthem.com/contact-us/maine",
         "Northeast Delta Dental" => "https://www.nedelta.com/Home",
-        "Taro Health Plan of Maine, Inc." => EnrollRegistry['taro_health_pay_now'].setting(:taro_health_home_page_url).item
-
+        "Taro Health" => EnrollRegistry['taro_health_pay_now'].setting(:taro_health_home_page_url).item
       }.freeze
 
-      # rubocop:disable Metrics/CyclomaticComplexity
       def show_pay_now?(source, hbx_enrollment)
-        carrier_name = hbx_enrollment&.product&.issuer_profile&.legal_name
-        @issuer_key = fetch_issuer_name(carrier_name)
-        return false unless carrier_paynow_enabled(@issuer_key) && can_pay_now?(hbx_enrollment)
-        rr_feature_enabled = EnrollRegistry.feature_enabled?("#{@issuer_key}_pay_now".to_sym)
-        return false unless rr_feature_enabled == true
-        return !pay_now_button_timed_out?(hbx_enrollment) if source == "Plan Shopping"
-        return past_effective_on?(hbx_enrollment) if source == "Enrollment Tile"
-        false
-      end
-      # rubocop:enable Metrics/CyclomaticComplexity
+        @carrier_key = fetch_carrier_key_from_legal_name(hbx_enrollment&.product&.issuer_profile&.legal_name)
 
-      def issuer_key(enrollment)
+        return unless carrier_paynow_enabled?(@carrier_key) && enrollment_can_pay_now?(hbx_enrollment)
+
+        case source
+        when "Plan Shopping"
+          !pay_now_button_timed_out?(hbx_enrollment)
+        when "Enrollment Tile"
+          EnrollRegistry["#{@carrier_key}_pay_now".to_sym].setting(:enrollment_tile).item
+        end
+      end
+
+      def show_generic_redirect?(hbx_enrollment)
+        generic_redirect_enabled = EnrollRegistry.feature_enabled?(:generic_redirect)
+        return unless generic_redirect_enabled
+
+        @carrier_key = fetch_carrier_key_from_legal_name(hbx_enrollment&.product&.issuer_profile&.legal_name)
+        strict_tile_check_enabled = EnrollRegistry[:generic_redirect].setting(:strict_tile_check).item
+        enrollment_tile_enabled = EnrollRegistry["#{@carrier_key}_pay_now".to_sym].setting(:enrollment_tile).item
+
+        strict_tile_check_enabled ? enrollment_tile_enabled : generic_redirect_enabled
+      end
+
+      def carrier_key_from_enrollment(enrollment)
         carrier_key = enrollment&.product&.issuer_profile&.legal_name
-        fetch_issuer_name(carrier_key)
+        fetch_carrier_key_from_legal_name(carrier_key)
       end
 
-      def can_pay_now?(hbx_enrollment)
-        individual?(hbx_enrollment) && (has_break_in_coverage_enrollments?(hbx_enrollment) || !has_any_previous_enrollments?(hbx_enrollment))
+      def enrollment_can_pay_now?(hbx_enrollment)
+        return if hbx_enrollment.aasm_state == "auto_renewing"
+        has_break_in_coverage_enrollments?(hbx_enrollment) || !has_any_previous_enrollments?(hbx_enrollment)
       end
 
       def carrier_url(legal_name)
@@ -46,29 +58,38 @@ module Insured
 
       def carrier_link(product)
         legal_name = product.issuer_profile.legal_name
-        (link_to l10n("plans.issuer.pay_now.first_payment"), carrier_url(legal_name), class: "btn-link btn-block dropdown-item", style: 'padding: 6px 12px; margin: 4px 0;', target: '_blank').html_safe
+        (link_to l10n("plans.issuer.pay_now.make_first_payment"), carrier_url(legal_name), class: "btn-link btn-block dropdown-item", style: 'padding: 6px 12px; margin: 4px 0;', target: '_blank').html_safe
       end
 
-      def individual?(hbx_enrollment)
+      def enrollment_is_ivl_or_coverall?(hbx_enrollment)
         hbx_enrollment.kind.in?(['individual', 'coverall'])
       end
 
       def has_any_previous_enrollments?(hbx_enrollment)
-        all_carrier_enrollments = hbx_enrollment.family.hbx_enrollments.where(:aasm_state.nin => ["inactive", "shopping", "coverage_canceled"]).select do |enr|
+        potential_previous_enrollments = hbx_enrollment.family.hbx_enrollments.where(:aasm_state.nin => ["inactive", "shopping", "coverage_canceled"]).select do |enr|
           next if enr.product.blank? || enr.subscriber.blank? || enr.is_shop?
-          fetch_issuer_name(enr.product.issuer_profile.legal_name) == @issuer_key && enr.effective_on.year == hbx_enrollment.effective_on.year && enr.subscriber.applicant_id == hbx_enrollment.subscriber.applicant_id
+          is_previous_enrollment?(hbx_enrollment, enr)
         end
-        enrollments = all_carrier_enrollments - hbx_enrollment.to_a
-        enrollments.present? ? true : false
+        enrollments = potential_previous_enrollments - hbx_enrollment.to_a
+        enrollments.present?
+      end
+
+      def is_previous_enrollment?(hbx_enrollment, enr)
+        same_carrier = fetch_carrier_key_from_legal_name(enr.product.issuer_profile.legal_name) == @carrier_key
+        same_year = enr.effective_on.year == hbx_enrollment.effective_on.year
+        same_subscriber = enr.subscriber.applicant_id == hbx_enrollment.subscriber.applicant_id
+        same_coverage_kind = enr.coverage_kind == hbx_enrollment.coverage_kind
+
+        same_carrier && same_year && same_subscriber && same_coverage_kind
       end
 
       def pay_now_button_timed_out?(hbx_enrollment)
-        covered_time = hbx_enrollment.workflow_state_transitions.where(to_state: 'coverage_selected').first
+        covered_time = hbx_enrollment.workflow_state_transitions.where(:to_state.in => ['renewing_coverage_selected', 'coverage_selected']).first
         return true if covered_time.blank?
         covered_time.transition_at + 15.minutes <= Time.now
       end
 
-      def past_effective_on?(hbx_enrollment)
+      def before_effective_date?(hbx_enrollment)
         hbx_enrollment.effective_on > TimeKeeper.date_of_record
       end
 
@@ -77,48 +98,40 @@ module Insured
         enrollments.any? { |enr| enr.terminated_on.year == hbx_enrollment.effective_on.year && (hbx_enrollment.effective_on - enr.terminated_on) > 1 }
       end
 
-      def carrier_paynow_enabled(issuer)
-        issuer = fetch_issuer_name(issuer)
-        issuer.present? && EnrollRegistry.key?("feature_index.#{issuer}_pay_now") && EnrollRegistry["#{issuer}_pay_now".to_sym].feature.is_enabled
+      def carrier_paynow_enabled?(carrier_name)
+        carrier_key = fetch_carrier_key_from_legal_name(carrier_name)
+        EnrollRegistry.key?("pay_now_feature.#{carrier_key}_pay_now") && EnrollRegistry.feature_enabled?("#{carrier_key}_pay_now".to_sym)
       end
 
       def is_kaiser_translation_key?(carrier_key)
-        carrier_key == 'kaiser' ? 'issuer' : 'other'
+        ['kaiser_permanente', 'kaiser'].include?(carrier_key) ? 'issuer' : 'other'
       end
 
-      def carrier_long_name(issuer)
-        issuer_key = fetch_issuer_name(issuer)
-        carrier_paynow_enabled(issuer) ? EnrollRegistry["#{issuer_key}_pay_now".to_sym].settings[2].item : issuer
+      def carrier_long_name(carrier_name)
+        carrier_key = fetch_carrier_key_from_legal_name(carrier_name)
+        carrier_paynow_enabled?(carrier_name) ? EnrollRegistry["#{carrier_key}_pay_now"].setting(:carriers_long_name).item : carrier_name
       end
 
-      def pay_now_url(issuer_name)
-        if carrier_paynow_enabled(issuer_name)
-          issuer_name = fetch_issuer_name(issuer_name)
-          SamlInformation.send("#{issuer_name}_pay_now_url")
+      def pay_now_url(carrier_name)
+        if carrier_paynow_enabled?(carrier_name)
+          carrier_key = fetch_carrier_key_from_legal_name(carrier_name)
+          SamlInformation.send("#{carrier_key}_pay_now_url")
         else
           "https://"
         end
       end
 
-      def pay_now_relay_state(issuer_name)
-        if carrier_paynow_enabled(issuer_name)
-          issuer_name = fetch_issuer_name(issuer_name)
-          SamlInformation.send("#{issuer_name}_pay_now_relay_state")
+      def pay_now_relay_state(carrier_name)
+        if carrier_paynow_enabled?(carrier_name)
+          carrier_key = fetch_carrier_key_from_legal_name(carrier_name)
+          SamlInformation.send("#{carrier_key}_pay_now_relay_state")
         else
           "https://"
         end
       end
 
-      def enable_pay_now(hbx_enrollment)
-        issuer = issuer_key(hbx_enrollment)
-        return false unless individual?(hbx_enrollment) && EnrollRegistry.key?("feature_index.#{issuer}_pay_now")
-        rr_feature = EnrollRegistry["#{@issuer_key}_pay_now".to_sym]
-        return false unless rr_feature&.enabled?
-        rr_feature.setting(:enrollment_tile)&.item
-      end
-
-      def fetch_issuer_name(issuer_name)
-        carrier_legal_name = issuer_name&.downcase
+      def fetch_carrier_key_from_legal_name(carrier_key)
+        carrier_legal_name = carrier_key&.downcase
         carrier_legal_name.downcase.gsub(' ', '_').gsub(/[,.]/, '')
       end
     end

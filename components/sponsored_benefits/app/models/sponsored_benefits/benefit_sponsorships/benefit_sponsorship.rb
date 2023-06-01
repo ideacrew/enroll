@@ -15,6 +15,7 @@ module SponsoredBenefits
     class BenefitSponsorship
       include Mongoid::Document
       include Mongoid::Timestamps
+      include GlobalID::Identification
       # include Concerns::Observable
 
       ENROLLMENT_FREQUENCY_KINDS = [ :annual, :rolling_month ]
@@ -39,6 +40,7 @@ module SponsoredBenefits
       field :contact_method, type: String, default: "Paper and Electronic communications"
 
       embeds_many :benefit_applications, class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
+      has_many :eligibilities, class_name: "::Eligibilities::Osse::Eligibility", as: :eligibility
 
       validates_presence_of :benefit_market, :contact_method
 
@@ -81,6 +83,25 @@ module SponsoredBenefits
 
       def build_nested_models
         # build_inbox if inbox.nil?
+      end
+
+      def market_kind
+        if benefit_market.to_s.scan(/aca_shop/).present?
+          'aca_shop'
+        else
+          benefit_market
+        end
+      end
+
+      def eligibility_for(evidence_key, start_on)
+        eligibilities.by_date(start_on).select do |eligibility|
+          el = eligibility.evidences.by_key(evidence_key).max_by(&:created_at)
+          el&.is_satisfied == true
+        end.last
+      end
+
+      def osse_eligible?(start_on)
+        eligibility_for(:osse_subsidy, start_on).present? && EnrollRegistry.feature_enabled?(:broker_quote_hc4cc_subsidy)
       end
 
       def save_inbox

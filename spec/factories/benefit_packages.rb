@@ -99,5 +99,17 @@ FactoryBot.define do
     trait :last_coverage_year_title do
       title {"individual_health_benefits_#{coverage_year - 1}"}
     end
+
+    trait :with_csr_0_benefit_eligibility_element_group do
+      after :build do |bp, _evaluator|
+        FactoryBot.build(:benefit_eligibility_element_group, cost_sharing: 'csr_0', benefit_package: bp)
+      end
+    end
+
+    trait :with_csr_73_benefit_eligibility_element_group do
+      after :build do |bp, _evaluator|
+        FactoryBot.build(:benefit_eligibility_element_group, cost_sharing: 'csr_73', benefit_package: bp)
+      end
+    end
   end
 end

@@ -156,7 +156,7 @@ RSpec.describe ::FinancialAssistance::TransferAccounts, dbclean: :after_each do
 
   end
 
-  context 'only current or future assistance year applications' do
+  context 'current or future assistance year applications' do
     it 'should send for current years even after 11/1' do
       year = TimeKeeper.date_of_record.year
       allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(year, 12, 31))
@@ -170,14 +170,6 @@ RSpec.describe ::FinancialAssistance::TransferAccounts, dbclean: :after_each do
       result = ::FinancialAssistance::TransferAccounts.run
       expect(application.reload.account_transferred).to eq true
       expect(result).to include(application.hbx_id)
-    end
-
-    it 'should not transfer an application from a past year' do
-      application.assistance_year = TimeKeeper.date_of_record.year - 1
-      application.save!
-      result = ::FinancialAssistance::TransferAccounts.run
-      expect(application.reload.account_transferred).to eq false
-      expect(result).not_to include(application.hbx_id)
     end
   end
 

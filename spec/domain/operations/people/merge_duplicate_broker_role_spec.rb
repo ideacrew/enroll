@@ -149,9 +149,15 @@ RSpec.describe ::Operations::People::MergeDuplicateBrokerRole,
         broker_person.broker_role.update(
           benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id
         )
-        family_1.hire_broker_agency(broker_person.broker_role.id)
+        family_1.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_person.broker_role.broker_agency_profile.id,
+                                                                                              writing_agent_id: broker_person.broker_role.id,
+                                                                                              start_on: Time.now,
+                                                                                              is_active: true)
         family_1.reload
-        family_2.hire_broker_agency(broker_person.broker_role.id)
+        family_2.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_person.broker_role.broker_agency_profile.id,
+                                                                                              writing_agent_id: broker_person.broker_role.id,
+                                                                                              start_on: Time.now,
+                                                                                              is_active: true)
         family_2.reload
       end
 

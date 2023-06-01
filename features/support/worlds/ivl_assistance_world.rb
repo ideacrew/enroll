@@ -111,6 +111,32 @@ module IvlAssistanceWorld
     @enrollment = create_enrollment_for_family(family)
   end
 
+  def create_mthh_for_family_with_aptc_csr(family, effective_date, csr = '73', aptc = 12_000)
+    determination = family.create_eligibility_determination(effective_date: effective_date)
+    determination.grants.create(key: "AdvancePremiumAdjustmentGrant",
+                                value: aptc,
+                                start_on: effective_date.beginning_of_year,
+                                end_on: effective_date.end_of_year,
+                                assistance_year: effective_date.year,
+                                member_ids: family.family_members.map(&:id))
+    family.family_members.each do |family_member|
+      subject = determination.subjects.create(
+        gid: "gid://enroll/FamilyMember/#{family_member.id}",
+        is_primary: family_member.is_primary_applicant,
+        person_id: family_member.person.id
+      )
+      state = subject.eligibility_states.create(eligibility_item_key: 'aptc_csr_credit')
+      state.grants.create(
+        key: "CsrAdjustmentGrant",
+        value: csr,
+        start_on: effective_date.beginning_of_year,
+        end_on: effective_date.end_of_year,
+        assistance_year: effective_date.year,
+        member_ids: family.family_members.map(&:id)
+      )
+    end
+  end
+
   def create_multiple_member_enrollment_for_family_with_one_minor
     person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
     family = FactoryBot.create(:family, :with_nuclear_family, person: person)
@@ -155,6 +181,38 @@ module IvlAssistanceWorld
     @application.save!
   end
 
+  def create_application_applicant_with_other_income(state)
+    create_family_faa_application(state)
+    eligibility_determination1 = FactoryBot.create(:financial_assistance_eligibility_determination, application: @application)
+    @applicant = FactoryBot.create(:financial_assistance_applicant, eligibility_determination_id: eligibility_determination1.id, is_primary_applicant: true, gender: "male", application: @application, family_member_id: BSON::ObjectId.new)
+    @application.applicants.each do |appl|
+      social_security_benefit_params = {kind: "social_security_benefit",
+                                        amount: 3400.0,
+                                        amount_tax_exempt: 0,
+                                        frequency_kind: "quarterly",
+                                        start_on: Date.new(TimeKeeper.date_of_record.year,0o1,0o1),
+                                        end_on: nil,
+                                        is_projected: false,
+                                        ssi_type: "retirement",
+                                        submitted_at: TimeKeeper.date_of_record}
+
+      appl.incomes << FinancialAssistance::Income.new(social_security_benefit_params)
+
+      appl.addresses = [FactoryBot.build(:financial_assistance_address,
+                                         :address_1 => '1111 Awesome Street NE',
+                                         :address_2 => '#111',
+                                         :address_3 => '',
+                                         :city => 'Washington',
+                                         :country_name => '',
+                                         :kind => 'home',
+                                         :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                         :zip => '20001',
+                                         county: 'Cumberland')]
+      appl.save!
+    end
+    @application.save!
+  end
+
   def create_family_faa_application_with_applicants_and_evidences(state)
     create_family_faa_application_with_applicants(state)
 
@@ -168,9 +226,10 @@ module IvlAssistanceWorld
   end
 
   def create_enrollment_for_family(family, carrier_name = nil)
-    if carrier_name == 'Kaiser'
+    case carrier_name
+    when 'Kaiser Permanente', 'Kaiser'
       enrollment_product = create_kaiser_product
-    elsif carrier_name == 'Anthm'
+    when 'Anthm'
       enrollment_product = create_anthm_product
     else
       enrollment_product = create_cat_product

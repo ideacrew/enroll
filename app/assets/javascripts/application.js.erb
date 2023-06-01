@@ -798,6 +798,17 @@ $(document).on('click', '#terms_check_thank_you', function() {
   }
 });
 
+$(document).on('keydown', '#btn-continue', function() {
+  first_name_thank_you = $("#first_name_thank_you").val().toLowerCase().trim();
+  last_name_thank_you = $("#last_name_thank_you").val().toLowerCase().trim();
+  subscriber_first_name = $("#subscriber_first_name").val();
+  subscriber_last_name = $("#subscriber_last_name").val();
+
+  if ((first_name_thank_you != subscriber_first_name || last_name_thank_you != subscriber_last_name) && event.code == 'Enter') {
+    event.preventDefault();
+  } 
+})
+
 $(document).on('blur keyup', 'input.thank_you_field', function() {
   first_name_thank_you = $("#first_name_thank_you").val().toLowerCase().trim();
   last_name_thank_you = $("#last_name_thank_you").val().toLowerCase().trim();

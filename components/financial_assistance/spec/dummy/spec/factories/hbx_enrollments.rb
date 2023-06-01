@@ -27,7 +27,19 @@ FactoryBot.define do
     # plan { create(:plan, :with_rating_factors, :with_premium_tables, active_year: active_year) }
 
     trait :with_enrollment_members do
-      hbx_enrollment_members { enrollment_members.map{|member| FactoryBot.build(:hbx_enrollment_member, applicant_id: member.id, hbx_enrollment: self, is_subscriber: member.is_primary_applicant, coverage_start_on: self.effective_on, eligibility_date: self.effective_on) }}
+      hbx_enrollment_members do
+        enrollment_members.map do |member|
+          FactoryBot.build(:hbx_enrollment_member, applicant_id: member.id, hbx_enrollment: self, is_subscriber: member.is_primary_applicant, coverage_start_on: self.effective_on, eligibility_date: self.effective_on)
+        end
+      end
+    end
+
+    trait :with_aptc_enrollment_members do
+      hbx_enrollment_members do
+        enrollment_members.map do |member|
+          FactoryBot.build(:hbx_enrollment_member, applicant_id: member.id, hbx_enrollment: self, is_subscriber: member.is_primary_applicant, coverage_start_on: self.effective_on, eligibility_date: self.effective_on, applied_aptc_amount: 1500)
+        end
+      end
     end
 
     trait :individual_assisted do

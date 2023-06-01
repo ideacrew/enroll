@@ -98,10 +98,10 @@ class Insured::PlanShoppingsController < ApplicationController
       @enrollment.verify_and_reset_osse_subsidy_amount(@member_group)
     else
       @enrollment.reset_dates_on_previously_covered_members(@plan)
+      set_aptcs_for_continuous_coverage
+      revise_applied_aptc_for_osse
       @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc)
       @enrollment.update(eligible_child_care_subsidy: @plan.total_childcare_subsidy_amount)
-      # Used for determing whether or not to show the extended APTC message
-      @any_aptc_present = @enrollment.hbx_enrollment_members.any? { |member| @plan.aptc_amount(member) > 0 } if EnrollRegistry.feature_enabled?(:extended_aptc_individual_agreement_message)
     end
 
     @family = @person.primary_family
@@ -247,13 +247,12 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
     set_admin_bookmark_url(family_account_path) if params[:market_kind] == 'individual'
     set_resident_bookmark_url(family_account_path) if params[:market_kind] == 'coverall'
-
+    @hbx_enrollment.reset_member_coverage_start_dates # Fixes coverage start date and aptc slider calculation issues related to browser navigation and page reload
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
     collect_shopping_filters
 
     generate_eligibility_data
     generate_checkbook_service if params[:market_kind] == 'individual'
-
     @carriers = @carrier_names_map.values
     @waivable = @hbx_enrollment.try(:can_complete_shopping?)
     @max_total_employee_cost = thousand_ceil(@plans.map(&:total_employee_cost).map(&:to_f).max)
@@ -265,6 +264,9 @@ class Insured::PlanShoppingsController < ApplicationController
     @hbx_enrollment.update_osse_childcare_subsidy
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
     products = @hbx_enrollment.sponsored_benefit.products(@hbx_enrollment.sponsored_benefit.rate_schedule_date)
+    product_ids = products.map(&:id)
+    # Fetch latest data from product that might not be updated with product_package.products
+    products = BenefitMarkets::Products::Product.where(:id.in => product_ids)
     @issuer_profiles = []
     @issuer_profile_ids = products.map(&:issuer_profile_id).uniq
     ip_lookup_table = {}
@@ -275,7 +277,7 @@ class Insured::PlanShoppingsController < ApplicationController
       end
     end
     ::Caches::CustomCache.allocate(::BenefitSponsors::Organizations::Organization, :plan_shopping, ip_lookup_table)
-    @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.currently_enrolled_plans(@hbx_enrollment)
+    @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.current_enrolled_or_termed_coverages(@hbx_enrollment, true).collect(&:product_id)
 
     @member_groups = sort_member_groups(sponsored_cost_calculator.groups_for_products(products))
     @products = @member_groups.map(&:group_enrollment).map(&:product)
@@ -350,7 +352,8 @@ class Insured::PlanShoppingsController < ApplicationController
     end
     if @tax_household.present? || @aptc_grants.present?
       entity = @tax_household || @aptc_grants
-      if is_eligibility_determined_and_not_csr_0?(entity)
+      @csr_available = is_eligibility_determined_and_not_csr_0?(entity)
+      if @csr_available
         sort_for_csr(@plans)
       else
         sort_by_standard_plans(@plans)
@@ -366,6 +369,35 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   private
+
+  def set_aptcs_for_continuous_coverage
+    return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+    return unless @enrollment.continuous_coverage?
+    return if @max_aptc.zero?
+
+    percentage = @elected_aptc / @max_aptc
+    @max_aptc = ::Operations::PremiumCredits::FindAptc.new.call({ hbx_enrollment: @enrollment, effective_on: @enrollment.effective_on }).value!
+    @elected_aptc = percentage * @max_aptc
+    session[:elected_aptc] = @elected_aptc.to_f
+    session[:max_aptc] = @max_aptc.to_f
+  end
+
+  def revise_applied_aptc_for_osse
+    return unless osse_aptc_minimum_enabled? && @enrollment.ivl_osse_eligible? && @plan.is_hc4cc_plan
+    return if @max_aptc.zero?
+
+    applied_percentage = (@elected_aptc / @max_aptc).to_f
+    minimum_applied_aptc_for_osse = EnrollRegistry[:aca_individual_assistance_benefits].setting(:minimum_applied_aptc_percentage_for_osse).item.to_f
+
+    return unless applied_percentage < minimum_applied_aptc_for_osse
+
+    @elected_aptc = minimum_applied_aptc_for_osse * @max_aptc
+    session[:elected_aptc] = @elected_aptc.to_f
+  end
+
+  def osse_aptc_minimum_enabled?
+    EnrollRegistry.feature_enabled?(:aca_individual_osse_aptc_minimum)
+  end
 
   def dependents_with_existing_coverage(enrollment)
     existing_coverages = ::Operations::FetchExistingCoverage.new.call({enrollment_id: enrollment.id})
@@ -432,7 +464,13 @@ class Insured::PlanShoppingsController < ApplicationController
   def send_receipt_emails
     email = @person.work_email_or_best
     UserMailer.generic_consumer_welcome(@person.first_name, @person.hbx_id, email).deliver_now
-    return unless EnrollRegistry.feature_enabled?(:send_secure_purchase_confirmation_email)
+    is_confirmation_email_enabled = if @enrollment.is_shop?
+                                      EnrollRegistry.feature_enabled?(:send_shop_secure_purchase_confirmation_email)
+                                    else
+                                      EnrollRegistry.feature_enabled?(:send_ivl_secure_purchase_confirmation_email)
+                                    end
+    return unless is_confirmation_email_enabled
+
     body = render_to_string 'user_mailer/secure_purchase_confirmation.html.erb', layout: false
     from_provider = HbxProfile.current_hbx
     message_params = {
@@ -448,7 +486,8 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def set_plans_by(hbx_enrollment_id:)
     Caches::MongoidCache.allocate(CarrierProfile)
-    @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.currently_enrolled_product_ids(@hbx_enrollment)
+
+    @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.current_enrolled_or_termed_products_by_subscriber(@hbx_enrollment).map(&:id)
 
     if @hbx_enrollment.blank?
       @plans = []
@@ -471,22 +510,24 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def enrolled_plans_by_hios_id_and_active_year
-    if !@hbx_enrollment.is_shop?
-      @enrolled_hbx_enrollment_plans = @hbx_enrollment.family.currently_enrolled_products(@hbx_enrollment)
-      (@plans.select{|plan| @enrolled_hbx_enrollment_plans.select {|existing_plan| plan.is_same_plan_by_hios_id_and_active_year?(existing_plan) }.present? }).collect(&:id)
-    else
-      @enrolled_hbx_enrollment_plans = @hbx_enrollment.family.currently_enrolled_plans(@hbx_enrollment)
+    family = @hbx_enrollment.family
+    if @hbx_enrollment.is_shop?
+      @enrolled_hbx_enrollment_plans = family.current_enrolled_or_termed_coverages(@hbx_enrollment, true).collect(&:product_id)
       (@plans.collect(&:id) & @enrolled_hbx_enrollment_plan_ids)
+    else
+      @enrolled_hbx_enrollment_plans = family.current_enrolled_or_termed_products_by_subscriber(@hbx_enrollment)
+      @enrolled_hbx_enrollment_plans = family.current_enrolled_or_termed_products(@hbx_enrollment) if @enrolled_hbx_enrollment_plans.empty?
+      (@plans.select{|plan| @enrolled_hbx_enrollment_plans.select {|existing_plan| plan.is_same_plan_by_hios_id_and_active_year?(existing_plan) }.present? }).collect(&:id)
     end
   end
 
   def build_same_plan_premiums
-
     enrolled_plans = enrolled_plans_by_hios_id_and_active_year
+
     if enrolled_plans.present?
       enrolled_plans = enrolled_plans.collect{|p| BenefitMarkets::Products::Product.find(p)}
 
-      plan_selection = PlanSelection.new(@hbx_enrollment, @hbx_enrollment.product)
+      plan_selection = PlanSelection.new(@hbx_enrollment, @hbx_enrollment.product || enrolled_plans.first)
       same_plan_enrollment = plan_selection.same_plan_enrollment
 
       if @hbx_enrollment.is_shop?

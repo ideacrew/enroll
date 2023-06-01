@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   include FloatHelper
+  include Config::AcaHelper
   attr_accessor :enrollment, :renewal_coverage_start, :assisted, :aptc_values
 
   CAT_AGE_OFF_HIOS_IDS = ["94506DC0390008", "86052DC0400004"]
@@ -22,15 +23,20 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
       raise "Cannot renew enrollment #{enrollment.hbx_id}. Error: #{can_renew.failure}" unless can_renew.success?
 
       save_renewal_enrollment(renewal_enrollment)
+
       # elected aptc should be the minimun between applied_aptc and EHB premium.
       renewal_enrollment = assisted_enrollment(renewal_enrollment) if @assisted.present? && renewal_enrollment.is_health_enrollment?
 
       if is_dependent_dropped?
         renewal_enrollment.aasm_state = 'coverage_selected'
         renewal_enrollment.workflow_state_transitions.build(from_state: 'shopping', to_state: 'coverage_selected')
+        renewal_enrollment.update_tax_household_enrollment
       else
         renewal_enrollment.renew_enrollment
       end
+
+      verify_and_set_osse_minimum_aptc(renewal_enrollment) if @assisted
+      renewal_enrollment.update_osse_childcare_subsidy
 
       # renewal_enrollment.decorated_hbx_enrollment
       @dependent_age_off = nil
@@ -109,30 +115,42 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
                         })
   end
 
+  def verify_and_set_osse_minimum_aptc(renewal_enrollment)
+    applied_aptc_pct = applied_aptc_pct_for(renewal_enrollment)
+    return if applied_aptc_pct == renewal_enrollment.elected_aptc_pct
+
+    calculated_aptc_pct = renewal_enrollment.applied_aptc_amount.to_f / aptc_values[:max_aptc]
+    if calculated_aptc_pct == renewal_enrollment.elected_aptc_pct
+      applied_aptc = @aptc_values[:max_aptc] * applied_aptc_pct
+    else
+      ehb_premium = renewal_enrollment.total_ehb_premium
+      applied_aptc = [(@aptc_values[:max_aptc] * applied_aptc_pct), ehb_premium].min
+    end
+
+    renewal_enrollment.update(
+      applied_aptc_amount: float_fix(applied_aptc),
+      elected_aptc_pct: applied_aptc_pct
+    )
+  end
+
+  def applied_aptc_pct_for(renewal_enrollment)
+    if renewal_enrollment.ivl_osse_eligible? && osse_aptc_minimum_enabled?
+      return renewal_enrollment.elected_aptc_pct if renewal_enrollment.elected_aptc_pct >= minimum_applied_aptc_pct_for_osse.to_f
+      minimum_applied_aptc_pct_for_osse
+    else
+      renewal_enrollment.elected_aptc_pct > 0 ? renewal_enrollment.elected_aptc_pct : default_applied_aptc_pct
+    end
+  end
+
   def can_renew_assisted_product?(renewal_enrollment)
     return false unless renewal_enrollment.is_health_enrollment?
-    return true if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature) && is_mthh_assisted?
+    return true if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature) && @aptc_values[:csr_amt].present?
     return false unless @assisted
 
     tax_household = enrollment.family.active_household.latest_active_thh_with_year(renewal_coverage_start.year)
     members = tax_household.tax_household_members
     enrollment_members_in_thh = members.where(:applicant_id.in => renewal_enrollment.hbx_enrollment_members.map(&:applicant_id))
     enrollment_members_in_thh.all? {|m| m.is_ia_eligible == true}
-  end
-
-  def is_mthh_assisted?
-    return false if current_enrolled_aptc_grants.blank?
-    true
-  end
-
-  def current_enrolled_aptc_grants
-    premium_credits = ::Operations::PremiumCredits::FindAll.new.call({ family: enrollment.family, year: renewal_coverage_start.year, kind: 'AdvancePremiumAdjustmentGrant' })
-    return [] if premium_credits.failure?
-
-    aptc_grants = premium_credits.value!
-    return [] if aptc_grants.blank?
-
-    aptc_grants.where(:member_ids.in => enrolled_family_member_ids)
   end
 
   def enrolled_family_member_ids
@@ -222,7 +240,11 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
         return product.id if product
 
         fetch_product("01").id
+      elsif eligible_csr_variant == '01'
+        fetch_product("01")&.id || @enrollment.product.renewal_product_id
       else
+        product = fetch_product(eligible_csr_variant) || fetch_product('01')
+        return product.id if product
         @enrollment.product.renewal_product_id
       end
     else
@@ -249,8 +271,9 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   # rubocop:disable Style/RedundantReturn
   def eligible_to_get_covered?(member)
     child_relations = %w[child ward foster_child adopted_child]
-
     return true unless child_relations.include?(member.family_member.relationship)
+
+    return true if member.family_member.age_off_excluded
 
     if EnrollRegistry.feature_enabled?(:age_off_relaxed_eligibility)
       dependent_coverage_eligible = ::EnrollRegistry[:age_off_relaxed_eligibility] do
