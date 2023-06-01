@@ -315,7 +315,7 @@ module Eligibilities
 
     def clone_request_results(new_evidence)
       request_results.each do |request_result|
-        request_result_attrs = request_result.attributes.deep_symbolize_keys.slice(:result, :source, :source_transaction_id, :code, :code_description, :raw_payload)
+        request_result_attrs = request_result.attributes.deep_symbolize_keys.slice(:result, :source, :source_transaction_id, :code, :code_description, :raw_payload, :date_of_action)
         new_evidence.request_results.build(request_result_attrs)
       end
     end

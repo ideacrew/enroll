@@ -501,7 +501,7 @@ class BenefitGroup
 
   def elected_dental_plans_by_option_kind
     if dental_plan_option_kind == "single_carrier"
-      Plan.by_active_year(self.start_on.year).shop_market.dental_coverage.by_carrier_profile(self.carrier_for_elected_dental_plan)
+      Plan.by_active_year(self.start_on.year).shop_market.dental_coverage.by_carrier_profile(self.carrier_for_elected_dental_plan || dental_reference_plan.carrier_profile)
     else
       Plan.by_active_year(self.start_on.year).shop_market.dental_coverage
     end

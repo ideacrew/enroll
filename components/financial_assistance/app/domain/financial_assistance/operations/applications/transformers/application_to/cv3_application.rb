@@ -425,7 +425,7 @@ module FinancialAssistance
             # JobIncome(wages_and_salaries) & SelfEmploymentIncome(net_self_employment)
             def wages_and_salaries(current_incomes)
               ws_incomes = current_incomes.select do |inc|
-                ['wages_and_salaries', 'net_self_employment'].include?(inc.kind)
+                ['wages_and_salaries'].include?(inc.kind)
               end
               ws_incomes.inject(0) do |result, income|
                 frequency = income.frequency_kind
@@ -501,7 +501,7 @@ module FinancialAssistance
             end
 
             def other_income(current_incomes)
-              other_kinds = ["dividend", "rental_and_royalty", "social_security_benefit", "american_indian_and_alaskan_native",
+              other_kinds = ["net_self_employment", "dividend", "rental_and_royalty", "social_security_benefit", "american_indian_and_alaskan_native",
                              "employer_funded_disability", "estate_trust", "foreign", "other", "prizes_and_awards"]
               otr_incomes = current_incomes.select do |inc|
                 other_kinds.include?(inc.kind)

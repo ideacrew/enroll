@@ -1182,7 +1182,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
 
     it 'should be able to successfully return mitc_income with amount' do
-      expect(@mitc_income[:amount]).to eq(60_000.00)
+      expect(@mitc_income[:amount]).to eq(30_000)
     end
 
     it 'should return taxable_interest for mitc_income as zero' do
@@ -1210,7 +1210,56 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     end
 
     it 'should return other_income for mitc_income as zero' do
-      expect(@mitc_income[:other_income]).to be_zero
+      expect(@mitc_income[:other_income]).not_to be_zero
+      expect(@mitc_income[:other_income]).to eq(30_000)
+    end
+  end
+
+  context 'for mitc_income negative income' do
+    let!(:create_job_income1) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'wages_and_salaries',
+                                                frequency_kind: 'yearly',
+                                                amount: 30_000.00,
+                                                start_on: TimeKeeper.date_of_record.beginning_of_month,
+                                                employer_name: 'Testing employer' })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    let!(:income2) do
+      inc = ::FinancialAssistance::Income.new({ kind: 'net_self_employment',
+                                                frequency_kind: 'monthly',
+                                                amount: -100.00,
+                                                start_on: TimeKeeper.date_of_record.beginning_of_month })
+      applicant.incomes << inc
+      applicant.save!
+    end
+
+    before do
+      result = subject.call(application.reload)
+      @entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
+      @mitc_income = result.success[:applicants].first[:mitc_income]
+    end
+
+    it 'should be able to successfully init Application Entity' do
+      expect(@entity_init).to be_success
+    end
+
+    it 'should be able to successfully return mitc_income with amount' do
+      expect(@mitc_income[:amount]).to eq(30_000.00)
+    end
+
+    it 'should return taxable_interest for mitc_income as zero' do
+      expect(@mitc_income[:taxable_interest]).to be_zero
+    end
+
+    it 'should return alimony for mitc_income as zero' do
+      expect(@mitc_income[:alimony]).to be_zero
+    end
+
+    it 'should return other_income for mitc_income as zero' do
+      expect(@mitc_income[:other_income]).not_to be_zero
+      expect(@mitc_income[:other_income]).to eq(-1200.00)
     end
   end
 

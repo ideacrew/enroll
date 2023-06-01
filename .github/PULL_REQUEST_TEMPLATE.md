@@ -25,9 +25,9 @@ Current behavior:
 
 New behavior:
 
-# Environment Variable
+# Feature Flag
 
-For all new feature development, a feature flag is required to control the exposure of the feature to our end users. Please share the name of the variable below that would enable/disable the feature and which client it applies to.
+For all new feature development, a feature flag is required to control the exposure of the feature to our end users. A feature flag needs a corresponding environment variable that is used to initialize the state of the flag. Please share the name of the environment variable below that would enable/disable the feature and which client(s) it applies to.
 
 Variable name:
 

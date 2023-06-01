@@ -253,6 +253,14 @@ When(/^the broker clicks delete$/) do
   find('a', text: "Delete").click
 end
 
+When(/^the broker clicks copy quote$/) do
+  find('a', text: "Copy Quote").click
+end
+
+Then(/the broker should see Yes for HC4CC/) do
+  expect(find(BrokerCreateQuotePage.osse_subsidy_radio_true).checked?).to eq true
+end
+
 Then(/^the broker sees the confirmation$/) do
   expect(page).to have_content('Are you sure you want to delete Test Quote?')
 end
@@ -386,7 +394,7 @@ And(/^Broker HC4CC feature enabled$/) do
 end
 
 And(/^Primary Broker should see HC4CC option$/) do
-  expect(page).to have_css('.panel', text: 'Healthcare4Childcare (HC4CC) Program')
+  expect(page).to have_css('.panel', text: 'HealthCare4ChildCare (HC4CC) Program')
 end
 
 Then(/^Primary broker should see plan names in employee costs$/) do
