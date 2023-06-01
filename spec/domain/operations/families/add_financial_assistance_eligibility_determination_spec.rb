@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDetermination, type: :model, dbclean: :after_each do
+RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDetermination, dbclean: :after_each do
 
   let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, :ivl_product)}
   let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
@@ -30,8 +30,8 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
            "is_active" => true,
            "has_fixed_address" => true,
            "tax_filer_kind" => "tax_filer",
-           "magi_medicaid_monthly_household_income" => {"cents" => 833325.0, "currency_iso" => "USD"},
-           "magi_medicaid_monthly_income_limit" => {"cents" => 228617.0, "currency_iso" => "USD"},
+           "magi_medicaid_monthly_household_income" => {"cents" => 833_325.0, "currency_iso" => "USD"},
+           "magi_medicaid_monthly_income_limit" => {"cents" => 228_617.0, "currency_iso" => "USD"},
            "magi_as_percentage_of_fpl" => 783.0,
            "age_left_foster_care" => nil,
            "children_expected_count" => nil,
@@ -110,16 +110,21 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
            "is_vets_spouse_or_child" => false,
            "eligibility_determination_id" => BSON::ObjectId('5f5eb0542e1423c05646b19b'),
            "medicaid_household_size" => 1,
-           "magi_medicaid_category" => "false"}],
+           "magi_medicaid_category" => "false",
+           "member_determinations" => [{
+             'kind' => 'Medicaid/CHIP Determination',
+             'is_eligible' => true,
+             'determination_reasons' => [:mitc_override_not_lawfully_present_pregnant]
+           }]}],
      :eligibility_determinations =>
          [{"_id" => BSON::ObjectId('5f5eb0542e1423c05646b19b'),
            "max_aptc" => {"cents" => 5826.0, "currency_iso" => "USD"},
            "yearly_expected_contribution" => {"cents" => 167_220.00, "currency_iso" => "USD"},
            "csr_percent_as_integer" => 94,
-           "aptc_csr_annual_household_income" => {"cents" => 3342466.0, "currency_iso" => "USD"},
-           "aptc_annual_income_limit" => {"cents" => 4752000.0, "currency_iso" => "USD"},
-           "csr_annual_income_limit" => {"cents" => 2970000.0, "currency_iso" => "USD"},
-           "hbx_assigned_id" => 10002,
+           "aptc_csr_annual_household_income" => {"cents" => 3_342_466.0, "currency_iso" => "USD"},
+           "aptc_annual_income_limit" => {"cents" => 4_752_000.0, "currency_iso" => "USD"},
+           "csr_annual_income_limit" => {"cents" => 2_970_000.0, "currency_iso" => "USD"},
+           "hbx_assigned_id" => 10_002,
            "effective_starting_on" => "2020-09-09 00:00:00 UTC",
            "is_eligibility_determined" => true,
            "determined_at" => "2020-09-09 00:00:00 UTC",
@@ -149,6 +154,14 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
 
     it 'should create Tax Household Member object' do
       expect(@thhs.first.tax_household_members.first.applicant_id).to eq(family.primary_applicant.id)
+    end
+
+    it 'should create Member Determination object' do
+      member_determination = @thhs.first.tax_household_members.first.member_determinations.first
+      applicant = params[:applicants].first
+      expect(member_determination.kind).to eq(applicant['member_determinations'].first['kind'])
+      expect(member_determination.is_eligible).to eq(applicant['member_determinations'].first['is_eligible'])
+      expect(member_determination.determination_reasons).to eq(applicant['member_determinations'].first['determination_reasons'])
     end
 
     it 'should update yearly_expected_contribution value' do
