@@ -110,7 +110,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::CreatePvcRe
     stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
     stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
     allow(FinancialAssistance::Operations::Applications::Pvc::CreatePvcRequest).to receive(:new).and_return(obj)
-    allow(obj).to receive(:build_event).and_return(event)
+    allow(obj).to receive(:build_event).with(anything).and_return(event)
     allow(event.success).to receive(:publish).and_return(true)
     allow(premiums_double).to receive(:failure?).and_return(false)
     allow(slcsp_double).to receive(:failure?).and_return(false)
