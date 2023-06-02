@@ -66,7 +66,7 @@ module FinancialAssistance
             Failure("Failed to transform application with hbx_id #{application.hbx_id}")
           end
 
-          def build_event(manifest, applicant, application_hbx_id)
+          def build_event(cv3_application)
             event('events.fdsh.evidences.periodic_verification_confirmation', attributes: { application: cv3_application.to_h })
           end
 
