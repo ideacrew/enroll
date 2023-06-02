@@ -302,6 +302,23 @@ javascript:
         return resultsData;
     }
 
+    function filterByOSSE(selectedOSE, dataArray) {
+      var resultsData = [];
+      var osse = Boolean;
+      if (selectedOSSE == "Yes") {
+          osse = true;
+      } else {
+          osse = false;
+      }
+
+      dataArray.filter(function (enrollment) {
+        if (enrollment.product.is_hc4cc_plan == osse) {
+            resultsData.push(enrollment);
+        }
+      })
+      return resultsData;
+    }
+
     function filterByPremiumAmountRange(selections, dataArray) {
         var resultsData = [];
         premiumFrom = parseFloat(selections.premiumFromAmountValue || 0).toFixed(2);
@@ -371,7 +388,7 @@ javascript:
       networkTypes = selections.selectedPlanNetworks;
       carrier = selections.selectedCarrier;
       selectedHSA = selections.selectedHSA;
-
+      selectedOSSE = selections.selectedOSSE;
       resultsArray = availableEnrollments;
 
       if (metalLevels.length) {
@@ -397,6 +414,11 @@ javascript:
       if (selectedHSA) {
         filtered = true;
         resultsArray = filterByHSA(selectedHSA, resultsArray)
+      }
+
+      if (selectedOSSE) {
+        filtered = true;
+        resultsArray = filterByOSSE(selectedOSSE, resultsArray)
       }
 
       if (selections.premiumFromAmountValue != "" || selections.premiumToAmountValue != "") {
