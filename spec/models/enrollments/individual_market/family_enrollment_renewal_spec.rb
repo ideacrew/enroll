@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+ # frozen_string_literal: true
 
 require 'rails_helper'
 require "#{Rails.root}/spec/shared_contexts/enrollment.rb"
@@ -827,6 +827,121 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               expect(renewal.is_a?(HbxEnrollment)).to eq true
               expect(subject.aptc_values).to eq({ })
               expect(subject.assisted).to be_falsey
+            end
+          end
+        end
+      end
+
+      context 'osse unassisted enrollment renewal' do
+
+        before do
+          BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+        end
+
+        let(:child1_dob) { current_date.next_month - 24.years }
+
+        context 'when osse eligibility present for renewal year' do
+
+          it "should renew and apply child care subsidy" do
+            allow_any_instance_of(HbxEnrollment).to receive(:ivl_osse_eligible?).and_return(true)
+            enrollment.update_osse_childcare_subsidy
+            expect(enrollment.eligible_child_care_subsidy.to_f).to be > 0
+
+            renewal = subject.renew
+            expect(renewal.auto_renewing?).to be_truthy
+            expect(renewal.eligible_child_care_subsidy.to_f).to be > 0
+            expect(renewal.eligible_child_care_subsidy.to_f).to eq(renewal.total_premium.to_f)
+          end
+        end
+
+        context 'when osse eligibility not present for renewal year' do
+
+          it "should renew and don't apply child care subsidy" do
+            allow(enrollment).to receive(:ivl_osse_eligible?).and_return(true)
+            enrollment.update_osse_childcare_subsidy
+            expect(enrollment.eligible_child_care_subsidy.to_f).to be > 0
+
+            renewal = subject.renew
+            expect(renewal.auto_renewing?).to be_truthy
+            expect(renewal.eligible_child_care_subsidy.to_f).to eq(0.0)
+          end
+        end
+      end
+
+      context 'osse assisted enrollment renewal' do
+
+        let(:assisted) { true }
+        let(:aptc_values) do
+          {
+            applied_percentage: 0.75,
+            applied_aptc: 547.5,
+            max_aptc: 730.0,
+            csr_amt: 73
+          }
+        end
+        let(:child1_dob) { current_date.next_month - 24.years }
+
+        before do
+          BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+        end
+
+        context 'when osse eligibility present for renewal year' do
+          before do
+            allow_any_instance_of(HbxEnrollment).to receive(:ivl_osse_eligible?).and_return(true)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:temporary_configuration_enable_multi_tax_household_feature).and_return(true)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with(:total_minimum_responsibility).and_return(false)
+            enrollment.update_osse_childcare_subsidy
+          end
+
+          context 'when osse minimum aptc enabled' do
+            before do
+              allow(subject).to receive(:osse_aptc_minimum_enabled?).and_return(true)
+              allow(subject).to receive(:minimum_applied_aptc_pct_for_osse).and_return(0.85)
+              allow(subject).to receive(:can_renew_assisted_product?).and_return(true)
+              allow(subject).to receive(:eligible_to_get_covered?).and_return(true)
+              allow(subject).to receive(:populate_aptc_hash).and_return(true)
+            end
+
+            it "should renew and apply child care subsidy" do
+              expect(enrollment.eligible_child_care_subsidy.to_f).to be > 0
+              renewal = subject.renew
+              expect(renewal.auto_renewing?).to be_truthy
+              expect(renewal.eligible_child_care_subsidy.to_f).to be > 0
+              expect(renewal.eligible_child_care_subsidy.to_f).to eq(renewal.total_premium.to_f - renewal.applied_aptc_amount.to_f)
+            end
+
+            it "should apply minimum aptc pct" do
+              expect(enrollment.eligible_child_care_subsidy.to_f).to be > 0
+              renewal = subject.renew
+              expect(renewal.auto_renewing?).to be_truthy
+              expect(renewal.elected_aptc_pct).to be 0.85
+              expect(renewal.applied_aptc_amount.to_f).to eq(730.0 * 0.85)
+            end
+          end
+
+          context 'when osse minimum aptc not enabled' do
+            before do
+              allow(subject).to receive(:osse_aptc_minimum_enabled?).and_return(false)
+              allow(subject).to receive(:minimum_applied_aptc_pct_for_osse).and_return(0.85)
+              allow(subject).to receive(:can_renew_assisted_product?).and_return(true)
+              allow(subject).to receive(:eligible_to_get_covered?).and_return(true)
+              allow(subject).to receive(:populate_aptc_hash).and_return(true)
+            end
+
+            it "should renew and apply child care subsidy" do
+              expect(enrollment.eligible_child_care_subsidy.to_f).to be > 0
+              renewal = subject.renew
+              expect(renewal.auto_renewing?).to be_truthy
+              expect(renewal.eligible_child_care_subsidy.to_f).to be > 0
+              expect(renewal.eligible_child_care_subsidy.to_f).to eq(renewal.total_premium.to_f - renewal.applied_aptc_amount.to_f)
+            end
+
+            it "should not apply minimum aptc pct" do
+              expect(enrollment.eligible_child_care_subsidy.to_f).to be > 0
+              renewal = subject.renew
+              expect(renewal.auto_renewing?).to be_truthy
+              expect(renewal.elected_aptc_pct).to be 0.75
+              expect(renewal.applied_aptc_amount.to_f).to eq(730.0 * 0.75)
             end
           end
         end

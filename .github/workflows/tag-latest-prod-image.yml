@@ -90,12 +90,12 @@ jobs:
           target: ${{ needs.prep.outputs.image_tag }}
           tags: ${{ needs.prep.outputs.latest_prod_tag }}
 
-      - name: Tag ECR images
-        uses: abronin/ecr-retag-action@v1
-        with:
-          repository: ${{ needs.prep.outputs.repo }}
-          tag: ${{ needs.prep.outputs.image_tag }}
-          new-tags: ${{ needs.prep.outputs.latest_prod_tag }}
+#      - name: Tag ECR images
+#        uses: abronin/ecr-retag-action@v1
+#        with:
+#          repository: ${{ needs.prep.outputs.repo }}
+#          tag: ${{ needs.prep.outputs.image_tag }}
+#          new-tags: ${{ needs.prep.outputs.latest_prod_tag }}
 
 
 #      - name: Pull, Tag, and Push Image

@@ -150,6 +150,7 @@ module Insured
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, "R-#{site_key}001", 'N').and_return(679.8)
         person.update_attributes!(dob: (enrollment.effective_on - 61.years))
         family.family_members[1].person.update_attributes!(dob: (enrollment.effective_on - 59.years))
+        allow(enrollment).to receive(:ivl_osse_eligible?).and_return(true)
       end
 
       it 'should return updated enrollment with aptc fields' do
@@ -171,6 +172,13 @@ module Insured
         enrollment.reload
         expect(enrollment.applied_aptc_amount.to_f).to eq 500
         expect(enrollment.elected_aptc_pct).to eq 0.25
+      end
+
+      it 'should set eligible child care subsidy amount' do
+        subject.update_enrollment_for_apcts(enrollment, 500)
+        enrollment.reload
+        expected_subsidy = enrollment.total_premium.to_f - enrollment.applied_aptc_amount.to_f
+        expect(enrollment.eligible_child_care_subsidy.to_f).to eq expected_subsidy.round(2)
       end
     end
 
@@ -295,7 +303,7 @@ module Insured
               )
             )
           )
-          allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1500, total_premium: 1600))
+          allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1500, total_premium: 1600, total_childcare_subsidy_amount: 0))
         end
 
         let(:max_aptc) { 1200.0 }
@@ -348,7 +356,7 @@ module Insured
         context 'when ehb premium less than aptc' do
           before do
             effective_on = hbx_profile.benefit_sponsorship.current_benefit_period.start_on
-            allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 393.76, total_premium: 410))
+            allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 393.76, total_premium: 410, total_childcare_subsidy_amount: 0))
           end
 
           it 'creates enrollment with ehb premium' do
