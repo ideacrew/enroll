@@ -222,7 +222,7 @@ When(/^HBX admin click on none of the situations listed above apply checkbox$/) 
 end
 
 And(/^HBX admin click on back to my account button$/) do
-  expect(page).to have_content "To enroll before open enrollment, you must qualify for a special enrollment period"
+  expect(page).to have_content "To enroll before Open enrollment, you must qualify for a Special Enrollment Period"
   find(IvlSpecialEnrollmentPeriod.outside_open_enrollment_back_to_my_account_btn).click
 end
 
