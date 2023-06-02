@@ -392,15 +392,15 @@ module BenefitSponsors
       context "with invalid captcha" do
         let(:general_agency_params) do
           {
-            :profile_type => "general_agency",
-            :staff_roles_attributes => staff_roles_attributes,
-            :organization => general_agency_organization
+            profile_type: "general_agency",
+            staff_roles_attributes: staff_roles_attributes,
+            organization: general_agency_organization
           }
         end
 
-        it "should not redirect" do
+        it "does not redirect" do
           allow(controller).to receive(:verify_recaptcha_if_needed).and_return(false)
-          post :create, params: {:agency => general_agency_params}
+          post :create, params: { agency: general_agency_params }
 
           expect(response).to render_template :new
         end

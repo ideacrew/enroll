@@ -88,14 +88,14 @@ RSpec.describe Users::RegistrationsController do
 
     context "with invalid captcha" do
       let(:email) { "devise9998@test.com" }
-      let!(:user) { FactoryBot.create(:user, email: email, oim_id: email) }
 
       before do
+        FactoryBot.create(:user, email: email, oim_id: email)
         @request.env["devise.mapping"] = Devise.mappings[:user]
+        allow(controller).to receive(:verify_recaptcha_if_needed).and_return(false)
       end
 
-      it "should not redirect" do
-        allow(controller).to receive(:verify_recaptcha_if_needed).and_return(false)
+      it "does not redirect" do
         post :create, params: { user: { oim_id: email, password: password, password_confirmation: password } }
 
         expect(response).not_to redirect_to(root_path)
