@@ -294,6 +294,12 @@
               <div class="col-md-6"><%= human_boolean applicant.is_primary_caregiver %></div>
             </div>
           <% end %>
+          <% if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_relationship_other_question) %>
+            <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+              <div class="col-md-6"><%= l10n("faa.primary_caretaker_for_text") %></div>
+              <div class="col-md-6"><%= applicant.is_primary_caregiver_for %></div>
+            </div>
+          <% end %>
           <div class="row row-form-wrapper ptb no-buffer row-height form-content">
             <div class="col-md-6">Does this person need help with daily life activities, such as dressing or
               bathing?
@@ -320,6 +326,7 @@
               <div class="col-md-6"><%= l10n("faa.medicaid_question") %></div>
             </div>
           <% end %>
+
         </div>
         <br>
       <% end %>
