@@ -311,13 +311,15 @@ module FinancialAssistance
 
     # depricated, need to remove this after after data migration
     embeds_many :evidences,     class_name: "::FinancialAssistance::Evidence"
+    # stores eligibility determinations with determination reasons
+    embeds_many :member_determinations, class_name: "::FinancialAssistance::MemberDetermination"
 
     embeds_one :income_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
     embeds_one :esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
     embeds_one :non_esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
     embeds_one :local_mec_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
 
-    accepts_nested_attributes_for :incomes, :deductions, :benefits, :income_evidence, :esi_evidence, :non_esi_evidence, :local_mec_evidence
+    accepts_nested_attributes_for :incomes, :deductions, :benefits, :income_evidence, :esi_evidence, :non_esi_evidence, :local_mec_evidence, :member_determinations
     accepts_nested_attributes_for :phones, :reject_if => proc { |addy| addy[:full_phone_number].blank? }, allow_destroy: true
     accepts_nested_attributes_for :addresses, :reject_if => proc { |addy| addy[:address_1].blank? && addy[:city].blank? && addy[:state].blank? && addy[:zip].blank? }, allow_destroy: true
     accepts_nested_attributes_for :emails, :reject_if => proc { |addy| addy[:address].blank? }, allow_destroy: true
