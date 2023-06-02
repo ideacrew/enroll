@@ -22,6 +22,10 @@ module Insured
       def product
         hbx_enrollment&.product
       end
+
+      def osse_eligible?
+        hbx_enrollment&.ivl_osse_eligible?
+      end
     end
   end
 end
