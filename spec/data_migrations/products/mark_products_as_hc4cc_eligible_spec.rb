@@ -24,8 +24,8 @@ describe MarkProductsAsHc4ccEligible, dbclean: :after_each do
     headers = ["HiosId", "CsrVarient", "ActiveYear"]
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << headers
-      products.each { |product| csv << [product.hios_id, product.csr_variant_id, product.active_year] }
-      plans.each { |plan| csv << [plan.hios_id, plan.csr_variant_id, plan.active_year] }
+      products.each { |product| csv << [product.hios_base_id, product.csr_variant_id, product.active_year] }
+      plans.each { |plan| csv << [plan.hios_base_id, plan.csr_variant_id, plan.active_year] }
     end
   end
 
