@@ -1102,7 +1102,7 @@ When(/Individual clicks on None of the situations listed above apply checkbox$/)
   sleep 2
   expect(page).to have_content 'None of the situations listed above apply'
   find(IvlSpecialEnrollmentPeriod.none_apply_checkbox).click
-  expect(page).to have_content 'To enroll before open enrollment'
+  expect(page).to have_content 'To enroll before Open Enrollment'
 end
 
 Then(/Individual should land on Home page$/) do
