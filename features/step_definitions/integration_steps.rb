@@ -854,6 +854,10 @@ Then(/^.+ selects nationwide filter$/) do
   find(EmployeeChoosePlan.nationwide).click
 end
 
+Then(/^.+ should see hc4cc filter$/) do
+  expect(page).to have_content('HC4CC Eligible')
+end
+
 Then(/^.+ clicks on apply button$/) do
   page.first(EmployeeChoosePlan.apply_btn, wait: 10).click
 end

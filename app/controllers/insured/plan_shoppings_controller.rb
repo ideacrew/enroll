@@ -383,7 +383,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def revise_applied_aptc_for_osse
-    return unless osse_aptc_minimum_enabled? && @enrollment.ivl_osse_eligible? && @plan.is_hc4cc_plan
+    return unless osse_aptc_minimum_enabled? && @enrollment.ivl_osse_eligible?
     return if @max_aptc.zero?
 
     applied_percentage = (@elected_aptc / @max_aptc).to_f
