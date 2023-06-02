@@ -208,9 +208,10 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def edit_aptc
-    aptc_applied_total = params[:aptc_applied_total].delete_prefix('$')
-    applied_aptc_pct = EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature) ? calculate_elected_aptc_pct(aptc_applied_total.to_f, params[:max_aptc].to_f) : params[:applied_pct_1]
-    attrs = {enrollment_id: params.require(:hbx_enrollment_id), elected_aptc_pct: applied_aptc_pct, aptc_applied_total: aptc_applied_total}
+    enrollment_id = params.require(:hbx_enrollment_id)
+    aptc_applied_total = revise_aptc_applied_total(params, enrollment_id)
+    applied_aptc_pct = calculate_elected_aptc_pct(aptc_applied_total.to_f, params[:max_aptc].to_f)
+    attrs = {enrollment_id: enrollment_id, elected_aptc_pct: applied_aptc_pct, aptc_applied_total: aptc_applied_total}
 
     begin
       message = ::Insured::Forms::SelfTermOrCancelForm.for_aptc_update_post(attrs)
@@ -224,8 +225,19 @@ class Insured::GroupSelectionController < ApplicationController
 
   private
 
+  def revise_aptc_applied_total(params, enrollment_id)
+    aptc_applied = params[:aptc_applied_total].delete_prefix('$')
+    hbx_enrollment = HbxEnrollment.find(enrollment_id)
+    max_aptc = params[:max_aptc]&.to_f
+
+    return aptc_applied unless hbx_enrollment&.ivl_osse_eligible? && max_aptc > 0.00
+
+    aptc_pct = (aptc_applied.to_f / max_aptc).round(2)
+    aptc_pct < 0.85 ? (max_aptc * 0.85) : aptc_applied
+  end
+
   def calculate_elected_aptc_pct(aptc_applied_amount, aggregate_aptc_amount)
-    aptc_applied_amount / aggregate_aptc_amount
+    (aptc_applied_amount / aggregate_aptc_amount).round(2)
   end
 
   def family_member_eligibility_check(family_member)

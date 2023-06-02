@@ -218,11 +218,11 @@ end
 When(/^HBX admin click on none of the situations listed above apply checkbox$/) do
   expect(page).to have_content 'None of the situations listed above apply'
   find(IvlSpecialEnrollmentPeriod.none_apply_checkbox).click
-  expect(page).to have_content 'To enroll before open enrollment'
+  expect(page).to have_content 'To enroll before Open Enrollment'
 end
 
 And(/^HBX admin click on back to my account button$/) do
-  expect(page).to have_content "To enroll before open enrollment, you must qualify for a special enrollment period"
+  expect(page).to have_content "To enroll before Open Enrollment, you must qualify for a Special Enrollment Period"
   find(IvlSpecialEnrollmentPeriod.outside_open_enrollment_back_to_my_account_btn).click
 end
 

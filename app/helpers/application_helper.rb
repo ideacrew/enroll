@@ -724,6 +724,10 @@ module ApplicationHelper
     (plan_hsa_status[plan.id.to_s]) if plan.benefit_market_kind == :aca_individual
   end
 
+  def osse_status(plan)
+    plan.is_hc4cc_plan ? "Yes" : "No"
+  end
+
   def products_count(products)
     return 0 unless products
 

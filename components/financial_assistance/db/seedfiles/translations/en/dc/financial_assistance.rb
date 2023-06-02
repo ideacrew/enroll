@@ -18,6 +18,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.other_ques.is_pregnant" => "Is this person pregnant?*",
   "en.faa.other_ques.pregnancy_due_date" => "Pregnancy due date?",
   "en.faa.other_ques.children_expected" => "How many children is this person expecting?*",
+  "en.faa.other_ques.pregnant_last_year" => "Was this person pregnant in the last year?*",
   "en.faa.other_ques.pregnant_last_60d" => "Was this person pregnant in the last 60 days?*",
   "en.faa.other_ques.pregnancy_end" => "Pregnancy end date:*",
   "en.faa.other_ques.is_enrolled_on_medicaid" => 'Was this person enrolled in Medicaid during the pregnancy?',
