@@ -160,6 +160,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.sadpi_url' => "https://dc.checkbookhealth.org/sadpi/dc/2019/",
   :'en.checkbook_health_url' => "https://dc.checkbookhealth.org/dc/",
   :'en.checkbook_sadpi_health_url' => "https://dc.checkbookhealth.org/sadpi/dc/2019",
+  :'en.dc_shop_nation_wide' => "/dcshopnationwide/",
   :'en.insured.broker_name' => "Agency Name",
   :'en.phone_number' => "Phone Number",
   :'en.email_address' => "Email Address",
