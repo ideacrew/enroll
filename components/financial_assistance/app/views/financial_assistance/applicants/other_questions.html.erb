@@ -86,7 +86,11 @@
 
       <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
         <div class='col-md-6'>
-          <h5 class="fa-text-color"><%= l10n('faa.other_ques.pregnant_last_60d') %></h5>
+          <% if FinancialAssistanceRegistry.feature_enabled?(:post_partum_period_one_year) %>
+            <h5 class="fa-text-color"><%= l10n('faa.other_ques.pregnant_last_year') %></h5>
+          <% else %>
+            <h5 class="fa-text-color"><%= l10n('faa.other_ques.pregnant_last_60d') %></h5>
+          <% end %>
         </div>
         <div class='col-md-2'>
           <%= f.radio_button("is_post_partum_period", true, class: "radio-yml", id: "is_post_partum_period_yes") %>

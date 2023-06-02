@@ -364,6 +364,14 @@ module BenefitSponsors
       end.last
     end
 
+    def current_eligibility(evidence_key)
+      # returns latest eligibility without an end date
+      eligibilities.select do |eligibility|
+        el = eligibility.evidences.by_key(evidence_key).max_by(&:created_at)
+        eligibility.end_on.nil? && el&.is_satisfied == true
+      end.last
+    end
+
     # Inverse of Profile#benefit_sponsorship
     def profile
       return @profile if defined?(@profile)

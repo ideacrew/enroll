@@ -186,6 +186,10 @@ Then(/^an applicant is selected as a caregivee$/) do
   expect(all(:css, "#is_primary_caregiver_for:checked").count).to be > 0
 end
 
+Then(/^the (.*?) option should display$/) do |option|
+  expect(page).to have_content(option)
+end
+
 And(/^the user fills out the rest of the other questions form and submits it$/) do
   choose('is_ssn_applied_no')
   find("#has_daily_living_no").click

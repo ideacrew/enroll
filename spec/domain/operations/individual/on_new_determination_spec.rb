@@ -115,7 +115,7 @@ RSpec.describe Operations::Individual::OnNewDetermination, type: :model, dbclean
           )
         )
       )
-      allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1500, total_premium: 1600))
+      allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1500, total_premium: 1600, total_childcare_subsidy_amount: 0))
     end
 
     let(:max_aptc) { 1200.0 }
@@ -160,7 +160,7 @@ RSpec.describe Operations::Individual::OnNewDetermination, type: :model, dbclean
     context 'when ehb premium less than aptc' do
       before do
         hbx_profile.benefit_sponsorship.current_benefit_period.start_on
-        allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 393.76, total_premium: 410))
+        allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 393.76, total_premium: 410, total_childcare_subsidy_amount: 16.24))
       end
 
       it 'creates enrollment with ehb premium' do

@@ -192,6 +192,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
     before do
       create_embedded_docs_for_evidence(income_evidence)
       income_evidence.verification_histories.first.update_attributes!(date_of_action: TimeKeeper.date_of_record - 1.day)
+      income_evidence.request_results.first.update_attributes!(date_of_action: TimeKeeper.date_of_record - 1.day)
       income_evidence.clone_embedded_documents(income_evidence2)
       @new_verification_history = income_evidence.verification_histories.first
       @new_request_result = income_evidence.request_results.first
@@ -226,6 +227,11 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
     it 'should copy the date_of_action of the copied document' do
       income_evidence2.verification_histories.first.save
       expect(income_evidence.verification_histories.first.date_of_action).to eql(income_evidence2.verification_histories.first.date_of_action)
+    end
+
+    it 'should copy the date_of_action of the request result' do
+      income_evidence2.request_results.first.save
+      expect(income_evidence.request_results.first.date_of_action).to eql(income_evidence2.request_results.first.date_of_action)
     end
   end
 end
