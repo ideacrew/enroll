@@ -17,6 +17,7 @@ function combineAllPlanSelectors(planSelectors) {
   combinedSelectors = filterPlanByRange("deductible", combinedSelectors);
   combinedSelectors = filterPlanBySelect("carrier", combinedSelectors);
   combinedSelectors = filterPlanBySelect("hsa-eligibility", combinedSelectors);
+  combinedSelectors = filterPlanBySelect("osse-eligibility", combinedSelectors);
   combinedSelectors.show();
 }
 
@@ -254,7 +255,8 @@ $(function() {
     $("#filter-sidebar input[type='text'].plan-metal-deductible-to-selection-filter").val($('#max_deductible').val());
     $("#filter-sidebar select.plan-carrier-selection-filter").prop('selectedIndex', 0).selectric('refresh');
     $("#filter-sidebar select.plan-hsa-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
-		applyPlanFilters();
+    $("#filter-sidebar select.plan-osse-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
+    applyPlanFilters();
   });
 
   function resetAptc() {

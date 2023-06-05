@@ -311,13 +311,15 @@ module FinancialAssistance
 
     # depricated, need to remove this after after data migration
     embeds_many :evidences,     class_name: "::FinancialAssistance::Evidence"
+    # stores eligibility determinations with determination reasons
+    embeds_many :member_determinations, class_name: "::FinancialAssistance::MemberDetermination"
 
     embeds_one :income_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
     embeds_one :esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
     embeds_one :non_esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
     embeds_one :local_mec_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
 
-    accepts_nested_attributes_for :incomes, :deductions, :benefits, :income_evidence, :esi_evidence, :non_esi_evidence, :local_mec_evidence
+    accepts_nested_attributes_for :incomes, :deductions, :benefits, :income_evidence, :esi_evidence, :non_esi_evidence, :local_mec_evidence, :member_determinations
     accepts_nested_attributes_for :phones, :reject_if => proc { |addy| addy[:full_phone_number].blank? }, allow_destroy: true
     accepts_nested_attributes_for :addresses, :reject_if => proc { |addy| addy[:address_1].blank? && addy[:city].blank? && addy[:state].blank? && addy[:zip].blank? }, allow_destroy: true
     accepts_nested_attributes_for :emails, :reject_if => proc { |addy| addy[:address].blank? }, allow_destroy: true
@@ -902,7 +904,7 @@ module FinancialAssistance
           return false if has_unemployment_income.nil? || has_other_income.nil?
           return true if has_unemployment_income == false && has_other_income == false
           return true if has_unemployment_income == true && incomes.unemployment.present? && has_other_income == false
-          return true if has_unemployment_income == false && has_other_income == true && incomes.other.present?
+          return true if has_unemployment_income == false && is_other_income_valid?
           return incomes.unemployment.present? && unemployment_fields_complete && incomes.other.present? if incomes.unemployment && incomes.other
           return incomes.unemployment.present? && unemployment_fields_complete && incomes.other.blank? if incomes.unemployment && !incomes.other
           return incomes.unemployment.blank? && unemployment_fields_complete && incomes.other.present? if !incomes.unemployment && incomes.other
@@ -964,10 +966,15 @@ module FinancialAssistance
       !validations.include?(false)
     end
 
+    def is_other_income_valid?
+      has_other_income == false || (has_other_income == true && incomes.other.present? && other_income_fields_complete)
+    end
+
     def other_income_fields_complete
       validations = []
       incomes.other.each do |other|
         validations << (other[:amount].present? && other[:frequency_kind].present? && other[:start_on].present?)
+        validations << other.ssi_type.present? if other.kind == "social_security_benefit" && FinancialAssistanceRegistry.feature_enabled?(:ssi_income_types)
       end
       !validations.include?(false)
     end

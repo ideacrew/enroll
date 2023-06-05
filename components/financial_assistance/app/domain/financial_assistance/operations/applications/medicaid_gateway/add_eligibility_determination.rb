@@ -88,6 +88,8 @@ module FinancialAssistance
             thh_entity.tax_household_members.each do |thhm_entity|
               applicant = find_matching_applicant(elig_d, thhm_entity.applicant_reference.person_hbx_id)
               ped_entity = thhm_entity.product_eligibility_determination
+              member_determinations = ped_entity.member_determinations&.map(&:to_h)
+
               applicant.assign_attributes({ medicaid_household_size: ped_entity.medicaid_household_size || 0,
                                             magi_medicaid_category: ped_entity.magi_medicaid_category || 'none',
                                             magi_as_percentage_of_fpl: ped_entity.magi_as_percentage_of_fpl,
@@ -99,8 +101,10 @@ module FinancialAssistance
                                             is_medicaid_chip_eligible: ped_entity.is_medicaid_chip_eligible || ped_entity.is_magi_medicaid,
                                             is_totally_ineligible: ped_entity.is_totally_ineligible,
                                             is_eligible_for_non_magi_reasons: ped_entity.is_eligible_for_non_magi_reasons,
-                                            is_non_magi_medicaid_eligible: ped_entity.is_non_magi_medicaid_eligible })
+                                            is_non_magi_medicaid_eligible: ped_entity.is_non_magi_medicaid_eligible})
               applicant.save
+
+              applicant.update(member_determinations: member_determinations) if member_determinations
             end
           end
 
@@ -126,6 +130,12 @@ module FinancialAssistance
           def find_matching_applicant(elig_det, applicant_ref)
             elig_det.applicants.detect do |applicant|
               applicant.person_hbx_id.to_s == applicant_ref.to_s
+            end
+          end
+
+          def build_member_determinations(ped_entity)
+            ped_entity.member_determinations.map do |member_determination|
+              ::FinancialAssistance::MemberDetermination.new(member_determination.to_h)
             end
           end
         end
