@@ -59,4 +59,4 @@
         Does this person need help paying for any medical bills from the last 3 months?:  <%= applicant.need_help_paying_bills %>
         Does this person have a disability?:  <%= applicant.is_physically_disabled %>
         Is this person the main person taking care of any children age 18 or younger?: <%= applicant.is_primary_caregiver %>
-        Which members of this household is this person the caretaker for?: <%= applicant.is_primary_caregiver_for&.collect{|id| Person.by_hbx_id(id)&.first&.full_name}&.compact%>
+        Which member(s) of the household is this person the caretaker for?: <%= applicant.is_primary_caregiver_for&.collect{|hbx_id| person_full_name_by_hbx_id(hbx_id) }&.compact%>

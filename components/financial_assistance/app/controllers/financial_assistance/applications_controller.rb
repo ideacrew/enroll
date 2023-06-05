@@ -470,5 +470,10 @@ module FinancialAssistance
         value
       end
     end
+
+    def person_full_name_by_hbx_id(hbx_id)
+      person = ::Person.by_hbx_id(hbx_id).first
+      person&.full_name
+    end
   end
 end
