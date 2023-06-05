@@ -53,12 +53,14 @@
             <div class="modal-footer" style="padding:10px">
               <center>
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-              <%=link_to sanitize(l10n("proceed")) , sanitize(l10n("checkbook_sadpi_health_url")), class: "btn btn-primary" %>
+              <%#=link_to sanitize(l10n("proceed")) , sanitize(l10n("checkbook_sadpi_health_url")), class: "btn btn-primary" %>
+              <% @link = "&lt;a href='https://dc.checkbookhealth.org/sadpi/dc/2019'&gt; Proceed </a> "%>
+              <%= sanitize @link %>
             </div>
           <div class="modal-footer" style="padding:10px">
             <center>
             <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-            <%=link_to sanitize(l10n("proceed")) , sanitize(@dc_individual_checkbook_url), class: "btn btn-primary checkbook_url" %>
+            <%= sanitize link_to sanitize(l10n("proceed")) , sanitize(@dc_individual_checkbook_url), class: "btn btn-primary checkbook_url" %>
           </center>
          </div>
       </div>
