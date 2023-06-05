@@ -151,6 +151,16 @@
             output name="pct" style="font-size:12px;" = (pct * 100).to_i
             | %
         h6 style="font-weight:400; margin-top:0;" = link_to l10n("how_is_this_calculated") + "?", "", data: {toggle: "modal", target: "#how_is_this_calculated"}
+  - if @hbx_enrollment.ivl_osse_eligible?
+    .checkbox-filter-wrapper-uc
+      h5
+        strong HC4CC Eligible
+        a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="#{l10n("insured.plan_shoppings.hc4cc_eligible_title_info")}"
+          i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
+      ul.list-unstyled
+        li
+          .filter-input-block
+            = select_tag :osse_eligibility, options_for_select(["Yes", "No"]), class: "plan-osse-eligibility-selection-filter form-control", include_blank: "All", onchange:"filterOSSEEligibility(this)"
   - if @market_kind == 'individual' || @market_kind == 'coverall' || @sponsored_benefit.try(:product_package_kind) == :single_issuer
     .checkbox-filter-wrapper-uc
       h5
@@ -265,6 +275,7 @@
         resolve('completed');
         $('select.plan-carrier-selection-filter').selectric('destroy');
         $('select.plan-hsa-eligibility-selection-filter').selectric('destroy');
+        $('select.plan-osse-eligibility-selection-filter').selectric('destroy');
       }, 700);
     });
 

@@ -1528,6 +1528,121 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           end
         end
       end
+
+      # ssi_income_types
+      context 'when feature ssi_income_types is enabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ssi_income_types).and_return(true)
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:american_indian_alaskan_native_income).and_return(false)
+        end
+
+        context 'when applicant has other_income with incompleted social security benefit' do
+          before do
+            applicant.update_attributes!(has_other_income: true)
+            inc = ::FinancialAssistance::Income.new({
+                                                      kind: 'social_security_benefit',
+                                                      frequency_kind: 'yearly',
+                                                      amount: 30_000.00,
+                                                      start_on: TimeKeeper.date_of_record.beginning_of_month
+                                                    })
+            applicant.incomes = [inc]
+            applicant.save!
+            @result = applicant.embedded_document_section_entry_complete?(:other_income)
+          end
+
+          it 'should return false' do
+            expect(@result).to be_falsey
+          end
+        end
+
+        context 'when applicant has_other_income without other incomes' do
+          before do
+            applicant.update_attributes!(has_other_income: true)
+            @result = applicant.embedded_document_section_entry_complete?(:other_income)
+          end
+
+          it 'should return false' do
+            expect(@result).to be_falsey
+          end
+        end
+
+        context 'where applicant has_other_income with completed social security benefit' do
+          before do
+            applicant.update_attributes!(has_other_income: true)
+            inc = ::FinancialAssistance::Income.new({
+                                                      kind: 'social_security_benefit',
+                                                      frequency_kind: 'yearly',
+                                                      amount: 30_000.00,
+                                                      start_on: TimeKeeper.date_of_record.beginning_of_month,
+                                                      ssi_type: 'retirement'
+                                                    })
+            applicant.incomes = [inc]
+            applicant.save!
+            @result = applicant.embedded_document_section_entry_complete?(:other_income)
+          end
+
+          it 'should return true' do
+            expect(@result).to be_truthy
+          end
+        end
+      end
+
+      context 'when feature ssi_income_types is disabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ssi_income_types).and_return(false)
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:american_indian_alaskan_native_income).and_return(false)
+        end
+
+        context 'when applicant has other_income with incompleted social security benefit' do
+          before do
+            applicant.update_attributes!(has_other_income: true)
+            inc = ::FinancialAssistance::Income.new({
+                                                      kind: 'social_security_benefit',
+                                                      frequency_kind: 'yearly',
+                                                      amount: 30_000.00,
+                                                      start_on: TimeKeeper.date_of_record.beginning_of_month
+                                                    })
+            applicant.incomes = [inc]
+            applicant.save!
+            @result = applicant.embedded_document_section_entry_complete?(:other_income)
+          end
+
+          it 'should return false' do
+            expect(@result).to be_truthy
+          end
+        end
+
+        context 'when applicant has_other_income without other incomes' do
+          before do
+            applicant.update_attributes!(has_other_income: true)
+            @result = applicant.embedded_document_section_entry_complete?(:other_income)
+          end
+
+          it 'should return false' do
+            expect(@result).to be_falsey
+          end
+        end
+
+        context 'where applicant has_other_income with completed social security benefit' do
+          before do
+            applicant.update_attributes!(has_other_income: true)
+            inc = ::FinancialAssistance::Income.new({
+                                                      kind: 'social_security_benefit',
+                                                      frequency_kind: 'yearly',
+                                                      amount: 30_000.00,
+                                                      start_on: TimeKeeper.date_of_record.beginning_of_month,
+                                                      ssi_type: 'retirement'
+                                                    })
+            applicant.incomes = [inc]
+            applicant.save!
+            @result = applicant.embedded_document_section_entry_complete?(:other_income)
+          end
+
+          it 'should return true' do
+            expect(@result).to be_truthy
+          end
+        end
+      end
     end
   end
 

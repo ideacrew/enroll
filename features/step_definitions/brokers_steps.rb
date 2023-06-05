@@ -475,6 +475,8 @@ Given(/the osse subsidy feature is enabled/) do
   EnrollRegistry[:broker_quote_hc4cc_subsidy].feature.stub(:is_enabled).and_return(true)
   EnrollRegistry["aca_shop_osse_subsidy_#{year}"].feature.stub(:is_enabled).and_return(true)
   EnrollRegistry["aca_shop_osse_subsidy_#{year - 1}"].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry["aca_ivl_osse_subsidy_#{year}"].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry["aca_ivl_osse_subsidy_#{year - 1}"].feature.stub(:is_enabled).and_return(true)
 end
 
 Then(/^The Employer's HC4CC eligibility should show (.*?)$/) do |status|
