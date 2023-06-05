@@ -105,6 +105,23 @@ Then(/^the esi question should be about your job rather than a job$/) do
   expect(page).to have_content('Coverage through your job (also known as employer-sponsored health insurance)')
 end
 
+And(/^the user checks on job coverage checkbox$/) do
+  find(:css, CostSavingsApplicationPage.employer_sponsored_insurance_benefit_checkbox).set(true)
+end
+
+Given(/the FAA short_enrolled_esi_forms feature is enabled/) do
+  enable_feature :short_enrolled_esi_forms, {registry_name: FinancialAssistanceRegistry}
+  enable_feature :short_enrolled_esi_forms
+end
+
+Then(/^the user should see the esi form$/) do
+  expect(page.has_css?(CostSavingsApplicationPage.esi_benefit)).to eq true
+end
+
+Then(/^the user should see the non_esi form$/) do
+  expect(page.has_css?(CostSavingsApplicationPage.non_esi_benefit)).to eq true
+end
+
 Given(/^the user fills out the required health coverage information$/) do
   fill_in 'benefit[start_on]', with: "02/01/2018"
 end
