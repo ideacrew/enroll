@@ -32,7 +32,8 @@
             <div class="modal-footer" style="padding:10px">
               <center>
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-              <%= raw.link_to l10n("proceed") , @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url" %>
+              <% @checkbook_url = link_to l10n("proceed") , @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url" %>
+              <%= sanitize @checkbook_url %>
             </center>
             </div>
          </div>
@@ -53,9 +54,8 @@
             <div class="modal-footer" style="padding:10px">
               <center>
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-              <%@link = link_to sanitize(l10n("proceed")) , sanitize(l10n("checkbook_sadpi_health_url")), class: "btn btn-primary" %>
-              <%# @link = "<a href=#{l10n("checkbook_sadpi_health_url")}> Proceed </a> "%>
-              <%= sanitize @link %>
+              <%@sadip_health_link = link_to sanitize(l10n("proceed")) , sanitize(l10n("checkbook_sadpi_health_url")), class: "btn btn-primary" %>
+              <%= sanitize @sadip_health_link %>
             </div>
           <div class="modal-footer" style="padding:10px">
             <center>
@@ -80,7 +80,7 @@
             <div class="modal-footer" style="padding:10px">
               <center>
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-              <%=link_to sanitize(l10n("proceed")) , sanitize(l10n("checkbook_health_url")), class: "btn btn-primary  mtz", target: '_blank'  %>
+              <%= sanitize link_to sanitize(l10n("proceed")) , sanitize(l10n("checkbook_health_url")), class: "btn btn-primary  mtz", target: '_blank'  %>
             </div>
           </center>
          </div>
