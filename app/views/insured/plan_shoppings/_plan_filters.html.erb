@@ -53,8 +53,8 @@
             <div class="modal-footer" style="padding:10px">
               <center>
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-              <%#=link_to sanitize(l10n("proceed")) , sanitize(l10n("checkbook_sadpi_health_url")), class: "btn btn-primary" %>
-              <% @link = "&lt;a href='https://dc.checkbookhealth.org/sadpi/dc/2019'&gt; Proceed </a> "%>
+              <%@link = link_to sanitize(l10n("proceed")) , sanitize(l10n("checkbook_sadpi_health_url")), class: "btn btn-primary" %>
+              <%# @link = "<a href=#{l10n("checkbook_sadpi_health_url")}> Proceed </a> "%>
               <%= sanitize @link %>
             </div>
           <div class="modal-footer" style="padding:10px">
