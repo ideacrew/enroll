@@ -977,4 +977,8 @@ module ApplicationHelper
 
     person.has_active_consumer_role? || person.has_active_resident_role?
   end
+
+  def display_registration_recaptcha
+    EnrollRegistry.feature_enabled?(:registration_recaptcha)
+  end
 end
