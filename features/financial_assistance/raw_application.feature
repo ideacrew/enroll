@@ -72,8 +72,6 @@ Feature: Cost Savings Raw Application
 
   Scenario: Admin clicks on review application action, sees caretaker questions
     When an applicant with other income exists for a determined financial application
-    And the primary caretaker question configuration is enabled
-    And FAA primary_caregiver_relationship_other_question feature is enabled
     And the user with hbx_staff role is logged in
     When admin visits home page
     And the Cost Savings link is visible
