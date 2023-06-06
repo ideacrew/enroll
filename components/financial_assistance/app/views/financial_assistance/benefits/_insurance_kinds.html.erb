@@ -14,7 +14,7 @@
   <div id="<%= insurance_kind %>"class="benefit-kind">
     <div class="row row-form-wrapper radio-align fa-text-color lightgray no-buffer row-height">
       <div class="col-md-10 benefits-check <%= insurance_kind %>">
-        <%=check_box_tag "insurance_kind", insurance_kind, @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).present?, class: "benefit-checkbox" %>
+        <%=check_box_tag "insurance_kind", insurance_kind, @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).present?, class: "benefit-checkbox", data: {cuke: "#{insurance_kind}_benefit_checkbox"} %>
         <% eligible_esi = kind == "is_eligible" && insurance_kind == 'employer_sponsored_insurance' && FinancialAssistanceRegistry.feature_enabled?(:minimum_value_standard_question) %>
         <% term = eligible_esi ? "faa.question.#{insurance_kind}_eligible" : "faa.question.#{insurance_kind}" %>
         <% if I18n.exists?("glossary."+insurance_kind) %>
@@ -27,7 +27,7 @@
 
     <div class="benefits-list <%= kind %>">
       <% @applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind).each do |benefit| %>
-        <%if benefit.insurance_kind == 'employer_sponsored_insurance' || benefit.insurance_kind == 'health_reimbursement_arrangement'%>
+        <% if display_esi_fields?(benefit.insurance_kind, kind) %>
           <%= render partial: 'esi_benefit', locals: { benefit: benefit, insurance_kind: insurance_kind, kind: kind } %>
         <% else %>
           <%= render partial: 'non_esi_benefit', locals: { benefit: benefit, insurance_kind: insurance_kind, kind: kind } %>
@@ -36,7 +36,7 @@
     </div>
 
     <div class='new-benefit-form hidden <%= insurance_kind %>'>
-      <% if insurance_kind == 'employer_sponsored_insurance' || insurance_kind == 'health_reimbursement_arrangement' %>
+      <% if display_esi_fields?(insurance_kind, kind) %>
         <%= render partial: 'financial_assistance/benefits/esi_benefit_form', locals: { benefit: @applicant.benefits.build, insurance_kind: insurance_kind, kind: kind} %>
       <% else %>
         <%= render partial: 'financial_assistance/benefits/non_esi_benefit_form', locals: { benefit: @applicant.benefits.build, insurance_kind: insurance_kind, kind: kind} %>

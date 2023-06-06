@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Users::RegistrationsController do
@@ -81,6 +83,22 @@ RSpec.describe Users::RegistrationsController do
         post :create, params: { user: { oim_id: email, password: 'Password1$', password_confirmation: 'Password1$'} }
         expect(response).to be_success
         expect(response).to render_template("new")
+      end
+    end
+
+    context "with invalid captcha" do
+      let(:email) { "devise9998@test.com" }
+
+      before do
+        FactoryBot.create(:user, email: email, oim_id: email)
+        @request.env["devise.mapping"] = Devise.mappings[:user]
+        allow(controller).to receive(:verify_recaptcha_if_needed).and_return(false)
+      end
+
+      it "does not redirect" do
+        post :create, params: { user: { oim_id: email, password: password, password_confirmation: password } }
+
+        expect(response).not_to redirect_to(root_path)
       end
     end
   end

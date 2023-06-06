@@ -14,8 +14,7 @@
       <div class="col-md-6 form-heading"><%= l10n(term, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></div>
       <div class="col-md-6 form-content"><%= start_to_end_dates(benefit) %></div>
     </div>
-
-    <% if ['employer_sponsored_insurance', 'health_reimbursement_arrangement'].include?(benefit.insurance_kind) %>
+    <% if display_esi_fields?(benefit.insurance_kind, kind) %>
       <%= render partial: 'financial_assistance/applications/review_esi_benefit', locals: {benefit: benefit} %>
     <% end %>
   <% end %>

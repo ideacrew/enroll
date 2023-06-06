@@ -56,3 +56,27 @@ Feature: Start a new Financial Assistance Application and answers questions on h
   Scenario: Health coverage form shows after checking an option (currently have coverage)
     Given the user answers yes to currently having health coverage
     Then the coverage_obtained_through_another_exchange does not have glossary link
+  Scenario: User enters job coverage without the short form feature being enabled
+    Given the user answers yes to currently having health coverage
+    And the user checks on job coverage checkbox
+    Then the user should see the esi form
+
+  Scenario: User enters job coverage with the short form feature being enabled
+    Given the FAA short_enrolled_esi_forms feature is enabled
+    And they visit the Health Coverage page via the left nav (also confirm they are on the Health Coverage page)
+    Given the user answers yes to currently having health coverage
+    And the user checks on job coverage checkbox
+    Then the user should see the non_esi form
+    And the user fills out the required health coverage information
+    Then the save button should be enabled
+    And the user saves the health coverage information
+    Then the health coverage should be saved on the page
+
+  Scenario: Health coverage form shows after checking an option (currently have coverage)
+    Given the user answers yes to currently having health coverage
+    Then the medicare have glossary link
+    Then the medicare have glossary content
+
+  Scenario: Health coverage form shows after checking an option (currently have coverage)
+    Given the user answers yes to currently having health coverage
+    Then the coverage_obtained_through_another_exchange does not have glossary link

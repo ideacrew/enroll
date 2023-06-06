@@ -24,7 +24,7 @@ module Insured
       end
 
       def osse_eligible?
-        hbx_enrollment&.ivl_osse_eligible?
+        hbx_enrollment&.ivl_osse_eligible?(effective_on)
       end
     end
   end

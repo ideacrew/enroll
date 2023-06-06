@@ -319,6 +319,7 @@ module BenefitSponsors
             # Stubbing the controller method (which has two conditions, one of which is a Resource Registry check) is easier
             allow(controller).to receive(:redirect_to_requirements_after_confirmation?).and_return(true) if profile_type == 'broker_agency'
             allow(controller).to receive(:is_broker_profile?).and_return(true) if profile_type == 'broker_agency'
+            allow(controller).to receive(:verify_recaptcha_if_needed).and_return(true)
             user = self.send("#{profile_type}_user")
             sign_in user if user
             post :create, params: {:agency => self.send("#{profile_type}_params")}
@@ -386,6 +387,23 @@ module BenefitSponsors
         # it_behaves_like "fail store profile for create if params invalid", "issuer"
         # it_behaves_like "fail store profile for create if params invalid", "contact_center"
         # it_behaves_like "fail store profile for create if params invalid", "fedhb"
+      end
+
+      context "with invalid captcha" do
+        let(:general_agency_params) do
+          {
+            profile_type: "general_agency",
+            staff_roles_attributes: staff_roles_attributes,
+            organization: general_agency_organization
+          }
+        end
+
+        it "does not redirect" do
+          allow(controller).to receive(:verify_recaptcha_if_needed).and_return(false)
+          post :create, params: { agency: general_agency_params }
+
+          expect(response).to render_template :new
+        end
       end
     end
 
