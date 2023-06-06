@@ -151,7 +151,7 @@
             output name="pct" style="font-size:12px;" = (pct * 100).to_i
             | %
         h6 style="font-weight:400; margin-top:0;" = link_to l10n("how_is_this_calculated") + "?", "", data: {toggle: "modal", target: "#how_is_this_calculated"}
-  - if @hbx_enrollment.ivl_osse_eligible?
+  - if @hbx_enrollment.ivl_osse_eligible?(@hbx_enrollment.effective_on)
     .checkbox-filter-wrapper-uc
       h5
         strong HC4CC Eligible

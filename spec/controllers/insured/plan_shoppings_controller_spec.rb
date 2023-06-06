@@ -241,7 +241,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         controller.instance_variable_set(:@max_aptc, max_aptc)
         controller.instance_variable_set(:@aptc_grants, double)
         EnrollRegistry[:aca_individual_osse_aptc_minimum].feature.stub(:is_enabled).and_return(true)
-        allow_any_instance_of(HbxEnrollment).to receive(:ivl_osse_eligible?).and_return(true)
+        allow_any_instance_of(HbxEnrollment).to receive(:ivl_osse_eligible?).with(start_of_year).and_return(true)
         sign_in(user)
       end
 
@@ -283,7 +283,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         controller.instance_variable_set(:@aptc_grants, double)
         EnrollRegistry[:aca_individual_osse_aptc_minimum].feature.stub(:is_enabled).and_return(false)
         plan.update!(is_hc4cc_plan: true)
-        allow_any_instance_of(HbxEnrollment).to receive(:ivl_osse_eligible?).and_return(true)
+        allow_any_instance_of(HbxEnrollment).to receive(:ivl_osse_eligible?).with(start_of_year).and_return(true)
         sign_in(user)
         get :thankyou, params: input_params, session: session_variables
       end
