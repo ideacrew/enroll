@@ -59,6 +59,8 @@ class Permission
   field :can_call_hub, type: Boolean, default: false
   field :can_edit_osse_eligibility, type: Boolean, default: false
   field :can_edit_broker_agency_profile, type: Boolean, default: false
+  field :can_view_notice_templates, type: Boolean, default: false
+  field :can_edit_notice_templates, type: Boolean, default: false
 
   class << self
     def hbx_staff

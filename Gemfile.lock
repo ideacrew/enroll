@@ -183,6 +183,7 @@ PATH
       money-rails (~> 1.13)
       mongoid (~> 7.0.2)
       non-stupid-digest-assets
+      pundit (~> 2.0)
       rails (~> 5.2.4.3)
       redcarpet (~> 3.4.0)
       roo (~> 2.1.0)
