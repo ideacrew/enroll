@@ -41,7 +41,7 @@ module UserWorld
   #    @users_by_role_name[role_name] ||= FactoryBot.create(:user, roles: [role_name])
   #  end
   # end
-  
+
   # perhaps should be an array for suroles
   # example
   # if @admin_roles[subrole]
@@ -105,6 +105,12 @@ Given(/^that a user with a (.*?) role(?: with (.*?) subrole)? exists and (.*?) l
     when 'is not'
       nil
   end
+end
+
+And(/user only has employer staff roles/) do
+  expect(user.has_hbx_staff_role?).to eq nil
+  expect(user.has_general_agency_staff_role?).to eq nil
+  expect(user.has_broker_agency_staff_role?).to eq nil
 end
 
 And(/^user with (.*?) role is (.*?)$/) do |type, locked_status|
