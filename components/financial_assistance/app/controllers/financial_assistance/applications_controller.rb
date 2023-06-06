@@ -474,6 +474,8 @@ module FinancialAssistance
     end
 
     def build_applicants_name_by_hbx_id_hash
+      return {} if @applicants.blank?
+
       @applicants_name_by_hbx_id_hash = @applicants.each_with_object({}) do |applicant, hash|
         hash[applicant.person_hbx_id] = applicant.full_name
       end
