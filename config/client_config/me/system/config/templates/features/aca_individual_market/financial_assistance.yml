@@ -134,6 +134,9 @@ registry:
       - key: :oe_application_warning_display
         item: :oe_application_warning_display
         is_enabled: <%= ENV['OE_APPLICATION_WARNING_DISPLAY_IS_ENABLED'] || false %>
+      - key: :short_enrolled_esi_forms
+        item: :short_enrolled_esi_forms
+        is_enabled: <%= ENV['SHORT_ENROLLED_ESI_IS_ENABLED'] || false %>
   - namespace:
     - :request_determination
     features:

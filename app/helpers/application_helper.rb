@@ -724,6 +724,10 @@ module ApplicationHelper
     (plan_hsa_status[plan.id.to_s]) if plan.benefit_market_kind == :aca_individual
   end
 
+  def osse_status(plan)
+    plan.is_hc4cc_plan ? "Yes" : "No"
+  end
+
   def products_count(products)
     return 0 unless products
 
@@ -972,5 +976,9 @@ module ApplicationHelper
     return false unless EnrollRegistry.feature_enabled?(:aca_ivl_osse_subsidy)
 
     person.has_active_consumer_role? || person.has_active_resident_role?
+  end
+
+  def display_registration_recaptcha
+    EnrollRegistry.feature_enabled?(:registration_recaptcha)
   end
 end

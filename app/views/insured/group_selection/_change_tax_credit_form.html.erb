@@ -17,7 +17,8 @@
           <h5 class="col-md-12 aptc-no-left-padding"><b><%= l10n("total_available_aptc_amount") %>: </b>$<span id="max_aptc_available"><%= '%.2f' % locals[:available_aptc] %></span></h5>
           <p class="action-msg col-md-12 aptc-no-left-padding"><%= l10n('aptc_slider_directions') %></p>
         <% else %>
-           <h5 class="col-md-12 aptc-no-left-padding"><b><%= l10n("total_available_aptc_amount") %>: </b>$<span id="max_aptc_available"><%= '%.2f' % locals[:available_aptc] %></span></h5>
+          <%= hidden_field_tag 'max_aptc', locals[:available_aptc] %>
+          <h5 class="col-md-12 aptc-no-left-padding"><b><%= l10n("total_available_aptc_amount") %>: </b>$<span id="max_aptc_available"><%= '%.2f' % locals[:available_aptc] %></span></h5>
         <% end %>
         <h5 class="col-md-12 aptc-no-left-padding"><b><%= l10n("aptc_slider_credit") %></b></h5>
         <span class="col-md-12" align= "center">
@@ -27,7 +28,9 @@
         </span>
         <%# Specify the value attribute on slider to move to right starting spot %>
         <% slider_starting_value = @self_term_or_cancel_form[:elected_aptc_pct] %>
-        <input id="applied_pct_1" name='applied_pct_1' type="range" min="0" value="<%= slider_starting_value %>" max="1" step="0.05" style = "padding: 0px;">
+        <% min_aptc = @self_term_or_cancel_form[:enrollment].osse_eligible? ? 0.85 : 0 %>
+        <% step = @self_term_or_cancel_form[:enrollment].osse_eligible? ? 0.005 : 0.05 %>
+        <input id="applied_pct_1" name='applied_pct_1' type="range" min="<%= min_aptc %>" value="<%= slider_starting_value %>" max="1" step="<%= step %>" style = "padding: 0px;" data-cuke="aptc_slider">
         <h5><b><%= l10n("tax_credit_value") %></b></h5>
         <input type="text" name="aptc_applied_total" id="aptc_applied_total"
         value="$<%= '%.2f' % @self_term_or_cancel_form[:default_tax_credit_value] %>" placeholder="APTC Applied" class="form-control" size="8px">
