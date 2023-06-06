@@ -230,7 +230,7 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment = HbxEnrollment.find(enrollment_id)
     max_aptc = params[:max_aptc]&.to_f
 
-    return aptc_applied unless hbx_enrollment&.ivl_osse_eligible? && max_aptc > 0.00
+    return aptc_applied unless hbx_enrollment&.ivl_osse_eligible?(hbx_enrollment.effective_on) && max_aptc > 0.00
 
     aptc_pct = (aptc_applied.to_f / max_aptc).round(2)
     aptc_pct < 0.85 ? (max_aptc * 0.85) : aptc_applied

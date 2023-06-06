@@ -221,7 +221,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def ivl_osse_eligible?
-    hbx_enrollment.ivl_osse_eligible?
+    hbx_enrollment.ivl_osse_eligible?(hbx_enrollment.effective_on)
   end
 
   private

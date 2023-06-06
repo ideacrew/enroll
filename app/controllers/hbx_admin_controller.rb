@@ -97,7 +97,7 @@ class HbxAdminController < ApplicationController
   def check_osse_eligibility
     return unless EnrollRegistry.feature_enabled?(:self_service_osse_subsidy)
     @hbxs.each do |hbx|
-      @enrollments_info[hbx.id]['osse_eligible'] = hbx.ivl_osse_eligible?
+      @enrollments_info[hbx.id]['osse_eligible'] = hbx.ivl_osse_eligible?(hbx.effective_on)
     end
   end
 end
