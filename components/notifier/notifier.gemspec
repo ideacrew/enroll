@@ -31,6 +31,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'aasm', '~> 4.8'
   s.add_dependency 'config', '~> 2.0'
   s.add_dependency 'money-rails', '~> 1.13'
+  s.add_dependency 'pundit', '~> 2.0'
 
   s.add_development_dependency 'rspec-rails'
   s.add_development_dependency 'shoulda-matchers'
