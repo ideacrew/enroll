@@ -58,3 +58,7 @@
         Does this person need help with daily life activities, such as dressing or bathing?:  <%= applicant.has_daily_living_help %>
         Does this person need help paying for any medical bills from the last 3 months?:  <%= applicant.need_help_paying_bills %>
         Does this person have a disability?:  <%= applicant.is_physically_disabled %>
+        <% if applicant.age_of_the_applicant >= 19 && applicant.is_applying_coverage %>
+        Is this person the main person taking care of any children age 18 or younger?: <%= applicant.is_primary_caregiver %>
+        Which member(s) of the household is this person the caretaker for?: <%=  applicant.is_primary_caregiver_for&.collect{|hbx_id| @applicants_name_by_hbx_id_hash[hbx_id]}&.compact %>
+        <% end %>

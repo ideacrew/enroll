@@ -76,3 +76,15 @@ Feature: My Financial Assistance Applications page that visit the Review Applica
     And the “Review Application” link will be actionable
     And clicks the “Review Application” link
     Then the health plan meets mvs and affordable question should show
+
+  Scenario: Admin clicks on Full application action, sees caretaker questions
+    Given that a family has a Financial Assistance application in the submitted state
+    When the primary caretaker question configuration is enabled
+    When the primary caretaker relationship question configuration is enabled
+    And an applicant has an existing non ssn apply reason
+    And the user navigates to the “Help Paying For Coverage” portal
+    When the user clicks the “Action” dropdown corresponding to the submitted application
+    And the “Review Application” link will be actionable
+    And clicks the “Review Application” link
+    Then the user will navigate to the Review Application page
+    Then the caretaker questions should show
