@@ -1,34 +1,38 @@
 module Notifier
   class NoticeKindsController < Notifier::ApplicationController
     include ::Config::SiteConcern
-
-    before_action :check_hbx_staff_role
+    rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
     
     layout 'notifier/single_column'
 
     def index
+      authorize ::Notifier::NoticeKind
       @notice_kinds = Notifier::NoticeKind.all
       @datatable = Effective::Datatables::NoticesDatatable.new
       @errors = []
     end
 
     def show
+      authorize ::Notifier::NoticeKind
       if params['id'] == 'upload_notices'
         redirect_to notice_kinds_path
       end
     end
 
     def new
+      authorize ::Notifier::NoticeKind
       @notice_kind = Notifier::NoticeKind.new
       @notice_kind.template = Notifier::Template.new
     end
 
     def edit
+      authorize ::Notifier::NoticeKind
       @notice_kind = Notifier::NoticeKind.find(params[:id])
       render :layout => 'notifier/application'
     end
 
     def create
+      authorize ::Notifier::NoticeKind
       template = Template.new(notice_params.delete('template'))
       notice_kind = NoticeKind.new(notice_params)
       notice_kind.template = template
@@ -47,6 +51,7 @@ module Notifier
     end
 
     def update
+      authorize ::Notifier::NoticeKind
       notice_kind = Notifier::NoticeKind.find(params['id'])
       notice_kind.update_attributes(notice_params)
       flash[:notice] = 'Notice content updated successfully'
@@ -54,6 +59,7 @@ module Notifier
     end
 
     def preview
+      authorize ::Notifier::NoticeKind
       notice_kind = Notifier::NoticeKind.find(params[:id])
       notice_kind.generate_pdf_notice
       send_file "#{Rails.root}/tmp/#{notice_kind.notice_recipient.hbx_id}_#{notice_kind.title.titleize.gsub(/\s+/, '_')}.pdf",
@@ -62,6 +68,7 @@ module Notifier
     end
 
     def delete_notices
+      authorize ::Notifier::NoticeKind
       Notifier::NoticeKind.where(:id.in => params['ids']).each do |notice|
         notice.delete
       end
@@ -71,6 +78,7 @@ module Notifier
     end
 
     def download_notices
+      authorize ::Notifier::NoticeKind
       notices = Notifier::NoticeKind.where(:id.in => params['ids'].split(","))
       
       send_data notices.to_csv,
@@ -80,6 +88,7 @@ module Notifier
     end
 
     def upload_notices
+      authorize ::Notifier::NoticeKind
       @errors = []
 
       if file_content_type == 'text/csv'
@@ -111,6 +120,7 @@ module Notifier
     end
 
     def get_tokens
+      authorize ::Notifier::NoticeKind, :tokens?
       service = Notifier::Services::NoticeKindService.new(params['market_kind'])
       service.builder = builder_param
       respond_to do |format|
@@ -120,6 +130,7 @@ module Notifier
     end
 
     def get_placeholders
+      authorize ::Notifier::NoticeKind, :placeholders?
       service = Notifier::Services::NoticeKindService.new(params['market_kind'])
       service.builder = builder_param
       respond_to do |format|
@@ -131,6 +142,7 @@ module Notifier
     end
 
     def get_recipients
+      authorize ::Notifier::NoticeKind, :recipients?
       recipients = Notifier::Services::NoticeKindService.new(params['market_kind']).recipients
 
       respond_to do |format|
@@ -143,12 +155,6 @@ module Notifier
 
     def file_content_type
       params[:file].content_type
-    end
-
-    def check_hbx_staff_role
-      if current_user.blank? || !current_user.has_hbx_staff_role?
-        redirect_to main_app.root_path, :flash => { :error => "You must be an HBX staff member" }
-      end
     end
 
     def notice_params
