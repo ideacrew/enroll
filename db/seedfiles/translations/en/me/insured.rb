@@ -305,7 +305,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.families.final_sep_experienced_any_events' => "Have you or anyone in your household recently experienced any of the following events?",
   :'en.insured.families.final_sep_none_of_the_situations_listed' => "None of the situations listed above apply.",
   :'en.insured.families.open_enrollment' => "Open Enrollment",
-  :'en.insured.families.final_sep_outside_open_enrollment_body' => "Open enrollment starts on .%{next_ivl_open_enrollment_date} To enroll before Open Enrollment, you must qualify for a Special Enrollment Period.",
+  :'en.insured.families.final_sep_outside_open_enrollment_body' => "Open enrollment starts on %{next_ivl_open_enrollment_date}. To enroll before Open Enrollment, you must qualify for a Special Enrollment Period.",
   :'en.insured.families.outside_open_enrollment' => "Outside Open Enrollment",
   :'en.insured.families.final_sep_open_enrollment_body' => "It is currently open enrollment. You can enroll even if you do not qualify for a special enrollment period.",
   :'en.back_to_my_account_title' => "Back To My Account",
