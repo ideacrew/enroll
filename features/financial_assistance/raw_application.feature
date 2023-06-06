@@ -71,7 +71,8 @@ Feature: Cost Savings Raw Application
     Then the social security type - retirement benefits should show
 
   Scenario: Admin clicks on review application action, sees caretaker questions
-    When an applicant with other income exists for a determined financial application
+    Given a family with financial application and applicants in determined state exists
+    And the primary applicant age greater than 18
     And the user with hbx_staff role is logged in
     When admin visits home page
     And the Cost Savings link is visible
