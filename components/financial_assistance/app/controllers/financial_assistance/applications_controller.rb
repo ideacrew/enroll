@@ -167,6 +167,8 @@ module FinancialAssistance
       save_faa_bookmark(request.original_url)
       @application = FinancialAssistance::Application.where(id: params["id"]).first
       @applicants = @application.active_applicants if @application.present?
+      build_applicants_name_by_hbx_id_hash
+
       redirect_to applications_path if @application.blank?
     end
 
@@ -182,11 +184,11 @@ module FinancialAssistance
       if @application.nil? || @application.is_draft?
         redirect_to applications_path
       else
-
         @applicants = @application.active_applicants
         @all_relationships = @application.relationships
         @demographic_hash = {}
         @income_coverage_hash = {}
+        build_applicants_name_by_hbx_id_hash
 
         @applicants.each do |applicant|
           file = if FinancialAssistanceRegistry[:has_enrolled_health_coverage].setting(:currently_enrolled).item
@@ -468,6 +470,14 @@ module FinancialAssistance
         'N/A'
       else
         value
+      end
+    end
+
+    def build_applicants_name_by_hbx_id_hash
+      return {} if @applicants.blank?
+
+      @applicants_name_by_hbx_id_hash = @applicants.each_with_object({}) do |applicant, hash|
+        hash[applicant.person_hbx_id] = applicant.full_name
       end
     end
   end
