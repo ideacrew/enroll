@@ -429,5 +429,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.enrollment.tobbaco_user' => 'Tobacco User',
   :'en.enrollment_member.coverage_state_date' => 'Coverage Start Date',
   :'en.not_available' => 'NA',
-  :'en.insured.rejected' => "%{ridp_type} successfully rejected."
+  :'en.insured.rejected' => "%{ridp_type} successfully rejected.",
+  :'en.your_tax_credit' => "Your Tax Credit",
+  :'en.your_tax_credit_for_hc4cc' => "Your Tax Credit: HC4CC eligible households must use at least 85 percent of the credit."
 }.freeze

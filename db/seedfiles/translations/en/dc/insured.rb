@@ -14,7 +14,7 @@ INSURED_TRANSLATIONS = {
   :'en.insured.consumer_roles.docs_shared.country_of_citizenship' => "Country of Citizenship",
   :'en.insured.consumer_roles.docs_shared.document_description' => "Document Description",
   :'en.insured.consumer_roles.docs_shared.document_description_req' => "Enter the type of document, using no more than 35 characters.",
-  :'en.insured.consumer_roles.docs_shared.expiration_date' => "%{name} Expiration Date",
+  :'en.insured.consumer_roles.docs_shared.expiration_date' => "'%'{name} Expiration Date",
   :'en.insured.consumer_roles.docs_shared.i94_number' => "I 94 Number",
   :'en.insured.consumer_roles.docs_shared.i94_number_req' => "When entering the I-94 Number, only include 9 numbers followed by a letter or a number in the 10th position and a number in the 11th position. Do not enter any other characters or spaces. -li- You must enter exactly 11 characters into the I-94 field. \
 -li- How to find the I-94 Number: \
@@ -35,7 +35,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.consumer_roles.naturalized_question' => "Is this person a naturalized citizen?",
   :'en.required_field_plural' => "required fields",
   :'en.insured.consumer_roles.select_doc_type' => "Select document type",
-  :'en.insured.consumer_roles.no_match_info' => "Next, we need to verify if you or you and your family are eligible to enroll in coverage through %{site_short_name}. Select CONTINUE.",
+  :'en.insured.consumer_roles.no_match_info' => "Next, we need to verify if you or you and your family are eligible to enroll in coverage through '%'{site_short_name}. Select CONTINUE.",
   :'en.insured.consumer_roles.match_info' => "You shouldn't be seeing this message",
   :'en.insured.consumer_roles.idp_identity_conflict' => "There are too many matching individuals, please contact the exchange.",
   :'en.insured.consumer_roles.privacy.privacy_info_html' => "<p class='starter'>We will keep your information private and will not share it with anyone unless you allow it or it is required by law. Your answers will only be used to decide whether you are eligible for health insurance. Information about your health will not be used to deny you insurance or determine how much you pay.<br/><br/>You can complete an application for health insurance for your children or other family members even if you do not qualify yourself. If you are applying for benefits for other members of your family, you will need to give us information about where you live, but you are not required to answer any questions about your citizenship or immigration status and you will not have to give us a Social Security Number.<br/><br/>As part of the application process, we will be checking the information you give us with information from other government agencies like the Social Security Administration, and the Department of Homeland Security. If the information you provide does not match the information we get from these agencies, we may ask you to send us proof. Remember, if you are not applying for benefits for yourself, we will not ask you about your citizenship or immigration status and will not check your information with the Department of Homeland Security.<br/><br/><a href='https://www.dchealthlink.com/privacy' target='_blank'>Learn more about how we will use your information.</a><br><a href='https://www.dchealthlink.com/privacy-act-statement' target='_blank'>View Privacy Act Statement</a><br/><br/>By clicking Continue, you are saying that you understand that information in this application, and the information we get from data sources will be used to decide the eligibility of the people who are applying for health insurance. You are also indicating that you have permission from all of the people listed on the application for their information to be retrieved and used from data sources.</p>",
@@ -46,21 +46,21 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
                     <br/><br/>
                     As part of the application process, we will be checking the information you give us with information from other government agencies like the Social Security Administration, and the Department of Homeland Security. If the information you provide does not match the information we get from these agencies, we may ask you to send us proof. Remember, if you are not applying for benefits for yourself, we will not ask you about your citizenship or immigration status and will not check your information with the Department of Homeland Security.
                     <br/><br/>
-                    <a href='%{site_privacy_url}' target='_blank'>Learn more about how we will use your information.</a><br>
-                    <a href='%{site_privacy_act_statement}' target='_blank'>View Privacy Act statement</a>
+                    <a href=''%'{site_privacy_url}' target='_blank'>Learn more about how we will use your information.</a><br>
+                    <a href=''%'{site_privacy_act_statement}' target='_blank'>View Privacy Act statement</a>
                     <br/><br/>
                     By selecting CONTINUE, you are saying that you understand that information in this application, and the information we get from data sources will be used to decide the eligibility of the people who are applying for health insurance. You are also indicating that you have permission from all of the people listed on the application for their information to be retrieved and used from data sources.",
   :'en.continue' => "Continue",
   :'en.insured.consumer_roles.redirect_to_recover_account_msg' => "An account for this user already exists.  Please visit the account recovery page.",
   :'en.insured.consumer_roles.ridp_agreement.ridp_agreement_html' => "<h2 class='darkblue'>Authorization and Consent</h2><p> Read the authorization and consent statement. You must select 'I Agree' to complete your application online. When you're finished, select CONTINUE.</p><p>For your security, we need to verify your identity before you can proceed. If you agree, you are providing consent to Experian to access your personal information to conduct identity verification on behalf of the Centers for Medicare and Medicaid Services (CMS) — part of the US Department of Health and Human Services (HHS). Below are a few items to keep in mind.</p><ul><li>Make sure that you entered your legal name, current home address, phone number, date of birth and email address correctly. We will only collect personal information to verify your identity with Experian, a third party identity verification provider.</li><br><li>To verify your identity, Experian uses information from your consumer credit report profile. As a result, you may see an entry called a “soft inquiry” on your Experian consumer report. Soft inquiries are only visible to you, are never shared with third parties, and do not affect your credit score. The soft inquiry will be titled “CMS Proofing Services” and will be removed from your Experian consumer report after 25 months.</li><br><li>You may need to have access to your personal and consumer report information, as the Experian application will pose questions to you based on data in their files.</li></ul><p><br>Select one of the following options to continue:</p>",
-  :'en.insured.consumer_roles.ridp_agreement.ridp_agreement_alert_msg' => "Please contact %{site_short_name} at %{contact_center_phone_number} for more info",
+  :'en.insured.consumer_roles.ridp_agreement.ridp_agreement_alert_msg' => "Please contact '%'{site_short_name} at '%'{contact_center_phone_number} for more info",
   :'en.insured.consumer_roles.search.enter_personal_info_msg' => "Enter your personal information. When you're finished, select CONTINUE.",
   :'en.insured.consumer_roles.search.no_ssn_tooltip' => "You should only select 'I don't have an SSN' if the person doesn't have a social security number. We use this information to verify your identity.",
   :'en.insured.consumer_roles.search.gender_tooltip' => "Gender is a required field on the application. You can choose how to answer this question, and we don’t compare your response against any data sources. The gender you choose is included in the information we send to your insurance company, but it’s a violation of District of Columbia law to restrict access to health benefits based on gender expression or identity.",
   :'en.insured.home_address_tooltip' => "Your home address is where you legally reside. If you prefer to receive mail at another address such as your office or a PO Box, select 'Add Mailing Address'.",
   :'en.is_not_your_employer' => "Not your employer?",
   :'en.click_here' => "Click Here",
-  :'en.insured.employee_roles.not_your_employer_modal_body' => "Unable to match your identifying information with an active employer.  First, verify the information that you provided here is correct.  If so, contact your employer to confirm that your name, date of birth, social security number, gender and date-of-hire information, as entered on %{site_short_name}, is accurate and complete.",
+  :'en.insured.employee_roles.not_your_employer_modal_body' => "Unable to match your identifying information with an active employer.  First, verify the information that you provided here is correct.  If so, contact your employer to confirm that your name, date of birth, social security number, gender and date-of-hire information, as entered on '%'{site_short_name}, is accurate and complete.",
   :'en.close' => "Close",
   :'en.insured.employee_roles.enroll_as_an_employee' => "Enroll as an employee of %{employer_name}",
   :'en.new_message' => "New Message",
@@ -567,5 +567,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.email_text' => "EMAIL *",
   :'en.insured.select_kind_text' => "SELECT KIND *",
   :'en.eligible' => "Eligible",
-  :'en.ineligible' => "Ineligible"
+  :'en.ineligible' => "Ineligible",
+  :'en.your_tax_credit' => "Your Tax Credit",
+  :'en.your_tax_credit_for_hc4cc' => "Your Tax Credit: HC4CC eligible households must use at least 85 percent of the credit."
 }.freeze
