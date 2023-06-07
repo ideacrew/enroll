@@ -5,6 +5,7 @@ module Operations
     module Addresses
       class AddressWorker
         include EventSource::Command
+        include Dry::Monads[:result, :do]
 
         # This method will be called when a job is enqueued
         # @param [Hash] params
@@ -42,7 +43,7 @@ module Operations
           end
           Success("AddressWorker: Completed")
         rescue StandardError => e
-          logger.error(params["person_hbx_id"]) { {Error: e.inspect} }
+          logger.error(valid_params["person_hbx_id"]) { {Error: e.inspect} }
           Success("AddressWorker: Failed")
         end
 

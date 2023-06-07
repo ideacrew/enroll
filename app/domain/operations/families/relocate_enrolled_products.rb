@@ -41,6 +41,7 @@ module Operations
       def validate(params)
         return Failure("RelocateEnrolledProducts: Person_hbx_id is missing") unless params[:person_hbx_id].present?
         return Failure("RelocateEnrolledProducts: address_set is missing") unless params[:address_set].present?
+        return Failure("RelocateEnrolledProducts: address_set should be of kind home") unless params[:address_set][:modified_address][:kind] == "home"
 
         Success(params)
       end
