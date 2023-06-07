@@ -253,6 +253,10 @@ Given(/^the user answers no to being pregnant$/) do
   choose('is_pregnant_no')
 end
 
+And(/the post partum language one year is not enabled/) do
+  FinancialAssistanceRegistry[:post_partum_period_one_year].feature.stub(:is_enabled).and_return(false)
+end
+
 And(/^was this person pregnant in the last (\d+) days question should display$/) do |_arg1|
   expect(page).to have_content('Was this person pregnant in the last 60 days?')
 end
