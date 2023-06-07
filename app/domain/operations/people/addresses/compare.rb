@@ -27,9 +27,9 @@ module Operations
         private
 
         def validate(params)
-          return Failure("Missing address id ") unless params["address_id"].present?
-          return Failure("Missing person hbx id ") unless params["person_hbx_id"].present?
-          Success([params["address_id"], params["person_hbx_id"]])
+          return Failure("Missing address id ") unless params[:address_id].present?
+          return Failure("Missing person hbx id ") unless params[:person_hbx_id].present?
+          Success([params[:address_id], params[:person_hbx_id]])
         end
 
         def find_person(person_hbx_id)
