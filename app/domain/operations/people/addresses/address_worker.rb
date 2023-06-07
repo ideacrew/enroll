@@ -3,12 +3,15 @@
 module Operations
   module People
     module Addresses
+      # This class is responsible for building payload and publishing event
       class AddressWorker
         include EventSource::Command
         include Dry::Monads[:result, :do]
 
-        # This method will be called when a job is enqueued
         # @param [Hash] params
+        # @option params [String] :person_hbx_id
+        # @option params [String] :address_id
+        # @return [Dry::Monads::Result]
         # @return Success monad if the operation is successful or Failure
         def call(params)
           valid_params = yield validate(params)
