@@ -58,6 +58,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.dhs_decision" => "<span>Next step: The Office for Family Independence will make a final decision on whether those listed qualify for <span class='run-glossary'>MaineCare and Cub Care</span>.</span>",
   "en.faa.primary_caretaker_question_text" => "Is this person the main person taking care of any children age 18 or younger? *",
   "en.faa.primary_caretaker_for_text" => "Which member(s) of the household is this person the caretaker for? (choose all that apply)",
+  "en.faa.primary_caretaker_for_text_review_page" => "Which member(s) of the household is this person the caretaker for?",
   "en.faa.dhs_contact" => "They will send you a letter, and may ask you to provide documents. If you haven’t heard from OFI within 45 days, you may want to ask for an update by calling",
   "en.faa.qualified_reason" => "These people may qualify for MaineCare for reasons like age or disability.",
   "en.faa.next_step_with_non_magi" => "<b>NEXT STEP:</b> We are sending your application to the Department of Health and Human Services (DHHS). They will contact you to get more information to see if you qualify.",

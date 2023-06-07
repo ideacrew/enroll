@@ -34,6 +34,7 @@ Feature: Cost Savings Raw Application
 
   Scenario: FAA Feature Is Enabled - Admin clicks on Full application action
     And a family with financial application and applicants in determined state exists
+    And the primary applicant age greater than 18
     And the user with hbx_staff role is logged in
     When admin visits home page
     And the Cost Savings link is visible
@@ -45,6 +46,7 @@ Feature: Cost Savings Raw Application
 
   Scenario: MVS Feature Is Enabled - Admin clicks on Full application action and sees MVS question
     And a family with financial application and applicants in determined state exists
+    And the primary applicant age greater than 18
     And FAA minimum_value_standard_question feature is enabled
     And FAA disable_employer_address_fields feature is enabled
     And the user with hbx_staff role is logged in
@@ -61,6 +63,7 @@ Feature: Cost Savings Raw Application
   Scenario: Admin clicks on Full application action, sees TYPES of other income
     When the ssi_income_types feature is enabled
     When an applicant with other income exists for a determined financial application
+    And the primary applicant age greater than 18
     And the user with hbx_staff role is logged in
     When admin visits home page
     And the Cost Savings link is visible
@@ -69,3 +72,15 @@ Feature: Cost Savings Raw Application
     And the admin should see text Full Application
     When admin clicks on Full application action
     Then the social security type - retirement benefits should show
+
+  Scenario: Admin clicks on review application action, sees caretaker questions
+    Given a family with financial application and applicants in determined state exists
+    And the primary applicant age greater than 18
+    And the user with hbx_staff role is logged in
+    When admin visits home page
+    And the Cost Savings link is visible
+    And admin clicks on Cost Savings link
+    When admin clicks on Action dropdown
+    And the admin should see text Full Application
+    When admin clicks on Full application action
+    Then the caretaker questions should show
