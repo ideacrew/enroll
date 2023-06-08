@@ -18,6 +18,11 @@ describe Forms::HealthcareForChildcareProgramForm do
     before do
       allow(::EnrollRegistry).to receive(:feature?).and_return(true)
       allow(::EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+      TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 5, 1))
+    end
+
+    after do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
     end
 
     context 'with consumer role' do
@@ -36,6 +41,14 @@ describe Forms::HealthcareForChildcareProgramForm do
         expect(subject.osse_eligibility).to be_truthy
         expect(subject.role).to eq(primary.consumer_role)
       end
+
+      it 'should set eligibility start date as beginning of year' do
+        subject.load_eligibility(primary)
+        expect(subject.osse_eligibility).to be_truthy
+        osse_eligibility = subject.role.eligibilities.first
+        expect(osse_eligibility.start_on).to eq(TimeKeeper.date_of_record.beginning_of_year)
+        expect(osse_eligibility.evidences.first.is_satisfied).to be_truthy
+      end
     end
 
     context 'when both consumer and resident role present' do
@@ -53,6 +66,14 @@ describe Forms::HealthcareForChildcareProgramForm do
 
         expect(subject.osse_eligibility).to be_truthy
         expect(subject.role).to eq(primary.resident_role)
+      end
+
+      it 'should set eligibility start date as beginning of year' do
+        subject.load_eligibility(primary)
+        expect(subject.osse_eligibility).to be_truthy
+        osse_eligibility = subject.role.eligibilities.first
+        expect(osse_eligibility.start_on).to eq(TimeKeeper.date_of_record.beginning_of_year)
+        expect(osse_eligibility.evidences.first.is_satisfied).to be_truthy
       end
     end
   end

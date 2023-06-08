@@ -870,3 +870,6 @@ registry:
       - key: :ivl_tax_form_notice
         item: :ivl_tax_form_notice
         is_enabled: <%= ENV['IVL_TAX_FORM_NOTICE_IS_ENABLED'] || false %>
+      - key: :registration_recaptcha
+        item: :registration_recaptcha
+        is_enabled: <%= ENV['REGISTRATION_RECAPTCHA_IS_ENABLED'] || false %>

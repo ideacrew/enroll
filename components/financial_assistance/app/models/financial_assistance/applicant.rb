@@ -1469,8 +1469,12 @@ module FinancialAssistance
         errors.add(:children_expected_count, "' How many children is this person expecting?' should be answered") if children_expected_count.blank?
       # Nil or "" means unanswered, true/or false boolean will be passed through
       elsif is_post_partum_period.nil? || is_post_partum_period == ""
-        # Even if they aren't pregnant, still need to ask if they were pregnant within the last 60 days
-        errors.add(:is_post_partum_period, "' Was this person pregnant in the last 60 days?' should be answered")
+        if FinancialAssistanceRegistry.feature_enabled?(:post_partum_period_one_year)
+          errors.add(:is_post_partum_period, "'#{l10n('faa.other_ques.pregnant_last_year')}' should be answered")
+        else
+          # Even if they aren't pregnant, still need to ask if they were pregnant within the last 60 days
+          errors.add(:is_post_partum_period, "'#{l10n('faa.other_ques.pregnant_last_60d')}' should be answered")
+        end
       end
       # If they're in post partum period, they need to tell us if they were on medicaid and when the pregnancy ended
       if is_post_partum_period.present?

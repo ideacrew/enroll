@@ -29,8 +29,7 @@ module BenefitSponsors
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_create(registration_params)
         authorize @agency
         begin
-          saved, result_url = @agency.save
-          result_url = self.send(result_url)
+          saved, result_url = verify_recaptcha_if_needed && @agency.save
           if saved && is_employer_profile?
               person = current_person
               create_sso_account(current_user, current_person, 15, "employer") do
@@ -48,6 +47,7 @@ module BenefitSponsors
             render template_filename, :layout => 'single_column'
             return
           elsif saved
+            result_url = self.send(result_url)
             redirect_to result_url
             return
           end
@@ -176,6 +176,11 @@ module BenefitSponsors
           session[:custom_url] = main_app.new_user_registration_path unless current_user
           super
         end
+      end
+
+      def verify_recaptcha_if_needed
+        return true unless EnrollRegistry.feature_enabled?(:registration_recaptcha)
+        verify_recaptcha(model: @agency)
       end
     end
   end
