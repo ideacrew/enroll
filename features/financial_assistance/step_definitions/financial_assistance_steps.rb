@@ -713,6 +713,11 @@ Then(/^the social security type - (.*) benefits should show$/) do |ssi_type|
   expect(page).to have_content(l10n("faa.income.social_security_benefit.#{ssi_type}"))
 end
 
+Then(/^the caretaker questions should show$/) do
+  expect(page).to have_content(l10n("faa.primary_caretaker_question_text").split(' *').first)
+  expect(page).to have_content(l10n("faa.primary_caretaker_for_text_review_page"))
+end
+
 Then(/^.+ should see county under Mailing and Home address$/) do
   expect(page).to have_content('COUNTY')
   expect(page).to have_content('Cumberland')
