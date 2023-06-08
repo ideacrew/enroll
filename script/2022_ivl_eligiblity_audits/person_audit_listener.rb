@@ -297,4 +297,29 @@ class PersonAuditListener
   end
 end
 
+# The following two overrides prevent database writing by Mongoid
+class Mongo::Collection
+  def update_one(filter, update, options = {})
+    #puts caller
+    #raise update.inspect
+  end
+
+  def update_many(filter, update, options = {})
+    #puts caller
+    #raise update.inspect
+  end
+end
+
+class Mongo::Collection::View
+  def update_one(filter, update, options = {})
+    #puts caller
+    #raise update.inspect
+  end
+
+  def update_many(filter, update, options = {})
+    #puts caller
+    #raise update.inspect
+  end
+end
+
 PersonAuditListener.run
