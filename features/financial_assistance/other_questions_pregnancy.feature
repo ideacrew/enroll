@@ -25,6 +25,7 @@ Feature: Start a new Financial Assistance Application and answers questions on O
 
   Scenario: Pregnancy response within 60 days Yes with information filled and submitted
     Given the user answers no to being pregnant
+    And FAA post_partum_period_one_year feature is disabled
     And they answer yes to was this person pregnant in the last 60 days question
     And the user enters a pregnancy end date of one month ago
     And the user fills out the rest of the other questions form and submits it
@@ -32,17 +33,20 @@ Feature: Start a new Financial Assistance Application and answers questions on O
 
   Scenario: Pregnancy question - no
     Given the user answers no to being pregnant
+    And FAA post_partum_period_one_year feature is disabled
     And was this person pregnant in the last 60 days question should display
     When they answer yes to was this person pregnant in the last 60 days question
     Then pregnancy end date question should display
 
   Scenario: If they were pregnant, were they on medicaid?
     Given the user answers no to being pregnant
+    And FAA post_partum_period_one_year feature is disabled
     And they answer yes to was this person pregnant in the last 60 days question
     Then the has this person ever been in foster care question should display
 
   Scenario: If they were pregnant, were they on medicaid? Answer "Yes" with form submitted.
     Given the user answers no to being pregnant
+    And FAA post_partum_period_one_year feature is disabled
     And they answer yes to was this person pregnant in the last 60 days question
     And the user enters a pregnancy end date of one month ago
     And the user fills out the rest of form with medicaid during pregnancy as yes and submits it
