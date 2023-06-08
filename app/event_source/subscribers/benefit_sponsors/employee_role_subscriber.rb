@@ -39,7 +39,7 @@ module Subscribers
         census_employee.osse_eligible_applications.each do |benefit_application|
           employer = benefit_application.employer_profile
 
-          result = ::Operations::Eligibilities::Osse::BuildEligibility.new.call(
+          result = ::Operations::Eligibilities::Osse::CreateEligibility.new.call(
             {
               subject_gid: employee_role.to_global_id,
               evidence_key: :osse_subsidy,
@@ -51,8 +51,6 @@ module Subscribers
           if result.success?
             subscriber_logger.info "on_employee_role_created employer fein: #{employer.fein}, employee: #{person&.full_name} processed successfully"
             logger.info "on_employee_role_created CensusEmployeeSubscriber: acked, SuccessResult: #{result.success}"
-            eligibility = employee_role.eligibilities.build(result.success.to_h)
-            eligibility.save!
           else
             errors =
               case result.failure

@@ -16,33 +16,16 @@ module Operations
         # @option opts [<String>]   :evidence_value required
         # @option opts [Date]       :effective_date required
         # @return [Dry::Monad] result
-        def call(params)
-          values = yield validate(params)
-          eligibility_params = yield build_eligibility(values)
-          eligibility = yield create_eligibility(eligibility_params)
+        def call(values)
+          attributes  = yield construct(values)
+          eligibility = yield build_entity(attributes)
 
           Success(eligibility)
         end
 
         private
 
-        def validate(params)
-          errors = []
-          errors << 'subject global id missing' unless params[:subject_gid]
-          errors << 'evidence key missing' unless params[:evidence_key]
-          errors << 'evidence value missing' unless params[:evidence_value]
-          errors << 'effective date missing' unless params[:effective_date]
-
-          if params[:effective_date]
-            subject = GlobalID::Locator.locate(params[:subject_gid])
-
-            params[:effective_date] = params[:effective_date].beginning_of_year if ['ConsumerRole', 'ResidentRole'].include?(subject.class.to_s)
-          end
-
-          errors.empty? ? Success(params) : Failure(errors)
-        end
-
-        def build_eligibility(values)
+        def construct(values)
           Success(
             {
               title: "#{values[:evidence_key]} Eligibility",
@@ -53,8 +36,8 @@ module Operations
           )
         end
 
-        def create_eligibility(eligibility_params)
-          ::Operations::Eligibilities::Create.new.call(eligibility_params)
+        def build_entity(attributes)
+          ::Operations::Eligibilities::Create.new.call(attributes)
         end
 
         def construct_subject(values)

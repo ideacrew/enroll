@@ -41,16 +41,7 @@ module ChildcareSubsidyConcern
     end
 
     def create_eligibility(eligibility_params)
-      eligibility_result = build_eligibility(eligibility_params)
-      if eligibility_result.success?
-        eligibility = self.eligibilities.build(eligibility_result.success.to_h)
-        eligibility.save!
-      end
-      eligibility_result
-    end
-
-    def build_eligibility(eligibility_params)
-      ::Operations::Eligibilities::Osse::BuildEligibility.new.call(
+      ::Operations::Eligibilities::Osse::CreateEligibility.new.call(
         eligibility_params.merge(subject_gid: self.to_global_id)
       )
     end

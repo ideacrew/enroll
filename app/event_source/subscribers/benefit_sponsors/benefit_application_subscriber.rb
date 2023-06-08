@@ -34,7 +34,7 @@ module Subscribers
         benefit_sponsorship.census_employees.without_cobra.non_terminated.each do |census_employee|
           employee_role = census_employee.employee_role
           next unless employee_role
-          result = ::Operations::Eligibilities::Osse::BuildEligibility.new.call(
+          result = ::Operations::Eligibilities::Osse::CreateEligibility.new.call(
             {
               subject_gid: employee_role.to_global_id,
               evidence_key: :osse_subsidy,
@@ -46,8 +46,6 @@ module Subscribers
           if result.success?
             subscriber_logger.info "on_open_enrollment_began employer fein: #{benefit_sponsorship.fein}, census_employee: #{census_employee.id} processed successfully"
             logger.info "on_open_enrollment_began BenefitApplicationsSubscriber: acked, SuccessResult: #{result.success}"
-            eligibility = employee_role.eligibilities.build(result.success.to_h)
-            eligibility.save!
           else
             errors =
               case result.failure
