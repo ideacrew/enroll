@@ -3,14 +3,14 @@
       <ul class="list-group">
         <li class="list-group-item">
           Sent By:
-          <%= raw("System Admin on #{message.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%m/%d/%Y")} at #{message.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p")}")%>
+          <%= sanitize("System Admin on #{message.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%m/%d/%Y")} at #{message.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p")}")%>
           <br></li>
         <li class="list-group-item">
           Subject:
-          <%= raw(message.try(:subject)) %>
+          <%= sanitize(message.try(:subject)) %>
           <br></li>
         <li class="list-group-item">
-          <%= raw(message.try(:body)) %>
+          <%= sanitize(message.try(:body)) %>
           <br></li>
       </ul>
       <br class="clear"/>
