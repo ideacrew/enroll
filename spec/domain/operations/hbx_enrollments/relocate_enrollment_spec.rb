@@ -65,6 +65,13 @@ RSpec.describe ::Operations::HbxEnrollments::RelocateEnrollment, dbclean: :after
       family.reload
       expect(family.active_household.hbx_enrollments.map(&:rating_area_id)).to eq([@rating_area.id, rating_area2.id])
     end
+
+    it "should generate new enrollment with different rating area" do
+      subject.call(@params)
+      family.reload
+      date_context = ::HbxEnrollments::CalculateEffectiveOnForEnrollment.call(base_enrollment_effective_on: enrollment.effective_on, system_date: TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'))
+      expect(family.active_household.hbx_enrollments.last.effective_on).to eq(date_context.new_effective_on.to_date)
+    end
   end
 
   context "when expected_enrollment_action is Terminate Enrollment Effective End of the Month" do
