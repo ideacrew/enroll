@@ -212,13 +212,13 @@ module IvlAssistanceWorld
     end
 
     wages_and_salaries_params = {kind: "wages_and_salaries",
-      amount: 3400.0,
-      amount_tax_exempt: 0,
-      frequency_kind: "quarterly",
-      start_on: Date.new(TimeKeeper.date_of_record.year,0o1,0o1),
-      end_on: nil,
-      is_projected: false,
-      submitted_at: TimeKeeper.date_of_record}
+                                 amount: 3400.0,
+                                 amount_tax_exempt: 0,
+                                 frequency_kind: "quarterly",
+                                 start_on: Date.new(TimeKeeper.date_of_record.year,0o1,0o1),
+                                 end_on: nil,
+                                 is_projected: false,
+                                 submitted_at: TimeKeeper.date_of_record}
 
     @application.applicants.first.incomes << FinancialAssistance::Income.new(wages_and_salaries_params)
 
