@@ -1,3 +1,4 @@
+- is_osse_eligible = @hbx_enrollment.ivl_osse_eligible?(@hbx_enrollment.effective_on)
 #filter-sidebar.col-lg-3.col-md-3.co-sm-3.col-xs-12.pl-0
   .checkbox-filter-wrapper-uc
     / TODO: These links will be deprecated for Maine. New feature checks will be added here to make them dissappear.
@@ -123,8 +124,9 @@
         a.btn.btn-default.reset-btn#reset-btn href="javascript:void(0);" = l10n("reset")
   - if @person.has_active_consumer_role? && @tax_household.present? && @market_kind == "individual"
     h5
-      strong Your Tax Credit
-      a href="#" data-toggle="tooltip" data-placement="right" data-container="body" title="Your Tax Credit"
+      strong #{l10n('your_tax_credit')}
+      - tooltip_text = is_osse_eligible ? "#{l10n('your_tax_credit_for_hc4cc')}" : "#{l10n('your_tax_credit')}"
+      a href="#" data-toggle="tooltip" data-placement="right" data-container="body" title=tooltip_text
         i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
     .aptc.panel.panel-default
       .panel-body style="padding:10px;"
@@ -145,13 +147,15 @@
         = hidden_field_tag :coverage_kind, @coverage_kind
         = hidden_field_tag :set_elected_aptc_url, set_elected_aptc_insured_plan_shopping_path(id: @hbx_enrollment.try(:id)) if @hbx_enrollment.present?
         form oninput=("pct.value = (elected_pct.value*100).toFixed(0)") onsubmit=("return false")
-          input max="1" min="0" name="elected_pct" step="0.05" type="range" value= "#{pct}" style="padding:0;"
-          span style="font-size:12px;" 0%
+          - min_aptc = is_osse_eligible ? 0.85 : 0
+          - step = is_osse_eligible ? 0.005 : 0.05
+          input max="1" min="#{min_aptc}" name="elected_pct" step="#{step}" type="range" value= "#{pct}" style="padding:0;"
+          span style="font-size:12px;" #{(min_aptc * 100).to_i}%
           span.pull-right
             output name="pct" style="font-size:12px;" = (pct * 100).to_i
             | %
         h6 style="font-weight:400; margin-top:0;" = link_to l10n("how_is_this_calculated") + "?", "", data: {toggle: "modal", target: "#how_is_this_calculated"}
-  - if @hbx_enrollment.ivl_osse_eligible?(@hbx_enrollment.effective_on)
+  - if is_osse_eligible
     .checkbox-filter-wrapper-uc
       h5
         strong HC4CC Eligible
