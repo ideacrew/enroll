@@ -17,6 +17,7 @@ RSpec.describe  Operations::People::Addresses::AddressWorker, :dbclean => :after
 
   context "for valid params" do
     it "should return success with success message" do
+      person.home_address.update_attributes(state: "TE")
       result = described_class.new.call(params)
       expect(result).to be_success
       expect(result.success).to eq("AddressWorker: Completed")
