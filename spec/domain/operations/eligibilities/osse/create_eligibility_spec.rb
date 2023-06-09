@@ -5,7 +5,7 @@ require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_site_spec
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-RSpec.describe ::Operations::Eligibilities::Osse::BuildEligibility,
+RSpec.describe ::Operations::Eligibilities::Osse::CreateEligibility,
                type: :model,
                dbclean: :after_each do
 
@@ -44,7 +44,9 @@ RSpec.describe ::Operations::Eligibilities::Osse::BuildEligibility,
 
       it 'should create eligibility' do
         result = subject.call(required_params)
-        expect(result.success).to be_a(AcaEntities::Eligibilities::Osse::Eligibility)
+
+        expect(result.success).to be_a(Eligibilities::Osse::Eligibility)
+        expect(result.success.persisted?).to be_truthy
       end
     end
 
@@ -74,8 +76,18 @@ RSpec.describe ::Operations::Eligibilities::Osse::BuildEligibility,
 
       it 'should create eligibility' do
         result = subject.call(required_params)
-        expect(result.success).to be_a(AcaEntities::Eligibilities::Osse::Eligibility)
+
+        expect(result.success).to be_a(Eligibilities::Osse::Eligibility)
+        expect(result.success.persisted?).to be_truthy
       end
+    end
+  end
+
+  context 'when required attributes not passed' do
+    it 'should fail with validation error' do
+      result = subject.call(required_params.except(:effective_date))
+      expect(result.failure?).to be_truthy
+      expect(result.failure).to include("effective date missing")
     end
   end
 end
