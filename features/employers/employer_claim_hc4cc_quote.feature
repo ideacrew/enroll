@@ -23,7 +23,8 @@ Feature: Employer HC4CC quote claim
 
   Scenario: Employer should be able to claim an HC4CC quote when eligible
     Given employer ABC Widgets is OSSE eligible
-    Given that a user with a HBX staff role with hbx staff subrole exists and is logged in
+    Given that a user with a Employer role exists and is logged in
+    And user only has employer staff roles
     And ABC Widgets goes to the benefits tab I should see plan year information
     # Temp step fix for failure when test run in batch
     And employer has correct reference plan id
