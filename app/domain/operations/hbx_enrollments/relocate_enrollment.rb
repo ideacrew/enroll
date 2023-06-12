@@ -24,7 +24,7 @@ module Operations
       def call(payload)
         valid_params = yield validate(payload)
         enrollment = yield find_enrollment(valid_params)
-        result = yield send(ENROLLMENT_ACTION_MAPPING[valid_params[:expected_enrollment_action]].to_sym, enrollment)
+        result = yield send(ENROLLMENT_ACTION_MAPPING[valid_params[:expected_enrollment_action]]&.to_sym, enrollment)
 
         # TODO: Uncomment below lines once enrollment_relocated event is ready
         # build_and_publish_enrollment_relocated_event(result)
@@ -68,10 +68,10 @@ module Operations
         reinstatement = Enrollments::Replicator::Reinstatement.new(base_enrollment, new_effective_date, base_enrollment.applied_aptc_amount).build
 
         if reinstatement.save!
-          result = if base_enrollment.has_aptc? && EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+          result = if reinstatement.is_health_enrollment? && base_enrollment.has_aptc? && EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
                      default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
                      elected_aptc_pct = base_enrollment.elected_aptc_pct > 0 ? base_enrollment.elected_aptc_pct : default_percentage
-                     aptc_context = ::HbxEnrollments::UpdateMthhAptcValuesOnEnrollment.call(enrollment: reinstatement, elected_aptc_pct: elected_aptc_pct, new_effective_date: new_effective_date)
+                     aptc_context = ::HbxEnrollments::UpdateMthhAptcValuesOnEnrollment.call(enrollment: reinstatement, elected_aptc_pct: elected_aptc_pct, new_effective_date: reinstatement.effective_on)
                      aptc_context.success? ? true : aptc_context.message
                    else
                      true
@@ -84,13 +84,14 @@ module Operations
             result_hash.merge!(:relocated_enrollment => {:hbx_id => reinstatement.hbx_id, :aasm_state => reinstatement.aasm_state, :coverage_kind => reinstatement.coverage_kind, :kind => reinstatement.kind})
             Success(result_hash)
           else
-            Failure(result)
+            Failure([result, "reinstatement_shopping_enrollment: #{reinstatement}"])
           end
         else
           Failure(reinstatement.errors.full_messages)
         end
       end
 
+      # TODO: Implement this method for emitting events once enrollment_relocation is done
       # families.individual_market.hbx_enrollments.dental_product_terminated
       # families.individual_market.hbx_enrollments.health_product_terminated
       # families.individual_market.hbx_enrollments.dental_product_relocated
