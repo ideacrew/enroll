@@ -433,7 +433,11 @@
 
             <% if @cfl_service.displayable_field?('applicant', applicant.id, :is_post_partum_period) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">Was this person pregnant in the last 60 days?</div>
+              <% if FinancialAssistanceRegistry.feature_enabled?(:post_partum_period_one_year) %>
+                <div class="col-md-6"><%= l10n('faa.other_ques.pregnant_last_year') %></div>
+              <% else %>
+                <div class="col-md-6"><%= l10n('faa.other_ques.pregnant_last_60d') %></div>
+              <% end %>
                 <div class="col-md-6"><%= human_boolean applicant.is_post_partum_period %></div>
               </div>
             <% end %>

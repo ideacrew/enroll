@@ -567,5 +567,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.email_text' => "EMAIL *",
   :'en.insured.select_kind_text' => "SELECT KIND *",
   :'en.eligible' => "Eligible",
-  :'en.ineligible' => "Ineligible"
+  :'en.ineligible' => "Ineligible",
+  :'en.your_tax_credit' => "Your Tax Credit",
+  :'en.your_tax_credit_for_hc4cc' => "Your Tax Credit: HC4CC eligible households must use at least 85 percent of the credit."
 }.freeze
