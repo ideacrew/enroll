@@ -8,7 +8,7 @@ class EligibilityDetermination
   embedded_in :member_determination
 
     # The override rule that was applied.
-  field :override_rule, type: Symbol
+  field :override_rule, type: String
 
     # Whether or not the override was applied.
   field :override_applied, type: Boolean
