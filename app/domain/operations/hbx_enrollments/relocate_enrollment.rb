@@ -24,7 +24,7 @@ module Operations
       def call(payload)
         valid_params = yield validate(payload)
         enrollment = yield find_enrollment(valid_params)
-        result = yield send(ENROLLMENT_ACTION_MAPPING[valid_params[:expected_enrollment_action]].to_sym, enrollment)
+        result = yield send(ENROLLMENT_ACTION_MAPPING[valid_params[:expected_enrollment_action]]&.to_sym, enrollment)
 
         # TODO: Uncomment below lines once enrollment_relocated event is ready
         # build_and_publish_enrollment_relocated_event(result)

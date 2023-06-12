@@ -34,7 +34,7 @@ RSpec.describe ::Operations::Families::RelocateEnrolledProducts, dbclean: :after
 
   let!(:original_address) do
     person.home_address.update_attributes(zip: county_zip.zip, county: county_zip.county_name, state: county_zip.state)
-    person.home_address.attributes.slice("address_1", "address_2", "address_3", "county", "kind", "city", "state", "zip")
+    person.home_address.attributes.slice("address_1", "address_2", "address_3", "county", "kind", "city", "state", "zip").transform_keys(&:to_sym)
   end
 
   context "when zip and county is changed" do
@@ -49,7 +49,7 @@ RSpec.describe ::Operations::Families::RelocateEnrolledProducts, dbclean: :after
       enrollment.update_attributes!(rating_area_id: rating_area.id)
       enrollment2.update_attributes!(rating_area_id: rating_area.id)
       person.home_address.update_attributes(zip: "04771", county: "Aroostook", state: "ME")
-      modified_address = person.home_address.attributes.slice("address_1", "address_2", "address_3", "county", "kind", "city", "state", "zip")
+      modified_address = person.home_address.attributes.slice("address_1", "address_2", "address_3", "county", "kind", "city", "state", "zip").transform_keys(&:to_sym)
       @params = {
         address_set: {original_address: original_address,
                       modified_address: modified_address},
@@ -82,7 +82,7 @@ RSpec.describe ::Operations::Families::RelocateEnrolledProducts, dbclean: :after
       enrollment.update_attributes!(rating_area_id: rating_area.id)
       enrollment2.update_attributes!(rating_area_id: rating_area.id)
       person.home_address.update_attributes(zip: "01001", county: "test", state: "AZ")
-      modified_address = person.home_address.attributes.slice("address_1", "address_2", "address_3", "county", "kind", "city", "state", "zip")
+      modified_address = person.home_address.attributes.slice("address_1", "address_2", "address_3", "county", "kind", "city", "state", "zip").transform_keys(&:to_sym)
       @params = {
         address_set: {original_address: original_address,
                       modified_address: modified_address},
@@ -101,6 +101,40 @@ RSpec.describe ::Operations::Families::RelocateEnrolledProducts, dbclean: :after
 
     it "should return service area changed" do
       expect(@result.success[enrollment2.hbx_id][:event_outcome]).to eq "service_area_changed"
+    end
+  end
+
+  context "when state is changed for mailing address" do
+    before do
+      allow(EnrollRegistry[:service_area].setting(:service_area_model)).to receive(:item).and_return('county')
+      allow(EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model)).to receive(:item).and_return('county')
+      allow(EnrollRegistry[:enroll_app].setting(:rating_areas)).to receive(:item).and_return('county')
+      BenefitMarkets::Locations::RatingArea.update_all(covered_states: ['ME'])
+      BenefitMarkets::Locations::ServiceArea.all.update_all(covered_states: ['ME'])
+
+      rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(person.home_address)
+      enrollment.update_attributes!(rating_area_id: rating_area.id)
+      enrollment2.update_attributes!(rating_area_id: rating_area.id)
+      person.mailing_address.update_attributes(zip: "01001", county: "test", state: "AZ", kind: "mailing")
+      modified_address = person.mailing_address.attributes.slice("address_1", "address_2", "address_3", "county", "kind", "city", "state", "zip").transform_keys(&:to_sym)
+      @params = {
+        address_set: {original_address: original_address,
+                      modified_address: modified_address},
+        change_set: {"old_set": {"state": "MT"},"new_set": {"state": "MA"}},
+        person_hbx_id: person.hbx_id,
+        primary_family_id: person.primary_family.id,
+        is_primary: person.primary_family.present?
+      }
+
+      @result = subject.call(@params)
+    end
+
+    it "should return failure" do
+      expect(@result).to be_failure
+    end
+
+    it "should return error message" do
+      expect(@result.failure).to eq "RelocateEnrolledProducts: address_set should be of kind home"
     end
   end
 end
