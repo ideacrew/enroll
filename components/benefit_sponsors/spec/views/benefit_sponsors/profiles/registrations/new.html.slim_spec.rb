@@ -10,13 +10,34 @@ end
 
 RSpec.describe "benefit_sponsors/profiles/registrations/new", :type => :view, dbclean: :after_each do
   include_context "setup benefit market with market catalogs and product packages"
-  let(:agency) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: 'broker_agency', portal: true) }
+  let(:br_agency) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: 'broker_agency', portal: true) }
   let(:ga_agency) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: 'general_agency', portal: true) }
+  let(:bs_agency) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: 'benefit_sponsor', portal: true) }
 
   before :each do
     current_benefit_market_catalog
     view.extend Pundit
     view.extend BenefitSponsors::Engine.routes.url_helpers
+    allow(view).to receive(:render).with(:partial => "shared/error_messages").and_return("")
+    allow(view).to receive(:render).with("shared/error_messages",anything).and_return("")
+
+    allow(view).to receive(:render).with({:template=>"benefit_sponsors/profiles/registrations/new"}, {}).and_call_original
+    allow(view).to receive(:render).with("benefit_sponsors/shared/error_messages", anything).and_call_original
+    allow(view).to receive(:render).with("./ui-components/v1/forms/employer_registration/employer_profile_form", anything).and_call_original
+    allow(view).to receive(:render).with("benefit_sponsors/profiles/registrations/sic_help", anything).and_call_original
+    allow(view).to receive(:render).with({:locals=> anything, :partial=> "./ui-components/v1/forms/employer_registration/staff_role_information"}).and_call_original
+    allow(view).to receive(:render).with({:locals=> anything, :partial=> "./ui-components/v1/forms/office_locations/office_location_fields"}).and_call_original
+    allow(view).to receive(:render).with({:locals=> anything, :partial=> "./ui-components/v1/forms/office_locations/address"}).and_call_original
+    allow(view).to receive(:render).with({:locals=> anything, :partial=> "./ui-components/v1/forms/office_locations/phone"}).and_call_original
+    allow(view).to receive(:render).with({:locals=> anything, :partial=> "./ui-components/v1/forms/general_agency_registration/personal_information"}).and_call_original
+    allow(view).to receive(:render).with({:locals=> anything, :partial=> "./ui-components/v1/forms/general_agency_registration/general_agency_information"}).and_call_original
+    allow(view).to receive(:render).with({:locals=> anything, :partial=> "./ui-components/v1/forms/general_agency_registration/general_agency_profile_information"}).and_call_original
+    allow(view).to receive(:render).with({:locals=> anything, :partial=> "./ui-components/v1/forms/broker_registration/personal_information"}).and_call_original
+    allow(view).to receive(:render).with({:locals=> anything, :partial=> "./ui-components/v1/forms/broker_registration/broker_agency_information"}).and_call_original
+    allow(view).to receive(:render).with({:locals=> anything, :partial=> "./ui-components/v1/forms/broker_registration/broker_profile_information"}).and_call_original
+    allow(view).to receive(:render).with({:partial=> "benefit_sponsors/profiles/registrations/general_agency_registration_form"}).and_call_original
+    allow(view).to receive(:render).with({:partial=> "benefit_sponsors/profiles/registrations/broker_registration_form"}).and_call_original
+
     allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_alphanumeric_npn).and_call_original
     allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_attestation_fields).and_call_original
     allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_call_original
@@ -25,7 +46,7 @@ RSpec.describe "benefit_sponsors/profiles/registrations/new", :type => :view, db
   it "should display recaptcha for broker agency" do
     allow(EnrollRegistry).to receive(:feature_enabled?).with(:registration_broker_recaptcha).and_return(true)
     @profile_type = 'broker_agency'
-    assign(:agency, agency)
+    assign(:agency, br_agency)
     render template: "benefit_sponsors/profiles/registrations/new"
     expect(rendered).to have_selector(:css,'.g-recaptcha')
   end
@@ -33,7 +54,7 @@ RSpec.describe "benefit_sponsors/profiles/registrations/new", :type => :view, db
   it "should not display recaptcha for broker agency" do
     allow(EnrollRegistry).to receive(:feature_enabled?).with(:registration_broker_recaptcha).and_return(false)
     @profile_type = 'broker_agency'
-    assign(:agency, agency)
+    assign(:agency, br_agency)
     render template: "benefit_sponsors/profiles/registrations/new"
     expect(rendered).not_to have_selector(:css,'.g-recaptcha')
   end
@@ -57,7 +78,7 @@ RSpec.describe "benefit_sponsors/profiles/registrations/new", :type => :view, db
   it "should display recaptcha for benefit sponsor" do
     allow(EnrollRegistry).to receive(:feature_enabled?).with(:registration_sponsor_recaptcha).and_return(true)
     @profile_type = 'benefit_sponsor'
-    assign(:agency, ga_agency)
+    assign(:agency, bs_agency)
     render template: "benefit_sponsors/profiles/registrations/new"
     expect(rendered).to have_selector(:css,'.g-recaptcha')
   end
@@ -65,7 +86,7 @@ RSpec.describe "benefit_sponsors/profiles/registrations/new", :type => :view, db
   it "should not display recaptcha for benefit sponsor" do
     allow(EnrollRegistry).to receive(:feature_enabled?).with(:registration_sponsor_recaptcha).and_return(false)
     @profile_type = 'benefit_sponsor'
-    assign(:agency, ga_agency)
+    assign(:agency, bs_agency)
     render template: "benefit_sponsors/profiles/registrations/new"
     expect(rendered).not_to have_selector(:css,'.g-recaptcha')
   end
