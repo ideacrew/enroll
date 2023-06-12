@@ -21,22 +21,22 @@ RSpec.describe "benefit_sponsors/profiles/registrations/new", :type => :view, db
     allow(view).to receive(:render).with(:partial => "shared/error_messages").and_return("")
     allow(view).to receive(:render).with("shared/error_messages",anything).and_return("")
 
-    allow(view).to receive(:render).with({:template=>"benefit_sponsors/profiles/registrations/new"}, {}).and_call_original
+    allow(view).to receive(:render).with({:template => "benefit_sponsors/profiles/registrations/new"}, {}).and_call_original
     allow(view).to receive(:render).with("benefit_sponsors/shared/error_messages", anything).and_call_original
     allow(view).to receive(:render).with("./ui-components/v1/forms/employer_registration/employer_profile_form", anything).and_call_original
     allow(view).to receive(:render).with("benefit_sponsors/profiles/registrations/sic_help", anything).and_call_original
-    allow(view).to receive(:render).with({:locals=> anything, :partial=> "./ui-components/v1/forms/employer_registration/staff_role_information"}).and_call_original
-    allow(view).to receive(:render).with({:locals=> anything, :partial=> "./ui-components/v1/forms/office_locations/office_location_fields"}).and_call_original
-    allow(view).to receive(:render).with({:locals=> anything, :partial=> "./ui-components/v1/forms/office_locations/address"}).and_call_original
-    allow(view).to receive(:render).with({:locals=> anything, :partial=> "./ui-components/v1/forms/office_locations/phone"}).and_call_original
-    allow(view).to receive(:render).with({:locals=> anything, :partial=> "./ui-components/v1/forms/general_agency_registration/personal_information"}).and_call_original
-    allow(view).to receive(:render).with({:locals=> anything, :partial=> "./ui-components/v1/forms/general_agency_registration/general_agency_information"}).and_call_original
-    allow(view).to receive(:render).with({:locals=> anything, :partial=> "./ui-components/v1/forms/general_agency_registration/general_agency_profile_information"}).and_call_original
-    allow(view).to receive(:render).with({:locals=> anything, :partial=> "./ui-components/v1/forms/broker_registration/personal_information"}).and_call_original
-    allow(view).to receive(:render).with({:locals=> anything, :partial=> "./ui-components/v1/forms/broker_registration/broker_agency_information"}).and_call_original
-    allow(view).to receive(:render).with({:locals=> anything, :partial=> "./ui-components/v1/forms/broker_registration/broker_profile_information"}).and_call_original
-    allow(view).to receive(:render).with({:partial=> "benefit_sponsors/profiles/registrations/general_agency_registration_form"}).and_call_original
-    allow(view).to receive(:render).with({:partial=> "benefit_sponsors/profiles/registrations/broker_registration_form"}).and_call_original
+    allow(view).to receive(:render).with({:locals => anything, :partial => "./ui-components/v1/forms/employer_registration/staff_role_information"}).and_call_original
+    allow(view).to receive(:render).with({:locals => anything, :partial => "./ui-components/v1/forms/office_locations/office_location_fields"}).and_call_original
+    allow(view).to receive(:render).with({:locals => anything, :partial => "./ui-components/v1/forms/office_locations/address"}).and_call_original
+    allow(view).to receive(:render).with({:locals => anything, :partial => "./ui-components/v1/forms/office_locations/phone"}).and_call_original
+    allow(view).to receive(:render).with({:locals => anything, :partial => "./ui-components/v1/forms/general_agency_registration/personal_information"}).and_call_original
+    allow(view).to receive(:render).with({:locals => anything, :partial => "./ui-components/v1/forms/general_agency_registration/general_agency_information"}).and_call_original
+    allow(view).to receive(:render).with({:locals => anything, :partial => "./ui-components/v1/forms/general_agency_registration/general_agency_profile_information"}).and_call_original
+    allow(view).to receive(:render).with({:locals => anything, :partial => "./ui-components/v1/forms/broker_registration/personal_information"}).and_call_original
+    allow(view).to receive(:render).with({:locals => anything, :partial => "./ui-components/v1/forms/broker_registration/broker_agency_information"}).and_call_original
+    allow(view).to receive(:render).with({:locals => anything, :partial => "./ui-components/v1/forms/broker_registration/broker_profile_information"}).and_call_original
+    allow(view).to receive(:render).with({:partial => "benefit_sponsors/profiles/registrations/general_agency_registration_form"}).and_call_original
+    allow(view).to receive(:render).with({:partial => "benefit_sponsors/profiles/registrations/broker_registration_form"}).and_call_original
 
     allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_alphanumeric_npn).and_call_original
     allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_attestation_fields).and_call_original
