@@ -6,9 +6,6 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # before_action :configure_account_update_params, only: [:update]
 
   # GET /resource/sign_up
-  # def new
-  #   super
-  # end
 
   # POST /resource
   def create
@@ -62,7 +59,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
   end
 
   def verify_recaptcha_if_needed
-    return true unless EnrollRegistry.feature_enabled?(:registration_recaptcha)
+    return true unless helpers.registration_recaptcha_enabled?("user_account")
     verify_recaptcha(model: resource)
   end
 

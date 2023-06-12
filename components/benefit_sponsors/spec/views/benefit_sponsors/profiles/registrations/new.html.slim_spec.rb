@@ -10,6 +10,70 @@ end
 
 RSpec.describe "benefit_sponsors/profiles/registrations/new", :type => :view, dbclean: :after_each do
   include_context "setup benefit market with market catalogs and product packages"
+  let(:agency) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: 'broker_agency', portal: true) }
+  let(:ga_agency) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: 'general_agency', portal: true) }
+
+  before :each do
+    current_benefit_market_catalog
+    view.extend Pundit
+    view.extend BenefitSponsors::Engine.routes.url_helpers
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:allow_alphanumeric_npn).and_call_original
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_attestation_fields).and_call_original
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_call_original
+  end
+
+  it "should display recaptcha for broker agency" do
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:registration_broker_recaptcha).and_return(true)
+    @profile_type = 'broker_agency'
+    assign(:agency, agency)
+    render template: "benefit_sponsors/profiles/registrations/new"
+    expect(rendered).to have_selector(:css,'.g-recaptcha')
+  end
+
+  it "should not display recaptcha for broker agency" do
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:registration_broker_recaptcha).and_return(false)
+    @profile_type = 'broker_agency'
+    assign(:agency, agency)
+    render template: "benefit_sponsors/profiles/registrations/new"
+    expect(rendered).not_to have_selector(:css,'.g-recaptcha')
+  end
+
+  it "should display recaptcha for general agency" do
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:registration_ga_recaptcha).and_return(true)
+    @profile_type = 'general_agency'
+    assign(:agency, ga_agency)
+    render template: "benefit_sponsors/profiles/registrations/new"
+    expect(rendered).to have_selector(:css,'.g-recaptcha')
+  end
+
+  it "should not display recaptcha for general agency" do
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:registration_ga_recaptcha).and_return(false)
+    @profile_type = 'general_agency'
+    assign(:agency, ga_agency)
+    render template: "benefit_sponsors/profiles/registrations/new"
+    expect(rendered).not_to have_selector(:css,'.g-recaptcha')
+  end
+
+  it "should display recaptcha for benefit sponsor" do
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:registration_sponsor_recaptcha).and_return(true)
+    @profile_type = 'benefit_sponsor'
+    assign(:agency, ga_agency)
+    render template: "benefit_sponsors/profiles/registrations/new"
+    expect(rendered).to have_selector(:css,'.g-recaptcha')
+  end
+
+  it "should not display recaptcha for benefit sponsor" do
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:registration_sponsor_recaptcha).and_return(false)
+    @profile_type = 'benefit_sponsor'
+    assign(:agency, ga_agency)
+    render template: "benefit_sponsors/profiles/registrations/new"
+    expect(rendered).not_to have_selector(:css,'.g-recaptcha')
+  end
+
+end
+
+RSpec.describe "benefit_sponsors/profiles/registrations/new", :type => :view, dbclean: :after_each do
+  include_context "setup benefit market with market catalogs and product packages"
 
   let(:user) { FactoryBot.create(:user) }
   let(:agency) { BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: 'benefit_sponsor', portal: true) }

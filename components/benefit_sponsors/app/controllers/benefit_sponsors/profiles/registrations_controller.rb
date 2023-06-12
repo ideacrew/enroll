@@ -52,6 +52,8 @@ module BenefitSponsors
             return
           end
         rescue Exception => e
+          logger.error "Error saving: #{e.message}"
+          logger.error e.backtrace.join("\n")
           flash[:error] = e.message
         end
         params[:profile_type] = profile_type
@@ -179,7 +181,7 @@ module BenefitSponsors
       end
 
       def verify_recaptcha_if_needed
-        return true unless EnrollRegistry.feature_enabled?(:registration_recaptcha)
+        return true unless helpers.registration_recaptcha_enabled?(profile_type)
         verify_recaptcha(model: @agency)
       end
     end
