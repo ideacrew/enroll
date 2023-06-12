@@ -113,7 +113,7 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
            "magi_medicaid_category" => "false",
            "member_determinations" => [{
              'kind' => 'Medicaid/CHIP Determination',
-             'is_eligible' => true,
+             'criteria_met' => true,
              'determination_reasons' => [:mitc_override_not_lawfully_present_pregnant]
            }]}],
      :eligibility_determinations =>
@@ -160,7 +160,7 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
       member_determination = @thhs.first.tax_household_members.first.member_determinations.first
       applicant = params[:applicants].first
       expect(member_determination.kind).to eq(applicant['member_determinations'].first['kind'])
-      expect(member_determination.is_eligible).to eq(applicant['member_determinations'].first['is_eligible'])
+      expect(member_determination.criteria_met).to eq(applicant['member_determinations'].first['criteria_met'])
       expect(member_determination.determination_reasons).to eq(applicant['member_determinations'].first['determination_reasons'])
     end
 
