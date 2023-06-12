@@ -53,12 +53,12 @@
             <div class="modal-footer" style="padding:10px">
               <center>
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-              <%= sanitize link_to sanitize(l10n("proceed")) , sanitize(l10n("checkbook_sadpi_health_url")), class: "btn btn-primary" %>
+              <%= sanitize link_to l10n("proceed") , l10n("checkbook_sadpi_health_url"), class: "btn btn-primary" %>
             </div>
           <div class="modal-footer" style="padding:10px">
             <center>
             <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-            <%= sanitize link_to sanitize(l10n("proceed")) , sanitize(@dc_individual_checkbook_url), class: "btn btn-primary checkbook_url" %>
+            <%= sanitize link_to l10n("proceed") , @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url" %>
           </center>
          </div>
       </div>
@@ -78,7 +78,7 @@
             <div class="modal-footer" style="padding:10px">
               <center>
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-              <%= sanitize link_to sanitize(l10n("proceed")) , sanitize(l10n("checkbook_health_url")), class: "btn btn-primary  mtz", target: '_blank'  %>
+              <%= sanitize link_to l10n("proceed") , l10n("checkbook_health_url"), class: "btn btn-primary  mtz", target: '_blank'  %>
             </div>
           </center>
          </div>
@@ -100,7 +100,7 @@
             <div class="modal-footer" style="padding:10px">
               <center>
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-              <%= sanitize link_to sanitize(l10n("proceed")), sanitize(@plan_comparison_checkbook_url) , class: "btn btn-primary" %>
+              <%= sanitize link_to l10n("proceed"), @plan_comparison_checkbook_url , class: "btn btn-primary" %>
             </div>
           </center>
          </div>
@@ -121,7 +121,7 @@
             <div class="modal-footer" style="padding:10px">
               <center>
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-              <%= sanitize link_to sanitize(l10n("proceed")) , sanitize(Rails.application.config.checkbook_services_base_url + l10n("dc_shop_nation_wide")) , class: "btn btn-primary",target: '_blank'%>
+              <%= sanitize link_to l10n("proceed") , Rails.application.config.checkbook_services_base_url + l10n("dc_shop_nation_wide") , class: "btn btn-primary",target: '_blank'%>
             </div>
           </center>
          </div>
