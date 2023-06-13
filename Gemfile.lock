@@ -1,13 +1,13 @@
 GIT
   remote: https://github.com/harshared/simple_calendar.git
-  revision: a2f5934cbcde8b6882147e27662d1e703203d071
+  revision: 109781178efa26c89ba51efa496bca29bc70a565
   specs:
     simple_calendar (2.2.5)
       rails (>= 3.0)
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 2b7a7c2f41bc6eed6580f45a26ee9dfceb9adb7a
+  revision: a2f5934cbcde8b6882147e27662d1e703203d071
   branch: trunk
   specs:
     aca_entities (0.10.0)
