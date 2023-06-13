@@ -89,7 +89,6 @@ module Operations
           is_non_magi_medicaid_eligible: applicant["is_non_magi_medicaid_eligible"],
           is_totally_ineligible: applicant["is_totally_ineligible"],
           csr_percent_as_integer: is_ia_eligible ? applicant["csr_percent_as_integer"] : 0,
-          # member_determinations: applicant["member_determinations"]
           member_determinations: member_determinations(applicant)
         )
       end
