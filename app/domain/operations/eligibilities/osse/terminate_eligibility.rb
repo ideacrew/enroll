@@ -9,6 +9,8 @@ module Operations
       # Terminate eligibility for the subject with given eligibility and termination date
       class TerminateEligibility
         send(:include, Dry::Monads[:result, :do])
+        include EventSource::Command
+        include EventSource::Logging
 
         # @param [Hash] opts Options to build eligibility
         # @option opts [<GlobalID>] :subject_gid required
@@ -16,8 +18,10 @@ module Operations
         # @option opts [Date]       :termination_date required
         # @return [Dry::Monad] result
         def call(params)
-          values = yield validate(params)
-          output = yield terminate(values)
+          values        = yield validate(params)
+          eligibilities = yield terminate(values)
+          event         = yield build_event(eligibilities)
+          output        = yield publish_event(event)
 
           Success(output)
         end
@@ -54,7 +58,8 @@ module Operations
             )
             eligibility.save! if eligibility.changed?
           end
-          Success('Eligibilities have been terminated')
+
+          Success(eligibilities)
         end
 
         def update_end_on?(eligibility, termination_date)
@@ -63,6 +68,24 @@ module Operations
               eligibility.end_on.present? &&
                 eligibility.end_on > termination_date
             )
+        end
+
+        def build_event(payload)
+          result = event('events.hc4cc.eligibility_terminated', attributes: payload)
+
+          unless Rails.env.test?
+            logger.info('-' * 100)
+            logger.info(
+              "Enroll Publisher to external systems(polypress),
+              event_key: events.hc4cc.eligibility_terminated, attributes: #{payload}, result: #{result}"
+            )
+            logger.info('-' * 100)
+          end
+          result
+        end
+
+        def publish_event(event)
+          Success(event.publish)
         end
       end
     end

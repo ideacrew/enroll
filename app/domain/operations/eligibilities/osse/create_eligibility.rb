@@ -19,10 +19,12 @@ module Operations
         # @option opts [Date]       :effective_date required
         # @return [Dry::Monad] result
         def call(params)
-          values  = yield validate(params)
-          entity  = yield build(values)
-          subject = yield load_subject(values)
-          output  = yield create(subject, entity)
+          values      = yield validate(params)
+          entity      = yield build(values)
+          subject     = yield load_subject(values)
+          eligibility = yield create(subject, entity)
+          event       = yield build_event(eligibility)
+          output      = yield publish_event(event)
 
           Success(output)
         end
@@ -64,12 +66,21 @@ module Operations
         end
 
         def build_event(payload)
-          event('events.crm_gateway.families.family_update', attributes: payload.to_h)
+          result = event('events.hc4cc.eligibility_created', attributes: payload)
+
+          unless Rails.env.test?
+            logger.info('-' * 100)
+            logger.info(
+              "Enroll Publisher to external systems(polypress),
+              event_key: events.hc4cc.eligibility_created, attributes: #{payload}, result: #{result}"
+            )
+            logger.info('-' * 100)
+          end
+          result
         end
 
         def publish(event)
-          event.publish
-          Success("Successfully published payload to CRM Gateway.")
+          Success(event.publish)
         end
       end
     end
