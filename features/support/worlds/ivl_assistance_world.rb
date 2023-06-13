@@ -181,7 +181,7 @@ module IvlAssistanceWorld
     @application.save!
   end
 
-  def create_application_applicant_with_other_income(state)
+  def create_application_applicant_with_incomes(state)
     create_family_faa_application(state)
     eligibility_determination1 = FactoryBot.create(:financial_assistance_eligibility_determination, application: @application)
     @applicant = FactoryBot.create(:financial_assistance_applicant, eligibility_determination_id: eligibility_determination1.id, is_primary_applicant: true, gender: "male", application: @application, family_member_id: BSON::ObjectId.new)
@@ -210,6 +210,18 @@ module IvlAssistanceWorld
                                          county: 'Cumberland')]
       appl.save!
     end
+
+    wages_and_salaries_params = {kind: "wages_and_salaries",
+                                 amount: 3400.0,
+                                 amount_tax_exempt: 0,
+                                 frequency_kind: "quarterly",
+                                 start_on: Date.new(TimeKeeper.date_of_record.year,0o1,0o1),
+                                 end_on: nil,
+                                 is_projected: false,
+                                 submitted_at: TimeKeeper.date_of_record}
+
+    @application.applicants.first.incomes << FinancialAssistance::Income.new(wages_and_salaries_params)
+
     @application.save!
   end
 
