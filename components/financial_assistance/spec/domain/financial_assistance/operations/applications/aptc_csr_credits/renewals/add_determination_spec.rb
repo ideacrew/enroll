@@ -150,8 +150,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
           it 'should update member_determination value' do
             @payload_member_determinations.each do |payload_member_determination|
               member_determination = @applicant.member_determinations.detect { |md| md.kind == payload_member_determination[:kind] }
-              expect(member_determination.is_eligible).to eq(payload_member_determination[:is_eligible])
+              expect(member_determination.criteria_met).to eq(payload_member_determination[:criteria_met])
               expect(member_determination.determination_reasons).to eq(payload_member_determination[:determination_reasons])
+              expect(member_determination.eligibility_overrides).to eq(payload_member_determination[:eligibility_overrides])
             end
           end
         end
