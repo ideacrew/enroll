@@ -72,6 +72,7 @@ Feature: Cost Savings Raw Application
     And the admin should see text Full Application
     When admin clicks on Full application action
     Then the social security type - retirement benefits should show
+    And the wages and salaries type should display
 
   Scenario: Admin clicks on review application action, sees caretaker questions
     Given a family with financial application and applicants in determined state exists
