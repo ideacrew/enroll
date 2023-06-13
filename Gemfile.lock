@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/harshared/simple_calendar.git
-  revision: 109781178efa26c89ba51efa496bca29bc70a565
+  revision: a2f5934cbcde8b6882147e27662d1e703203d071
   specs:
     simple_calendar (2.2.5)
       rails (>= 3.0)

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Represents an eligibility override for a member
-class EligibilityDetermination
+class EligibilityOverride
   include Mongoid::Document
   include Mongoid::Timestamps
 
