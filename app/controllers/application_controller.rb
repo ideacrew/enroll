@@ -456,7 +456,9 @@ class ApplicationController < ActionController::Base
                         end
         dismiss_announcements = JSON.parse(session[:dismiss_announcements] || "[]") rescue []
         announcements -= dismiss_announcements
-        flash.now[:warning] = announcements
+        flash.now[:warning] = announcements.map do |announcement|
+          { is_announcement: true, announcement: announcement }
+        end
       end
     end
 
@@ -467,7 +469,9 @@ class ApplicationController < ActionController::Base
     announcements = Announcement.announcements_for_web
     dismiss_announcements = JSON.parse(session[:dismiss_announcements] || '[]')
     announcements -= dismiss_announcements
-    flash.now[:warning] = announcements
+    flash.now[:warning] = announcements.map do |announcement|
+      { is_announcement: true, announcement: announcement }
+    end
   end
 
   def check_browser_compatibility
