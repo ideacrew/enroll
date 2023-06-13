@@ -26,7 +26,7 @@
         .modal-footer style="padding:10px"
           center
             button.btn.btn-default.btn-default data-dismiss="modal" type="button"  Cancel
-            = link_to l10n("confirm") , @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url"
+            = link_to l10n("proceed") , @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url"
 
   #plan_match_dental_redirection.modal.fade role="document" tabindex="-1"
     .modal-dialog
@@ -41,7 +41,7 @@
         .modal-footer style="padding:10px"
           center
             button.btn.btn-default.btn-default data-dismiss="modal" type="button"  Cancel
-            = link_to l10n("confirm") , 'https://dc.checkbookhealth.org/sadpi/dc/2019/', class: "btn btn-primary"
+            = link_to l10n("proceed") , l10n("sadpi_url"), class: "btn btn-primary"
 
   #plan_match_family.modal.fade role="document" tabindex="-1"
     .modal-dialog
@@ -56,7 +56,7 @@
         .modal-footer style="padding:10px"
           center
             button.btn.btn-default.btn-default data-dismiss="modal" type="button"  Cancel
-            = link_to l10n("confirm"), EnrollRegistry[:enroll_app].setting(:shop_find_your_doctor_url).item, class: "btn btn-primary  mtz", target: '_blank'
+            = link_to l10n("proceed"), EnrollRegistry[:enroll_app].setting(:shop_find_your_doctor_url).item, class: "btn btn-primary  mtz", target: '_blank'
 
   #plan_match_doctor_shop.modal.fade role="document" tabindex="-1"
     .modal-dialog
@@ -71,7 +71,7 @@
         .modal-footer style="padding:10px"
           center
             button.btn.btn-default.btn-default data-dismiss="modal" type="button" Cancel
-            = link_to l10n("confirm") , Rails.application.config.checkbook_services_base_url + '/dcshopnationwide/' , class: "btn btn-primary",target: '_blank'
+            = link_to l10n("proceed") , Rails.application.config.checkbook_services_base_url + l10n("dc_shop_nation_wide") , class: "btn btn-primary",target: '_blank'
   #plan_match_shop.modal.fade role="document" tabindex="-1"
     .modal-dialog
       .modal-content
@@ -85,7 +85,7 @@
         .modal-footer style="padding:10px"
           center
             button.btn.btn-default.btn-default data-dismiss="modal" type="button" Cancel
-            =link_to l10n("confirm"), @plan_comparison_checkbook_url , class: "btn btn-primary"
+            =link_to l10n("proceed"), @plan_comparison_checkbook_url , class: "btn btn-primary"
   #how_is_this_calculated.modal.fade role="document" tabindex="-1"
     .modal-dialog
       .modal-content
