@@ -7,7 +7,7 @@ RSpec.describe ::Operations::People::Addresses::Compare, dbclean: :after_each do
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:params) do
     person.addresses.first.delete
-    {"person_hbx_id" => person.hbx_id, "address_id" => person.home_address.id}
+    {:person_hbx_id => person.hbx_id, :address_id => person.home_address.id}
   end
 
   context 'when valid params passed' do
