@@ -53,7 +53,7 @@ module Operations
         def terminate(values, eligibilities)
           termination_date = values[:termination_date].to_date
           evidence_key = values[:evidence_key]
-       
+
           eligibilities.each do |eligibility|
             evidence = eligibility.evidences.new
             evidence.title = "#{evidence_key.to_s.titleize} Evidence"

@@ -24,7 +24,7 @@ module Operations
           subject     = yield load_subject(values)
           eligibility = yield create(subject, entity)
           event       = yield build_event(eligibility)
-          output      = yield publish_event(event)
+          _output     = yield publish_event(event)
 
           Success(eligibility)
         end
