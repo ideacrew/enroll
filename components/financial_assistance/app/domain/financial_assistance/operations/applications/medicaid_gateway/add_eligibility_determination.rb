@@ -102,9 +102,15 @@ module FinancialAssistance
                                             is_totally_ineligible: ped_entity.is_totally_ineligible,
                                             is_eligible_for_non_magi_reasons: ped_entity.is_eligible_for_non_magi_reasons,
                                             is_non_magi_medicaid_eligible: ped_entity.is_non_magi_medicaid_eligible})
-              applicant.save
 
-              applicant.update(member_determinations: member_determinations) if member_determinations
+              build_member_determinations(applicant, member_determinations) if member_determinations
+              applicant.save
+            end
+          end
+
+          def build_member_determinations(applicant, member_determinations)
+            member_determinations&.each do |md|
+              applicant.member_determinations.build(md)
             end
           end
 
@@ -130,12 +136,6 @@ module FinancialAssistance
           def find_matching_applicant(elig_det, applicant_ref)
             elig_det.applicants.detect do |applicant|
               applicant.person_hbx_id.to_s == applicant_ref.to_s
-            end
-          end
-
-          def build_member_determinations(ped_entity)
-            ped_entity.member_determinations.map do |member_determination|
-              ::FinancialAssistance::MemberDetermination.new(member_determination.to_h)
             end
           end
         end
