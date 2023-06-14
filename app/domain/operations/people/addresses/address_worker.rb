@@ -66,7 +66,7 @@ module Operations
         end
 
         def address_logger
-          @address_logger ||= Logger.new("#{Rails.root}/log/address_worker_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+          @address_logger ||= Logger.new("#{Rails.root}/log/address_worker.log")
         end
       end
     end
