@@ -23,8 +23,19 @@ module Operations
         private
 
         def validate(params)
-          return Failure("AddressWorker: Person_hbx_id is missing") unless params[:person_hbx_id].present?
-          return Failure("AddressWorker: address_id is missing") unless params[:address_id].present?
+          address_logger << "\n"
+
+          unless params[:person_hbx_id].present?
+            address_logger.debug(params) { "AddressWorker: Person_hbx_id is missing" }
+            return Failure("AddressWorker: Person_hbx_id is missing")
+          end
+
+          address_logger.info(params[:person_hbx_id]) { "*" * 100 }
+
+          unless params[:address_id].present?
+            address_logger.debug(params[:person_hbx_id]) { "AddressWorker: address_id is missing" }
+            return Failure("AddressWorker: address_id is missing")
+          end
 
           Success(params)
         end
@@ -34,19 +45,16 @@ module Operations
 
           if output.success?
             payload = output.success.deep_symbolize_keys!
-            logger << "\n"
-            logger.info(payload[:person_hbx_id]) { "*" * 100 }
-
             event_payload = build_event_payload(payload)
             result = ::Operations::Events::BuildAndPublish.new.call(event_payload)
 
-            logger.info(payload[:person_hbx_id]) { [result, {event_payload: event_payload}] }
+            address_logger.info(payload[:person_hbx_id]) { [result, {event_payload: event_payload}] }
           else
-            logger.debug(payload[:person_hbx_id]) { output }
+            address_logger.debug(payload[:person_hbx_id]) { output }
           end
           Success("AddressWorker: Completed")
         rescue StandardError => e
-          logger.error(valid_params["person_hbx_id"]) { {Error: e.inspect} }
+          address_logger.error(valid_params["person_hbx_id"]) { {Error: e.inspect} }
           Success("AddressWorker: Failed")
         end
 
@@ -57,8 +65,8 @@ module Operations
           {event_name: "events.families.family_members.#{event_key}", attributes: payload.to_h, headers: headers}
         end
 
-        def logger
-          @logger ||= Logger.new("#{Rails.root}/log/address_worker_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+        def address_logger
+          @address_logger ||= Logger.new("#{Rails.root}/log/address_worker_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
         end
       end
     end
