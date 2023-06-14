@@ -26,7 +26,7 @@ module Operations
           event       = yield build_event(eligibility)
           output      = yield publish_event(event)
 
-          Success(output)
+          Success(eligibility)
         end
 
         private
@@ -66,20 +66,20 @@ module Operations
         end
 
         def build_event(payload)
-          result = event('events.hc4cc.eligibility_created', attributes: payload)
+          result = event('events.hc4cc.eligibility_created', attributes: payload.attributes.to_h)
 
           unless Rails.env.test?
             logger.info('-' * 100)
             logger.info(
               "Enroll Publisher to external systems(polypress),
-              event_key: events.hc4cc.eligibility_created, attributes: #{payload}, result: #{result}"
+              event_key: events.hc4cc.eligibility_created, attributes: #{payload.attributes.to_h}, result: #{result}"
             )
             logger.info('-' * 100)
           end
           result
         end
 
-        def publish(event)
+        def publish_event(event)
           Success(event.publish)
         end
       end

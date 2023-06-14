@@ -19,8 +19,9 @@ module Operations
         # @return [Dry::Monad] result
         def call(params)
           values        = yield validate(params)
-          eligibilities = yield terminate(values)
-          event         = yield build_event(eligibilities)
+          eligibilities = yield find_eligibility(values)
+          eligibility   = yield terminate(values, eligibilities)
+          event         = yield build_event(eligibility)
           output        = yield publish_event(event)
 
           Success(output)
@@ -37,14 +38,22 @@ module Operations
           errors.empty? ? Success(params) : Failure(errors)
         end
 
-        def terminate(values)
+        def find_eligibility(values)
           subject_instance = GlobalID::Locator.locate(values[:subject_gid])
+          eligibilities =
+            subject_instance.eligibilities.with_evidence(values[:evidence_key])
+
+          if eligibilities.present?
+            Success(eligibilities)
+          else
+            Failure('unable to find eligibilities for termination')
+          end
+        end
+
+        def terminate(values, eligibilities)
           termination_date = values[:termination_date].to_date
           evidence_key = values[:evidence_key]
-
-          eligibilities =
-            subject_instance.eligibilities.with_evidence(evidence_key)
-
+       
           eligibilities.each do |eligibility|
             evidence = eligibility.evidences.new
             evidence.title = "#{evidence_key.to_s.titleize} Evidence"
@@ -59,7 +68,7 @@ module Operations
             eligibility.save! if eligibility.changed?
           end
 
-          Success(eligibilities)
+          Success(eligibilities.first)
         end
 
         def update_end_on?(eligibility, termination_date)
@@ -71,13 +80,13 @@ module Operations
         end
 
         def build_event(payload)
-          result = event('events.hc4cc.eligibility_terminated', attributes: payload)
+          result = event('events.hc4cc.eligibility_terminated', attributes: payload.attributes.to_h)
 
           unless Rails.env.test?
             logger.info('-' * 100)
             logger.info(
               "Enroll Publisher to external systems(polypress),
-              event_key: events.hc4cc.eligibility_terminated, attributes: #{payload}, result: #{result}"
+              event_key: events.hc4cc.eligibility_terminated, attributes: #{payload.attributes.to_h}, result: #{result}"
             )
             logger.info('-' * 100)
           end
