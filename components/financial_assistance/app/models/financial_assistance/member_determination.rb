@@ -6,12 +6,13 @@ module FinancialAssistance
     include Mongoid::Timestamps
 
     embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
+    embeds_many :eligibility_overrides, class_name: '::FinancialAssistance::EligibilityOverride'
 
       # The kind of determination.
     field :kind, type: String
 
       # Whether or not the member is eligible for the kind of determination.
-    field :is_eligible, type: Boolean
+    field :criteria_met, type: Boolean
 
       # The reasons the member qualifies for the determination.
     field :determination_reasons, type: Array

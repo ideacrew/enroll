@@ -33,7 +33,7 @@ module FinancialAssistance
 
             def validate(application)
               if application.determined?
-                parsed_payload = JSON.parse(application.eligibility_response_payload)
+                parsed_payload = JSON.parse(application.eligibility_response_payload, symbolize_names: true)
                 ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(parsed_payload)
               else
                 Failure("RequestDeterminationNotice: Unable to send the notice for undetermined application for given application hbx_id: #{application.hbx_id}")
