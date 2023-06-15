@@ -65,7 +65,7 @@ module Subscribers
         end
 
         def subscriber_logger
-          @subscriber_logger ||= Logger.new("#{Rails.root}/log/address_relocated_subscriber#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+          @subscriber_logger ||= Logger.new("#{Rails.root}/log/address_relocated_subscriber.log")
         end
       end
     end

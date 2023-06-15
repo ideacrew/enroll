@@ -6,7 +6,7 @@ module FinancialAssistance
     include Mongoid::Timestamps
 
     embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
-    embeds_many :eligibility_overrides, class_name: '::FinancialAssistance::EligibilityOverride'
+    embeds_many :eligibility_overrides, class_name: '::FinancialAssistance::EligibilityOverride', cascade_callbacks: true
 
       # The kind of determination.
     field :kind, type: String
