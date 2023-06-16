@@ -80,6 +80,7 @@ module Operations
           else
             current = nil
             current = "Lived in another country or was deceased" if current_month_data[:primary_absent]
+            current = "Lived in a different state" if current.blank? && in_different_state?(params, current_month_data)
           end
         end
 
@@ -168,6 +169,17 @@ module Operations
       members.each do |member|
         return member if member[:primaryMember]
       end
+    end
+
+    def in_different_state?(params, current_month_data)
+      return true if current_month_data.blank?
+      return true if current_month_data[:residence].blank?
+      return true if current_month_data[:residence][:state].blank?
+
+      estimate_state = params[:state].downcase
+      address_state = current_month_data[:residence][:state].downcase
+
+      address_state != estimate_state
     end
 
     def generate_small_id
