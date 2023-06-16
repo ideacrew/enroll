@@ -5,6 +5,7 @@ class MemberDetermination
   include Mongoid::Timestamps
 
   embedded_in :tax_household_member
+  embeds_many :eligibility_overrides, cascade_callbacks: true
 
   # The kind of determination.
   field :kind, type: String
