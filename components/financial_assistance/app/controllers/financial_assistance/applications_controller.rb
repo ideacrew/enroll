@@ -152,6 +152,7 @@ module FinancialAssistance
       @all_relationships = @application.relationships
       @application.calculate_total_net_income_for_applicants
       @applicants = @application.active_applicants if @application.present?
+      build_applicants_name_by_hbx_id_hash
       flash[:error] = 'Applicant has incomplete information' if @application.incomplete_applicants?
       @has_outstanding_local_mec_evidence = has_outstanding_local_mec_evidence?(@application) if EnrollRegistry.feature_enabled?(:mec_check)
       @shop_coverage = shop_enrollments_exist?(@application) if EnrollRegistry.feature_enabled?(:shop_coverage_check)
