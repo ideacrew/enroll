@@ -358,7 +358,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
 
       it "should get announcement" do
-        expect(flash.now[:warning]).to eq ["msg for Employee"]
+        expect(flash.now[:warning]).to eq [{ :announcement => 'msg for Employee', :is_announcement => true }]
       end
     end
 
