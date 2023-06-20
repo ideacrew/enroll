@@ -143,7 +143,7 @@ if ExchangeTestingConfigurationHelper.general_agency_enabled?
       end
 
       it "should get announcement" do
-        expect(flash.now[:warning]).to eq ["msg for GA"]
+        expect(flash.now[:warning]).to eq [{ :announcement => 'msg for GA', :is_announcement => true }]
       end
     end
 

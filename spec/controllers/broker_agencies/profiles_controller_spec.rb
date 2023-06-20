@@ -44,7 +44,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
     end
 
     it "should get announcement" do
-      expect(flash.now[:warning]).to eq ["msg for Broker"]
+      expect(flash.now[:warning]).to eq [{ :announcement => 'msg for Broker', :is_announcement => true }]
     end
   end
 
