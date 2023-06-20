@@ -24,7 +24,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def can_access_user_account_tab?
-    return false unless (role = user.person) && user.person.hbx_staff_role
+    return false unless user.person && (role = user.person.hbx_staff_role)
     return false unless role.permission
     role.permission.can_access_user_account_tab
   end
