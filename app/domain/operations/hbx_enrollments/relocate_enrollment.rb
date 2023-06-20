@@ -79,9 +79,7 @@ module Operations
 
           if result == true
             reinstatement.select_coverage!
-            result_hash = {}
-            result_hash[:base_enrollment] = {:hbx_id => base_enrollment.hbx_id, :aasm_state => base_enrollment.aasm_state, :coverage_kind => base_enrollment.coverage_kind, :kind => reinstatement.kind}
-            result_hash.merge!(:relocated_enrollment => {:hbx_id => reinstatement.hbx_id, :aasm_state => reinstatement.aasm_state, :coverage_kind => reinstatement.coverage_kind, :kind => reinstatement.kind})
+            result_hash = build_result_hash(base_enrollment, reinstatement)
             Success(result_hash)
           else
             Failure([result, "reinstatement_shopping_enrollment: #{reinstatement}"])
@@ -89,6 +87,21 @@ module Operations
         else
           Failure(reinstatement.errors.full_messages)
         end
+      end
+
+      def build_result_hash(base_enrollment, reinstatement)
+        hash = {}
+        hash[:base_enrollment] = {:hbx_id => base_enrollment.hbx_id,
+                                  :aasm_state => base_enrollment.aasm_state,
+                                  :coverage_kind => base_enrollment.coverage_kind,
+                                  :kind => base_enrollment.kind,
+                                  :applied_aptc_amount => base_enrollment.applied_aptc_amount&.to_f}
+        hash.merge!(:relocated_enrollment => {:hbx_id => reinstatement.hbx_id,
+                                              :aasm_state => reinstatement.aasm_state,
+                                              :coverage_kind => reinstatement.coverage_kind,
+                                              :kind => reinstatement.kind,
+                                              :applied_aptc_amount => reinstatement.applied_aptc_amount&.to_f})
+        hash
       end
 
       # TODO: Implement this method for emitting events once enrollment_relocation is done

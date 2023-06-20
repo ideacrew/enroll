@@ -677,7 +677,7 @@ Then(/^a family with financial application and applicants in (.*) state exists w
 end
 
 When(/^an applicant with other income exists for a (.*) financial application$/) do |state|
-  create_application_applicant_with_other_income(state)
+  create_application_applicant_with_incomes(state)
 end
 
 Then(/^the user with (.*) role is logged in$/) do |role|
@@ -711,6 +711,10 @@ end
 
 Then(/^the social security type - (.*) benefits should show$/) do |ssi_type|
   expect(page).to have_content(l10n("faa.income.social_security_benefit.#{ssi_type}"))
+end
+
+Then(/^the (.*) type should display$/) do |income_type|
+  expect(page).to have_content(l10n("faa.income.#{income_type.parameterize.underscore}"))
 end
 
 Then(/^the caretaker questions should show$/) do

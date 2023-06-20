@@ -2014,4 +2014,54 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     evidence.documents.create(title: 'document.pdf', creator: 'mehl', subject: 'document.pdf', publisher: 'mehl', type: 'text', identifier: 'identifier',
                               source: 'enroll_system', language: 'en')
   end
+
+  context 'adding member_determinations' do
+    let(:override_rules) {::AcaEntities::MagiMedicaid::Types::EligibilityOverrideRule.values}
+    let(:member_determinations) do
+      [medicaid_and_chip_member_determination]
+    end
+
+    let(:medicaid_and_chip_member_determination) do
+      {
+        kind: 'Medicaid/CHIP Determination',
+        criteria_met: false,
+        determination_reasons: [],
+        eligibility_overrides: medicaid_chip_eligibility_overrides
+      }
+    end
+
+    let(:medicaid_chip_eligibility_overrides) do
+      override_rules.map do |rule|
+        {
+          override_rule: rule,
+          override_applied: false
+        }
+      end
+    end
+
+    before do
+      @applicant = application.applicants.first
+      @applicant.update(member_determinations: member_determinations)
+
+    end
+
+    it 'should successfully add all member determination attributes' do
+      expect(@applicant.member_determinations.first.kind).to eq('Medicaid/CHIP Determination')
+      expect(@applicant.member_determinations.first.criteria_met).to eq(false)
+      expect(@applicant.member_determinations.first.determination_reasons).to eq([])
+      expect(@applicant.member_determinations.first.eligibility_overrides.present?).to be_truthy
+    end
+
+    context 'eligibility_overrides' do
+      it 'should successfully add all eligibility_overrides attributes' do
+        override_rules.each do |rule|
+          override = @applicant.member_determinations.first.eligibility_overrides.detect{|o| o.override_rule == rule}
+          expect(override.present?).to be_truthy
+          expect(override.override_applied).to eq(false)
+          expect(override.created_at.present?).to be_truthy
+          expect(override.updated_at.present?).to be_truthy
+        end
+      end
+    end
+  end
 end

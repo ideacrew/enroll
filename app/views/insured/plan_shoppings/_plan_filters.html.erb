@@ -32,7 +32,7 @@
             <div class="modal-footer" style="padding:10px">
               <center>
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-              <%=link_to l10n("confirm") , @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url" %>
+              <%= sanitize link_to l10n("proceed") , @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url" %>
             </center>
             </div>
          </div>
@@ -53,12 +53,12 @@
             <div class="modal-footer" style="padding:10px">
               <center>
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-              <%=link_to l10n("confirm") , 'https://dc.checkbookhealth.org/sadpi/dc/2019/', class: "btn btn-primary" %>
+              <%= sanitize link_to l10n("proceed") , l10n("checkbook_sadpi_health_url"), class: "btn btn-primary" %>
             </div>
           <div class="modal-footer" style="padding:10px">
             <center>
             <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-            <%=link_to l10n("confirm") , @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url" %>
+            <%= sanitize link_to l10n("proceed") , @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url" %>
           </center>
          </div>
       </div>
@@ -78,7 +78,7 @@
             <div class="modal-footer" style="padding:10px">
               <center>
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-              <%=link_to l10n("confirm") , 'https://dc.checkbookhealth.org/dc/', class: "btn btn-primary  mtz", target: '_blank'  %>
+              <%= sanitize link_to l10n("proceed") , l10n("checkbook_health_url"), class: "btn btn-primary  mtz", target: '_blank'  %>
             </div>
           </center>
          </div>
@@ -100,7 +100,7 @@
             <div class="modal-footer" style="padding:10px">
               <center>
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-              <%=link_to l10n("confirm"), @plan_comparison_checkbook_url , class: "btn btn-primary" %>
+              <%= sanitize link_to l10n("proceed"), @plan_comparison_checkbook_url , class: "btn btn-primary" %>
             </div>
           </center>
          </div>
@@ -121,7 +121,7 @@
             <div class="modal-footer" style="padding:10px">
               <center>
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-              <%=link_to l10n("confirm") , Rails.application.config.checkbook_services_base_url + '/dcshopnationwide/' , class: "btn btn-primary",target: '_blank'%>
+              <%= sanitize link_to l10n("proceed") , Rails.application.config.checkbook_services_base_url + l10n("dc_shop_nation_wide") , class: "btn btn-primary",target: '_blank'%>
             </div>
           </center>
          </div>
