@@ -136,6 +136,8 @@ class MeDefinePermissions < MigrationTask
     hbx_admin_can_access_age_off_excluded
     hbx_admin_can_manage_qles
     hbx_admin_can_change_username_and_email
+    hbx_admin_can_view_notice_templates
+    hbx_admin_can_edit_notice_templates
   end
 
   def build_test_roles
@@ -413,6 +415,18 @@ class MeDefinePermissions < MigrationTask
     Permission.hbx_csr_supervisor.update_attributes!(can_change_username_and_email: false)
     Permission.hbx_csr_tier1.update_attributes!(can_change_username_and_email: false)
     Permission.hbx_csr_tier2.update_attributes!(can_change_username_and_email: false)
+  end
+
+  def hbx_admin_can_view_notice_templates
+    Permission.super_admin.update_attributes!(can_view_notice_templates: true)
+    Permission.hbx_staff.update_attributes!(can_view_notice_templates: true)
+    Permission.hbx_tier3.update_attributes!(can_view_notice_templates: true)
+  end
+
+  def hbx_admin_can_edit_notice_templates
+    Permission.super_admin.update_attributes!(can_edit_notice_templates: true)
+    Permission.hbx_staff.update_attributes!(can_edit_notice_templates: true)
+    Permission.hbx_tier3.update_attributes!(can_edit_notice_templates: true)
   end
 end
 # rubocop:enable Metrics/ClassLength

@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: ab7af7e162fbd2a0a48e3961352f02817fa83033
+  revision: 5cf8f6079674c5ffe1fd283322a848b26bb2dfa3
   branch: trunk
   specs:
     aca_entities (0.10.0)
@@ -183,6 +183,7 @@ PATH
       money-rails (~> 1.13)
       mongoid (~> 7.0.2)
       non-stupid-digest-assets
+      pundit (~> 2.0)
       rails (~> 5.2.4.3)
       redcarpet (~> 3.4.0)
       roo (~> 2.1.0)

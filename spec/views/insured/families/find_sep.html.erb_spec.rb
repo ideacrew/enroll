@@ -48,7 +48,7 @@ RSpec.describe "insured/families/find_sep.html.erb", :dbclean => :around_each do
   it "should have outside open enrollment modal" do
     expect(rendered).to have_selector('div.modal#outside-open-enrollment')
     expect(rendered).to match(/Open enrollment starts on/)
-    expect(rendered).to match(/To enroll before open enrollment, you must qualify for a special enrollment period. If none of the circumstances listed apply to you, you will not be able to enroll until/)
+    expect(rendered).to match(/To enroll before Open Enrollment, you must qualify for a Special Enrollment Period/)
     expect(rendered).to have_selector("a[href='/families/home']", text: 'Back To My Account')
   end
 end

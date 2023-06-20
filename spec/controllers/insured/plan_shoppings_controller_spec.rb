@@ -241,7 +241,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         controller.instance_variable_set(:@max_aptc, max_aptc)
         controller.instance_variable_set(:@aptc_grants, double)
         EnrollRegistry[:aca_individual_osse_aptc_minimum].feature.stub(:is_enabled).and_return(true)
-        allow_any_instance_of(HbxEnrollment).to receive(:ivl_osse_eligible?).and_return(true)
+        allow_any_instance_of(HbxEnrollment).to receive(:ivl_osse_eligible?).with(start_of_year).and_return(true)
         sign_in(user)
       end
 
@@ -252,9 +252,25 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         expect(assigns(:elected_aptc)).to eq(max_aptc * 0.85)
       end
 
-      it 'does not change elected_aptc for non hc4cc plan' do
+      it 'changes elected_aptc for non hc4cc plan' do
         plan.update!(is_hc4cc_plan: false)
         get :thankyou, params: input_params, session: session_variables
+        expect(response).to have_http_status(:success)
+        expect(assigns(:elected_aptc)).to eq(max_aptc * 0.85)
+      end
+    end
+
+    context 'when consumer is not osse eligible' do
+      before do
+        controller.instance_variable_set(:@elected_aptc, elected_aptc)
+        controller.instance_variable_set(:@max_aptc, max_aptc)
+        controller.instance_variable_set(:@aptc_grants, double)
+        EnrollRegistry[:aca_individual_osse_aptc_minimum].feature.stub(:is_enabled).and_return(false)
+        sign_in(user)
+        get :thankyou, params: input_params, session: session_variables
+      end
+
+      it 'does not change elected_aptc' do
         expect(response).to have_http_status(:success)
         expect(assigns(:elected_aptc)).to eq(elected_aptc)
       end
@@ -267,12 +283,12 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         controller.instance_variable_set(:@aptc_grants, double)
         EnrollRegistry[:aca_individual_osse_aptc_minimum].feature.stub(:is_enabled).and_return(false)
         plan.update!(is_hc4cc_plan: true)
-        allow_any_instance_of(HbxEnrollment).to receive(:ivl_osse_eligible?).and_return(true)
+        allow_any_instance_of(HbxEnrollment).to receive(:ivl_osse_eligible?).with(start_of_year).and_return(true)
         sign_in(user)
         get :thankyou, params: input_params, session: session_variables
       end
 
-      it 'changes elected_aptc to min 85 percent' do
+      it 'does not change elected_aptc' do
         expect(response).to have_http_status(:success)
         expect(assigns(:elected_aptc)).to eq(elected_aptc)
       end

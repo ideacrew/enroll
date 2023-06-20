@@ -994,6 +994,11 @@ And(/consumer has successful ridp/) do
   benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(start_on)}.update_attributes!(slcsp_id: current_product.id)
 end
 
+And(/consumer has osse eligibility/) do
+  person = Person.all.first
+  person.consumer_role.eligibilities << FactoryBot.build(:eligibility, :with_evidences, :with_subject, start_on: TimeKeeper.date_of_record.beginning_of_year)
+end
+
 When(/consumer visits home page after successful ridp/) do
   user.identity_final_decision_code = "acc"
   user.save
@@ -1097,7 +1102,7 @@ When(/Individual clicks on None of the situations listed above apply checkbox$/)
   sleep 2
   expect(page).to have_content 'None of the situations listed above apply'
   find(IvlSpecialEnrollmentPeriod.none_apply_checkbox).click
-  expect(page).to have_content 'To enroll before open enrollment'
+  expect(page).to have_content 'To enroll before Open Enrollment'
 end
 
 Then(/Individual should land on Home page$/) do

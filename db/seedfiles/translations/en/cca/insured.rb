@@ -391,6 +391,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.filter_by_the_carrier' => "filter by the carrier",
   :'en.hsa_eligible' => "HSA Eligible",
   :'en.insured.plan_shoppings.hsa_eligible_title_info' => "Plans that are eligible for HSA (Health Savings Accounts) are classified as High Deductible Health Plans (HDHP) and enable you to open a tax-preferred medical savings account at your bank to pay for qualified medical expenses. Funds in an HSA account roll over year to year if you don't spend them.",
+  :'en.insured.plan_shoppings.hc4cc_eligible_title_info' => "Plans that are eligible for premium reductions. OSSE eligible plans",
   :'en.premium_amount' => "Premium Amount",
   :'en.insured.plan_shoppings.premium_amount_title_info' => "Will filter by Your Cost",
   :'en.deductible_amount' => "Deductible Amount",
@@ -428,5 +429,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.enrollment.tobbaco_user' => 'Tobacco User',
   :'en.enrollment_member.coverage_state_date' => 'Coverage Start Date',
   :'en.not_available' => 'NA',
-  :'en.insured.rejected' => "%{ridp_type} successfully rejected."
+  :'en.insured.rejected' => "%{ridp_type} successfully rejected.",
+  :'en.your_tax_credit' => "Your Tax Credit",
+  :'en.your_tax_credit_for_hc4cc' => "Your Tax Credit: HC4CC eligible households must use at least 85 percent of the credit."
 }.freeze

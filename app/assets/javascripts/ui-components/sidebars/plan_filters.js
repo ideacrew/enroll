@@ -10,6 +10,7 @@ var filterParams = {
   selectedPlanNetworks: new Array,
   selectedCarrier: new String,
   selectedHSA: new String,
+  selectedOSSE: new String,
   premiumFromAmountValue: new String,
   premiumToAmountValue: new String,
   deductibleFromAmountValue: new String,
@@ -36,6 +37,10 @@ function filterHSAEligibility(element) {
   filterParams.selectedHSA = element.value
 }
 
+function filterOSSEEligibility(element) {
+  filterParams.selectedOSSE = element.value
+}
+
 function premuimFromAmount(element) {
   filterParams.premiumFromAmountValue = element.value
 }
@@ -55,7 +60,7 @@ function deductibleToAmount(element) {
 function processValues(element) {
   if (element.checked) {
     var dataType = element.dataset.category;
- 
+
     if (dataType == "planMetalLevel") {
       filterParams.selectedMetalLevels.push(element.dataset.planMetalLevel)
     }
@@ -67,7 +72,7 @@ function processValues(element) {
     }
   } else if (!element.checked) {
     var dataType = element.dataset.category;
-    
+
     if (dataType == "planMetalLevel") {
       index = filterParams.selectedMetalLevels.indexOf(element.dataset.planMetalLevel)
       removeItems(filterParams.selectedMetalLevels,index)
@@ -98,6 +103,7 @@ function clearAll() {
     // Select options -- WISH LIST GET RID OF SELECTRIC TO REMOVE JQUERY RELIANCE --
     $("#filter-sidebar select.plan-carrier-selection-filter").prop('selectedIndex', 0).selectric('refresh');
     $("#filter-sidebar select.plan-hsa-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
+    $("#filter-sidebar select.plan-osse-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
   }
   
   
@@ -107,6 +113,7 @@ function clearAll() {
   filterParams.selectedPlanNetworks = [];
   filterParams.selectedCarrier = "";
   filterParams.selectedHSA = "";
+  filterParams.selectedOSSE = "";
   filterParams.premiumFromAmountValue = "";
   filterParams.premiumToAmountValue = "";
   filterParams.deductibleFromAmountValue = "";

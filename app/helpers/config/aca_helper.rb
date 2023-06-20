@@ -397,4 +397,16 @@ module Config::AcaHelper
       false
     end
   end
+
+  def osse_aptc_minimum_enabled?
+    EnrollRegistry.feature_enabled?(:aca_individual_osse_aptc_minimum)
+  end
+
+  def default_applied_aptc_pct
+    EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
+  end
+
+  def minimum_applied_aptc_pct_for_osse
+    EnrollRegistry[:aca_individual_assistance_benefits].setting(:minimum_applied_aptc_percentage_for_osse).item
+  end
 end
