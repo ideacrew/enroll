@@ -342,16 +342,29 @@ module ApplicationHelper
   def render_flash
     rendered = []
     flash.each do |type, messages|
-      next if messages.respond_to?(:include?) && messages&.include?("nil is not a symbol nor a string")
+      next if messages.blank? || (messages.respond_to?(:include?) && messages.include?("nil is not a symbol nor a string"))
+
       if messages.respond_to?(:each)
         messages.each do |m|
-          rendered << render(:partial => 'layouts/flash', :locals => {:type => type, :message => m}) unless m.blank?
+          rendered << get_flash(type, m) if m.present?
         end
       else
-        rendered << render(:partial => 'layouts/flash', :locals => {:type => type, :message => messages}) unless messages.blank?
+        rendered << get_flash(type, messages)
       end
     end
     rendered.join.html_safe
+  end
+
+  def get_flash(type, msg)
+    if is_announcement?(msg)
+      render(:partial => 'layouts/announcement_flash', :locals => {:type => type, :message => msg[:announcement]})
+    else
+      render(:partial => 'layouts/flash', :locals => {:type => type, :message => msg})
+    end
+  end
+
+  def is_announcement?(item)
+    item.respond_to?(:keys) && item[:is_announcement]
   end
 
   def dd_value(val)
