@@ -128,6 +128,14 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
         }
       end
 
+      let(:faa_invalid_past_due_date) do
+        {
+          "is_pregnant" => true,
+          "pregnancy_due_on" => Date.yesterday.strftime("%m/%d/%Y"),
+          "children_expected_count" => 1
+        }
+      end
+
       it "should not save and redirects to other_questions_financial_assistance_application_applicant_path with invalid params", dbclean: :after_each do
         get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: faa_invalid_params_pregenancy }
         expect(response).to have_http_status(302)
@@ -156,6 +164,13 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
         expect(response).to have_http_status(302)
         expect(response.headers['Location']).to have_content 'edit'
         expect(response).to redirect_to(edit_application_path(application))
+      end
+
+      it "should not save and redirects to other_questions_financial_assistance_application_applicant_path with invalid past due date", dbclean: :after_each do
+        get :save_questions, params: { application_id: application.id, id: applicant.id, applicant: faa_invalid_past_due_date }
+        expect(response).to have_http_status(302)
+        expect(response.headers['Location']).to have_content 'other_questions'
+        expect(response).to redirect_to(other_questions_application_applicant_path(application, applicant))
       end
     end
 
