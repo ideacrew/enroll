@@ -690,9 +690,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     let!(:hbx_enrollment) do
       FactoryBot.create(:hbx_enrollment,
-                         family: family,
-                         household: family.active_household,
-                         product: product)
+                        family: family,
+                        household: family.active_household,
+                        product: product)
     end
 
     before do
