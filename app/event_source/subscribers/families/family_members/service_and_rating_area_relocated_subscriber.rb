@@ -36,7 +36,7 @@ module Subscribers
         end
 
         def subscriber_logger
-          @subscriber_logger ||= Logger.new("#{Rails.root}/log/service_and_rating_area_relocated_subscriber#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+          @subscriber_logger ||= Logger.new("#{Rails.root}/log/service_and_rating_area_relocated_subscriber.log")
         end
 
         def subscriber_key(key, enrollment_hbx_id)

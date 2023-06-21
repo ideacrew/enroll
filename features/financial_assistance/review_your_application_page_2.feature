@@ -49,3 +49,14 @@ Feature: Review your application page functionality 2
     Given the user will navigate to the FAA Household Info page
     When the user clicks CONTINUE
     Then they should not see the shop coverage exists warning text
+
+  Scenario: Admin clicks on Full application action, sees caretaker questions
+    Given that a family has a Financial Assistance application in the draft state
+    When the primary caretaker question configuration is enabled
+    When the primary caretaker relationship question configuration is enabled
+    And an applicant has an existing non ssn apply reason
+    And the user will navigate to the FAA Household Info page
+    And all applicants are in Info Completed state with all types of income
+    And the user clicks CONTINUE
+    Then the user is on the Review Your Application page
+    Then the caretaker questions should show
