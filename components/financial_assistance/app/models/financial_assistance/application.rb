@@ -561,7 +561,11 @@ module FinancialAssistance
     def send_determination_to_ea
       return if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
-      result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(params: self.attributes)
+      # result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(params: self.attributes)
+      # include member determinations data in params when adding eligibility determination
+      # member_determinations = self.member_determinations.map(&:to_hash)
+      # params = self.attributes.merge()
+      result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(self)
       if result.success?
         rt_transfer
         true
