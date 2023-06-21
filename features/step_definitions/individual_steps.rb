@@ -176,6 +176,14 @@ And(/^.+ selects (.*) for coverage$/) do |coverage|
   end
 end
 
+Then(/^the question (.*) is displayed$/) do |question|
+  expect(page).to have_content(question)
+end
+
+Then(/^the question (.*) is not displayed$/) do |question|
+  expect(page).not_to have_content(question)
+end
+
 Then(/^.+ should see error message (.*)$/) do |text|
   page.should have_content(text)
 end
