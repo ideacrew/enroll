@@ -50,7 +50,7 @@
             | )
           = f.text_field :email, class: "form-control", data: {action: "focus->signup#hideTooltips click->signup#hideTooltips blur->signup#validateEmailFormat", target: 'signup.optionalEmail'}
           = f.hidden_field :invitation_id
-        - if display_registration_recaptcha
+        - if registration_recaptcha_enabled?("user_account")
           = recaptcha_tags
         .recaptcha-error.alert-error
         .recaptcha#captcha-widget
