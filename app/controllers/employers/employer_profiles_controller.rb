@@ -2,7 +2,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   include ::Config::AcaConcern
   include ApplicationHelper
   include ResourceConfigurator
-  
+
   before_action :redirect_new_model, only: [:welcome, :index, :new, :show_profile, :edit, :generate_sic_tree, :create]
   before_action :redirect_show, only: [:show]
 
@@ -190,10 +190,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     redirect_to family_account_path
   end
 
+  #Deprecated. Use new model version instead.
   def export_census_employees
-    respond_to do |format|
-      format.csv { send_data CensusEmployee.download_census_employees_roster(@employer_profile.id), filename: "#{@employer_profile.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
-    end
   end
 
   def bulk_employee_upload_form
