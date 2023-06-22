@@ -27,3 +27,17 @@ Feature: Orphan Accounts tab
         And orphan accounts feature is enabled
         When the user types in the orphan accounts URL
         Then the user will be able to access orphan accounts page
+
+    Scenario: hbx_read_only logged in and orphan accounts tab is enabled
+        Given that a user with a HBX staff role with hbx_read_only subrole exists and is logged in
+        And orphan accounts feature is enabled
+        And user visits the HBX Portal
+        When the user clicks the Admin tab
+        Then the user clicks on Orphan User Accounts
+        Then access will be denied for the user
+
+    Scenario: hbx_read_only logged in and orphan accounts Tab is enabled with External Routing
+        Given that a user with a HBX staff role with hbx_read_only subrole exists and is logged in
+        And orphan accounts feature is enabled
+        When the user types in the orphan accounts URL
+        Then access will be denied for the user
