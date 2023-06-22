@@ -10,7 +10,7 @@ namespace :import do
 
     # BenefitPackages - HBX
     hbx = HbxProfile.current_hbx
-    puts hbx.blank? ? 'No current HBX present' : "Current HBX: #{hbx.us_state_abbreviation} #{hbx.cms_id}"
+    puts 'No current HBX present' if hbx.blank?
     abort if hbx.blank?
 
     #
@@ -21,9 +21,8 @@ namespace :import do
     #
     # Second lowest cost silver plan
     #
-    slcsp_id = bc_period_for_current_year&.slcsp_id
-    slcsp_hios_id = BenefitMarkets::Products::Product.where(id: slcsp_id)&.first&.hios_id ||
-      hbx.us_state_abbreviation == "ME" ? "96667ME0310072-03" : "94506DC0390005-01"
+    slcsp_id = bc_period_for_current_year.slcsp_id
+    slcsp_hios_id = BenefitMarkets::Products::Product.where(id: slcsp_id).first&.hios_id || "94506DC0390005-01"
     slcs_products = BenefitMarkets::Products::Product.where(hios_id: slcsp_hios_id)
     slcsp_for_current_year =  slcs_products.select{|a| a.active_year == current_year}.first
 
@@ -35,11 +34,11 @@ namespace :import do
       bc_period_for_current_year.slcsp_id = slcsp_for_current_year.id
     else
       # create benefit package and benefit_coverage_period
-      bc_period_for_previous_year = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == previous_year }&.first || hbx.benefit_sponsorship.benefit_coverage_periods.first
+      bc_period_for_previous_year = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == previous_year }.first
       bc_period_for_current_year = bc_period_for_previous_year.clone
       bc_period_for_current_year.title = "Individual Market Benefits #{current_year}"
-      bc_period_for_current_year.start_on = Date.new(current_year, 1, 1)
-      bc_period_for_current_year.end_on = Date.new(current_year, 12, 31)
+      bc_period_for_current_year.start_on = bc_period_for_previous_year.start_on + 1.year
+      bc_period_for_current_year.end_on = bc_period_for_previous_year.end_on + 1.year
 
       # if we need to change these dates after running this rake task in test or prod environments,
       # we should write a separate script.
