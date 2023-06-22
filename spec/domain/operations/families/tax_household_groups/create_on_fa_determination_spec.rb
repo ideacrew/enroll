@@ -91,5 +91,13 @@ RSpec.describe Operations::Families::TaxHouseholdGroups::CreateOnFaDetermination
       expect(member_determination.criteria_met).to eq(applicant['member_determinations'].first['criteria_met'])
       expect(member_determination.determination_reasons).to eq(applicant['member_determinations'].first['determination_reasons'])
     end
+
+    it 'should create Eligibility Override objects' do
+      eligibility_overrides = @result.value!.tax_households.first.tax_household_members.first.member_determinations.first.eligibility_overrides
+      eligibility_overrides.each do |override|
+        expect(override.override_rule.present?).to be_truthy
+        expect(override.override_applied.is_a?(Boolean)).to be_truthy
+      end
+    end
   end
 end

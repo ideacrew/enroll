@@ -80,7 +80,13 @@ module Operations
 
         def member_determinations(applicant)
           applicant.member_determinations&.map do |member_determination|
-            member_determination.attributes.except('_id', 'created_at', 'updated_at')
+            md_attributes = member_determination.attributes
+            md_attributes.except!('_id', 'created_at', 'updated_at')
+            eo_attributes = member_determination.eligibility_overrides&.map do |eo|
+              eo.attributes.except!('_id', 'created_at', 'updated_at')
+            end
+            md_attributes['eligibility_overrides'] = eo_attributes
+            md_attributes
           end
         end
       end
