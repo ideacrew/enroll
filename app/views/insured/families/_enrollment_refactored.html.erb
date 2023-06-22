@@ -1,17 +1,25 @@
 <% product = hbx_enrollment.product %>
 
 <% if hbx_enrollment.is_coverage_waived? %>
-  <%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: read_only || hbx_enrollment.can_make_changes? , hbx_enrollment: hbx_enrollment } %>
+  <%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: read_only || hbx_enrollment.can_make_changes?, hbx_enrollment: hbx_enrollment } %>
 <% else %>
-    <div class="hbx-enrollment-refactored-panel plan-tile panel panel-default module <%= "initially_hidden_enrollment hidden" if initially_hide_enrollment?(hbx_enrollment) %>">
-        <div class="plan-header">
-            <div class="plan-status-container"><%= render partial: "insured/families/enrollment_progress", locals: {step: hbx_enrollment.enroll_step, hbx_enrollment: hbx_enrollment} %></div>
-            <div class="plan-logo-and-name">
-                <%= display_carrier_logo(Maybe.new(product), {width: 100}) %>
-                <h3>
-                    <%= link_to product.title, summary_products_plans_path({:standard_component_id => product.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: product.active_year}), remote: true %>
-                </h3>
-            </div>
+  <div class="hbx-enrollment-refactored-panel plan-tile panel panel-default module <%= "initially_hidden_enrollment hidden" if initially_hide_enrollment?(hbx_enrollment) %>">
+    <div class="plan-header">
+      <h3 class="plan-year">
+        <%= hbx_enrollment.coverage_year %> <%= product.kind.to_s.titleize %> <%= l10n('coverage').titleize %>
+      </h3>
+      <div class="plan-status-container"><%= render partial: "insured/families/enrollment_progress", locals: { step: hbx_enrollment.enroll_step, hbx_enrollment: hbx_enrollment } %></div>
+    </div>
+
+    <div class="plan-details-container">
+
+        <div class="plan-title">
+          <div class="plan-logo-and-name">
+            <%= display_carrier_logo(Maybe.new(product), { width: 100 }) %>
+            <h3>
+              <%= sanitize link_to product.title, summary_products_plans_path({ :standard_component_id => product.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: product.active_year }), remote: true %>
+            </h3>
+          </div>
         </div>
 
         <div class="plan-details">
@@ -160,4 +168,5 @@
             <%= render partial: "insured/families/enrollment_actions", locals: { read_only: read_only, hbx_enrollment: hbx_enrollment }  %>
         </div>
     </div>
+  </div>
 <% end %>
