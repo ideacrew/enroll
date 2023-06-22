@@ -8,8 +8,8 @@ module Operations
     class AddFinancialAssistanceEligibilityDetermination
       send(:include, Dry::Monads[:result, :do])
 
-      def call(params:)
-        values = yield validate(params) #application_contract
+      def call(application)
+        values = yield validate(application) #application_contract
         family = yield find_family(values[:family_id])
         result = yield add_determination(family, values)
 
@@ -18,7 +18,9 @@ module Operations
 
       private
 
-      def validate(params)
+      def validate(application)
+        @application = application
+        params = @application.attributes
         contract_result = Validators::Families::EligibilityDeterminationContract.new.call(params)
         contract_result.success? ? Success(contract_result.to_h) : Failure(contract_result.errors)
       end
@@ -94,8 +96,15 @@ module Operations
       end
 
       def member_determinations(applicant)
-        applicant["member_determinations"]&.map do |md|
-          md.except('_id', 'created_at', 'updated_at')
+        member_determinations = @application.applicants.detect {|a| a.person_hbx_id == applicant["person_hbx_id"]}.member_determinations
+        member_determinations.map do |md|
+          md_attributes = md.attributes
+          md_attributes.except!('_id', 'created_at', 'updated_at')
+          eo_attributes = md.eligibility_overrides&.map do |eo|
+            eo.attributes.except!('_id', 'created_at', 'updated_at')
+          end
+          md_attributes['eligibility_overrides'] = eo_attributes
+          md_attributes
         end
       end
 

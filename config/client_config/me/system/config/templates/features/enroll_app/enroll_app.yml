@@ -870,6 +870,15 @@ registry:
       - key: :ivl_tax_form_notice
         item: :ivl_tax_form_notice
         is_enabled: <%= ENV['IVL_TAX_FORM_NOTICE_IS_ENABLED'] || false %>
-      - key: :registration_recaptcha
-        item: :registration_recaptcha
-        is_enabled: <%= ENV['REGISTRATION_RECAPTCHA_IS_ENABLED'] || false %>
+      - key: :registration_broker_recaptcha
+        item: :registration_broker_recaptcha
+        is_enabled: <%= ENV['REGISTRATION_BROKER_RECAPTCHA_IS_ENABLED'] || false %>
+      - key: :registration_ga_recaptcha
+        item: :registration_ga_recaptcha
+        is_enabled: <%= ENV['REGISTRATION_GA_RECAPTCHA_IS_ENABLED'] || false %>
+      - key: :registration_user_account_recaptcha
+        item: :registration_user_account_recaptcha
+        is_enabled: <%= ENV['REGISTRATION_USERACCOUNT_RECAPTCHA_IS_ENABLED'] || false %>
+      - key: :registration_sponsor_recaptcha
+        item: :registration_sponsor_recaptcha
+        is_enabled: <%= ENV['REGISTRATION_SPONSOR_RECAPTCHA_IS_ENABLED'] || false %>
