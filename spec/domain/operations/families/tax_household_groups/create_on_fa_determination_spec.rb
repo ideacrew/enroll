@@ -58,8 +58,9 @@ RSpec.describe Operations::Families::TaxHouseholdGroups::CreateOnFaDetermination
   let(:member_determinations) do
     [{
       'kind' => 'Medicaid/CHIP Determination',
-      'is_eligible' => true,
-      'determination_reasons' => [:mitc_override_not_lawfully_present_pregnant]
+      'criteria_met' => true,
+      'determination_reasons' => [:not_lawfully_present_pregnant],
+      'eligibility_overrides' => []
     }]
   end
 
@@ -87,7 +88,7 @@ RSpec.describe Operations::Families::TaxHouseholdGroups::CreateOnFaDetermination
     it 'should create Member Determination object' do
       member_determination = @result.value!.tax_households.first.tax_household_members.first.member_determinations.first
       expect(member_determination.kind).to eq(applicant['member_determinations'].first['kind'])
-      expect(member_determination.is_eligible).to eq(applicant['member_determinations'].first['is_eligible'])
+      expect(member_determination.criteria_met).to eq(applicant['member_determinations'].first['criteria_met'])
       expect(member_determination.determination_reasons).to eq(applicant['member_determinations'].first['determination_reasons'])
     end
   end

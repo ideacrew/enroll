@@ -27,9 +27,9 @@ module Operations
         private
 
         def validate(params)
-          return Failure("Missing address id ") unless params["address_id"].present?
-          return Failure("Missing person hbx id ") unless params["person_hbx_id"].present?
-          Success([params["address_id"], params["person_hbx_id"]])
+          return Failure("Missing address id ") unless params[:address_id].present?
+          return Failure("Missing person hbx id ") unless params[:person_hbx_id].present?
+          Success([params[:address_id], params[:person_hbx_id]])
         end
 
         def find_person(person_hbx_id)
@@ -45,8 +45,8 @@ module Operations
         def build_change_set(address)
           change_set = {}
           history_track = address.history_tracks.last
-          Failure("change set payload is only applicable for action :update") unless history_track.action.to_sym == :update
-          Failure("No address changes present") unless history_track.original.present? && history_track.modified.present?
+          return Failure("change set payload is only applicable for action :update") unless history_track.action.to_sym == :update
+          return Failure("No address changes present") unless history_track.original.present? && history_track.modified.present?
 
           change_set.merge!(old_set: history_track.original, new_set: history_track.modified)
           Success(change_set)

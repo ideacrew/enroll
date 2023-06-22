@@ -14,6 +14,7 @@ module SponsoredBenefits
     before_action :published_plans_are_view_only, only: [:edit]
     before_action :claimed_quotes_are_view_only, only: [:edit]
     before_action :load_profile, only: [:new, :edit, :index]
+    skip_before_action :set_broker_agency_profile_from_user, only: [:claim]
 
     def index
       @datatable = effective_datatable

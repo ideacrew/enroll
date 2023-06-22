@@ -312,7 +312,7 @@ module FinancialAssistance
     # depricated, need to remove this after after data migration
     embeds_many :evidences,     class_name: "::FinancialAssistance::Evidence"
     # stores eligibility determinations with determination reasons
-    embeds_many :member_determinations, class_name: "::FinancialAssistance::MemberDetermination"
+    embeds_many :member_determinations, class_name: "::FinancialAssistance::MemberDetermination", cascade_callbacks: true
 
     embeds_one :income_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true
     embeds_one :esi_evidence, class_name: "::Eligibilities::Evidence", as: :evidenceable, cascade_callbacks: true

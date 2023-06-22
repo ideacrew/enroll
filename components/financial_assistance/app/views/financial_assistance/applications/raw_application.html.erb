@@ -30,7 +30,7 @@
               <% income_and_deductions_for(applicant).each do |embedded_document| %>
                 <tr>
                   <td> <%= applicant.full_name %> </td>
-                  <% if FinancialAssistanceRegistry.feature_enabled?(:ssi_income_types) %>
+                  <% if embedded_document.kind == "social_security_benefit" && FinancialAssistanceRegistry.feature_enabled?(:ssi_income_types) %>
                     <td> <%= l10n("faa.#{embedded_document.class.name.demodulize.downcase}.#{embedded_document.kind}.#{embedded_document.ssi_type}") %> </td>
                   <%else%>
                     <td> <%= l10n("faa.#{embedded_document.class.name.demodulize.downcase}.#{embedded_document.kind}") %> </td>

@@ -121,8 +121,9 @@ RSpec.shared_context 'cms ME simple_scenarios test_case_d', :shared_context => :
                                                                       :is_without_assistance => false,
                                                                       :member_determinations => [{
                                                                         :kind => 'Insurance Assistance Determination',
-                                                                        :is_eligible => true,
-                                                                        :determination_reasons => []
+                                                                        :criteria_met => true,
+                                                                        :determination_reasons => [],
+                                                                        eligibility_overrides: []
                                                                       }]},
                               :applicant_reference => { :first_name => "Gerald",
                                                         :last_name => "Rivers",

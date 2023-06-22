@@ -41,6 +41,7 @@ module Operations
       def validate(params)
         return Failure("RelocateEnrolledProducts: Person_hbx_id is missing") unless params[:person_hbx_id].present?
         return Failure("RelocateEnrolledProducts: address_set is missing") unless params[:address_set].present?
+        return Failure("RelocateEnrolledProducts: address_set should be of kind home") unless params[:address_set][:modified_address][:kind] == "home"
 
         Success(params)
       end
@@ -123,8 +124,8 @@ module Operations
       def build_and_publish_enrollment_event(enrollments_hash)
         enrollments_hash.each do |k,v|
           event_key = EVENT_OUTCOME_MAPPING[v[:event_outcome].to_sym]
+          next if v[:expected_enrollment_action] == "No Action Required"
           return Failure(["RelocateEnrolledProducts: Event key is invalid", {request_payload: enrollments_hash}]) unless event_key.present?
-          return Success(["RelocateEnrolledProducts: No action on Enrollments for this address change", {request_payload: enrollments_hash}]) if event_key == "no_change"
 
           event_payload = build_event_payload(enrollments_hash[k].merge!(enrollment_hbx_id: k), event_key)
           publish_event(event_payload)
