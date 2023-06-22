@@ -176,7 +176,7 @@ class Insured::GroupSelectionController < ApplicationController
 
   def terminate_confirm
     active_household_enrollments = current_user.person.primary_family.active_household.hbx_enrollments.map(&:id).map(&:to_s)
-    raise "HBX enrollment ID does not belong to the user terminating" unless active_household_enrollments.include?(params.require(:hbx_enrollment_id))
+    raise "HBX enrollment ID does not belong to the user terminating" unless current_user.has_hbx_staff_role? || active_household_enrollments.include?(params.require(:hbx_enrollment_id))
     @hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
   rescue StandardError => e
     flash[:error] = e.message
