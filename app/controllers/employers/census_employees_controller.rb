@@ -74,7 +74,12 @@ class Employers::CensusEmployeesController < ApplicationController
         end
       end
 
-      flash[:notice] = "Census Employee is successfully updated."
+      flash[:notice] = if @census_employee.is_linked?
+                         "Employee record updated. NOTE: These changes will not update any existing coverage. Any household composition changes will require the employee to re-enroll."
+                       else
+                         "Employee record updated, the employee is not currently account-linked and will need to register to enroll in coverage."
+                       end
+
       if benefit_group_id.blank?
         flash[:notice] += " Note: new employee cannot enroll on #{site_short_name} until they are assigned a benefit group."
       end
