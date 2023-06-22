@@ -80,12 +80,6 @@ module Operations
 
         def member_determinations(applicant)
           applicant.member_determinations&.map do |member_determination|
-            # need to exclude id and timestamps on eligibility overrides as well
-            # md_attributes = member_determination.attributes.except('_id', 'created_at', 'updated_at')
-            # md_attributes["eligibility_overrides"] = member_determination.eligibility_overrides&.map do |eligibility_override|
-            #   eligibility_override.attributes.except('_id', 'created_at', 'updated_at')
-            # end
-            # md_attributes
             md_attributes = member_determination.attributes
             md_attributes.except!('_id', 'created_at', 'updated_at')
             eo_attributes = member_determination.eligibility_overrides&.map do |eo|
