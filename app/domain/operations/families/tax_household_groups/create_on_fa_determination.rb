@@ -74,7 +74,20 @@ module Operations
             is_medicaid_chip_eligible: applicant.is_medicaid_chip_eligible,
             is_non_magi_medicaid_eligible: applicant.is_non_magi_medicaid_eligible,
             is_totally_ineligible: applicant.is_totally_ineligible,
-            csr_percent_as_integer: applicant.is_ia_eligible ? applicant.csr_percent_as_integer : 0 }
+            csr_percent_as_integer: applicant.is_ia_eligible ? applicant.csr_percent_as_integer : 0,
+            member_determinations: member_determinations(applicant)}
+        end
+
+        def member_determinations(applicant)
+          applicant.member_determinations&.map do |member_determination|
+            md_attributes = member_determination.attributes
+            md_attributes.except!('_id', 'created_at', 'updated_at')
+            eo_attributes = member_determination.eligibility_overrides&.map do |eo|
+              eo.attributes.except!('_id', 'created_at', 'updated_at')
+            end
+            md_attributes['eligibility_overrides'] = eo_attributes
+            md_attributes
+          end
         end
       end
     end

@@ -2,34 +2,57 @@
 
 module Operations
   module HbxEnrollments
-    # This class terminate(shop) a coverage_selected/coverage_terminated/coverage_termination_pending
-    # hbx_enrollment when employment termianted/future terminated sceanrio,
-    # more enhancement need to be done to this class to handle various enrollment terminations.
+    # Terminate enrollment operation for SHOP and IVL enrollments
     class Terminate
       include Dry::Monads[:result, :do]
 
-      # @param [ HbxEnrollment ] hbx_enrollment
-      # @return [ HbxEnrollment ] hbx_enrollment
+      # @param [Hash] params
+      # @option params [String] :enrollment_hbx_id
+      # @return [Dry::Monads::Result]
       def call(params)
-        values            = yield validate(params)
-        hbx_enrollment    = yield terminate_employment_term_enrollment(values)
+        enrollment_hbx_id = yield validate(params)
+        hbx_enrollment    = yield find_enrollment(enrollment_hbx_id)
+        result            = yield terminate_enrollment(hbx_enrollment, params)
 
-        Success(hbx_enrollment)
+        Success(result)
       end
 
       private
 
       def validate(params)
-        return Failure('Missing Key.') unless params.key?(:hbx_enrollment)
-        return Failure('Not a valid HbxEnrollment object.') unless params[:hbx_enrollment].is_a?(HbxEnrollment)
-        return Failure('Not a SHOP enrollment.') unless params[:hbx_enrollment].is_shop?
-        return Failure("Missing census employee.") unless params[:hbx_enrollment].census_employee
+        return Failure('Missing enrollment_hbx_id') unless params.key?(:enrollment_hbx_id)
 
-        Success(params)
+        Success(params[:enrollment_hbx_id])
       end
 
-      def terminate_employment_term_enrollment(params)
-        hbx_enrollment = params[:hbx_enrollment]
+      def find_enrollment(enrollment_hbx_id)
+        Operations::HbxEnrollments::Find.new.call({hbx_id: enrollment_hbx_id})
+      end
+
+      def terminate_enrollment(enrollment, params)
+        if enrollment.is_shop?
+          terminate_employment_term_enrollment(enrollment, params)
+        elsif enrollment.kind == "individual"
+          terminate_enrollment_for_ivl(enrollment)
+        else
+          Failure("Unable to terminate enrollment - does not meet the enrollment kind criteria: #{enrollment.hbx_id}.")
+        end
+      end
+
+      def terminate_enrollment_for_ivl(enrollment)
+        if enrollment.effective_on > TimeKeeper.date_of_record && enrollment.may_cancel_coverage?
+          enrollment.cancel_coverage!
+        elsif enrollment.may_terminate_coverage?
+          enrollment.terminate_coverage!(TimeKeeper.date_of_record.end_of_month)
+        else
+          return Failure("Unable to terminate/cancel enrollment - does not meet the enrollment kind criteria: #{enrollment.hbx_id}.")
+        end
+
+        Success({hbx_id: enrollment.hbx_id, aasm_state: enrollment.aasm_state, coverage_kind: enrollment.coverage_kind, :kind => enrollment.kind})
+      end
+
+      def terminate_employment_term_enrollment(hbx_enrollment, params)
+        return Failure("Missing census employee") unless hbx_enrollment.census_employee
         census_employee = hbx_enrollment.census_employee
         employment_term_date = census_employee.employment_terminated_on
         return Success(hbx_enrollment) unless employment_term_date.present?

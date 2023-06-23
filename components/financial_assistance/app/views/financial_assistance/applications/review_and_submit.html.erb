@@ -433,7 +433,11 @@
 
             <% if @cfl_service.displayable_field?('applicant', applicant.id, :is_post_partum_period) %>
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                <div class="col-md-6">Was this person pregnant in the last 60 days?</div>
+              <% if FinancialAssistanceRegistry.feature_enabled?(:post_partum_period_one_year) %>
+                <div class="col-md-6"><%= l10n('faa.other_ques.pregnant_last_year') %></div>
+              <% else %>
+                <div class="col-md-6"><%= l10n('faa.other_ques.pregnant_last_60d') %></div>
+              <% end %>
                 <div class="col-md-6"><%= human_boolean applicant.is_post_partum_period %></div>
               </div>
             <% end %>
@@ -506,11 +510,19 @@
                 <div class="col-md-6"><%= human_boolean applicant.is_self_attested_blind %></div>
               </div>
 
-              <% if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) %>
-                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6"><%= l10n("faa.primary_caretaker_question_text") %></div>
-                  <div class="col-md-6"><%= human_boolean applicant.is_primary_caregiver %></div>
-                </div>
+              <% if applicant.age_of_the_applicant >= 19 && applicant.is_applying_coverage %>
+                <% if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) %>
+                  <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                    <div class="col-md-6"><%= l10n("faa.primary_caretaker_question_text") %></div>
+                    <div class="col-md-6"><%= human_boolean applicant.is_primary_caregiver %></div>
+                  </div>
+                <% end %>
+                <% if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_relationship_other_question) %>
+                  <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                    <div class="col-md-6"><%= l10n("faa.primary_caretaker_for_text_review_page") %></div>
+                    <div class="col-md-6"><%= applicant.is_primary_caregiver_for&.collect{|hbx_id| @applicants_name_by_hbx_id_hash[hbx_id]}&.compact %></div>
+                  </div>
+                <% end %>
               <% end %>
 
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">

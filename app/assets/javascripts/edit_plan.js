@@ -139,14 +139,16 @@ $(document).on("ready ajax:success", function() {
     // Update the view to reflect the total cash to be applied
     $('#aptc_applied_total').val("$" + aptc_total_cash_amount_to_apply);
 
+    // Show dollar amount of Tax Credit value
+    var new_premium = (total_premium - aptc_total_cash_amount_to_apply);
+    $('#new-premium').text(toFixedTrunc(new_premium.toFixed(8))).html();
+
     if (mthh_enabled && (max_aptc * (percent / 100) > max_aptc_available)) {
       $('#applied_pct_1').val((max_aptc_available / max_aptc).toFixed(2));
       $('#aptc_applied_pct_1_percent').val((max_aptc_available / max_aptc).toFixed(2) * 100 + '%');
       $('#aptc_applied_total').val("$" + max_aptc_available);
+      $('#new-premium').text(toFixedTrunc((total_premium - max_aptc_available).toFixed(8))).html();
     }
-    // Show dollar amount of Tax Credit value
-    var new_premium = (total_premium - aptc_total_cash_amount_to_apply);
-    $('#new-premium').html(toFixedTrunc(new_premium.toFixed(8)));
   }
 
 });

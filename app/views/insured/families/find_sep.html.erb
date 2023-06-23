@@ -68,7 +68,7 @@
         <% if @market_kind == ('individual' || 'coverall') && is_under_open_enrollment? %>
           <p><%= l10n("insured.families.final_sep_open_enrollment_body") %></p>
         <% else %>
-          <p><%= l10n("insured.families.final_sep_outside_open_enrollment_body", next_ivl_open_enrollment_date: @next_ivl_open_enrollment_date.try(:strftime, "%B %e, %Y"), next_ivl_open_enrollment_period: @next_ivl_open_enrollment_date.try(:strftime, "%B %e") ) %>.</p>
+          <p><%= l10n("insured.families.final_sep_outside_open_enrollment_body", next_ivl_open_enrollment_date: HbxProfile.current_hbx&.benefit_sponsorship&.current_benefit_coverage_period&.open_enrollment_start_on.try(:strftime, "%B %e")) %></p>
         <% end %>
       </div>
       <div class="modal-footer">

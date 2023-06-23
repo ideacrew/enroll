@@ -6,36 +6,21 @@ function isApplyingCoverage(target) {
     addEventOnNoSsn(target);
     addEventOnSsn(target);
     if ($(fields).not(':checked').val() == 'true') {
-      $('#consumer_fields_sets').hide();
+      $('.consumer_fields_for_applying_coverage').hide();
       $('#employer-coverage-msg').show();
       if ($("input[name='" + target + "[ssn]']").val() == '' && !$("input[name='" + target + "[no_ssn]']").is(':checked')) {
         $('#ssn-coverage-msg').show();
       }
-      if (!($(fields).not(':checked').val() == 'false') && $('.no_coverage_tribe_details').length > 0 ) {
-        new_tribe_form = $('#indian_tribe_area').clone(true).addClass('tribe-area-clone');
-        $('#indian_tribe_area').remove();
-        new_tribe_form.insertBefore($('#consumer_fields_sets'));
-      }
     }
     $(fields).change(function () {
       if ($(fields).not(':checked').val() == 'true') {
-        $('#consumer_fields_sets').hide();
+        $('.consumer_fields_for_applying_coverage').hide();
         $('#employer-coverage-msg').show();
         if ($("input[name='" + target + "[ssn]']").val() == '' && !$("input[name='" + target + "[no_ssn]']").is(':checked')) {
           $('#ssn-coverage-msg').show();
         }
-        if (!($(fields).not(':checked').val() == 'false') && $('.no_coverage_tribe_details').length > 0 ) {
-          new_tribe_form = $('#indian_tribe_area').clone(true).addClass('tribe-area-clone');
-          $('#indian_tribe_area').remove();
-          new_tribe_form.insertBefore($('#consumer_fields_sets'));
-        }
       } else {
-        if ($('.no_coverage_tribe_details').length > 0) {
-          new_tribe_form = $('#indian_tribe_area').clone(true).removeClass('tribe-area-clone');
-          $('#indian_tribe_area').remove();
-          new_tribe_form.insertAfter($('#vlp_documents_container'));
-        }
-        $('#consumer_fields_sets').show();
+        $('.consumer_fields_for_applying_coverage').show();
         $('#employer-coverage-msg').hide();
         $('#ssn-coverage-msg').hide();
       }
@@ -135,18 +120,31 @@ function applyListenersFor(target) {
     }
   });
 
-  $('select#tribal-state').change(function() {
-    if ($('.featured_tribes_selection').length > 0 && this.value == $('#enroll_state_abbr').val()) {
-      $('.featured-tribe-container').removeClass('hide');
-      var tribe_codes_array = $('.tribe_codes:checked').map(function(){ return $(this).val(); }).get();
-      if (tribe_codes_array.includes("OT")){
-        $('.tribal-name-container').removeClass('hide');
+  // tribal-state change - select from options
+  $('select#tribal-state').on("change", function() {
+    var enroll_state_abbr = $('#enroll_state_abbr').val();
+    var is_indian_alaskan_tribe_details_enabled = ($('#is_indian_alaskan_tribe_details_enabled').val() === 'true');
+
+    if (is_indian_alaskan_tribe_details_enabled) {
+      var is_featured_tribes_selection_enabled = ($('#is_featured_tribes_selection_enabled').val() === 'true');
+      var tribe_codes_array = $('.tribe_codes:checked').map(function() {
+        return $(this).val();
+      }).get();
+      var tribal_name_container_show_on_select = (typeof tribe_codes_array != 'undefined' && tribe_codes_array.includes("OT"));
+
+      if (is_featured_tribes_selection_enabled && this.value == enroll_state_abbr) {
+        $('.featured-tribe-container').removeClass('hide');
+        if (tribal_name_container_show_on_select) {
+          $('.tribal-name-container').removeClass('hide');
+        } else {
+          $('#tribal-name').val("");
+          $('.tribal-name-container').addClass('hide');
+        }
       } else {
-        $('.tribal-name-container').addClass('hide');
+        $('.tribe_codes:checked').removeAttr('checked');
+        $('.tribal-name-container').removeClass('hide');
+        $('.featured-tribe-container').addClass('hide');
       }
-    } else {
-      $('.tribal-name-container').removeClass('hide');
-      $('.featured-tribe-container').addClass('hide');
     }
   });
 

@@ -176,6 +176,26 @@ And(/^.+ selects (.*) for coverage$/) do |coverage|
   end
 end
 
+Then(/^the question "(.*)" is displayed$/) do |question|
+  expect(page).to have_content(question)
+end
+
+Then(/^the question "(.*)" is not displayed$/) do |question|
+  expect(page).not_to have_content(question)
+end
+
+Then(/^tribal state dropdown box is clicked$/) do
+  find_all(IvlPersonalInformation.tribe_state_dropdown).first.click
+end
+
+When(/^AI AN question is answered yes$/) do
+  find_all(IvlPersonalInformation.american_or_alaskan_native_yes_radiobtn).first.click
+end
+
+Then(/^states dropdown should popup$/) do
+  expect(page.find("#tribal-state-container .selectric-items").present?).to be_truthy
+end
+
 Then(/^.+ should see error message (.*)$/) do |text|
   page.should have_content(text)
 end
@@ -969,6 +989,19 @@ Then(/the individual should see the elected aptc amount applied to enrollment in
   screenshot("my_account")
 end
 
+And(/^consumer is an indian_tribe_member$/) do
+  user.person.update_attributes!(tribal_state: 'ME')
+end
+
+Given(/^site is for (.*)$/) do |state|
+  EnrollRegistry[:enroll_app].setting(:state_abbreviation).stub(:item).and_return(state.upcase)
+end
+
+And(/^the consumer should see tribal name textbox without text$/) do
+  wait_for_ajax
+  expect(page).to have_selector("#tribal-name", text: '')
+end
+
 And(/consumer has successful ridp/) do
   user.identity_final_decision_code = "acc"
   user.save
@@ -979,6 +1012,11 @@ And(/consumer has successful ridp/) do
   current_product = BenefitMarkets::Products::Product.all.by_year(start_on.year).where(metal_level_kind: :silver).first
   benefit_sponsorship = hbx_profile.benefit_sponsorship
   benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(start_on)}.update_attributes!(slcsp_id: current_product.id)
+end
+
+And(/consumer has osse eligibility/) do
+  person = Person.all.first
+  person.consumer_role.eligibilities << FactoryBot.build(:eligibility, :with_evidences, :with_subject, start_on: TimeKeeper.date_of_record.beginning_of_year)
 end
 
 When(/consumer visits home page after successful ridp/) do
@@ -1084,7 +1122,7 @@ When(/Individual clicks on None of the situations listed above apply checkbox$/)
   sleep 2
   expect(page).to have_content 'None of the situations listed above apply'
   find(IvlSpecialEnrollmentPeriod.none_apply_checkbox).click
-  expect(page).to have_content 'To enroll before open enrollment'
+  expect(page).to have_content 'To enroll before Open Enrollment'
 end
 
 Then(/Individual should land on Home page$/) do

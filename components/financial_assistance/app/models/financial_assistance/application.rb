@@ -561,7 +561,7 @@ module FinancialAssistance
     def send_determination_to_ea
       return if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
-      result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(params: self.attributes)
+      result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(self)
       if result.success?
         rt_transfer
         true
@@ -1423,6 +1423,29 @@ module FinancialAssistance
       applicants.applying_coverage
     end
 
+    def dependents
+      active_applicants.where(is_primary_applicant: false)
+    end
+
+    def update_dependents_home_address
+      address_keys = ["address_1", "address_2", "address_3", "city", "state", "zip", "kind"]
+      address_keys << "county" if EnrollRegistry.feature_enabled?(:display_county)
+      primary_applicant = applicants.where(is_primary_applicant: true).first
+      home_address_attributes = primary_applicant.home_address.attributes.slice(*address_keys)
+      no_state_address_attributes = primary_applicant.attributes.slice("is_homeless", "is_temporarily_out_of_state")
+
+      dependents.where(same_with_primary: true).each do |dependent|
+        if dependent.home_address
+          dependent.home_address.assign_attributes(home_address_attributes)
+        else
+          address = ::FinancialAssistance::Locations::Address.new(home_address_attributes)
+          dependent.addresses << address
+        end
+        dependent.assign_attributes(no_state_address_attributes)
+        dependent.save!
+      end
+    end
+
     private
 
     # If MemberA is parent to MemberB,
@@ -1638,7 +1661,11 @@ module FinancialAssistance
       #TODO: Invalid Report here
     end
 
+    # Example: application.determine will change the aasm_state in-memory, data is not persisted at this point.
+    # When trying to find latest determine application in subsequent after call methods, previous application is fetched instead of current application.
+    # Persisting the application right after the aasm_state change will avoid issues reated the fetching the latest application.
     def record_transition
+      self.save if self.aasm_state_changed?
       self.workflow_state_transitions << WorkflowStateTransition.new(
         from_state: aasm.from_state,
         to_state: aasm.to_state

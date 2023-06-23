@@ -78,6 +78,21 @@ Then(/^the user should be see proper text in the modal popup$/) do
   expect(page).to have_content('The minimum value is a standard used to see if a health plan offered by your employer meets the basic requirements of the Affordable Care Act.')
 end
 
+Then(/^the medicare have glossary link$/) do
+  expect(page.has_css?(IvlIapHealthCoveragePage.medicare)).to be_truthy
+  expect(page.has_css?(IvlIapHealthCoveragePage.medicare_glossary_link)).to be_truthy
+end
+
+Then(/^the medicare have glossary content$/) do
+  find(IvlIapHealthCoveragePage.medicare_glossary_link).click
+  expect(page).to have_content 'A federal health insurance program for people who are 65 or older'
+end
+
+Then(/^the coverage_obtained_through_another_exchange does not have glossary link$/) do
+  expect(page.has_css?(IvlIapHealthCoveragePage.coverage_obtained_through_another_exchange)).to be_truthy
+  expect(page.has_css?(IvlIapHealthCoveragePage.coverage_obtained_through_another_exchange_glossary_link)).to be_falsy
+end
+
 Then(/^the health coverage form should show$/) do
   expect(page).to have_xpath("//*[@id='acf_refugee_medical_assistance']/div[2]/div")
 end
@@ -88,6 +103,23 @@ end
 
 Then(/^the esi question should be about your job rather than a job$/) do
   expect(page).to have_content('Coverage through your job (also known as employer-sponsored health insurance)')
+end
+
+And(/^the user checks on job coverage checkbox$/) do
+  find(:css, CostSavingsApplicationPage.employer_sponsored_insurance_benefit_checkbox).set(true)
+end
+
+Given(/the FAA short_enrolled_esi_forms feature is enabled/) do
+  enable_feature :short_enrolled_esi_forms, {registry_name: FinancialAssistanceRegistry}
+  enable_feature :short_enrolled_esi_forms
+end
+
+Then(/^the user should see the esi form$/) do
+  expect(page.has_css?(CostSavingsApplicationPage.esi_benefit)).to eq true
+end
+
+Then(/^the user should see the non_esi form$/) do
+  expect(page.has_css?(CostSavingsApplicationPage.non_esi_benefit)).to eq true
 end
 
 Given(/^the user fills out the required health coverage information$/) do

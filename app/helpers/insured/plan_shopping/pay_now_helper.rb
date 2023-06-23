@@ -10,11 +10,12 @@ module Insured
         "Delta Dental" => "https://www1.deltadentalins.com/login.html",
         "Dominion National" => "https://www.dominionmembers.com/",
         "Kaiser" => "https://kp.org/paypremium",
+        "Kaiser Permanente" => "https://kp.org/paypremium",
         "Community Health Options" => "https://healthoptions.org",
         "Harvard Pilgrim Health Care" => "https://www.harvardpilgrim.org/public/home",
         "Anthem Blue Cross and Blue Shield" => "https://www.anthem.com/contact-us/maine",
         "Northeast Delta Dental" => "https://www.nedelta.com/Home",
-        "Taro Health Plan of Maine, Inc." => EnrollRegistry['taro_health_pay_now'].setting(:taro_health_home_page_url).item
+        "Taro Health" => EnrollRegistry['taro_health_pay_now'].setting(:taro_health_home_page_url).item
       }.freeze
 
       def show_pay_now?(source, hbx_enrollment)
@@ -65,12 +66,21 @@ module Insured
       end
 
       def has_any_previous_enrollments?(hbx_enrollment)
-        all_carrier_enrollments = hbx_enrollment.family.hbx_enrollments.where(:aasm_state.nin => ["inactive", "shopping", "coverage_canceled"]).select do |enr|
+        potential_previous_enrollments = hbx_enrollment.family.hbx_enrollments.where(:aasm_state.nin => ["inactive", "shopping", "coverage_canceled"]).select do |enr|
           next if enr.product.blank? || enr.subscriber.blank? || enr.is_shop?
-          fetch_carrier_key_from_legal_name(enr.product.issuer_profile.legal_name) == @carrier_key && enr.effective_on.year == hbx_enrollment.effective_on.year && enr.subscriber.applicant_id == hbx_enrollment.subscriber.applicant_id
+          is_previous_enrollment?(hbx_enrollment, enr)
         end
-        enrollments = all_carrier_enrollments - hbx_enrollment.to_a
-        enrollments.present? ? true : false
+        enrollments = potential_previous_enrollments - hbx_enrollment.to_a
+        enrollments.present?
+      end
+
+      def is_previous_enrollment?(hbx_enrollment, enr)
+        same_carrier = fetch_carrier_key_from_legal_name(enr.product.issuer_profile.legal_name) == @carrier_key
+        same_year = enr.effective_on.year == hbx_enrollment.effective_on.year
+        same_subscriber = enr.subscriber.applicant_id == hbx_enrollment.subscriber.applicant_id
+        same_coverage_kind = enr.coverage_kind == hbx_enrollment.coverage_kind
+
+        same_carrier && same_year && same_subscriber && same_coverage_kind
       end
 
       def pay_now_button_timed_out?(hbx_enrollment)
@@ -94,7 +104,7 @@ module Insured
       end
 
       def is_kaiser_translation_key?(carrier_key)
-        carrier_key == 'kaiser' ? 'issuer' : 'other'
+        ['kaiser_permanente', 'kaiser'].include?(carrier_key) ? 'issuer' : 'other'
       end
 
       def carrier_long_name(carrier_name)

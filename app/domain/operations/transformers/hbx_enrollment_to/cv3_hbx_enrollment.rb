@@ -56,7 +56,7 @@ module Operations
           Success(payload)
         rescue StandardError => e
           puts "Cv3HbxEnrollment error: #{e.message} | exception: #{e.inspect} | backtrace: #{e.backtrace.inspect}"
-          Rails.logger.error "Cv3HbxEnrollment error: #{e.message} | exception: #{e.inspect} | backtrace: #{e.backtrace.inspect}"
+          Rails.logger.error "Cv3HbxEnrollment id: #{enr&.hbx_id} | error: #{e.message} | exception: #{e.inspect} | backtrace: #{e.backtrace.inspect}"
         end
         # rubocop:enable Metrics/CyclomaticComplexity, Metrics/AbcSize
 
@@ -84,7 +84,8 @@ module Operations
 
         def special_enrollment_period_reference(enrollment)
           sep = enrollment.special_enrollment_period || fetch_special_enrollment_period(enrollment)
-          qle = sep.qualifying_life_event_kind
+          return {} unless sep.present?
+
           {
             qualifying_life_event_kind_reference: construct_qle_reference(sep.qualifying_life_event_kind),
             qle_on: sep.qle_on,
@@ -148,6 +149,7 @@ module Operations
             exchange_provided_code: exchange_provided_code,
             primary_enrollee: qhp_table.primary_enrollee,
             primary_enrollee_one_dependent: qhp_table.primary_enrollee_one_dependent,
+            primary_enrollee_two_dependents: qhp_table.primary_enrollee_two_dependent,
             primary_enrollee_many_dependent: qhp_table.primary_enrollee_many_dependent
           }
         end

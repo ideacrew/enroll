@@ -214,4 +214,20 @@ class IvlIapIncomeAdjustmentsPage
   def self.taxable_income_select_monthly
     'li[class="interaction-choice-control-deduction-frequency-kind-100 interaction-choice-control-deduction-frequency-kind-4"]'
   end
+
+  def self.health_savings_account
+    '.health_savings_account'
+  end
+
+  def self.health_savings_account_glossary_link
+    '.health_savings_account span'
+  end
+
+  def self.alimony_paid
+    '.alimony_paid'
+  end
+
+  def self.alimony_paid_glossary_link
+    '.alimony_paid span'
+  end
 end

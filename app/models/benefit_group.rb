@@ -393,7 +393,7 @@ class BenefitGroup
       else
         pcd = PlanCostDecorator.new(plan, ce, self, rp)
       end
-      BigDecimal.new((acc + pcd.total_employer_contribution).to_s).round(2)
+      BigDecimal((acc + pcd.total_employer_contribution).to_s).round(2)
     end
   end
 
@@ -501,7 +501,7 @@ class BenefitGroup
 
   def elected_dental_plans_by_option_kind
     if dental_plan_option_kind == "single_carrier"
-      Plan.by_active_year(self.start_on.year).shop_market.dental_coverage.by_carrier_profile(self.carrier_for_elected_dental_plan)
+      Plan.by_active_year(self.start_on.year).shop_market.dental_coverage.by_carrier_profile(self.carrier_for_elected_dental_plan || dental_reference_plan.carrier_profile)
     else
       Plan.by_active_year(self.start_on.year).shop_market.dental_coverage
     end
@@ -827,7 +827,13 @@ class BenefitGroup
     end
   end
 
+  def all_contribution_levels_min_met_relaxed?
+    false
+  end
+
   def check_employer_contribution_for_employee
+    return if all_contribution_levels_min_met_relaxed?
+
     start_on = self.plan_year.try(:start_on)
     return if start_on.try(:at_beginning_of_year) == start_on
     # all employee contribution < 50% for 1/1 employers

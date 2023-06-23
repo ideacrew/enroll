@@ -98,7 +98,7 @@
 
               <div class="collapse" id="collapseDentalCosts">
                 <div class="employee-costs">
-                  <% if @benefit_group.dental_reference_plan.present? %>
+                  <% if @benefit_group&.dental_reference_plan.present? %>
                     <%= render :partial => "sponsored_benefits/organizations/plan_design_proposals/shared/benefit_group_cost_summary", locals: {benefit_group: @benefit_group, kind: 'dental', benefit_group_costs: @benefit_group_dental_costs } %>
                   <% else %>
                     <div class="row">
@@ -120,7 +120,7 @@
   <div class="row">
     <div class="col-md-12">
       <div class="pull-left">
-        <%= link_to "Back to all Quotes", organizations_plan_design_organization_plan_design_proposals_path(@plan_design_organization, profile_id: params[:profile_id]), class:"btn btn-primary new-plan-design-proposal"  %>
+        <%= link_to "Back to all Quotes", organizations_plan_design_organization_plan_design_proposals_path(@plan_design_organization, profile_id: params[:profile_id]), class:"btn btn-primary new-plan-design-proposal", data: {cuke: "back_to_all_quotes"}  %>
       </div>
   </div>
   </div>

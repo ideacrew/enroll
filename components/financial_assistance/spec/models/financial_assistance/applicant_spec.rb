@@ -927,6 +927,74 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         expect(FinancialAssistance::Operations::Families::CreateOrUpdateMember).to_not have_received(:new)
       end
     end
+
+    context "when primary address changes" do
+      let!(:application2) do
+        FactoryBot.create(:application,
+                          family_id: application.family_id,
+                          aasm_state: 'draft',
+                          assistance_year: TimeKeeper.date_of_record.year,
+                          effective_date: Date.today)
+      end
+
+      let!(:applicant1) do
+
+        FactoryBot.create(:financial_assistance_applicant, :with_home_address,
+                          application: application2,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: true,
+                          same_with_primary: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+
+      context "when same_with_primary is true" do
+        let!(:applicant2) do
+          FactoryBot.create(:financial_assistance_applicant,
+                            application: application2,
+                            dob: Date.today - 38.years,
+                            is_primary_applicant: false,
+                            same_with_primary: true,
+                            family_member_id: BSON::ObjectId.new)
+        end
+
+        let!(:relationship) do
+          application2.ensure_relationship_with_primary(applicant2, 'spouse')
+          application2.reload
+        end
+
+        it 'should update dependent address' do
+          expect(application2.applicants[1].addresses.present?).to be_falsey
+          application2.reload
+          application2.applicants.first.addresses.first.assign_attributes(city: "was")
+          application2.save!
+          expect(application2.applicants[1].addresses.present?).to be_truthy
+        end
+      end
+
+      context "when same_with_primary is false" do
+        let!(:applicant2) do
+          FactoryBot.create(:financial_assistance_applicant,
+                            application: application2,
+                            dob: Date.today - 38.years,
+                            is_primary_applicant: false,
+                            same_with_primary: false,
+                            family_member_id: BSON::ObjectId.new)
+        end
+
+        let!(:relationship) do
+          application2.ensure_relationship_with_primary(applicant2, 'spouse')
+          application2.reload
+        end
+
+        it 'should not update dependent address' do
+          expect(application2.applicants[1].addresses.present?).to be_falsey
+          application2.reload
+          application2.applicants.first.addresses.first.assign_attributes(city: "was")
+          application2.save!
+          expect(application2.applicants[1].addresses.present?).to be_falsey
+        end
+      end
+    end
   end
 
   context 'propagate_destroy' do
@@ -1298,6 +1366,8 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
   describe 'enrolled_with' do
     let(:person) { FactoryBot.create(:person, :with_consumer_role)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let(:product) {double(id: '123', csr_variant_id: '01')}
+
     let!(:enrollment) do
       FactoryBot.create(
         :hbx_enrollment,
@@ -1323,6 +1393,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
+      allow(enrollment).to receive(:product).and_return(product)
       applicant.create_evidences
       applicant.create_eligibility_income_evidence
       applicant.income_evidence.move_to_pending!
@@ -1363,21 +1434,21 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       end
     end
 
-    context "when aptc is not applied on enrolment member" do
+    context "when aptc & csr are not applied on enrollment member" do
       context "when evidence is in pending state" do
-        it "move to unverified state" do
+        it "move to outstanding" do
           applicant.enrolled_with(enrollment)
           FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
             evidence = applicant.send(evidence_type)
-            expect(evidence.outstanding?).to eq false
-            expect(evidence.unverified?).to eq true
-            expect(evidence.due_on).to eq nil
+            expect(evidence.outstanding?).to eq true
+            expect(evidence.negative_response_received?).to eq false
+            expect(evidence.due_on).to eq applicant.schedule_verification_due_on
           end
         end
       end
 
       context "when evidence is in negative_response_received state" do
-        it "will stay in negative_response_received state" do
+        it "will move to outstanding" do
           FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
             evidence = applicant.send(evidence_type)
             evidence.negative_response_received!
@@ -1387,9 +1458,9 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
           FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
             evidence = applicant.send(evidence_type)
-            expect(evidence.outstanding?).to eq false
-            expect(evidence.negative_response_received?).to eq true
-            expect(evidence.due_on).to eq nil
+            expect(evidence.outstanding?).to eq true
+            expect(evidence.negative_response_received?).to eq false
+            expect(evidence.due_on).to eq applicant.schedule_verification_due_on
           end
         end
       end
@@ -1453,6 +1524,121 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           end
 
           it 'should return true as other_income section is complete' do
+            expect(@result).to be_truthy
+          end
+        end
+      end
+
+      # ssi_income_types
+      context 'when feature ssi_income_types is enabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ssi_income_types).and_return(true)
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:american_indian_alaskan_native_income).and_return(false)
+        end
+
+        context 'when applicant has other_income with incompleted social security benefit' do
+          before do
+            applicant.update_attributes!(has_other_income: true)
+            inc = ::FinancialAssistance::Income.new({
+                                                      kind: 'social_security_benefit',
+                                                      frequency_kind: 'yearly',
+                                                      amount: 30_000.00,
+                                                      start_on: TimeKeeper.date_of_record.beginning_of_month
+                                                    })
+            applicant.incomes = [inc]
+            applicant.save!
+            @result = applicant.embedded_document_section_entry_complete?(:other_income)
+          end
+
+          it 'should return false' do
+            expect(@result).to be_falsey
+          end
+        end
+
+        context 'when applicant has_other_income without other incomes' do
+          before do
+            applicant.update_attributes!(has_other_income: true)
+            @result = applicant.embedded_document_section_entry_complete?(:other_income)
+          end
+
+          it 'should return false' do
+            expect(@result).to be_falsey
+          end
+        end
+
+        context 'where applicant has_other_income with completed social security benefit' do
+          before do
+            applicant.update_attributes!(has_other_income: true)
+            inc = ::FinancialAssistance::Income.new({
+                                                      kind: 'social_security_benefit',
+                                                      frequency_kind: 'yearly',
+                                                      amount: 30_000.00,
+                                                      start_on: TimeKeeper.date_of_record.beginning_of_month,
+                                                      ssi_type: 'retirement'
+                                                    })
+            applicant.incomes = [inc]
+            applicant.save!
+            @result = applicant.embedded_document_section_entry_complete?(:other_income)
+          end
+
+          it 'should return true' do
+            expect(@result).to be_truthy
+          end
+        end
+      end
+
+      context 'when feature ssi_income_types is disabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ssi_income_types).and_return(false)
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:american_indian_alaskan_native_income).and_return(false)
+        end
+
+        context 'when applicant has other_income with incompleted social security benefit' do
+          before do
+            applicant.update_attributes!(has_other_income: true)
+            inc = ::FinancialAssistance::Income.new({
+                                                      kind: 'social_security_benefit',
+                                                      frequency_kind: 'yearly',
+                                                      amount: 30_000.00,
+                                                      start_on: TimeKeeper.date_of_record.beginning_of_month
+                                                    })
+            applicant.incomes = [inc]
+            applicant.save!
+            @result = applicant.embedded_document_section_entry_complete?(:other_income)
+          end
+
+          it 'should return false' do
+            expect(@result).to be_truthy
+          end
+        end
+
+        context 'when applicant has_other_income without other incomes' do
+          before do
+            applicant.update_attributes!(has_other_income: true)
+            @result = applicant.embedded_document_section_entry_complete?(:other_income)
+          end
+
+          it 'should return false' do
+            expect(@result).to be_falsey
+          end
+        end
+
+        context 'where applicant has_other_income with completed social security benefit' do
+          before do
+            applicant.update_attributes!(has_other_income: true)
+            inc = ::FinancialAssistance::Income.new({
+                                                      kind: 'social_security_benefit',
+                                                      frequency_kind: 'yearly',
+                                                      amount: 30_000.00,
+                                                      start_on: TimeKeeper.date_of_record.beginning_of_month,
+                                                      ssi_type: 'retirement'
+                                                    })
+            applicant.incomes = [inc]
+            applicant.save!
+            @result = applicant.embedded_document_section_entry_complete?(:other_income)
+          end
+
+          it 'should return true' do
             expect(@result).to be_truthy
           end
         end
@@ -1827,5 +2013,55 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
   def create_document(evidence)
     evidence.documents.create(title: 'document.pdf', creator: 'mehl', subject: 'document.pdf', publisher: 'mehl', type: 'text', identifier: 'identifier',
                               source: 'enroll_system', language: 'en')
+  end
+
+  context 'adding member_determinations' do
+    let(:override_rules) {::AcaEntities::MagiMedicaid::Types::EligibilityOverrideRule.values}
+    let(:member_determinations) do
+      [medicaid_and_chip_member_determination]
+    end
+
+    let(:medicaid_and_chip_member_determination) do
+      {
+        kind: 'Medicaid/CHIP Determination',
+        criteria_met: false,
+        determination_reasons: [],
+        eligibility_overrides: medicaid_chip_eligibility_overrides
+      }
+    end
+
+    let(:medicaid_chip_eligibility_overrides) do
+      override_rules.map do |rule|
+        {
+          override_rule: rule,
+          override_applied: false
+        }
+      end
+    end
+
+    before do
+      @applicant = application.applicants.first
+      @applicant.update(member_determinations: member_determinations)
+
+    end
+
+    it 'should successfully add all member determination attributes' do
+      expect(@applicant.member_determinations.first.kind).to eq('Medicaid/CHIP Determination')
+      expect(@applicant.member_determinations.first.criteria_met).to eq(false)
+      expect(@applicant.member_determinations.first.determination_reasons).to eq([])
+      expect(@applicant.member_determinations.first.eligibility_overrides.present?).to be_truthy
+    end
+
+    context 'eligibility_overrides' do
+      it 'should successfully add all eligibility_overrides attributes' do
+        override_rules.each do |rule|
+          override = @applicant.member_determinations.first.eligibility_overrides.detect{|o| o.override_rule == rule}
+          expect(override.present?).to be_truthy
+          expect(override.override_applied).to eq(false)
+          expect(override.created_at.present?).to be_truthy
+          expect(override.updated_at.present?).to be_truthy
+        end
+      end
+    end
   end
 end

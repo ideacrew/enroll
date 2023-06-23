@@ -42,12 +42,17 @@ RSpec.describe ::Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment, db
       @validated_payload = AcaEntities::Contracts::Enrollments::HbxEnrollmentContract.new.call(transformed_payload).to_h
     end
 
+    let(:family_rated_premiums_result) do
+      @validated_payload[:product_reference][:family_rated_premiums]
+    end
+
     it 'returns with :slcsp_member_premium, :family_rated_premiums & :pediatric_dental_ehb' do
       expect(@validated_payload[:hbx_id]).to eq(enrollment.hbx_id.to_s)
       expect(@validated_payload[:terminated_on]).to eq(enrollment.terminated_on)
       expect(@validated_payload[:hbx_enrollment_members].first[:slcsp_member_premium]).not_to be_empty
       expect(@validated_payload[:hbx_enrollment_members].first[:coverage_end_on]).to eq enrollment_member.coverage_end_on
-      expect(@validated_payload[:product_reference][:family_rated_premiums]).not_to be_empty
+      expect(family_rated_premiums_result).not_to be_empty
+      expect(family_rated_premiums_result[:primary_enrollee_two_dependents]).not_to be_nil
       expect(@validated_payload[:product_reference][:pediatric_dental_ehb]).not_to be_nil
       expect(@validated_payload[:product_reference][:metal_level]).to eq(enr_product.metal_level_kind.to_s)
     end
@@ -156,6 +161,44 @@ RSpec.describe ::Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment, db
     context "when exclude_seps is passed to cv3 builder" do
       it 'should not return special enrollment period reference' do
         expect(@validated_payload[:special_enrollment_period_reference]).to be_nil
+      end
+    end
+  end
+
+  context 'when special_enrollment is outside SEP_period without exclude_seps parameter' do
+    let(:enrollment_kind) { 'special_enrollment' }
+
+    let(:submitted_at) { TimeKeeper.date_of_record }
+    let(:start_on) { submitted_at.prev_day }
+    let(:special_enrollment_period) do
+      build(
+        :special_enrollment_period,
+        family: family,
+        qualifying_life_event_kind_id: qle.id,
+        market_kind: "ivl",
+        start_on: start_on,
+        end_on: start_on
+      )
+    end
+
+    let!(:add_special_enrollment_period) do
+      family.special_enrollment_periods = [special_enrollment_period]
+      family.save
+    end
+    let!(:qle)  { FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual") }
+
+    before do
+      transformed_payload = subject.call(enrollment.reload).success
+      @validated_payload = AcaEntities::Contracts::Enrollments::HbxEnrollmentContract.new.call(transformed_payload).to_h
+    end
+
+    context "when exclude_seps is passed to cv3 builder" do
+      it 'should return hash block' do
+        expect(@validated_payload[:special_enrollment_period_reference].class).to be(Hash)
+      end
+
+      it 'should not return special enrollment period reference' do
+        expect(@validated_payload[:special_enrollment_period_reference].present?).to be_falsy
       end
     end
   end

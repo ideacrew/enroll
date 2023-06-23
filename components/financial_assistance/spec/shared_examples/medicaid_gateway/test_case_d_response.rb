@@ -118,7 +118,13 @@ RSpec.shared_context 'cms ME simple_scenarios test_case_d', :shared_context => :
                                                                       is_eligible_for_non_magi_reasons: true,
                                                                       :csr => "limited",
                                                                       :is_non_magi_medicaid_eligible => false,
-                                                                      :is_without_assistance => false },
+                                                                      :is_without_assistance => false,
+                                                                      :member_determinations => [{
+                                                                        :kind => 'Insurance Assistance Determination',
+                                                                        :criteria_met => true,
+                                                                        :determination_reasons => [],
+                                                                        eligibility_overrides: []
+                                                                      }]},
                               :applicant_reference => { :first_name => "Gerald",
                                                         :last_name => "Rivers",
                                                         :dob => member_dob,

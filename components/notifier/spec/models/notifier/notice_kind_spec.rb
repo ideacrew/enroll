@@ -74,5 +74,26 @@ module Notifier
         expect(subject).to have_received(:store_paper_notice)
       end
     end
+
+    describe '#check_template_elements' do
+      subject { Notifier::NoticeKind.new(title: 'Title', notice_number: 'abc') }
+      let(:template) { subject.build_template }
+
+      context 'when raw_body have blocking elements' do
+
+        it 'makes record invalid' do
+          template.raw_body = 'raw body content with invalid elements - <script, %%iframe%'
+          expect(subject.valid?).to eq false
+          expect(subject.errors.full_messages).to eq ['Template is invalid']
+        end
+      end
+
+      context 'when raw_body does not have any blocking elements' do
+        it 'returns valid' do
+          template.raw_body = 'raw body content with some text around prescription and something else'
+          expect(subject.valid?).to eq true
+        end
+      end
+    end
   end
 end

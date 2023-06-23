@@ -8,6 +8,10 @@ Given(/^that a family has a Financial Assistance application in the (.*?) state$
   application.update_attributes(aasm_state: state)
 end
 
+And(/^the primary applicant age greater than (.*?)$/) do |age|
+  @application.primary_applicant.update_attributes(dob: (age.to_i + 1).years.ago)
+end
+
 And(/^the user navigates to the “Help Paying For Coverage” portal$/) do
   visit financial_assistance.applications_path
 end

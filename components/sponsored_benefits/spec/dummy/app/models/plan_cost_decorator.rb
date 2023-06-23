@@ -95,7 +95,7 @@ class PlanCostDecorator < SimpleDelegator
     relationship_benefit = relationship_benefit_for(member)
     if relationship_benefit && relationship_benefit.offered?
       value = (Caches::PlanDetails.lookup_rate(__getobj__.id, plan_year_start_on, age_of(member)) * large_family_factor(member))
-      BigDecimal.new("#{value}").round(2).to_f
+      BigDecimal("#{value}").round(2).to_f
     else
       0.00
     end

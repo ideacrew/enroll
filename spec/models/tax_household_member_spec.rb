@@ -129,4 +129,52 @@ RSpec.describe TaxHouseholdMember, type: :model do
       expect(tax_household_member1.aptc_benchmark_amount(enrollment, Date.new(TimeKeeper.date_of_record.year, 1, 1))).to eq 198.86
     end
   end
+
+  context 'adding member_determinations' do
+    let(:override_rules) {::AcaEntities::MagiMedicaid::Types::EligibilityOverrideRule.values}
+    let(:member_determinations) do
+      [medicaid_and_chip_member_determination]
+    end
+
+    let(:medicaid_and_chip_member_determination) do
+      {
+        kind: 'Medicaid/CHIP Determination',
+        criteria_met: false,
+        determination_reasons: [],
+        eligibility_overrides: medicaid_chip_eligibility_overrides
+      }
+    end
+
+    let(:medicaid_chip_eligibility_overrides) do
+      override_rules.map do |rule|
+        {
+          override_rule: rule,
+          override_applied: false
+        }
+      end
+    end
+
+    before do
+      tax_household_member1.update(member_determinations: member_determinations)
+    end
+
+    it 'should successfully add all member determination attributes' do
+      expect(tax_household_member1.member_determinations.first.kind).to eq('Medicaid/CHIP Determination')
+      expect(tax_household_member1.member_determinations.first.criteria_met).to eq(false)
+      expect(tax_household_member1.member_determinations.first.determination_reasons).to eq([])
+      expect(tax_household_member1.member_determinations.first.eligibility_overrides.present?).to be_truthy
+    end
+
+    context 'eligibility_overrides' do
+      it 'should successfully add all eligibility_overrides attributes' do
+        override_rules.each do |rule|
+          override = tax_household_member1.member_determinations.first.eligibility_overrides.detect{|o| o.override_rule == rule}
+          expect(override.present?).to be_truthy
+          expect(override.override_applied).to eq(false)
+          expect(override.created_at.present?).to be_truthy
+          expect(override.updated_at.present?).to be_truthy
+        end
+      end
+    end
+  end
 end

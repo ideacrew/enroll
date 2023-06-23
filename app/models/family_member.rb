@@ -198,7 +198,10 @@ class FamilyMember
   end
 
   def deactivate_tax_households
-    return unless family.persisted? && family.active_household.tax_households.present?
+    return unless family.persisted?
+
+    family.deactivate_financial_assistance(TimeKeeper.date_of_record)
+    return if family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year).blank?
 
     Operations::Households::DeactivateFinancialAssistanceEligibility.new.call(params: {family_id: family.id, date: TimeKeeper.date_of_record})
   rescue StandardError => e

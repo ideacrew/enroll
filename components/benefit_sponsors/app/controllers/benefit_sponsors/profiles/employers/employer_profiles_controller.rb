@@ -5,7 +5,6 @@ module BenefitSponsors
     module Employers
       # EmployerProfilesController
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
-
         include Config::AcaHelper
 
         before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :export_census_employees, :show_invoice, :coverage_reports, :download_invoice, :terminate_employee_roster_enrollments]
@@ -15,7 +14,6 @@ module BenefitSponsors
         before_action :set_flash_by_announcement, only: :show
         layout "two_column", except: [:new]
 
-        #New profile registration with existing organization and approval request submitted to employer
         def show_pending
           authorize BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new
           respond_to do |format|
@@ -24,7 +22,6 @@ module BenefitSponsors
           end
         end
 
-# TODO: - Each when clause should be a seperate action.
         def show
           authorize @employer_profile
           @tab = params['tab']
@@ -132,13 +129,20 @@ module BenefitSponsors
         def bulk_employee_upload
           authorize @employer_profile, :show?
           if roster_upload_file_type.include?(file_content_type)
-            tmp = params[:file].tempfile
-            file = File.join("#{Rails.root}/public", params[:file].original_filename.gsub(" ", "_"))
-            FileUtils.cp tmp.path, file
-            # calling worker
-            BenefitSponsors::BulkEmployeesUploadWorker.perform_async(params[:file].original_filename.gsub(" ", "_"), params[:file].content_type, @employer_profile._id, current_user.email)
-            flash[:notice] = l10n("employers.employer_profiles.employee_bulk_upload")
-            redirect_to employees_upload_url(@employer_profile.id)
+            file = params.require(:file)
+            @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, @employer_profile)
+            roaster_upload_count = @roster_upload_form.census_records.length
+            begin
+              if @roster_upload_form.save
+                flash[:notice] = "#{roaster_upload_count} records uploaded from CSV"
+                redirect_to URI.parse(@roster_upload_form.redirection_url).to_s
+              else
+                render @roster_upload_form.redirection_url || default_url
+              end
+            rescue StandardError => e
+              @roster_upload_form.errors.add(:base, e.message)
+              render @roster_upload_form.redirection_url || default_url
+            end
           else
             @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.new
             @roster_upload_form.errors.add(:base, "Can't detect file type #{params[:file]&.original_filename}, please upload Excel/CSV format files only.")
@@ -306,31 +310,29 @@ module BenefitSponsors
         end
 
         def csv_for(groups)
-          (output = "").tap do
-            CSV.generate(output) do |csv|
-              csv << ["Name", "SSN", "DOB", "Hired On", "Benefit Group", "Type", "Name", "Issuer", "Covered Ct", "Employer Contribution",
-                      "Employee Premium", "Total Premium"]
-              groups.each do |element|
-                primary = element.primary_member
-                census_employee = primary.employee_role.census_employee
-                sponsored_benefit = primary.sponsored_benefit
-                product = @product_info[element.group_enrollment.product[:id]]
-                next if census_employee.blank?
-                csv << [
-                          census_employee.full_name,
-                          census_employee.ssn,
-                          census_employee.dob,
-                          census_employee.hired_on,
-                          sponsored_benefit.benefit_package.title,
-                          product[:kind],
-                          product[:title],
-                          product[:issuer_name],
-                          (element.members.size - 1),
-                          view_context.number_to_currency(element.group_enrollment.sponsor_contribution_total.to_s),
-                          view_context.number_to_currency((element.group_enrollment.product_cost_total.to_f - element.group_enrollment.sponsor_contribution_total.to_f).to_s),
-                          view_context.number_to_currency(element.group_enrollment.product_cost_total.to_s)
-                        ]
-              end
+          CSV.generate do |csv|
+            csv << ["Name", "SSN", "DOB", "Hired On", "Benefit Group", "Type", "Name", "Issuer", "Covered Ct", "Employer Contribution",
+                    "Employee Premium", "Total Premium"]
+            groups.each do |element|
+              primary = element.primary_member
+              census_employee = primary.employee_role.census_employee
+              sponsored_benefit = primary.sponsored_benefit
+              product = @product_info[element.group_enrollment.product[:id]]
+              next if census_employee.blank?
+              csv << [
+                        census_employee.full_name,
+                        census_employee.ssn,
+                        census_employee.dob,
+                        census_employee.hired_on,
+                        sponsored_benefit.benefit_package.title,
+                        product[:kind],
+                        product[:title],
+                        product[:issuer_name],
+                        (element.members.size - 1),
+                        view_context.number_to_currency(element.group_enrollment.sponsor_contribution_total.to_s),
+                        view_context.number_to_currency((element.group_enrollment.product_cost_total.to_f - element.group_enrollment.sponsor_contribution_total.to_f).to_s),
+                        view_context.number_to_currency(element.group_enrollment.product_cost_total.to_s)
+                      ]
             end
           end
         end

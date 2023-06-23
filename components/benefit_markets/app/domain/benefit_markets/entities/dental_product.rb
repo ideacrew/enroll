@@ -12,6 +12,7 @@ module BenefitMarkets
       attribute :dental_plan_kind,              Types::Strict::Symbol
       attribute :ehb,                           Types::Strict::Float
       attribute :is_standard_plan,              Types::Strict::Bool
+      attribute :is_hc4cc_plan,                 Types::Bool.optional
       attribute :hsa_eligibility,               Types::Strict::Bool
       attribute :metal_level_kind,              Types::Strict::Symbol
     end

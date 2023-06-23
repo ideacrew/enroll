@@ -34,18 +34,47 @@ module Subscribers
 
       def process_find_by_requested_event(subscriber_logger, correlation_id, response)
         subscriber_logger.info "process_find_by_requested_event: ------- start"
-        result = ::Operations::Families::FindBy.new.call({correlation_id: correlation_id, response: response})
-
-        if result.success?
-          message = result.success
-          subscriber_logger.info "on_find_by_requested acked #{message.is_a?(Hash) ? message[:event] : message}"
-        else
-          subscriber_logger.info "process_find_by_requested_event: failure: #{error_messages(result)}"
-        end
+        generate_and_publish_payload(subscriber_logger, correlation_id, response)
         subscriber_logger.info "process_find_by_requested_event: ------- end"
       rescue StandardError => e
         subscriber_logger.error "process_find_by_requested_event: error: #{e} backtrace: #{e.backtrace}"
         subscriber_logger.error "process_find_by_requested_event: ------- end"
+      end
+
+      def generate_event_payload(subscriber_logger, response)
+        generate_payload_result = ::Operations::Families::FindBy.new.call({ response: response })
+
+        if generate_payload_result.success?
+          subscriber_logger.info "Successfully generated valid family_cv for primary person with hbx_id: #{response[:person_hbx_id]}"
+          { errors: [], family: generate_payload_result.success, primary_person_hbx_id: response[:person_hbx_id] }
+        else
+          subscriber_logger.error "Unable to generate valid family_cv for primary person with hbx_id: #{response[:person_hbx_id]}"
+          { errors: [generate_payload_result.failure], family: {}, primary_person_hbx_id: response[:person_hbx_id] }
+        end
+      end
+
+      def publish_payload(subscriber_logger, correlation_id, response, event_payload)
+        published_result = ::Operations::Events::BuildAndPublish.new.call(
+          {
+            attributes: event_payload,
+            event_name: 'events.families.found_by',
+            headers: { correlation_id: correlation_id }
+          }
+        )
+
+        if published_result.success?
+          subscriber_logger.info "Successfully published event_payload: #{
+            event_payload} for primary person with hbx_id: #{response[:person_hbx_id]}"
+        else
+          subscriber_logger.error "Unable to publish event_payload: #{
+            event_payload} for primary person with hbx_id: #{
+              response[:person_hbx_id]} with failure: #{published_result.failure.inspect}"
+        end
+      end
+
+      def generate_and_publish_payload(subscriber_logger, correlation_id, response)
+        event_payload = generate_event_payload(subscriber_logger, response)
+        publish_payload(subscriber_logger, correlation_id, response, event_payload)
       end
 
       def subscriber_logger_for(event)

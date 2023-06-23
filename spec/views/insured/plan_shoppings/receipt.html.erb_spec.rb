@@ -91,7 +91,7 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
   let(:member_group) {double(group_enrollment:group_enrollment)}
 
   before :each do
-    allow(view).to receive(:carrier_key_from_enrollment).and_return("kaiser")
+    allow(view).to receive(:carrier_key_from_enrollment).and_return("kaiser_permanente")
     assign :enrollment, enrollment
     assign :member_group, member_group
     @plan = plan_cost_decorator

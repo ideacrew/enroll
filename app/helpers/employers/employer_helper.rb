@@ -10,11 +10,7 @@ module Employers::EmployerHelper
       return 'Account Linked'
     elsif employee_state == 'eligible'
       return 'No Account Linked'
-    elsif employee_state == "cobra_linked" &&
-          (
-            census_employee.has_cobra_hbx_enrollment? ||
-            census_employee.active_benefit_group_enrollments.present? && census_employee.cobra_begin_date.present?
-          )
+    elsif employee_state == "cobra_linked" && census_employee.has_cobra_hbx_enrollment?
       return "Cobra Enrolled"
     else
       return employee_state.humanize
@@ -326,6 +322,10 @@ module Employers::EmployerHelper
 
   def ivl_osse_eligibility_is_enabled?(year = TimeKeeper.date_of_record.year)
     EnrollRegistry.feature?("aca_ivl_osse_subsidy_#{year}") && EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
+  end
+
+  def eligibility_audit_log_is_enabled?
+    EnrollRegistry.feature?("eligibility_audit_log") && EnrollRegistry.feature_enabled?("eligibility_audit_log")
   end
 
   def shop_osse_eligibility_is_enabled?(year = TimeKeeper.date_of_record.year)

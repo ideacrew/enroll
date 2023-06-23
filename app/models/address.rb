@@ -50,6 +50,8 @@ class Address
   before_save :set_crm_updates
   before_destroy :set_crm_updates
 
+  after_update :notify_address_changed, if: :changed?
+
   track_history :on => [:fields],
                 :scope => :person,
                 :modifier_field => :modifier,
@@ -335,6 +337,19 @@ class Address
   end
 
   private
+
+  # @api private
+  # @return [ job ID ]
+  # @note This method is called by Mongoid after the document is saved.
+  # calls the operation to build the payload and send it to the queue
+  # success or failure of the operation is not handled here or should not stop the save
+  def notify_address_changed
+    return unless EnrollRegistry.feature_enabled?(:notify_address_changed)
+    return unless self.person.present?
+
+    Operations::People::Addresses::AddressWorker.new.call({address_id: self.id.to_s, person_hbx_id: self.person.hbx_id})
+    true
+  end
 
   def attribute_matches?(attribute, other)
     self[attribute].to_s.downcase == other[attribute].to_s.downcase

@@ -128,8 +128,8 @@ module BenefitSponsors
             employees.compact.each(&:save!)
           else
             map_errors_for(self, onto: form)
-            employees.each_with_index do |record, i|
-              map_errors_for(record, i, onto: form)
+            @persist_queqe.each do |key, value|
+              map_errors_for(value.employee, key, onto: form)
             end
             return false
           end
@@ -139,7 +139,7 @@ module BenefitSponsors
 
       def map_errors_for(obj, key = "", onto:)
         obj.errors.each do |att, err|
-          row = key.present? ? "Row #{key + 4}:" : ""
+          row = key.present? ? "base Row #{key}: " : ""
           onto.errors.add(:base, row + "#{att} #{err}")
         end
       end
@@ -340,7 +340,9 @@ module BenefitSponsors
       end
 
       def parse_ssn(cell)
-        cell.blank? ? nil : cell.to_s.gsub(/\D/, '')
+        return nil if cell.blank?
+        value = cell.to_i.to_s.gsub(/\D/, '')
+        value.length.between?(7,8) ? value.rjust(9, "0") : value
       end
 
       def parse_boolean(cell)

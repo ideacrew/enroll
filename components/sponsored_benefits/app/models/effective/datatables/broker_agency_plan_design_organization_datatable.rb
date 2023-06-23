@@ -41,7 +41,7 @@ module Effective
           end
         }, :sortable => false, :filter => false
 
-        if EnrollRegistry.feature_enabled?(:aca_shop_osse_subsidy) && EnrollRegistry.feature_enabled?(:TEMP_broker_client_hc4cc_status)
+        if EnrollRegistry.feature_enabled?(:aca_shop_osse_subsidy) && EnrollRegistry.feature_enabled?(:broker_quote_hc4cc_subsidy)
           table_column :hc4cc, :label => "HC4CC", :proc => proc { |row|
             if row.is_prospect?
               l10n('ineligible')
@@ -155,12 +155,10 @@ module Effective
       end
 
       def check_employer_osse_eligibility(employer)
-        org = BenefitSponsors::Organizations::Organization.where(fein: employer.fein).first
-        aba = org&.active_benefit_sponsorship&.active_benefit_application
-        rba = org&.active_benefit_sponsorship&.renewal_benefit_application
-        return rba.osse_eligible? if rba.present?
-        return aba.osse_eligible? if aba.present?
-        false
+        # checks if an eligibility has been created and not yet ended for an employer
+        bs = employer.employer_profile.organization.active_benefit_sponsorship
+        osse_eligibility = bs&.current_eligibility(:osse_subsidy) if bs.present?
+        osse_eligibility.present?
       end
     end
   end

@@ -854,6 +854,10 @@ Then(/^.+ selects nationwide filter$/) do
   find(EmployeeChoosePlan.nationwide).click
 end
 
+Then(/^.+ should see hc4cc filter$/) do
+  expect(page).to have_content('HC4CC Eligible')
+end
+
 Then(/^.+ clicks on apply button$/) do
   page.first(EmployeeChoosePlan.apply_btn, wait: 10).click
 end
@@ -1029,13 +1033,19 @@ end
 
 When(/Primary Broker clicks the Employers tab/) do
   find(BrokerHomePage.employers_tab, wait: 5).click
+  sleep 2
+  wait_for_ajax
+end
+
+When(/Primary Broker clicks Back to All Quotes/) do
+  find(BrokerCreateQuotePage.back_to_all_quotes).click
   wait_for_ajax
 end
 
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) tab$/) do |tab_name|
   click_link 'HBX Portal' if page.has_link?('HBX Portal')
-  find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 10).click
-  wait_for_ajax
+  find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 5).click
+  sleep 5
 end
 
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) dropdown$/) do |tab_name|
@@ -1174,6 +1184,15 @@ end
 
 Then("user will click on New Employee Paper Application link") do
   find('.new_employee_paper_application').click
+end
+
+And(/Individual hits tab and enter/) do
+  find_all(".thank_you_field")[1].send_keys(:tab)
+  find("#btn-continue").send_keys(:return)
+end
+
+Then(/Individual does not navigate to the enrollment submitted page/) do
+  expect(page).to_not have_content IvlEnrollmentSubmitted.enrollment_submitted_text
 end
 
 And(/(.*) should have a ER sponsored enrollment/) do |named_person|

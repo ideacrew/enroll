@@ -16,7 +16,8 @@ module Operations
           cv3_members = yield transform_member_array(enrollment)
           payload = yield construct_payload(cv3_enrollment, cv3_members)
           xml_response = yield transform_xml(payload)
-          Success(xml_response)
+          cleaned_xml = yield clean_xml(xml_response)
+          Success(cleaned_xml)
         end
 
         private
@@ -50,6 +51,14 @@ module Operations
         def transform_xml(payload)
           xml_response = ::AcaEntities::PayNow::CareFirst::Operations::GenerateXml.new.call(payload)
           xml_response.success? ? xml_response : Failure("unable to create xml due to #{xml_response.failure}.")
+        end
+
+        def clean_xml(xml)
+          # clean xml of whitespace around tags
+          cleaned_xml = xml.gsub(/>\s+</, '><').strip
+          Success(cleaned_xml)
+        rescue StandardError => e
+          Failure("::Operations::PayNow::CareFirst::EmbeddedXml.clean_xml -> #{e}")
         end
       end
     end

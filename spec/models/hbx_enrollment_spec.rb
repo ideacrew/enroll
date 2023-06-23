@@ -422,18 +422,45 @@ describe '.reset_dates_on_previously_covered_members' do
                       ])
   end
 
+  let(:tax_household_group) do
+    thhg = family.tax_household_groups.create!(
+      assistance_year: effective_on.year, source: 'Admin', start_on: effective_on.year,
+      tax_households: [FactoryBot.build(:tax_household, household: family.active_household)]
+    )
+    thhg.tax_households.first.tax_household_members.create!(
+      applicant_id: family.primary_applicant.id, is_ia_eligible: true
+    )
+    thhg
+  end
+
+  let!(:tax_household_enrollment) do
+    hbx_enrollment_member = shopping_enrollment.hbx_enrollment_members.first
+    thh_enr = TaxHouseholdEnrollment.create(
+      enrollment_id: shopping_enrollment.id, tax_household_id: tax_household_group.tax_households.first.id,
+      household_benchmark_ehb_premium: 500.00, available_max_aptc: 250.00
+    )
+
+    thh_enr.tax_household_members_enrollment_members.create(
+      family_member_id: hbx_enrollment_member.applicant_id, hbx_enrollment_member_id: hbx_enrollment_member.id,
+      tax_household_member_id: tax_household_group.tax_households.first.tax_household_members.first.id,
+      age_on_effective_date: 20, relationship_with_primary: 'self', date_of_birth: effective_on - 20.years
+    )
+    thh_enr
+  end
+
   let(:primary_enrollment_member) { shopping_enrollment.hbx_enrollment_members.detect{|enm| enm.applicant_id == family.primary_applicant.id} }
   let(:dependent_enrollment_member) { shopping_enrollment.hbx_enrollment_members.detect{|enm| enm.applicant_id != family.primary_applicant.id} }
 
   context 'when same product passed' do
     let(:new_product) { product }
 
-    it 'should reset coverage_start_on dates on previously enrolled members' do
+    it 'should reset coverage_start_on dates on previously enrolled members and should not create new enrollment member records' do
       expect(primary_enrollment_member.coverage_start_on).to eq new_effective_on
       expect(dependent_enrollment_member.coverage_start_on).to eq new_effective_on
-
+      thh_enrollment_member_id = tax_household_enrollment.tax_household_members_enrollment_members.first.hbx_enrollment_member_id
       shopping_enrollment.reset_dates_on_previously_covered_members(new_product)
 
+      expect(shopping_enrollment.hbx_enrollment_members.first.id).to eq thh_enrollment_member_id
       expect(primary_enrollment_member.reload.coverage_start_on).to eq effective_on
       expect(dependent_enrollment_member.reload.coverage_start_on).to eq new_effective_on
     end
@@ -443,12 +470,14 @@ describe '.reset_dates_on_previously_covered_members' do
 
     let(:new_product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '02')}
 
-    it 'should not reset coverage_start_on dates on previously enrolled members' do
+    it 'should not reset coverage_start_on dates on previously enrolled members and should not create new enrollment member records' do
       expect(primary_enrollment_member.coverage_start_on).to eq new_effective_on
       expect(dependent_enrollment_member.coverage_start_on).to eq new_effective_on
+      thh_enrollment_member_id = tax_household_enrollment.tax_household_members_enrollment_members.first.hbx_enrollment_member_id
 
       shopping_enrollment.reset_dates_on_previously_covered_members(new_product)
 
+      expect(shopping_enrollment.hbx_enrollment_members.first.id).to eq thh_enrollment_member_id
       expect(primary_enrollment_member.reload.coverage_start_on).to eq new_effective_on
       expect(dependent_enrollment_member.reload.coverage_start_on).to eq new_effective_on
     end
@@ -668,6 +697,85 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
         shop_enrollment.verify_and_reset_osse_subsidy_amount(member_group)
         expect(shop_enrollment.eligible_child_care_subsidy.to_f).to eq subscriber_premium
       end
+    end
+  end
+end
+
+describe '#advance_day', dbclean: :after_each do
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+
+  let(:aasm_state) { :active }
+  let(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile) }
+  let(:employee_role) { FactoryBot.create(:employee_role, person: person, census_employee: census_employee, employer_profile: benefit_sponsorship.profile) }
+
+  let!(:shop_enrollment) do
+    FactoryBot.create(
+      :hbx_enrollment,
+      :shop,
+      :with_product,
+      employee_role: employee_role,
+      sponsored_benefit_package_id: current_benefit_package.id,
+      household: family.active_household,
+      family: family,
+      effective_on: (Date.today - 3.months),
+      aasm_state: enr_aasm_state,
+      hbx_enrollment_members: [primary, age_off_dependent],
+      terminated_on: (Date.today.beginning_of_month - 1.day)
+    )
+  end
+
+  let(:person) { FactoryBot.create(:person) }
+
+  let(:family) do
+    family = FactoryBot.build(:family)
+
+    family.family_members = [
+      FactoryBot.build(:family_member, family: family, is_primary_applicant: true, is_active: true, person: person),
+      FactoryBot.build(:family_member, family: family, is_primary_applicant: false, is_active: true, person: FactoryBot.create(:person, first_name: "dep", last_name: "Doe"))
+    ]
+
+    family.dependents.each do |dependent|
+      family.relate_new_member(dependent.person, "child")
+    end
+
+    family.save
+    family
+  end
+  let(:primary_fm) { family.family_members.where(is_primary_applicant: true).first }
+  let(:age_off_dependent_fm) do
+    member = family.family_members.where(is_primary_applicant: false).first
+    member.person.update_attributes(dob: Date.today - 27.years)
+    member
+  end
+  let(:primary) { FactoryBot.build(:hbx_enrollment_member, is_subscriber: true, applicant_id: primary_fm.id)}
+  let(:age_off_dependent) { FactoryBot.build(:hbx_enrollment_member, is_subscriber: false, applicant_id: age_off_dependent_fm.id)}
+
+  before :each do
+    allow(::BenefitSponsors::Organizations::Organization).to receive(:where).and_return [benefit_sponsorship.organization]
+    allow(initial_application).to receive(:active_and_cobra_enrolled_families).and_return [family]
+    allow(TimeKeeper).to receive(:date_of_record).and_return(Date.today.beginning_of_month)
+  end
+
+  context 'when age off dependent exists on terminating enrollment' do
+    let(:enr_aasm_state) { 'coverage_termination_pending' }
+
+    it 'should not create a new enrollment' do
+      expect(HbxEnrollment.all.size).to eq 1
+      HbxEnrollment.advance_day(TimeKeeper.date_of_record)
+      expect(HbxEnrollment.all.size).to eq 1
+    end
+  end
+
+  context 'when age off dependent exists on active enrollment' do
+    let(:enr_aasm_state) { 'coverage_enrolled' }
+
+    it 'should create a new enrollment by dropping dependent' do
+      expect(HbxEnrollment.all.size).to eq 1
+      expect(HbxEnrollment.all.first.hbx_enrollment_members.size).to eq 2
+      HbxEnrollment.advance_day(TimeKeeper.date_of_record)
+      expect(HbxEnrollment.all.size).to eq 2
+      expect(HbxEnrollment.all.last.hbx_enrollment_members.size).to eq 1
     end
   end
 end

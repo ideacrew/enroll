@@ -112,6 +112,11 @@
           = l10n('rating_area.exchange_provided_code')
         = @hbx_enrollment&.rating_area&.exchange_provided_code || l10n('not_available')
         br/
+        span.ttu.lg.twelve.font-weight-bold
+          = l10n('service_area')
+          | :
+        =< @hbx_enrollment&.product&.service_area&.issuer_provided_code || l10n('not_available')
+        br/
         br/
         span.h3 data-cuke='enrollment_member_detail'
           = l10n('enrollment.members.header')

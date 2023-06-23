@@ -308,14 +308,14 @@ module Eligibilities
 
     def clone_verification_histories(new_evidence)
       verification_histories.each do |verification|
-        verification_attrs = verification.attributes.deep_symbolize_keys.slice(:action, :modifier, :update_reason, :updated_by, :is_satisfied, :verification_outstanding, :due_on, :aasm_state)
+        verification_attrs = verification.attributes.deep_symbolize_keys.slice(:action, :modifier, :update_reason, :updated_by, :is_satisfied, :verification_outstanding, :due_on, :aasm_state, :date_of_action)
         new_evidence.verification_histories.build(verification_attrs)
       end
     end
 
     def clone_request_results(new_evidence)
       request_results.each do |request_result|
-        request_result_attrs = request_result.attributes.deep_symbolize_keys.slice(:result, :source, :source_transaction_id, :code, :code_description, :raw_payload)
+        request_result_attrs = request_result.attributes.deep_symbolize_keys.slice(:result, :source, :source_transaction_id, :code, :code_description, :raw_payload, :date_of_action)
         new_evidence.request_results.build(request_result_attrs)
       end
     end

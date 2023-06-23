@@ -237,9 +237,7 @@ registry:
           - key: :favicon_tab_icon
             item: 'image/vnd.microsoft.icon'
           - key: :eligibile_immigration_statuses_url
-            item: ''
-          - key: :eligibile_immigration_statuses_url
-            item: ''
+            item: 'https://www.healthcare.gov/immigrants/immigration-status/'
           - key: :geographic_rating_area_model
             item: 'county'
           - key: :assistance_estimate_url
@@ -417,14 +415,32 @@ registry:
       - key: :address_verification
         item: :address_verification
         is_enabled: <%= ENV['ADDRESS_VERIFICATION_IS_ENABLED'] || false %>
+      - key: :eligibility_audit_log
+        item: :eligibility_audit_log
+        is_enabled: <%= ENV['ELIGIBILITY_AUDIT_LOG_IS_ENABLED'] || false %>
+      - key: :notify_address_changed
+        is_enabled: <%= ENV['NOTIFY_ADDRESS_CHANGED_IS_ENABLED'] || false %>
   - namespace:
       - :pay_now_feature
     features:
+      - key: :validate_saml
+        is_enabled: <%= ENV['VALIDATE_SAML_IS_ENABLED'] || false %>
       - key: :generic_redirect
         is_enabled: <%= ENV['GENERIC_REDIRECT_PAY_NOW_IS_ENABLED'] || false %>
-        settings: 
+        settings:
           - key: :strict_tile_check
             item: <%= ENV['STRICT_TILE_CHECK_PAY_NOW_IS_ENABLED'] || false %>
+      - key: :kaiser_permanente_pay_now
+        is_enabled: <%= ENV['KAISER_PERMANENTE_PAY_NOW_IS_ENABLED'] || false %>
+        settings:
+          - key: :plan_shopping
+            item: <%= ENV['KAISER_PERMANENTE_PAY_NOW_PLAN_SHOPPING_IS_ENABLED'] || false %>
+          - key: :enrollment_tile
+            item: <%= ENV['KAISER_PERMANENTE_PAY_NOW_ENROLLMENT_TILE_IS_ENABLED'] || false %>
+          - key: :carriers_long_name
+            item: 'Kaiser Permanente'
+          - key: :connect_test
+            item: <%= ENV['KAISER_PERMANENTE_PAY_NOW_CONNECT_TEST_IS_ENABLED'] || false %>
       - key: :kaiser_pay_now
         is_enabled: <%= ENV['KAISER_PERMANENTE_PAY_NOW_IS_ENABLED'] || false %>
         settings:
@@ -677,7 +693,7 @@ registry:
       - key: :document_reminder_notice_trigger
         is_enabled: true
       - key: :account_transfer_notice_trigger
-        is_enabled: true
+        is_enabled: <%= ENV['ACCOUNT_TRANSFER_NOTICE_IS_ENABLED'] || true %>
       - key: :verification_type_income_verification
         is_enabled: true
       - key: :tobacco_user_field
@@ -786,9 +802,12 @@ registry:
         is_enabled: true
       - key: :zero_permium_policy
         is_enabled: true
-      - key: :send_secure_purchase_confirmation_email
-        item: :send_secure_purchase_confirmation_email
+      - key: :send_ivl_secure_purchase_confirmation_email
+        item: :send_ivl_secure_purchase_confirmation_email
         is_enabled: false
+      - key: :send_shop_secure_purchase_confirmation_email
+        item: :send_shop_secure_purchase_confirmation_email
+        is_enabled: true
       - key: :custom_exceptions_controller
         item: :custom_exceptions_controller
         is_enabled: true
@@ -851,3 +870,15 @@ registry:
       - key: :ivl_tax_form_notice
         item: :ivl_tax_form_notice
         is_enabled: <%= ENV['IVL_TAX_FORM_NOTICE_IS_ENABLED'] || false %>
+      - key: :registration_broker_recaptcha
+        item: :registration_broker_recaptcha
+        is_enabled: <%= ENV['REGISTRATION_BROKER_RECAPTCHA_IS_ENABLED'] || false %>
+      - key: :registration_ga_recaptcha
+        item: :registration_ga_recaptcha
+        is_enabled: <%= ENV['REGISTRATION_GA_RECAPTCHA_IS_ENABLED'] || false %>
+      - key: :registration_user_account_recaptcha
+        item: :registration_user_account_recaptcha
+        is_enabled: <%= ENV['REGISTRATION_USERACCOUNT_RECAPTCHA_IS_ENABLED'] || false %>
+      - key: :registration_sponsor_recaptcha
+        item: :registration_sponsor_recaptcha
+        is_enabled: <%= ENV['REGISTRATION_SPONSOR_RECAPTCHA_IS_ENABLED'] || false %>

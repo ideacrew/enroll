@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: bf5be46e4a5ec2ef00fdcb0eeeddf8ec2c189865
+  revision: 5cf8f6079674c5ffe1fd283322a848b26bb2dfa3
   branch: trunk
   specs:
     aca_entities (0.10.0)
@@ -183,6 +183,7 @@ PATH
       money-rails (~> 1.13)
       mongoid (~> 7.0.2)
       non-stupid-digest-assets
+      pundit (~> 2.0)
       rails (~> 5.2.4.3)
       redcarpet (~> 3.4.0)
       roo (~> 2.1.0)
@@ -349,8 +350,9 @@ GEM
     builder (3.2.4)
     bunny (2.14.4)
       amq-protocol (~> 2.3, >= 2.3.0)
-    cable_ready (4.3.0)
+    cable_ready (4.5.0)
       rails (>= 5.2)
+      thread-local (>= 1.1.0)
     capistrano (3.14.1)
       airbrussh (>= 1.0.0)
       i18n
@@ -877,9 +879,6 @@ GEM
       rspec-expectations (~> 3.9)
       rspec-mocks (~> 3.9)
       rspec-support (~> 3.9)
-    rspec-sidekiq (3.1.0)
-      rspec-core (~> 3.0, >= 3.0.0)
-      sidekiq (>= 2.4.0)
     rspec-support (3.9.3)
     rspec_junit_formatter (0.4.1)
       rspec-core (>= 2, < 4, != 2.12.0)
@@ -979,13 +978,14 @@ GEM
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
     state_machines (0.5.0)
-    stimulus_reflex (3.3.0)
-      cable_ready (>= 4.3.0)
+    stimulus_reflex (3.4.1)
+      cable_ready (>= 4.5)
       nokogiri
       rack
       rails (>= 5.2)
       redis
-    stimulus_reflex_testing (0.1.0)
+    stimulus_reflex_testing (0.3.0)
+      stimulus_reflex (>= 3.3.0)
     symmetric-encryption (3.9.1)
       coercible (~> 1.0)
     temple (0.8.2)
@@ -994,6 +994,7 @@ GEM
       climate_control (>= 0.0.3, < 1.0)
     test-prof (0.11.3)
     thor (1.2.1)
+    thread-local (1.1.0)
     thread_safe (0.3.6)
     tilt (2.0.10)
     timers (4.3.3)
@@ -1156,7 +1157,6 @@ DEPENDENCIES
   rspec-benchmark
   rspec-instafail (~> 1)
   rspec-rails
-  rspec-sidekiq
   rspec_junit_formatter
   rubocop
   rubocop-git
@@ -1176,8 +1176,8 @@ DEPENDENCIES
   sponsored_benefits!
   spring
   spring-watcher-listen
-  stimulus_reflex (~> 3.3)
-  stimulus_reflex_testing
+  stimulus_reflex (= 3.4.1)
+  stimulus_reflex_testing (~> 0.3.0)
   symmetric-encryption (= 3.9.1)
   test-prof
   transport_gateway!
@@ -1202,4 +1202,4 @@ RUBY VERSION
    ruby 2.5.9p229
 
 BUNDLED WITH
-   2.3.23
+   2.3.24
