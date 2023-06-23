@@ -660,7 +660,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
         eligible_child_care_subsidy: 1,
         is_any_enrollment_member_outstanding: false,
         terminate_reason: nil
-        )
+      )
     end
 
     before :each do
@@ -724,8 +724,8 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
           covered_members_first_names: [],
           eligible_child_care_subsidy: 0,
           is_any_enrollment_member_outstanding: false,
-          terminate_reason: nil,
-          )
+          terminate_reason: nil
+        )
       end
 
       before do

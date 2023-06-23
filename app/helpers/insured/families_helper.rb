@@ -236,10 +236,10 @@ module Insured::FamiliesHelper
         default: { text: 'Renewing Coverage Selected', color: 'green' }
       },
       unverified: {
-        has_outstanding_verification: { text: 'Action Needed', color: 'yellow' },
+        has_outstanding_verification: { text: 'Action Needed', color: 'yellow' }
       },
       default: {
-        has_outstanding_verification: { text: 'Action Needed', color: 'yellow' },
+        has_outstanding_verification: { text: 'Action Needed', color: 'yellow' }
       }
     }
 
