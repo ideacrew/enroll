@@ -115,7 +115,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       let(:faa_expected_count_nil) do
         {
           "is_pregnant" => true,
-          "pregnancy_due_on" => Date.tomorrow.strftime("%m/%d/%Y"),
+          "pregnancy_due_on" => (TimeKeeper.date_of_record + 1).strftime("%m/%d/%Y"),
           "children_expected_count" => nil
         }
       end
@@ -123,7 +123,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       let(:faa_valid_params_pregnancy) do
         {
           "is_pregnant" => true,
-          "pregnancy_due_on" => Date.tomorrow.strftime("%m/%d/%Y"),
+          "pregnancy_due_on" => (TimeKeeper.date_of_record + 1).strftime("%m/%d/%Y"),
           "children_expected_count" => 1
         }
       end
@@ -131,7 +131,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       let(:faa_invalid_past_due_date) do
         {
           "is_pregnant" => true,
-          "pregnancy_due_on" => Date.yesterday.strftime("%m/%d/%Y"),
+          "pregnancy_due_on" => (TimeKeeper.date_of_record - 1).strftime("%m/%d/%Y"),
           "children_expected_count" => 1
         }
       end
