@@ -15,11 +15,14 @@ module BenefitSponsors
       end
 
       def show
+        authorize @inbox_provider, :can_read_inbox?
         BenefitSponsors::Services::MessageService.for_show(@message, @current_user)
         respond_to do |format|
           format.html
           format.js
         end
+      rescue Pundit::NotAuthorizedError
+        raise 'User not authorized to perform this operation'
       end
 
       def destroy
