@@ -25,3 +25,12 @@ end
 Given(/^the display enrollment summary configuration is enabled$/) do
   enable_feature :display_enr_summary
 end
+
+And(/^navigates to Enrollment Summary page$/) do
+  sleep(3)
+  expect(page).to have_content(l10n('enrollment.details.header'))
+end
+
+Then(/^the \w+ should see "(.*)" text$/) do |label|
+  expect(page).to have_content(label)
+end
