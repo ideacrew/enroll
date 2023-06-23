@@ -567,6 +567,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.enrollment.latest_transition_data' => "From %{from_state} to %{to_state} at %{created_at}",
   :'en.product_hios_id' => 'Product HIOS ID: ',
   :'en.rating_area.exchange_provided_code' => 'Rating Area: ',
+  :'en.service_area' => 'Service Area',
   :'en.enrollment.tobbaco_user' => 'Tobacco User',
   :'en.enrollment_member.coverage_state_date' => 'Coverage Start Date',
   :'en.not_available' => 'NA',
