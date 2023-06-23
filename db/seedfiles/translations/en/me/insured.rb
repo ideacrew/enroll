@@ -289,6 +289,8 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.employer_assigned_broker' => "Employer Assigned Broker",
   :'en.insured.shop_for_health_and_dental_plans' => "Shop for health and dental plans",
   :'en.insured.shop_for_plans' => "Shop for Plans",
+  :'en.insured.sep_eligibility_alert' => "You are eligible to enroll or change coverage through %{sep_end_date}.",
+  :'en.insured.sep_verbose_eligibility_alert' => "You are eligible to enroll or change coverage. The sooner you enroll, the sooner your plan may start. The last day you can pick a plan is %{sep_end_date}, but waiting until then may delay the start of your coverage.",
   :'en.insured.you_are_not_under_open_enrollment_period' => "You are not under open enrollment period.",
   :'en.insured.do_you_need_coverage_earlier_msg' => "If you still need coverage for %{current_year}, go to %{healthcare_link}. %{site_short_name} offers coverage starting in %{year}.",
   :'en.insured.enroll_in_the_individual_market_msg' => "If you wish to purchase insurance, please enroll in the Individual Market.",

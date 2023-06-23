@@ -2,12 +2,21 @@
   <a href="#" data-dismiss="alert" class="close interaction-click-control-×">×</a>
   <div class="row">
     <div class="col-md-11 col-sm-12 col-xs-12">
-      <strong>
-        You are eligible to enroll or change coverage through <%= @active_sep.end_on %>.
-        <!-- <i class="fa fa-lg fa-info-circle" data-toggle="tooltip" title="Your ‘<%=@active_sep.title%>’ Qualifying Life Event resulted in a Special Enrollment Period starting <%=@active_sep.start_on%>"></i>-->
-        &nbsp;&nbsp;&nbsp;
-        <%= build_link_for_sep_type(@active_sep, nil, local_assigns[:family_id]) %>
-      </strong>
+      <% if EnrollRegistry.feature_enabled?(:verbose_sep_message) %>
+          <div style="color: #323130;">
+            <%= l10n("insured.sep_verbose_eligibility_alert", sep_end_date: @active_sep.end_on ) %>
+            <span style="text-decoration: underline;">
+              <%= build_link_for_sep_type(@active_sep, nil, local_assigns[:family_id]) %>
+            </span>
+          </div>
+      <% else %>
+        <strong>
+          <%= l10n("insured.sep_eligibility_alert", sep_end_date: @active_sep.end_on ) %>
+          <div class="btn btn-default ml-1">
+            <%= build_link_for_sep_type(@active_sep, nil, local_assigns[:family_id]) %>
+          </div>
+        </strong>
+      <% end %>
     </div>
   </div>
 </div>
