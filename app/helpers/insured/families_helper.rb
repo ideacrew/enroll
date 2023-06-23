@@ -250,7 +250,7 @@ module Insured::FamiliesHelper
   end
 
   def determine_condition(enrollment, enrollment_state)
-    if enrollment.terminate_reason == HbxEnrollment::TermReason::NON_PAYMENT && enrollment_state.key?(:non_payment)
+    if display_termination_reason?(enrollment) && enrollment_state.key?(:non_payment)
       :non_payment
     elsif enrollment.is_any_enrollment_member_outstanding && enrollment_state.key?(:has_outstanding_verification)
       :has_outstanding_verification
