@@ -1,5 +1,7 @@
-require 'rails_helper'
+# frozen_string_literal: true
 
+require 'rails_helper'
+# spec for GeneralAgencyProfilePolicy
 module BenefitSponsors
   RSpec.describe Organizations::GeneralAgencyProfilePolicy, dbclean: :after_each  do
     let!(:user) { FactoryBot.create(:user) }
