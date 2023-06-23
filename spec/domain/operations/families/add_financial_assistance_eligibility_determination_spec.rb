@@ -15,8 +15,10 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
                       dob: Date.new(1984, 3, 8))
   end
   let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
-
-  let!(:params) do
+  let(:application) do
+    FactoryBot.create(:financial_assistance_application, params)
+  end
+  let(:params) do
     {:family_id => BSON::ObjectId(family.id),
      :assistance_year => 2020,
      :benchmark_product_id => BSON::ObjectId('5f6020f26e81d9c148d3db34'),
@@ -111,11 +113,7 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
            "eligibility_determination_id" => BSON::ObjectId('5f5eb0542e1423c05646b19b'),
            "medicaid_household_size" => 1,
            "magi_medicaid_category" => "false",
-           "member_determinations" => [{
-             'kind' => 'Medicaid/CHIP Determination',
-             'criteria_met' => true,
-             'determination_reasons' => [:mitc_override_not_lawfully_present_pregnant]
-           }]}],
+           "member_determinations" => member_determinations}],
      :eligibility_determinations =>
          [{"_id" => BSON::ObjectId('5f5eb0542e1423c05646b19b'),
            "max_aptc" => {"cents" => 5826.0, "currency_iso" => "USD"},
@@ -130,6 +128,27 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
            "determined_at" => "2020-09-09 00:00:00 UTC",
            "source" => "Faa"}]}
   end
+  let(:member_determinations) do
+    [{
+      'kind' => 'Medicaid/CHIP Determination',
+      'criteria_met' => true,
+      'determination_reasons' => [:mitc_override_not_lawfully_present_pregnant],
+      "eligibility_overrides" => [
+        {
+          "override_rule" => "not_lawfully_present_pregnant",
+          "override_applied" => true
+        },
+        {
+          "override_rule" => "not_lawfully_present_chip_eligible",
+          "override_applied" => false
+        },
+        {
+          "override_rule" => "not_lawfully_present_under_twenty_one",
+          "override_applied" => false
+        }
+    ]
+    }]
+  end
 
   it 'should be a container-ready operation' do
     expect(subject.respond_to?(:call)).to be_truthy
@@ -139,7 +158,7 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
     before do
       bcp = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
       bcp.update_attributes!(slcsp_id: product.id)
-      @result = subject.call(params: params)
+      @result = subject.call(application)
       family.reload
       @thhs = family.active_household.tax_households
     end
@@ -157,11 +176,23 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
     end
 
     it 'should create Member Determination object' do
-      member_determination = @thhs.first.tax_household_members.first.member_determinations.first
+      member_determination = family.active_household&.latest_active_tax_household&.tax_household_members&.first&.member_determinations&.first
       applicant = params[:applicants].first
+      expect(member_determination.created_at.present?).to be_truthy
+      expect(member_determination.updated_at.present?).to be_truthy
       expect(member_determination.kind).to eq(applicant['member_determinations'].first['kind'])
       expect(member_determination.criteria_met).to eq(applicant['member_determinations'].first['criteria_met'])
       expect(member_determination.determination_reasons).to eq(applicant['member_determinations'].first['determination_reasons'])
+    end
+
+    it 'should create Eligibility Override objects' do
+      eligibility_overrides = family.active_household.latest_active_tax_household.tax_household_members.first.member_determinations.first.eligibility_overrides
+      eligibility_overrides.each do |override|
+        expect(override.created_at.present?).to be_truthy
+        expect(override.updated_at.present?).to be_truthy
+        expect(override.override_rule.present?).to be_truthy
+        expect(override.override_applied.is_a?(Boolean)).to be_truthy
+      end
     end
 
     it 'should update yearly_expected_contribution value' do
@@ -179,49 +210,31 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
 
   context 'creation of tax households for family' do
     context 'applicant ineligible' do
-      it 'should not create a tax household for non applicant members' do
-        applicant = params[:applicants].first
-        applicant.merge!({"is_ia_eligible" => false,
-                          "is_medicaid_chip_eligible" => false,
-                          "is_totally_ineligible" => false,
-                          "is_magi_medicaid" => false,
-                          "is_non_magi_medicaid_eligible" => false,
-                          "is_without_assistance" => false})
+      context 'non applicant members' do
+        before do
+          applicant = params[:applicants].first
+          applicant.merge!({"is_ia_eligible" => false,
+                            "is_medicaid_chip_eligible" => false,
+                            "is_totally_ineligible" => false,
+                            "is_magi_medicaid" => false,
+                            "is_non_magi_medicaid_eligible" => false,
+                            "is_without_assistance" => false})
+          @result = subject.call(application)
+        end
 
-        @result = subject.call(params: params)
-        family.reload
-
-        expect(family.active_household.tax_households.count).to eq(0)
-      end
-
-      it 'should not create a tax household for applicants with nil attributes' do
-        applicant = params[:applicants].first
-        applicant.merge!({"is_ia_eligible" => nil,
-                          "is_medicaid_chip_eligible" => nil,
-                          "is_totally_ineligible" => nil,
-                          "is_magi_medicaid" => nil,
-                          "is_non_magi_medicaid_eligible" => nil,
-                          "is_without_assistance" => nil})
-
-        @result = subject.call(params: params)
-        family.reload
-
-        expect(family.active_household.tax_households.count).to eq(0)
+        it 'should not create a tax household for non applicant members' do
+          expect(family.active_household.tax_households.count).to eq(0)
+        end
       end
     end
-
   end
 
   context 'csr_percent_as_integer' do
-    let(:csr_params) do
-      params[:applicants].first.merge!(appli_addnl_params)
-      params
-    end
-
     before do
       bcp = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
       bcp.update_attributes!(slcsp_id: product.id)
-      @result = subject.call(params: csr_params)
+      params[:applicants].first.merge!(appli_addnl_params)
+      @result = subject.call(application)
       family.reload
       @thhm = family.active_household.tax_households.first.tax_household_members.first
     end
@@ -327,7 +340,8 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
     before do
       bcp = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
       bcp.update_attributes!(slcsp_id: product.id)
-      @result = subject.call(params: params.except(:family_id))
+      params.except!(:family_id)
+      @result = subject.call(application)
       family.reload
       @thhs = family.active_household.tax_households
     end
@@ -345,18 +359,14 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
     before do
       bcp = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
       bcp.update_attributes!(slcsp_id: product.id)
-      @result = subject.call(params: input_params)
+      eligibility_determination = params[:eligibility_determinations].first
+      eligibility_determination.merge!('yearly_expected_contribution' => nil)
+      @result = subject.call(application)
       family.reload
       @thhs = family.active_household.tax_households
     end
 
     context 'when yearly_expected_contribution is nil' do
-      let(:input_params) do
-        eligibility_determination = params[:eligibility_determinations].first
-        eligibility_determination.merge!('yearly_expected_contribution' => nil)
-        params
-      end
-
       it 'should successfully create thh object' do
         expect(@thhs.first).to be_a(TaxHousehold)
         expect(@thhs.first.yearly_expected_contribution).to be_nil
