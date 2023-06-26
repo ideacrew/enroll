@@ -18,7 +18,7 @@ module BenefitSponsors
     context 'access to general agency profile' do
       it 'returns true if admin user and has hbx staff role' do
         user_with_hbx_staff_role = FactoryBot.create(:user, :with_hbx_staff_role)
-        FactoryBot.create(:person, user: user_with_hbx_staff_role )
+        FactoryBot.create(:person, user: user_with_hbx_staff_role)
         policy = BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(user_with_hbx_staff_role, general_agency_profile)
         expect(policy.can_read_inbox?).to be true
       end
@@ -31,7 +31,7 @@ module BenefitSponsors
       it 'returns true if general agency has staff role' do
         general_agency_staff_role = FactoryBot.create(:general_agency_staff_role, aasm_state: 'active', is_primary: true)
         person = general_agency_staff_role.person
-        user = FactoryBot.create(:user, :general_agency_staff, person: person)
+        user = FactoryBot.create(:user, person: person)
         policy = BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(user, general_agency_profile)
 
         expect(policy.can_read_inbox?).to be true
