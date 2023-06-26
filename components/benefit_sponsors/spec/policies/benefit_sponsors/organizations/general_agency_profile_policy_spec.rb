@@ -5,7 +5,7 @@ require 'rails_helper'
 module BenefitSponsors
   RSpec.describe Organizations::GeneralAgencyProfilePolicy, dbclean: :after_each  do
     let!(:user) { FactoryBot.create(:user) }
-    let(:general_agency_profile) {FactoryBot.create(:general_agency_profile)}
+    let(:general_agency_profile) {FactoryBot.create(:benefit_sponsors_general_agency_profile)}
     let(:policy){BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(user, general_agency_profile)}
     let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let(:organization_with_hbx_profile)  { site.owner_organization }
@@ -16,7 +16,7 @@ module BenefitSponsors
 
     context 'access to general agency profile' do
       it 'returns true if admin user and has hbx staff role' do
-        FactoryBot.create(:hbx_staff_role, person: person)
+        FactoryBot.create(:benefit_sponsors_hbx_staff_role, person: person)
         expect(policy.can_read_inbox?).to be true
       end
 

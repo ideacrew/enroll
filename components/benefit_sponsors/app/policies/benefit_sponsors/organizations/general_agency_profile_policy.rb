@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Organizations
+    # Policy for GeneralAgency
     class GeneralAgencyProfilePolicy < ApplicationPolicy
       def can_read_inbox?
         return false if user.blank?
