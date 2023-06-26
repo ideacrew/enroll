@@ -5,9 +5,10 @@ require 'rails_helper'
 module BenefitSponsors
   RSpec.describe Organizations::GeneralAgencyProfilePolicy, dbclean: :after_each  do
     let!(:user) { FactoryBot.create(:user) }
-    let(:general_agency_profile) {FactoryBot.create(:benefit_sponsors_general_agency_profile)}
-    let(:policy){BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(user, general_agency_profile)}
     let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let(:general_agency) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site)}
+    let(:general_agency_profile) {general_agency.profiles.first }
+    let(:policy){BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(user, general_agency_profile)}
     let(:organization_with_hbx_profile)  { site.owner_organization }
     let!(:organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site) }
     let(:gap_id) { organization.general_agency_profile.id }
@@ -16,11 +17,14 @@ module BenefitSponsors
 
     context 'access to general agency profile' do
       it 'returns true if admin user and has hbx staff role' do
-        FactoryBot.create(:benefit_sponsors_hbx_staff_role, person: person)
+        user_with_hbx_staff_role = FactoryBot.create(:user, :with_hbx_staff_role)
+        FactoryBot.create(:person, user: user_with_hbx_staff_role )
+        policy = BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(user_with_hbx_staff_role, general_agency_profile)
         expect(policy.can_read_inbox?).to be true
       end
 
       it 'returns false if user has no valid role' do
+        FactoryBot.create(:person, user: user)
         expect(policy.can_read_inbox?).to be false
       end
 
