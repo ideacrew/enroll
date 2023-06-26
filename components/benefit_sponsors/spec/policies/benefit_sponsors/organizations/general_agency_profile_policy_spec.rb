@@ -12,7 +12,7 @@ module BenefitSponsors
     let(:organization_with_hbx_profile)  { site.owner_organization }
     let!(:organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site) }
     let(:gap_id) { organization.general_agency_profile.id }
-    let(:general_agency_staff_role) { FactoryBot.build(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, aasm_state: "active")}
+    let(:general_agency_staff_role) { FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, aasm_state: "active")}
     let!(:person) {FactoryBot.create(:person, user: user)}
 
     context 'access to general agency profile' do
@@ -29,9 +29,11 @@ module BenefitSponsors
       end
 
       it 'returns true if general agency has staff role' do
-        person.general_agency_staff_roles = [general_agency_staff_role]
-        person.save!
-        FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: gap_id, person: person)
+        general_agency_staff_role = FactoryBot.create(:general_agency_staff_role, aasm_state: 'active', is_primary: true)
+        person = general_agency_staff_role.person
+        user = FactoryBot.create(:user, :general_agency_staff, person: person)
+        policy = BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(user, general_agency_profile)
+
         expect(policy.can_read_inbox?).to be true
       end
     end
