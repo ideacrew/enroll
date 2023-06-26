@@ -1,45 +1,72 @@
 :root {
     .plan-tile {
-        padding: 12px;
-        font-size: medium;
+      font-size: medium;
 
-        .plan-header {
-            display: flex;
-            flex-direction: column;
+      .plan-header {
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #ddd;
+        background: #FAF9F8;
 
-            img {
-                flex: 0;
-                object-fit: scale-down;
-                height: 100px;
-            }
-
-            .plan-logo-and-name {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                gap: 20px;
-
-                .plan-status-container {
-                    min-height: 20px;
-                }
-
-                h3 {
-                    margin: 0;
-                    justify-self: left;
-                    padding: 8px 0;
-                    flex-basis: 100%;
-
-                    a {
-                        color: black !important;
-                        font-size: 18px;
-                        font-weight: 700;
-                        line-height: 1.5;
-                        display: block;
-                    }
-
-                }
-            }
+        .plan-year {
+          margin: 0;
+          padding-left: 12px;
+          flex-grow: 1;
+          line-height: 0;
+          font-size: medium;
         }
+
+        .plan-status-container {
+          display: flex;
+          min-height: 36px;
+          align-items: stretch;
+        }
+
+        .label {
+          display: flex;
+          height: 100%;
+          border-radius: 0 .25rem 0 0;
+          align-items: center;
+        }
+      }
+
+      .plan-details-container {
+        padding: 12px;
+      }
+
+      .plan-title {
+        display: flex;
+        flex-direction: column;
+
+        img {
+            flex: 0;
+            object-fit: scale-down;
+            height: 100px;
+        }
+
+        .plan-logo-and-name {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          gap: 20px;
+
+          h3 {
+            margin: 0;
+            justify-self: left;
+            padding: 8px 0;
+            flex-basis: 100%;
+
+            a {
+              color: black !important;
+              font-size: 18px;
+              font-weight: 700;
+              line-height: 1.5;
+              display: block;
+            }
+
+          }
+        }
+      }
 
         .plan-details {
             display: flex;
@@ -98,7 +125,7 @@
 
                 a {
                     color: inherit;
-                    
+
                     &:hover {
                         text-decoration: none;
                     }
