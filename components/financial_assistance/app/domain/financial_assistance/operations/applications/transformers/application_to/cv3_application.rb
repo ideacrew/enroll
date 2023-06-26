@@ -257,7 +257,7 @@ module FinancialAssistance
                 is_satisfied: applicant_evidence.is_satisfied,
                 verification_outstanding: applicant_evidence.verification_outstanding,
                 update_reason: applicant_evidence.update_reason,
-                due_on: applicant_evidence.due_on,
+                due_on: applicant_evidence.verif_due_date,
                 external_service: applicant_evidence.external_service,
                 updated_by: applicant_evidence.updated_by,
                 verification_histories: applicant_evidence.verification_histories.collect { |v_his| v_his.serializable_hash.symbolize_keys },

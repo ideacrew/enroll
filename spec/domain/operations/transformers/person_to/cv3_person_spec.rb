@@ -91,4 +91,17 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
       end
     end
   end
+
+
+  describe '#transform_verification_types' do
+
+    subject { ::Operations::Transformers::PersonTo::Cv3Person.new.transform_verification_types(person.verification_types) }
+
+    context 'due date is nil' do
+
+      it 'should populate the due date field' do
+        expect(subject.first[:due_date]).to eq person.verification_types.first.verif_due_date
+      end
+    end
+  end
 end
