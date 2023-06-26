@@ -1138,7 +1138,7 @@ class CensusEmployee < CensusMember
         rec["middle_name"],
         rec["name_sfx"],
         rec["email"].present? ? rec["email"]["address"] : nil,
-        SymmetricEncryption.decrypt(rec["encrypted_ssn"]),
+        SymmetricEncryption.decrypt(rec["encrypted_ssn"]).to_s.gsub(/\d(?=\d{4})/,"*"),
         rec["dob"].present? ? rec["dob"].strftime("%m/%d/%Y") : nil,
         rec["gender"]
       ]
