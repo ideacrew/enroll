@@ -675,6 +675,54 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     end
   end
 
+  context 'GET terminate_confirm' do
+    let!(:person) { FactoryBot.create(:person, :with_active_consumer_role, :with_consumer_role) }
+    let(:user) { FactoryBot.create(:user, person: person) }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
+    let(:new_family) { FactoryBot.build(:family, :with_primary_family_member_and_dependent)}
+    let!(:hbx_enrollment_not_tied_to_user) { FactoryBot.create(:hbx_enrollment, family: new_family, household: new_family.active_household) }
+    let!(:product) do
+      FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                        hios_id: '11111111122301-01',
+                        csr_variant_id: '01',
+                        metal_level_kind: :silver,
+                        application_period: TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year,
+                        benefit_market_kind: :aca_individual)
+    end
+
+    let!(:hbx_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: family.active_household,
+                        product: product)
+    end
+
+    before do
+      family.active_household.hbx_enrollments << [hbx_enrollment]
+      family.save
+    end
+
+    it 'should find the HBX enrollment if it belongs to the current user' do
+      sign_in user
+      get :terminate_confirm, params: {hbx_enrollment_id: hbx_enrollment.id}
+      expect(response).to render_template(:terminate_confirm)
+    end
+
+    it 'finds any HBX enrollment if the user is a HBX staff' do
+      sign_in user
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+
+      get :terminate_confirm, params: {hbx_enrollment_id: hbx_enrollment_not_tied_to_user.id}
+      expect(response).to render_template(:terminate_confirm)
+    end
+
+    it 'raises error if find the HBX enrollment does not belong to the current user' do
+      sign_in user
+      error_message = "HBX enrollment ID does not belong to the user terminating"
+      expect{ get :terminate_confirm, params: {hbx_enrollment_id: "5f6278b81bdce242ca1eb1a1"}}.to raise_error(RuntimeError, error_message)
+    end
+  end
+
   context 'POST term_or_cancel' do
     before { allow(Person).to receive(:find).and_return(person) }
 
