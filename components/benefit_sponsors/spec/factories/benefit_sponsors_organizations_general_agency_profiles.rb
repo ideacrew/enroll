@@ -37,7 +37,7 @@ FactoryBot.define do
 
     trait :organization do
       after(:build) do |profile, evaluator|
-          site = BenefitSponsors::Site.by_site_key(:cca).first || create(:benefit_sponsors_site, :as_hbx_profile, :with_benefit_market, :cca)
+        site = BenefitSponsors::Site.by_site_key(:cca).first || create(:benefit_sponsors_site, :as_hbx_profile, :with_benefit_market, :cca)
         profile.organization = build(:benefit_sponsors_organizations_general_organization, site: site) unless profile.organization
       end
     end
@@ -45,7 +45,7 @@ FactoryBot.define do
     trait :with_staff do
       after :create do |benefit_sponsors_organizations_general_agency_profile, evaluator|
         FactoryBot.create(:general_agency_staff_role,
-          benefit_sponsors_general_agency_profile_id: benefit_sponsors_organizations_general_agency_profile.id)
+                          benefit_sponsors_general_agency_profile_id: benefit_sponsors_organizations_general_agency_profile.id)
       end
     end
   end
