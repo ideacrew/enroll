@@ -61,7 +61,7 @@ gem 'mongoid_userstamp',        '~> 0.4', :path => "./project_gems/mongoid_users
 gem 'mongoid_rails_migrations', '~> 1.2'
 
 ## General gems
-gem 'aasm',                     '~> 4.9'
+gem 'aasm',                     '~> 4.10'
 gem 'addressable',              '~> 2.3'
 gem 'animate-rails',            '~> 1.0.10'
 gem 'recurring_select'
