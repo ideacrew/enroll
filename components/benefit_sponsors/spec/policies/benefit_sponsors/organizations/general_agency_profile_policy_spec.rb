@@ -32,7 +32,7 @@ module BenefitSponsors
         general_agency_staff_role = FactoryBot.create(:general_agency_staff_role, aasm_state: 'active', is_primary: true)
         person = general_agency_staff_role.person
         user = FactoryBot.create(:user, person: person)
-        policy = BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(user, general_agency_profile)
+        policy = BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(user, general_agency_staff_role)
 
         expect(policy.can_read_inbox?).to be true
       end
