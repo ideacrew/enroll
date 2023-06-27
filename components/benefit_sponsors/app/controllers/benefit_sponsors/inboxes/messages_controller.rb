@@ -15,7 +15,11 @@ module BenefitSponsors
       end
 
       def show
-        authorize @inbox_provider, :can_read_inbox?
+        if @inbox_provider.class.name == "Person"
+          authorize @inbox_provider, :can_read_inbox?, policy_class: BenefitSponsors::PersonPolicy
+        else
+          authorize @inbox_provider, :can_read_inbox?
+        end
         BenefitSponsors::Services::MessageService.for_show(@message, @current_user)
         respond_to do |format|
           format.html
