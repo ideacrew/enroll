@@ -300,13 +300,11 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
 
   describe "#transform_min_verification_due_date" do
 
-    
-   
     context "with nil min verification due date" do
       subject { Operations::Transformers::FamilyTo::Cv3Family.new.transform_min_verification_due_date(family) }
       let!(:eligibility_determination) do
         determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
-        
+
         determination
       end
 
