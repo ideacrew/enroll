@@ -88,7 +88,7 @@ PATH
   remote: ../benefit_markets
   specs:
     benefit_markets (0.0.1)
-      aasm (~> 4.8)
+      aasm (~> 4.9)
       active_model_serializers (~> 0.10)
       config (~> 2.0)
       dry-monads
@@ -108,13 +108,14 @@ PATH
   remote: ../notifier
   specs:
     notifier (0.0.1)
-      aasm (~> 4.8)
+      aasm (~> 4.9)
       ckeditor (= 4.2.4)
       combine_pdf
       config (~> 2.0)
       money-rails (~> 1.13)
       mongoid (~> 7.0.2)
       non-stupid-digest-assets
+      pundit (~> 2.0)
       rails (~> 5.2.4.3)
       redcarpet (~> 3.4.0)
       roo (~> 2.1.0)
@@ -127,7 +128,7 @@ PATH
   remote: ../sponsored_benefits
   specs:
     sponsored_benefits (0.0.1)
-      aasm (~> 4.8.0)
+      aasm (~> 4.9)
       config (~> 2.0)
       devise (~> 4.5)
       dry-auto_inject (= 0.6.1)
@@ -153,7 +154,7 @@ PATH
   remote: .
   specs:
     benefit_sponsors (0.0.1)
-      aasm (~> 4.8)
+      aasm (~> 4.9)
       active_model_serializers (~> 0.10)
       browser (= 2.7.0)
       config (~> 2.0)
@@ -184,7 +185,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    aasm (4.8.0)
+    aasm (4.9.0)
     actioncable (5.2.4.4)
       actionpack (= 5.2.4.4)
       nio4r (~> 2.0)
