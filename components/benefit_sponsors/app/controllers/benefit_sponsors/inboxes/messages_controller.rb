@@ -15,7 +15,7 @@ module BenefitSponsors
       end
 
       def show
-        if @inbox_provider.class.name == "Person"
+        if @inbox_provider.instance_of?(Person)
           authorize @inbox_provider, :can_read_inbox?, policy_class: BenefitSponsors::PersonPolicy
         else
           authorize @inbox_provider, :can_read_inbox?
