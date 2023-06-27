@@ -24,15 +24,13 @@ module BenefitSponsors
       end
 
       it 'returns false if user has no valid role' do
-        FactoryBot.create(:person, user: user)
         expect(policy.can_read_inbox?).to be false
       end
 
       it 'returns true if general agency has staff role' do
-        general_agency_staff_role = FactoryBot.create(:general_agency_staff_role, aasm_state: 'active', is_primary: true)
-        person = general_agency_staff_role.person
-        user = FactoryBot.create(:user, person: person)
-        policy = BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(user, general_agency_staff_role)
+        general_agency_staff_role1 = FactoryBot.create(:general_agency_staff_role, aasm_state: 'active', is_primary: true)
+        new_user = FactoryBot.create(:user, person: general_agency_staff_role1.person)
+        policy = BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(new_user, general_agency_staff_role1)
 
         expect(policy.can_read_inbox?).to be true
       end
