@@ -1466,6 +1466,7 @@ module FinancialAssistance
     def presence_of_attr_other_qns # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity TODO: Remove this
       if is_pregnant
         errors.add(:pregnancy_due_on, "' Pregnancy Due date' should be answered if you are pregnant") if pregnancy_due_on.blank? && FinancialAssistanceRegistry.feature_enabled?(:pregnancy_due_on_required)
+        errors.add(:pregnancy_due_on,"' Pregnancy Due date' should be in the future") if pregnancy_due_on.present? && pregnancy_due_on < TimeKeeper.date_of_record
         errors.add(:children_expected_count, "' How many children is this person expecting?' should be answered") if children_expected_count.blank?
       # Nil or "" means unanswered, true/or false boolean will be passed through
       elsif is_post_partum_period.nil? || is_post_partum_period == ""
