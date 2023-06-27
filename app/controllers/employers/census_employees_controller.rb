@@ -5,12 +5,14 @@ class Employers::CensusEmployeesController < ApplicationController
   before_action :updateable?, except: [:edit, :show, :update, :benefit_group]
   layout "two_column"
   def new
+    authorize @employer_profile, :show?
     @census_employee = build_census_employee
     @no_ssn = @benefit_sponsorship.is_no_ssn_enabled
     flash[:notice] = "SSN requirement is currently disabled. This means you are not required to input an SSN when adding new employees to your roster at this time." if @no_ssn
   end
 
   def create
+    authorize @employer_profile, :createable?
     @census_employee = CensusEmployee.new(census_employee_params.merge!({
       benefit_sponsorship_id: @benefit_sponsorship.id,
       benefit_sponsors_employer_profile_id: @employer_profile.id,

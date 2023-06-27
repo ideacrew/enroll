@@ -176,6 +176,26 @@ And(/^.+ selects (.*) for coverage$/) do |coverage|
   end
 end
 
+Then(/^the question "(.*)" is displayed$/) do |question|
+  expect(page).to have_content(question)
+end
+
+Then(/^the question "(.*)" is not displayed$/) do |question|
+  expect(page).not_to have_content(question)
+end
+
+Then(/^tribal state dropdown box is clicked$/) do
+  find_all(IvlPersonalInformation.tribe_state_dropdown).first.click
+end
+
+When(/^AI AN question is answered yes$/) do
+  find_all(IvlPersonalInformation.american_or_alaskan_native_yes_radiobtn).first.click
+end
+
+Then(/^states dropdown should popup$/) do
+  expect(page.find("#tribal-state-container .selectric-items").present?).to be_truthy
+end
+
 Then(/^.+ should see error message (.*)$/) do |text|
   page.should have_content(text)
 end
