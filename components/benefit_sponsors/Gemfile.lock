@@ -128,7 +128,7 @@ PATH
   remote: ../sponsored_benefits
   specs:
     sponsored_benefits (0.0.1)
-      aasm (~> 4.8)
+      aasm (~> 4.9)
       config (~> 2.0)
       devise (~> 4.5)
       dry-auto_inject (= 0.6.1)
