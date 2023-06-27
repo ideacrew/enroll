@@ -28,6 +28,7 @@ module SponsoredBenefits
         offering_query = ::Queries::EmployerPlanOfferings.new(plan_design_organization)
         @plans = offering_query.dental_reference_plans_by_id(params[:plans_ids], params[:active_year])
         @plans = @plans.select{|a| a.premium_tables.present?}
+        @plans_ids_json = @plans&.map{|a| a.id.to_s}&.to_json
         @search_options = ::Plan.search_options(@plans)
         @search_option_titles = {
           'plan_type': EnrollRegistry.feature_enabled?(:hmo_ppo_plan_type) ? 'HMO / PPO' : 'Plan Type',
