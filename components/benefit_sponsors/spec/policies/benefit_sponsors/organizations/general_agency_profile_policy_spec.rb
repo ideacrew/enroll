@@ -22,7 +22,7 @@ module BenefitSponsors
 
       it 'returns true if general agency has staff role' do
         person_with_ga_staff_role = FactoryBot.create(:person, :with_general_agency_staff_role)
-        user_with_ga_staff_role =FactoryBot.create(:user, person: person_with_ga_staff_role, roles: ["general_agency_staff"])
+        user_with_ga_staff_role = FactoryBot.create(:user, person: person_with_ga_staff_role, roles: ["general_agency_staff"])
         policy = BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(user_with_ga_staff_role, nil)
 
         expect(policy.can_read_inbox?).to be true
