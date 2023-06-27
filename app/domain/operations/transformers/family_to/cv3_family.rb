@@ -45,13 +45,18 @@ module Operations
             # broker_accounts = transform_broker_accounts(family.broker_accounts), #TO DO
             # updated_by: construct_updated_by(updated_by)
           }
-          payload.merge!(min_verification_due_date: family.min_verification_due_date) if family.min_verification_due_date.present?
+          payload.merge!(min_verification_due_date: transform_min_verification_due_date(family))
           payload.merge!(irs_groups: transform_irs_groups(family.irs_groups)) if family.irs_groups.present?
           payload.merge!(households: transform_households(family.households, options)) if family.households.present?
           payload.merge!(tax_household_groups: transform_tax_household_groups(family.tax_household_groups)) if family.tax_household_groups.present?
           failed_payloads = payload.values.select { |value| value.is_a?(Dry::Monads::Result::Failure) }
           return Failure("Unable to transform payload values: #{failed_payloads}") if failed_payloads.present?
           Success(payload)
+        end
+
+        def transform_min_verification_due_date(family)
+          return family.min_verification_due_date if family.min_verification_due_date.present?
+          family&.eligibility_determination&.default_earliest_verification_due_date
         end
 
         def transform_applications(family, exclude_applications)

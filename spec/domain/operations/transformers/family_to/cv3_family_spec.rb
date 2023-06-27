@@ -297,4 +297,39 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
       expect(tax_household_members.count).to eq(1)
     end
   end
+
+  describe "#transform_min_verification_due_date" do
+
+    
+   
+    context "with nil min verification due date" do
+      subject { Operations::Transformers::FamilyTo::Cv3Family.new.transform_min_verification_due_date(family) }
+      let!(:eligibility_determination) do
+        determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+        
+        determination
+      end
+
+      before do
+        family.eligibility_determination.update_attributes!(outstanding_verification_earliest_due_date: TimeKeeper.date_of_record + 96.days, outstanding_verification_document_status: 'outstanding')
+      end
+
+      it "should return eligibility_determination earliest_verification_due_date" do
+        expect(subject).to eql(family.eligibility_determination.default_earliest_verification_due_date)
+      end
+    end
+
+    context "with present min verification due date" do
+      let(:family_2) { FactoryBot.create(:family, :with_primary_family_member) }
+      subject { Operations::Transformers::FamilyTo::Cv3Family.new.transform_min_verification_due_date(family_2) }
+
+      before do
+        family_2.update_attributes!(min_verification_due_date: TimeKeeper.date_of_record)
+      end
+
+      it "should return min verification_due_date" do
+        expect(subject).to eql(family_2.min_verification_due_date)
+      end
+    end
+  end
 end
