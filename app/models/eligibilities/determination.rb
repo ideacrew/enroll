@@ -17,10 +17,9 @@ module Eligibilities
     accepts_nested_attributes_for :subjects, :grants
 
     def default_earliest_verification_due_date
-      if outstanding_verification_status == 'outstanding'
-        verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
-        outstanding_verification_earliest_due_date || TimeKeeper.date_of_record + verification_document_due.days
-      end
+      return unless outstanding_verification_status == 'outstanding'
+      verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+      outstanding_verification_earliest_due_date || TimeKeeper.date_of_record + verification_document_due.days
     end
   end
 end
