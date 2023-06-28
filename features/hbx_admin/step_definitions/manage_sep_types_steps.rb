@@ -948,7 +948,7 @@ Given("Employee creates account and on home page") do
 end
 
 When("Patrick Doe clicked on Shop For Plans button") do
-  find('.pull-right.interaction-click-control-shop-for-plans', text: 'Shop For Plans').click
+  find('.pull-right.interaction-click-control-shop-for-plans').click
   find('.interaction-click-control-shop-now').click
   find(IvlChooseCoverage.continue_btn).click
 end
