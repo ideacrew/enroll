@@ -199,6 +199,66 @@ module Insured::FamiliesHelper
     enrollment_states_hash.stringify_keys[enrollment.aasm_state.to_s]
   end
 
+  # Generates an HTML label for the given hbx enrollment object based on its aasm state and other attributes.
+  # The label provides a visual representation of the enrollment state with text and color.
+  #
+  # @param enrollment [Object] The hbx enrollment object for which the label is generated.
+  # @return [String, nil] An HTML string representing the label or nil if the enrollment is blank.
+  def enrollment_state_label(enrollment)
+    return if enrollment.blank?
+
+    # The colors correspond to those set in enrollment.scss as label-{color}
+    state_groups = {
+      auto_renewing: {
+        has_outstanding_verification: { text: 'Action Needed', color: 'yellow' },
+        default: { text: 'Auto Renewing', color: 'green' }
+      },
+      coverage_canceled: {
+        non_payment: { text: 'Canceled by Insurance Company', color: 'red' },
+        default: { text: 'Coverage Canceled', color: 'grey' }
+      },
+      coverage_expired: {
+        default: { text: 'Coverage Year Ended', color: 'blue' }
+      },
+      coverage_reinstated: {
+        default: { text: 'Coverage Reinstated', color: 'green' }
+      },
+      coverage_selected: {
+        has_outstanding_verification: { text: 'Action Needed', color: 'yellow' },
+        default: { text: 'Coverage Selected', color: 'green' }
+      },
+      coverage_terminated: {
+        non_payment: { text: 'Terminated by Insurance Company', color: 'red' },
+        default: { text: 'Terminated', color: 'blue' }
+      },
+      renewing_coverage_selected: {
+        has_outstanding_verification: { text: 'Action Needed', color: 'yellow' },
+        default: { text: 'Renewing Coverage Selected', color: 'green' }
+      },
+      unverified: {
+        has_outstanding_verification: { text: 'Action Needed', color: 'yellow' }
+      },
+      default: {
+        has_outstanding_verification: { text: 'Action Needed', color: 'yellow' }
+      }
+    }
+
+    group = state_groups[enrollment.aasm_state.to_sym] || state_groups[:default]
+    condition = determine_condition(enrollment, group)
+    label = group[condition] || { text: enrollment.aasm_state.to_s.titleize, color: 'grey' }
+    content_tag(:span, label[:text], class: "label label-#{label[:color]}")
+  end
+
+  def determine_condition(enrollment, enrollment_state)
+    if display_termination_reason?(enrollment) && enrollment_state.key?(:non_payment)
+      :non_payment
+    elsif enrollment.is_any_enrollment_member_outstanding && enrollment_state.key?(:has_outstanding_verification)
+      :has_outstanding_verification
+    else
+      :default
+    end
+  end
+
   def display_termination_reason?(enrollment)
     return false if enrollment.is_shop?
     enrollment.terminate_reason && EnrollRegistry.feature_enabled?(:display_ivl_termination_reason) &&
