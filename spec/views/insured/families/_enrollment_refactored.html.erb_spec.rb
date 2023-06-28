@@ -93,7 +93,9 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
         future_enrollment_termination_date: "",
         :is_ivl_actively_outstanding? => false,
         covered_members_first_names: [],
-        :eligible_child_care_subsidy => 0
+        :eligible_child_care_subsidy => 0,
+        is_any_enrollment_member_outstanding: false,
+        terminate_reason: nil
       )
     end
 
@@ -222,7 +224,9 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
         consumer_role: nil,
         future_enrollment_termination_date: future_enrollment_termination_date,
         covered_members_first_names: [],
-        eligible_child_care_subsidy: 0
+        eligible_child_care_subsidy: 0,
+        is_any_enrollment_member_outstanding: false,
+        terminate_reason: nil
       )
     end
 
@@ -331,6 +335,8 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
       let(:future_enrollment_termination_date) { Date.today }
 
       before :each do
+        allow(hbx_enrollment).to receive(:is_any_enrollment_member_outstanding).and_return(false)
+        allow(hbx_enrollment).to receive(:terminate_reason).and_return(nil)
         allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
         allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
         allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
@@ -346,7 +352,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
       end
 
       it 'displays future_enrollment_termination_date when enrollment is in coverage_termination_pending state' do
-        expect(rendered).to match(/Future enrollment termination date:/)
+        expect(rendered).to match(/terminated-on enrollment-effective/) # classes for the relevant label
       end
 
       it 'displays terminated_on when coverage_termination_pending and not future_enrollment_termination_date' do
@@ -410,15 +416,15 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
         EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(true)
       end
 
-      it "should display Terminated by health insure indicator on enrollment tile" do
+      it "should display Terminated by Insurance Company indicator on enrollment tile" do
         render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
-        expect(rendered).to have_text("Terminated by health insurer")
+        expect(rendered).to have_text("Terminated by Insurance Company")
       end
 
-      it "should not display Terminated by health insure indicator on enrollment tile" do
+      it "should not display Terminated by Insurance Company indicator on enrollment tile" do
         hbx_enrollment.update_attributes(terminate_reason: nil)
         render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
-        expect(rendered).not_to have_text("Terminated by health insurer")
+        expect(rendered).not_to have_text("Terminated by Insurance Company")
         expect(rendered).to have_text("Terminated")
       end
     end
@@ -430,7 +436,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
 
       it "should not display Terminated by health insure indicator on enrollment tile" do
         render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
-        expect(rendered).not_to have_text("Terminated by health insurer")
+        expect(rendered).not_to have_text("Terminated by Insurance Company")
         expect(rendered).to have_text("Terminated")
       end
 
@@ -499,7 +505,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
 
       it "should display Canceled by health insure indicator on enrollment tile" do
         render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
-        expect(rendered).to have_text("Canceled by health insurer")
+        expect(rendered).to have_text("Canceled by Insurance Company")
       end
 
       it "should not display Canceled by health insure indicator on enrollment tile" do
@@ -651,7 +657,9 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
         future_enrollment_termination_date: "",
         :is_ivl_actively_outstanding? => false,
         covered_members_first_names: [],
-        eligible_child_care_subsidy: 1
+        eligible_child_care_subsidy: 1,
+        is_any_enrollment_member_outstanding: false,
+        terminate_reason: nil
       )
     end
 
@@ -714,7 +722,9 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
           future_enrollment_termination_date: "",
           :is_ivl_actively_outstanding? => false,
           covered_members_first_names: [],
-          eligible_child_care_subsidy: 0
+          eligible_child_care_subsidy: 0,
+          is_any_enrollment_member_outstanding: false,
+          terminate_reason: nil
         )
       end
 
