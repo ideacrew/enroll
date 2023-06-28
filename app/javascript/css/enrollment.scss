@@ -113,7 +113,7 @@
                 text-align: right;
             }
 
-            .btn {
+            &>.btn {
                 height: 34px;
                 color: var(--button-default-color);
                 border-color: var(--button-default-color);
