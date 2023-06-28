@@ -28,6 +28,31 @@
           border-radius: 0 .25rem 0 0;
           align-items: center;
         }
+
+        .label-red {
+          background-color: #A21E1F;
+          color: #FFF;
+        }
+
+        .label-green {
+          background-color: #027314;
+          color: #FFF;
+        }
+
+        .label-yellow {
+          background-color: #E5A900;
+          color: #323130;
+        }
+
+        .label-blue {
+          background-color: #003260;
+          color: #FFF;
+        }
+
+        .label-grey {
+          background-color: #3B3A39;
+          color: #FFF;
+        }
       }
 
       .plan-details-container {
