@@ -63,6 +63,12 @@ module BenefitSponsors
       is_staff_role_for_employer?(record)
     end
 
+    def can_read_inbox?
+      return false if user.blank? || user.person.blank?
+      return true if user.has_hbx_staff_role? || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record)
+      is_staff_role_for_employer?(record)
+    end
+
     def list_enrollments?
       coverage_reports?
     end
