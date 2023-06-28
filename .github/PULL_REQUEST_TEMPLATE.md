@@ -36,4 +36,4 @@ Variable name:
 - [ ] ME
 
 # Additional Context
-Include any additional context that may be relevant to the peer review process. For example, if spec coverage is not required for these changes, please explain your reasoning here.
+Include any additional context that may be relevant to the peer review process.
