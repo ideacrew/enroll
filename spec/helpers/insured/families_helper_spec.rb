@@ -699,4 +699,51 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
       end
     end
   end
+
+  # Though we primarily care to test the functionality of the method and not the exact html we use the existence of
+  # expected html elements as a positive indicator. If the related state_groups hash fields are updated, this test will
+  # need to be updated as well.
+  describe 'enrollment_state_label' do
+    let(:enrollment) { instance_double(HbxEnrollment, is_shop?: false) }
+
+    shared_examples 'a label checker' do |aasm_state, terminate_reason, is_outstanding, expected_label|
+      before do
+        EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(true)
+        allow(enrollment).to receive(:aasm_state).and_return(aasm_state)
+        allow(enrollment).to receive(:terminate_reason).and_return(terminate_reason)
+        allow(enrollment).to receive(:is_any_enrollment_member_outstanding).and_return(is_outstanding)
+      end
+
+      it "returns the #{expected_label} label" do
+        expect(enrollment_state_label(enrollment)).to include(*expected_label)
+      end
+    end
+
+    context 'when enrollment is blank' do
+      before do
+        allow(enrollment).to receive(:blank?).and_return(true)
+      end
+
+      it 'returns nil' do
+        expect(enrollment_state_label(enrollment)).to be_nil
+      end
+    end
+
+    context 'when enrollment is not blank' do
+
+      context 'when condition is present in state group' do
+        it_behaves_like 'a label checker', 'coverage_canceled', HbxEnrollment::TermReason::NON_PAYMENT, false, ['red', 'Canceled by Insurance Company']
+        it_behaves_like 'a label checker', 'auto_renewing', nil, true, ['yellow', 'Action Needed']
+      end
+
+      context 'when condition is not present in state group' do
+        it_behaves_like 'a label checker', 'auto_renewing', nil, false, ['green', 'Auto Renewing']
+      end
+
+      context 'when aasm_state is not found in state_groups' do
+        it_behaves_like 'a label checker', 'unknown_state', nil, false, ['grey', 'Unknown State']
+      end
+    end
+  end
+
 end

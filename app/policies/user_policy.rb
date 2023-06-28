@@ -22,4 +22,10 @@ class UserPolicy < ApplicationPolicy
     return false unless role.permission
     role.permission.view_login_history
   end
+
+  def can_access_user_account_tab?
+    return false unless user.person && (role = user.person.hbx_staff_role)
+    return false unless role.permission
+    role.permission.can_access_user_account_tab
+  end
 end
