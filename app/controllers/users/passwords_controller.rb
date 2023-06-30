@@ -6,15 +6,15 @@ class Users::PasswordsController < Devise::PasswordsController
 
   rescue_from 'Mongoid::Errors::DocumentNotFound', with: :user_not_found
   def create
-    if check_recaptcha
+    if verify_recaptcha_if_needed
       self.resource = resource_class.send_reset_password_instructions(resource_params)
       yield resource if block_given?
       if successfully_sent?(resource)
         resource.security_question_responses.destroy_all
 
         respond_to do |format|
-         format.html { respond_with({}, location: after_sending_reset_password_instructions_path_for(resource_name)) }
-         format.js
+          format.html { respond_with({}, location: after_sending_reset_password_instructions_path_for(resource_name)) }
+          format.js
         end
 
       else
@@ -39,7 +39,8 @@ class Users::PasswordsController < Devise::PasswordsController
 
   private
 
-  def check_recaptcha
+  def verify_recaptcha_if_needed
+    return true unless helpers.forgot_password_recaptcha_enabled?(@user.profile_type)
     verify_recaptcha(model: @user)
   end
 
