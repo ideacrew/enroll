@@ -246,8 +246,10 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def is_user_authorized?
-    primary_family_enrollments = current_user.person.primary_family.hbx_enrollments.map(&:id).map(&:to_s)
-    raise "HBX enrollment ID does not belong to the user" unless current_user.has_hbx_staff_role? || primary_family_enrollments.include?(params.require(:hbx_enrollment_id))
+    return true if current_user.has_hbx_staff_role?
+    hbx_enrollment_exists = current_user.person.primary_family.hbx_enrollments.where(id: params.require(:hbx_enrollment_id)).present?
+    raise "HBX enrollment ID does not belong to the user" unless hbx_enrollment_exists
+    true
   end
 
   def family_member_eligibility_check(family_member)
