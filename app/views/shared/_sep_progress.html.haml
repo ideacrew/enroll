@@ -62,21 +62,4 @@
 - else
   %button.btn.btn-lg.btn-primary.btn-block#btn-continue{type: 'submit'}
     CONTINUE
-
-%ul.list-unstyled.list-right-section
-  %li
-    %a.back{href: '#'}
-      <!-- = image_tag 'icons/list.png' -->
-      PREVIOUS
-  %li
-    %a{href: '#'}
-      <!-- = image_tag 'icons/list.png' -->
-      SAVE &amp; EXIT
-    %br
-    %br
-  %li
-    %p
-      If you select Save & Exit, you can save your work and continue where you left off the next time you login.
-.btn.btn-default{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal", "style" => "width: 100%;"}
-  Help me sign up
-= render partial: 'ui-components/v1/modals/help_with_plan'
+= render partial: 'shared/shopping_nav_panel', locals: {step: step}
