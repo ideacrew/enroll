@@ -270,5 +270,27 @@ module BenefitSponsors
         end
       end
     end
+
+    describe "GET export_census_employees", type: :controller, dbclean: :after_each do
+      let(:hbx_staff_permission) { FactoryBot.create(:permission, :hbx_staff) }
+      let!(:user) { FactoryBot.create(:user) }
+
+      context "downloads CSV template" do
+        before do
+          benefit_sponsorship.save
+          allow(controller).to receive(:authorize).and_return(true)
+          sign_in(user)
+          get :export_census_employees, params: {employer_profile_id: employer_profile.id.to_s}, format: :csv
+        end
+
+        it "should not contain ssn header and match with original headers" do
+          csv_data = CSV.parse(response.body)
+          column_headers = csv_data[2]
+
+          expect(column_headers).to_not include('ssn')
+          expect(column_headers).to include("Email Address", "Date of Birth (MM/DD/YYYY)", "Gender", "Date of Hire")
+        end
+      end
+    end
   end
 end
