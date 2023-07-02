@@ -66,7 +66,8 @@ module BenefitSponsors
     def can_read_inbox?
       return false if user.blank? || user.person.blank?
       return true if user.has_hbx_staff_role? || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record)
-      true if is_staff_role_for_employer?(record) || user.person.inbox.messages
+      return true if is_staff_role_for_employer?(record)
+      false
     end
 
     def list_enrollments?
