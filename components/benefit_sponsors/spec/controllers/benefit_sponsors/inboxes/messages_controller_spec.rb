@@ -113,7 +113,7 @@ module BenefitSponsors
       context "for broker agency profile - from Admin login" do
         before do
           user_with_hbx_staff_role = FactoryBot.create(:user, :with_hbx_staff_role)
-          FactoryBot.create(:person, user: user_with_hbx_staff_role )
+          FactoryBot.create(:person, user: user_with_hbx_staff_role)
           user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: broker_organization.broker_agency_profile.id)
           user_with_hbx_staff_role.person.hbx_staff_role.save!
           broker_person.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_organization.broker_agency_profile.id)
