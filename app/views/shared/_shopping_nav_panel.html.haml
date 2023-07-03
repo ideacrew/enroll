@@ -8,10 +8,10 @@
 - if EnrollRegistry.feature_enabled?(:back_to_account_all_shop)
   = link_to l10n("back_to_my_account"), family_account_path, class: 'btn btn-default btn btn-lg', style: 'width: 100%; margin-top: 16px;'
 %ul.list-unstyled.list-right-section
-  - unless no_previous_button
-    %li
-      %a.back{href: '#', style: link_style}
-        Previous Step
+  -# - unless no_previous_button
+  %li
+    %a.back{href: '#', style: link_style}
+      Previous Step
   - if step != 1 && EnrollRegistry.feature_enabled?(:back_to_account_all_shop)
     %li
       %a{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal", style: link_style}
