@@ -153,7 +153,9 @@
         <% end %>
         <br/>
         <br/>
-        <%= link_to l10n("back_to_my_account"), family_account_path, class: 'btn btn-default btn btn-lg' %>
+        <% unless EnrollRegistry.feature_enabled?(:back_to_account_all_shop) && @change_plan.blank? %>
+          <%= link_to l10n("back_to_my_account"), family_account_path, class: 'btn btn-default btn btn-lg' %>
+        <% end %>
       </div>
       <div class="col-xs-3 right-section pull-right">
         <% if @change_plan.blank?  && @market_kind == "individual" %>
