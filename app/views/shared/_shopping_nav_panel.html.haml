@@ -1,7 +1,6 @@
 - step = (defined? step) ? step.to_i : 1
+- no_previous_button = (defined? @no_previous_button) ? @no_previous_button : step == 1
 
-
-- back_button_unless = EnrollRegistry.feature_enabled?(:back_to_account_all_shop) ? @no_previous_button || !step.between?(4, 6) : @no_previous_button || step == 1
 - save_and_exit_text = EnrollRegistry.feature_enabled?(:back_to_account_all_shop) ? "Log Out" : "SAVE &amp; EXIT"
 - link_style =  EnrollRegistry.feature_enabled?(:back_to_account_all_shop)  ? "width: 100%; font-size: 16px; text-decoration: underline;" : "text-transform: uppercase;"
 - help_sign_up_text = "Help Me Sign Up"
@@ -9,20 +8,17 @@
 - if EnrollRegistry.feature_enabled?(:back_to_account_all_shop)
   = link_to l10n("back_to_my_account"), family_account_path, class: 'btn btn-default btn btn-lg', style: 'width: 100%; margin-top: 16px;'
 %ul.list-unstyled.list-right-section
-  - unless back_button_unless
+  - unless no_previous_button
     %li
       %a.back{href: '#', style: link_style}
-        <!-- = image_tag 'icons/list.png' -->
         Previous Step
   - if step != 1 && EnrollRegistry.feature_enabled?(:back_to_account_all_shop)
     %li
       %a{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal", style: link_style}
-        <!-- = image_tag 'icons/list.png' -->
         = help_sign_up_text
   - unless @no_save_button
     %li
       %a{href: destroy_user_session_path, style: link_style}
-        <!-- = image_tag 'icons/list.png' -->
         = save_and_exit_text
   - unless EnrollRegistry.feature_enabled?(:back_to_account_all_shop)
     %br
