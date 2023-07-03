@@ -5,7 +5,7 @@
 - identity_verified = (defined? identity_verified) ? identity_verified : false
 - application_verified = (defined? application_verified) ? application_verified : false
 - search_page = (defined? search_page ) ? search_page : false
-
+-# test modify
 - percent_complete = 0
 - percent_complete = step == 1 ? 15 : (step == 2) ? 35 : ((step == 3) ? 50 : ((step == 4) ? 75 : ((step == 5) ? 90 : (step == 6 ? 100 : 0))))
 
@@ -36,7 +36,7 @@
       %span.circle-progress
       .vertical-line-progress
       Complete
-    
+
 - if step == 1 && search_page == true
   = link_to "Continue", insured_consumer_role_index_path(person: @person_params), method: :post, class: 'btn btn-lg btn-primary  btn-block'
 - elsif step == 1
