@@ -32,4 +32,6 @@
   locals: {state: step == 1 ? 'shop' : step == 2 ? 'review' : 'complete',
   no_previous_button: !(step == 2 && !no_purchase),
   no_save_button: true,
-  no_help_sign_up: true }
+  no_help_sign_up: true,
+  continue_to_account_text: @market_kind == "individual" ? nil : l10n('continue').upcase }
+  }
