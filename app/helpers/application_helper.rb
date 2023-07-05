@@ -986,4 +986,34 @@ module ApplicationHelper
 
     person.has_active_consumer_role? || person.has_active_resident_role?
   end
+
+  def registration_recaptcha_enabled?(profile_type)
+    case profile_type
+    when "broker_agency"
+      EnrollRegistry.feature_enabled?(:registration_broker_recaptcha)
+    when "general_agency"
+      EnrollRegistry.feature_enabled?(:registration_ga_recaptcha)
+    when "user_account"
+      EnrollRegistry.feature_enabled?(:registration_user_account_recaptcha)
+    when "benefit_sponsor"
+      EnrollRegistry.feature_enabled?(:registration_sponsor_recaptcha)
+    else
+      false
+    end
+  end
+
+  def forgot_password_recaptcha_enabled?(profile_type)
+    case profile_type
+    when "broker_agency"
+      EnrollRegistry.feature_enabled?(:forgot_password_broker_recaptcha)
+    when "general_agency"
+      EnrollRegistry.feature_enabled?(:forgot_password_ga_recaptcha)
+    when "user_account"
+      EnrollRegistry.feature_enabled?(:forgot_password_user_account_recaptcha)
+    when "benefit_sponsor"
+      EnrollRegistry.feature_enabled?(:forgot_password_sponsor_recaptcha)
+    else
+      false
+    end
+  end
 end
