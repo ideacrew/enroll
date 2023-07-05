@@ -17,11 +17,7 @@
           <div class="plan-logo-and-name">
             <%= display_carrier_logo(Maybe.new(product), { width: 100 }) %>
             <h3>
-              <% product_title = sanitize product.title %>
-              <% product_hios_id = sanitize product.hios_id %>
-              <% hbx_enrollment_id = sanitize hbx_enrollment.id %>
-              <% active_year = sanitize product.active_year %>
-              <%= link_to product_title, summary_products_plans_path({ :standard_component_id => product_hios_id, hbx_enrollment_id: hbx_enrollment_id, active_year: active_year }), remote: true %>
+              <%= link_to product.title, summary_products_plans_path({ :standard_component_id => product.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: product.active_year }), remote: true %>
             </h3>
           </div>
         </div>
