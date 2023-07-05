@@ -341,6 +341,9 @@ registry:
         settings:
           - key: :effective_period
             item: <%= Date.new(2020,9,18)..Date.new(2021,12,31) %>
+      - key: :verbose_sep_message
+        item: :verbose_sep_message
+        is_enabled: <%= ENV['VERBOSE_SEP_MESSAGE_IS_ENABLED'] || false %>
       - key: :special_cover_header
         item: :special_cover_header
         is_enabled: false
