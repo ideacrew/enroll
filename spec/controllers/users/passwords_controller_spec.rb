@@ -10,6 +10,7 @@ require 'rails_helper'
    before(:each) do
       @request.env["devise.mapping"] = Devise.mappings[:user]
       allow(CuramUser).to receive(:match_unique_login).with(email).and_return([curam_user])
+      allow(controller).to receive(:verify_recaptcha_if_needed).and_return(true)
       user.update_attributes!(email: email)
     end
 
