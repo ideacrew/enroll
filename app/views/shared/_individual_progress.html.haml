@@ -72,4 +72,9 @@
 - else
   %button.btn.btn-lg.btn-primary.btn-block#btn-continue{type: 'submit'}
     CONTINUE
-= render partial: 'shared/shopping_nav_panel', locals: {step: step}
+
+= render partial: 'shared/shopping_nav_panel',
+  locals: {state: step == 3 ? 'house' : step == 4 ? 'shop' : (step == 5) ? 'review' : (step == 6) ? 'complete' : nil,
+  no_previous_button: @no_previous_button || step == 1,
+  no_save_button: @no_save_button,
+  no_help_sign_up: true }

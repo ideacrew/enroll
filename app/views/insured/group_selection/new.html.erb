@@ -153,12 +153,12 @@
         <% end %>
         <br/>
         <br/>
-        <% unless EnrollRegistry.feature_enabled?(:back_to_account_all_shop) && @change_plan.blank? %>
+        <% unless EnrollRegistry.feature_enabled?(:back_to_account_all_shop)%>
           <%= link_to l10n("back_to_my_account"), family_account_path, class: 'btn btn-default btn btn-lg' %>
         <% end %>
       </div>
       <div class="col-xs-3 right-section pull-right">
-        <% if @change_plan.blank?  && @market_kind == "individual" %>
+        <% if @change_plan.blank? && @market_kind == "individual" %>
           <% if @enrollment_kind.blank? && is_under_open_enrollment? %>
             <%= render  partial: 'shared/individual_progress', locals: {step: '3'} %>
           <% else %>
@@ -169,7 +169,7 @@
         <% elsif @change_plan.blank? %>
           <%= render  partial: 'shared/signup_progress', locals: {step: '4'} %>
         <% elsif @change_plan == "change_by_qle" %>
-          <%= render partial: 'shared/qle_progress', locals: {step: '2',show_button:false} %>
+          <%= render partial: 'shared/qle_progress', locals: {step: '1',show_button:false} %>
         <% elsif @change_plan == "change_plan" %>
           <% if (@market_kind == "individual" && !is_under_open_enrollment?) || @enrollment_kind == 'sep' %>
               <%= render  partial: 'shared/sep_shop_for_plans_progress', locals: {step: '2'} %>

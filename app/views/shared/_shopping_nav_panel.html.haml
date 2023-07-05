@@ -1,29 +1,40 @@
-- step = (defined? step) ? step.to_i : 1
-- no_previous_button = (defined? @no_previous_button) ? @no_previous_button : step == 1
-- link_style =  EnrollRegistry.feature_enabled?(:back_to_account_all_shop)  ? "width: 100%; font-size: 16px; text-decoration: underline;" : "text-transform: uppercase;"
+-# state options: 'house', shop', 'review', 'complete'
+- ff = EnrollRegistry.feature_enabled?(:back_to_account_all_shop)
 
-- if EnrollRegistry.feature_enabled?(:back_to_account_all_shop)
-  = link_to l10n("back_to_my_account"), family_account_path, class: 'btn btn-default btn btn-lg', style: 'width: 100%; margin-top: 16px;'
-%ul.list-unstyled.list-right-section
-  - unless no_previous_button
-    %li
-      %a.back{href: '#', style: link_style}
-        = l10n("previous_step")
-  - if step != 1 && EnrollRegistry.feature_enabled?(:back_to_account_all_shop)
-    %li
-      %a{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal", style: link_style}
-        = l10n("help_sign_up")
-  - unless @no_save_button
-    %li
-      %a{href: destroy_user_session_path, style: link_style}
-        = l10n("save_and_exit")
-  - unless EnrollRegistry.feature_enabled?(:back_to_account_all_shop)
-    %br
-    %br
-    %li
-      %p
-        If you select Save & Exit, you can save your work and continue where you left off the next time you login.
-    - if step != 1
-      .btn.btn-default{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal", "style" => "width: 100%;"}
-        = l10n("help_sign_up")
-= render partial: 'ui-components/v1/modals/help_with_plan'
+- if ff
+  - no_previous_button = !state || state == 'house'
+  - no_save_button = false
+  - no_help_sign_up = state == 'review' || state == 'complete'
+- else
+  - no_previous_button ||= false
+  - no_save_button ||= false
+  - no_help_sign_up ||= false
+
+- link_style = ff ? "width: 100%; font-size: 16px; text-decoration: underline;" : "text-transform: uppercase;"
+- back_to_account_text = (state == 'complete') ? l10n("insured.plan_shoppings.receipt.go_to_my_account") : l10n("back_to_my_account")
+
+- if state
+  - if ff || state == 'complete'
+    = link_to back_to_account_text, family_account_path, class: "btn btn btn-lg #{state == "complete"? "btn-primary": "btn-default"}", id: 'btn-continue', style: 'width: 100%; margin-top: 16px;'
+  %ul.list-unstyled.list-right-section
+    - unless no_previous_button || state == 'complete'
+      %li
+        %a.back{href: '#', style: link_style}
+          = l10n("previous_step")
+    - unless no_help_sign_up || !ff
+      %li
+        %a{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal", style: link_style}
+          = l10n("help_sign_up")
+    - unless no_save_button
+      %li
+        %a{href: destroy_user_session_path, style: link_style}
+          = l10n("save_and_exit")
+      - unless ff
+        %br
+        %br
+        %li
+          %p
+            If you select Save & Exit, you can save your work and continue where you left off the next time you login.
+      - unless ff || no_help_sign_up
+        .btn.btn-default{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal", "style" => "width: 100%;"}
+          = l10n("help_sign_up")
