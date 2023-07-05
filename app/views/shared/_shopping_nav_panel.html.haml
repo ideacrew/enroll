@@ -11,11 +11,11 @@
   - no_help_sign_up ||= false
 
 - link_style = ff ? "width: 100%; font-size: 16px; text-decoration: underline;" : "text-transform: uppercase;"
-- back_to_account_text = (state == 'complete') ? l10n("insured.plan_shoppings.receipt.go_to_my_account") : l10n("back_to_my_account")
+- back_to_account_text = (state == 'complete') ? back_to_account_text || l10n("insured.plan_shoppings.receipt.go_to_my_account") : l10n("back_to_my_account")
 
 - if state
   - if ff || state == 'complete'
-    = link_to back_to_account_text, family_account_path, class: "btn btn btn-lg #{state == "complete"? "btn-primary": "btn-default"}", id: 'btn-continue', style: 'width: 100%; margin-top: 16px;'
+    = link_to back_to_account_text, family_account_path, class: "btn btn btn-md #{state == "complete"? "btn-primary": "btn-default"}", id: 'btn-continue', style: 'width: 100%; margin-top: 16px;'
   %ul.list-unstyled.list-right-section
     - unless no_previous_button || state == 'complete'
       %li
