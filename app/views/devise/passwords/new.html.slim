@@ -11,6 +11,8 @@
 				= f.hidden_field :identity_confirmed_token
 				.invalid-feedback
 					| Please enter an email address.
+				br
+				= recaptcha_tags
 			.form-group
 				= f.submit l10n(".send_me_reset_password_instructions"), class: 'btn btn-primary mb-3'
 				= render "devise/shared/links"
