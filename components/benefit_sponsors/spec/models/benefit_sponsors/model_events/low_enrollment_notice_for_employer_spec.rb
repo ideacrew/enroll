@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', dbclean: :around_each do
 
   let(:model_event) { "open_enrollment_end_reminder_and_low_enrollment" }
-  let(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month}
+  let(:start_on) { Date.today.next_month.beginning_of_month}
   let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item) }
   let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
@@ -59,11 +59,13 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
       let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:open_enrollment_end_reminder_and_low_enrollment, model_instance, {}) }
 
       before do
-        # allow_any_instance_of(::BenefitSponsors::BenefitApplications::BenefitApplication).to receive(:osse_eligible?).and_return true
         params = {subject_gid: benefit_sponsorship.to_global_id, evidence_key: :osse_subsidy, evidence_value: 'true', effective_date: TimeKeeper.date_of_record }
         result = ::Operations::Eligibilities::Osse::BuildEligibility.new.call(params)
         eligibility = benefit_sponsorship.eligibilities.build(result.success.to_h)
         eligibility.save!
+        year = model_instance.start_on.year
+        allow(EnrollRegistry).to receive(:feature?).with("aca_shop_osse_subsidy_#{year}").and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with("aca_shop_osse_subsidy_#{year}").and_return(true)
       end
 
       it "should trigger notice event" do
