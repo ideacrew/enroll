@@ -6,29 +6,43 @@ class Users::PasswordsController < Devise::PasswordsController
 
   rescue_from 'Mongoid::Errors::DocumentNotFound', with: :user_not_found
   def create
-    self.resource = resource_class.send_reset_password_instructions(resource_params)
-    yield resource if block_given?
-    if successfully_sent?(resource)
-      resource.security_question_responses.destroy_all
+    if verify_recaptcha_if_needed
+      self.resource = resource_class.send_reset_password_instructions(resource_params)
+      yield resource if block_given?
+      if successfully_sent?(resource)
+        resource.security_question_responses.destroy_all
 
-      respond_to do |format|
-       format.html { respond_with({}, location: after_sending_reset_password_instructions_path_for(resource_name)) }
-       format.js
+        respond_to do |format|
+          format.html { respond_with({}, location: after_sending_reset_password_instructions_path_for(resource_name)) }
+          format.js
+        end
+
+      else
+        respond_with(resource)
       end
-
     else
-      respond_with(resource)
+      flash[:error] = "reCAPTCHA verification failed, please try again."
+      redirect_to "/users/password/new"
     end
   end
 
   def user_not_found
-    respond_to do |format|
-      format.html { respond_with({}, location: after_sending_reset_password_instructions_path_for(resource_name)) }
-      format.js
+    if verify_recaptcha
+      respond_to do |format|
+        format.html { respond_with({}, location: after_sending_reset_password_instructions_path_for(resource_name)) }
+        format.js
+      end
+    else
+      redirect_to "/users/password/new"
     end
   end
 
   private
+
+  def verify_recaptcha_if_needed
+    return true unless helpers.forgot_password_recaptcha_enabled?(@user.profile_type)
+    verify_recaptcha(model: @user)
+  end
 
   def user
     @user ||= User.find_by(email: params[:user][:email])
@@ -38,7 +52,6 @@ class Users::PasswordsController < Devise::PasswordsController
     if current_user && current_user.has_role?('hbx_staff')
       return true
     end
-
     if user.identity_confirmed_token.present?
       unless user.identity_confirmed_token == params[:user][:identity_confirmed_token]
         flash[:error] = "Something went wrong, please try again"

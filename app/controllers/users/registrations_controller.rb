@@ -62,7 +62,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
   end
 
   def verify_recaptcha_if_needed
-    return true unless EnrollRegistry.feature_enabled?(:registration_recaptcha)
+    return true unless helpers.registration_recaptcha_enabled?("user_account")
     verify_recaptcha(model: resource)
   end
 

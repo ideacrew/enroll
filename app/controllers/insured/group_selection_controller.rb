@@ -6,6 +6,7 @@ class Insured::GroupSelectionController < ApplicationController
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   before_action :validate_rating_address, only: [:create]
   before_action :set_cache_headers, only: [:new, :edit_plan]
+  before_action :is_user_authorized?, only: [:edit_plan, :terminate_confirm, :term_or_cancel]
   # before_action :set_vars_for_market, only: [:new]
   # before_action :is_under_open_enrollment, only: [:new]
 
@@ -176,6 +177,10 @@ class Insured::GroupSelectionController < ApplicationController
 
   def terminate_confirm
     @hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
+  rescue StandardError => e
+    flash[:error] = e.message
+    logger.error "#{e.message}\n#{e.backtrace.join("\n")}"
+    raise e.message
   end
 
   def terminate
@@ -238,6 +243,13 @@ class Insured::GroupSelectionController < ApplicationController
 
   def calculate_elected_aptc_pct(aptc_applied_amount, aggregate_aptc_amount)
     (aptc_applied_amount / aggregate_aptc_amount).round(2)
+  end
+
+  def is_user_authorized?
+    return true if current_user.has_hbx_staff_role?
+    hbx_enrollment_exists = current_user.person.primary_family.hbx_enrollments.where(id: params.require(:hbx_enrollment_id)).present?
+    raise "HBX enrollment ID does not belong to the user" unless hbx_enrollment_exists
+    true
   end
 
   def family_member_eligibility_check(family_member)
