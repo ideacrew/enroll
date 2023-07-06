@@ -113,7 +113,7 @@ class CensusEmployee < CensusMember
   validate :validate_unique_identifier
   after_update :update_hbx_enrollment_effective_on_by_hired_on
   after_save :assign_default_benefit_package
-  after_save :assign_benefit_packages
+  # after_save :assign_benefit_packages
   after_save :assign_prior_plan_benefit_packages, only: [:create]
   after_save :notify_on_save
 
