@@ -18,10 +18,6 @@ module BenefitSponsors
     let(:broker_person) { FactoryBot.create(:person, :with_broker_role) }
     let(:broker_user) { FactoryBot.create(:user, person: broker_person ) }
 
-    let(:admin_person) {FactoryBot.create(:person)}
-    let(:admin_user) {FactoryBot.create(:user, :person => admin_person)}
-    let(:hbx_staff_role) {FactoryBot.create(:hbx_staff_role, person: admin_user.person)}
-
     describe "GET show / DELETE destroy" do
       context "redirect show message if user not signed in" do
         before do
@@ -38,12 +34,10 @@ module BenefitSponsors
       end
 
       context "for employer profile" do
-        before do
-          sign_in user
-        end
 
         context "show message" do
           before do
+            sign_in user
             get :show, params: {id: organization.employer_profile.id, message_id: inbox.messages.first.id}
           end
 
@@ -60,6 +54,7 @@ module BenefitSponsors
           it "should not render show template and raise a error" do
             person.employer_staff_roles = []
             person.save!
+            sign_in user
             get :show, params: {id: organization.employer_profile.id, message_id: inbox.messages.first.id}
             expect(response).to_not have_http_status(:success)
           end
@@ -67,6 +62,7 @@ module BenefitSponsors
 
         context "delete message" do
           before do
+            sign_in user
             delete :destroy, params: {id: organization.employer_profile.id, message_id: inbox.messages.first.id}, format: :js
           end
 
@@ -116,13 +112,17 @@ module BenefitSponsors
 
       context "for broker agency profile - from Admin login" do
         before do
+          user_with_hbx_staff_role = FactoryBot.create(:user, :with_hbx_staff_role)
+          FactoryBot.create(:person, user: user_with_hbx_staff_role)
+          user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: broker_organization.broker_agency_profile.id)
+          user_with_hbx_staff_role.person.hbx_staff_role.save!
           broker_person.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_organization.broker_agency_profile.id)
           @broker_inbox = broker_person.build_inbox
           @broker_inbox.save!
           welcome_subject = "Welcome to #{EnrollRegistry[:enroll_app].setting(:short_name).item}"
           welcome_body = "#{EnrollRegistry[:enroll_app].setting(:short_name).item} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
           broker_message = @broker_inbox.messages.create(subject: welcome_subject, body: welcome_body)
-          sign_in admin_user
+          sign_in user_with_hbx_staff_role
         end
 
         context "show message" do
