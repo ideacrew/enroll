@@ -484,7 +484,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         Family.delete_all
         HbxEnrollment.all.delete_all
         Person.all.delete_all
-
         person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
         @family = FactoryBot.create(:family, :with_primary_family_member, person: person)
         second_consumer = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
@@ -509,17 +508,24 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
         area = EnrollRegistry[:rating_area].settings(:areas).item.first
         allow(Person).to receive(:find).and_return(person)
+        @user = FactoryBot.create(:user, person: person)
         # allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, @enrollment.effective_on, 59, area).and_return(814.85)
         # allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, @enrollment.effective_on, 61, area).and_return(879.8)
       end
 
       it 'return http success and render' do
-        sign_in user
+        sign_in @user
         @family.special_enrollment_periods << @sep
         attrs = {hbx_enrollment_id: @enrollment.id.to_s, family_id: @family.id}
         get :edit_plan, params: attrs
         expect(response).to have_http_status(:success)
         expect(response).to render_template(:edit_plan)
+      end
+
+      it 'raises error if find the HBX enrollment does not belong to the current user' do
+        sign_in user
+        error_message = "HBX enrollment ID does not belong to the user"
+        expect{ get :edit_plan, params: {hbx_enrollment_id: "5f6278b81bdce242ca1eb1a1"}}.to raise_error(RuntimeError, error_message)
       end
     end
   end
@@ -718,7 +724,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     it 'raises error if find the HBX enrollment does not belong to the current user' do
       sign_in user
-      error_message = "HBX enrollment ID does not belong to the user terminating"
+      error_message = "HBX enrollment ID does not belong to the user"
       expect{ get :terminate_confirm, params: {hbx_enrollment_id: "5f6278b81bdce242ca1eb1a1"}}.to raise_error(RuntimeError, error_message)
     end
   end
@@ -749,6 +755,12 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       enrollment_to_term.reload
       expect(enrollment_to_term.aasm_state).to eq 'coverage_terminated'
       expect(response).to redirect_to(family_account_path)
+    end
+
+    it 'raises error if find the HBX enrollment does not belong to the current user' do
+      sign_in user
+      error_message = "HBX enrollment ID does not belong to the user"
+      expect{ post :term_or_cancel, params: {hbx_enrollment_id: "5f6278b81bdce242ca1eb1a1", term_date: nil, term_or_cancel: 'cancel'}}.to raise_error(RuntimeError, error_message)
     end
   end
 
