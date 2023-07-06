@@ -181,6 +181,10 @@ module Effective
           top_scope: :families
         }
       end
+
+      def authorize_datatables?(current_user, controller, action, resource)
+        current_user.has_hbx_staff_role?
+      end
     end
   end
 end
