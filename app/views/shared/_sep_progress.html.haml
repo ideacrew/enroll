@@ -61,4 +61,8 @@
     CONTINUE
 
 = render partial: 'shared/shopping_nav_panel',
-  locals: {state: step == 4 ? 'house' : (step == 5) ? 'shop' : (step == 6) ? 'review' : (step == 7) ? 'complete' : nil}
+  locals: {show_exit_button: true,
+  show_previous_button: ![1,7].include?(step),
+  show_account_button: step > 2 && EnrollRegistry.feature_enabled?(:back_to_account_all_shop),
+  show_help_button: step < 7,
+  is_complete: step == 7 }

@@ -34,7 +34,8 @@
   = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, change_plan: @change_plan, coverage_kind: @coverage_kind, market_kind: @market_kind), :class => "btn btn-lg btn-primary  btn-block #{'disabled' if kind == 'individual'}", id: 'btn-continue', :method => :post, :disabled => disable_purchase?(!@enrollable, @enrollment, qle: qle)
 
 = render partial: 'shared/shopping_nav_panel',
-  locals: {state: step == 1 ? 'house' : step == 2 ? 'shop' : step == 3 ? 'review' : 'complete',
-  no_previous_button: !(step == 3 && !no_purchase),
-  no_save_button: true,
-  no_help_sign_up: true }
+  locals: {show_exit_button: false,
+  show_previous_button: step == 3 && !no_purchase,
+  show_account_button: EnrollRegistry.feature_enabled?(:back_to_account_all_shop),
+  show_help_button: false,
+  is_complete: step == 4 }

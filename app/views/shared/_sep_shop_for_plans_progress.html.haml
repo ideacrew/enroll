@@ -35,8 +35,9 @@
   = link_to 'CONTINUE', family_account_path, class: 'btn btn-lg btn-primary  btn-block no-sep-continue', disabled: true, id: 'btn-continue'
 
 = render partial: 'shared/shopping_nav_panel',
-  locals: {state: step == 1 ? 'house' : step == 2 ? 'shop' : step == 3 ? 'review' : 'complete',
-  no_previous_button: !(step == 3 && !no_purchase),
-  no_save_button: true,
-  no_help_sign_up: true,
+  locals: {show_exit_button: false,
+  show_previous_button: step == 3 && !no_purchase,
+  show_account_button: EnrollRegistry.feature_enabled?(:back_to_account_all_shop),
+  show_help_button: false,
+  is_complete: step == 4,
   continue_to_account_text: l10n('continue').upcase }

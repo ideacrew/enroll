@@ -139,10 +139,8 @@
             <%= hidden_field_tag 'change_plan', @change_plan %>
             <%= hidden_field_tag 'effective_on_option_selected', params[:effective_on_option_selected] if params[:effective_on_option_selected].present?%>
             <br/>
-          <% unless EnrollRegistry.feature_enabled?(:back_to_account_all_shop) %>
             <h3><%= l10n("insured.group_selection.new.what_would_you_like_to_do") %></h3>
             <%= submit_tag l10n('shop_for_new_plan'), class: 'btn btn-primary  btn-lg' + pundit_class(Family, :updateable?) %>
-          <% end %>
             <% if @hbx_enrollment.present? && @hbx_enrollment.may_terminate_coverage? %>
               <%= submit_tag l10n('keep_existing_plan'), class: 'btn btn-primary  btn-lg' + pundit_class(Family, :updateable?) if show_keep_existing_plan(@shop_for_plans, @hbx_enrollment, @new_effective_on) %>
               <% if @hbx_enrollment.effective_on <= TimeKeeper.date_of_record && (@market_kind == 'shop' || @market_kind == 'fehb') && @hbx_enrollment.is_shop? && @hbx_enrollment.may_terminate_coverage? %>
