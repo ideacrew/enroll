@@ -57,12 +57,6 @@
                     </div>
                 <% end %>
 
-                <% if hbx_enrollment.is_reinstated_enrollment? %>
-                    <div class="reinstated-enrollment enrollment-effective">
-                        <label><%= l10n("reinstated_enrollment") %></label>
-                    </div>
-                <% end %>
-
                 <% if current_user.has_hbx_staff_role? %>
                     <div class="plan-id">
                         <label for="<%=hbx_enrollment.hbx_id%>"><%= HbxProfile::ShortName %> ID:</label>
