@@ -31,17 +31,15 @@ module BenefitSponsors
       end
 
       it 'returns true if user has general agency staff role' do
-        general_agency_profile = ::GeneralAgencyProfile.last
+        general_agency_profile = ::GeneralAgencyProfile.all.last
         policy = BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(user_with_ga_staff_role, general_agency_profile)
 
         expect(policy.can_read_inbox?).to be true
         expect(policy.show?).to be true
       end
 
-      it 'returns false if user has no general agency staff role' do
-        FactoryBot.create(:person, :with_general_agency_staff_role)
-        some_random_profile = ::GeneralAgencyProfile.last
-        policy = BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(user_with_ga_staff_role, some_random_profile)
+      it 'returns false if random record is passed' do
+        policy = BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(user_with_ga_staff_role, person)
 
         expect(policy.can_read_inbox?).to be false
         expect(policy.show?).to be false
