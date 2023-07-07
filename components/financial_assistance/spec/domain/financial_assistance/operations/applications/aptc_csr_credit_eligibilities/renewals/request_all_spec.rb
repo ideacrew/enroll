@@ -9,6 +9,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
     DatabaseCleaner.clean
   end
 
+  let(:current_date) { TimeKeeper.date_of_record }
+  let(:current_year) { current_date.year }
+  let(:renewal_year) { current_year.next }
+
   let!(:person) do
     FactoryBot.create(:person, :with_consumer_role, first_name: 'test10', last_name: 'test30', gender: 'male', hbx_id: '100095')
   end
@@ -30,7 +34,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
                       parent_living_out_of_home_terms: true,
                       attestation_terms: true,
                       submission_terms: true,
-                      assistance_year: TimeKeeper.date_of_record.year,
+                      aasm_state: 'determined',
+                      assistance_year: current_year,
                       full_medicaid_determination: true)
   end
 
@@ -84,9 +89,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
   context 'for success' do
     context 'query and publish renewal draft application' do
       before do
-        application.update_attributes!(aasm_state: 'determined', assistance_year: 2022)
-        application.reload
-        @result = subject.call(renewal_year: 2023)
+        @result = subject.call(renewal_year: renewal_year)
       end
 
       it 'should return IVL family id' do
