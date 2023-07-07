@@ -207,7 +207,9 @@ module Insured::FamiliesHelper
   def enrollment_state_label(enrollment)
     return if enrollment.blank?
 
-    # The colors correspond to those set in enrollment.scss as label-{color}
+    # The colors correspond to those set in enrollment.scss as label-{color}. We use color as an indicator of the
+    # enrollment status. For example, green indicates that the enrollment is active, red indicates that the enrollment
+    # is terminated, yellow indicates that the enrollment requires action, etc.
     state_groups = {
       auto_renewing: {
         has_outstanding_verification: { text: 'Action Needed', color: 'yellow' },
@@ -246,6 +248,8 @@ module Insured::FamiliesHelper
     group = state_groups[enrollment.aasm_state.to_sym] || state_groups[:default]
     condition = determine_condition(enrollment, group)
     label = group[condition] || { text: enrollment.aasm_state.to_s.titleize, color: 'grey' }
+    # Coverage reinstated is a special case where the aasm state is something else but we want to show it as reinstated in "green" (active) scenarios
+    label = state_groups[:coverage_reinstated][:default] if enrollment.is_reinstated_enrollment? && label[:color] == 'green'
     content_tag(:span, label[:text], class: "label label-#{label[:color]}")
   end
 

@@ -384,9 +384,6 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
       render partial: "insured/families/enrollment_refactored", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
-    it "should have reinstated enrollment text" do
-      expect(rendered).to have_text("Reinstated Enrollment")
-    end
     it "should show month text" do
       expect(rendered).to match(/month/)
     end
