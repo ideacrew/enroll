@@ -704,7 +704,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
   # expected html elements as a positive indicator. If the related state_groups hash fields are updated, this test will
   # need to be updated as well.
   describe 'enrollment_state_label' do
-    let(:enrollment) { instance_double(HbxEnrollment, is_shop?: false, is_reinstated_enrollment?: false ) }
+    let(:enrollment) { instance_double(HbxEnrollment, is_shop?: false, is_reinstated_enrollment?: false) }
 
     shared_examples 'a label checker' do |aasm_state, terminate_reason, is_outstanding, expected_label|
       before do
