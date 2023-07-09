@@ -113,7 +113,7 @@ class CensusEmployee < CensusMember
   validate :validate_unique_identifier
   after_update :update_hbx_enrollment_effective_on_by_hired_on
   after_save :assign_default_benefit_package
-  # after_save :assign_benefit_packages
+  after_save :assign_benefit_packages
   after_save :assign_prior_plan_benefit_packages, only: [:create]
   after_save :notify_on_save
 
@@ -625,6 +625,7 @@ class CensusEmployee < CensusMember
     assignment = benefit_package_assignment_on(coverage_date)
     assignment ||= benefit_group_assignments.detect(&:is_application_active?)
     assignment || benefit_group_assignments.detect(&:is_active)
+    assignment
   end
 
   # Pass in active coverage_date to get the renewal benefit group assignment

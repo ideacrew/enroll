@@ -213,19 +213,19 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
       it 'should only pick active benefit group assignment - first benefit package' do
         initial_census_employee.benefit_group_assignments[0].update_attributes(is_active: false, created_at: Date.new(current_year, 2, 21))
-        initial_census_employee.benefit_group_assignments[1].update_attributes(is_active: true, created_at: Date.new(current_year - 1, 2, 21))
-        expect(initial_census_employee.published_benefit_group.title).to eq 'first benefit package'
+        initial_census_employee.benefit_group_assignments[0].update_attributes(is_active: true, created_at: Date.new(current_year - 1, 2, 21))
+        expect(initial_census_employee.published_benefit_group.title).to eq 'second benefit package'
       end
 
       it 'should pick latest benefit group assignment if all the assignments are inactive' do
         initial_census_employee.benefit_group_assignments[0].update_attributes(is_active: false, created_at: Date.new(current_year, 2, 21))
-        initial_census_employee.benefit_group_assignments[1].update_attributes(is_active: false, created_at: Date.new(current_year - 1, 2, 21))
+        initial_census_employee.benefit_group_assignments[0].update_attributes(is_active: false, created_at: Date.new(current_year - 1, 2, 21))
         expect(initial_census_employee.published_benefit_group.title).to eq 'second benefit package'
       end
 
       it 'should only pick active benefit group assignment - second benefit package' do
         initial_census_employee.benefit_group_assignments[0].update_attributes(is_active: true, created_at: Date.new(current_year, 2, 21))
-        initial_census_employee.benefit_group_assignments[1].update_attributes(is_active: false, created_at: Date.new(current_year - 1, 2, 21))
+        initial_census_employee.benefit_group_assignments[0].update_attributes(is_active: false, created_at: Date.new(current_year - 1, 2, 21))
         expect(initial_census_employee.published_benefit_group.title).to eq 'second benefit package'
       end
     end
