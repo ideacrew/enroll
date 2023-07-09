@@ -625,7 +625,6 @@ class CensusEmployee < CensusMember
     assignment = benefit_package_assignment_on(coverage_date)
     assignment ||= benefit_group_assignments.detect(&:is_application_active?)
     assignment || benefit_group_assignments.detect(&:is_active)
-    assignment
   end
 
   # Pass in active coverage_date to get the renewal benefit group assignment
