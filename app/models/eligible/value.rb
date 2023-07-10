@@ -10,6 +10,6 @@ module Eligible
     field :description, type: String
     field :key, type: Symbol
 
-    validates_presence_of :key
+    validates_presence_of :title, :key
   end
 end
