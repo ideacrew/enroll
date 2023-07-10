@@ -20,7 +20,7 @@ module Effective
       translation_key.gsub(/\W+/, '').titleize
     end
 
-    def authorized?(current_user, controller, action, resource)
+    def authorized?(_current_user, _controller, _action, _resource)
       false
     end
   end
