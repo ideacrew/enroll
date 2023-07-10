@@ -12,7 +12,9 @@ module SponsoredBenefits
           sponsorship = proposal.profile.benefit_sponsorships.first
           assign_benefit_group(sponsorship: sponsorship, old_sponsorship: plan_design_form.proposal.profile.benefit_sponsorships.first)
           assign_roster_employees(sponsorship: sponsorship, roster: existing_roster)
-
+          plan_design_form.proposal.osse_eligibility&.grants&.each do |grant|
+            proposal.osse_eligibility.grants << grant.dup
+          end
           proposal.plan_design_organization.save!
           flash[:success] = "Proposal successfully copied"
         else
