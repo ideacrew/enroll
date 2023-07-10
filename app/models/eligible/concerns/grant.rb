@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Eligible
   module Concerns
     module Grant
@@ -16,6 +18,8 @@ module Eligible
                     class_name: '::Eligible::StateHistory',
                     cascade_callbacks: true,
                     as: :status_trackable
+
+        validates_presence_of :title, :key
       end
     end
   end
