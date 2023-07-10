@@ -39,9 +39,13 @@ module AccessPolicies
     def view_families(general_agency)
       return false unless user
       return true if user.has_hbx_staff_role?
+      return false unless user.person
 
-      staff_roles = Person.where("general_agency_staff_roles.general_agency_profile_id" => general_agency.id).flat_map {|p| p.general_agency_staff_roles.select {|s| s.general_agency_profile_id == general_agency.id}}.select(&:active?)
-      staff_roles.any?
+      staff_roles = user.person.general_agency_staff_roles.select(&:active?)
+
+      staff_roles.any? do |sr|
+        sr.general_agency_profile_id == general_agency.id
+      end
     end
   end
 end
