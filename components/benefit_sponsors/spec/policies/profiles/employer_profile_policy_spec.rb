@@ -61,7 +61,9 @@ module BenefitSponsors
       end
 
       context 'when current user exists with staff role' do
-        let(:person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+        let!(:hbx_staff_role) do
+          person.create_hbx_staff_role(benefit_sponsor_hbx_profile_id: BSON::ObjectId.new, hbx_profile_id: BSON::ObjectId.new)
+        end
 
         it 'should authorize access' do
           expect(policy.show?).to be_truthy
@@ -126,7 +128,7 @@ module BenefitSponsors
       context 'when current user exists with employer staff role' do
         let(:person) { FactoryBot.create(:person) }
         let!(:employer_staff_role) do
-          FactoryBot.create(:employer_staff_role, aasm_state: :is_active, person: person, benefit_sponsor_employer_profile_id: profile.id)
+          person.employer_staff_roles.create(aasm_state: :is_active, benefit_sponsor_employer_profile_id: profile.id)
         end
 
         it 'should authorize access' do
