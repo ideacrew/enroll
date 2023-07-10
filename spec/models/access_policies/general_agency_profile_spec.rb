@@ -124,3 +124,47 @@ describe AccessPolicies::GeneralAgencyProfile, :dbclean => :after_each do
     end
   end
 end
+
+describe AccessPolicies::GeneralAgencyProfile, "checking for ability to view families" do
+
+  let(:general_agency_profile_id) { "SOME BOGUS ID" }
+  let(:hbx_staff_user) { instance_double(User, has_hbx_staff_role?: true)}
+  let(:general_agency_staff_user) { instance_double(User, has_hbx_staff_role?: false) }
+  let(:normal_user) { instance_double(User, has_hbx_staff_role?: false) }
+  let(:general_agency) { instance_double(GeneralAgencyProfile, id: general_agency_profile_id) }
+  let(:general_agency_staff_role) do
+    instance_double(
+      GeneralAgencyStaffRole,
+      {
+        general_agency_profile_id: general_agency_profile_id,
+        active?: true
+      }
+    )
+  end
+  let(:general_agency_staff_person) do
+    instance_double(
+      Person,
+      general_agency_staff_roles: [general_agency_staff_role]
+    )
+  end
+
+  it "allows an hbx-staff user" do
+    authorized = AccessPolicies::GeneralAgencyProfile.new(hbx_staff_user).view_families(general_agency)
+    expect(authorized).to be_truthy
+  end
+
+  it "allows a user who is active general agency staff" do
+    allow(Person).to receive(:where).with(
+      "general_agency_staff_roles.general_agency_profile_id" => general_agency_profile_id
+    ).and_return(
+      [general_agency_staff_person]
+    )
+    authorized = AccessPolicies::GeneralAgencyProfile.new(general_agency_staff_user).view_families(general_agency)
+    expect(authorized).to be_truthy
+  end
+
+  it "denies a regular user" do
+    authorized = AccessPolicies::GeneralAgencyProfile.new(normal_user).view_families(general_agency)
+    expect(authorized).to be_falsey
+  end
+end
