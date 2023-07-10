@@ -16,6 +16,7 @@ module Eligible
     field :transition_at, type: DateTime
 
     field :event, type: Symbol
+
     field :comment, type: String
     field :reason, type: String
 
