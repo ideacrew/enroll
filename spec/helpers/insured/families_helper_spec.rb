@@ -704,7 +704,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
   # expected html elements as a positive indicator. If the related state_groups hash fields are updated, this test will
   # need to be updated as well.
   describe 'enrollment_state_label' do
-    let(:enrollment) { instance_double(HbxEnrollment, is_shop?: false) }
+    let(:enrollment) { instance_double(HbxEnrollment, is_shop?: false, is_reinstated_enrollment?: false) }
 
     shared_examples 'a label checker' do |aasm_state, terminate_reason, is_outstanding, expected_label|
       before do
@@ -734,6 +734,15 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
       context 'when condition is present in state group' do
         it_behaves_like 'a label checker', 'coverage_canceled', HbxEnrollment::TermReason::NON_PAYMENT, false, ['red', 'Canceled by Insurance Company']
         it_behaves_like 'a label checker', 'auto_renewing', nil, true, ['yellow', 'Action Needed']
+      end
+
+      context 'when is reinstated' do
+        before do
+          allow(enrollment).to receive(:is_reinstated_enrollment?).and_return(true)
+        end
+        # should return Coverage Reinstated only if the color is green (active)
+        it_behaves_like 'a label checker', 'coverage_selected', nil, true, ['yellow', 'Action Needed']
+        it_behaves_like 'a label checker', 'coverage_selected', nil, false, ['green', 'Coverage Reinstated']
       end
 
       context 'when condition is not present in state group' do
