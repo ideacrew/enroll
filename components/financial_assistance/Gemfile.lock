@@ -83,7 +83,7 @@ PATH
   remote: .
   specs:
     financial_assistance (0.1.0)
-      aasm (~> 4.11)
+      aasm (~> 4.12)
       config (~> 2.0)
       devise (~> 4.5)
       dry-monads

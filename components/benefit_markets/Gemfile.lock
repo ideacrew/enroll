@@ -50,7 +50,7 @@ PATH
   remote: .
   specs:
     benefit_markets (0.0.1)
-      aasm (~> 4.11)
+      aasm (~> 4.12)
       active_model_serializers (~> 0.10)
       config (~> 2.0)
       dry-monads

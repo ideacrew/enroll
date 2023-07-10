@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "mongoid",                   "~> 7.0.2"
 
-  s.add_dependency "aasm",                      "~> 4.11"
+  s.add_dependency "aasm",                      "~> 4.12"
   s.add_dependency 'active_model_serializers',  '~> 0.10'
   s.add_dependency 'config',                    '~> 2.0'
   s.add_dependency 'language_list',             '~> 1'

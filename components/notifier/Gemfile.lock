@@ -34,7 +34,7 @@ PATH
   remote: .
   specs:
     notifier (0.0.1)
-      aasm (~> 4.11)
+      aasm (~> 4.12)
       ckeditor (= 4.2.4)
       combine_pdf
       config (~> 2.0)

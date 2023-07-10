@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rails",                     "~> 5.2.3"
   spec.add_dependency "mongoid",                   "~> 7.0.2"
   spec.add_dependency 'mongoid-autoinc',           '~> 6.0'
-  spec.add_dependency "aasm",                      "~> 4.11"
+  spec.add_dependency "aasm",                      "~> 4.12"
   spec.add_dependency 'config',                    '~> 2.0'
   spec.add_dependency 'devise',                    '~> 4.5'
   spec.add_dependency 'money-rails',               '~> 1.13.3'
