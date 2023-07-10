@@ -17,6 +17,16 @@ module Eligible
                     as: :status_trackable
 
         validates_presence_of :title, :key, :is_satisfied
+
+        delegate :effective_on,
+                 :is_eligible,
+                 :current_state,
+                 to: :latest_state_history,
+                 allow_nil: false
+
+        def latest_state_history
+          state_histories.latest_history
+        end
       end
     end
   end
