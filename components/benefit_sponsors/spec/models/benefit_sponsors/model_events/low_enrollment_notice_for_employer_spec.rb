@@ -68,7 +68,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
         allow(EnrollRegistry).to receive(:feature_enabled?).with("aca_shop_osse_subsidy_#{year}").and_return(true)
       end
 
-      it "should trigger notice event" do
+      it "should not trigger notice event" do
         expect(subject.notifier).not_to receive(:notify)
         subject.process_application_events(model_instance, model_event)
       end
