@@ -4,6 +4,9 @@ require 'rails_helper'
 # spec for GeneralAgencyProfilePolicy
 module BenefitSponsors
   RSpec.describe Organizations::GeneralAgencyProfilePolicy, dbclean: :after_each  do
+    let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item) }
+    let(:general_agency) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site)}
+    let(:general_agency_profile) {general_agency.profiles.first }
     let!(:user) { FactoryBot.create(:user) }
     let!(:person) {FactoryBot.create(:person, user: user)}
     let(:person_with_ga_staff_role) { FactoryBot.create(:person, :with_general_agency_staff_role) }
@@ -31,7 +34,7 @@ module BenefitSponsors
       end
 
       it 'returns true if user has general agency staff role' do
-        general_agency_profile = ::GeneralAgencyProfile.all.last
+        person_with_ga_staff_role.general_agency_staff_roles.first.update_attributes(benefit_sponsors_general_agency_profile_id: general_agency_profile.id)
         policy = BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(user_with_ga_staff_role, general_agency_profile)
 
         expect(policy.can_read_inbox?).to be true
@@ -47,4 +50,3 @@ module BenefitSponsors
     end
   end
 end
-
