@@ -24,5 +24,11 @@ module Eligibile
                           :from_state,
                           :to_state,
                           :transition_at
+
+    scope :latest_history, -> { order(transition_at: :desc).first }
+
+    def current_state
+      to_state
+    end
   end
 end
