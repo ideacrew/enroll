@@ -159,6 +159,13 @@ module Effective
         :datatable_search
       end
 
+      def authorized?(current_user, _controller, _action, _resource)
+        employer_profile = ::BenefitSponsors::Organizations::Organization.employer_profiles.where(
+          :"profiles._id" => BSON::ObjectId.from_string(attributes[:id])
+        ).first.try(:employer_profile) || ::EmployerProfile.find(attributes[:id])
+
+        ::BenefitSponsors::EmployerProfilePolicy.new(current_user, employer_profile).show?
+      end
     end
   end
 end
