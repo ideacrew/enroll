@@ -34,7 +34,7 @@ PATH
   remote: .
   specs:
     notifier (0.0.1)
-      aasm (~> 4.10)
+      aasm (~> 4.11)
       ckeditor (= 4.2.4)
       combine_pdf
       config (~> 2.0)
@@ -359,4 +359,4 @@ DEPENDENCIES
   shoulda-matchers
 
 BUNDLED WITH
-   2.3.23
+   2.3.16
