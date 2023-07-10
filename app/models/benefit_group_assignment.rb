@@ -102,8 +102,7 @@ class BenefitGroupAssignment
       elsif assignments_with_no_end_on.present?
         filter_assignments_with_no_end_on(assignments_with_no_end_on, date)
       else
-        bg_assignment = perspective_assignments_with_end_on.detect{ |assignment| assignment.start_on && (assignment.start_on..assignment.end_on).cover?(date) }
-        bg_assignment || perspective_assignments_with_end_on.last
+        perspective_assignments_with_end_on.detect{ |assignment| assignment.start_on && (assignment.start_on..assignment.end_on).cover?(date) }
       end
     end
 
