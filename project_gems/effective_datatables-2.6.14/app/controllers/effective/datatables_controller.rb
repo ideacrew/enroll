@@ -29,10 +29,6 @@ module Effective
 
     end
 
-    def authorize_datatables?(action, resource)
-      raise [action, resource].inspect
-    end
-
     private
 
     def find_datatable(id)
