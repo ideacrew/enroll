@@ -5,6 +5,7 @@ class HbxStaffRole
   embedded_in :person
 
   field :hbx_profile_id, type: BSON::ObjectId
+  field :benefit_sponsor_hbx_profile_id, type: BSON::ObjectId
   field :job_title, type: String, default: ""
   field :department, type: String, default: ""
   field :is_active, type: Boolean, default: true
