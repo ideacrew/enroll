@@ -40,12 +40,12 @@ class Users::PasswordsController < Devise::PasswordsController
   private
 
   def verify_recaptcha_for_user_not_found
-    return true unless helpers.forgot_password_recaptcha_enabled?('user_account')
+    return true unless helpers.forgot_password_recaptcha_enabled?
     verify_recaptcha
   end
 
   def verify_recaptcha_if_needed
-    return true unless helpers.forgot_password_recaptcha_enabled?(@user.profile_type)
+    return true unless helpers.forgot_password_recaptcha_enabled?
     verify_recaptcha(model: @user)
   end
 

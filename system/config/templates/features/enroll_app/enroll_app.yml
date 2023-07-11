@@ -886,18 +886,9 @@ registry:
       - key: :ivl_tax_form_notice
         item: :ivl_tax_form_notice
         is_enabled: <%= ENV['IVL_TAX_FORM_NOTICE_IS_ENABLED'] || false %>
-      - key: :forgot_password_broker_recaptcha
-        item: :forgot_password_broker_recaptcha
-        is_enabled: <%= ENV['FORGOT_PASSWORD_BROKER_RECAPTCHA_IS_ENABLED'] || false %>
-      - key: :forgot_password_ga_recaptcha
-        item: :forgot_password_ga_recaptcha
-        is_enabled: <%= ENV['FORGOT_PASSWORD_GA_RECAPTCHA_IS_ENABLED'] || false %>
-      - key: :forgot_password_user_account_recaptcha
-        item: :forgot_password_user_account_recaptcha
-        is_enabled: <%= ENV['FORGOT_PASSWORD_USERACCOUNT_RECAPTCHA_IS_ENABLED'] || false %>
-      - key: :forgot_password_sponsor_recaptcha
-        item: :forgot_password_sponsor_recaptcha
-        is_enabled: <%= ENV['FORGOT_PASSWORD_SPONSOR_RECAPTCHA_IS_ENABLED'] || false %>
+      - key: :forgot_password_recaptcha
+        item: :forgot_password_recaptcha
+        is_enabled: <%= ENV['FORGOT_PASSWORD_RECAPTCHA'] || false %>
       - key: :registration_broker_recaptcha
         item: :registration_broker_recaptcha
         is_enabled: <%= ENV['REGISTRATION_BROKER_RECAPTCHA_IS_ENABLED'] || false %>
