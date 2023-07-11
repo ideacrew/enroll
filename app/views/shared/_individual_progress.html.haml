@@ -36,7 +36,7 @@
       %span.circle-progress
       .vertical-line-progress
       Complete
-    
+
 - if step == 1 && search_page == true
   = link_to "Continue", insured_consumer_role_index_path(person: @person_params), method: :post, class: 'btn btn-lg btn-primary  btn-block'
 - elsif step == 1
@@ -67,30 +67,13 @@
   %br
 - elsif step == 5
   = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), :class => 'btn btn-lg btn-primary  btn-block disabled', id: 'btn-continue', :method => :post, :disabled => !@enrollable
-- elsif step == 6
-  = link_to 'GO TO MY ACCOUNT', family_account_path, class: 'btn btn-primary ', id: 'btn-continue', style: 'width: 100%;'
 - else
   %button.btn.btn-lg.btn-primary.btn-block#btn-continue{type: 'submit'}
     CONTINUE
-%ul.list-unstyled.list-right-section
-  - unless @no_previous_button || step == 1
-    %li
-      %a.back{href: '#'}
-        <!-- = image_tag 'icons/list.png' -->
-        PREVIOUS
-  - unless @no_save_button
-    %li
-      %a{href: destroy_user_session_path}
-        <!-- = image_tag 'icons/list.png' -->
-        SAVE &amp; EXIT
-      %br
-      %br
-    %li
-      %p
-        If you select Save & Exit, you can save your work and continue where you left off the next time you login.
-    %br.clear
-- if step != 1
-  = render partial: 'shared/help_me_sign_up'
-  = render partial: 'ui-components/v1/modals/help_with_plan'
-</span>
 
+= render partial: 'shared/shopping_nav_panel',
+  locals: {show_exit_button: !@no_save_button,
+  show_previous_button: !@no_previous_button || step == 1,
+  show_account_button: step > 2 && EnrollRegistry.feature_enabled?(:back_to_account_all_shop),
+  is_complete: step == 6,
+  show_help_button: step != 1 }

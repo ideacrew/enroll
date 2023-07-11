@@ -5,7 +5,7 @@
       <% if EnrollRegistry.feature_enabled?(:verbose_sep_message) %>
           <div style="color: #323130;">
             <%= l10n("insured.sep_verbose_eligibility_alert", sep_end_date: @active_sep.end_on ) %>
-            <span style="text-decoration: underline;" class="font-weight-bold">
+            <span style="text-decoration: underline" class="font-weight-bold font-color-inherit">
               <%= build_link_for_sep_type(@active_sep, nil, local_assigns[:family_id]) %>
             </span>
           </div>
