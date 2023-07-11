@@ -2,6 +2,7 @@
 
 module Eligible
   module Concerns
+    # Concern for Grant
     module Grant
       extend ActiveSupport::Concern
 

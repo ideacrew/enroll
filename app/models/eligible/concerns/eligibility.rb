@@ -2,6 +2,7 @@
 
 module Eligible
   module Concerns
+    # Concern for Eligibility
     module Eligibility
       extend ActiveSupport::Concern
 

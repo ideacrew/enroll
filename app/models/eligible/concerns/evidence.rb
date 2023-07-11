@@ -2,6 +2,7 @@
 
 module Eligible
   module Concerns
+    # Concern for Evidence
     module Evidence
       extend ActiveSupport::Concern
 
@@ -9,7 +10,7 @@ module Eligible
         field :title, type: String
         field :description, type: String
         field :key, type: Symbol
-        field :is_satisfied, type: Boolean
+        field :is_satisfied, type: Boolean, default: false
 
         embeds_many :state_histories,
                     class_name: '::Eligible::StateHistory',

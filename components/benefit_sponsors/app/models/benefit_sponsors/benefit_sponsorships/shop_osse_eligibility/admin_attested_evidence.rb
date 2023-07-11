@@ -7,7 +7,7 @@ module BenefitSponsors
       class AdminAttestedEvidence
         include Mongoid::Document
         include Mongoid::Timestamps
-        include ::Eligble::Concerns::Evidence
+        include ::Eligible::Concerns::Evidence
       end
     end
   end
