@@ -32,5 +32,9 @@ module Eligible
     def self.latest_history
       order(transition_at: :desc).first
     end
+
+    def self.latest_history
+      order(transition_at: :desc).first
+    end
   end
 end
