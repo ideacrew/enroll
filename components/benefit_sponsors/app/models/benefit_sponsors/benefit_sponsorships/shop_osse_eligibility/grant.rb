@@ -7,7 +7,7 @@ module BenefitSponsors
       class Grant
         include Mongoid::Document
         include Mongoid::Timestamps
-        include ::Eligble::Concerns::Grant
+        include ::Eligible::Concerns::Grant
       end
     end
   end

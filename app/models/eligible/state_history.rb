@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Eligibile
+module Eligible
   # State history model
   class StateHistory
     include Mongoid::Document

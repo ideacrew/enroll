@@ -7,7 +7,7 @@ module BenefitSponsors
       class Eligibility
         include Mongoid::Document
         include Mongoid::Timestamps
-        include ::Eligble::Concerns::Eligibility
+        include ::Eligible::Concerns::Eligibility
 
         embeds_one :shop_osse_evidence,
                    class_name:
