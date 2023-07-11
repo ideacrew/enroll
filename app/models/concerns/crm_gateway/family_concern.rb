@@ -33,7 +33,6 @@ module CrmGateway
       result = ::Operations::Families::SugarCrm::PublishFamily.new.call(self)
       # Update column directly without callbacks
       if result.success?
-        Rails.logger.warn("37777777")
         family_payload = result.success.last
         self.set(cv3_payload: family_payload.to_h.with_indifferent_access) unless EnrollRegistry.feature_enabled?(:check_for_crm_updates)
         p family_payload if Rails.env.test?
