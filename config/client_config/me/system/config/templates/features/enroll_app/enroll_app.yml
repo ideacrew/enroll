@@ -897,3 +897,6 @@ registry:
       - key: :registration_sponsor_recaptcha
         item: :registration_sponsor_recaptcha
         is_enabled: <%= ENV['REGISTRATION_SPONSOR_RECAPTCHA_IS_ENABLED'] || false %>
+      - key: :back_to_account_all_shop
+        item: :back_to_account_all_shop
+        is_enabled: <%= ENV['BACK_TO_ACCOUNT_ALL_SHOP_IS_ENABLED'] || false %>
