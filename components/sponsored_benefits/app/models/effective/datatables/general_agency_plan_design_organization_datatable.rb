@@ -103,6 +103,13 @@ module Effective
           top_scope: :filters
         }
       end
+
+      def authorized?(current_user, _controller, _action, _resource)
+        return true if current_user.has_hbx_staff_role?
+        return true if current_user.has_general_agency_staff_role? && current_user.person.general_agency_staff_roles.any? { |role| role.benefit_sponsors_general_agency_profile_id == attributes["profile_id"] }
+
+        false
+      end
     end
   end
 end
