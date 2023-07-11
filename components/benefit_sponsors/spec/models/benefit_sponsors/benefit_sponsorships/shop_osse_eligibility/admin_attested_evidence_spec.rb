@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitSponsors
+  # benefit sponsorships
   module BenefitSponsorships
     RSpec.describe ShopOsseEligibility::AdminAttestedEvidence,
                    type: :model,
