@@ -282,6 +282,11 @@ module Effective
         end
         filters
       end
+
+      def authorized?(current_user, _controller, _action, _resource)
+        return false unless current_user&.has_hbx_staff_role?
+        true
+      end
     end
   end
 end
