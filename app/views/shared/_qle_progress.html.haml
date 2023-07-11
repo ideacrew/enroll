@@ -33,10 +33,9 @@
 - if step == 3 && !no_purchase
   = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, plan_id: @plan.id, change_plan: @change_plan, coverage_kind: @coverage_kind, market_kind: @market_kind), :class => "btn btn-lg btn-primary  btn-block #{'disabled' if kind == 'individual'}", id: 'btn-continue', :method => :post, :disabled => disable_purchase?(!@enrollable, @enrollment, qle: qle)
 
-  %ul.list-unstyled.list-right-section
-    %li
-      %a.back{href: '#'}
-        <!-- = image_tag 'icons/list.png' -->
-        PREVIOUS
-- elsif step == 4
-  = link_to 'GO TO MY ACCOUNT', family_account_path, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue', style: 'width: 100%;'
+= render partial: 'shared/shopping_nav_panel',
+  locals: {show_exit_button: false,
+  show_previous_button: step == 3 && !no_purchase,
+  show_account_button: EnrollRegistry.feature_enabled?(:back_to_account_all_shop),
+  show_help_button: false,
+  is_complete: step == 4 }
