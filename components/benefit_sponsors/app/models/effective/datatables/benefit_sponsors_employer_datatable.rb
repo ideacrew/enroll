@@ -284,8 +284,8 @@ module Effective
       end
 
       def authorized?(current_user, _controller, _action, _resource)
-        return false unless current_user&.has_hbx_staff_role?
-        true
+        return true if current_user&.has_hbx_staff_role?
+        false
       end
     end
   end
