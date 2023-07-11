@@ -6,9 +6,9 @@ require 'factory_bot_rails'
 describe Effective::Datatables::IdentityVerificationDataTable, "with correct access permissions" do
 
   let(:admin_user) { FactoryBot.create(:user, person: admin_person) }
-  let(:admin_person) {FactoryBot.create(:person, :with_hbx_staff_role) }
+  let(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
   let(:regular_user) { FactoryBot.create(:user, person: regular_person) }
-  let(:regular_person) {FactoryBot.create(:person, ) }
+  let(:regular_person) { FactoryBot.create(:person) }
 
 
   subject { Effective::Datatables::IdentityVerificationDataTable.new }
