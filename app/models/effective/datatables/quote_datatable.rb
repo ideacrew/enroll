@@ -67,7 +67,7 @@ module Effective
       end
 
       def authorized?(current_user, _controller, _action, _resource)
-        return nil unless current_user
+        return false unless current_user
 
         current_user.has_hbx_staff_role? || current_user.has_broker_role?
       end
