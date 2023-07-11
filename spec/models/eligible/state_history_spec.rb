@@ -2,17 +2,19 @@
 
 require 'rails_helper'
 
+# Eligible module namespace for new models
 module Eligible
+  # Test class to test the state history model
+  class TestStatusTrackable
+    include Mongoid::Document
+
+    embeds_many :state_histories,
+                class_name: '::Eligible::StateHistory',
+                cascade_callbacks: true,
+                as: :status_trackable
+  end
+
   RSpec.describe StateHistory, type: :model, dbclean: :after_each do
-    class TestStatusTrackable
-      include Mongoid::Document
-
-      embeds_many :state_histories,
-                  class_name: '::Eligible::StateHistory',
-                  cascade_callbacks: true,
-                  as: :status_trackable
-    end
-
     describe 'A new model instance' do
       it { is_expected.to be_mongoid_document }
       it do
