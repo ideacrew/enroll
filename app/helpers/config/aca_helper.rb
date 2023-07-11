@@ -380,6 +380,10 @@ module Config::AcaHelper
     EnrollRegistry.feature?("aca_ivl_osse_subsidy_#{year}") && EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
   end
 
+  def ivl_osse_filtering_enabled?
+    EnrollRegistry.feature_enabled?("individual_osse_plan_filter")
+  end
+
   def eligibility_audit_log_is_enabled?
     EnrollRegistry.feature?("eligibility_audit_log") && EnrollRegistry.feature_enabled?("eligibility_audit_log")
   end
