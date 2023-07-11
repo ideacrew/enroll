@@ -40,7 +40,7 @@ class Users::PasswordsController < Devise::PasswordsController
   private
 
   def verify_recaptcha_for_user_not_found
-    return true unless helpers.forgot_password_recaptcha_enabled?("user_account")
+    return true unless helpers.forgot_password_recaptcha_enabled?('user_account')
     verify_recaptcha
   end
 
