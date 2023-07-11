@@ -9,7 +9,7 @@ module Eligible
     embedded_in :status_trackable, polymorphic: true
 
     field :effective_on, type: Date
-    field :is_eligible, type: Boolean
+    field :is_eligible, type: Boolean, default: false
 
     field :from_state, type: String
     field :to_state, type: String
@@ -25,10 +25,12 @@ module Eligible
                           :to_state,
                           :transition_at
 
-    scope :latest_history, -> { order(transition_at: :desc).first }
-
     def current_state
       to_state
+    end
+
+    def self.latest_history
+      order(transition_at: :desc).first
     end
   end
 end

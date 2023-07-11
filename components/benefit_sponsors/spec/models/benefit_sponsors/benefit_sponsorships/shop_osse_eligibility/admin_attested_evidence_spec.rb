@@ -37,10 +37,23 @@ module BenefitSponsors
               expect(described_class.find(subject.id)).to eq subject
             end
 
-            it 'should have state history' do
-              subject.save!
-              record = described_class.find(subject.id)
-              expect(record.state_histories).not_to be_empty
+            context '.save' do
+              before { subject.save! }
+
+              it 'should have state history' do
+                record = described_class.find(subject.id)
+                expect(record.state_histories).not_to be_empty
+              end
+
+              it 'should delegate methods to latest state history' do
+                record = described_class.find(subject.id)
+
+                history = record.state_histories.last
+
+                expect(record.effective_on).to eq history.effective_on
+                expect(record.is_eligible).to eq history.is_eligible
+                expect(record.current_state).to eq history.to_state
+              end
             end
           end
         end
