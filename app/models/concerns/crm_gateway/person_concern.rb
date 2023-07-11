@@ -14,7 +14,7 @@ module CrmGateway
       return unless primary_family.present? && self == primary_family.primary_person
       return if EnrollRegistry.feature_enabled?(:check_for_crm_updates) && !self.crm_notifiction_needed
       Rails.logger.info("Triggering CRM primary subscriber update publish for person: #{self.hbx_id}")
-      CrmWorker.perform_asyc(self.id.to_s, self.class.to_s, :trigger_primary_subscriber_publish)
+      CrmWorker.perform_async(self.id.to_s, self.class.to_s, :trigger_primary_subscriber_publish)
     end
 
     def trigger_primary_subscriber_publish
