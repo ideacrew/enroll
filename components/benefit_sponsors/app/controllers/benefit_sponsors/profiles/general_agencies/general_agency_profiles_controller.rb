@@ -16,9 +16,9 @@ module BenefitSponsors
         layout 'single_column'
 
         def show
-          authorize self
-          set_flash_by_announcement
           @general_agency_profile = ::BenefitSponsors::Organizations::GeneralAgencyProfile.find(params[:id])
+          authorize @general_agency_profile
+          set_flash_by_announcement
           @provider = current_user.person
         end
 
