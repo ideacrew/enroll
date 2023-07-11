@@ -183,7 +183,7 @@ module Effective
       def authorized?(current_user, _controller, _action, _resource)
         return false unless current_user
 
-        HbxProfilePolicy.new(current_user, nil).employer_index?
+        current_user.has_hbx_staff_role?
       end
     end
   end
