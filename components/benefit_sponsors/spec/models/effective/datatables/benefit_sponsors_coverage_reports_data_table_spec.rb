@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe Effective::Datatables::BenefitSponsorsCoverageReportsDataTable, dbclean: :after_each do
+RSpec.describe Effective::Datatables::BenefitSponsorsCoverageReportsDataTable, dbclean: :after_each do
   describe '#authorized?' do
     context 'when current user does not exist' do
       let(:user) { nil }
