@@ -27,7 +27,7 @@ class Users::PasswordsController < Devise::PasswordsController
   end
 
   def user_not_found
-    if verify_recaptcha
+    if verify_recaptcha_for_user_not_found
       respond_to do |format|
         format.html { respond_with({}, location: after_sending_reset_password_instructions_path_for(resource_name)) }
         format.js
@@ -38,6 +38,11 @@ class Users::PasswordsController < Devise::PasswordsController
   end
 
   private
+
+  def verify_recaptcha_for_user_not_found
+    return true unless helpers.forgot_password_recaptcha_enabled?("user_account")
+    verify_recaptcha
+  end
 
   def verify_recaptcha_if_needed
     return true unless helpers.forgot_password_recaptcha_enabled?(@user.profile_type)
