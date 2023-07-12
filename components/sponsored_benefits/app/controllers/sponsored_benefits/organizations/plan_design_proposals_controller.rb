@@ -195,7 +195,9 @@ module SponsoredBenefits
     end
 
     def employee_datatable(sponsorship)
-      Effective::Datatables::PlanDesignEmployeeDatatable.new({id: sponsorship.id, scopes: params[:scopes]})
+      Effective::Datatables::PlanDesignEmployeeDatatable.new(
+        { id: sponsorship.id, profile_id: params[:profile_id], scopes: params[:scopes] }
+      )
     end
 
     def init_employee_datatable
