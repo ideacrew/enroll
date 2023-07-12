@@ -88,6 +88,31 @@ module Effective
             top_scope: :employees
         }
       end
+
+      def matching_broker?(current_user, profile)
+        current_user&.person&.broker_role.present? && current_user.person.broker_role.benefit_sponsors_broker_agency_profile_id == profile.id
+      end
+
+      def matching_ga_staff?(staff_roles, profile)
+        profile.general_agency_accounts.any? do |acc|
+          staff_roles.map(&:benefit_sponsors_general_agency_profile_id).include?(acc.benefit_sponsrship_general_agency_profile_id)
+        end
+      end
+
+      def authorized?(current_user, _controller, _action, _resource)
+        return false unless current_user
+        return true if current_user.has_hbx_staff_role?
+
+        profile = ::BenefitSponsors::Organizations::Profile.where(id: attributes[:profile_id]).first || ::BrokerAgencyProfile.where(id: attributes[:profile_id]).first || ::GeneralAgencyProfile.where(id: attributes[:profile_id]).first
+        return false unless profile
+        return true if matching_broker?(current_user, profile)
+        return false if profile.general_agency_accounts.blank?
+
+        staff_roles = current_user.person.active_general_agency_staff_roles
+        return false if staff_roles.blank?
+
+        matching_ga_staff?(staff_roles, profile)
+      end
     end
   end
 end
