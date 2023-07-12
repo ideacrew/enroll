@@ -16,12 +16,12 @@ describe Effective::Datatables::GeneralAgencyDataTable, "with correct access per
   it "allows authorized users" do
     allow(access_policy).to receive(:view_families).with(general_agency_profile).and_return true
     datatable = Effective::Datatables::GeneralAgencyDataTable.new({id: general_agency_profile_id})
-    datatable.authorized?(current_user, nil, nil, nil)
+    expect(datatable.authorized?(current_user, nil, nil, nil)).to be_truthy
   end
 
   it "denies unauthorized users" do
     allow(access_policy).to receive(:view_families).with(general_agency_profile).and_return false
     datatable = Effective::Datatables::GeneralAgencyDataTable.new({id: general_agency_profile_id})
-    datatable.authorized?(current_user, nil, nil, nil)
+    expect(datatable.authorized?(current_user, nil, nil, nil)).to be_falsey
   end
 end

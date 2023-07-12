@@ -17,12 +17,12 @@ RSpec.describe Effective::Datatables::BenefitSponsorsGeneralAgencyFamilyDataTabl
   it "allows authorized users" do
     allow(access_policy).to receive(:families?).and_return true
     datatable = Effective::Datatables::BenefitSponsorsGeneralAgencyFamilyDataTable.new({id: general_agency_profile_id})
-    datatable.authorized?(current_user, nil, nil, nil)
+    expect(datatable.authorized?(current_user, nil, nil, nil)).to be_truthy
   end
 
   it "denies unauthorized users" do
     allow(access_policy).to receive(:families?).and_return false
     datatable = Effective::Datatables::BenefitSponsorsGeneralAgencyFamilyDataTable.new({id: general_agency_profile_id})
-    datatable.authorized?(current_user, nil, nil, nil)
+    expect(datatable.authorized?(current_user, nil, nil, nil)).to be_falsey
   end
 end
