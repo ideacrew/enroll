@@ -105,10 +105,14 @@ module Effective
       end
 
       def authorized?(current_user, _controller, _action, _resource)
+        return false if current_user.blank?
         return true if current_user.has_hbx_staff_role?
-        return true if current_user.has_general_agency_staff_role? && current_user.person.general_agency_staff_roles.any? { |role| role.benefit_sponsors_general_agency_profile_id == attributes["profile_id"] }
 
-        false
+        (current_user.has_general_agency_staff_role? &&  ga_staff_role_belongs_to_profile?(current_user, attributes["profile_id"])) ? true : false
+      end
+
+      def ga_staff_role_belongs_to_profile?(current_user, ga_profile_id)
+        current_user.person.general_agency_staff_roles.any? { |role| role.benefit_sponsors_general_agency_profile_id == ga_profile_id }
       end
     end
   end
