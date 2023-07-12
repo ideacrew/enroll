@@ -2,8 +2,7 @@
 
 require 'rails_helper'
 
-describe Effective::Datatables::EmployeeDatatable, dbclean: :after_each do
-
+RSpec.describe Effective::Datatables::BenefitSponsorsEmployerDocumentsDataTable, dbclean: :after_each do
   describe '#authorized?' do
     context 'when current user does not exist' do
       let(:user) { nil }
@@ -14,7 +13,7 @@ describe Effective::Datatables::EmployeeDatatable, dbclean: :after_each do
       end
     end
 
-    context 'when current user exists and profile is not found' do
+    context 'when current user exists with valid staff role and profile does not match' do
       let(:user) { FactoryBot.create(:user) }
       let(:profile_id) { BSON::ObjectId.new.to_s }
 

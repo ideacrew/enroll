@@ -17,7 +17,7 @@ describe Effective::Datatables::EmployerDatatable, dbclean: :after_each do
       let(:user) { FactoryBot.create(:user) }
 
       it 'should not authorize access' do
-        expect(subject.authorized?(user, nil, nil, nil)).to eq(false)
+        expect(subject.authorized?(user, nil, nil, nil)).to be_falsey
       end
     end
 
@@ -26,7 +26,7 @@ describe Effective::Datatables::EmployerDatatable, dbclean: :after_each do
       let(:user) { FactoryBot.create(:user, person: person, roles: ["hbx_staff"]) }
 
       it 'should authorize access' do
-        expect(subject.authorized?(user, nil, nil, nil)).to eq(true)
+        expect(subject.authorized?(user, nil, nil, nil)).to be_truthy
       end
     end
   end
