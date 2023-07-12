@@ -49,4 +49,6 @@ Feature: Broker HC4CC quote creation
     Then Primary Broker clicks Back to All Quotes
     And the broker clicks Actions dropdown
     And the broker clicks copy quote
-    Then the broker should see Yes for HC4CC
+    And the broker should see Yes for HC4CC
+    And Primary broker clicks on Select Health Benefits button
+    Then Primary broker should see metal level non bronze options
