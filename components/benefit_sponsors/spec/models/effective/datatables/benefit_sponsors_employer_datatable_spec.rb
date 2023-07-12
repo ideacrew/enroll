@@ -22,11 +22,12 @@ RSpec.describe Effective::Datatables::BenefitSponsorsEmployerDatatable, dbclean:
     end
 
     context 'when current user exists with staff role' do
-      let!(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_hbx_staff_role) }
-      let!(:person) { FactoryBot.create(:person, user: user_with_hbx_staff_role)}
+      let(:user) { FactoryBot.create(:user) }
+
+      before { allow(user).to receive(:hbx_staff_role?).and_return(true) }
 
       it 'should authorize access' do
-        expect(subject.authorized?(user_with_hbx_staff_role, nil, nil, nil)).to eq(true)
+        expect(subject.authorized?(user, nil, nil, nil)).to eq(true)
       end
     end
   end
