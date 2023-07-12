@@ -15,9 +15,9 @@
 
         <div class="plan-title">
           <div class="plan-logo-and-name">
-            <%= display_carrier_logo(Maybe.new(product), { width: 100 }) %>
+            <%= display_carrier_logo(Maybe.new(product)) %>
             <h3>
-              <%= sanitize link_to product.title, summary_products_plans_path({ :standard_component_id => product.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: product.active_year }), remote: true %>
+              <%= link_to product.title, summary_products_plans_path({ :standard_component_id => product.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: product.active_year }), remote: true %>
             </h3>
           </div>
         </div>
@@ -54,12 +54,6 @@
                     <div class="created-at enrollment-effective">
                         <label><%= l10n("plan_selected") %>:</label>
                         <%= format_policy_purchase_date(hbx_enrollment) %> (<%= format_policy_purchase_time(hbx_enrollment) %>)
-                    </div>
-                <% end %>
-
-                <% if hbx_enrollment.is_reinstated_enrollment? %>
-                    <div class="reinstated-enrollment enrollment-effective">
-                        <label><%= l10n("reinstated_enrollment") %></label>
                     </div>
                 <% end %>
 
