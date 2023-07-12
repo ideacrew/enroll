@@ -160,6 +160,17 @@ module Effective
         osse_eligibility = bs&.current_eligibility(:osse_subsidy) if bs.present?
         osse_eligibility.present?
       end
+
+      def authorized?(current_user, _controller, _action, _resource)
+        return false if current_user.blank?
+        return true if current_user.has_hbx_staff_role?
+
+        (current_user.has_broker_agency_staff_role? &&  ba_staff_role_belongs_to_profile?(current_user, attributes["profile_id"])) ? true : false
+      end
+
+      def ba_staff_role_belongs_to_profile?(current_user, ga_profile_id)
+        current_user.person.broker_agency_staff_roles.any? { |role| role.benefit_sponsors_broker_agency_profile_id == ga_profile_id }
+      end
     end
   end
 end
