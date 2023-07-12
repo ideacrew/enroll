@@ -108,11 +108,12 @@ module Effective
         return false if current_user.blank?
         return true if current_user.has_hbx_staff_role?
 
-        (current_user.has_general_agency_staff_role? &&  ga_staff_role_belongs_to_profile?(current_user, attributes["profile_id"])) ? true : false
-      end
+        ga_staff_roles = current_user.person&.general_agency_staff_roles&.select(&:active?)
+        return false if ga_staff_roles.blank?
 
-      def ga_staff_role_belongs_to_profile?(current_user, ga_profile_id)
-        current_user.person.general_agency_staff_roles.any? { |role| role.benefit_sponsors_general_agency_profile_id == ga_profile_id }
+        ga_staff_roles.any? do |sr|
+          sr.benefit_sponsors_general_agency_profile_id == attributes["profile_id"]
+        end
       end
     end
   end
