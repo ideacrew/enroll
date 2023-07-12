@@ -25,10 +25,14 @@ module Effective
         row.broker_role.broker_agency_profile
       end
 
-      def 
-
       def nested_filter_definition
 
+      end
+
+      def authorized?(current_user, _controller, _action, _resource)
+        return false if current_user.blank?
+
+        current_user.hbx_staff_role?
       end
     end
   end

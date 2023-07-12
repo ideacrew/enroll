@@ -56,6 +56,10 @@ module PermissionsConcern
       has_role?(:broker)
     end
 
+    def hbx_staff_role?
+      self.person&.hbx_staff_role.present?
+    end
+
     def has_hbx_staff_role?
       hbx_staff_role_present = !self.try(:person).try(:hbx_staff_role).nil?
       has_role?(:hbx_staff) || hbx_staff_role_present
