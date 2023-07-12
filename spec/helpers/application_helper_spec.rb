@@ -780,48 +780,14 @@ describe "Enabled/Disabled IVL market" do
   end
 
   describe 'forgot_password_recaptcha_enabled?' do
-    it 'should return true if recaptcha is enabled if view is benefit_sponsor and ff is enabled' do
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:forgot_password_sponsor_recaptcha).and_return(true)
-      expect(helper.forgot_password_recaptcha_enabled?('benefit_sponsor')).to eq true
+    it 'should return true if recaptcha is enabled if ff is enabled' do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:forgot_password_recaptcha).and_return(true)
+      expect(helper.forgot_password_recaptcha_enabled?).to eq true
     end
 
-    it 'should return false if recaptcha is enabled if view is benefit_sponsor and ff is disabled' do
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:forgot_password_sponsor_recaptcha).and_return(false)
-      expect(helper.forgot_password_recaptcha_enabled?('benefit_sponsor')).to eq false
-    end
-
-    it 'should return true if recaptcha is enabled if view is user_account and ff is enabled' do
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:forgot_password_user_account_recaptcha).and_return(true)
-      expect(helper.forgot_password_recaptcha_enabled?('user_account')).to eq true
-    end
-
-    it 'should return false if recaptcha is enabled if view is user_account and ff is disabled' do
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:forgot_password_user_account_recaptcha).and_return(false)
-      expect(helper.forgot_password_recaptcha_enabled?('user_account')).to eq false
-    end
-
-    it 'should return true if recaptcha is enabled if view is general_agency and ff is enabled' do
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:forgot_password_ga_recaptcha).and_return(true)
-      expect(helper.forgot_password_recaptcha_enabled?('general_agency')).to eq true
-    end
-
-    it 'should return false if recaptcha is enabled if view is general_agency and ff is disabled' do
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:forgot_password_ga_recaptcha).and_return(false)
-      expect(helper.forgot_password_recaptcha_enabled?('general_agency')).to eq false
-    end
-
-    it 'should return true if recaptcha is enabled if view is broker_agency and ff is enabled' do
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:forgot_password_broker_recaptcha).and_return(true)
-      expect(helper.forgot_password_recaptcha_enabled?('broker_agency')).to eq true
-    end
-
-    it 'should return false if recaptcha is enabled if view is broker_agency and ff is disabled' do
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:forgot_password_broker_recaptcha).and_return(false)
-      expect(helper.forgot_password_recaptcha_enabled?('broker_agency')).to eq false
-    end
-
-    it 'should return false by default' do
-      expect(helper.forgot_password_recaptcha_enabled?('abc')).to eq false
+    it 'should return false if recaptcha is enabled if ff is disabled' do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:forgot_password_recaptcha).and_return(false)
+      expect(helper.forgot_password_recaptcha_enabled?).to eq false
     end
   end
 

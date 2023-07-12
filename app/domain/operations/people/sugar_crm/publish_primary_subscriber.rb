@@ -83,7 +83,7 @@ module Operations
           if send_to_gateway?(primary_subscriber_person, payload)
             event('events.crm_gateway.people.primary_subscriber_update', attributes: payload.to_h)
           else
-            Failure("No critical changes made to primary subscriber, no update needed to CRM gateway.")
+            Failure("No critical changes made to primary subscriber: #{primary_subscriber_person.hbx_id}, no update needed to CRM gateway.")
           end
         end
 
