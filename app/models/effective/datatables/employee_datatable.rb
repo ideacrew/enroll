@@ -160,9 +160,13 @@ module Effective
       end
 
       def authorized?(current_user, _controller, _action, _resource)
+        return false unless current_user
+
         employer_profile = ::BenefitSponsors::Organizations::Organization.employer_profiles.where(
           :"profiles._id" => BSON::ObjectId.from_string(attributes[:id])
         ).first.try(:employer_profile) || ::EmployerProfile.find(attributes[:id])
+
+        return false unless employer_profile
 
         ::BenefitSponsors::EmployerProfilePolicy.new(current_user, employer_profile).show?
       end
