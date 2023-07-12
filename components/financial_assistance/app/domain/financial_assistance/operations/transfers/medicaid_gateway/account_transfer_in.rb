@@ -28,10 +28,18 @@ module FinancialAssistance
             _apps = yield build_applicants(payload, application, family)
             _applicants = yield fill_applicants_form(payload, application)
             _record = yield record(application)
+            auto_submit(application) if FinancialAssistanceRegistry.feature_enabled?(:automatic_submission)
             Success(application_id)
           end
 
           private
+
+          def auto_submit(application)
+            # application = ::FinancialAssistance::Operations::Applications::Copy.new.call(application_id: ::FinancialAssistance::Application.where(aasm_state: 'submitted').last.id)
+            # FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination.new.call(application_id: application.success.id)
+            FinancialAssistance::Operations::Transfers::MedicaidGateway::AutomaticSubmission.new.call(application)
+            # FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination.new.call(application_id: application.id)
+          end
 
           def county_finder(zip)
             ::BenefitMarkets::Locations::CountyZip.where(zip: zip)
