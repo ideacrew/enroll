@@ -105,15 +105,9 @@ module Effective
       end
 
       def authorized?(current_user, _controller, _action, _resource)
-        return false if current_user.blank?
-        return true if current_user.has_hbx_staff_role?
+        general_agency = BenefitSponsors::Organizations::GeneralAgencyProfile.find(attributes[:profile_id])
 
-        ga_staff_roles = current_user.person&.general_agency_staff_roles&.select(&:active?)
-        return false if ga_staff_roles.blank?
-
-        ga_staff_roles.any? do |sr|
-          sr.benefit_sponsors_general_agency_profile_id == attributes["profile_id"]
-        end
+        ::SponsoredBenefits::PlanDesignOrganizationPolicy.new(current_user, general_agency).can_access_employers_tab_via_ga_portal?
       end
     end
   end
