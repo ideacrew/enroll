@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe Effective::Datatables::BenefitSponsorsGeneralAgencyFamilyDataTable, "verifying access" do
+RSpec.describe Effective::Datatables::BenefitSponsorsGeneralAgencyFamilyDataTable, "verifying access" do
   let(:general_agency_profile_id) { "SOME BOGUS ID" }
   let(:current_user) { instance_double(User) }
   let(:general_agency_profile) { instance_double(::BenefitSponsors::Organizations::GeneralAgencyProfile) }
@@ -17,12 +17,12 @@ describe Effective::Datatables::BenefitSponsorsGeneralAgencyFamilyDataTable, "ve
   it "allows authorized users" do
     allow(access_policy).to receive(:families?).and_return true
     datatable = Effective::Datatables::BenefitSponsorsGeneralAgencyFamilyDataTable.new({id: general_agency_profile_id})
-    datatable.authorized?(current_user, nil, nil, nil)
+    expect(datatable.authorized?(current_user, nil, nil, nil)).to be_truthy
   end
 
   it "denies unauthorized users" do
     allow(access_policy).to receive(:families?).and_return false
     datatable = Effective::Datatables::BenefitSponsorsGeneralAgencyFamilyDataTable.new({id: general_agency_profile_id})
-    datatable.authorized?(current_user, nil, nil, nil)
+    expect(datatable.authorized?(current_user, nil, nil, nil)).to be_falsey
   end
 end
