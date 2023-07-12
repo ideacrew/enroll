@@ -50,7 +50,7 @@ Feature: Change Tax Credit button
     When the user clicks on the Change Tax Credit button
     Then the user should see that applied tax credit has been set accordingly
 
-  Scenario: APTC slider should be minimum 85% when enrollment is OSSE eligible
+  Scenario: APTC slider should be minimum 85% when enrollment is OSSE eligible and feature enabled
     Given self service osse feature is enabled
     Given active enrollment is OSSE eligible with APTC
     And the tax household has at least one member that is APTC eligible
