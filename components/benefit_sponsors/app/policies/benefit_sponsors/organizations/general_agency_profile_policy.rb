@@ -12,6 +12,10 @@ module BenefitSponsors
         false
       end
 
+      def employers?
+        families?
+      end
+
       def families?
         return false if user.blank?
         return true if user.has_hbx_staff_role?

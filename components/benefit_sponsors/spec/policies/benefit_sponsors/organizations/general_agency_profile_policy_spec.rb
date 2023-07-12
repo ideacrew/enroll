@@ -50,7 +50,7 @@ module BenefitSponsors
     end
   end
 
-  RSpec.describe Organizations::GeneralAgencyProfilePolicy, "authorizing the viewing of families" do
+  RSpec.describe Organizations::GeneralAgencyProfilePolicy, "authorizing" do
 
     let(:general_agency_profile_id) { "SOME BOGUS ID" }
     let(:hbx_staff_user) { instance_double(User, has_hbx_staff_role?: true)}
@@ -79,19 +79,38 @@ module BenefitSponsors
       )
     end
 
-    it "allows an hbx-staff user" do
-      authorized = ::BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(hbx_staff_user, general_agency).families?
-      expect(authorized).to be_truthy
+    context "viewing of families" do
+      it "allows an hbx-staff user" do
+        authorized = ::BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(hbx_staff_user, general_agency).families?
+        expect(authorized).to be_truthy
+      end
+
+      it "allows a user who is active general agency staff" do
+        authorized = ::BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(general_agency_staff_user, general_agency).families?
+        expect(authorized).to be_truthy
+      end
+
+      it "denies a regular user" do
+        authorized = ::BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(normal_user, general_agency).families?
+        expect(authorized).to be_falsey
+      end
     end
 
-    it "allows a user who is active general agency staff" do
-      authorized = ::BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(general_agency_staff_user, general_agency).families?
-      expect(authorized).to be_truthy
-    end
+    context "viewing of employers" do
+      it "allows an hbx-staff user" do
+        authorized = ::BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(hbx_staff_user, general_agency).employers?
+        expect(authorized).to be_truthy
+      end
 
-    it "denies a regular user" do
-      authorized = ::BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(normal_user, general_agency).families?
-      expect(authorized).to be_falsey
+      it "allows a user who is active general agency staff" do
+        authorized = ::BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(general_agency_staff_user, general_agency).employers?
+        expect(authorized).to be_truthy
+      end
+
+      it "denies a regular user" do
+        authorized = ::BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(normal_user, general_agency).employers?
+        expect(authorized).to be_falsey
+      end
     end
   end
 end
