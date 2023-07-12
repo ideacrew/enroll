@@ -66,6 +66,12 @@ module Effective
         end
       end
 
+      def authorized?(current_user, _controller, _action, _resource)
+        return false unless current_user
+
+        current_user.has_hbx_staff_role? || current_user.has_broker_role?
+      end
+
       class << self
         attr_accessor :broker_role_id
       end
