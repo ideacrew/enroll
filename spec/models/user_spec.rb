@@ -501,4 +501,32 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       end
     end
   end
+
+  describe '#hbx_staff_role?' do
+    context 'with hbx_staff role' do
+      let(:person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+      let(:user) { FactoryBot.create(:user, person: person) }
+
+      it 'returns true' do
+        expect(user.hbx_staff_role?).to eq true
+      end
+    end
+
+    context 'without hbx_staff role' do
+      let(:person) { FactoryBot.create(:person) }
+      let(:user) { FactoryBot.create(:user, person: person) }
+
+      it 'returns false' do
+        expect(user.hbx_staff_role?).to eq false
+      end
+    end
+
+    context 'without person' do
+      let(:user) { FactoryBot.create(:user) }
+
+      it 'returns false' do
+        expect(user.hbx_staff_role?).to eq false
+      end
+    end
+  end
 end
