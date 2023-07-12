@@ -69,7 +69,7 @@ module Operations
           elsif send_to_gateway?(family, payload_hash.value!)
             payload_hash
           else
-            Failure("No critical changes made to family, no update needed to CRM gateway.")
+            Failure("No critical changes made to family: #{family.id}, no update needed to CRM gateway.")
           end
         rescue StandardError => e
           # Likely failure constructing applications payload
