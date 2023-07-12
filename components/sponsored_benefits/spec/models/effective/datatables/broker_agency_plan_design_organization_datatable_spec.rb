@@ -1,65 +1,27 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
-module SponsoredBenefits
-  RSpec.describe Effective::Datatables::BrokerAgencyPlanDesignOrganizationDatatable, dbclean: :after_each do
-    include_context "set up broker agency profile for BQT, by using configuration settings"
+RSpec.describe Effective::Datatables::BrokerAgencyPlanDesignOrganizationDatatable, "authorizing access" do
+  let(:broker_agency_profile_id) { BSON::ObjectId.new }
+  let(:broker_agency_profile) { instance_double(BenefitSponsors::Organizations::BrokerAgencyProfile, id: broker_agency_profile_id) }
+  let(:user) { instance_double(User) }
+  let(:access_policy) { instance_double(::SponsoredBenefits::BrokerAgencyPlanDesignOrganizationPolicy) }
 
-    describe '#authorized?' do
+  before :each do
+    allow(BenefitSponsors::Organizations::BrokerAgencyProfile).to receive(:find).with(broker_agency_profile_id).and_return(broker_agency_profile)
+    allow(::SponsoredBenefits::BrokerAgencyPlanDesignOrganizationPolicy).to receive(:new).with(user, broker_agency_profile).and_return(access_policy)
+  end
 
-      context 'when current user does not exist' do
-        let(:user) { nil }
+  it "accepts authorized users" do
+    allow(access_policy).to receive(:manage_quotes?).and_return(true)
+    datatable = Effective::Datatables::BrokerAgencyPlanDesignOrganizationDatatable.new({profile_id: broker_agency_profile_id})
+    expect(datatable.authorized?(user, nil, nil, nil)).to be_truthy
+  end
 
-        it 'should not authorize access' do
-          expect(subject.authorized?(user, nil, nil, nil)).to eq(false)
-        end
-      end
-
-      context 'hbx staff role' do
-        context 'when current user exists without staff role' do
-          let(:user) { FactoryBot.create(:user) }
-
-          it 'should not authorize access' do
-            expect(subject.authorized?(user, nil, nil, nil)).to eq(false)
-          end
-        end
-
-        context 'when current user exists with staff role' do
-          let!(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_hbx_staff_role) }
-          let!(:person) { FactoryBot.create(:person, user: user_with_hbx_staff_role)}
-
-          it 'should authorize access' do
-            expect(subject.authorized?(user_with_hbx_staff_role, nil, nil, nil)).to eq(true)
-          end
-        end
-      end
-
-      context 'when current user exists with broker agency staff role' do
-        let!(:ba_profile_id) {broker_agency_profile.id}
-        let!(:broker_agency_staff_role) do
-          person.broker_agency_staff_roles << BrokerAgencyStaffRole.new(benefit_sponsors_broker_agency_profile_id: ba_profile_id, aasm_state: 'active')
-          person.save!
-          person.broker_agency_staff_roles.first
-        end
-        let!(:person) {  FactoryBot.create(:person)}
-        let!(:user_with_ba_staff_role) { FactoryBot.create(:user, person: person, roles: ["broker_agency_staff"])}
-
-        context 'and belongs to profile' do
-          let!(:subject) { described_class.new(profile_id: ba_profile_id) }
-
-          it 'should authorize access' do
-            expect(subject.authorized?(user_with_ba_staff_role, nil, nil, nil)).to eq(true)
-          end
-        end
-
-        context 'and does not belongs to profile' do
-          let!(:subject) { described_class.new(profile_id: "test") }
-
-          it 'should not authorize access' do
-            expect(subject.authorized?(user_with_ba_staff_role, nil, nil, nil)).to eq(false)
-          end
-        end
-      end
-    end
+  it "rejects unauthorized users" do
+    allow(access_policy).to receive(:manage_quotes?).and_return(false)
+    datatable = Effective::Datatables::BrokerAgencyPlanDesignOrganizationDatatable.new({profile_id: broker_agency_profile_id})
+    expect(datatable.authorized?(user, nil, nil, nil)).to be_falsey
   end
 end
