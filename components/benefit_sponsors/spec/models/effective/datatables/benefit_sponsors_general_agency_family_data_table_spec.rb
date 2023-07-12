@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe Effective::Datatables::BenefitSponsorsGeneralAgencyFamilyDataTable, "verifying access" do
+RSpec.describe Effective::Datatables::BenefitSponsorsGeneralAgencyFamilyDataTable, "verifying access" do
   let(:general_agency_profile_id) { "SOME BOGUS ID" }
   let(:current_user) { instance_double(User) }
   let(:general_agency_profile) { instance_double(::BenefitSponsors::Organizations::GeneralAgencyProfile) }
