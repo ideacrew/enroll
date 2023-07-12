@@ -284,7 +284,7 @@ module Effective
       end
 
       def authorized?(current_user, _controller, _action, _resource)
-        (current_user.present? && current_user.has_hbx_staff_role?) ? true : false
+        current_user.present? && current_user.hbx_staff_role?
       end
     end
   end
