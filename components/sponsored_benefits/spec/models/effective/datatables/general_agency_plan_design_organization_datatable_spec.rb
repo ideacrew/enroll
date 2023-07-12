@@ -1,6 +1,8 @@
 require 'rails_helper'
+require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
 
 RSpec.describe Effective::Datatables::GeneralAgencyPlanDesignOrganizationDatatable, dbclean: :after_each do
+  include_context "set up broker agency profile for BQT, by using configuration settings"
 
   describe '#authorized?' do
 
@@ -32,15 +34,17 @@ RSpec.describe Effective::Datatables::GeneralAgencyPlanDesignOrganizationDatatab
     end
 
     context 'when current user exists with general agency staff role' do
-      let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item) }
-      let!(:general_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site) }
-      let(:general_agency_profile) { general_agency_organization.general_agency_profile }
-      let!(:general_agency_staff_role) {FactoryBot.build(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, aasm_state: 'active')}
-      let!(:person_with_ga_staff_role) { general_agency_staff_role.person }
-      let!(:user_with_ga_staff_role) { FactoryBot.create(:user, person: person_with_ga_staff_role, roles: ["general_agency_staff"])}
+      let!(:ga_profile_id) { general_agency_profile.id }
+      let!(:general_agency_staff_role) do
+        person.general_agency_staff_roles << ::GeneralAgencyStaffRole.new(benefit_sponsors_general_agency_profile_id: ga_profile_id, aasm_state: 'active', npn: '1234567')
+        person.save!
+        person.general_agency_staff_roles.first
+      end
+      let!(:person) { FactoryBot.create(:person) }
+      let!(:user_with_ga_staff_role) { FactoryBot.create(:user, person: person, roles: ["general_agency_staff"])}
 
       context 'and belongs to profile' do
-        let!(:subject) { described_class.new(profile_id: general_agency_profile.id) }
+        let!(:subject) { described_class.new(profile_id: ga_profile_id) }
 
         it 'should authorize access' do
           expect(subject.authorized?(user_with_ga_staff_role.reload, nil, nil, nil)).to eq(true)
