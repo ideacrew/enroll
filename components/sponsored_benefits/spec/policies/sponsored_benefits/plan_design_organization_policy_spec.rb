@@ -3,7 +3,7 @@
 require "rails_helper"
 require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
 
-RSpec.describe SponsoredBenefits::PlanDesignOrganizationPolicy do
+RSpec.describe SponsoredBenefits::PlanDesignOrganizationPolicy, dbclean: :after_each do
   include_context "set up broker agency profile for BQT, by using configuration settings"
 
   context "when current user does not exist" do
