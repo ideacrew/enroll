@@ -103,7 +103,7 @@ module Effective
         return false unless current_user
         return true if current_user.has_hbx_staff_role?
 
-        profile = ::BenefitSponsors::Organizations::Profile.where(id: attributes[:profile_id]).first || ::BrokerAgencyProfile.where(id: attributes[:profile_id]).first || ::GeneralAgencyProfile.where(id: attributes[:profile_id]).first
+        profile = ::BenefitSponsors::Organizations::Profile.find(attributes[:profile_id]) || ::BrokerAgencyProfile.where(id: attributes[:profile_id]).first || ::GeneralAgencyProfile.where(id: attributes[:profile_id]).first
         return false unless profile
         return true if matching_broker?(current_user, profile)
         return false if profile.general_agency_accounts.blank?
