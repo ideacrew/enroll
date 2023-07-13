@@ -38,7 +38,7 @@ RSpec.describe Effective::Datatables::PlanDesignProposalsDatatable, dbclean: :af
       let(:ba_profile) { double('BrokerAgencyProfile', id: profile_id) }
 
       before do
-        allow(::BrokerAgencyProfile).to receive(:where).with(id: profile_id).and_return([ba_profile])
+        allow(::BrokerAgencyProfile).to receive(:find).with(profile_id).and_return(ba_profile)
       end
 
       it 'should authorize access' do
@@ -54,7 +54,7 @@ RSpec.describe Effective::Datatables::PlanDesignProposalsDatatable, dbclean: :af
       let(:ga_profile) { double('GeneralAgencyProfile', id: profile_id, general_agency_accounts: [ga_account]) }
 
       before do
-        allow(::GeneralAgencyProfile).to receive(:where).with(id: profile_id).and_return([ga_profile])
+        allow(::GeneralAgencyProfile).to receive(:find).with(profile_id).and_return(ga_profile)
       end
 
       it 'should authorize access' do
