@@ -63,4 +63,8 @@ class Person
   def has_active_general_agency_staff_role?
     !active_general_agency_staff_roles.empty?
   end
+
+  def active_broker_staff_roles
+    broker_agency_staff_roles.where(:aasm_state => :active)
+  end
 end

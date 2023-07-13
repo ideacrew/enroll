@@ -17,12 +17,12 @@ RSpec.describe Effective::Datatables::PlanDesignEmployeeDatatable, "performing a
   end
 
   it "accepts authorized users" do
-    allow(access_policy).to receive(:view_proposals?).and_return(true)
+    allow(access_policy).to receive(:view_employees?).and_return(true)
     expect(subject.authorized?(user, nil, nil, nil)).to be_truthy
   end
 
   it "rejects unauthorized users" do
-    allow(access_policy).to receive(:view_proposals?).and_return(false)
+    allow(access_policy).to receive(:view_employees?).and_return(false)
     expect(subject.authorized?(user, nil, nil, nil)).to be_falsey
   end
 end
