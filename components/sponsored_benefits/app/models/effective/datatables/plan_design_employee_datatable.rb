@@ -93,7 +93,7 @@ module Effective
         return false unless current_user
         benefit_sponsorship = SponsoredBenefits::BenefitSponsorships::BenefitSponsorship.find(attributes[:id])
         proposal_organization = benefit_sponsorship.plan_design_organization
-        SponsoredBenefits::PlanDesignOrganizationPolicy.new(current_user, proposal_organization).view_proposals?
+        SponsoredBenefits::PlanDesignOrganizationPolicy.new(current_user, proposal_organization).view_employees?
       end
     end
   end
