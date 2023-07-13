@@ -50,7 +50,7 @@ PATH
   remote: .
   specs:
     benefit_markets (0.0.1)
-      aasm (~> 5.0.0)
+      aasm (~> 5.1.0)
       active_model_serializers (~> 0.10)
       config (~> 2.0)
       dry-monads
@@ -69,7 +69,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    aasm (5.0.0)
+    aasm (5.1.0)
       concurrent-ruby (~> 1.0)
     actioncable (5.2.4.4)
       actionpack (= 5.2.4.4)
