@@ -35,10 +35,8 @@ module FinancialAssistance
           private
 
           def auto_submit(application)
-            # application = ::FinancialAssistance::Operations::Applications::Copy.new.call(application_id: ::FinancialAssistance::Application.where(aasm_state: 'submitted').last.id)
-            # FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination.new.call(application_id: application.success.id)
+            Rails.logger.info "Calling automatic submission operation for application #{application.id}"
             FinancialAssistance::Operations::Transfers::MedicaidGateway::AutomaticSubmission.new.call(application)
-            # FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination.new.call(application_id: application.id)
           end
 
           def county_finder(zip)

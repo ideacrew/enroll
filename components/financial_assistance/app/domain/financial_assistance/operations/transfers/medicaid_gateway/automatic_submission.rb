@@ -11,14 +11,20 @@ module FinancialAssistance
         class AutomaticSubmission
         include Dry::Monads[:result, :do]
           def call(application)
-            # add step to populate default values?
-            # add step to validate application (consider UI only validations)?
+            # Additional steps that may be needed:
+            # populate default values for application
+            # apply more validations (such as ones that are only enforced in the UI)
             result = yield request_determination(application)
             Success(result)
           end
 
           def request_determination(application)
-            FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination.new.call(application_id: application.id)
+            Rails.logger.info "Submitting application #{application.id} to Medicaid Gateway for determination"
+
+            result = FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination.new.call(application_id: application.id)
+            if result.failure?
+                Rails.logger.error "Failed automatic submission for application #{application.id} due to #{result.failure.inspect}"
+            end
           end
         end
       end
