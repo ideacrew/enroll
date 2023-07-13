@@ -89,29 +89,11 @@ module Effective
         }
       end
 
-      def matching_broker?(current_user, profile)
-        current_user&.person&.broker_role.present? && current_user.person.broker_role.benefit_sponsors_broker_agency_profile_id == profile.id
-      end
-
-      def matching_ga_staff?(staff_roles, profile)
-        profile.general_agency_accounts.any? do |acc|
-          staff_roles.map(&:benefit_sponsors_general_agency_profile_id).include?(acc.benefit_sponsrship_general_agency_profile_id)
-        end
-      end
-
       def authorized?(current_user, _controller, _action, _resource)
         return false unless current_user
-        return true if current_user.has_hbx_staff_role?
-
-        profile = ::BenefitSponsors::Organizations::Profile.find(attributes[:profile_id]) || ::BrokerAgencyProfile.find(attributes[:profile_id]) || ::GeneralAgencyProfile.find(attributes[:profile_id])
-        return false unless profile
-        return true if matching_broker?(current_user, profile)
-        return false if profile.general_agency_accounts.blank?
-
-        staff_roles = current_user.person.active_general_agency_staff_roles
-        return false if staff_roles.blank?
-
-        matching_ga_staff?(staff_roles, profile)
+        benefit_sponsorship = SponsoredBenefits::BenefitSponsorships::BenefitSponsorship.find(attributes[:id])
+        proposal_organization = benefit_sponsorship.plan_design_organization
+        SponsoredBenefits::PlanDesignOrganizationPolicy.new(current_user, proposal_organization).view_proposals?
       end
     end
   end
