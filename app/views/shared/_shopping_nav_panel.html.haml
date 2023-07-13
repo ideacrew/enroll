@@ -1,4 +1,4 @@
-- back_to_account_flag = true #EnrollRegistry.feature_enabled?(:back_to_account_all_shop)
+- back_to_account_flag = EnrollRegistry.feature_enabled?(:back_to_account_all_shop)
 
 - default_value = Proc.new { |value, default| value.nil? ? default : value }
 
