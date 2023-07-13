@@ -1,5 +1,3 @@
-require 'securerandom'
-
 module FinancialAssistance
   class HbxIdGenerator
     attr_accessor :provider
@@ -52,15 +50,15 @@ module FinancialAssistance
     class SlugSource
 
       def self.generate_member_id
-        random_uuid
+        uniq_id
       end
 
-      def self.random_uuid
-        SecureRandom.uuid.gsub("-", "")
+      def self.uniq_id
+        Time.now.to_i
       end
 
       def self.generate_application_id
-        random_uuid
+        uniq_id
       end
     end
   end

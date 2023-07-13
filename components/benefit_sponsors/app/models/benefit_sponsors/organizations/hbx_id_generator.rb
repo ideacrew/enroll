@@ -1,5 +1,3 @@
-require 'securerandom'
-
 module BenefitSponsors
   module Organizations
     class HbxIdGenerator
@@ -76,23 +74,23 @@ module BenefitSponsors
 
       class SlugSource
         def self.generate_organization_id
-          random_uuid
+          uniq_id
         end
 
         def self.generate_benefit_sponsorship_id
-          random_uuid
+          uniq_id
         end
 
         def self.generate_policy_id
-          random_uuid
+          uniq_id
         end
 
         def self.generate_member_id
-          random_uuid
+          uniq_id
         end
 
-        def self.random_uuid
-          SecureRandom.uuid.gsub("-","")
+        def self.uniq_id
+          Time.now.to_i
         end
       end
     end
