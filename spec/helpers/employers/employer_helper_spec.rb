@@ -52,7 +52,9 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
           before do
             allow(benefit_sponsorship.profile).to receive(:active_benefit_sponsorship).and_return(benefit_sponsorship)
             allow(census_employee).to receive(:employer_profile).and_return(benefit_sponsorship.profile)
-            census_employee.terminate_employment!(TimeKeeper.date_of_record - 45.days)
+            census_employee.save!
+            benefit_sponsorship.profile.census_employees.first.terminate_employment!(TimeKeeper.date_of_record - 45.days)
+            census_employee.reload
           end
 
           it "should return true for terminated state" do

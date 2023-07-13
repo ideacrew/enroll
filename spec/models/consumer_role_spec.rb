@@ -507,8 +507,8 @@ context 'Verification process and notices' do
         it_behaves_like 'IVL state machine transitions and workflow', '111111111', 'naturalized_citizen', true, 'valid', state, :fully_verified, 'import!'
         it_behaves_like 'IVL state machine transitions and workflow', '111111111', 'alien_lawfully_present', true, 'valid', state, :fully_verified, 'import!'
         it_behaves_like 'IVL state machine transitions and workflow', '111111111', 'lawful_permanent_resident', false, 'outstanding', state, :fully_verified, 'import!'
-        it_behaves_like 'IVL state machine transitions and workflow', '111111111', 'any', true, 'valid', state, :fully_verified, 'import!'
-        it_behaves_like 'IVL state machine transitions and workflow', nil, 'any', false, 'outstanding', state, :fully_verified, 'import!'
+        it_behaves_like 'IVL state machine transitions and workflow', '111111111', 'non_native_citizen', true, 'valid', state, :fully_verified, 'import!'
+        it_behaves_like 'IVL state machine transitions and workflow', nil, 'undocumented_immigrant', false, 'outstanding', state, :fully_verified, 'import!'
         it 'updates all verification types with callback' do
           consumer.import!
           expect(consumer.all_types_verified?).to eq true
