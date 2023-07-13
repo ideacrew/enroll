@@ -1,37 +1,27 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
 
-RSpec.describe Effective::Datatables::GeneralAgencyPlanDesignOrganizationDatatable, dbclean: :after_each do
-  include_context "set up broker agency profile for BQT, by using configuration settings"
+RSpec.describe Effective::Datatables::GeneralAgencyPlanDesignOrganizationDatatable, "performing authorization" do
+  let(:general_agency_id) { "GENERAL AGENCY ID" }
+  let(:access_policy) { instance_double(SponsoredBenefits::PlanDesignOrganizationPolicy) }
+  let(:general_agency) { instance_double(::BenefitSponsors::Organizations::GeneralAgencyProfile) }
+  let(:user) { instance_double(User) }
 
-  describe '#authorized?' do
-    context 'for current user with general agency staff role' do
-      let!(:ga_profile_id) { general_agency_profile.id }
-      let!(:general_agency_staff_role) do
-        person.general_agency_staff_roles << ::GeneralAgencyStaffRole.new(benefit_sponsors_general_agency_profile_id: ga_profile_id, aasm_state: 'active', npn: '1234567')
-        person.save!
-        person.general_agency_staff_roles.first
-      end
-      let!(:person) { FactoryBot.create(:person) }
-      let!(:user_with_ga_staff_role) { FactoryBot.create(:user, person: person, roles: ["general_agency_staff"])}
+  subject { described_class.new({profile_id: general_agency_id }) }
 
-      context 'when staff belongs to agency' do
-        let!(:subject) { described_class.new(profile_id: ga_profile_id) }
+  before :each do
+    allow(::BenefitSponsors::Organizations::GeneralAgencyProfile).to receive(:find).with(general_agency_id).and_return(general_agency)
+    allow(::SponsoredBenefits::PlanDesignOrganizationPolicy).to receive(:new).with(user, general_agency).and_return(access_policy)
+  end
 
-        it 'allows access' do
-          expect(subject.authorized?(user_with_ga_staff_role, nil, nil, nil)).to eq(true)
-        end
-      end
+  it "accepts authorized users" do
+    allow(access_policy).to receive(:can_access_employers_tab_via_ga_portal?).and_return(true)
+    expect(subject.authorized?(user, nil, nil, nil)).to be_truthy
+  end
 
-      context 'when staff does not belongs to agency' do
-        let!(:subject) { described_class.new(profile_id: BSON::ObjectId.new) }
-
-        it 'denies access' do
-          expect(subject.authorized?(user_with_ga_staff_role, nil, nil, nil)).to eq(false)
-        end
-      end
-    end
+  it "rejects unauthorized users" do
+    allow(access_policy).to receive(:can_access_employers_tab_via_ga_portal?).and_return(false)
+    expect(subject.authorized?(user, nil, nil, nil)).to be_falsey
   end
 end

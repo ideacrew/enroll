@@ -7,6 +7,7 @@ module SponsoredBenefits
       return false unless user
       return true if user.has_hbx_staff_role?
       return false if record.blank?
+      return false unless user.person
 
       general_agency_staff_roles = user.person.active_general_agency_staff_roles
       general_agency_staff_roles.any? do |gasr|
@@ -43,7 +44,7 @@ module SponsoredBenefits
       return false if broker_agency_staff_roles.blank?
 
       broker_agency_staff_roles.any? do |basr|
-        basr.benefit_sponsors_broker_agency_profile_id == profile.owner_profile_id
+        basr.benefit_sponsors_broker_agency_profile_id == record.owner_profile_id
       end
     end
 
