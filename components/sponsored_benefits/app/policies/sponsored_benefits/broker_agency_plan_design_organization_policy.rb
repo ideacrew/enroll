@@ -2,14 +2,7 @@
 
 module SponsoredBenefits
   # Determines access rights for working with broker agency quotes.
-  class BrokerAgencyPlanDesignOrganizationPolicy
-    attr_reader :user, :record
-
-    def initialize(user, record)
-      @user = user
-      @record = record
-    end
-
+  class BrokerAgencyPlanDesignOrganizationPolicy < Policy
     def manage_quotes?
       return false unless user
       return true if user.has_hbx_staff_role?
