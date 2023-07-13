@@ -142,7 +142,7 @@
         end
 
         def find_profile(profile_id)
-          ::BrokerAgencyProfile.where(id: profile_id).first || ::GeneralAgencyProfile.where(id: profile_id).first || ::BenefitSponsors::Organizations::Profile.find(profile_id)
+          ::BrokerAgencyProfile.find(profile_id) || ::GeneralAgencyProfile.find(profile_id) || ::BenefitSponsors::Organizations::Profile.find(profile_id)
         end
 
         def user_has_ba_or_ga_staff_role?(current_user)
