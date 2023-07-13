@@ -83,7 +83,7 @@ PATH
   remote: .
   specs:
     financial_assistance (0.1.0)
-      aasm (~> 4.12)
+      aasm (~> 5.0.0)
       config (~> 2.0)
       devise (~> 4.5)
       dry-monads
@@ -102,7 +102,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    aasm (4.12.3)
+    aasm (5.0.0)
       concurrent-ruby (~> 1.0)
     actioncable (5.2.4.3)
       actionpack (= 5.2.4.3)

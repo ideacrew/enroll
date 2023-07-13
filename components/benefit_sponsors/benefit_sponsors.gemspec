@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'mongoid-autoinc',           '~> 6.0'
   s.add_dependency 'browser',                   '2.7.0'
 
-  s.add_dependency "aasm",                      "~> 4.12"
+  s.add_dependency "aasm",                      "~> 5.0.0"
   s.add_dependency 'active_model_serializers',  '~> 0.10'
   s.add_dependency 'config',                    '~> 2.0'
   s.add_dependency 'devise',                    '~> 4.5'
