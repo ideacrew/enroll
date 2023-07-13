@@ -37,3 +37,4 @@
   - if show_help_button && !back_to_account_flag
     .btn.btn-default{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal", "style" => "width: 100%;"}
       = l10n("help_sign_up")
+= render partial: 'ui-components/v1/modals/help_with_plan' if show_help_button
