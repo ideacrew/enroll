@@ -242,9 +242,10 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
         end
 
         context "and coverage is terminated" do
-
+          let!(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+          let!(:household) { FactoryBot.create(:household, family: family)}
           let(:employee_role)   { FactoryBot.build(:employee_role, employer_profile: employer_profile)}
-          let(:hbx_enrollment)  { HbxEnrollment.new(sponsored_benefit_package: benefit_package, employee_role: census_employee.employee_role, effective_on: TimeKeeper.date_of_record, aasm_state: :coverage_selected) }
+          let(:hbx_enrollment)  { HbxEnrollment.new(sponsored_benefit_package: benefit_package, employee_role: census_employee.employee_role, effective_on: TimeKeeper.date_of_record, aasm_state: :coverage_selected, household: household, family: family) }
 
           it "should update the end_on date to terminated date only if CE is termed/pending" do
             census_employee.update_attributes!(aasm_state: 'employee_termination_pending', coverage_terminated_on: TimeKeeper.date_of_record + 2.days)

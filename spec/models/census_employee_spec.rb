@@ -568,26 +568,26 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
   describe 'construct_employee_role', dbclean: :after_each do
     let(:user)  { FactoryBot.create(:user) }
     context 'when employee_role present' do
-      let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, employer_profile: employer_profile) }
-      let(:census_employee) do
-        FactoryBot.create(
+      let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, employer_profile: employer_profile) }
+
+      before do
+        allow(Rails).to receive_message_chain(:env, :test?).and_return false
+        @census_employee = FactoryBot.create(
           :benefit_sponsors_census_employee,
           employer_profile: employer_profile,
           benefit_sponsorship: organization.active_benefit_sponsorship,
           employee_role_id: employee_role.id
         )
-      end
-      before do
-        allow(Rails).to receive_message_chain(:env, :test?).and_return false
         organization.active_benefit_sponsorship.update_attributes(source_kind: :conversion)
         person = employee_role.person
         person.user = user
         person.save
-        census_employee.construct_employee_role
-        census_employee.reload
+        employer_profile.census_employees.first.construct_employee_role
+        @census_employee.reload
       end
+
       it "should return true when link_employee_role!" do
-        expect(census_employee.aasm_state).to eq('employee_role_linked')
+        expect(@census_employee.aasm_state).to eq('employee_role_linked')
       end
 
       it 'should send an invite' do
@@ -596,7 +596,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
 
     context 'when employee_role not present' do
-      let(:census_employee) do
+      let!(:census_employee) do
         FactoryBot.create(
           :benefit_sponsors_census_employee,
           employer_profile: employer_profile,
@@ -604,7 +604,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         )
       end
       before do
-        census_employee.construct_employee_role
+        employer_profile.census_employees.first.construct_employee_role
         census_employee.reload
       end
       it { expect(census_employee.aasm_state).to eq('eligible') }
