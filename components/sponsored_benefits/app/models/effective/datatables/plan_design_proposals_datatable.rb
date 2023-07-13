@@ -142,11 +142,11 @@
         end
 
         def find_profile(profile_id)
-          ::BrokerAgencyProfile.where(id: profile_id).first || ::GeneralAgencyProfile.where(id: profile_id).first || ::BenefitSponsors::Organizations::Profile.where(id: profile_id).first
+          ::BrokerAgencyProfile.find(profile_id) || ::GeneralAgencyProfile.find(profile_id) || ::BenefitSponsors::Organizations::Profile.find(profile_id)
         end
 
         def user_has_ba_or_ga_staff_role?(current_user)
-          profile = find_profile(attributes[:profile_id])
+          profile = find_profile(attributes.symbolize_keys[:profile_id])
           return false unless profile
 
           matching_broker = current_user&.person&.broker_role.present? && current_user.person.broker_role.benefit_sponsors_broker_agency_profile_id == profile.id
