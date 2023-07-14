@@ -104,7 +104,7 @@ PATH
   remote: components/benefit_markets
   specs:
     benefit_markets (0.0.1)
-      aasm (~> 5.2.0)
+      aasm (~> 5.5.0)
       active_model_serializers (~> 0.10)
       config (~> 2.0)
       dry-monads
@@ -124,7 +124,7 @@ PATH
   remote: components/benefit_sponsors
   specs:
     benefit_sponsors (0.0.1)
-      aasm (~> 5.2.0)
+      aasm (~> 5.5.0)
       active_model_serializers (~> 0.10)
       browser (= 2.7.0)
       config (~> 2.0)
@@ -156,7 +156,7 @@ PATH
   remote: components/financial_assistance
   specs:
     financial_assistance (0.1.0)
-      aasm (~> 5.2.0)
+      aasm (~> 5.5.0)
       config (~> 2.0)
       devise (~> 4.5)
       dry-monads
@@ -176,7 +176,7 @@ PATH
   remote: components/notifier
   specs:
     notifier (0.0.1)
-      aasm (~> 5.2.0)
+      aasm (~> 5.5.0)
       ckeditor (= 4.2.4)
       combine_pdf
       config (~> 2.0)
@@ -196,7 +196,7 @@ PATH
   remote: components/sponsored_benefits
   specs:
     sponsored_benefits (0.0.1)
-      aasm (~> 5.2.0)
+      aasm (~> 5.5.0)
       config (~> 2.0)
       devise (~> 4.5)
       dry-auto_inject (= 0.6.1)
@@ -264,7 +264,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     Ascii85 (1.0.3)
-    aasm (5.2.0)
+    aasm (5.5.0)
       concurrent-ruby (~> 1.0)
     action-cable-testing (0.6.1)
       actioncable (>= 5.0)
@@ -1063,7 +1063,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  aasm (~> 5.2.0)
+  aasm (~> 5.5.0)
   aca_entities!
   acapi!
   action-cable-testing
