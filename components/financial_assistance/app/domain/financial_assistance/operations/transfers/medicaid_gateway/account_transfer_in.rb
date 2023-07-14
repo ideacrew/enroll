@@ -197,6 +197,8 @@ module FinancialAssistance
               @family_member = fam_result.value!
               consumer_role_params = family_member_hash['person']['consumer_role']
               create_or_update_consumer_role(consumer_role_params.merge(is_consumer_role: true), @family_member)
+              create_or_update_vlp_document(consumer_role_params['vlp_documents'], @person) if consumer_role_params['vlp_documents']
+              Success(@person.consumer_role)
             else
               first_name = family_member_hash['person']['person_name']['first_name']
               last_name = family_member_hash['person']['person_name']['last_name']
@@ -247,8 +249,10 @@ module FinancialAssistance
             Failure("create_or_update_family_member: #{e}")
           end
 
-          def create_or_update_vlp_document(applicant_params, person)
-            ::Operations::People::CreateOrUpdateVlpDocument.new.call(params: { applicant_params: applicant_params, person: person })
+          def create_or_update_vlp_document(vlp_documents, person)
+            vlp_documents.each do |vlp_document|
+              ::Operations::People::CreateOrUpdateVlpDocument.new.call(params: { applicant_params: vlp_document, person: person })
+            end
           rescue StandardError => e
             Failure("create_or_update_vlp_document: #{e}")
           end
@@ -339,8 +343,20 @@ module FinancialAssistance
                 is_resident_role: applicant_hash['is_resident_role'],
                 is_applying_coverage: applicant_hash['is_applying_coverage'],
                 is_consent_applicant: applicant_hash['is_consent_applicant'],
-                vlp_document: applicant_hash['vlp_document'],
-
+                vlp_subject: applicant_hash['vlp_subject'],
+                alien_number: applicant_hash['alien_number'],
+                i94_number: nil,
+                visa_number: nil,
+                passport_number: nil,
+                sevis_id: nil,
+                naturalization_number: applicant_hash['naturalization_number'],
+                receipt_number: nil,
+                citizenship_number: nil,
+                card_number: nil,
+                country_of_citizenship: nil,
+                vlp_description: nil,
+                expiration_date: nil,
+                issuing_country: nil,
                 person_hbx_id: family_member.person.hbx_id,
                 ext_app_id: applicant_hash['person_hbx_id'],
                 is_required_to_file_taxes: applicant_hash['is_required_to_file_taxes'],
