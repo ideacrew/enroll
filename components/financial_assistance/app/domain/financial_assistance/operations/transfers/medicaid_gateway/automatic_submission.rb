@@ -9,7 +9,7 @@ module FinancialAssistance
       module MedicaidGateway
         # This class is used to automatically submit the application to Medicaid Gateway for determination.
         class AutomaticSubmission
-        include Dry::Monads[:result, :do]
+          include Dry::Monads[:result, :do]
           def call(application)
             # Additional steps that may be needed:
             # populate default values for application
@@ -23,8 +23,8 @@ module FinancialAssistance
 
             result = FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination.new.call(application_id: application.id)
             if result.failure?
-                Rails.logger.error "Failed automatic submission for application #{application.id} due to #{result.failure.inspect}"
-                return result
+              Rails.logger.error "Failed automatic submission for application #{application.id} due to #{result.failure.inspect}"
+              return result
             end
             Success(result)
           end
