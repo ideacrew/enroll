@@ -36,7 +36,9 @@ module Effective
 
       def authorized?(current_user, _controller, _action, _resource)
         return false unless current_user
-        organization = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => attributes[:id]).first
+        organization = BenefitSponsors::Organizations::Organization.where(
+          :"profiles._id" => BSON::ObjectId.from_string(attributes[:id].to_s)
+        ).first
         general_agency_profile = organization&.general_agency_profile
         return false unless general_agency_profile
 
