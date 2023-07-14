@@ -73,7 +73,7 @@
 
 = render partial: 'shared/shopping_nav_panel',
   locals: {show_exit_button: !@no_save_button,
-  show_previous_button: !@no_previous_button || step == 1,
+  show_previous_button: !@no_previous_button && step != 1,
   show_account_button: step > 2 && EnrollRegistry.feature_enabled?(:back_to_account_all_shop),
   is_complete: step == 6,
   show_help_button: step != 1 }
