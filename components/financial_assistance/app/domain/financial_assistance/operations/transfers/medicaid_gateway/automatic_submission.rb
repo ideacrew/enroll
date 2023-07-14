@@ -24,7 +24,9 @@ module FinancialAssistance
             result = FinancialAssistance::Operations::Applications::MedicaidGateway::RequestEligibilityDetermination.new.call(application_id: application.id)
             if result.failure?
                 Rails.logger.error "Failed automatic submission for application #{application.id} due to #{result.failure.inspect}"
+                return result
             end
+            Success(result)
           end
         end
       end
