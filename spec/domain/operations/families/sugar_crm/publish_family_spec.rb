@@ -82,7 +82,7 @@ RSpec.describe Operations::Families::SugarCrm::PublishFamily, type: :model, dbcl
     end
 
     it "should return failure if no family members critical attributes have been changed" do
-      expect(subject.call(family)).to eq(Failure("No critical changes made to family, no update needed to CRM gateway."))
+      expect(subject.call(family)).to eq(Failure("No critical changes made to family: #{family.id}, no update needed to CRM gateway."))
     end
   end
 

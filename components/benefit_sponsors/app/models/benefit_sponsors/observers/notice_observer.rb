@@ -400,8 +400,7 @@ module BenefitSponsors
           rescue StandardError => e
             (Rails.logger.error { "Unable to deliver open enrollment reminder notice to #{ce.full_name} due to #{e}" }) unless Rails.env.test?
           end
-          next if benefit_application.effective_period.min.yday == 1
-
+          next if benefit_application.effective_period.min.yday == 1 || benefit_application.osse_eligible?
           next unless benefit_application.enrollment_ratio < benefit_application.benefit_market.configuration.ee_ratio_min
 
           deliver(recipient: benefit_sponsorship.profile, event_object: benefit_application, notice_event: "low_enrollment_notice_for_employer")
