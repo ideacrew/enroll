@@ -54,6 +54,18 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         end
       end
 
+      context "vlp documents" do
+        it "should populate vlp documents on the applicant and consumer role" do
+          family = Family.first
+          consumer_role = family.family_members.first.person.consumer_role
+          active_vlp_doc = consumer_role.vlp_documents.last
+          expect(consumer_role.active_vlp_document_id).to eq active_vlp_doc.id
+          expect(active_vlp_doc.subject).to eq("Naturalization Certificate")
+          expect(active_vlp_doc.naturalization_number).to eq("123456")
+          expect(active_vlp_doc.alien_number).to eq("123456789")
+        end
+      end
+
       context 'person ethnicity' do
         it 'should populate person ethnicity using cv3 person demographics ethnicity' do
           person_demographics = @transformed["family"]["family_members"].first["person"]["person_demographics"]

@@ -10,6 +10,7 @@ module FinancialAssistance
       module MedicaidGateway
         # This Operation creates a new family and application draft
         # Operation receives ATP payload from medicaid gateway
+        # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/ClassLength
         class AccountTransferIn
           include ::FinancialAssistance::MeCountyHelper
           include Dry::Monads[:result, :do, :try]
@@ -197,7 +198,7 @@ module FinancialAssistance
               @family_member = fam_result.value!
               consumer_role_params = family_member_hash['person']['consumer_role']
               create_or_update_consumer_role(consumer_role_params.merge(is_consumer_role: true), @family_member)
-              create_or_update_vlp_document(consumer_role_params['vlp_documents'], @person) if consumer_role_params['vlp_documents']
+              create_or_update_vlp_documents(consumer_role_params['vlp_documents'], @person) if consumer_role_params['vlp_documents']
               Success(@person.consumer_role)
             else
               first_name = family_member_hash['person']['person_name']['first_name']
@@ -249,7 +250,7 @@ module FinancialAssistance
             Failure("create_or_update_family_member: #{e}")
           end
 
-          def create_or_update_vlp_document(vlp_documents, person)
+          def create_or_update_vlp_documents(vlp_documents, person)
             vlp_documents.each do |vlp_document|
               ::Operations::People::CreateOrUpdateVlpDocument.new.call(params: { applicant_params: vlp_document, person: person })
             end
@@ -293,7 +294,7 @@ module FinancialAssistance
             Failure("same_address_with_primary: #{e}")
           end
 
-          def sanitize_applicant_params(iap_hash, primary) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity
+          def sanitize_applicant_params(iap_hash, primary)
             sanitize_params = []
             applicants = iap_hash['applicants']
             applicants.each do |applicant_hash|
@@ -579,6 +580,8 @@ module FinancialAssistance
             end
             result.success? ? Success("recorded transferred_at") : Failure("could not set transferred_at")
           end
+
+          # rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/ClassLength
 
         end
       end
