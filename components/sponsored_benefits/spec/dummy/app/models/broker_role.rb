@@ -41,6 +41,10 @@ class BrokerRole
 
   delegate :hbx_id, :hbx_id=, to: :person, allow_nil: true
 
+  def active?
+    aasm_state == 'active'
+  end
+
   def broker_agency_profile=(new_broker_agency)
     if new_broker_agency.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile
       if new_broker_agency.nil?

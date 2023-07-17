@@ -48,8 +48,23 @@ class Person
   embeds_many :emails, cascade_callbacks: true, validate: true
   embeds_one :hbx_staff_role, cascade_callbacks: true, validate: true
   embeds_many :employee_roles, cascade_callbacks: true, validate: true
+  embeds_many :broker_agency_staff_roles, cascade_callbacks: true, validate: true
+
+  embeds_many :general_agency_staff_roles, cascade_callbacks: true, validate: true
 
   accepts_nested_attributes_for :phones, :reject_if => Proc.new { |addy| Phone.new(addy).blank? }
   accepts_nested_attributes_for :addresses, :reject_if => Proc.new { |addy| Address.new(addy).blank? }
   accepts_nested_attributes_for :emails, :reject_if => Proc.new { |addy| Email.new(addy).blank? }
+
+  def active_general_agency_staff_roles
+    general_agency_staff_roles.where(:aasm_state => :active)
+  end
+
+  def has_active_general_agency_staff_role?
+    !active_general_agency_staff_roles.empty?
+  end
+
+  def active_broker_staff_roles
+    broker_agency_staff_roles.where(:aasm_state => :active)
+  end
 end

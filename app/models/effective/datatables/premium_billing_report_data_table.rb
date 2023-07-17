@@ -88,7 +88,11 @@ module Effective
         top_scope: :families
         }
       end
-                     
+
+      def authorized?(current_user, _controller, _action, _resource)
+        employer_profile = EmployerProfile.find(attributes[:id]) || BenefitSponsors::Organizations::Profile.find(attributes[:id])
+        EmployerProfilePolicy.new(current_user, employer_profile).list_enrollments?
+      end
     end
   end
 end
