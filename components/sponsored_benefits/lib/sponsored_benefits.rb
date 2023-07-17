@@ -8,6 +8,7 @@ require 'dry-validation'
 require 'dry-struct'
 require 'dry-monads'
 
+# Top level for sponsored benefits and quoting functionality.
 module SponsoredBenefits
   class << self
     attr_writer :configuration
