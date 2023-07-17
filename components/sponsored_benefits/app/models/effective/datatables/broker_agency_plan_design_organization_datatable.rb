@@ -160,6 +160,11 @@ module Effective
         osse_eligibility = bs&.eligibility_for(:osse_subsidy, effective_on) if effective_on.present?
         osse_eligibility.present?
       end
+
+      def authorized?(current_user, _controller, _action, _resource)
+        broker_agency = BenefitSponsors::Organizations::BrokerAgencyProfile.find(attributes[:profile_id])
+        ::SponsoredBenefits::BrokerAgencyPlanDesignOrganizationPolicy.new(current_user, broker_agency).manage_quotes?
+      end
     end
   end
 end
