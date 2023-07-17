@@ -15,7 +15,7 @@ class EmployeeRenewalsExport < MongoidMigrationTask
     BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(
       benefit_applications: {
         :$elemMatch => {
-          :"effective_period.min" => start_on_date,
+          :"effective_period.min" => ActiveRecord::Base.sanitize(start_on_date),
           :predecessor_id => { "$ne" => nil },
           :aasm_state.in => aasm_states
         }
