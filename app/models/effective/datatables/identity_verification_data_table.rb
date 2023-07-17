@@ -61,6 +61,10 @@ module Effective
           ridp_document.present? && ridp_document.uploaded_at.present? ? ridp_document.uploaded_at : ""
         end
       end
+
+      def authorized?(current_user, _controller, _action, _resource)
+        current_user.has_hbx_staff_role?
+      end
     end
   end
 end
