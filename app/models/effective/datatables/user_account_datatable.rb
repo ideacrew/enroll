@@ -69,6 +69,11 @@ module Effective
           top_scope: :users
         }
       end
+
+      def authorized?(current_user, _controller, _action, _resource)
+        return nil unless current_user
+        HbxProfilePolicy.new(current_user, nil).can_access_user_account_tab?
+      end
     end
   end
 end

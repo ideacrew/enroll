@@ -19,5 +19,9 @@ module Effective
     rescue I18n::MissingTranslationData
       translation_key.gsub(/\W+/, '').titleize
     end
+
+    def authorized?(_current_user, _controller, _action, _resource)
+      false
+    end
   end
 end
