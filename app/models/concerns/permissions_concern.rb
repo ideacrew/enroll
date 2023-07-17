@@ -57,6 +57,12 @@ module PermissionsConcern
       has_role?(:broker)
     end
 
+    # Method will return false instead of nil if the hbx_staff_role is not present
+    # Method returns a boolean
+    def hbx_staff_role?
+      self.person&.hbx_staff_role.present?
+    end
+
     def has_hbx_staff_role?
       has_role?(:hbx_staff) || self.try(:person).try(:hbx_staff_role)
     end

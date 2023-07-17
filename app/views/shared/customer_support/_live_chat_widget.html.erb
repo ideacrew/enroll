@@ -43,13 +43,21 @@
 </style>
 <% if EnrollRegistry.feature_enabled?(:external_qna_bot) %>
   <script type="text/javascript">
+    let qnaBotWindow = null; // Variable to store the reference to the opened window
+
     function openQnaBot() {
-      let height = 500,
-          width = 400,
-          url = '/qna_bot',
-          top = window.innerHeight - height,
-          left = window.innerWidth - width
-      window.open(url, '', 'width='+width+',height='+height+',top='+top+',left='+left+',fullscreen=no,location=no');
+      if (qnaBotWindow && !qnaBotWindow.closed) {
+        // If the window is already open and not closed, focus on it
+        qnaBotWindow.focus();
+      } else {
+        let height = 500,
+            width = 400,
+            url = '/qna_bot',
+            top = window.innerHeight - height,
+            left = window.innerWidth - width;
+
+        qnaBotWindow = window.open(url, '', 'width='+width+',height='+height+',top='+top+',left='+left+',fullscreen=no,location=no');
+      }
     }
   </script>
   <button class="live-chat-button" type="button" data-cuke="bot-button" onclick="javascript: openQnaBot();">

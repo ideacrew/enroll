@@ -58,6 +58,12 @@ module Effective
         top_scope: :market_kind
         }
       end
+
+      def authorized?(current_user, _controller, _action, _resource)
+        return false if current_user.blank?
+
+        Notifier::NoticeKindPolicy.new(current_user, nil).index?
+      end
     end
   end
 end

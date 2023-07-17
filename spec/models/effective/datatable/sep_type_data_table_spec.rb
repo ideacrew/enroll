@@ -105,3 +105,31 @@ describe Effective::Datatables::SepTypeDataTable, dbclean: :after_each do
   end
 end
 
+describe Effective::Datatables::SepTypeDataTable, "with correct access permissions" do
+
+  let(:permission) { instance_double(Permission, can_manage_qles: @can_manage_qles)}
+  let(:hbx_staff_role) { instance_double(HbxStaffRole, permission: permission) }
+  let(:person) { instance_double(Person, hbx_staff_role: @hbx_staff_role)}
+  let(:current_user) { instance_double(User, :person => person) }
+
+
+  subject { Effective::Datatables::SepTypeDataTable.new }
+
+  it "allows hbx staff which have the permission" do
+    @can_manage_qles = true
+    @hbx_staff_role = hbx_staff_role
+    expect(subject.authorized?(current_user, nil, nil, nil)).to be_truthy
+  end
+
+  it "allows hbx staff which do not have the permission" do
+    @can_manage_qles = false
+    @hbx_staff_role = hbx_staff_role
+    expect(subject.authorized?(current_user, nil, nil, nil)).to be_falsey
+  end
+
+  it "blocks regular users" do
+    @hbx_staff_role = nil
+    expect(subject.authorized?(current_user, nil, nil, nil)).to be_falsey
+  end
+end
+
