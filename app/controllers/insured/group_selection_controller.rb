@@ -247,9 +247,34 @@ class Insured::GroupSelectionController < ApplicationController
 
   def is_user_authorized?
     return true if current_user.has_hbx_staff_role?
+    return true if is_broker_authorized?
+    error_message = 'User not authorized to perform this operation'
     hbx_enrollment_exists = current_user.person.primary_family.hbx_enrollments.where(id: params.require(:hbx_enrollment_id)).present?
-    raise "HBX enrollment ID does not belong to the user" unless hbx_enrollment_exists
+    unless hbx_enrollment_exists
+      flash[:error] = error_message
+      return redirect_to root_path
+    end
     true
+  rescue Pundit::NotAuthorizedError
+    flash[:error] = error_message
+    redirect_to root_path
+  rescue StandardError => e
+    flash[:error] = e.message
+    logger.error "#{e.message}\n#{e.backtrace.join("\n")}"
+    redirect_to root_path
+  end
+
+  def is_broker_authorized?
+    broker_agency_profile = current_user.person&.broker_role&.broker_agency_profile
+    if broker_agency_profile.present?
+      hbx_enrollment = HbxEnrollment.where(id: params.require(:hbx_enrollment_id)).last
+      authorize broker_agency_profile, :access_to_broker_agency_profile?
+      if hbx_enrollment.present?
+        return true if current_user.person.broker_role.id == hbx_enrollment&.broker&.id
+        return true if hbx_enrollment.broker_agency_profile_id == broker_agency_profile.id
+      end
+    end
+    false
   end
 
   def family_member_eligibility_check(family_member)
