@@ -13,12 +13,13 @@ class EmployeeRenewalsExport < MongoidMigrationTask
 
   def benefit_applications_in_aasm_state(aasm_states, start_on_date)
     BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(
-      {:benefit_applications =>
-        { :$elemMatch => {
+      benefit_applications: {
+        :$elemMatch => {
           :"effective_period.min" => start_on_date,
-          :predecessor_id => {"$ne" => nil},
+          :predecessor_id => { "$ne" => nil },
           :aasm_state.in => aasm_states
-        }}}
+        }
+      }
     )
   end
 
