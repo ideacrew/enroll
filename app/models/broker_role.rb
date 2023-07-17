@@ -349,6 +349,9 @@ class BrokerRole
     notify(BROKER_UPDATED_EVENT_NAME, { :broker_id => self.npn } )
   end
 
+  def active?
+    aasm_state == 'active'
+  end
 
   private
 
@@ -400,10 +403,6 @@ class BrokerRole
 
   def applicant?
     aasm_state == 'applicant'
-  end
-
-  def active?
-    aasm_state == 'active'
   end
 
   def agency_pending?
