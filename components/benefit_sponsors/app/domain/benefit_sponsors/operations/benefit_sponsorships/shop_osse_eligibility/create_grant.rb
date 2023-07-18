@@ -7,6 +7,7 @@ module BenefitSponsors
   module Operations
     module BenefitSponsorships
       module ShopOsseEligibility
+        # Operation to support grant creation
         class CreateGrant
           send(:include, Dry::Monads[:result, :do])
 

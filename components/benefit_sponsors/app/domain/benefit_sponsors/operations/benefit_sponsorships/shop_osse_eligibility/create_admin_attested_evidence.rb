@@ -7,6 +7,7 @@ module BenefitSponsors
   module Operations
     module BenefitSponsorships
       module ShopOsseEligibility
+        # Operation to support evidence creation
         class CreateAdminAttestedEvidence
           send(:include, Dry::Monads[:result, :do])
 
