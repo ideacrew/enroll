@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require 'spec_helper'
 
@@ -21,9 +23,9 @@ describe "shared/_pay_now_modal.html.erb", dbclean: :after_each do
   let(:kaiser_permanente_pay_now_double) { double }
   let(:enrollment_tile_setting_double) { double }
   let(:plan_shopping_setting_double) { double }
-  let(:generic_redirect_url) do 
+  let(:generic_redirect_url) do
     carrier_legal_name = hbx_enrollment.product.issuer_profile.legal_name
-    Insured::PlanShopping::PayNowHelper::LINK_URL["#{carrier_legal_name}"]
+    Insured::PlanShopping::PayNowHelper::LINK_URL[carrier_legal_name.to_s]
   end
 
   before do
@@ -60,8 +62,8 @@ describe "shared/_pay_now_modal.html.erb", dbclean: :after_each do
             end
 
             it 'should render with a link to the generic redirect' do
-                render template: "shared/_pay_now_modal.html.erb", locals: {hbx_enrollment: hbx_enrollment, source: 'Enrollment Tile'}
-                expect(rendered).to match(generic_redirect_url)
+              render template: "shared/_pay_now_modal.html.erb", locals: {hbx_enrollment: hbx_enrollment, source: 'Enrollment Tile'}
+              expect(rendered).to match(generic_redirect_url)
             end
           end
         end
