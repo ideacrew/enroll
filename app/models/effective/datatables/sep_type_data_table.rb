@@ -92,6 +92,11 @@ module Effective
           top_scope: :manage_qles
         }
       end
+
+      def authorized?(current_user, _controller, _action, _resource)
+        return nil unless current_user
+        QualifyingLifeEventKindPolicy.new(current_user,nil).can_manage_qles?
+      end
     end
   end
 end

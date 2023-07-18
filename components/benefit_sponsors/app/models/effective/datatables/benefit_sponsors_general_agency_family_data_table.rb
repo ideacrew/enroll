@@ -62,6 +62,16 @@ module Effective
         end
         super(collection)
       end
+
+      def authorized?(current_user, _controller, _action, _resource)
+        return nil unless current_user
+        organizations = BenefitSponsors::Organizations::Organization.where(
+          :"profiles._id" => BSON::ObjectId.from_string(attributes[:id].to_s)
+        )
+        general_agency_profile = organizations.first.general_agency_profile
+
+        ::BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(current_user, general_agency_profile).families?
+      end
     end
   end
 end
