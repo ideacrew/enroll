@@ -269,7 +269,8 @@ class Insured::GroupSelectionController < ApplicationController
   def is_broker_authorized?
     person = current_user.person
     hbx_enrollment = HbxEnrollment.where(id: params.require(:hbx_enrollment_id)).last
-    return false unless person.present? || hbx_enrollment.blank? || hbx_enrollment.broker.blank?
+    return false unless person.present?
+    return false if hbx_enrollment.blank? || hbx_enrollment.broker.blank?
     # check if user with broker role has access to enrollment
     return true if person.broker_role&.broker_agency_profile && person.broker_role.id == hbx_enrollment.broker.id
     # check if user with no broker role but has broker staff role has access to enrollment
