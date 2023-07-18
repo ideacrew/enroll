@@ -247,59 +247,18 @@ class Insured::GroupSelectionController < ApplicationController
 
   def is_user_authorized?
     is_authorized = false
-    return true if current_user.has_hbx_staff_role?
-    return true if is_broker_authorized?
-    return true if is_general_agency_authorized?
+    hbx_enrollment_id = params.require(:hbx_enrollment_id)
+    return if current_user.has_hbx_staff_role?
+    return if is_broker_authorized?(current_user, hbx_enrollment_id)
+    return if is_general_agency_authorized?(current_user, hbx_enrollment_id)
     error_message = 'User not authorized to perform this operation'
-    is_authorized = current_user.person.primary_family.hbx_enrollments.where(id: params.require(:hbx_enrollment_id)).present? if current_user.person&.primary_family
+    is_authorized = current_user.person.primary_family.hbx_enrollments.where(id: hbx_enrollment_id).present? if current_user.person&.primary_family
     unless is_authorized
       flash[:error] = error_message
-      return redirect_to root_path
+      redirect_to root_path
     end
-    true
   rescue StandardError => e
     logger.error "#{e.message}\n#{e.backtrace.join("\n")}"
-    # Efforts are being made to reduce a bunch of diverse authorization checks that may occur,
-    # yet there remain situations where the system could potentially fail to detect.
-    # In such cases, we aim to record and thoroughly investigate each occurrence for troubleshooting purposes.
-    # Ex: HBX enrollment does not have `broker` set but General Agency has access to the enrollment.
-    true
-  end
-
-  def is_broker_authorized?
-    person = current_user.person
-    hbx_enrollment = HbxEnrollment.where(id: params.require(:hbx_enrollment_id)).last
-    return false unless person.present?
-    return false if hbx_enrollment.blank?
-    # check if user with broker role has access to enrollment
-    return true if is_person_with_broker_role?(person, hbx_enrollment)
-    # check if user with no broker role but has broker staff role has access to enrollment
-    return unless person.active_broker_staff_roles.present?
-    found = person.active_broker_staff_roles.any? do |staff_role|
-      staff_role.broker_agency_profile.primary_broker_role.id == hbx_enrollment.broker.id
-    end
-    true if found
-  end
-
-  def is_person_with_broker_role?(person, hbx_enrollment)
-    return true if person.broker_role&.broker_agency_profile && hbx_enrollment.broker_agency_profile_id.present? && person.broker_role.broker_agency_profile.id == hbx_enrollment.broker_agency_profile_id
-    return unless person.broker_role && hbx_enrollment.broker.present?
-    true if person.broker_role.id == hbx_enrollment.broker.id
-  end
-
-  def is_general_agency_authorized?
-    person = current_user.person
-    return unless person.present?
-    staff_roles = person.active_general_agency_staff_roles
-    return unless staff_roles.present?
-    general_agency_profile_id = staff_roles.last.benefit_sponsors_general_agency_profile_id
-    organization = BenefitSponsors::Organizations::Organization.where(
-      "profiles.default_general_agency_profile_id" => BSON::ObjectId.from_string(general_agency_profile_id.to_s)
-    ).last
-    hbx_enrollment = HbxEnrollment.where(id: params.require(:hbx_enrollment_id)).last
-    return unless organization.present? && hbx_enrollment.present? && hbx_enrollment.broker.present?
-    broker_agency_profile = organization.broker_agency_profile
-    true if broker_agency_profile.primary_broker_role.id == hbx_enrollment.broker.id && broker_agency_profile
   end
 
   def family_member_eligibility_check(family_member)
