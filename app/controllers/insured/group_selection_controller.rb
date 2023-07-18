@@ -246,18 +246,18 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def is_user_authorized?
+    is_authorized = false
     return true if current_user.has_hbx_staff_role?
     return true if is_broker_authorized?
     return true if is_general_agency_authorized?
     error_message = 'User not authorized to perform this operation'
-    hbx_enrollment_exists = current_user.person.primary_family.hbx_enrollments.where(id: params.require(:hbx_enrollment_id)).present?
-    unless hbx_enrollment_exists
+    is_authorized = current_user.person.primary_family.hbx_enrollments.where(id: params.require(:hbx_enrollment_id)).present? if current_user.person&.primary_family
+    unless is_authorized
       flash[:error] = error_message
       return redirect_to root_path
     end
     true
   rescue StandardError => e
-    flash[:error] = e.message
     logger.error "#{e.message}\n#{e.backtrace.join("\n")}"
     # Efforts are being made to reduce a bunch of diverse authorization checks that may occur,
     # yet there remain situations where the system could potentially fail to detect.
