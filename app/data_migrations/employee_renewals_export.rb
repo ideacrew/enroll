@@ -20,7 +20,7 @@ class EmployeeRenewalsExport < MongoidMigrationTask
           "aasm_state" => { "$in" => aasm_states }
         }
       }
-    ).params(start_on_date: start_on_date, aasm_states: aasm_states)
+    )
   end
 
   def detailed_report_field_names(start_on_date)
