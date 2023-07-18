@@ -248,6 +248,7 @@ class Insured::GroupSelectionController < ApplicationController
   def is_user_authorized?
     return true if current_user.has_hbx_staff_role?
     return true if is_broker_authorized?
+    return true if is_general_agency_authorized?
     error_message = 'User not authorized to perform this operation'
     hbx_enrollment_exists = current_user.person.primary_family.hbx_enrollments.where(id: params.require(:hbx_enrollment_id)).present?
     unless hbx_enrollment_exists
@@ -255,26 +256,49 @@ class Insured::GroupSelectionController < ApplicationController
       return redirect_to root_path
     end
     true
-  rescue Pundit::NotAuthorizedError
-    flash[:error] = error_message
-    redirect_to root_path
   rescue StandardError => e
     flash[:error] = e.message
     logger.error "#{e.message}\n#{e.backtrace.join("\n")}"
-    redirect_to root_path
+    # Efforts are being made to reduce a bunch of diverse authorization checks that may occur,
+    # yet there remain situations where the system could potentially fail to detect.
+    # In such cases, we aim to record and thoroughly investigate each occurrence for troubleshooting purposes.
+    # Ex: HBX enrollment does not have `broker` set but General Agency has access to the enrollment.
+    true
   end
 
   def is_broker_authorized?
-    broker_agency_profile = current_user.person&.broker_role&.broker_agency_profile
-    if broker_agency_profile.present?
+    person = current_user.person
+    return false unless person.present?
+    if person.broker_role&.broker_agency_profile
       hbx_enrollment = HbxEnrollment.where(id: params.require(:hbx_enrollment_id)).last
-      authorize broker_agency_profile, :access_to_broker_agency_profile?
-      if hbx_enrollment.present?
-        return true if current_user.person.broker_role.id == hbx_enrollment&.broker&.id
-        return true if hbx_enrollment.broker_agency_profile_id == broker_agency_profile.id
+      return true if person.broker_role.id == hbx_enrollment.broker.id if hbx_enrollment.present? && hbx_enrollment.broker.present?
+    end
+    active_broker_staff_roles = person.active_broker_staff_roles
+    hbx_enrollment = HbxEnrollment.where(id: params.require(:hbx_enrollment_id)).last
+    if active_broker_staff_roles.present? && hbx_enrollment.present? && hbx_enrollment.broker.present?
+      found = active_broker_staff_roles.any? do |staff_role|
+         staff_role.broker_agency_profile.primary_broker_role.id == hbx_enrollment.broker.id
       end
+      return true if found
     end
     false
+  end
+
+  def is_general_agency_authorized?
+    person = current_user.person
+    return false unless person.present?
+    staff_roles = person.active_general_agency_staff_roles
+    if staff_roles.present?
+      general_agency_profile_id = staff_roles.last.benefit_sponsors_general_agency_profile_id
+      organization = BenefitSponsors::Organizations::Organization.where(
+        "profiles.default_general_agency_profile_id" => BSON::ObjectId.from_string(general_agency_profile_id.to_s)
+      ).last
+      hbx_enrollment = HbxEnrollment.where(id: params.require(:hbx_enrollment_id)).last
+      if organization.present? && hbx_enrollment.present? && hbx_enrollment.broker.present?
+        broker_agency_profile = organization.broker_agency_profile
+        return true if broker_agency_profile.primary_broker_role.id == hbx_enrollment.broker.id && broker_agency_profile
+      end
+    end
   end
 
   def family_member_eligibility_check(family_member)
