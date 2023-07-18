@@ -839,14 +839,18 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     context "person and general agency staff role" do
       let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site)}
       let(:general_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_general_agency_profile, organization: organization) }
-      let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile,
-                                                      default_general_agency_profile_id: general_agency_profile.id) }
+      let(:broker_agency_profile) do
+        FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile,
+                          default_general_agency_profile_id: general_agency_profile.id)
+      end
       let(:person1) { FactoryBot.create(:person)}
       let(:user_with_general_staff_role) { FactoryBot.create(:user, person: person1) }
-      let(:general_staff_role) { FactoryBot.create(:general_agency_staff_role,
-                                                   benefit_sponsors_general_agency_profile_id: general_agency_profile.id,
-                                                   person: person1, general_agency_profile: general_agency_profile,
-                                                   aasm_state: 'active') }
+      let(:general_staff_role) do
+        FactoryBot.create(:general_agency_staff_role,
+                          benefit_sponsors_general_agency_profile_id: general_agency_profile.id,
+                          person: person1, general_agency_profile: general_agency_profile,
+                          aasm_state: 'active')
+      end
       let(:broker_family) { FactoryBot.create(:family, :with_primary_family_member, person: person1)}
       let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
 

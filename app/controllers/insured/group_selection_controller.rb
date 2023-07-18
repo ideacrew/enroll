@@ -268,37 +268,31 @@ class Insured::GroupSelectionController < ApplicationController
 
   def is_broker_authorized?
     person = current_user.person
-    return false unless person.present?
-    if person.broker_role&.broker_agency_profile
-      hbx_enrollment = HbxEnrollment.where(id: params.require(:hbx_enrollment_id)).last
-      return true if person.broker_role.id == hbx_enrollment.broker.id if hbx_enrollment.present? && hbx_enrollment.broker.present?
-    end
-    active_broker_staff_roles = person.active_broker_staff_roles
     hbx_enrollment = HbxEnrollment.where(id: params.require(:hbx_enrollment_id)).last
-    if active_broker_staff_roles.present? && hbx_enrollment.present? && hbx_enrollment.broker.present?
-      found = active_broker_staff_roles.any? do |staff_role|
-         staff_role.broker_agency_profile.primary_broker_role.id == hbx_enrollment.broker.id
-      end
-      return true if found
+    return false unless person.present? || hbx_enrollment.blank? || hbx_enrollment.broker.blank?
+    # check if user with broker role has access to enrollment
+    return true if person.broker_role&.broker_agency_profile && person.broker_role.id == hbx_enrollment.broker.id
+    # check if user with no broker role but has broker staff role has access to enrollment
+    return unless person.active_broker_staff_roles.present?
+    found = person.active_broker_staff_roles.any? do |staff_role|
+      staff_role.broker_agency_profile.primary_broker_role.id == hbx_enrollment.broker.id
     end
-    false
+    true if found
   end
 
   def is_general_agency_authorized?
     person = current_user.person
-    return false unless person.present?
+    return unless person.present?
     staff_roles = person.active_general_agency_staff_roles
-    if staff_roles.present?
-      general_agency_profile_id = staff_roles.last.benefit_sponsors_general_agency_profile_id
-      organization = BenefitSponsors::Organizations::Organization.where(
-        "profiles.default_general_agency_profile_id" => BSON::ObjectId.from_string(general_agency_profile_id.to_s)
-      ).last
-      hbx_enrollment = HbxEnrollment.where(id: params.require(:hbx_enrollment_id)).last
-      if organization.present? && hbx_enrollment.present? && hbx_enrollment.broker.present?
-        broker_agency_profile = organization.broker_agency_profile
-        return true if broker_agency_profile.primary_broker_role.id == hbx_enrollment.broker.id && broker_agency_profile
-      end
-    end
+    return unless staff_roles.present?
+    general_agency_profile_id = staff_roles.last.benefit_sponsors_general_agency_profile_id
+    organization = BenefitSponsors::Organizations::Organization.where(
+      "profiles.default_general_agency_profile_id" => BSON::ObjectId.from_string(general_agency_profile_id.to_s)
+    ).last
+    hbx_enrollment = HbxEnrollment.where(id: params.require(:hbx_enrollment_id)).last
+    return unless organization.present? && hbx_enrollment.present? && hbx_enrollment.broker.present?
+    broker_agency_profile = organization.broker_agency_profile
+    true if broker_agency_profile.primary_broker_role.id == hbx_enrollment.broker.id && broker_agency_profile
   end
 
   def family_member_eligibility_check(family_member)
