@@ -796,7 +796,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
 
       it "should not be able to view page if user does not have active staff role" do
-        sign_in broker_user
+        sign_in user
 
         post :term_or_cancel, params: {hbx_enrollment_id: hbx_enrollment_with_broker.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate'}
         hbx_enrollment_with_broker.reload
