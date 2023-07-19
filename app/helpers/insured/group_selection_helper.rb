@@ -327,5 +327,42 @@ module Insured
 
       return health_offered_relationship_benefits, dental_offered_relationship_benefits
     end
+
+    def is_broker_authorized?(user, hbx_enrollment_id)
+      person = user.person
+      hbx_enrollment = HbxEnrollment.where(id: hbx_enrollment_id).last
+      return false unless person.present?
+      return false if hbx_enrollment.blank?
+      # check if user with broker role has access to enrollment
+      return true if is_person_with_broker_role?(person, hbx_enrollment)
+      # check if user with no broker role but has broker staff role has access to enrollment
+      return unless person.active_broker_staff_roles.present?
+      found = person.active_broker_staff_roles.any? do |staff_role|
+        staff_role.broker_agency_profile.primary_broker_role.id == hbx_enrollment.broker.id
+      end
+      true if found
+    end
+
+    def is_person_with_broker_role?(person, hbx_enrollment)
+      return true if person.broker_role&.broker_agency_profile && hbx_enrollment.broker_agency_profile_id.present? && person.broker_role.broker_agency_profile.id == hbx_enrollment.broker_agency_profile_id
+      return unless person.broker_role && hbx_enrollment.broker.present?
+      true if person.broker_role.id == hbx_enrollment.broker&.id
+    end
+
+    def is_general_agency_authorized?(user, hbx_enrollment_id)
+      person = user.person
+      return unless person.present?
+      staff_roles = person.active_general_agency_staff_roles
+      return unless staff_roles.present?
+      general_agency_profile_id = staff_roles.last.benefit_sponsors_general_agency_profile_id
+      organization = BenefitSponsors::Organizations::Organization.where(
+        "profiles.default_general_agency_profile_id" => BSON::ObjectId.from_string(general_agency_profile_id.to_s)
+      ).last
+      hbx_enrollment = HbxEnrollment.where(id: hbx_enrollment_id).last
+      return true if hbx_enrollment.broker.blank?
+      return unless organization.present? && hbx_enrollment.present?
+      broker_agency_profile = organization.broker_agency_profile
+      true if broker_agency_profile.primary_broker_role.id == hbx_enrollment.broker.id && broker_agency_profile
+    end
   end
 end

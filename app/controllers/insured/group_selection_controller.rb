@@ -246,10 +246,24 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def is_user_authorized?
-    return true if current_user.has_hbx_staff_role?
-    hbx_enrollment_exists = current_user.person.primary_family.hbx_enrollments.where(id: params.require(:hbx_enrollment_id)).present?
-    raise "HBX enrollment ID does not belong to the user" unless hbx_enrollment_exists
-    true
+    is_authorized = false
+    hbx_enrollment_id = params.require(:hbx_enrollment_id)
+    return if current_user.has_hbx_staff_role?
+    return if is_broker_authorized?(current_user, hbx_enrollment_id)
+    return if is_general_agency_authorized?(current_user, hbx_enrollment_id)
+    error_message = 'User not authorized to perform this operation'
+    is_authorized = current_user.person.primary_family.hbx_enrollments.where(id: hbx_enrollment_id).present? if current_user.person&.primary_family
+    unless is_authorized
+      flash[:error] = error_message
+      redirect_to root_path
+    end
+  rescue StandardError => e
+    # The code should robustly handle all authorization use cases, but it's important to understand that there may be exceptional scenarios where we encounter
+    # difficulties in identifying the user and their enrollment relationship.
+    # In such rare instances, we will diligently log these occurrences, take the necessary steps to rectify the issue,
+    # and ensure that the system continues to function without disruption.
+    logger.error "[GroupSelectionController] Failed to authorize user #{current_user.id},
+                  class #{e.class} with message #{e.message}\n#{e.backtrace&.join("\n")}"
   end
 
   def family_member_eligibility_check(family_member)
