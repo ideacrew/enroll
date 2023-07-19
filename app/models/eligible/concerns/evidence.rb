@@ -10,14 +10,14 @@ module Eligible
         include AASM
         include Recordable
 
-        ELIGIBLE_STATES = %w[attested pending review outstanding verified].freeze
-        INELIGIBLE_STATES = %w[initialized unverified negative_response_received].freeze
+        ELIGIBLE_STATES = %i[attested pending review outstanding verified].freeze
+        INELIGIBLE_STATES = %i[initialized unverified negative_response_received].freeze
 
         field :title, type: String
         field :description, type: String
         field :key, type: Symbol
         field :is_satisfied, type: Boolean, default: false
-        field :current_state, type: String
+        field :current_state, type: Symbol
 
         embeds_many :state_histories,
                     class_name: '::Eligible::StateHistory',

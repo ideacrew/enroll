@@ -10,13 +10,13 @@ module Eligible
         include AASM
         include Recordable
 
-        ELIGIBLE_STATES = %w[active].freeze
-        INELIGIBLE_STATES = %w[draft expired].freeze
+        ELIGIBLE_STATES = %i[active].freeze
+        INELIGIBLE_STATES = %i[draft expired].freeze
 
         field :title, type: String
         field :description, type: String
         field :key, type: Symbol
-        field :current_state, type: String
+        field :current_state, type: Symbol
 
         embeds_one :value,
                    class_name: '::Eligible::Value',
