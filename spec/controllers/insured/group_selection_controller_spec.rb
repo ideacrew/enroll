@@ -525,7 +525,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       it 'raises error if find the HBX enrollment does not belong to the current user' do
         sign_in user
         error_message = "HBX enrollment ID does not belong to the user"
-        expect{ get :edit_plan, params: {hbx_enrollment_id: "5f6278b81bdce242ca1eb1a1"}}.to raise_error(RuntimeError, error_message)
+        get :edit_plan, params: {hbx_enrollment_id: "5f6278b81bdce242ca1eb1a1"}
+        expect(flash[:error]).to eq 'User not authorized to perform this operation'
       end
     end
   end
@@ -725,7 +726,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     it 'raises error if find the HBX enrollment does not belong to the current user' do
       sign_in user
       error_message = "HBX enrollment ID does not belong to the user"
-      expect{ get :terminate_confirm, params: {hbx_enrollment_id: "5f6278b81bdce242ca1eb1a1"}}.to raise_error(RuntimeError, error_message)
+      get :terminate_confirm, params: {hbx_enrollment_id: "5f6278b81bdce242ca1eb1a1"}
+      expect(flash[:error]).to eq 'User not authorized to perform this operation'
     end
   end
 
@@ -760,7 +762,117 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     it 'raises error if find the HBX enrollment does not belong to the current user' do
       sign_in user
       error_message = "HBX enrollment ID does not belong to the user"
-      expect{ post :term_or_cancel, params: {hbx_enrollment_id: "5f6278b81bdce242ca1eb1a1", term_date: nil, term_or_cancel: 'cancel'}}.to raise_error(RuntimeError, error_message)
+      post :term_or_cancel, params: {hbx_enrollment_id: "5f6278b81bdce242ca1eb1a1", term_date: nil, term_or_cancel: 'cancel'}
+      expect(flash[:error]).to eq 'User not authorized to perform this operation'
+    end
+
+    context "person has a broker role" do
+      let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
+      let(:broker_person) { broker_agency_profile.primary_broker_role.person }
+      let(:site)                      { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let(:broker_organization)      { FactoryBot.build(:benefit_sponsors_organizations_general_organization, site: site)}
+      let(:broker_user) { FactoryBot.create(:user, person: broker_person) }
+      let(:broker_family) { FactoryBot.create(:family, :with_primary_family_member, person: broker_person)}
+      let(:rating_area) { FactoryBot.create_default(:benefit_markets_locations_rating_area) }
+      let(:hbx_enrollment_with_broker) do
+        FactoryBot.create(:hbx_enrollment,
+                          product_id: product.id,
+                          kind: 'individual',
+                          family: broker_family,
+                          rating_area_id: rating_area.id,
+                          broker_agency_profile_id: broker_agency_profile.id)
+      end
+
+      it "should be able to terminate coverage if user is valid and has broker role" do
+        broker_role = broker_person.broker_role
+        broker_role.aasm_state = "active"
+        broker_role.save
+        sign_in broker_user
+
+        post :term_or_cancel, params: {hbx_enrollment_id: hbx_enrollment_with_broker.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate'}
+        hbx_enrollment_with_broker.reload
+        expect(hbx_enrollment_with_broker.aasm_state).to eq 'coverage_terminated'
+        expect(response).to redirect_to(family_account_path)
+      end
+
+      it "should not be able to view page if user does not have active staff role" do
+        sign_in user
+
+        post :term_or_cancel, params: {hbx_enrollment_id: hbx_enrollment_with_broker.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate'}
+        hbx_enrollment_with_broker.reload
+
+        expect(hbx_enrollment_with_broker.aasm_state).to eq 'coverage_selected'
+        expect(response).to redirect_to(root_path)
+      end
+    end
+
+    context "person and broker staff role" do
+      let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
+      let(:broker_agency) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
+      let(:person1) { FactoryBot.create(:person)}
+      let(:user_with_broker_staff_role) { FactoryBot.create(:user, person: person1) }
+      let(:broker_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person1, broker_agency_profile: broker_agency_profile) }
+      let(:broker_family) { FactoryBot.create(:family, :with_primary_family_member, person: person1)}
+      let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
+
+      let(:hbx_enrollment_with_broker) do
+        FactoryBot.create(:hbx_enrollment,
+                          product_id: product.id,
+                          kind: 'individual',
+                          family: broker_family,
+                          rating_area_id: rating_area.id,
+                          writing_agent_id: broker_agency_profile.primary_broker_role.id,
+                          broker_agency_profile_id: broker_agency_profile.id)
+      end
+      it "should be able to terminate coverage if user is valid and has active broker staff role" do
+        person.broker_agency_staff_roles = [broker_staff_role]
+        person.save!
+        sign_in user_with_broker_staff_role
+        post :term_or_cancel, params: {hbx_enrollment_id: hbx_enrollment_with_broker.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate'}
+        hbx_enrollment_with_broker.reload
+
+        expect(hbx_enrollment_with_broker.aasm_state).to eq 'coverage_terminated'
+        expect(response).to redirect_to(family_account_path)
+      end
+    end
+
+    context "person and general agency staff role" do
+      let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site)}
+      let(:general_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_general_agency_profile, organization: organization) }
+      let(:broker_agency_profile) do
+        FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile,
+                          default_general_agency_profile_id: general_agency_profile.id)
+      end
+      let(:person1) { FactoryBot.create(:person)}
+      let(:user_with_general_staff_role) { FactoryBot.create(:user, person: person1) }
+      let(:general_staff_role) do
+        FactoryBot.create(:general_agency_staff_role,
+                          benefit_sponsors_general_agency_profile_id: general_agency_profile.id,
+                          person: person1, general_agency_profile: general_agency_profile,
+                          aasm_state: 'active')
+      end
+      let(:broker_family) { FactoryBot.create(:family, :with_primary_family_member, person: person1)}
+      let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
+
+      let(:hbx_enrollment_with_broker) do
+        FactoryBot.create(:hbx_enrollment,
+                          product_id: product.id,
+                          kind: 'individual',
+                          family: broker_family,
+                          rating_area_id: rating_area.id,
+                          writing_agent_id: broker_agency_profile.primary_broker_role.id,
+                          broker_agency_profile_id: broker_agency_profile.id)
+      end
+      it "should be able to terminate coverage if user is valid and has active broker staff role" do
+        person.general_agency_staff_roles = [general_staff_role]
+        person.save!
+        sign_in user_with_general_staff_role
+        post :term_or_cancel, params: {hbx_enrollment_id: hbx_enrollment_with_broker.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate'}
+        hbx_enrollment_with_broker.reload
+
+        expect(hbx_enrollment_with_broker.aasm_state).to eq 'coverage_terminated'
+        expect(response).to redirect_to(family_account_path)
+      end
     end
   end
 

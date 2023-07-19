@@ -12,7 +12,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
   let(:primary_family) { FactoryBot.create(:family, :with_primary_family_member) }
   let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, household: primary_family.active_household, family: primary_family)}
 
-  let(:user) { FactoryBot.create(:user) }
+  let(:user) { FactoryBot.create(:user, :with_hbx_staff_role, person: FactoryBot.create(:person, :with_hbx_staff_role)) }
 
   let(:benefit_group) { BenefitGroup.new }
 
@@ -55,7 +55,6 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
     assign(:employees, census_employees)
     assign(:datatable, Effective::Datatables::EmployeeDatatable.new({id: employer_profile.id}))
     assign(:page_alphabets, ['a', 'b', 'c'])
-    sign_in user
     stub_template "shared/alph_paginate" => ''
   end
 

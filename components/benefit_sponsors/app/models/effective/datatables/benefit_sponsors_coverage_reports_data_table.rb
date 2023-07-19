@@ -88,6 +88,19 @@ module Effective
           result
         end
       end
+
+      def authorized?(current_user, _controller, _action, _resource)
+        return false if current_user.nil?
+
+        organization = ::BenefitSponsors::Organizations::Organization.employer_profiles.where(
+          :"profiles._id" => BSON::ObjectId.from_string(attributes[:id])
+        ).first
+
+        employer_profile = organization&.employer_profile
+        return false if employer_profile.nil?
+
+        ::BenefitSponsors::EmployerProfilePolicy.new(current_user, employer_profile).coverage_reports?
+      end
     end
   end
 end
