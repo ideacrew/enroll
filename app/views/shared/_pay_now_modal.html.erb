@@ -1,8 +1,13 @@
 <% carrier = hbx_enrollment.product.carrier_profile.legal_name %>
 <% carrier_long_name = carrier_long_name(carrier) %>
-<% first_payment = carrier_paynow_enabled?(carrier) && before_effective_date?(hbx_enrollment) %>
+
+<%# note: using show_pay_now? method makes sure enrollment_tile setting is enabled and other conditions are met for linking to the pay now portal %>
+<% first_payment = carrier_paynow_enabled?(carrier) && before_effective_date?(hbx_enrollment) && show_pay_now?("Enrollment Tile", hbx_enrollment) %>
 <% plan_shopping = carrier_paynow_enabled?(carrier) && source == "Plan Shopping"  %>
+<%# use PayNow url if user is making first payment from enrollment tile or is in plan shopping flow, %>
+<%# otherwise use generic carrier url %>
 <% url = first_payment || plan_shopping ? pay_now_url(carrier) : carrier_url(carrier) %>
+
 <% carrier_key = carrier_paynow_enabled?(carrier) ? fetch_carrier_key_from_legal_name(carrier) : "other" %>
 <% translation_key = is_kaiser_translation_key?(carrier_key) %>
 <div class="modal fade" tabindex="-1" role="dialog" id="payNowModal<%= hbx_enrollment.hbx_id %>">
