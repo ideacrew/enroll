@@ -258,7 +258,12 @@ class Insured::GroupSelectionController < ApplicationController
       redirect_to root_path
     end
   rescue StandardError => e
-    logger.error "#{e.message}\n#{e.backtrace.join("\n")}"
+    # The code should robustly handle all authorization use cases, but it's important to understand that there may be exceptional scenarios where we encounter
+    # difficulties in identifying the user and their enrollment relationship.
+    # In such rare instances, we will diligently log these occurrences, take the necessary steps to rectify the issue,
+    # and ensure that the system continues to function without disruption.
+    logger.error "[GroupSelectionController] Failed to authorize user #{current_user.id},
+                  class #{e.class} with message #{e.message}\n#{e.backtrace&.join("\n")}"
   end
 
   def family_member_eligibility_check(family_member)
