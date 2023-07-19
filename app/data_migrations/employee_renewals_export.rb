@@ -12,11 +12,13 @@ class EmployeeRenewalsExport < MongoidMigrationTask
   end
 
   def benefit_applications_in_aasm_state(aasm_states, start_on_date)
-    BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where("benefit_applications.effective_period.min = :start_on_date
-  AND benefit_applications.predecessor_id IS NOT NULL
-  AND benefit_applications.aasm_state IN (:aasm_states)",
-                                                                   start_on_date: start_on_date,
-                                                                   aasm_states: aasm_states)
+    BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(
+      "benefit_applications.effective_period.min = ? AND
+  benefit_applications.predecessor_id IS NOT NULL AND
+  benefit_applications.aasm_state IN (?)",
+      start_on_date,
+      aasm_states
+    )
   end
 
   def detailed_report_field_names(start_on_date)
