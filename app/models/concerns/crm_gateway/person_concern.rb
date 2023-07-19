@@ -13,12 +13,12 @@ module CrmGateway
       return unless has_active_consumer_role?
       return unless primary_family.present? && self == primary_family.primary_person
       return if EnrollRegistry.feature_enabled?(:check_for_crm_updates) && !self.crm_notifiction_needed
+      Rails.logger.info("Triggering CRM primary subscriber update publish for person: #{self.hbx_id}")
       CrmWorker.perform_async(self.id.to_s, self.class.to_s, :trigger_primary_subscriber_publish)
-      "Triggering CRM primary subscriber update publish for person"
     end
 
     def trigger_primary_subscriber_publish
-      puts("Triggering CRM primary subscriber update publish for person with mongo id #{self.id}")
+      puts("Triggered CRM primary subscriber update publish for person with hbx id #{self.hbx_id}")
       result = ::Operations::People::SugarCrm::PublishPrimarySubscriber.new.call(self)
       # Update column directly without callbacks
       if result.success?

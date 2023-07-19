@@ -22,6 +22,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
     before do
       ::BenefitMarkets::Locations::CountyZip.create(zip: "04330", state: "ME", county_name: "Kennebec")
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).and_call_original
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:automatic_submission).and_return(false)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:load_county_on_inbound_transfer).and_return(true)
     end
 
@@ -156,6 +157,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         context 'with all addressess missing counties' do
           before do
             allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).and_call_original
+            allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:automatic_submission).and_return(false)
             allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:load_county_on_inbound_transfer).and_return(true)
             missing_counties_xml = Nokogiri::XML(xml)
             missing_counties_xml.xpath("//ns3:LocationCountyName", {"ns3" => "http://niem.gov/niem/niem-core/2.0"}).remove

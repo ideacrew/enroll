@@ -43,6 +43,10 @@ module Config::SiteConcern
     EnrollRegistry.feature_enabled?(:aca_individual_market)
   end
 
+  def ivl_osse_filtering_enabled?
+    EnrollRegistry.feature_enabled?("individual_osse_plan_filter")
+  end
+
   def is_shop_and_individual_market_enabled?
     EnrollRegistry.feature_enabled?(:aca_shop_market) && EnrollRegistry.feature_enabled?(:aca_individual_market)
   end
