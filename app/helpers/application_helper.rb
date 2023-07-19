@@ -1005,4 +1005,8 @@ module ApplicationHelper
       false
     end
   end
+
+  def forgot_password_recaptcha_enabled?
+    EnrollRegistry.feature_enabled?(:forgot_password_recaptcha)
+  end
 end

@@ -779,6 +779,18 @@ describe "Enabled/Disabled IVL market" do
     end
   end
 
+  describe 'forgot_password_recaptcha_enabled?' do
+    it 'should return true if recaptcha is enabled if ff is enabled' do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:forgot_password_recaptcha).and_return(true)
+      expect(helper.forgot_password_recaptcha_enabled?).to eq true
+    end
+
+    it 'should return false if recaptcha is enabled if ff is disabled' do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:forgot_password_recaptcha).and_return(false)
+      expect(helper.forgot_password_recaptcha_enabled?).to eq false
+    end
+  end
+
   describe "#previous_year" do
     it "should return past year" do
       expect(helper.previous_year).to eq (TimeKeeper.date_of_record.year - 1)

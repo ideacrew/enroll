@@ -3,12 +3,14 @@ require "rails_helper"
 RSpec.describe "employers/employer_profiles/my_account/_census_employees.html.erb", dbclean: :after_each do
   let(:employer_profile) { FactoryBot.create(:employer_profile) }
   let(:census_employee) { FactoryBot.create(:census_employee) }
+  let(:datatable) { Effective::Datatables::EmployeeDatatable.new({id: employer_profile.id}) }
 
   before :each do
     allow(employer_profile).to receive(:census_employees).and_return [census_employee]
+    allow(datatable).to receive(:authorized?).with(any_args).and_return(true)
     assign(:employer_profile, employer_profile)
     assign(:avaliable_employee_names, "employee_names")
-    assign(:datatable, Effective::Datatables::EmployeeDatatable.new({id: employer_profile.id}))
+    assign(:datatable, datatable)
 
     assign(:census_employees, [])
     allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))

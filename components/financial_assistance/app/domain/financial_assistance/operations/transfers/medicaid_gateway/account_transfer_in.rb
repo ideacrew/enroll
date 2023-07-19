@@ -28,10 +28,16 @@ module FinancialAssistance
             _apps = yield build_applicants(payload, application, family)
             _applicants = yield fill_applicants_form(payload, application)
             _record = yield record(application)
+            auto_submit(application) if FinancialAssistanceRegistry.feature_enabled?(:automatic_submission)
             Success(application_id)
           end
 
           private
+
+          def auto_submit(application)
+            Rails.logger.info "Calling automatic submission operation for application #{application.id}"
+            FinancialAssistance::Operations::Transfers::MedicaidGateway::AutomaticSubmission.new.call(application)
+          end
 
           def county_finder(zip)
             ::BenefitMarkets::Locations::CountyZip.where(zip: zip)
