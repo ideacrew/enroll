@@ -20,7 +20,7 @@
               <p><strong>Important:</strong> You must pay your first month’s premium directly to your carrier for
                 your coverage to take effect. Select 'How to Pay' to learn more.</p>
             <% end %>
-            <p>When you’re finished, select GO TO MY ACCOUNT to view the status of your enrollment. You can also
+            <p>When you’re finished, select <%= EnrollRegistry.feature_enabled?(:back_to_account_all_shop) ? "CONTINUE" : "GO TO MY ACCOUNT" %> to view the status of your enrollment. You can also
               contact your insurance carrier directly for additional information or to check the status of your
               enrollment.</p>
           <% end %>
