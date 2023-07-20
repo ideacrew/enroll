@@ -46,7 +46,7 @@ module BenefitSponsors
           def validate(params)
             errors = []
             errors << 'evidence key missing' unless params[:evidence_key]
-            errors << 'evidence value missing' unless params[:evidence_value]
+            errors << 'evidence value missing' unless params.key?(:evidence_value)
             errors << 'effective date missing' unless params[:effective_date]
 
             errors.empty? ? Success(params) : Failure(errors)
