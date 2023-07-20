@@ -3,21 +3,6 @@
 require 'dry/monads'
 require 'dry/monads/do'
 
-
-# create an operation that will take 
-  # Yes/No for eligibility 
-  # date
-
-  # BuildEligibility
-     # validate params 
-     # construct evidence params 
-     # construct evidence object
-     # update eligibility
-        # if evidence is eligible, move to eligible 
-        # if evidence ineligible, move to ineligible
-
-
-
 module BenefitSponsors
   module Operations
     module BenefitSponsorships

@@ -5,9 +5,9 @@ module Eligible
     # Mixin to record state transitions
     module Recordable
 
-      def record_transition(_params)
+      def record_transition(params)
         entity = Operations::Eligible::CreateStateHistory.new.call({
-                                                                     effective_on: Date.today,
+                                                                     effective_on: params[:effective_date],
                                                                      is_eligible: self.class::ELIGIBLE_STATES.include?(aasm.to_state),
                                                                      from_state: aasm.from_state,
                                                                      to_state: aasm.to_state,
