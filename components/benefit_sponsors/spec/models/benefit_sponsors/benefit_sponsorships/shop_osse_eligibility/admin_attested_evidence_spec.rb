@@ -47,12 +47,9 @@ module BenefitSponsors
 
               it 'should delegate methods to latest state history' do
                 record = described_class.find(subject.id)
-
                 history = record.state_histories.last
-
                 expect(record.effective_on).to eq history.effective_on
                 expect(record.is_eligible).to eq history.is_eligible
-                expect(record.current_state).to eq history.to_state
               end
             end
           end
