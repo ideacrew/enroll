@@ -7,9 +7,16 @@ module Eligible
       extend ActiveSupport::Concern
 
       included do
+        include AASM
+        include Recordable
+
+        ELIGIBLE_STATES = %i[active].freeze
+        INELIGIBLE_STATES = %i[draft expired].freeze
+
         field :title, type: String
         field :description, type: String
         field :key, type: Symbol
+        field :current_state, type: Symbol
 
         embeds_one :value,
                    class_name: '::Eligible::Value',
@@ -24,9 +31,24 @@ module Eligible
 
         delegate :effective_on,
                  :is_eligible,
-                 :current_state,
                  to: :latest_state_history,
                  allow_nil: false
+
+        aasm column: :current_state do
+          state :draft, initial: true
+          state :active
+          state :expired
+
+          event :move_to_active, :after => [:record_transition] do
+            transitions from: :draft, to: :active
+            transitions from: :expired, to: :active
+          end
+
+          event :move_to_expired, :after => [:record_transition] do
+            transitions from: :draft, to: :expired
+            transitions from: :active, to: :expired
+          end
+        end
 
         def latest_state_history
           state_histories.latest_history

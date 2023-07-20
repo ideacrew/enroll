@@ -11,11 +11,11 @@ module Eligible
     field :effective_on, type: Date
     field :is_eligible, type: Boolean, default: false
 
-    field :from_state, type: String
-    field :to_state, type: String
+    field :from_state, type: Symbol
+    field :to_state, type: Symbol
     field :transition_at, type: DateTime
 
-    field :event, type: String
+    field :event, type: Symbol
     field :comment, type: String
     field :reason, type: String
 
@@ -24,10 +24,6 @@ module Eligible
                           :from_state,
                           :to_state,
                           :transition_at
-
-    def current_state
-      to_state
-    end
 
     def self.latest_history
       order(transition_at: :desc).first
