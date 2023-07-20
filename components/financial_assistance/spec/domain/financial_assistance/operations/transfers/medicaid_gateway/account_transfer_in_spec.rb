@@ -57,7 +57,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
 
       context "vlp documents" do
         it "should populate vlp documents on the applicant and consumer role" do
-          family = Family.first
+          family = Family.last
           consumer_role = family.family_members.first.person.consumer_role
           active_vlp_doc = consumer_role.vlp_documents.last
           expect(consumer_role.active_vlp_document_id).to eq active_vlp_doc.id
