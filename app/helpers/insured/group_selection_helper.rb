@@ -340,7 +340,7 @@ module Insured
       broker_ids = fetch_brokers_from_enrollment(hbx_enrollment)
       found = person.active_broker_staff_roles.any? do |staff_role|
         primary_broker_role_id = staff_role.broker_agency_profile.primary_broker_role.id
-        primary_broker_role_id == hbx_enrollment.broker&.id || broker_ids.include?(primary_broker_role_id)
+        primary_broker_role_id == hbx_enrollment.broker&.id || primary_broker_role_id == broker_ids.include?(primary_broker_role_id)
       end
       true if found
     end
