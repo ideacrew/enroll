@@ -1704,4 +1704,41 @@ describe Person, :dbclean => :after_each do
       expect(person.reload.send(:trigger_async_publish)).to eq nil
     end
   end
+
+  context "fetch_writing_agents_for_employee_role" do
+    let(:person) { FactoryBot.create(:person) }
+    let(:broker_role) { FactoryBot.create(:broker_role, person: person) }
+
+    before do
+      site = FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+      organization = FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)
+      benefit_sponsorship = FactoryBot.create(
+        :benefit_sponsors_benefit_sponsorship,
+        :with_rating_area,
+        :with_service_areas,
+        organization: organization,
+        profile_id: organization.profiles.first.id
+      )
+      census_employee = FactoryBot.create(:benefit_sponsors_census_employee,
+                                          employer_profile: benefit_sponsorship.profile,
+                                          benefit_sponsorship: benefit_sponsorship)
+      employee_role = FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee.id)
+
+      FactoryBot.create(:family, :with_primary_family_member, person: person)
+      employee_role.person.save!
+      FactoryBot.create(:broker_agency_profile, primary_broker_role: broker_role)
+      broker_agency_account = BenefitSponsors::Accounts::BrokerAgencyAccount.new(writing_agent_id: broker_role.id, start_on: TimeKeeper.date_of_record)
+      allow(benefit_sponsorship.profile).to receive(:active_broker_agency_account).and_return(broker_agency_account)
+    end
+
+    it "should fetch writing agents for employee role" do
+      expect(person.fetch_writing_agents_for_employee_role.first).to eq(broker_role.id)
+    end
+
+    it "should not fetch writing agents for employee role if no broker_agency_accounts" do
+      new_person = FactoryBot.create(:person)
+      expect(new_person.fetch_writing_agents_for_employee_role).to eq([])
+    end
+
+  end
 end
