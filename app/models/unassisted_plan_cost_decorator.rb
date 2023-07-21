@@ -213,7 +213,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   def total_childcare_subsidy_amount
     return hbx_enrollment.eligible_child_care_subsidy.to_f if hbx_enrollment.is_reinstated_enrollment?
 
-    if ivl_osse_eligible?
+    if ivl_osse_eligible? && is_hc4cc_plan
       total_premium - total_aptc_amount
     else
       0.0
