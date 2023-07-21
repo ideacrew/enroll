@@ -337,8 +337,10 @@ module Insured
       return true if is_person_with_broker_role?(person, hbx_enrollment)
       # check if user with no broker role but has broker staff role has access to enrollment
       return unless person.active_broker_staff_roles.present?
+      broker_ids = fetch_brokers_from_enrollment(hbx_enrollment)
       found = person.active_broker_staff_roles.any? do |staff_role|
-        staff_role.broker_agency_profile.primary_broker_role.id == hbx_enrollment.broker.id
+        primary_broker_role_id = staff_role.broker_agency_profile.primary_broker_role.id
+        primary_broker_role_id == hbx_enrollment.broker&.id || broker_ids.include?(primary_broker_role_id)
       end
       true if found
     end
@@ -359,10 +361,28 @@ module Insured
         "profiles.default_general_agency_profile_id" => BSON::ObjectId.from_string(general_agency_profile_id.to_s)
       ).last
       hbx_enrollment = HbxEnrollment.where(id: hbx_enrollment_id).last
-      return true if hbx_enrollment.broker.blank?
       return unless organization.present? && hbx_enrollment.present?
       broker_agency_profile = organization.broker_agency_profile
-      true if broker_agency_profile.primary_broker_role.id == hbx_enrollment.broker.id && broker_agency_profile
+      broker_ids = fetch_brokers_from_enrollment(hbx_enrollment)
+      true if broker_agency_profile && broker_ids.include?(broker_agency_profile.primary_broker_role.id)
+    end
+
+    # A person (enrollment holder) may serve as an employee for two different employers,
+    # and each employer may have different brokers assigned to the person.
+    # Additionally, a person can have a dual role, meaning they can hold both employee and consumer roles.
+    #
+    # Furthermore, there are a few other cases that can occur:
+    # If a person adds a broker and purchases an enrollment, the broker is assigned to the hbx_enrollment
+    # If a person purchases an enrollment and then adds a broker, the broker is not assigned to the hbx_enrollment
+    # In both the above cases broker have full control on the person.
+    def fetch_brokers_from_enrollment(hbx_enrollment)
+      return [hbx_enrollment.broker.id] if hbx_enrollment.broker.present?
+      broker_ids = []
+      primary_person = hbx_enrollment.family&.primary_person
+      return broker_ids unless primary_person
+      broker_ids << primary_person.fetch_writing_agents_for_employee_role
+      broker_ids << primary_person.primary_family&.current_broker_agency&.writing_agent&.id if primary_person.has_consumer_role?
+      broker_ids.compact.flatten
     end
   end
 end

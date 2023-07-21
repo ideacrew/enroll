@@ -1028,5 +1028,32 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
         expect(helper.family_member_eligible_for_medicaid(family_member3, family, TimeKeeper.date_of_record.year)).to eq true
       end
     end
+
+    context "fetch_brokers_from_enrollment" do
+      let(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active') }
+      let(:broker_agency_account) {BenefitSponsors::Accounts::BrokerAgencyAccount.new(start_on: Date.today, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, is_active: true, writing_agent_id: broker_role.id)}
+
+      let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, legal_name: 'Legal Name1') }
+      it "fetch writing agents for consumer role" do
+        person_with_consumer_role = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
+        family = FactoryBot.create(:family, :with_primary_family_member, person: person_with_consumer_role, broker_agency_accounts: [broker_agency_account])
+
+        hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                                           household: family.active_household,
+                                           family: family,
+                                           aasm_state: "coverage_selected")
+        expect(helper.fetch_brokers_from_enrollment(hbx_enrollment)).to eq([broker_role.id])
+      end
+
+      it "does not fetch any writing agents if none exists for enrollment" do
+        family = FactoryBot.create(:family, :with_primary_family_member)
+        hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                                           household: family.active_household,
+                                           family: family,
+                                           aasm_state: "coverage_selected")
+
+        expect(helper.fetch_brokers_from_enrollment(hbx_enrollment)).to eq([])
+      end
+    end
   end
 end
