@@ -288,6 +288,25 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
         end
       end
 
+      context 'should have correct total_childcare_subsidy_amount' do
+        let(:plan_cost_decorator) { UnassistedPlanCostDecorator.new(@product, hbx_enrollment10, 1500.00, tax_household10) }
+
+        it 'for non hc4cc plan subsidy amount should be 0' do
+          expect(plan_cost_decorator.total_childcare_subsidy_amount).to eq 0.0
+        end
+
+        context "for hc4cc plan" do
+          before do
+            allow(plan_cost_decorator).to receive(:ivl_osse_eligible?).and_return true
+            allow(plan_cost_decorator).to receive(:is_hc4cc_plan).and_return true
+          end
+
+          it 'for hc4cc plan subsidy amount should not be 0' do
+            expect(plan_cost_decorator.total_childcare_subsidy_amount).not_to eq 0.0
+          end
+        end
+      end
+
       context 'when elected aptc is 0, use method total_ehb_premium' do
         it 'should return total_ehb_premium' do
           upcd = UnassistedPlanCostDecorator.new(@product, hbx_enrollment10, 0.00, tax_household10)
