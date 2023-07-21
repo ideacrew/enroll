@@ -116,12 +116,14 @@ class SpecialEnrollmentPeriod
   end
 
   def qualifying_life_event_kind=(new_qualifying_life_event_kind)
+    puts '119'
     raise ArgumentError.new("expected QualifyingLifeEventKind") unless new_qualifying_life_event_kind.is_a?(QualifyingLifeEventKind)
     unless new_qualifying_life_event_kind.active?
       raise StandardError, "Qualifying life event kind is expired" if (self.created_at.present? && (new_qualifying_life_event_kind.start_on..new_qualifying_life_event_kind.end_on).exclude?(self.created_at.to_date)) || self.created_at.blank?
     end
     self.qualifying_life_event_kind_id = new_qualifying_life_event_kind._id
     self.title = new_qualifying_life_event_kind.title
+    puts "125"
     @qualifying_life_event_kind = new_qualifying_life_event_kind
     set_sep_dates
     @qualifying_life_event_kind
@@ -138,6 +140,16 @@ class SpecialEnrollmentPeriod
     write_attribute(:qle_on, new_qle_date)
     set_sep_dates
     qle_on
+  end
+
+  def calculate_effective_on(enrollment_created_date)
+    puts "1466666666"
+    return self.effective_on
+    puts "147 #{enrollment_created_date}"
+    puts "131 #{effective_on.to_date}"
+    sep_effective_on = [effective_on.to_date, enrollment_created_date.to_date].max
+    self.update_attributes!(effective_on: sep_effective_on.end_of_month + 1.day)
+    effective_on
   end
 
   def effective_on_kind=(new_effective_on_kind)
@@ -276,6 +288,7 @@ private
   end
 
   def set_effective_on
+    puts "280"
     return unless self.start_on.present? && self.qualifying_life_event_kind.present?
     self.effective_on = case effective_on_kind
                         when "date_of_event"
@@ -298,6 +311,9 @@ private
                           first_of_reporting_month_effective_date
                         when "first_of_next_month_reporting"
                           first_of_next_month_reporting_effective_date
+                        when "first_of_the_month_plan_shopping"
+                          puts "315"
+                          first_of_this_month_plan_shopping
                         end
   end
 
@@ -323,6 +339,10 @@ private
   end
 
   def first_of_next_month_plan_selection_effective_date
+    earliest_effective_date.end_of_month + 1.day
+  end
+
+  def first_of_this_month_plan_shopping
     earliest_effective_date.end_of_month + 1.day
   end
 
