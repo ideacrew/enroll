@@ -1706,8 +1706,10 @@ describe Person, :dbclean => :after_each do
   end
 
   context "fetch_writing_agents_for_employee_role" do
+    let(:person) { FactoryBot.create(:person) }
+    let(:broker_role) { FactoryBot.create(:broker_role, person: person) }
+
     before do
-      person = FactoryBot.create(:person)
       site = FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
       organization = FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)
       benefit_sponsorship = FactoryBot.create(
@@ -1724,9 +1726,9 @@ describe Person, :dbclean => :after_each do
 
       FactoryBot.create(:family, :with_primary_family_member, person: person)
       employee_role.person.save!
-      broker_role = FactoryBot.create(:broker_role, person: person)
       FactoryBot.create(:broker_agency_profile, primary_broker_role: broker_role)
-      benefit_sponsorship.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(writing_agent_id: broker_role.id, start_on: TimeKeeper.date_of_record)
+      broker_agency_account = BenefitSponsors::Accounts::BrokerAgencyAccount.new(writing_agent_id: broker_role.id, start_on: TimeKeeper.date_of_record)
+      allow(benefit_sponsorship.profile).to receive(:active_broker_agency_account).and_return(broker_agency_account)
     end
 
     it "should fetch writing agents for employee role" do
@@ -1735,7 +1737,7 @@ describe Person, :dbclean => :after_each do
 
     it "should not fetch writing agents for employee role if no broker_agency_accounts" do
       new_person = FactoryBot.create(:person)
-      expect(new_person.fetch_writing_agents_for_employee_role.first).to eq([])
+      expect(new_person.fetch_writing_agents_for_employee_role).to eq([])
     end
 
   end
