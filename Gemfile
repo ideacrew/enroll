@@ -59,7 +59,6 @@ gem 'mongoid_rails_migrations', '~> 1.2'
 
 ## General gems
 gem 'aasm',                     '~> 4.8'
-gem 'animate-rails',            '~> 1.0.10'
 gem 'recurring_select'
 
 gem 'aws-sdk',                  '~> 2.2.4'
@@ -180,7 +179,6 @@ group :test do
 end
 
 group :production do
-  gem 'eye',          '~> 0.10.0'
   gem 'newrelic_rpm', '~> 5.0'
   gem 'unicorn',      '~> 4.8'
   gem 'puma',         '~> 3.12.4'
