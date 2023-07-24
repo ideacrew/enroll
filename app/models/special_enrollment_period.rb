@@ -304,8 +304,7 @@ private
                         when "first_of_next_month_reporting"
                           first_of_next_month_reporting_effective_date
                         when "first_of_the_month_plan_shopping"
-                          puts "315"
-                          first_of_this_month_plan_shopping
+                          first_of_the_month_plan_shopping_effective_date
                         end
   end
 
@@ -334,7 +333,7 @@ private
     earliest_effective_date.end_of_month + 1.day
   end
 
-  def first_of_this_month_plan_shopping
+  def first_of_the_month_plan_shopping_effective_date
     earliest_effective_date.end_of_month + 1.day
   end
 
