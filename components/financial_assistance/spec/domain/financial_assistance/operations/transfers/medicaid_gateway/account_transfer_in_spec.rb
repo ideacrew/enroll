@@ -7,6 +7,10 @@ require 'aca_entities/atp/transformers/cv/family'
 RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferIn, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
+  before do
+    DatabaseCleaner.clean
+  end
+
   let(:xml_file_path) { ::FinancialAssistance::Engine.root.join('spec', 'shared_examples', 'medicaid_gateway', 'Simple_Test_Case_E_New.xml') }
   let(:xml) do
     Rails.cache.fetch("test_xml_string") do
