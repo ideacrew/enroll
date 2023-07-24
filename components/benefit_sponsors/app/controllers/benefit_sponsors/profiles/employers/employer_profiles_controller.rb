@@ -126,22 +126,48 @@ module BenefitSponsors
           send_data(Aws::S3Storage.find(@invoice.identifier), options) if @invoice&.identifier
         end
 
+        def bulk_upload_with_async_process(file)
+          file_name = file.original_filename
+          # preparing the file upload to s3
+          uri = Aws::S3Storage.save(file.path, 'ce_roster_upload', file_name)
+          if uri.present?
+            # making call to subscriber
+            event = event('events.benefit_sponsors.employer_profile.bulk_ce_upload',attributes: {s3_reference_key: file_name, bucket_name: 'ce_roster_upload',employer_profile_id: @employer_profile._id, extension: File.extname(file_name)})
+            event.success.publish if event.success?
+            # once we put file to s3 then redirecting user to the employees list page
+            redirect_to employees_upload_url(@employer_profile.id)
+          else
+            flash[:notice] = 'File not uploaded to S3'
+            respond_to do |format|
+              format.html {  render default_url}
+            end
+          end
+        end
+
+        def bulk_upload_with_sync_process(file)
+          @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, @employer_profile)
+          roaster_upload_count = @roster_upload_form.census_records.length
+          begin
+            if @roster_upload_form.save
+              flash[:notice] = "#{roaster_upload_count} records uploaded from CSV"
+              redirect_to URI.parse(@roster_upload_form.redirection_url).to_s
+            else
+              render @roster_upload_form.redirection_url || default_url
+            end
+          rescue StandardError => e
+            @roster_upload_form.errors.add(:base, e.message)
+            render @roster_upload_form.redirection_url || default_url
+          end
+        end
+
         def bulk_employee_upload
           authorize @employer_profile, :show?
           if roster_upload_file_type.include?(file_content_type)
             file = params.require(:file)
-            @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, @employer_profile)
-            roaster_upload_count = @roster_upload_form.census_records.length
-            begin
-              if @roster_upload_form.save
-                flash[:notice] = "#{roaster_upload_count} records uploaded from CSV"
-                redirect_to URI.parse(@roster_upload_form.redirection_url).to_s
-              else
-                render @roster_upload_form.redirection_url || default_url
-              end
-            rescue StandardError => e
-              @roster_upload_form.errors.add(:base, e.message)
-              render @roster_upload_form.redirection_url || default_url
+            if ce_roster_bulk_upload_enabled?
+              bulk_upload_with_async_process(file)
+            else
+              bulk_upload_with_sync_process(file)
             end
           else
             @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.new

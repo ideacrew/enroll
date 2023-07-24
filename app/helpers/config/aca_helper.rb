@@ -413,4 +413,8 @@ module Config::AcaHelper
   def minimum_applied_aptc_pct_for_osse
     EnrollRegistry[:aca_individual_assistance_benefits].setting(:minimum_applied_aptc_percentage_for_osse).item
   end
+
+  def ce_roster_bulk_upload_enabled?
+    EnrollRegistry.feature?("ce_roster_bulk_upload") && EnrollRegistry.feature_enabled?("ce_roster_bulk_upload")
+  end
 end
