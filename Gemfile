@@ -6,7 +6,6 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby '2.5.9'
 gem 'rails', '~> 5.2.4.3'
 gem 'sidekiq'
-gem 'ffaker'
 gem 'globalid'
 #######################################################
 # FIXME
@@ -25,8 +24,6 @@ gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd
 ## Fix this dependency -- bring into project
 gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar.git'
 
-## Verify Rails 5 eliminates need for this gem with MongoDB
-gem 'database_cleaner',       '~> 1.7'
 #######################################################
 
 #######################################################
@@ -62,7 +59,6 @@ gem 'mongoid_rails_migrations', '~> 1.2'
 
 ## General gems
 gem 'aasm',                     '~> 4.8'
-gem 'addressable',              '~> 2.3'
 gem 'animate-rails',            '~> 1.0.10'
 gem 'recurring_select'
 
@@ -122,10 +118,6 @@ gem 'loofah', '~> 2.3.1'
 gem 'stimulus_reflex', '3.4.1'
 gem 'rack-cors'
 
-group :doc do
-  gem 'sdoc',                   '~> 1.0'
-end
-
 group :development do
   gem "certified",              '~> 1'
   gem 'overcommit',             '~> 0.47'
@@ -144,6 +136,7 @@ end
 group :development, :test do
   gem 'dotenv-rails'
   gem 'action-cable-testing'
+  gem 'addressable',            '~> 2.3'
   # gem 'bundler-audit',          '~> 0.6'
   gem 'brakeman'
   gem 'capistrano',             '~> 3.1'
@@ -151,12 +144,14 @@ group :development, :test do
   gem 'climate_control',        '~> 0.2.0'
   gem 'email_spec',             '~> 2'
   gem 'factory_bot_rails',      '~> 4.11'
+  gem 'ffaker'
   gem 'forgery',                '~> 0.7.0'
   gem 'parallel_tests',         '~> 2.26.2'
   gem 'rails-controller-testing'
   gem 'railroady',              '~> 1.5.3'
   gem 'rspec-rails'
   gem 'rspec_junit_formatter'
+  gem 'sdoc',                    '~> 1.0'
   gem 'stimulus_reflex_testing', '~> 0.3.0'
   gem 'yard',                   '~> 0.9.20',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
@@ -167,6 +162,9 @@ group :test do
   gem 'capybara',                     '~> 3.12'
   gem 'capybara-screenshot',          '~> 1.0.18'
   gem 'cucumber-rails',               '2.0', :require => false
+
+  ## Verify Rails 5 eliminates need for this gem with MongoDB
+  gem 'database_cleaner',             '~> 1.7'
   gem 'fakeredis',                    '~> 0.7.0', :require => 'fakeredis/rspec'
   gem 'mongoid-rspec',                '~> 4'
   gem 'rspec-instafail',              '~> 1'
