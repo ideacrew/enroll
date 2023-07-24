@@ -1310,6 +1310,16 @@ class Person
     end
   end
 
+  def fetch_writing_agents_for_employee_role
+    writing_agents = []
+    if has_active_employee_role?
+      active_employee_roles.each do |role|
+        writing_agents << role.employer_profile&.active_broker_agency_account&.writing_agent&.id
+      end
+    end
+    writing_agents
+  end
+
   private
   def is_ssn_composition_correct?
     # Invalid compositions:
