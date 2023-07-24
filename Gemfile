@@ -59,7 +59,6 @@ gem 'mongoid_rails_migrations', '~> 1.2'
 
 ## General gems
 gem 'aasm',                     '~> 4.8'
-gem 'addressable',              '~> 2.3'
 gem 'animate-rails',            '~> 1.0.10'
 gem 'recurring_select'
 
@@ -137,6 +136,7 @@ end
 group :development, :test do
   gem 'dotenv-rails'
   gem 'action-cable-testing'
+  gem 'addressable',            '~> 2.3'
   # gem 'bundler-audit',          '~> 0.6'
   gem 'brakeman'
   gem 'capistrano',             '~> 3.1'
