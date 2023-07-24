@@ -116,14 +116,12 @@ class SpecialEnrollmentPeriod
   end
 
   def qualifying_life_event_kind=(new_qualifying_life_event_kind)
-    puts '119'
     raise ArgumentError.new("expected QualifyingLifeEventKind") unless new_qualifying_life_event_kind.is_a?(QualifyingLifeEventKind)
     unless new_qualifying_life_event_kind.active?
       raise StandardError, "Qualifying life event kind is expired" if (self.created_at.present? && (new_qualifying_life_event_kind.start_on..new_qualifying_life_event_kind.end_on).exclude?(self.created_at.to_date)) || self.created_at.blank?
     end
     self.qualifying_life_event_kind_id = new_qualifying_life_event_kind._id
     self.title = new_qualifying_life_event_kind.title
-    puts "125"
     @qualifying_life_event_kind = new_qualifying_life_event_kind
     set_sep_dates
     @qualifying_life_event_kind
@@ -142,14 +140,9 @@ class SpecialEnrollmentPeriod
     qle_on
   end
 
-  def calculate_effective_on(enrollment_created_date)
-    puts "1466666666"
-    return self.effective_on
-    puts "147 #{enrollment_created_date}"
-    puts "131 #{effective_on.to_date}"
-    sep_effective_on = [effective_on.to_date, enrollment_created_date.to_date].max
-    self.update_attributes!(effective_on: sep_effective_on.end_of_month + 1.day)
-    effective_on
+  def calculate_effective_date(enrollment_created_date)
+    self.update_attributes!(effective_on: enrollment_created_date.end_of_month + 1.day) if (enrollment_created_date > self.effective_on) && (effective_on_kind == 'first_of_the_month_plan_shopping')
+    self.effective_on
   end
 
   def effective_on_kind=(new_effective_on_kind)
