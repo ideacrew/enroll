@@ -69,9 +69,9 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
           expect(active_vlp_doc.naturalization_number).to eq("123456")
           expect(active_vlp_doc.alien_number).to eq("123456789")
         end
-        
+
         it "should populate vlp documents on the applicant" do
-          applicant = FinancialAssistance::Applicant.first
+          applicant = FinancialAssistance::Application.first.applicants.first
           expect(applicant.vlp_subject).to eq("Naturalization Certificate")
           expect(applicant.alien_number).to eq("123456789")
           expect(applicant.naturalization_number).to eq("123456")
