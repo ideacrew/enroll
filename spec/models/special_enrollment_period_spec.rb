@@ -1310,7 +1310,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       end
     end
 
-    describe "#calculate_effective_on" do
+    describe "#calculate_effective_date" do
       after :all do
         TimeKeeper.set_date_of_record_unprotected!(Date.today)
       end
@@ -1326,7 +1326,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
           end
 
           it "updates the SEP effective on date to the first of the month after the plan shopping date" do
-            expect(sep.calculate_effective_on(plan_shopping_date)).to eq (plan_shopping_date + 1.month).beginning_of_month
+            expect(sep.calculate_effective_date(plan_shopping_date)).to eq (plan_shopping_date + 1.month).beginning_of_month
           end
         end
 
@@ -1338,7 +1338,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
           end
 
           it "returns the SEP effective on date" do
-            expect(sep.calculate_effective_on(plan_shopping_date)).to eq(sep.effective_on)
+            expect(sep.calculate_effective_date(plan_shopping_date)).to eq(sep.effective_on)
           end
         end
 
@@ -1350,7 +1350,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
           end
 
           it "returns the SEP effective on date" do
-            expect(sep.calculate_effective_on(plan_shopping_date)).to eq(sep.effective_on)
+            expect(sep.calculate_effective_date(plan_shopping_date)).to eq(sep.effective_on)
           end
         end
       end
@@ -1359,7 +1359,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
         let(:sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: ivl_qle, qle_on: qle_on, effective_on_kind: 'date_of_event') }
 
         it "should return the SEP effective on date" do
-          expect(sep.calculate_effective_on(TimeKeeper.date_of_record)).to eq(sep.effective_on)
+          expect(sep.calculate_effective_date(TimeKeeper.date_of_record)).to eq(sep.effective_on)
         end
 
       end
