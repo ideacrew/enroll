@@ -64,6 +64,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
           person = Person.first
           consumer_role = person.consumer_role
           active_vlp_doc = consumer_role.vlp_documents.last
+          expect(@result).to be_success
           expect(consumer_role.active_vlp_document_id).to eq("1")
           # expect(consumer_role.active_vlp_document_id).to eq active_vlp_doc.id
           # expect(active_vlp_doc.subject).to eq("Naturalization Certificate")

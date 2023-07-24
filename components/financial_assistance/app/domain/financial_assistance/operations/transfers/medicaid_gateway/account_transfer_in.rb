@@ -257,11 +257,13 @@ module FinancialAssistance
           end
 
           def create_or_update_vlp_documents(vlp_documents, person)
-            vlp_documents.each do |vlp_document|
-              ::Operations::People::CreateOrUpdateVlpDocument.new.call(params: { applicant_params: vlp_document, person: person })
+            failed_results = vlp_documents.each_with_object([]) do |vlp_document, failures|
+              result = ::Operations::People::CreateOrUpdateVlpDocument.new.call(params: { applicant_params: vlp_document, person: person })
+              failures << result.failure unless result.success?
             end
+            Failure("Failed to create or update VLP document(s): #{failures}") if failed_results.present?
           rescue StandardError => e
-            Failure("create_or_update_vlp_document: #{e}")
+            Failure("create_or_update_vlp_documents: #{e}")
           end
 
           def create_or_update_relationship(person, family, relationship_kind)
