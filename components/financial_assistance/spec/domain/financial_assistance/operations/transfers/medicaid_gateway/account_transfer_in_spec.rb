@@ -60,7 +60,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
       end
 
       context "vlp documents" do
-        it "should populate vlp documents on the applicant and consumer role" do
+        it "should populate vlp documents on the consumer role" do
           person = Person.first
           consumer_role = person.consumer_role
           active_vlp_doc = consumer_role.vlp_documents.last
@@ -68,6 +68,13 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
           expect(active_vlp_doc.subject).to eq("Naturalization Certificate")
           expect(active_vlp_doc.naturalization_number).to eq("123456")
           expect(active_vlp_doc.alien_number).to eq("123456789")
+        end
+        
+        it "should populate vlp documents on the applicant" do
+          applicant = FinancialAssistance::Applicant.first
+          expect(applicant.vlp_subject).to eq("Naturalization Certificate")
+          expect(applicant.alien_number).to eq("123456789")
+          expect(applicant.naturalization_number).to eq("123456")
         end
       end
 
