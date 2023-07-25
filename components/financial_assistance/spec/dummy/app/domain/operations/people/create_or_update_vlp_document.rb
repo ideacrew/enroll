@@ -31,14 +31,18 @@ module Operations
         if result.success?
           Success(result)
         else
-          Failure(result)
+          Failure("Validation Failure #{result}")
         end
       end
 
       def create_entity(values)
         result = Entities::VlpDocument.new(values.to_h)
 
-        Success(result)
+        if result.success?
+          Success(result)
+        else
+          Failure("Entity Failure #{result}")
+        end
       end
 
       def create_or_update_vlp_document(vlp_document_params, person)
@@ -53,8 +57,8 @@ module Operations
         person.save!
 
         Success(vlp_document)
-      rescue StandardError => e
-        Failure(person.errors.messages)
+      rescue StandardError => 
+        Failure("Creation Failure #{person.errors.messages}")
       end
 
       def no_update_needed?(params)
