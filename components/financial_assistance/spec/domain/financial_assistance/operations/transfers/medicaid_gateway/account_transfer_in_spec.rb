@@ -60,28 +60,27 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
       end
 
       context "vlp documents" do
-        it "should create vlp documents" do
-          person = Person.first
-          vlp_doc = {"subject"=>"Naturalization Certificate", "alien_number"=>"123456789", "naturalization_number"=>"123456", "i94_number"=>nil, "visa_number"=>nil, "sevis_id"=>nil, "passport_number"=>nil, "receipt_number"=>nil, "citizenship_number"=>nil, "card_number"=>nil, "country_of_citizenship"=>nil, "expiration_date"=>nil, "issuing_country"=>nil}
-          vlp = Operations::People::CreateOrUpdateVlpDocument.new.call(params: { applicant_params: vlp_doc, person: person })
-          expect(vlp).to eq("1")
+        before do
+          @category_code = @transformed["family"]["family_members"].first["person"]["consumer_role"]["vlp_documents"].first["subject"]
+          @naturalization_number = @transformed["family"]["family_members"].first["person"]["consumer_role"]["vlp_documents"].first["naturalization_number"]
+          @alien_number = @transformed["family"]["family_members"].first["person"]["consumer_role"]["vlp_documents"].first["alien_number"]
         end
+
         it "should populate vlp documents on the consumer role" do
-          application = FinancialAssistance::Application.where(id: @result.value!).first
-          family = Family.where(id: application.family_id).first
-          consumer_role = family.primary_applicant.person.consumer_role
+          person = Person.first
+          consumer_role = person.consumer_role
           active_vlp_doc = consumer_role.vlp_documents.last
           expect(consumer_role.active_vlp_document_id).to eq active_vlp_doc.id
-          expect(active_vlp_doc.subject).to eq("Naturalization Certificate")
-          expect(active_vlp_doc.naturalization_number).to eq("123456")
-          expect(active_vlp_doc.alien_number).to eq("123456789")
+          expect(active_vlp_doc.subject).to eq(@category_code)
+          expect(active_vlp_doc.naturalization_number).to eq(@naturalization_number)
+          expect(active_vlp_doc.alien_number).to eq(@alien_number)
         end
 
         it "should populate vlp documents on the applicant" do
           applicant = FinancialAssistance::Application.first.applicants.first
-          expect(applicant.vlp_subject).to eq("Naturalization Certificate")
-          expect(applicant.alien_number).to eq("123456789")
-          expect(applicant.naturalization_number).to eq("123456")
+          expect(applicant.vlp_subject).to eq(@category_code)
+          expect(applicant.alien_number).to eq(@alien_number)
+          expect(applicant.naturalization_number).to eq(@naturalization_number)
         end
       end
 

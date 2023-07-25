@@ -3,6 +3,7 @@
 module Operations
   module Validators
     module Families
+      # dummy vlp document contract
       class VlpDocumentContract < Dry::Validation::Contract
         params do
           required(:subject).filled(:string)

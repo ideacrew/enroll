@@ -31,7 +31,7 @@ module Operations
         if result.success?
           Success(result)
         else
-          Failure("Validation Failure #{result}")
+          Failure("validate and sanitize params error: #{result}")
         end
       end
 
@@ -40,7 +40,7 @@ module Operations
 
         Success(result)
       rescue StandardError => e
-        Failure("Entity error #{e}")
+        Failure("create_entity error: #{e}")
       end
 
       def create_or_update_vlp_document(vlp_document_params, person)
@@ -56,7 +56,7 @@ module Operations
 
         Success(vlp_document)
       rescue StandardError => e
-        Failure("Creation Failure #{e}")
+        Failure("create_or_update failure: #{e}")
       end
 
       def no_update_needed?(params)
