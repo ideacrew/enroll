@@ -56,7 +56,7 @@ module Operations
 
         Success(vlp_document)
       rescue StandardError => e
-        Failure("Creation Failure #{person.errors.messages}")
+        Failure("Creation Failure #{e}")
       end
 
       def no_update_needed?(params)
