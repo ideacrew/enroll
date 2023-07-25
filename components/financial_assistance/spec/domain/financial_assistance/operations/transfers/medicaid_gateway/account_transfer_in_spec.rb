@@ -64,12 +64,10 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
       end
 
       context "vlp documents" do
-        before do
-          operation.send(:create_or_update_vlp_documents, vlp_documents, Person.first)
-        end
-
         it "should create vlp documents" do
           person = Person.first
+          vlp_doc = vlp_documents.first
+          Operations::People::CreateOrUpdateVlpDocument.new.call(params: { applicant_params: vlp_doc, person: person })
           consumer_role = person.consumer_role
           expect(person.consumer_role).to eq("1")
         end
