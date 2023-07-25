@@ -135,7 +135,12 @@
           }
         end
 
+        def authorized?(current_user, _controller, _action, _resource)
+          return false unless current_user
 
+          proposal_organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find(attributes[:organization_id])
+          SponsoredBenefits::PlanDesignOrganizationPolicy.new(current_user, proposal_organization).view_proposals?
+        end
       end
     end
   end
