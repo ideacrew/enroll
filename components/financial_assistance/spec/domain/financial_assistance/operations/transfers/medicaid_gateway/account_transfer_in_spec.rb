@@ -3,6 +3,7 @@
 require 'rails_helper'
 require 'aca_entities/serializers/xml/medicaid/atp'
 require 'aca_entities/atp/transformers/cv/family'
+require "#{FinancialAssistance::Engine.root}/spec/dummy/app/domain/operations/people/create_or_update_vlp_document.rb"
 
 RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferIn, dbclean: :after_each do
   include Dry::Monads[:result, :do]
