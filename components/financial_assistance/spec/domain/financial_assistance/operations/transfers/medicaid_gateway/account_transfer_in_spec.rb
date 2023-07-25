@@ -22,6 +22,10 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
 
   let(:transformer) { ::AcaEntities::Atp::Transformers::Cv::Family }
 
+  let(:vlp_documents) { [{"subject"=>"Naturalization Certificate", "alien_number"=>"123456789", "naturalization_number"=>"123456", "i94_number"=>nil, "visa_number"=>nil, "sevis_id"=>nil, "passport_number"=>nil, "receipt_number"=>nil, "citizenship_number"=>nil, "card_number"=>nil, "country_of_citizenship"=>nil, "expiration_date"=>nil, "issuing_country"=>nil}] }
+  let(:operation) { described_class.new }
+
+
   context 'success' do
     before do
       ::BenefitMarkets::Locations::CountyZip.create(zip: "04330", state: "ME", county_name: "Kennebec")
@@ -60,17 +64,25 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
       end
 
       context "vlp documents" do
+        before do
+          operation.send(:create_or_update_vlp_documents, vlp_documents, Person.first)
+        end
+
+        it "should create vlp documents" do
+          person = Person.first
+          consumer_role = person.consumer_role
+          expect(person.consumer_role).to eq("1")
+        end
+
         it "should populate vlp documents on the consumer role" do
           application = FinancialAssistance::Application.where(id: @result.value!).first
           family = Family.where(id: application.family_id).first
           consumer_role = family.primary_applicant.person.consumer_role
           active_vlp_doc = consumer_role.vlp_documents.last
-          expect(@result).to be_success
-          expect(consumer_role.active_vlp_document_id).to eq("1")
-          # expect(consumer_role.active_vlp_document_id).to eq active_vlp_doc.id
-          # expect(active_vlp_doc.subject).to eq("Naturalization Certificate")
-          # expect(active_vlp_doc.naturalization_number).to eq("123456")
-          # expect(active_vlp_doc.alien_number).to eq("123456789")
+          expect(consumer_role.active_vlp_document_id).to eq active_vlp_doc.id
+          expect(active_vlp_doc.subject).to eq("Naturalization Certificate")
+          expect(active_vlp_doc.naturalization_number).to eq("123456")
+          expect(active_vlp_doc.alien_number).to eq("123456789")
         end
 
         it "should populate vlp documents on the applicant" do
