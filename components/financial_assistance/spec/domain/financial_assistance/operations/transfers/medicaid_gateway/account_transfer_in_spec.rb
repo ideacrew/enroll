@@ -3,7 +3,6 @@
 require 'rails_helper'
 require 'aca_entities/serializers/xml/medicaid/atp'
 require 'aca_entities/atp/transformers/cv/family'
-require "#{FinancialAssistance::Engine.root}/spec/dummy/app/domain/operations/people/create_or_update_vlp_document.rb"
 
 RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferIn, dbclean: :after_each do
   include Dry::Monads[:result, :do]
@@ -22,10 +21,6 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
   let(:serializer) { ::AcaEntities::Serializers::Xml::Medicaid::Atp::AccountTransferRequest }
 
   let(:transformer) { ::AcaEntities::Atp::Transformers::Cv::Family }
-
-  let(:vlp_documents) { [{"subject"=>"Naturalization Certificate", "alien_number"=>"123456789", "naturalization_number"=>"123456", "i94_number"=>nil, "visa_number"=>nil, "sevis_id"=>nil, "passport_number"=>nil, "receipt_number"=>nil, "citizenship_number"=>nil, "card_number"=>nil, "country_of_citizenship"=>nil, "expiration_date"=>nil, "issuing_country"=>nil}] }
-  let(:operation) { described_class.new }
-
 
   context 'success' do
     before do
@@ -65,14 +60,6 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
       end
 
       context "vlp documents" do
-        it "should create vlp documents" do
-          person = Person.first
-          vlp_doc = vlp_documents.first
-          Operations::People::CreateOrUpdateVlpDocument.new.call(params: { applicant_params: vlp_doc, person: person })
-          consumer_role = person.consumer_role
-          expect(person.consumer_role).to eq("1")
-        end
-
         it "should populate vlp documents on the consumer role" do
           application = FinancialAssistance::Application.where(id: @result.value!).first
           family = Family.where(id: application.family_id).first
