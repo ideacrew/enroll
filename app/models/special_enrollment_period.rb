@@ -144,7 +144,7 @@ class SpecialEnrollmentPeriod
     self.update_attributes!(effective_on: enrollment_created_date.end_of_month + 1.day) if (enrollment_created_date > effective_on) && (effective_on_kind == 'first_of_the_month_plan_shopping')
     effective_on
   end
- 
+
   def effective_on_kind=(new_effective_on_kind)
     write_attribute(:effective_on_kind, new_effective_on_kind)
     set_sep_dates
