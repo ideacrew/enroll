@@ -60,6 +60,12 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
       end
 
       context "vlp documents" do
+        it "should create vlp documents" do
+          person = Person.first
+          vlp_doc = {"subject"=>"Naturalization Certificate", "alien_number"=>"123456789", "naturalization_number"=>"123456", "i94_number"=>nil, "visa_number"=>nil, "sevis_id"=>nil, "passport_number"=>nil, "receipt_number"=>nil, "citizenship_number"=>nil, "card_number"=>nil, "country_of_citizenship"=>nil, "expiration_date"=>nil, "issuing_country"=>nil}
+          Operations::People::CreateOrUpdateVlpDocument.new.call(params: { applicant_params: vlp_doc, person: person })
+          expect(person.consumer_role).to eq("1")
+        end
         it "should populate vlp documents on the consumer role" do
           application = FinancialAssistance::Application.where(id: @result.value!).first
           family = Family.where(id: application.family_id).first
