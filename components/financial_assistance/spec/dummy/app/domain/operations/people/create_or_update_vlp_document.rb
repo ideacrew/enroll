@@ -31,7 +31,7 @@ module Operations
         if result.success?
           Success(result)
         else
-          Failure("validate and sanitize params error: #{result}")
+          Failure(result)
         end
       end
 
