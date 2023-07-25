@@ -1349,8 +1349,8 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
             sep.save!
           end
 
-          it "returns the SEP effective on date" do
-            expect(sep.calculate_effective_date(plan_shopping_date)).to eq(sep.effective_on)
+          it "returns first of the month after the plan shopping date" do
+            expect(sep.calculate_effective_date(plan_shopping_date)).to eq(plan_shopping_date + 1.month)
           end
         end
       end
