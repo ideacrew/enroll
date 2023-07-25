@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-module Validators
+module Operations
+  module Validators
     module Families
       class VlpDocumentContract < Dry::Validation::Contract
         params do
-  
           required(:subject).filled(:string)
           optional(:alien_number).maybe(:string)
           optional(:i94_number).maybe(:string)
@@ -24,3 +24,4 @@ module Validators
       end
     end
   end
+end
