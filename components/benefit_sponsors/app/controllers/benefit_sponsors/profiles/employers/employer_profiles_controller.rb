@@ -6,6 +6,7 @@ module BenefitSponsors
       # EmployerProfilesController
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
         include Config::AcaHelper
+        include EventSource::Command
 
         before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :export_census_employees, :show_invoice, :coverage_reports, :download_invoice, :terminate_employee_roster_enrollments]
         before_action :load_group_enrollments, only: [:coverage_reports], if: :is_format_csv?
@@ -127,12 +128,12 @@ module BenefitSponsors
         end
 
         def bulk_upload_with_async_process(file)
-          file_name = file.original_filename
+          filename = file.original_filename
           # preparing the file upload to s3
-          uri = Aws::S3Storage.save(file.path, 'ce_roster_upload', file_name)
+          uri = Aws::S3Storage.save(file.path, 'ce-roster-upload', filename)
           if uri.present?
             # making call to subscriber
-            event = event('events.benefit_sponsors.employer_profile.bulk_ce_upload',attributes: {s3_reference_key: file_name, bucket_name: 'ce_roster_upload',employer_profile_id: @employer_profile._id, extension: File.extname(file_name)})
+            event = event('events.benefit_sponsors.employer_profile.bulk_ce_upload', attributes: {s3_reference_key: filename, bucket_name: 'ce-roster-upload', employer_profile_id: @employer_profile.id, filename: filename})
             event.success.publish if event.success?
             # once we put file to s3 then redirecting user to the employees list page
             redirect_to employees_upload_url(@employer_profile.id)

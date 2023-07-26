@@ -12,9 +12,9 @@ module Subscribers
         payload = JSON.parse(response)
         uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{payload['bucket_name']}##{payload['s3_reference_key']}"
 
-        extension = payload[:extension]
-        employer_profile_id = payload[:employer_profile_id]
-        result = Operations::BenefitSponsors::EmployerProfile::BulkCeUpload.new.call(uri: uri, employer_profile_id: employer_profile_id, extension: extension)
+        filename = payload["filename"]
+        employer_profile_id = payload["employer_profile_id"]
+        result = Operations::BenefitSponsors::EmployerProfile::BulkCeUpload.new.call(uri: uri, employer_profile_id: employer_profile_id, filename: filename)
         begin
           if result.success?
             logger.info "EmployerProfileSubscriber: on_primary_determination acked with success: #{result.success}"

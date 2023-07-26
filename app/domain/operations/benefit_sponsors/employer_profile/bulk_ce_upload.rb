@@ -2,6 +2,7 @@
 
 require 'dry/monads'
 require 'dry/monads/do'
+require 'tempfile'
 
 module Operations
   module BenefitSponsors
@@ -13,8 +14,8 @@ module Operations
 
         def call(params)
           _values = yield validate(params)
-          file = yield fetch_s3_file(params[:uri], params[:extension])
-          result = yield process_file(file, params[:employer_profile_id])
+          file = yield fetch_s3_file(params[:uri], params[:filename])
+          result = yield process_ce_bulk_upload(file, params[:employer_profile_id])
           Success(result)
         end
 
@@ -24,24 +25,25 @@ module Operations
           errors = []
           errors << 'uri is missing' unless params[:uri]
           errors << 'employer profile id is missing' unless params[:employer_profile_id]
-          errors << 'file extension is missing' unless params[:extension]
+          errors << 'file name is missing' unless params[:filename]
           errors.empty? ? Success(params) : Failure(errors)
         end
 
-        def fetch_s3_file(uri, extension)
+        def fetch_s3_file(uri, filename)
           s3_object = Aws::S3Storage.find(uri)
           if s3_object
-            file = Tempfile.new(['temp', extension])
+            file = File.open(filename, 'w')
             file.binmode
             file.write s3_object
             file.close
-            Success(file)
+            uploaded_file = ActionDispatch::Http::UploadedFile.new({tempfile: file, original_filename: filename})
+            Success(uploaded_file)
           else
             Failure('could not find the URI')
           end
         end
 
-        def process_file(file, employer_profile_id)
+        def process_ce_bulk_upload(file, employer_profile_id)
           organization = ::BenefitSponsors::Organizations::Organization.employer_profiles.where(:"profiles._id" => BSON::ObjectId.from_string(employer_profile_id)).first
           employer_profile = organization.employer_profile
           roster_upload_form = ::BenefitSponsors::Forms::RosterUploadForm.call(file, employer_profile)
