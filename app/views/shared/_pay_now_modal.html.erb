@@ -1,15 +1,14 @@
 <% carrier = hbx_enrollment.product.carrier_profile.legal_name %>
 <% carrier_long_name = carrier_long_name(carrier) %>
 
-<%# note: using show_pay_now? method makes sure enrollment_tile setting is enabled and other conditions are met for linking to the pay now portal %>
-<% first_payment = carrier_paynow_enabled?(carrier) && before_effective_date?(hbx_enrollment) && show_pay_now?("Enrollment Tile", hbx_enrollment) %>
-<% plan_shopping = carrier_paynow_enabled?(carrier) && source == "Plan Shopping"  %>
-<%# use PayNow url if user is making first payment from enrollment tile or is in plan shopping flow, %>
-<%# otherwise use generic carrier url %>
+<%# using show_pay_now? method makes sure pay now is enabled and other conditions are met for linking to the pay now portal %>
+<% first_payment = show_pay_now?(source, hbx_enrollment) && before_effective_date?(hbx_enrollment) %>
+<% plan_shopping = carrier_paynow_enabled?(carrier) && source == "Plan Shopping" %>
+<%# use PayNow url if user is making first payment, otherwise use generic carrier url %>
 <% url = first_payment || plan_shopping ? pay_now_url(carrier) : carrier_url(carrier) %>
+<%# note: Plan Shopping flow is checked explicitly because it always indicates a first payment,
+    even when effective date is in the past (for example, when enrolling via SEP) %>
 
-<% carrier_key = carrier_paynow_enabled?(carrier) ? fetch_carrier_key_from_legal_name(carrier) : "other" %>
-<% translation_key = is_kaiser_translation_key?(carrier_key) %>
 <div class="modal fade" tabindex="-1" role="dialog" id="payNowModal<%= hbx_enrollment.hbx_id %>">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -22,7 +21,7 @@
         <p>
           <%= l10n("plans.issuer.pay_now.redirection_message", site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item, carrier_name: carrier_long_name) %><br/>
           <ul>
-            <% if before_effective_date?(hbx_enrollment) && carrier_key != 'other' %>
+            <% if first_payment %>
               <li><%= l10n("plans.issuer.pay_now.link_info")%></li>
             <% end %>
             <% if !before_effective_date?(hbx_enrollment) %>
