@@ -141,7 +141,10 @@ class SpecialEnrollmentPeriod
   end
 
   def calculate_effective_date(enrollment_created_date)
-    self.update_attributes!(effective_on: enrollment_created_date.end_of_month + 1.day) if (enrollment_created_date >= effective_on) && (effective_on_kind == 'first_of_the_month_plan_shopping')
+    if (enrollment_created_date >= effective_on) && (effective_on_kind == 'first_of_the_month_plan_shopping')
+      new_effective_on = enrollment_created_date.end_of_month + 1.day
+      self.update_attributes!(effective_on: new_effective_on, next_poss_effective_date: new_effective_on)
+    end
     effective_on
   end
 

@@ -1328,6 +1328,11 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
           it "updates the SEP effective on date to the first of the month after the plan shopping date" do
             expect(sep.calculate_effective_date(plan_shopping_date)).to eq (plan_shopping_date + 1.month).beginning_of_month
           end
+
+          it "updates the SEP next possible effective date" do
+            sep.calculate_effective_date(plan_shopping_date)
+            expect(sep.next_poss_effective_date).to eq (plan_shopping_date + 1.month).beginning_of_month
+          end
         end
 
         context 'when plan shopping date is before the SEP effective date' do
