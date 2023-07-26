@@ -63,6 +63,14 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         end
       end
 
+      context 'language preference' do
+        it 'should populate person language preference' do
+          person_demographics = @transformed["family"]["family_members"].first["person"]["consumer_role"]
+          person = Person.first
+          expect(person.consumer_role.language_preference).to match(/#{person_demographics["language_preference"]}/i)
+        end
+      end
+
       context 'no ssn' do
         context 'person' do
           it 'should should populate person no_ssn field using transformed cv3 person demographics' do
