@@ -33,9 +33,8 @@ module Operations
           errors << 'evidence value missing' unless params[:evidence_value]
           errors << 'effective date missing' unless params[:effective_date]
 
-          if params[:effective_date]
+          if params[:effective_date] && EnrollRegistry.feature_enabled?("aca_ivl_osse_effective_beginning_of_year")
             subject = GlobalID::Locator.locate(params[:subject_gid])
-
             params[:effective_date] = params[:effective_date].beginning_of_year if ['ConsumerRole', 'ResidentRole'].include?(subject.class.to_s)
           end
 
