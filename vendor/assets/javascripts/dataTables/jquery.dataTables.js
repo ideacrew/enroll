@@ -5512,7 +5512,7 @@
     // both match, but we want to hide it completely. We want to also fix their
     // width to what they currently are
     _fnApplyToChildren( function(nSizer, i) {
-      nSizer.InnerText = '<div class="dataTables_sizing">'+headerContent[i]+'</div>';
+      nSizer.innerHTML = '<div class="dataTables_sizing">'+headerContent[i]+'</div>';
       nSizer.childNodes[0].style.height = "0";
       nSizer.childNodes[0].style.overflow = "hidden";
       nSizer.style.width = headerWidths[i];
@@ -5521,7 +5521,7 @@
     if ( footer )
     {
       _fnApplyToChildren( function(nSizer, i) {
-        nSizer.InnerText = '<div class="dataTables_sizing">'+footerContent[i]+'</div>';
+        nSizer.innerHTML = '<div class="dataTables_sizing">'+footerContent[i]+'</div>';
         nSizer.childNodes[0].style.height = "0";
         nSizer.childNodes[0].style.overflow = "hidden";
         nSizer.style.width = footerWidths[i];
