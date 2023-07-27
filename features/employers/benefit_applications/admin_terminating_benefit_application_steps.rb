@@ -97,9 +97,11 @@ And(/^employer should see Add Plan Year link$/) do
 end
 
 And(/^user able to see (.*) benefit package headers on the census employee roster$/) do |bp_count|
-  sleep(3)
-  expect(page.all("td").detect { |td| td[:class] == " col-string col-reinstated_benefit_package" }.text).to eq "First benefit package" if bp_count == 'two'
-  expect(page.all("td").detect { |td| td[:class] == " col-string col-benefit_package" }.text).to eq "First benefit package"
+  if bp_count == 'two'
+    expect(page).to have_content('First benefit package', count: 2)
+  else
+    expect(page).to have_content('First benefit package', count: 1)
+  end
 end
 
 And(/^user able to see (.*) enrollment status headers on the census employee roster$/) do |es_count|
