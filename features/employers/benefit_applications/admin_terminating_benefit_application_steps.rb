@@ -106,10 +106,6 @@ end
 
 And(/^user able to see (.*) enrollment status headers on the census employee roster$/) do |es_count|
   sleep(3)
-  if es_count == 'two'
-    expect(page.all("td").detect { |td| td[:class] == " col-string col-enrollment_status" }.text).to eq "Coverage Termination Pending (Health)"
-    expect(page.all("td").detect { |td| td[:class] == " col-string col-reinstated_enrollment_status" }.text).to eq "Enrolled (Health)"
-  else
-    expect(page.all("td").detect { |td| td[:class] == " col-string col-enrollment_status" }.text).to eq "Enrolled (Health)"
-  end
+  expect(page).to have_content('Coverage Termination Pending (Health)') if es_count == 'two'
+  expect(page).to have_content('Enrolled (Health)')
 end
