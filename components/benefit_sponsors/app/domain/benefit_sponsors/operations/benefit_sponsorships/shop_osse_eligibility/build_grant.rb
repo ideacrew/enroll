@@ -48,23 +48,12 @@ module BenefitSponsors
                         title: values[:grant_key].to_s.titleize,
                         key: values[:grant_key].to_sym,
                         item: values[:grant_value]
-                      },
-                      state_histories: [
-                                          {
-                                            is_eligible: false,
-                                            from_state: :draft,
-                                            to_state: :draft,
-                                            event: :initialize,
-                                            transition_at: DateTime.now,
-                                            effective_on: values[:effective_date],
-                                            comment: "evidence inititalized"
-                                          }
-                                        ]
+                      }
                     })
           end
 
           def create(grant_params)
-            CreateGrant.new.call(grant_params)
+            AcaEntities::BenefitSponsors::BenefitSponsorships::ShopOsseEligibility::CreateGrant.new.call(grant_params)
           end
 
           def build(entity, values)
