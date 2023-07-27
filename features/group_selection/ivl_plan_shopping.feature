@@ -126,3 +126,20 @@ Feature: IVL plan purchase
     Then consumer should see all the family members names
     And consumer clicked on shop for new plan
     Then consumer should see hc4cc filter
+
+  Scenario: APTC eligible consumers should seeing OSSE subsidy when OSSE eligible and individual_osse_plan_filter disabled
+    Given plan filter feature is disabled and osse subsidy feature is enabled
+    Given a consumer exists
+    And the consumer is logged in
+    And consumer has a dependent in child relationship with age less than 26
+    And consumer has successful ridp
+    And consumer has osse eligibility
+    Given every individual is eligible for Plan shopping for CSR plans
+    When consumer visits home page
+    And consumer clicked on "Married" qle
+    And I select a past qle date
+    Then I should see confirmation and continue
+    When ivl clicked continue on household info page
+    Then consumer should see all the family members names
+    And consumer clicked on shop for new plan
+    Then consumer should see 0 premiums for all plans
