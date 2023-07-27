@@ -4,7 +4,7 @@ module BenefitSponsors
   module BenefitSponsorships
     module ShopOsseEligibility
       # Grant model
-      class Grant
+      class ShopOsseGrant
         include Mongoid::Document
         include Mongoid::Timestamps
         include ::Eligible::Concerns::Grant
