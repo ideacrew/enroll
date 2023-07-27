@@ -710,7 +710,7 @@ end
 Then(/^employer clicks on terminated filter$/) do
   expect(page).to have_content "Select 'Add New Employee' to continue building your roster, or select 'Upload Employee Roster' if you're ready to download or upload the roster template"
   find_by_id('Tab:terminated').click
-  wait_for_ajax
+  sleep(2)
 end
 
 Then(/^employer should not see the Get Help from Broker$/) do
