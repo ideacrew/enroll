@@ -1,5 +1,5 @@
 <% plan_carrier = Caches::MongoidCache.lookup(BenefitSponsors::Organizations::Organization.issuer_profiles, plan.issuer_profile_id) { plan.issuer_profile } %>
-<div class="module plan-row panel panel-default" data-plan-id="<%= plan.id %>" data-plan-category="<%= plan.product_type ? plan.product_type.downcase : '' %>" data-plan-metal-level="<%= plan.metal_level.downcase %>" data-plan-metal-network="<%= plan.network&.downcase %>" data-plan-metal-premium="<%= plan.total_employee_cost %>" data-plan-metal-ehb-premium="<%= plan.total_ehb_premium %>" data-plan-childcare-subsidy-eligible="<%= plan.ivl_osse_eligible? && plan.is_hc4cc_plan %>" data-plan-metal-deductible="<%= plan.deductible == 'Not Applicable' ? '$0' : plan.deductible %>" data-plan-name="<%= plan.name %>" data-plan-carrier="<%= plan_carrier.try(:legal_name) %>" data-plan-hsa-eligibility="<%= ivl_hsa_status(@plan_hsa_status, plan) %>" data-plan-osse-eligibility="<%= osse_status(plan) %>" data-plan-ehb="<%= plan.ehb %>" data-can-use-aptc="<%= plan.can_use_aptc? %>">
+<div class="module plan-row panel panel-default" data-plan-id="<%= plan.id %>" data-plan-category="<%= plan.product_type ? plan.product_type.downcase : '' %>" data-plan-metal-level="<%= plan.metal_level.downcase %>" data-plan-metal-network="<%= plan.network&.downcase %>" data-plan-metal-premium="<%= plan.total_employee_cost %>" data-plan-metal-ehb-premium="<%= plan.total_ehb_premium %>" data-plan-childcare-subsidy-eligible="<%= plan_childcare_subsidy_eligible(plan) %>" data-plan-metal-deductible="<%= plan.deductible == 'Not Applicable' ? '$0' : plan.deductible %>" data-plan-name="<%= plan.name %>" data-plan-carrier="<%= plan_carrier.try(:legal_name) %>" data-plan-hsa-eligibility="<%= ivl_hsa_status(@plan_hsa_status, plan) %>" data-plan-osse-eligibility="<%= osse_status(plan) %>" data-plan-ehb="<%= plan.ehb %>" data-can-use-aptc="<%= plan.can_use_aptc? %>">
   <div class="panel-body">
     <div class="row">
       <% if plan.try(:is_standard_plan) %>
@@ -108,6 +108,6 @@
 
 <style type="text/css">
     .fa-bookmark, .fa-check-square-o {
-        color: green;
+      color: green;
     }
 </style>
