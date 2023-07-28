@@ -142,14 +142,13 @@ class SpecialEnrollmentPeriod
 
   def calculate_effective_date(enrollment_created_date)
     new_effective_on = enrollment_created_date.end_of_month + 1.day
-    if (enrollment_created_date >= effective_on) && (effective_on_kind == 'first_of_the_month_plan_shopping')
-      new_effective_on = enrollment_created_date.end_of_month + 1.day
-      self.update_attributes!(effective_on: new_effective_on, next_poss_effective_date: new_effective_on)
-    elsif effective_on_kind == 'first_of_the_month_coinciding' 
-      if (enrollment_created_date == effective_on) && !beginning_of_month?
-        self.update_attributes!(effective_on: new_effective_on, next_poss_effective_date: new_effective_on)
-      elsif (enrollment_created_date == effective_on) && qle_on != effective_on
-        self.update_attributes!(effective_on: new_effective_on, next_poss_effective_date: new_effective_on)
+
+    case effective_on_kind
+    when "first_of_the_month_plan_shopping"
+      self.update_attributes!(effective_on: new_effective_on, next_poss_effective_date: new_effective_on) if enrollment_created_date >= effective_on
+    when "first_of_the_month_coinciding"
+      if enrollment_created_date == effective_on
+        self.update_attributes!(effective_on: new_effective_on, next_poss_effective_date: new_effective_on) if qle_on != effective_on
       elsif enrollment_created_date > effective_on
         self.update_attributes!(effective_on: new_effective_on, next_poss_effective_date: new_effective_on)
       end
@@ -363,7 +362,7 @@ private
       if beginning_of_month?
         qle_on
       else
-        qle_on.end_of_month.next_day
+        today.end_of_month.next_day
       end
     else
       today.end_of_month.next_day

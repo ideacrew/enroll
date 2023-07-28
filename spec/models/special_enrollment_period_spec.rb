@@ -1145,7 +1145,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       context 'qle_on is after the submitted at date, but is not the first of the month' do
         let(:qle_on) { TimeKeeper.date_of_record.end_of_month}
         let(:reporting_date) { TimeKeeper.date_of_record.beginning_of_month }
-  
+
         before do
           new_sep.save!
           TimeKeeper.set_date_of_record_unprotected!(reporting_date)
@@ -1175,17 +1175,17 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
 
       context 'qle_on is the same as the submitted at date' do
         let(:qle_on) { TimeKeeper.date_of_record }
-        
-          it 'should set effective date as the qle_on date' do
-            if qle_on == qle_on.beginning_of_month
-              expect(new_sep.effective_on).to eq(qle_on)
-            else
-              expect(new_sep.effective_on).to eq(qle_on.next_month.beginning_of_month)
-            end
+
+        it 'should set effective date as the qle_on date' do
+          if qle_on == qle_on.beginning_of_month
+            expect(new_sep.effective_on).to eq(qle_on)
+          else
+            expect(new_sep.effective_on).to eq(qle_on.next_month.beginning_of_month)
           end
+        end
       end
     end
-    
+
     context 'when first_of_next_month_coinciding is selected' do
       after :all do
         TimeKeeper.set_date_of_record_unprotected!(Date.today)
@@ -1437,10 +1437,10 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
         after :all do
           TimeKeeper.set_date_of_record_unprotected!(Date.today)
         end
-        
+
         context "when plan shopping date is the same as the effective date and the event date is not the first of the month" do
           let(:qle_on) {TimeKeeper.date_of_record.beginning_of_month + 1.day }
-         
+
           let(:plan_shopping_date) { sep.effective_on }
 
           before do
@@ -1467,13 +1467,13 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
 
         context "when plan shopping date is after the effective date" do
           let(:qle_on) {TimeKeeper.date_of_record.beginning_of_month + 1.day }
-         
+
           let(:plan_shopping_date) { sep.effective_on + 1.day }
-  
+
           before do
             allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.beginning_of_month + 1.day)
           end
-  
+
           it "should return the SEP effective on date" do
             expect(sep.calculate_effective_date(plan_shopping_date)).to eq((plan_shopping_date + 1.month).beginning_of_month)
           end
