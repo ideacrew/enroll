@@ -6,39 +6,40 @@ require 'dry/monads/do'
 module BenefitSponsors
   module Operations
     module BenefitSponsorships
-      module ShopOsseEligibility
+      module ShopOsseEligibilities
         # Operation to support eligibility creation
-        class PersistEligibility
+        class CreateShopOsseEligibility
           send(:include, Dry::Monads[:result, :do])
 
           # @param [Hash] opts Options to build eligibility
+          # @option opts [<GlobalId>] :subject required
           # @option opts [<String>]   :evidence_key required
           # @option opts [<String>]   :evidence_value required
-          # @option opts [<Symbol>]   :event required
           # @option opts [Date]       :effective_date required
+          # @option opts [<Symbol>]   :event required
           # @return [Dry::Monad] result
           def call(params)
             values = yield validate(params)
             eligibility_options = yield build_eligibility_options(values)
             eligibility = yield create_eligibility(eligibility_options)
-            # eligibility_record = persit(subject, eligibility)
-            Success(eligibility)
+            eligibility_record = yield store(values, eligibility)
+
+            Success(eligibility_record)
           end
   
           private
   
           def validate(params)
-            unless params[:event]
-              params[:event] ||= :initialize
-              params[:effective_date] ||= Date.today
-            end
+            params[:event] ||= :initialize
+            params[:effective_date] ||= Date.today
 
             errors = []
+            errors << 'subject missing' unless params[:subject]
             errors << 'evidence key missing' unless params[:evidence_key]
             errors << 'evidence value missing' unless params[:evidence_value]
             errors << 'effective date missing' unless params[:effective_date]
-            errors << 'effective date missing' unless params[:event]
-
+            errors << 'event missing' unless params[:event]
+          
             errors.empty? ? Success(params) : Failure(errors)
           end
 
@@ -53,9 +54,24 @@ module BenefitSponsors
             )
           end
 
-          def persist(subject, eligibility)
-            eligibility = subject.eligibilies.build(eligibility.to_h)
-            eligibility.save
+          def store(values, eligibility)
+            osse_eligibility_params = eligibility.to_h.except(:evidences, :grants)
+            eligibility_record = BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::ShopOsseEligibility.new(osse_eligibility_params)
+
+            eligibility_record.tap do |record|
+              record.evidences = record.class.create_objects(eligibility.evidences, :evidences)
+              record.grants = record.class.create_objects(eligibility.grants, :grants)
+            end
+
+            subject = GlobalID::Locator.locate(values[:subject])
+            subject.eligibilities << eligibility_record
+            subject.save!
+
+            if subject.save
+              Success(eligibility_record)
+            else
+              Failure(subject.errors.full_messages)
+            end
           end
         end
       end

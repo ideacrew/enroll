@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module BenefitSponsors
   module Operations
     module BenefitSponsorships
-      module ShopOsseEligibility
+      module ShopOsseEligibilities
         # Operation to support eligibility creation
         class BuildShopOsseGrant
           send(:include, Dry::Monads[:result, :do])
@@ -17,7 +17,7 @@ module BenefitSponsors
           # @return [Dry::Monad] result
           def call(params)
             values = yield validate(params)
-            grant_options = yield build_grant_options(values)
+            grant_options = yield build(values)
 
             Success(grant_options)
           end
@@ -32,17 +32,20 @@ module BenefitSponsors
             errors.empty? ? Success(params) : Failure(errors)
           end
 
-          def build_grant_options(values)
+          def build(values)
+            grant_key = values[:grant_key]
+            grant_value = values[:grant_value]
+          
             Success({
-                      title: values[:grant_key].to_s.titleize,
-                      key: values[:grant_key].to_sym,
-                      value: {
-                        title: values[:grant_key].to_s.titleize,
-                        key: values[:grant_key].to_sym,
-                        item: values[:grant_value]
-                      }
-                    })
-          end
+              title: grant_key.to_s.titleize,
+              key: grant_key.to_sym,
+              value: {
+                title: grant_key.to_s.titleize,
+                key: grant_key.to_sym,
+                item: grant_value
+              }
+            })
+          end          
         end
       end
     end
