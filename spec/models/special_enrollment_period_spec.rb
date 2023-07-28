@@ -1354,6 +1354,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
         context 'qle_on future, reporting_date after 15th of month' do
           let(:qle_on) { TimeKeeper.date_of_record.next_month }
           let!(:reporting_date) { TimeKeeper.date_of_record }
+
           before do
             TimeKeeper.set_date_of_record_unprotected!(reporting_date)
           end
@@ -1386,7 +1387,6 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
         let(:sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: ivl_qle, qle_on: qle_on, effective_on_kind: 'first_of_the_month_plan_shopping') }
 
         context 'when plan shopping date is after the SEP effective on date' do
-          #! this is good
           let(:plan_shopping_date) { TimeKeeper.date_of_record + 1.month }
 
           before do
@@ -1404,7 +1404,6 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
         end
 
         context 'when plan shopping date is before the SEP effective date' do
-          #!this is good
           let(:plan_shopping_date) { TimeKeeper.date_of_record }
 
           before do
@@ -1417,7 +1416,6 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
         end
 
         context 'when plan shopping date is the same as the SEP effective date' do
-          #!THIS IS GOOD
           let(:plan_shopping_date) { sep.effective_on }
 
           before do

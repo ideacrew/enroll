@@ -352,6 +352,7 @@ private
 
   def first_of_the_month_coinciding_effective_date
     today = TimeKeeper.date_of_record
+
     if qle_on > today
       if beginning_of_month?
         qle_on
