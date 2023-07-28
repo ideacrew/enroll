@@ -146,6 +146,8 @@ module BenefitSponsors
       inclusion: { in: SOURCE_KINDS, message: "%{value} is not a valid source kind" },
       allow_blank: false
 
+    scope :shop_osse_eligibilities, -> { where(:"eligibilities._type" => /.*ShopOsseEligibility$/) }
+
     # Workflow attributes
     scope :active,                      ->{ any_in(aasm_state: ACTIVE_STATES) }
     scope :inactive,                    ->{ any_in(aasm_state: INACTIVE_STATES) }

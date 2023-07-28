@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require "dry/monads"
-require "dry/monads/do"
+require 'dry/monads'
+require 'dry/monads/do'
 
 module BenefitSponsors
   module Operations
@@ -65,8 +65,7 @@ module BenefitSponsors
           # Following Operation expects AcaEntities domain class as subject
           def create_eligibility(eligibility_options)
             AcaEntities::Eligible::AddEligibility.new.call(
-              subject:
-                "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
+              subject: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
               eligibility: eligibility_options
             )
           end

@@ -11,17 +11,14 @@ module Eligible
     field :key, type: Symbol
     field :title, type: String
     field :description, type: String
-    field :current_state, type: Symbol, default: :initial
 
-    embeds_many :evidences,
-                class_name: "::Eligible::Evidence",
-                cascade_callbacks: true
-    embeds_many :grants,
-                class_name: "::Eligible::Grant",
-                cascade_callbacks: true
+    field :current_state, type: Symbol
+
+    embeds_many :evidences,  class_name: '::Eligible::Evidence', cascade_callbacks: true
+    embeds_many :grants, class_name: '::Eligible::Grant', cascade_callbacks: true
 
     embeds_many :state_histories,
-                class_name: "::Eligible::StateHistory",
+                class_name: '::Eligible::StateHistory',
                 cascade_callbacks: true,
                 as: :status_trackable
 

@@ -14,12 +14,13 @@ module Eligible
     field :description, type: String
     field :is_satisfied, type: Boolean, default: false
     field :current_state, type: Symbol, default: :initial
+
     field :current_state, type: Symbol
     field :subject_ref, type: String
     field :evidence_ref, type: String
 
     embeds_many :state_histories,
-                class_name: "::Eligible::StateHistory",
+                class_name: '::Eligible::StateHistory',
                 cascade_callbacks: true,
                 as: :status_trackable
 
