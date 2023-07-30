@@ -9,12 +9,12 @@ FactoryBot.define do
     description { 'Evidence for Group OSSE Eligibility' }
     key { :shop_osse_evidence }
     is_satisfied { false }
-    subject_ref { 'shop_osse_evidence'}
-    evidence_ref { 'shop_osse_evidence'}
+    subject_ref { URI("gid://enroll_app/BenefitSponsors/BenefitSponsorship")}
+    evidence_ref { URI("gid://enroll_app/BenefitSponsors/Evidence") }
 
     transient do
-      from_state { :draft }
-      to_state { :accepted }
+      from_state { :initial }
+      to_state { :initial }
       is_eligible { false }
       effective_on { TimeKeeper.date_of_record.beginning_of_month }
     end
@@ -25,12 +25,11 @@ FactoryBot.define do
         from_state: evaluator.from_state,
         to_state: evaluator.to_state,
         is_eligible: evaluator.is_eligible,
+        event: "move_to_#{evaluator.to_state}".to_sym,
         effective_on: evaluator.effective_on
       )
 
-      if evaluator.is_eligible
-        evidence.is_satisfied = true
-      end
+      evidence.is_satisfied = true if evaluator.is_eligible
     end
   end
 end
