@@ -8,5 +8,12 @@ FactoryBot.define do
     title { 'Contribution Subsidy' }
     description { 'Osse Contribution Subsidy' }
     key { :contribution_grant }
+    value {
+      {
+        title: 'Contribution Subsidy',
+        key: :contribution_grant,
+        item: 'true'
+      }
+    }
   end
 end

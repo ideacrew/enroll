@@ -20,15 +20,16 @@ module BenefitSponsors
           # @return [Dry::Monad] result
           def call(params)
             values = yield validate(params)
-            eligibility_options = yield build_eligibility_options(values)
+            eligibility_record = yield find_eligibility(values)
+            eligibility_options = yield build_eligibility_options(values, eligibility_record)
             eligibility = yield create_eligibility(eligibility_options)
-            eligibility_record = yield store(values, eligibility)
+            persisted_eligibility = yield store(values, eligibility)
 
-            Success(eligibility_record)
+            Success(persisted_eligibility)
           end
-  
+
           private
-  
+
           def validate(params)
             params[:event] ||= :initialize
             params[:effective_date] ||= Date.today
@@ -39,12 +40,19 @@ module BenefitSponsors
             errors << 'evidence value missing' unless params[:evidence_value]
             errors << 'effective date missing' unless params[:effective_date]
             errors << 'event missing' unless params[:event]
-          
+
             errors.empty? ? Success(params) : Failure(errors)
           end
 
-          def build_eligibility_options(values)
-            BuildShopOsseEligibility.new.call(values)
+          def find_eligibility(values)
+            subject = GlobalID::Locator.locate(values[:subject])
+            eligibility = subject.eligibilities.by_key(:shop_osse_eligibility).last
+
+            Success(eligibility)
+          end
+
+          def build_eligibility_options(values, eligibility_record = nil)
+            BuildShopOsseEligibility.new.call(values.merge(eligibility_record: eligibility_record))
           end
 
           def create_eligibility(eligibility_options)

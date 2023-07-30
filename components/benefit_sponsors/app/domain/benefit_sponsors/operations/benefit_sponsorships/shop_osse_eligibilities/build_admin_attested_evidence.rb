@@ -62,7 +62,10 @@ module BenefitSponsors
 
           def build_default_evidence_options(values)
             if values[:evidence_record]&.persisted?
-              values[:evidence_record].serializable_hash.deep_symbolize_keys
+              options = values[:evidence_record].serializable_hash.deep_symbolize_keys
+              options[:subject_ref] = URI(options[:subject_ref]) unless options[:subject_ref].is_a? URI
+              options[:evidence_ref] = URI(options[:evidence_ref]) unless options[:evidence_ref].is_a? URI
+              options
             else
               {
                 title: values[:evidence_key].to_s.titleize,

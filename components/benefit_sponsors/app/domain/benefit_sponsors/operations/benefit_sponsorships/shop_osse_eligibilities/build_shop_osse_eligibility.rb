@@ -52,22 +52,29 @@ module BenefitSponsors
           end
 
           def build_eligibility_options(values, evidence_options)
-            options = if values[:eligibility_record]&.persisted?
-                        values[:eligibility_record].serializable_hash.deep_symbolize_keys
-                      else
-                        {
-                          title: 'Shop Osse Eligibility',
-                          key: :shop_osse_eligibility,
-                          grants: build_grants
-                        }
-                      end
+            options = build_default_eligibility_options(values)
 
-            options[:evidences] ||= []
-            options[:evidences] << evidence_options
+            index = options[:evidences].index { |e| e[:_id].to_s == evidence_options[:_id].to_s } if options[:evidences].present?
+            if index
+              options[:evidences][index] = evidence_options
+            else
+              options[:evidences] = [evidence_options]
+            end
+
             options[:state_histories] ||= []
             options[:state_histories] << build_state_history(values, evidence_options)
 
             Success(options)
+          end
+
+          def build_default_eligibility_options(values)
+            return values[:eligibility_record].serializable_hash.deep_symbolize_keys if values[:eligibility_record]&.persisted?
+
+            {
+              title: 'Shop Osse Eligibility',
+              key: :shop_osse_eligibility,
+              grants: build_grants
+            }
           end
 
           def build_grants

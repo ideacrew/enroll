@@ -7,41 +7,6 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 
 RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::BuildShopOsseEligibility, type: :model, dbclean: :after_each do
 
-  # let(:required_params) do
-  #   {
-  #     evidence_key: :hc4cc,
-  #     effective_date: Date.today,
-  #     evidence_value: 'true'
-  #   }
-  # end
-
-  # context 'with input params' do
-  #   it 'should build admin attested evidence' do
-  #     result = described_class.new.call(required_params)
-
-  #     expect(result).to be_success
-  #     expect(result.success).to be_a(BenefitSponsors::BenefitSponsorships::ShopOsseEligibility::Eligibility)
-  #   end
-
-  #   it 'should create state history with attested state' do
-  #     eligibility = described_class.new.call(required_params).success
-
-  #     state_history = eligibility.latest_state_history
-  #     expect(state_history.event).to eq(:move_to_eligible)
-  #     expect(state_history.from_state).to eq(:draft)
-  #     expect(state_history.to_state).to eq(:eligible)
-  #   end
-
-  #   it 'should create default initialized state history' do
-  #     eligibility = described_class.new.call(required_params).success
-
-  #     state_history = eligibility.state_histories.first
-  #     expect(state_history.event).to eq(:initialize)
-  #     expect(state_history.from_state).to eq(:draft)
-  #     expect(state_history.to_state).to eq(:draft)
-  #   end
-  # end
-
   let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market }
   let(:employer_organization)   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let(:employer_profile)        { employer_organization.employer_profile }
