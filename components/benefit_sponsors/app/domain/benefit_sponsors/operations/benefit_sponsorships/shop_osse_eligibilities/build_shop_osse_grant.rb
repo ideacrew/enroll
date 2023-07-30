@@ -35,17 +35,17 @@ module BenefitSponsors
           def build(values)
             grant_key = values[:grant_key]
             grant_value = values[:grant_value]
-          
+
             Success({
-              title: grant_key.to_s.titleize,
-              key: grant_key.to_sym,
-              value: {
-                title: grant_key.to_s.titleize,
-                key: grant_key.to_sym,
-                item: grant_value
-              }
-            })
-          end          
+                      title: grant_key.to_s.titleize,
+                      key: grant_key.to_sym,
+                      value: {
+                        title: grant_key.to_s.titleize,
+                        key: grant_key.to_sym,
+                        item: grant_value
+                      }
+                    })
+          end
         end
       end
     end
