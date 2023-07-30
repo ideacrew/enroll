@@ -28,6 +28,8 @@ module Eligible
              to: :latest_state_history,
              allow_nil: false
 
+    scope :by_key, ->(key) { where(key: key.to_sym) }
+
     def latest_state_history
       state_histories.latest_history
     end

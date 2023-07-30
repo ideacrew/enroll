@@ -12,21 +12,23 @@ module BenefitSponsors
           send(:include, Dry::Monads[:result, :do])
 
           # @param [Hash] opts Options to build eligibility
-          # @option opts [<GlobalId>]   :subject required
+          # @option opts [<GlobalId>] :subject required
           # @option opts [<String>]   :evidence_key required
           # @option opts [<String>]   :evidence_value required
           # @option opts [Date]       :effective_date required
+          # @option opts [ShopOsseEligibility]  :eligibility_record optional
           # @return [Dry::Monad] result
           def call(params)
             values = yield validate(params)
-            evidence_options = yield build_evidence_options(values)
+            evidence_record = yield find_evidence(values)
+            evidence_options = yield build_evidence_options(values, evidence_record)
             eligibility_options = yield build_eligibility_options(values, evidence_options)
 
             Success(eligibility_options)
           end
-  
+
           private
-  
+
           def validate(params)
             errors = []
             errors << 'subject missing' unless params[:subject]
@@ -38,24 +40,38 @@ module BenefitSponsors
             errors.empty? ? Success(params) : Failure(errors)
           end
 
-          def build_evidence_options(values)
-            BuildAdminAttestedEvidence.new.call(values)
+          def find_evidence(values)
+            eligibility_rec = values[:eligibility_record]
+
+            return Success(nil) unless eligibility_rec
+            Success(eligibility_rec.evidences.by_key(:shop_osse_evidence).last)
+          end
+
+          def build_evidence_options(values, evidence_record = nil)
+            BuildAdminAttestedEvidence.new.call(values.merge(evidence_record: evidence_record))
           end
 
           def build_eligibility_options(values, evidence_options)
-            eligibility = {
-              title: 'Shop Osse Eligibility',
-              key: :shop_osse_eligibility,
-              evidences: [evidence_options],
-              grants: build_grants,
-              state_histories: [build_state_history(values, evidence_options)]
-            }
-       
-            Success(eligibility)
-          end          
+            options = if values[:eligibility_record]&.persisted?
+                        values[:eligibility_record].serializable_hash.deep_symbolize_keys
+                      else
+                        {
+                          title: 'Shop Osse Eligibility',
+                          key: :shop_osse_eligibility,
+                          grants: build_grants
+                        }
+                      end
+
+            options[:evidences] ||= []
+            options[:evidences] << evidence_options
+            options[:state_histories] ||= []
+            options[:state_histories] << build_state_history(values, evidence_options)
+
+            Success(options)
+          end
 
           def build_grants
-            grants = [
+            [
               :contribution_subsidy_grant,
               :min_employee_participation_relaxed_grant,
               :min_fte_count_relaxed_grant,
@@ -67,42 +83,35 @@ module BenefitSponsors
                 grant_value: true
               ).success
             end
-
-            grants
           end
 
           def build_state_history(values, evidence_options)
             eligibility_event = eligibility_event_for(evidence_options)
-          
-            state_history = {
-              event: values[:event],
+            from_state = values[:eligibility_record]&.state_histories&.last&.to_state
+
+            {
+              event: eligibility_event,
               transition_at: DateTime.now,
               effective_on: values[:effective_date],
+              from_state: from_state || :initial,
+              to_state: to_state(eligibility_event),
               is_eligible: evidence_options[:is_satisfied]
             }
-
-            state_history.merge!(states_for(eligibility_event))
           end
-          
+
           def eligibility_event_for(evidence_options)
-            latest_history = evidence_options[:state_histories].first
-          
-            case latest_history[:event]
-            when :approved then :publish
-            when :denied then :expire
-            else :initialize
+            latest_history = evidence_options[:state_histories].last
+
+            case latest_history[:to_state]
+            when :approved, :denied
+              :move_to_published
+            else
+              :move_to_initial
             end
           end
 
-          def states_for(event)
-            case event              
-            when :publish
-              { from_state: :initial, to_state: :published }
-            when :expire
-              { from_state: :initial, to_state: :expired }
-            else
-              { from_state: :initial, to_state: :initial }
-            end
+          def to_state(event)
+            event.to_s.match(/move_to_(.*)/)[1].to_sym
           end
         end
       end

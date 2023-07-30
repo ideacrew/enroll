@@ -11,13 +11,13 @@ module BenefitSponsors
         class BuildAdminAttestedEvidence
           send(:include, Dry::Monads[:result, :do])
 
-          ELIGIBLE_STATUSES = %i[accepted].freeze
+          ELIGIBLE_STATUSES = %i[approved].freeze
           EVENTS = %i[move_to_initial move_to_approved move_to_denied].freeze
 
           STATE_MAPPING = {
             initial: [:initial],
-            accepted: [:initial, :denied],
-            denied: [:initial, :accepted]
+            approved: [:initial, :denied],
+            denied: [:initial, :approved]
           }.freeze
 
           # @param [Hash] opts Options to build eligibility
@@ -26,7 +26,7 @@ module BenefitSponsors
           # @option opts [<String>]   :evidence_value required
           # @option opts [<Symbol>]   :event required
           # @option opts [Date]       :effective_date required
-          # @option opts [Date]       :evidence_record required
+          # @option opts [Date]       :evidence_record optional
           # @return [Dry::Monad] result
           def call(params)
             values = yield validate(params)
@@ -44,8 +44,6 @@ module BenefitSponsors
             errors << 'evidence value missing' unless params[:evidence_value]
             errors << 'effective date missing' unless params[:effective_date]
             errors << 'event missing' unless params[:event]
-            errors << 'evidence_record missing' unless params[:evidence_record]
-
             errors << "Event: #{params[:event]} Invalid. It should be one of #{EVENTS}" unless EVENTS.include?(params[:event])
 
             errors.empty? ? Success(params) : Failure(errors)
@@ -76,7 +74,8 @@ module BenefitSponsors
           end
 
           def build_state_history(values)
-            from_state = values[:evidence_record].state_histories.last&.to_state
+            from_state = values[:evidence_record]&.state_histories&.last&.to_state
+
             options = {
               event: values[:event],
               transition_at: DateTime.now,
