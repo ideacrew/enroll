@@ -11,9 +11,14 @@ module BenefitSponsors
         class BuildAdminAttestedEvidence
           send(:include, Dry::Monads[:result, :do])
 
-          INELIGIBLE_STATUSES = %i[initial denied].freeze
           ELIGIBLE_STATUSES = %i[accepted].freeze
-          EVENTS = %i[initialize accept deny].freeze
+          EVENTS = %i[move_to_initial move_to_approved move_to_denied].freeze
+
+          STATE_MAPPING = {
+            initial: [:initial],
+            accepted: [:initial, :denied],
+            denied: [:initial, :accepted]
+          }.freeze
 
           # @param [Hash] opts Options to build eligibility
           # @option opts [<GlobalId>] :subject required
@@ -21,6 +26,7 @@ module BenefitSponsors
           # @option opts [<String>]   :evidence_value required
           # @option opts [<Symbol>]   :event required
           # @option opts [Date]       :effective_date required
+          # @option opts [Date]       :evidence_record required
           # @return [Dry::Monad] result
           def call(params)
             values = yield validate(params)
@@ -38,49 +44,54 @@ module BenefitSponsors
             errors << 'evidence value missing' unless params[:evidence_value]
             errors << 'effective date missing' unless params[:effective_date]
             errors << 'event missing' unless params[:event]
+            errors << 'evidence_record missing' unless params[:evidence_record]
 
-            unless EVENTS.include?(params[:event])
-              errors << "Event: #{params[:event]} Invalid. It should be one of #{EVENTS}"
-            end
+            errors << "Event: #{params[:event]} Invalid. It should be one of #{EVENTS}" unless EVENTS.include?(params[:event])
 
             errors.empty? ? Success(params) : Failure(errors)
           end
 
           def build(values)
-            state_history = build_state_history(values)
+            options = build_default_evidence_options(values)
+            state_history_options = build_state_history(values)
 
-            Success({
-                      title: values[:evidence_key].to_s.titleize,
-                      key: values[:evidence_key].to_sym,
-                      is_satisfied: state_history[:is_eligible],
-                      state_histories: [state_history],
-                      subject_ref: values[:subject].uri,
-                      evidence_ref: URI("gid://enroll_app/BenefitSponsorships/ShopOsseEvidence")
-                  })
+            options[:state_histories] ||= []
+            options[:state_histories] << state_history_options
+            options[:is_satisfied] = state_history_options[:is_eligible]
+
+            Success(options)
+          end
+
+          def build_default_evidence_options(values)
+            if values[:evidence_record]&.persisted?
+              values[:evidence_record].serializable_hash.deep_symbolize_keys
+            else
+              {
+                title: values[:evidence_key].to_s.titleize,
+                key: values[:evidence_key].to_sym,
+                subject_ref: values[:subject].uri,
+                evidence_ref: URI("gid://enroll_app/BenefitSponsorships/ShopOsseEvidence")
+              }
+            end
           end
 
           def build_state_history(values)
-            transition_states = states_for(values[:event])
-
-            {   
+            from_state = values[:evidence_record].state_histories.last&.to_state
+            options = {
               event: values[:event],
               transition_at: DateTime.now,
               effective_on: values[:effective_date],
-              is_eligible: ELIGIBLE_STATUSES.include?(transition_states[:to_state]),
-              event: values[:event]
-            }.merge(transition_states)
+              from_state: from_state || :initial,
+              to_state: to_state(values[:event])
+            }
+
+            options[:is_eligible] = ELIGIBLE_STATUSES.include?(options[:to_state]) if options[:to_state]
+            options
           end
 
-          def states_for(event)
-            case event
-            when :accept
-              { from_state: :initial, to_state: :accepted }
-            when :deny
-              { from_state: :initial, to_state: :denied }
-            else
-              { from_state: :initial, to_state: :initial }
-            end
-          end      
+          def to_state(event)
+            event.to_s.match(/move_to_(.*)/)[1].to_sym
+          end
         end
       end
     end
