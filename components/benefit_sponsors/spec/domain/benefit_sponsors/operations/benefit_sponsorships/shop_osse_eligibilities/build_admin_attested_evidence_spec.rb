@@ -22,44 +22,56 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
       subject: benefit_sponsorship.to_global_id,
       effective_date: Date.today,
       evidence_key: :shop_osse_evidence,
-      evidence_value: 'false',
-      event: :move_to_denied,
+      evidence_value: evidence_value,
+      event: event,
       evidence_record: evidence_record
     }
   end
 
+  let(:evidence_value) { 'false' }
+  let(:event) { :move_to_denied }
   let(:evidence_record) { nil }
 
   context 'with input params' do
-    it 'should build admin attested evidence' do
+    let(:event) { :move_to_initial }
+
+    it 'should build admin attested evidence options' do
       result = described_class.new.call(required_params)
 
       expect(result).to be_success
-      expect(result.success).to be_a(BenefitSponsors::BenefitSponsorships::ShopOsseEligibility::AdminAttestedEvidence)
     end
 
-    it 'should create state history with attested state' do
+    it 'should build evidence options with :initial state' do
       evidence = described_class.new.call(required_params).success
 
-      state_history = evidence.latest_state_history
-      expect(state_history.event).to eq(:attest)
-      expect(state_history.from_state).to eq(:initialized)
-      expect(state_history.to_state).to eq(:attested)
+      state_history = evidence[:state_histories].last
+      expect(state_history[:event]).to eq(:move_to_initial)
+      expect(state_history[:from_state]).to eq(:initial)
+      expect(state_history[:to_state]).to eq(:initial)
+      expect(state_history[:is_eligible]).to eq(false)
+      expect(evidence[:is_satisfied]).to eq(false)
     end
+  end
 
-    it 'should create default initialized state history' do
+  context 'with event approved' do
+    let(:event) { :move_to_approved }
+    let(:evidence_value) { 'true' }
+
+    it 'should build evidence options with :approved state' do
       evidence = described_class.new.call(required_params).success
 
-      state_history = evidence.state_histories.first
-      expect(state_history.event).to eq(:initialize)
-      expect(state_history.from_state).to eq(:initialized)
-      expect(state_history.to_state).to eq(:initialized)
+      state_history = evidence[:state_histories].last
+      expect(state_history[:event]).to eq(:move_to_approved)
+      expect(state_history[:from_state]).to eq(:initial)
+      expect(state_history[:to_state]).to eq(:approved)
+      expect(state_history[:is_eligible]).to eq(true)
+      expect(evidence[:is_satisfied]).to eq(true)
     end
   end
 
   context 'when existing evidence present' do
     let!(:shop_osse_eligibility) do
-      eligibility = build(:benefit_sponsors_benefit_sponsorships_shop_osse_eligibilities_shop_osse_eligibility, :with_admin_attested_evidence, to_state: :approved, is_eligible: true)
+      eligibility = build(:benefit_sponsors_benefit_sponsorships_shop_osse_eligibilities_shop_osse_eligibility, :with_admin_attested_evidence, evidence_state: :approved, is_eligible: true)
       benefit_sponsorship.eligibilities << eligibility
       benefit_sponsorship.save!
       eligibility
@@ -75,6 +87,8 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
       expect(state_history[:event]).to eq(:move_to_denied)
       expect(state_history[:from_state]).to eq(:approved)
       expect(state_history[:to_state]).to eq(:denied)
+      expect(state_history[:is_eligible]).to eq(false)
+      expect(evidence[:is_satisfied]).to eq(false)
     end
   end
 end
