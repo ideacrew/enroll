@@ -66,8 +66,40 @@ module BenefitSponsors
           end
 
           def store(values, eligibility)
+            subject = GlobalID::Locator.locate(values[:subject])
+
+            persisted_eligibility =
+              subject.shop_eligibilities.where(id: eligibility._id).first
+
+            if persisted_eligibility
+              evidence = eligibility.evidences.last
+              persisted_eligibility.evidences.last.state_histories.build(
+                evidence.state_histories.last.to_h
+              )
+              persisted_eligibility.evidences.last.is_satisfied =
+                evidence.is_satisfied
+              persisted_eligibility.state_histories.build(
+                eligibility.state_histories.last.to_h
+              )
+
+              persisted_eligibility.save
+            else
+              subject.shop_eligibilities << create_eligibility_record(
+                eligibility
+              )
+            end
+
+            if subject.save
+              Success(eligibility_record)
+            else
+              Failure(subject.errors.full_messages)
+            end
+          end
+
+          def create_eligibility_record(eligibility)
             osse_eligibility_params =
               eligibility.to_h.except(:evidences, :grants)
+
             eligibility_record =
               BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::ShopOsseEligibility.new(
                 osse_eligibility_params
@@ -80,15 +112,7 @@ module BenefitSponsors
                 record.class.create_objects(eligibility.grants, :grants)
             end
 
-            subject = GlobalID::Locator.locate(values[:subject])
-            subject.shop_eligibilities << eligibility_record
-            subject.save!
-
-            if subject.save
-              Success(eligibility_record)
-            else
-              Failure(subject.errors.full_messages)
-            end
+            eligibility_record
           end
         end
       end

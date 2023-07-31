@@ -13,11 +13,15 @@ module Eligible
     field :description, type: String
     field :current_state, type: Symbol
 
-    embeds_many :evidences,  class_name: '::Eligible::Evidence', cascade_callbacks: true
-    embeds_many :grants, class_name: '::Eligible::Grant', cascade_callbacks: true
+    embeds_many :evidences,
+                class_name: "::Eligible::Evidence",
+                cascade_callbacks: true
+    embeds_many :grants,
+                class_name: "::Eligible::Grant",
+                cascade_callbacks: true
 
     embeds_many :state_histories,
-                class_name: '::Eligible::StateHistory',
+                class_name: "::Eligible::StateHistory",
                 cascade_callbacks: true,
                 as: :status_trackable
 
@@ -29,9 +33,42 @@ module Eligible
              allow_nil: false
 
     scope :by_key, ->(key) { where(key: key.to_sym) }
+    scope :by_date, ->(key) { where(key: key.to_sym) }
+
+    def self.by_date(date = TimeKeeper.date_of_record)
+      effective_on.gte
+    end
 
     def latest_state_history
-      state_histories.latest_history
+      state_histories.max_by(&:created_at)
+    end
+
+    def current_state
+      latest_state_history&.to_state
+    end
+
+    def effectuated?
+      current_state != :initial
+    end
+
+    def eligibility_period_cover?(date)
+      end_on.present? ? (start_on..end_on).cover?(date) : start_on <= date
+    end
+
+    def start_on
+      publish_history =
+        state_histories.by_state(:published).min_by(&:created_at)
+      publish_history&.effective_on
+    end
+
+    def end_on
+      expiration_history =
+        state_histories.by_state(:expired).min_by(&:created_at)
+      expiration_history&.effective_on&.prev_day
+    end
+
+    def is_eligible_on?(date)
+      evidences.all? { |evidence| evidence.is_eligible_on?(date) }
     end
 
     class << self
@@ -68,49 +105,3 @@ module Eligible
     end
   end
 end
-
-# Input params
-# We build params for eligibility/evidence/grant in the enroll
-# we call aca entities to validate and create entity
-# we persist result into our db
-
-# Operations:
-#    create_eligibility
-
-#       - build params for eligibiliy
-#       - build params for evidence
-#       - build params for grant
-
-#       - call aca_entities to validate and create entity
-#       - persist record into our database
-
-#    build_eligibility
-#    build_evidence
-#    build_grant
-#    build_state_history
-
-#    update_eligibility
-#        - subject: GlobalID
-#        - fetch persisted eligibility record
-#         - update evidence with new state history (use build state history)
-#         - update eligibility based evidence is satisfied or not
-#             - creates new state history under eligibily (use build state history)
-#         - call aca_entities to validate and create entity
-#         - persist record into our database
-#         - subject.eligibilites.find(eligibility[:id]).update #
-#         - subject.save
-
-# We removed state machine from enroll
-#    instead we do state gaurds in aca entities
-
-
-# We create default osse eligibility for all sponsors/consumers
-   # default eligibility will be in initial state
-   # default evidence will be in initial state
-   # default grants...we create them
-
-#  when admin grants osse eligibility from UI
-  #  create new state history under evidence with status approved
-  #  update eligibility state to published and create a state history record
-  #  do we create grants??? I don't know...depends on grants that existing are relavent or not
-

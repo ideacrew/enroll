@@ -17,7 +17,7 @@ module Eligible
     field :evidence_ref, type: String
 
     embeds_many :state_histories,
-                class_name: '::Eligible::StateHistory',
+                class_name: "::Eligible::StateHistory",
                 cascade_callbacks: true,
                 as: :status_trackable
 
@@ -32,6 +32,37 @@ module Eligible
 
     def latest_state_history
       state_histories.latest_history
+    end
+
+    def is_eligible_on?(date)
+      eligible_periods.any? do |period|
+        if period[:end_on].present?
+          (period[:start_on]..period[:end_on]).cover?(date)
+        else
+          period[:start_on] <= date
+        end
+      end
+    end
+
+    def eligible_periods
+      eligible_periods = []
+      date_range = {}
+      state_histories.each do |state_history|
+        next if state_history.to_state == :initial
+        if date_range.empty? && state_history.to_state == :approved
+          date_range[:start_on] = state_history.effective_on
+        end
+
+        if date_range.present? && state_history.to_state == :denied
+          date_range[:end_on] = state_history.effective_on.prev_day
+          eligible_periods << date_range
+          date_range = {}
+        end
+      end
+
+      eligible_periods << date_range unless date_range.empty?
+
+      eligible_periods
     end
   end
 end

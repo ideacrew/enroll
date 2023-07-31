@@ -25,6 +25,8 @@ module Eligible
                           :to_state,
                           :transition_at
 
+    scope :by_state, ->(state) { where(to_state: state.to_sym) }
+
     def self.latest_history
       order(transition_at: :desc).first
     end
