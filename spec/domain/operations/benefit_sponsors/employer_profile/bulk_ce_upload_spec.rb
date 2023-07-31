@@ -19,11 +19,11 @@ RSpec.describe Operations::BenefitSponsors::EmployerProfile::BulkCeUpload, type:
     let(:hired_on) {TimeKeeper.date_of_record.beginning_of_month}
     let!(:census_employees) {FactoryBot.create_list(:benefit_sponsors_census_employee, 2, :owner, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship) }
     let(:input_params) do
-        {
-          uri: uri,
-          s3_reference_key: 'sample-key', bucket_name: bucket_name, employer_profile_id: employer_profile.id, filename: filename
-        }
-      end
+      {
+        uri: uri,
+        s3_reference_key: 'sample-key', bucket_name: bucket_name, employer_profile_id: employer_profile.id, filename: filename
+      }
+    end
 
     context "validate params" do
       context 'with invalid input params' do
@@ -45,7 +45,7 @@ RSpec.describe Operations::BenefitSponsors::EmployerProfile::BulkCeUpload, type:
         it 'process the file and uploads census employees successfully' do
           result = subject.call(input_params)
           expect(employer_profile.census_employees.length).to eq 2
-          expect(result.success).to match /Successfully uploaded census employees: 2 to the roster/
+          expect(result.success).to match(/Successfully uploaded census employees: 2 to the roster/)
         end
       end
     end

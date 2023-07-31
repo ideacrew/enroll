@@ -130,7 +130,7 @@ module BenefitSponsors
         def bulk_upload_with_async_process(file)
           filename = file.original_filename
           # preparing the file upload to s3
-          uri = Aws::S3Storage.save(file.path, 'ce-roster-upload', filename)
+          uri = Aws::S3Storage.save(file.path, 'ce-roster-upload')
           if uri.present?
             # making call to subscriber
             event = event('events.benefit_sponsors.employer_profile.bulk_ce_upload', attributes: {s3_reference_key: filename, bucket_name: 'ce-roster-upload', employer_profile_id: @employer_profile.id, filename: filename})
