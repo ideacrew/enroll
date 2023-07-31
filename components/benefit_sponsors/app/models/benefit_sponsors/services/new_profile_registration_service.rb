@@ -44,7 +44,8 @@ module BenefitSponsors
 
       def osse_eligibility(object)
         return false unless object.active_benefit_sponsorship
-        object.active_benefit_sponsorship.eligibility_for(:osse_subsidy, TimeKeeper.date_of_record).present?
+        eligibility = object.active_benefit_sponsorship.eligibility_for(:shop_osse_eligibility, TimeKeeper.date_of_record)
+        eligibility.present? ? eligibility.is_eligible_on?(TimeKeeper.date_of_record) : false
       end
 
       def load_form_metadata(form)

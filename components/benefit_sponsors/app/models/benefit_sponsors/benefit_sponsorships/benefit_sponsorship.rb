@@ -360,11 +360,11 @@ module BenefitSponsors
       primary_office_location.present? && primary_office_location.address.present?
     end
 
-    def eligibility_for(evidence_key, start_on)
-      eligibilities.by_date(start_on).select do |eligibility|
-        el = eligibility.evidences.by_key(evidence_key).max_by(&:created_at)
-        el&.is_satisfied == true
-      end.last
+    def eligibility_for(eligibility_key, start_on)
+      eligibilities = shop_eligibilities.by_key(eligibility_key)
+      eligibilities.select(&:effectuated?).detect do |eligibility|
+        eligibility.eligibility_period_cover?(start_on)
+      end
     end
 
     def current_eligibility(evidence_key)
