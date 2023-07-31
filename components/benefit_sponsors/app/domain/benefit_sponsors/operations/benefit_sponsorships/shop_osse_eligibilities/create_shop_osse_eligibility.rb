@@ -46,7 +46,7 @@ module BenefitSponsors
 
           def find_eligibility(values)
             subject = GlobalID::Locator.locate(values[:subject])
-            eligibility = subject.eligibilities.by_key(:shop_osse_eligibility).last
+            eligibility = subject.shop_eligibilities.by_key(:shop_osse_eligibility).last
 
             Success(eligibility)
           end
@@ -72,7 +72,7 @@ module BenefitSponsors
             end
 
             subject = GlobalID::Locator.locate(values[:subject])
-            subject.eligibilities << eligibility_record
+            subject.shop_eligibilities << eligibility_record
             subject.save!
 
             if subject.save

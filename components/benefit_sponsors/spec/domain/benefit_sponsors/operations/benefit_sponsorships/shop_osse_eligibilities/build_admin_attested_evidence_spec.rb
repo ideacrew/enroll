@@ -72,7 +72,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
   context 'when existing evidence present' do
     let!(:shop_osse_eligibility) do
       eligibility = build(:benefit_sponsors_benefit_sponsorships_shop_osse_eligibilities_shop_osse_eligibility, :with_admin_attested_evidence, evidence_state: :approved, is_eligible: true)
-      benefit_sponsorship.eligibilities << eligibility
+      benefit_sponsorship.shop_eligibilities << eligibility
       benefit_sponsorship.save!
       eligibility
     end
