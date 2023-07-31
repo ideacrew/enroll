@@ -11,6 +11,7 @@ module Eligible
     field :key, type: Symbol
     field :title, type: String
     field :description, type: String
+<<<<<<< HEAD
     field :current_state, type: Symbol, default: :initial
 
     embeds_many :evidences,
@@ -22,6 +23,15 @@ module Eligible
 
     embeds_many :state_histories,
                 class_name: "::Eligible::StateHistory",
+=======
+    field :current_state, type: Symbol
+
+    embeds_many :evidences,  class_name: '::Eligible::Evidence', cascade_callbacks: true
+    embeds_many :grants, class_name: '::Eligible::Grant', cascade_callbacks: true
+
+    embeds_many :state_histories,
+                class_name: '::Eligible::StateHistory',
+>>>>>>> 6d654049e5 (update benefit sponsors dummy eligible models)
                 cascade_callbacks: true,
                 as: :status_trackable
 
@@ -33,7 +43,6 @@ module Eligible
              allow_nil: false
 
     scope :by_key, ->(key) { where(key: key.to_sym) }
-    scope :by_date, ->(key) { where(key: key.to_sym) }
 
     def latest_state_history
       state_histories.max_by(&:created_at)
