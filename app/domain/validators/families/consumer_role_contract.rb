@@ -9,7 +9,7 @@ module Validators
         optional(:is_state_resident).maybe(:bool)
         optional(:lawful_presence_determination).maybe(:string)
         optional(:citizen_status).maybe(:string)
-
+        optional(:language_preference).maybe(:string)
       end
     end
   end

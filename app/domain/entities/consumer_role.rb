@@ -8,5 +8,6 @@ module Entities
     attribute :is_state_resident, Types::Strict::Bool.optional.meta(omittable: true)
     attribute :lawful_presence_determination, Types::Strict::String.optional.meta(omittable: true)
     attribute :citizen_status, Types::Strict::String.optional.meta(omittable: true)
+    attribute :language_preference, Types::Strict::String.optional.meta(omittable: true)
   end
 end
