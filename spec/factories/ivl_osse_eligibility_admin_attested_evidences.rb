@@ -2,10 +2,9 @@
 
 FactoryBot.define do
   factory :ivl_osse_admin_attested_evidence,
-          class: '::IvlOsseEligibility::AdminAttestedEvidence' do
-
-    title { 'Childcare Subsidy' }
-    description { 'Childcare Subsidy Evidence' }
+          class: "::IvlOsseEligibilities::AdminAttestedEvidence" do
+    title { "Childcare Subsidy" }
+    description { "Childcare Subsidy Evidence" }
     key { :osse_subsidy }
     is_satisfied { true }
 

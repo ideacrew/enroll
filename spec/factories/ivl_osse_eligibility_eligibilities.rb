@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :ivl_osse_eligibility, class: '::IvlOsseEligibility::Eligibility' do
-
-    title { 'Contribution Subsidy' }
-    description { 'Osse Contribution Subsidy' }
+  factory :ivl_osse_eligibility,
+          class: "::IvlOsseEligibilities::IvlOsseEligibility" do
+    title { "Contribution Subsidy" }
+    description { "Osse Contribution Subsidy" }
 
     transient do
       from_state { :draft }

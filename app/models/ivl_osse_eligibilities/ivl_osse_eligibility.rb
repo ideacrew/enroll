@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module IvlOsseEligibility
+module IvlOsseEligibilities
   # Eligibility model for ivl osse
   class IvlOsseEligibility < ::Eligible::Eligibility
   end
