@@ -102,7 +102,10 @@ module BenefitSponsors
       class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication",
       inverse_of: :benefit_sponsorship
 
-    embeds_many :eligibilities, class_name: '::Eligible::Eligibility', cascade_callbacks: true
+    has_many :eligibilities, class_name: "::Eligibilities::Osse::Eligibility",
+                            as: :eligibility
+
+    embeds_many :shop_eligibilities, class_name: '::Eligible::Eligibility', cascade_callbacks: true
 
     has_many    :census_employees,
       class_name: "::CensusEmployee"
