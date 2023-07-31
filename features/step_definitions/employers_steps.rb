@@ -710,7 +710,7 @@ end
 Then(/^employer clicks on terminated filter$/) do
   expect(page).to have_content "Select 'Add New Employee' to continue building your roster, or select 'Upload Employee Roster' if you're ready to download or upload the roster template"
   find_by_id('Tab:terminated').click
-  wait_for_ajax
+  sleep(2)
 end
 
 Then(/^employer should not see the Get Help from Broker$/) do
@@ -834,11 +834,11 @@ And(/^employer clicks on all employees$/) do
   expect(page).to have_content "Select 'Add New Employee' to continue building your roster, or select 'Upload Employee Roster' if you're ready to download or upload the roster template"
   find_by_id('Tab:all').click
 
-  wait_for_ajax
+  sleep(2)
 end
 
 Then(/^employer should not see termination date column$/) do
-  wait_for_ajax
+  sleep(2)
   expect(page).not_to have_content "Terminated On"
 end
 
@@ -847,7 +847,7 @@ And(/^employer clicked on save plan year button$/) do
 end
 
 Then(/^they should see that employee's details$/) do
-  wait_for_ajax
+  sleep(2)
   expect(page).to have_selector("input[value='#{employees.first.dob.strftime('%m/%d/%Y')}']")
 end
 
