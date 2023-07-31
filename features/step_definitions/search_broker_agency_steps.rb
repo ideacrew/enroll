@@ -8,6 +8,5 @@ When(/^he enters an broker agency name and clicks on the search button$/) do
 end
 
 Then(/^he should see the one result with the agency name$/) do
-  sleep(2)
   expect(page).to have_content(broker_agency_profile.legal_name)
 end
