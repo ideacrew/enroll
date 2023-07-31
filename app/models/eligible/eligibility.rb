@@ -69,48 +69,48 @@ module Eligible
   end
 end
 
-# Input params 
-# We build params for eligibility/evidence/grant in the enroll 
-# we call aca entities to validate and create entity 
-# we persist result into our db 
+# Input params
+# We build params for eligibility/evidence/grant in the enroll
+# we call aca entities to validate and create entity
+# we persist result into our db
 
-# Operations: 
-#    create_eligibility 
+# Operations:
+#    create_eligibility
 
 #       - build params for eligibiliy
-#       - build params for evidence 
-#       - build params for grant 
+#       - build params for evidence
+#       - build params for grant
 
 #       - call aca_entities to validate and create entity
-#       - persist record into our database 
+#       - persist record into our database
 
-#    build_eligibility 
+#    build_eligibility
 #    build_evidence
 #    build_grant
-#    build_state_history 
+#    build_state_history
 
 #    update_eligibility
 #        - subject: GlobalID
-#        - fetch persisted eligibility record 
+#        - fetch persisted eligibility record
 #         - update evidence with new state history (use build state history)
-#         - update eligibility based evidence is satisfied or not 
+#         - update eligibility based evidence is satisfied or not
 #             - creates new state history under eligibily (use build state history)
 #         - call aca_entities to validate and create entity
 #         - persist record into our database
-#         - subject.eligibilites.find(eligibility[:id]).update # 
+#         - subject.eligibilites.find(eligibility[:id]).update #
 #         - subject.save
 
-# We removed state machine from enroll 
-#    instead we do state gaurds in aca entities 
+# We removed state machine from enroll
+#    instead we do state gaurds in aca entities
 
 
 # We create default osse eligibility for all sponsors/consumers
    # default eligibility will be in initial state
    # default evidence will be in initial state
-   # default grants...we create them 
+   # default grants...we create them
 
 #  when admin grants osse eligibility from UI
   #  create new state history under evidence with status approved
-  #  update eligibility state to published and create a state history record 
+  #  update eligibility state to published and create a state history record
   #  do we create grants??? I don't know...depends on grants that existing are relavent or not
 
