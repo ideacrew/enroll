@@ -102,12 +102,12 @@ RSpec.describe Operations::Eligible::BuildEligibility,
     let!(:shop_osse_eligibility) do
       eligibility =
         build(
-          :benefit_sponsors_benefit_sponsorships_shop_osse_eligibilities_shop_osse_eligibility,
+          :benefit_sponsors_shop_osse_eligibility,
           :with_admin_attested_evidence,
           evidence_state: :initial,
           is_eligible: false
         )
-      benefit_sponsorship.shop_eligibilities << eligibility
+      benefit_sponsorship.eligibilities << eligibility
       benefit_sponsorship.save!
       eligibility
     end

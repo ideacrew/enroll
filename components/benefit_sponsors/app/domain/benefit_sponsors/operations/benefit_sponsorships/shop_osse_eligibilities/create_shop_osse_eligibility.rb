@@ -11,16 +11,20 @@ module BenefitSponsors
         class CreateShopOsseEligibility
           send(:include, Dry::Monads[:result, :do])
 
+          attr_reader :subject
+
           # @param [Hash] opts Options to build eligibility
           # @option opts [<GlobalId>] :subject required
           # @option opts [<String>]   :evidence_key required
           # @option opts [<String>]   :evidence_value required
           # @option opts [Date]       :effective_date required
+          # @option opts [Hash]       :timestamps optional timestamps for data migrations purposes
           # @return [Dry::Monad] result
           def call(params)
             values = yield validate(params)
             eligibility_record = yield find_eligibility(values)
-            eligibility_options = yield build_eligibility_options(values, eligibility_record)
+            eligibility_options =
+              yield build_eligibility_options(values, eligibility_record)
             eligibility = yield create_eligibility(eligibility_options)
             persisted_eligibility = yield store(values, eligibility)
 
@@ -30,7 +34,6 @@ module BenefitSponsors
           private
 
           def validate(params)
-            params[:event] ||= :initialize
             params[:effective_date] ||= TimeKeeper.date_of_record
 
             errors = []
@@ -43,8 +46,13 @@ module BenefitSponsors
             errors.empty? ? Success(params) : Failure(errors)
           end
 
-          def find_eligibility(_values)
-            eligibility = @subject.shop_eligibilities.by_key(:shop_osse_eligibility).last
+          # Given calendar year there will be only one instance of osse eligibility with single evidence record.
+          # When eligibility changes we create new state histories for evidence and eligibility
+          def find_eligibility(values)
+            eligibility =
+              subject.find_eligibility_by(
+                "aca_shop_osse_eligibility_#{values[:effective_date].year}".to_sym
+              )
 
             Success(eligibility)
           end
@@ -52,12 +60,15 @@ module BenefitSponsors
           def build_eligibility_options(values, eligibility_record = nil)
             ::Operations::Eligible::BuildEligibility.new(
               configuration:
-                BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::OsseEligibilityConfiguration
+                BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::OsseEligibilityConfiguration.new(
+                  subject: subject,
+                  effective_date: values[:effective_date]
+                )
             ).call(
               values.merge(
                 eligibility_record: eligibility_record,
                 evidence_configuration:
-                  BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::OsseEvidenceConfiguration
+                  BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::OsseEvidenceConfiguration.new
               )
             )
           end
@@ -72,34 +83,42 @@ module BenefitSponsors
           end
 
           def store(_values, eligibility)
-            eligibility_record = @subject.shop_eligibilities.where(id: eligibility._id).first
+            eligibility_record =
+              subject.eligibilities.where(id: eligibility._id).first
 
             if eligibility_record
               update_eligibility_record(eligibility_record, eligibility)
             else
               eligibility_record = create_eligibility_record(eligibility)
-              @subject.shop_eligibilities << eligibility_record
+              subject.eligibilities << eligibility_record
             end
 
-            if @subject.save
+            if subject.save
               Success(eligibility_record)
             else
-              Failure(@subject.errors.full_messages)
+              Failure(subject.errors.full_messages)
             end
           end
 
           def update_eligibility_record(eligibility_record, eligibility)
             evidence = eligibility.evidences.last
-            eligibility_record.evidences.last.state_histories.build(
-              evidence.state_histories.last.to_h
-            )
-            eligibility_record.evidences.last.is_satisfied =
-              evidence.is_satisfied
-            eligibility_record.state_histories.build(
-              eligibility.state_histories.last.to_h
-            )
+            evidence_history_params = build_history_params_for(evidence)
+            eligibility_history_params = build_history_params_for(eligibility)
+
+            evidence_record = eligibility_record.evidences.last
+            evidence_record.is_satisfied = evidence.is_satisfied
+            evidence_record.current_state = evidence.current_state
+            evidence_record.state_histories.build(evidence_history_params)
+            eligibility_record.state_histories.build(eligibility_history_params)
+            eligibility_record.current_state = eligibility.current_state
 
             eligibility_record.save
+            subject.save
+          end
+
+          def build_history_params_for(record)
+            record_history = record.state_histories.last
+            record_history.to_h
           end
 
           def create_eligibility_record(eligibility)
