@@ -47,11 +47,7 @@ module BenefitSponsors
             return if osse_eligibility.to_s == 'true'
             terminate_eligibility(benefit_sponsorship)
           else
-            result = ::Operations::Eligibilities::Osse::BuildEligibility.new.call(osse_eligibility_params(benefit_sponsorship, osse_eligibility))
-            if result.success?
-              eligibility = benefit_sponsorship.eligibilities.build(result.success.to_h)
-              eligibility.save!
-            end
+            ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(osse_eligibility_params(benefit_sponsorship, osse_eligibility))
           end
         rescue StandardError => e
           Rails.logger.error { "error building osse eligibility due to: #{e.message}" }
@@ -85,9 +81,9 @@ module BenefitSponsors
 
         def self.osse_eligibility_params(benefit_sponsorship, osse_eligibility)
           {
-            subject_gid: benefit_sponsorship.to_global_id,
-            evidence_key: :osse_subsidy,
-            evidence_value: osse_eligibility,
+            subject: benefit_sponsorship.to_global_id,
+            evidence_key: :shop_osse_evidence,
+            evidence_value: osse_eligibility.to_s,
             effective_date: TimeKeeper.date_of_record
           }
         end
