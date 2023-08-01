@@ -33,27 +33,29 @@ module ChildcareSubsidyConcern
     end
 
     def create_or_term_eligibility(eligibility_params)
+      osse_eligibility = eligibility_params[:evidence_value]
       if is_osse_eligibility_satisfied?(eligibility_params[:effective_date])
-        return if eligibility_params[:evidence_value] == 'true'
+        return if osse_eligibility == 'true'
         terminate_eligibility(eligibility_params)
-      elsif eligibility_params[:evidence_value] == 'true'
-        create_eligibility(eligibility_params)
+      elsif osse_eligibility == 'true'
+        ::IvlOsseEligibilities::CreateIvlOsseEligibility.new.call(osse_eligibility_params(osse_eligibility))
       end
     end
 
-    def create_eligibility(eligibility_params)
-      eligibility_result = build_eligibility(eligibility_params)
-      if eligibility_result.success?
-        eligibility = self.eligibilities.build(eligibility_result.success.to_h)
-        eligibility.save!
-      end
-      eligibility_result
-    end
+    def self.osse_eligibility_params(osse_eligibility)
+      effective_date = if EnrollRegistry.feature_enabled?("aca_ivl_osse_effective_beginning_of_year")
+                         TimeKeeper.date_of_record.beginning_of_year
+                       else
+                         TimeKeeper.date_of_record
+                       end
 
-    def build_eligibility(eligibility_params)
-      ::Operations::Eligibilities::Osse::BuildEligibility.new.call(
-        eligibility_params.merge(subject_gid: self.to_global_id)
-      )
+      {
+        subject: self.to_global_id,
+        evidence_key: :ivl_osse_evidence,
+        evidence_value: osse_eligibility.to_s,
+        effective_date: effective_date,
+        eligibility_key: :ivl_osse_eligibility
+      }
     end
 
     def terminate_eligibility(eligibility_params)

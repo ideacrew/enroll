@@ -84,7 +84,8 @@ module BenefitSponsors
             subject: benefit_sponsorship.to_global_id,
             evidence_key: :shop_osse_evidence,
             evidence_value: osse_eligibility.to_s,
-            effective_date: TimeKeeper.date_of_record
+            effective_date: TimeKeeper.date_of_record,
+            eligibility_key: :shop_osse_eligibility
           }
         end
 
