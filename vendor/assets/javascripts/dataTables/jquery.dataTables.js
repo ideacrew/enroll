@@ -12003,7 +12003,7 @@
        *      } );
        *    } );
        */
-      "sProcessing": "",
+      "sProcessing": "Processing...",
   
   
       /**
