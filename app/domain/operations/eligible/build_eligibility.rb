@@ -5,6 +5,9 @@ require "dry/monads/do"
 
 module Operations
   module Eligible
+    EligibilityImport = Dry.AutoInject(EligibilityContainer) unless defined?(
+      EligibilityImport
+    )
     # Operation to support eligibility creation
     class BuildEligibility
       send(:include, Dry::Monads[:result, :do])
@@ -19,7 +22,10 @@ module Operations
       # @option opts [Date]       :effective_date required
       # @option opts [ShopOsseEligibility]  :eligibility_record optional
       # @option opts [EvidenceConfiguration]  :evidence_configuration optional
+<<<<<<< HEAD
       # @option opts [Hash]       :timestamps optional timestamps for data migrations purposes
+=======
+>>>>>>> 7c04c477ec (Add dependency injection for top level eligibility builders)
       # @return [Dry::Monad] result
       def call(params)
         values = yield validate(params)
