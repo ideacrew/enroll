@@ -56,9 +56,11 @@ module Operations
           options[:subject_ref] = URI(options[:subject_ref]) unless options[
             :subject_ref
           ].is_a? URI
-          options[:evidence_ref] = URI(options[:evidence_ref]) unless options[
-            :evidence_ref
-          ].is_a? URI
+          if options[:evidence_ref]
+            options[:evidence_ref] = URI(options[:evidence_ref]) unless options[
+              :evidence_ref
+            ].is_a? URI
+          end
           options
         else
           {
