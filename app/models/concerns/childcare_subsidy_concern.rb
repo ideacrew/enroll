@@ -54,19 +54,17 @@ module ChildcareSubsidyConcern
         subject: self.to_global_id,
         evidence_key: :ivl_osse_evidence,
         evidence_value: osse_eligibility.to_s,
-        effective_date: effective_date,
-        eligibility_key: :ivl_osse_eligibility
+        effective_date: effective_date
       }
     end
 
     def terminate_eligibility(eligibility_params)
-      ::Operations::Eligibilities::Osse::TerminateEligibility.new.call(
-        {
-          subject_gid: self.to_global_id.to_s,
-          evidence_key: :osse_subsidy,
-          termination_date: eligibility_params[:effective_date]
-        }
-      )
+      ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new.call({
+        subject: self.to_global_id,
+        evidence_key: :ivl_osse_evidence,
+        evidence_value: eligibility_params[:evidence_value].to_s,
+        effective_date: eligibility_params[:effective_date]
+      })
     end
   end
 end
