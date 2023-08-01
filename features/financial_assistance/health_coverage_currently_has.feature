@@ -27,6 +27,14 @@ Feature: Start a new Financial Assistance Application and answers questions on h
     Then the save button should be enabled
     And the user saves the health coverage information
     Then the health coverage should be saved on the page
+
+  Scenario: User enters health coverage information with end date less than start date
+    Given the user answers yes to currently having health coverage
+    And the user checks a health coverage checkbox
+    And the user fills out the required health coverage information with end date less than start date
+    Then the save button should be enabled
+    And the user saves the health coverage information
+    Then the user should see a JS alert
   
   Scenario: Cancel button functionality (currently have coverage)
     Given the user answers yes to currently having health coverage

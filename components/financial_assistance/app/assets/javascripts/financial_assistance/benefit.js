@@ -14,6 +14,17 @@ function startEditingBenefit(benefit_kind) {
   $('.col-md-3 > .interaction-click-control-continue').addClass('disabled');
 };
 
+function checkDate(benefit_id) {
+  var startDate = $("#start_on_" + benefit_id).datepicker('getDate');
+  var endDate = $("#end_on_" + benefit_id).datepicker('getDate');
+
+  if ((endDate != "" && endDate != null) && (endDate < startDate)) {
+    alert('The end date must be after the start date.')
+    $("#end_on_" + benefit_id)[0].value = ""
+    window.event.preventDefault()
+  }
+}
+
 function currentlyEditing() {
   return $('.interaction-click-control-continue').hasClass('disabled');
 };

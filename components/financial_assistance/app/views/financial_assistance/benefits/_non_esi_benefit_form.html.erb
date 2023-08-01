@@ -13,7 +13,7 @@
     <div class="row">
       <div class="col-md-3 pull-right">
         <a class="btn btn-default benefit-cancel">Cancel</a>
-        <%= f.submit 'Save', class: 'btn btn-danger' %>
+        <%= f.submit 'Save', class: 'btn btn-danger', onclick: "checkDate('#{benefit.id}')" %>
       </div>
     </div>
   </div>
