@@ -5,9 +5,6 @@ require "dry/monads/do"
 
 module Operations
   module Eligible
-    EligibilityImport = Dry.AutoInject(EligibilityContainer) unless defined?(
-      EligibilityImport
-    )
     # Operation to support eligibility creation
     class BuildEvidence
       send(:include, Dry::Monads[:result, :do])
