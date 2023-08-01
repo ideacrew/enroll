@@ -72,17 +72,7 @@ module BenefitSponsors
               subject.shop_eligibilities.where(id: eligibility._id).first
 
             if persisted_eligibility
-              evidence = eligibility.evidences.last
-              persisted_eligibility.evidences.last.state_histories.build(
-                evidence.state_histories.last.to_h
-              )
-              persisted_eligibility.evidences.last.is_satisfied =
-                evidence.is_satisfied
-              persisted_eligibility.state_histories.build(
-                eligibility.state_histories.last.to_h
-              )
-
-              persisted_eligibility.save
+              update_eligibility_record(persisted_eligibility, eligibility)
             else
               subject.shop_eligibilities << create_eligibility_record(
                 eligibility
@@ -94,6 +84,19 @@ module BenefitSponsors
             else
               Failure(subject.errors.full_messages)
             end
+          end
+
+          def update_eligibility_record(model_record, eligibility)
+            evidence = eligibility.evidences.last
+            model_record.evidences.last.state_histories.build(
+              evidence.state_histories.last.to_h
+            )
+            model_record.evidences.last.is_satisfied = evidence.is_satisfied
+            model_record.state_histories.build(
+              eligibility.state_histories.last.to_h
+            )
+
+            model_record.save
           end
 
           def create_eligibility_record(eligibility)

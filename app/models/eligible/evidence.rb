@@ -47,8 +47,7 @@ module Eligible
     def eligible_periods
       eligible_periods = []
       date_range = {}
-      state_histories.each do |state_history|
-        next if state_history.to_state == :initial
+      state_histories.non_initial.each do |state_history|
         if date_range.empty? && state_history.to_state == :approved
           date_range[:start_on] = state_history.effective_on
         end
