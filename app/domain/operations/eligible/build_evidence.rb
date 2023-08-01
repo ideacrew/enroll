@@ -5,18 +5,15 @@ require "dry/monads/do"
 
 module Operations
   module Eligible
+    EligibilityImport = Dry.AutoInject(EligibilityContainer) unless defined?(
+      EligibilityImport
+    )
     # Operation to support eligibility creation
     class BuildEvidence
       send(:include, Dry::Monads[:result, :do])
-
-      ELIGIBLE_STATUSES = %i[approved].freeze
-      EVENTS = %i[move_to_initial move_to_approved move_to_denied].freeze
-
-      STATE_MAPPING = {
-        initial: [:initial],
-        approved: %i[initial denied],
-        denied: %i[approved]
-      }.freeze
+      include ::Operations::Eligible::EligibilityImport[
+                configuration: "evidence_defaults"
+              ]
 
       # @param [Hash] opts Options to build eligibility
       # @option opts [<GlobalId>] :subject required
@@ -68,11 +65,9 @@ module Operations
           options
         else
           {
-            title: values[:evidence_key].to_s.titleize,
-            key: values[:evidence_key].to_sym,
-            subject_ref: values[:subject].uri,
-            evidence_ref:
-              URI("gid://enroll_app/BenefitSponsorships/ShopOsseEvidence") # FIXME
+            title: configuration.title,
+            key: values[:evidence_key],
+            subject_ref: values[:subject].uri
           }
         end
       end
@@ -81,39 +76,18 @@ module Operations
         recent_record =
           values[:evidence_record]&.state_histories&.max_by(&:created_at)
         from_state = recent_record&.to_state || :initial
-        to_state = to_state_for(values, from_state)
+        to_state = configuration.to_state_for(values, from_state)
 
         options = {
           event: "move_to_#{to_state}".to_sym,
           transition_at: DateTime.now,
           effective_on: values[:effective_date],
           from_state: from_state,
+          is_eligible: configuration.is_eligible?(to_state),
           to_state: to_state
         }
 
-        options[:is_eligible] = ELIGIBLE_STATUSES.include?(options[:to_state]) if options[:to_state]
         options
-      end
-
-      def to_state(event)
-        event.to_s.match(/move_to_(.*)/)[1].to_sym
-      end
-
-      def to_state_for(values, from_state)
-        evidence_value = values[:evidence_value]
-
-        case evidence_value
-        when "true"
-          :approved
-        when "false"
-          case from_state
-          when :approved
-            :denied
-          when :initial
-            return :initial unless values[:evidence_record]
-            :denied
-          end
-        end
       end
     end
   end

@@ -5,9 +5,15 @@ require "dry/monads/do"
 
 module Operations
   module Eligible
+    EligibilityImport = Dry.AutoInject(EligibilityContainer) unless defined?(
+      EligibilityImport
+    )
     # Operation to support eligibility creation
     class BuildEligibility
       send(:include, Dry::Monads[:result, :do])
+      include ::Operations::Eligible::EligibilityImport[
+                configuration: "eligibility_defaults"
+              ]
 
       # @param [Hash] opts Options to build eligibility
       # @option opts [<GlobalId>] :subject required
@@ -15,6 +21,7 @@ module Operations
       # @option opts [<String>]   :evidence_value required
       # @option opts [Date]       :effective_date required
       # @option opts [ShopOsseEligibility]  :eligibility_record optional
+      # @option opts [EvidenceConfiguration]  :evidence_configuration optional
       # @return [Dry::Monad] result
       def call(params)
         values = yield validate(params)
@@ -34,7 +41,6 @@ module Operations
         errors << "evidence key missing" unless params[:evidence_key]
         errors << "evidence value missing" unless params[:evidence_value]
         errors << "effective date missing" unless params[:effective_date]
-        errors << "eligibility_key is missing" unless params[:eligibility_key]
 
         errors.empty? ? Success(params) : Failure(errors)
       end
@@ -52,7 +58,13 @@ module Operations
       end
 
       def build_evidence_options(values, evidence_record = nil)
-        BuildEvidence.new.call(values.merge(evidence_record: evidence_record))
+        options = {}
+        options[:configuration] = values[:evidence_configuration] if values[
+          :evidence_configuration
+        ]
+        BuildEvidence.new(options).call(
+          values.merge(evidence_record: evidence_record)
+        )
       end
 
       def build_eligibility_options(values, evidence_options)
@@ -87,52 +99,37 @@ module Operations
         end
 
         {
-          title: values[:eligibility_key].to_s.titleize,
-          key: values[:eligibility_key],
+          title: configuration.title,
+          key: configuration.key,
           grants: build_grants
         }
       end
 
       def build_grants
-        %i[
-          contribution_subsidy_grant
-          min_employee_participation_relaxed_grant
-          min_fte_count_relaxed_grant
-          min_contribution_relaxed_grant
-          metal_level_products_restricted_grant
-        ].map do |key|
+        configuration.grants.collect do |key|
           BuildGrant.new.call(grant_key: key, grant_value: true).success
         end
       end
 
       def build_state_history(values, evidence_options)
-        eligibility_event = eligibility_event_for(evidence_options)
+        to_state = to_state_for(evidence_options)
         from_state =
           values[:eligibility_record]&.state_histories&.last&.to_state
 
         {
-          event: eligibility_event,
+          event: "move_to_#{to_state}".to_sym,
           transition_at: DateTime.now,
           effective_on: values[:effective_date],
           from_state: from_state || :initial,
-          to_state: to_state(eligibility_event),
+          to_state: to_state,
           is_eligible: evidence_options[:is_satisfied]
         }
       end
 
-      def eligibility_event_for(evidence_options)
+      def to_state_for(evidence_options)
         latest_history = evidence_options[:state_histories].last
 
-        case latest_history[:to_state]
-        when :approved, :denied
-          :move_to_published
-        else
-          :move_to_initial
-        end
-      end
-
-      def to_state(event)
-        event.to_s.match(/move_to_(.*)/)[1].to_sym
+        configuration.to_state_for(latest_history[:to_state])
       end
     end
   end

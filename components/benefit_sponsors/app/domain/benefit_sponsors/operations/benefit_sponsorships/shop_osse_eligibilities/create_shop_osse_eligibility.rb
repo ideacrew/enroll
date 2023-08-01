@@ -39,7 +39,6 @@ module BenefitSponsors
             errors << "evidence key missing" unless params[:evidence_key]
             errors << "evidence value missing" unless params[:evidence_value]
             errors << "effective date missing" unless params[:effective_date]
-            errors << "eligibility_key is missing" unless params[:eligibility_key]
 
             errors.empty? ? Success(params) : Failure(errors)
           end
@@ -53,8 +52,15 @@ module BenefitSponsors
           end
 
           def build_eligibility_options(values, eligibility_record = nil)
-            ::Operations::Eligible::BuildEligibility.new.call(
-              values.merge(eligibility_record: eligibility_record)
+            ::Operations::Eligible::BuildEligibility.new(
+              configuration:
+                BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::OsseEligibilityConfiguration
+            ).call(
+              values.merge(
+                eligibility_record: eligibility_record,
+                evidence_configuration:
+                  BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::OsseEvidenceConfiguration
+              )
             )
           end
 
@@ -69,15 +75,14 @@ module BenefitSponsors
           def store(values, eligibility)
             subject = GlobalID::Locator.locate(values[:subject])
 
-            persisted_eligibility =
+            eligibility_record =
               subject.shop_eligibilities.where(id: eligibility._id).first
 
-            if persisted_eligibility
-              update_eligibility_record(persisted_eligibility, eligibility)
+            if eligibility_record
+              update_eligibility_record(eligibility_record, eligibility)
             else
-              subject.shop_eligibilities << create_eligibility_record(
-                eligibility
-              )
+              eligibility_record = create_eligibility_record(eligibility)
+              subject.shop_eligibilities << eligibility_record
             end
 
             if subject.save
@@ -87,17 +92,18 @@ module BenefitSponsors
             end
           end
 
-          def update_eligibility_record(model_record, eligibility)
+          def update_eligibility_record(eligibility_record, eligibility)
             evidence = eligibility.evidences.last
-            model_record.evidences.last.state_histories.build(
+            eligibility_record.evidences.last.state_histories.build(
               evidence.state_histories.last.to_h
             )
-            model_record.evidences.last.is_satisfied = evidence.is_satisfied
-            model_record.state_histories.build(
+            eligibility_record.evidences.last.is_satisfied =
+              evidence.is_satisfied
+            eligibility_record.state_histories.build(
               eligibility.state_histories.last.to_h
             )
 
-            model_record.save
+            eligibility_record.save
           end
 
           def create_eligibility_record(eligibility)
