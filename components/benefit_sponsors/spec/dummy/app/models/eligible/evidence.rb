@@ -18,7 +18,7 @@ module Eligible
     field :evidence_ref, type: String
 
     embeds_many :state_histories,
-                class_name: '::Eligible::StateHistory',
+                class_name: "::Eligible::StateHistory",
                 cascade_callbacks: true,
                 as: :status_trackable
 
