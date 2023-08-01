@@ -60,11 +60,11 @@ module ChildcareSubsidyConcern
 
     def terminate_eligibility(eligibility_params)
       ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new.call({
-        subject: self.to_global_id,
-        evidence_key: :ivl_osse_evidence,
-        evidence_value: eligibility_params[:evidence_value].to_s,
-        effective_date: eligibility_params[:effective_date]
-      })
+                                                                              subject: self.to_global_id,
+                                                                              evidence_key: :ivl_osse_evidence,
+                                                                              evidence_value: eligibility_params[:evidence_value].to_s,
+                                                                              effective_date: eligibility_params[:effective_date]
+                                                                            })
     end
   end
 end
