@@ -34,6 +34,7 @@ module Operations
         errors << "evidence key missing" unless params[:evidence_key]
         errors << "evidence value missing" unless params[:evidence_value]
         errors << "effective date missing" unless params[:effective_date]
+        errors << "eligibility_key is missing" unless params[:eligibility_key]
 
         errors.empty? ? Success(params) : Failure(errors)
       end
@@ -57,10 +58,12 @@ module Operations
       def build_eligibility_options(values, evidence_options)
         options = build_default_eligibility_options(values)
 
-        index =
-          options[:evidences].index do |e|
-            e[:_id].to_s == evidence_options[:_id].to_s
-          end if options[:evidences].present?
+        if options[:evidences].present?
+          index =
+            options[:evidences].index do |e|
+              e[:_id].to_s == evidence_options[:_id].to_s
+            end
+        end
         if index
           options[:evidences][index] = evidence_options
         else
@@ -84,8 +87,8 @@ module Operations
         end
 
         {
-          title: "Shop Osse Eligibility",
-          key: :shop_osse_eligibility,
+          title: values[:eligibility_key].to_s.titleize,
+          key: values[:eligibility_key],
           grants: build_grants
         }
       end

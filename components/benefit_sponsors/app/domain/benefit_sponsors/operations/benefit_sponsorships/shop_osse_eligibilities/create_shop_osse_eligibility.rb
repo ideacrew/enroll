@@ -39,6 +39,7 @@ module BenefitSponsors
             errors << "evidence key missing" unless params[:evidence_key]
             errors << "evidence value missing" unless params[:evidence_value]
             errors << "effective date missing" unless params[:effective_date]
+            errors << "eligibility_key is missing" unless params[:eligibility_key]
 
             errors.empty? ? Success(params) : Failure(errors)
           end

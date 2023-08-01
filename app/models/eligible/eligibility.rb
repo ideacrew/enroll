@@ -35,10 +35,6 @@ module Eligible
     scope :by_key, ->(key) { where(key: key.to_sym) }
     scope :by_date, ->(key) { where(key: key.to_sym) }
 
-    def self.by_date(date = TimeKeeper.date_of_record)
-      effective_on.gte
-    end
-
     def latest_state_history
       state_histories.max_by(&:created_at)
     end

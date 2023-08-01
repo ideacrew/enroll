@@ -91,9 +91,7 @@ module Operations
           to_state: to_state
         }
 
-        options[:is_eligible] = ELIGIBLE_STATUSES.include?(
-          options[:to_state]
-        ) if options[:to_state]
+        options[:is_eligible] = ELIGIBLE_STATUSES.include?(options[:to_state]) if options[:to_state]
         options
       end
 
@@ -104,12 +102,14 @@ module Operations
       def to_state_for(values, from_state)
         evidence_value = values[:evidence_value]
 
-        if evidence_value == "true"
+        case evidence_value
+        when "true"
           :approved
-        elsif evidence_value == "false"
-          if from_state == :approved
+        when "false"
+          case from_state
+          when :approved
             :denied
-          elsif from_state == :initial
+          when :initial
             return :initial unless values[:evidence_record]
             :denied
           end

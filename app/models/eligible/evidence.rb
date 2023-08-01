@@ -48,15 +48,12 @@ module Eligible
       eligible_periods = []
       date_range = {}
       state_histories.non_initial.each do |state_history|
-        if date_range.empty? && state_history.to_state == :approved
-          date_range[:start_on] = state_history.effective_on
-        end
+        date_range[:start_on] = state_history.effective_on if date_range.empty? && state_history.to_state == :approved
 
-        if date_range.present? && state_history.to_state == :denied
-          date_range[:end_on] = state_history.effective_on.prev_day
-          eligible_periods << date_range
-          date_range = {}
-        end
+        next unless date_range.present? && state_history.to_state == :denied
+        date_range[:end_on] = state_history.effective_on.prev_day
+        eligible_periods << date_range
+        date_range = {}
       end
 
       eligible_periods << date_range unless date_range.empty?
