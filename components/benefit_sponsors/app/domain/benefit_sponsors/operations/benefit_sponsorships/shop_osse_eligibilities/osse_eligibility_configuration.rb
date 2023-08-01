@@ -4,6 +4,7 @@ module BenefitSponsors
   module Operations
     module BenefitSponsorships
       module ShopOsseEligibilities
+        # Overrides top level eligibility_configuration for feature specific configurations
         class OsseEligibilityConfiguration < ::Operations::Eligible::EligibilityConfiguration
           def self.key
             :shop_osse_eligibility

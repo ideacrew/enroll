@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 module Operations
   module Eligible
+    # Configurations for the Eligibility
     class EligibilityConfiguration
       def self.key
         :eligibility

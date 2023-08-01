@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 module Operations
   module Eligible
+    # Configurations for the Evidence
     class EvidenceConfiguration
       def self.key
         :evidence
