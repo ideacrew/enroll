@@ -16,20 +16,21 @@ module ChildcareSubsidyConcern
     end
 
     def is_osse_eligibility_satisfied?(start_on)
-      eligibility = eligibility_for(:osse_subsidy, start_on)
+      eligibility = eligibility_for(:ivl_osse_eligibility, start_on)
       return false unless eligibility
-      evidence = eligibility.evidences.by_key(:osse_subsidy).max_by(&:created_at)
-      evidence&.is_satisfied == true
+
+      eligibility.is_eligible_on?(start_on)
     end
 
     def osse_feature_enabled_for?(year)
       ::EnrollRegistry.feature?("aca_ivl_osse_subsidy_#{year}") && ::EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
     end
 
-    def eligibility_for(evidence_key, start_on)
-      eligibilities.by_date(start_on).select do |eligibility|
-        eligibility.evidences.by_key(evidence_key).present?
-      end.max_by(&:created_at)
+    def eligibility_for(eligibility_key, start_on)
+      eligibilities = ivl_eligibilities.by_key(eligibility_key)
+      eligibilities.select(&:effectuated?).detect do |eligibility|
+        eligibility.eligibility_period_cover?(start_on)
+      end
     end
 
     def create_or_term_eligibility(eligibility_params)
@@ -38,11 +39,11 @@ module ChildcareSubsidyConcern
         return if osse_eligibility == 'true'
         terminate_eligibility(eligibility_params)
       elsif osse_eligibility == 'true'
-        ::IvlOsseEligibilities::CreateIvlOsseEligibility.new.call(osse_eligibility_params(osse_eligibility))
+        ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new.call(osse_eligibility_params(osse_eligibility))
       end
     end
 
-    def self.osse_eligibility_params(osse_eligibility)
+    def osse_eligibility_params(osse_eligibility)
       effective_date = if EnrollRegistry.feature_enabled?("aca_ivl_osse_effective_beginning_of_year")
                          TimeKeeper.date_of_record.beginning_of_year
                        else
