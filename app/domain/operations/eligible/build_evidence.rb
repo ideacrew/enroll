@@ -5,9 +5,6 @@ require "dry/monads/do"
 
 module Operations
   module Eligible
-    EligibilityImport = Dry.AutoInject(EligibilityContainer) unless defined?(
-      EligibilityImport
-    )
     # Operation to support eligibility creation
     class BuildEvidence
       send(:include, Dry::Monads[:result, :do])
@@ -80,7 +77,7 @@ module Operations
         from_state = recent_record&.to_state || :initial
         to_state = configuration.to_state_for(values, from_state)
 
-        options = {
+        {
           event: "move_to_#{to_state}".to_sym,
           transition_at: DateTime.now,
           effective_on: values[:effective_date],
