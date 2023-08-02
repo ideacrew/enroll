@@ -314,7 +314,7 @@ class Insured::PlanShoppingsController < ApplicationController
     year = params[:year]
     hios_id = params[:hios_id]
     @enrollment = HbxEnrollment.find(params[:id])
-    market_kind = @enrollment.fehb_profile ? 'fehb' : params[:market_kind]
+    market_kind = @enrollment.fehb_profile ? 'fehb' : @enrollment.kind
     selected_plan = if @enrollment.fehb_profile
                       BenefitMarkets::Products::Product.where(:hios_id => hios_id, :"application_period.min" => Date.new(year.to_i, 1, 1), benefit_market_kind: :fehb).first
                     else
