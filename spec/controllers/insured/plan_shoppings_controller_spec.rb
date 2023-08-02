@@ -1207,7 +1207,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     describe "plan_selection_callback" do
       let(:coverage_kind){"health"}
-      let(:market_kind){"individual"}
       let(:person) { FactoryBot.create(:person, :with_active_consumer_role, :with_consumer_role) }
       let(:user)  { FactoryBot.create(:user, person: person) }
       let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
@@ -1218,12 +1217,23 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       context "When a callback is received" do
         before do
           sign_in user
-          get :plan_selection_callback, params: { id: hbx_enrollment.id, hios_id: product.hios_id, year: year, market_kind: market_kind, coverage_kind: coverage_kind }
+          get :plan_selection_callback, params: { id: hbx_enrollment.id, hios_id: product.hios_id, year: year, market_kind: 'individual', coverage_kind: coverage_kind }
         end
 
         it "should assign market kind and coverage_kind" do
           expect(assigns(:market_kind)).to be_truthy
           expect(assigns(:coverage_kind)).to be_truthy
+        end
+      end
+
+      context "When a callback is received with no market kind" do
+        before do
+          sign_in user
+          get :plan_selection_callback, params: { id: hbx_enrollment.id, hios_id: product.hios_id, year: year, market_kind: nil, coverage_kind: coverage_kind }
+        end
+
+        it "should assign market kind to enrollment kind" do
+          expect(response).to redirect_to(thankyou_insured_plan_shopping_path(plan_id: product.id.to_s, id: hbx_enrollment.id,coverage_kind: coverage_kind, market_kind: hbx_enrollment.kind, change_plan: nil))
         end
       end
     end
