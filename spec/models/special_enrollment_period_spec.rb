@@ -1119,6 +1119,73 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       end
     end
 
+    context 'when first_of_the_month_coinciding is selected' do
+      after :all do
+        TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      end
+
+      let(:effective_on_kind) { 'first_of_the_month_coinciding' }
+      let(:new_sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: ivl_qle, qle_on: qle_on, effective_on_kind: effective_on_kind) }
+
+      let!(:qle) { create(:qualifying_life_event_kind, market_kind: "individual") }
+
+      context 'qle_on is before the submitted date and qle on is not first of the month' do
+        let(:qle_on) { TimeKeeper.date_of_record - 1.day }
+        let(:reporting_date) { TimeKeeper.date_of_record }
+
+        before do
+          TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+        end
+
+        it 'should set effective on as the next month beginning of month from the submitted date' do
+          expect(sep.effective_on).to eq reporting_date.end_of_month + 1.day
+        end
+      end
+
+      context 'qle_on is after the submitted at date, but is not the first of the month' do
+        let(:qle_on) { TimeKeeper.date_of_record.end_of_month}
+        let(:reporting_date) { TimeKeeper.date_of_record.beginning_of_month }
+
+        before do
+          new_sep.save!
+          TimeKeeper.set_date_of_record_unprotected!(reporting_date)
+        end
+
+        it 'should set effective date as next month beginning of month from qle' do
+          expect(new_sep.effective_on).to eq qle_on.next_month.beginning_of_month
+        end
+      end
+
+      context 'qle_on is after the submitted at date, and is the first of the month' do
+        let(:qle_on) { TimeKeeper.date_of_record.next_month.beginning_of_month}
+
+        it 'should set effective date as the qle_on' do
+          expect(new_sep.effective_on).to eq qle_on
+        end
+      end
+
+      context 'qle_on is the first of the month and is before the submitted at date' do
+        let(:qle_on) { TimeKeeper.date_of_record.prev_month.beginning_of_month }
+        let(:reporting_date) { TimeKeeper.date_of_record }
+
+        it 'should set effective date as the first of the month after the submitted at date' do
+          expect(new_sep.effective_on).to eq (reporting_date + 1.month).beginning_of_month
+        end
+      end
+
+      context 'qle_on is the same as the submitted at date' do
+        let(:qle_on) { TimeKeeper.date_of_record }
+
+        it 'should set effective date as the qle_on date' do
+          if qle_on == qle_on.beginning_of_month
+            expect(new_sep.effective_on).to eq(qle_on)
+          else
+            expect(new_sep.effective_on).to eq(qle_on.next_month.beginning_of_month)
+          end
+        end
+      end
+    end
+
     context 'when first_of_next_month_coinciding is selected' do
       after :all do
         TimeKeeper.set_date_of_record_unprotected!(Date.today)
@@ -1287,6 +1354,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
         context 'qle_on future, reporting_date after 15th of month' do
           let(:qle_on) { TimeKeeper.date_of_record.next_month }
           let!(:reporting_date) { TimeKeeper.date_of_record }
+
           before do
             TimeKeeper.set_date_of_record_unprotected!(reporting_date)
           end
@@ -1360,13 +1428,62 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
         end
       end
 
-      context "with effective_on_kind not first_of_the_month_plan_shopping" do
+      context "when effective_on_kind is first_of_the_month_coinciding" do
+
+        let(:sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: ivl_qle, qle_on: qle_on, effective_on_kind: 'first_of_the_month_coinciding') }
+
+        after :all do
+          TimeKeeper.set_date_of_record_unprotected!(Date.today)
+        end
+
+        context "when plan shopping date is the same as the effective date and the event date is not the first of the month" do
+          let(:qle_on) {TimeKeeper.date_of_record.beginning_of_month + 1.day }
+
+          let(:plan_shopping_date) { sep.effective_on }
+
+          before do
+            allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.beginning_of_month + 1.day)
+          end
+
+          it "should return the SEP effective on date" do
+            expect(sep.calculate_effective_date(plan_shopping_date)).to eq((plan_shopping_date + 1.month).beginning_of_month)
+          end
+        end
+
+        context "with plan shopping date the same as the effective date and event date is the first of the month" do
+          let(:qle_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+          let(:plan_shopping_date) { sep.effective_on }
+
+          before do
+            TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.beginning_of_month)
+          end
+
+          it "should return the SEP effective on date" do
+            expect(sep.calculate_effective_date(plan_shopping_date)).to eq(plan_shopping_date)
+          end
+        end
+
+        context "when plan shopping date is after the effective date" do
+          let(:qle_on) {TimeKeeper.date_of_record.beginning_of_month + 1.day }
+
+          let(:plan_shopping_date) { sep.effective_on + 1.day }
+
+          before do
+            allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.beginning_of_month + 1.day)
+          end
+
+          it "should return the SEP effective on date" do
+            expect(sep.calculate_effective_date(plan_shopping_date)).to eq((plan_shopping_date + 1.month).beginning_of_month)
+          end
+        end
+      end
+
+      context "with effective_on_kind not first_of_the_month_plan_shopping or first_of_the_month_coinciding" do
         let(:sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: ivl_qle, qle_on: qle_on, effective_on_kind: 'date_of_event') }
 
         it "should return the SEP effective on date" do
           expect(sep.calculate_effective_date(TimeKeeper.date_of_record)).to eq(sep.effective_on)
         end
-
       end
     end
 

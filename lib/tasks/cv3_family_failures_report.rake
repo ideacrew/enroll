@@ -14,7 +14,7 @@ namespace :cv3_family_failures_report do
       csv << ['hbx_id', 'result', 'output']
 
       # Iterate over all Family entries
-      Family.all.each do |family|
+      Family.all.no_timeout.each do |family|
         begin
           result = Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
 
