@@ -91,9 +91,10 @@ module FinancialAssistance
                   years_to_renew: calculate_years_to_renew(application),
                   renewal_base_year: calculated_renewal_base_year,
                   predecessor_id: application.id,
-                  full_medicaid_determination: application.full_medicaid_determination,
                   effective_date: Date.new(validated_params[:renewal_year])
                 )
+
+                renewal_application.full_medicaid_determination = application.full_medicaid_determination unless EnrollRegistry[:enroll_app].setting(:site_key).item == :dc
 
                 renewal_application.save
                 if renewal_application.renewal_draft?

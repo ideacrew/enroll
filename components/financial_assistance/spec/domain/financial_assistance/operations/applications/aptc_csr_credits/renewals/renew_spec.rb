@@ -82,7 +82,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
       end
     end
 
-    context 'determined application' do
+    context 'determined application for DC' do
       before do
         application.update_attributes!({ aasm_state: 'determined', years_to_renew: 1 })
         application.reload
@@ -155,8 +155,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
             expect(@renewal_draft_app.attestation_terms).to eq(application.attestation_terms)
           end
 
-          it 'should return application with full_medicaid_determination' do
-            expect(@renewal_draft_app.full_medicaid_determination).to eq(application.full_medicaid_determination)
+          it 'should return application without full_medicaid_determination' do
+            expect(@renewal_draft_app.full_medicaid_determination).to be nil
           end
         end
       end
