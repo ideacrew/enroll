@@ -1232,8 +1232,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
           get :plan_selection_callback, params: { id: hbx_enrollment.id, hios_id: product.hios_id, year: year, market_kind: nil, coverage_kind: coverage_kind }
         end
 
-        it "should assign market kind" do
-          expect(assigns(:market_kind)).to be_truthy
+        it "should assign market kind to enrollment kind" do
+          expect(response).to redirect_to(thankyou_insured_plan_shopping_path(plan_id: product.id.to_s, id: hbx_enrollment.id,coverage_kind: coverage_kind, market_kind: hbx_enrollment.kind, change_plan: nil))
         end
       end
     end
