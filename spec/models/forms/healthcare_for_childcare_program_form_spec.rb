@@ -9,7 +9,7 @@ describe Forms::HealthcareForChildcareProgramForm do
 
     let(:eligibility_params) do
       {
-        evidence_key: :osse_subsidy,
+        evidence_key: :ivl_osse_evidence,
         evidence_value: true,
         effective_date: ::TimeKeeper.date_of_record
       }
@@ -27,9 +27,12 @@ describe Forms::HealthcareForChildcareProgramForm do
 
     context 'with consumer role' do
       let(:primary) { FactoryBot.create(:person, :with_consumer_role) }
+      let(:osse_eligibility) { build(:ivl_osse_eligibility, :with_admin_attested_evidence, evidence_state: :approved, is_eligible: false)}
 
       before do
-        primary.consumer_role.create_eligibility(eligibility_params)
+        EnrollRegistry[:aca_ivl_osse_effective_beginning_of_year].feature.stub(:is_enabled).and_return(true)
+        primary.consumer_role.create_or_term_eligibility(eligibility_params)
+        primary.reload
       end
 
       it 'should return eligibility' do
@@ -37,7 +40,6 @@ describe Forms::HealthcareForChildcareProgramForm do
         expect(subject.role).to be_blank
 
         subject.load_eligibility(primary)
-
         expect(subject.osse_eligibility).to be_truthy
         expect(subject.role).to eq(primary.consumer_role)
       end
@@ -45,7 +47,7 @@ describe Forms::HealthcareForChildcareProgramForm do
       it 'should set eligibility start date as beginning of year' do
         subject.load_eligibility(primary)
         expect(subject.osse_eligibility).to be_truthy
-        osse_eligibility = subject.role.eligibilities.first
+        osse_eligibility = subject.role.ivl_eligibilities.first
         expect(osse_eligibility.start_on).to eq(TimeKeeper.date_of_record.beginning_of_year)
         expect(osse_eligibility.evidences.first.is_satisfied).to be_truthy
       end
@@ -53,9 +55,12 @@ describe Forms::HealthcareForChildcareProgramForm do
 
     context 'when both consumer and resident role present' do
       let(:primary) { FactoryBot.create(:person, :with_consumer_role, :with_resident_role) }
+      let(:osse_eligibility) { build(:ivl_osse_eligibility, :with_admin_attested_evidence, evidence_state: :approved, is_eligible: false)}
 
       before do
-        primary.resident_role.create_eligibility(eligibility_params)
+        EnrollRegistry[:aca_ivl_osse_effective_beginning_of_year].feature.stub(:is_enabled).and_return(true)
+        primary.resident_role.create_or_term_eligibility(eligibility_params)
+        primary.reload
       end
 
       it 'should return eligibility with resident role' do
@@ -71,7 +76,7 @@ describe Forms::HealthcareForChildcareProgramForm do
       it 'should set eligibility start date as beginning of year' do
         subject.load_eligibility(primary)
         expect(subject.osse_eligibility).to be_truthy
-        osse_eligibility = subject.role.eligibilities.first
+        osse_eligibility = subject.role.ivl_eligibilities.first
         expect(osse_eligibility.start_on).to eq(TimeKeeper.date_of_record.beginning_of_year)
         expect(osse_eligibility.evidences.first.is_satisfied).to be_truthy
       end
@@ -132,17 +137,18 @@ describe Forms::HealthcareForChildcareProgramForm do
       let(:osse_eligibility) { 'false' }
 
       before do
-        primary.consumer_role.create_eligibility({
-                                                   evidence_key: :osse_subsidy,
-                                                   evidence_value: true,
-                                                   effective_date: start_on
-                                                 })
+        primary.consumer_role.create_or_term_eligibility({
+                                                           evidence_key: :ivl_osse_evidence,
+                                                           evidence_value: true,
+                                                           effective_date: ::TimeKeeper.date_of_record
+                                                         })
+        primary.reload
       end
 
       it 'should terminate osse eligibility' do
         expect(primary.consumer_role.osse_eligible?(start_on)).to be_truthy
         described_class.submit_with(params)
-        expect(primary.consumer_role.osse_eligible?(start_on)).to be_falsey
+        expect(primary.consumer_role.reload.osse_eligible?(start_on)).to be_falsey
       end
     end
 

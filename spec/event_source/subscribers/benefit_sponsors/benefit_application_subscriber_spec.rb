@@ -86,20 +86,21 @@ RSpec.describe Subscribers::BenefitSponsors::BenefitApplicationSubscriber,
         )
       end
 
-      it 'should create eligibility for employee' do
-        valid_employee_role.reload
-        expect(valid_employee_role.eligibilities).to be_blank
+      # removing osse eligibilities from rmployee role. All legacy Code will be removed at once
+      # it 'should create eligibility for employee' do
+      #   valid_employee_role.reload
+      #   expect(valid_employee_role.eligibilities).to be_blank
 
-        queue_proxy.on_receive_message(
-          described_class,
-          delivery_info,
-          {},
-          payload
-        )
+      #   queue_proxy.on_receive_message(
+      #     described_class,
+      #     delivery_info,
+      #     {},
+      #     payload
+      #   )
 
-        valid_employee_role.reload
-        expect(valid_employee_role.eligibilities).to be_present
-      end
+      #   valid_employee_role.reload
+      #   expect(valid_employee_role.eligibilities).to be_present
+      # end
     end
   end
 
