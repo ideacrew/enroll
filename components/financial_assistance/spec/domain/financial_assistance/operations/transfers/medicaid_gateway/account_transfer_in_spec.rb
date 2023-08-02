@@ -186,8 +186,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         it 'should create valid attestations for the application' do
           attributes = @transformed["family"]['magi_medicaid_applications'].first
           application = FinancialAssistance::Application.find(@result.value!)
-          attestation_vals = { "years_to_renew": attributes["years_to_renew"],
-                               "submission_terms": attributes["submission_terms"],
+          attestation_vals = { "submission_terms": attributes["submission_terms"],
                                "medicaid_terms": attributes["medicaid_terms"],
                                "medicaid_insurance_collection_terms": attributes["medicaid_insurance_collection_terms"],
                                "parent_living_out_of_home_terms": attributes["parent_living_out_of_home_terms"],
