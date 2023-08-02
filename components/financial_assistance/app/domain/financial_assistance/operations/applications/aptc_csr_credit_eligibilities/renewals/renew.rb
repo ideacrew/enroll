@@ -94,7 +94,8 @@ module FinancialAssistance
                   effective_date: Date.new(validated_params[:renewal_year])
                 )
 
-                renewal_application.full_medicaid_determination = application.full_medicaid_determination unless EnrollRegistry[:enroll_app].setting(:site_key).item == :dc
+                full_medicaid_determination_feature = FinancialAssistanceRegistry[:full_medicaid_determination_step]
+                renewal_application.full_medicaid_determination = application.full_medicaid_determination if full_medicaid_determination_feature.enabled? && full_medicaid_determination_feature.settings(:annual_eligibility_redetermination).item
 
                 renewal_application.save
                 if renewal_application.renewal_draft?

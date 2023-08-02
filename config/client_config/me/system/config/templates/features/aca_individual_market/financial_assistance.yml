@@ -264,6 +264,9 @@ registry:
           item: true
     - key: :full_medicaid_determination_step
       is_enabled: false
+      settings:
+        - key: :annual_eligibility_redetermination
+          item: <%= ENV['ANNUAL_ELIGIBILITY_REDETERMINATION_IS_ENABLED'] || false %>
     - key: :native_american_csr
       is_enabled: true
     - key: :display_medicaid_question
