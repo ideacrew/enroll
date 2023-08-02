@@ -1275,7 +1275,7 @@ module BenefitSponsors
     end
 
     def osse_eligible?
-      eligibility_for(:osse_subsidy).present? && shop_osse_eligibility_is_enabled?(start_on.year)
+      eligibility_for(:shop_osse_eligibility).present? && shop_osse_eligibility_is_enabled?(start_on.year)
     end
 
     private
