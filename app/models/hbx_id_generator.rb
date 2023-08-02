@@ -129,7 +129,7 @@ class HbxIdGenerator
 
     def self.random_uuid
       timestamp = Time.now.strftime("%m%d%H%M%S%L")
-      random_number = SecureRandom.random_number(100 / 2)
+      random_number = SecureRandom.random_number(50)
       "#{timestamp}#{random_number}".to_i
     end
 
