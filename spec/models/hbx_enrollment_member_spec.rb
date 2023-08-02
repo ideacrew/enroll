@@ -114,11 +114,9 @@ describe HbxEnrollmentMember, dbclean: :around_each do
     end
 
     context 'when consumer is osse eligible' do
-      let(:ee_elig) { build(:eligibility, :with_subject, :with_evidences, start_on: start_on) }
-      let!(:eligibility) do
-        consumer_role.eligibilities << ee_elig
-        consumer_role.save!
-        consumer_role.eligibilities.first
+      before do
+        consumer_role.create_or_term_eligibility({ evidence_key: :ivl_osse_evidence, evidence_value: true, effective_date: TimeKeeper.date_of_record })
+        consumer_role.reload
       end
 
       context 'when osse is enabled for the given year' do

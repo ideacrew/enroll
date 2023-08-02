@@ -29,7 +29,9 @@ module Operations
 
       def validate(params)
         params[:event] ||= :initialize
-        params[:effective_date] ||= Date.today
+        params[:effective_date] ||= TimeKeeper.date_of_record
+
+        params[:effective_date] = params[:effective_date].beginning_of_year if EnrollRegistry.feature_enabled?("aca_ivl_osse_effective_beginning_of_year")
 
         errors = []
         errors << "subject missing" unless params[:subject]
