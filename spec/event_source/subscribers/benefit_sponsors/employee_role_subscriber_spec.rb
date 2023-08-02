@@ -158,5 +158,5 @@ RSpec.describe Subscribers::BenefitSponsors::EmployeeRoleSubscriber,
   #     valid_employee_role.reload
   #     expect(valid_employee_role.eligibilities).to be_blank
   #   end
-  # end
+  end
 end
