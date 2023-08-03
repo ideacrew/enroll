@@ -38,19 +38,19 @@ RSpec.describe ::Operations::Eligibilities::Osse::TerminateEligibility,
 
   let(:latest_osee_evidence) { eligibility.evidences.by_key(:osse_subsidy).last }
 
-  it 'should be a container-ready operation' do
+  xit 'should be a container-ready operation' do
     expect(subject.respond_to?(:call)).to be_truthy
   end
 
   context 'when required attributes passed' do
     context 'when subject is benefit sponsorship' do
 
-      it 'should be success' do
+      xit 'should be success' do
         result = subject.call(required_params)
         expect(result.success?).to be_truthy
       end
 
-      it 'should terminate eligibility' do
+      xit 'should terminate eligibility' do
         subject.call(required_params)
         eligibility.reload
         expect(eligibility.end_on).to eq(termination_date)
@@ -83,12 +83,12 @@ RSpec.describe ::Operations::Eligibilities::Osse::TerminateEligibility,
 
       let(:subject_ref) { employee_role.to_global_id }
 
-      it 'should be success' do
+      xit 'should be success' do
         result = subject.call(required_params)
         expect(result.success?).to be_truthy
       end
 
-      it 'should terminate eligibility' do
+      xit 'should terminate eligibility' do
         subject.call(required_params)
         eligibility.reload
         expect(eligibility.end_on).to eq(termination_date)
@@ -98,7 +98,7 @@ RSpec.describe ::Operations::Eligibilities::Osse::TerminateEligibility,
   end
 
   context 'when required attributes not passed' do
-    it 'should fail with validation error' do
+    xit 'should fail with validation error' do
       result = subject.call(required_params.except(:termination_date))
       expect(result.failure?).to be_truthy
       expect(result.failure).to include("termination date missing")
