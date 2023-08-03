@@ -359,7 +359,7 @@ module BenefitSponsors
     end
 
     def eligibility_for(eligibility_key, start_on)
-      eligibilities = eligibilities.by_key(eligibility_key)
+      eligibilities = eligibilities&.by_key(eligibility_key) || []
       eligibilities.select(&:effectuated?).detect do |eligibility|
         eligibility.eligibility_period_cover?(start_on)
       end
