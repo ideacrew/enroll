@@ -34,6 +34,14 @@ ARG BUNDLER_VERSION_OVERRIDE
 ENV BUNDLER_VERSION=$BUNDLER_VERSION_OVERRIDE
 RUN gem update --system && gem install bundler:$BUNDLER_VERSION
 
+
+ARG USERNAME=nonroot
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+USER $USERNAME
+
 # Configure app home directory
 ENV HOME /enroll
 RUN mkdir -p $HOME
