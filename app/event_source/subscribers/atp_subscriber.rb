@@ -20,7 +20,7 @@ module Subscribers
         transfer_response = FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferResponse.new.call(result.value!)
         if transfer_response.failure?
           transfer_details[:result] = "Failed"
-          transfer_details[:failure] = "Unsucessfully built account transfer response by Enroll - #{transfer_response.failure}"
+          transfer_details[:failure] = "Unsuccessfully built account transfer response by Enroll - #{transfer_response.failure}"
         else
           transfer_details.merge!(transfer_response.value!)
         end
@@ -28,10 +28,10 @@ module Subscribers
         logger.info "AtpSubscriber: acked with success: #{result.success}"
       else
         transfer_details[:result] = "Failed"
-        transfer_details[:failure] = "Unsucessfully ingested by Enroll - #{result.failure}"
+        transfer_details[:failure] = "Unsuccessfully ingested by Enroll - #{result.failure.full_messages.join(', ')}"
         errors = result.failure
         nack(delivery_info.delivery_tag)
-        logger.info "AtpSubscriber: nacked with failure, errors: #{errors}"
+        logger.info "AtpSubscriber: nacked with failure, errors: #{errors.full_messages.join(', ')}"
       end
       FinancialAssistance::Operations::Transfers::MedicaidGateway::PublishTransferResponse.new.call(transfer_details)
     rescue StandardError => e
