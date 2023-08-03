@@ -21,9 +21,9 @@ module BenefitSponsors
           def call(params)
             values = yield validate(params)
             subject = yield find_subject(values)
-            new_eligibilities = yield migrate(subject, values)
+            result = yield migrate(subject, values)
 
-            Success(new_eligibilities)
+            Success(result)
           end
 
           private
@@ -48,14 +48,13 @@ module BenefitSponsors
           end
 
           def migrate(subject, values)
-            results =
-              values[:current_eligibilities].collect do |eligibility|
-                next unless eligibility.evidences.present?
+            values[:current_eligibilities].each do |eligibility|
+              next unless eligibility.evidences.present?
 
-                migrate_eligibility(subject, values, eligibility)
-              end
+              migrate_eligibility(subject, values, eligibility)
+            end
 
-            Success(results)
+            Success(true)
           end
 
           def migrate_eligibility(subject, values, eligibility)
@@ -115,9 +114,11 @@ module BenefitSponsors
 
             if result.success?
               Rails.logger.info "completed processing #{action}"
+              result.success
             else
               Rails.logger.error "failed processing #{action}"
               Rails.logger.error result.failure
+              result.failure
             end
           end
         end

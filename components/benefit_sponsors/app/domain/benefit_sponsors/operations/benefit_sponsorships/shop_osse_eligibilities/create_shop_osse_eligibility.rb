@@ -95,16 +95,18 @@ module BenefitSponsors
 
           def update_eligibility_record(eligibility_record, eligibility)
             evidence = eligibility.evidences.last
-            eligibility_record.evidences.last.state_histories.build(
+            evidence_record = eligibility_record.evidences.last
+            evidence_record.state_histories.build(
               evidence.state_histories.last.to_h
             )
-            eligibility_record.evidences.last.is_satisfied =
-              evidence.is_satisfied
+            evidence_record.is_satisfied = evidence.is_satisfied
             eligibility_record.state_histories.build(
               eligibility.state_histories.last.to_h
             )
 
+            evidence_record.save
             eligibility_record.save
+            eligibility_record._parent.save
           end
 
           def create_eligibility_record(eligibility)

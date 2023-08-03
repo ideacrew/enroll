@@ -91,10 +91,34 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
 
   context "when existing eligibility record passed with subject" do
     it "should migrate eligibility into new models" do
-      described_class.new.call(
-        current_eligibilities: [eligibility],
-        eligibility_key: :shop_osse_eligibility
-      )
+      result =
+        described_class.new.call(
+          current_eligibilities: [eligibility],
+          eligibility_key: :shop_osse_eligibility
+        )
+
+      expect(result.success?).to be_truthy
+
+      benefit_sponsorship.reload
+      eligibilities = benefit_sponsorship.eligibilities
+      expect(eligibilities.count).to eq 1
+
+      eligibility = eligibilities.first
+      evidence = eligibility.evidences.first
+      # expect(evidence.is_satisfied).to be_truthy
+
+      # expect(
+      #   evidence.state_histories.pluck(
+      #     :is_eligible,
+      #     :effective_on,
+      #     :from_state,
+      #     :to_state,
+      #     :event
+      #   )
+      # ).to eq [
+      #      [false, Date.today, :initial, :initial, :move_to_initial],
+      #      [true, Date.today, :initial, :approved, :move_to_approved]
+      #    ]
     end
   end
 end
