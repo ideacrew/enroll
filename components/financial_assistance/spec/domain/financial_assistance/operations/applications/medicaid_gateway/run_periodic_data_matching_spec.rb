@@ -79,7 +79,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
   let(:fetch_double) { double(:new => double(call: premiums_double))}
   let(:fetch_slcsp_double) { double(:new => double(call: slcsp_double))}
   let(:fetch_lcsp_double) { double(:new => double(call: lcsp_double))}
-  let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, csr_variant_id: '04')}
+  let(:product) { FactoryBot.create(:financial_assistance_benefit_market_product, csr_variant_id: '04')}
   let(:operation) { ::FinancialAssistance::Operations::Applications::MedicaidGateway::RunPeriodicDataMatching.new }
   let(:effective_on) { TimeKeeper.date_of_record.beginning_of_month }
 
