@@ -87,7 +87,7 @@ RSpec.describe Operations::Eligible::BuildEvidence,
           evidence_state: :approved,
           is_eligible: true
         )
-      benefit_sponsorship.shop_eligibilities << eligibility
+      benefit_sponsorship.eligibilities << eligibility
       benefit_sponsorship.save!
       eligibility
     end

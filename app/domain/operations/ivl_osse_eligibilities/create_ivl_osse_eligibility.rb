@@ -44,7 +44,7 @@ module Operations
 
       def find_eligibility(values)
         subject = GlobalID::Locator.locate(values[:subject])
-        eligibility = subject.ivl_eligibilities.by_key(:ivl_osse_eligibility).last
+        eligibility = subject.eligibilities.by_key(:ivl_osse_eligibility).last
 
         Success(eligibility)
       end
@@ -74,13 +74,13 @@ module Operations
       def store(values, eligibility)
         subject = GlobalID::Locator.locate(values[:subject])
 
-        eligibility_record = subject.ivl_eligibilities.where(id: eligibility._id).first
+        eligibility_record = subject.eligibilities.where(id: eligibility._id).first
 
         if eligibility_record
           update_eligibility_record(eligibility_record, eligibility)
         else
           eligibility_record = create_eligibility_record(eligibility)
-          subject.ivl_eligibilities << eligibility_record
+          subject.eligibilities << eligibility_record
         end
 
         if subject.save

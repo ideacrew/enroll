@@ -394,7 +394,7 @@ module BenefitSponsors
             let(:osse_eligibility) { 'true' }
 
             it "should build eligibilities" do
-              expect(abc_organization.benefit_sponsorships.first.shop_eligibilities.count).to eql(1)
+              expect(abc_organization.benefit_sponsorships.first.eligibilities.count).to eql(1)
             end
           end
 
@@ -407,9 +407,9 @@ module BenefitSponsors
                     :is_eligible => false)
             end
             let!(:er_eligibility) do
-              benefit_sponsorship.shop_eligibilities << er_elig
+              benefit_sponsorship.eligibilities << er_elig
               benefit_sponsorship.save!
-              benefit_sponsorship.shop_eligibilities.first
+              benefit_sponsorship.eligibilities.first
             end
 
             # let!(:employee_role) { create(:employee_role, person: person, census_employee: census_employee, benefit_sponsors_employer_profile_id: benefit_sponsorship.profile.id) }

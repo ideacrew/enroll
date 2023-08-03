@@ -75,7 +75,7 @@ Given(/active enrollment is OSSE eligible with APTC/) do
   hbx = HbxEnrollment.first
   member = hbx.hbx_enrollment_members.first
   hbx.update_attributes!(applied_aptc_amount: 476)
-  member.person.consumer_role.ivl_eligibilities << FactoryBot.build(:ivl_osse_eligibility, :with_admin_attested_evidence, evidence_state: :approved)
+  member.person.consumer_role.eligibilities << FactoryBot.build(:ivl_osse_eligibility, :with_admin_attested_evidence, evidence_state: :approved)
 end
 
 Then(/APTC slider should show minimum 85%/) do

@@ -2071,21 +2071,21 @@ describe '.create_or_term_eligibility' do
       end
 
       it 'should create eligibility for primary and child only' do
-        expect(primary.consumer_role.ivl_eligibilities).to be_present
-        expect(spouse.consumer_role.ivl_eligibilities).to be_blank
-        expect(child1.consumer_role.ivl_eligibilities).to be_present
+        expect(primary.consumer_role.eligibilities).to be_present
+        expect(spouse.consumer_role.eligibilities).to be_blank
+        expect(child1.consumer_role.eligibilities).to be_present
       end
 
       it 'should create eligibility with given effective date' do
         verify_active_family_members do |consumer_role|
-          expect(consumer_role.ivl_eligibilities.count).to eq 1
-          expect(consumer_role.ivl_eligibilities.first.start_on).to eq valid_params[:effective_date]
+          expect(consumer_role.eligibilities.count).to eq 1
+          expect(consumer_role.eligibilities.first.start_on).to eq valid_params[:effective_date]
         end
       end
 
       it 'should create eligibility with evidence' do
         verify_active_family_members do |consumer_role|
-          eligibility = consumer_role.ivl_eligibilities.first
+          eligibility = consumer_role.eligibilities.first
           expect(eligibility.evidences.by_key(valid_params[:evidence_key]).count).to eq 1
           expect(eligibility.evidences.by_key(valid_params[:evidence_key]).first.is_satisfied.to_s).to eq valid_params[:evidence_value]
         end
@@ -2099,7 +2099,7 @@ describe '.create_or_term_eligibility' do
                             :with_admin_attested_evidence,
                             :evidence_state => :approved,
                             :is_eligible => false)
-        consumer_role.ivl_eligibilities << eligibility
+        consumer_role.eligibilities << eligibility
         consumer_role.save!
         eligibility
       end

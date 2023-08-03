@@ -47,7 +47,7 @@ describe Forms::HealthcareForChildcareProgramForm do
       it 'should set eligibility start date as beginning of year' do
         subject.load_eligibility(primary)
         expect(subject.osse_eligibility).to be_truthy
-        osse_eligibility = subject.role.ivl_eligibilities.first
+        osse_eligibility = subject.role.eligibilities.first
         expect(osse_eligibility.start_on).to eq(TimeKeeper.date_of_record.beginning_of_year)
         expect(osse_eligibility.evidences.first.is_satisfied).to be_truthy
       end
@@ -76,7 +76,7 @@ describe Forms::HealthcareForChildcareProgramForm do
       it 'should set eligibility start date as beginning of year' do
         subject.load_eligibility(primary)
         expect(subject.osse_eligibility).to be_truthy
-        osse_eligibility = subject.role.ivl_eligibilities.first
+        osse_eligibility = subject.role.eligibilities.first
         expect(osse_eligibility.start_on).to eq(TimeKeeper.date_of_record.beginning_of_year)
         expect(osse_eligibility.evidences.first.is_satisfied).to be_truthy
       end
