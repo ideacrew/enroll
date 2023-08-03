@@ -120,7 +120,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       expect(result).not_to be_success
       expect(result.failure).to include "assistance_year param is invalid"
 
-      result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_job_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
+      result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_job_id: nil)
       expect(result).not_to be_success
       expect(result.failure).to include "transmittable_job_id param is missing"
     end
@@ -131,7 +131,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_job_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
 
       expect(result).to be_success
-      expect(result.success).to eq("Successfully ran Periodic Data matching for 1 applications")
+      expect(result.success).to eq({:total_applications_ran => 1})
     end
 
     it 'should not find results with old assistance_year' do
@@ -141,7 +141,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_job_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
 
       expect(result).to be_success
-      expect(result.success).to eq("Successfully ran Periodic Data matching for 0 applications")
+      expect(result.success).to eq({:total_applications_ran => 0})
     end
 
     it 'should not find results with submitted aasm_state' do
@@ -151,7 +151,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_job_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
 
       expect(result).to be_success
-      expect(result.success).to eq("Successfully ran Periodic Data matching for 0 applications")
+      expect(result.success).to eq({:total_applications_ran => 0})
     end
 
     it 'should not find results if applicants.is_ia_eligible is false' do
@@ -162,7 +162,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_job_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
 
       expect(result).to be_success
-      expect(result.success).to eq("Successfully ran Periodic Data matching for 0 applications")
+      expect(result.success).to eq({:total_applications_ran => 0})
     end
 
     it 'should not find results if enrollment applied_aptc_amount is 0' do
@@ -175,7 +175,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_job_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
 
       expect(result).to be_success
-      expect(result.success).to eq("Successfully ran Periodic Data matching for 0 applications")
+      expect(result.success).to eq({:total_applications_ran => 0})
     end
   end
 end

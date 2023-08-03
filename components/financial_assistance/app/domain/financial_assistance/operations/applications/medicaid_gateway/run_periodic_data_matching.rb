@@ -19,7 +19,7 @@ module FinancialAssistance
             values = yield validate(params)
             response = yield filter_and_call_mec_service(values)
 
-            Success("Successfully ran Periodic Data matching for #{response[:total_applications_to_pdm]} applications")
+            Success(response)
           end
 
           private
@@ -49,7 +49,7 @@ module FinancialAssistance
             Rails.logger.info "MedicaidGateway::RunPeriodicDataMatching Total families determined - #{determined_family_ids.count}"
             not_outstanding_families = Family.where(:_id.in => determined_family_ids, :'eligibility_determination.outstanding_verification_status'.nin => %w[outstanding not_enrolled])
             Rails.logger.info "MedicaidGateway::RunPeriodicDataMatching Total number of not outstanding families - #{not_outstanding_families.count}"
-            total_applications_to_pdm = 0
+            total_applications_ran = 0
             (0..not_outstanding_families.count).step(batch_size) do |offset|
               batch = not_outstanding_families.skip(offset).limit(batch_size)
               batch.each do |family|
@@ -58,12 +58,12 @@ module FinancialAssistance
                 next unless family.hbx_enrollments.enrolled_and_renewal.any? {|enrollment| enrollment.applied_aptc_amount > 0 || %w[02 03 04 05 06].include?(enrollment.product.csr_variant_id) }
                 determined_application = fetch_application(family, params[:assistance_year])
                 next unless determined_application.present? && is_aptc_or_csr_eligible?(determined_application)
-                total_applications_to_pdm += 1
+                total_applications_ran += 1
                 ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: determined_application.id)
               end
             end
-            Rails.logger.info "MedicaidGateway::RunPeriodicDataMatching Total applications ran periodic data matching - #{total_applications_to_pdm}"
-            Success({ total_applications_to_pdm: total_applications_to_pdm })
+            Rails.logger.info "MedicaidGateway::RunPeriodicDataMatching Total applications ran periodic data matching - #{total_applications_ran}"
+            Success({ total_applications_ran: total_applications_ran })
           end
 
           def is_aptc_or_csr_eligible?(application)
