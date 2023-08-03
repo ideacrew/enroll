@@ -1,4 +1,3 @@
-require 'securerandom'
 
 module SponsoredBenefits
   module Organizations
@@ -79,12 +78,8 @@ module SponsoredBenefits
         # The length of the ID matters because a float with more than 15 digits is represented using scientific notation.
         # Keep the id length less than 16 digits to avoid this issue.
         def self.random_uuid
-          # 11 digit timestamp for uniqueness
-          timestamp = Time.now.strftime("%m%d%H%M%S")
-          # Max 4 digit random number
-          random_number = SecureRandom.random_number(9999)
-          # 15 digit unique number padded with 0
-          "#{timestamp}#{random_number.to_s.rjust(4, '0')}".to_i
+          # Timestamp is 10 digits. Random number is 5 digits.
+          "#{Time.now.to_i}#{rand(10_000...99_999)}".to_i
         end
       end
     end
