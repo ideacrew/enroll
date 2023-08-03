@@ -44,6 +44,7 @@ module FinancialAssistance
           end
 
           def publish(payload)
+            binding.irb
             FinancialAssistance::Operations::Applications::MedicaidGateway::PublishMecCheck.new.call(payload.to_h, "application")
           end
 
