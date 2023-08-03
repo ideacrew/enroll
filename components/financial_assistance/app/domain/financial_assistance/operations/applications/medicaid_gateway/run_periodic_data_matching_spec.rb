@@ -89,7 +89,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
                       kind: "individual",
                       coverage_kind: "health",
                       aasm_state: 'coverage_selected',
-                      effective_on:  effective_on,
+                      effective_on: effective_on,
                       product_id: product.id,
                       hbx_enrollment_members: [
                         FactoryBot.build(:hbx_enrollment_member,

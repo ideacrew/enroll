@@ -43,8 +43,8 @@ module FinancialAssistance
           def filter_and_call_mec_service(params)
             batch_size = params[:batch_size] || 1000
             determined_family_ids = FinancialAssistance::Application.where(:aasm_state => "determined",
-                                                                :assistance_year => params[:assistance_year],
-                                                                :"applicants.is_ia_eligible" => true).distinct(:family_id)
+                                                                           :assistance_year => params[:assistance_year],
+                                                                           :"applicants.is_ia_eligible" => true).distinct(:family_id)
 
             Rails.logger.info "MedicaidGateway::RunPeriodicDataMatching Total families determined - #{determined_family_ids.count}"
             not_outstanding_families = Family.where(:_id.in => determined_family_ids, :'eligibility_determination.outstanding_verification_status'.nin => %w[outstanding not_enrolled])
@@ -59,7 +59,7 @@ module FinancialAssistance
                 determined_application = fetch_application(family, params[:assistance_year])
                 next unless determined_application.present? && is_aptc_or_csr_eligible?(determined_application)
                 total_applications_ran += 1
-                ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: determined_application.id)
+                ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: determined_application.id) unless params[:skip_mec_call]
               end
             end
             Rails.logger.info "MedicaidGateway::RunPeriodicDataMatching Total applications ran periodic data matching - #{total_applications_ran}"
