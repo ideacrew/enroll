@@ -77,7 +77,7 @@ RSpec.describe ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility, typ
           evidence_state: :initial,
           is_eligible: false
         )
-      consumer_role.ivl_eligibilities << eligibility
+      consumer_role.eligibilities << eligibility
       consumer_role.save!
       eligibility
     end

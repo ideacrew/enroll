@@ -102,9 +102,7 @@ module BenefitSponsors
       class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication",
       inverse_of: :benefit_sponsorship
 
-    has_many :eligibilities, class_name: "::Eligibilities::Osse::Eligibility", as: :eligibility
-
-    embeds_many :shop_eligibilities, class_name: '::Eligible::Eligibility', cascade_callbacks: true
+    embeds_many :eligibilities, class_name: '::Eligible::Eligibility', cascade_callbacks: true
 
     has_many    :census_employees,
       class_name: "::CensusEmployee"
@@ -361,7 +359,7 @@ module BenefitSponsors
     end
 
     def eligibility_for(eligibility_key, start_on)
-      eligibilities = shop_eligibilities.by_key(eligibility_key)
+      eligibilities = eligibilities.by_key(eligibility_key)
       eligibilities.select(&:effectuated?).detect do |eligibility|
         eligibility.eligibility_period_cover?(start_on)
       end

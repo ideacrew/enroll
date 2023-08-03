@@ -60,7 +60,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
                           :with_admin_attested_evidence,
                           :evidence_state => :initial,
                           :is_eligible => false)
-      benefit_sponsorship.shop_eligibilities << eligibility
+      benefit_sponsorship.eligibilities << eligibility
       benefit_sponsorship.save!
       eligibility
     end
@@ -74,7 +74,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
                             :with_admin_attested_evidence,
                             :evidence_state => :published,
                             :is_eligible => false)
-        benefit_sponsorship.shop_eligibilities << eligibility
+        benefit_sponsorship.eligibilities << eligibility
         benefit_sponsorship.save!
         year = model_instance.start_on.year
         allow(EnrollRegistry).to receive(:feature?).with("aca_shop_osse_subsidy_#{year}").and_return(true)

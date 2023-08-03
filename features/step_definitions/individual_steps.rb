@@ -1016,7 +1016,7 @@ end
 
 And(/consumer has osse eligibility/) do
   person = Person.all.first
-  person.consumer_role.ivl_eligibilities << FactoryBot.build(:ivl_osse_eligibility, :with_admin_attested_evidence, evidence_state: :approved)
+  person.consumer_role.eligibilities << FactoryBot.build(:ivl_osse_eligibility, :with_admin_attested_evidence, evidence_state: :approved)
 end
 
 When(/consumer visits home page after successful ridp/) do
