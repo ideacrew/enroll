@@ -135,7 +135,7 @@ module Operations
               update_reason: verification_type.update_reason,
               rejected: verification_type.rejected,
               external_service: verification_type.external_service,
-              due_date: verification_type.due_date,
+              due_date: verification_type.verif_due_date,
               due_date_type: verification_type.due_date_type,
               # TO DO updated_by:,
               inactive: verification_type.inactive,

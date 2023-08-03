@@ -1,51 +1,102 @@
 :root {
     .plan-tile {
-        padding: 12px;
-        font-size: medium;
+      font-size: medium;
 
-        .plan-header {
+      .plan-header {
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #ddd;
+        background: #FAF9F8;
+
+        .plan-year {
+          margin: 0;
+          padding-left: 12px;
+          flex-grow: 1;
+          line-height: 0;
+          font-size: medium;
+        }
+
+        .plan-status-container {
+          display: flex;
+          min-height: 36px;
+          align-items: stretch;
+
+          .label {
             display: flex;
-            flex-direction: column;
+            height: 100%;
+            border-radius: 0 .25rem 0 0;
+            align-items: center;
+            color: white;
 
-            img {
-                flex: 0;
-                object-fit: scale-down;
-                height: 100px;
+            &.label-red {
+              background-color: var(--enrollment-status-red);
             }
 
-            .plan-logo-and-name {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                gap: 20px;
-
-                .plan-status-container {
-                    min-height: 20px;
-                }
-
-                h3 {
-                    margin: 0;
-                    justify-self: left;
-                    padding: 8px 0;
-                    flex-basis: 100%;
-
-                    a {
-                        color: black !important;
-                        font-size: 18px;
-                        font-weight: 700;
-                        line-height: 1.5;
-                        display: block;
-                    }
-
-                }
+            &.label-green {
+              background-color: var(--enrollment-status-green);
             }
+
+            &.label-yellow {
+              background-color: var(--enrollment-status-yellow);
+              color: var(--default-font-color);
+            }
+
+            &.label-blue {
+              background-color: var(--enrollment-status-blue);
+            }
+
+            &.label-grey {
+              background-color: var(--enrollment-status-grey);
+            }
+          }
+        }
+
+
+      }
+
+      .plan-details-container {
+        padding: 0 12px 12px 12px;
+
+        .plan-title {
+          display: flex;
+          flex-direction: column;
+
+          img {
+              flex: 0;
+              object-fit: scale-down;
+              height: 70px;
+              width: 100px;
+          }
+
+          .plan-logo-and-name {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 20px;
+
+            h3 {
+              margin: 0;
+              justify-self: left;
+              padding: 8px 0;
+              flex-basis: 100%;
+
+              a {
+                color: var(--default-font-color);
+                font-size: 18px;
+                font-weight: 700;
+                line-height: 1.5;
+                display: block;
+              }
+
+            }
+          }
         }
 
         .plan-details {
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
-            color: var(--grey-130);
+            color: var(--default-font-color);
 
             div[class$='-column'] {
                 flex: 1;
@@ -66,7 +117,7 @@
 
         .plan-covered {
             padding: 8px 0 0 0;
-            color: var(--grey-130);
+            color: var(--default-font-color);
 
             label {
                 font-weight: 600;
@@ -84,10 +135,16 @@
             .enrollment-actions-ddl {
                 flex-basis: 85px;
                 text-align: right;
+
+                .btn {
+                  color: var(--button-default-color);
+                  border-color: var(--button-default-color);
+                }
             }
 
-            .btn {
+            &>.btn {
                 height: 34px;
+                padding-right: 0;
                 color: var(--button-default-color);
                 border-color: var(--button-default-color);
 
@@ -98,7 +155,7 @@
 
                 a {
                     color: inherit;
-                    
+
                     &:hover {
                         text-decoration: none;
                     }
@@ -110,5 +167,6 @@
                 }
             }
         }
+      }
     }
 }

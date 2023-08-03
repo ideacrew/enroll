@@ -81,7 +81,7 @@ class ApplicationController < ActionController::Base
     flash[:error] = "Access not allowed for #{policy_name}.#{exception.query}, (Pundit policy)"
       respond_to do |format|
       format.json { render nothing: true, status: :forbidden }
-      format.html { redirect_to(request.referrer || root_path)}
+      format.html { redirect_to(request.referrer || main_app.root_path)}
       format.js   { render nothing: true, status: :forbidden }
     end
   end
@@ -456,7 +456,9 @@ class ApplicationController < ActionController::Base
                         end
         dismiss_announcements = JSON.parse(session[:dismiss_announcements] || "[]") rescue []
         announcements -= dismiss_announcements
-        flash.now[:warning] = announcements
+        flash.now[:warning] = announcements.map do |announcement|
+          { is_announcement: true, announcement: announcement }
+        end
       end
     end
 
@@ -467,7 +469,9 @@ class ApplicationController < ActionController::Base
     announcements = Announcement.announcements_for_web
     dismiss_announcements = JSON.parse(session[:dismiss_announcements] || '[]')
     announcements -= dismiss_announcements
-    flash.now[:warning] = announcements
+    flash.now[:warning] = announcements.map do |announcement|
+      { is_announcement: true, announcement: announcement }
+    end
   end
 
   def check_browser_compatibility

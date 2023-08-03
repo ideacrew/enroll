@@ -103,6 +103,14 @@ Then(/^the user will not be able to access orphan accounts page$/) do
   expect(page).to have_content(l10n("orphan_accounts_not_enabled"))
 end
 
+Then(/access will be denied for the user/) do
+  expect(page).to have_content("Access not allowed")
+end
+
+Then(/the user clicks on Orphan User Accounts/) do
+  page.find('#users-orphans').click
+end
+
 Then(/^the user will be able to access orphan accounts page$/) do
   expect(page).to have_content("Orphan User Accounts")
 end

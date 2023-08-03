@@ -40,8 +40,19 @@ end
 # end
 
 def can_transmit?(enrollment)
-  offered_in_service_area = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: enrollment})
-  offered_in_service_area.success?
+  # We need to replace this.
+  # It currently checks if we offer the plan attached to the enrollment.
+  # However, it uses the **current** address of the covered individuals.
+  # This means that when you move, resulting in a termination, the termination
+  # event will no longer flow, because all of a sudden, the plan isn't offered -
+  # which is correct.  What we need to check for instead is an **actual**
+  # $0 premium.  I'm leaving the operation intact as I'm not sure where
+  # else it might be used.
+
+  # offered_in_service_area = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: enrollment})
+  # offered_in_service_area.success?
+
+  enrollment.total_premium > 0.0
 end
 
 enrollment_kinds = %w(employer_sponsored employer_sponsored_cobra)

@@ -199,6 +199,70 @@ module Insured::FamiliesHelper
     enrollment_states_hash.stringify_keys[enrollment.aasm_state.to_s]
   end
 
+  # Generates an HTML label for the given hbx enrollment object based on its aasm state and other attributes.
+  # The label provides a visual representation of the enrollment state with text and color.
+  #
+  # @param enrollment [Object] The hbx enrollment object for which the label is generated.
+  # @return [String, nil] An HTML string representing the label or nil if the enrollment is blank.
+  def enrollment_state_label(enrollment)
+    return if enrollment.blank?
+
+    # The colors correspond to those set in enrollment.scss as label-{color}. We use color as an indicator of the
+    # enrollment status. For example, green indicates that the enrollment is active, red indicates that the enrollment
+    # is terminated, yellow indicates that the enrollment requires action, etc.
+    state_groups = {
+      auto_renewing: {
+        has_outstanding_verification: { text: 'Action Needed', color: 'yellow' },
+        default: { text: 'Auto Renewing', color: 'green' }
+      },
+      coverage_canceled: {
+        non_payment: { text: 'Canceled by Insurance Company', color: 'red' },
+        default: { text: 'Coverage Canceled', color: 'grey' }
+      },
+      coverage_expired: {
+        default: { text: 'Coverage Year Ended', color: 'blue' }
+      },
+      coverage_reinstated: {
+        default: { text: 'Coverage Reinstated', color: 'green' }
+      },
+      coverage_selected: {
+        has_outstanding_verification: { text: 'Action Needed', color: 'yellow' },
+        default: { text: 'Coverage Selected', color: 'green' }
+      },
+      coverage_terminated: {
+        non_payment: { text: 'Terminated by Insurance Company', color: 'red' },
+        default: { text: 'Terminated', color: 'blue' }
+      },
+      renewing_coverage_selected: {
+        has_outstanding_verification: { text: 'Action Needed', color: 'yellow' },
+        default: { text: 'Renewing Coverage Selected', color: 'green' }
+      },
+      unverified: {
+        has_outstanding_verification: { text: 'Action Needed', color: 'yellow' }
+      },
+      default: {
+        has_outstanding_verification: { text: 'Action Needed', color: 'yellow' }
+      }
+    }
+
+    group = state_groups[enrollment.aasm_state.to_sym] || state_groups[:default]
+    condition = determine_condition(enrollment, group)
+    label = group[condition] || { text: enrollment.aasm_state.to_s.titleize, color: 'grey' }
+    # Coverage reinstated is a special case where the aasm state is something else but we want to show it as reinstated in "green" (active) scenarios
+    label = state_groups[:coverage_reinstated][:default] if enrollment.is_reinstated_enrollment? && label[:color] == 'green'
+    content_tag(:span, label[:text], class: "label label-#{label[:color]}")
+  end
+
+  def determine_condition(enrollment, enrollment_state)
+    if display_termination_reason?(enrollment) && enrollment_state.key?(:non_payment)
+      :non_payment
+    elsif enrollment.is_any_enrollment_member_outstanding && enrollment_state.key?(:has_outstanding_verification)
+      :has_outstanding_verification
+    else
+      :default
+    end
+  end
+
   def display_termination_reason?(enrollment)
     return false if enrollment.is_shop?
     enrollment.terminate_reason && EnrollRegistry.feature_enabled?(:display_ivl_termination_reason) &&
@@ -241,7 +305,7 @@ module Insured::FamiliesHelper
       # Use turbolinks: false, to avoid calling controller action twice.
       # TODO: Refactor Shop For Planss as a translation at some point
       link_path = family_id.present? ? insured_family_members_path(sep_id: sep.id, qle_id: qle.id, family_id: family_id) : insured_family_members_path(sep_id: sep.id, qle_id: qle.id)
-      link_to link_title.presence || 'Shop for Plans', link_path, class: 'btn btn-default', data: {turbolinks: false}
+      link_to link_title.presence || l10n("insured.shop_for_plans"), link_path, data: {turbolinks: false}
     end
   end
 

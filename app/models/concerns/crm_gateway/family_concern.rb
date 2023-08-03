@@ -11,9 +11,9 @@ module CrmGateway
     def trigger_async_publish
       return unless EnrollRegistry.feature_enabled?(:crm_update_family_save)
       return if EnrollRegistry.feature_enabled?(:check_for_crm_updates) && !send_to_gateway?
+      Rails.logger.info("Triggering CRM family update publish for family #{self.id}")
       CrmWorker.perform_async(self.id.to_s, self.class.to_s, :trigger_crm_family_update_publish)
       reset_crm_notifiction_needed if EnrollRegistry.feature_enabled?(:check_for_crm_updates)
-      "Triggered CRM family update publish for family"
     end
 
     def send_to_gateway?
@@ -29,7 +29,7 @@ module CrmGateway
 
     def trigger_crm_family_update_publish
       return unless EnrollRegistry.feature_enabled?(:crm_update_family_save)
-      puts("Triggering CRM family update publish for family with mongo id #{self.id}")
+      puts("Triggered CRM family update publish for family with mongo id #{self.id}")
       result = ::Operations::Families::SugarCrm::PublishFamily.new.call(self)
       # Update column directly without callbacks
       if result.success?

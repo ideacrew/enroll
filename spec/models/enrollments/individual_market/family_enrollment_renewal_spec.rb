@@ -835,6 +835,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       context 'osse unassisted enrollment renewal' do
 
         before do
+          allow_any_instance_of(BenefitMarkets::Products::HealthProducts::HealthProduct).to receive(:is_hc4cc_plan).and_return(true)
           BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
         end
 
@@ -883,6 +884,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
         before do
           BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+          allow_any_instance_of(BenefitMarkets::Products::HealthProducts::HealthProduct).to receive(:is_hc4cc_plan).and_return(true)
         end
 
         context 'when osse eligibility present for renewal year' do
