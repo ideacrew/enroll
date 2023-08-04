@@ -79,18 +79,17 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
   let(:fetch_double) { double(:new => double(call: premiums_double))}
   let(:fetch_slcsp_double) { double(:new => double(call: slcsp_double))}
   let(:fetch_lcsp_double) { double(:new => double(call: lcsp_double))}
-  let(:product) { FactoryBot.create(:financial_assistance_benefit_market_product, csr_variant_id: '04')}
   let(:operation) { ::FinancialAssistance::Operations::Applications::MedicaidGateway::RunPeriodicDataMatching.new }
   let(:effective_on) { TimeKeeper.date_of_record.beginning_of_month }
 
   let!(:enrollment) do
     FactoryBot.create(:hbx_enrollment,
+                      :with_product,
                       family: family,
                       kind: "individual",
                       coverage_kind: "health",
                       aasm_state: 'coverage_selected',
                       effective_on: effective_on,
-                      product_id: product.id,
                       hbx_enrollment_members: [
                         FactoryBot.build(:hbx_enrollment_member,
                                          applicant_id: family.primary_applicant.id,

@@ -86,6 +86,16 @@ class HbxEnrollment
   scope :current_year,         ->{ where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
   scope :individual_market,   ->{ where(:kind.nin => ["employer_sponsored", "employer_sponsored_cobra"]) }
 
+  def product=(new_product)
+    if new_product.blank?
+      self.product_id = nil
+      @product = nil
+      return
+    end
+    raise ArgumentError.new("expected product") unless new_product.kind_of?(BenefitMarkets::Products::Product)
+    self.product_id = new_product._id
+    @product = new_product
+  end
   def product
     return @product if defined? @product
     @product = ::BenefitMarkets::Products::Product.find(self.product_id) unless product_id.blank?
