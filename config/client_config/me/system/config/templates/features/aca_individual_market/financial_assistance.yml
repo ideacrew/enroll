@@ -317,6 +317,8 @@ registry:
           item: <%= ENV['RENEWALS_CREATION_MONTH'] || 10 %>
         - key: :renewals_creation_day
           item: <%= ENV['RENEWALS_CREATION_DAY'] || 16 %>
+    - key: :skip_eligibility_redetermination
+      is_enabled: <%= ENV['SKIP_ELIGIBILITY_REDETERMINATION_IS_ENABLED'] || false %>
     - key: :skip_employer_address_validation
       is_enabled: :true
     - key: :skip_employer_phone_validation
