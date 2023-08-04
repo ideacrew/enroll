@@ -98,27 +98,25 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
         )
 
       expect(result.success?).to be_truthy
-
       benefit_sponsorship.reload
-      eligibilities = benefit_sponsorship.eligibilities
-      expect(eligibilities.count).to eq 1
+      eligibility = benefit_sponsorship.eligibilities.last
+      expect(eligibility).to be_present
 
-      eligibility = eligibilities.first
-      evidence = eligibility.evidences.first
-      # expect(evidence.is_satisfied).to be_truthy
+      evidence = eligibility.evidences.last
+      expect(evidence.is_satisfied).to be_truthy
 
-      # expect(
-      #   evidence.state_histories.pluck(
-      #     :is_eligible,
-      #     :effective_on,
-      #     :from_state,
-      #     :to_state,
-      #     :event
-      #   )
-      # ).to eq [
-      #      [false, Date.today, :initial, :initial, :move_to_initial],
-      #      [true, Date.today, :initial, :approved, :move_to_approved]
-      #    ]
+      expect(
+        evidence.state_histories.pluck(
+          :is_eligible,
+          :effective_on,
+          :from_state,
+          :to_state,
+          :event
+        )
+      ).to eq [
+           [false, Date.today, :initial, :initial, :move_to_initial],
+           [true, Date.today, :initial, :approved, :move_to_approved]
+         ]
     end
   end
 end
