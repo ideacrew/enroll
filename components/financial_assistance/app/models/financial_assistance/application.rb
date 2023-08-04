@@ -1239,7 +1239,7 @@ module FinancialAssistance
     end
 
     def all_applicants_totally_ineligible?
-      active_applicants.all?(&:applicant.is_totally_ineligible)
+      active_applicants.all?(&:is_totally_ineligible)
     end
 
     def all_applicants_without_applying_for_coverage?
