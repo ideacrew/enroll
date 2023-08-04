@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :benefit_sponsors_benefit_sponsorships_shop_osse_eligibilities_admin_attested_evidence,
+  factory :shop_osse_eligibilities_admin_attested_evidence,
           class:
             'BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::AdminAttestedEvidence' do
 
