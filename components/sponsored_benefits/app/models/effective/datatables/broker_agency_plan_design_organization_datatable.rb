@@ -157,7 +157,7 @@ module Effective
       def check_employer_osse_eligibility(employer)
         # checks if an eligibility has been created and not yet ended for an employer
         bs = employer.employer_profile.organization.active_benefit_sponsorship
-        osse_eligibility = bs&.current_eligibility(:osse_subsidy) if bs.present?
+        osse_eligibility = bs&.current_eligibility(:shop_osse_eligibility) if bs.present?
         osse_eligibility.present?
       end
 

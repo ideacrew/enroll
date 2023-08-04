@@ -401,7 +401,7 @@ module BenefitSponsors
           context 'terminate eligibility' do
             let(:osse_eligibility) { 'false' }
             let(:er_elig) do
-              build(:benefit_sponsors_benefit_sponsorships_shop_osse_eligibilities_shop_osse_eligibility,
+              build(:benefit_sponsors_shop_osse_eligibility,
                     :with_admin_attested_evidence,
                     :evidence_state => :published,
                     :is_eligible => false)

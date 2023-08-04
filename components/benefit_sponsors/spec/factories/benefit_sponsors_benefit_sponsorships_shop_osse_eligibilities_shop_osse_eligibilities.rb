@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :benefit_sponsors_benefit_sponsorships_shop_osse_eligibilities_shop_osse_eligibility,
+  factory :benefit_sponsors_shop_osse_eligibility,
           class:
             'BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::ShopOsseEligibility' do
 
@@ -28,7 +28,7 @@ FactoryBot.define do
       )
 
       eligibility.grants << FactoryBot.build(
-        :benefit_sponsors_benefit_sponsorships_shop_osse_eligibilities_shop_osse_grant,
+        :shop_osse_eligibilities_shop_osse_grant,
         key: :contribution_subsidy_grant,
         title: 'Contribution Subsidy Grant'
       )
@@ -38,7 +38,7 @@ FactoryBot.define do
     trait :with_admin_attested_evidence do
       after :build do |eligibility, evaluator|
         eligibility.evidences << FactoryBot.build(
-          :benefit_sponsors_benefit_sponsorships_shop_osse_eligibilities_admin_attested_evidence,
+          :shop_osse_eligibilities_admin_attested_evidence,
           to_state: evaluator.evidence_state,
           is_eligible: evaluator.is_eligible,
           effective_on: evaluator.effective_on

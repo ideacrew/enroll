@@ -56,7 +56,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
     end
 
     let!(:shop_osse_eligibility) do
-      eligibility = build(:benefit_sponsors_benefit_sponsorships_shop_osse_eligibilities_shop_osse_eligibility,
+      eligibility = build(:benefit_sponsors_shop_osse_eligibility,
                           :with_admin_attested_evidence,
                           :evidence_state => :initial,
                           :is_eligible => false)
@@ -70,7 +70,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
       let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:open_enrollment_end_reminder_and_low_enrollment, model_instance, {}) }
 
       before do
-        eligibility = build(:benefit_sponsors_benefit_sponsorships_shop_osse_eligibilities_shop_osse_eligibility,
+        eligibility = build(:benefit_sponsors_shop_osse_eligibility,
                             :with_admin_attested_evidence,
                             :evidence_state => :published,
                             :is_eligible => false)
