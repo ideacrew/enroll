@@ -80,7 +80,11 @@ module BenefitSponsors
               subject.eligibilities.where(id: eligibility._id).first
 
             if eligibility_record
-              update_eligibility_record(eligibility_record, eligibility)
+              update_eligibility_record(
+                subject,
+                eligibility_record,
+                eligibility
+              )
             else
               eligibility_record = create_eligibility_record(eligibility)
               subject.eligibilities << eligibility_record
@@ -93,20 +97,23 @@ module BenefitSponsors
             end
           end
 
-          def update_eligibility_record(eligibility_record, eligibility)
+          def update_eligibility_record(
+            subject,
+            eligibility_record,
+            eligibility
+          )
             evidence = eligibility.evidences.last
             evidence_record = eligibility_record.evidences.last
             evidence_record.state_histories.build(
               evidence.state_histories.last.to_h
             )
+
             evidence_record.is_satisfied = evidence.is_satisfied
             eligibility_record.state_histories.build(
               eligibility.state_histories.last.to_h
             )
 
-            evidence_record.save
-            eligibility_record.save
-            eligibility_record._parent.save
+            subject.save
           end
 
           def create_eligibility_record(eligibility)
