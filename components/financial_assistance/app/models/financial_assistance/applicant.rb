@@ -602,16 +602,15 @@ module FinancialAssistance
     def has_spouse
       spouse_relationship.present?
     end
-    
+
     # Checks that an applicant cannot have more than one spousal relationship
     def valid_spousal_relationship?
-      
       partner_relationships = application.relationships.where({
-        "$or" => [
-        {:applicant_id => id, :kind.in => ['spouse', 'domestic_partner']},
-        {:relative_id => id, :kind.in => ['spouse', 'domestic_partner']}
-        ]
-      })
+                                                                "$or" => [
+                                                                { :applicant_id => id, :kind.in => ['spouse', 'domestic_partner'] },
+                                                                { :relative_id => id, :kind.in => ['spouse', 'domestic_partner'] }
+                                                                ]
+                                                              })
       return false if partner_relationships.size > 2
       true
     end

@@ -545,22 +545,6 @@ module FinancialAssistance
       end
       self.errors[:base] << I18n.t("faa.errors.missing_relationships")
       missing_relationships
-
-      # loop through all their relationships if the relative id appears more than once, that's an issue right?
-    end
-
-    def check_inconsistent_relationships
-      applicants.each do |applicant|
-        relationships = []
-       relative_ids = applicant.relationships.map(&:relative_id)
-       filtered_relative_ids = relative_ids.uniq
-       inconsistent_relationships = if relative_ids.size != filtered_relative_ids.size
-        false
-        else
-          true
-       end
-      end
-      inconsistent_relationships
     end
 
     def update_response_attributes(attrs)
@@ -660,7 +644,7 @@ module FinancialAssistance
       all_relationships = find_all_relationships(matrix)
       spouse_relation = all_relationships.select{|hash| hash[:relation] == "spouse"}.first
       return true unless spouse_relation.present?
-    
+
       spouse_rel_id = spouse_relation.to_a.flatten.select{|a| a.is_a?(BSON::ObjectId) && a != primary_applicant.id}.first
       # assumes the primary is a spouse
       primary_parent_relations = relationships.where(applicant_id: primary_applicant.id, kind: 'parent')
@@ -677,7 +661,7 @@ module FinancialAssistance
       else
         self.errors[:base] << I18n.t("faa.errors.invalid_household_relationships")
         false
-      
+
       end
     end
     # if you list bob as your brother and you list tom as your dad, but bob lists tom as their spouse
@@ -689,7 +673,7 @@ module FinancialAssistance
     #if spouse_or_domestic_partner.count > 1
       #return false if spouse_or_domestic_partner.count > 1
     # end
-  
+
 
     def apply_rules_and_update_relationships(matrix) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
       missing_relationships = find_missing_relationships(matrix)
