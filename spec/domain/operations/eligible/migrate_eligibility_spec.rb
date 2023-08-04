@@ -5,7 +5,7 @@ require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_site_spec
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application"
 
-RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::MigrateBenefitSponsorEligibility,
+RSpec.describe Operations::Eligible::MigrateEligibility,
                type: :model,
                dbclean: :after_each do
   let(:site) do
