@@ -1060,7 +1060,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         application.ensure_relationship_with_primary(applicant2, 'spouse')
         applicant.save!
       end
-      
+
       let!(:relationship_2) do
         application.add_or_update_relationships(applicant2, applicant3, 'siblings')
         applicant2.save!
@@ -1070,7 +1070,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         application.add_or_update_relationships(applicant3, applicant, 'domestic_partner')
         applicant3.save!
       end
-   
+
       it "returns false" do
         expect(applicant.valid_spousal_relationship?).to eq false
       end
@@ -1082,7 +1082,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         application.ensure_relationship_with_primary(applicant2, 'spouse')
         application.reload
       end
-      
+
       let!(:relationship_2) do
         application.add_or_update_relationships(applicant2, applicant3, 'parent')
         applicant2.save!
@@ -1092,7 +1092,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         application.add_or_update_relationships(applicant3, applicant, 'child')
         applicant3.save!
       end
-      
+
       it "returns true" do
         expect(applicant.valid_spousal_relationship?).to eq true
       end
