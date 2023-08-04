@@ -644,35 +644,19 @@ module FinancialAssistance
       all_relationships = find_all_relationships(matrix)
       spouse_relation = all_relationships.select{|hash| hash[:relation] == "spouse"}.first
       return true unless spouse_relation.present?
-
       spouse_rel_id = spouse_relation.to_a.flatten.select{|a| a.is_a?(BSON::ObjectId) && a != primary_applicant.id}.first
-      # assumes the primary is a spouse
       primary_parent_relations = relationships.where(applicant_id: primary_applicant.id, kind: 'parent')
-      #dad has 3 relationships where he is the parent
-
-      # find all the parent relationships
       child_ids = primary_parent_relations.map(&:relative_id)
-      # find all the children
       spouse_parent_relations = relationships.where(:relative_id.in => child_ids.flatten, applicant_id: spouse_rel_id, kind: 'parent')
-      # find all the spouse's children
-      # return false if the primary and the spouse have different amounts of children
+
       if spouse_parent_relations.count == child_ids.flatten.count
         true
       else
         self.errors[:base] << I18n.t("faa.errors.invalid_household_relationships")
         false
-
       end
     end
-    # if you list bob as your brother and you list tom as your dad, but bob lists tom as their spouse
-
-    # applicant.relationships.each do |relationship|
-    #   look at this person's relationship types
-    #   look at all the relative's relationship types and who they coorespond with
-   # spouse_or_domestic_partner = applicant.relationships.select {|relationship| relationship.kind == "spouse" || relationship.kind == "domestic_partner"}
-    #if spouse_or_domestic_partner.count > 1
-      #return false if spouse_or_domestic_partner.count > 1
-    # end
+    
 
 
     def apply_rules_and_update_relationships(matrix) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
@@ -734,6 +718,9 @@ module FinancialAssistance
         end
       end
 
+      # Spouse Rule
+      # When MemberA is child of MemberB, And MemberC is child to MemberD,
+      # And MemberB, MemberD are spouse to eachother, Then MemberA, MemberC are Siblings
       missing_relationships.each do |rel|
         first_rel = rel.to_a.flatten.first
         second_rel = rel.to_a.flatten.second
