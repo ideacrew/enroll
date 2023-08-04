@@ -94,8 +94,7 @@ module FinancialAssistance
                   effective_date: Date.new(validated_params[:renewal_year])
                 )
 
-                full_medicaid_determination_feature = FinancialAssistanceRegistry[:full_medicaid_determination_step]
-                renewal_application.full_medicaid_determination = application.full_medicaid_determination if full_medicaid_determination_feature.enabled? && full_medicaid_determination_feature.settings(:annual_eligibility_redetermination).item
+                renewal_application.full_medicaid_determination = application.full_medicaid_determination if full_medicaid_determination_feature_enabled?
 
                 renewal_application.save
                 if renewal_application.renewal_draft?
@@ -104,6 +103,11 @@ module FinancialAssistance
                   Failure("Renewal Application Applicants Update or income_verification_extension required - #{renewal_application.hbx_id}")
                 end
               end.to_result
+            end
+
+            def full_medicaid_determination_feature_enabled?
+              feature = FinancialAssistanceRegistry[:full_medicaid_determination_step]
+              feature.enabled? && feature.settings(:annual_eligibility_redetermination).item
             end
 
             def find_aasm_state(application, family_members_changed)
