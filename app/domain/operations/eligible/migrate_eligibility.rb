@@ -29,9 +29,7 @@ module Operations
       def validate(params)
         errors = []
         errors << "eligibility key missing" unless params[:eligibility_key]
-        unless params[:current_eligibilities].present?
-          errors << "current eligibilities missing"
-        end
+        errors << "current eligibilities missing" unless params[:current_eligibilities].present?
 
         errors.empty? ? Success(params) : Failure(errors)
       end
