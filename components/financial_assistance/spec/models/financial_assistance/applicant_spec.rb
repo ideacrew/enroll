@@ -1038,6 +1038,67 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     end
   end
 
+  describe '#valid_spousal_relationship' do
+    let!(:applicant2) do
+      FactoryBot.create(:applicant,
+                        application: application,
+                        dob: Date.today - 38.years,
+                        is_primary_applicant: false,
+                        family_member_id: BSON::ObjectId.new)
+    end
+
+    let!(:applicant3) do
+      FactoryBot.create(:applicant,
+                        application: application,
+                        dob: Date.today - 38.years,
+                        is_primary_applicant: false,
+                        family_member_id: BSON::ObjectId.new)
+    end
+
+    context "invalid spousal relationships" do
+      let!(:relationship_1) do
+        application.ensure_relationship_with_primary(applicant2, 'spouse')
+        applicant.save!
+      end
+      
+      let!(:relationship_2) do
+        application.add_or_update_relationships(applicant2, applicant3, 'siblings')
+        applicant2.save!
+      end
+
+      let!(:relationship_3) do
+        application.add_or_update_relationships(applicant3, applicant, 'domestic_partner')
+        applicant3.save!
+      end
+   
+      it "returns false" do
+        expect(applicant.valid_spousal_relationship?).to eq false
+      end
+    end
+
+    context "valid spousal relationships" do
+
+      let!(:relationship_1) do
+        application.ensure_relationship_with_primary(applicant2, 'spouse')
+        application.reload
+      end
+      
+      let!(:relationship_2) do
+        application.add_or_update_relationships(applicant2, applicant3, 'parent')
+        applicant2.save!
+      end
+
+      let!(:relationship_3) do
+        application.add_or_update_relationships(applicant3, applicant, 'child')
+        applicant3.save!
+      end
+      
+      it "returns true" do
+        expect(applicant.valid_spousal_relationship?).to eq true
+      end
+    end
+  end
+
   describe '#is_spouse_of_primary' do
     let!(:applicant2) do
       FactoryBot.create(:applicant,

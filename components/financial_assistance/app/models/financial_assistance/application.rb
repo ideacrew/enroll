@@ -656,7 +656,7 @@ module FinancialAssistance
 
     def validate_relationships(matrix)
       # validates the child has relationship as parent for 'spouse of the primary'.
-      return false if applicants.any? {|applicant| !applicant.valid_relationships?}
+      return false if applicants.any? { |applicant| !applicant.valid_spousal_relationship? }
       all_relationships = find_all_relationships(matrix)
       spouse_relation = all_relationships.select{|hash| hash[:relation] == "spouse"}.first
       return true unless spouse_relation.present?
@@ -750,9 +750,6 @@ module FinancialAssistance
         end
       end
 
-      # Spouse Rule
-      # When MemberA is child of MemberB, And MemberC is child to MemberD,
-      # And MemberB, MemberD are spouse to eachother, Then MemberA, MemberC are Siblings
       missing_relationships.each do |rel|
         first_rel = rel.to_a.flatten.first
         second_rel = rel.to_a.flatten.second
