@@ -20,8 +20,7 @@ module BenefitSponsors
           def call(params)
             values = yield validate(params)
             eligibility_record = yield find_eligibility(values)
-            eligibility_options =
-              yield build_eligibility_options(values, eligibility_record)
+            eligibility_options = yield build_eligibility_options(values, eligibility_record)
             eligibility = yield create_eligibility(eligibility_options)
             persisted_eligibility = yield store(values, eligibility)
 
@@ -47,7 +46,7 @@ module BenefitSponsors
           def find_eligibility(_values)
             eligibility = @subject.shop_eligibilities.by_key(:shop_osse_eligibility).last
 
-            eligibility.present? ? Success(eligibility) : Failure("Shop Osse Eligibility not found for #{@subject}")
+            Success(eligibility)
           end
 
           def build_eligibility_options(values, eligibility_record = nil)
