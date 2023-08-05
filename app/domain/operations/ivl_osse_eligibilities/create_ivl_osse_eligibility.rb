@@ -46,7 +46,7 @@ module Operations
       def find_eligibility(_values)
         eligibility = @subject.ivl_eligibilities.by_key(:ivl_osse_eligibility).last
 
-        Success(eligibility)
+        eligibility.present? ? Success(eligibility) : Failure("Ivl Osse Eligibility not found for #{@subject}")
       end
 
       def build_eligibility_options(values, eligibility_record = nil)

@@ -47,7 +47,7 @@ module BenefitSponsors
           def find_eligibility(_values)
             eligibility = @subject.shop_eligibilities.by_key(:shop_osse_eligibility).last
 
-            Success(eligibility)
+            eligibility.present? ? Success(eligibility) : Failure("Shop Osse Eligibility not found for #{@subject}")
           end
 
           def build_eligibility_options(values, eligibility_record = nil)
