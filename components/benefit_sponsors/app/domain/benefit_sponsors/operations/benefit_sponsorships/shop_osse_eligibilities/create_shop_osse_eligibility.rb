@@ -23,8 +23,7 @@ module BenefitSponsors
           def call(params)
             values = yield validate(params)
             eligibility_record = yield find_eligibility(values)
-            eligibility_options =
-              yield build_eligibility_options(values, eligibility_record)
+            eligibility_options = yield build_eligibility_options(values, eligibility_record)
             eligibility = yield create_eligibility(eligibility_options)
             persisted_eligibility = yield store(values, eligibility)
 
