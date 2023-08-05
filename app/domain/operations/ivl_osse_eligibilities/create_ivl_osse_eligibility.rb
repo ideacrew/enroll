@@ -34,19 +34,19 @@ module Operations
         params[:effective_date] = params[:effective_date].beginning_of_year if EnrollRegistry.feature_enabled?("aca_ivl_osse_effective_beginning_of_year")
 
         errors = []
-        errors << "subject missing" unless params[:subject]
         errors << "evidence key missing" unless params[:evidence_key]
         errors << "evidence value missing" unless params[:evidence_value]
-        errors << "effective date missing" unless params[:effective_date]
+        errors << "effective date missing or it should be a date" unless params[:effective_date].is_a?(::Date)
+        @subject = GlobalID::Locator.locate(params[:subject])
+        errors << "subject missing or not found for #{params[:subject]}" unless @subject.present?
 
         errors.empty? ? Success(params) : Failure(errors)
       end
 
-      def find_eligibility(values)
-        subject = GlobalID::Locator.locate(values[:subject])
-        eligibility = subject.ivl_eligibilities.by_key(:ivl_osse_eligibility).last
+      def find_eligibility(_values)
+        eligibility = @subject.ivl_eligibilities.by_key(:ivl_osse_eligibility).last
 
-        Success(eligibility)
+        eligibility.present? ? Success(eligibility) : Failure("Ivl Osse Eligibility not found for #{@subject}")
       end
 
       def build_eligibility_options(values, eligibility_record = nil)
@@ -63,31 +63,24 @@ module Operations
       end
 
       # Following Operation expects AcaEntities domain class as subject
-      def create_eligibility(values, eligibility_options)
-        subject = GlobalID::Locator.locate(values[:subject])
+      def create_eligibility(_values, eligibility_options)
         AcaEntities::Eligible::AddEligibility.new.call(
-          subject: "AcaEntities::People::#{subject.class.to_s.demodulize}",
+          subject: "AcaEntities::People::#{@subject.class.to_s.demodulize}",
           eligibility: eligibility_options
         )
       end
 
-      def store(values, eligibility)
-        subject = GlobalID::Locator.locate(values[:subject])
-
-        eligibility_record = subject.ivl_eligibilities.where(id: eligibility._id).first
+      def store(_values, eligibility)
+        eligibility_record = @subject.ivl_eligibilities.where(id: eligibility._id).first
 
         if eligibility_record
           update_eligibility_record(eligibility_record, eligibility)
         else
           eligibility_record = create_eligibility_record(eligibility)
-          subject.ivl_eligibilities << eligibility_record
+          @subject.ivl_eligibilities << eligibility_record
         end
 
-        if subject.save
-          Success(eligibility_record)
-        else
-          Failure(subject.errors.full_messages)
-        end
+        @subject.save ? Success(eligibility_record) : Failure(@subject.errors.full_messages)
       end
 
       def update_eligibility_record(eligibility_record, eligibility)
