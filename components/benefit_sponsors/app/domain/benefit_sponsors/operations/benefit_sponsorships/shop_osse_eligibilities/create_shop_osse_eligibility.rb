@@ -11,6 +11,8 @@ module BenefitSponsors
         class CreateShopOsseEligibility
           send(:include, Dry::Monads[:result, :do])
 
+          attr_reader :subject
+
           # @param [Hash] opts Options to build eligibility
           # @option opts [<GlobalId>] :subject required
           # @option opts [<String>]   :evidence_key required
@@ -21,7 +23,8 @@ module BenefitSponsors
           def call(params)
             values = yield validate(params)
             eligibility_record = yield find_eligibility(values)
-            eligibility_options = yield build_eligibility_options(values, eligibility_record)
+            eligibility_options =
+              yield build_eligibility_options(values, eligibility_record)
             eligibility = yield create_eligibility(eligibility_options)
             persisted_eligibility = yield store(values, eligibility)
 
@@ -45,7 +48,8 @@ module BenefitSponsors
           end
 
           def find_eligibility(_values)
-            eligibility = @subject.shop_eligibilities.by_key(:shop_osse_eligibility).last
+            eligibility =
+              subject.eligibilities.by_key(:shop_osse_eligibility).last
 
             Success(eligibility)
           end
@@ -73,31 +77,24 @@ module BenefitSponsors
           end
 
           def store(_values, eligibility)
-            eligibility_record = @subject.eligibilities.where(id: eligibility._id).first
+            eligibility_record =
+              subject.eligibilities.where(id: eligibility._id).first
 
             if eligibility_record
-              update_eligibility_record(
-                subject,
-                eligibility_record,
-                eligibility
-              )
+              update_eligibility_record(eligibility_record, eligibility)
             else
               eligibility_record = create_eligibility_record(eligibility)
-              @subject.eligibilities << eligibility_record
+              subject.eligibilities << eligibility_record
             end
 
-            if @subject.save
+            if subject.save
               Success(eligibility_record)
             else
-              Failure(@subject.errors.full_messages)
+              Failure(subject.errors.full_messages)
             end
           end
 
-          def update_eligibility_record(
-            subject,
-            eligibility_record,
-            eligibility
-          )
+          def update_eligibility_record(eligibility_record, eligibility)
             evidence = eligibility.evidences.last
             evidence_history_params = build_history_params_for(evidence)
             eligibility_history_params = build_history_params_for(eligibility)
