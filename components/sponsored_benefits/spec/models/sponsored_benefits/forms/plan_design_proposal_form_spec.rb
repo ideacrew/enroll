@@ -2,9 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe SponsoredBenefits::Forms::PlanDesignProposal,
-               type: :model,
-               dbclean: :after_each do
+RSpec.describe SponsoredBenefits::Forms::PlanDesignProposal, type: :model, dbclean: :after_each do
   context 'osse eligibility' do
     let!(:organization) do
       create(
@@ -22,7 +20,6 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignProposal,
     let(:plan_design_proposal) { organization.reload.plan_design_proposals[0] }
     let(:employer_profile) { plan_design_proposal.profile }
     let(:benefit_sponsorship) { employer_profile.benefit_sponsorships[0] }
-    let(:osse_eligibility) { 'true' }
 
     let(:params) do
       {
@@ -34,33 +31,29 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignProposal,
     end
 
     before do
-      form =
-        described_class.new(
-          params.merge('proposal_id' => plan_design_proposal.id.to_s)
-        )
+      form = described_class.new(params.merge('proposal_id' => plan_design_proposal.id.to_s))
       form.save
     end
 
     context 'when true' do
+      let(:osse_eligibility) { 'true' }
 
       it 'should store eligibility' do
-        osse_eligibility =
-          benefit_sponsorship.eligibility_for(
-            :osse_subsidy,
-            plan_design_proposal.effective_date
-          )
+        osse_eligibility = benefit_sponsorship.reload.eligibility_for(:bqt_osse_eligibility, plan_design_proposal.effective_date)
         expect(osse_eligibility).to be_present
+        expect(osse_eligibility.is_eligible_on?(plan_design_proposal.effective_date)).to be_truthy
       end
     end
 
     context 'when false' do
+      let(:osse_eligibility) { 'true' }
+
       it 'should term eligibility' do
-        osse_eligibility =
-          benefit_sponsorship.eligibility_for(
-            :osse_subsidy,
+        osse_eligibility = benefit_sponsorship.reload.eligibility_for(
+            :bqt_osse_eligibility,
             plan_design_proposal.effective_date
           )
-        expect(osse_eligibility.present?).to be_truthy
+        expect(osse_eligibility.is_eligible_on?(plan_design_proposal.effective_date)).to be_truthy
 
         form =
           described_class.new(
@@ -71,12 +64,11 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignProposal,
           )
         form.save
 
-        osse_eligibility =
-          benefit_sponsorship.eligibility_for(
-            :osse_subsidy,
-            plan_design_proposal.effective_date
-          )
-        expect(osse_eligibility.present?).to be_falsey
+        osse_eligibility = benefit_sponsorship.reload.eligibility_for(
+          :bqt_osse_eligibility,
+          plan_design_proposal.effective_date
+        )
+        expect(osse_eligibility.is_eligible_on?(plan_design_proposal.effective_date)).to be_falsey
       end
     end
   end
