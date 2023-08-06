@@ -101,7 +101,7 @@ module SponsoredBenefits
       end
 
       def osse_eligible?(start_on)
-        eligibility_for(:shop_osse_eligibility, start_on).present? && EnrollRegistry.feature_enabled?(:broker_quote_hc4cc_subsidy)
+        eligibility_for(:bqt_osse_eligibility, start_on).present? && EnrollRegistry.feature_enabled?(:broker_quote_hc4cc_subsidy)
       end
 
       def save_inbox
