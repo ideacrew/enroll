@@ -21,8 +21,7 @@ module BenefitSponsors
           def call(params)
             values = yield validate(params)
             eligibility_record = yield find_eligibility(values)
-            eligibility_options =
-              yield build_eligibility_options(values, eligibility_record)
+            eligibility_options = yield build_eligibility_options(values, eligibility_record)
             eligibility = yield create_eligibility(eligibility_options)
             persisted_eligibility = yield store(values, eligibility)
 
@@ -33,21 +32,20 @@ module BenefitSponsors
 
           def validate(params)
             params[:event] ||= :initialize
-            params[:effective_date] ||= Date.today
+            params[:effective_date] ||= TimeKeeper.date_of_record
 
             errors = []
-            errors << "subject missing" unless params[:subject]
             errors << "evidence key missing" unless params[:evidence_key]
             errors << "evidence value missing" unless params[:evidence_value]
-            errors << "effective date missing" unless params[:effective_date]
+            errors << "effective date missing" unless params[:effective_date].is_a?(::Date)
+            @subject = GlobalID::Locator.locate(params[:subject])
+            errors << "subject missing or not found for #{params[:subject]}" unless @subject.present?
 
             errors.empty? ? Success(params) : Failure(errors)
           end
 
-          def find_eligibility(values)
-            subject = GlobalID::Locator.locate(values[:subject])
-            eligibility =
-              subject.eligibilities.by_key(:shop_osse_eligibility).last
+          def find_eligibility(_values)
+            eligibility = @subject.shop_eligibilities.by_key(:shop_osse_eligibility).last
 
             Success(eligibility)
           end
@@ -74,11 +72,8 @@ module BenefitSponsors
             )
           end
 
-          def store(values, eligibility)
-            subject = GlobalID::Locator.locate(values[:subject])
-
-            eligibility_record =
-              subject.eligibilities.where(id: eligibility._id).first
+          def store(_values, eligibility)
+            eligibility_record = @subject.eligibilities.where(id: eligibility._id).first
 
             if eligibility_record
               update_eligibility_record(
@@ -88,13 +83,13 @@ module BenefitSponsors
               )
             else
               eligibility_record = create_eligibility_record(eligibility)
-              subject.eligibilities << eligibility_record
+              @subject.eligibilities << eligibility_record
             end
 
-            if subject.save
+            if @subject.save
               Success(eligibility_record)
             else
-              Failure(subject.errors.full_messages)
+              Failure(@subject.errors.full_messages)
             end
           end
 

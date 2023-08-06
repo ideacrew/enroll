@@ -38,7 +38,7 @@ module Operations
         errors << "subject missing" unless params[:subject]
         errors << "evidence key missing" unless params[:evidence_key]
         errors << "evidence value missing" unless params[:evidence_value]
-        errors << "effective date missing" unless params[:effective_date]
+        errors << "effective date missing or it should be a date" unless params[:effective_date].is_a?(::Date)
 
         errors.empty? ? Success(params) : Failure(errors)
       end
