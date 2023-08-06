@@ -104,6 +104,7 @@ module BenefitSponsors
             evidence_record.state_histories.build(evidence_history_params)
             eligibility_record.state_histories.build(eligibility_history_params)
 
+            evidence_record.save
             subject.save
           end
 
