@@ -2,7 +2,7 @@
 
 module SponsoredBenefits
   module BenefitSponsorships
-    module ShopOsseEligibilities
+    module BqtOsseEligibilities
       # Evidence model
       class AdminAttestedEvidence < ::Eligible::Evidence
 

@@ -232,13 +232,13 @@ module SponsoredBenefits
       end
 
       def osse_eligibility_with(benefit_sponsorship)
-        benefit_sponsorship.eligibility_for(:shop_osse_eligibility, effective_date)
+        benefit_sponsorship.eligibility_for(:bqt_osse_eligibility, effective_date)
       end
 
       def create_or_term_osse_eligibility(benefit_sponsorship)
         return unless osse_eligibility.present?
 
-        eligibility_record = benefit_sponsorship.eligibility_for(:shop_osse_eligibility, effective_date)
+        eligibility_record = benefit_sponsorship.eligibility_for(:bqt_osse_eligibility, effective_date)
 
         if eligibility_record&.is_eligible_on?(TimeKeeper.date_of_record)
           terminate_eligibility(benefit_sponsorship, osse_eligibility.to_s) if osse_eligibility.to_s == 'false'
@@ -256,21 +256,21 @@ module SponsoredBenefits
       def osse_eligibility_params(benefit_sponsorship, osse_eligibility)
         {
           subject: benefit_sponsorship.to_global_id,
-          evidence_key: :shop_osse_evidence,
+          evidence_key: :bqt_osse_evidence,
           evidence_value: osse_eligibility.to_s,
           effective_date: TimeKeeper.date_of_record
         }
       end
 
       def create_eligibility(benefit_sponsorship, osse_eligibility)
-        ::SponsoredBenefits::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(osse_eligibility_params(benefit_sponsorship, osse_eligibility))
+        ::SponsoredBenefits::Operations::BenefitSponsorships::BqtOsseEligibilities::CreateBqtOsseEligibility.new.call(osse_eligibility_params(benefit_sponsorship, osse_eligibility))
       end
 
       def terminate_eligibility(benefit_sponsorship, osse_eligibility)
-        ::SponsoredBenefits::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(
+        ::SponsoredBenefits::Operations::BenefitSponsorships::BqtOsseEligibilities::CreateBqtOsseEligibility.new.call(
           {
             subject: benefit_sponsorship.to_global_id,
-            evidence_key: :shop_osse_evidence,
+            evidence_key: :bqt_osse_evidence,
             evidence_value: osse_eligibility.to_s,
             effective_date: TimeKeeper.date_of_record
           }

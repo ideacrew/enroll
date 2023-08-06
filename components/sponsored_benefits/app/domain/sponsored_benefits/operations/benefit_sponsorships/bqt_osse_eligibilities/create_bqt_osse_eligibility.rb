@@ -6,9 +6,9 @@ require "dry/monads/do"
 module SponsoredBenefits
   module Operations
     module BenefitSponsorships
-      module ShopOsseEligibilities
+      module BqtOsseEligibilities
         # Operation to support eligibility creation
-        class CreateShopOsseEligibility
+        class CreateBqtOsseEligibility
           send(:include, Dry::Monads[:result, :do])
 
           # @param [Hash] opts Options to build eligibility
@@ -45,8 +45,7 @@ module SponsoredBenefits
 
           def find_eligibility(values)
             subject = GlobalID::Locator.locate(values[:subject])
-            eligibility =
-              subject.eligibilities.by_key(:shop_osse_eligibility).last
+            eligibility = subject.eligibilities.by_key(:bqt_osse_eligibility).last
 
             Success(eligibility)
           end
@@ -54,12 +53,12 @@ module SponsoredBenefits
           def build_eligibility_options(values, eligibility_record = nil)
             ::Operations::Eligible::BuildEligibility.new(
               configuration:
-                SponsoredBenefits::Operations::BenefitSponsorships::ShopOsseEligibilities::OsseEligibilityConfiguration
+                SponsoredBenefits::Operations::BenefitSponsorships::BqtOsseEligibilities::OsseEligibilityConfiguration
             ).call(
               values.merge(
                 eligibility_record: eligibility_record,
                 evidence_configuration:
-                  SponsoredBenefits::Operations::BenefitSponsorships::ShopOsseEligibilities::OsseEvidenceConfiguration
+                  SponsoredBenefits::Operations::BenefitSponsorships::BqtOsseEligibilities::OsseEvidenceConfiguration
               )
             )
           end
@@ -112,7 +111,7 @@ module SponsoredBenefits
               eligibility.to_h.except(:evidences, :grants)
 
             eligibility_record =
-              SponsoredBenefits::BenefitSponsorships::ShopOsseEligibilities::ShopOsseEligibility.new(
+              SponsoredBenefits::BenefitSponsorships::BqtOsseEligibilities::BqtOsseEligibility.new(
                 osse_eligibility_params
               )
 

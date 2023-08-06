@@ -2,9 +2,9 @@
 
 module SponsoredBenefits
   module BenefitSponsorships
-    module ShopOsseEligibilities
+    module BqtOsseEligibilities
       # Grant model
-      class ShopOsseGrant < ::Eligible::Grant
+      class BqtOsseGrant < ::Eligible::Grant
 
       end
     end

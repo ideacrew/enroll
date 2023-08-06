@@ -3,15 +3,15 @@
 module SponsoredBenefits
   module Operations
     module BenefitSponsorships
-      module ShopOsseEligibilities
+      module BqtOsseEligibilities
         # Overrides top level eligibility_configuration for feature specific configurations
         class OsseEligibilityConfiguration < ::Operations::Eligible::EligibilityConfiguration
           def self.key
-            :shop_osse_eligibility
+            :bqt_osse_eligibility
           end
 
           def self.title
-            "Shop Osse Eligibility"
+            "BQT Osse Eligibility"
           end
 
           def self.grants
