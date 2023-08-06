@@ -17,7 +17,8 @@ module Operations
 
       # @param [Hash] opts Options to build eligibility
       # @option opts [<String>]   :resource_name required
-      # @option opts [<Array>]   :filename required
+      # @option opts [<String>]   :filename required
+      # @option opts [<String>]   :eligibility_type required
       # @return [Dry::Monad] result
       def call(params)
         values = yield validate(params)
@@ -80,6 +81,7 @@ module Operations
 
       def process_entry(csv, entry)
         subject = GlobalID::Locator.locate(entry["_id"])
+
         entry["records"]
           .sort_by { |record| record["created_at"].to_i }
           .each do |record|

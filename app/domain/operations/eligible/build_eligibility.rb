@@ -19,6 +19,7 @@ module Operations
       # @option opts [Date]       :effective_date required
       # @option opts [ShopOsseEligibility]  :eligibility_record optional
       # @option opts [EvidenceConfiguration]  :evidence_configuration optional
+      # @option opts [Hash]       :timestamps optional timestamps for data migrations purposes
       # @return [Dry::Monad] result
       def call(params)
         values = yield validate(params)
@@ -113,7 +114,7 @@ module Operations
         from_state =
           values[:eligibility_record]&.state_histories&.last&.to_state
 
-        {
+        options = {
           event: "move_to_#{to_state}".to_sym,
           transition_at: DateTime.now,
           effective_on: values[:effective_date],
@@ -121,6 +122,8 @@ module Operations
           to_state: to_state,
           is_eligible: evidence_options[:is_satisfied]
         }
+        options[:timestamps] = values[:timestamps] if values[:timestamps]
+        options
       end
 
       def to_state_for(evidence_options)

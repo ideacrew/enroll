@@ -31,5 +31,11 @@ module Eligible
     def self.latest_history
       order(transition_at: :desc).first
     end
+
+    def timestamps=(timestamps)
+      self.transition_at = timestamps[:modified_at]
+      self.created_at = timestamps[:created_at]
+      self.updated_at = timestamps[:modified_at]
+    end
   end
 end

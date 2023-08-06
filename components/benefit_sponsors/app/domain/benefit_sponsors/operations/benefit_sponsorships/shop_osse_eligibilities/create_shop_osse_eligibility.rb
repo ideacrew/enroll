@@ -16,6 +16,7 @@ module BenefitSponsors
           # @option opts [<String>]   :evidence_key required
           # @option opts [<String>]   :evidence_value required
           # @option opts [Date]       :effective_date required
+          # @option opts [Hash]       :timestamps optional timestamps for data migrations purposes
           # @return [Dry::Monad] result
           def call(params)
             values = yield validate(params)
@@ -103,17 +104,20 @@ module BenefitSponsors
             eligibility
           )
             evidence = eligibility.evidences.last
-            evidence_record = eligibility_record.evidences.last
-            evidence_record.state_histories.build(
-              evidence.state_histories.last.to_h
-            )
+            evidence_history_params = build_history_params_for(evidence)
+            eligibility_history_params = build_history_params_for(eligibility)
 
+            evidence_record = eligibility_record.evidences.last
             evidence_record.is_satisfied = evidence.is_satisfied
-            eligibility_record.state_histories.build(
-              eligibility.state_histories.last.to_h
-            )
+            evidence_record.state_histories.build(evidence_history_params)
+            eligibility_record.state_histories.build(eligibility_history_params)
 
             subject.save
+          end
+
+          def build_history_params_for(record)
+            record_history = record.state_histories.last
+            record_history.to_h
           end
 
           def create_eligibility_record(eligibility)
