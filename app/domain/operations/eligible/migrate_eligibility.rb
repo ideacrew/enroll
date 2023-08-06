@@ -53,9 +53,7 @@ module Operations
       def validate(params)
         errors = []
         errors << "eligibility key missing" unless params[:eligibility_type]
-        unless params[:current_eligibilities].present?
-          errors << "current eligibilities missing"
-        end
+        errors << "current eligibilities missing" unless params[:current_eligibilities].present?
 
         errors.empty? ? Success(params) : Failure(errors)
       end
@@ -81,14 +79,14 @@ module Operations
 
       def migrate_eligibility(subject, values, eligibility)
         logger(
-          "initialize_eligibility_is_satisfied_as_false for #{subject.to_global_id.to_s}"
+          "initialize_eligibility_is_satisfied_as_false for #{subject.to_global_id}"
         ) { initialize_eligibility(subject, values, eligibility) }
 
         eligibility.evidences.each do |evidence|
           effective_date = eligibility.start_on
           effective_date = evidence.updated_at unless evidence.is_satisfied
           logger(
-            "update_eligibility_is_satisfied_as_#{evidence.is_satisfied} for #{subject.to_global_id.to_s}"
+            "update_eligibility_is_satisfied_as_#{evidence.is_satisfied} for #{subject.to_global_id}"
           ) do
             migrate_record(
               values,
@@ -115,27 +113,23 @@ module Operations
 
         if result.success?
           eligibility = result.success
-          eligibility.tap do |eligibility|
-            reset_timestamps(eligibility)
-            eligibility.evidences.last.tap do |evidence|
-              reset_timestamps(evidence)
+          eligibility.tap do |eligibility_instance|
+            reset_timestamps(eligibility_instance)
+            eligibility_instance.evidences.last.tap do |evidence_instance|
+              reset_timestamps(evidence_instance)
             end
           end
-          unless eligibility.save
-            print_error "unable to reset timestamps #{result.failure}"
-          end
+          print_error "unable to reset timestamps #{result.failure}" unless eligibility.save
         end
         result
       end
 
       def reset_timestamps(record)
         state_history = record.state_histories.last
-        if state_history
-          record.updated_at = state_history.updated_at
-          if record.created_at > record.created_at
-            record.created_at = state_history.created_at
-          end
-        end
+        return unless state_history
+        record.updated_at = state_history.updated_at
+        record.created_at = state_history.created_at if record.created_at >
+                                                        record.updated_at
       end
 
       def initialize_eligibility(subject, values, eligibility)
