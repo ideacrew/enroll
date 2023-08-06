@@ -14,6 +14,7 @@ module Operations
       # @option opts [<String>]   :evidence_key required
       # @option opts [<String>]   :evidence_value required
       # @option opts [Date]       :effective_date required
+      # @option opts [Hash]       :timestamps optional timestamps for data migrations purposes
       # @return [Dry::Monad] result
       def call(params)
         values                = yield validate(params)
