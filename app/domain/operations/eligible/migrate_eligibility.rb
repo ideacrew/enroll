@@ -16,7 +16,6 @@ require "dry/monads/do"
 #       { "$group": { _id: "$subject.key", records: { "$push": "$$ROOT" } } }
 #     ]
 #   )
-
 # grouped_records.each do |entry|
 #   subject = GlobalID::Locator.locate(entry["_id"])
 #   eligibilities =
@@ -26,7 +25,7 @@ require "dry/monads/do"
 
 #   result =
 #     Operations::Eligible::MigrateEligibility.new.call(
-#       eligibility_key: :shop_osse_eligibility,
+#       eligibility_type: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
 #       current_eligibilities: eligibility_records
 #     )
 # end
@@ -38,7 +37,7 @@ module Operations
       send(:include, Dry::Monads[:result, :do])
 
       # @param [Hash] opts Options to build eligibility
-      # @option opts [<String>]   :eligibility_key required
+      # @option opts [<String>]   :eligibility_type required
       # @option opts [<Array>]   :current_eligibilities required
       # @return [Dry::Monad] result
       def call(params)
@@ -53,7 +52,7 @@ module Operations
 
       def validate(params)
         errors = []
-        errors << "eligibility key missing" unless params[:eligibility_key]
+        errors << "eligibility key missing" unless params[:eligibility_type]
         unless params[:current_eligibilities].present?
           errors << "current eligibilities missing"
         end
@@ -95,7 +94,7 @@ module Operations
               values,
               {
                 subject: subject.to_global_id,
-                evidence_key: evidence_key_for(values[:eligibility_key]),
+                evidence_key: evidence_key_for(values[:eligibility_type]),
                 evidence_value: evidence.is_satisfied.to_s,
                 effective_date: effective_date,
                 timestamps: {
@@ -110,7 +109,7 @@ module Operations
 
       def migrate_record(values, eligibility_options)
         result =
-          eligibility_operation_for(values[:eligibility_key]).new.call(
+          eligibility_operation_for(values[:eligibility_type]).new.call(
             eligibility_options
           )
 
@@ -144,7 +143,7 @@ module Operations
           values,
           {
             subject: subject.to_global_id,
-            evidence_key: evidence_key_for(values[:eligibility_key]),
+            evidence_key: evidence_key_for(values[:eligibility_type]),
             evidence_value: "false",
             effective_date: eligibility.start_on,
             timestamps: {
@@ -155,17 +154,23 @@ module Operations
         )
       end
 
-      def eligibility_operation_for(eligibility_key)
-        if eligibility_key == :shop_osse_eligibility
+      def eligibility_operation_for(eligibility_type)
+        case eligibility_type
+        when "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
           ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility
+        when "SponsoredBenefits::BenefitSponsorships::BenefitSponsorship"
+          ::SponsoredBenefits::Operations::BenefitSponsorships::BqtOsseEligibilities::CreateBqtOsseEligibility
         else
           ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility
         end
       end
 
-      def evidence_key_for(eligibility_key)
-        if eligibility_key == :shop_osse_eligibility
+      def evidence_key_for(eligibility_type)
+        case eligibility_type
+        when "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
           :shop_osse_evidence
+        when "SponsoredBenefits::BenefitSponsorships::BenefitSponsorship"
+          :bqt_osse_evidence
         else
           :ivl_osse_evidence
         end
