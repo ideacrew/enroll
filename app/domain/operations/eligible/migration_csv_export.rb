@@ -69,7 +69,7 @@ module Operations
 
       def export(records, values)
         CSV.open(
-          "#{values[:filename]}#{TimeKeeper.date_of_record.strftime("%m_%d_%Y")}.csv",
+          "#{values[:filename]}#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv",
           "w"
         ) do |csv|
           csv << fields
