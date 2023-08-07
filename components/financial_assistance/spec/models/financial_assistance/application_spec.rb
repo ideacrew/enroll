@@ -1888,6 +1888,25 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
     end
 
+    context "when an applicant has more than one spouse relationship" do
+      let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let(:set_up_relationships) do
+        relationship_application.ensure_relationship_with_primary(applicant1, 'spouse')
+        relationship_application.ensure_relationship_with_primary(applicant2, 'spouse')
+        relationship_application.add_or_update_relationships(applicant1, applicant2, 'parent')
+        relationship_application.build_relationship_matrix
+        relationship_application.save(validate: false)
+      end
+
+      before do
+        set_up_relationships
+      end
+      it "returns false" do
+        expect(relationship_application.valid_relations?).to eq(false)
+      end
+    end
+
     context "when there are two applicants with spouse relationship" do
       let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
       let(:set_up_relationships) do
