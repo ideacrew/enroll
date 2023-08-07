@@ -2463,10 +2463,6 @@ class HbxEnrollment
     coverage_kind == "health"
   end
 
-  def is_dental_enrollment?
-    coverage_kind == "dental"
-  end
-
   def plan_year_check(employee_role)
     covered_plan_year(employee_role).present? && !covered_plan_year(employee_role).send(:can_be_migrated?)
   end
