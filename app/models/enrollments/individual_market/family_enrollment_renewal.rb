@@ -295,8 +295,13 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   # rubocop:enable Style/RedundantReturn
 
   def eligible_enrollment_members
-    @enrollment.hbx_enrollment_members.reject do |member|
-      member.person.is_disabled || !eligible_to_get_covered?(member)
+    @enrollment.hbx_enrollment_members.select do |member|
+      eligible_to_get_covered?(member) &&
+        member.person.is_state_resident? &&
+        member.person.is_lawfully_present? &&
+        !member.person.is_disabled &&
+        !member.person.is_incarcerated &&
+        member.family_member.is_applying_coverage
     end
   end
 

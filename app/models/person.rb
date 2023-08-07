@@ -1445,4 +1445,14 @@ class Person
     return true if self.mec_check_response.nil?
     mec_check_date.day != Date.today
   end
+
+  def is_in_state_resident?
+    address_to_use = addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
+    addresses.each{|address| return true if address.kind == address_to_use && address.state == aca_state_abbreviation}
+    false
+  end
+
+  def is_lawfully_present?
+    us_citizen.present? || (::ConsumerRole::ALIEN_LAWFULLY_PRESENT_STATUS == citizen_status)
+  end
 end
