@@ -1035,7 +1035,7 @@ module FinancialAssistance
         Rails.logger.error { "Failed while creating enrollment on_new_determination: #{self.hbx_id}, Error: #{on_new_determination.failure}" }
       end
     rescue StandardError => e
-      Rails.logger.error { "Failed while creating enrollment on_new_determination: #{self.hbx_id}, Error: #{e.message}" }
+      Rails.logger.error { "Error while creating enrollment on_new_determination: #{self.hbx_id}, Error: #{e.message}" }
     end
 
     def retro_application
