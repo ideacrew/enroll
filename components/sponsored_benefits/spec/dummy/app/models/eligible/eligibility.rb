@@ -33,7 +33,7 @@ module Eligible
              allow_nil: false
 
     scope :by_key, ->(key) { where(key: key.to_sym) }
-    scope :by_date, ->(date) { where(effective_on: date) }
+    scope :by_date, ->(key) { where(key: key.to_sym) }
 
     def latest_state_history
       state_histories.max_by(&:created_at)
@@ -52,17 +52,26 @@ module Eligible
     end
 
     def start_on
-      publish_history = state_histories.by_state(:published).min_by(&:created_at)
+      publish_history =
+        state_histories.by_state(:published).min_by(&:created_at)
       publish_history&.effective_on
     end
 
     def end_on
-      expiration_history = state_histories.by_state(:expired).min_by(&:created_at)
+      expiration_history =
+        state_histories.by_state(:expired).min_by(&:created_at)
       expiration_history&.effective_on&.prev_day
     end
 
     def is_eligible_on?(date)
       evidences.all? { |evidence| evidence.is_eligible_on?(date) }
+    end
+
+    def grant_for(value)
+      grants.detect do |grant|
+        value_instance = grant.value
+        value_instance.value.to_s == value.to_s
+      end
     end
 
     class << self

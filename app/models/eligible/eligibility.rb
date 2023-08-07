@@ -67,6 +67,13 @@ module Eligible
       evidences.all? { |evidence| evidence.is_eligible_on?(date) }
     end
 
+    def grant_for(value)
+      grants.detect do |grant|
+        value_instance = grant.value
+        value_instance.value.to_s == value.to_s
+      end
+    end
+
     class << self
       ResourceReference = Struct.new(:class_name, :optional, :meta)
 
