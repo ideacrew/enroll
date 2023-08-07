@@ -686,7 +686,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     let!(:person) { FactoryBot.create(:person, :with_active_consumer_role, :with_consumer_role) }
     let(:user) { FactoryBot.create(:user, person: person) }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, :person => person) }
-    let(:new_family) { FactoryBot.build(:family, :with_primary_family_member_and_dependent)}
+    let!(:new_family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent)}
     let!(:hbx_enrollment_not_tied_to_user) { FactoryBot.create(:hbx_enrollment, family: new_family, household: new_family.active_household) }
     let!(:product) do
       FactoryBot.create(:benefit_markets_products_health_products_health_product,
@@ -718,7 +718,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     it 'finds any HBX enrollment if the user is a HBX staff' do
       sign_in user
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
-      allow(hbx_enrollment_not_tied_to_user).to receive(:family).and_return(new_family)
 
       get :terminate_confirm, params: {hbx_enrollment_id: hbx_enrollment_not_tied_to_user.id}
       expect(response).to render_template(:terminate_confirm)
@@ -773,8 +772,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       let(:site)                      { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
       let(:broker_organization)      { FactoryBot.build(:benefit_sponsors_organizations_general_organization, site: site)}
       let(:broker_user) { FactoryBot.create(:user, person: broker_person) }
-      let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-      let(:broker_agency_account) { FactoryBot.create(:benefit_sponsors_accounts_broker_agency_account, family: family, broker_agency_profile: broker_agency_profile, is_active: true) }
+      let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+      let(:broker_agency_account) { FactoryBot.build(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, is_active: true) }
       let(:rating_area) { FactoryBot.create_default(:benefit_markets_locations_rating_area) }
       let(:hbx_enrollment_with_broker) do
         FactoryBot.create(:hbx_enrollment,
@@ -786,9 +785,11 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
 
       it "should be able to terminate coverage if user is valid and has broker role" do
-        broker_role = broker_person.broker_role
-        broker_role.aasm_state = "active"
-        broker_role.save
+        # broker_role = broker_person.broker_role
+        # broker_role.aasm_state = "active"
+        # broker_role.save
+        family.broker_agency_accounts << broker_agency_account
+        family.save
         sign_in broker_user
 
         post :term_or_cancel, params: {hbx_enrollment_id: hbx_enrollment_with_broker.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate'}
@@ -798,7 +799,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
 
       it "should not be able to view page if user does not have active staff role" do
-        sign_in user
+        sign_in broker_user
 
         post :term_or_cancel, params: {hbx_enrollment_id: hbx_enrollment_with_broker.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate'}
         hbx_enrollment_with_broker.reload
@@ -814,9 +815,14 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       let(:person1) { FactoryBot.create(:person)}
       let(:user_with_broker_staff_role) { FactoryBot.create(:user, person: person1) }
       let(:broker_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person1, broker_agency_profile: broker_agency_profile) }
-      let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+      let(:family) do
+        family = FactoryBot.create(:family, :with_primary_family_member)
+        family.broker_agency_accounts << broker_agency_account
+        family.save
+        family
+      end
       let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
-      let(:broker_agency_account) { FactoryBot.create(:benefit_sponsors_accounts_broker_agency_account, family: family, broker_agency_profile: broker_agency_profile, is_active: true) }
+      let(:broker_agency_account) { FactoryBot.build(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, is_active: true) }
 
       let(:hbx_enrollment_with_broker) do
         FactoryBot.create(:hbx_enrollment,
@@ -854,7 +860,14 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
                           person: person1, general_agency_profile: general_agency_profile,
                           aasm_state: 'active')
       end
-      let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+      let(:family) do
+        family = FactoryBot.create(:family, :with_primary_family_member)
+        family.broker_agency_accounts << broker_agency_account
+        family.save
+        family
+      end
+      let(:broker_role) { broker_agency_profile.primary_broker_role }
+      let(:broker_agency_account) { FactoryBot.build(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, is_active: true, writing_agent: broker_role) }
       let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
 
       let(:hbx_enrollment_with_broker) do
@@ -866,7 +879,11 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
                           writing_agent_id: broker_agency_profile.primary_broker_role.id,
                           broker_agency_profile_id: broker_agency_profile.id)
       end
-      let(:general_agency_account) { FactoryBot.build(:sponsored_benefits_accounts_general_agency_account, family: family, general_agency_profile: general_agency_profile)}
+
+      before do
+        general_agency_profile.update_attributes(primary_broker_role_id: broker_role.id)
+      end
+
       it "should be able to terminate coverage if user is valid and has active ga staff role" do
         person.general_agency_staff_roles = [general_staff_role]
         person.save!

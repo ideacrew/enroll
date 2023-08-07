@@ -339,17 +339,17 @@ module Insured
       family_broker_agency_id = family.current_broker_agency&.benefit_sponsors_broker_agency_profile_id
       return false if family_broker_agency_id.blank? # family has no broker
 
-      family_broker_agency_id == logged_user_broker_role || logged_user_staff_roles.map(&:benefit_sponsors_broker_agency_profile_id).include?(family_broker_agency_id)
+      family_broker_agency_id == logged_user_broker_role.benefit_sponsors_broker_agency_profile_id || logged_user_staff_roles.map(&:benefit_sponsors_broker_agency_profile_id).include?(family_broker_agency_id)
     end
 
     def is_general_agency_authorized?(current_user, family)
       logged_user_ga_roles = current_user.person&.general_agency_staff_roles
       return false if logged_user_ga_roles.blank? # logged in user is not a ga
 
-      family_ga_accounts = family.general_agency_accounts.active
-      return false if family_ga_accounts.blank? # family has no GA
+      family_broker_role_id = family.current_broker_agency&.writing_agent_id
+      return false if family_broker_role_id.blank? # family has no broker, hence no ga
 
-      (family_ga_accounts.map(&:benefit_sponsrship_general_agency_profile_id) & logged_user_ga_roles.map(&:benefit_sponsors_general_agency_profile_id)).present?
+      logged_user_ga_roles.map(&:general_agency_profile).map(&:primary_broker_role_id).include?(family_broker_role_id)
     end
 
     def is_family_authorized?(current_user, family)
