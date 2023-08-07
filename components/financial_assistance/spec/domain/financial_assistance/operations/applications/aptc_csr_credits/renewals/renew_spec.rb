@@ -87,8 +87,45 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
       end
     end
 
-    context 'determined application' do
+    context '#full_medicaid_determination' do
+      context 'when full_medicaid_determination feature is enabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:full_medicaid_determination_step).and_return(true)
+          allow(FinancialAssistanceRegistry[:full_medicaid_determination_step].setting(:annual_eligibility_redetermination)).to receive(:item).and_return(true)
+
+          application.update_attributes!({ aasm_state: 'determined', years_to_renew: 1 })
+          application.reload
+          @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+          @renewal_draft_app = @result.success
+        end
+
+        it 'should return application with full_medicaid_determination value' do
+          expect(@renewal_draft_app.full_medicaid_determination).to eq true
+        end
+      end
+
+      context 'when full_medicaid_determination feature is disabled' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:full_medicaid_determination_step).and_return(false)
+          allow(FinancialAssistanceRegistry[:full_medicaid_determination_step].setting(:annual_eligibility_redetermination)).to receive(:item).and_return(false)
+
+          application.update_attributes!({ aasm_state: 'determined', years_to_renew: 1 })
+          application.reload
+          @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+          @renewal_draft_app = @result.success
+        end
+
+        it 'should return application with nil full_medicaid_determination' do
+          expect(@renewal_draft_app.full_medicaid_determination).to eq nil
+        end
+      end
+    end
+
+    context 'determined application for DC' do
       before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:full_medicaid_determination_step).and_return(true)
+        allow(FinancialAssistanceRegistry[:full_medicaid_determination_step].setting(:annual_eligibility_redetermination)).to receive(:item).and_return(false)
+
         application.update_attributes!({ aasm_state: 'determined', years_to_renew: 1 })
         application.reload
         @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
@@ -160,8 +197,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
             expect(@renewal_draft_app.attestation_terms).to eq(application.attestation_terms)
           end
 
-          it 'should return application with full_medicaid_determination' do
-            expect(@renewal_draft_app.full_medicaid_determination).to eq(application.full_medicaid_determination)
+          it 'should return application without full_medicaid_determination' do
+            expect(@renewal_draft_app.full_medicaid_determination).to be nil
           end
         end
       end
