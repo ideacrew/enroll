@@ -33,6 +33,17 @@ module Effective
       def nested_filter_definition
 
       end
+
+      def authorized?(current_user, _controller, _action, _resource)
+        return false unless current_user
+        organization = BenefitSponsors::Organizations::Organization.where(
+          :"profiles._id" => BSON::ObjectId.from_string(attributes[:id].to_s)
+        ).first
+        general_agency_profile = organization&.general_agency_profile
+        return false unless general_agency_profile
+
+        ::BenefitSponsors::Organizations::GeneralAgencyProfilePolicy.new(current_user, general_agency_profile).employers?
+      end
     end
   end
 end

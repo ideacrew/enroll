@@ -27,13 +27,11 @@
   - enrollment = @hbx_enrollment || @enrollment
   - disabled_in_ivl = (enrollment && enrollment.is_shop?) ? '' : 'disabled'
   = link_to 'Confirm', checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, :change_plan => @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind), :class => "btn btn-lg btn-primary  btn-block #{disabled_in_ivl}", id: 'btn-continue', :method => :post, :disabled => disable_purchase?(!@enrollable, @enrollment), 'data-disable-with' => l10n("please_wait")
-  %ul.list-unstyled.list-right-section
-    %li
-      %a.back{href: '#'}
-        <!-- = image_tag 'icons/list.png' -->
-        PREVIOUS
-- elsif step == 3
-  - if @market_kind == "individual"
-    = link_to l10n("insured.plan_shoppings.receipt.go_to_my_account"), family_account_path, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue'
-  - else
-    = link_to l10n('continue').upcase, family_account_path, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue'
+
+= render partial: 'shared/shopping_nav_panel',
+  locals: {show_exit_button: false,
+  show_previous_button: step == 2 && !no_purchase,
+  show_account_button: EnrollRegistry.feature_enabled?(:back_to_account_all_shop),
+  show_help_button: false,
+  is_complete: step == 3,
+  continue_to_account_text: @market_kind == "individual" ? nil : l10n('continue').upcase }

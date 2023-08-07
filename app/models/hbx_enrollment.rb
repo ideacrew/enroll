@@ -1707,7 +1707,7 @@ class HbxEnrollment
         end
       when 'individual'
         if qle && family.is_under_special_enrollment_period?
-          family.current_sep.effective_on
+          family.current_sep.calculate_effective_date(TimeKeeper.date_of_record)
         else
           benefit_sponsorship.current_benefit_period.earliest_effective_date
         end

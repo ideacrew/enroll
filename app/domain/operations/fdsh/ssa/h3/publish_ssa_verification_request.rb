@@ -22,7 +22,7 @@ module Operations
           private
 
           def build_event(payload)
-            event('events.fdsh.ssa.h3.ssa_verification_requested', attributes: payload.to_h, headers: { correlation_id: payload.to_h[:hbx_id] })
+            event('events.fdsh.ssa.h3.ssa_verification_requested', attributes: payload.to_h, headers: { correlation_id: payload.to_h[:hbx_id], payload_type: EnrollRegistry[:ssa_h3].setting(:payload_type).item })
           end
 
           def publish(event)

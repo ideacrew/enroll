@@ -46,7 +46,7 @@ RSpec.describe Operations::People::SugarCrm::PublishPrimarySubscriber, type: :mo
     end
 
     it "should return failure if no family members critical attributes have been changed" do
-      expect(subject.call(person)).to eq(Failure("No critical changes made to primary subscriber, no update needed to CRM gateway."))
+      expect(subject.call(person)).to eq(Failure("No critical changes made to primary subscriber: #{person.hbx_id}, no update needed to CRM gateway."))
     end
   end
 end
