@@ -84,7 +84,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
 
   let!(:enrollment) do
     FactoryBot.create(:hbx_enrollment,
-                      :with_product,
+                      :with_health_product,
                       family: family,
                       kind: "individual",
                       coverage_kind: "health",
