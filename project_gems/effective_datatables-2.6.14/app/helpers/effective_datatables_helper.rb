@@ -7,8 +7,9 @@ module EffectiveDatatablesHelper
     datatable.view ||= self
 
     begin
-      EffectiveDatatables.authorized?(controller, :index, datatable.try(:collection_class) || datatable.try(:class)) || raise('unauthorized')
+      EffectiveDatatables.authorized?(datatable, controller, :index, datatable.try(:collection_class) || datatable.try(:class)) || raise('unauthorized')
     rescue => e
+      Rails.logger.error { e }
       return content_tag(:p, "You are not authorized to view this datatable. (cannot :index, #{datatable.try(:collection_class) || datatable.try(:class)})")
     end
 
@@ -23,7 +24,7 @@ module EffectiveDatatablesHelper
     datatable.simple = true
 
     begin
-      EffectiveDatatables.authorized?(controller, :index, datatable.try(:collection_class) || datatable.try(:class)) || raise('unauthorized')
+      EffectiveDatatables.authorized?(datatable, controller, :index, datatable.try(:collection_class) || datatable.try(:class)) || raise('unauthorized')
     rescue => e
       return content_tag(:p, "You are not authorized to view this datatable. (cannot :index, #{datatable.try(:collection_class) || datatable.try(:class)})")
     end
@@ -47,7 +48,7 @@ module EffectiveDatatablesHelper
     return unless datatable.charts.present?
     datatable.view ||= self
 
-    datatable.charts.map { |name, _| render_datatable_chart(datatable, name) }.join.html_safe
+    datatable.charts.map { |name, _| render_datatable_chart(datatable, name) }.join
   end
 
   def render_datatable_chart(datatable, name)

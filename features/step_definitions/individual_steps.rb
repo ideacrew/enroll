@@ -176,6 +176,26 @@ And(/^.+ selects (.*) for coverage$/) do |coverage|
   end
 end
 
+Then(/^the question "(.*)" is displayed$/) do |question|
+  expect(page).to have_content(question)
+end
+
+Then(/^the question "(.*)" is not displayed$/) do |question|
+  expect(page).not_to have_content(question)
+end
+
+Then(/^tribal state dropdown box is clicked$/) do
+  find_all(IvlPersonalInformation.tribe_state_dropdown).first.click
+end
+
+When(/^AI AN question is answered yes$/) do
+  find_all(IvlPersonalInformation.american_or_alaskan_native_yes_radiobtn).first.click
+end
+
+Then(/^states dropdown should popup$/) do
+  expect(page.find("#tribal-state-container .selectric-items").present?).to be_truthy
+end
+
 Then(/^.+ should see error message (.*)$/) do |text|
   page.should have_content(text)
 end
@@ -1226,4 +1246,18 @@ end
 
 And(/the extended_aptc_individual_agreement_message configuration is enabled/) do
   enable_feature :extended_aptc_individual_agreement_message
+end
+
+Given(/plan filter feature is disabled and osse subsidy feature is enabled/) do
+  year = TimeKeeper.date_of_record.year
+  EnrollRegistry[:aca_ivl_osse_subsidy].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry["aca_ivl_osse_subsidy_#{year}"].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry["aca_ivl_osse_subsidy_#{year - 1}"].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry[:individual_osse_plan_filter].feature.stub(:is_enabled).and_return(false)
+end
+
+Then(/consumer should see 0 premiums for all plans/) do
+  page.all("h2.plan-premium").each do |premium|
+    expect(premium).to have_content("$0.00")
+  end
 end

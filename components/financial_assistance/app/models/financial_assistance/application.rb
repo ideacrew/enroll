@@ -561,7 +561,7 @@ module FinancialAssistance
     def send_determination_to_ea
       return if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
-      result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(params: self.attributes)
+      result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(self)
       if result.success?
         rt_transfer
         true
@@ -640,6 +640,7 @@ module FinancialAssistance
 
     def validate_relationships(matrix)
       # validates the child has relationship as parent for 'spouse of the primary'.
+      return false if applicants.any? { |applicant| !applicant.valid_spousal_relationship? }
       all_relationships = find_all_relationships(matrix)
       spouse_relation = all_relationships.select{|hash| hash[:relation] == "spouse"}.first
       return true unless spouse_relation.present?

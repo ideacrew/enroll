@@ -137,7 +137,7 @@ module Insured
       before :each do
         EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(false)
         @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
-        @product.update_attributes(ehb: 0.9844)
+        @product.update_attributes(ehb: 0.9844, is_hc4cc_plan: true)
         premium_table = @product.premium_tables.first
         premium_table.premium_tuples.where(age: 59).first.update_attributes(cost: 614.85)
         premium_table.premium_tuples.where(age: 60).first.update_attributes(cost: 646.72)

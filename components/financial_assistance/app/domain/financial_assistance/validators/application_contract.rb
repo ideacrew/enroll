@@ -14,6 +14,12 @@ module FinancialAssistance
         optional(:is_renewal_authorized).maybe(:bool)
         required(:applicants).array(:hash)
         optional(:transfer_id).maybe(:string)
+        optional(:submission_terms).maybe(:bool)
+        optional(:medicaid_terms).maybe(:bool)
+        optional(:medicaid_insurance_collection_terms).maybe(:bool)
+        optional(:parent_living_out_of_home_terms).maybe(:bool)
+        optional(:report_change_terms).maybe(:bool)
+        optional(:attestation_terms).maybe(:bool)
       end
 
       rule(:years_to_renew, :renewal_consent_through_year, :is_renewal_authorized) do

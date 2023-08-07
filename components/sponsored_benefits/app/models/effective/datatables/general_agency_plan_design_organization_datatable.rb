@@ -103,6 +103,12 @@ module Effective
           top_scope: :filters
         }
       end
+
+      def authorized?(current_user, _controller, _action, _resource)
+        general_agency = BenefitSponsors::Organizations::GeneralAgencyProfile.find(attributes[:profile_id])
+
+        ::SponsoredBenefits::PlanDesignOrganizationPolicy.new(current_user, general_agency).can_access_employers_tab_via_ga_portal?
+      end
     end
   end
 end

@@ -64,6 +64,18 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
     #   expect(response).to render_template("new")
     # end
 
+    context 'without permissions' do
+      let(:user) { FactoryBot.create(:user) }
+      let!(:person) { FactoryBot.create(:person, user: user) }
+
+      it "should not render the new template" do
+        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+        sign_in(user)
+        get :new, params: {:employer_profile_id => employer_profile_id}
+        expect(response).to be_redirect
+        expect(response).not_to render_template("new")
+      end
+    end
   end
 
   describe "POST create", dbclean: :around_each do

@@ -6,6 +6,7 @@ class Users::OrphansController < ApplicationController
   before_action :redirect_if_orphan_accounts_is_disabled
 
   def index
+    authorize User, :can_access_user_account_tab?
     @orphans = User.orphans
     respond_to do |format|
       format.html { render '/users/orphans/index.html.erb' }
@@ -16,6 +17,7 @@ class Users::OrphansController < ApplicationController
   end
 
   def destroy
+    authorize User, :can_access_user_account_tab?
     @orphan.destroy
     respond_to do |format|
       format.html { redirect_to exchanges_hbx_profiles_path, notice: 'Orphan user account was successfully deleted.' }

@@ -948,8 +948,7 @@ Given("Employee creates account and on home page") do
 end
 
 When("Patrick Doe clicked on Shop For Plans button") do
-  sfp = page.all('div').detect { |div| div.text == 'Shop For Plans'}
-  sfp.click
+  find('.pull-right.interaction-click-control-shop-for-plans').click
   find('.interaction-click-control-shop-now').click
   find(IvlChooseCoverage.continue_btn).click
 end
