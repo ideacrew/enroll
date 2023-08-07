@@ -94,7 +94,7 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
       result =
         described_class.new.call(
           current_eligibilities: [eligibility],
-          eligibility_key: :shop_osse_eligibility
+          eligibility_type: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
         )
 
       expect(result.success?).to be_truthy

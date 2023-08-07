@@ -65,7 +65,7 @@ module SponsoredBenefits
 
           # Following Operation expects AcaEntities domain class as subject
           def create_eligibility(eligibility_options)
-            AcaEntities::Eligible::AddEligibility.new.call(
+            ::AcaEntities::Eligible::AddEligibility.new.call(
               subject:
                 "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
               eligibility: eligibility_options
