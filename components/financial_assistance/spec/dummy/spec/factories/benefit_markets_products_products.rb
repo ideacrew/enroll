@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :benefit_markets_products_product, class: 'BenefitMarkets::Products::Product' do
 

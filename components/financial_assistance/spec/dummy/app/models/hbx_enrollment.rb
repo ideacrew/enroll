@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# dummy spec for hbx_enrollment model
 class HbxEnrollment
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -92,10 +93,11 @@ class HbxEnrollment
       @product = nil
       return
     end
-    raise ArgumentError.new("expected product") unless new_product.kind_of?(BenefitMarkets::Products::Product)
+    raise ArgumentError, "expected product" unless new_product.is_a?(BenefitMarkets::Products::Product)
     self.product_id = new_product._id
     @product = new_product
   end
+
   def product
     return @product if defined? @product
     @product = ::BenefitMarkets::Products::Product.find(self.product_id) unless product_id.blank?
