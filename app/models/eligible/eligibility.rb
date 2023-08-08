@@ -48,19 +48,25 @@ module Eligible
     end
 
     def eligibility_period_cover?(date)
-      end_on.present? ? (start_on..end_on).cover?(date) : start_on <= date
+      if current_state == :initial
+        (effective_on..effective_on.end_of_year).cover?(date)
+      else
+        return false unless published_on
+        (published_on..expired_on).cover?(date)
+      end
     end
 
-    def start_on
-      publish_history =
-        state_histories.by_state(:published).min_by(&:created_at)
+    def published_on
+      publish_history = state_histories.by_state(:published).min_by(&:created_at)
       publish_history&.effective_on
     end
 
-    def end_on
-      expiration_history =
-        state_histories.by_state(:expired).min_by(&:created_at)
-      expiration_history&.effective_on&.prev_day
+    #default expired_on will be last day of callender year of the eligibility
+    #eligibility can't span across multiple years
+    #once eligibility is expired, it can never be moved back to published state
+    def expired_on
+      expiration_history = state_histories.by_state(:expired).min_by(&:created_at)
+      expiration_history&.effective_on&.prev_day || published_on&.end_of_year
     end
 
     def is_eligible_on?(date)
