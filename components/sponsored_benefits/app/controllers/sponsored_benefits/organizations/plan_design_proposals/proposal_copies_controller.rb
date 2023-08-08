@@ -15,8 +15,11 @@ module SponsoredBenefits
           plan_design_form.proposal.osse_eligibility&.grants&.each do |grant|
             proposal.osse_eligibility.grants << grant.dup
           end
-          proposal.plan_design_organization.save!
-          flash[:success] = "Proposal successfully copied"
+          if proposal.plan_design_organization.save
+            flash[:success] = "Proposal successfully copied"
+          else
+            flash[:error] = "Something went wrong"
+          end
         else
           flash[:error] = "Something went wrong"
         end

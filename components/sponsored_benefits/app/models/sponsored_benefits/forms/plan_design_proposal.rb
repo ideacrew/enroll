@@ -64,6 +64,7 @@ module SponsoredBenefits
           @plan_design_organization.plan_design_proposals.detect do |proposal|
             proposal.id.to_s == val
           end
+
         if @proposal.present?
           @profile = @proposal.profile
           prepopulate_attributes
@@ -166,11 +167,11 @@ module SponsoredBenefits
             enrollment_dates[:effective_period]
           benefit_application.open_enrollment_period =
             enrollment_dates[:open_enrollment_period]
-
-          create_or_term_osse_eligibility(sponsorship)
         end
 
-        @proposal.save!
+        if @proposal.save
+          create_or_term_osse_eligibility(sponsorship) if sponsorship
+        end
       end
 
       def has_reference_plan_assigned?
@@ -241,19 +242,19 @@ module SponsoredBenefits
         eligibility_record = benefit_sponsorship.eligibility_for(:bqt_osse_eligibility, effective_date)
 
         if eligibility_record&.is_eligible_on?(TimeKeeper.date_of_record)
-          terminate_eligibility(benefit_sponsorship, osse_eligibility.to_s) if osse_eligibility.to_s == 'false'
+          terminate_eligibility(benefit_sponsorship) if osse_eligibility.to_s == 'false'
           return
         end
 
         return unless osse_eligibility.to_s == 'true'
-        create_eligibility(benefit_sponsorship, osse_eligibility.to_s)
+        create_eligibility(benefit_sponsorship)
       rescue StandardError => e
         Rails.logger.error do
           "error building osse eligibility due to: #{e.message}"
         end
       end
 
-      def osse_eligibility_params(benefit_sponsorship, osse_eligibility)
+      def osse_eligibility_params(benefit_sponsorship)
         {
           subject: benefit_sponsorship.to_global_id,
           evidence_key: :bqt_osse_evidence,
@@ -262,18 +263,15 @@ module SponsoredBenefits
         }
       end
 
-      def create_eligibility(benefit_sponsorship, osse_eligibility)
-        ::SponsoredBenefits::Operations::BenefitSponsorships::BqtOsseEligibilities::CreateBqtOsseEligibility.new.call(osse_eligibility_params(benefit_sponsorship, osse_eligibility))
+      def create_eligibility(benefit_sponsorship)
+        ::SponsoredBenefits::Operations::BenefitSponsorships::BqtOsseEligibilities::CreateBqtOsseEligibility.new.call(
+          osse_eligibility_params(benefit_sponsorship)
+        )
       end
 
-      def terminate_eligibility(benefit_sponsorship, osse_eligibility)
+      def terminate_eligibility(benefit_sponsorship)
         ::SponsoredBenefits::Operations::BenefitSponsorships::BqtOsseEligibilities::CreateBqtOsseEligibility.new.call(
-          {
-            subject: benefit_sponsorship.to_global_id,
-            evidence_key: :bqt_osse_evidence,
-            evidence_value: osse_eligibility.to_s,
-            effective_date: TimeKeeper.date_of_record
-          }
+          osse_eligibility_params(benefit_sponsorship)
         )
       end
 
