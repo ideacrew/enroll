@@ -603,6 +603,10 @@ module FinancialAssistance
       spouse_relationship.present?
     end
 
+    def valid_family_relationships?
+      valid_spousal_relationship? && valid_child_relationship?
+    end
+
     # Checks that an applicant cannot have more than one spousal relationship
     def valid_spousal_relationship?
       partner_relationships = application.relationships.where({
@@ -612,6 +616,16 @@ module FinancialAssistance
                                                                 ]
                                                               })
       return false if partner_relationships.size > 2
+      true
+    end
+
+    def valid_child_relationship?
+      child_relationship = self.relationships.where(kind: 'child').first
+      if child_relationship.present?
+        parent = child_relationship.relative
+        domestic_partner = parent.relationships.where(kind: 'domestic_partner').first
+        return false if domestic_partner.present? && self.relationships.where(relative_id: domestic_partner.relative.id).first.kind != 'domestic_partners_child'
+      end
       true
     end
 
