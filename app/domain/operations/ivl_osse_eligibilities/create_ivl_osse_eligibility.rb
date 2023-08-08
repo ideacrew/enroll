@@ -45,7 +45,7 @@ module Operations
       end
 
       def find_eligibility(values)
-        eligibility = subject.eligibility_for(:ivl_osse_eligibility, values[:effective_date])
+        eligibility = subject.find_eligibility_by(:ivl_osse_eligibility, values[:effective_date])
 
         Success(eligibility)
       end
@@ -91,8 +91,10 @@ module Operations
 
         evidence_record = eligibility_record.evidences.last
         evidence_record.is_satisfied = evidence.is_satisfied
+        evidence_record.current_state = evidence.current_state
         evidence_record.state_histories.build(evidence_history_params)
         eligibility_record.state_histories.build(eligibility_history_params)
+        eligibility_record.current_state = eligibility.current_state
 
         eligibility_record.save
         subject.save

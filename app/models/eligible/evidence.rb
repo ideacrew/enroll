@@ -15,7 +15,7 @@ module Eligible
     field :title, type: String
     field :description, type: String
     field :is_satisfied, type: Boolean, default: false
-    field :current_state, type: Symbol
+    field :current_state, type: Symbol, default: :initial
     field :subject_ref, type: String
     field :evidence_ref, type: String
 
@@ -34,7 +34,7 @@ module Eligible
     scope :by_key, ->(key) { where(key: key.to_sym) }
 
     def latest_state_history
-      state_histories.latest_history
+      state_histories.max_by(&:created_at)
     end
 
     def is_eligible_on?(date)

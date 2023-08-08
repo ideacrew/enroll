@@ -47,8 +47,7 @@ module BenefitSponsors
           end
 
           def find_eligibility(values)
-            eligibility = subject.eligibility_for(:shop_osse_eligibility, values[:effective_date])
-
+            eligibility = subject.find_eligibility_by(:shop_osse_eligibility, values[:effective_date])
             Success(eligibility)
           end
 
@@ -98,10 +97,12 @@ module BenefitSponsors
 
             evidence_record = eligibility_record.evidences.last
             evidence_record.is_satisfied = evidence.is_satisfied
+            evidence_record.current_state = evidence.current_state
             evidence_record.state_histories.build(evidence_history_params)
             eligibility_record.state_histories.build(eligibility_history_params)
+            eligibility_record.current_state = eligibility.current_state
 
-            evidence_record.save
+            eligibility_record.save
             subject.save
           end
 
@@ -120,10 +121,8 @@ module BenefitSponsors
               )
 
             eligibility_record.tap do |record|
-              record.evidences =
-                record.class.create_objects(eligibility.evidences, :evidences)
-              record.grants =
-                record.class.create_objects(eligibility.grants, :grants)
+              record.evidences = record.class.create_objects(eligibility.evidences, :evidences)
+              record.grants = record.class.create_objects(eligibility.grants, :grants)
             end
 
             eligibility_record

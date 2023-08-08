@@ -358,9 +358,17 @@ module BenefitSponsors
       primary_office_location.present? && primary_office_location.address.present?
     end
 
+    # we cannot have multiple eligibilities with same key in a given calender year
+    def find_eligibility_by(eligibility_key, start_on)
+      eligibilities = self.eligibilities&.by_key(eligibility_key)
+      eligibilities.detect do |eligibility|
+        eligibility.eligibility_period_cover?(start_on)
+      end
+    end
+
     def eligibility_for(eligibility_key, start_on)
       eligibilities = self.eligibilities&.by_key(eligibility_key)
-      eligibilities.select(&:effectuated?).detect do |eligibility|
+      eligibilities.effectuated.detect do |eligibility|
         eligibility.eligibility_period_cover?(start_on)
       end
     end
