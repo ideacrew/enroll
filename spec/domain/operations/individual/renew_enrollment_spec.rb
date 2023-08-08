@@ -88,6 +88,7 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
   end
 
   let!(:enrollment_member) do
+    family_member.person.update_attributes!(is_incarcerated: false)
     FactoryBot.create(:hbx_enrollment_member,
                       hbx_enrollment: enrollment,
                       applicant_id: family_member.id,

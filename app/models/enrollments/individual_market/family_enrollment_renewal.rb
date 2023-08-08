@@ -297,7 +297,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   def eligible_enrollment_members
     @enrollment.hbx_enrollment_members.select do |member|
       eligible_to_get_covered?(member) &&
-        member.person.is_state_resident? &&
+        member.person.is_in_state_resident? &&
         member.person.is_lawfully_present? &&
         !member.person.is_disabled &&
         !member.person.is_incarcerated &&
