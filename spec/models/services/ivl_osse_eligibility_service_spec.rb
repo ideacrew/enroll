@@ -7,7 +7,7 @@ RSpec.describe Services::IvlOsseEligibilityService, type: :model, :dbclean => :a
   let(:role) { person.consumer_role }
   let(:current_date) { TimeKeeper.date_of_record }
 
-  let(:params) { { person_id: person.id, osse: { "#{current_date.year}" => "true", "#{current_date.last_year.year}" => "false" } } }
+  let(:params) { { person_id: person.id, osse: { current_date.year.to_s => "true", current_date.last_year.year.to_s => "false" } } }
 
   subject { described_class.new(params) }
 
@@ -59,7 +59,7 @@ RSpec.describe Services::IvlOsseEligibilityService, type: :model, :dbclean => :a
 
       result = subject.update_osse_eligibilities_by_year
 
-      expect(result).to eq({ "Success" => ["#{current_date.year}"]})
+      expect(result).to eq({ "Success" => [current_date.year.to_s]})
     end
   end
 

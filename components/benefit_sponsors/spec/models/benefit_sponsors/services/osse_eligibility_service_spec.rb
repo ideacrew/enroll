@@ -6,8 +6,10 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 
 #rspec for OsseEligibilityService
 module BenefitSponsors
-  RSpec.describe ::BenefitSponsors::Services::OsseEligibilityService, type: :model, :dbclean => :after_each do
-
+  RSpec.describe ::BenefitSponsors::Services::OsseEligibilityService, type: :model, :dbclean => :around_each do
+    before(:all) do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
     let!(:site)  { FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_profile)    { organization.employer_profile }

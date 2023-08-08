@@ -2079,7 +2079,7 @@ describe '.create_or_term_eligibility' do
       it 'should create eligibility with given effective date' do
         verify_active_family_members do |consumer_role|
           expect(consumer_role.eligibilities.count).to eq 1
-          expect(consumer_role.eligibilities.first.start_on).to eq valid_params[:effective_date]
+          expect(consumer_role.eligibilities.first.published_on).to eq valid_params[:effective_date]
         end
       end
 
