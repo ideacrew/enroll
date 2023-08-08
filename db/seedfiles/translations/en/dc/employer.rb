@@ -45,5 +45,7 @@ EMPLOYER_TRANSLATIONS = {
   :'en.standard_plan' => 'Standard Plan',
   :'en.osse_subsidy.unable_to_claim' => "Unable to claim HC4CC quote. Please contact customer service at %{contact_center_phone_number}.",
   :'en.quote.not_found' => 'No quote matching this code could be found. Please contact your broker representative.',
-  :'en.quote.already_claimed' => 'Quote claim code already claimed.'
+  :'en.quote.already_claimed' => 'Quote claim code already claimed.',
+  :'en.select_years_osse_offered' => "Select year(s) the OSSE subsidy is offered.",
+  :'en.osse_multi_year_description' => "<strong>Note, </strong>When the eligibility calender year is set to Active, any coverage year start(initial or renewal) within the active callender will have HC4CC eligibility."
 }.freeze

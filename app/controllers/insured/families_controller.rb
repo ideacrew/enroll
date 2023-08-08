@@ -169,13 +169,28 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def healthcare_for_childcare_program
+    authorize @family, :healthcare_for_childcare_program?
+
     @childcare_forms = ::Forms::HealthcareForChildcareProgramForm.build_forms_for(@person.primary_family)
   end
 
-  def update_healthcare_for_childcare_program_eligibility
-    ::Forms::HealthcareForChildcareProgramForm.submit_with(healthcare_for_childcare_program_params)
+  def healthcare_for_childcare_program_form
+    authorize @family, :healthcare_for_childcare_program?
 
-    redirect_to(healthcare_for_childcare_program_insured_families_path)
+    service = ::Services::IvlOsseEligibilityService.new(params.permit(:person_id))
+    @osse_status_by_year = service.osse_status_by_year
+  end
+
+  def update_osse_eligibilities
+    authorize @family, :healthcare_for_childcare_program?
+    args = params.require(:eligibilities).permit(:person_id, :osse => {})
+    service = ::Services::IvlOsseEligibilityService.new(args)
+    result = service.update_osse_eligibilities_by_year
+
+    flash[:notice] = "Sucessfully updated #{service.person.full_name}'s OSSE eligibility for years #{result['Success'].join(', ')}" if result["Success"]
+    flash[:error] = "Failed to updated #{service.person.full_name}'s OSSE eligibility for years #{result['Failure'].join(', ')}" if result["Failure"]
+
+    redirect_to(healthcare_for_childcare_program_form_insured_families_path(person_id: service.person.id))
   end
 
   def verification

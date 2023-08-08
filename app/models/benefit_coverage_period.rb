@@ -283,6 +283,9 @@ class BenefitCoveragePeriod
       organizations.size > 0 ? organizations.first.hbx_profile.benefit_sponsorship.benefit_coverage_periods : nil
     end
 
+    def osse_eligibility_years_for_display
+      [2022, 2023, 2024]
+    end
   end
 
   private

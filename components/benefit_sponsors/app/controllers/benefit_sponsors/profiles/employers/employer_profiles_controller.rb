@@ -124,9 +124,8 @@ module BenefitSponsors
         def update_osse_eligibilities
           authorize @employer_profile, :update_osse_eligibilities?
 
-          eligibilities = params[:eligibility].permit!
+          eligibilities = params.require(:eligibilities).permit(:osse => {})
           service = BenefitSponsors::Services::OsseEligibilityService.new(@employer_profile, eligibilities)
-
           result = service.update_osse_eligibilities_by_year
           flash[:notice] = "Sucessfully updated OSSE eligibility for years #{result['Success'].join(', ')}" if result["Success"]
           flash[:error] = "Failed to updated OSSE eligibility for years #{result['Failure'].join(', ')}" if result["Failure"]

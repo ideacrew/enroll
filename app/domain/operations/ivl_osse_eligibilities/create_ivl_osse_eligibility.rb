@@ -9,6 +9,8 @@ module Operations
     class CreateIvlOsseEligibility
       send(:include, Dry::Monads[:result, :do])
 
+      attr_reader :subject
+
       # @param [Hash] opts Options to build eligibility
       # @option opts [<GlobalId>] :subject required
       # @option opts [<String>]   :evidence_key required
@@ -32,20 +34,18 @@ module Operations
         params[:event] ||= :initialize
         params[:effective_date] ||= TimeKeeper.date_of_record
 
-        params[:effective_date] = params[:effective_date].beginning_of_year if EnrollRegistry.feature_enabled?("aca_ivl_osse_effective_beginning_of_year")
-
         errors = []
         errors << "evidence key missing" unless params[:evidence_key]
         errors << "evidence value missing" unless params[:evidence_value]
         errors << "effective date missing or it should be a date" unless params[:effective_date].is_a?(::Date)
         @subject = GlobalID::Locator.locate(params[:subject])
-        errors << "subject missing or not found for #{params[:subject]}" unless @subject.present?
+        errors << "subject missing or not found for #{params[:subject]}" unless subject.present?
 
         errors.empty? ? Success(params) : Failure(errors)
       end
 
-      def find_eligibility(_values)
-        eligibility = @subject.eligibilities.by_key(:ivl_osse_eligibility).last
+      def find_eligibility(values)
+        eligibility = subject.eligibility_for(:ivl_osse_eligibility, values[:effective_date])
 
         Success(eligibility)
       end
@@ -66,31 +66,41 @@ module Operations
       # Following Operation expects AcaEntities domain class as subject
       def create_eligibility(_values, eligibility_options)
         AcaEntities::Eligible::AddEligibility.new.call(
-          subject: "AcaEntities::People::#{@subject.class.to_s.demodulize}",
+          subject: "AcaEntities::People::#{subject.class.to_s.demodulize}",
           eligibility: eligibility_options
         )
       end
 
       def store(_values, eligibility)
-        eligibility_record = @subject.eligibilities.where(id: eligibility._id).first
+        eligibility_record = subject.eligibilities.where(id: eligibility._id).first
 
         if eligibility_record
           update_eligibility_record(eligibility_record, eligibility)
         else
           eligibility_record = create_eligibility_record(eligibility)
-          @subject.eligibilities << eligibility_record
+          subject.eligibilities << eligibility_record
         end
 
-        @subject.save ? Success(eligibility_record) : Failure(@subject.errors.full_messages)
+        subject.save ? Success(eligibility_record) : Failure(subject.errors.full_messages)
       end
 
       def update_eligibility_record(eligibility_record, eligibility)
         evidence = eligibility.evidences.last
-        eligibility_record.evidences.last.state_histories.build(evidence.state_histories.last.to_h)
-        eligibility_record.evidences.last.is_satisfied = evidence.is_satisfied
-        eligibility_record.state_histories.build(eligibility.state_histories.last.to_h)
+        evidence_history_params = build_history_params_for(evidence)
+        eligibility_history_params = build_history_params_for(eligibility)
+
+        evidence_record = eligibility_record.evidences.last
+        evidence_record.is_satisfied = evidence.is_satisfied
+        evidence_record.state_histories.build(evidence_history_params)
+        eligibility_record.state_histories.build(eligibility_history_params)
 
         eligibility_record.save
+        subject.save
+      end
+
+      def build_history_params_for(record)
+        record_history = record.state_histories.last
+        record_history.to_h
       end
 
       def create_eligibility_record(eligibility)
