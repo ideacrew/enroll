@@ -16,5 +16,7 @@ module Eligible
     embeds_one :value, class_name: "::Eligible::Value", cascade_callbacks: true
 
     validates_presence_of :title, :key
+
+    scope :by_key, ->(key) { where(key: key.to_sym) }
   end
 end

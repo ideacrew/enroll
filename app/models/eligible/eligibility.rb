@@ -67,11 +67,10 @@ module Eligible
       evidences.all? { |evidence| evidence.is_eligible_on?(date) }
     end
 
-    def grant_for(value)
-      grants.detect do |grant|
-        value_instance = grant.value
-        value_instance.item.to_s == value.to_s
-      end
+    def grant_for(grant_key)
+      grants
+        .by_key(grant_key)
+        .detect { |grant| grant.value&.item.to_s == "true" }
     end
 
     class << self

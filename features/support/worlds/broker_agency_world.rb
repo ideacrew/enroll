@@ -148,7 +148,8 @@ Given(/^employer (.*?) has OSSE eligibilities$/) do |legal_name|
 
   eligibility1 = FactoryBot.build(:benefit_sponsors_shop_osse_eligibility,
                                   :with_admin_attested_evidence,
-                                  evidence_state: :approved)
+                                  evidence_state: :approved,
+                                  is_eligible: true)
 
   org.active_benefit_sponsorship.eligibilities << eligibility1
   org.active_benefit_sponsorship.save!

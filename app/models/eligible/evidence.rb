@@ -42,7 +42,7 @@ module Eligible
         if period[:end_on].present?
           (period[:start_on]..period[:end_on]).cover?(date)
         else
-          period[:start_on] <= date
+          (period[:start_on]..period[:start_on].end_of_year).cover?(date)
         end
       end
     end
