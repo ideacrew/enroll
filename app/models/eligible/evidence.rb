@@ -47,6 +47,9 @@ module Eligible
       end
     end
 
+    # coverage period of the eligibility will start from the first day of the calendar year
+    # in which the eligibility was approved
+    # coverage period end on the last day of the calendar year in which the eligibility was denied
     def eligible_periods
       eligible_periods = []
       date_range = {}
