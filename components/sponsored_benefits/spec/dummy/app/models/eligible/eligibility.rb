@@ -11,7 +11,7 @@ module Eligible
     field :key, type: Symbol
     field :title, type: String
     field :description, type: String
-    field :current_state, type: Symbol
+    field :current_state, type: Symbol, default: :initial
 
     embeds_many :evidences,
                 class_name: "::Eligible::Evidence",
@@ -33,18 +33,10 @@ module Eligible
              allow_nil: false
 
     scope :by_key, ->(key) { where(key: key.to_sym) }
-    scope :by_date, ->(key) { where(key: key.to_sym) }
+    scope :effectuated, ->{ where(:current_state.ne => :initial) }
 
     def latest_state_history
       state_histories.max_by(&:created_at)
-    end
-
-    def current_state
-      latest_state_history&.to_state
-    end
-
-    def effectuated?
-      current_state != :initial
     end
 
     def eligibility_period_cover?(date)

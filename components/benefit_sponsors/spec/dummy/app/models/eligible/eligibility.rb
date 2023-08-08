@@ -18,7 +18,6 @@ module Eligible
     embeds_many :evidences,
                 class_name: "::Eligible::Evidence",
                 cascade_callbacks: true
-
     embeds_many :grants,
                 class_name: "::Eligible::Grant",
                 cascade_callbacks: true
