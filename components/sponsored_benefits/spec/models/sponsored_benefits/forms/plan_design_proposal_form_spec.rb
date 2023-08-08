@@ -50,9 +50,9 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignProposal, type: :model, dbcle
 
       it 'should term eligibility' do
         osse_eligibility = benefit_sponsorship.reload.eligibility_for(
-            :bqt_osse_eligibility,
-            plan_design_proposal.effective_date
-          )
+          :bqt_osse_eligibility,
+          plan_design_proposal.effective_date
+        )
         expect(osse_eligibility.is_eligible_on?(plan_design_proposal.effective_date)).to be_truthy
 
         form =

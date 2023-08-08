@@ -1,0 +1,37 @@
+<% content_for :navigation do %>
+  <%= render :partial => 'ui-components/v1/navs/employers_navigation', :locals => {:active_tab=>params[:tab], organization: @employer_profile.organization, profile: @employer_profile} %>
+<% end %>
+
+<div class="employer-edit-tab">
+  <h1 class="heading-text"><strong>HC4CC Eligibility Year(s)</strong></h1>
+  <h3 class="heading-text"><strong><%= @employer_profile.legal_name %></strong></h3>
+  <p><%="Select year(s) the OSSE subsidy is offered."%></p>
+  <div class="row no-buffer vertically-aligned-row">
+    <p><strong>Note, </strong>When the eligibility calender year is set to Active, any coverage year start(initial or renewal) within the active callender will have HC4CC eligibility.</p>
+  </div>
+
+  <%= form_tag(profiles_employers_employer_profile_update_osse_eligibilities_path(employer_profile_id: @employer_profile.id), method: "post") do %>
+    <%= submit_tag "Save Changes", class: 'btn btn-primary active pull-left col-12', style: 'background-color: #007bc4'%></br>
+    <div class='table-responsive col-12 mt-3' style="padding-top: 10px">
+      <table style='width: 70%; border-collapse: collapse; border: 0px solid #d5d5d5'>
+        <thead style='height: 40px;'>
+          <th style='width: 20%; height: 40px; padding: 10px'>Plan Year</th>
+          <th style='width: 20%'>Active</th>
+          <th style='width: 20%'>Inactive</th>
+          <th style='width: 40%'>Details</th>
+        </thead>
+        <% osse_eligibility_years_for_display.each do |year| %>
+          <tr style='border: 0px solid #d5d5d5; height: 50px; '>
+            <td style='padding: 20px'><strong><%= year %></strong></td>
+            <td><%= radio_button_tag "eligibility[#{year}]", "true", @osse_status_by_year[year][:is_eligible], class: "radio-button" %></td>
+            <td><%= radio_button_tag "eligibility[#{year}]", "false", !@osse_status_by_year[year][:is_eligible], class: "radio-button" %></td>
+            <% if @osse_status_by_year[year][:start_on].present? %>
+              <td><%= "#{@osse_status_by_year[year][:start_on].to_s} - #{@osse_status_by_year[year][:end_on].to_s}" %></td>
+            <% end %>
+          </tr>
+        <% end %>
+      </table>
+    </div></br>
+    <%= submit_tag "Save Changes", class: 'btn btn-primary active pull-left col-12', style: 'background-color: #007bc4' %>
+  <% end %>
+</div>
