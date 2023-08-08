@@ -39,18 +39,13 @@ module Eligible
       state_histories.max_by(&:created_at)
     end
 
-    def current_state
-      latest_state_history&.to_state
-    end
-
-    def effectuated?
-      current_state != :initial
-    end
-
     def eligibility_period_cover?(date)
-      return false unless published_on
-
-      (published_on..expired_on).cover?(date)
+      if current_state == :initial
+        (effective_on..effective_on.end_of_year).cover?(date)
+      else
+        return false unless published_on
+        (published_on..expired_on).cover?(date)
+      end
     end
 
     def published_on
