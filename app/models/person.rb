@@ -1229,6 +1229,7 @@ class Person
   end
 
   def us_citizen
+    binding.pry
     return @us_citizen if !@us_citizen.nil?
     return nil if citizen_status.blank?
     @us_citizen ||= ::ConsumerRole::US_CITIZEN_STATUS_KINDS.include?(citizen_status)
@@ -1321,9 +1322,8 @@ class Person
   end
 
   def is_in_state_resident?
-    address_to_use = addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
-    addresses.each{|address| return true if address.kind == address_to_use && address.state == aca_state_abbreviation}
-    false
+    address_to_use = addresses.collect(&:kind).include?('home') ? home_address : mailing_address
+    address_to_use.state == aca_state_abbreviation
   end
 
   def is_lawfully_present?
