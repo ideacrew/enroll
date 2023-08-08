@@ -1143,7 +1143,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
 
         it "returns true" do
-          expect(applicant.valid_family_relationships).to eql(true)
+          expect(applicant.valid_family_relationships?).to eql(true)
         end
       end
     end
