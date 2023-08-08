@@ -161,8 +161,16 @@ Given(/^employer (.*?) has OSSE eligibilities created during effective period$/)
   aba = org.active_benefit_sponsorship.active_benefit_application
   rba = org.active_benefit_sponsorship.renewal_benefit_application
 
-  eligibility1 = FactoryBot.build(:eligibility, :with_evidences, :with_subject, start_on: aba.effective_period.min + 2.days)
-  eligibility2 = FactoryBot.build(:eligibility, :with_evidences, :with_subject, start_on: rba.effective_period.min + 2.days)
+  eligibility1 = FactoryBot.build(:benefit_sponsors_shop_osse_eligibility,
+                                  :with_admin_attested_evidence,
+                                  evidence_state: :approved,
+                                  is_eligible: true,
+                                  effective_on: (aba.effective_period.min + 2.days).beginning_of_year)
+  eligibility2 = FactoryBot.build(:benefit_sponsors_shop_osse_eligibility,
+                                  :with_admin_attested_evidence,
+                                  evidence_state: :approved,
+                                  is_eligible: true,
+                                  effective_on: (rba.effective_period.min + 2.days).beginning_of_year)
 
   org.active_benefit_sponsorship.eligibilities << eligibility1
   org.active_benefit_sponsorship.eligibilities << eligibility2
