@@ -171,6 +171,9 @@ module SponsoredBenefits
 
         if @proposal.save
           create_or_term_osse_eligibility(sponsorship) if sponsorship
+          true
+        else
+          false
         end
       end
 
