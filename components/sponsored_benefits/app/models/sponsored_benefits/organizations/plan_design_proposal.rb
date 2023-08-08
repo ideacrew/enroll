@@ -59,11 +59,11 @@ module SponsoredBenefits
 
         return nil unless plan_design_organization.fein.present?
         org = BenefitSponsors::Organizations::Organization.where(fein: plan_design_organization.fein)&.first
-        org&.active_benefit_sponsorship&.eligibility_for(:bqt_osse_eligibility, effective_date)
+        org&.active_benefit_sponsorship&.eligibility_for(:shop_osse_eligibility, effective_date)
       end
 
       def metal_level_products_restricted?
-        grant = osse_eligibility&.grant_for(:employer_metal_level_products)
+        grant = osse_eligibility&.grant_for(:metal_level_products_restricted_grant)
         return false unless grant
         grant.value.run
       end
