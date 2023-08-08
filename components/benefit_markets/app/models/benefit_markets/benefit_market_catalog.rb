@@ -137,6 +137,10 @@ module BenefitMarkets
       open_enrollment_end_on_day - minimum_length
     end
 
+    def self.osse_eligibility_years_for_display
+      [2022, 2023, 2024]
+    end
+
     private
 
     def unique_application_period_range

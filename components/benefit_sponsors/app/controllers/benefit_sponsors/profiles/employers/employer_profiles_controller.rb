@@ -7,7 +7,11 @@ module BenefitSponsors
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
         include Config::AcaHelper
 
-        before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :export_census_employees, :show_invoice, :coverage_reports, :download_invoice, :terminate_employee_roster_enrollments]
+        before_action :find_employer, only: [
+          :show, :inbox, :bulk_employee_upload, :export_census_employees, :show_invoice,
+          :coverage_reports, :download_invoice, :terminate_employee_roster_enrollments,
+          :osse_eligibilities, :update_osse_eligibilities
+        ]
         before_action :load_group_enrollments, only: [:coverage_reports], if: :is_format_csv?
         before_action :check_and_download_invoice, only: [:download_invoice, :show_invoice]
         before_action :wells_fargo_sso, only: [:show]
@@ -106,6 +110,28 @@ module BenefitSponsors
               send_data(csv_for(@group_enrollments), type: csv_content_type, filename: "DCHealthLink_Premium_Billing_Report.csv")
             end
           end
+        end
+
+        def osse_eligibilities
+          authorize @employer_profile, :osse_eligibilities?
+          service = BenefitSponsors::Services::OsseEligibilityService.new(@employer_profile)
+          @osse_status_by_year = service.osse_status_by_year
+          respond_to do |format|
+            format.html
+          end
+        end
+
+        def update_osse_eligibilities
+          authorize @employer_profile, :update_osse_eligibilities?
+
+          eligibilities = params[:eligibility].permit!
+          service = BenefitSponsors::Services::OsseEligibilityService.new(@employer_profile, eligibilities)
+
+          result = service.update_osse_eligibilities_by_year
+          flash[:notice] = "Sucessfully updated OSSE eligibility for years #{result['Success'].join(', ')}" if result["Success"]
+          flash[:error] = "Failed to updated OSSE eligibility for years #{result['Failure'].join(', ')}" if result["Failure"]
+
+          redirect_to profiles_employers_employer_profile_osse_eligibilities_path(employer_profile_id: @employer_profile.id)
         end
 
         def export_census_employees
