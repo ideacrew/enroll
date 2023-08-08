@@ -46,6 +46,7 @@ module Operations
         options[:state_histories] ||= []
         options[:state_histories] << state_history_options
         options[:is_satisfied] = state_history_options[:is_eligible]
+        options[:current_state] = state_history_options[:to_state]
 
         Success(options)
       end

@@ -26,6 +26,7 @@ FactoryBot.define do
         effective_on: evaluator.effective_on
       )
 
+      evidence.current_state = evidence.latest_state_history.to_state
       evidence.is_satisfied = true if evaluator.is_eligible
     end
   end

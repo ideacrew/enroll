@@ -30,6 +30,7 @@ FactoryBot.define do
         key: :childcare_subsidy_grant,
         title: 'Childcare Subsidy Grant'
       )
+      eligibility.current_state = eligibility.latest_state_history.to_state
     end
 
     trait :with_admin_attested_evidence do

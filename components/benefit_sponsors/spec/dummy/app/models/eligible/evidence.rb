@@ -6,6 +6,8 @@ module Eligible
     include Mongoid::Document
     include Mongoid::Timestamps
 
+    embedded_in :eligibility, class_name: "::Eligible::Eligibility"
+
     STATUSES = %i[initial approved denied].freeze
     ELIGIBLE_STATUSES = %i[approved].freeze
 
@@ -13,7 +15,7 @@ module Eligible
     field :title, type: String
     field :description, type: String
     field :is_satisfied, type: Boolean, default: false
-    field :current_state, type: Symbol
+    field :current_state, type: Symbol, default: :initial
     field :subject_ref, type: String
     field :evidence_ref, type: String
 
@@ -32,7 +34,7 @@ module Eligible
     scope :by_key, ->(key) { where(key: key.to_sym) }
 
     def latest_state_history
-      state_histories.latest_history
+      state_histories.max_by(&:created_at)
     end
 
     def is_eligible_on?(date)
@@ -45,6 +47,9 @@ module Eligible
       end
     end
 
+    # coverage period of the eligibility will start from the first day of the calendar year
+    # in which the eligibility was approved
+    # coverage period end on the last day of the calendar year in which the eligibility was denied
     def eligible_periods
       eligible_periods = []
       date_range = {}
