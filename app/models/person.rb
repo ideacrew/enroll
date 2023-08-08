@@ -1229,7 +1229,6 @@ class Person
   end
 
   def us_citizen
-    binding.pry
     return @us_citizen if !@us_citizen.nil?
     return nil if citizen_status.blank?
     @us_citizen ||= ::ConsumerRole::US_CITIZEN_STATUS_KINDS.include?(citizen_status)
