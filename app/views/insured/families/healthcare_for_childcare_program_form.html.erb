@@ -4,14 +4,14 @@
 
 <div class="employer-edit-tab">
   <h1 class="heading-text"><strong>HC4CC Eligibility Year(s)</strong></h1>
-  <h3 class="heading-text"><strong><%= @person.full_name.titleize %></strong></h3>
+  <h3 class="heading-text"><strong><%= @service.person.full_name.titleize %></strong></h3>
   <p><%= l10n('select_years_osse_offered') %></p>
   <div class="row no-buffer vertically-aligned-row">
     <p><%= l10n('osse_multi_year_description') %></p>
   </div>
 
-  <%= form_tag(update_osse_eligibilities_insured_families_path(person_id: @person.id), method: "put") do %>
-    <%= hidden_field_tag 'eligibilities[person_id]', @person.id %>
+  <%= form_tag(update_osse_eligibilities_insured_families_path(person_id: @service.person.id), method: "put") do %>
+    <%= hidden_field_tag 'eligibilities[person_id]', @service.person.id %>
     <%= submit_tag "Save Changes", class: 'btn btn-primary active pull-left col-12', style: 'background-color: #007bc4'%></br>
     <div class='table-responsive col-12 mt-3' style="padding-top: 10px">
       <table style='width: 70%; border-collapse: collapse; border: 0px solid #d5d5d5'>
