@@ -317,6 +317,11 @@ registry:
           item: <%= ENV['RENEWALS_CREATION_MONTH'] || 10 %>
         - key: :renewals_creation_day
           item: <%= ENV['RENEWALS_CREATION_DAY'] || 16 %>
+    - key: :auto_update_income_evidence_due_on
+      is_enabled: <%= ENV['AUTO_UPDATE_INCOME_EVIDENCE_DUE_ON_IS_ENABLED'] || false %>
+      settings:
+        - key: :days
+          item:  <%= ENV['AUTO_UPDATE_INCOME_EVIDENCE_DUE_ON_DAYS'] || 65 %>
     - key: :skip_employer_address_validation
       is_enabled: :false
     - key: :skip_employer_phone_validation
