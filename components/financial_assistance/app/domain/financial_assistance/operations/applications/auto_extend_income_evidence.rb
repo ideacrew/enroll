@@ -26,9 +26,9 @@ module FinancialAssistance
           params[:current_due_on] = params[:current_due_on] || TimeKeeper.date_of_record
           params[:extend_by] = params[:extend_by] || EnrollRegistry[:auto_update_income_evidence_due_on].settings(:days).item
           params[:modified_by] = params[:modified_by] || "system"
-          return Failure("Invalid param for key current_due_on, must be a Date") if !params[:current_due_on].is_a?(Date)
-          return Failure("Invalid param for key extend_by, must be an Integer") if !params[:extend_by].is_a?(Integer)
-          return Failure("Invalid param for key modified_by, must be a String") if !params[:modified_by].is_a?(String)
+          return Failure("Invalid param for key current_due_on, must be a Date") unless params[:current_due_on].is_a?(Date)
+          return Failure("Invalid param for key extend_by, must be an Integer") unless params[:extend_by].is_a?(Integer)
+          return Failure("Invalid param for key modified_by, must be a String") unless params[:modified_by].is_a?(String)
           Success(params)
         end
 
@@ -44,7 +44,7 @@ module FinancialAssistance
           end
           Success(updated_applicants)
         rescue StandardError => e
-          Failure("Failed to auto extend income evidence due on")
+          Failure("Failed to auto extend income evidence due on because of #{e.message}")
         end
       end
     end

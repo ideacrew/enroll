@@ -81,7 +81,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
       before do
         income_evidence.verification_histories.create(action: 'auto_extend_due_date', update_reason: 'Auto extended due date', updated_by: 'system')
         income_evidence.workflow_state_transitions.create(to_state: "verified", transition_at: TimeKeeper.date_of_record, reason: "met minimum criteria", comment: "consumer provided proper documentation",
-                                                      user_id: BSON::ObjectId.from_time(DateTime.now))
+                                                          user_id: BSON::ObjectId.from_time(DateTime.now))
         @result = subject.call({})
       end
 
@@ -137,7 +137,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
 
     context 'with invalid modified_by' do
       it 'should fail' do
-        result = subject.call({modified_by: 345435})
+        result = subject.call({modified_by: 345})
         expect(result).to be_failure
         expect(result.failure).to eq("Invalid param for key modified_by, must be a String")
       end
