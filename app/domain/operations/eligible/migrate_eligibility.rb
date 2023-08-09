@@ -3,33 +3,6 @@
 require "dry/monads"
 require "dry/monads/do"
 
-# Instructions: Run this script in rails console to migrate eligibilities
-# grouped_records =
-#   ::Eligibilities::Osse::Eligibility.collection.aggregate(
-#     [
-#       {
-#         "$match" => {
-#           eligibility_type:
-#             /BenefitSponsors::BenefitSponsorships::BenefitSponsorship/i
-#         }
-#       },
-#       { "$group": { _id: "$subject.key", records: { "$push": "$$ROOT" } } }
-#     ]
-#   )
-# grouped_records.each do |entry|
-#   subject = GlobalID::Locator.locate(entry["_id"])
-#   eligibilities =
-#     entry["records"].sort_by { |record| record["created_at"].to_i }
-#   ids = eligibilities.collect { |r| r["_id"] }
-#   eligibility_records = ::Eligibilities::Osse::Eligibility.where(:_id.in => ids)
-
-#   result =
-#     Operations::Eligible::MigrateEligibility.new.call(
-#       eligibility_type: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
-#       current_eligibilities: eligibility_records
-#     )
-# end
-
 module Operations
   module Eligible
     # Operation to support eligibility creation
