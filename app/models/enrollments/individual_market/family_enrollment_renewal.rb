@@ -296,12 +296,18 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   def eligible_enrollment_members
     @enrollment.hbx_enrollment_members.select do |member|
-      eligible_to_get_covered?(member) &&
-        member.person.is_in_state_resident? &&
-        member.person.is_lawfully_present? &&
-        !member.person.is_disabled &&
-        !member.person.is_incarcerated &&
-        member.family_member.is_applying_coverage
+      result = []
+      result << if member.person.consumer_role?
+                  (eligible_to_get_covered?(member) &&
+                              member.person.is_in_state_resident? &&
+                              member.person.is_lawfully_present? &&
+                              !member.person.is_disabled &&
+                              !member.person.is_incarcerated &&
+                              member.family_member.is_applying_coverage)
+                else
+                  (eligible_to_get_covered?(member) && !member.person.is_disabled)
+                end
+      result.all?(true)
     end
   end
 
