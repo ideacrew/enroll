@@ -115,19 +115,19 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
   context 'Given invalid data' do
     it 'should fail when the params are invalid' do
       invalid_id = "invalid_id"
-      result = operation.call(assistance_year: invalid_id, transmittable_job_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
+      result = operation.call(assistance_year: invalid_id, transmittable_message_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
       expect(result).not_to be_success
       expect(result.failure).to include "assistance_year param is invalid"
 
-      result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_job_id: nil)
+      result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_message_id: nil)
       expect(result).not_to be_success
-      expect(result.failure).to include "transmittable_job_id param is missing"
+      expect(result.failure).to include "transmittable_message_id param is missing"
     end
   end
 
   context 'Given a valid application' do
     it 'should find results and run periodic matching' do
-      result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_job_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
+      result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_message_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
 
       expect(result).to be_success
       expect(result.success).to eq({:total_applications_ran => 1})
@@ -137,7 +137,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       app = ::FinancialAssistance::Application.last
       app.assistance_year = TimeKeeper.date_of_record.year - 1
       app.save
-      result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_job_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
+      result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_message_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
 
       expect(result).to be_success
       expect(result.success).to eq({:total_applications_ran => 0})
@@ -147,7 +147,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       app = ::FinancialAssistance::Application.last
       app.aasm_state = 'submitted'
       app.save
-      result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_job_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
+      result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_message_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
 
       expect(result).to be_success
       expect(result.success).to eq({:total_applications_ran => 0})
@@ -158,7 +158,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       application = app.applicants.last
       application.is_ia_eligible = false
       application.save
-      result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_job_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
+      result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_message_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
 
       expect(result).to be_success
       expect(result.success).to eq({:total_applications_ran => 0})
@@ -171,7 +171,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       product.csr_variant_id = '01'
       enrollment.save
       product.save
-      result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_job_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
+      result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_message_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
 
       expect(result).to be_success
       expect(result.success).to eq({:total_applications_ran => 0})

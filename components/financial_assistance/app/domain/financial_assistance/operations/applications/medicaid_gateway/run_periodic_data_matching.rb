@@ -29,7 +29,9 @@ module FinancialAssistance
             errors << 'assistance_year param missing' if params[:assistance_year].blank?
             assistance_year = params[:assistance_year]
             errors << 'assistance_year param is invalid' unless assistance_year.to_i.to_s == assistance_year.to_s
-            errors << 'transmittable_job_id param is missing' if params[:transmittable_job_id].blank?
+            errors << 'transmittable_message_id param is missing' if params[:transmittable_message_id].blank?
+            batch_size = params[:batch_size]
+            errors << 'batch_size param given is invalid' if batch_size.present? && batch_size.to_i > 0
 
             errors.empty? ? Success(params) : Failure(errors)
           end
@@ -46,7 +48,7 @@ module FinancialAssistance
 
           def filter_and_call_mec_service(params)
             @logger = Logger.new("#{Rails.root}/log/run_periodic_data_matching_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
-            batch_size = params[:batch_size] || 1000
+            batch_size = params[:batch_size].to_i || 1000
             families = Family.where(:_id.in => HbxEnrollment.by_health.enrolled_and_renewal.distinct(:family_id))
             total_families_count = families.count
 
@@ -61,7 +63,14 @@ module FinancialAssistance
                 determined_application = fetch_application(family, params[:assistance_year])
                 next unless determined_application.present?
                 total_applications_ran += 1
-                ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: determined_application.id) unless params[:skip_mec_call]
+                @logger.info "process mec_check for determined application #{determined_application.id}"
+                next if params[:skip_mec_call]
+                mec_check_published = ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: determined_application.id)
+                if mec_check_published.success?
+                  @logger.info "Successfully published mec_check for determined application #{determined_application.id}"
+                else
+                  @logger.error "Error publishing mec_check for determined application #{determined_application.id}"
+                end
               end
             end
             @logger.info "MedicaidGateway::RunPeriodicDataMatching Completed periodic data matching for #{total_applications_ran} applications"
