@@ -130,7 +130,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_message_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
 
       expect(result).to be_success
-      expect(result.success).to eq({:total_applications_ran => 1})
+      expect(result.success).to eq({:total_applications_published => 1})
     end
 
     it 'should not find results with old assistance_year' do
@@ -140,7 +140,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_message_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
 
       expect(result).to be_success
-      expect(result.success).to eq({:total_applications_ran => 0})
+      expect(result.success).to eq({:total_applications_published => 0})
     end
 
     it 'should not find results with submitted aasm_state' do
@@ -150,7 +150,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_message_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
 
       expect(result).to be_success
-      expect(result.success).to eq({:total_applications_ran => 0})
+      expect(result.success).to eq({:total_applications_published => 0})
     end
 
     it 'should not find results if applicants.is_ia_eligible is false' do
@@ -161,7 +161,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_message_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
 
       expect(result).to be_success
-      expect(result.success).to eq({:total_applications_ran => 0})
+      expect(result.success).to eq({:total_applications_published => 0})
     end
 
     it 'should not find results if enrollment applied_aptc_amount is 0' do
@@ -174,7 +174,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       result = operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_message_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
 
       expect(result).to be_success
-      expect(result.success).to eq({:total_applications_ran => 0})
+      expect(result.success).to eq({:total_applications_published => 0})
     end
   end
 end

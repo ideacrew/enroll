@@ -36,6 +36,46 @@ module FinancialAssistance
             errors.empty? ? Success(params) : Failure(errors)
           end
 
+          def filter_and_call_mec_service(params)
+            initialize_logger
+            batch_size = params[:batch_size]&.to_i || 1000
+            @total_applications_published = 0
+            families = fetch_enrolled_and_renewal_families
+            process_families(families, batch_size, params)
+            @logger.info "MedicaidGateway::RunPeriodicDataMatching Completed periodic data matching for #{@total_applications_published} applications"
+            Success(total_applications_published: @total_applications_published)
+          rescue StandardError => e
+            @logger.error "Error: message: #{e.message}, backtrace: #{e.backtrace}"
+          end
+
+          def initialize_logger
+            log_file = "#{Rails.root}/log/run_periodic_data_matching_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+            @logger = Logger.new(log_file)
+          end
+
+          def fetch_enrolled_and_renewal_families
+            Family.in(_id: HbxEnrollment.by_health.enrolled_and_renewal.distinct(:family_id))
+          end
+
+          def process_families(families, batch_size, params)
+            (0..families.count).step(batch_size) do |offset|
+              batch = families.skip(offset).limit(batch_size)
+              process_family_batch(batch, params)
+            end
+          end
+
+          def process_family_batch(batch, params)
+            batch.each do |family|
+              enrollments = family.hbx_enrollments.by_health.enrolled_and_renewal
+              next unless eligible_for_mec_check?(enrollments)
+
+              determined_application = fetch_application(family, params[:assistance_year])
+              next unless determined_application.present?
+
+              process_mec_check(determined_application, params)
+            end
+          end
+
           def fetch_application(family, assistance_year)
             applications = ::FinancialAssistance::Application.where(
               family_id: family.id,
@@ -46,37 +86,27 @@ module FinancialAssistance
             applications.max_by(&:created_at)
           end
 
-          def filter_and_call_mec_service(params)
-            @logger = Logger.new("#{Rails.root}/log/run_periodic_data_matching_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
-            batch_size = params[:batch_size].present? ? params[:batch_size].to_i : 1000
-            families = Family.where(:_id.in => HbxEnrollment.by_health.enrolled_and_renewal.distinct(:family_id))
-            total_families_count = families.count
-
-            @logger.info "MedicaidGateway::RunPeriodicDataMatching Total families to run - #{total_families_count}"
-            total_applications_ran = 0
-            (0..total_families_count).step(batch_size) do |offset|
-              batch = families.skip(offset).limit(batch_size)
-              batch.each do |family|
-                enrollments = family.hbx_enrollments.by_health.enrolled_and_renewal
-                # Process each record in the batch
-                next unless enrollments.any? {|enrollment| enrollment.applied_aptc_amount.cents.positive? || %w[02 03 04 05 06].include?(enrollment.product.csr_variant_id) }
-                determined_application = fetch_application(family, params[:assistance_year])
-                next unless determined_application.present?
-                total_applications_ran += 1
-                @logger.info "process mec_check for determined application #{determined_application.id}"
-                next if params[:skip_mec_call]
-                mec_check_published = ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: determined_application.id)
-                if mec_check_published.success?
-                  @logger.info "Successfully published mec_check for determined application #{determined_application.id}"
-                else
-                  @logger.error "Error publishing mec_check for determined application #{determined_application.id}"
-                end
-              end
+          def eligible_for_mec_check?(enrollments)
+            enrollments.any? do |enrollment|
+              enrollment.applied_aptc_amount.cents.positive? || %w[02 03 04 05 06].include?(enrollment.product.csr_variant_id)
             end
-            @logger.info "MedicaidGateway::RunPeriodicDataMatching Completed periodic data matching for #{total_applications_ran} applications"
-            Success({ total_applications_ran: total_applications_ran })
-          rescue StandardError => e
-            @logger.error "Error: message: #{e.message}, backtrace: #{e.backtrace}"
+          end
+
+          def process_mec_check(application, params)
+            @logger.info "process mec_check for determined application #{application.id}"
+            return if params[:skip_mec_call]
+            mec_check_published = ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: application.id)
+            if mec_check_published.success?
+              @total_applications_published += 1
+              @logger.info "Successfully published mec_check for determined application #{application.id}"
+            else
+              @logger.error "Error publishing mec_check for determined application #{application.id}"
+            end
+          end
+
+          def log_completion
+            @logger.info "MedicaidGateway::RunPeriodicDataMatching Completed periodic data matching for #{@total_applications_published} applications"
+            Success(total_applications_published: @total_applications_published)
           end
 
         end
