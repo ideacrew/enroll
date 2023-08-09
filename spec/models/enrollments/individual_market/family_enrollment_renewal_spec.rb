@@ -193,6 +193,109 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       TimeKeeper.set_date_of_record_unprotected!(Date.today)
     end
 
+    describe '.turned_19_during_renewal_with_pediatric_only_qdp?' do
+      let(:renewal_coverage_start) { renewal_benefit_coverage_period.start_on }
+      let(:person) { FactoryBot.create(:person, :with_consumer_role, dob: TimeKeeper.date_of_record - dependent_age.years) }
+      let(:dependent) { double('HbxEnrollmentMember', person: person) }
+      let(:dependent_age) { rand(1..18) }
+
+      context 'when slcsp feature is disabled' do
+        before do
+          allow(subject).to receive(:slcsp_feature_enabled?).with(renewal_coverage_start.year).and_return(false)
+        end
+
+        it 'returns false as the feature is disabled' do
+          expect(
+            subject.turned_19_during_renewal_with_pediatric_only_qdp?(dependent)
+          ).to be_falsey
+        end
+      end
+
+      context 'when enrollment is of coverage_kind health' do
+        before do
+          allow(subject).to receive(:slcsp_feature_enabled?).with(renewal_coverage_start.year).and_return(true)
+        end
+
+        it 'returns false as the enrollment is health' do
+          expect(
+            subject.turned_19_during_renewal_with_pediatric_only_qdp?(dependent)
+          ).to be_falsey
+        end
+      end
+
+      context 'when renewal dental product allows adult offerings' do
+        let(:coverage_kind) { 'dental' }
+        let(:dental_renewal_product) do
+          double('::BenefitMarkets::Products::DentalProducts::DentalProduct', allows_child_only_offering?: false)
+        end
+
+        before do
+          allow(subject).to receive(:slcsp_feature_enabled?).with(renewal_coverage_start.year).and_return(true)
+          allow(subject).to receive(:dental_renewal_product).and_return(dental_renewal_product)
+        end
+
+        it 'returns false as the dental product allows adult offerings' do
+          expect(
+            subject.turned_19_during_renewal_with_pediatric_only_qdp?(dependent)
+          ).to be_falsey
+        end
+      end
+
+      context 'when member is aged less than 19 as of the renewal_coverage_start' do
+        let(:coverage_kind) { 'dental' }
+        let(:dental_renewal_product) do
+          double('::BenefitMarkets::Products::DentalProducts::DentalProduct', allows_child_only_offering?: true)
+        end
+
+        before do
+          allow(subject).to receive(:slcsp_feature_enabled?).with(renewal_coverage_start.year).and_return(true)
+          allow(subject).to receive(:dental_renewal_product).and_return(dental_renewal_product)
+        end
+
+        it 'returns false as member is aged less 19' do
+          expect(
+            subject.turned_19_during_renewal_with_pediatric_only_qdp?(dependent)
+          ).to be_falsey
+        end
+      end
+
+      # when slcsp feature enabled
+      # enrollment is dental
+      # renewal dental product only offers child only
+      # member is turning 19 as of renewal_coverage_start
+      context 'member is ineligible for pediatric only dental renewal' do
+        let(:coverage_kind) { 'dental' }
+        let(:dental_renewal_product) do
+          double('::BenefitMarkets::Products::DentalProducts::DentalProduct', allows_child_only_offering?: true)
+        end
+
+        before do
+          allow(subject).to receive(:slcsp_feature_enabled?).with(renewal_coverage_start.year).and_return(true)
+          allow(subject).to receive(:dental_renewal_product).and_return(dental_renewal_product)
+        end
+
+        context 'when member is turning 19 as of renewal_coverage_start' do
+          let(:dependent_age) { 19 }
+
+          it 'returns true as member is ineligible for pediatric only dental renewal' do
+            expect(
+              subject.turned_19_during_renewal_with_pediatric_only_qdp?(dependent)
+            ).to be_truthy
+          end
+        end
+
+        context 'when member is aged more than 19 as of renewal_coverage_start' do
+          let(:dependent_age) { rand(20..100) }
+
+          it 'returns true as member is ineligible for pediatric only dental renewal' do
+            expect(
+              subject.turned_19_during_renewal_with_pediatric_only_qdp?(dependent)
+            ).to be_truthy
+          end
+        end
+      end
+    end
+
     describe ".clone_enrollment_members" do
 
       context "when dependent age off feature is turned off" do
