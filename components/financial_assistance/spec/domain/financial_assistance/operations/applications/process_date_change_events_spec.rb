@@ -72,7 +72,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::ProcessDateChang
     allow(::FinancialAssistance::Operations::Applications::MedicaidGateway::PublishApplication).to receive(:new).and_return(obj)
     allow(obj).to receive(:build_event).and_return(event)
     allow(event.success).to receive(:publish).and_return(true)
-    # need to check
     @result = subject.call(input_params)
   end
 

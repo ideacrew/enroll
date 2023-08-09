@@ -17,11 +17,6 @@ registry:
       - key: :verification_document_due_in_days
         item: 96
         is_enabled: true
-      - key: :auto_update_income_evidence_due_on
-        is_enabled: <%= ENV['AUTO_UPDATE_INCOME_EVIDENCE_DUE_ON_IS_ENABLED'] || false %>
-        settings:
-          - key: :days
-            item:  <%= ENV['AUTO_UPDATE_INCOME_EVIDENCE_DUE_ON_DAYS'] || 65 %>
       - key: :ivl_eligibility_notices
         is_enabled: true
         settings:

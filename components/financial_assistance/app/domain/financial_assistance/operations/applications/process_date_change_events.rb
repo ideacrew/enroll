@@ -69,9 +69,9 @@ module FinancialAssistance
         end
 
         def auto_extend_income_evidence
-          if EnrollRegistry.feature_enabled?(:auto_update_income_evidence_due_on)
+          if FinancialAssistanceRegistry.feature_enabled?(:auto_update_income_evidence_due_on)
             @logger.info 'Started auto_extend_income_evidence process'
-            ::FinancialAssistance::Operations::Applications::AutoExtendIncomeEvidence.new.call
+            ::FinancialAssistance::Operations::Applications::AutoExtendIncomeEvidence.new.call({})
             @logger.info 'Ended auto_extend_income_evidence process'
           else
             Success("auto_update_income_evidence_due_on not enabled")
