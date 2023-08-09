@@ -25,20 +25,20 @@ namespace :cv3_family_failures_report do
       if File.exists?(last_id_file_path)
         last_family_id = File.read(last_id_file_path).strip
       else
-        last_line = `tail -n 1 #{csv_file_path}`
-        last_family_id = last_line.strip.split(',').first
+        last_entry = CSV.read(csv_file_path).last
+        last_family_id = last_entry&.first
       end
       families = Family.where(:hbx_assigned_id.gt => last_family_id)
-      log "Resuming from family with hbx_id #{last_family_id}."
+      family_ids = families.pluck(:hbx_assigned_id)
+      log "Resuming after family with hbx_id #{last_family_id}."
     else
       CSV.open(csv_file_path, 'wb') { |csv| csv << %w[hbx_id result output] }
-      families = Family.all
-
+      family_ids = Family.pluck(:hbx_assigned_id)
     end
 
-    total = families.count
+    total = family_ids&.count
 
-    if total.zero?
+    if !total || total.zero?
       log "There are no families left to process."
       next
     end
@@ -47,13 +47,14 @@ namespace :cv3_family_failures_report do
     log "There are #{total} families to process in #{total_batches} batches of #{batch_size}."
 
     # Process families in batches and write to CSV file logging progress as we go
-    families.asc(:hbx_assigned_id).no_timeout.each_slice(batch_size).with_index do |family_batch, batch_number|
+    family_ids.sort.each_slice(batch_size).with_index do |family_id_batch, batch_number|
+      families = Family.in(hbx_assigned_id: family_id_batch).to_a
       CSV.open(csv_file_path, 'ab') do |csv|
-        process_family_batch(family_batch, csv)
+        process_family_batch(families, csv)
       end
 
-      # write the last processed id to the file in case of interruption
-      File.write(last_id_file_path, family_batch.last.hbx_assigned_id)
+      # write the last processed id in the batch to the file in case of interruption it will resume from the next batch
+      File.write(last_id_file_path, family_id_batch.last)
 
       # Log progress
       progress = ((batch_number + 1).to_f / total_batches * 100).round(2)
@@ -68,13 +69,14 @@ namespace :cv3_family_failures_report do
 
   def process_family_batch(families, csv)
     families.each do |family|
+      id = family.hbx_assigned_id
       begin
         result = Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
         if result.failure?
-          csv << [family.hbx_assigned_id, 'failure', result.failure]
+          csv << [id, 'failure', result.failure]
         end
       rescue StandardError => e
-        csv << [family.hbx_assigned_id, 'failure', e.message]
+        csv << [id, 'failure', e.message]
       end
     end
   end
