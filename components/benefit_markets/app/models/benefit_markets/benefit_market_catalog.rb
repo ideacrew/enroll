@@ -137,8 +137,18 @@ module BenefitMarkets
       open_enrollment_end_on_day - minimum_length
     end
 
+    #TODO: update the logic once settings moved to benefit market catalog
     def self.osse_eligibility_years_for_display
-      [2022, 2023, 2024]
+      years = [
+        TimeKeeper.date_of_record.year - 1,
+        TimeKeeper.date_of_record.year,
+        TimeKeeper.date_of_record.year + 1
+      ]
+
+      years.map do |year|
+        year if EnrollRegistry.feature?("aca_shop_osse_subsidy_#{year}") &&
+        EnrollRegistry.feature_enabled?("aca_shop_osse_subsidy_#{year}")
+      end.compact
     end
 
     private

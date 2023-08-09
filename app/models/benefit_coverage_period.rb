@@ -283,8 +283,18 @@ class BenefitCoveragePeriod
       organizations.size > 0 ? organizations.first.hbx_profile.benefit_sponsorship.benefit_coverage_periods : nil
     end
 
+    #TODO: update the logic once settings moved to benefit coverage period
     def osse_eligibility_years_for_display
-      [2022, 2023, 2024]
+      years = [
+        TimeKeeper.date_of_record.year - 1,
+        TimeKeeper.date_of_record.year,
+        TimeKeeper.date_of_record.year + 1
+      ]
+
+      years.map do |year|
+        year if EnrollRegistry.feature?("aca_ivl_osse_subsidy_#{year}") &&
+        EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
+      end.compact
     end
   end
 
