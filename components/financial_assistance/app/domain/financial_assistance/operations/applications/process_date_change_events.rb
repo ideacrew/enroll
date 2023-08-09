@@ -21,6 +21,7 @@ module FinancialAssistance
           # { events_execution_date: TimeKeeper.date_of_record, logger: adv_day_logger, renewal_year: TimeKeeper.date_of_record.year.next }
           _validated_params = yield validate_input_params(params)
           _renewals_result  = yield process_renewals
+          _income_evidences = yield auto_extend_income_evidence
 
           Success('Successfully processed all the date change events.')
         end
@@ -65,6 +66,18 @@ module FinancialAssistance
           day = FinancialAssistanceRegistry[:create_renewals_on_date_change].settings(:renewals_creation_day).item
           month = FinancialAssistanceRegistry[:create_renewals_on_date_change].settings(:renewals_creation_month).item
           Date.new(TimeKeeper.date_of_record.year, month, day)
+        end
+
+        def auto_extend_income_evidence
+          if EnrollRegistry.feature_enabled?(:auto_update_income_evidence_due_on)
+            @logger.info 'Started auto_extend_income_evidence process'
+            ::FinancialAssistance::Operations::Applications::AutoExtendIncomeEvidence.new.call
+            @logger.info 'Ended auto_extend_income_evidence process'
+          else
+            Success("auto_update_income_evidence_due_on not enabled")
+          end
+        rescue StandardError => e
+          @logger.info "Failed to execute auto_extend_income_evidence, error: #{e.backtrace}"
         end
       end
     end
