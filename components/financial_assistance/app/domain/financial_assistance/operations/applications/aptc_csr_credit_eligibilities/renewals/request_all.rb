@@ -35,7 +35,7 @@ module FinancialAssistance
 
             # rubocop:disable Style/MultilineBlockChain
             def generate_renewal_events(renewal_year, family_ids)
-              logger = Logger.new("#{Rails.root}/log/aptc_credit_eligibilities_request_all_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+              logger = Logger.new("#{Rails.root}/log/aptc_credit_eligibilities_request_all.log")
 
               logger.info 'Started publish_generate_draft_renewals process'
               logger.info "Total number of applications with assistance_year: #{renewal_year.pred} are #{family_ids.count}"
