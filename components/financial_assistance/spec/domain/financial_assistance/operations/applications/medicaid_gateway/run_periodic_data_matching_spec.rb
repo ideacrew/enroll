@@ -110,6 +110,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
     allow(premiums_double).to receive(:failure?).and_return(false)
     allow(slcsp_double).to receive(:failure?).and_return(false)
     allow(lcsp_double).to receive(:failure?).and_return(false)
+    allow(operation).to receive(:publish_mec_check).and_return(Success())
   end
 
   context 'Given invalid data' do

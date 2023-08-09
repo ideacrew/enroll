@@ -95,13 +95,17 @@ module FinancialAssistance
           def process_mec_check(application, params)
             @logger.info "process mec_check for determined application #{application.id}"
             return if params[:skip_mec_call]
-            mec_check_published = ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: application.id)
+            mec_check_published = publish_mec_check(application.id)
             if mec_check_published.success?
               @total_applications_published += 1
               @logger.info "Successfully published mec_check for determined application #{application.id}"
             else
               @logger.error "Error publishing mec_check for determined application #{application.id}"
             end
+          end
+
+          def publish_mec_check(application_id)
+            ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: application_id)
           end
 
           def log_completion
