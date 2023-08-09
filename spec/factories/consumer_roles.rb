@@ -6,7 +6,7 @@ FactoryBot.define do
     gender { 'male' }
     is_state_resident { 'yes' }
     citizen_status { 'us_citizen' }
-    is_incarcerated { 'yes' }
+    is_incarcerated { 'no' }
     is_applicant { 'yes' }
     vlp_documents {[FactoryBot.build(:vlp_document)]}
     ridp_documents {[FactoryBot.build(:ridp_document)]}
