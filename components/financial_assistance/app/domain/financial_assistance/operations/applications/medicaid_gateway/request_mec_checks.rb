@@ -19,7 +19,6 @@ module FinancialAssistance
             application    = yield find_application(application_id)
             payload_param  = yield construct_payload(application)
             payload_value  = yield validate_payload(payload_param)
-            binding.irb
             payload        = yield publish(payload_value)
 
             Success(payload)
