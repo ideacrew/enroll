@@ -48,7 +48,7 @@ module FinancialAssistance
 
           def filter_and_call_mec_service(params)
             @logger = Logger.new("#{Rails.root}/log/run_periodic_data_matching_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
-            batch_size = params[:batch_size].to_i || 1000
+            batch_size = params[:batch_size].present? ? params[:batch_size].to_i : 1000
             families = Family.where(:_id.in => HbxEnrollment.by_health.enrolled_and_renewal.distinct(:family_id))
             total_families_count = families.count
 
