@@ -70,6 +70,13 @@ module Eligible
     class << self
       ResourceReference = Struct.new(:class_name, :optional, :meta)
 
+      RESOURCE_KINDS = [
+        "::BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::AdminAttestedEvidence",
+        "::BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::ShopOsseGrant",
+        "::IvlOsseEligibilities::AdminAttestedEvidence",
+        "::IvlOsseEligibilities::IvlOsseGrant"
+      ].freeze
+
       def resource_ref_dir
         @resource_ref_dir ||= Concurrent::Map.new
       end
@@ -94,7 +101,9 @@ module Eligible
 
       def create_objects(collection, type)
         collection.map do |item|
-          item_class = resource_ref_dir[type][item.key].class_name.safe_constantize
+          model = resource_ref_dir[type][item.key].class_name
+          item_class = RESOURCE_KINDS.include?(model) ? model.safe_constantize : nil
+          next unless item_class
           item_class.new(item.to_h)
         end
       end
