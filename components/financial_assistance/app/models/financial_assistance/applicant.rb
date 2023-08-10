@@ -623,8 +623,8 @@ module FinancialAssistance
       child_relationship = self.relationships.where(kind: 'child').first
       if child_relationship.present?
         parent = child_relationship.relative
-        domestic_partner = parent.relationships.where(kind: 'domestic_partner').first
-        return false if domestic_partner.present? && self.relationships.where(relative_id: domestic_partner.relative.id).first.kind != 'domestic_partners_child'
+        domestic_partner_relationship = parent.relationships.where(kind: 'domestic_partner').first
+        return false if domestic_partner_relationship.present? && ['domestic_partners_child', 'child'].exclude?(self.relationships.where(relative_id: domestic_partner_relationship.relative.id).first.kind)
       end
       true
     end
