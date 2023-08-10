@@ -2,6 +2,7 @@ module BenefitMarkets
   class BenefitMarketCatalog
     include Mongoid::Document
     include Mongoid::Timestamps
+    include GlobalID::Identification
 
     # Frequency at which sponsors may submit an initial or renewal application
     # Example application interval kinds:
@@ -41,6 +42,9 @@ module BenefitMarkets
                 class_name: "::BenefitMarkets::MarketPolicies::MemberMarketPolicy"
     embeds_many :product_packages, as: :packagable,
                 class_name: "::BenefitMarkets::Products::ProductPackage"
+
+    embeds_many :eligibilities, class_name: '::Eligible::Eligibility', cascade_callbacks: true
+
 
     # Entire geography covered by under this catalog
     has_and_belongs_to_many  :service_areas,
@@ -147,7 +151,7 @@ module BenefitMarkets
 
       years.map do |year|
         year if EnrollRegistry.feature?("aca_shop_osse_subsidy_#{year}") &&
-        EnrollRegistry.feature_enabled?("aca_shop_osse_subsidy_#{year}")
+                EnrollRegistry.feature_enabled?("aca_shop_osse_subsidy_#{year}")
       end.compact
     end
 

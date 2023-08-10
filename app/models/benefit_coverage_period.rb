@@ -5,6 +5,7 @@
 class BenefitCoveragePeriod
   include Mongoid::Document
   include Mongoid::Timestamps
+  include GlobalID::Identification
 
   embedded_in :benefit_sponsorship
 
@@ -25,6 +26,7 @@ class BenefitCoveragePeriod
 
   # embeds_many :open_enrollment_periods, class_name: "EnrollmentPeriod"
   embeds_many :benefit_packages
+  embeds_many :eligibilities, class_name: '::Eligible::Eligibility', cascade_callbacks: true
 
   accepts_nested_attributes_for :benefit_packages
 
@@ -293,7 +295,7 @@ class BenefitCoveragePeriod
 
       years.map do |year|
         year if EnrollRegistry.feature?("aca_ivl_osse_subsidy_#{year}") &&
-        EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
+                EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
       end.compact
     end
   end

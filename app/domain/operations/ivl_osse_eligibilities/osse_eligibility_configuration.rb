@@ -15,7 +15,7 @@ module Operations
       def grants
         %i[
           childcare_subsidy_grant
-        ]
+        ].collect { |key| [key, true] }
       end
     end
   end

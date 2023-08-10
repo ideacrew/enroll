@@ -23,10 +23,7 @@ module Operations
 
       def grants
         offered_grants.collect do |grant_feature_key|
-          [
-            grant_feature_key,
-            EnrollRegistry.feature_enabled?(grant_feature_key)
-          ]
+          [grant_feature_key, EnrollRegistry[grant_feature_key].enabled?]
         end
       end
 
@@ -64,11 +61,14 @@ module Operations
       # @param [Hash] opts Options to Create Eligibility Configuration
       # @option opts [GlobalId] :subject required
       # @option opts [String]   :eligibility_feature required
+      # @option opts [String]   :effective_date required
+      # @option opts [String]   :domain_model required
       # @return [Dry::Monad] result
       def call(params)
         values = yield validate(params)
         eligibility = yield build(values)
-        eligibility_record = yield create(values, eligibility)
+        eligibility_entity = yield create(values, eligibility)
+        eligibility_record = yield persist(eligibility_entity)
 
         Success(eligibility_record)
       end
@@ -79,22 +79,23 @@ module Operations
         errors = []
         errors << "subject missing" unless params[:subject]
         @subject = GlobalID::Locator.locate(params[:subject])
+        errors << "effective_date missing" unless params[:effective_date]
 
         errors << "unable to find subject: #{params[:subject]}" unless @subject.present?
-
+        errors << "domain model missing" unless params[:domain_model]
         errors << "eligibility feature missing" unless params[:eligibility_feature]
 
-        @calender_year = subject.application_period.begin.year
-        unless EnrollRegistry.feature?(
+        @calender_year = params[:effective_date].year
+        if EnrollRegistry.feature?(
           "#{params[:eligibility_feature]}_#{calender_year}"
         )
+          @eligibility_feature =
+            EnrollRegistry[
+              "#{params[:eligibility_feature]}_#{calender_year}".to_sym
+            ]
+        else
           errors << "unable to find feature: #{params[:eligibility_feature]}_#{calender_year}"
         end
-
-        @eligibility_feature =
-          EnrollRegistry[
-            "#{params[:eligibility_feature]}_#{calender_year}".to_sym
-          ]
 
         errors.empty? ? Success(params) : Failure(errors)
       end
@@ -103,8 +104,8 @@ module Operations
         options = {
           subject: subject.to_global_id,
           evidence_key: "#{eligibility_feature.key}_evidence",
-          evidence_value: eligibility_feature.enabled?,
-          effective_date: subject.application_period.begin
+          evidence_value: eligibility_feature.enabled?.to_s,
+          effective_date: values[:effective_date]
         }
 
         ::Operations::Eligible::BuildEligibility.new(
@@ -117,8 +118,29 @@ module Operations
         )
       end
 
-      def create(values)
-        # binding.irb
+      def create(values, eligibility)
+        AcaEntities::Eligible::AddEligibility.new.call(
+          subject: values[:domain_model],
+          eligibility: eligibility
+        )
+      end
+
+      def persist(eligibility_entity)
+        eligibility_params = eligibility_entity.to_h.except(:evidences, :grants)
+        eligibility_record = ::Eligible::Eligibility.new(eligibility_params)
+        eligibility_record.tap do |record|
+          record.evidences =
+            record.class.create_objects(
+              eligibility_entity.evidences,
+              :evidences
+            )
+          record.grants =
+            record.class.create_objects(eligibility_entity.grants, :grants)
+        end
+
+        subject.eligibilities << eligibility_record
+
+        subject.save ? Success(eligibility_record) : Failure(subject.errors)
       end
     end
   end
