@@ -1310,16 +1310,6 @@ class Person
     end
   end
 
-  def fetch_writing_agents_for_employee_role
-    writing_agents = []
-    if has_active_employee_role?
-      active_employee_roles.each do |role|
-        writing_agents << role.employer_profile&.active_broker_agency_account&.writing_agent&.id
-      end
-    end
-    writing_agents
-  end
-
   def is_state_resident?
     address = addresses.collect(&:kind).include?('home') ? home_address : mailing_address
     address&.state == aca_state_abbreviation
