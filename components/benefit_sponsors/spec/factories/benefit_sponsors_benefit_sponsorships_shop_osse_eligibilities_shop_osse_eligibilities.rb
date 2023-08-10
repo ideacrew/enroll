@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :ivl_osse_eligibility, class: 'IvlOsseEligibilities::IvlOsseEligibility' do
+  factory :benefit_sponsors_benefit_sponsorships_shop_osse_eligibilities_shop_osse_eligibility,
+          class:
+            'BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::ShopOsseEligibility' do
 
-    key { :ivl_osse_eligibility }
-    title { 'IVL Osse Subsidy' }
+    key { :shop_osse_eligibility }
+    title { 'Contribution Subsidy' }
     description { 'Osse Contribution Subsidy' }
 
     transient do
@@ -26,16 +28,16 @@ FactoryBot.define do
       )
 
       eligibility.grants << FactoryBot.build(
-        :ivl_osse_eligibility_grant,
-        key: :childcare_subsidy_grant,
-        title: 'Childcare Subsidy Grant'
+        :benefit_sponsors_benefit_sponsorships_shop_osse_eligibilities_shop_osse_grant,
+        key: :contribution_subsidy_grant,
+        title: 'Contribution Subsidy Grant'
       )
     end
 
     trait :with_admin_attested_evidence do
       after :build do |eligibility, evaluator|
         eligibility.evidences << FactoryBot.build(
-          :ivl_osse_admin_attested_evidence,
+          :benefit_sponsors_benefit_sponsorships_shop_osse_eligibilities_admin_attested_evidence,
           to_state: evaluator.evidence_state,
           is_eligible: evaluator.is_eligible,
           effective_on: evaluator.effective_on

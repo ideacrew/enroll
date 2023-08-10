@@ -1,13 +1,16 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :ivl_osse_admin_attested_evidence, class: "::IvlOsseEligibilities::AdminAttestedEvidence" do
+  factory :benefit_sponsors_benefit_sponsorships_shop_osse_eligibilities_admin_attested_evidence,
+          class:
+            'BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::AdminAttestedEvidence' do
 
-    title { 'Ivl Osse Evidence' }
-    description { 'Evidence for Individual OSSE Eligibility' }
+    title { 'Sho Osse Evidence' }
+    description { 'Evidence for Group OSSE Eligibility' }
     key { :shop_osse_evidence }
     is_satisfied { false }
-    subject_ref { URI("gid://enroll_app/Consumer_role")}
+    subject_ref { URI("gid://enroll_app/BenefitSponsors/BenefitSponsorship")}
+    evidence_ref { URI("gid://enroll_app/BenefitSponsors/Evidence") }
 
     transient do
       from_state { :initial }
