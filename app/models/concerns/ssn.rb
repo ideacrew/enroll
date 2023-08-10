@@ -46,26 +46,15 @@ module Ssn
     self.class.decrypt_ssn(ssn_val) unless ssn_val.blank?
   end
 
-  def is_ssn_composition_correct?
-    # Invalid compositions:
+  # Invalid compositions:
     #   All zeros or 000, 666, 900-999 in the area numbers (first three digits);
     #   00 in the group number (fourth and fifth digit); or
     #   0000 in the serial number (last four digits)
-
-    if ssn.present?
-      invalid_area_numbers = %w[000 666]
-      invalid_area_range = 900..999
-      invalid_group_numbers = %w[00]
-      invalid_serial_numbers = %w[0000]
-
-      return false if ssn.to_s.blank?
-      return false if invalid_area_numbers.include?(ssn.to_s[0,3])
-      return false if invalid_area_range.include?(ssn.to_s[0,3].to_i)
-      return false if invalid_group_numbers.include?(ssn.to_s[3,2])
-      return false if invalid_serial_numbers.include?(ssn.to_s[5,4])
+  def is_ssn_composition_correct?
+    if ssn.present? && self.consumer_role.present?
+      regex = /^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$/
+      errors.add(:base, "Invalid SSN format") unless ssn.match?(regex)
     end
-
-    true
   end
 
   # ClassMethods
