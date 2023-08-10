@@ -71,10 +71,10 @@ module Eligible
       ResourceReference = Struct.new(:class_name, :optional, :meta)
 
       RESOURCE_KINDS = [
-        "BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::AdminAttestedEvidence",
-        "BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::ShopOsseGrant",
-        "IvlOsseEligibilities::AdminAttestedEvidence",
-        "IvlOsseEligibilities::IvlOsseGrant"
+        BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::AdminAttestedEvidence,
+        BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::ShopOsseGrant,
+        IvlOsseEligibilities::AdminAttestedEvidence,
+        IvlOsseEligibilities::IvlOsseGrant
       ].freeze
 
       def resource_ref_dir
@@ -102,7 +102,7 @@ module Eligible
       def create_objects(collection, type)
         collection.map do |item|
           model = resource_ref_dir[type][item.key].class_name.sub(/^::/, '')
-          item_class = RESOURCE_KINDS.find { |kind| kind == model }&.safe_constantize
+          item_class = RESOURCE_KINDS.find { |kind| kind.name == model }
 
           next unless item_class
           item_class.new(item.to_h)
