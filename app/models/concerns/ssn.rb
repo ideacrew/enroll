@@ -51,7 +51,7 @@ module Ssn
     #   00 in the group number (fourth and fifth digit); or
     #   0000 in the serial number (last four digits)
   def is_ssn_composition_correct?
-    if ssn.present? && self.consumer_role.present?
+    if ssn.present? && EnrollRegistry.feature_enabled?(:validate_ssn)
       regex = /^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$/
       errors.add(:base, "Invalid SSN format") unless ssn.match?(regex)
     end
