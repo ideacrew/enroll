@@ -106,7 +106,7 @@ module FinancialAssistance
                 if renewal_application.renewal_draft?
                   Success(renewal_application)
                 else
-                  Failure("Renewal Application: (#{renewal_application.hbx_id}) failed with aasm_state: (#{renewal_application.aasm_state}), because: (#{@failure_reason || "Unknown"})")
+                  Failure("Renewal Application: (#{renewal_application.hbx_id}) failed with aasm_state: (#{renewal_application.aasm_state}), because: (#{@failure_reason || 'Unknown'})")
                 end
               end.to_result
             end
