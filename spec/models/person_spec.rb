@@ -1742,7 +1742,7 @@ describe Person, :dbclean => :after_each do
 
   end
 
-  describe "#is_in_state_resident?" do
+  describe "#is_state_resident?" do
     let(:person) { FactoryBot.create(:person, :with_consumer_role) }
 
     context "when person is in state resident" do
@@ -1751,7 +1751,7 @@ describe Person, :dbclean => :after_each do
       end
 
       it "should return true" do
-        expect(person.is_in_state_resident?).to eq true
+        expect(person.is_state_resident?).to eq true
       end
     end
 
@@ -1761,7 +1761,7 @@ describe Person, :dbclean => :after_each do
       end
 
       it "should return false" do
-        expect(person.is_in_state_resident?).to eq false
+        expect(person.is_state_resident?).to eq false
       end
     end
   end
@@ -1771,11 +1771,6 @@ describe Person, :dbclean => :after_each do
       let!(:consumer_role) { FactoryBot.create(:consumer_role, citizen_status: "alien_lawfully_present") }
       let!(:person) { consumer_role.person }
 
-      before do
-        person.consumer_role.citizen_status = "alien_lawfully_present"
-        person.save!
-      end
-
       it "should return true" do
         expect(person.is_lawfully_present?).to eq true
       end
@@ -1784,10 +1779,6 @@ describe Person, :dbclean => :after_each do
     context "when person is not lawfully present" do
       let!(:consumer_role) { FactoryBot.create(:consumer_role, citizen_status: "not_lawfully_present_in_us") }
       let!(:person) { consumer_role.person }
-
-      before do
-        consumer_role.update_attributes!(citizen_status: "not_lawfully_present_in_us")
-      end
 
       it "should return false" do
         expect(person.is_lawfully_present?).to eq false

@@ -1320,9 +1320,9 @@ class Person
     writing_agents
   end
 
-  def is_in_state_resident?
-    address_to_use = addresses.collect(&:kind).include?('home') ? home_address : mailing_address
-    address_to_use.state == aca_state_abbreviation
+  def is_state_resident?
+    address = addresses.collect(&:kind).include?('home') ? home_address : mailing_address
+    address&.state == aca_state_abbreviation
   end
 
   def is_lawfully_present?

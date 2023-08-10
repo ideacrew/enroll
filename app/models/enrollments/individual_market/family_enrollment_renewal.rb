@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   include FloatHelper
   include Config::AcaHelper
@@ -296,19 +297,22 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   def eligible_enrollment_members
     @enrollment.hbx_enrollment_members.select do |member|
-      result = []
-      result << if member.person.consumer_role?
-                  (eligible_to_get_covered?(member) &&
-                              member.person.is_in_state_resident? &&
-                              member.person.is_lawfully_present? &&
-                              !member.person.is_disabled &&
-                              !member.person.is_incarcerated &&
-                              member.family_member.is_applying_coverage)
-                else
-                  (eligible_to_get_covered?(member) && !member.person.is_disabled)
-                end
-      result.all?(true)
+      if member.person.consumer_role?
+        (eligible_to_get_covered?(member) &&
+                    is_family_state_resident? &&
+                    member.person.is_lawfully_present? &&
+                    !member.person.is_disabled &&
+                    !member.person.is_incarcerated &&
+                    member.family_member.is_applying_coverage)
+      else
+        (eligible_to_get_covered?(member) && !member.person.is_disabled && !member.person.is_incarcerated)
+      end
     end
+  end
+
+  # If primary is instate resident then all members are considered to be instate residents
+  def is_family_state_resident?
+    @is_family_state_resident ||= @enrollment.family.primary_applicant.person.is_state_resident?
   end
 
   def clone_enrollment_members
