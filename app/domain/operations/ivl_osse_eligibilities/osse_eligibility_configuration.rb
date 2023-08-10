@@ -4,15 +4,15 @@ module Operations
   module IvlOsseEligibilities
     # Overrides top level eligibility_configuration for ivl osse specific configurations
     class OsseEligibilityConfiguration < ::Operations::Eligible::EligibilityConfiguration
-      def self.key
+      def key
         :ivl_osse_eligibility
       end
 
-      def self.title
+      def title
         "Ivl Osse Eligibility"
       end
 
-      def self.grants
+      def grants
         %i[
           childcare_subsidy_grant
         ]

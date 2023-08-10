@@ -4,19 +4,19 @@ module Operations
   module Eligible
     # Configurations for the Eligibility
     class EligibilityConfiguration
-      def self.key
+      def key
         :eligibility
       end
 
-      def self.title
+      def title
         "Eligibility"
       end
 
-      def self.grants
+      def grants
         %i[subsidy_grant]
       end
 
-      def self.to_state_for(evidence_state)
+      def to_state_for(evidence_state)
         case evidence_state
         when :approved, :denied
           :published
