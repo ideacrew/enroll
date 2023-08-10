@@ -123,12 +123,16 @@ module FinancialAssistance
               elsif family_members_changed
                 @failure_reason = 'family_members_changed'
                 'applicants_update_required'
-              elsif relationships_changed && !renew_application.relationships_complete?
+              elsif missing_relationships?(relationships_changed, renew_application)
                 @failure_reason = 'missing_relationships'
                 'applicants_update_required'
               else
                 'renewal_draft'
               end
+            end
+
+            def missing_relationships?(relationships_changed, renew_application)
+              relationships_changed && !renew_application.relationships_complete?
             end
 
             def calculate_years_to_renew(application)

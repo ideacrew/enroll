@@ -78,7 +78,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
       end
 
       it 'should return application in income_verification_extension_required state' do
-        expect(@result.failure).to match(/Unable to create renewal application - Renewal Application Applicants Update or income_verification_extension required/)
+        expect(@result.failure).to match(/Renewal Application:.*failed with aasm_state: \(income_verification_extension_required\)/)
       end
     end
 
@@ -293,6 +293,18 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
           expect(FinancialAssistance::Application.where(family_id: family_11.id).last.aasm_state).to eq 'applicants_update_required'
         end
       end
+
+      context 'Family members changed and missing relationships' do
+        before do
+          allow(operation_instance).to receive(:missing_relationships?).and_return(true)
+          @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+        end
+
+        it 'should return failure' do
+          expect(@result).to be_failure
+          expect  expect(FinancialAssistance::Application.where(family_id: application.family.id).last.aasm_state).to eq 'applicants_update_required'
+        end
+      end
     end
     context 'missing keys' do
       context 'missing family_id' do
@@ -383,7 +395,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
           expect(@result).to be_failure
         end
 
-        it "should return failure with error messasge for application with aasm_state: #{app_state}" do
+        it "should return failure with error message for application with aasm_state: #{app_state}" do
           expect(@result.failure).to eq("Could not find any applications that are renewal eligible: #{validated_params}.")
         end
       end
