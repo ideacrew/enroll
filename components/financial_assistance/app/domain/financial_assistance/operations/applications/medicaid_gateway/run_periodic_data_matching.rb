@@ -31,7 +31,7 @@ module FinancialAssistance
             errors << 'assistance_year param is invalid' unless assistance_year.to_i.to_s == assistance_year.to_s
             errors << 'transmittable_message_id param is missing' if params[:transmittable_message_id].blank?
             batch_size = params[:batch_size]
-            errors << 'batch_size param given is invalid' if batch_size.present? && batch_size.to_i > 0
+            errors << 'batch_size param given is invalid' if batch_size.present? && batch_size.to_i <= 0
 
             errors.empty? ? Success(params) : Failure(errors)
           end
