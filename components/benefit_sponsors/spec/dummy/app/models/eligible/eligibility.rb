@@ -11,7 +11,7 @@ module Eligible
     field :key, type: Symbol
     field :title, type: String
     field :description, type: String
-    field :current_state, type: Symbol
+    field :current_state, type: Symbol, default: :initial
 
     embeds_many :evidences,
                 class_name: "::Eligible::Evidence",
@@ -94,7 +94,7 @@ module Eligible
 
       def create_objects(collection, type)
         collection.map do |item|
-          item_class = resource_ref_dir[type][item.key].class_name.constantize
+          item_class = resource_ref_dir[type][item.key].class_name.safe_constantize
           item_class.new(item.to_h)
         end
       end

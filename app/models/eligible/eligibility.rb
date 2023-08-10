@@ -94,7 +94,7 @@ module Eligible
 
       def create_objects(collection, type)
         collection.map do |item|
-          item_class = resource_ref_dir[type][item.key].class_name.constantize
+          item_class = resource_ref_dir[type][item.key].class_name.safe_constantize
           item_class.new(item.to_h)
         end
       end

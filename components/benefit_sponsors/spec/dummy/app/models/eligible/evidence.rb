@@ -13,7 +13,7 @@ module Eligible
     field :title, type: String
     field :description, type: String
     field :is_satisfied, type: Boolean, default: false
-    field :current_state, type: Symbol
+    field :current_state, type: Symbol, default: :initial
     field :subject_ref, type: String
     field :evidence_ref, type: String
 

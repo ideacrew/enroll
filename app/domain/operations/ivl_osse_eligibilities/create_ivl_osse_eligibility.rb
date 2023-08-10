@@ -87,7 +87,9 @@ module Operations
         evidence = eligibility.evidences.last
         eligibility_record.evidences.last.state_histories.build(evidence.state_histories.last.to_h)
         eligibility_record.evidences.last.is_satisfied = evidence.is_satisfied
+        eligibility_record.evidences.last.current_state = evidence.current_state
         eligibility_record.state_histories.build(eligibility.state_histories.last.to_h)
+        eligibility_record.current_state = eligibility.current_state
 
         eligibility_record.save
       end

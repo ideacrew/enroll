@@ -80,10 +80,9 @@ module Operations
         end
 
         options[:state_histories] ||= []
-        options[:state_histories] << build_state_history(
-          values,
-          evidence_options
-        )
+        new_state_history = build_state_history(values, evidence_options)
+        options[:state_histories] << new_state_history
+        options[:current_state] = new_state_history[:to_state]
 
         Success(options)
       end
