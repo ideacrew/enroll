@@ -12,6 +12,7 @@ module SponsoredBenefits
           send(:include, Dry::Monads[:result, :do])
 
           attr_reader :subject
+
           # @param [Hash] opts Options to build eligibility
           # @option opts [<GlobalId>] :subject required
           # @option opts [<String>]   :evidence_key required
@@ -72,7 +73,7 @@ module SponsoredBenefits
             )
           end
 
-          def store(values, eligibility)
+          def store(_values, eligibility)
             eligibility_record = subject.eligibilities.where(id: eligibility._id).first
 
             if eligibility_record

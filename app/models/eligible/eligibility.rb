@@ -33,7 +33,7 @@ module Eligible
              allow_nil: false
 
     scope :by_key, ->(key) { where(key: key.to_sym) }
-    scope :effectuated, ->{ where(:current_state.ne => :initial) }
+    scope :effectuated, -> { where(:current_state.ne => :initial) }
 
     def latest_state_history
       state_histories.max_by(&:created_at)
@@ -49,7 +49,8 @@ module Eligible
     end
 
     def published_on
-      publish_history = state_histories.by_state(:published).min_by(&:created_at)
+      publish_history =
+        state_histories.by_state(:published).min_by(&:created_at)
       publish_history&.effective_on
     end
 
@@ -57,7 +58,8 @@ module Eligible
     #eligibility can't span across multiple years
     #once eligibility is expired, it can never be moved back to published state
     def expired_on
-      expiration_history = state_histories.by_state(:expired).min_by(&:created_at)
+      expiration_history =
+        state_histories.by_state(:expired).min_by(&:created_at)
       expiration_history&.effective_on&.prev_day || published_on&.end_of_year
     end
 
@@ -96,10 +98,19 @@ module Eligible
         register(:evidence, name, options)
       end
 
+      def evidences_resource_for(key)
+        resource_ref_dir[:evidences]&.dig(key)&.class_name ||
+          "Eligible::Evidence"
+      end
+
+      def grants_resource_for(key)
+        resource_ref_dir[:grants]&.dig(key)&.class_name || "Eligible::Grant"
+      end
+
       def create_objects(collection, type)
         collection.map do |item|
-          item_class = resource_ref_dir[type][item.key].class_name.constantize
-          item_class.new(item.to_h)
+          resource_name = send("#{type}_resource_for", item.key)
+          resource_name.constantize.new(item.to_h)
         end
       end
     end

@@ -21,7 +21,7 @@ module SponsoredBenefits
               min_fte_count_relaxed_grant
               min_contribution_relaxed_grant
               metal_level_products_restricted_grant
-            ]
+            ].collect { |key| [key, true] }
           end
         end
       end
