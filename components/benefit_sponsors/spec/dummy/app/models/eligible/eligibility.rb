@@ -72,9 +72,7 @@ module Eligible
 
       RESOURCE_KINDS = [
         BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::AdminAttestedEvidence,
-        BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::ShopOsseGrant,
-        IvlOsseEligibilities::AdminAttestedEvidence,
-        IvlOsseEligibilities::IvlOsseGrant
+        BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::ShopOsseGrant
       ].freeze
 
       def resource_ref_dir
