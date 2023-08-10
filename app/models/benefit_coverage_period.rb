@@ -251,7 +251,9 @@ class BenefitCoveragePeriod
     # @return [ BenefitCoveragePeriod ] the matching HBX benefit coverage period instance
     def find(id)
       organizations = Organization.where("hbx_profile.benefit_sponsorship.benefit_coverage_periods._id" => BSON::ObjectId.from_string(id))
-      organizations.size > 0 ? all.select{ |bcp| bcp.id == id }.first : nil
+      return unless organizations.present?
+      hbx_profile = organizations.first.hbx_profile
+      hbx_profile&.benefit_sponsorship&.benefit_coverage_periods.find(BSON::ObjectId.from_string(id))
     end
 
     # The HBX benefit coverage period instance that includes this date within its start and end dates
