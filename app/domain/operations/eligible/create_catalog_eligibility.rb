@@ -77,18 +77,21 @@ module Operations
 
       def validate(params)
         errors = []
-        errors << "subject missing" unless params[:subject]
-        @subject = GlobalID::Locator.locate(params[:subject])
         errors << "effective_date missing" unless params[:effective_date]
-
-        errors << "unable to find subject: #{params[:subject]}" unless @subject.present?
+        errors << "subject missing" unless params[:subject]
+        @subject = locator.locate(params[:subject])
+        unless @subject.present?
+          errors << "unable to find subject: #{params[:subject]}"
+        end
         errors << "domain model missing" unless params[:domain_model]
-        errors << "eligibility feature missing" unless params[:eligibility_feature]
+        unless params[:eligibility_feature]
+          errors << "eligibility feature missing"
+        end
 
         @calender_year = params[:effective_date].year
         if EnrollRegistry.feature?(
-          "#{params[:eligibility_feature]}_#{calender_year}"
-        )
+             "#{params[:eligibility_feature]}_#{calender_year}"
+           )
           @eligibility_feature =
             EnrollRegistry[
               "#{params[:eligibility_feature]}_#{calender_year}".to_sym
@@ -100,7 +103,15 @@ module Operations
         errors.empty? ? Success(params) : Failure(errors)
       end
 
-      def build(_values)
+      def locator
+        return @locator if defined?(@locator)
+        @locator =
+          GlobalID::Locator.use :foo do |gid|
+            Object.const_get(gid.model_name).find(gid.model_id)
+          end
+      end
+
+      def build(values)
         options = {
           subject: subject.to_global_id,
           evidence_key: "#{eligibility_feature.key}_evidence",
@@ -139,7 +150,6 @@ module Operations
         end
 
         subject.eligibilities << eligibility_record
-
         subject.save ? Success(eligibility_record) : Failure(subject.errors)
       end
     end

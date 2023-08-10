@@ -80,7 +80,7 @@ RSpec.describe Operations::Eligible::CreateCatalogEligibility,
     let(:required_params) do
       {
         subject: benefit_coverage_period.to_global_id,
-        eligibility_feature: "aca_individual_osse_eligibility",
+        eligibility_feature: "aca_ivl_osse_eligibility",
         effective_date: benefit_coverage_period.start_on.to_date,
         domain_model:
           "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
@@ -110,7 +110,7 @@ RSpec.describe Operations::Eligible::CreateCatalogEligibility,
           expect(result.success?).to be_falsey
           expect(result.failure).to include("domain model missing")
           expect(result.failure).to include(
-            "unable to find feature: aca_shop_osse_#{current_benefit_market_catalog.application_period.begin.year}"
+            "unable to find feature: aca_shop_osse_#{benefit_coverage_period.start_on.year}"
           )
         end
       end
