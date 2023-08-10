@@ -6,15 +6,15 @@ module SponsoredBenefits
       module BqtOsseEligibilities
         # Overrides top level eligibility_configuration for feature specific configurations
         class OsseEligibilityConfiguration < ::Operations::Eligible::EligibilityConfiguration
-          def self.key
+          def key
             :bqt_osse_eligibility
           end
 
-          def self.title
+          def title
             "BQT Osse Eligibility"
           end
 
-          def self.grants
+          def grants
             %i[
               contribution_subsidy_grant
               min_employee_participation_relaxed_grant

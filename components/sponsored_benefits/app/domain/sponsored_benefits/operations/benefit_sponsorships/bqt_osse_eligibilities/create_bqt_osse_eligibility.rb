@@ -53,12 +53,12 @@ module SponsoredBenefits
           def build_eligibility_options(values, eligibility_record = nil)
             ::Operations::Eligible::BuildEligibility.new(
               configuration:
-                SponsoredBenefits::Operations::BenefitSponsorships::BqtOsseEligibilities::OsseEligibilityConfiguration
+                SponsoredBenefits::Operations::BenefitSponsorships::BqtOsseEligibilities::OsseEligibilityConfiguration.new
             ).call(
               values.merge(
                 eligibility_record: eligibility_record,
                 evidence_configuration:
-                  SponsoredBenefits::Operations::BenefitSponsorships::BqtOsseEligibilities::OsseEvidenceConfiguration
+                  SponsoredBenefits::Operations::BenefitSponsorships::BqtOsseEligibilities::OsseEvidenceConfiguration.new
               )
             )
           end

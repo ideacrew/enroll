@@ -6,11 +6,11 @@ module SponsoredBenefits
       module BqtOsseEligibilities
         # Overrides top level evidence_configuration for feature specific configurations
         class OsseEvidenceConfiguration < ::Operations::Eligible::EvidenceConfiguration
-          def self.key
+          def key
             :bqt_osse_evidence
           end
 
-          def self.title
+          def title
             "BQT Osse Evidence"
           end
         end
