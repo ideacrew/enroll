@@ -63,6 +63,7 @@ class Family
   embeds_many :documents, as: :documentable
   has_many :applications, class_name: "FinancialAssistance::Application"
   has_many :payment_transactions
+  has_many :hbx_enrollments
 
   after_initialize :build_household
   before_save :clear_blank_fields
