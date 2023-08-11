@@ -11,7 +11,6 @@ module Eligible
     field :key, type: Symbol
     field :title, type: String
     field :description, type: String
-    field :current_state, type: Symbol
 
     embeds_one :value, class_name: "::Eligible::Value", cascade_callbacks: true
 

@@ -77,8 +77,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
         benefit_sponsorship.eligibilities << eligibility
         benefit_sponsorship.save!
         year = model_instance.start_on.year
-        allow(EnrollRegistry).to receive(:feature?).with("aca_shop_osse_subsidy_#{year}").and_return(true)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with("aca_shop_osse_subsidy_#{year}").and_return(true)
+        allow(EnrollRegistry).to receive(:feature?).with("aca_shop_osse_eligibility_#{year}").and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with("aca_shop_osse_eligibility_#{year}").and_return(true)
       end
 
       it "should not trigger notice event" do

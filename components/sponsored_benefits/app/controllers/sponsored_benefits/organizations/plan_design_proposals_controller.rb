@@ -30,7 +30,7 @@ module SponsoredBenefits
       claim_code_status, quote = SponsoredBenefits::Organizations::PlanDesignProposal.claim_code_status?(quote_claim_code)
 
       unless claim_code_status == "invalid"
-        osse_quote = quote.osse_eligibility&.present? && EnrollRegistry.feature_enabled?(:broker_quote_hc4cc_subsidy)
+        osse_quote = quote.osse_eligibility&.present? && EnrollRegistry.feature_enabled?(:broker_quote_osse_eligibility)
         effective_on = quote.profile.benefit_application.effective_period.min
         employer_osse_eligible = employer_profile.active_benefit_sponsorship&.eligibility_for(:shop_osse_eligibility, effective_on).present?
 
