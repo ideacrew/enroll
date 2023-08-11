@@ -321,7 +321,7 @@ module Employers::EmployerHelper
   end
 
   def ivl_osse_eligibility_is_enabled?(year = TimeKeeper.date_of_record.year)
-    EnrollRegistry.feature?("aca_ivl_osse_subsidy_#{year}") && EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
+    EnrollRegistry.feature?("aca_ivl_osse_eligibility_#{year}") && EnrollRegistry.feature_enabled?("aca_ivl_osse_eligibility_#{year}")
   end
 
   def eligibility_audit_log_is_enabled?

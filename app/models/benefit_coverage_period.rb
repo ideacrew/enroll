@@ -297,8 +297,8 @@ class BenefitCoveragePeriod
       ]
 
       years.map do |year|
-        year if EnrollRegistry.feature?("aca_ivl_osse_subsidy_#{year}") &&
-                EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
+        year if EnrollRegistry.feature?("aca_ivl_osse_eligibility_#{year}") &&
+                EnrollRegistry.feature_enabled?("aca_ivl_osse_eligibility_#{year}")
       end.compact
     end
   end
