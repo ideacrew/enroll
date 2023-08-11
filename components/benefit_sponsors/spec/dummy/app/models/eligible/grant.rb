@@ -6,15 +6,16 @@ module Eligible
     include Mongoid::Document
     include Mongoid::Timestamps
 
+    embedded_in :eligibility, class_name: "::Eligible::Eligibility"
+
     field :key, type: Symbol
     field :title, type: String
     field :description, type: String
-    field :current_state, type: Symbol
 
-    embeds_one :value,
-               class_name: '::Eligible::Value',
-               cascade_callbacks: true
+    embeds_one :value, class_name: "::Eligible::Value", cascade_callbacks: true
 
     validates_presence_of :title, :key
+
+    scope :by_key, ->(key) { where(key: key.to_sym) }
   end
 end
