@@ -604,7 +604,7 @@ module FinancialAssistance
     end
 
     def valid_family_relationships?
-      valid_spousal_relationship? && valid_child_relationship?
+      valid_spousal_relationship? && valid_child_relationship? && valid_in_law_relationship?
     end
 
     # Checks that an applicant cannot have more than one spousal relationship
@@ -628,18 +628,19 @@ module FinancialAssistance
       return true if domestic_partner_relationship.blank?
 
       ['domestic_partners_child', 'child'].include?(relationships.where(relative_id: domestic_partner_relationship.relative.id).first.kind)
-    # applicant should have the same number of sibling or in law relationships as their spouse
+    end
+
+
     def valid_in_law_relationship?
-      in_law_relationships = self.relationships.where(:kind.in => ['sibling', 'brother_or_sister_in_law'])
-      return true unless in_law_relationships.present?
-      spouse_relationship = self.relationships.where(:kind => 'spouse').first
-      in_law_relationships.each do |in_law_relationship|
-        if spouse_relationship.present?
-          spouse_siblings = spouse_relationship.relative.relationships.where(:kind.in => ['sibling', 'brother_or_sister_in_law'])
-          return false unless spouse_siblings.size == applicant_siblings.size
-        end
-      end
-      true
+      unrelated_relationships = relationships.where(kind: 'unrelated')
+      spouse_relationship = relationships.where(:kind => 'spouse').first
+      return true unless unrelated_relationships.present? && spouse_relationship.present?
+      spouse_sibling_relationships = spouse_relationship.relative.relationships.where(:kind.in => ['sibling', 'brother_or_sister_in_law'])
+      return true unless spouse_sibling_relationships.present?
+
+      unrelated_relatives = unrelated_relationships.collect(&:relative_id)
+      spouse_siblings = spouse_sibling_relationships.collect(&:relative_id)
+      return false if unrelated_relatives.any? { |unrelated_relative| spouse_siblings.include?(unrelated_relative) }
     end
 
     # Checks to see if there is a relationship for Application where current applicant is spouse to PrimaryApplicant.
