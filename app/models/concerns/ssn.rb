@@ -13,7 +13,7 @@ module Ssn
               allow_blank: true,
               numericality: true
 
-    validate :is_ssn_composition_correct?
+    # validate :is_ssn_composition_correct?
     after_validation :move_encrypted_ssn_errors
   end
 
