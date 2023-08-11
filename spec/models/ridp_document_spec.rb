@@ -19,12 +19,14 @@ RSpec.describe RidpDocument, :type => :model do
   context "verification reasons" do
     if EnrollRegistry[:enroll_app].setting(:site_key).item == :me
       it "should have crm document system as verification reason" do
+        expect(VlpDocument::VERIFICATION_REASONS).to include("Self-Attestation")
         expect(RidpDocument::VERIFICATION_REASONS).to include("CRM Document Management System")
         expect(EnrollRegistry[:verification_reasons].item).to include("CRM Document Management System")
       end
     end
     if EnrollRegistry[:enroll_app].setting(:site_key).item == :dc
       it "should have salesforce as verification reason" do
+        expect(VlpDocument::VERIFICATION_REASONS).to include("Self-Attestation")
         expect(RidpDocument::VERIFICATION_REASONS).to include("Salesforce")
         expect(EnrollRegistry[:verification_reasons].item).to include("Salesforce")
       end
