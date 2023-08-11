@@ -86,12 +86,12 @@ module FinancialAssistance
           end
 
           def update_applicants(elig_d, thh_entity, application)
-            totally_ineligible_members = false
+            totally_ineligible_members = []
             thh_entity.tax_household_members.each do |thhm_entity|
               applicant = find_matching_applicant(elig_d, thhm_entity.applicant_reference.person_hbx_id)
               ped_entity = thhm_entity.product_eligibility_determination
               member_determinations = ped_entity.member_determinations&.map(&:to_h)
-              totally_ineligible_members = true if ped_entity.is_totally_ineligible
+              totally_ineligible_members << ped_entity.is_totally_ineligible
 
               applicant.assign_attributes({ medicaid_household_size: ped_entity.medicaid_household_size || 0,
                                             magi_medicaid_category: ped_entity.magi_medicaid_category || 'none',
@@ -110,7 +110,7 @@ module FinancialAssistance
               applicant.save
             end
 
-            notify_totally_ineligible(application) if totally_ineligible_members && FinancialAssistanceRegistry.feature_enabled?(:totally_ineligible_notice)
+            notify_totally_ineligible(application) if totally_ineligible_members.include?(true) && FinancialAssistanceRegistry.feature_enabled?(:totally_ineligible_notice)
           end
 
           def notify_totally_ineligible(application)
