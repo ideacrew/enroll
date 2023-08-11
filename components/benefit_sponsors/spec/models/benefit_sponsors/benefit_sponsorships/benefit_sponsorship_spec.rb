@@ -1522,7 +1522,7 @@ module BenefitSponsors
 
       context 'when osse feature for the given year is disabled' do
         before do
-          EnrollRegistry["aca_shop_osse_eligibility_#{current_year}"].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
         end
 
         it 'should create osse eligibility in initial state' do
@@ -1534,7 +1534,8 @@ module BenefitSponsors
 
       context 'when osse feature for the given year is enabled' do
         before do
-          EnrollRegistry["aca_shop_osse_eligibility_#{current_year}"].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry).to receive(:feature?).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
         end
 
         it 'should create osse eligibility in initial state' do
