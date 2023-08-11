@@ -377,7 +377,7 @@ module Config::AcaHelper
   end
 
   def ivl_osse_eligibility_is_enabled?(year = TimeKeeper.date_of_record.year)
-    EnrollRegistry.feature?("aca_ivl_osse_subsidy_#{year}") && EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
+    EnrollRegistry.feature?("aca_ivl_osse_eligibility_#{year}") && EnrollRegistry.feature_enabled?("aca_ivl_osse_eligibility_#{year}")
   end
 
   def ivl_osse_filtering_enabled?
