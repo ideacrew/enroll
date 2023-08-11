@@ -303,6 +303,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
         it 'should return failure' do
           expect(@result).to be_failure
           expect(FinancialAssistance::Application.where(family_id: application.family.id).last.aasm_state).to eq 'applicants_update_required'
+          expect(@result.failure).to match(/because: \(missing_relationships\)/)
         end
       end
     end
