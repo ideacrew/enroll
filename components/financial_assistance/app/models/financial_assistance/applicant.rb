@@ -627,7 +627,7 @@ module FinancialAssistance
       domestic_partner_relationship = parent.relationships.where(kind: 'domestic_partner').first
       return true if domestic_partner_relationship.blank?
 
-     ['domestic_partners_child', 'child'].include?(relationships.where(relative_id: domestic_partner_relationship.relative.id).first.kind)
+      ['domestic_partners_child', 'child'].include?(relationships.where(relative_id: domestic_partner_relationship.relative.id).first.kind)
     end
 
     # Checks to see if there is a relationship for Application where current applicant is spouse to PrimaryApplicant.
