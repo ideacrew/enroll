@@ -1250,9 +1250,9 @@ end
 
 Given(/plan filter feature is disabled and osse subsidy feature is enabled/) do
   year = TimeKeeper.date_of_record.year
-  EnrollRegistry[:aca_ivl_osse_subsidy].feature.stub(:is_enabled).and_return(true)
-  EnrollRegistry["aca_ivl_osse_subsidy_#{year}"].feature.stub(:is_enabled).and_return(true)
-  EnrollRegistry["aca_ivl_osse_subsidy_#{year - 1}"].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry[:aca_ivl_osse_eligibility].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry["aca_ivl_osse_eligibility_#{year}"].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry["aca_ivl_osse_eligibility_#{year - 1}"].feature.stub(:is_enabled).and_return(true)
   EnrollRegistry[:individual_osse_plan_filter].feature.stub(:is_enabled).and_return(false)
 end
 
