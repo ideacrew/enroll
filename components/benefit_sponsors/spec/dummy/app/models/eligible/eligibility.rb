@@ -52,7 +52,8 @@ module Eligible
     end
 
     def published_on
-      publish_history = state_histories.by_state(:published).min_by(&:created_at)
+      publish_history =
+        state_histories.by_state(:published).min_by(&:created_at)
       publish_history&.effective_on
     end
 
@@ -60,7 +61,8 @@ module Eligible
     #eligibility can't span across multiple years
     #once eligibility is expired, it can never be moved back to published state
     def expired_on
-      expiration_history = state_histories.by_state(:expired).min_by(&:created_at)
+      expiration_history =
+        state_histories.by_state(:expired).min_by(&:created_at)
       expiration_history&.effective_on&.prev_day || published_on&.end_of_year
     end
 

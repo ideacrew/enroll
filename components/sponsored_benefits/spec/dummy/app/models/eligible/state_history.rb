@@ -28,10 +28,6 @@ module Eligible
     scope :by_state, ->(state) { where(to_state: state.to_sym) }
     scope :non_initial, -> { where(:to_state.ne => :initial) }
 
-    def self.latest_history
-      order(transition_at: :desc).first
-    end
-
     def timestamps=(timestamps)
       self.transition_at = timestamps[:modified_at]
       self.created_at = timestamps[:created_at]
