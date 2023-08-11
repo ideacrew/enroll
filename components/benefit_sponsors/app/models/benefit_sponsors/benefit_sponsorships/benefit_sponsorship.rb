@@ -292,6 +292,7 @@ module BenefitSponsors
 
     after_save :notify_on_save
     before_create :generate_hbx_id
+    after_create :create_default_osse_eligibility
     before_validation :pull_profile_attributes, :pull_organization_attributes, :validate_profile_organization
 
     def application_may_renew_effective_on(new_date)
@@ -918,6 +919,26 @@ module BenefitSponsors
 
     def generate_hbx_id
       write_attribute(:hbx_id, BenefitSponsors::Organizations::HbxIdGenerator.generate_benefit_sponsorship_id) if hbx_id.blank?
+    end
+
+    def initial_osse_eligibility_params
+      {
+        subject: self.to_global_id,
+        evidence_key: :shop_osse_evidence,
+        evidence_value: 'false',
+        effective_date: TimeKeeper.date_of_record.beginning_of_year
+      }
+    end
+
+    def shop_osse_eligibility_is_enabled?(year = TimeKeeper.date_of_record.year)
+      EnrollRegistry.feature?("aca_shop_osse_eligibility_#{year}") && EnrollRegistry.feature_enabled?("aca_shop_osse_eligibility_#{year}")
+    end
+
+    def create_default_osse_eligibility
+      return unless shop_osse_eligibility_is_enabled?
+      ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(initial_osse_eligibility_params)
+    rescue StandardError => e
+      Rails.logger.error { "Default Osse Eligibility not created for #{self.to_global_id} due to #{e.backtrace}" }
     end
 
     def employer_profile_to_benefit_sponsor_states_map

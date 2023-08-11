@@ -8,6 +8,8 @@ module ChildcareSubsidyConcern
 
     embeds_many :eligibilities, class_name: '::Eligible::Eligibility', cascade_callbacks: true
 
+    after_create :create_default_osse_eligibility
+
     def osse_eligible?(start_on)
       return false unless osse_feature_enabled_for?(start_on.year)
 
@@ -22,7 +24,7 @@ module ChildcareSubsidyConcern
     end
 
     def osse_feature_enabled_for?(year)
-      ::EnrollRegistry.feature?("aca_ivl_osse_subsidy_#{year}") && ::EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
+      ::EnrollRegistry.feature?("aca_ivl_osse_eligibility_#{year}") && ::EnrollRegistry.feature_enabled?("aca_ivl_osse_eligibility_#{year}")
     end
 
     # we cannot have multiple eligibilities with same key in a given calender year
@@ -69,6 +71,22 @@ module ChildcareSubsidyConcern
                                                                               evidence_value: eligibility_params[:evidence_value].to_s,
                                                                               effective_date: eligibility_params[:effective_date]
                                                                             })
+    end
+
+    def initial_osse_eligibility_params
+      {
+        subject: self.to_global_id,
+        evidence_key: :ivl_osse_evidence,
+        evidence_value: 'false',
+        effective_date: TimeKeeper.date_of_record.beginning_of_year
+      }
+    end
+
+    def create_default_osse_eligibility
+      return unless osse_feature_enabled_for?(TimeKeeper.date_of_record.year)
+      ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new.call(initial_osse_eligibility_params)
+    rescue StandardError => e
+      Rails.logger.error { "Default Osse Eligibility not created for #{self.to_global_id} due to #{e.backtrace}" }
     end
   end
 end
