@@ -469,7 +469,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
       end
     end
 
-    context 'DC' do
+    context 'skip_eligibility_redetermination Feature' do
       context 'application has all ineligible applicants and skip_eligibility_redetermination flag is set to true' do
         before do
           application.applicants.each do |appl|
@@ -560,9 +560,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
           expect(@result).to be_success
         end
       end
-    end
 
-    context 'ME' do
       context 'application has all ineligible applicants and skip_eligibility_redetermination flag is set to false' do
         before do
           application.applicants.each do |appl|
