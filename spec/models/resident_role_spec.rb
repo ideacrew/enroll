@@ -47,5 +47,43 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
       end
     end
+
+    describe 'create default osse eligibility on create' do
+      let(:consumer_role) { FactoryBot.build(:consumer_role) }
+      let(:current_year) { TimeKeeper.date_of_record.year }
+
+      context 'when osse feature for the given year is disabled' do
+        before do
+          EnrollRegistry["aca_ivl_osse_eligibility_#{current_year}"].feature.stub(:is_enabled).and_return(false)
+        end
+
+        it 'should create osse eligibility in initial state' do
+          expect(consumer_role.eligibilities.count).to eq 0
+          consumer_role.save
+          expect(consumer_role.reload.eligibilities.count).to eq 0
+        end
+      end
+
+      context 'when osse feature for the given year is enabled' do
+        before do
+          EnrollRegistry["aca_ivl_osse_eligibility_#{current_year}"].feature.stub(:is_enabled).and_return(true)
+        end
+
+        it 'should create osse eligibility in initial state' do
+          expect(consumer_role.eligibilities.count).to eq 0
+          consumer_role.save!
+          expect(consumer_role.reload.eligibilities.count).to eq 1
+          eligibility = consumer_role.eligibilities.first
+          expect(eligibility.key).to eq :ivl_osse_eligibility
+          expect(eligibility.current_state).to eq :initial
+          expect(eligibility.state_histories.count).to eq 1
+          expect(eligibility.evidences.count).to eq 1
+          evidence = eligibility.evidences.first
+          expect(evidence.key).to eq :ivl_osse_evidence
+          expect(evidence.current_state).to eq :initial
+          expect(evidence.state_histories.count).to eq 1
+        end
+      end
+    end
   end
 end
