@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 1bed1e55db5274163468a1db5b9739d35c552c8e
-  branch: 185545372_entity_updates
+  revision: bd24041abc4bfaf62f1f010b7caaab1627c39412
+  branch: trunk
   specs:
     aca_entities (0.10.0)
       deep_merge
@@ -116,6 +116,7 @@ PATH
       money-rails (~> 1.13)
       mongoid (~> 7.0.2)
       non-stupid-digest-assets
+      pundit (~> 2.0)
       rails (~> 5.2.4.3)
       redcarpet (~> 3.4.0)
       roo (~> 2.1.0)
@@ -708,4 +709,4 @@ DEPENDENCIES
   webpacker (~> 4.0.2)
 
 BUNDLED WITH
-   2.3.24
+   2.3.23
