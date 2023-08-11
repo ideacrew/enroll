@@ -29,8 +29,8 @@ RSpec.describe Operations::Eligible::CreateCatalogEligibility,
       context "with valid params" do
         it "should create eligibility" do
           result = described_class.new.call(required_params)
-
           expect(result.success?).to be_truthy
+          expect(result.success).to be_a_kind_of(Eligible::Eligibility)
         end
       end
 
@@ -92,6 +92,7 @@ RSpec.describe Operations::Eligible::CreateCatalogEligibility,
         it "should create eligibility" do
           result = described_class.new.call(required_params)
           expect(result.success?).to be_truthy
+          expect(result.success).to be_a_kind_of(Eligible::Eligibility)
         end
       end
 
