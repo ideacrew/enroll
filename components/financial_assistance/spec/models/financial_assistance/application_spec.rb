@@ -1927,10 +1927,10 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
 
     context "when there is an invalid in-law relationship" do
-      let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) } #selinna
-      let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) } #alex
-      let!(:applicant3) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }#kim
-      let!(:applicant4) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }#Taylor
+      let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let!(:applicant3) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let!(:applicant4) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
       let(:set_up_relationships) do
         relationship_application.ensure_relationship_with_primary(applicant1, 'child')
         relationship_application.ensure_relationship_with_primary(applicant2, 'spouse')

@@ -1181,7 +1181,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           application.build_relationship_matrix
           application.save(validate: false)
         end
-  
+
         before do
           set_up_relationships
         end
@@ -1207,7 +1207,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           application.build_relationship_matrix
           application.save(validate: false)
         end
-  
+
         before do
           set_up_relationships
         end

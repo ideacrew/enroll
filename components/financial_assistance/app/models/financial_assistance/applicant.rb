@@ -630,7 +630,6 @@ module FinancialAssistance
       ['domestic_partners_child', 'child'].include?(relationships.where(relative_id: domestic_partner_relationship.relative.id).first.kind)
     end
 
-
     def valid_in_law_relationship?
       unrelated_relationships = relationships.where(kind: 'unrelated')
       spouse_relationship = relationships.where(:kind => 'spouse').first
