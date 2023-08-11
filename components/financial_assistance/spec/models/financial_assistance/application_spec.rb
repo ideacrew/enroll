@@ -1914,6 +1914,23 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         relationship_application.ensure_relationship_with_primary(applicant1, 'child')
         relationship_application.ensure_relationship_with_primary(applicant2, 'domestic_partner')
         relationship_application.add_or_update_relationships(applicant1, applicant2, 'unrelated')
+    context "when there is an invalid in-law relationship" do
+      let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) } #selinna
+      let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) } #alex
+      let!(:applicant3) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }#kim
+      let!(:applicant4) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }#Taylor
+      let(:set_up_relationships) do
+        relationship_application.ensure_relationship_with_primary(applicant1, 'child')
+        relationship_application.ensure_relationship_with_primary(applicant2, 'sibling')
+        relationship_application.ensure_relationship_with_primary(applicant3, 'spouse')
+        relationship_application.ensure_relationship_with_primary(applicant4, 'unrelated')
+        relationship_application.add_or_update_relationships(applicant1, applicant2, 'nephew_or_niece')
+        relationship_application.add_or_update_relationships(applicant1, applicant3, 'child')
+        relationship_application.add_or_update_relationships(applicant1, applicant4, 'nephew_or_niece')
+        relationship_application.add_or_update_relationships(applicant2, applicant3, 'brother_or_sister_in_law')
+        relationship_application.add_or_update_relationships(applicant2, applicant4, 'spouse')
+        relationship_application.add_or_update_relationships(applicant3, applicant4, 'unrelated')
+
         relationship_application.build_relationship_matrix
         relationship_application.save(validate: false)
       end
@@ -1924,6 +1941,60 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
       it "returns false" do
         expect(relationship_application.valid_relations?).to eq(false)
+      end
+    end
+
+    context "when there is a valid in-law relationship" do
+      
+      context "with spousal relationship" do
+        let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) } #selinna
+        let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) } #alex
+        let!(:applicant3) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }#kim
+        let(:set_up_relationships) do
+          relationship_application.ensure_relationship_with_primary(applicant1, 'spouse')
+          relationship_application.ensure_relationship_with_primary(applicant2, 'sibling')
+          relationship_application.ensure_relationship_with_primary(applicant3, 'brother_or_sister_in_law')
+          relationship_application.add_or_update_relationships(applicant1, applicant2, 'brother_or_sister_in_law')
+          relationship_application.add_or_update_relationships(applicant1, applicant3, 'brother_or_sister_in_law')
+          relationship_application.add_or_update_relationships(applicant2, applicant3, 'spouse')
+
+          relationship_application.build_relationship_matrix
+          relationship_application.save(validate: false)
+        end
+
+        before do
+          set_up_relationships
+        end
+        
+
+        it "returns true" do
+          expect(relationship_application.valid_relations?).to eq(true)
+        end
+      end
+      context "with domestic partner relationship" do
+        let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) } #selinna
+        let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) } #alex
+        let!(:applicant3) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }#kim
+        let(:set_up_relationships) do
+          relationship_application.ensure_relationship_with_primary(applicant1, 'spouse')
+          relationship_application.ensure_relationship_with_primary(applicant2, 'sibling')
+          relationship_application.ensure_relationship_with_primary(applicant3, 'unrelated')
+          relationship_application.add_or_update_relationships(applicant1, applicant2, 'brother_or_sister_in_law')
+          relationship_application.add_or_update_relationships(applicant1, applicant3, 'unrelated')
+          relationship_application.add_or_update_relationships(applicant2, applicant3, 'domestic_partner')
+
+          relationship_application.build_relationship_matrix
+          relationship_application.save(validate: false)
+        end
+
+        before do
+          set_up_relationships
+        end
+        
+
+        it "returns true" do
+          expect(relationship_application.valid_relations?).to eq(true)
+        end
       end
     end
 
