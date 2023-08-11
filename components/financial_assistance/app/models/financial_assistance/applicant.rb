@@ -620,13 +620,14 @@ module FinancialAssistance
     end
 
     def valid_child_relationship?
-      child_relationship = self.relationships.where(kind: 'child').first
-      if child_relationship.present?
-        parent = child_relationship.relative
-        domestic_partner_relationship = parent.relationships.where(kind: 'domestic_partner').first
-        return false if domestic_partner_relationship.present? && ['domestic_partners_child', 'child'].exclude?(self.relationships.where(relative_id: domestic_partner_relationship.relative.id).first.kind)
-      end
-      true
+      child_relationship = relationships.where(kind: 'child').first
+      return true if child_relationship.blank?
+
+      parent = child_relationship.relative
+      domestic_partner_relationship = parent.relationships.where(kind: 'domestic_partner').first
+      return true if domestic_partner_relationship.blank?
+
+     ['domestic_partners_child', 'child'].include?(relationships.where(relative_id: domestic_partner_relationship.relative.id).first.kind)
     end
 
     # Checks to see if there is a relationship for Application where current applicant is spouse to PrimaryApplicant.
