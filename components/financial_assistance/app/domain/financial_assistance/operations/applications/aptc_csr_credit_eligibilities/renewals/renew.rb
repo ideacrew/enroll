@@ -65,7 +65,7 @@ module FinancialAssistance
             def renew_application(application, validated_params)
               application = create_renewal_draft_application(application, validated_params)
 
-              return Failure("Unable to create renewal application - #{application.failure} with #{validated_params}") if application.failure?
+              return Failure("Unable to create renewal application - #{application.failure} with params: (#{validated_params})") if application.failure?
 
               application
             end
@@ -90,10 +90,16 @@ module FinancialAssistance
                 renewal_application = copied_result.success
 
                 family_members_changed = renewal_application_factory.family_members_changed
+                relationships_changed = renewal_application_factory.relationships_changed
                 calculated_renewal_base_year = calculate_renewal_base_year(application)
 
                 renewal_application.assign_attributes(
-                  aasm_state: find_aasm_state(application, family_members_changed),
+                  aasm_state: find_aasm_state(
+                    application,
+                    family_members_changed,
+                    renewal_application,
+                    relationships_changed
+                  ),
                   assistance_year: validated_params[:renewal_year],
                   years_to_renew: calculate_years_to_renew(application),
                   renewal_base_year: calculated_renewal_base_year,
@@ -107,7 +113,7 @@ module FinancialAssistance
                 if renewal_application.renewal_draft?
                   Success(renewal_application)
                 else
-                  Failure("Renewal Application Applicants Update or income_verification_extension required - #{renewal_application.hbx_id}")
+                  Failure("Renewal Application: (#{renewal_application.hbx_id}) failed with aasm_state: (#{renewal_application.aasm_state}), because: (#{@failure_reason || 'Unknown'})")
                 end
               end.to_result
             end
@@ -117,12 +123,23 @@ module FinancialAssistance
               feature.enabled? && feature.settings(:annual_eligibility_redetermination).item
             end
 
-            def find_aasm_state(application, family_members_changed)
+            def find_aasm_state(application, family_members_changed, renew_application, relationships_changed)
               if application.years_to_renew == 0 || application.years_to_renew.nil?
+                @failure_reason = 'years_to_renew is 0 or nil'
                 'income_verification_extension_required'
+              elsif family_members_changed
+                @failure_reason = 'family_members_changed'
+                'applicants_update_required'
+              elsif missing_relationships?(relationships_changed, renew_application)
+                @failure_reason = 'missing_relationships'
+                'applicants_update_required'
               else
-                family_members_changed ? 'applicants_update_required' : 'renewal_draft'
+                'renewal_draft'
               end
+            end
+
+            def missing_relationships?(relationships_changed, renew_application)
+              relationships_changed && !renew_application.relationships_complete?
             end
 
             def calculate_years_to_renew(application)
