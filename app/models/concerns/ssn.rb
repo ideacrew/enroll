@@ -13,7 +13,7 @@ module Ssn
               allow_blank: true,
               numericality: true
 
-    # validate :is_ssn_composition_correct?
+    validate :is_ssn_composition_correct?, if: :validate_ssn_enabled?
     after_validation :move_encrypted_ssn_errors
   end
 
@@ -46,12 +46,16 @@ module Ssn
     self.class.decrypt_ssn(ssn_val) unless ssn_val.blank?
   end
 
+  def validate_ssn_enabled?
+    EnrollRegistry.feature_enabled?(:validate_ssn)
+  end
+
   # Invalid compositions:
     #   All zeros or 000, 666, 900-999 in the area numbers (first three digits);
     #   00 in the group number (fourth and fifth digit); or
     #   0000 in the serial number (last four digits)
   def is_ssn_composition_correct?
-    return true unless ssn.present? && EnrollRegistry.feature_enabled?(:validate_ssn)
+    return true unless ssn.present?
 
     regex = /^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$/
     errors.add(:base, "Invalid SSN format") unless ssn.match?(regex)
