@@ -11,8 +11,7 @@ module Eligible
     field :key, type: Symbol
     field :title, type: String
     field :description, type: String
-
-    field :current_state, type: Symbol
+    field :current_state, type: Symbol, default: :initial
 
     embeds_many :evidences,
                 class_name: "::Eligible::Evidence",
