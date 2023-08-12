@@ -11,6 +11,7 @@ module BenefitSponsors
       attribute :benefit_application_kind,        Types::Strict::Symbol
       attribute :service_areas,                   Types::Array.of(BenefitMarkets::Entities::ServiceArea)
       attribute :osse_min_employer_contribution,  Types::Strict::Bool
+      attribute :sponsor_eligibilities,           Types::Array.optional.meta(omittable: true)
 
     end
   end
