@@ -8,6 +8,8 @@ module Eligible
 
     STATUSES = %i[initial published expired].freeze
 
+    embedded_in :eligible, polymorphic: true
+
     field :key, type: Symbol
     field :title, type: String
     field :description, type: String
@@ -26,6 +28,7 @@ module Eligible
                 as: :status_trackable
 
     validates_presence_of :title
+    validates_uniqueness_of :key
 
     delegate :effective_on,
              :is_eligible,

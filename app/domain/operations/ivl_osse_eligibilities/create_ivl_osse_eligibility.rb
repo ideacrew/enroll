@@ -19,10 +19,11 @@ module Operations
       # @option opts [Hash]       :timestamps optional timestamps for data migrations purposes
       # @return [Dry::Monad] result
       def call(params)
-        values                = yield validate(params)
-        eligibility_record    = yield find_eligibility(values)
-        eligibility_options   = yield build_eligibility_options(values, eligibility_record)
-        eligibility           = yield create_eligibility(values, eligibility_options)
+        values = yield validate(params)
+        eligibility_record = yield find_eligibility(values)
+        eligibility_options =
+          yield build_eligibility_options(values, eligibility_record)
+        eligibility = yield create_eligibility(values, eligibility_options)
         persisted_eligibility = yield store(values, eligibility)
 
         Success(persisted_eligibility)
@@ -37,15 +38,23 @@ module Operations
         errors = []
         errors << "evidence key missing" unless params[:evidence_key]
         errors << "evidence value missing" unless params[:evidence_value]
-        errors << "effective date missing or it should be a date" unless params[:effective_date].is_a?(::Date)
+        unless params[:effective_date].is_a?(::Date)
+          errors << "effective date missing or it should be a date"
+        end
         @subject = GlobalID::Locator.locate(params[:subject])
-        errors << "subject missing or not found for #{params[:subject]}" unless subject.present?
+        unless subject.present?
+          errors << "subject missing or not found for #{params[:subject]}"
+        end
 
         errors.empty? ? Success(params) : Failure(errors)
       end
 
       def find_eligibility(values)
-        eligibility = subject.find_eligibility_by(:ivl_osse_eligibility, values[:effective_date])
+        eligibility =
+          subject.find_eligibility_by(
+            "aca_ivl_osse_eligibility_#{values[:effective_date].year}".to_sym,
+            values[:effective_date]
+          )
 
         Success(eligibility)
       end
@@ -53,7 +62,9 @@ module Operations
       def build_eligibility_options(values, eligibility_record = nil)
         ::Operations::Eligible::BuildEligibility.new(
           configuration:
-            ::Operations::IvlOsseEligibilities::OsseEligibilityConfiguration.new
+            ::Operations::IvlOsseEligibilities::OsseEligibilityConfiguration.new(
+              values[:effective_date]
+            )
         ).call(
           values.merge(
             eligibility_record: eligibility_record,
@@ -72,7 +83,8 @@ module Operations
       end
 
       def store(_values, eligibility)
-        eligibility_record = subject.eligibilities.where(id: eligibility._id).first
+        eligibility_record =
+          subject.eligibilities.where(id: eligibility._id).first
 
         if eligibility_record
           update_eligibility_record(eligibility_record, eligibility)
@@ -81,7 +93,11 @@ module Operations
           subject.eligibilities << eligibility_record
         end
 
-        subject.save ? Success(eligibility_record) : Failure(subject.errors.full_messages)
+        if subject.save
+          Success(eligibility_record)
+        else
+          Failure(subject.errors.full_messages)
+        end
       end
 
       def update_eligibility_record(eligibility_record, eligibility)
@@ -108,11 +124,16 @@ module Operations
       def create_eligibility_record(eligibility)
         osse_eligibility_params = eligibility.to_h.except(:evidences, :grants)
 
-        eligibility_record = ::IvlOsseEligibilities::IvlOsseEligibility.new(osse_eligibility_params)
+        eligibility_record =
+          ::IvlOsseEligibilities::IvlOsseEligibility.new(
+            osse_eligibility_params
+          )
 
         eligibility_record.tap do |record|
-          record.evidences = record.class.create_objects(eligibility.evidences, :evidences)
-          record.grants = record.class.create_objects(eligibility.grants, :grants)
+          record.evidences =
+            record.class.create_objects(eligibility.evidences, :evidences)
+          record.grants =
+            record.class.create_objects(eligibility.grants, :grants)
         end
 
         eligibility_record

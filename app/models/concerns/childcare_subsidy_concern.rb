@@ -6,7 +6,7 @@ module ChildcareSubsidyConcern
 
   included do
 
-    embeds_many :eligibilities, class_name: '::Eligible::Eligibility', cascade_callbacks: true
+    embeds_many :eligibilities, class_name: '::Eligible::Eligibility', as: :eligible, cascade_callbacks: true
 
     after_create :create_default_osse_eligibility
 

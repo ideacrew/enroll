@@ -23,7 +23,8 @@ module Operations
 
       def grants
         offered_grants.collect do |grant_feature_key|
-          [grant_feature_key, EnrollRegistry[grant_feature_key].enabled?]
+          next unless EnrollRegistry[grant_feature_key].enabled?
+          [grant_feature_key, EnrollRegistry[grant_feature_key].item]
         end
       end
 
@@ -158,8 +159,6 @@ module Operations
       end
 
       def save_eligibility(eligibility_record)
-        subject.eligibilities << eligibility_record
-
         if subject.is_a?(BenefitCoveragePeriod)
           organization =
             Organization.where(
@@ -170,10 +169,15 @@ module Operations
           organization.tap do |org|
             org.hbx_profile.tap do |profile|
               profile.benefit_sponsorship.tap do |sponsorship|
-                sponsorship.benefit_coverage_periods << subject
+                sponsorship.benefit_coverage_periods.each do |coverage_period|
+                  next unless coverage_period.id.to_s == subject.id.to_s
+                  coverage_period.eligibilities << eligibility_record
+                  coverage_period.save
+                end
               end
             end
           end
+
           organization.save
         else
           subject.save
