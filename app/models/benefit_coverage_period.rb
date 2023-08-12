@@ -26,7 +26,7 @@ class BenefitCoveragePeriod
 
   # embeds_many :open_enrollment_periods, class_name: "EnrollmentPeriod"
   embeds_many :benefit_packages
-  embeds_many :eligibilities, class_name: '::Eligible::Eligibility', cascade_callbacks: true
+  embeds_many :eligibilities, class_name: '::Eligible::Eligibility', as: :eligible, cascade_callbacks: true
 
   accepts_nested_attributes_for :benefit_packages
 

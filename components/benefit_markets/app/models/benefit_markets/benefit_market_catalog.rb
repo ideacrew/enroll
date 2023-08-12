@@ -43,8 +43,7 @@ module BenefitMarkets
     embeds_many :product_packages, as: :packagable,
                 class_name: "::BenefitMarkets::Products::ProductPackage"
 
-    embeds_many :eligibilities, class_name: '::Eligible::Eligibility', cascade_callbacks: true
-
+    embeds_many :eligibilities, class_name: '::Eligible::Eligibility', as: :eligible, cascade_callbacks: true
 
     # Entire geography covered by under this catalog
     has_and_belongs_to_many  :service_areas,

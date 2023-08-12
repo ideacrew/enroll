@@ -33,28 +33,25 @@ registry:
         is_enabled: <%= ENV['IVL_OSSE_ELIGIBILITY_2021_IS_ENABLED'] || false %>
       - key: :aca_ivl_osse_eligibility_2022
         item: :aca_ivl_osse_eligibility_2022
-        is_enabled: <%= ENV['IVL_OSSE_ELIGIBILITY_2022_IS_ENABLED'] || false %>
+        is_enabled: <%= ENV['IVL_OSSE_ELIGIBILITY_2022_IS_ENABLED'] || true %>
         settings:
           - key: :grants_offered
             item:
-              - :self_service_osse_subsidy_2022
-              - :aca_individual_osse_aptc_minimum_2022
+              - :aca_individual_osse_plan_subsidy_2022
       - key: :aca_ivl_osse_eligibility_2023
         item: :aca_ivl_osse_eligibility_2023
-        is_enabled: <%= ENV['IVL_OSSE_ELIGIBILITY_2023_IS_ENABLED'] || false %>
+        is_enabled: <%= ENV['IVL_OSSE_ELIGIBILITY_2023_IS_ENABLED'] || true %>
         settings:
           - key: :grants_offered
             item:
-              - :self_service_osse_subsidy_2023
-              - :aca_individual_osse_aptc_minimum_2023
+              - :aca_individual_osse_plan_subsidy_2023
       - key: :aca_ivl_osse_eligibility_2024
         item: :aca_ivl_osse_eligibility_2024
-        is_enabled: <%= ENV['IVL_OSSE_ELIGIBILITY_2024_IS_ENABLED'] || false %>
+        is_enabled: <%= ENV['IVL_OSSE_ELIGIBILITY_2024_IS_ENABLED'] || true %>
         settings:
           - key: :grants_offered
             item:
-              - :self_service_osse_subsidy_2024
-              - :aca_individual_osse_aptc_minimum_2024
+              - :aca_individual_osse_plan_subsidy_2024
   - namespace:
     - :enroll_app
     - :aca_individual_market
@@ -62,14 +59,9 @@ registry:
     - :aca_ivl_osse_eligibility
     - :aca_ivl_osse_eligibility_2022
     features:
-      - key: :self_service_osse_subsidy_2022
-        item: :self_service_osse_subsidy
-        is_enabled: <%= ENV['SELF_SERVICE_OSSE_SUBSIDY_IS_ENABLED'] || false %>
-      - key: :aca_individual_osse_aptc_minimum_2022
-        is_enabled: <%= ENV['ACA_INDIVIDUAL_OSSE_APTC_MINIMUM'] || false %>
-        settings:
-          - key: :minimum_applied_aptc_percentage_for_osse
-            item: 0.85
+      - key: :aca_individual_osse_plan_subsidy_2022
+        item: :aca_individual_osse_plan_subsidy
+        is_enabled: true
   - namespace:
     - :enroll_app
     - :aca_individual_market
@@ -77,14 +69,9 @@ registry:
     - :aca_ivl_osse_eligibility
     - :aca_ivl_osse_eligibility_2023
     features:
-      - key: :self_service_osse_subsidy_2023
-        item: :self_service_osse_subsidy
-        is_enabled: <%= ENV['SELF_SERVICE_OSSE_SUBSIDY_IS_ENABLED'] || false %>
-      - key: :aca_individual_osse_aptc_minimum_2023
-        is_enabled: <%= ENV['ACA_INDIVIDUAL_OSSE_APTC_MINIMUM'] || false %>
-        settings:
-          - key: :minimum_applied_aptc_percentage_for_osse
-            item: 0.85
+      - key: :aca_individual_osse_plan_subsidy_2023
+        item: :aca_individual_osse_plan_subsidy
+        is_enabled: true
   - namespace:
     - :enroll_app
     - :aca_individual_market
@@ -92,11 +79,6 @@ registry:
     - :aca_ivl_osse_eligibility
     - :aca_ivl_osse_eligibility_2024
     features:
-      - key: :self_service_osse_subsidy_2024
-        item: :self_service_osse_subsidy
-        is_enabled: <%= ENV['SELF_SERVICE_OSSE_SUBSIDY_IS_ENABLED'] || false %>
-      - key: :aca_individual_osse_aptc_minimum_2024
-        is_enabled: <%= ENV['ACA_INDIVIDUAL_OSSE_APTC_MINIMUM'] || false %>
-        settings:
-          - key: :minimum_applied_aptc_percentage_for_osse
-            item: 0.85
+      - key: :aca_individual_osse_plan_subsidy_2024
+        item: :aca_individual_osse_plan_subsidy
+        is_enabled: true

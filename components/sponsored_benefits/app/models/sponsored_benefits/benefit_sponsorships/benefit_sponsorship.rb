@@ -40,7 +40,7 @@ module SponsoredBenefits
       field :contact_method, type: String, default: "Paper and Electronic communications"
 
       embeds_many :benefit_applications, class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
-      embeds_many :eligibilities, class_name: '::Eligible::Eligibility', cascade_callbacks: true
+      embeds_many :eligibilities, class_name: '::Eligible::Eligibility', as: :eligible, cascade_callbacks: true
 
       validates_presence_of :benefit_market, :contact_method
 
