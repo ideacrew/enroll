@@ -5,7 +5,6 @@ FactoryBot.define do
           class:
             'BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::ShopOsseEligibility' do
 
-    key { :shop_osse_eligibility }
     title { 'Contribution Subsidy' }
     description { 'Osse Contribution Subsidy' }
 
@@ -32,6 +31,7 @@ FactoryBot.define do
         key: :contribution_subsidy_grant,
         title: 'Contribution Subsidy Grant'
       )
+      eligibility.key = "aca_shop_osse_eligibility_#{eligibility.effective_on.year}".to_sym
       eligibility.current_state = eligibility.latest_state_history.to_state
     end
 
