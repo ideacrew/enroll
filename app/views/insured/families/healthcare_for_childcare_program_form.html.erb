@@ -21,7 +21,7 @@
           <th style='width: 20%'>Inactive</th>
           <th style='width: 40%'>Details</th>
         </thead>
-        <% osse_eligibility_years_for_display.each do |year| %>
+        <% individual_osse_eligibility_years_for_display.each do |year| %>
           <tr style='border: 0px solid #d5d5d5; height: 50px; '>
             <td style='padding: 20px'><strong><%= year %></strong></td>
             <td><%= radio_button_tag "eligibilities[osse][#{year}]", "true", @osse_status_by_year[year][:is_eligible], class: "radio-button",  disabled: !pundit_allow(HbxProfile, :can_edit_osse_eligibility?) %></td>

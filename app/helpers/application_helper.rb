@@ -1022,7 +1022,7 @@ module ApplicationHelper
     osse_eligibility&.is_eligible_on?(date) ? "Active for (#{date.year})" : "Not Active for (#{date.year})"
   end
 
-  def osse_eligibility_years_for_display
+  def individual_osse_eligibility_years_for_display
     ::BenefitCoveragePeriod.osse_eligibility_years_for_display.sort.reverse
   end
 end

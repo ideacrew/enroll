@@ -73,7 +73,7 @@ module Services
 
       args[:osse].each do |year, osse_eligibility|
         effective_on = Date.new(year.to_i, 0o1, 0o1)
-        eligibility_record = role.eligibility_for(:ivl_osse_eligibility, effective_on)
+        eligibility_record = role.eligibility_for("aca_ivl_osse_eligibility_#{year}".to_sym, effective_on)
         eligible_on = (year.to_i == TimeKeeper.date_of_record.year) ? TimeKeeper.date_of_record : effective_on
         if eligibility_record&.is_eligible_on?(eligible_on) && osse_eligibility.to_s == 'false'
           term_date = get_osse_term_date(eligibility_record.published_on)
@@ -95,6 +95,7 @@ module Services
           effective_date: effective_on
         }
       )
+
       result.success? ? "Success" : "Failure"
     end
   end

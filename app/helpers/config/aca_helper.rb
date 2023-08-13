@@ -414,7 +414,11 @@ module Config::AcaHelper
     EnrollRegistry[:aca_individual_assistance_benefits].setting(:minimum_applied_aptc_percentage_for_osse).item
   end
 
-  def osse_eligibility_years_for_display
+  def shop_osse_eligibility_years_for_display
     BenefitMarkets::BenefitMarketCatalog.osse_eligibility_years_for_display.sort.reverse
+  end
+
+  def individual_osse_eligibility_years_for_display
+    ::BenefitCoveragePeriod.osse_eligibility_years_for_display.sort.reverse
   end
 end
