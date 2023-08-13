@@ -17,7 +17,7 @@ module ChildcareSubsidyConcern
     end
 
     def is_osse_eligibility_satisfied?(start_on)
-      eligibility = eligibility_for(:ivl_osse_eligibility, start_on)
+      eligibility = eligibility_for("aca_ivl_osse_eligibility_#{start_on.year}".to_sym, start_on)
       return false unless eligibility
 
       eligibility.is_eligible_on?(start_on)
