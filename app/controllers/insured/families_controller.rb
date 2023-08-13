@@ -14,6 +14,11 @@ class Insured::FamiliesController < FamiliesController
   before_action :transition_family_members_update_params, only: [:transition_family_members_update]
   before_action :upload_notice_form_enabled?, only: [:upload_notice_form]
   before_action :set_cache_headers, only: [:home, :inbox]
+  before_action :ivl_osse_enabled?, only: [
+    :healthcare_for_childcare_program,
+    :healthcare_for_childcare_program_form,
+    :update_osse_eligibilities
+  ]
 
   def home
     Caches::CurrentHbx.with_cache do

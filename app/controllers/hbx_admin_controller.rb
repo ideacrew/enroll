@@ -1,4 +1,6 @@
 class HbxAdminController < ApplicationController
+  include Config::SiteConcern
+
   $months_array = Date::ABBR_MONTHNAMES.compact
 
   before_action :find_values, only: [:update_aptc_csr, :calculate_aptc_csr, :edit_aptc_csr]
@@ -95,9 +97,9 @@ class HbxAdminController < ApplicationController
   end
 
   def check_osse_eligibility
-    return unless EnrollRegistry.feature_enabled?(:self_service_osse_subsidy)
+    return unless osse_self_serve_enabled?
     @hbxs.each do |hbx|
-      @enrollments_info[hbx.id]['osse_eligible'] = hbx.ivl_osse_eligible?(hbx.effective_on)
+      @enrollments_info[hbx.id]['osse_eligible'] = hbx.ivl_osse_eligible?
     end
   end
 end

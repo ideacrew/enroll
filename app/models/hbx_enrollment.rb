@@ -2822,7 +2822,7 @@ class HbxEnrollment
 
   def ivl_osse_eligible?(new_effective_date = nil)
     return false if is_shop? || dental?
-
+    new_effective_date ||= effective_on
     hbx_enrollment_members.any? do |member|
       member.osse_eligible_on_effective_date?(new_effective_date)
     end

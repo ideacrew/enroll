@@ -1275,7 +1275,8 @@ module BenefitSponsors
     end
 
     def osse_eligible?
-      eligibility_for(:shop_osse_eligibility).present? && shop_osse_eligibility_is_enabled?(start_on.year)
+      osse_key = "aca_shop_osse_eligibility_#{start_on.year}".to_sym
+      eligibility_for(osse_key).present? && shop_osse_eligibility_is_enabled?(start_on.year)
     end
 
     private

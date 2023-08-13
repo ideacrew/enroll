@@ -55,16 +55,6 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
       end
     end
 
-    let!(:shop_osse_eligibility) do
-      eligibility = build(:benefit_sponsors_shop_osse_eligibility,
-                          :with_admin_attested_evidence,
-                          :evidence_state => :initial,
-                          :is_eligible => false)
-      benefit_sponsorship.eligibilities << eligibility
-      benefit_sponsorship.save!
-      eligibility
-    end
-
     context "if benefit applicationis osse_eligible" do
       subject { BenefitSponsors::Observers::NoticeObserver.new }
       let(:model_event) { BenefitSponsors::ModelEvents::ModelEvent.new(:open_enrollment_end_reminder_and_low_enrollment, model_instance, {}) }

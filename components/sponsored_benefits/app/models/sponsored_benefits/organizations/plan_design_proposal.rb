@@ -59,7 +59,8 @@ module SponsoredBenefits
 
         return nil unless plan_design_organization.fein.present?
         org = BenefitSponsors::Organizations::Organization.where(fein: plan_design_organization.fein)&.first
-        org&.active_benefit_sponsorship&.eligibility_for(:shop_osse_eligibility, effective_date)
+        osse_key = "aca_shop_osse_eligibility_#{effective_date.year}".to_sym
+        org&.active_benefit_sponsorship&.eligibility_for(osse_key, effective_date)
       end
 
       def metal_level_products_restricted?

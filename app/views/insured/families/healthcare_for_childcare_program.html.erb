@@ -7,7 +7,7 @@
   <h4><%=l10n('osse_ivl_description')%></h4>
   <div class="mt-2">
     <% @childcare_forms.each do |person, form| %>
-      <h4><strong><%= person.full_name %></strong></h4>
+      <h4><strong><%= person.full_name.titleize %></strong></h4>
       <div class="row no-buffer vertically-aligned-row" style="width: 100%; border: 1px solid #ddd; border-top: none; margin-top: 15px; padding: 3px; background-color: #fff;">
           <div class="col-md-9"><%= "OSSE Subsidies |"%><%= current_osse_status_for_role(form.role) %></div>
           <div class="col-md-3">

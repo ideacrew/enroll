@@ -986,8 +986,6 @@ module ApplicationHelper
   end
 
   def display_childcare_program_options(person)
-    return false unless EnrollRegistry.feature_enabled?(:aca_ivl_osse_eligibility)
-
     person.has_active_consumer_role? || person.has_active_resident_role?
   end
 
