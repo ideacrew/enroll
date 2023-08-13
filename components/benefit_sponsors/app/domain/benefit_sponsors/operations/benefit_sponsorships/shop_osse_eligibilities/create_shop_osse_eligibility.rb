@@ -39,9 +39,13 @@ module BenefitSponsors
             errors = []
             errors << "evidence key missing" unless params[:evidence_key]
             errors << "evidence value missing" unless params[:evidence_value]
-            errors << "effective date missing" unless params[:effective_date].is_a?(::Date)
+            unless params[:effective_date].is_a?(::Date)
+              errors << "effective date missing"
+            end
             @subject = GlobalID::Locator.locate(params[:subject])
-            errors << "subject missing or not found for #{params[:subject]}" unless @subject.present?
+            unless @subject.present?
+              errors << "subject missing or not found for #{params[:subject]}"
+            end
 
             errors.empty? ? Success(params) : Failure(errors)
           end
