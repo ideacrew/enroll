@@ -22,7 +22,7 @@ module BenefitSponsors
           data[year] = {}
           start_on = Date.new(year, 0o1, 0o1)
 
-          eligibility = benefit_sponsorship.eligibility_for(:shop_osse_eligibility, start_on)
+          eligibility = benefit_sponsorship.eligibility_for("aca_shop_osse_eligibility_#{year}".to_sym, start_on)
           eligible_on = year == TimeKeeper.date_of_record.year ? TimeKeeper.date_of_record : start_on
           data[year][:is_eligible] = eligibility&.is_eligible_on?(eligible_on) || false
           next data unless eligibility.present?

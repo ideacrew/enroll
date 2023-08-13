@@ -128,10 +128,10 @@ module Operations
       end
 
       def matched_eligibility_fields(subject, record, evidence_hash)
-        eligibility =
-          subject.eligibilities.detect do |e|
-            e.eligibility_period_cover?(record["start_on"].to_date)
-          end
+        eligibility = subject.eligibilities.detect do |e|
+          e.eligibility_period_cover?(record["start_on"].to_date)
+        end
+
         eligibility_state_history =
           find_matched_state_history(
             evidence_hash,

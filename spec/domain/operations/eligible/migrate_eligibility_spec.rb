@@ -5,9 +5,7 @@ require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_site_spec
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application"
 
-RSpec.describe Operations::Eligible::MigrateEligibility,
-               type: :model,
-               dbclean: :after_each do
+RSpec.describe Operations::Eligible::MigrateEligibility, type: :model, dbclean: :after_each do
   let(:site) do
     ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market
   end
@@ -91,11 +89,10 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
 
   context "when existing eligibility record passed with subject" do
     it "should migrate eligibility into new models" do
-      result =
-        described_class.new.call(
-          current_eligibilities: [eligibility],
-          eligibility_type: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
-        )
+      result = described_class.new.call(
+        current_eligibilities: [eligibility],
+        eligibility_type: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+      )
 
       expect(result.success?).to be_truthy
       benefit_sponsorship.reload

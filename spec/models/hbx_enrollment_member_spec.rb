@@ -97,7 +97,19 @@ describe HbxEnrollmentMember, dbclean: :around_each do
   end
 
   context 'osse_eligible_on_effective_date?' do
-
+    let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
+    let!(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+    let!(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+    let!(:catalog_eligibility) do
+      Operations::Eligible::CreateCatalogEligibility.new.call(
+        {
+          subject: benefit_coverage_period.to_global_id,
+          eligibility_feature: "aca_ivl_osse_eligibility",
+          effective_date: benefit_coverage_period.start_on.to_date,
+          domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+        }
+      )
+    end
     let(:consumer_role) { create(:consumer_role, person: person) }
     let(:person) { enrollment_member.person }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member) }

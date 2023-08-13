@@ -1543,7 +1543,7 @@ module BenefitSponsors
           benefit_sponsorship.save!
           expect(benefit_sponsorship.reload.eligibilities.count).to eq 1
           eligibility = benefit_sponsorship.eligibilities.first
-          expect(eligibility.key).to eq :shop_osse_eligibility
+          expect(eligibility.key).to eq "aca_shop_osse_eligibility_#{TimeKeeper.date_of_record.year}".to_sym
           expect(eligibility.current_state).to eq :initial
           expect(eligibility.state_histories.count).to eq 1
           expect(eligibility.evidences.count).to eq 1

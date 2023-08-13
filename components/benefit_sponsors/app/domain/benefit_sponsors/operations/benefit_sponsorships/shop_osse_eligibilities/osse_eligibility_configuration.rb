@@ -7,7 +7,7 @@ module BenefitSponsors
         # Overrides top level eligibility_configuration for feature specific configurations
         class OsseEligibilityConfiguration < ::Operations::Eligible::EligibilityConfiguration
           def key
-            :shop_osse_eligibility
+            "aca_shop_osse_eligibility_#{TimeKeeper.date_of_record.year}".to_sym
           end
 
           def title
