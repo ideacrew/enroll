@@ -132,6 +132,8 @@ module Operations
           e.eligibility_period_cover?(record["start_on"].to_date)
         end
 
+        return [] unless eligibility
+
         eligibility_state_history =
           find_matched_state_history(
             evidence_hash,
