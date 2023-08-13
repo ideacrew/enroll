@@ -29,16 +29,33 @@ module Services
         data[year] = {}
         start_on = Date.new(year, 0o1, 0o1)
 
-        eligibility = role.eligibility_for(:ivl_osse_eligibility, start_on)
-
-        eligible_on = year == TimeKeeper.date_of_record.year ? TimeKeeper.date_of_record : start_on
-        data[year][:is_eligible] = eligibility&.is_eligible_on?(eligible_on) || false
+        eligibility = get_eligibility_by_year(start_on)
+        data[year][:is_eligible] = is_eligible_on(eligibility, start_on)
         next data unless eligibility.present?
-        latest_eligibility_period = eligibility.evidences.first&.eligible_periods&.last
+        latest_eligibility_period = eligibility.evidences.last&.eligible_periods&.last
         data[year][:start_on] = latest_eligibility_period[:start_on]
         data[year][:end_on] = latest_eligibility_period[:end_on] || latest_eligibility_period[:start_on].end_of_year
 
         data
+      end
+    end
+
+    def is_eligible_on(eligibility, start_on)
+      if start_on.year == TimeKeeper.date_of_record.year
+        eligibility&.is_eligible_on?(TimeKeeper.date_of_record) || false
+      else
+        return true if eligibility.evidences.last.current_state == :approved
+        eligibility&.is_eligible_on?(start_on) || false
+      end
+    end
+
+    def get_eligibility_by_year(start_on)
+      eligibility = role.eligibility_for("aca_ivl_osse_eligibility_#{start_on.year}".to_sym, start_on)
+      return eligibility if eligibility.present?
+
+      eligibilities = self.eligibilities&.by_key(eligibility_key)
+      eligibilities.detect do |eligibility|
+        (start_on.beginning_of_year..start_on.end_of_year).cover?(eligibility.effective_on)
       end
     end
 

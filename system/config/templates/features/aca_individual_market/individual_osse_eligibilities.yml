@@ -33,21 +33,21 @@ registry:
         is_enabled: <%= ENV['IVL_OSSE_ELIGIBILITY_2021_IS_ENABLED'] || false %>
       - key: :aca_ivl_osse_eligibility_2022
         item: :aca_ivl_osse_eligibility_2022
-        is_enabled: <%= ENV['IVL_OSSE_ELIGIBILITY_2022_IS_ENABLED'] || true %>
+        is_enabled: <%= ENV['IVL_OSSE_ELIGIBILITY_2022_IS_ENABLED'] || false %>
         settings:
           - key: :grants_offered
             item:
               - :aca_individual_osse_plan_subsidy_2022
       - key: :aca_ivl_osse_eligibility_2023
         item: :aca_ivl_osse_eligibility_2023
-        is_enabled: <%= ENV['IVL_OSSE_ELIGIBILITY_2023_IS_ENABLED'] || true %>
+        is_enabled: <%= ENV['IVL_OSSE_ELIGIBILITY_2023_IS_ENABLED'] || false %>
         settings:
           - key: :grants_offered
             item:
               - :aca_individual_osse_plan_subsidy_2023
       - key: :aca_ivl_osse_eligibility_2024
         item: :aca_ivl_osse_eligibility_2024
-        is_enabled: <%= ENV['IVL_OSSE_ELIGIBILITY_2024_IS_ENABLED'] || true %>
+        is_enabled: <%= ENV['IVL_OSSE_ELIGIBILITY_2024_IS_ENABLED'] || false %>
         settings:
           - key: :grants_offered
             item:

@@ -38,6 +38,8 @@ module Eligible
     end
 
     def is_eligible_on?(date)
+      return true if current_state == :approved
+
       eligible_periods.any? do |period|
         if period[:end_on].present?
           (period[:start_on]..period[:end_on]).cover?(date)
