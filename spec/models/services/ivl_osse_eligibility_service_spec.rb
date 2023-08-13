@@ -3,6 +3,19 @@
 require 'rails_helper'
 
 RSpec.describe Services::IvlOsseEligibilityService, type: :model, :dbclean => :after_each do
+  let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
+  let!(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+  let!(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+  let!(:catalog_eligibility) do
+    Operations::Eligible::CreateCatalogEligibility.new.call(
+      {
+        subject: benefit_coverage_period.to_global_id,
+        eligibility_feature: "aca_ivl_osse_eligibility",
+        effective_date: benefit_coverage_period.start_on.to_date,
+        domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+      }
+    )
+  end
   let(:person) { FactoryBot.create(:person, :with_consumer_role)}
   let(:role) { person.consumer_role }
   let(:current_date) { TimeKeeper.date_of_record }

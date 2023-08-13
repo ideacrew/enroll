@@ -44,16 +44,17 @@ module Services
       if start_on.year == TimeKeeper.date_of_record.year
         eligibility&.is_eligible_on?(TimeKeeper.date_of_record) || false
       else
-        return true if eligibility.evidences.last.current_state == :approved
+        return true if eligibility&.evidences&.last&.current_state == :approved
         eligibility&.is_eligible_on?(start_on) || false
       end
     end
 
     def get_eligibility_by_year(start_on)
-      eligibility = role.eligibility_for("aca_ivl_osse_eligibility_#{start_on.year}".to_sym, start_on)
+      eligibility_key = "aca_ivl_osse_eligibility_#{start_on.year}".to_sym
+      eligibility = role.eligibility_for(eligibility_key, start_on)
       return eligibility if eligibility.present?
 
-      eligibilities = self.eligibilities&.by_key(eligibility_key)
+      eligibilities = role.eligibilities&.by_key(eligibility_key)
       eligibilities.detect do |eligibility|
         (start_on.beginning_of_year..start_on.end_of_year).cover?(eligibility.effective_on)
       end

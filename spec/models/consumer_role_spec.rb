@@ -2034,6 +2034,19 @@ end
 describe '.create_or_term_eligibility' do
 
   context 'family members with consumer roles present' do
+    let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
+    let!(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+    let!(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+    let!(:catalog_eligibility) do
+      Operations::Eligible::CreateCatalogEligibility.new.call(
+        {
+          subject: benefit_coverage_period.to_global_id,
+          eligibility_feature: "aca_ivl_osse_eligibility",
+          effective_date: benefit_coverage_period.start_on.to_date,
+          domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+        }
+      )
+    end
     let(:primary) { FactoryBot.create(:person, :with_consumer_role) }
     let(:spouse) { FactoryBot.create(:person, :with_consumer_role) }
     let(:child1) { FactoryBot.create(:person, :with_consumer_role) }
@@ -2049,7 +2062,7 @@ describe '.create_or_term_eligibility' do
         {
           evidence_key: :ivl_osse_evidence,
           evidence_value: 'true',
-          effective_date: TimeKeeper.date_of_record.next_year.beginning_of_year
+          effective_date: TimeKeeper.date_of_record.beginning_of_year
         }
       end
 
@@ -2117,6 +2130,19 @@ describe '.create_or_term_eligibility' do
 end
 
 describe 'create default osse eligibility on create' do
+  let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
+  let!(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+  let!(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+  let!(:catalog_eligibility) do
+    Operations::Eligible::CreateCatalogEligibility.new.call(
+      {
+        subject: benefit_coverage_period.to_global_id,
+        eligibility_feature: "aca_ivl_osse_eligibility",
+        effective_date: benefit_coverage_period.start_on.to_date,
+        domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+      }
+    )
+  end
   let(:consumer_role) { FactoryBot.build(:consumer_role) }
   let(:current_year) { TimeKeeper.date_of_record.year }
 
@@ -2142,7 +2168,7 @@ describe 'create default osse eligibility on create' do
       consumer_role.save!
       expect(consumer_role.reload.eligibilities.count).to eq 1
       eligibility = consumer_role.eligibilities.first
-      expect(eligibility.key).to eq :ivl_osse_eligibility
+      expect(eligibility.key).to eq "aca_ivl_osse_eligibility_#{TimeKeeper.date_of_record.year}".to_sym
       expect(eligibility.current_state).to eq :initial
       expect(eligibility.state_histories.count).to eq 1
       expect(eligibility.evidences.count).to eq 1
