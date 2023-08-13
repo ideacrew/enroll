@@ -38,13 +38,9 @@ module Operations
         errors = []
         errors << "evidence key missing" unless params[:evidence_key]
         errors << "evidence value missing" unless params[:evidence_value]
-        unless params[:effective_date].is_a?(::Date)
-          errors << "effective date missing or it should be a date"
-        end
+        errors << "effective date missing or it should be a date" unless params[:effective_date].is_a?(::Date)
         @subject = GlobalID::Locator.locate(params[:subject])
-        unless subject.present?
-          errors << "subject missing or not found for #{params[:subject]}"
-        end
+        errors << "subject missing or not found for #{params[:subject]}" unless subject.present?
 
         errors.empty? ? Success(params) : Failure(errors)
       end

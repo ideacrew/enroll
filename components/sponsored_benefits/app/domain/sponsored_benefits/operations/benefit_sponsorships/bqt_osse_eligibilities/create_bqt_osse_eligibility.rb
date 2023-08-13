@@ -47,7 +47,7 @@ module SponsoredBenefits
 
           # Given calendar year there will be only one instance of osse eligibility with single evidence record.
           # When eligibility changes we create new state histories for evidence and eligibility
-          def find_eligibility(values)
+          def find_eligibility(_values)
             eligibility = subject.find_eligibility_by(:bqt_osse_eligibility)
 
             Success(eligibility)
