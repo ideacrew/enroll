@@ -73,7 +73,7 @@ registry:
         is_enabled: false
       - key: :lowest_cost_silver_product_2022
         item: '94506DC0350030-01'
-        is_enabled: <%= ENV['SHOP_OSSE_ELIGIBILITY_2022_IS_ENABLED'] || false %>
+        is_enabled: true
  
   - namespace:
     - :enroll_app
@@ -96,7 +96,7 @@ registry:
         is_enabled: true
       - key: :lowest_cost_silver_product_2023
         item: '94506DC0350033-01'
-        is_enabled: <%= ENV['SHOP_OSSE_ELIGIBILITY_2023_IS_ENABLED'] || false %>
+        is_enabled: true
 
   - namespace:
     - :enroll_app
@@ -119,4 +119,4 @@ registry:
         is_enabled: true
       - key: :lowest_cost_silver_product_2024
         item: '94506DC0350033-01'
-        is_enabled: <%= ENV['SHOP_OSSE_ELIGIBILITY_2024_IS_ENABLED'] || false %>
+        is_enabled: true

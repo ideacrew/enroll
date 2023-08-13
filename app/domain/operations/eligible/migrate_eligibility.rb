@@ -79,8 +79,7 @@ module Operations
       end
 
       def migrate_record(values, eligibility_options)
-        result =
-          eligibility_operation_for(values[:eligibility_type]).new.call(
+        result = eligibility_operation_for(values[:eligibility_type]).new.call(
             eligibility_options
           )
 

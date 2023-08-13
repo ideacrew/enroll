@@ -49,8 +49,21 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     end
 
     describe 'create default osse eligibility on create' do
-      let(:consumer_role) { FactoryBot.build(:consumer_role) }
+      let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
+      let!(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+      let!(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+      let(:resident_role) { FactoryBot.build(:resident_role) }
       let(:current_year) { TimeKeeper.date_of_record.year }
+      let!(:catalog_eligibility) do
+        Operations::Eligible::CreateCatalogEligibility.new.call(
+          {
+            subject: benefit_coverage_period.to_global_id,
+            eligibility_feature: "aca_ivl_osse_eligibility",
+            effective_date: benefit_coverage_period.start_on.to_date,
+            domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+          }
+        )
+      end
 
       context 'when osse feature for the given year is disabled' do
         before do
@@ -58,9 +71,9 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
 
         it 'should create osse eligibility in initial state' do
-          expect(consumer_role.eligibilities.count).to eq 0
-          consumer_role.save
-          expect(consumer_role.reload.eligibilities.count).to eq 0
+          expect(resident_role.eligibilities.count).to eq 0
+          resident_role.save
+          expect(resident_role.reload.eligibilities.count).to eq 0
         end
       end
 
@@ -70,11 +83,11 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
 
         it 'should create osse eligibility in initial state' do
-          expect(consumer_role.eligibilities.count).to eq 0
-          consumer_role.save!
-          expect(consumer_role.reload.eligibilities.count).to eq 1
-          eligibility = consumer_role.eligibilities.first
-          expect(eligibility.key).to eq :ivl_osse_eligibility
+          expect(resident_role.eligibilities.count).to eq 0
+          resident_role.save!
+          expect(resident_role.reload.eligibilities.count).to eq 1
+          eligibility = resident_role.eligibilities.first
+          expect(eligibility.key).to eq "aca_ivl_osse_eligibility_#{TimeKeeper.date_of_record.year}".to_sym
           expect(eligibility.current_state).to eq :initial
           expect(eligibility.state_histories.count).to eq 1
           expect(eligibility.evidences.count).to eq 1

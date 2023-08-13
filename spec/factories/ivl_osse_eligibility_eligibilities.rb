@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :ivl_osse_eligibility, class: 'IvlOsseEligibilities::IvlOsseEligibility' do
 
-    key { :ivl_osse_eligibility }
+    key { "aca_ivl_osse_eligibility_#{TimeKeeper.date_of_record}".to_sym }
     title { 'IVL Osse Subsidy' }
     description { 'Osse Contribution Subsidy' }
 
