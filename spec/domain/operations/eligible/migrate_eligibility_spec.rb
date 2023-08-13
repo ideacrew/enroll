@@ -240,10 +240,10 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
 
         expect(result.success).to be_truthy
         consumer_role.reload
-        expect(consumer_role.eligibilities).to be_present 
+        expect(consumer_role.eligibilities).to be_present
         expect(consumer_role.eligibilities.count).to eq 1
         eligibility = consumer_role.eligibilities.first
-        expect(eligibility.effective_on).to eq eligibilities.last.start_on.to_date 
+        expect(eligibility.effective_on).to eq eligibilities.last.start_on.to_date
         expect(eligibility.is_eligible).to be_truthy
       end
     end
