@@ -98,7 +98,8 @@ module BenefitSponsors
       def employer_current_year_osse_status
         benefit_sponsorship = find_employer_profile.active_benefit_sponsorship
         date = TimeKeeper.date_of_record
-        osse_eligibility = benefit_sponsorship&.eligibility_for(:shop_osse_eligibility, date)
+        osse_key = "aca_shop_osse_eligibility_#{date.year}".to_sym
+        osse_eligibility = benefit_sponsorship&.eligibility_for(osse_key, date)
         osse_eligibility&.is_eligible_on?(date) ? "Active for (#{date.year})" : "Not Active for (#{date.year})"
       end
 

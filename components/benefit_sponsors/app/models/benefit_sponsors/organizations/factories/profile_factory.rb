@@ -42,7 +42,8 @@ module BenefitSponsors
 
         def self.create_or_term_osse_eligibility(organization, osse_eligibility)
           benefit_sponsorship = organization.active_benefit_sponsorship
-          eligibility_record = benefit_sponsorship.eligibility_for(:shop_osse_eligibility, TimeKeeper.date_of_record)
+          osse_key = "aca_shop_osse_eligibility_#{TimeKeeper.date_of_record.year}".to_sym
+          eligibility_record = benefit_sponsorship.eligibility_for(osse_key, TimeKeeper.date_of_record)
 
           if eligibility_record&.is_eligible_on?(TimeKeeper.date_of_record)
             return if osse_eligibility.to_s == 'true'

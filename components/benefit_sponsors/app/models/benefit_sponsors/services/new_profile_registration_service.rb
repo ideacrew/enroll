@@ -44,7 +44,8 @@ module BenefitSponsors
 
       def osse_eligibility(object)
         return false unless object.active_benefit_sponsorship
-        eligibility = object.active_benefit_sponsorship.eligibility_for(:shop_osse_eligibility, TimeKeeper.date_of_record)
+        osse_key = "aca_shop_osse_eligibility_#{TimeKeeper.date_of_record.year}".to_sym
+        eligibility = object.active_benefit_sponsorship.eligibility_for(osse_key, TimeKeeper.date_of_record)
         eligibility.present? ? eligibility.is_eligible_on?(TimeKeeper.date_of_record) : false
       end
 
