@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility,
                type: :model,
-               dbclean: :after_each do
+               dbclean: :around_each do
   let(:coverage_year) { Date.today.year }
 
   let(:hbx_profile) do
