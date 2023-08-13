@@ -234,7 +234,7 @@ class Insured::GroupSelectionController < ApplicationController
     aptc_applied = params[:aptc_applied_total].delete_prefix('$')
     hbx_enrollment = HbxEnrollment.find(enrollment_id)
     max_aptc = params[:max_aptc]&.to_f
-    osse_eligible = hbx_enrollment&.ivl_osse_eligible?(hbx_enrollment.effective_on) && ivl_osse_filtering_enabled?
+    osse_eligible = hbx_enrollment&.ivl_osse_eligible? && ivl_osse_filtering_enabled?
     return aptc_applied unless osse_eligible && max_aptc > 0.00
 
     aptc_pct = (aptc_applied.to_f / max_aptc).round(2)

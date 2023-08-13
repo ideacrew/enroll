@@ -290,15 +290,12 @@ class BenefitCoveragePeriod
 
     #TODO: update the logic once settings moved to benefit coverage period
     def osse_eligibility_years_for_display
-      years = [
-        TimeKeeper.date_of_record.year - 1,
-        TimeKeeper.date_of_record.year,
-        TimeKeeper.date_of_record.year + 1
-      ]
-
-      years.map do |year|
-        year if EnrollRegistry.feature?("aca_ivl_osse_eligibility_#{year}") &&
-                EnrollRegistry.feature_enabled?("aca_ivl_osse_eligibility_#{year}")
+      all.collect do |bcp|
+        year = bcp.start_on.year
+        eligibility = bcp.eligibilities.by_key("aca_ivl_osse_eligibility_#{year}".to_sym).first
+        evidence = eligibility&.evidences&.first
+        next unless evidence&.current_state == :approved
+        bcp.start_on.year
       end.compact
     end
   end
