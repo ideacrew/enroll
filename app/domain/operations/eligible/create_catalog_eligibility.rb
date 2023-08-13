@@ -82,18 +82,14 @@ module Operations
         errors << "subject missing" unless params[:subject]
 
         @subject = locator.locate(params[:subject])
-        unless @subject.present?
-          errors << "unable to find subject: #{params[:subject]}"
-        end
+        errors << "unable to find subject: #{params[:subject]}" unless @subject.present?
         errors << "domain model missing" unless params[:domain_model]
-        unless params[:eligibility_feature]
-          errors << "eligibility feature missing"
-        end
+        errors << "eligibility feature missing" unless params[:eligibility_feature]
 
         @calender_year = params[:effective_date].year
         if EnrollRegistry.feature?(
-             "#{params[:eligibility_feature]}_#{calender_year}"
-           )
+          "#{params[:eligibility_feature]}_#{calender_year}"
+        )
           @eligibility_feature =
             EnrollRegistry[
               "#{params[:eligibility_feature]}_#{calender_year}".to_sym

@@ -55,8 +55,8 @@ module Services
       return eligibility if eligibility.present?
 
       eligibilities = role.eligibilities&.by_key(eligibility_key)
-      eligibilities.detect do |eligibility|
-        (start_on.beginning_of_year..start_on.end_of_year).cover?(eligibility.effective_on)
+      eligibilities.detect do |el|
+        (start_on.beginning_of_year..start_on.end_of_year).cover?(el.effective_on)
       end
     end
 

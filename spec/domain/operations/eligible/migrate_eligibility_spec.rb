@@ -90,9 +90,9 @@ RSpec.describe Operations::Eligible::MigrateEligibility, type: :model, dbclean: 
   context "when existing eligibility record passed with subject" do
     it "should migrate eligibility into new models" do
       result = described_class.new.call(
-          current_eligibilities: [eligibility],
-          eligibility_type: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
-        )
+        current_eligibilities: [eligibility],
+        eligibility_type: "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+      )
 
       expect(result.success?).to be_truthy
       benefit_sponsorship.reload
