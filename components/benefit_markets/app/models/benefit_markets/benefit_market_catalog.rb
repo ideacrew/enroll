@@ -149,8 +149,8 @@ module BenefitMarkets
       ]
 
       years.map do |year|
-        year if EnrollRegistry.feature?("aca_shop_osse_subsidy_#{year}") &&
-                EnrollRegistry.feature_enabled?("aca_shop_osse_subsidy_#{year}")
+        year if EnrollRegistry.feature?("aca_shop_osse_eligibility_#{year}") &&
+                EnrollRegistry.feature_enabled?("aca_shop_osse_eligibility_#{year}")
       end.compact
     end
 

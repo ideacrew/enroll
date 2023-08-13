@@ -46,7 +46,7 @@ module BenefitSponsors
         eligibility_result = {}
         args[:osse].each do |year, osse_eligibility|
           effective_on = Date.new(year.to_i, 0o1, 0o1)
-          eligibility_record = benefit_sponsorship.eligibility_for(:shop_osse_eligibility, effective_on)
+          eligibility_record = benefit_sponsorship.eligibility_for("aca_shop_osse_eligibility_#{year}".to_sym, effective_on)
           eligible_on = (year.to_i == TimeKeeper.date_of_record.year) ? TimeKeeper.date_of_record : effective_on
           if eligibility_record&.is_eligible_on?(eligible_on) && osse_eligibility.to_s == 'false'
             term_date = get_osse_term_date(eligibility_record.published_on)
