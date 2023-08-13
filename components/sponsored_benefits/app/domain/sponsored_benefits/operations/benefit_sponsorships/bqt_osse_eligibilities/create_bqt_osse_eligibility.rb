@@ -45,8 +45,10 @@ module SponsoredBenefits
             errors.empty? ? Success(params) : Failure(errors)
           end
 
+          # Given calendar year there will be only one instance of osse eligibility with single evidence record.
+          # When eligibility changes we create new state histories for evidence and eligibility
           def find_eligibility(values)
-            eligibility = subject.find_eligibility_by(:bqt_osse_eligibility, values[:effective_date])
+            eligibility = subject.find_eligibility_by(:bqt_osse_eligibility)
 
             Success(eligibility)
           end

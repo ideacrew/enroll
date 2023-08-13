@@ -38,18 +38,23 @@ module Operations
         errors = []
         errors << "evidence key missing" unless params[:evidence_key]
         errors << "evidence value missing" unless params[:evidence_value]
-        errors << "effective date missing or it should be a date" unless params[:effective_date].is_a?(::Date)
+        unless params[:effective_date].is_a?(::Date)
+          errors << "effective date missing or it should be a date"
+        end
         @subject = GlobalID::Locator.locate(params[:subject])
-        errors << "subject missing or not found for #{params[:subject]}" unless subject.present?
+        unless subject.present?
+          errors << "subject missing or not found for #{params[:subject]}"
+        end
 
         errors.empty? ? Success(params) : Failure(errors)
       end
 
+      # For a given calendar year there will be only one instance of OSSE eligibility with only one evidence instance.
+      # We'll be adding State Histories when the eligibility changes
       def find_eligibility(values)
         eligibility =
           subject.find_eligibility_by(
-            "aca_ivl_osse_eligibility_#{values[:effective_date].year}".to_sym,
-            values[:effective_date]
+            "aca_ivl_osse_eligibility_#{values[:effective_date].year}".to_sym
           )
 
         Success(eligibility)

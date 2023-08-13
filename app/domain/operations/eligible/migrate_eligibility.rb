@@ -44,6 +44,8 @@ module Operations
         values[:current_eligibilities].each do |eligibility|
           next unless eligibility.evidences.present?
 
+
+
           migrate_eligibility(subject, values, eligibility)
         end
 
@@ -55,9 +57,9 @@ module Operations
           "initialize_eligibility_is_satisfied_as_false for #{subject.to_global_id}"
         ) { initialize_eligibility(subject, values, eligibility) }
 
-        eligibility.evidences.each do |evidence|
-          effective_date = eligibility.start_on
-          effective_date = evidence.updated_at unless evidence.is_satisfied
+        eligibility.evidences.sort_by(&:updated_at).each do |evidence|
+          effective_date = eligibility.start_on.to_date
+          effective_date = evidence.updated_at.to_date unless evidence.is_satisfied
           logger(
             "update_eligibility_is_satisfied_as_#{evidence.is_satisfied} for #{subject.to_global_id}"
           ) do

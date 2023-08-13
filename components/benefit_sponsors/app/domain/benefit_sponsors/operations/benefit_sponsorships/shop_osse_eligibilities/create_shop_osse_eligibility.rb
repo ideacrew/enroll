@@ -23,7 +23,8 @@ module BenefitSponsors
           def call(params)
             values = yield validate(params)
             eligibility_record = yield find_eligibility(values)
-            eligibility_options = yield build_eligibility_options(values, eligibility_record)
+            eligibility_options =
+              yield build_eligibility_options(values, eligibility_record)
             eligibility = yield create_eligibility(eligibility_options)
             persisted_eligibility = yield store(values, eligibility)
 
@@ -39,18 +40,24 @@ module BenefitSponsors
             errors = []
             errors << "evidence key missing" unless params[:evidence_key]
             errors << "evidence value missing" unless params[:evidence_value]
-            errors << "effective date missing" unless params[:effective_date].is_a?(::Date)
+            unless params[:effective_date].is_a?(::Date)
+              errors << "effective date missing"
+            end
             @subject = GlobalID::Locator.locate(params[:subject])
-            errors << "subject missing or not found for #{params[:subject]}" unless @subject.present?
+            unless @subject.present?
+              errors << "subject missing or not found for #{params[:subject]}"
+            end
 
             errors.empty? ? Success(params) : Failure(errors)
           end
 
+          # Given calendar year there will be only one instance of osse eligibility with single evidence record.
+          # When eligibility changes we create new state histories for evidence and eligibility
           def find_eligibility(values)
-            eligibility = subject.find_eligibility_by(
-              "aca_shop_osse_eligibility_#{values[:effective_date].year}".to_sym,
-              values[:effective_date]
-            )
+            eligibility =
+              subject.find_eligibility_by(
+                "aca_shop_osse_eligibility_#{values[:effective_date].year}".to_sym
+              )
 
             Success(eligibility)
           end
@@ -78,7 +85,8 @@ module BenefitSponsors
           end
 
           def store(_values, eligibility)
-            eligibility_record = subject.eligibilities.where(id: eligibility._id).first
+            eligibility_record =
+              subject.eligibilities.where(id: eligibility._id).first
 
             if eligibility_record
               update_eligibility_record(eligibility_record, eligibility)
