@@ -860,7 +860,7 @@ class HbxEnrollment
     # IVL: cancel renewals on cancelling active coverage.
     return if is_shop?
 
-    return unless EnrollRegistry.feature_enabled?(:cancel_renewals_for_term)
+    return unless EnrollRegistry[:cancel_renewals_for_term].enabled?
     ::EnrollRegistry[:cancel_renewals_for_term] { {hbx_enrollment: self} }
   end
 
@@ -877,7 +877,7 @@ class HbxEnrollment
       notify(ENROLLMENT_UPDATED_EVENT_NAME, {policy_id: self.hbx_id})
     end
 
-    return unless EnrollRegistry.feature_enabled?(:cancel_renewals_for_term)
+    return unless EnrollRegistry[:cancel_renewals_for_term].enabled?
     ::EnrollRegistry[:cancel_renewals_for_term] { {hbx_enrollment: self} }
   end
 
