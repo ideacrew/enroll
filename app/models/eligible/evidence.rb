@@ -34,7 +34,7 @@ module Eligible
     scope :by_key, ->(key) { where(key: key.to_sym) }
 
     def latest_state_history
-      state_histories.max_by(&:created_at)
+      state_histories.last
     end
 
     def is_eligible_on?(date)

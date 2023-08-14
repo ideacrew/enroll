@@ -39,7 +39,7 @@ module Eligible
     scope :effectuated, -> { where(:current_state.ne => :initial) }
 
     def latest_state_history
-      state_histories.max_by(&:created_at)
+      state_histories.last
     end
 
     def eligibility_period_cover?(date)
