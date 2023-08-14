@@ -24,6 +24,7 @@ module BenefitMarkets
                 class_name: "::BenefitMarkets::Products::ProductPackage",
                 validate: false  # validation disabled to improve performance during catalog creation
 
+    embeds_many :eligibilities, class_name: '::Eligible::Eligibility', as: :eligible, cascade_callbacks: true
 
     validates_presence_of :effective_date, :probation_period_kinds, :effective_period, :open_enrollment_period,
                           :service_area_ids, :product_packages
