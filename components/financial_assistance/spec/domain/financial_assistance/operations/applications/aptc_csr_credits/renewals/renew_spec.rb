@@ -61,6 +61,11 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
   end
 
   context 'success' do
+
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(false)
+    end
+
     context 'determined application with no years to renew' do
       before do
         application.update_attributes!({ aasm_state: 'determined', years_to_renew: [0, nil].sample })
@@ -214,6 +219,11 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
   end
 
   context 'failure' do
+
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(false)
+    end
+
     context 'submitted application' do
       before do
         application.update_attributes!(aasm_state: 'submitted')
@@ -405,6 +415,241 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
         it_behaves_like 'non determined state application', 'draft'
         it_behaves_like 'non determined state application', 'renewal_draft'
         it_behaves_like 'non determined state application', 'determination_response_error'
+      end
+    end
+  end
+
+  describe 'application renewal determination eligibility' do
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: '100095')}
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let!(:application) do
+      FactoryBot.create(:financial_assistance_application,
+                        hbx_id: '111000222',
+                        family_id: family.id,
+                        is_renewal_authorized: false,
+                        is_requesting_voter_registration_application_in_mail: true,
+                        years_to_renew: 5,
+                        medicaid_terms: true,
+                        report_change_terms: true,
+                        medicaid_insurance_collection_terms: true,
+                        parent_living_out_of_home_terms: true,
+                        attestation_terms: true,
+                        submission_terms: true,
+                        assistance_year: TimeKeeper.date_of_record.year,
+                        full_medicaid_determination: true)
+    end
+
+    let!(:applicant_1) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        person_hbx_id: '100095',
+                        is_primary_applicant: true,
+                        family_member_id: family.primary_applicant.id,
+                        first_name: 'Gerald',
+                        last_name: 'Rivers',
+                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                        application: application)
+    end
+
+    let!(:applicant_2) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        person_hbx_id: '100096',
+                        is_primary_applicant: true,
+                        family_member_id: family.primary_applicant.id,
+                        first_name: 'Diana',
+                        last_name: 'Rivers',
+                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                        application: application)
+    end
+
+    let(:event) { Success(double) }
+    let(:operation_instance) { described_class.new }
+
+    before do
+      allow(operation_instance.class).to receive(:new).and_return(operation_instance)
+      allow(event.success).to receive(:publish).and_return(true)
+      application.applicants.each do |appl|
+        appl.addresses = [FactoryBot.build(:financial_assistance_address,
+                                           :address_1 => '1111 Awesome Street NE',
+                                           :address_2 => '#111',
+                                           :address_3 => '',
+                                           :city => 'Washington',
+                                           :country_name => '',
+                                           :kind => 'home',
+                                           :state => FinancialAssistanceRegistry[:enroll_app].setting(:state_abbreviation).item,
+                                           :zip => '20001',
+                                           :county => 'Cumberland')]
+        appl.save!
+      end
+    end
+
+    context 'skip_eligibility_redetermination Feature' do
+      context 'application has all ineligible applicants and skip_eligibility_redetermination flag is set to true' do
+        before do
+          application.applicants.each do |appl|
+            appl.update_attributes!(is_totally_ineligible: true)
+          end
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(true)
+          @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+        end
+
+        it 'should return failure' do
+          expect(@result).to be_failure
+        end
+
+        it 'should return failure with error message' do
+          expect(@result.failure).to eq("Application is not eligible for renewal: #{application.id}")
+        end
+      end
+
+      context 'application has all not applyling coverage applicants and skip_eligibility_redetermination flag is set to true' do
+        before do
+          application.applicants.each do |appl|
+            appl.update_attributes!(is_applying_coverage: false)
+          end
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(true)
+          @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+        end
+
+        it 'should return failure' do
+          expect(@result).to be_failure
+        end
+
+        it 'should return failure with error message' do
+          expect(@result.failure).to eq("Application is not eligible for renewal: #{application.id}")
+        end
+      end
+
+      context 'application has all medicaid chip applicants and skip_eligibility_redetermination flag is set to true' do
+        before do
+          application.applicants.each do |appl|
+            appl.update_attributes!(is_medicaid_chip_eligible: true)
+          end
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(true)
+          @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+        end
+
+        it 'should return failure' do
+          expect(@result).to be_failure
+        end
+
+        it 'should return failure with error message' do
+          expect(@result.failure).to eq("Application is not eligible for renewal: #{application.id}")
+        end
+      end
+
+      context 'application has one medicaid chip and uqhp eligible applicant and skip_eligibility_redetermination flag is set to true' do
+        before do
+          application.applicants[0].update_attributes!(is_medicaid_chip_eligible: true)
+          application.applicants[1].update_attributes!(is_without_assistance: true)
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(true)
+          @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+        end
+
+        it 'should return success' do
+          expect(@result).to be_success
+        end
+      end
+
+      context 'application has one medicaid chip and one insurance assistance eligible applicant and skip_eligibility_redetermination flag is set to true' do
+        before do
+          application.applicants[0].update_attributes!(is_medicaid_chip_eligible: true)
+          application.applicants[1].update_attributes!(is_ia_eligible: true)
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(true)
+          @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+        end
+
+        it 'should return success' do
+          expect(@result).to be_success
+        end
+      end
+
+      context 'skip eligibility redetermination feature flag is set to false' do
+        before do
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(false)
+          @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+        end
+
+        it 'should return success' do
+          expect(@result).to be_success
+        end
+      end
+
+      context 'application has all ineligible applicants and skip_eligibility_redetermination flag is set to false' do
+        before do
+          application.applicants.each do |appl|
+            appl.update_attributes!(is_totally_ineligible: true)
+          end
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(false)
+          @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+          @renewal_draft_app = @result.success
+        end
+
+        it 'should return success' do
+          expect(@result).to be_success
+        end
+
+        it 'should return application' do
+          expect(@renewal_draft_app).to be_a(::FinancialAssistance::Application)
+        end
+
+        it 'should return application with assistance_year' do
+          expect(@renewal_draft_app.assistance_year).to eq(application.assistance_year.next)
+        end
+      end
+
+      context 'application has all not applying coverage applicants and skip_eligibility_redetermination flag is set to false' do
+        before do
+          application.applicants.each do |appl|
+            appl.update_attributes!(is_applying_coverage: false)
+          end
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(false)
+          @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+        end
+
+        it 'should return success' do
+          expect(@result).to be_success
+        end
+      end
+
+      context 'application has all medicaid chip applicants and skip_eligibility_redetermination flag is set to false' do
+        before do
+          application.applicants.each do |appl|
+            appl.update_attributes!(is_medicaid_chip_eligible: true)
+          end
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(false)
+          @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+        end
+
+        it 'should return success' do
+          expect(@result).to be_success
+        end
+      end
+
+      context 'application has one medicaid chip and uqhp eligible applicant and skip_eligibility_redetermination flag is set to false' do
+        before do
+          application.applicants[0].update_attributes!(is_medicaid_chip_eligible: true)
+          application.applicants[1].update_attributes!(is_without_assistance: true)
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(false)
+          @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+          @renewal_draft_app = @result.success
+        end
+
+        it 'should return success' do
+          expect(@result).to be_success
+        end
+      end
+
+      context 'application has one medicaid chip and one insurance assistance eligible applicant and skip_eligibility_redetermination flag is set to false' do
+        before do
+          application.applicants[0].update_attributes!(is_medicaid_chip_eligible: true)
+          application.applicants[1].update_attributes!(is_ia_eligible: true)
+          allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(false)
+          @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+        end
+
+        it 'should return success' do
+          expect(@result).to be_success
+        end
       end
     end
   end
