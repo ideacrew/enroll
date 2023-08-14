@@ -665,6 +665,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       context 'has living_outside_state feature disabled' do
         before do
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:living_outside_state).and_return(false)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
           applicant.update_attributes!({is_temporarily_out_of_state: nil})
         end
@@ -1739,6 +1740,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       before do
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:out_of_state_primary).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
       end
 
       context 'valid addresses' do
@@ -1775,6 +1777,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       before do
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:out_of_state_primary).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
       end
 
       context 'valid addresses' do
