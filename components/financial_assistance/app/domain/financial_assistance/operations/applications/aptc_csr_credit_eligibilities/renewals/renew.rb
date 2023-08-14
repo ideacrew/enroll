@@ -23,6 +23,7 @@ module FinancialAssistance
             def call(params)
               validated_params       = yield validate(params)
               latest_application     = yield find_latest_application(validated_params)
+              _application_eligibility = yield check_application_eligibility(latest_application)
               renewal_draft_app      = yield renew_application(latest_application, validated_params)
               # result                 = yield generate_renewed_event(renewal_draft_app, validated_params[:renewal_year])
 
@@ -53,6 +54,12 @@ module FinancialAssistance
               end
             rescue SystemStackError => e
               Failure("Critical Error: Unable to find application from database  for family id: #{validated_params[:family_id]}.\n error_message: #{e.message} \n backtrace: #{e.backtrace.join("\n")}")
+            end
+
+            def check_application_eligibility(application)
+              return Success(application) if application.eligible_for_renewal?
+
+              Failure("Application is not eligible for renewal: #{application.id}")
             end
 
             def renew_application(application, validated_params)
