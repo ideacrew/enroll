@@ -640,6 +640,7 @@ module FinancialAssistance
       unrelated_relatives = unrelated_relationships.collect(&:relative_id)
       spouse_siblings = spouse_sibling_relationships.collect(&:relative_id)
       return false if unrelated_relatives.any? { |unrelated_relative| spouse_siblings.include?(unrelated_relative) }
+      true
     end
 
     # Checks to see if there is a relationship for Application where current applicant is spouse to PrimaryApplicant.
