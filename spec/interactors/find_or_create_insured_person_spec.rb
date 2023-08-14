@@ -4,7 +4,7 @@ describe FindOrCreateInsuredPerson, :dbclean => :after_each do
   let(:first_name) { "Joe" }
   let(:last_name) { "Smith" }
   let(:dob) { Date.new(1988, 3, 10) }
-  let(:ssn) { "989834231" }
+  let(:ssn) { "789834231" }
   let(:user) { FactoryBot.create(:user) }
   let(:result) { FindOrCreateInsuredPerson.call(context_arguments) }
 
@@ -57,6 +57,64 @@ describe FindOrCreateInsuredPerson, :dbclean => :after_each do
 
     it "should communicate that a new person was not created" do
       expect(result.is_new).to be_falsey
+    end
+  end
+
+  context "given an invalid SSN" do
+    let(:context_arguments) {
+      { :first_name => first_name,
+        :last_name => last_name,
+        :dob => dob
+      }
+    }
+
+    it "will throw an error if the SSN consists of only zeroes" do
+      context_arguments[:ssn] = '000000000'
+      person = result.person
+
+      expect(person.valid?).to be_falsey
+      expect(person.errors[:base]).to include('Invalid SSN format')
+    end
+
+    it "will throw an error if the first three digits of an SSN consists of only zeroes" do
+      context_arguments[:ssn] = '000834231'
+      person = result.person
+
+      expect(person.valid?).to be_falsey
+      expect(person.errors[:base]).to include('Invalid SSN format')
+    end
+
+    it "will throw an error if the first three digits of an SSN consists of only sixes" do
+      context_arguments[:ssn] = '666834231'
+      person = result.person
+
+      expect(person.valid?).to be_falsey
+      expect(person.errors[:base]).to include('Invalid SSN format')
+    end
+
+    it "will throw an error if the first three digits of an SSN is between 900-999" do
+      ssn = "#{rand(900..999)}834231"
+      context_arguments[:ssn] = ssn
+      person = result.person
+
+      expect(person.valid?).to be_falsey
+      expect(person.errors[:base]).to include('Invalid SSN format')
+    end
+
+    it "will throw an error if the fourth and fifth digit of an SSN are zeroes" do
+      context_arguments[:ssn] = '789004231'
+      person = result.person
+
+      expect(person.valid?).to be_falsey
+      expect(person.errors[:base]).to include('Invalid SSN format')
+    end
+
+    it "will throw an error if the last four digits of an SSN are zeroes" do
+      context_arguments[:ssn] = '789830000'
+      person = result.person
+
+      expect(person.valid?).to be_falsey
+      expect(person.errors[:base]).to include('Invalid SSN format')
     end
   end
 end
