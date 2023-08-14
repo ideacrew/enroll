@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 # !WARNING! This test file is only a starting point for testing the shared/_sep_progress.html.erb partial.
