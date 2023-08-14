@@ -151,8 +151,9 @@ Given(/^employer (.*?) has OSSE eligibilities$/) do |legal_name|
                                   evidence_state: :approved,
                                   is_eligible: true)
 
+  org.active_benefit_sponsorship.eligibilities = []
   org.active_benefit_sponsorship.eligibilities << eligibility1
-  org.active_benefit_sponsorship.save!
+  org.save!
   org.active_benefit_sponsorship.reload
 end
 
@@ -171,7 +172,7 @@ Given(/^employer (.*?) has OSSE eligibilities created during effective period$/)
                                   evidence_state: :approved,
                                   is_eligible: true,
                                   effective_on: (rba.effective_period.min + 2.days).beginning_of_year)
-
+  org.active_benefit_sponsorship.eligibilities = []
   org.active_benefit_sponsorship.eligibilities << eligibility1
   org.active_benefit_sponsorship.eligibilities << eligibility2
   org.active_benefit_sponsorship.save!
@@ -180,7 +181,12 @@ end
 Given(/^employer (.*?) is OSSE eligible$/) do |legal_name|
   org = BenefitSponsors::Organizations::Organization.find_by(legal_name: legal_name)
   bs = org.active_benefit_sponsorship
-  eligibility = FactoryBot.build(:eligibility, :with_evidences, :with_subject, start_on: TimeKeeper.date_of_record)
+  eligibility1 = FactoryBot.build(:benefit_sponsors_shop_osse_eligibility,
+                                  :with_admin_attested_evidence,
+                                  evidence_state: :approved,
+                                  is_eligible: true)
+
+  bs.eligibilities = []
   bs.eligibilities << eligibility
   bs.save!
 end
