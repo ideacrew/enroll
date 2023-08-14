@@ -45,11 +45,12 @@ module Operations
         errors.empty? ? Success(params) : Failure(errors)
       end
 
+      # For a given calendar year there will be only one instance of OSSE eligibility with only one evidence instance.
+      # We'll be adding State Histories when the eligibility changes
       def find_eligibility(values)
         eligibility =
           subject.find_eligibility_by(
-            "aca_ivl_osse_eligibility_#{values[:effective_date].year}".to_sym,
-            values[:effective_date]
+            "aca_ivl_osse_eligibility_#{values[:effective_date].year}".to_sym
           )
 
         Success(eligibility)
