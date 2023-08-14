@@ -116,7 +116,13 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
             :event
           )
         ).to eq [
-             [false, Date.today.beginning_of_year, :initial, :initial, :move_to_initial],
+             [
+               false,
+               Date.today.beginning_of_year,
+               :initial,
+               :initial,
+               :move_to_initial
+             ],
              [true, Date.today, :initial, :approved, :move_to_approved]
            ]
       end
@@ -324,7 +330,6 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
       end
 
       context "when eligibility with mulitiple years present" do
-
         let(:eligibilities) do
           [options1].collect do |options|
             Eligibilities::Osse::Eligibility.new(options)
@@ -344,18 +349,201 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
           expect(consumer_role.eligibilities).to be_present
           expect(consumer_role.eligibilities.count).to eq 2
 
-          eligibility_2022 = consumer_role.eligibilities.by_key(:aca_ivl_osse_eligibility_2022).first
-          eligibility_2023 = consumer_role.eligibilities.by_key(:aca_ivl_osse_eligibility_2023).first
+          eligibility_2022 =
+            consumer_role
+            .eligibilities
+            .by_key(:aca_ivl_osse_eligibility_2022)
+            .first
+          eligibility_2023 =
+            consumer_role
+            .eligibilities
+            .by_key(:aca_ivl_osse_eligibility_2023)
+            .first
 
           expect(eligibility_2022.is_eligible).to be_truthy
-          expect(eligibility_2022.effective_on.to_date).to eq Date.new(2022, 10, 3)
+          expect(eligibility_2022.effective_on.to_date).to eq Date.new(
+            2022,
+            10,
+            3
+          )
           expect(eligibility_2022.evidences.last.current_state).to eq :approved
-          expect(eligibility_2022.evidences.last.state_histories.pluck(:to_state)).to eq [:initial, :approved]
+          expect(
+            eligibility_2022.evidences.last.state_histories.pluck(:to_state)
+          ).to eq %i[initial approved]
 
           expect(eligibility_2023.is_eligible).to be_falsey
-          expect(eligibility_2023.effective_on.to_date).to eq Date.new(2023, 5, 9)
+          expect(eligibility_2023.effective_on.to_date).to eq Date.new(
+            2023,
+            5,
+            9
+          )
           expect(eligibility_2023.evidences.last.current_state).to eq :denied
-          expect(eligibility_2023.evidences.last.state_histories.pluck(:to_state)).to eq [:initial, :denied]
+          expect(
+            eligibility_2023.evidences.last.state_histories.pluck(:to_state)
+          ).to eq %i[initial denied]
+        end
+      end
+    end
+
+    context ".scenario 3 (eligibility with multiple evidences)" do
+      let(:options1) do
+        {
+          "_id" => BSON.ObjectId("63989f87a130410010a67bf8"),
+          "start_on" => Date.new(2022, 12, 13).beginning_of_day,
+          "eligibility_id" => BSON.ObjectId("639697889ce37e00107596ea"),
+          "eligibility_type" => "ConsumerRole",
+          "updated_at" => DateTime.parse("2022-12-13 16:04:03 UTC"),
+          "created_at" => DateTime.parse("2022-12-13 15:51:35 UTC"),
+          "subject" => {
+            "_id" => BSON.ObjectId("63989f87a130410010a67bf9"),
+            "title" => "Subject for Osse Subsidy",
+            "key" => consumer_role.to_global_id.to_s,
+            "klass" => "ConsumerRole",
+            "updated_at" => DateTime.parse("2022-12-13 15:51:35 UTC"),
+            "created_at" => DateTime.parse("2022-12-13 15:51:35 UTC")
+          },
+          "evidences" => [
+            {
+              "_id" => BSON.ObjectId("63989f87a130410010a67bfa"),
+              "key" => :osse_subsidy,
+              "title" => "Evidence for Osse Subsidy",
+              "is_satisfied" => true,
+              "updated_at" => DateTime.parse("2022-12-13 15:51:35 UTC"),
+              "created_at" => DateTime.parse("2022-12-13 15:51:35 UTC")
+            },
+            {
+              "_id" => BSON.ObjectId("6398a273f343d300103b84b7"),
+              "title" => "Osse Subsidy Evidence",
+              "key" => :osse_subsidy,
+              "is_satisfied" => false,
+              "updated_at" => DateTime.parse("2022-12-13 16:04:03 UTC"),
+              "created_at" => DateTime.parse("2022-12-13 16:04:03 UTC")
+            }
+          ],
+          "end_on" => DateTime.parse("2022-12-13 00:00:00 UTC")
+        }
+      end
+
+      context "when eligibility with mulitiple evidences present" do
+        let(:eligibilities) do
+          [options1].collect do |options|
+            Eligibilities::Osse::Eligibility.new(options)
+          end
+        end
+
+        it "should migrate eligibility record" do
+          result =
+            described_class.new.call(
+              current_eligibilities: eligibilities,
+              eligibility_type: "ConsumerRole"
+            )
+
+          expect(result.success).to be_truthy
+          consumer_role.reload
+
+          expect(consumer_role.eligibilities).to be_present
+          expect(consumer_role.eligibilities.count).to eq 1
+
+          eligibility_2022 =
+            consumer_role
+            .eligibilities
+            .by_key(:aca_ivl_osse_eligibility_2022)
+            .first
+
+          eligibility_2022.tap do |e|
+            expect(e.is_eligible).to be_falsey
+            expect(e.effective_on.to_date).to eq Date.new(2022, 12, 13)
+            expect(e.evidences.last.current_state).to eq :denied
+            expect(e.evidences.last.state_histories.pluck(:to_state)).to eq %i[
+                 initial
+                 approved
+                 denied
+               ]
+          end
+        end
+      end
+    end
+
+    context ".scenario 3 (eligibility still active at the end of year)" do
+      let(:options1) do
+        {
+          "_id" => BSON.ObjectId("63989f87a130410010a67bf8"),
+          "start_on" => Date.new(2022, 12, 13).beginning_of_day,
+          "eligibility_id" => BSON.ObjectId("639697889ce37e00107596ea"),
+          "eligibility_type" => "ConsumerRole",
+          "updated_at" => DateTime.parse("2022-12-13 16:04:03 UTC"),
+          "created_at" => DateTime.parse("2022-12-13 15:51:35 UTC"),
+          "subject" => {
+            "_id" => BSON.ObjectId("63989f87a130410010a67bf9"),
+            "title" => "Subject for Osse Subsidy",
+            "key" => consumer_role.to_global_id.to_s,
+            "klass" => "ConsumerRole",
+            "updated_at" => DateTime.parse("2022-12-13 15:51:35 UTC"),
+            "created_at" => DateTime.parse("2022-12-13 15:51:35 UTC")
+          },
+          "evidences" => [
+            {
+              "_id" => BSON.ObjectId("63989f87a130410010a67bfa"),
+              "key" => :osse_subsidy,
+              "title" => "Evidence for Osse Subsidy",
+              "is_satisfied" => true,
+              "updated_at" => DateTime.parse("2022-12-13 15:51:35 UTC"),
+              "created_at" => DateTime.parse("2022-12-13 15:51:35 UTC")
+            }
+          ]
+        }
+      end
+
+      context "when eligibility active last year" do
+        let(:eligibilities) do
+          [options1].collect do |options|
+            Eligibilities::Osse::Eligibility.new(options)
+          end
+        end
+
+        it "should migrate eligibility record and create renewal eligibility" do
+          result =
+            described_class.new.call(
+              current_eligibilities: eligibilities,
+              eligibility_type: "ConsumerRole"
+            )
+
+          expect(result.success).to be_truthy
+          consumer_role.reload
+
+          expect(consumer_role.eligibilities).to be_present
+          expect(consumer_role.eligibilities.count).to eq 2
+
+          eligibility_2022 =
+            consumer_role
+            .eligibilities
+            .by_key(:aca_ivl_osse_eligibility_2022)
+            .first
+          eligibility_2023 =
+            consumer_role
+            .eligibilities
+            .by_key(:aca_ivl_osse_eligibility_2023)
+            .first
+
+          eligibility_2022.tap do |e|
+            expect(e.is_eligible).to be_truthy
+            expect(e.effective_on.to_date).to eq Date.new(2022, 12, 13)
+            expect(e.evidences.last.current_state).to eq :approved
+            expect(e.evidences.last.state_histories.pluck(:to_state)).to eq %i[
+                 initial
+                 approved
+               ]
+          end
+
+          eligibility_2023.tap do |e|
+            expect(e.is_eligible).to be_truthy
+            expect(e.effective_on.to_date).to eq Date.new(2023, 1, 1)
+            expect(e.evidences.last.current_state).to eq :approved
+            expect(e.evidences.last.state_histories.pluck(:to_state)).to eq %i[
+                 initial
+                 approved
+               ]
+          end
         end
       end
     end
