@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: eb810cecd106bb4f203997c0eaf395864f32d624
+  revision: ae0788b2612f97088259a50eef3c298850d2c5cf
   branch: trunk
   specs:
     aca_entities (0.10.0)
@@ -11,6 +11,7 @@ GIT
       dry-types (~> 1.0)
       dry-validation (~> 1.2)
       iso_country_codes
+      json-schema
       nokogiri-happymapper
       oj (~> 3.11)
       rbnacl (~> 7.1)
@@ -115,6 +116,7 @@ PATH
       money-rails (~> 1.13)
       mongoid (~> 7.0.2)
       non-stupid-digest-assets
+      pundit (~> 2.0)
       rails (~> 5.2.4.3)
       redcarpet (~> 3.4.0)
       roo (~> 2.1.0)
@@ -399,6 +401,8 @@ GEM
       rails (>= 4.2)
     iso_country_codes (0.7.8)
     jaro_winkler (1.5.4)
+    json-schema (2.8.1)
+      addressable (>= 2.4)
     jsonapi-renderer (0.2.2)
     kaminari (0.17.0)
       actionpack (>= 3.0.0)
@@ -705,4 +709,4 @@ DEPENDENCIES
   webpacker (~> 4.0.2)
 
 BUNDLED WITH
-   2.3.24
+   2.3.23
