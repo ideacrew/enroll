@@ -44,8 +44,6 @@ module Operations
         values[:current_eligibilities].each do |eligibility|
           next unless eligibility.evidences.present?
 
-
-
           migrate_eligibility(subject, values, eligibility)
         end
 
@@ -57,33 +55,40 @@ module Operations
           "initialize_eligibility_is_satisfied_as_false for #{subject.to_global_id}"
         ) { initialize_eligibility(subject, values, eligibility) }
 
-        eligibility.evidences.sort_by(&:updated_at).each do |evidence|
-          effective_date = eligibility.start_on.to_date
-          effective_date = evidence.updated_at.to_date unless evidence.is_satisfied
-          logger(
-            "update_eligibility_is_satisfied_as_#{evidence.is_satisfied} for #{subject.to_global_id}"
-          ) do
-            migrate_record(
-              values,
-              {
-                subject: subject.to_global_id,
-                evidence_key: evidence_key_for(values[:eligibility_type]),
-                evidence_value: evidence.is_satisfied.to_s,
-                effective_date: effective_date,
-                timestamps: {
-                  created_at: evidence.created_at.to_datetime,
-                  modified_at: evidence.updated_at.to_datetime
+        eligibility
+          .evidences
+          .sort_by(&:updated_at)
+          .each do |evidence|
+            effective_date = eligibility.start_on.to_date
+            unless evidence.is_satisfied
+              effective_date =
+                evidence.updated_at.to_date
+            end
+            logger(
+              "update_eligibility_is_satisfied_as_#{evidence.is_satisfied} for #{subject.to_global_id}"
+            ) do
+              migrate_record(
+                values,
+                {
+                  subject: subject.to_global_id,
+                  evidence_key: evidence_key_for(values[:eligibility_type]),
+                  evidence_value: evidence.is_satisfied.to_s,
+                  effective_date: effective_date,
+                  timestamps: {
+                    created_at: evidence.created_at.to_datetime,
+                    modified_at: evidence.updated_at.to_datetime
+                  }
                 }
-              }
-            )
+              )
+            end
           end
-        end
       end
 
       def migrate_record(values, eligibility_options)
-        result = eligibility_operation_for(values[:eligibility_type]).new.call(
-          eligibility_options
-        )
+        result =
+          eligibility_operation_for(values[:eligibility_type]).new.call(
+            eligibility_options
+          )
 
         if result.success?
           eligibility = result.success
@@ -107,19 +112,31 @@ module Operations
       end
 
       def initialize_eligibility(subject, values, eligibility)
-        migrate_record(
-          values,
-          {
-            subject: subject.to_global_id,
-            evidence_key: evidence_key_for(values[:eligibility_type]),
-            evidence_value: "false",
-            effective_date: eligibility.start_on,
-            timestamps: {
-              created_at: eligibility.created_at.to_datetime,
-              modified_at: eligibility.created_at.to_datetime
-            }
-          }
-        )
+        calendar_years =
+          eligibility.evidences.map(&:updated_at).map(&:year).uniq
+
+        results =
+          calendar_years.collect do |calendar_year|
+            migrate_record(
+              values,
+              {
+                subject: subject.to_global_id,
+                evidence_key: evidence_key_for(values[:eligibility_type]),
+                evidence_value: "false",
+                effective_date: Date.new(calendar_year, 1, 1),
+                timestamps: {
+                  created_at: eligibility.created_at.beginning_of_year.to_datetime,
+                  modified_at: eligibility.created_at.beginning_of_year.to_datetime
+                }
+              }
+            )
+          end
+
+        if results.all?(&:success?)
+          Success(results)
+        else
+          Failure(results.detect(&:failure?).failure)
+        end
       end
 
       def eligibility_operation_for(eligibility_type)
