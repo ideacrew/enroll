@@ -176,6 +176,7 @@ module Operations
 
           organization.save
         else
+          subject.eligibilities << eligibility_record
           subject.save
         end
       end
