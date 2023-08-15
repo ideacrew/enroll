@@ -62,6 +62,10 @@ describe FindOrCreateInsuredPerson, :dbclean => :after_each do
   end
 
   context "given an invalid SSN" do
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(true)
+    end
+
     let(:context_arguments) do
       { :first_name => first_name,
         :last_name => last_name,
