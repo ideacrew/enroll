@@ -27,6 +27,7 @@ module BenefitSponsors
           data[year][:is_eligible] = eligibility&.is_eligible_on?(eligible_on) || false
           next data unless eligibility.present?
           latest_eligibility_period = eligibility.evidences.first&.eligible_periods&.last
+          next data unless latest_eligibility_period.present?
           data[year][:start_on] = latest_eligibility_period[:start_on]
           data[year][:end_on] = latest_eligibility_period[:end_on] || latest_eligibility_period[:start_on].end_of_year
 
