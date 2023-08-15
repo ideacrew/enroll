@@ -2819,6 +2819,13 @@ class HbxEnrollment
     workflow_state_transitions.order(created_at: :desc).first
   end
 
+  def is_eligible_for_osse_grant?(key)
+    return false if is_shop? || dental?
+    hbx_enrollment_members.any? do |member|
+      member.is_eligible_for_osse_grant?(key, effective_on)
+    end
+  end
+
   def ivl_osse_eligible?(new_effective_date = nil)
     return false if is_shop? || dental?
     new_effective_date ||= effective_on

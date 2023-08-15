@@ -238,7 +238,7 @@ class Insured::GroupSelectionController < ApplicationController
     return aptc_applied unless osse_eligible && max_aptc > 0.00
 
     aptc_pct = (aptc_applied.to_f / max_aptc).round(2)
-    aptc_pct < 0.85 ? (max_aptc * 0.85) : aptc_applied
+    aptc_pct < minimum_applied_aptc_pct_for_osse ? (max_aptc * minimum_applied_aptc_pct_for_osse) : aptc_applied
   end
 
   def calculate_elected_aptc_pct(aptc_applied_amount, aggregate_aptc_amount)

@@ -16,6 +16,12 @@ module ChildcareSubsidyConcern
       is_osse_eligibility_satisfied?(start_on)
     end
 
+    def has_osse_grant?(key, effective_date)
+      eligibility = eligibility_for("aca_ivl_osse_eligibility_#{effective_date.year}".to_sym, effective_date)
+      return false unless eligibility
+      eligibility.grant_for(key).present?
+    end
+
     def is_osse_eligibility_satisfied?(start_on)
       eligibility = eligibility_for("aca_ivl_osse_eligibility_#{start_on.year}".to_sym, start_on)
       return false unless eligibility
