@@ -95,6 +95,13 @@ module Eligibilities
       self.save
     end
 
+    def auto_extend_due_on(period = 30.days, updated_by = nil)
+      current = verif_due_date
+      self.due_on = current + period
+      add_verification_history('auto_extend_due_date', "Auto extended due date from #{current.strftime('%m/%d/%Y')} to #{due_on.strftime('%m/%d/%Y')}", updated_by)
+      self.save
+    end
+
     def verif_due_date
       due_on || evidenceable.schedule_verification_due_on
     end
@@ -102,6 +109,17 @@ module Eligibilities
     # bypasses regular guards for changing the date
     def change_due_on!(new_date)
       self.due_on = new_date
+    end
+
+    def can_be_extended?
+      return false unless type_unverified?
+      extensions = verification_histories.where(action: "auto_extend_due_date")
+      return true unless extensions.any?
+      #  want this limitation on due date extensions to reset anytime an evidence no longer requires a due date
+      # (is moved to 'verified' or 'attested' state) so that an individual can benefit from the extension again in the future.
+      auto_extend_time = extensions.last&.created_at
+      return true unless auto_extend_time
+      workflow_state_transitions.where(:to_state.in => ['verified', 'attested'], :created_at.gt => auto_extend_time).any?
     end
 
     # rubocop:disable Metrics/CyclomaticComplexity

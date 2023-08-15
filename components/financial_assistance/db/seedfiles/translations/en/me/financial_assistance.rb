@@ -169,7 +169,8 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.see_if_you_qualify_1" => "Select to see if you qualify for lower monthly premiums on your %{short_name} insurance plan or %{medicaid_or_chip_program_short_name}.",
   "en.faa.see_if_you_qualify_2" => "Select if you have experienced a life change and need to update your current enrollment or see if you qualify for lower monthly premiums or %{medicaid_or_chip_program_short_name}",
   "en.faa.non_oe_see_if_you_qualify_1" => "Select if you've experienced a life change and need to enroll through a Special Enrollment Period or make an update to your %{year} application.",
-  "en.faa.non_oe_see_if_you_qualify_2" => "Select if you need to make changes for coverage from last year. <b>This is uncommon.</b> You can only sign up for %{previous_year} coverage if CoverME.gov has approved you for a Special Enrollment Period. Changes you make to your %{previous_year} application do not automatically apply to your %{calendar_year} application. To apply changes, you must copy your application and submit it for %{calendar_year}.",
+  "en.faa.non_oe_see_if_you_qualify_2" => "Select if you need to make changes for coverage from last year. <b>This is uncommon.</b> You can only sign up for %{previous_year} coverage if %{site_short_name} has approved you for a Special Enrollment Period. Changes you make to your %{previous_year} application do not automatically apply to your %{calendar_year} application. To apply changes, you must copy your application and submit it for %{calendar_year}.",
+  "en.faa.choose_a_plan_year" => "Choose a plan year",
   "en.faa.non_oe_learn_more" => "Learn more about Special Enrollment Periods",
   "en.faa.year_selection_oe_range_from" => "Open enrollment is from ",
   "en.faa.year_selection_oe_range_through" => " through ",
@@ -178,6 +179,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.eligibility_go_to_my_account_message" => "If you've already enrolled in a CoverME.gov Individual & Family plan, you're finished! You'll see your updated plan in a minute or two. Select <b>GO TO MY ACCOUNT</b>.",
   "en.faa.application_for_coverage" => "Application for Coverage",
   "en.faa.update_reminder" => "If you make changes to your %{year} coverage that should apply to your %{year2} coverage too, you will need to come back and update your %{year2} application. You can do this by copying your latest %{year} application and submitting it for %{year2}. ",
+  "en.faa.learn_more_about_life_changes" => "Learn more about life changes",
   # Mec check
   "en.faa.mc_success" => "It looks like you may already be enrolled in MaineCare or Cub Care. If you need to update information like your income, address, or who is in your household, contact the Office for Family Independence at <a href='tel:855-797-4357'>(855) 797-4357</a> to make these changes before completing a CoverME.gov application.",
   "en.faa.shop_check_success" => "It looks like you may already be enrolled in employer sponsored coverage. If you need to update information like your income, address, or who is in your household, visit the Manage Family page to make these changes before completing a CoverME.gov application.",

@@ -35,7 +35,6 @@ module FinancialAssistance
             errors << 'batch_size param given is invalid' if batch_size.present? && batch_size.to_i <= 0
             fetch_family_limit = params[:fetch_family_limit]
             errors << 'fetch_family_limit param given is invalid' if fetch_family_limit.present? && fetch_family_limit.to_i <= 0
-
             errors.empty? ? Success(params) : Failure(errors)
           end
 
