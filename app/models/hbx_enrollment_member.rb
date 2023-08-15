@@ -88,6 +88,12 @@ class HbxEnrollmentMember
     role_for_subsidy&.osse_eligible?(date_for_eligibility)
   end
 
+  def is_eligible_for_osse_grant?(key, effective_date)
+    return false unless ivl_osse_eligibility_is_enabled?(effective_date.year)
+
+    role_for_subsidy&.has_osse_grant?(key, effective_date)
+  end
+
   def role_for_subsidy
     if person.has_active_resident_role?
       person.resident_role
