@@ -138,8 +138,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_message_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
 
       filename_pattern = /periodic_data_matching_results_me/
-      csv_file_name = Dir.glob('*').detect { |file| file =~ filename_pattern }
-      csv_file_path = "#{Rails.root}/#{csv_file_name}"
+      csv_file_path = Dir.glob("#{Rails.root}/**/*").detect { |file| file =~ filename_pattern }
       expect(File.exist?(csv_file_path)).to be true
       csv_data = CSV.read(csv_file_path)
 
