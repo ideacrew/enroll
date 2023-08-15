@@ -137,7 +137,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
     it 'should build a csv file' do
       operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_message_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
 
-      csv_file_path = "#{Rails.root}/periodic_data_matching_results_me.csv"
+      filename_pattern = /periodic_data_matching_results_me/
+      csv_file_name = Dir.glob('*').detect { |file| file =~ filename_pattern }
+      csv_file_path = "#{Rails.root}/#{csv_file_name}"
       expect(File.exist?(csv_file_path)).to be true
       csv_data = CSV.read(csv_file_path)
 

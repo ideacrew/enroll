@@ -100,7 +100,7 @@ module FinancialAssistance
           end
 
           def build_csv_report(family, enrollments, determined_app)
-            file_path = "#{Rails.root}/periodic_data_matching_results_me.csv"
+            file_path = "#{Rails.root}/periodic_data_matching_results_me_#{Time.now.to_i}.csv"
             File.delete(file_path) if File.exist?(file_path)
             add_csv_headers(file_path)
             # add data to csv
