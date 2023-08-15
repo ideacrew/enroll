@@ -359,30 +359,6 @@ module BenefitSponsors
       primary_office_location.present? && primary_office_location.address.present?
     end
 
-    # we cannot have multiple eligibilities with same key in a given calender year
-    def find_eligibility_by(eligibility_key, start_on = nil)
-      eligibilities = self.eligibilities&.by_key(eligibility_key)
-      return eligibilities.last unless start_on
-      eligibilities.detect do |eligibility|
-        eligibility.eligibility_period_cover?(start_on)
-      end
-    end
-
-    def eligibility_for(eligibility_key, start_on)
-      eligibilities = self.eligibilities&.by_key(eligibility_key)
-      eligibilities.effectuated.detect do |eligibility|
-        eligibility.eligibility_period_cover?(start_on)
-      end
-    end
-
-    def current_eligibility(evidence_key)
-      # returns latest eligibility without an end date
-      eligibilities.select do |eligibility|
-        el = eligibility.evidences.by_key(evidence_key).max_by(&:created_at)
-        eligibility.end_on.nil? && el&.is_satisfied == true
-      end.last
-    end
-
     # Inverse of Profile#benefit_sponsorship
     def profile
       return @profile if defined?(@profile)
@@ -451,6 +427,36 @@ module BenefitSponsors
 
     def benefit_market_catalog_for(effective_date)
       benefit_market.benefit_market_catalog_effective_on(effective_date)
+    end
+
+    # we cannot have multiple eligibilities with same key in a given calender year
+    def find_eligibility_by(eligibility_key, start_on = nil)
+      eligibilities = self.eligibilities&.by_key(eligibility_key)
+      return eligibilities.last unless start_on
+      eligibilities.detect do |eligibility|
+        eligibility.eligibility_period_cover?(start_on)
+      end
+    end
+
+    def eligibility_for(eligibility_key, start_on)
+      eligibilities = self.eligibilities&.by_key(eligibility_key)
+      eligibilities.effectuated.detect do |eligibility|
+        eligibility.eligibility_period_cover?(start_on)
+      end
+    end
+
+    def current_eligibility(evidence_key)
+      # returns latest eligibility without an end date
+      eligibilities.select do |eligibility|
+        el = eligibility.evidences.by_key(evidence_key).max_by(&:created_at)
+        eligibility.end_on.nil? && el&.is_satisfied == true
+      end.last
+    end
+
+    def eligibilities_for(date = TimeKeeper.date_of_record)
+      eligibilities.effectuated.select do |eligibility|
+        eligibility.eligibility_period_cover?(date) && eligibility.is_eligible_on?(date)
+      end
     end
 
     def benefit_sponsor_catalog_for(effective_date)
