@@ -1,33 +1,48 @@
 # frozen_string_literal: true
 
+# NOTE: The current tests provide a baseline coverage for the shared/_individual_progress.html.erb partial.
+# As the logic in the view evolves, it's crucial to expand upon these tests to ensure comprehensive coverage.
+# These tests are not exhaustive and should be considered a starting point. As features or functionalities
+# are added to or modified in the view, corresponding tests should be updated or added accordingly to
+# maintain a robust test suite.
 require 'rails_helper'
 
-# !WARNING! This test file is only a starting point for testing the shared/_individual_progress.html.erb partial.
-# It is in no way exhaustive and should be expanded upon to include all logic in all steps.
-
 describe "shared/_individual_progress.html.erb" do
-  context "last step" do
-    before :each do
-      allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
-      render 'shared/individual_progress', step: '6'
+  let(:person_user) { FactoryBot.create(:person) }
+  let(:current_user) { FactoryBot.create(:user, person: person_user) }
+
+  before do
+    sign_in current_user
+    allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
+  end
+
+  def validate_continue_button
+    expect(rendered).to have_selector('#btn-continue', count: 1)
+  end
+
+  def validate_link_visibility(should_be_visible)
+    %w[previous_step help_sign_up save_and_exit].each do |link_name|
+      action = should_be_visible ? :to : :not_to
+      expect(rendered).send(action, have_selector('a', text: l10n(link_name)))
     end
+  end
 
-    it "should only have the continue button; without back_to_account_all_shop" do
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:back_to_account_all_shop).and_return(false)
-      expect(rendered).to have_selector('a#btn-continue', count: 1)
+  # Currently testing for steps 0 and 6, where 6 is the last step. You can add more steps
+  # to the array if you want to test for more steps and update the test accordingly (e.g. the validate_link_visibility parameter)
+  %w[0 6].each do |step|
+    context "on step #{step}" do
+      before { render 'shared/individual_progress', step: step }
 
-      expect(rendered).not_to have_selector('a', text: l10n("previous_step"))
-      expect(rendered).not_to have_selector('a', text: l10n("help_sign_up"))
-      expect(rendered).not_to have_selector('a', text: l10n("save_and_exit"))
-    end
+      [true, false].each do |feature_state|
+        context "with back_to_account_all_shop feature #{feature_state ? 'enabled' : 'disabled'}" do
+          before { allow(EnrollRegistry).to receive(:feature_enabled?).with(:back_to_account_all_shop).and_return(feature_state) }
 
-    it "should only have the continue button; with back_to_account_all_shop" do
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:back_to_account_all_shop).and_return(true)
-      expect(rendered).to have_selector('a#btn-continue', count: 1)
-
-      expect(rendered).not_to have_selector('a', text: l10n("previous_step"))
-      expect(rendered).not_to have_selector('a', text: l10n("help_sign_up"))
-      expect(rendered).not_to have_selector('a', text: l10n("save_and_exit"))
+          it "validates button and link visibility" do
+            validate_continue_button
+            validate_link_visibility(step == '0')
+          end
+        end
+      end
     end
   end
 end
