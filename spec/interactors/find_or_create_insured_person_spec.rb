@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 describe FindOrCreateInsuredPerson, :dbclean => :after_each do
@@ -9,11 +11,11 @@ describe FindOrCreateInsuredPerson, :dbclean => :after_each do
   let(:result) { FindOrCreateInsuredPerson.call(context_arguments) }
 
   context "given a person who does not exist" do
-    let(:context_arguments) {
+    let(:context_arguments) do
       { :first_name => first_name,
-      :last_name => last_name,
-      :dob => dob }
-    }
+        :last_name => last_name,
+        :dob => dob }
+    end
 
     it "should create that person and return them" do
       expect(result.person.first_name).to eq first_name
@@ -26,11 +28,11 @@ describe FindOrCreateInsuredPerson, :dbclean => :after_each do
 
   context "given a person who does exist" do
     let!(:found_person) { FactoryBot.create(:person, ssn: nil, :first_name => first_name, :last_name => last_name, :dob => dob) }
-    let(:context_arguments) {
+    let(:context_arguments) do
       { :first_name => first_name,
         :last_name => last_name,
         :dob => dob }
-    }
+    end
 
     it "should return the found person" do
       expect(result.person).to eq found_person
@@ -43,13 +45,12 @@ describe FindOrCreateInsuredPerson, :dbclean => :after_each do
 
   context "given a person who does not exist but SSN is already taken" do
     let!(:found_person) {  FactoryBot.create(:person, ssn: ssn) }
-    let(:context_arguments) {
+    let(:context_arguments) do
       { :first_name => first_name,
         :last_name => last_name,
         :dob => dob,
-        :ssn => ssn
-      }
-    }
+        :ssn => ssn}
+    end
 
     it "should just return" do
       expect(result.person).to eq nil
@@ -61,12 +62,11 @@ describe FindOrCreateInsuredPerson, :dbclean => :after_each do
   end
 
   context "given an invalid SSN" do
-    let(:context_arguments) {
+    let(:context_arguments) do
       { :first_name => first_name,
         :last_name => last_name,
-        :dob => dob
-      }
-    }
+        :dob => dob}
+    end
 
     it "will throw an error if the SSN consists of only zeroes" do
       context_arguments[:ssn] = '000000000'
