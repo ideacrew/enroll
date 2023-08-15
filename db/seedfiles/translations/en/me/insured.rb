@@ -131,6 +131,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.email' => "Email",
   :'en.dob' => "DOB",
   :'en.ssn' => "SSN",
+  :'en.invalid_ssn_format' => "Invalid SSN format",
   :'en.family' => "Family",
   :'en.count' => "Count",
   :'en.active' => "Active",
