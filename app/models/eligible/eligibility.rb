@@ -71,7 +71,7 @@ module Eligible
     def grant_for(value)
       grants.detect do |grant|
         value_instance = grant.value
-        value_instance.value.to_s == value.to_s
+        value_instance.item.to_s == value.to_s
       end
     end
 
