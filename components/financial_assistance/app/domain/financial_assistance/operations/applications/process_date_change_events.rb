@@ -19,8 +19,9 @@ module FinancialAssistance
         def call(params)
           # adv_day_logger = Logger.new("#{Rails.root}/log/fa_application_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
           # { events_execution_date: TimeKeeper.date_of_record, logger: adv_day_logger, renewal_year: TimeKeeper.date_of_record.year.next }
-          _validated_params = yield validate_input_params(params)
-          _renewals_result  = yield process_renewals
+          _validated_params        = yield validate_input_params(params)
+          _renewal_drafts_result   = yield generate_renewal_drafts
+          _draft_submission_result = yield submit_renewal_drafts
           _income_evidences = yield auto_extend_income_evidence
 
           Success('Successfully processed all the date change events.')
@@ -42,30 +43,54 @@ module FinancialAssistance
           Success(params)
         end
 
-        def process_renewals
-          @logger.info 'Started process_renewals process'
-          create_application_renewal_requests if can_trigger_bulk_application_renewals?
-          @logger.info 'Ended process_renewals process'
-          Success('Processed application renewals successfully')
+        def generate_renewal_drafts
+          @logger.info 'Started generate_renewal_drafts process'
+          create_application_renewal_requests if can_trigger_bulk_renewal_drafts?
+          @logger.info 'Ended generate_renewal_drafts process'
+          Success('Generated application renewal drafts successfully')
         end
 
-        def can_trigger_bulk_application_renewals?
+        def can_trigger_bulk_renewal_drafts?
           FinancialAssistanceRegistry.feature_enabled?(:create_renewals_on_date_change) &&
-            TimeKeeper.date_of_record == bulk_application_renewal_trigger_date
+            @new_date == bulk_application_renewal_trigger_date
         end
 
         def create_application_renewal_requests
           @logger.info 'Started create_application_renewal_requests process'
-          ::FinancialAssistance::Operations::Applications::MedicaidGateway::CreateApplicationRenewalRequest.new.call(renewal_year: @renewal_year)
+          ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::RequestAll.new.call(
+            { renewal_year: @renewal_year }
+          )
           @logger.info 'Ended create_application_renewal_requests process'
         rescue StandardError => e
           @logger.info "Failed to execute create_application_renewal_requests, error: #{e.backtrace}"
         end
 
+        def can_submit_renewal_drafts?
+          FinancialAssistanceRegistry.feature_enabled?(:create_renewals_on_date_change) &&
+            @new_date == bulk_application_renewal_trigger_date.next_day
+        end
+
+        def submit_renewal_drafts
+          @logger.info 'Started submit_renewal_drafts process'
+          submit_renewal_draft_applications if can_submit_renewal_drafts?
+          @logger.info 'Ended submit_renewal_drafts process'
+          Success('Submitted application renewal drafts successfully')
+        end
+
+        def submit_renewal_draft_applications
+          @logger.info 'Started submit_renewal_draft_applications process'
+          ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::DetermineAll.new.call(
+            { renewal_year: @renewal_year }
+          )
+          @logger.info 'Ended submit_renewal_draft_applications process'
+        rescue StandardError => e
+          @logger.info "Failed to execute submit_renewal_draft_applications, error: #{e.backtrace}"
+        end
+
         def bulk_application_renewal_trigger_date
           day = FinancialAssistanceRegistry[:create_renewals_on_date_change].settings(:renewals_creation_day).item
           month = FinancialAssistanceRegistry[:create_renewals_on_date_change].settings(:renewals_creation_month).item
-          Date.new(TimeKeeper.date_of_record.year, month, day)
+          @bulk_application_renewal_trigger_date = Date.new(@new_date.year, month, day)
         end
 
         def auto_extend_income_evidence
