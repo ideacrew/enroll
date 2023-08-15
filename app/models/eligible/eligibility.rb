@@ -69,7 +69,7 @@ module Eligible
     end
 
     def grant_for(grant_key)
-      grants.detect { |grant| grant.value&.item.to_s == grant_key.to_s }
+      grants.detect { |grant| grant.value&.item&.to_s == grant_key.to_s }
     end
 
     class << self
