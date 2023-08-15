@@ -221,8 +221,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def is_eligible_for_osse_grant?
-    grant_key = "aca_individual_osse_plan_subsidy_#{hbx_enrollment.effective_on.year}"
-    hbx_enrollment.is_eligible_for_osse_grant?(grant_key)
+    hbx_enrollment.is_eligible_for_osse_grant?("aca_individual_osse_plan_subsidy".to_sym)
   end
 
   def ivl_osse_eligible?
