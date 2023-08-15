@@ -1045,7 +1045,7 @@ describe Person, :dbclean => :after_each do
         person = Person.create(**params)
 
         expect(person.valid?).to be_falsey
-        expect(person.errors[:base]).to include('Invalid SSN format')
+        expect(person.errors[:ssn]).to include('Invalid SSN format')
       end
 
       it "will throw an error if the first three digits of an SSN consists of only zeroes" do
@@ -1053,7 +1053,7 @@ describe Person, :dbclean => :after_each do
         person = Person.create(**params)
 
         expect(person.valid?).to be_falsey
-        expect(person.errors[:base]).to include('Invalid SSN format')
+        expect(person.errors[:ssn]).to include('Invalid SSN format')
       end
 
       it "will throw an error if the first three digits of an SSN consists of only sixes" do
@@ -1061,7 +1061,7 @@ describe Person, :dbclean => :after_each do
         person = Person.create(**params)
 
         expect(person.valid?).to be_falsey
-        expect(person.errors[:base]).to include('Invalid SSN format')
+        expect(person.errors[:ssn]).to include('Invalid SSN format')
       end
 
       it "will throw an error if the first three digits of an SSN is between 900-999" do
@@ -1070,7 +1070,7 @@ describe Person, :dbclean => :after_each do
         person = Person.create(**params)
 
         expect(person.valid?).to be_falsey
-        expect(person.errors[:base]).to include('Invalid SSN format')
+        expect(person.errors[:ssn]).to include('Invalid SSN format')
       end
 
       it "will throw an error if the fourth and fifth digit of an SSN are zeroes" do
@@ -1078,7 +1078,7 @@ describe Person, :dbclean => :after_each do
         person = Person.create(**params)
 
         expect(person.valid?).to be_falsey
-        expect(person.errors[:base]).to include('Invalid SSN format')
+        expect(person.errors[:ssn]).to include('Invalid SSN format')
       end
 
       it "will throw an error if the last four digits of an SSN are zeroes" do
@@ -1086,7 +1086,7 @@ describe Person, :dbclean => :after_each do
         person = Person.create(**params)
 
         expect(person.valid?).to be_falsey
-        expect(person.errors[:base]).to include('Invalid SSN format')
+        expect(person.errors[:ssn]).to include('Invalid SSN format')
       end
     end
   end
