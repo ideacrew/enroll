@@ -42,7 +42,7 @@ module FinancialAssistance
             initialize_logger
             batch_size = params[:batch_size]&.to_i || 1000
             @total_applications_published = 0
-            families = fetch_enrolled_and_renewal_families
+            families = fetch_enrolled_and_renewal_families(params)
             process_families(families, batch_size, params)
             @logger.info "MedicaidGateway::RunPeriodicDataMatching Completed periodic data matching for #{@total_applications_published} applications"
             Success(total_applications_published: @total_applications_published)
@@ -55,7 +55,7 @@ module FinancialAssistance
             @logger = Logger.new(log_file)
           end
 
-          def fetch_enrolled_and_renewal_families
+          def fetch_enrolled_and_renewal_families(params)
             if params[:fetch_family_limit].present?
               # can be very helpful in UAT testing where we can process few families, test the behaviour, process rest of them
               Family.in(_id: HbxEnrollment.by_health.enrolled_and_renewal.limit(params[:fetch_family_limit]).distinct(:family_id))
