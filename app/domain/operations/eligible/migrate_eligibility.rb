@@ -47,7 +47,9 @@ module Operations
         return unless eligibility_years == [prev_year]
         last_eligibility = values[:current_eligibilities].max_by(&:updated_at)
         return if last_eligibility.end_on.present?
-        values[:current_eligibilities] << build_renewal_eligibility(last_eligibility)
+        values[:current_eligibilities] << build_renewal_eligibility(
+          last_eligibility
+        )
       end
 
       def build_renewal_eligibility(last_eligibility)
@@ -98,7 +100,10 @@ module Operations
           .sort_by(&:updated_at)
           .each do |evidence|
             effective_date = eligibility.start_on.to_date
-            effective_date = evidence.updated_at.to_date unless evidence.is_satisfied
+            unless evidence.is_satisfied
+              effective_date =
+                evidence.updated_at.to_date
+            end
             logger(
               "update_eligibility_is_satisfied_as_#{evidence.is_satisfied} for #{subject.to_global_id}"
             ) do
@@ -147,11 +152,16 @@ module Operations
       end
 
       def initialize_eligibility(subject, values, eligibility)
-        calendar_years =
-          eligibility.evidences.map(&:updated_at).map(&:year).uniq
+        updated_timestamps = eligibility.evidences.map(&:updated_at)
+        calendar_years = updated_timestamps.map(&:year).uniq
 
         results =
           calendar_years.collect do |calendar_year|
+            earliest_timestamp =
+              updated_timestamps.detect do |timestamp|
+                timestamp.year == calendar_year
+              end
+
             migrate_record(
               values,
               {
@@ -160,10 +170,8 @@ module Operations
                 evidence_value: "false",
                 effective_date: Date.new(calendar_year, 1, 1),
                 timestamps: {
-                  created_at:
-                    eligibility.created_at.beginning_of_year.to_datetime,
-                  modified_at:
-                    eligibility.created_at.beginning_of_year.to_datetime
+                  created_at: earliest_timestamp.to_datetime,
+                  modified_at: earliest_timestamp.to_datetime
                 }
               }
             )
