@@ -20,7 +20,7 @@ registry:
         is_enabled: <%= ENV['IAP_YEAR_SELECTION_FORM_IS_ENABLED'] || false %>
         settings:
           - key: :iap_year_sep_link
-            item: ""
+            item: "https://www.dchealthlink.com/individuals/life-changes"
       - key: :iap_assistance_year_display
         is_enabled: <%= ENV['IAP_ASSISTANCE_YEAR_DISPLAY_IS_ENABLED'] || false %>
       - key: :enrollment_dates
