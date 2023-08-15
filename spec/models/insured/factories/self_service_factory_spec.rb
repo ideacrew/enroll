@@ -150,7 +150,7 @@ module Insured
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, enrollment.effective_on, 61, "R-#{site_key}001", 'N').and_return(679.8)
         person.update_attributes!(dob: (enrollment.effective_on - 61.years))
         family.family_members[1].person.update_attributes!(dob: (enrollment.effective_on - 59.years))
-        allow(enrollment).to receive(:ivl_osse_eligible?).and_return(true)
+        allow(enrollment).to receive(:is_eligible_for_osse_grant?).and_return(true)
       end
 
       it 'should return updated enrollment with aptc fields' do

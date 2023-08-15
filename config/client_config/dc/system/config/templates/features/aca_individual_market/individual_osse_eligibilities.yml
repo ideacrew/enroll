@@ -60,7 +60,7 @@ registry:
     - :aca_ivl_osse_eligibility_2022
     features:
       - key: :aca_individual_osse_plan_subsidy_2022
-        item: true
+        item: aca_individual_osse_plan_subsidy
         is_enabled: true
   - namespace:
     - :enroll_app
@@ -70,7 +70,7 @@ registry:
     - :aca_ivl_osse_eligibility_2023
     features:
       - key: :aca_individual_osse_plan_subsidy_2023
-        item: true
+        item: aca_individual_osse_plan_subsidy
         is_enabled: true
   - namespace:
     - :enroll_app
@@ -80,5 +80,5 @@ registry:
     - :aca_ivl_osse_eligibility_2024
     features:
       - key: :aca_individual_osse_plan_subsidy_2024
-        item: true
+        item: aca_individual_osse_plan_subsidy
         is_enabled: true
