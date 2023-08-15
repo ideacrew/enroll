@@ -61,7 +61,10 @@ module BenefitSponsors
           def build_eligibility_options(values, eligibility_record = nil)
             ::Operations::Eligible::BuildEligibility.new(
               configuration:
-                BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::OsseEligibilityConfiguration.new
+                BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::OsseEligibilityConfiguration.new(
+                  subject: subject,
+                  effective_date: values[:effective_date]
+                )
             ).call(
               values.merge(
                 eligibility_record: eligibility_record,
