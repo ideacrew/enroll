@@ -2,6 +2,7 @@ module BenefitMarkets
   class BenefitSponsorCatalog
     include Mongoid::Document
     include Mongoid::Timestamps
+    include GlobalID::Identification
 
     belongs_to :benefit_application, class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication", optional: true
 
@@ -9,6 +10,8 @@ module BenefitMarkets
     field :effective_period,        type: Range
     field :open_enrollment_period,  type: Range
     field :probation_period_kinds,  type: Array, default: []
+
+    delegate :benefit_sponsorship, to: :benefit_application
 
     has_and_belongs_to_many  :service_areas,
                 class_name: "BenefitMarkets::Locations::ServiceArea",
@@ -34,6 +37,7 @@ module BenefitMarkets
     index({"benefit_application_id" => 1})
     index({"product_packages._id" => 1})
 
+    after_create :create_sponsor_eligibilities
 
     def benefit_application=(benefit_application)
       raise "Expected Benefit Application" unless benefit_application.kind_of?(BenefitSponsors::BenefitApplications::BenefitApplication)
@@ -99,5 +103,19 @@ module BenefitMarkets
       end
     end
 
+    def create_sponsor_eligibilities
+      sponsor_eligibilities = benefit_sponsorship.eligibilities_for(effective_date)
+    
+      sponsor_eligibilities.each do |eligibility|
+        next unless eligibility.key.to_s.match?(/^aca_shop_osse_eligibility/)
+    
+        ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call({
+          subject: self.to_global_id,
+          effective_date: effective_date,
+          evidence_key: :shop_osse_evidence,
+          evidence_value: 'true'
+        })
+      end
+    end
   end
 end

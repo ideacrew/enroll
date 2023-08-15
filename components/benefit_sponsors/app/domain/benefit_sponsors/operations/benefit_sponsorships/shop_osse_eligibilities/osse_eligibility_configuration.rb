@@ -29,9 +29,17 @@ module BenefitSponsors
               .detect { |bm| bm.kind == :aca_shop }
           end
 
+          def eligibilities_source
+            if subject.is_a?(BenefitMarkets::BenefitSponsorCatalog)
+              subject.benefit_sponsorship
+            else
+              benefit_market_catalog
+            end
+          end
+
           def catalog_eligibility
-            return unless benefit_market_catalog
-            benefit_market_catalog
+            return unless eligibilities_source
+            eligibilities_source
               .eligibilities
               .by_key("aca_shop_osse_eligibility_#{effective_date.year}")
               .first

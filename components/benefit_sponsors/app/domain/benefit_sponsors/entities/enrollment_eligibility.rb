@@ -13,6 +13,13 @@ module BenefitSponsors
       attribute :osse_min_employer_contribution,  Types::Strict::Bool
       attribute :sponsor_eligibilities,           Types::Array.optional.meta(omittable: true)
 
+      def metal_level_products_restricted?
+        sponsor_eligibilities.any?{|e| e.grant_for(:employer_metal_level_products).present?}
+      end
+
+      def employer_contribution_minimum_relaxed?
+        sponsor_eligibilities.any?{|e| e.grant_for(:all_contribution_levels_min_met).present?}
+      end
     end
   end
 end
