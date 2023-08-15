@@ -9,6 +9,7 @@ module Eligible
     field :title, type: String
     field :description, type: String
     field :key, type: Symbol
+    field :item, type: String
 
     validates_presence_of :title, :key
   end

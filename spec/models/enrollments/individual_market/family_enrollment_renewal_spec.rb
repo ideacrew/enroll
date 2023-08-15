@@ -148,9 +148,9 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             expect(applicant_ids).to include(child2.id)
           end
 
-          it "should generate passive renewal in coverage_selected state" do
+          it "should generate passive renewal in auto_renewing state" do
             renewal = subject.renew
-            expect(renewal.coverage_selected?).to be_truthy
+            expect(renewal.auto_renewing?).to be_truthy
           end
         end
       end
@@ -215,7 +215,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
           it "should generate passive renewal" do
             renewal = subject.renew
-            expect(renewal.aasm_state).to eq "coverage_selected"
+            expect(renewal.auto_renewing?).to be_truthy
             expect(renewal.effective_on).to eq renewal_benefit_coverage_period.start_on
           end
 
@@ -308,7 +308,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
 
         it 'should return nil and log an error' do
-          expect_any_instance_of(Logger).to receive(:info).with(/Enrollment renewal failed for #{enrollment.hbx_id} with Exception: /i)
+          expect_any_instance_of(Logger).to receive(:info).with(/Enrollment renewal failed for #{enrollment.hbx_id} with error message: /i)
           expect(subject.renew).to eq nil
         end
       end
@@ -319,7 +319,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
 
         it 'should return nil and log an error' do
-          expect_any_instance_of(Logger).to receive(:info).with(/Enrollment renewal failed for #{enrollment.hbx_id} with Exception: /i)
+          expect_any_instance_of(Logger).to receive(:info).with(/Enrollment renewal failed for #{enrollment.hbx_id} with error message: /i)
           expect(subject.renew).to eq nil
         end
       end
