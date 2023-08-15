@@ -58,7 +58,7 @@ module Ssn
     return true unless ssn.present?
 
     regex = /^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$/
-    errors.add(:base, "Invalid SSN format") unless ssn.match?(regex)
+    errors.add(:ssn, "Invalid SSN format") unless ssn.match?(regex)
   end
 
   # ClassMethods
