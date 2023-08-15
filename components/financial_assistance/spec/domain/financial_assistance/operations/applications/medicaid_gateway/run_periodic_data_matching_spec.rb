@@ -134,6 +134,21 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       expect(result.success).to eq({:total_applications_published => 1})
     end
 
+    it 'should build a csv file' do
+      operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_message_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
+
+      csv_file_path = "#{Rails.root}/periodic_data_matching_results_me.csv"
+      expect(File.exist?(csv_file_path)).to be true
+      csv_data = CSV.read(csv_file_path)
+
+      # validate csv has right headers
+      expected_headers = %w[FamilyHbxID MemberHbxId IsPrimaryApplicant EnrollmentHbxId EnrollmentType EnrollmentState HiosId AppliedAptc ProgramEligibility]
+      expect(csv_data[0]).to eq(expected_headers)
+
+      # validate csv has data
+      expect(csv_data.length).to eq(2)
+    end
+
     it 'should not find results with old assistance_year' do
       app = ::FinancialAssistance::Application.last
       app.assistance_year = TimeKeeper.date_of_record.year - 1
