@@ -20,7 +20,7 @@ registry:
         is_enabled: <%= ENV['IAP_YEAR_SELECTION_FORM_IS_ENABLED'] || false %>
         settings:
           - key: :iap_year_sep_link
-            item: ""
+            item: "https://www.dchealthlink.com/individuals/life-changes"
       - key: :iap_assistance_year_display
         is_enabled: <%= ENV['IAP_ASSISTANCE_YEAR_DISPLAY_IS_ENABLED'] || false %>
       - key: :enrollment_dates
@@ -137,6 +137,9 @@ registry:
       - key: :short_enrolled_esi_forms
         item: :short_enrolled_esi_forms
         is_enabled: <%= ENV['SHORT_ENROLLED_ESI_IS_ENABLED'] || false %>
+      - key: :totally_ineligible_notice
+        item: :totally_ineligible_notice
+        is_enabled: <%= ENV['TOTALLY_INELIGIBLE_NOTICE_IS_ENABLED'] || false %>
   - namespace:
     - :request_determination
     features:
