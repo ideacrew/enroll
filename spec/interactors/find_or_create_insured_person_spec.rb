@@ -61,15 +61,17 @@ describe FindOrCreateInsuredPerson, :dbclean => :after_each do
     end
   end
 
-  context "given an invalid SSN" do
-    before do
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(true)
-    end
-
+  context "given an invalid SSN with the :validate_ssn feature flag active" do
     let(:context_arguments) do
       { :first_name => first_name,
         :last_name => last_name,
         :dob => dob}
+    end
+
+    before :each do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(true)
     end
 
     it "will throw an error if the SSN consists of only zeroes" do

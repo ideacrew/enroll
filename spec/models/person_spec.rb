@@ -999,6 +999,98 @@ describe Person, :dbclean => :after_each do
     end
   end
 
+  describe "validation of ssn" do
+    let(:params) do
+      {
+        first_name: "Martina",
+        last_name: "Williams",
+        gender: "male",
+        address: FactoryBot.build(:address).attributes
+      }
+    end
+
+    context "with the feature flag is disabled" do
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
+      end
+
+      it "will create a person without errors with an invalid SSN" do
+        params[:ssn] = "000637863"
+        person = Person.create(**params)
+
+        expect(person.valid?).to be_truthy
+        expect(person.errors[:ssn].present?).to be_falsey
+      end
+    end
+
+    context "with the feature flag is enabled" do
+      before :each do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(true)
+      end
+
+      it "will create a person without errors with a valid SSN" do
+        params[:ssn] = "657637863"
+        person = Person.create(**params)
+
+        expect(person.valid?).to be_truthy
+        expect(person.errors[:ssn].present?).to be_falsey
+      end
+
+      it "will throw an error if the SSN consists of only zeroes" do
+        params[:ssn] = '000000000'
+        person = Person.create(**params)
+
+        expect(person.valid?).to be_falsey
+        expect(person.errors[:base]).to include('Invalid SSN format')
+      end
+
+      it "will throw an error if the first three digits of an SSN consists of only zeroes" do
+        params[:ssn] = '000834231'
+        person = Person.create(**params)
+
+        expect(person.valid?).to be_falsey
+        expect(person.errors[:base]).to include('Invalid SSN format')
+      end
+
+      it "will throw an error if the first three digits of an SSN consists of only sixes" do
+        params[:ssn] = '666834231'
+        person = Person.create(**params)
+
+        expect(person.valid?).to be_falsey
+        expect(person.errors[:base]).to include('Invalid SSN format')
+      end
+
+      it "will throw an error if the first three digits of an SSN is between 900-999" do
+        ssn = "#{rand(900..999)}834231"
+        params[:ssn] = ssn
+        person = Person.create(**params)
+
+        expect(person.valid?).to be_falsey
+        expect(person.errors[:base]).to include('Invalid SSN format')
+      end
+
+      it "will throw an error if the fourth and fifth digit of an SSN are zeroes" do
+        params[:ssn] = '789004231'
+        person = Person.create(**params)
+
+        expect(person.valid?).to be_falsey
+        expect(person.errors[:base]).to include('Invalid SSN format')
+      end
+
+      it "will throw an error if the last four digits of an SSN are zeroes" do
+        params[:ssn] = '789830000'
+        person = Person.create(**params)
+
+        expect(person.valid?).to be_falsey
+        expect(person.errors[:base]).to include('Invalid SSN format')
+      end
+    end
+  end
+
   describe "us_citizen status" do
     let(:person) { FactoryBot.create(:person) }
 
