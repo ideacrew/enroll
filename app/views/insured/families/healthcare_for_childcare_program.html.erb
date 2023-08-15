@@ -3,13 +3,16 @@
 <% end %>
 <div class="module">
   <h1 class="darkblue no-buffer"><strong><%= l10n("ivl_osse_subsidy_title_line_1") %></strong></h1>
-  <h3 class="darkblue no-buffer"><strong><%= l10n("ivl_osse_subsidy_title_line_2") %></strong></h2>
-  <h4><%=l10n('osse_ivl_description')%></h4>
+  <h3 class="darkblue no-buffer"><strong><%= l10n("ivl_osse_subsidy_title_line_2") %></strong></h3>
+  <h4><%= l10n('osse_ivl_description') %></h4>
   <div class="mt-2">
     <% @childcare_forms.each do |person, form| %>
-      <h4><strong><%= person.full_name.titleize %></strong></h4>
-      <div class="row no-buffer vertically-aligned-row" style="width: 100%; border: 1px solid #ddd; border-top: none; margin-top: 15px; padding: 3px; background-color: #fff;">
-          <div class="col-md-9"><%= "OSSE Subsidies |"%><%= current_osse_status_for_role(form.role) %></div>
+      <div class="person-form">
+        <h4><strong><%= person.full_name.titleize %></strong></h4>
+        <div class="row no-buffer vertically-aligned-row form-row" style="width: 100%; border: 1px solid #ddd; border-top: none; margin-top: 15px; padding: 3px; background-color: #fff;">
+          <div class="col-md-9">
+            <%= "OSSE Subsidies |" %><%= current_osse_status_for_role(form.role) %>
+          </div>
           <div class="col-md-3">
             <%= link_to 'Select Eligibility Year(s)', healthcare_for_childcare_program_form_insured_families_path(person_id: person.id), id: "check_osse_eligibilities", class: 'btn btn-primary active', style: 'background-color: #007bc4' %>
           </div>
