@@ -68,7 +68,7 @@ describe FindOrCreateInsuredPerson, :dbclean => :after_each do
         :dob => dob}
     end
 
-    before :each do
+    before do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(true)

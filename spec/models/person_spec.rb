@@ -1026,7 +1026,7 @@ describe Person, :dbclean => :after_each do
     end
 
     context "with the feature flag is enabled" do
-      before :each do
+      before do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(true)
