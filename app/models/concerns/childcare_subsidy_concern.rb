@@ -5,8 +5,9 @@ module ChildcareSubsidyConcern
   extend ActiveSupport::Concern
 
   included do
-    has_many :eligibilities, class_name: "::Eligibilities::Osse::Eligibility",
-                             as: :eligibility
+    has_many :eligibilities, class_name: "::Eligibilities::Osse::Eligibility", as: :eligibility
+
+    embeds_many :ivl_eligibilities, class_name: '::Eligible::Eligibility', cascade_callbacks: true
 
     def osse_eligible?(start_on)
       return false unless osse_feature_enabled_for?(start_on.year)

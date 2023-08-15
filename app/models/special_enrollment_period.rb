@@ -141,9 +141,17 @@ class SpecialEnrollmentPeriod
   end
 
   def calculate_effective_date(enrollment_created_date)
-    if (enrollment_created_date >= effective_on) && (effective_on_kind == 'first_of_the_month_plan_shopping')
-      new_effective_on = enrollment_created_date.end_of_month + 1.day
-      self.update_attributes!(effective_on: new_effective_on, next_poss_effective_date: new_effective_on)
+    new_effective_on = enrollment_created_date.end_of_month + 1.day
+
+    case effective_on_kind
+    when "first_of_the_month_plan_shopping"
+      self.update_attributes!(effective_on: new_effective_on, next_poss_effective_date: new_effective_on) if enrollment_created_date >= effective_on
+    when "first_of_the_month_coinciding"
+      if enrollment_created_date == effective_on
+        self.update_attributes!(effective_on: new_effective_on, next_poss_effective_date: new_effective_on) if qle_on != effective_on
+      elsif enrollment_created_date > effective_on
+        self.update_attributes!(effective_on: new_effective_on, next_poss_effective_date: new_effective_on)
+      end
     end
     effective_on
   end
@@ -308,6 +316,8 @@ private
                           first_of_next_month_reporting_effective_date
                         when "first_of_the_month_plan_shopping"
                           first_of_the_month_plan_shopping_effective_date
+                        when "first_of_the_month_coinciding"
+                          first_of_the_month_coinciding_effective_date
                         end
   end
 
@@ -338,6 +348,26 @@ private
 
   def first_of_the_month_plan_shopping_effective_date
     earliest_effective_date.end_of_month + 1.day
+  end
+
+  def first_of_the_month_coinciding_effective_date
+    today = TimeKeeper.date_of_record
+
+    if qle_on > today
+      if beginning_of_month?
+        qle_on
+      else
+        qle_on.end_of_month.next_day
+      end
+    elsif qle_on == today
+      if beginning_of_month?
+        qle_on
+      else
+        today.end_of_month.next_day
+      end
+    else
+      today.end_of_month.next_day
+    end
   end
 
   def first_of_next_month_coinciding_effective_date

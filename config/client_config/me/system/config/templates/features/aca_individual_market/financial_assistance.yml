@@ -137,6 +137,9 @@ registry:
       - key: :short_enrolled_esi_forms
         item: :short_enrolled_esi_forms
         is_enabled: <%= ENV['SHORT_ENROLLED_ESI_IS_ENABLED'] || false %>
+      - key: :totally_ineligible_notice
+        item: :totally_ineligible_notice
+        is_enabled: <%= ENV['TOTALLY_INELIGIBLE_NOTICE_IS_ENABLED'] || false %>
   - namespace:
     - :request_determination
     features:
@@ -264,6 +267,9 @@ registry:
           item: true
     - key: :full_medicaid_determination_step
       is_enabled: false
+      settings:
+        - key: :annual_eligibility_redetermination
+          item: <%= ENV['FULL_MEDICAID_DETERMINATION_FOR_ANNUAL_ELIGIBILITY_REDETERMINATION_IS_ENABLED'] || false %>
     - key: :native_american_csr
       is_enabled: true
     - key: :display_medicaid_question
@@ -317,6 +323,13 @@ registry:
           item: <%= ENV['RENEWALS_CREATION_MONTH'] || 10 %>
         - key: :renewals_creation_day
           item: <%= ENV['RENEWALS_CREATION_DAY'] || 16 %>
+    - key: :skip_eligibility_redetermination
+      is_enabled: <%= ENV['SKIP_ELIGIBILITY_REDETERMINATION_IS_ENABLED'] || false %>
+    - key: :auto_update_income_evidence_due_on
+      is_enabled: <%= ENV['AUTO_UPDATE_INCOME_EVIDENCE_DUE_ON_IS_ENABLED'] || false %>
+      settings:
+        - key: :days
+          item:  <%= ENV['AUTO_UPDATE_INCOME_EVIDENCE_DUE_ON_DAYS'] || 65 %>
     - key: :skip_employer_address_validation
       is_enabled: :true
     - key: :skip_employer_phone_validation
@@ -362,5 +375,9 @@ registry:
           item: 12_550
         - key: :unearned_income_filing_threshold_2023
           item: 1_100
+        - key: :earned_income_filing_threshold_2024
+          item: 12_950
+        - key: :unearned_income_filing_threshold_2024
+          item: 1_150
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings

@@ -59,14 +59,14 @@
             </ns5:InsuranceApplicantIncarceration>
             <ns5:InsuranceApplicantLawfulPresenceStatus>
                 <ns5:LawfulPresenceStatusArrivedBefore1996Indicator>true</ns5:LawfulPresenceStatusArrivedBefore1996Indicator>
-                <ns5:LawfulPresenceStatusImmigrationDocument> 
-                    <ns5:LawfulPresenceDocumentNumber> 
-                        <ns2:IdentificationID>123456</ns2:IdentificationID> 
-                    </ns5:LawfulPresenceDocumentNumber> 
-                    <ns5:LawfulPresenceDocumentPersonIdentification> 
-                        <ns2:IdentificationID>123456789</ns2:IdentificationID> 
-                        <ns2:IdentificationCategoryText>Alien Number</ns2:IdentificationCategoryText> 
-                    </ns5:LawfulPresenceDocumentPersonIdentification> 
+                <ns5:LawfulPresenceStatusImmigrationDocument>
+                    <ns5:LawfulPresenceDocumentNumber>
+                        <ns2:IdentificationID>123456</ns2:IdentificationID>
+                    </ns5:LawfulPresenceDocumentNumber>
+                    <ns5:LawfulPresenceDocumentPersonIdentification>
+                        <ns2:IdentificationID>123456789</ns2:IdentificationID>
+                        <ns2:IdentificationCategoryText>Alien Number</ns2:IdentificationCategoryText>
+                    </ns5:LawfulPresenceDocumentPersonIdentification>
                     <ns5:LawfulPresenceDocumentCategoryCode>NaturalizationCertificate</ns5:LawfulPresenceDocumentCategoryCode>
                 </ns5:LawfulPresenceStatusImmigrationDocument>
                 <ns5:LawfulPresenceStatusEligibility>
@@ -145,6 +145,7 @@
             </ns5:SSFSignerAuthorizedRepresentativeAssociation>
             <ns5:SSFAttestation>
                 <ns5:SSFAttestationCollectionsAgreementIndicator>false</ns5:SSFAttestationCollectionsAgreementIndicator>
+                <ns5:SSFAttestationMedicaidObligationsIndicator>true</ns5:SSFAttestationMedicaidObligationsIndicator>
                 <ns5:SSFAttestationNonPerjuryIndicator>true</ns5:SSFAttestationNonPerjuryIndicator>
                 <ns5:SSFAttestationNotIncarceratedIndicator ns1:metadata="vm2009583325215611507">true</ns5:SSFAttestationNotIncarceratedIndicator>
                 <ns5:SSFAttestationNotIncarceratedIndicator>true</ns5:SSFAttestationNotIncarceratedIndicator>

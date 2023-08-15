@@ -67,13 +67,13 @@
   %br
 - elsif step == 5
   = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), :class => 'btn btn-lg btn-primary  btn-block disabled', id: 'btn-continue', :method => :post, :disabled => !@enrollable
-- else
+- elsif step != 6 && !EnrollRegistry.feature_enabled?(:back_to_account_all_shop)
   %button.btn.btn-lg.btn-primary.btn-block#btn-continue{type: 'submit'}
     CONTINUE
 
 = render partial: 'shared/shopping_nav_panel',
-  locals: {show_exit_button: !@no_save_button,
-  show_previous_button: !@no_previous_button && step != 1,
+  locals: {show_exit_button: !@no_save_button && step < 6,
+  show_previous_button: !@no_previous_button && ![1,6].include?(step),
   show_account_button: step > 2 && EnrollRegistry.feature_enabled?(:back_to_account_all_shop),
   is_complete: step == 6,
-  show_help_button: step != 1 }
+  show_help_button: step != 1 && step < 6}

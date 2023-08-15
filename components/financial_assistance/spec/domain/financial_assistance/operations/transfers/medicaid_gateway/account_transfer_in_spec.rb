@@ -33,7 +33,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         @result = subject.call(@transformed)
       end
 
-      it 'should set the transferred_at field'  do
+      it 'should set the transferred_at field' do
         app = FinancialAssistance::Application.find(@result.value!)
         expect(app.transferred_at).not_to eq nil
       end
@@ -181,6 +181,22 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
           end
         end
       end
+
+      context 'valid attestations' do
+        it 'should create valid attestations for the application' do
+          attributes = @transformed["family"]['magi_medicaid_applications'].first
+          application = FinancialAssistance::Application.find(@result.value!)
+          attestation_vals = { "submission_terms": attributes["submission_terms"],
+                               "medicaid_terms": attributes["medicaid_terms"],
+                               "medicaid_insurance_collection_terms": attributes["medicaid_insurance_collection_terms"],
+                               "parent_living_out_of_home_terms": attributes["parent_living_out_of_home_terms"],
+                               "report_change_terms": attributes["report_change_terms"],
+                               "attestation_terms": attributes["attestation_terms"] }
+
+          attributes = attestation_vals.keys.map { |name| [name, application.attributes[name]] }.to_h
+          expect(attributes).to eq attestation_vals
+        end
+      end
     end
   end
 
@@ -193,7 +209,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
             allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:automatic_submission).and_return(false)
             allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:load_county_on_inbound_transfer).and_return(true)
             missing_counties_xml = Nokogiri::XML(xml)
-            missing_counties_xml.xpath("//ns3:LocationCountyName", {"ns3" => "http://niem.gov/niem/niem-core/2.0"}).remove
+            missing_counties_xml.xpath("//ns3:LocationCountyName", { "ns3" => "http://niem.gov/niem/niem-core/2.0" }).remove
             record = serializer.parse(missing_counties_xml)
             transformed = transformer.transform(record.to_hash(identifier: true)).deep_stringify_keys!
             @result = subject.call(transformed)
@@ -211,7 +227,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
     before do
       ::BenefitMarkets::Locations::CountyZip.create(zip: "04330", state: "ME", county_name: "Kennebec")
       missing_counties_xml = Nokogiri::XML(xml)
-      missing_counties_xml.xpath("//ns3:LocationCountyName", {"ns3" => "http://niem.gov/niem/niem-core/2.0"}).remove
+      missing_counties_xml.xpath("//ns3:LocationCountyName", { "ns3" => "http://niem.gov/niem/niem-core/2.0" }).remove
       record = serializer.parse(missing_counties_xml)
       @transformed = transformer.transform(record.to_hash(identifier: true)).deep_stringify_keys!
     end
