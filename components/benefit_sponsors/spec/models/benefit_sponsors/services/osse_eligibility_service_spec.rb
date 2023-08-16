@@ -7,6 +7,8 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 #rspec for OsseEligibilityService
 module BenefitSponsors
   RSpec.describe ::BenefitSponsors::Services::OsseEligibilityService, type: :model, :dbclean => :around_each do
+    include_context "setup benefit market with market catalogs and product packages"
+
     before(:all) do
       TimeKeeper.set_date_of_record_unprotected!(Date.today)
     end
@@ -18,9 +20,33 @@ module BenefitSponsors
       employer_profile.benefit_sponsorships.first.save!
       employer_profile.active_benefit_sponsorship
     end
-    let(:current_date) { TimeKeeper.date_of_record }
+    let(:current_effective_date) { Date.new(Date.today.year, 3, 1) }
+    let(:current_date) { current_effective_date }
     let(:params) { {osse: { current_date.year.to_s => "true", current_date.last_year.year.to_s => "false" } } }
     let(:subject) { described_class.new(employer_profile, params) }
+    let(:catalog_eligibility) do
+      catalog_eligibility =
+        ::Operations::Eligible::CreateCatalogEligibility.new.call(
+          {
+            subject: current_benefit_market_catalog.to_global_id,
+            eligibility_feature: "aca_shop_osse_eligibility",
+            effective_date:
+              current_benefit_market_catalog.application_period.begin.to_date,
+            domain_model:
+              "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+          }
+        )
+  
+      catalog_eligibility
+    end
+
+    before do 
+      TimeKeeper.set_date_of_record_unprotected!(current_date)
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+      catalog_eligibility
+    end
+  
+    after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
 
     describe "#osse_eligibility_years_for_display" do
       it "returns sorted and reversed osse eligibility years" do
