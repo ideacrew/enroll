@@ -1,6 +1,6 @@
 require 'csv'
 # This rake task generates a CSV report from a failure analysis of family to cv3 transformation. It creates a report
-# where each row corresponds to a single family and has the following columns: hbx_id, result, and output. If a
+# where each row corresponds to a single family and has the following columns: hbx_assigned_id, result, and output. If a
 # family's transformation fails, it logs the failure result or error message. The CSV report is saved in the root directory
 # with the filename 'cv3_family_failures_report.csv'.
 # Additionally, progress of the task and final report status are logged both to stdout and a log file 'cv3_family_failures_report.log'.
@@ -8,7 +8,7 @@ require 'csv'
 # @param
 #   batch_size [Integer] the number of families to process in a single batch. Defaults to 100.
 # @example
-#   rake cv3_family_failures_report:generate_csv[100]
+#   rake cv3_family_failures_report:generate_csv
 namespace :cv3_family_failures_report do
   desc "Generate an error report from Operations::Transformers::FamilyTo::Cv3Family.new.call(family) on all Families"
 
@@ -39,7 +39,7 @@ namespace :cv3_family_failures_report do
       end
     end
 
-    CSV.open(csv_file_path, 'wb') { |csv| csv << %w[hbx_id result output] } unless File.exists?(csv_file_path)
+    CSV.open(csv_file_path, 'wb') { |csv| csv << %w[hbx_assigned_id result output] } unless File.exists?(csv_file_path)
     family_ids = families_to_process(list_of_ids_file_path, last_id_file_path, csv_file_path)
 
     total = family_ids&.count
