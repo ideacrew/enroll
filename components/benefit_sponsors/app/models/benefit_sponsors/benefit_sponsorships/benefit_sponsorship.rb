@@ -438,8 +438,8 @@ module BenefitSponsors
       eligibilities_on(date, eligibility_collection).select{|e| e.is_eligible_on?(date) }
     end
 
-    def eligibility_for(eligibility_key, start_on)
-      active_eligibilities_on(date, eligibilities.by_key(eligibility_key)).last
+    def eligibility_for(eligibility_key, effective_date)
+      active_eligibilities_on(effective_date, eligibilities.by_key(eligibility_key)).last
     end
 
     def is_grant_eligible_on?(grant_value, effective_date)
