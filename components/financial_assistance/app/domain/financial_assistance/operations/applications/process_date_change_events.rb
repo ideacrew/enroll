@@ -44,8 +44,10 @@ module FinancialAssistance
         end
 
         def generate_renewal_drafts
+          return Success('FA Applications: Ineligible to trigger bulk renewal drafts') unless can_trigger_bulk_renewal_drafts?
+
           @logger.info 'Started generate_renewal_drafts process'
-          create_application_renewal_requests if can_trigger_bulk_renewal_drafts?
+          create_application_renewal_requests
           @logger.info 'Ended generate_renewal_drafts process'
           Success('Generated application renewal drafts successfully')
         end
@@ -71,8 +73,10 @@ module FinancialAssistance
         end
 
         def submit_renewal_drafts
+          return Success('FA Applications: Ineligible to submit bulk renewal drafts') unless can_submit_renewal_drafts?
+
           @logger.info 'Started submit_renewal_drafts process'
-          submit_renewal_draft_applications if can_submit_renewal_drafts?
+          submit_renewal_draft_applications
           @logger.info 'Ended submit_renewal_drafts process'
           Success('Submitted application renewal drafts successfully')
         end
