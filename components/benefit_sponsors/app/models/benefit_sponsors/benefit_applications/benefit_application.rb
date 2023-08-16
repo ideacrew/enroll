@@ -1235,24 +1235,25 @@ module BenefitSponsors
       benefit_sponsorship.eligibility_for(evidence_key, start_on)
     end
 
-    def grant_value_for(evidence_key, grant_type)
-      eligibility = eligibility_for(evidence_key)
-      grant = eligibility&.grant_for(grant_type)
-      grant&.value
+    def osse_eligible?
+      osse_key = "aca_shop_osse_eligibility_#{start_on.year}".to_sym
+      eligibility_for(osse_key).present? && shop_osse_eligibility_is_enabled?(start_on.year)
+    end
+
+    def is_grant_eligble?(grant_name)
+      benefit_sponsorship.is_grant_eligible_on?(grant_name, effective_on)
     end
 
     def validate_minimum_participation_rule
-      if (value = grant_value_for(:osse_subsidy, :minimum_participation_rule))
-        return value.run
-      end
+      return if is_grant_eligble?(:minimum_participation_rule)
 
       enrollment_ratio >= employee_participation_ratio_minimum
     end
 
     def validate_minimum_employer_contribution_rule
-      if (value = grant_value_for(:osse_subsidy, :all_contribution_levels_min_met))
-        value.run
-      elsif benefit_packages.map(&:sponsored_benefits).flatten.present?
+      return if is_grant_eligble?(:all_contribution_levels_min_met)
+
+      if benefit_packages.map(&:sponsored_benefits).flatten.present?
         if effective_period.min.month == 1
           true
         else
@@ -1265,18 +1266,13 @@ module BenefitSponsors
     end
 
     def validate_fte_count
-      if (value = grant_value_for(:osse_subsidy, :benefit_application_fte_count))
-        value.run
-      elsif is_renewing?
+      return if is_grant_eligble?(:benefit_application_fte_count)
+
+      if is_renewing?
         true
       else
         fte_count >= EMPLOYEE_MINIMUM_COUNT && fte_count < EMPLOYEE_MAXIMUM_COUNT
       end
-    end
-
-    def osse_eligible?
-      osse_key = "aca_shop_osse_eligibility_#{start_on.year}".to_sym
-      eligibility_for(osse_key).present? && shop_osse_eligibility_is_enabled?(start_on.year)
     end
 
     private

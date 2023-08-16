@@ -429,6 +429,18 @@ module BenefitSponsors
       benefit_market.benefit_market_catalog_effective_on(effective_date)
     end
 
+    def is_grant_eligible_on?(grant_value, effective_date)
+      active_eligibilities_for_date(date).any{|e| e.grant_for(grant_value)}
+    end
+
+    def eligibilities_for_date(date)
+      eligibilities.effectuated.select{|e| eligibility_period_cover?(date)}
+    end
+
+    def active_eligibilities_for_date(date)
+      eligibilities_for_date(date).select{|e| e.is_eligible_on?(date) }
+    end
+
     # we cannot have multiple eligibilities with same key in a given calender year
     def find_eligibility_by(eligibility_key, start_on = nil)
       eligibilities = self.eligibilities.effectuated.by_key(eligibility_key)
