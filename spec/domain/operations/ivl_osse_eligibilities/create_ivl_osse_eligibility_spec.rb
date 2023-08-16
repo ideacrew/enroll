@@ -22,7 +22,7 @@ RSpec.describe ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility,
     end
   end
 
-  let!(:catalog_eligibility) do
+  let(:catalog_eligibility) do
     Operations::Eligible::CreateCatalogEligibility.new.call(
       {
         subject: benefit_coverage_period.to_global_id,
@@ -47,6 +47,11 @@ RSpec.describe ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility,
 
   let(:evidence_value) { "false" }
 
+  before do
+    allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+    catalog_eligibility
+  end
+
   context "with input params" do
     it "should build admin attested evidence options" do
       result = described_class.new.call(required_params)
@@ -70,21 +75,6 @@ RSpec.describe ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility,
       expect(evidence_state_history.from_state).to eq(:initial)
       expect(evidence_state_history.to_state).to eq(:initial)
       expect(evidence_state_history.is_eligible).to be_falsey
-
-      # evidence = eligibility.evidences.last
-      # eligibility_state_history = eligibility.state_histories.last
-      # evidence_state_history = evidence.state_histories.last
-
-      # expect(eligibility_state_history.event).to eq(:move_to_published)
-      # expect(eligibility_state_history.from_state).to eq(:initial)
-      # expect(eligibility_state_history.to_state).to eq(:published)
-      # expect(eligibility_state_history.is_eligible).to be_falsey
-
-      # expect(evidence_state_history.event).to eq(:move_to_denied)
-      # expect(evidence_state_history.from_state).to eq(:initial)
-      # expect(evidence_state_history.to_state).to eq(:denied)
-      # expect(evidence_state_history.is_eligible).to be_falsey
-      # expect(evidence.is_satisfied).to be_falsey
     end
   end
 
