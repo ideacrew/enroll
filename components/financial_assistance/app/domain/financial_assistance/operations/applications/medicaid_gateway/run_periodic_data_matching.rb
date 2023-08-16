@@ -165,7 +165,7 @@ module FinancialAssistance
           end
 
           def publish_mec_check(application_id)
-            ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: application_id)
+            ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: application_id, transmittable_message_id: params[:transmittable_message_id])
           end
 
           def log_completion
