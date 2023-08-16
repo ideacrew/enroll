@@ -1517,8 +1517,27 @@ module BenefitSponsors
     end
 
     describe 'create default osse eligibility on create' do
+      include_context "setup benefit market with market catalogs and product packages"
+
       let(:benefit_sponsorship) { employer_profile.add_benefit_sponsorship }
       let(:current_year) { TimeKeeper.date_of_record.year }
+      let(:current_effective_date) { Date.new(Date.today.year, 3, 1) }
+
+      let!(:catalog_eligibility) do
+        catalog_eligibility =
+          ::Operations::Eligible::CreateCatalogEligibility.new.call(
+            {
+              subject: current_benefit_market_catalog.to_global_id,
+              eligibility_feature: "aca_shop_osse_eligibility",
+              effective_date:
+                current_benefit_market_catalog.application_period.begin.to_date,
+              domain_model:
+                "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+            }
+          )
+    
+        catalog_eligibility
+      end
 
       context 'when osse feature for the given year is disabled' do
         before do
