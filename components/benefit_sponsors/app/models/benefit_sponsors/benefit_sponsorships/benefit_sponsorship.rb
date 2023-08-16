@@ -443,7 +443,7 @@ module BenefitSponsors
     end
 
     def is_grant_eligible_on?(grant_value, effective_date)
-      active_eligibilities_on(effective_date).any{|e| e.grant_for(grant_value)}
+      active_eligibilities_on(effective_date).any?{|e| e.grant_for(grant_value)}
     end
 
     # we cannot have multiple eligibilities with same key in a given calender year
