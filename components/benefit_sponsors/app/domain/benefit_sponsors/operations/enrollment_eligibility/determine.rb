@@ -51,7 +51,7 @@ module BenefitSponsors
         end
 
         def attach_sponsor_eligibility_params(sponsorship_record, effective_date, eligibility_params)
-          eligibility_params[:sponsor_eligibilities] = sponsorship_record.eligibilities_for(effective_date)
+          eligibility_params[:sponsor_eligibilities] = sponsorship_record.active_eligibilities_on(effective_date)
 
           Success(eligibility_params)
         end

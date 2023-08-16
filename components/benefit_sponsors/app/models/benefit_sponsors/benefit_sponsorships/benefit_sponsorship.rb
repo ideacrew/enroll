@@ -429,21 +429,21 @@ module BenefitSponsors
       benefit_market.benefit_market_catalog_effective_on(effective_date)
     end
 
-    def is_grant_eligible_on?(grant_value, effective_date)
-      active_eligibilities_for_date(date).any{|e| e.grant_for(grant_value)}
-    end
-
-    def eligibilities_for_date(date, eligibility_collection = nil)
+    def eligibilities_on(date, eligibility_collection = nil)
       eligibility_collection ||= eligibilities.effectuated
       eligibility_collection.select{|e| eligibility_period_cover?(date)}
     end
 
-    def active_eligibilities_for_date(date, eligibility_collection = nil)
-      eligibilities_for_date(date, eligibility_collection).select{|e| e.is_eligible_on?(date) }
+    def active_eligibilities_on(date, eligibility_collection = nil)
+      eligibilities_on(date, eligibility_collection).select{|e| e.is_eligible_on?(date) }
     end
 
     def eligibility_for(eligibility_key, start_on)
-      active_eligibilities_for_date(date, eligibilities.by_key(eligibility_key)).last
+      active_eligibilities_on(date, eligibilities.by_key(eligibility_key)).last
+    end
+
+    def is_grant_eligible_on?(grant_value, effective_date)
+      active_eligibilities_on(effective_date).any{|e| e.grant_for(grant_value)}
     end
 
     # we cannot have multiple eligibilities with same key in a given calender year
@@ -453,20 +453,6 @@ module BenefitSponsors
       return eligibilities.last unless start_on
       eligibilities.detect do |eligibility|
         eligibility.eligibility_period_cover?(start_on)
-      end
-    end
-
-    def current_eligibility(evidence_key)
-      # returns latest eligibility without an end date
-      eligibilities.select do |eligibility|
-        el = eligibility.evidences.by_key(evidence_key).max_by(&:created_at)
-        eligibility.end_on.nil? && el&.is_satisfied == true
-      end.last
-    end
-
-    def eligibilities_for(date = TimeKeeper.date_of_record)
-      eligibilities.effectuated.select do |eligibility|
-        eligibility.eligibility_period_cover?(date) && eligibility.is_eligible_on?(date)
       end
     end
 

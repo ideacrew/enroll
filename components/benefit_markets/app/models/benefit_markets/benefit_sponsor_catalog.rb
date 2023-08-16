@@ -110,7 +110,7 @@ module BenefitMarkets
     def create_sponsor_eligibilities
       return unless benefit_sponsorship
 
-      sponsor_eligibilities = benefit_sponsorship.eligibilities_for(effective_date)
+      sponsor_eligibilities = benefit_sponsorship.active_eligibilities_on(effective_date)
       sponsor_eligibilities.each do |eligibility|
         next unless eligibility.key.to_s.match?(/^aca_shop_osse_eligibility/)
 
