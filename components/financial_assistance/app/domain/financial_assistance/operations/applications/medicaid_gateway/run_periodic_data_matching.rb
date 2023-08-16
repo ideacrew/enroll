@@ -18,6 +18,9 @@ module FinancialAssistance
 
           def call(params)
             values = yield validate(params)
+            @logger = initialize_logger
+            file_decorator = CSVFileBuilder.new("#{Rails.root}/periodic_data_matching_results_me_#{Time.now.to_i}.csv", fetch_csv_headers)
+            @report = BuildReport.new(file_decorator, @logger)
             response = yield filter_and_call_mec_service(values)
 
             Success(response)
@@ -38,8 +41,12 @@ module FinancialAssistance
             errors.empty? ? Success(params) : Failure(errors)
           end
 
+          def initialize_logger
+            log_file = "#{Rails.root}/log/run_periodic_data_matching_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+            Logger.new(log_file)
+          end
+
           def filter_and_call_mec_service(params)
-            initialize_logger
             batch_size = params[:batch_size]&.to_i || 1000
             @total_applications_published = 0
             families = fetch_enrolled_and_renewal_families(params)
@@ -47,12 +54,7 @@ module FinancialAssistance
             @logger.info "MedicaidGateway::RunPeriodicDataMatching Completed periodic data matching for #{@total_applications_published} applications"
             Success(total_applications_published: @total_applications_published)
           rescue StandardError => e
-            @logger.error "Error: message: #{e.message}, backtrace: #{e.backtrace}"
-          end
-
-          def initialize_logger
-            log_file = "#{Rails.root}/log/run_periodic_data_matching_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
-            @logger = Logger.new(log_file)
+            @logger.error "Error in filter_and_call_mec_service with message: #{e.message}, backtrace: #{e.backtrace}"
           end
 
           def fetch_enrolled_and_renewal_families(params)
@@ -78,7 +80,7 @@ module FinancialAssistance
 
               determined_application = fetch_application(family, params[:assistance_year])
               next unless determined_application.present?
-              build_csv_report(family, enrollments, determined_application) # Build CSV report
+              append_data_to_csv(family, enrollments, determined_application)
               process_mec_check(determined_application, params)
             end
           end
@@ -99,41 +101,29 @@ module FinancialAssistance
             end
           end
 
-          def build_csv_report(family, enrollments, determined_app)
-            file_path = "#{Rails.root}/periodic_data_matching_results_me_#{Time.now.to_i}.csv"
-            File.delete(file_path) if File.exist?(file_path)
-            add_csv_headers(file_path)
-            # add data to csv
-            CSV.open(file_path, 'a') do |csv|
-              enrollments.each do |enr|
-                enr.hbx_enrollment_members.each do |enr_member|
-                  fm = enr_member.family_member
-                  applicant = determined_app&.active_applicants&.where(family_member_id: fm.id)&.first
-                  program_eligibility = fetch_eligibility(applicant)
-                  csv << [
-                    family.hbx_assigned_id,
-                    fm.person&.hbx_id,
-                    fm.is_primary_applicant,
-                    enr.hbx_id,
-                    enr.coverage_kind,
-                    enr.aasm_state,
-                    enr.product.hios_id,
-                    enr.applied_aptc_amount.to_s,
-                    program_eligibility
-                  ]
-                end
+          def append_data_to_csv(family, enrollments, determined_app)
+            data_to_append = []
+            enrollments.each do |enr|
+              enr.hbx_enrollment_members.each do |enr_member|
+                fm = enr_member.family_member
+                applicant = determined_app&.active_applicants&.where(family_member_id: fm.id)&.first
+                program_eligibility = fetch_eligibility(applicant)
+                data_to_append << [
+                  family.hbx_assigned_id,
+                  fm.person&.hbx_id,
+                  fm.is_primary_applicant,
+                  enr.hbx_id,
+                  enr.coverage_kind,
+                  enr.aasm_state,
+                  enr.product.hios_id,
+                  enr.applied_aptc_amount.to_s,
+                  program_eligibility
+                ]
               end
             end
+            @report.append_data(data_to_append)
           rescue StandardError => e
-            @logger.error "Error: message: application: #{determined_app.id}, #{e.message}, backtrace: #{e.backtrace}"
-          end
-
-          def add_csv_headers(file_path)
-            # Check if the file is empty or missing headers
-            return if File.exist?(file_path) && !File.zero?(file_path)
-            CSV.open(file_path, 'w') do |csv|
-              csv << fetch_csv_headers
-            end
+            @logger.error "Error: Failed to append data to CSV: application: #{determined_app.id}, #{e.message}, backtrace: #{e.backtrace}"
           end
 
           def fetch_csv_headers
@@ -181,6 +171,36 @@ module FinancialAssistance
             Success(total_applications_published: @total_applications_published)
           end
 
+        end
+
+        # Generic decorator to build report
+        class BuildReport
+          def initialize(decorator, logger)
+            @decorator = decorator
+            @logger = logger
+          end
+
+          def append_data(data)
+            @decorator.append_data(data)
+          end
+        end
+
+        # CSV file builder to build report
+        class CSVFileBuilder
+          def initialize(filename, headers)
+            @output = CSV.open(filename, "w")
+
+            append_data(headers)
+          rescue StandardError => e
+            @logger.error "Error: Failed in initialize CSVFileBuilder #{e.message}, backtrace: #{e.backtrace}"
+          end
+
+          def append_data(data)
+            @output.add_row(data)
+            @output.flush
+          rescue StandardError => e
+            @logger.error "Error: Failed in append_data CSVFileBuilder #{e.message}, backtrace: #{e.backtrace}"
+          end
         end
       end
     end
