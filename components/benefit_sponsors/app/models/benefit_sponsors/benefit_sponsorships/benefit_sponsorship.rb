@@ -431,7 +431,7 @@ module BenefitSponsors
 
     def eligibilities_on(date, eligibility_collection = nil)
       eligibility_collection ||= eligibilities.effectuated
-      eligibility_collection.select{|e| eligibility_period_cover?(date)}
+      eligibility_collection.select{|e| e.eligibility_period_cover?(date)}
     end
 
     def active_eligibilities_on(date, eligibility_collection = nil)
