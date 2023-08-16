@@ -603,6 +603,10 @@ module FinancialAssistance
       spouse_relationship.present?
     end
 
+    def valid_family_relationships?
+      valid_spousal_relationship? && valid_child_relationship? && valid_in_law_relationship?
+    end
+
     # Checks that an applicant cannot have more than one spousal relationship
     def valid_spousal_relationship?
       partner_relationships = application.relationships.where({
@@ -612,6 +616,30 @@ module FinancialAssistance
                                                                 ]
                                                               })
       return false if partner_relationships.size > 2
+      true
+    end
+
+    def valid_child_relationship?
+      child_relationship = relationships.where(kind: 'child').first
+      return true if child_relationship.blank?
+
+      parent = child_relationship.relative
+      domestic_partner_relationship = parent.relationships.where(kind: 'domestic_partner').first
+      return true if domestic_partner_relationship.blank?
+
+      ['domestic_partners_child', 'child'].include?(relationships.where(relative_id: domestic_partner_relationship.relative.id).first.kind)
+    end
+
+    def valid_in_law_relationship?
+      unrelated_relationships = relationships.where(kind: 'unrelated')
+      spouse_relationship = relationships.where(:kind => 'spouse').first
+      return true unless unrelated_relationships.present? && spouse_relationship.present?
+      spouse_sibling_relationships = spouse_relationship.relative.relationships.where(:kind.in => ['sibling', 'brother_or_sister_in_law'])
+      return true unless spouse_sibling_relationships.present?
+
+      unrelated_relatives = unrelated_relationships.collect(&:relative_id)
+      spouse_siblings = spouse_sibling_relationships.collect(&:relative_id)
+      return false if unrelated_relatives.any? { |unrelated_relative| spouse_siblings.include?(unrelated_relative) }
       true
     end
 

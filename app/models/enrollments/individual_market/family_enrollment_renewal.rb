@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   include FloatHelper
   include Config::AcaHelper
@@ -11,40 +12,24 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   end
 
   def renew
-    @dependent_age_off = false
+    set_csr_value if enrollment.is_health_enrollment?
+    renewal_enrollment = clone_enrollment
+    populate_aptc_hash(renewal_enrollment) if renewal_enrollment.is_health_enrollment?
 
-    begin
-      set_csr_value if enrollment.is_health_enrollment?
-      renewal_enrollment = clone_enrollment
-      populate_aptc_hash(renewal_enrollment) if renewal_enrollment.is_health_enrollment?
+    can_renew = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: renewal_enrollment})
 
-      can_renew = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: renewal_enrollment})
+    raise "Cannot renew enrollment #{enrollment.hbx_id}. Error: #{can_renew.failure}" unless can_renew.success?
 
-      raise "Cannot renew enrollment #{enrollment.hbx_id}. Error: #{can_renew.failure}" unless can_renew.success?
+    save_renewal_enrollment(renewal_enrollment)
 
-      save_renewal_enrollment(renewal_enrollment)
-
-      # elected aptc should be the minimun between applied_aptc and EHB premium.
-      renewal_enrollment = assisted_enrollment(renewal_enrollment) if @assisted.present? && renewal_enrollment.is_health_enrollment?
-
-      if is_dependent_dropped?
-        renewal_enrollment.aasm_state = 'coverage_selected'
-        renewal_enrollment.workflow_state_transitions.build(from_state: 'shopping', to_state: 'coverage_selected')
-        renewal_enrollment.update_tax_household_enrollment
-      else
-        renewal_enrollment.renew_enrollment
-      end
-
-      verify_and_set_osse_minimum_aptc(renewal_enrollment) if @assisted
-      renewal_enrollment.update_osse_childcare_subsidy
-
-      # renewal_enrollment.decorated_hbx_enrollment
-      @dependent_age_off = nil
-      save_renewal_enrollment(renewal_enrollment)
-    rescue Exception => e
-      puts "#{enrollment.hbx_id}---#{e.inspect}" # unless Rails.env.test?
-      @logger.info "Enrollment renewal failed for #{enrollment.hbx_id} with Exception: #{e.backtrace}"
-    end
+    # elected aptc should be the minimun between applied_aptc and EHB premium.
+    renewal_enrollment = assisted_enrollment(renewal_enrollment) if @assisted.present? && renewal_enrollment.is_health_enrollment?
+    renewal_enrollment.renew_enrollment
+    verify_and_set_osse_minimum_aptc(renewal_enrollment) if @assisted
+    renewal_enrollment.update_osse_childcare_subsidy
+    save_renewal_enrollment(renewal_enrollment)
+  rescue StandardError => e
+    @logger.info "Enrollment renewal failed for #{enrollment.hbx_id} with error message: #{e} backtrace: #{e.backtrace.join('\n')}"
   end
 
   def clone_enrollment
@@ -173,10 +158,6 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_service.assign(@aptc_values)
   end
 
-  def is_dependent_dropped?
-    @dependent_age_off
-  end
-
   # Assisted
   # Tax household > eligibility determinations
   #  - latest eligibility determation
@@ -268,10 +249,31 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     end
   end
 
+  def slcsp_feature_enabled?(renewal_year)
+    EnrollRegistry.feature_enabled?(:atleast_one_silver_plan_donot_cover_pediatric_dental_cost) &&
+      EnrollRegistry[:atleast_one_silver_plan_donot_cover_pediatric_dental_cost]&.settings(renewal_year)&.item
+  end
+
+  # Check if member turned 19 during renewal and has pediatric only Qualified Dental Plan
+  def turned_19_during_renewal_with_pediatric_only_qdp?(member)
+    return false unless slcsp_feature_enabled?(renewal_coverage_start.year)
+    return false if enrollment.is_health_enrollment?
+    return false unless dental_renewal_product.allows_child_only_offering?
+
+    member.person.age_on(renewal_coverage_start) >= 19
+  end
+
+  # Find the dental product using renewal_product_id
+  def dental_renewal_product
+    @dental_renewal_product ||= ::BenefitMarkets::Products::DentalProducts::DentalProduct.find(renewal_product)
+  end
+
   # rubocop:disable Style/RedundantReturn
   def eligible_to_get_covered?(member)
     child_relations = %w[child ward foster_child adopted_child]
     return true unless child_relations.include?(member.family_member.relationship)
+
+    return false if turned_19_during_renewal_with_pediatric_only_qdp?(member)
 
     return true if member.family_member.age_off_excluded
 
@@ -289,7 +291,6 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
       return true if member.person.age_on(renewal_coverage_start.prev_day) < 26
     end
 
-    @dependent_age_off ||= true
     return false
   end
   # rubocop:enable Style/RedundantReturn

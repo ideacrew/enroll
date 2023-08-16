@@ -22,7 +22,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="applicant_link" type="ApplicantLinkType" maxOccurs="unbounded"/>
+				<xs:element name="applicant_link" type="ApplicantLinkType" maxOccurs="10"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -32,7 +32,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="applicant" type="ApplicantType" maxOccurs="unbounded"/>
+				<xs:element name="applicant" type="ApplicantType" maxOccurs="10"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -47,7 +47,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="application_group" maxOccurs="unbounded"/>
+				<xs:element ref="application_group" maxOccurs="10"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -60,7 +60,7 @@
 	<xs:element name="eligibility_determinations">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="eligibility_determination" type="EligibilityDeterminationType" maxOccurs="unbounded"/>
+				<xs:element name="eligibility_determination" type="EligibilityDeterminationType" maxOccurs="10"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -70,14 +70,14 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="eligibility_determination_applicant" type="EligibilityDeterminationApplicantType" maxOccurs="unbounded"/>
+				<xs:element name="eligibility_determination_applicant" type="EligibilityDeterminationApplicantType" maxOccurs="10"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="emergency_medicaid_enrollments">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="emergency_medicaid_enrollment" type="EmergencyMedicaidEnrollmentType" maxOccurs="unbounded"/>
+				<xs:element name="emergency_medicaid_enrollment" type="EmergencyMedicaidEnrollmentType" maxOccurs="10"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -87,7 +87,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="hbx_enrollment_exemption" type="HbxEnrollmentExemptionType" maxOccurs="unbounded"/>
+				<xs:element name="hbx_enrollment_exemption" type="HbxEnrollmentExemptionType" maxOccurs="10"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -97,7 +97,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="financial_statement" type="FinancialStatementType" maxOccurs="unbounded"/>
+				<xs:element name="financial_statement" type="FinancialStatementType" maxOccurs="10"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -108,14 +108,14 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="hbx_enrollment" type="HbxEnrollmentType" maxOccurs="unbounded"/>
+				<xs:element name="hbx_enrollment" type="HbxEnrollmentType" maxOccurs="10"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="hcr_chip_enrollments">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="hcr_chip_enrollment" type="HcrChipEnrollmentType" maxOccurs="unbounded"/>
+				<xs:element name="hcr_chip_enrollment" type="HcrChipEnrollmentType" maxOccurs="10"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -125,7 +125,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="ia_enrollment" type="IaEnrollmentType" maxOccurs="unbounded"/>
+				<xs:element name="ia_enrollment" type="IaEnrollmentType" maxOccurs="10"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -150,7 +150,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="irs_group" type="IrsGroupType" maxOccurs="unbounded"/>
+				<xs:element name="irs_group" type="IrsGroupType" maxOccurs="10"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -159,7 +159,7 @@
 	<xs:element name="person_relationships">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="person_relationship" type="PersonRelationshipType" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="person_relationship" type="PersonRelationshipType" minOccurs="0" maxOccurs="10"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -172,21 +172,21 @@
 	<xs:element name="responsible_parties">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="responsible_party" maxOccurs="unbounded"/>
+				<xs:element ref="responsible_party" maxOccurs="10"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="shop_enrollments">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="shop_enrollment" type="ShopEnrollmentType" maxOccurs="unbounded"/>
+				<xs:element name="shop_enrollment" type="ShopEnrollmentType" maxOccurs="10"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="streamlined_medicaid_enrollments">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="streamlined_medicaid_enrollment" type="StreamlinedMedicaidEnrollmentType" maxOccurs="unbounded"/>
+				<xs:element name="streamlined_medicaid_enrollment" type="StreamlinedMedicaidEnrollmentType" maxOccurs="10"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -196,7 +196,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="tax_household_member" type="TaxHouseholdMemberType" maxOccurs="unbounded"/>
+				<xs:element name="tax_household_member" type="TaxHouseholdMemberType" maxOccurs="10"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -204,7 +204,7 @@
 	<xs:element name="tax_households">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="tax_household" type="TaxHouseholdType" maxOccurs="unbounded"/>
+				<xs:element name="tax_household" type="TaxHouseholdType" maxOccurs="10"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -214,7 +214,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="uqhp_enrollment" type="UQhpEnrollmentType" maxOccurs="unbounded"/>
+				<xs:element name="uqhp_enrollment" type="UQhpEnrollmentType" maxOccurs="10"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -462,7 +462,7 @@
 								<xs:element name="application_groups">
 									<xs:complexType>
 										<xs:sequence>
-											<xs:element ref="application_group" minOccurs="0" maxOccurs="unbounded"/>
+											<xs:element ref="application_group" minOccurs="0" maxOccurs="10"/>
 										</xs:sequence>
 									</xs:complexType>
 								</xs:element>
@@ -579,7 +579,7 @@
 	</xs:complexType>
 	<xs:complexType name="EmergencyMedicaidEnrollmentType">
 		<xs:sequence>
-			<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="10"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="EmployeeRoleType">
@@ -601,7 +601,7 @@
 			<xs:documentation>A list of employee roles for an individual.</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="employee_role" type="EmployeeRoleType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="employee_role" type="EmployeeRoleType" minOccurs="0" maxOccurs="10"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="BrokerRolesListType">
@@ -609,7 +609,7 @@
 			<xs:documentation>A list of employee roles for an individual.</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="broker_role" type="BrokerRoleType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="broker_role" type="BrokerRoleType" minOccurs="0" maxOccurs="10"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="FinancialAssistanceApplicantIndivdualType">
@@ -766,16 +766,16 @@
 			<xs:element name="incomes" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="total_income_by_year" type="CurrencyAmountPerAnnumType" minOccurs="0" maxOccurs="unbounded"/>
-						<xs:element name="income" type="IndividualIncomeType" maxOccurs="unbounded"/>
+						<xs:element name="total_income_by_year" type="CurrencyAmountPerAnnumType" minOccurs="0" maxOccurs="10"/>
+						<xs:element name="income" type="IndividualIncomeType" maxOccurs="10"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="deductions" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="total_deductions_by_year" type="CurrencyAmountPerAnnumType" minOccurs="0" maxOccurs="unbounded"/>
-						<xs:element name="deduction" type="IndividualDeductionType" maxOccurs="unbounded"/>
+						<xs:element name="total_deductions_by_year" type="CurrencyAmountPerAnnumType" minOccurs="0" maxOccurs="10"/>
+						<xs:element name="deduction" type="IndividualDeductionType" maxOccurs="10"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -785,7 +785,7 @@
 				</xs:annotation>
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="alternative_benefit" type="AlternateBenefitType" maxOccurs="unbounded"/>
+						<xs:element name="alternative_benefit" type="AlternateBenefitType" maxOccurs="10"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -840,7 +840,7 @@
 	</xs:complexType>
 	<xs:complexType name="HcrChipEnrollmentType">
 		<xs:sequence>
-			<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="10"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="IaEnrollmentType">
@@ -1145,7 +1145,7 @@
 								<xs:element name="individuals">
 									<xs:complexType>
 										<xs:sequence>
-											<xs:element ref="individual" minOccurs="0" maxOccurs="unbounded"/>
+											<xs:element ref="individual" minOccurs="0" maxOccurs="10"/>
 										</xs:sequence>
 									</xs:complexType>
 								</xs:element>
@@ -1158,7 +1158,7 @@
 	</xs:complexType>
 	<xs:complexType name="IndividualUpdateType">
 		<xs:sequence>
-			<xs:element name="change_type" type="IndividualUpdateNameType" maxOccurs="unbounded"/>
+			<xs:element name="change_type" type="IndividualUpdateNameType" maxOccurs="10"/>
 			<xs:element ref="individual"/>
 			<xs:element name="previous_information" type="PreviousIndividualType"/>
 		</xs:sequence>
@@ -1224,14 +1224,14 @@
 			<xs:element name="tax_household_ids">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="tax_household_id" type="IdentifierSimpleType" maxOccurs="unbounded"/>
+						<xs:element name="tax_household_id" type="IdentifierSimpleType" maxOccurs="10"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="hbx_enrollment_ids">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="hbx_enrollment_id" type="IdentifierSimpleType" maxOccurs="unbounded"/>
+						<xs:element name="hbx_enrollment_id" type="IdentifierSimpleType" maxOccurs="10"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -1282,7 +1282,7 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:element name="race" type="RaceNameType" minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="race" type="RaceNameType" minOccurs="0" maxOccurs="10">
 				<xs:annotation>
 					<xs:documentation>Individual's race - optional selections - can select all that apply</xs:documentation>
 				</xs:annotation>
@@ -1345,7 +1345,7 @@
 			<xs:element name="name_last" type="xs:string"/>
 			<xs:element name="name_suffix" type="xs:string" minOccurs="0"/>
 			<xs:element name="name_full" type="xs:string" minOccurs="0"/>
-			<xs:element name="member_change" type="PreviousMemberType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="member_change" type="PreviousMemberType" minOccurs="0" maxOccurs="10"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="PreviousMemberType">
@@ -1466,7 +1466,7 @@
 	</xs:complexType>
 	<xs:complexType name="AllocatedAptcsType">
 		<xs:sequence>
-			<xs:element name="allocated_aptc" type="CurrencyAmountPerAnnumType" maxOccurs="unbounded"/>
+			<xs:element name="allocated_aptc" type="CurrencyAmountPerAnnumType" maxOccurs="10"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="TotalIncomesByYearType">
@@ -1474,7 +1474,7 @@
 			<xs:documentation>Sum of all qualified household income sources, including incomes of person who pays taxes, spouse and dependents, less qualified deductions, by calendar year</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="total_income_by_year" type="CurrencyAmountPerAnnumType" maxOccurs="unbounded"/>
+			<xs:element name="total_income_by_year" type="CurrencyAmountPerAnnumType" maxOccurs="10"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="EligibilityDeterminationApplicantType">
@@ -1543,7 +1543,7 @@
 	</xs:complexType>
 	<xs:complexType name="StreamlinedMedicaidEnrollmentType">
 		<xs:sequence>
-			<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="10"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="UQhpEnrollmentType">
@@ -2107,7 +2107,7 @@
 	</xs:simpleType>
 	<xs:complexType name="CoverageHouseholdMembersListType">
 		<xs:sequence>
-			<xs:element name="coverage_household_member" type="PersonLinkType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="coverage_household_member" type="PersonLinkType" minOccurs="0" maxOccurs="10"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="CoverageHouseholdType">
@@ -2134,12 +2134,12 @@
 	</xs:complexType>
 	<xs:complexType name="CoverageHouseholdBrokerAssignmentsType">
 		<xs:sequence>
-			<xs:element name="broker_assignment" type="CoverageHouseholdBrokerAssignmentType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="broker_assignment" type="CoverageHouseholdBrokerAssignmentType" minOccurs="0" maxOccurs="10"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="CoverageHouseholdsListType">
 		<xs:sequence>
-			<xs:element name="coverage_household" type="CoverageHouseholdType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="coverage_household" type="CoverageHouseholdType" minOccurs="0" maxOccurs="10"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="HouseholdType">
@@ -2159,12 +2159,12 @@
 	</xs:complexType>
 	<xs:complexType name="HouseholdsListType">
 		<xs:sequence>
-			<xs:element name="household" type="HouseholdType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="household" type="HouseholdType" minOccurs="0" maxOccurs="10"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="FamilyMembersListType">
 		<xs:sequence>
-			<xs:element name="family_member" type="ApplicantType" maxOccurs="unbounded"/>
+			<xs:element name="family_member" type="ApplicantType" maxOccurs="10"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:element name="renewal_consent_through_year">
@@ -2184,7 +2184,7 @@
 		</xs:annotation>
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="qualifying_life_event" type="QualifyingLifeEventType" maxOccurs="unbounded"/>
+				<xs:element name="qualifying_life_event" type="QualifyingLifeEventType" maxOccurs="10"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -2202,7 +2202,7 @@
 	</xs:complexType>
 	<xs:complexType name="FamilyBrokerAccountListType">
 		<xs:sequence>
-			<xs:element name="broker_account" type="FamilyBrokerAccountType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="broker_account" type="FamilyBrokerAccountType" minOccurs="0" maxOccurs="10"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:group name="FamilySharedElementsGroup">
@@ -2409,7 +2409,7 @@
 			<xs:documentation>Sum of all qualified, adjusted individual income sources, by calendar year. Also includes information about verification of the income.</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="total_income_by_year" type="VerifiedCurrencyAmountPerAnnumType" maxOccurs="unbounded"/>
+			<xs:element name="total_income_by_year" type="VerifiedCurrencyAmountPerAnnumType" maxOccurs="10"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:simpleType name="MagiMedicaidCategoryType">
