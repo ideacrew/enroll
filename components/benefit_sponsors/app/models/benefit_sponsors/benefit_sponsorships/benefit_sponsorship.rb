@@ -449,7 +449,7 @@ module BenefitSponsors
     # we cannot have multiple eligibilities with same key in a given calender year
     # Following method should be used only when we're pulling all matching eligibilities irrespective of eligible or not
     def find_eligibility_by(eligibility_key, start_on = nil)
-      eligibilities = self.eligibilities.by_key(eligibility_key).last
+      eligibilities = self.eligibilities.by_key(eligibility_key)
       return eligibilities.last unless start_on
       eligibilities.detect do |eligibility|
         eligibility.eligibility_period_cover?(start_on)
