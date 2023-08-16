@@ -9,7 +9,7 @@ describe Forms::HealthcareForChildcareProgramForm do
     let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
     let!(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
     let!(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
-    let!(:catalog_eligibility) do
+    let(:catalog_eligibility) do
       Operations::Eligible::CreateCatalogEligibility.new.call(
         {
           subject: benefit_coverage_period.to_global_id,
@@ -32,6 +32,7 @@ describe Forms::HealthcareForChildcareProgramForm do
       allow(::EnrollRegistry).to receive(:feature?).and_return(true)
       allow(::EnrollRegistry).to receive(:feature_enabled?).and_return(true)
       TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 5, 1))
+      catalog_eligibility
     end
 
     after do
