@@ -14,12 +14,15 @@ RSpec.describe Operations::Eligible::CreateCatalogEligibility,
       ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market
     end
 
+    let(:catalog_begin) do
+      current_benefit_market_catalog.application_period.begin
+    end
+
     let(:required_params) do
       {
         subject: current_benefit_market_catalog.to_global_id,
         eligibility_feature: "aca_shop_osse_eligibility",
-        effective_date:
-          current_benefit_market_catalog.application_period.begin.to_date,
+        effective_date: catalog_begin.to_date,
         domain_model:
           "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
       }
@@ -27,6 +30,9 @@ RSpec.describe Operations::Eligible::CreateCatalogEligibility,
 
     context "Given a benefit market calog exists" do
       context "with valid params" do
+        before do
+          allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+        end
         it "should create eligibility" do
           result = described_class.new.call(required_params)
           expect(result.success?).to be_truthy
@@ -77,11 +83,13 @@ RSpec.describe Operations::Eligible::CreateCatalogEligibility,
       end
     end
 
+    let(:catalog_begin) { benefit_coverage_period.start_on }
+
     let(:required_params) do
       {
         subject: benefit_coverage_period.to_global_id,
         eligibility_feature: "aca_ivl_osse_eligibility",
-        effective_date: benefit_coverage_period.start_on.to_date,
+        effective_date: catalog_begin.to_date,
         domain_model:
           "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
       }
@@ -89,6 +97,10 @@ RSpec.describe Operations::Eligible::CreateCatalogEligibility,
 
     context "Given a benefit coverage period exists" do
       context "with valid params" do
+        before do
+          allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+        end
+
         it "should create eligibility" do
           result = described_class.new.call(required_params)
           expect(result.success?).to be_truthy
