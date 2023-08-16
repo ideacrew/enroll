@@ -11,7 +11,7 @@ module BenefitMarkets
     field :open_enrollment_period,  type: Range
     field :probation_period_kinds,  type: Array, default: []
 
-    delegate :benefit_sponsorship, to: :benefit_application
+    delegate :benefit_sponsorship, to: :benefit_application, allow_nil: true
 
     has_and_belongs_to_many  :service_areas,
                 class_name: "BenefitMarkets::Locations::ServiceArea",
@@ -104,17 +104,20 @@ module BenefitMarkets
     end
 
     def create_sponsor_eligibilities
+      return unless benefit_sponsorship
       sponsor_eligibilities = benefit_sponsorship.eligibilities_for(effective_date)
-    
+
       sponsor_eligibilities.each do |eligibility|
         next unless eligibility.key.to_s.match?(/^aca_shop_osse_eligibility/)
-    
-        ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call({
-          subject: self.to_global_id,
-          effective_date: effective_date,
-          evidence_key: :shop_osse_evidence,
-          evidence_value: 'true'
-        })
+
+        ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(
+          {
+            subject: self.to_global_id,
+            effective_date: effective_date,
+            evidence_key: :shop_osse_evidence,
+            evidence_value: 'true'
+          }
+        )
       end
     end
   end
