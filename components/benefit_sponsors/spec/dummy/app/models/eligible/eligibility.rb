@@ -8,6 +8,8 @@ module Eligible
 
     STATUSES = %i[initial published expired].freeze
 
+    embedded_in :eligible, polymorphic: true
+
     field :key, type: Symbol
     field :title, type: String
     field :description, type: String
@@ -26,6 +28,7 @@ module Eligible
                 as: :status_trackable
 
     validates_presence_of :title
+    validates_uniqueness_of :key
 
     delegate :effective_on,
              :is_eligible,
@@ -36,7 +39,7 @@ module Eligible
     scope :effectuated, -> { where(:current_state.ne => :initial) }
 
     def latest_state_history
-      state_histories.max_by(&:created_at)
+      state_histories.last
     end
 
     def eligibility_period_cover?(date)
@@ -49,8 +52,7 @@ module Eligible
     end
 
     def published_on
-      publish_history =
-        state_histories.by_state(:published).min_by(&:created_at)
+      publish_history = state_histories.by_state(:published).min_by(&:created_at)
       publish_history&.effective_on
     end
 
@@ -58,8 +60,7 @@ module Eligible
     #eligibility can't span across multiple years
     #once eligibility is expired, it can never be moved back to published state
     def expired_on
-      expiration_history =
-        state_histories.by_state(:expired).min_by(&:created_at)
+      expiration_history = state_histories.by_state(:expired).min_by(&:created_at)
       expiration_history&.effective_on&.prev_day || published_on&.end_of_year
     end
 
@@ -68,9 +69,7 @@ module Eligible
     end
 
     def grant_for(grant_key)
-      grants
-        .by_key(grant_key)
-        .detect { |grant| grant.value&.item.to_s == "true" }
+      grants.detect { |grant| grant.value&.item.to_s == grant_key.to_s }
     end
 
     class << self

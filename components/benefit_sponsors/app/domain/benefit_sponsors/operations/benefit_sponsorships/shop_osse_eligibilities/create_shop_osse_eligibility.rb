@@ -34,7 +34,6 @@ module BenefitSponsors
           private
 
           def validate(params)
-            params[:event] ||= :initialize
             params[:effective_date] ||= TimeKeeper.date_of_record
 
             errors = []
