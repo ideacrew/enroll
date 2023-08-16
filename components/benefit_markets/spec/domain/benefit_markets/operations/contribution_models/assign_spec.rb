@@ -204,7 +204,6 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
       benefit_application_kind: :initial,
       service_areas: service_areas,
       benefit_sponsorship_id: BSON::ObjectId.new,
-      osse_min_employer_contribution: osse_min_employer_contribution
     )
   end
   let(:params)                 {{ product_package_values: product_package_params, enrollment_eligibility: enrollment_eligibility }}
@@ -243,8 +242,7 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
         market_kind: market_kind,
         benefit_application_kind: :renewal,
         service_areas: service_areas,
-        benefit_sponsorship_id: BSON::ObjectId.new,
-        osse_min_employer_contribution: false
+        benefit_sponsorship_id: BSON::ObjectId.new
       )
     end
 
