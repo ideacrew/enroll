@@ -322,5 +322,21 @@ namespace :import do
     ]
 
     current_period_bc.save!
+
+    puts "current benefit coverage period created. Creating eligibilities....."
+    result = Operations::Eligible::CreateCatalogEligibility.new.call(
+      {
+        subject: current_period_bc.to_global_id,
+        eligibility_feature: "aca_ivl_osse_eligibility",
+        effective_date: current_period_bc.start_on.to_date,
+        domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+      }
+    )
+
+    if result.success?
+      p "Success: created eligibility for #{current_period_bc.start_on.year} benefit coverage period"
+    else
+      p "Failed to create eligibility for #{current_period_bc.start_on.year} benefit coverage period"
+    end
   end
 end
