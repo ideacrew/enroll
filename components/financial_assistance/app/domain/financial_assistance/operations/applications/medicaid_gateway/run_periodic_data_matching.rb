@@ -3,6 +3,8 @@
 require 'dry/monads'
 require 'dry/monads/do'
 require 'aca_entities/magi_medicaid/libraries/iap_library'
+require "#{Rails.root}/lib/decorators/build_report"
+require "#{Rails.root}/lib/decorators/csv_file_builder"
 require 'csv'
 
 module FinancialAssistance
@@ -19,8 +21,8 @@ module FinancialAssistance
           def call(params)
             values = yield validate(params)
             @logger = initialize_logger
-            file_decorator = CSVFileBuilder.new("#{Rails.root}/periodic_data_matching_results_me_#{Time.now.to_i}.csv", fetch_csv_headers)
-            @report = BuildReport.new(file_decorator, @logger)
+            csv_file_builder = ::Decorators::CSVFileBuilder.new("#{Rails.root}/periodic_data_matching_results_me_#{Time.now.to_i}.csv", fetch_csv_headers)
+            @report = ::Decorators::BuildReport.new(csv_file_builder, @logger)
             response = yield filter_and_call_mec_service(values)
 
             Success(response)
@@ -171,36 +173,6 @@ module FinancialAssistance
             Success(total_applications_published: @total_applications_published)
           end
 
-        end
-
-        # Generic decorator to build report
-        class BuildReport
-          def initialize(decorator, logger)
-            @decorator = decorator
-            @logger = logger
-          end
-
-          def append_data(data)
-            @decorator.append_data(data)
-          end
-        end
-
-        # CSV file builder to build report
-        class CSVFileBuilder
-          def initialize(filename, headers)
-            @output = CSV.open(filename, "w")
-
-            append_data(headers)
-          rescue StandardError => e
-            @logger.error "Error: Failed in initialize CSVFileBuilder #{e.message}, backtrace: #{e.backtrace}"
-          end
-
-          def append_data(data)
-            @output.add_row(data)
-            @output.flush
-          rescue StandardError => e
-            @logger.error "Error: Failed in append_data CSVFileBuilder #{e.message}, backtrace: #{e.backtrace}"
-          end
         end
       end
     end
