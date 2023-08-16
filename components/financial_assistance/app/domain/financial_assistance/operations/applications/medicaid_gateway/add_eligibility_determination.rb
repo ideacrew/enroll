@@ -12,6 +12,7 @@ module FinancialAssistance
         # Operation receives the MagiMedicaidApplication with Full Determination
         class AddEligibilityDetermination
           include Dry::Monads[:result, :do]
+          include EventSource::Command
 
           # @param [Hash] opts The options to add eligibility determination to Application(persistence object)
           # @option opts [Hash] :application_response_payload ::AcaEntities::MagiMedicaid::Application params
@@ -63,7 +64,7 @@ module FinancialAssistance
           def add_eligibility_determination(app_entity, application)
             app_entity.tax_households.each do |thh_entity|
               elig_d = find_matching_eligibility_determination(application, thh_entity)
-              update_applicants(elig_d, thh_entity)
+              update_applicants(elig_d, thh_entity, application)
               update_eligibility_determination(elig_d, thh_entity)
             end
 
@@ -84,11 +85,13 @@ module FinancialAssistance
             end
           end
 
-          def update_applicants(elig_d, thh_entity)
+          def update_applicants(elig_d, thh_entity, application)
+            totally_ineligible_members = []
             thh_entity.tax_household_members.each do |thhm_entity|
               applicant = find_matching_applicant(elig_d, thhm_entity.applicant_reference.person_hbx_id)
               ped_entity = thhm_entity.product_eligibility_determination
               member_determinations = ped_entity.member_determinations&.map(&:to_h)
+              totally_ineligible_members << ped_entity.is_totally_ineligible
 
               applicant.assign_attributes({ medicaid_household_size: ped_entity.medicaid_household_size || 0,
                                             magi_medicaid_category: ped_entity.magi_medicaid_category || 'none',
@@ -105,6 +108,19 @@ module FinancialAssistance
 
               build_member_determinations(applicant, member_determinations) if member_determinations
               applicant.save
+            end
+
+            notify_totally_ineligible(application) if totally_ineligible_members.include?(true) && FinancialAssistanceRegistry.feature_enabled?(:totally_ineligible_notice)
+          end
+
+          def notify_totally_ineligible(application)
+            event_to_publish = event("enroll.families.notices.faa_totally_ineligible_notice.requested", attributes: application.serializable_hash)
+            result = event_to_publish.success.publish
+
+            if result.success?
+              log({:message => "Successfully published the payload for event __________"}, :severity => 'info')
+            else
+              log({:message => "Failed to publish the payload for event __________"}, :severity => 'error')
             end
           end
 
