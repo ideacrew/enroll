@@ -9,6 +9,8 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
                type: :model,
                dbclean: :after_each do
   describe "group migrations" do
+    include_context "setup benefit market with market catalogs and product packages"
+
     let(:site) do
       ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market
     end
@@ -76,6 +78,22 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
       }
     end
 
+    let(:catalog_eligibility) do
+      catalog_eligibility =
+        ::Operations::Eligible::CreateCatalogEligibility.new.call(
+          {
+            subject: current_benefit_market_catalog.to_global_id,
+            eligibility_feature: "aca_shop_osse_eligibility",
+            effective_date:
+              current_benefit_market_catalog.application_period.begin.to_date,
+            domain_model:
+              "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+          }
+        )
+  
+      catalog_eligibility
+    end
+
     let(:eligibility) do
       subject = OpenStruct.new(subject_options)
       eligibility = OpenStruct.new(eligibility_options)
@@ -89,6 +107,16 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
       eligibility.subject = subject
       eligibility
     end
+
+    let(:current_effective_date) { Date.new(Date.today.year, 3, 1) }
+
+    before do 
+      TimeKeeper.set_date_of_record_unprotected!(current_effective_date)
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+      catalog_eligibility
+    end
+  
+    after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
 
     context "when existing eligibility record passed with subject" do
       it "should migrate eligibility into new models" do
@@ -155,7 +183,7 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
       end
     end
 
-    let!(:catalog_eligibility) do
+    let(:catalog_eligibility) do
       Operations::Eligible::CreateCatalogEligibility.new.call(
         {
           subject: benefit_coverage_period.to_global_id,
@@ -167,7 +195,7 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
       )
     end
 
-    let!(:last_year_catalog_eligibility) do
+    let(:last_year_catalog_eligibility) do
       Operations::Eligible::CreateCatalogEligibility.new.call(
         {
           subject: last_year_benefit_coverage_period.to_global_id,
@@ -185,14 +213,11 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
 
     let!(:consumer_role) { person.consumer_role }
 
-    # before do
-    #   allow(EnrollRegistry).to receive(:feature_enabled?).with(
-    #     "aca_ivl_osse_eligibility_#{coverage_year - 1}"
-    #   ).and_return(true)
-    #   allow(EnrollRegistry).to receive(:feature_enabled?).with(
-    #     "aca_ivl_osse_eligibility_#{coverage_year}"
-    #   ).and_return(true)
-    # end
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+      last_year_catalog_eligibility
+      catalog_eligibility
+    end
 
     context ".scenario 1 (multiple eligibilities)" do
       let(:options1) do

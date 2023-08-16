@@ -30,7 +30,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
 
   let(:current_effective_date) { Date.new(Date.today.year, 3, 1) }
 
-  let!(:catalog_eligibility) do
+  let(:catalog_eligibility) do
     catalog_eligibility =
       ::Operations::Eligible::CreateCatalogEligibility.new.call(
         {
@@ -57,7 +57,11 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
 
   let(:evidence_value) { "false" }
 
-  before { TimeKeeper.set_date_of_record_unprotected!(current_effective_date) }
+  before do 
+    TimeKeeper.set_date_of_record_unprotected!(current_effective_date)
+    allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+    catalog_eligibility
+  end
 
   after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
 
