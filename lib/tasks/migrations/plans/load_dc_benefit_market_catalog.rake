@@ -40,6 +40,26 @@ namespace :load do
         product_class.by_product_package(product_package).collect { |prod| prod.create_copy_for_embedding }
       end
 
+      if kind == :aca_shop
+        puts "Creating eligibilities......"
+
+        result = Operations::Eligible::CreateCatalogEligibility.new.call(
+          {
+            subject: benefit_market_catalog.to_global_id,
+            eligibility_feature: "aca_shop_osse_eligibility",
+            effective_date: benefit_market_catalog.application_period.min.to_date,
+            domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+          }
+        )
+
+        if result.success?
+          p "Success: created eligibility for #{current_period_bc.start_on.year} benefit coverage period"
+        else
+          p "Failed to create eligibility for #{current_period_bc.start_on.year} benefit coverage period"
+        end
+      end
+
+
       puts "Creating Product Packages..." unless Rails.env.test?
 
       [:health, :dental].each do |product_kind|
