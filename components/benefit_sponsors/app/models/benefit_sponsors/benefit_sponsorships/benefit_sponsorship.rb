@@ -433,26 +433,25 @@ module BenefitSponsors
       active_eligibilities_for_date(date).any{|e| e.grant_for(grant_value)}
     end
 
-    def eligibilities_for_date(date)
-      eligibilities.effectuated.select{|e| eligibility_period_cover?(date)}
+    def eligibilities_for_date(date, eligibility_collection = nil)
+      eligibility_collection ||= eligibilities.effectuated
+      eligibility_collection.select{|e| eligibility_period_cover?(date)}
     end
 
-    def active_eligibilities_for_date(date)
-      eligibilities_for_date(date).select{|e| e.is_eligible_on?(date) }
-    end
-
-    # we cannot have multiple eligibilities with same key in a given calender year
-    def find_eligibility_by(eligibility_key, start_on = nil)
-      eligibilities = self.eligibilities.effectuated.by_key(eligibility_key)
-      return eligibilities.last unless start_on
-      eligibilities.effectuated.detect do |eligibility|
-        eligibility.eligibility_period_cover?(start_on)
-      end
+    def active_eligibilities_for_date(date, eligibility_collection = nil)
+      eligibilities_for_date(date, eligibility_collection).select{|e| e.is_eligible_on?(date) }
     end
 
     def eligibility_for(eligibility_key, start_on)
-      eligibilities = self.eligibilities&.by_key(eligibility_key)
-      eligibilities.effectuated.detect do |eligibility|
+      active_eligibilities_for_date(date, eligibilities.by_key(eligibility_key)).last
+    end
+
+    # we cannot have multiple eligibilities with same key in a given calender year
+    # Following method should be used only when we're pulling all matching eligibilities irrespective of eligible or not
+    def find_eligibility_by(eligibility_key, start_on = nil)
+      eligibilities = self.eligibilities.by_key(eligibility_key).last
+      return eligibilities.last unless start_on
+      eligibilities.detect do |eligibility|
         eligibility.eligibility_period_cover?(start_on)
       end
     end
