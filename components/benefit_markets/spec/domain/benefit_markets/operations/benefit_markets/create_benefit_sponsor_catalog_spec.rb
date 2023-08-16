@@ -31,6 +31,11 @@ RSpec.describe BenefitMarkets::Operations::BenefitMarkets::CreateBenefitSponsorC
   end
   let(:params) { { enrollment_eligibility: enrollment_eligibility} }
 
+  before do
+    allow(enrollment_eligibility).to receive(:metal_level_products_restricted?).and_return(false)
+    allow(enrollment_eligibility).to receive(:employer_contribution_minimum_relaxed?).and_return(false)
+  end
+
   context 'sending required parameters' do
 
     it 'should create BenefitSponsorCatalog' do
