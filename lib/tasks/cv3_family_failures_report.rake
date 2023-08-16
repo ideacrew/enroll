@@ -15,26 +15,32 @@ namespace :cv3_family_failures_report do
   task :generate_csv, [:batch_size] => :environment do |t, args|
     start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     csv_file_path = Rails.root.join("cv3_family_failures_report.csv")
-    last_id_file_path = Rails.root.join("cv3_report_last_processed_id.txt")
+    last_id_file_path = Rails.root.join("cv3_family_failures_report_last_processed_id.txt")
+    list_of_ids_file_path = Rails.root.join("cv3_family_failures_report_ids_to_process.txt")
     batch_size = args[:batch_size].nil? ? 100 : args[:batch_size].to_i
 
-    if File.exists?(csv_file_path)
-      # Ideally there is a last_id_file_path for every csv_file_path accounting for families that are processed but
-      # not saved due to successful transformation, but in case there isn't, we can still
-      # resume from the last family with a failure in the CSV report file.
-      if File.exists?(last_id_file_path)
+    def families_to_process(list_of_ids_file_path, last_id_file_path, csv_file_path)
+      if File.exists?(list_of_ids_file_path)
+        log "Processing families from #{list_of_ids_file_path}."
+        File.read(list_of_ids_file_path).split("\n").select { |id| id.strip =~ /^\d+$/ && !id.strip.empty? }
+      elsif File.exists?(last_id_file_path)
+        log "Processing families from #{last_id_file_path}."
         last_family_id = File.read(last_id_file_path).strip
-      else
+        families = Family.where(:hbx_assigned_id.gt => last_family_id)
+        families.pluck(:hbx_assigned_id)
+      elsif File.exists?(csv_file_path)
+        log "Processing families from #{csv_file_path}."
         last_entry = CSV.read(csv_file_path).last
         last_family_id = last_entry&.first
+        families = Family.where(:hbx_assigned_id.gt => last_family_id)
+        families.pluck(:hbx_assigned_id)
+      else
+        Family.pluck(:hbx_assigned_id)
       end
-      families = Family.where(:hbx_assigned_id.gt => last_family_id)
-      family_ids = families.pluck(:hbx_assigned_id)
-      log "Resuming after family with hbx_id #{last_family_id}."
-    else
-      CSV.open(csv_file_path, 'wb') { |csv| csv << %w[hbx_id result output] }
-      family_ids = Family.pluck(:hbx_assigned_id)
     end
+
+    CSV.open(csv_file_path, 'wb') { |csv| csv << %w[hbx_id result output] } unless File.exists?(csv_file_path)
+    family_ids = families_to_process(list_of_ids_file_path, last_id_file_path, csv_file_path)
 
     total = family_ids&.count
 
@@ -76,7 +82,7 @@ namespace :cv3_family_failures_report do
           csv << [id, 'failure', result.failure]
         end
       rescue StandardError => e
-        csv << [id, 'failure', e.message]
+        csv << [id, 'error', e.message]
       end
     end
   end
