@@ -82,23 +82,32 @@ module Operations
         errors << "subject missing" unless params[:subject]
 
         @subject = locator.locate(params[:subject])
-        errors << "unable to find subject: #{params[:subject]}" unless @subject.present?
+        unless @subject.present?
+          errors << "unable to find subject: #{params[:subject]}"
+        end
         errors << "domain model missing" unless params[:domain_model]
-        errors << "eligibility feature missing" unless params[:eligibility_feature]
-
-        @calender_year = params[:effective_date].year
-        if EnrollRegistry.feature?(
-          "#{params[:eligibility_feature]}_#{calender_year}"
-        )
-          @eligibility_feature =
-            EnrollRegistry[
-              "#{params[:eligibility_feature]}_#{calender_year}".to_sym
-            ]
-        else
-          errors << "unable to find feature: #{params[:eligibility_feature]}_#{calender_year}"
+        unless params[:eligibility_feature]
+          errors << "eligibility feature missing"
         end
 
+        @calender_year = params[:effective_date].year
+        load_eligibility_feature(params, errors)
+
         errors.empty? ? Success(params) : Failure(errors)
+      end
+
+      def load_eligibility_feature(params, errors)
+        feature_key = "#{params[:eligibility_feature]}_#{calender_year}".to_sym
+
+        if EnrollRegistry.feature?(feature_key)
+          if EnrollRegistry.feature_enabled?(feature_key)
+            @eligibility_feature = EnrollRegistry[feature_key]
+          else
+            errors << "feature not enabled: #{feature_key}"
+          end
+        else
+          errors << "unable to find feature: #{feature_key}"
+        end
       end
 
       def locator
@@ -155,7 +164,7 @@ module Operations
       end
 
       def save_eligibility(eligibility_record)
-        if subject.class.name == 'BenefitCoveragePeriod'
+        if subject.class.name == "BenefitCoveragePeriod"
           organization =
             Organization.where(
               "hbx_profile.benefit_sponsorship.benefit_coverage_periods._id" =>
