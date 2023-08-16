@@ -25,8 +25,7 @@ RSpec.describe BenefitMarkets::Operations::BenefitMarkets::CreateBenefitSponsorC
       market_kind: market_kind,
       benefit_application_kind: :initial,
       service_areas: service_areas,
-      benefit_sponsorship_id: benefit_sponsorship_id,
-      osse_min_employer_contribution: false
+      benefit_sponsorship_id: benefit_sponsorship_id
     )
   end
   let(:params) { { enrollment_eligibility: enrollment_eligibility} }
