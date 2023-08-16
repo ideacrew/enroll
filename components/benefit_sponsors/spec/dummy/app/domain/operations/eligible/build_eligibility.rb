@@ -103,7 +103,7 @@ module Operations
       end
 
       def build_grants
-        configuration.grants.collect do |value_pair|
+        configuration.grants.compact.collect do |value_pair|
           params = { grant_key: value_pair[0], grant_value: value_pair[1].to_s }
           result = BuildGrant.new.call(params)
           result.success? ? result.value! : nil
