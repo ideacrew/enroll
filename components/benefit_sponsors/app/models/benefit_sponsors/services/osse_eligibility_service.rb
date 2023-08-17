@@ -17,21 +17,25 @@ module BenefitSponsors
         ::BenefitMarkets::BenefitMarketCatalog.osse_eligibility_years_for_display.sort.reverse
       end
 
+      # Needed to display valid osse eligible application period date ranges in multi year interface
       def osse_status_by_year
-        osse_eligibility_years_for_display.inject({}) do |data, year|
+        calendar_year = TimeKeeper.date_of_record
+      
+        osse_eligibility_years_for_display.each_with_object({}) do |year, data|
           data[year] = {}
-          start_on = Date.new(year, 0o1, 0o1)
-
+      
+          start_on = Date.new(year, 1, 1)
+          start_on = TimeKeeper.date_of_record if year == calendar_year
+          start_on = start_on.end_of_year if year == calendar_year - 1
+      
           eligibility = benefit_sponsorship.eligibility_for("aca_shop_osse_eligibility_#{year}".to_sym, start_on)
-          eligible_on = year == TimeKeeper.date_of_record.year ? TimeKeeper.date_of_record : start_on
-          data[year][:is_eligible] = eligibility&.is_eligible_on?(eligible_on) || false
-          next data unless eligibility.present?
-          latest_eligibility_period = eligibility.evidences.first&.eligible_periods&.last
-          next data unless latest_eligibility_period.present?
-          data[year][:start_on] = latest_eligibility_period[:start_on]
-          data[year][:end_on] = latest_eligibility_period[:end_on] || latest_eligibility_period[:start_on].end_of_year
-
-          data
+          data[year][:is_eligible] = eligibility.present?
+      
+          application = benefit_sponsorship.benefit_applications.by_year(year).approved_and_terminated.select(&:osse_eligible?).last
+          next unless application
+      
+          data[year][:start_on] = application.start_on
+          data[year][:end_on] = application.end_on
         end
       end
 

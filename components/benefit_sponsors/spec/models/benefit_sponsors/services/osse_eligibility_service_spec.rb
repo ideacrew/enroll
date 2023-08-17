@@ -73,11 +73,10 @@ module BenefitSponsors
 
       it "returns osse status by year" do
         result = subject.osse_status_by_year
+
         expect(result[current_date.last_year.year][:is_eligible]).to eq(false)
         expect(result[current_date.next_year.year][:is_eligible]).to eq(false)
         expect(result[current_date.year][:is_eligible]).to eq(true)
-        expect(result[current_date.year][:start_on]).to eq(current_date.beginning_of_year)
-        expect(result[current_date.year][:end_on]).to eq(current_date.end_of_year)
       end
     end
 

@@ -3,13 +3,12 @@ module BenefitSponsors
     include Mongoid::Document
     include Mongoid::Timestamps
     include Acapi::Notifiers
-    include BenefitSponsors::Concerns::RecordTransition
-    include ::BenefitSponsors::Concerns::Observable
-    include ::BenefitSponsors::ModelEvents::BenefitApplication
-    include ::BenefitSponsors::Employers::EmployerHelper
     include EventSource::Command
     include GlobalID::Identification
     include AASM
+    include ::BenefitSponsors::Concerns::RecordTransition
+    include ::BenefitSponsors::Concerns::Observable
+    include ::BenefitSponsors::ModelEvents::BenefitApplication
     include ::BenefitSponsors::Employers::EmployerHelper
 
     embedded_in :benefit_sponsorship,
