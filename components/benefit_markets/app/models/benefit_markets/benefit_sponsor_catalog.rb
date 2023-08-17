@@ -123,8 +123,7 @@ module BenefitMarkets
           }
         )
       end
-
-    rescue StandardError => e 
+    rescue StandardError => e
       Rails.logger.error { "Couldn't create sponsor catalog eligibility due to #{e.message}\n#{e.backtrace.join('\n')}" }
     end
   end

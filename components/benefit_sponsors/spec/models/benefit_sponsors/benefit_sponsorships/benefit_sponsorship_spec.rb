@@ -1535,7 +1535,7 @@ module BenefitSponsors
                 "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
             }
           )
-    
+
         catalog_eligibility
       end
 

@@ -82,13 +82,9 @@ module Operations
         errors << "subject missing" unless params[:subject]
 
         @subject = locator.locate(params[:subject])
-        unless @subject.present?
-          errors << "unable to find subject: #{params[:subject]}"
-        end
+        errors << "unable to find subject: #{params[:subject]}" unless @subject.present?
         errors << "domain model missing" unless params[:domain_model]
-        unless params[:eligibility_feature]
-          errors << "eligibility feature missing"
-        end
+        errors << "eligibility feature missing" unless params[:eligibility_feature]
 
         @calender_year = params[:effective_date].year
         load_eligibility_feature(params, errors)
@@ -164,7 +160,7 @@ module Operations
       end
 
       def save_eligibility(eligibility_record)
-        if subject.class.name == "BenefitCoveragePeriod"
+        if subject.instance_of?(BenefitCoveragePeriod)
           organization =
             Organization.where(
               "hbx_profile.benefit_sponsorship.benefit_coverage_periods._id" =>

@@ -36,16 +36,16 @@ module BenefitSponsors
               "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
           }
         )
-  
+
       catalog_eligibility
     end
 
-    before do 
+    before do
       TimeKeeper.set_date_of_record_unprotected!(current_date)
       allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
       catalog_eligibility
     end
-  
+
     after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
 
     describe "#osse_eligibility_years_for_display" do
