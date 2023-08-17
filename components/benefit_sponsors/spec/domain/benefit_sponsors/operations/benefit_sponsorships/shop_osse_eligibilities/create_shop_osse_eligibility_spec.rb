@@ -57,7 +57,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
 
   let(:evidence_value) { "false" }
 
-  before do 
+  before do
     TimeKeeper.set_date_of_record_unprotected!(current_effective_date)
     allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
     catalog_eligibility

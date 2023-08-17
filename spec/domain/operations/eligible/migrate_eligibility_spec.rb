@@ -90,7 +90,7 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
               "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
           }
         )
-  
+
       catalog_eligibility
     end
 
@@ -110,12 +110,12 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
 
     let(:current_effective_date) { Date.new(Date.today.year, 3, 1) }
 
-    before do 
+    before do
       TimeKeeper.set_date_of_record_unprotected!(current_effective_date)
       allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
       catalog_eligibility
     end
-  
+
     after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
 
     context "when existing eligibility record passed with subject" do

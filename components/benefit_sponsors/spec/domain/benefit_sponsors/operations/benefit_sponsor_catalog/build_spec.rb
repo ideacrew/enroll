@@ -100,13 +100,13 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorCatalog::Build,
       it "should create benefit sponsor catalog with eligibilities" do
         result = subject.call(params)
 
-        # expect()
+        expect(result.success?).to be_truthy
       end
     end
 
-    context "when employer has granted osse eligibility" do
-      it "should create benefit sponsor catalog with applied grants" do
-      end
-    end
+    # context "when employer has granted osse eligibility" do
+    #   it "should create benefit sponsor catalog with applied grants" do
+    #   end
+    # end
   end
 end
