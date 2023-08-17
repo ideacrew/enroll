@@ -1244,13 +1244,13 @@ module BenefitSponsors
     end
 
     def validate_minimum_participation_rule
-      return if is_grant_eligble?(:minimum_participation_rule)
+      return true if is_grant_eligble?(:minimum_participation_rule)
 
       enrollment_ratio >= employee_participation_ratio_minimum
     end
 
     def validate_minimum_employer_contribution_rule
-      return if is_grant_eligble?(:all_contribution_levels_min_met)
+      return true if is_grant_eligble?(:all_contribution_levels_min_met)
 
       if benefit_packages.map(&:sponsored_benefits).flatten.present?
         if effective_period.min.month == 1
@@ -1265,7 +1265,7 @@ module BenefitSponsors
     end
 
     def validate_fte_count
-      return if is_grant_eligble?(:benefit_application_fte_count)
+      return true if is_grant_eligble?(:benefit_application_fte_count)
 
       if is_renewing?
         true
