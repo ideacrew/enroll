@@ -329,7 +329,7 @@ module Employers::EmployerHelper
   end
 
   def shop_osse_eligibility_is_enabled?(year = TimeKeeper.date_of_record.year)
-    EnrollRegistry.feature?("aca_shop_osse_subsidy_#{year}") && EnrollRegistry.feature_enabled?("aca_shop_osse_subsidy_#{year}")
+    EnrollRegistry.feature?("aca_shop_osse_eligibility_#{year}") && EnrollRegistry.feature_enabled?("aca_shop_osse_eligibility_#{year}")
   end
 
   def osse_eligibility_history_is_enabled?
