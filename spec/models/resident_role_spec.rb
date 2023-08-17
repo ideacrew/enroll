@@ -54,7 +54,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       let!(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
       let(:resident_role) { FactoryBot.build(:resident_role) }
       let(:current_year) { TimeKeeper.date_of_record.year }
-      let!(:catalog_eligibility) do
+      let(:catalog_eligibility) do
         Operations::Eligible::CreateCatalogEligibility.new.call(
           {
             subject: benefit_coverage_period.to_global_id,
@@ -68,6 +68,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       context 'when osse feature for the given year is disabled' do
         before do
           EnrollRegistry["aca_ivl_osse_eligibility_#{current_year}"].feature.stub(:is_enabled).and_return(false)
+          catalog_eligibility
         end
 
         it 'should create osse eligibility in initial state' do
@@ -79,7 +80,9 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
       context 'when osse feature for the given year is enabled' do
         before do
-          EnrollRegistry["aca_ivl_osse_eligibility_#{current_year}"].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry).to receive(:feature?).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+          catalog_eligibility
         end
 
         it 'should create osse eligibility in initial state' do

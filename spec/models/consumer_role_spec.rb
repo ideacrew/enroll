@@ -2135,7 +2135,7 @@ describe 'create default osse eligibility on create' do
   let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
   let!(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
   let!(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
-  let!(:catalog_eligibility) do
+  let(:catalog_eligibility) do
     Operations::Eligible::CreateCatalogEligibility.new.call(
       {
         subject: benefit_coverage_period.to_global_id,
@@ -2151,6 +2151,7 @@ describe 'create default osse eligibility on create' do
   context 'when osse feature for the given year is disabled' do
     before do
       EnrollRegistry["aca_ivl_osse_eligibility_#{current_year}"].feature.stub(:is_enabled).and_return(false)
+      catalog_eligibility
     end
 
     it 'should create osse eligibility in initial state' do
@@ -2162,7 +2163,9 @@ describe 'create default osse eligibility on create' do
 
   context 'when osse feature for the given year is enabled' do
     before do
-      EnrollRegistry["aca_ivl_osse_eligibility_#{current_year}"].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry).to receive(:feature?).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+      catalog_eligibility
     end
 
     it 'should create osse eligibility in initial state' do
