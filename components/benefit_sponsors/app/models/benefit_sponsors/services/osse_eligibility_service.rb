@@ -19,7 +19,7 @@ module BenefitSponsors
 
       # Needed to display valid osse eligible application period date ranges in multi year interface
       def osse_status_by_year
-        calendar_year = TimeKeeper.date_of_record
+        calendar_year = TimeKeeper.date_of_record.year
 
         osse_eligibility_years_for_display.each_with_object({}) do |year, data|
           data[year] = {}
@@ -33,8 +33,8 @@ module BenefitSponsors
           application = benefit_sponsorship.benefit_applications.by_year(year).approved_and_terminated.select(&:osse_eligible?).last
           next unless application
 
-          data[year][:start_on] = application.start_on
-          data[year][:end_on] = application.end_on
+          data[year][:start_on] = application.start_on.to_date
+          data[year][:end_on] = application.end_on.to_date
         end
       end
 
