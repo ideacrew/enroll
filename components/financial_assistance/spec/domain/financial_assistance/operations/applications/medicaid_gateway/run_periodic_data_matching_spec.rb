@@ -134,6 +134,46 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       expect(result.success).to eq({:total_applications_published => 1})
     end
 
+    context "should build a csv report" do
+      around(:each) do |test|
+        delete_existing_files
+        test.run
+        delete_existing_files
+      end
+
+      def delete_existing_files
+        filename_pattern = /periodic_data_matching_results_me/
+        csv_file_paths = Dir.glob("#{Rails.root}/**/*").select { |file| file =~ filename_pattern }
+        csv_file_paths.each do |file_path|
+          File.delete(file_path)
+        end
+      end
+
+      it 'builds csv with headers and data' do
+        operation.call(assistance_year: TimeKeeper.date_of_record.year, transmittable_message_id: "f55bec40-98f1-4d1a-9336-63affe761a60")
+
+        filename_pattern = /periodic_data_matching_results_me/
+        csv_file_paths = Dir.glob("#{Rails.root}/**/*").select { |file| file =~ filename_pattern }
+        # There should be only one CSV file generated at any point.
+        expect(csv_file_paths.size).to eq(1)
+
+        csv_data = CSV.read(csv_file_paths[0])
+
+        # validate csv has right headers
+        expected_headers = %w[FamilyHbxID MemberHbxId IsPrimaryApplicant EnrollmentHbxId EnrollmentType EnrollmentState HiosId AppliedAptc ProgramEligibility]
+        expect(csv_data[0]).to eq(expected_headers)
+
+        # validate csv has data
+        expect(csv_data.length).to eq(2)
+
+        csv_file_paths = Dir.glob("#{Rails.root}/**/*").select { |file| file =~ filename_pattern }
+        csv_file_paths.each do |file_path|
+          File.delete(file_path)
+        end
+      end
+
+    end
+
     it 'should not find results with old assistance_year' do
       app = ::FinancialAssistance::Application.last
       app.assistance_year = TimeKeeper.date_of_record.year - 1
