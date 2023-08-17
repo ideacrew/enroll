@@ -42,20 +42,21 @@ namespace :load do
 
       if kind == :aca_shop
         puts "Creating eligibilities......"
+        effective_date = benefit_market_catalog.application_period.min.to_date
 
         result = Operations::Eligible::CreateCatalogEligibility.new.call(
           {
             subject: benefit_market_catalog.to_global_id,
             eligibility_feature: "aca_shop_osse_eligibility",
-            effective_date: benefit_market_catalog.application_period.min.to_date,
+            effective_date: effective_date,
             domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
           }
         )
 
         if result.success?
-          p "Success: created eligibility for #{current_period_bc.start_on.year} benefit coverage period"
+          p "Success: created eligibility for #{effective_date.year} benefit market catalog"
         else
-          p "Failed to create eligibility for #{current_period_bc.start_on.year} benefit coverage period"
+          p "Failed to create eligibility for #{effective_date.year} benefit market catalog"
         end
       end
 
