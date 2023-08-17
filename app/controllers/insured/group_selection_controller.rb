@@ -98,7 +98,6 @@ class Insured::GroupSelectionController < ApplicationController
     update_tobacco_field(hbx_enrollment.hbx_enrollment_members) if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
 
     if @market_kind == 'shop' || @market_kind == 'fehb'
-
       raise @adapter.no_employer_benefits_error_message(hbx_enrollment) unless hbx_enrollment.sponsored_benefit_package.shoppable?
 
       census_effective_on = @employee_role.census_employee.coverage_effective_on(hbx_enrollment.sponsored_benefit_package)

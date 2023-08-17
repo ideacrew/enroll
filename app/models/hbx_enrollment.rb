@@ -2828,6 +2828,7 @@ class HbxEnrollment
 
   def ivl_osse_eligible?(new_effective_date = nil)
     return false if is_shop? || dental?
+    
     new_effective_date ||= effective_on
     hbx_enrollment_members.any? do |member|
       member.osse_eligible_on_effective_date?(new_effective_date)
@@ -2835,11 +2836,13 @@ class HbxEnrollment
   end
 
   def update_osse_childcare_subsidy
-    if is_shop?
-      effective_year = sponsored_benefit_package.start_on.year
-      return if coverage_kind.to_s == 'dental'
-      return unless employee_role&.osse_eligible?(effective_on)
+    return if dental?
+
+    if is_shop?  
+      application = sponsored_benefit_package.benefit_application
+      effective_year = application.start_on.year
       return unless shop_osse_eligibility_is_enabled?(effective_year)
+      return unless application.osse_eligible?
 
       osse_childcare_subsidy = osse_subsidy_for_member(primary_hbx_enrollment_member)
     else
@@ -2870,6 +2873,7 @@ class HbxEnrollment
 
   def verify_and_reset_osse_subsidy_amount(member_group)
     return unless is_shop?
+
     hbx_enrollment_members.each do |member|
       next unless member.is_subscriber?
       product_price = member_group.group_enrollment.member_enrollments.find{|enrollment| enrollment.member_id == member.id }.product_price

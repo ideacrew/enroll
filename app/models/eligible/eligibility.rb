@@ -56,7 +56,7 @@ module Eligible
       publish_history&.effective_on
     end
 
-    #default expired_on will be last day of callender year of the eligibility
+    #default expired_on will be last day of calendar year of the eligibility
     #eligibility can't span across multiple years
     #once eligibility is expired, it can never be moved back to published state
     def expired_on
