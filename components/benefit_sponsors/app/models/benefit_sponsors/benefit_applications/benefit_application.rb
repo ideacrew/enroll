@@ -1231,7 +1231,11 @@ module BenefitSponsors
     end
 
     def eligibility_for(evidence_key)
-      benefit_sponsorship.eligibility_for(evidence_key, start_on)
+      if benefit_sponsor_catalog&.eligibilities.present?
+        benefit_sponsor_catalog.eligibility_for(evidence_key, start_on)
+      else
+        benefit_sponsorship.eligibility_for(evidence_key, start_on)
+      end
     end
 
     def osse_eligible?
