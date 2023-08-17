@@ -6,7 +6,7 @@ RSpec.describe Services::IvlOsseEligibilityService, type: :model, :dbclean => :a
   let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
   let!(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
   let!(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
-  let!(:catalog_eligibility) do
+  let(:catalog_eligibility) do
     Operations::Eligible::CreateCatalogEligibility.new.call(
       {
         subject: benefit_coverage_period.to_global_id,
@@ -23,6 +23,11 @@ RSpec.describe Services::IvlOsseEligibilityService, type: :model, :dbclean => :a
   let(:params) { { person_id: person.id, osse: { current_date.year.to_s => "true", current_date.last_year.year.to_s => "false" } } }
 
   subject { described_class.new(params) }
+
+  before do
+    allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+    catalog_eligibility
+  end
 
   describe "#osse_eligibility_years_for_display" do
     it "returns sorted and reversed osse eligibility years" do
