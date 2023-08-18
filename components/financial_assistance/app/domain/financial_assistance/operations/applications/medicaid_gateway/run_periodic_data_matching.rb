@@ -155,7 +155,7 @@ module FinancialAssistance
           def process_mec_check(application, params)
             @logger.info "process mec_check for determined application #{application.id}"
             return if params[:skip_mec_call]
-            mec_check_published = publish_mec_check(application.id)
+            mec_check_published = publish_mec_check(application.id, params)
             if mec_check_published.success?
               @total_applications_published += 1
               @logger.info "Successfully published mec_check for determined application #{application.id}"
@@ -164,7 +164,7 @@ module FinancialAssistance
             end
           end
 
-          def publish_mec_check(application_id)
+          def publish_mec_check(application_id, params)
             ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: application_id, transmittable_message_id: params[:transmittable_message_id])
           end
 
