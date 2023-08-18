@@ -1207,7 +1207,6 @@ class Family
       application&.active_applicants&.each do |applicant|
         FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
           evidence = applicant.send(evidence_type)
-          # Possible state conflict? No 'pending' state?
           next unless evidence.present? && Eligibilities::Evidence::DUE_DATE_STATES.include?(evidence.aasm_state)
 
           due_dates << evidence.verif_due_date
