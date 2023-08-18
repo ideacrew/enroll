@@ -56,7 +56,7 @@ module ChildcareSubsidyConcern
     end
 
     def osse_eligibility_params(evidence_value, effective_date = nil)
-      effective_date = effective_date || TimeKeeper.date_of_record
+      effective_date ||= TimeKeeper.date_of_record
       effective_date = effective_date.beginning_of_year if EnrollRegistry.feature_enabled?("aca_ivl_osse_effective_beginning_of_year")
 
       {
