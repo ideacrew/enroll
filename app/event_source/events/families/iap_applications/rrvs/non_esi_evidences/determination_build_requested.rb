@@ -5,7 +5,7 @@ module Events
     module IapApplications
       module Rrvs
         module NonEsiEvidences
-          # This class will register event 'application_renewal_request_created'
+          # This class has publisher's path for registering relevant events
           class DeterminationBuildRequested < EventSource::Event
             publisher_path 'publishers.families.iap_applications.rrvs.non_esi_evidences_publisher'
 
