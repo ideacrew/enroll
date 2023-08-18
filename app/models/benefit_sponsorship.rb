@@ -27,17 +27,7 @@ class BenefitSponsorship
     bcp = benefit_coverage_periods.by_year(year).first
     return bcp if bcp.present?
 
-    previous_bcp = benefit_coverage_periods.by_year(year.pred).first
-    benefit_coverage_periods.create!(
-      {
-        title: "Individual Market Benefits #{year}",
-        service_market: previous_bcp&.service_market || 'individual',
-        start_on: previous_bcp&.start_on&.next_year || Date.new(year, 1, 1),
-        end_on: previous_bcp&.end_on&.next_year || Date.new(year, 12, 31),
-        open_enrollment_start_on: previous_bcp&.open_enrollment_start_on&.next_year || Date.new(year.pred, 11, 1),
-        open_enrollment_end_on: previous_bcp&.open_enrollment_end_on&.next_year || Date.new(year, 1, 31)
-      }
-    )
+    benefit_coverage_periods.create!(bcp_create_params(year))
   end
 
   def current_benefit_coverage_period
@@ -143,6 +133,32 @@ class BenefitSponsorship
       FinancialAssistanceRegistry.feature_enabled?(:create_bcp_on_date_change) &&
         new_date.month == FinancialAssistanceRegistry[:create_bcp_on_date_change].settings(:bcp_creation_month).item &&
         new_date.day == FinancialAssistanceRegistry[:create_bcp_on_date_change].settings(:bcp_creation_day).item
+    end
+  end
+
+  private
+
+  def bcp_create_params(year)
+    previous_bcp = benefit_coverage_periods.by_year(year.pred).first
+
+    if previous_bcp.present?
+      {
+        title: "Individual Market Benefits #{year}",
+        service_market: previous_bcp.service_market,
+        start_on: previous_bcp.start_on.next_year,
+        end_on: previous_bcp.end_on.next_year,
+        open_enrollment_start_on: previous_bcp.open_enrollment_start_on.next_year,
+        open_enrollment_end_on: previous_bcp.open_enrollment_end_on.next_year
+      }
+    else
+      {
+        title: "Individual Market Benefits #{year}",
+        service_market: 'individual',
+        start_on: Date.new(year, 1, 1),
+        end_on: Date.new(year, 12, 31),
+        open_enrollment_start_on: Date.new(year.pred, 11, 1),
+        open_enrollment_end_on: Date.new(year, 1, 31)
+      }
     end
   end
 end
