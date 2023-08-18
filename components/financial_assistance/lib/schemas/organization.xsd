@@ -95,7 +95,7 @@
 	</xs:complexType>
 	<xs:complexType name="BrokerAgencyBrokersListType">
 		<xs:sequence>
-			<xs:element name="broker" type="BrokerType" maxOccurs="unbounded"/>
+			<xs:element name="broker" type="BrokerType" maxOccurs="20"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="BrokerType">
@@ -132,7 +132,7 @@
 
 	<xs:complexType name="BrokerPaymentAccountsType">
 		<xs:sequence>
-			<xs:element name="broker_payment_account" type="BrokerPaymentAccountType" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element name="broker_payment_account" type="BrokerPaymentAccountType" minOccurs="1" maxOccurs="20"/>
 	        </xs:sequence>
 	</xs:complexType>
 
@@ -178,10 +178,10 @@
 		<xs:sequence>
 			<xs:element name="entity_identifier" type="EntityNameType"/>
 			<xs:element name="organization" type="OrganizationType" minOccurs="0"/>
-			<xs:element name="policies" maxOccurs="unbounded">
+			<xs:element name="policies" maxOccurs="20">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="policy" type="PolicyLinkType" maxOccurs="unbounded"/>
+						<xs:element name="policy" type="PolicyLinkType" maxOccurs="20"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -218,7 +218,7 @@
 	</xs:complexType>
 	<xs:complexType name="GAAssignmentListType">
 		<xs:sequence>
-			<xs:element name="ga_assignment" type="GAAssignmentType" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element name="ga_assignment" type="GAAssignmentType" minOccurs="1" maxOccurs="20"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="BrokerAccountType">
@@ -249,7 +249,7 @@
 	</xs:complexType>
 	<xs:complexType name="BrokerAccountListType">
 		<xs:sequence>
-			<xs:element name="broker_account" type="BrokerAccountType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="broker_account" type="BrokerAccountType" minOccurs="0" maxOccurs="20"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="BrokerAgencyProfileType">
@@ -262,7 +262,7 @@
 	</xs:complexType>
 	<xs:complexType name="PlanYearListType">
 		<xs:sequence>
-			<xs:element name="plan_year" type="PlanYearType" maxOccurs="unbounded"/>
+			<xs:element name="plan_year" type="PlanYearType" maxOccurs="20"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="EmployerPlanListType">
@@ -314,7 +314,7 @@
 
 	<xs:complexType name="RelationshipBenefitsListType">
 		<xs:sequence>
-			<xs:element name="relationship_benefit" type="RelationshipBenefitType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="relationship_benefit" type="RelationshipBenefitType" minOccurs="0" maxOccurs="20"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="BenefitGroupType">
@@ -331,7 +331,7 @@
 			<xs:element name="elected_plans">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="elected_plan" type="PlanLinkType" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="elected_plan" type="PlanLinkType" minOccurs="0" maxOccurs="20"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -399,7 +399,7 @@
 			<xs:element name="benefit_groups" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="benefit_group" type="BenefitGroupType" maxOccurs="unbounded"/>
+						<xs:element name="benefit_group" type="BenefitGroupType" maxOccurs="20"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -524,7 +524,7 @@
 			<xs:element name="dependents" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="dependent" type="EmployerCensusFamilyDependentType" maxOccurs="unbounded"/>
+						<xs:element name="dependent" type="EmployerCensusFamilyDependentType" maxOccurs="20"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -533,7 +533,7 @@
 	<xs:element name="employer_census_families">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="employer_census_family" type="EmployerCensusFamilyType" maxOccurs="unbounded"/>
+				<xs:element name="employer_census_family" type="EmployerCensusFamilyType" maxOccurs="20"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -786,7 +786,7 @@
 			<xs:element name="benefit_groups">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="benefit_group" type="BenefitGroupLinkType" minOccurs="1" maxOccurs="unbounded"/>
+						<xs:element name="benefit_group" type="BenefitGroupLinkType" minOccurs="1" maxOccurs="20"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -849,7 +849,7 @@
 							<xs:documentation>URN(s) for the employer instance that is subject of this event</xs:documentation>
 						</xs:annotation>
 					</xs:element>
-					<xs:element ref="extended_resource_instance_uri" minOccurs="0" maxOccurs="unbounded">
+					<xs:element ref="extended_resource_instance_uri" minOccurs="0" maxOccurs="20">
 						<xs:annotation>
 							<xs:documentation>URN(s) for additional uris which may be used to reference the subject of this event.</xs:documentation>
 						</xs:annotation>
@@ -872,7 +872,7 @@
 					<xs:documentation>The start and end timestamps for events listed in this digest instance</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="employer_event" type="EmployerEventType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="employer_event" type="EmployerEventType" minOccurs="0" maxOccurs="20"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="EmployerDigestServiceEventBodyType">
@@ -1155,7 +1155,7 @@
 
 	<xs:complexType name="CompositeRatingTierListType">
 		<xs:sequence>
-			<xs:element name="composite_rating_tier" type="CompositeRatingTierType" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element name="composite_rating_tier" type="CompositeRatingTierType" minOccurs="1" maxOccurs="20"/>
 		</xs:sequence>
 	</xs:complexType>
 </xs:schema>

@@ -12,8 +12,8 @@ module FinancialAssistance
           send(:include, Dry::Monads[:result, :do, :try])
           include EventSource::Command
 
-          def call(payload, payload_type)
-            event = yield build_event(payload, payload_type)
+          def call(payload, payload_type, transmittable_message_id = nil)
+            event = yield build_event(payload, payload_type, transmittable_message_id)
             result = yield publish(event)
 
             Success(result)
@@ -21,8 +21,8 @@ module FinancialAssistance
 
           private
 
-          def build_event(payload, payload_type)
-            event('events.iap.mec_check.mec_check_requested', attributes: payload, headers: { payload_type: payload_type })
+          def build_event(payload, payload_type, transmittable_message_id)
+            event('events.iap.mec_check.mec_check_requested', attributes: payload, headers: { payload_type: payload_type, transmittable_data: {message_id: transmittable_message_id} })
           end
 
           def publish(event)

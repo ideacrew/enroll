@@ -20,7 +20,7 @@ registry:
         is_enabled: <%= ENV['IAP_YEAR_SELECTION_FORM_IS_ENABLED'] || false %>
         settings:
           - key: :iap_year_sep_link
-            item: ""
+            item: "https://www.dchealthlink.com/individuals/life-changes"
       - key: :iap_assistance_year_display
         is_enabled: <%= ENV['IAP_ASSISTANCE_YEAR_DISPLAY_IS_ENABLED'] || false %>
       - key: :enrollment_dates
@@ -122,7 +122,7 @@ registry:
       - key: :non_applicant_citizen_status
         is_enabled: false
       - key: :out_of_state_primary
-        is_enabled: true
+        is_enabled: <%= ENV['OUT_OF_STATE_PRIMARY_IS_ENABLED'] || true %>
       - key: :temporary_configuration_enable_multi_tax_household_feature
         is_enabled: <%= ENV['TEMPORARY_CONFIGURATION_OF_MULTI_TAX_HOUSEHOLD_FEATURE_IS_ENABLED'] || false %>
       - key: :draft_application_after_ridp
@@ -137,6 +137,9 @@ registry:
       - key: :short_enrolled_esi_forms
         item: :short_enrolled_esi_forms
         is_enabled: <%= ENV['SHORT_ENROLLED_ESI_IS_ENABLED'] || false %>
+      - key: :totally_ineligible_notice
+        item: :totally_ineligible_notice
+        is_enabled: <%= ENV['TOTALLY_INELIGIBLE_NOTICE_IS_ENABLED'] || false %>
   - namespace:
     - :request_determination
     features:
@@ -320,6 +323,8 @@ registry:
           item: <%= ENV['RENEWALS_CREATION_MONTH'] || 10 %>
         - key: :renewals_creation_day
           item: <%= ENV['RENEWALS_CREATION_DAY'] || 16 %>
+    - key: :skip_eligibility_redetermination
+      is_enabled: <%= ENV['SKIP_ELIGIBILITY_REDETERMINATION_IS_ENABLED'] || false %>
     - key: :auto_update_income_evidence_due_on
       is_enabled: <%= ENV['AUTO_UPDATE_INCOME_EVIDENCE_DUE_ON_IS_ENABLED'] || false %>
       settings:
