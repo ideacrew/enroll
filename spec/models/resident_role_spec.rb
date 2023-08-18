@@ -48,11 +48,13 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
     end
 
-    describe 'create default osse eligibility on create' do
+    describe 'create default osse eligibility on create', :dbclean => :after_each do
       let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
       let!(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
       let!(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
-      let(:resident_role) { FactoryBot.build(:resident_role) }
+      let(:person) { create(:person, addresses: [home_address]) }
+      let(:home_address) { build(:address, kind: :home) }
+      let(:resident_role) { build(:resident_role) }
       let(:current_year) { TimeKeeper.date_of_record.year }
       let(:catalog_eligibility) do
         Operations::Eligible::CreateCatalogEligibility.new.call(
@@ -73,8 +75,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
         it 'should create osse eligibility in initial state' do
           expect(resident_role.eligibilities.count).to eq 0
-          resident_role.save
-          expect(resident_role.reload.eligibilities.count).to eq 0
+          person.build_resident_role(resident_role.attributes).save
+          resident_role = person.reload.resident_role
+          resident_role.reload
+          expect(person.reload.resident_role.eligibilities.count).to eq 0
         end
       end
 
@@ -87,8 +91,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
         it 'should create osse eligibility in initial state' do
           expect(resident_role.eligibilities.count).to eq 0
-          resident_role.save!
-          expect(resident_role.reload.eligibilities.count).to eq 1
+          person.build_resident_role(resident_role.attributes).save
+          resident_role = person.reload.resident_role
+          resident_role.reload
+          expect(resident_role.eligibilities.count).to eq 1
           eligibility = resident_role.eligibilities.first
           expect(eligibility.key).to eq "aca_ivl_osse_eligibility_#{TimeKeeper.date_of_record.year}".to_sym
           expect(eligibility.current_state).to eq :initial

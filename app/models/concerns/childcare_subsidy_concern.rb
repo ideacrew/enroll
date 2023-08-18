@@ -51,47 +51,34 @@ module ChildcareSubsidyConcern
 
     def create_or_term_eligibility(eligibility_params)
       osse_eligibility = eligibility_params[:evidence_value].to_s
-      if is_osse_eligibility_satisfied?(eligibility_params[:effective_date])
-        return if osse_eligibility == 'true'
-        terminate_eligibility(eligibility_params)
-      elsif osse_eligibility == 'true'
-        ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new.call(osse_eligibility_params(eligibility_params))
-      end
+      return if is_osse_eligibility_satisfied?(eligibility_params[:effective_date]) && osse_eligibility == 'true'
+      store_eligibility(eligibility_params)
     end
 
-    def osse_eligibility_params(eligibility_params)
-      effective_date = eligibility_params[:effective_date] || TimeKeeper.date_of_record
+    def osse_eligibility_params(evidence_value, effective_date = nil)
+      effective_date = effective_date || TimeKeeper.date_of_record
       effective_date = effective_date.beginning_of_year if EnrollRegistry.feature_enabled?("aca_ivl_osse_effective_beginning_of_year")
 
       {
         subject: self.to_global_id,
         evidence_key: :ivl_osse_evidence,
-        evidence_value: eligibility_params[:evidence_value].to_s,
+        evidence_value: evidence_value.to_s,
         effective_date: effective_date
       }
     end
 
-    def terminate_eligibility(eligibility_params)
-      ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new.call({
-                                                                              subject: self.to_global_id,
-                                                                              evidence_key: :ivl_osse_evidence,
-                                                                              evidence_value: eligibility_params[:evidence_value].to_s,
-                                                                              effective_date: eligibility_params[:effective_date]
-                                                                            })
-    end
-
-    def initial_osse_eligibility_params
-      {
-        subject: self.to_global_id,
-        evidence_key: :ivl_osse_evidence,
-        evidence_value: 'false',
-        effective_date: TimeKeeper.date_of_record.beginning_of_year
-      }
+    def store_eligibility(eligibility_params)
+      params = osse_eligibility_params(
+        eligibility_params[:evidence_value],
+        eligibility_params[:effective_date]
+      )
+      ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new.call(params)
     end
 
     def create_default_osse_eligibility
       return unless osse_feature_enabled_for?(TimeKeeper.date_of_record.year)
-      ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new.call(initial_osse_eligibility_params)
+
+      ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new.call(osse_eligibility_params(false))
     rescue StandardError => e
       Rails.logger.error { "Default Osse Eligibility not created for #{self.to_global_id} due to #{e.backtrace}" }
     end
