@@ -203,6 +203,7 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
 
       context 'when py is terminated' do
         before do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:cancel_renewals_for_term).and_return(true)
           initial_application.terminate_enrollment!
           census_employee.reload
         end
@@ -302,6 +303,7 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
 
       context 'when py is terminated' do
         before do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:cancel_renewals_for_term).and_return(true)
           initial_application.terminate_enrollment!
           census_employee.reload
         end

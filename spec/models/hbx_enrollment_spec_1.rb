@@ -7,6 +7,9 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 require File.join(Rails.root, 'spec/shared_contexts/dchbx_product_selection')
 
 RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
+  before do
+    EnrollRegistry[:cancel_renewals_for_term].feature.stub(:is_enabled).and_return(true)
+  end
 
   describe HbxEnrollment, dbclean: :around_each do
     include_context "setup benefit market with market catalogs and product packages"

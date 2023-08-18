@@ -23,7 +23,7 @@ Feature: Admin plan shopping via SEP
     When the individual clicks on the Continue button of the Family Information page
     Then I should see Shop for new plan button
 
-  Scenario: Dual Role User will not see warning message owhen shopping vis Shop flow
+  Scenario: Dual Role User will not see ivl warning message when shopping in Shop flow
     Given the shop market configuration is enabled
     Given all market kinds are enabled for user to select
     Given all announcements are enabled for user to select
