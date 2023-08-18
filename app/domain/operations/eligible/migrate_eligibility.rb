@@ -41,48 +41,21 @@ module Operations
       end
 
       def add_renewal_eligibilities(values)
-        prev_year = Date.today.year - 1
-        eligibility_years =
-          values[:current_eligibilities].collect(&:start_on).map(&:year).uniq
+        current_year = Date.today.year
+        prev_year = current_year - 1
+
+        eligibility_years = values[:current_eligibilities].collect(&:start_on).map(&:year).uniq
         return unless eligibility_years == [prev_year]
+
         last_eligibility = values[:current_eligibilities].max_by(&:updated_at)
         return if last_eligibility.end_on.present?
-        values[:current_eligibilities] << build_renewal_eligibility(
-          last_eligibility
-        )
-      end
-
-      def build_renewal_eligibility(last_eligibility)
-        options = {
-          "start_on" => last_eligibility.start_on.next_year.beginning_of_year,
-          "eligibility_id" => BSON.ObjectId("639697889ce37e00107596ea"),
-          "eligibility_type" => "ConsumerRole",
-          "updated_at" => DateTime.now,
-          "created_at" => DateTime.now,
-          "subject" => {
-            "title" => "Subject for Osse Subsidy",
-            "key" => last_eligibility.subject.key,
-            "klass" => "ConsumerRole",
-            "updated_at" => DateTime.now,
-            "created_at" => DateTime.now
-          },
-          "evidences" => [
-            {
-              "key" => :osse_subsidy,
-              "title" => "Evidence for Osse Subsidy",
-              "is_satisfied" => true,
-              "updated_at" => DateTime.now,
-              "created_at" => DateTime.now
-            }
-          ]
-        }
-
-        ::Eligibilities::Osse::Eligibility.new(options)
+        renewal_eligibility = ::Eligibilities::Osse::Eligibility.new(renewal_eligibility_params(last_eligibility))
+        values[:current_eligibilities] << renewal_eligibility
       end
 
       def migrate(subject, values)
         add_renewal_eligibilities(values)
-        values[:current_eligibilities].each do |eligibility|
+        values[:current_eligibilities].compact.each do |eligibility|
           next unless eligibility.evidences.present?
           migrate_eligibility(subject, values, eligibility)
         end
@@ -100,10 +73,7 @@ module Operations
           .sort_by(&:updated_at)
           .each do |evidence|
             effective_date = eligibility.start_on.to_date
-            unless evidence.is_satisfied
-              effective_date =
-                evidence.updated_at.to_date
-            end
+            effective_date = evidence.updated_at.to_date unless evidence.is_satisfied
             logger(
               "update_eligibility_is_satisfied_as_#{evidence.is_satisfied} for #{subject.to_global_id}"
             ) do
@@ -228,6 +198,32 @@ module Operations
       def print_error(error)
         Rails.logger.error error
         puts error
+      end
+
+      def renewal_eligibility_params(last_eligibility)
+        {
+          "start_on" => last_eligibility.start_on.next_year.beginning_of_year,
+          "eligibility_id" => last_eligibility.eligibility_id,
+          "eligibility_type" => last_eligibility.eligibility_type,
+          "updated_at" => DateTime.now,
+          "created_at" => DateTime.now,
+          "subject" => {
+            "title" => "Subject for Osse Subsidy",
+            "key" => last_eligibility.subject.key,
+            "klass" => last_eligibility.eligibility_type,
+            "updated_at" => DateTime.now,
+            "created_at" => DateTime.now
+          },
+          "evidences" => [
+            {
+              "key" => :osse_subsidy,
+              "title" => "Evidence for Osse Subsidy",
+              "is_satisfied" => true,
+              "updated_at" => DateTime.now,
+              "created_at" => DateTime.now
+            }
+          ]
+        }
       end
     end
   end
