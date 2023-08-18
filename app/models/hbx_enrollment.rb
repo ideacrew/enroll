@@ -2829,7 +2829,7 @@ class HbxEnrollment
 
   def ivl_osse_eligible?(new_effective_date = nil)
     return false if is_shop? || dental?
-    
+
     new_effective_date ||= effective_on
     hbx_enrollment_members.any? do |member|
       member.osse_eligible_on_effective_date?(new_effective_date)
@@ -2839,7 +2839,7 @@ class HbxEnrollment
   def update_osse_childcare_subsidy
     return if dental?
 
-    if is_shop?  
+    if is_shop?
       application = sponsored_benefit_package.benefit_application
       effective_year = application.start_on.year
       return unless shop_osse_eligibility_is_enabled?(effective_year)
