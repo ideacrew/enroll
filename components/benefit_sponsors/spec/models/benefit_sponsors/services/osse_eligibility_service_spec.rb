@@ -24,6 +24,20 @@ module BenefitSponsors
     let(:current_date) { current_effective_date }
     let(:params) { {osse: { current_date.year.to_s => "true", current_date.last_year.year.to_s => "false" } } }
     let(:subject) { described_class.new(employer_profile, params) }
+
+    let(:previous_catalog_eligibility) do
+      ::Operations::Eligible::CreateCatalogEligibility.new.call(
+        {
+          subject: current_benefit_market_catalog.to_global_id,
+          eligibility_feature: "aca_shop_osse_eligibility",
+          effective_date:
+            current_benefit_market_catalog.application_period.begin.to_date,
+          domain_model:
+            "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+        }
+      )
+    end
+
     let(:catalog_eligibility) do
       catalog_eligibility =
         ::Operations::Eligible::CreateCatalogEligibility.new.call(
@@ -43,6 +57,7 @@ module BenefitSponsors
     before do
       TimeKeeper.set_date_of_record_unprotected!(current_date)
       allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+      previous_catalog_eligibility
       catalog_eligibility
     end
 
@@ -117,5 +132,3 @@ module BenefitSponsors
     end
   end
 end
-
-
