@@ -13,6 +13,7 @@ module Operations
 
           include Dry::Monads[:result, :do, :try]
           include Acapi::Notifiers
+          include EventSource::Command
 
           def call(person)
             payload_entity = yield validate_and_build_payload_entity(person)
