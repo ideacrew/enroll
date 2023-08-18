@@ -8,7 +8,7 @@ RSpec.describe Operations::Fdsh::ValidatePersonPayload do
 
     context 'when all validation rules pass' do
       it 'returns a Success result' do
-        result = described_class.new.call(payload, request_type)
+        result = described_class.new.call(person, request_type)
         expect(result).to be_success
       end
     end
