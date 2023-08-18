@@ -22,7 +22,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
 
   def process_renewals
     @logger.info "Started process at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
-    process_ivl_osse_renewals if renewal_benefit_coverage_period.eligibility_for("aca_ivl_osse_eligibility_#{renewal_effective_on.year}".to_sym, renewal_effective_on)
+    process_ivl_osse_renewals if renewal_bcp.eligibility_for("aca_ivl_osse_eligibility_#{renewal_effective_on.year}".to_sym, renewal_effective_on)
     process_qhp_renewals
     @logger.info "Process ended at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
   end
@@ -36,20 +36,20 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     }
   end
 
-  def current_benefit_sponsorship
-    @current_benefit_sponsorship ||= HbxProfile.current_hbx.benefit_sponsorship
+  def current_bs
+    @current_bs ||= HbxProfile.current_hbx.benefit_sponsorship
   end
 
-  def renewal_benefit_coverage_period
-    @renewal_benefit_coverage_period ||= current_benefit_sponsorship.renewal_benefit_coverage_period
+  def renewal_bcp
+    @renewal_bcp ||= current_bs.renewal_benefit_coverage_period
   end
 
-  def current_benefit_coverage_period
-    @current_benefit_coverage_period ||= current_benefit_sponsorship.current_benefit_coverage_period
+  def current_bcp
+    @current_bcp ||= current_bs.current_benefit_coverage_period
   end
 
   def renewal_effective_on
-    @renewal_effective_on ||= renewal_benefit_coverage_period.start_on
+    @renewal_effective_on ||= renewal_bcp.start_on
   end
 
   def fetch_role(person)
@@ -61,6 +61,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
   end
 
   def process_ivl_osse_renewals
+    @logger.info "Started processing IVL OSSE renewals at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
     @osse_renewal_failed_families = []
     Person.where({
                    '$or' => [
@@ -89,11 +90,12 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     rescue StandardError => e
       @logger.info "Failed Osse Renewal: #{person.hbx_id}; Exception: #{e.inspect}"
     end
+    @logger.info "Finished processing IVL OSSE renewals at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
     @osse_renewal_failed_families.flatten!.uniq!
   end
 
   def process_qhp_renewals
-    query = kollection(HbxEnrollment::COVERAGE_KINDS, current_benefit_coverage_period)
+    query = kollection(HbxEnrollment::COVERAGE_KINDS, current_bcp)
     family_ids = HbxEnrollment.where(query).pluck(:family_id).uniq
 
     if @osse_renewal_failed_families.present?
