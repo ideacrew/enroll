@@ -582,10 +582,14 @@ class ConsumerRole
       transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?], :after => [:move_types_to_pending]
     end
 
-    event :coverage_purchased_no_residency, :after => [:invoke_pending_verification!, :record_transition, :move_types_to_pending, :notify_of_eligibility_change]  do
-      transitions from: :unverified, to: :verification_outstanding, :guard => [:is_tribe_member_or_native_no_snn?], :after => [:handle_native_no_snn_or_indian_transition]
+    event :coverage_purchased_no_residency, :after => [:invoke_pending_verification!, :record_transition, :notify_of_eligibility_change]  do
+      transitions from: :unverified, to: :verification_outstanding, :guard => [:is_tribe_member_or_native_no_snn?]
       transitions from: :unverified, to: :dhs_pending, :guards => [:call_dhs?]
       transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?]
+
+      success do
+        handle_native_no_snn_or_indian_transition if self.verification_outstanding?
+      end
     end
 
     event :ssn_invalid, :after => [:fail_ssn, :fail_lawful_presence, :record_transition, :notify_of_eligibility_change] do
@@ -726,7 +730,6 @@ class ConsumerRole
       fail_indian_tribe
     elsif tribal_with_ssn?
       invoke_verification!(verification_attr)
-      move_types_to_pending
       fail_indian_tribe
     elsif native_no_ssn?
       fail_lawful_presence(verification_attr)
