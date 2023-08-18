@@ -39,7 +39,7 @@ module Operations
         elsif /^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$/.match?(ssn)
           Success(ssn)
         else
-          Failure('Invalid SSN format')
+          Failure('Invalid SSN')
         end
       end
     end
