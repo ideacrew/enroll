@@ -7,11 +7,9 @@ describe LawfulPresenceDetermination do
   after :each do
     DatabaseCleaner.clean
   end
-
-  let(:consumer_role) {
-    FactoryBot.create(:consumer_role_object)
-  }
-  let(:person_id) { consumer_role.person.id }
+  let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:consumer_role) { person.consumer_role}
+  let(:person_id) { person.id }
   let(:payload) { "lsjdfioennnklsjdfe" }
 
   describe "in a verification pending state with no responses" do
@@ -24,7 +22,7 @@ describe LawfulPresenceDetermination do
 
   describe "being given an ssa response which fails" do
     before :each do
-      consumer_role.coverage_purchased!
+      consumer_role.coverage_purchased_no_residency!
     end
     it "should have the ssa response document" do
       consumer_role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: Time.now, body: payload})
