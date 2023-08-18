@@ -489,7 +489,7 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
       end
     end
 
-    context ".scenario 3 (eligibility still active at the end of year)" do
+    context ".scenario 4 (eligibility still active at the end of year)" do
       let(:options1) do
         {
           "_id" => BSON.ObjectId("63989f87a130410010a67bf8"),
@@ -553,6 +553,184 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
           eligibility_2022.tap do |e|
             expect(e.is_eligible).to be_truthy
             expect(e.effective_on.to_date).to eq Date.new(2022, 12, 13)
+            expect(e.evidences.last.current_state).to eq :approved
+            expect(e.evidences.last.state_histories.pluck(:to_state)).to eq %i[
+                 initial
+                 approved
+               ]
+          end
+
+          eligibility_2023.tap do |e|
+            expect(e.is_eligible).to be_truthy
+            expect(e.effective_on.to_date).to eq Date.new(2023, 1, 1)
+            expect(e.evidences.last.current_state).to eq :approved
+            expect(e.evidences.last.state_histories.pluck(:to_state)).to eq %i[
+                 initial
+                 approved
+               ]
+          end
+        end
+      end
+    end
+  end
+
+  describe "shop migrations" do
+    include_context "setup benefit market with market catalogs and product packages"
+
+    let(:site) do
+      ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market
+    end
+    let(:employer_organization) do
+      FactoryBot.create(
+        :benefit_sponsors_organizations_general_organization,
+        :with_aca_shop_cca_employer_profile,
+        site: site
+      )
+    end
+    let(:employer_profile) { employer_organization.employer_profile }
+
+    let!(:benefit_sponsorship) do
+      sponsorship = employer_profile.add_benefit_sponsorship
+      sponsorship.save!
+      sponsorship
+    end
+
+    let(:past_benefit_market_catalog) do
+      market_catalogs = benefit_market.benefit_market_catalogs
+      market_catalogs.where(
+        "application_period.min" => current_effective_date.prev_year
+      ).first
+    end
+
+    let(:catalog_eligibility) do
+      catalog_eligibility =
+        ::Operations::Eligible::CreateCatalogEligibility.new.call(
+          {
+            subject: current_benefit_market_catalog.to_global_id,
+            eligibility_feature: "aca_shop_osse_eligibility",
+            effective_date:
+              current_benefit_market_catalog.application_period.begin.to_date,
+            domain_model:
+              "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+          }
+        )
+
+      catalog_eligibility
+    end
+
+    let(:past_catalog_eligibility) do
+      catalog_eligibility =
+        ::Operations::Eligible::CreateCatalogEligibility.new.call(
+          {
+            subject: past_benefit_market_catalog.to_global_id,
+            eligibility_feature: "aca_shop_osse_eligibility",
+            effective_date:
+              past_benefit_market_catalog.application_period.begin.to_date,
+            domain_model:
+              "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+          }
+        )
+
+      catalog_eligibility
+    end
+
+    let(:past_effective_date) { Date.new(Date.today.year, 1, 1).prev_year }
+    let(:current_effective_date) { Date.new(Date.today.year, 1, 1) }
+
+    before do
+      TimeKeeper.set_date_of_record_unprotected!(current_effective_date)
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+      catalog_eligibility
+      past_catalog_eligibility
+    end
+
+    after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
+
+    context ".scenario 1 (eligibility still active at the end of year)" do
+      let(:options1) do
+        {
+          "_id" => BSON.ObjectId("633db44976827000105abfcb"),
+          "start_on" => DateTime.parse("2022-10-05 00:00:00 UTC"),
+          "eligibility_id" => BSON.ObjectId("6335c3a8f356ed00104446f3"),
+          "eligibility_type" =>
+            "BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
+          "updated_at" => DateTime.parse("2022-10-05 16:43:53 UTC"),
+          "created_at" => DateTime.parse("2022-10-05 16:43:53 UTC"),
+          "subject" => {
+            "_id" => BSON.ObjectId("633db44976827000105abfcc"),
+            "title" => "Subject for Osse Subsidy",
+            "key" => benefit_sponsorship.to_global_id,
+            "klass" =>
+              "BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
+            "updated_at" => DateTime.parse("2022-10-05 16:43:53 UTC"),
+            "created_at" => DateTime.parse("2022-10-05 16:43:53 UTC")
+          },
+          "evidences" => [
+            {
+              "_id" => BSON.ObjectId("633db44976827000105abfcd"),
+              "key" => :osse_subsidy,
+              "title" => "Evidence for Osse Subsidy",
+              "is_satisfied" => true,
+              "updated_at" => DateTime.parse("2022-10-05 16:43:53 UTC"),
+              "created_at" => DateTime.parse("2022-10-05 16:43:53 UTC")
+            }
+          ],
+          "grants" => [
+            {
+              "_id" => BSON.ObjectId("633db44976827000105abfcf"),
+              "title" => "minimum_participation_rule_relaxed_2022",
+              "key" => :minimum_participation_rule,
+              "start_on" => DateTime.parse("2022-10-05 00:00:00 UTC"),
+              "updated_at" => DateTime.parse("2022-10-05 16:43:53 UTC"),
+              "created_at" => DateTime.parse("2022-10-05 16:43:53 UTC"),
+              "value" => {
+                "_id" => BSON.ObjectId("633db44976827000105abfce"),
+                "_type" => "Eligibilities::Osse::BenefitSponsorshipOssePolicy",
+                "title" => "minimum_participation_rule_relaxed_2022",
+                "key" => :minimum_participation_rule,
+                "value" => "minimum_participation_rule",
+                "updated_at" => DateTime.parse("2022-10-05 16:43:53 UTC"),
+                "created_at" => DateTime.parse("2022-10-05 16:43:53 UTC")
+              }
+            }
+          ]
+        }
+      end
+
+      context "when eligibility active last year" do
+        let(:eligibilities) do
+          [options1].collect do |options|
+            Eligibilities::Osse::Eligibility.new(options)
+          end
+        end
+
+        it "should migrate eligibility record and create renewal eligibility" do
+          result =
+            described_class.new.call(
+              current_eligibilities: eligibilities,
+              eligibility_type:
+                "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+            )
+
+          expect(result.success).to be_truthy
+          benefit_sponsorship.reload
+          expect(benefit_sponsorship.eligibilities).to be_present
+          expect(benefit_sponsorship.eligibilities.count).to eq 2
+
+          eligibility_2022 =
+            benefit_sponsorship
+            .eligibilities
+            .by_key(:aca_shop_osse_eligibility_2022)
+            .first
+          eligibility_2023 =
+            benefit_sponsorship
+            .eligibilities
+            .by_key(:aca_shop_osse_eligibility_2023)
+            .first
+
+          eligibility_2022.tap do |e|
+            expect(e.is_eligible).to be_truthy
+            expect(e.effective_on.to_date).to eq eligibilities.first.start_on.to_date
             expect(e.evidences.last.current_state).to eq :approved
             expect(e.evidences.last.state_histories.pluck(:to_state)).to eq %i[
                  initial
