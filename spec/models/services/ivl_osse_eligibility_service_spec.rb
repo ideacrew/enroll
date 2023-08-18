@@ -73,7 +73,7 @@ RSpec.describe Services::IvlOsseEligibilityService, type: :model, :dbclean => :a
 
   describe "#update_osse_eligibilities_by_year" do
     it "updates osse eligibilities by year" do
-      allow(subject).to receive(:create_or_term_osse_eligibility).and_return("Success")
+      allow(subject).to receive(:store_osse_eligibility).and_return("Success")
 
       result = subject.update_osse_eligibilities_by_year
 
@@ -81,17 +81,17 @@ RSpec.describe Services::IvlOsseEligibilityService, type: :model, :dbclean => :a
     end
   end
 
-  describe "#create_or_term_osse_eligibility" do
+  describe "#store_osse_eligibility" do
     it "creates or terms osse eligibility" do
       allow(::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new).to receive(:call).and_return(double("Result", success?: true))
 
-      result = subject.create_or_term_osse_eligibility(role, "true", TimeKeeper.date_of_record.beginning_of_year)
+      result = subject.store_osse_eligibility(role, "true", TimeKeeper.date_of_record.beginning_of_year)
 
       expect(result).to eq("Success")
     end
 
     it "returns Failure if operation fails" do
-      result = subject.create_or_term_osse_eligibility(role, "true", Date.today.to_s)
+      result = subject.store_osse_eligibility(role, "true", Date.today.to_s)
 
       expect(result).to eq("Failure")
     end

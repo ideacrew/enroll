@@ -25,15 +25,22 @@ module Services
     end
 
     def osse_status_by_year
+      calendar_year = TimeKeeper.date_of_record.year
+
       osse_eligibility_years_for_display.inject({}) do |data, year|
         data[year] = {}
-        start_on = Date.new(year, 0o1, 0o1)
 
-        eligibility = get_eligibility_by_year(start_on)
-        data[year][:is_eligible] = is_eligible_on(eligibility, start_on)
+        start_on = Date.new(year, 1, 1)
+        start_on = TimeKeeper.date_of_record if year == calendar_year
+        start_on = start_on.end_of_year if year == calendar_year - 1
+
+        eligibility = get_eligibility_by_date(start_on)
+        data[year][:is_eligible] = eligibility&.is_eligible_on?(start_on) || false
         next data unless eligibility.present?
+
         latest_eligibility_period = eligibility.evidences.last&.eligible_periods&.last
         next data unless latest_eligibility_period.present?
+
         data[year][:start_on] = latest_eligibility_period[:start_on]
         data[year][:end_on] = latest_eligibility_period[:end_on] || latest_eligibility_period[:start_on].end_of_year
 
@@ -41,24 +48,9 @@ module Services
       end
     end
 
-    def is_eligible_on(eligibility, start_on)
-      if start_on.year == TimeKeeper.date_of_record.year
-        eligibility&.is_eligible_on?(TimeKeeper.date_of_record) || false
-      else
-        return true if eligibility&.evidences&.last&.current_state == :approved
-        eligibility&.is_eligible_on?(start_on) || false
-      end
-    end
-
-    def get_eligibility_by_year(start_on)
+    def get_eligibility_by_date(start_on)
       eligibility_key = "aca_ivl_osse_eligibility_#{start_on.year}".to_sym
-      eligibility = role.eligibility_for(eligibility_key, start_on)
-      return eligibility if eligibility.present?
-
-      eligibilities = role.eligibilities&.by_key(eligibility_key)
-      eligibilities.detect do |el|
-        (start_on.beginning_of_year..start_on.end_of_year).cover?(el.effective_on)
-      end
+      role.eligibility_for(eligibility_key, start_on)
     end
 
     def get_osse_term_date(published_on)
@@ -76,18 +68,19 @@ module Services
         effective_on = Date.new(year.to_i, 0o1, 0o1)
         eligibility_record = role.eligibility_for("aca_ivl_osse_eligibility_#{year}".to_sym, effective_on)
         eligible_on = (year.to_i == TimeKeeper.date_of_record.year) ? TimeKeeper.date_of_record : effective_on
+
         if eligibility_record&.is_eligible_on?(eligible_on) && osse_eligibility.to_s == 'false'
           term_date = get_osse_term_date(eligibility_record.published_on)
-          eligibility_result[year] = create_or_term_osse_eligibility(role, osse_eligibility, term_date)
+          eligibility_result[year] = store_osse_eligibility(role, osse_eligibility, term_date)
         elsif osse_eligibility.to_s == 'true'
-          eligibility_result[year] = create_or_term_osse_eligibility(role, osse_eligibility, effective_on)
+          eligibility_result[year] = store_osse_eligibility(role, osse_eligibility, effective_on)
         end
       end
 
       eligibility_result.group_by { |_key, value| value }.transform_values { |items| items.map(&:first) }
     end
 
-    def create_or_term_osse_eligibility(role, osse_eligibility, effective_on)
+    def store_osse_eligibility(role, osse_eligibility, effective_on)
       result = ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new.call(
         {
           subject: role.to_global_id,
