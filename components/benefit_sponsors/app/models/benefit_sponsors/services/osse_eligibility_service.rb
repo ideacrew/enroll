@@ -54,15 +54,15 @@ module BenefitSponsors
           eligible_on = (year.to_i == TimeKeeper.date_of_record.year) ? TimeKeeper.date_of_record : effective_on
           if eligibility_record&.is_eligible_on?(eligible_on) && osse_eligibility.to_s == 'false'
             term_date = get_osse_term_date(eligibility_record.published_on)
-            eligibility_result[year] = create_or_term_osse_eligibility(benefit_sponsorship, osse_eligibility, term_date)
+            eligibility_result[year] = create_or_update_osse_eligibility(benefit_sponsorship, osse_eligibility, term_date)
           elsif osse_eligibility.to_s == 'true'
-            eligibility_result[year] = create_or_term_osse_eligibility(benefit_sponsorship, osse_eligibility, effective_on)
+            eligibility_result[year] = create_or_update_osse_eligibility(benefit_sponsorship, osse_eligibility, effective_on)
           end
         end
         eligibility_result.group_by { |_key, value| value }.transform_values { |items| items.map(&:first) }
       end
 
-      def create_or_term_osse_eligibility(benefit_sponsorship, osse_eligibility, effective_on)
+      def create_or_update_osse_eligibility(benefit_sponsorship, osse_eligibility, effective_on)
         result = ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(
           {
             subject: benefit_sponsorship.to_global_id,

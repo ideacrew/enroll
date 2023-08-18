@@ -26,7 +26,7 @@ module BenefitSponsors
         def self.update!(factory_obj, attributes)
           organization = factory_obj.get_organization
           osse_eligibility = attributes[:organization][:profiles_attributes][0][:osse_eligibility]
-          create_or_term_osse_eligibility(organization, osse_eligibility)
+          create_or_update_osse_eligibility(organization, osse_eligibility)
           organization.assign_attributes(sanitize_organization_params_for_update(attributes[:organization]))
           organization.update_benefit_sponsorship(organization.employer_profile) if is_employer_profile? && address_changed?(organization.employer_profile)
           factory_obj.update_representative(attributes[:staff_roles_attributes][0]) if attributes[:staff_roles_attributes].present?
@@ -40,22 +40,17 @@ module BenefitSponsors
           factory_obj
         end
 
-        def self.create_or_term_osse_eligibility(organization, osse_eligibility)
+        def self.create_or_update_osse_eligibility(organization, osse_eligibility)
           benefit_sponsorship = organization.active_benefit_sponsorship
           osse_key = "aca_shop_osse_eligibility_#{TimeKeeper.date_of_record.year}".to_sym
           eligibility_record = benefit_sponsorship.eligibility_for(osse_key, TimeKeeper.date_of_record)
-
-          if eligibility_record&.is_eligible_on?(TimeKeeper.date_of_record)
-            return if osse_eligibility.to_s == 'true'
-            terminate_eligibility(benefit_sponsorship, osse_eligibility)
-          else
-            ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(osse_eligibility_params(benefit_sponsorship, osse_eligibility))
-          end
+          return if eligibility_record&.is_eligible_on?(TimeKeeper.date_of_record) && osse_eligibility.to_s == 'true'
+          store_eligibility(benefit_sponsorship, osse_eligibility)
         rescue StandardError => e
           Rails.logger.error { "error building osse eligibility due to: #{e.message}" }
         end
 
-        def self.terminate_eligibility(benefit_sponsorship, osse_eligibility)
+        def self.store_eligibility(benefit_sponsorship, osse_eligibility)
           ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(
             {
               subject: benefit_sponsorship.to_global_id,
@@ -64,31 +59,6 @@ module BenefitSponsors
               effective_date: TimeKeeper.date_of_record
             }
           )
-          #
-          # Deprecated as discussed in architectural meetings
-          #
-          # benefit_sponsorship.census_employees.each do |census_employee|
-          #   employee_role = census_employee.employee_role
-
-          #   ::Operations::Eligibilities::Osse::TerminateEligibility.new.call(
-          #     {
-          #       subject_gid: employee_role.to_global_id.to_s,
-          #       evidence_key: :osse_subsidy,
-          #       termination_date: TimeKeeper.date_of_record
-          #     }
-          #   )
-          # rescue StandardError => e
-          #   Rails.logger.error { "error terminating osse eligibility for employee_role_id: #{employee_role.id} due to: #{e.message}" }
-          # end
-        end
-
-        def self.osse_eligibility_params(benefit_sponsorship, osse_eligibility)
-          {
-            subject: benefit_sponsorship.to_global_id,
-            evidence_key: :shop_osse_evidence,
-            evidence_value: osse_eligibility.to_s,
-            effective_date: TimeKeeper.date_of_record
-          }
         end
 
         def self.update_plan_design_organization(organization)
