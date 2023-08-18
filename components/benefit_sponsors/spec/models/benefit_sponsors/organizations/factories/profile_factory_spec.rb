@@ -287,6 +287,24 @@ module BenefitSponsors
 
     context '.update' do
       context 'when type is benefit sponsor' do
+        include_context "setup benefit market with market catalogs and product packages"
+        let(:current_effective_date) { Date.new(Date.today.year, 3, 1) }
+
+        let(:catalog_eligibility) do
+          catalog_eligibility =
+            ::Operations::Eligible::CreateCatalogEligibility.new.call(
+              {
+                subject: current_benefit_market_catalog.to_global_id,
+                eligibility_feature: "aca_shop_osse_eligibility",
+                effective_date:
+                  current_benefit_market_catalog.application_period.begin.to_date,
+                domain_model:
+                  "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+              }
+            )
+
+          catalog_eligibility
+        end
 
         let!(:abc_organization) do
           FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, :with_broker_agency_profile, site: site)
@@ -365,7 +383,12 @@ module BenefitSponsors
         let(:osse_eligibility) { 'true' }
         let!(:ee_eligibility) { nil }
 
+        after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
+
         before do
+          TimeKeeper.set_date_of_record_unprotected!(current_effective_date)
+          allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+          catalog_eligibility
           valid_employer_params_update[:organization][:profiles_attributes][0].merge!(:osse_eligibility => osse_eligibility)
           profile_factory
           abc_organization.reload
@@ -389,7 +412,7 @@ module BenefitSponsors
           expect(abc_organization.dba).to eq plan_design_organization.dba
         end
 
-        context ".create_or_term_osse_eligibility" do
+        context ".create_or_update_osse_eligibility" do
           context 'create eligibility' do
             let(:osse_eligibility) { 'true' }
 
