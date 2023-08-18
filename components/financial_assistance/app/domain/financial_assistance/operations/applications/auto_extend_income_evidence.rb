@@ -33,7 +33,7 @@ module FinancialAssistance
         end
 
         def update_evidences(params)
-          applications = FinancialAssistance::Application.determined.where(:"applicants.income_evidence.due_on" => params[:current_due_on], :"applicants.income_evidence.aasm_state".in =>['rejected', 'outstanding'])
+          applications = FinancialAssistance::Application.determined.where(:"applicants.income_evidence.due_on" => params[:current_due_on], :"applicants.income_evidence.aasm_state".in => ['rejected', 'outstanding'])
           updated_applicants = []
           applications.each do |application|
             application.applicants.each do |applicant|
@@ -54,14 +54,12 @@ module FinancialAssistance
           family = application.family
           eligibility_determination = family&.eligibility_determination
           return unless eligibility_determination
-          
+
           applicants_earliest_due_date = family&.min_verification_due_date_on_family
           family_earliest_due_date = eligibility_determination&.outstanding_verification_earliest_due_date
           return unless applicants_earliest_due_date && family_earliest_due_date
 
-          if applicants_earliest_due_date > family_earliest_due_date
-            family.eligibility_determination.update(outstanding_verification_earliest_due_date: applicants_earliest_due_date)
-          end
+          family.eligibility_determination.update(outstanding_verification_earliest_due_date: applicants_earliest_due_date) if applicants_earliest_due_date > family_earliest_due_date
         end
       end
     end

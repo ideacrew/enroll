@@ -37,10 +37,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
                                                           verification_outstanding: true,
                                                           is_satisfied: false)
     end
-    
+
     before do
       allow(FinancialAssistanceRegistry[:auto_update_income_evidence_due_on].setting(:days)).to receive(:item).and_return(65)
-    end 
+    end
 
     context 'success' do
       context 'with no params submitted' do
@@ -148,15 +148,15 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
         end
       end
     end
-  end 
+  end
 
-  describe 'extending income evidence verification due date on a family level' do 
-    # Test family with 
+  describe 'extending income evidence verification due date on a family level' do
+    # Test family with
     # 1 member eligible for income evidence extension (later due date)
     # 1 member eligible for income evidence extension (earlier due date)
     # 1 member ineligible for income evidence extension
     # Maybe add 1 member with complete verified income evidence?
-    
+
     let!(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: '100095') }
     let!(:family) { FactoryBot.create(:family, :with_nuclear_family, person: person) }
     let(:applicant_1_due_date) { TimeKeeper.date_of_record + 10.days }
@@ -167,7 +167,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
       FactoryBot.create(:application,
                         family_id: family.id,
                         aasm_state: "determined",
-                        effective_date: (TimeKeeper.date_of_record -  2.days))
+                        effective_date: (TimeKeeper.date_of_record - 2.days))
     end
 
     let!(:applicant_1) do
@@ -202,40 +202,40 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
 
     let!(:income_evidence_1) do
       applicant_1.create_income_evidence(key: :income,
-                                              title: 'Income',
-                                              aasm_state: 'outstanding',
-                                              due_on: applicant_1_due_date,
-                                              verification_outstanding: true,
-                                              is_satisfied: false)
+                                         title: 'Income',
+                                         aasm_state: 'outstanding',
+                                         due_on: applicant_1_due_date,
+                                         verification_outstanding: true,
+                                         is_satisfied: false)
     end
 
     let!(:income_evidence_2) do
       applicant_2.create_income_evidence(key: :income,
-                                                title: 'Income',
-                                                aasm_state: 'outstanding',
-                                                due_on: applicant_2_due_date,
-                                                verification_outstanding: true,
-                                                is_satisfied: false)
+                                         title: 'Income',
+                                         aasm_state: 'outstanding',
+                                         due_on: applicant_2_due_date,
+                                         verification_outstanding: true,
+                                         is_satisfied: false)
     end
 
     let!(:income_evidence_3) do
       applicant_3.create_income_evidence(key: :income,
-                                              title: 'Income',
-                                              aasm_state: 'outstanding',
-                                              due_on: applicant_3_due_date,
-                                              verification_outstanding: true,
-                                              is_satisfied: false)
+                                         title: 'Income',
+                                         aasm_state: 'outstanding',
+                                         due_on: applicant_3_due_date,
+                                         verification_outstanding: true,
+                                         is_satisfied: false)
     end
 
     before do
       family.create_eligibility_determination
       family.eligibility_determination.update!(outstanding_verification_status: 'outstanding',
-                                                outstanding_verification_earliest_due_date: TimeKeeper.date_of_record,
-                                                outstanding_verification_document_status: 'Partially Uploaded')
+                                               outstanding_verification_earliest_due_date: TimeKeeper.date_of_record,
+                                               outstanding_verification_document_status: 'Partially Uploaded')
 
-      income_evidence_3.verification_histories.create(action: 'auto_extend_due_date', 
-                                                        update_reason: 'Auto extended due date', 
-                                                        updated_by: 'system')
+      income_evidence_3.verification_histories.create(action: 'auto_extend_due_date',
+                                                      update_reason: 'Auto extended due date',
+                                                      updated_by: 'system')
     end
 
     context 'success' do
@@ -266,9 +266,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
 
         it 'should update the family outstanding_verification_earliest_due_date to the earliest income_evidence due_on date' do
           # applicant_3 has the earliest income_evidence due_on date -- meaning the overall earliest due date for the family should also be this date
-          expect(family.eligibility_determination.outstanding_verification_earliest_due_date).to eq(applicant_3.income_evidence.due_on) 
+          expect(family.eligibility_determination.outstanding_verification_earliest_due_date).to eq(applicant_3.income_evidence.due_on)
         end
       end
     end
-  end 
+  end
 end
