@@ -48,3 +48,11 @@ Feature: EE with consumer role plan purchase
     Then Employee clicks on the Actions button
     When Employee clicks on the make changes to my coverage button
 
+  Scenario: when user purchase plan as employee and ineligible for individual market
+    Given a matched Employee exists with consumer role
+    Then Employee sign in to portal
+    And user did not apply coverage as ivl
+    When employee clicked on shop for plans
+    Then employee should see all the family members names
+    When employee switched for employer-sponsored benefits
+    Then user should not see the ivl error message
