@@ -238,6 +238,19 @@ class BenefitCoveragePeriod
     eligible_packages.push(cat_benefit_package)
   end
 
+  def eligibilities_on(date, eligibility_collection = nil)
+    eligibility_collection ||= eligibilities.effectuated
+    eligibility_collection.select{|e| e.eligibility_period_cover?(date)}
+  end
+
+  def active_eligibilities_on(date, eligibility_collection = nil)
+    eligibilities_on(date, eligibility_collection).select{|e| e.is_eligible_on?(date) }
+  end
+
+  def eligibility_for(eligibility_key, effective_date)
+    active_eligibilities_on(effective_date, eligibilities.by_key(eligibility_key)).last
+  end
+
   ## Class methods
   class << self
 
