@@ -25,10 +25,6 @@ module FinancialAssistance
         def validate_input_params(params)
           params[:current_due_on] = params[:current_due_on] || TimeKeeper.date_of_record
           params[:extend_by] = params[:extend_by] || FinancialAssistanceRegistry[:auto_update_income_evidence_due_on].settings(:days).item
-
-          # This line is being used to test until FinancialAssitancesRegistry stub can be added to test suite
-          params[:extend_by] = 65 if params[:extend_by] == true
-          
           params[:modified_by] = params[:modified_by] || "system"
           return Failure("Invalid param for key current_due_on, must be a Date") unless params[:current_due_on].is_a?(Date)
           return Failure("Invalid param for key extend_by, must be an Integer") unless params[:extend_by].is_a?(Integer)
@@ -37,7 +33,7 @@ module FinancialAssistance
         end
 
         def update_evidences(params)
-          applications = FinancialAssistance::Application.determined.where(:"applicants.income_evidence.due_on" => params[:current_due_on])
+          applications = FinancialAssistance::Application.determined.where(:"applicants.income_evidence.due_on" => params[:current_due_on], :"applicants.income_evidence.aasm_state".in =>['rejected', 'outstanding'])
           updated_applicants = []
           applications.each do |application|
             application.applicants.each do |applicant|
@@ -56,15 +52,14 @@ module FinancialAssistance
 
         def update_family_level_verification_due_date(application)
           family = application.family
-          eligibility_determination = family.eligibility_determination
+          eligibility_determination = family&.eligibility_determination
+          return unless eligibility_determination
           
-          applicants_earliest_due_date = family.min_verification_due_date_on_family
-          # Is there an instance where this would be nil? Maybe when it's first built? 
-          family_earliest_due_date = eligibility_determination.outstanding_verification_earliest_due_date
-          
-          # More elegant way to write? -- The names are really loooooong...
+          applicants_earliest_due_date = family&.min_verification_due_date_on_family
+          family_earliest_due_date = eligibility_determination&.outstanding_verification_earliest_due_date
+          return unless applicants_earliest_due_date && family_earliest_due_date
+
           if applicants_earliest_due_date > family_earliest_due_date
-            # Do we need to add a verification_history for altering the eligibility_determination.outstanding_verification_earliest_due_date?
             family.eligibility_determination.update(outstanding_verification_earliest_due_date: applicants_earliest_due_date)
           end
         end

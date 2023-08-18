@@ -32,21 +32,14 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
     let!(:income_evidence) do
       application.applicants.first.create_income_evidence(key: :income,
                                                           title: 'Income',
-                                                          # Had to change from 'pending' to 'outstanding'?
                                                           aasm_state: 'outstanding',
                                                           due_on: TimeKeeper.date_of_record,
                                                           verification_outstanding: true,
                                                           is_satisfied: false)
     end
-
+    
     before do
-      # stub might look something like this?
-      # allow(FinancialAssistanceRegistry).to receive(:[]).with(:auto_update_income_evidence_due_on).and_return(double(settings: double(days: double(item: 65))))
-
-      family.create_eligibility_determination
-      family.eligibility_determination.update!(outstanding_verification_status: 'outstanding',
-                                                outstanding_verification_earliest_due_date: TimeKeeper.date_of_record,
-                                                outstanding_verification_document_status: 'Partially Uploaded')
+      allow(FinancialAssistanceRegistry[:auto_update_income_evidence_due_on].setting(:days)).to receive(:item).and_return(65)
     end 
 
     context 'success' do
@@ -166,11 +159,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
     
     let!(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: '100095') }
     let!(:family) { FactoryBot.create(:family, :with_nuclear_family, person: person) }
-    # let!(:family) { FactoryBot.create(:family, :with_family_of_four, person: person) }
     let(:applicant_1_due_date) { TimeKeeper.date_of_record + 10.days }
     let(:applicant_2_due_date) { TimeKeeper.date_of_record }
     let(:applicant_3_due_date) { TimeKeeper.date_of_record + 30.days }
-    # let(:applicant_4_due_date) { TimeKeeper.date_of_record - 45.days } # income submitted/verified 48 days ago
 
     let!(:application) do
       FactoryBot.create(:application,
@@ -209,17 +200,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
                         addresses: [FactoryBot.build(:financial_assistance_address)])
     end
 
-    # possible 4th applicant with verified income_evidence
-    # let!(:applicant_4) do
-    #   FactoryBot.create(:applicant,
-    #                     application: application,
-    #                     dob: TimeKeeper.date_of_record - 9.years,
-    #                     is_primary_applicant: true,
-    #                     family_member_id: family.family_members[3].id,
-    #                     person_hbx_id: family.family_members[3].hbx_id,
-    #                     addresses: [FactoryBot.build(:financial_assistance_address)])
-    # end
-
     let!(:income_evidence_1) do
       applicant_1.create_income_evidence(key: :income,
                                               title: 'Income',
@@ -245,18 +225,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
                                               due_on: applicant_3_due_date,
                                               verification_outstanding: true,
                                               is_satisfied: false)
-                                              # requirements to meet verification_outstanding: false vs is_satisfied: true
     end
-    
-    # let!(:income_evidence_4) do
-    #   applicant_4.create_income_evidence(key: :income,
-    #                                           title: 'Income',
-    #                                           aasm_state: 'verified',
-    #                                           due_on: applicant_4_due_date,
-    #                                           verification_outstanding: false,
-    #                                           is_satisfied: true)
-    #                                           # requirements to meet verification_outstanding: false vs is_satisfied: true
-    # end
 
     before do
       family.create_eligibility_determination
@@ -264,17 +233,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
                                                 outstanding_verification_earliest_due_date: TimeKeeper.date_of_record,
                                                 outstanding_verification_document_status: 'Partially Uploaded')
 
-      # Is adding verification history necessary? I don't think the user necessarily had to have the date extended to test this case
       income_evidence_3.verification_histories.create(action: 'auto_extend_due_date', 
                                                         update_reason: 'Auto extended due date', 
                                                         updated_by: 'system')
-      # # How is user_id determined with DateTime?
-      # income_evidence_4.workflow_state_transitions.create(to_state: "verified", 
-      #                                                     transition_at: (applicant_4_due_date - 2.days),
-      #                                                     reason: "met minimum criteria", 
-      #                                                     comment: "consumer provided proper documentation",
-      #                                                     user_id: BSON::ObjectId.from_time(applicant_3_due_date - 2.days))
-
     end
 
     context 'success' do
@@ -285,6 +246,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
           applicant_1.reload
           applicant_2.reload
           applicant_3.reload
+          family.eligibility_determination.reload
         end
 
         it 'should return success' do
@@ -303,10 +265,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
         end
 
         it 'should update the family outstanding_verification_earliest_due_date to the earliest income_evidence due_on date' do
-          ed = family.eligibility_determination
-
           # applicant_3 has the earliest income_evidence due_on date -- meaning the overall earliest due date for the family should also be this date
-          expect(ed.outstanding_verification_earliest_due_date).to eq(applicant_3.income_evidence.due_on) 
+          expect(family.eligibility_determination.outstanding_verification_earliest_due_date).to eq(applicant_3.income_evidence.due_on) 
         end
       end
     end
