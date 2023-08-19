@@ -391,7 +391,7 @@ registry:
           - key: :ivl_enrollment_renewal_begin_effective_day
             item: 1
           - key: :ivl_enrollment_renewal_begin_effective_month
-            item: 11
+            item: <%= ENV['IVL_ENROLLMENT_RENEWAL_BEGIN_EFFECTIVE_MONTH'] || 11 %>
       - key: :exclude_child_only_offering
         item: :exclude_child_only_offering
         is_enabled: false
