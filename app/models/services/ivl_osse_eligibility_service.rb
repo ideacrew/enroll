@@ -24,6 +24,7 @@ module Services
       ::BenefitCoveragePeriod.osse_eligibility_years_for_display.sort.reverse
     end
 
+    # rubocop:disable Metrics/CyclomaticComplexity
     def osse_status_by_year
       calendar_year = TimeKeeper.date_of_record.year
 
@@ -47,6 +48,7 @@ module Services
         data
       end
     end
+    # rubocop:enable Metrics/CyclomaticComplexity
 
     def get_eligibility_by_date(start_on)
       eligibility_key = "aca_ivl_osse_eligibility_#{start_on.year}".to_sym

@@ -13,12 +13,12 @@ module Operations
       # @option opts [<String>]   :sponsorship_id required
       # @return [Dry::Monad] result
       def call(params)
-        benefit_sponsorship = yield find_sponsorship(values)
+        benefit_sponsorship = yield find_sponsorship(params)
         applications = yield verify_migration_eligible(benefit_sponsorship)
-        _errors = yield check_ref_plan_and_enrollments(applications)
-        catalog = yield update_catalog(benefit_sponsorship, applications)
+        _errors = yield validate_applications(benefit_sponsorship, applications)
+        catalogs = yield update_catalog(benefit_sponsorship, applications)
 
-        Success(catalog)
+        Success(catalogs)
       end
 
       private
@@ -30,29 +30,32 @@ module Operations
       end
 
       def verify_migration_eligible(benefit_sponsorship)
-        applications = applications_for(benefit_sponsorship)
-        eligible_applications = []
-        applications.each do |application|
+        applications = []
+        applications_for(benefit_sponsorship).each do |application|
           start_on = application.start_on
-          next unless calendar_years.include?(start_on.year)
-
           eligibility =
-            eligibility_for(
+            benefit_sponsorship.eligibility_for(
               "aca_shop_osse_eligibility_#{start_on.year}".to_sym,
               start_on
             )
-          next unless eligibility
-          next unless application.created_at > eligibility.created_at
 
-          eligible_applications << application
+          next unless eligibility
+          next unless calendar_years.include?(start_on.year)
+          next unless application.created_at > eligibility.created_at
+          applications << application
+        end
+
+        if applications.present?
+          Success(applications)
+        else
+          Failure("no applications found")
         end
       end
 
-      def check_ref_plan_and_enrollments(applications)
+      def validate_applications(benefit_sponsorship, applications)
         errors = []
 
         logger.info "validating  #{benefit_sponsorship.legal_name}(#{benefit_sponsorship.fein})"
-
         applications.each do |application|
           if application.benefit_packages.any? { |benefit_package|
                benefit_package
@@ -73,35 +76,43 @@ module Operations
             errors << "found bronze reference plan for application #{application.start_on} #{application.aasm_state}"
           end
 
-          if application.benefit_packages.any? { |benefit_package|
-               families = benefit_package.enrolled_and_terminated_families
-               families.any? do |family|
-                 enrollment_for_package(family, benefit_package).any? do |en|
-                   en.product&.metal_level_kind.to_s == "bronze"
-                 end
-               end
-             }
-            errors << "found employees enrolled in bronze plan for application #{application.start_on} #{application.aasm_state}"
-          end
-
-          if application.benefit_packages.any? { |benefit_package|
-               families = benefit_package.enrolled_and_terminated_families
-               families.all? do |family|
-                 enrollment_for_package(family, benefit_package).none? do |en|
-                   en.eligible_child_care_subsidy > 0
-                 end
-               end
-             }
-            errors << "found no employees with subsidy for application #{application.start_on} #{application.aasm_state}"
-          end
+          verify_bronze_plan_coverages(application, errors)
+          verify_employee_subsidies(application, errors)
         end
-
         return Success(errors) unless errors.present?
         logger.info "failed validation due to #{errors.inspect}"
         Failure(errors)
       end
 
-      def enrollment_for_package(family, benefit_package)
+      def verify_bronze_plan_coverages(application, errors)
+        if application.benefit_packages.any? { |benefit_package|
+             enrolled_families(benefit_package).any? do |family|
+               enrollments_by_package(family, benefit_package).any? do |en|
+                 en.product&.metal_level_kind.to_s == "bronze"
+               end
+             end
+           }
+          errors << "found employees enrolled in bronze plan for application #{application.start_on} #{application.aasm_state}"
+        end
+      end
+
+      def verify_employee_subsidies(application, errors)
+        if application.benefit_packages.any? { |benefit_package|
+             enrolled_families(benefit_package).all? do |family|
+               enrollments_by_package(family, benefit_package).none? do |en|
+                 en.eligible_child_care_subsidy > 0
+               end
+             end
+           }
+          errors << "found no employees with subsidy for application #{application.start_on} #{application.aasm_state}"
+        end
+      end
+
+      def enrolled_families(benefit_package)
+        benefit_package.enrolled_and_terminated_families
+      end
+
+      def enrollments_by_package(family, benefit_package)
         enrollments =
           family.hbx_enrollments.by_health.by_benefit_package(benefit_package)
 
@@ -112,39 +123,50 @@ module Operations
 
       def update_catalog(benefit_sponsorship, applications)
         logger.info "updating catalog for #{benefit_sponsorship.legal_name}(#{benefit_sponsorship.fein})"
-        applications.each do |application|
-          logger.info "updating application catalog for #{application.start_on} #{application.aasm_state}"
-          sponsor_catalog = application.benefit_sponsor_catalog
-          sponsor_catalog.tap do |catalog|
-            catalog.product_packages.delete_if do |package|
-              package.product_kind == :health &&
-                package.package_kind != :metal_level
-            end
-
-            catalog
-              .product_packages
-              .detect do |package|
-                package.product_kind == :health &&
-                  package.package_kind == :metal_level
-              end
-              .tap do |package|
-                package.products.delete_if do |product|
-                  product.health? && product.metal_level_kind == :bronze
-                end
-              end
+        catalogs =
+          applications.collect do |application|
+            logger.info "updating application catalog for #{application.start_on} #{application.aasm_state}"
+            update_application_catalog(application)
+            logger.info "updated application catalog for #{application.start_on} #{application.aasm_state}"
+            application.benefit_sponsor_catalog
           end
 
-          sponsor_catalog.save
-          sponsor_catalog.create_sponsor_eligibilities
-          logger.info "updated application catalog for #{application.start_on} #{application.aasm_state}"
-        end
+        Success(catalogs)
       end
 
+      # rubocop:disable Style/MultilineBlockChain
+      def update_application_catalog(application)
+        sponsor_catalog = application.benefit_sponsor_catalog
+        sponsor_catalog.tap do |catalog|
+          catalog.product_packages.delete_if do |package|
+            package.product_kind == :health &&
+              package.package_kind != :metal_level
+          end
+
+          catalog
+            .product_packages
+            .detect do |package|
+              package.product_kind == :health &&
+                package.package_kind == :metal_level
+            end
+            .tap do |package|
+              package.products.delete_if do |product|
+                product.health? && product.metal_level_kind == :bronze
+              end
+            end
+        end
+        sponsor_catalog.save
+        sponsor_catalog.create_sponsor_eligibilities
+      end
+      # rubocop:enable Style/MultilineBlockChain
+
       def logger
-        @logger =
-          Logger.new(
-            "#{Rails.root}/log/migrate_benefit_sponsor_catalogs_#{TimeKeeper.date_of_record.strftime("%Y_%m_%d")}.log"
-          ) unless defined?(@logger)
+        unless defined?(@logger)
+          @logger =
+            Logger.new(
+              "#{Rails.root}/log/migrate_benefit_sponsor_catalogs_#{TimeKeeper.date_of_record.strftime("%Y_%m_%d")}.log"
+            )
+        end
         @logger
       end
 
