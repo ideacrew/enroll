@@ -118,7 +118,7 @@ module BenefitSponsors
             subject.renew_application
             benefit_sponsorship.reload
 
-            renewal_application = benefit_sponsorship.benefit_applications(&:is_renewing?)
+            renewal_application = benefit_sponsorship.benefit_applications.detect(&:is_renewing?)
 
             expect(renewal_application.start_on.to_date).to eq current_effective_date.next_year
             renewal_eligibility = renewal_application.benefit_sponsor_catalog.eligibilities.where(key: "aca_shop_osse_eligibility_#{renewal_application.effective_period.min.year}".to_sym).first
