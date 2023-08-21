@@ -76,7 +76,7 @@ class LawfulPresenceDetermination
   def start_ssa_process
     if EnrollRegistry.feature_enabled?(:ssa_h3)
       result = Operations::Fdsh::Ssa::H3::RequestSsaVerification.new.call(ivl_role.person)
-      ssa_verification_type = ivl_role.verification_types.by_name("Social Security Number").first
+      ssa_verification_type = ivl_role.verification_types.ssn_type.first
 
       if result.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_errors)
         ssa_verification_type.add_type_history_element(action: "Hub Request Failed", modifier: "System", update_reason: "SSA Verification Request Failed due to #{result.failure}")
