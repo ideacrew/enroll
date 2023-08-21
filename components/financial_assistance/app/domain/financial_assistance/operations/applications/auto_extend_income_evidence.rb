@@ -53,10 +53,17 @@ module FinancialAssistance
         def update_family_level_verification_due_date(application)
           family = application.family
           eligibility_determination = family&.eligibility_determination
+          puts "\n\n\neligibility determination"
+          p eligibility_determination
           return unless eligibility_determination
 
           applicants_earliest_due_date = family&.min_verification_due_date_on_family
           family_earliest_due_date = eligibility_determination&.outstanding_verification_earliest_due_date
+
+          puts "\n\n\n\napplicants_earliest vs family_earliest"
+          p applicants_earliest_due_date
+          p family_earliest_due_date
+
           return unless applicants_earliest_due_date && family_earliest_due_date
 
           family.eligibility_determination.update(outstanding_verification_earliest_due_date: applicants_earliest_due_date) if applicants_earliest_due_date > family_earliest_due_date
