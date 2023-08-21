@@ -382,7 +382,6 @@ module Operations
         end
 
         def transform_hbx_enrollment(enrollment, options)
-          # Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment.new.call(enrollment, options).value!
           Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment.new.call(enrollment, options)
         end
 
