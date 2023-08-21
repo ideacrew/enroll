@@ -55,8 +55,7 @@ module Operations
           payload.merge!(tax_households_references: transform_enr_tax_households(enr_tax_households)) if enr_tax_households.present?
           Success(payload)
         rescue StandardError => e
-          puts "Cv3HbxEnrollment error: #{e.message} | exception: #{e.inspect} | backtrace: #{e.backtrace.inspect}"
-          Rails.logger.error "Cv3HbxEnrollment id: #{enr&.hbx_id} | error: #{e.message} | exception: #{e.inspect} | backtrace: #{e.backtrace.inspect}"
+          Failure("Cv3HbxEnrollment hbx id: #{enr&.hbx_id} | exception: #{e.inspect} | backtrace: #{e.backtrace.inspect}")
         end
         # rubocop:enable Metrics/CyclomaticComplexity, Metrics/AbcSize
 
