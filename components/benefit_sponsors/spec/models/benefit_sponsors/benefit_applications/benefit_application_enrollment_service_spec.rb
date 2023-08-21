@@ -47,6 +47,88 @@ module BenefitSponsors
           expect(renewal_application.benefit_sponsor_catalog).not_to be_nil
           expect(renewal_application.benefit_packages.count).to eq 1
         end
+
+        context 'when OSSE enabled' do
+          before do
+            allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+          end
+
+          let(:year) { current_benefit_market_catalog.application_period.begin.to_date.year }
+
+          let(:catalog_eligibility) do
+            catalog_eligibility =
+              ::Operations::Eligible::CreateCatalogEligibility.new.call(
+                {
+                  subject: current_benefit_market_catalog.to_global_id,
+                  eligibility_feature: "aca_shop_osse_eligibility",
+                  effective_date:
+                    current_benefit_market_catalog.application_period.begin.to_date,
+                  domain_model:
+                    "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+                }
+              )
+
+            catalog_eligibility
+          end
+
+          let!(:sponsor_eligibility) do
+            BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(
+              {
+                subject: benefit_sponsorship.to_global_id,
+                effective_date: current_benefit_market_catalog.application_period.begin.to_date,
+                evidence_key: :shop_osse_evidence,
+                evidence_value: "true"
+              }
+            )
+          end
+
+          let!(:renewal_catalog_eligibility) do
+            renewal_catalog_eligibility =
+              ::Operations::Eligible::CreateCatalogEligibility.new.call(
+                {
+                  subject: renewal_benefit_market_catalog.to_global_id,
+                  eligibility_feature: "aca_shop_osse_eligibility",
+                  effective_date:
+                    renewal_benefit_market_catalog.application_period.begin.to_date,
+                  domain_model:
+                    "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+                }
+              )
+
+            renewal_catalog_eligibility
+          end
+
+          let!(:renewal_sponsor_eligibility) do
+            BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(
+              {
+                subject: benefit_sponsorship.to_global_id,
+                effective_date: renewal_benefit_market_catalog.application_period.begin.to_date,
+                evidence_key: :shop_osse_evidence,
+                evidence_value: "true"
+              }
+            )
+          end
+
+          it 'should generate osse eligibilities' do
+            benefit_sponsor_catalog.benefit_application = initial_application
+            benefit_sponsor_catalog.save
+            benefit_sponsorship.reload
+            allow(subject).to receive(:business_policy).and_return(business_policy)
+            allow(business_policy).to receive(:is_satisfied?).with(initial_application).and_return(true)
+            subject.renew_application
+            benefit_sponsorship.reload
+
+            renewal_application = benefit_sponsorship.benefit_applications(&:is_renewing?)
+
+            expect(renewal_application.start_on.to_date).to eq current_effective_date.next_year
+            renewal_eligibility = renewal_application.benefit_sponsor_catalog.eligibilities.where(key: "aca_shop_osse_eligibility_#{renewal_application.effective_period.min.year}".to_sym).first
+            expect(renewal_eligibility).not_to be_nil
+
+            product_packages = renewal_application.benefit_sponsor_catalog.product_packages.where(product_kind: :health)
+            expect(product_packages.size).to eq 1
+            expect(product_packages.first.package_kind).to eq :metal_level
+          end
+        end
       end
     end
 
@@ -640,7 +722,7 @@ module BenefitSponsors
       context "when employer open enrollment extended" do
 
         let(:open_enrollment_close) { TimeKeeper.date_of_record + 2.days }
-        let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }        
+        let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }
         let(:benefit_sponsorship_state) { :applicant }
 
         include_context "setup initial benefit application" do
@@ -918,13 +1000,13 @@ module BenefitSponsors
         TimeKeeper.set_date_of_record_unprotected!(Date.today)
       end
 
-      context 'when application is ineligible' do 
+      context 'when application is ineligible' do
         let(:aasm_state) { :enrollment_ineligible }
         let(:benefit_sponsorship_state) { :applicant }
         let(:today) { current_effective_date - 7.days }
         let(:oe_end_date) { current_effective_date - 5.days }
 
-        it 'should extend open enrollment' do 
+        it 'should extend open enrollment' do
           expect(initial_application.aasm_state).to eq :enrollment_ineligible
           expect(initial_application.benefit_sponsorship.aasm_state).to eq :applicant
           subject.extend_open_enrollment(oe_end_date)
@@ -941,7 +1023,7 @@ module BenefitSponsors
         let(:today) { current_effective_date + 2.days }
         let(:oe_end_date) { current_effective_date + 5.days }
 
-        it 'should extend open enrollment' do 
+        it 'should extend open enrollment' do
           expect(initial_application.aasm_state).to eq :canceled
           expect(initial_application.benefit_sponsorship.aasm_state).to eq :applicant
           subject.extend_open_enrollment(oe_end_date)
@@ -958,7 +1040,7 @@ module BenefitSponsors
         let(:today) { current_effective_date - 8.days }
         let(:oe_end_date) { current_effective_date - 5.days }
 
-        it 'should extend open enrollment' do 
+        it 'should extend open enrollment' do
           expect(initial_application.aasm_state).to eq :enrollment_closed
           expect(initial_application.benefit_sponsorship.aasm_state).to eq :applicant
           subject.extend_open_enrollment(oe_end_date)
@@ -975,7 +1057,7 @@ module BenefitSponsors
         let(:today) { current_effective_date - 13.days }
         let(:oe_end_date) { current_effective_date - 5.days }
 
-        it 'should extend open enrollment' do 
+        it 'should extend open enrollment' do
           expect(initial_application.aasm_state).to eq :enrollment_open
           expect(initial_application.benefit_sponsorship.aasm_state).to eq :applicant
           subject.extend_open_enrollment(oe_end_date)
@@ -997,39 +1079,42 @@ module BenefitSponsors
       let(:benefit_package) { initial_application.benefit_packages.first }
       let(:benefit_group_assignment) {FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_package)}
       let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee.id) }
-      let(:census_employee) { FactoryBot.create(:census_employee,
-        employer_profile: benefit_sponsorship.profile,
-        benefit_sponsorship: benefit_sponsorship,
-        benefit_group_assignments: [benefit_group_assignment]
-      )}
+      let(:census_employee) do
+        FactoryBot.create(:census_employee,
+                          employer_profile: benefit_sponsorship.profile,
+                          benefit_sponsorship: benefit_sponsorship,
+                          benefit_group_assignments: [benefit_group_assignment])
+      end
       let(:person){ FactoryBot.create(:person, :with_family)}
       let(:family) {person.primary_family}
 
-      let!(:hbx_enrollment) {  FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
-                        family: family,
-                        household: family.active_household,
-                        aasm_state: "coverage_selected",
-                        effective_on: initial_application.start_on,
-                        rating_area_id: initial_application.recorded_rating_area_id,
-                        coverage_kind: "health",
-                        sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
-                        sponsored_benefit_package_id:initial_application.benefit_packages.first.id,
-                        benefit_sponsorship_id:initial_application.benefit_sponsorship.id,
-                        employee_role_id: employee_role.id)
-      }
+      let!(:hbx_enrollment) do
+        FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                          family: family,
+                          household: family.active_household,
+                          aasm_state: "coverage_selected",
+                          effective_on: initial_application.start_on,
+                          rating_area_id: initial_application.recorded_rating_area_id,
+                          coverage_kind: "health",
+                          sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
+                          sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+                          benefit_sponsorship_id: initial_application.benefit_sponsorship.id,
+                          employee_role_id: employee_role.id)
+      end
 
-      let!(:dental_hbx_enrollment) {  FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
-                        family: family,
-                        household: family.active_household,
-                        aasm_state: "coverage_selected",
-                        effective_on: initial_application.start_on,
-                        rating_area_id: initial_application.recorded_rating_area_id,
-                        coverage_kind: "dental",
-                        sponsored_benefit_id: initial_application.benefit_packages.first.dental_sponsored_benefit.id,
-                        sponsored_benefit_package_id:initial_application.benefit_packages.first.id,
-                        benefit_sponsorship_id:initial_application.benefit_sponsorship.id,
-                        employee_role_id: employee_role.id)
-      }
+      let!(:dental_hbx_enrollment) do
+        FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                          family: family,
+                          household: family.active_household,
+                          aasm_state: "coverage_selected",
+                          effective_on: initial_application.start_on,
+                          rating_area_id: initial_application.recorded_rating_area_id,
+                          coverage_kind: "dental",
+                          sponsored_benefit_id: initial_application.benefit_packages.first.dental_sponsored_benefit.id,
+                          sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+                          benefit_sponsorship_id: initial_application.benefit_sponsorship.id,
+                          employee_role_id: employee_role.id)
+      end
 
       let!(:enrollment_service) { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }
       let!(:enrollments) { enrollment_service.hbx_enrollments_by_month(initial_application.start_on) }
