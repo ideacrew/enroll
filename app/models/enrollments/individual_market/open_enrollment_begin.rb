@@ -63,12 +63,16 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
   def process_ivl_osse_renewals
     @logger.info "Started processing IVL OSSE renewals at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
     @osse_renewal_failed_families = []
-    Person.where({
-                   '$or' => [
-                     { 'consumer_role' => { '$exists' => true } },
-                     { 'resident_role' => { '$exists' => true } }
-                   ]
-                 }).no_timeout.each do |person|
+    people = Person.where({
+                            '$or' => [
+                               { 'consumer_role.eligibilities.key' => "aca_ivl_osse_eligibility_#{renewal_effective_on.prev_year.year}".to_sym },
+                               { 'resident_role.eligibilities.key' => "aca_ivl_osse_eligibility_#{renewal_effective_on.prev_year.year}".to_sym }
+                            ]
+                          })
+
+    @logger.info "OSSE:: processing #{people.size} records"
+
+    people.no_timeout.each do |person|
       role = fetch_role(person)
       next if role.blank?
 
@@ -83,7 +87,9 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
         }
       )
 
-      unless result.success?
+      if result.success?
+        @logger.info "Succeeded Osse Renewal: #{person.hbx_id}"
+      else
         @osse_renewal_failed_families << person.families.map(&:id)
         @logger.info "Failed Osse Renewal: #{person.hbx_id}; Error: #{result.failure}"
       end
