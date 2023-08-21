@@ -48,6 +48,10 @@ module FinancialAssistance
                   Rails.logger.error("Income Evidence Not Found for applicant with person_hbx_id: #{applicant.person_hbx_id} in application with hbx_id: #{application.hbx_id}")
                   next
                 end
+                if applicant.income_evidence.verification_histories&.last&.action == "retry" && status === "outstanding"
+                  set_negative_retry_result(applicant, response_applicant_entity)
+                  next
+                end
                 update_applicant_evidence(applicant, status, response_applicant_entity, enrollments)
               end
               Success('Successfully updated Applicant with evidence')
@@ -74,6 +78,15 @@ module FinancialAssistance
                 end
               end
 
+              response_income_evidence.request_results&.each do |request_result|
+                income_evidence.request_results << Eligibilities::RequestResult.new(request_result.to_h)
+              end
+              applicant.save!
+            end
+
+            def set_negative_retry_result(applicant, response_applicant_entity)
+              response_income_evidence = response_applicant_entity.income_evidence
+              income_evidence = applicant.income_evidence
               response_income_evidence.request_results&.each do |request_result|
                 income_evidence.request_results << Eligibilities::RequestResult.new(request_result.to_h)
               end
