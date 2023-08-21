@@ -158,7 +158,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
     # Maybe add 1 member with complete verified income evidence?
 
     let!(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: '100095') }
-    let!(:family) { FactoryBot.create(:family, :with_nuclear_family, person: person) }
+    let!(:family) { FactoryBot.create(:family, :testing_with_primary_family_member_and_dependent, person: person) }
+    # let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person) }
     let(:applicant_1_due_date) { TimeKeeper.date_of_record + 10.days }
     let(:applicant_2_due_date) { TimeKeeper.date_of_record }
     let(:applicant_3_due_date) { TimeKeeper.date_of_record + 30.days }
@@ -228,6 +229,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
     end
 
     before do
+      # Enable to be able to use min_verification_due_date_on_family on family model
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:include_faa_outstanding_verifications).and_return(true)
       family.create_eligibility_determination
       family.eligibility_determination.update!(outstanding_verification_status: 'outstanding',
                                                outstanding_verification_earliest_due_date: TimeKeeper.date_of_record,

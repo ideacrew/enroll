@@ -65,6 +65,8 @@ class Family
   has_many :payment_transactions
   has_many :hbx_enrollments
 
+  embeds_one :eligibility_determination, class_name: "::Eligibilities::Determination", as: :determinable, cascade_callbacks: true
+
   after_initialize :build_household
   before_save :clear_blank_fields
 
@@ -1248,6 +1250,19 @@ class Family
         due_dates << v_type.verif_due_date if VerificationType::DUE_DATE_STATES.include? v_type.validation_status
       end
     end
+
+    if EnrollRegistry.feature_enabled?(:include_faa_outstanding_verifications)
+      application = ::FinancialAssistance::Application.where(family_id: self.id, aasm_state: 'determined').max_by(&:created_at)
+      application&.active_applicants&.each do |applicant|
+        FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+          evidence = applicant.send(evidence_type)
+          next unless evidence.present? && Eligibilities::Evidence::DUE_DATE_STATES.include?(evidence.aasm_state)
+
+          due_dates << evidence.verif_due_date
+        end
+      end
+    end
+    
     due_dates.compact!
     due_dates.uniq.sort
   end
