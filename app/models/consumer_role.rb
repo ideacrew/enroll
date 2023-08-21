@@ -639,7 +639,7 @@ class ConsumerRole
       transitions from: :fully_verified, to: :verification_outstanding
     end
 
-    event :trigger_residency, :after => [:mark_residency_pending, :record_transition, :start_residency_verification_process, :notify_of_eligibility_change] do
+    event :trigger_residency, :after => [:record_transition, :start_residency_verification_process, :mark_residency_pending, :notify_of_eligibility_change] do
       transitions from: :ssa_pending, to: :ssa_pending
       transitions from: :unverified, to: :unverified
       transitions from: :dhs_pending, to: :dhs_pending
