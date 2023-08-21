@@ -44,7 +44,7 @@ RSpec.describe Operations::Fdsh::CheckEligibilityRules do
       value = Operations::Transformers::PersonTo::Cv3Person.new.call(person).success
       AcaEntities::People::Person.new(value.to_h)
     end
-    let(:request_type) { :vlp }
+    let(:request_type) { :dhs }
     let(:validator) { instance_double(Operations::Fdsh::EncryptedSsnValidator) }
 
     context 'when all validation rules pass' do
