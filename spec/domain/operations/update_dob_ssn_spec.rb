@@ -12,7 +12,7 @@ RSpec.describe Operations::UpdateDobSsn, type: :model, dbclean: :after_each do
     let(:test_params) do
       { person: { person_id: person.id.to_s,
                   dob: "#{TimeKeeper.date_of_record.year}-01-01",
-                  ssn: '000-00-0000',
+                  ssn: '789-83-4231',
                   pid: person.id.to_s,
                   family_actions_id: 'family_actions_238764'}, jq_datepicker_ignore_person: { dob: "01/01/#{TimeKeeper.date_of_record.year}" }}
     end
