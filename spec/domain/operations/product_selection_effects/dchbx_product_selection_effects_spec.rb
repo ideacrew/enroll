@@ -496,8 +496,11 @@ RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects
     context 'new enrollment in prior plan year for dependent add with previous year active coverage' do
       include_context 'family with two members and one enrollment and one predecessor enrollment with two members with previous year active coverage'
 
+      let(:person2) { family.family_members[1].person }
+      let!(:consumer_role) { FactoryBot.create(:consumer_role, person: person2) }
+
       before do
-        family.family_members[1].person.update_attributes(dob: predecessor_enrollment.effective_on - 10.years)
+        person2.update_attributes(dob: predecessor_enrollment.effective_on - 10.years)
         expired_enrollment.generate_hbx_signature
         predecessor_enrollment.update_attributes(enrollment_signature: expired_enrollment.enrollment_signature)
         product_selection = Entities::ProductSelection.new({:enrollment => predecessor_enrollment, :product => predecessor_product, :family => family})

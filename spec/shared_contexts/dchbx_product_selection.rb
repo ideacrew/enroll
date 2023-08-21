@@ -21,15 +21,9 @@ RSpec.shared_context 'family with one member and one enrollment', :shared_contex
                       dob: (start_of_year - 22.years))
   end
 
-  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person) }
   let!(:family_member) { family.primary_applicant }
-  let(:person2) do
-    FactoryBot.create(:person,
-                      :with_consumer_role,
-                      :with_active_consumer_role,
-                      dob: (start_of_year - 20.years))
-  end
-  let!(:family_member1) { FactoryBot.create(:family_member, person: person2, family: family) }
+  let!(:family_member1) {family.family_members[1]}
   let!(:renewal_product) do
     FactoryBot.create(:benefit_markets_products_health_products_health_product,
                       :ivl_product,
