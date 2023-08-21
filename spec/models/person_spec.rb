@@ -1800,7 +1800,7 @@ describe Person, :dbclean => :after_each do
     end
   end
 
-  describe "#is_state_resident?" do
+  describe "#state_resident?" do
     let(:person) { FactoryBot.create(:person, :with_consumer_role) }
 
     context "when person is in state resident" do
@@ -1809,7 +1809,7 @@ describe Person, :dbclean => :after_each do
       end
 
       it "should return true" do
-        expect(person.is_state_resident?).to eq true
+        expect(person.state_resident?).to eq true
       end
     end
 
@@ -1819,27 +1819,54 @@ describe Person, :dbclean => :after_each do
       end
 
       it "should return false" do
-        expect(person.is_state_resident?).to eq false
+        expect(person.state_resident?).to eq false
       end
     end
   end
 
-  describe "#is_lawfully_present?" do
-    context "when person is lawfully present" do
-      let!(:consumer_role) { FactoryBot.create(:consumer_role, citizen_status: "alien_lawfully_present") }
-      let!(:person) { consumer_role.person }
+  describe "#lawfully_present?" do
+    context "when person is alien_lawfully_present" do
+      let(:consumer_role) { FactoryBot.create(:consumer_role, citizen_status: 'alien_lawfully_present') }
+      let(:person) { consumer_role.person }
 
-      it "should return true" do
-        expect(person.is_lawfully_present?).to eq true
+      it 'returns true' do
+        expect(person.lawfully_present?).to eq true
+      end
+    end
+
+    context "when person is a us_citizen" do
+      let(:consumer_role) { FactoryBot.create(:consumer_role, citizen_status: 'us_citizen') }
+      let(:person) { consumer_role.person }
+
+      it 'returns true' do
+        expect(person.lawfully_present?).to eq true
+      end
+    end
+
+    context "when person is a naturalized_citizen" do
+      let(:consumer_role) { FactoryBot.create(:consumer_role, citizen_status: 'naturalized_citizen') }
+      let(:person) { consumer_role.person }
+
+      it 'returns true' do
+        expect(person.lawfully_present?).to eq true
+      end
+    end
+
+    context "when person is lawful_permanent_resident" do
+      let(:consumer_role) { FactoryBot.create(:consumer_role, citizen_status: 'lawful_permanent_resident') }
+      let(:person) { consumer_role.person }
+
+      it 'returns true' do
+        expect(person.lawfully_present?).to eq true
       end
     end
 
     context "when person is not lawfully present" do
-      let!(:consumer_role) { FactoryBot.create(:consumer_role, citizen_status: "not_lawfully_present_in_us") }
-      let!(:person) { consumer_role.person }
+      let(:consumer_role) { FactoryBot.create(:consumer_role, citizen_status: 'not_lawfully_present_in_us') }
+      let(:person) { consumer_role.person }
 
-      it "should return false" do
-        expect(person.is_lawfully_present?).to eq false
+      it 'returns false' do
+        expect(person.lawfully_present?).to eq false
       end
     end
   end

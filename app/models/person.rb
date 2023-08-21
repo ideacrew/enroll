@@ -1308,13 +1308,13 @@ class Person
     end
   end
 
-  def is_state_resident?
+  def state_resident?
     address = addresses.collect(&:kind).include?('home') ? home_address : mailing_address
     address&.state == aca_state_abbreviation
   end
 
-  def is_lawfully_present?
-    us_citizen.present? || (::ConsumerRole::ALIEN_LAWFULLY_PRESENT_STATUS == citizen_status)
+  def lawfully_present?
+    us_citizen.present? || [::ConsumerRole::ALIEN_LAWFULLY_PRESENT_STATUS, 'lawful_permanent_resident'].include?(citizen_status)
   end
 
   private

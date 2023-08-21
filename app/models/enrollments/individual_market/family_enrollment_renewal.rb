@@ -296,23 +296,25 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   # rubocop:enable Style/RedundantReturn
 
   def eligible_enrollment_members
-    @enrollment.hbx_enrollment_members.select do |member|
-      if member.person.consumer_role?
-        (eligible_to_get_covered?(member) &&
-                    is_family_state_resident? &&
-                    member.person.is_lawfully_present? &&
-                    !member.person.is_disabled &&
-                    !member.person.is_incarcerated &&
-                    member.family_member.is_applying_coverage)
-      else
-        (eligible_to_get_covered?(member) && !member.person.is_disabled && !member.person.is_incarcerated)
+    if @enrollment.subscriber.person.consumer_role.present?
+      @enrollment.hbx_enrollment_members.select do |member|
+        eligible_to_get_covered?(member) &&
+          is_primary_a_state_resident? &&
+          member.person.lawfully_present? &&
+          !member.person.is_disabled &&
+          !member.person.is_incarcerated &&
+          member.family_member.is_applying_coverage
+      end
+    else
+      @enrollment.hbx_enrollment_members.select do |member|
+        eligible_to_get_covered?(member) && !member.person.is_disabled && !member.person.is_incarcerated
       end
     end
   end
 
-  # If primary is instate resident then all members are considered to be instate residents
-  def is_family_state_resident?
-    @is_family_state_resident ||= @enrollment.family.primary_applicant.person.is_state_resident?
+  # If primary is instate resident then all members are considered to be instate residents for enrollment renewals
+  def is_primary_a_state_resident?
+    @is_primary_a_state_resident ||= @enrollment.family.primary_applicant.person.state_resident?
   end
 
   def clone_enrollment_members
