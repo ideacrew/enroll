@@ -12,6 +12,8 @@ module Operations
     class EncryptedSsnValidator
       include Dry::Monads[:result, :do, :try]
 
+      SSN_FORMAT_REGEX = /^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$/.freeze
+
       def call(encrypted_ssn)
         decrypted_ssn = yield decrypt_ssn(encrypted_ssn)
         validated_ssn = yield validate_ssn(decrypted_ssn)
@@ -36,7 +38,7 @@ module Operations
       def validate_ssn(ssn)
         if ssn.nil? || ssn.empty?
           Failure('SSN is required')
-        elsif /^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$/.match?(ssn)
+        elsif SSN_FORMAT_REGEX.match?(ssn)
           Success(ssn)
         else
           Failure('Invalid SSN')

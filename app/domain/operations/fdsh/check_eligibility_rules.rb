@@ -10,7 +10,8 @@ module Operations
       # Define the validation rules for each request type
       RULES = {
         ssa: [:validate_ssn],
-        vlp: [],
+        dhs: [],
+        local_residency: [],
         income_evidence: [:validate_ssn],
         esi_evidence: [:validate_ssn],
         non_esi_evidence: [:validate_ssn],
@@ -29,7 +30,7 @@ module Operations
       # Process the validation rules for the given payload and request type
       def process(payload, request_type)
         rules = RULES[request_type]
-        result = rules.map { |rule| send(rule, payload) }.compact.flatten
+        result = rules.map { |rule| send(rule, payload) }.flatten.compact
 
         # Return a Failure result if any of the validation rules fail
         if result.any?(Failure)

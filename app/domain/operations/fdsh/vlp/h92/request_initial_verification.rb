@@ -16,7 +16,7 @@ module Operations
           include EventSource::Command
 
           def call(person)
-            payload_entity = yield validate_and_build_payload_entity(person)
+            payload_entity = yield build_and_validate_payload_entity(person)
             event  = yield build_event(payload_entity.to_h)
             result = yield publish(event)
 
@@ -25,8 +25,8 @@ module Operations
 
           private
 
-          def validate_and_build_payload_entity(person)
-            Operations::Fdsh::ValidatePersonPayload.new.call(person, :vlp)
+          def build_and_validate_payload_entity(person)
+            Operations::Fdsh::BuildAndValidatePersonPayload.new.call(person, :dhs)
           end
 
           def build_event(payload)
