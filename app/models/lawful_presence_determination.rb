@@ -78,7 +78,7 @@ class LawfulPresenceDetermination
       result = Operations::Fdsh::Ssa::H3::RequestSsaVerification.new.call(ivl_role.person)
       ssa_verification_type = ivl_role.verification_types.by_name("Social Security Number").first
 
-      if result.failure? # && feature switch
+      if result.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_errors)
         ssa_verification_type.add_type_history_element(action: "Hub Request Failed", modifier: "System", update_reason: "SSA Verification Request Failed due to #{result.failure}")
         args = OpenStruct.new(determined_at: Time.now, vlp_authority: 'ssa')
         ivl_role.ssn_invalid!(args)
@@ -95,7 +95,7 @@ class LawfulPresenceDetermination
       result = Operations::Fdsh::Vlp::H92::RequestInitialVerification.new.call(ivl_role.person)
       verification_type = ivl_role.verification_types.active.where(:type_name.in => ["Citizenship", "Immigration status"]).first
 
-      if result.failure? # && feature switch
+      if result.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_errors)
         verification_type.add_type_history_element(action: "Hub Request Failed", modifier: "System", update_reason: "#{verification_type.type_name} Request Failed due to #{result.failure}")
         args = OpenStruct.new(determined_at: Time.now, vlp_authority: 'dhs')
         ivl_role.fail_dhs!(args)

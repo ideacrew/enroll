@@ -13,7 +13,7 @@ module Operations
         payload_param = yield construct_payload_hash(person)
         payload_value = yield validate(payload_param)
         payload_entity = yield create_payload_entity(payload_value)
-        yield check_eligibility_rules(payload_entity, request_type) # if feature switch
+        yield check_eligibility_rules(payload_entity, request_type) if EnrollRegistry.feature_enabled?(:validate_and_record_publish_errors)
 
 
         Success(payload_entity)
