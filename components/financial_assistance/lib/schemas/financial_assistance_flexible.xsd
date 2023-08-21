@@ -72,21 +72,21 @@
 			<xs:element name="incomes">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="income" type="FinancialAssistanceApplicantIncomeType" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="income" type="FinancialAssistanceApplicantIncomeType" minOccurs="0" maxOccurs="10"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="deductions">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="deduction" type="FinancialAssistanceApplicantDeductionType" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="deduction" type="FinancialAssistanceApplicantDeductionType" minOccurs="0" maxOccurs="10"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="benefits">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="benefit" type="FinancialAssistanceApplicantBenefitType" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element name="benefit" type="FinancialAssistanceApplicantBenefitType" minOccurs="0" maxOccurs="10"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -125,7 +125,7 @@
 	</xs:complexType>
 	<xs:complexType name="AssistanceTaxHouseholdsListType">
 		<xs:sequence>
-			<xs:element name="assistance_tax_household" type="AssistanceTaxHouseholdType" maxOccurs="unbounded"/>
+			<xs:element name="assistance_tax_household" type="AssistanceTaxHouseholdType" maxOccurs="10"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="AssistanceTaxHouseholdType">
@@ -142,7 +142,7 @@
 	</xs:complexType>
 	<xs:complexType name="AssistanceEligibilityDeterminationListType">
 		<xs:sequence>
-			<xs:element name="eligibility_determination" type="AssistanceEligibilityDeterminationType" maxOccurs="unbounded"/>
+			<xs:element name="eligibility_determination" type="AssistanceEligibilityDeterminationType" maxOccurs="10"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="AssistanceEligibilityDeterminationType">
@@ -190,7 +190,7 @@
 	</xs:complexType>
 	<xs:complexType name="AssistanceEligibilityDeterminationApplicantListType">
 		<xs:sequence>
-			<xs:element name="eligibility_determination_applicant" type="AssistanceEligibilityDeterminationApplicantType" maxOccurs="unbounded"/>
+			<xs:element name="eligibility_determination_applicant" type="AssistanceEligibilityDeterminationApplicantType" maxOccurs="10"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="AssistanceEligibilityDeterminationApplicantType">
@@ -222,7 +222,7 @@
 	</xs:complexType>
 	<xs:complexType name="AssistanceTaxHouseholdMemberListType">
 		<xs:sequence>
-			<xs:element name="assistance_tax_household_member" type="FinancialAssistanceApplicantType" maxOccurs="unbounded"/>
+			<xs:element name="assistance_tax_household_member" type="FinancialAssistanceApplicantType" maxOccurs="10"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="AssistedTaxHouseholdIncomesByYearType">
@@ -230,7 +230,7 @@
 			<xs:documentation>Sum of all qualified household income sources, including incomes of person who pays taxes, spouse and dependents, less qualified deductions, by calendar year. Also includes information about verification of the income.</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="total_income_by_year" type="VerifiedCurrencyAmountPerAnnumType" maxOccurs="unbounded"/>
+			<xs:element name="total_income_by_year" type="VerifiedCurrencyAmountPerAnnumType" maxOccurs="10"/>
 		</xs:sequence>
 	</xs:complexType>
 </xs:schema>

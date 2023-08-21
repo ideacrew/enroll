@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# dummy spec for hbx_enrollment model
 class HbxEnrollment
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -85,6 +86,18 @@ class HbxEnrollment
   scope :enrolled,             ->{ where(:aasm_state.in => ENROLLED_STATUSES) }
   scope :current_year,         ->{ where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
   scope :individual_market,   ->{ where(:kind.nin => ["employer_sponsored", "employer_sponsored_cobra"]) }
+  scope :by_health,           ->{where(coverage_kind: "health").order(effective_on: :desc)}
+
+  def product=(new_product)
+    if new_product.blank?
+      self.product_id = nil
+      @product = nil
+      return
+    end
+    raise ArgumentError, "expected product" unless new_product.is_a?(BenefitMarkets::Products::Product)
+    self.product_id = new_product._id
+    @product = new_product
+  end
 
   def product
     return @product if defined? @product

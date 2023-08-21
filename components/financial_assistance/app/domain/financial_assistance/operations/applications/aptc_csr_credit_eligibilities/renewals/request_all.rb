@@ -25,8 +25,6 @@ module FinancialAssistance
             private
 
             def find_families(renewal_year)
-              # Success(::Family.all_active_assistance_receiving_for_assistance_year(renewal_year.pred).all_enrollments.distinct(:id))
-
               family_ids = ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id)
               determined_family_ids = ::FinancialAssistance::Application.by_year(renewal_year.pred).where(:family_id.in => family_ids).distinct(:family_id)
 
@@ -35,7 +33,7 @@ module FinancialAssistance
 
             # rubocop:disable Style/MultilineBlockChain
             def generate_renewal_events(renewal_year, family_ids)
-              logger = Logger.new("#{Rails.root}/log/aptc_credit_eligibilities_request_all_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+              logger = Logger.new("#{Rails.root}/log/aptc_credit_eligibilities_request_all.log")
 
               logger.info 'Started publish_generate_draft_renewals process'
               logger.info "Total number of applications with assistance_year: #{renewal_year.pred} are #{family_ids.count}"

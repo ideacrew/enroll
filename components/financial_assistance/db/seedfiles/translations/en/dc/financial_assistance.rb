@@ -161,9 +161,14 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.year_selection_header" => "You’re About to Sign Up for Health Insurance that Starts January 1 or Later",
   "en.faa.year_selection_subheader" => "Select CONTINUE to start a new application for lower premiums or Medicaid.",
   "en.faa.assitance_year_option1" => "%{year} Open Enrollment",
+  "en.faa.assitance_year_option2" => "%{year} Report a Life Change",
   "en.faa.year_selection_oe_year" => " Open Enrollment",
   "en.faa.see_if_you_qualify_1" => "See if you qualify for lower monthly premiums for ",
   "en.faa.see_if_you_qualify_2" => " %{short_name} health insurance or free Medicaid coverage.",
+  "en.faa.non_oe_see_if_you_qualify_1" => "Select if you've experienced a life change and need to enroll through a Special Enrollment Period or make an update to your %{year} application.",
+  "en.faa.non_oe_see_if_you_qualify_2" => "Select if you need to make changes for coverage from last year. <b>This is uncommon.</b> You can only sign up for %{previous_year} coverage if %{site_short_name} has approved you for a Special Enrollment Period. Changes you make to your %{previous_year} application do not automatically apply to your %{calendar_year} application. To apply changes, you must copy your application and submit it for %{calendar_year}.",
+  "en.faa.choose_a_plan_year" => "Choose a plan year",
+  "en.faa.non_oe_learn_more" => "Learn more about Special Enrollment Periods",
   "en.faa.year_selection_oe_range_from" => "Open enrollment is from ",
   "en.faa.year_selection_oe_range_through" => " through ",
   "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a target='_blank' href='https://www.dchealthlink.com/contact-us-for-2022-coverage?utm_source=2022EnrollmentCoverage&utm_medium=ea_link&utm_campaign=WantsCoverage2022'>submit a webform</a> or call %{short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
@@ -171,6 +176,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.eligibility_go_to_my_account_message" => "<b>If you’re already enrolled in DC Health Link’s Individual & Family plan</b>, you’re finished! To see your plan information, select <b>GO TO MY ACCOUNT</b>.",
   "en.faa.application_for_coverage" => "Application for Coverage",
   "en.faa.update_reminder" => "If you make changes to your %{year} coverage that should apply to your %{year2} coverage too, you will need to come back and update your %{year2} application. You can do this by copying your latest %{year} application and submitting it for %{year2}. ",
+  "en.faa.learn_more_about_life_changes" => "Learn more about life changes",
   # Mec check
   "en.faa.mc_success" => "It looks like you may already be enrolled in Medicaid or CHIP. If you need to update information like your income, address, or who is in your household, contact DC Health Link at <a href='tel:1-855-532-5465'>1-855-532-5465</a> to make these changes before completing a DC Health Link application.",
   "en.faa.shop_check_success" => "It looks like you may already be enrolled in employer sponsored coverage. If you need to update information like your income, address, or who is in your household, visit the Manage Family page to make these changes before completing a DC Health Link application.",

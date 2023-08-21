@@ -640,7 +640,7 @@ module FinancialAssistance
 
     def validate_relationships(matrix)
       # validates the child has relationship as parent for 'spouse of the primary'.
-      return false if applicants.any? { |applicant| !applicant.valid_spousal_relationship? }
+      return false if applicants.any? { |applicant| !applicant.valid_family_relationships? }
       all_relationships = find_all_relationships(matrix)
       spouse_relation = all_relationships.select{|hash| hash[:relation] == "spouse"}.first
       return true unless spouse_relation.present?
@@ -1030,10 +1030,13 @@ module FinancialAssistance
       return unless EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment) || !previously_renewal_draft?
       return if retro_application
       on_new_determination = ::Operations::Individual::OnNewDetermination.new.call({family: self.family, year: self.effective_date.year})
-
-      Rails.logger.error { "Failed while creating enrollment on_new_determination: #{self.hbx_id}, Error: #{on_new_determination.failure}" } unless on_new_determination.success?
+      if on_new_determination.success?
+        Rails.logger.info { "Successfully created new enrollment on_new_determination: #{self.hbx_id}" }
+      else
+        Rails.logger.error { "Failed while creating enrollment on_new_determination: #{self.hbx_id}, Failure Message: #{on_new_determination.failure}" }
+      end
     rescue StandardError => e
-      Rails.logger.error { "Failed while creating enrollment on_new_determination: #{self.hbx_id}, Error: #{e.message}" }
+      Rails.logger.error { "Error while creating enrollment on_new_determination: #{self.hbx_id}, Error: #{e.message}" }
     end
 
     def retro_application
@@ -1219,6 +1222,32 @@ module FinancialAssistance
       active_applicants.each do |applicant|
         return applicant if applicant.applicant_validation_complete? == false
       end
+    end
+
+    def eligible_for_renewal?
+      return true unless FinancialAssistanceRegistry.feature_enabled?(:skip_eligibility_redetermination)
+      return true if has_eligible_applicants_for_assistance?
+      return false if all_applicants_medicaid_or_chip_eligible?
+      return false if all_applicants_totally_ineligible?
+      return false if all_applicants_without_applying_for_coverage?
+
+      true
+    end
+
+    def has_eligible_applicants_for_assistance?
+      active_applicants.any? { |applicant| applicant.is_without_assistance || applicant.is_ia_eligible }
+    end
+
+    def all_applicants_medicaid_or_chip_eligible?
+      active_applicants.all?(&:is_medicaid_chip_eligible)
+    end
+
+    def all_applicants_totally_ineligible?
+      active_applicants.all?(&:is_totally_ineligible)
+    end
+
+    def all_applicants_without_applying_for_coverage?
+      active_applicants.all? { |applicant| !applicant.is_applying_coverage }
     end
 
     def active_applicants

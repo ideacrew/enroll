@@ -50,7 +50,7 @@ registry:
             item: 0
       - key: :cancel_renewals_for_term
         item: Operations::Individual::CancelRenewalEnrollment.new
-        is_enabled: true
+        is_enabled: <%= ENV['CANCEL_RENEWALS_FOR_TERM_IS_ENABLED'] || false %>
       - key: :calculate_monthly_aggregate
         item: Operations::Individual::CalculateMonthlyAggregate.new
         is_enabled: <%= ENV['CALCULATE_MONTHLY_AGGREGATE_IS_ENABLED'] || true %>
@@ -108,7 +108,7 @@ registry:
         is_enabled: true
       - key: :verification_reasons
         item: ["Document in EnrollApp", "Electronic data source", "State Medicaid Agency",
-               "CRM Document Management System"]
+                "CRM Document Management System", "Self-Attestation"]
         is_enabled: true
       - key: :total_minimum_responsibility
         is_enabled: true
