@@ -242,11 +242,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
       income_evidence_3.verification_histories.create(action: 'auto_extend_due_date',
                                                       update_reason: 'Auto extended due date',
                                                       updated_by: 'system')
-
-      application.ensure_relationship_with_primary(applicant_2, 'spouse')
-      application.ensure_relationship_with_primary(applicant_3, 'child')
-      application.update_or_build_relationship(applicant_2, applicant_3, 'parent')
-      application.update_or_build_relationship(applicant_3, applicant_2, 'child')
     end
 
     context 'success' do
