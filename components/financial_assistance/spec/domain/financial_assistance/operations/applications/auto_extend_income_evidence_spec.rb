@@ -158,7 +158,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
     # Maybe add 1 member with complete verified income evidence?
 
     let!(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: '100095') }
-    let!(:family) { FactoryBot.create(:family, :with_nuclear_family, person: person) }
+    # let!(:family) { FactoryBot.create(:family, :with_nuclear_family, person: person) }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_spouse_and_child, person: person) }
     let!(:address) { FactoryBot.build(:financial_assistance_address) }
     let(:applicant_1_due_date) { TimeKeeper.date_of_record + 10.days }
     let(:applicant_2_due_date) { TimeKeeper.date_of_record }

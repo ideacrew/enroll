@@ -640,7 +640,7 @@ class Family
   end
 
   def relate_new_member(person, relationship)
-    primary_applicant_person.ensure_relationship_with(person, relationship, self.id) #old_code
+    primary_applicant_person.ensure_relationship_with(person, relationship)
     add_family_member(person)
   end
 
