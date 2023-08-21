@@ -122,6 +122,7 @@ module BenefitMarkets
 
     def create_sponsor_eligibilities
       return unless benefit_sponsorship
+      self.benefit_application&.save
 
       sponsor_eligibilities = benefit_sponsorship.active_eligibilities_on(effective_date)
       sponsor_eligibilities.each do |eligibility|
