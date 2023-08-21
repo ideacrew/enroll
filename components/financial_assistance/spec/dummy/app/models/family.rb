@@ -1251,17 +1251,25 @@ class Family
       end
     end
 
+    puts "Due Dates 1"
+    p due_dates
+    
     if EnrollRegistry.feature_enabled?(:include_faa_outstanding_verifications)
+      puts "Due Dates 2"
+      p due_dates
       application = ::FinancialAssistance::Application.where(family_id: self.id, aasm_state: 'determined').max_by(&:created_at)
       application&.active_applicants&.each do |applicant|
         FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
           evidence = applicant.send(evidence_type)
           next unless evidence.present? && Eligibilities::Evidence::DUE_DATE_STATES.include?(evidence.aasm_state)
-
+          
           due_dates << evidence.verif_due_date
         end
       end
     end
+    
+    puts "Due Dates 3"
+    p due_dates
     
     due_dates.compact!
     due_dates.uniq.sort

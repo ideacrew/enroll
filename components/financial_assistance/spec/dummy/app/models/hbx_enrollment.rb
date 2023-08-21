@@ -81,7 +81,8 @@ class HbxEnrollment
   field :termination_submitted_on, type: DateTime
 
   embeds_many :hbx_enrollment_members
-
+  
+  scope :terminated,          ->{ where(:aasm_state.in => ["coverage_terminated", "coverage_termination_pending"]) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
   scope :enrolled_and_renewal, ->{where(:aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES)}
   scope :enrolled,             ->{ where(:aasm_state.in => ENROLLED_STATUSES) }

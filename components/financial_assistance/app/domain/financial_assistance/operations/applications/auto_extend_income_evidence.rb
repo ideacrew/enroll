@@ -53,8 +53,6 @@ module FinancialAssistance
         def update_family_level_verification_due_date(application)
           family = application.family
           eligibility_determination = family&.eligibility_determination
-          puts "\n\n\neligibility determination"
-          p eligibility_determination
           return unless eligibility_determination
 
           applicants_earliest_due_date = family&.min_verification_due_date_on_family
