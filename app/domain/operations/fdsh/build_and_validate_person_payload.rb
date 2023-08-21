@@ -9,7 +9,7 @@ module Operations
       include Dry::Monads[:result, :do, :try]
       include Acapi::Notifiers
 
-      def call(person, request_type, can_check_rules = true)
+      def call(person, request_type, can_check_rules: true)
         payload_param = yield construct_payload_hash(person)
         payload_value = yield validate(payload_param)
         payload_entity = yield create_payload_entity(payload_value)
