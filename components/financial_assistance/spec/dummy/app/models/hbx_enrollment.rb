@@ -6,11 +6,14 @@ class HbxEnrollment
   include Mongoid::Timestamps
 
   ENROLLED_STATUSES = %w[coverage_selected transmitted_to_carrier coverage_enrolled coverage_termination_pending unverified coverage_reinstated].freeze
+  TERMINATED_STATUSES = %w[coverage_terminated unverified coverage_expired].freeze
+  CANCELED_STATUSES   = %w[coverage_canceled void].freeze # Void state enrollments are invalid enrollments. will be treated same as canceled.
   RENEWAL_STATUSES = %w[auto_renewing renewing_coverage_selected renewing_transmitted_to_carrier renewing_coverage_enrolled
                         auto_renewing_contingent renewing_contingent_selected renewing_contingent_transmitted_to_carrier
                         renewing_contingent_enrolled].freeze
 
   ENROLLED_AND_RENEWAL_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES
+  WAIVED_STATUSES     = %w(inactive renewing_waived)
 
   belongs_to :family
 
@@ -84,9 +87,18 @@ class HbxEnrollment
 
   scope :canceled, -> { where(:aasm_state.in => CANCELED_STATUSES) }
   scope :terminated,          ->{ where(:aasm_state.in => ["coverage_terminated", "coverage_termination_pending"]) }
+  scope :canceled_and_terminated, -> { where(:aasm_state.in => (CANCELED_STATUSES + TERMINATED_STATUSES)) }
+  scope :canceled_and_waived, -> { where(:aasm_state.in => (CANCELED_STATUSES + WAIVED_STATUSES)) }
   scope :renewing,            ->{ where(:aasm_state.in => RENEWAL_STATUSES )}
-  scope :enrolled_and_renewal, ->{where(:aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES)}
   scope :enrolled,             ->{ where(:aasm_state.in => ENROLLED_STATUSES) }
+  scope :waived,              ->{ where(:aasm_state.in => WAIVED_STATUSES )}
+  scope :expired,             ->{ where(:aasm_state => "coverage_expired")}
+  scope :cancel_eligible,     ->{ where(:aasm_state.in => ["coverage_selected", "renewing_coverage_selected", "coverage_enrolled", "auto_renewing", "unverified"])}
+  scope :enrolled_and_renewal, ->{where(:aasm_state.in => ENROLLED_AND_RENEWAL_STATUSES)}
+  scope :enrolled_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES)) }
+  scope :enrolled_waived_and_renewing, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + WAIVED_STATUSES)) }
+  scope :enrolled_and_renewing_and_shopping, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + ['shopping'])) }
+  scope :enrolled_and_renewing_and_expired, -> { where(:aasm_state.in => (ENROLLED_STATUSES + RENEWAL_STATUSES + ['coverage_expired'])) }
   scope :current_year,         ->{ where(:effective_on.gte => TimeKeeper.date_of_record.beginning_of_year, :effective_on.lte => TimeKeeper.date_of_record.end_of_year) }
   scope :individual_market,   ->{ where(:kind.nin => ["employer_sponsored", "employer_sponsored_cobra"]) }
   scope :by_health,           ->{where(coverage_kind: "health").order(effective_on: :desc)}
