@@ -47,22 +47,6 @@ FactoryBot.define do
       end
     end
 
-    trait :with_primary_family_member_and_spouse_and_child do
-      family_members do
-        [
-            FactoryBot.build(:family_member, family: self, is_primary_applicant: true, is_active: true, person: person),
-            FactoryBot.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person: FactoryBot.create(:person, first_name: "Jane", last_name: person.last_name)),
-            FactoryBot.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person:  FactoryBot.create(:person, first_name: "Alex", last_name: person.last_name))
-        ]
-      end
-      before(:create)  do |family, _evaluator|
-        # family.dependents.each do |dependent|
-        #   family.relate_new_member(dependent.person, "spouse") if dependent.person.first_name == 'Jane'
-        #   family.relate_new_member(dependent.person, "child") if dependent.person.first_name == 'Alex'
-        # end
-      end
-    end
-
     trait :with_primary_family_member_and_dependent do
       family_members do
         [

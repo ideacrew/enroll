@@ -231,6 +231,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
     before do
       # Enable to be able to use min_verification_due_date_on_family on family model
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:include_faa_outstanding_verifications).and_return(true)
       family.create_eligibility_determination
       family.eligibility_determination.update!(outstanding_verification_status: 'outstanding',
@@ -241,7 +242,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
                                                       update_reason: 'Auto extended due date',
                                                       updated_by: 'system')
 
-      binding.irb
       application.ensure_relationship_with_primary(applicant_2, 'spouse')
       application.ensure_relationship_with_primary(applicant_3, 'child')
       application.update_or_build_relationship(applicant_2, applicant_3, 'parent')
