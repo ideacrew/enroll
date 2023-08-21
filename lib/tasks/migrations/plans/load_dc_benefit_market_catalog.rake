@@ -58,7 +58,9 @@ namespace :load do
 
           puts "::: Creating SHOP OSSE eligibilities"
 
+          count = 0
           ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.each do |benefit_sponsorship|
+            count += 1
             osse_eligibility = benefit_sponsorship.is_osse_eligibility_satisfied?(effective_date - 1.day)
 
             result = ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(
@@ -72,6 +74,7 @@ namespace :load do
             unless result.success?
               puts "Failed to create OSSE shop eligibility for benefit_sponsorship with id: #{benefit_sponsorship.id}"
             end
+            puts "Processsed #{count} SHOP OSSE eligibilities" if (count % 1000) == 0
           end
         else
           p "Failed to create eligibility for #{effective_date.year} benefit market catalog"
