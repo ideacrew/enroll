@@ -37,15 +37,18 @@ FactoryBot.define do
       end
     end
 
-    trait :with_family_of_four do
-      before(:create) do |family, _evaluator|
-        FactoryBot.build(:family_member, is_primary_applicant: true, is_active: true, person: family.person, family: family)
-
-        { 'Kelly' => 'spouse', 'Danny' => 'child', 'Katie' => 'child' }.each do |first_name, relationship|
-          person = FactoryBot.create(:person, :with_consumer_role, first_name: first_name, last_name: family.person.last_name)
-          family.person.person_relationships.push PersonRelationship.new(relative_id: person.id, kind: relationship)
-          person.save
-          FactoryBot.build(:family_member, is_primary_applicant: false, is_active: true, person: person, family: family)
+    trait :with_primary_family_member_and_spouse_and_child do
+      family_members do
+        [
+            FactoryBot.build(:family_member, family: self, is_primary_applicant: true, is_active: true, person: person),
+            FactoryBot.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person: FactoryBot.create(:person, first_name: "Jane", last_name: person.last_name)),
+            FactoryBot.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person:  FactoryBot.create(:person, first_name: "Alex", last_name: person.last_name))
+        ]
+      end
+      before(:create)  do |family, _evaluator|
+        family.dependents.each do |dependent|
+          family.relate_new_member(dependent.person, "spouse") if dependent.person.first_name == 'Jane'
+          family.relate_new_member(dependent.person, "child") if dependent.person.first_name == 'Alex'
         end
       end
     end
