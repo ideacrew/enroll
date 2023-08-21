@@ -21,8 +21,8 @@ module FinancialAssistance
           def call(params)
             values = yield validate(params)
             @logger = initialize_logger
-            csv_file_builder = ::Decorators::CSVFileBuilder.new("#{Rails.root}/periodic_data_matching_results_me_#{Time.now.to_i}.csv", fetch_csv_headers)
-            @report = ::Decorators::BuildReport.new(csv_file_builder, @logger)
+            csv_file_builder = ::Decorators::CSVFileBuilder.new("#{Rails.root}/periodic_data_matching_results_me_#{Time.now.to_i}.csv", fetch_csv_headers, @logger)
+            @report = ::Decorators::BuildReport.new(csv_file_builder)
             response = yield filter_and_call_mec_service(values)
 
             Success(response)
@@ -38,8 +38,6 @@ module FinancialAssistance
             errors << 'transmittable_message_id param is missing' if params[:transmittable_message_id].blank?
             batch_size = params[:batch_size]
             errors << 'batch_size param given is invalid' if batch_size.present? && batch_size.to_i <= 0
-            fetch_family_limit = params[:fetch_family_limit]
-            errors << 'fetch_family_limit param given is invalid' if fetch_family_limit.present? && fetch_family_limit.to_i <= 0
             errors.empty? ? Success(params) : Failure(errors)
           end
 
@@ -60,9 +58,11 @@ module FinancialAssistance
           end
 
           def fetch_enrolled_and_renewal_families(params)
-            if params[:fetch_family_limit].present?
-              # can be very helpful in UAT testing where we can process few families, test the behaviour, process rest of them
-              Family.in(_id: HbxEnrollment.by_health.enrolled_and_renewal.limit(params[:fetch_family_limit]).distinct(:family_id))
+            if params[:primary_person_hbx_ids].present?
+              # can be very helpful in UAT testing to trigger specific families
+              people = Person.where(:hbx_id.in => params[:primary_person_hbx_ids])
+              family_ids = people.map(&:primary_family).pluck(:id)
+              Family.where(:_id.in => family_ids)
             else
               Family.in(_id: HbxEnrollment.by_health.enrolled_and_renewal.distinct(:family_id))
             end
@@ -123,7 +123,7 @@ module FinancialAssistance
                 ]
               end
             end
-            @report.append_data(data_to_append)
+            @report.append_data(data_to_append) if data_to_append.present?
           rescue StandardError => e
             @logger.error "Error: Failed to append data to CSV: application: #{determined_app.id}, #{e.message}, backtrace: #{e.backtrace}"
           end

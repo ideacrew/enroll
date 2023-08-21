@@ -3,9 +3,8 @@
 module Decorators
   # Generic decorator to build report
   class BuildReport
-    def initialize(decorator, logger)
+    def initialize(decorator)
       @decorator = decorator
-      @logger = logger
     end
 
     def append_data(data)
