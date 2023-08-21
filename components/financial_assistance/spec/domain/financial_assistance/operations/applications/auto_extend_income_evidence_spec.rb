@@ -159,6 +159,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
 
     let!(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: '100095') }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_spouse_and_child, person: person) }
+    let!(:address) { FactoryBot.build(:financial_assistance_address) }
     # let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person) }
     let(:applicant_1_due_date) { TimeKeeper.date_of_record + 10.days }
     let(:applicant_2_due_date) { TimeKeeper.date_of_record }
@@ -178,7 +179,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
                         is_primary_applicant: true,
                         family_member_id: family.family_members[0].id,
                         person_hbx_id: person.hbx_id,
-                        addresses: [FactoryBot.build(:financial_assistance_address)])
+                        addresses: [address])
     end
 
     let!(:applicant_2) do
@@ -188,7 +189,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
                         is_primary_applicant: true,
                         family_member_id: family.family_members[1].id,
                         person_hbx_id: family.family_members[1].hbx_id,
-                        addresses: [FactoryBot.build(:financial_assistance_address)])
+                        addresses: [address])
     end
 
     let!(:applicant_3) do
@@ -198,7 +199,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
                         is_primary_applicant: true,
                         family_member_id: family.family_members[2].id,
                         person_hbx_id: family.family_members[2].hbx_id,
-                        addresses: [FactoryBot.build(:financial_assistance_address)])
+                        addresses: [address])
     end
 
     let!(:income_evidence_1) do
@@ -243,6 +244,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
 
       application.ensure_relationship_with_primary(applicant_2, 'spouse')
       application.ensure_relationship_with_primary(applicant_3, 'child')
+      application.update_or_build_relationship(applicant_2, applicant_3, 'parent')
+      application.update_or_build_relationship(applicant_3, applicant_2, 'child')
     end
 
     context 'success' do

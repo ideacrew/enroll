@@ -56,10 +56,10 @@ FactoryBot.define do
         ]
       end
       before(:create)  do |family, _evaluator|
-        family.dependents.each do |dependent|
-          family.relate_new_member(dependent.person, "spouse") if dependent.person.first_name == 'Jane'
-          family.relate_new_member(dependent.person, "child") if dependent.person.first_name == 'Alex'
-        end
+        # family.dependents.each do |dependent|
+        #   family.relate_new_member(dependent.person, "spouse") if dependent.person.first_name == 'Jane'
+        #   family.relate_new_member(dependent.person, "child") if dependent.person.first_name == 'Alex'
+        # end
       end
     end
 
