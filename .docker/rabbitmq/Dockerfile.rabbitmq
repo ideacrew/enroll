@@ -13,5 +13,6 @@ sed -r "s|RABBITMQ_URL|$RABBITMQ_URL|g" /tmp/advanced.config > /etc/rabbitmq/adv
 sed -i -r "s/HBX_ID/$HBX_ID/g" /etc/rabbitmq/advanced.config && \
 sed -i -r "s/ENV_NAME/$ENV_NAME/g" /etc/rabbitmq/advanced.config && \
 chown rabbitmq:rabbitmq /etc/rabbitmq/rabbitmq.conf /etc/rabbitmq/hbx_rabbit_definitions.json /etc/rabbitmq/advanced.config && \
+USER rabbitmq
 rabbitmq-server 
 
