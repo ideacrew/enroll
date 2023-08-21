@@ -59,7 +59,7 @@ namespace :load do
           puts "::: Creating SHOP OSSE eligibilities"
 
           count = 0
-          ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.each do |benefit_sponsorship|
+          ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"eligibilities.key" => "aca_shop_osse_eligibility_#{calender_year}".to_sym).each do |benefit_sponsorship|
             count += 1
             osse_eligibility = benefit_sponsorship.is_osse_eligibility_satisfied?(effective_date - 1.day)
 
