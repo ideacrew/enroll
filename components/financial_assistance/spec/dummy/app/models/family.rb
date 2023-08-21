@@ -1244,6 +1244,7 @@ class Family
   end
 
   def contingent_enrolled_family_members_due_dates
+    puts "\n\n\n\n\n\n In contingent enrolled family members"
     due_dates = []
     contingent_enrolled_active_family_members.each do |family_member|
       family_member.person.verification_types.active.each do |v_type|
@@ -1270,7 +1271,7 @@ class Family
     
     puts "Due Dates 3"
     p due_dates
-    
+
     due_dates.compact!
     due_dates.uniq.sort
   end
