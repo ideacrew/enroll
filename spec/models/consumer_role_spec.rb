@@ -487,7 +487,7 @@ context 'Verification process and notices' do
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.zone.now, :vlp_authority => 'hbx' })}
 
     context 'success payload' do
-      shared_examples_for 'IVL state machine transitions and workflow' do |ssn, citizen, from_state, to_state, event, type_name, verification_type_validation_status|
+      shared_examples_for 'IVL state machine transitions and verification_types validation_status' do |ssn, citizen, from_state, to_state, event, type_name, verification_type_validation_status|
         before do
           EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
           person.ssn = ssn
@@ -501,10 +501,10 @@ context 'Verification process and notices' do
       end
 
       context 'coverage_purchased_no_residency' do
-        it_behaves_like 'IVL state machine transitions and workflow', '999001234', 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Social Security Number"], "negative_response_received"
-        it_behaves_like 'IVL state machine transitions and workflow', '999001234', 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Citizenship"], "pending"
-        it_behaves_like 'IVL state machine transitions and workflow', '111111111', 'us_citizen', :unverified, :ssa_pending, 'coverage_purchased_no_residency!', ["Social Security Number"], "pending"
-        it_behaves_like 'IVL state machine transitions and workflow', '111111111', 'us_citizen', :unverified, :ssa_pending, 'coverage_purchased_no_residency!', ["Citizenship"], "pending"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '999001234', 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Social Security Number"], "negative_response_received"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '999001234', 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Citizenship"], "pending"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '111111111', 'us_citizen', :unverified, :ssa_pending, 'coverage_purchased_no_residency!', ["Social Security Number"], "pending"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '111111111', 'us_citizen', :unverified, :ssa_pending, 'coverage_purchased_no_residency!', ["Citizenship"], "pending"
       end
     end
 
