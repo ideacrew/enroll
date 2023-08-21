@@ -1255,6 +1255,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   describe 'build_relationship_matrix' do
     before do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
     end
 
     let!(:application10) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
@@ -1406,6 +1407,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   describe 'fetch_relationship_matrix' do
     before do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
     end
 
     let!(:application10) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
@@ -1867,6 +1869,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     before :each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
       relationship_application.applicants.each do |appl|
         appl.addresses = [FactoryBot.build(:financial_assistance_address,
                                            :address_1 => '1111 Awesome Street NE',
@@ -2237,6 +2240,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     before :each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
       relationship_application.applicants.each do |appl|
         appl.addresses = [FactoryBot.build(:financial_assistance_address,
                                            :address_1 => '1111 Awesome Street NE',

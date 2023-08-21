@@ -1513,6 +1513,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:home_tiles_current_and_future_only).and_call_original
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:show_non_pay_enrollments).and_call_original
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:show_non_pay_enrollments)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
     end
 
@@ -1544,6 +1545,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     context "ivl with 'show non pay enrollments' FF " do
       before :each do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:show_non_pay_enrollments).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
         sign_in(ivl_user)
         get :home, params: {:family => ivl_family.id.to_s}
       end
