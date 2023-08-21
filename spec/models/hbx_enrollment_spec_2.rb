@@ -310,6 +310,7 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
           end
 
           before do
+            EnrollRegistry[:cancel_renewals_for_term].feature.stub(:is_enabled).and_return(true)
             allow(sep_enrollment).to receive(:parent_enrollment).and_return(enrollment_1)
           end
 
