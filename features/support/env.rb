@@ -6,7 +6,7 @@
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
 
-ENV["RAILS_ENV"] ||= 'test'
+ENV['RAILS_ENV'] ||= 'test'
 $LOADING_CUCUMBER_ENV = true
 require 'webdrivers'
 require 'cucumber/rails'
