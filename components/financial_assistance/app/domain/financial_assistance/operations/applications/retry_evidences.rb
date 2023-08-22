@@ -25,24 +25,23 @@ module FinancialAssistance
 
         def validate_input_params(params)
           params[:modified_by] = params[:modified_by] || "system"
-          return Failure("Missing or invalid param for key applicants, must be an array of applicants") unless params[:applicants] # &
-          return Failure("Missing or invalid param for key evidence_type, must be a valid evidence_type") unless params[:evidence_type] # &
+          return Failure("Missing or invalid param for key applicants, must be an array of applicants") unless params[:applicants] && params[:applicants]&.is_a?(Array)
+          return Failure("Missing or invalid param for key evidence_type, must be a valid evidence_type") unless params[:evidence_type] && params[:evidence_type]&.is_a?(Symbol)
           return Failure("Invalid param for key modified_by, must be a String") unless params[:modified_by].is_a?(String)
-          return Failure("Missing or invalid param for key update_reason, must be a String") unless params[:update_reason] && params[:update_reason].is_a?(String)
+          return Failure("Missing or invalid param for key update_reason, must be a String") unless params[:update_reason] && params[:update_reason]&.is_a?(String)
           Success(params)
         end
 
         def update_evidences(params)
           params[:applicants].each do |applicant|
-            evidence = applicant.evidences.where(key: params[:evidence_type])&.last
+            evidence = applicant.send("#{params[:evidence_type]}_evidence")
             next unless evidence
             request = evidence.request_determination("retry", params[:update_reason], params[:modified_by])
-            next if request.success?
-            # log the failure?
+            next if request
           end
           Success("Published request determinations for retries")
         rescue StandardError => e
-          Failure("Failed to retry evidences due to #{e.message}")
+          Failure("Failed to retry evidences due to #{e.backtrace}")
         end
       end
     end
