@@ -39,7 +39,7 @@ namespace :cv3_family_failures_report do
       end
     end
 
-    CSV.open(csv_file_path, 'wb') { |csv| csv << %w[hbx_assigned_id result output] } unless File.exists?(csv_file_path)
+    CSV.open(csv_file_path, 'wb') { |csv| csv << %w[family_hbx_id result output] } unless File.exists?(csv_file_path)
     family_ids = families_to_process(list_of_ids_file_path, last_id_file_path, csv_file_path)
 
     total = family_ids&.count
