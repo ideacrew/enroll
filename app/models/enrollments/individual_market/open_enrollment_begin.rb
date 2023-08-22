@@ -73,9 +73,9 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     @logger.info "OSSE:: processing #{people.size} records"
 
     @logger.info "Skipping callbacks"
-    ConsumerRole.skip_callback(:update, :after, :publish_created_event)
-    ConsumerRole.skip_callback(:validation, :after, :ensure_verification_types)
-    ConsumerRole.skip_callback(:validation, :after, :ensure_validation_states)
+    ConsumerRole.skip_callback(:update, :after, :publish_updated_event)
+    ConsumerRole.skip_callback(:validation, :before, :ensure_verification_types)
+    ConsumerRole.skip_callback(:validation, :before, :ensure_validation_states)
 
     count = 0
 
@@ -104,9 +104,9 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       @logger.info "Failed Osse Renewal: #{person.hbx_id}; Exception: #{e.inspect}"
     end
     @logger.info "Finished processing IVL OSSE renewals at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
-    ConsumerRole.set_callback(:update, :after, :publish_created_event)
-    ConsumerRole.set_callback(:validation, :after, :ensure_verification_types)
-    ConsumerRole.set_callback(:validation, :after, :ensure_validation_states)
+    ConsumerRole.set_callback(:update, :after, :publish_updated_event)
+    ConsumerRole.set_callback(:validation, :before, :ensure_verification_types)
+    ConsumerRole.set_callback(:validation, :before, :ensure_validation_states)
     @logger.info "Setting callbacks"
     @osse_renewal_failed_families.flatten!.uniq!
   end
