@@ -119,8 +119,8 @@ module GoldenSeedHelper
   def generate_and_return_unique_ssn
     data_array = ssns
     index_length = 8
-    return_value = SecureRandom.hex(100).tr('^0-9', '')[0..index_length]
-    return_value = SecureRandom.hex(100).tr('^0-9', '')[0..index_length] until data_array.exclude?(return_value)
+    return_value = SecureRandom.hex(100).tr('^1-8', '')[0..index_length]
+    return_value = SecureRandom.hex(100).tr('^1-8', '')[0..index_length] until data_array.exclude?(return_value)
     data_array << return_value
     return_value
   end

@@ -127,7 +127,7 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
     end
   end
 
-  describe '#transform hbx_enrollments' do
+  describe '#transform_hbx_enrollments' do
     let(:aasm_state) { 'coverage_selected' }
     let!(:coverage_selected_enrollment) do
       create(
@@ -168,13 +168,36 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
 
     let(:product) { create(:benefit_markets_products_health_products_health_product, :ivl_product, issuer_profile: issuer) }
     let(:issuer) { create(:benefit_sponsors_organizations_issuer_profile, abbrev: 'ANTHM') }
-
-    subject { Operations::Transformers::FamilyTo::Cv3Family.new.transform_households(family.households, {exclude_seps: true}) }
+    let(:enrollments) do
+      # this matches the current selection logic in the CV3 Family transformer
+      family.households.first.hbx_enrollments.where(:aasm_state.ne => "shopping", :product_id.ne => nil)
+    end
 
     context 'when enrollment is outside of sep periods and exclude_seps is true' do
       let(:aasm_state) { 'coverage_selected' }
+
+      subject do
+        Operations::Transformers::FamilyTo::Cv3Family.new.transform_hbx_enrollments(enrollments, {exclude_seps: true})
+      end
+
       it 'should not return special_enrollment_period_reference' do
-        expect(subject[0][:hbx_enrollments][0][:special_enrollment_period_reference]).to be_nil
+        # expect(subject[0][:hbx_enrollments][0][:special_enrollment_period_reference]).to be_nil
+        expect(subject[0][:special_enrollment_period_reference]).to be_nil
+      end
+    end
+
+    context "when enrollment fails transform" do
+      before do
+        # allow(Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment).to receive_message_chain('new.call').and_call_original
+        allow(Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment).to receive_message_chain('new.call').with(coverage_selected_enrollment, {}).and_return(Dry::Monads::Result::Failure.new("failed to transform enrollment"))
+      end
+
+      subject do
+        Operations::Transformers::FamilyTo::Cv3Family.new.transform_hbx_enrollments(enrollments, {})
+      end
+
+      it "should throw a failure if cv3 hbx enrollment throws failure" do
+        expect(subject).to be_a(Dry::Monads::Result::Failure)
       end
     end
   end
