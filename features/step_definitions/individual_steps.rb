@@ -67,7 +67,7 @@ When(/the user registers as an individual$/) do
   fill_in IvlPersonalInformation.first_name, :with => (@u.first_name :first_name)
   fill_in IvlPersonalInformation.last_name, :with => (@u.last_name :last_name)
   fill_in IvlPersonalInformation.dob, :with => (@u.adult_dob :adult_dob)
-  fill_in IvlPersonalInformation.ssn, :with => (@u.ssn :ssn)
+  fill_in IvlPersonalInformation.ssn, :with => "262-61-3061"
   find(IvlPersonalInformation.male_radiobtn).click
   screenshot("register")
   find(IvlPersonalInformation.continue_btn).click

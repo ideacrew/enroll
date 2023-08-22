@@ -1656,7 +1656,7 @@ class CensusEmployee < CensusMember
 
   def active_benefit_group_enrollments_for_cobra
     return nil if active_benefit_application.blank?
-    return active_benefit_group_enrollments unless active_benefit_application.active?
+    return active_benefit_group_enrollments if active_benefit_application.active?
     active_bga = benefit_group_assignments.detect(&:is_application_active?)
     active_benefit_application_for_cobra = active_bga&.benefit_package&.benefit_application
     enrollments_under_benefit_application(active_benefit_application_for_cobra)
