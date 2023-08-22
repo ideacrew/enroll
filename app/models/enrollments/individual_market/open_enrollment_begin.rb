@@ -65,14 +65,22 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     @osse_renewal_failed_families = []
     people = Person.where({
                             '$or' => [
-                               { 'consumer_role.eligibilities.key' => "aca_ivl_osse_eligibility_#{renewal_effective_on.prev_year.year}".to_sym },
-                               { 'resident_role.eligibilities.key' => "aca_ivl_osse_eligibility_#{renewal_effective_on.prev_year.year}".to_sym }
+                               { 'consumer_role' => { '$exists' => true } },
+                               { 'resident_role' => { '$exists' => true } }
                             ]
                           })
 
     @logger.info "OSSE:: processing #{people.size} records"
 
+    @logger.info "Skipping callbacks"
+    ConsumerRole.skip_callback(:update, :after, :publish_updated_event)
+    ConsumerRole.skip_callback(:validation, :before, :ensure_verification_types)
+    ConsumerRole.skip_callback(:validation, :before, :ensure_validation_states)
+
+    count = 0
+
     people.no_timeout.each do |person|
+      count += 1
       role = fetch_role(person)
       next if role.blank?
 
@@ -87,9 +95,8 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
         }
       )
 
-      if result.success?
-        @logger.info "Succeeded Osse Renewal: #{person.hbx_id}"
-      else
+      @logger.info "processed #{count} records" if count % 100 == 0
+      unless result.success?
         @osse_renewal_failed_families << person.families.map(&:id)
         @logger.info "Failed Osse Renewal: #{person.hbx_id}; Error: #{result.failure}"
       end
@@ -97,6 +104,10 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       @logger.info "Failed Osse Renewal: #{person.hbx_id}; Exception: #{e.inspect}"
     end
     @logger.info "Finished processing IVL OSSE renewals at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
+    ConsumerRole.set_callback(:update, :after, :publish_updated_event)
+    ConsumerRole.set_callback(:validation, :before, :ensure_verification_types)
+    ConsumerRole.set_callback(:validation, :before, :ensure_validation_states)
+    @logger.info "Setting callbacks"
     @osse_renewal_failed_families.flatten!.uniq!
   end
 
