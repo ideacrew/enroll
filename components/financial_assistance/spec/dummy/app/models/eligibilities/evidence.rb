@@ -3,6 +3,7 @@
 module Eligibilities
   # A fact - usually obtained from an external service - that contributes to determining
   # whether a subject is eligible to make use of a benefit resource
+  # rubocop:disable Metrics/ClassLength
   class Evidence
     include Mongoid::Document
     include Mongoid::Timestamps
@@ -71,7 +72,6 @@ module Eligibilities
       payload = payload.value!
       headers = self.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: application.id }
       response = publish_evidence_event_dummy(payload, headers) # Had to do it for testing purpose under the engine.
-
       if response
         add_verification_history(action_name, update_reason, updated_by)
       else
@@ -372,3 +372,4 @@ module Eligibilities
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
