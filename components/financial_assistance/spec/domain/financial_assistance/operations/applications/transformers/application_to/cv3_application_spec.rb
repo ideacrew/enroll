@@ -2206,6 +2206,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     context 'when use_defaults_for_qnc_and_five_year_bar_data is disabled' do
       before do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:use_defaults_for_qnc_and_five_year_bar_data).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
       end
 
       context 'when qnc is false on applicant' do
@@ -2264,6 +2265,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     context 'when use_defaults_for_qnc_and_five_year_bar_data is disabled' do
       before do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:use_defaults_for_qnc_and_five_year_bar_data).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
         applicant.update!(qualified_non_citizen: false)
         result = subject.call(application.reload)
         entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
