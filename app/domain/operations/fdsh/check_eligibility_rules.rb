@@ -19,13 +19,21 @@ module Operations
       }.freeze
 
       # Call the validation process for the given payload and request type
-      def call(payload, request_type)
-        rules_verified = yield process(payload, request_type)
+      def call(payload_entity, request_type)
+        yield validate(payload_entity, request_type)
+        rules_verified = yield process(payload_entity, request_type)
 
         Success(rules_verified)
       end
 
       private
+
+      def validate(payload_entity, request_type)
+        return Failure("Invalid Person Object #{payload_entity}") unless payload_entity.is_a?(::AcaEntities::People::Person)
+        return Failure("Invalid Request Type #{request_type}") unless RULES.key?(request_type)
+
+        Success()
+      end
 
       # Process the validation rules for the given payload and request type
       def process(payload, request_type)
