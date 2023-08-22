@@ -171,6 +171,7 @@ group :test do
   gem 'ruby-progressbar',             '~> 1'
   gem 'shoulda-matchers',             '~> 3'
   gem 'simplecov',                    '~> 0.14',  :require => false
+  gem 'simplecov-cobertura'
   gem 'test-prof'
   gem 'warden',                       '~> 1.2.7'
   gem 'watir',                        '~> 6.10.3'
