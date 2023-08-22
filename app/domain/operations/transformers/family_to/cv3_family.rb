@@ -31,8 +31,9 @@ module Operations
 
         def construct_payload(family, exclude_applications, args)
           options = args.first || {}
+          @family_hbx_id = family.hbx_assigned_id.to_s
           payload = {
-            hbx_id: family.hbx_assigned_id.to_s,
+            hbx_id: @family_hbx_id,
             family_members: transform_family_members(family.family_members),
             renewal_consent_through_year: family.renewal_consent_through_year,
             special_enrollment_periods: transform_special_enrollment_periods(family.special_enrollment_periods),
@@ -368,7 +369,12 @@ module Operations
         end
 
         def transform_hbx_enrollments(enrollments, options)
-          enrollments.map { |enrollment| transform_hbx_enrollment(enrollment, options) }
+          transformed_enrollments = enrollments.collect do |enrollment|
+            transform_hbx_enrollment(enrollment, options)
+          end
+          return Failure("Could not transform enrollment for family with hbx_id #{@family_hbx_id}: #{transformed_enrollments.select(&:failure?).map(&:failure)}") unless transformed_enrollments.all?(&:success?)
+
+          transformed_enrollments.map(&:value!)
         end
 
         def construct_updated_by(updated_by)
@@ -376,7 +382,7 @@ module Operations
         end
 
         def transform_hbx_enrollment(enrollment, options)
-          Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment.new.call(enrollment, options).value!
+          Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment.new.call(enrollment, options)
         end
 
         def transform_person(person)
