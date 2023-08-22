@@ -665,6 +665,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       context 'has living_outside_state feature disabled' do
         before do
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:living_outside_state).and_return(false)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
           applicant.update_attributes!({is_temporarily_out_of_state: nil})
         end
@@ -1038,7 +1039,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     end
   end
 
-  describe '#valid_spousal_relationship' do
+  describe '#valid_family_relationships' do
     let!(:applicant2) do
       FactoryBot.create(:applicant,
                         application: application,
@@ -1055,46 +1056,166 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
                         family_member_id: BSON::ObjectId.new)
     end
 
-    context "invalid spousal relationships" do
-      let!(:relationship_1) do
-        application.ensure_relationship_with_primary(applicant2, 'spouse')
-        applicant.save!
+    context "spousal relationships" do
+
+      context "invalid spousal relationships" do
+        let!(:relationship_1) do
+          application.ensure_relationship_with_primary(applicant2, 'spouse')
+          applicant.save!
+        end
+
+        let!(:relationship_2) do
+          application.add_or_update_relationships(applicant2, applicant3, 'siblings')
+          applicant2.save!
+        end
+
+        let!(:relationship_3) do
+          application.add_or_update_relationships(applicant3, applicant, 'domestic_partner')
+          applicant3.save!
+        end
+
+        it "returns false" do
+          expect(applicant.valid_spousal_relationship?).to eq false
+        end
       end
 
-      let!(:relationship_2) do
-        application.add_or_update_relationships(applicant2, applicant3, 'siblings')
-        applicant2.save!
-      end
+      context "valid spousal relationships" do
 
-      let!(:relationship_3) do
-        application.add_or_update_relationships(applicant3, applicant, 'domestic_partner')
-        applicant3.save!
-      end
+        let!(:relationship_1) do
+          application.ensure_relationship_with_primary(applicant2, 'spouse')
+          application.reload
+        end
 
-      it "returns false" do
-        expect(applicant.valid_spousal_relationship?).to eq false
+        let!(:relationship_2) do
+          application.add_or_update_relationships(applicant2, applicant3, 'parent')
+          applicant2.save!
+        end
+
+        let!(:relationship_3) do
+          application.add_or_update_relationships(applicant3, applicant, 'child')
+          applicant3.save!
+        end
+
+        it "returns true" do
+          expect(applicant.valid_spousal_relationship?).to eq true
+        end
       end
     end
 
-    context "valid spousal relationships" do
+    context "child relationships" do
 
-      let!(:relationship_1) do
-        application.ensure_relationship_with_primary(applicant2, 'spouse')
-        application.reload
+      context "invalid child relationships" do
+
+        let!(:relationship_1) do
+          application.ensure_relationship_with_primary(applicant2, 'domestic_partner')
+          application.reload
+        end
+
+        let!(:relationship_2) do
+          application.add_or_update_relationships(applicant2, applicant3, 'parent')
+          applicant2.save!
+        end
+
+        let!(:relationship_3) do
+          application.add_or_update_relationships(applicant3, applicant, 'unrelated')
+          applicant3.save!
+        end
+
+        it "returns false" do
+          expect(applicant3.valid_family_relationships?).to eql(false)
+        end
       end
 
-      let!(:relationship_2) do
-        application.add_or_update_relationships(applicant2, applicant3, 'parent')
-        applicant2.save!
+      context "valid child relationships" do
+
+        let!(:relationship_1) do
+          application.ensure_relationship_with_primary(applicant2, 'domestic_partner')
+          application.reload
+        end
+
+        let!(:relationship_2) do
+          application.add_or_update_relationships(applicant2, applicant3, 'parent')
+          applicant2.save!
+        end
+
+        let!(:relationship_3) do
+          application.add_or_update_relationships(applicant3, applicant, 'child_of_domestic_partner')
+          applicant3.save!
+        end
+
+        it "returns true" do
+          expect(applicant.valid_family_relationships?).to eql(true)
+        end
+      end
+    end
+
+    context "in-law relationships" do
+      let!(:applicant4) do
+        FactoryBot.create(:applicant,
+                          application: application,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
       end
 
-      let!(:relationship_3) do
-        application.add_or_update_relationships(applicant3, applicant, 'child')
-        applicant3.save!
+      let!(:applicant5) do
+        FactoryBot.create(:applicant,
+                          application: application,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
       end
 
-      it "returns true" do
-        expect(applicant.valid_spousal_relationship?).to eq true
+      context "invalid in-law relationships" do
+        let(:set_up_relationships) do
+          application.ensure_relationship_with_primary(applicant2, 'child')
+          application.ensure_relationship_with_primary(applicant3, 'spouse')
+          application.ensure_relationship_with_primary(applicant4, 'sibling')
+          application.ensure_relationship_with_primary(applicant5, 'unrelated')
+          application.add_or_update_relationships(applicant2, applicant3, 'child')
+          application.add_or_update_relationships(applicant2, applicant4, 'nephew_or_niece')
+          application.add_or_update_relationships(applicant2, applicant5, 'nephew_or_niece')
+          application.add_or_update_relationships(applicant3, applicant4, 'brother_or_sister_in_law')
+          application.add_or_update_relationships(applicant3, applicant5, 'unrelated')
+          application.add_or_update_relationships(applicant4, applicant5, 'spouse')
+
+          application.build_relationship_matrix
+          application.save(validate: false)
+        end
+
+        before do
+          set_up_relationships
+        end
+
+        it "returns false" do
+          expect(applicant5.valid_family_relationships?).to eql(false)
+        end
+      end
+
+      context "valid in-law relationships" do
+        let(:set_up_relationships) do
+          application.ensure_relationship_with_primary(applicant2, 'child')
+          application.ensure_relationship_with_primary(applicant3, 'spouse')
+          application.ensure_relationship_with_primary(applicant4, 'sibling')
+          application.ensure_relationship_with_primary(applicant5, 'brother_or_sister_in_law')
+          application.add_or_update_relationships(applicant2, applicant3, 'child')
+          application.add_or_update_relationships(applicant2, applicant4, 'nephew_or_niece')
+          application.add_or_update_relationships(applicant2, applicant5, 'nephew_or_niece')
+          application.add_or_update_relationships(applicant3, applicant4, 'brother_or_sister_in_law')
+          application.add_or_update_relationships(applicant3, applicant5, 'brother_or_sister_in_law')
+          application.add_or_update_relationships(applicant4, applicant5, 'spouse')
+
+          application.build_relationship_matrix
+          application.save(validate: false)
+        end
+
+        before do
+          set_up_relationships
+        end
+
+        it "returns true" do
+          expect(applicant5.valid_family_relationships?).to eql(true)
+        end
       end
     end
   end
@@ -1156,6 +1277,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         expect(applicant2.is_spouse_of_primary).to eq(false)
       end
     end
+
 
     context 'when is_spouse_of_primary id called for primary_applicant' do
       it 'should return false' do
@@ -1739,6 +1861,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       before do
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:out_of_state_primary).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
       end
 
       context 'valid addresses' do
@@ -1775,6 +1898,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       before do
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:out_of_state_primary).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
       end
 
       context 'valid addresses' do
