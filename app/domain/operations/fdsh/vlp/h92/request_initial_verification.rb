@@ -12,7 +12,6 @@ module Operations
           # primary request from fdsh gateway
 
           include Dry::Monads[:result, :do, :try]
-          include Acapi::Notifiers
           include EventSource::Command
 
           def call(person)
