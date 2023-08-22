@@ -1524,14 +1524,14 @@ module BenefitSponsors
       let(:current_effective_date) { Date.new(Date.today.year, 3, 1) }
 
       let(:catalog_eligibility) do
-          ::Operations::Eligible::CreateCatalogEligibility.new.call(
-            {
-              subject: current_benefit_market_catalog.to_global_id,
-              eligibility_feature: "aca_shop_osse_eligibility",
-              effective_date: current_benefit_market_catalog.application_period.begin.to_date,
-              domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
-            }
-          )
+        ::Operations::Eligible::CreateCatalogEligibility.new.call(
+          {
+            subject: current_benefit_market_catalog.to_global_id,
+            eligibility_feature: "aca_shop_osse_eligibility",
+            effective_date: current_benefit_market_catalog.application_period.begin.to_date,
+            domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+          }
+        )
       end
 
       context 'when osse feature for the given year is disabled' do

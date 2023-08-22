@@ -5,9 +5,7 @@ require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_site_spec
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application"
 
-RSpec.describe Operations::Eligible::MigrateBenefitSponsorCatalog,
-               type: :model,
-               dbclean: :after_each do
+RSpec.describe Operations::Eligible::MigrateBenefitSponsorCatalog, type: :model, dbclean: :around_each do
   describe "benefit sponsor catalog migrations" do
     include_context "setup benefit market with market catalogs and product packages"
 
@@ -30,16 +28,16 @@ RSpec.describe Operations::Eligible::MigrateBenefitSponsorCatalog,
     end
 
     let(:catalog_eligibility) do
-        ::Operations::Eligible::CreateCatalogEligibility.new.call(
-          {
-            subject: current_benefit_market_catalog.to_global_id,
-            eligibility_feature: "aca_shop_osse_eligibility",
-            effective_date:
-              current_benefit_market_catalog.application_period.begin.to_date,
-            domain_model:
-              "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
-          }
-        )
+      ::Operations::Eligible::CreateCatalogEligibility.new.call(
+        {
+          subject: current_benefit_market_catalog.to_global_id,
+          eligibility_feature: "aca_shop_osse_eligibility",
+          effective_date:
+            current_benefit_market_catalog.application_period.begin.to_date,
+          domain_model:
+            "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+        }
+      )
     end
 
     let(:current_effective_date) { Date.new(Date.today.year, 3, 1) }
