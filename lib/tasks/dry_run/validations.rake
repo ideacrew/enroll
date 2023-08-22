@@ -1,24 +1,33 @@
+require_relative 'helpers'
+
 namespace :dry_run do
   desc "Run all validations for a given year"
   task :validations, [:year] => :environment do |_t, args|
     year = args[:year].to_i
     puts "Running all validations for #{year}"
 
-    Rake::Task['dry_run:validate_environment'].invoke(year)
+    validate_environment(year)
   end
 
-  desc "Validate the environment for a dry run"
-  task :validate_environment, [:year] => :environment do |_t, args|
-    year = args[:year].to_i
+  def validate_environment(year)
     puts "Validating the environment for #{year}"
 
-    # Validate the income thresholds: https://github.com/ideacrew/enroll/pull/3005/files & https://github.com/ideacrew/medicaid_gateway/pull/360/files
-    unearned_threshold_income = EnrollRegistry[:dependent_income_filing_thresholds].setting("unearned_income_filing_threshold_#{year}")&.item
-    earned_threshold_income = EnrollRegistry[:dependent_income_filing_thresholds].setting("earned_income_filing_threshold_#{year}")&.item
-    puts "-" * 80
-    puts "earned_income_filing_threshold_#{year}: #{earned_threshold_income ? earned_threshold_income : 'Not Found'}"
-    puts "unearned_income_filing_threshold_#{year}: #{unearned_threshold_income ? unearned_threshold_income : 'Not Found'}"
-    puts "-" * 80
-    return earned_threshold_income.present? && unearned_threshold_income.present?
+    validate_income_thresholds(year)
+
+    puts "Environment validation successful for #{year}"
+  rescue ValidationFailed => e
+    puts "Environment validation failed for #{year}: #{e.message}"
+    exit 1
   end
+
+  def validate_income_thresholds(year)
+    earned_threshold_income = EnrollRegistry[:dependent_income_filing_thresholds].setting("earned_income_filing_threshold_#{year}")&.item
+    unearned_threshold_income = EnrollRegistry[:dependent_income_filing_thresholds].setting("unearned_income_filing_threshold_#{year}")&.item
+
+    unless earned_threshold_income.present? && unearned_threshold_income.present?
+      raise ValidationFailed, "Income thresholds are missing for #{year}"
+    end
+  end
+
+  class ValidationFailed < StandardError; end
 end

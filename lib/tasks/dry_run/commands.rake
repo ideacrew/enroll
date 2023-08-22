@@ -1,3 +1,5 @@
+require_relative 'helpers'
+
 namespace :dry_run do
   namespace :commands do
     desc "begin open enrollment for a given year"
