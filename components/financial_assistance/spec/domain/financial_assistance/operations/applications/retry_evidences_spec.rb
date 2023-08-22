@@ -60,7 +60,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::RetryEvidences, 
       end
 
       it 'should add a verification history recording the update for' do
-        history = applicant.income_evidence.verification_histories.last
+        history = income_evidence.verification_histories.last
         expect(history.action).to eq("retry")
         expect(history.update_reason).to eq(test_params[:update_reason])
         expect(history.updated_by).to eq("system")
