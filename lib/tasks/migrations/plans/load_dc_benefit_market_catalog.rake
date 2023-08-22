@@ -61,7 +61,9 @@ namespace :load do
           count = 0
           ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"eligibilities.key" => "aca_shop_osse_eligibility_#{calender_year}".to_sym).each do |benefit_sponsorship|
             count += 1
-            osse_eligibility = benefit_sponsorship.is_osse_eligibility_satisfied?(effective_date - 1.day)
+            start_on = effective_date - 1.day
+            eligibility = benefit_sponsorship.eligibility_for("aca_shop_osse_eligibility_#{start_on.year}".to_sym, start_on)
+            osse_eligibility = eligibility.blank? ? false : eligibility.is_eligible_on?(start_on)
 
             result = ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(
               {

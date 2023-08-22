@@ -442,13 +442,6 @@ module BenefitSponsors
       active_eligibilities_on(effective_date, eligibilities.by_key(eligibility_key)).last
     end
 
-    def is_osse_eligibility_satisfied?(start_on)
-      eligibility = eligibility_for("aca_shop_osse_eligibility_#{start_on.year}".to_sym, start_on)
-      return false unless eligibility.present?
-
-      eligibility.is_eligible_on?(start_on)
-    end
-
     def is_grant_eligible_on?(grant_value, effective_date)
       active_eligibilities_on(effective_date).any?{|e| e.grant_for(grant_value)}
     end
