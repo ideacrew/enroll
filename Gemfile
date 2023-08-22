@@ -175,7 +175,6 @@ group :test do
   gem 'warden',                       '~> 1.2.7'
   gem 'watir',                        '~> 6.18.0'
   gem 'webdrivers', '~> 5.3.1'
-  # gem 'selenium-webdriver',          '4.9.0'
   gem 'webmock',                      '~> 3.0.1'
 end
 
