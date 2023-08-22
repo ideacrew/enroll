@@ -66,8 +66,10 @@ module Eligibilities
 
     def request_determination(action_name, update_reason, updated_by = nil)
       application = self.evidenceable.application
-      payload = construct_payload(application)
-      headers = self.key == :local_mec ? { payload_type: 'application' } : { correlation_id: application.id }
+      payload = construct_payload(application, action_name)
+      return false if payload.failure?
+      payload = payload.value!
+      headers = self.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: application.id }
 
       request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: headers)
       return false unless request_event.success?
@@ -75,8 +77,10 @@ module Eligibilities
 
       if response
         add_verification_history(action_name, update_reason, updated_by)
-        self.save
+      else
+        add_verification_history(action_name, "Failed to request determination", "system")
       end
+      self.save
       response
     end
 
@@ -84,9 +88,19 @@ module Eligibilities
       self.verification_histories.build(action: action, update_reason: update_reason, updated_by: updated_by)
     end
 
-    def construct_payload(application)
-      cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application).value!
-      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application).value!
+    def construct_payload(application, action_name = "")
+      cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
+      if cv3_application.failure?
+        add_verification_history(action_name, "Failed to construct payload", "system") if action_name.present?
+        self.save
+        return cv3_application
+      end
+
+      application = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application.value!)
+      return application if application.success?
+      add_verification_history(action_name, "Failed to validate application", "system") if action_name.present?
+      self.save
+      application
     end
 
     def extend_due_on(period = 30.days, updated_by = nil)

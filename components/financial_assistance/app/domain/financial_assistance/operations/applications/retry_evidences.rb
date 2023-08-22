@@ -25,10 +25,10 @@ module FinancialAssistance
 
         def validate_input_params(params)
           params[:modified_by] = params[:modified_by] || "system"
-          return Failure("Missing or invalid param for key applicants, must be an array of applicants") unless params[:applicants] && params[:applicants]&.is_a?(Array)
-          return Failure("Missing or invalid param for key evidence_type, must be a valid evidence_type") unless params[:evidence_type] && params[:evidence_type]&.is_a?(Symbol)
+          return Failure("Missing or invalid param for key applicants, must be an array of applicants") unless params[:applicants].is_a?(Array)
+          return Failure("Missing or invalid param for key evidence_type, must be a valid evidence_type") unless params[:evidence_type].is_a?(Symbol)
           return Failure("Invalid param for key modified_by, must be a String") unless params[:modified_by].is_a?(String)
-          return Failure("Missing or invalid param for key update_reason, must be a String") unless params[:update_reason] && params[:update_reason]&.is_a?(String)
+          return Failure("Missing or invalid param for key update_reason, must be a String") unless params[:update_reason].is_a?(String)
           Success(params)
         end
 
@@ -41,7 +41,7 @@ module FinancialAssistance
           end
           Success("Published request determinations for retries")
         rescue StandardError => e
-          Failure("Failed to retry evidences due to #{e.backtrace}")
+          Failure("Failed to retry evidences due to #{e.message}")
         end
       end
     end
