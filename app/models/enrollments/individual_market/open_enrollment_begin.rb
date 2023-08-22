@@ -65,8 +65,8 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     @osse_renewal_failed_families = []
     people = Person.where({
                             '$or' => [
-                               { 'consumer_role.eligibilities.key' => "aca_ivl_osse_eligibility_#{renewal_effective_on.prev_year.year}".to_sym },
-                               { 'resident_role.eligibilities.key' => "aca_ivl_osse_eligibility_#{renewal_effective_on.prev_year.year}".to_sym }
+                               { 'consumer_role' => { '$exists' => true } },
+                               { 'resident_role' => { '$exists' => true } }
                             ]
                           })
 
@@ -77,7 +77,10 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     ConsumerRole.skip_callback(:validation, :after, :ensure_verification_types)
     ConsumerRole.skip_callback(:validation, :after, :ensure_validation_states)
 
+    count = 0
+
     people.no_timeout.each do |person|
+      count += 1
       role = fetch_role(person)
       next if role.blank?
 
@@ -92,9 +95,8 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
         }
       )
 
-      if result.success?
-        @logger.info "Succeeded Osse Renewal: #{person.hbx_id}"
-      else
+      @logger.info "processed #{count} records" if count % 100 == 0
+      unless result.success?
         @osse_renewal_failed_families << person.families.map(&:id)
         @logger.info "Failed Osse Renewal: #{person.hbx_id}; Error: #{result.failure}"
       end
