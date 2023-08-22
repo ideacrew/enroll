@@ -1523,20 +1523,15 @@ module BenefitSponsors
       let(:current_year) { TimeKeeper.date_of_record.year }
       let(:current_effective_date) { Date.new(Date.today.year, 3, 1) }
 
-      let!(:catalog_eligibility) do
-        catalog_eligibility =
+      let(:catalog_eligibility) do
           ::Operations::Eligible::CreateCatalogEligibility.new.call(
             {
               subject: current_benefit_market_catalog.to_global_id,
               eligibility_feature: "aca_shop_osse_eligibility",
-              effective_date:
-                current_benefit_market_catalog.application_period.begin.to_date,
-              domain_model:
-                "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+              effective_date: current_benefit_market_catalog.application_period.begin.to_date,
+              domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
             }
           )
-
-        catalog_eligibility
       end
 
       context 'when osse feature for the given year is disabled' do
@@ -1555,6 +1550,7 @@ module BenefitSponsors
         before do
           allow(EnrollRegistry).to receive(:feature?).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+          catalog_eligibility
         end
 
         it 'should create osse eligibility in initial state' do

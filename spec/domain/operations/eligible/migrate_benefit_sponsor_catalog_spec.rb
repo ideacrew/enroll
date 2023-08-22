@@ -30,7 +30,6 @@ RSpec.describe Operations::Eligible::MigrateBenefitSponsorCatalog,
     end
 
     let(:catalog_eligibility) do
-      catalog_eligibility =
         ::Operations::Eligible::CreateCatalogEligibility.new.call(
           {
             subject: current_benefit_market_catalog.to_global_id,
@@ -41,8 +40,6 @@ RSpec.describe Operations::Eligible::MigrateBenefitSponsorCatalog,
               "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
           }
         )
-
-      catalog_eligibility
     end
 
     let(:current_effective_date) { Date.new(Date.today.year, 3, 1) }
