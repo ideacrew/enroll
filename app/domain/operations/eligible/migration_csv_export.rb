@@ -88,7 +88,7 @@ module Operations
             record["evidences"].each do |evidence|
               csv << (
                 [
-                  subject.hbx_id,
+                  (subject.try(:hbx_id) || subject.id),
                   record["eligibility_type"],
                   record["start_on"],
                   record["created_at"],
