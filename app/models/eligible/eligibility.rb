@@ -81,7 +81,9 @@ module Eligible
         SponsoredBenefits::BenefitSponsorships::BqtOsseEligibilities::AdminAttestedEvidence,
         SponsoredBenefits::BenefitSponsorships::BqtOsseEligibilities::BqtOsseGrant,
         IvlOsseEligibilities::AdminAttestedEvidence,
-        IvlOsseEligibilities::IvlOsseGrant
+        IvlOsseEligibilities::IvlOsseGrant,
+        Eligible::Evidence,
+        Eligible::Grant
       ].freeze
 
       def resource_ref_dir
