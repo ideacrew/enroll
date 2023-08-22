@@ -665,6 +665,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       context 'has living_outside_state feature disabled' do
         before do
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:living_outside_state).and_return(false)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
           applicant.update_attributes!({is_temporarily_out_of_state: nil})
         end
@@ -1144,6 +1145,76 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
         it "returns true" do
           expect(applicant.valid_family_relationships?).to eql(true)
+        end
+      end
+    end
+
+    context "in-law relationships" do
+      let!(:applicant4) do
+        FactoryBot.create(:applicant,
+                          application: application,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+
+      let!(:applicant5) do
+        FactoryBot.create(:applicant,
+                          application: application,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+
+      context "invalid in-law relationships" do
+        let(:set_up_relationships) do
+          application.ensure_relationship_with_primary(applicant2, 'child')
+          application.ensure_relationship_with_primary(applicant3, 'spouse')
+          application.ensure_relationship_with_primary(applicant4, 'sibling')
+          application.ensure_relationship_with_primary(applicant5, 'unrelated')
+          application.add_or_update_relationships(applicant2, applicant3, 'child')
+          application.add_or_update_relationships(applicant2, applicant4, 'nephew_or_niece')
+          application.add_or_update_relationships(applicant2, applicant5, 'nephew_or_niece')
+          application.add_or_update_relationships(applicant3, applicant4, 'brother_or_sister_in_law')
+          application.add_or_update_relationships(applicant3, applicant5, 'unrelated')
+          application.add_or_update_relationships(applicant4, applicant5, 'spouse')
+
+          application.build_relationship_matrix
+          application.save(validate: false)
+        end
+
+        before do
+          set_up_relationships
+        end
+
+        it "returns false" do
+          expect(applicant5.valid_family_relationships?).to eql(false)
+        end
+      end
+
+      context "valid in-law relationships" do
+        let(:set_up_relationships) do
+          application.ensure_relationship_with_primary(applicant2, 'child')
+          application.ensure_relationship_with_primary(applicant3, 'spouse')
+          application.ensure_relationship_with_primary(applicant4, 'sibling')
+          application.ensure_relationship_with_primary(applicant5, 'brother_or_sister_in_law')
+          application.add_or_update_relationships(applicant2, applicant3, 'child')
+          application.add_or_update_relationships(applicant2, applicant4, 'nephew_or_niece')
+          application.add_or_update_relationships(applicant2, applicant5, 'nephew_or_niece')
+          application.add_or_update_relationships(applicant3, applicant4, 'brother_or_sister_in_law')
+          application.add_or_update_relationships(applicant3, applicant5, 'brother_or_sister_in_law')
+          application.add_or_update_relationships(applicant4, applicant5, 'spouse')
+
+          application.build_relationship_matrix
+          application.save(validate: false)
+        end
+
+        before do
+          set_up_relationships
+        end
+
+        it "returns true" do
+          expect(applicant5.valid_family_relationships?).to eql(true)
         end
       end
     end
@@ -1790,6 +1861,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       before do
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:out_of_state_primary).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
       end
 
       context 'valid addresses' do
@@ -1826,6 +1898,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       before do
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:out_of_state_primary).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
       end
 
       context 'valid addresses' do

@@ -1255,6 +1255,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   describe 'build_relationship_matrix' do
     before do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
     end
 
     let!(:application10) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
@@ -1406,6 +1407,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   describe 'fetch_relationship_matrix' do
     before do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
     end
 
     let!(:application10) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
@@ -1867,6 +1869,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     before :each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
       relationship_application.applicants.each do |appl|
         appl.addresses = [FactoryBot.build(:financial_assistance_address,
                                            :address_1 => '1111 Awesome Street NE',
@@ -1902,6 +1905,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       before do
         set_up_relationships
       end
+
       it "returns false" do
         expect(relationship_application.valid_relations?).to eq(false)
       end
@@ -1914,6 +1918,34 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         relationship_application.ensure_relationship_with_primary(applicant1, 'child')
         relationship_application.ensure_relationship_with_primary(applicant2, 'domestic_partner')
         relationship_application.add_or_update_relationships(applicant1, applicant2, 'unrelated')
+      end
+
+      before do
+        set_up_relationships
+      end
+
+      it "should return false" do
+        expect(relationship_application.valid_relations?).to eq(false)
+      end
+    end
+
+    context "when there is an invalid in-law relationship" do
+      let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let!(:applicant3) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let!(:applicant4) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let(:set_up_relationships) do
+        relationship_application.ensure_relationship_with_primary(applicant1, 'child')
+        relationship_application.ensure_relationship_with_primary(applicant2, 'spouse')
+        relationship_application.ensure_relationship_with_primary(applicant3, 'sibling')
+        relationship_application.ensure_relationship_with_primary(applicant4, 'unrelated')
+        relationship_application.add_or_update_relationships(applicant1, applicant2, 'child')
+        relationship_application.add_or_update_relationships(applicant1, applicant3, 'nephew_or_niece')
+        relationship_application.add_or_update_relationships(applicant1, applicant4, 'nephew_or_niece')
+        relationship_application.add_or_update_relationships(applicant2, applicant3, 'brother_or_sister_in_law')
+        relationship_application.add_or_update_relationships(applicant2, applicant4, 'unrelated')
+        relationship_application.add_or_update_relationships(applicant3, applicant4, 'spouse')
+
         relationship_application.build_relationship_matrix
         relationship_application.save(validate: false)
       end
@@ -2208,6 +2240,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     before :each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
       relationship_application.applicants.each do |appl|
         appl.addresses = [FactoryBot.build(:financial_assistance_address,
                                            :address_1 => '1111 Awesome Street NE',

@@ -15,11 +15,11 @@ module FinancialAssistance
           include Dry::Monads[:result, :do]
           include Acapi::Notifiers
 
-          def call(application_id:)
+          def call(application_id:, transmittable_message_id: nil)
             application    = yield find_application(application_id)
             payload_param  = yield construct_payload(application)
             payload_value  = yield validate_payload(payload_param)
-            payload        = yield publish(payload_value)
+            payload        = yield publish(payload_value, transmittable_message_id)
 
             Success(payload)
           end
@@ -43,8 +43,8 @@ module FinancialAssistance
             AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(payload)
           end
 
-          def publish(payload)
-            FinancialAssistance::Operations::Applications::MedicaidGateway::PublishMecCheck.new.call(payload.to_h, "application")
+          def publish(payload, transmittable_message_id)
+            FinancialAssistance::Operations::Applications::MedicaidGateway::PublishMecCheck.new.call(payload.to_h, "application", transmittable_message_id)
           end
 
         end

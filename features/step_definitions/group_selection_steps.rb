@@ -425,6 +425,11 @@ And(/user did not apply coverage for child as ivl/) do
   family.family_members.detect { |fm| fm.primary_relationship == "child"}.person.consumer_role.update_attributes(is_applying_coverage: false)
 end
 
+And(/user did not apply coverage as ivl/) do
+  primary = Family.all.first.primary_person
+  primary.consumer_role.update_attributes(is_applying_coverage: false)
+end
+
 And(/employee has a valid "(.*)" qle/) do |qle|
   qle = FactoryBot.create :qualifying_life_event_kind, title: qle
 end
