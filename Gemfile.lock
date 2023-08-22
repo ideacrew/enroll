@@ -821,7 +821,6 @@ GEM
       redis (>= 3.3)
       resque (>= 1.26)
       rufus-scheduler (~> 3.2)
-    rexml (3.2.4)
     roo (2.1.1)
       nokogiri (~> 1)
       rubyzip (~> 1.1, < 2.0.0)
@@ -999,8 +998,6 @@ GEM
       dry-configurable (~> 0.8)
       jwt (~> 2.1)
       warden (~> 1.2)
-    watir (6.10.3)
-      selenium-webdriver (~> 3.4, >= 3.4.1)
     web-console (3.7.0)
       actionview (>= 5.0)
       activemodel (>= 5.0)
@@ -1168,7 +1165,7 @@ DEPENDENCIES
   yard-mongoid (~> 0.1)
 
 RUBY VERSION
-   ruby 2.5.9p229
+   ruby 2.6.3
 
 BUNDLED WITH
    2.3.24
