@@ -57,22 +57,22 @@ module Operations
 
         logger.info "validating  #{benefit_sponsorship.legal_name}(#{benefit_sponsorship.fein})"
         applications.each do |application|
-          if application.benefit_packages.any? { |benefit_package|
+          if application.benefit_packages.any? do |benefit_package|
                benefit_package
-                 .health_sponsored_benefit
+             .health_sponsored_benefit
                  &.product_package_kind
-                 .to_s != "metal_level"
-             }
+             .to_s != "metal_level"
+             end
             errors << "found non metal level product package for application #{application.start_on} #{application.aasm_state}"
           end
 
-          if application.benefit_packages.any? { |benefit_package|
+          if application.benefit_packages.any? do |benefit_package|
                benefit_package
-                 .health_sponsored_benefit
+             .health_sponsored_benefit
                  &.reference_product
                  &.metal_level_kind
-                 .to_s == "bronze"
-             }
+             .to_s == "bronze"
+             end
             errors << "found bronze reference plan for application #{application.start_on} #{application.aasm_state}"
           end
 
@@ -85,25 +85,25 @@ module Operations
       end
 
       def verify_bronze_plan_coverages(application, errors)
-        if application.benefit_packages.any? { |benefit_package|
+        if application.benefit_packages.any? do |benefit_package|
              enrolled_families(benefit_package).any? do |family|
                enrollments_by_package(family, benefit_package).any? do |en|
                  en.product&.metal_level_kind.to_s == "bronze"
                end
              end
-           }
+           end
           errors << "found employees enrolled in bronze plan for application #{application.start_on} #{application.aasm_state}"
         end
       end
 
       def verify_employee_subsidies(application, errors)
-        if application.benefit_packages.any? { |benefit_package|
+        if application.benefit_packages.any? do |benefit_package|
              enrolled_families(benefit_package).all? do |family|
                enrollments_by_package(family, benefit_package).none? do |en|
                  en.eligible_child_care_subsidy > 0
                end
              end
-           }
+           end
           errors << "found no employees with subsidy for application #{application.start_on} #{application.aasm_state}"
         end
       end
@@ -164,7 +164,7 @@ module Operations
         unless defined?(@logger)
           @logger =
             Logger.new(
-              "#{Rails.root}/log/migrate_benefit_sponsor_catalogs_#{TimeKeeper.date_of_record.strftime("%Y_%m_%d")}.log"
+              "#{Rails.root}/log/migrate_benefit_sponsor_catalogs_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
             )
         end
         @logger

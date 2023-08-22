@@ -126,10 +126,8 @@ module Operations
           )
 
         eligibility_record.tap do |record|
-          record.evidences =
-            record.class.create_objects(eligibility.evidences, :evidences)
-          record.grants =
-            record.class.create_objects(eligibility.grants, :grants)
+          record.evidences = record.class.create_objects(eligibility.evidences, :evidences)
+          record.grants = record.class.create_objects(eligibility.grants, :grants)
         end
 
         eligibility_record

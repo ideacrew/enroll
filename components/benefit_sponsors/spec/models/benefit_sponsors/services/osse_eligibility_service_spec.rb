@@ -8,10 +8,8 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 module BenefitSponsors
   RSpec.describe ::BenefitSponsors::Services::OsseEligibilityService, type: :model, :dbclean => :around_each do
     include_context "setup benefit market with market catalogs and product packages"
+    before(:all) { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
 
-    before(:all) do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today)
-    end
     let!(:site)  { FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let!(:employer_profile)    { organization.employer_profile }
@@ -30,10 +28,8 @@ module BenefitSponsors
         {
           subject: current_benefit_market_catalog.to_global_id,
           eligibility_feature: "aca_shop_osse_eligibility",
-          effective_date:
-            current_benefit_market_catalog.application_period.begin.to_date,
-          domain_model:
-            "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+          effective_date: current_benefit_market_catalog.application_period.begin.to_date,
+          domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
         }
       )
     end
@@ -44,10 +40,8 @@ module BenefitSponsors
           {
             subject: current_benefit_market_catalog.to_global_id,
             eligibility_feature: "aca_shop_osse_eligibility",
-            effective_date:
-              current_benefit_market_catalog.application_period.begin.to_date,
-            domain_model:
-              "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+            effective_date: current_benefit_market_catalog.application_period.begin.to_date,
+            domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
           }
         )
 
@@ -99,7 +93,6 @@ module BenefitSponsors
       it "returns term date based on published_on" do
         result = subject.get_osse_term_date(TimeKeeper.date_of_record.last_year)
         expect(result).to eq(TimeKeeper.date_of_record.last_year)
-
         result = subject.get_osse_term_date(TimeKeeper.date_of_record.beginning_of_year)
         expect(result).to eq(TimeKeeper.date_of_record)
       end
@@ -108,9 +101,7 @@ module BenefitSponsors
     describe "#update_osse_eligibilities_by_year" do
       it "updates osse eligibilities by year" do
         allow(subject).to receive(:create_or_update_osse_eligibility).and_return("Success")
-
         result = subject.update_osse_eligibilities_by_year
-
         expect(result).to eq({ "Success" => [current_date.year.to_s]})
       end
     end
@@ -118,15 +109,12 @@ module BenefitSponsors
     describe "#create_or_update_osse_eligibility" do
       it "creates or terms osse eligibility" do
         allow(::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new).to receive(:call).and_return(double("Result", success?: true))
-
         result = subject.create_or_update_osse_eligibility(benefit_sponsorship, "true", TimeKeeper.date_of_record.beginning_of_year)
-
         expect(result).to eq("Success")
       end
 
       it "returns Failure if operation fails" do
         result = subject.create_or_update_osse_eligibility(benefit_sponsorship, "true", Date.today.to_s)
-
         expect(result).to eq("Failure")
       end
     end

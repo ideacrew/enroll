@@ -86,11 +86,11 @@ RSpec.describe Operations::Eligible::MigrateBenefitSponsorCatalog,
         sponsored_benefit = benefit_package.health_sponsored_benefit
         sponsored_benefit.reference_product_id =
           sponsored_benefit
-            .product_package
-            .products
-            .detect do |product|
-              product.metal_level_kind.to_s == reference_product_metal.to_s
-            end
+          .product_package
+          .products
+          .detect do |product|
+            product.metal_level_kind.to_s == reference_product_metal.to_s
+          end
             &.id
       end
       application.save

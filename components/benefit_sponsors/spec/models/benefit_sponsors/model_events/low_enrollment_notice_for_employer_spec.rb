@@ -62,7 +62,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::LowEnrollmentNoticeForEmployer', d
       before do
         eligibility = build(:benefit_sponsors_shop_osse_eligibility,
                             :with_admin_attested_evidence,
-                            :evidence_state => :published,
+                            :evidence_state => :approved,
                             :is_eligible => false)
         benefit_sponsorship.eligibilities << eligibility
         benefit_sponsorship.save!
