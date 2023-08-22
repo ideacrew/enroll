@@ -21,6 +21,7 @@ module Operations
         # **Do not pass in args(exclude_seps) elsewhere unless approved from Dan/leadership team**
         # !!!Important!!!
         def call(family, exclude_applications = false, *args)
+          @transformed_family_members = yield transform_family_members(family.family_members)
           request_payload = yield construct_payload(family, exclude_applications, args)
 
           Success(request_payload)
@@ -34,7 +35,7 @@ module Operations
           @family_hbx_id = family.hbx_assigned_id.to_s
           payload = {
             hbx_id: @family_hbx_id,
-            family_members: transform_family_members(family.family_members),
+            family_members: @transformed_family_members,
             renewal_consent_through_year: family.renewal_consent_through_year,
             special_enrollment_periods: transform_special_enrollment_periods(family.special_enrollment_periods),
             payment_transactions: transform_payment_transactions(family.payment_transactions),
@@ -353,7 +354,10 @@ module Operations
         end
 
         def transform_family_members(family_members)
-          family_members.collect do |member|
+          transformed_family_members = family_members.collect do |member|
+            person = transform_person(member.person)
+            return person if person.failure?
+
             {
               hbx_id: member.hbx_id.to_s,
               is_primary_applicant: member.is_primary_applicant,
@@ -361,11 +365,11 @@ module Operations
               is_consent_applicant: member.is_consent_applicant,
               is_coverage_applicant: member.is_coverage_applicant,
               is_active: member.is_active,
-              # magi_medicaid_application_applicants: transform_applicants(member.magi_medicaid_application_applicants),
-              person: transform_person(member.person),
+              person: person,
               timestamp: {created_at: member.created_at.to_datetime, modified_at: member.updated_at.to_datetime}
             }
           end
+          Success(transformed_family_members)
         end
 
         def transform_hbx_enrollments(enrollments, options)
@@ -386,7 +390,7 @@ module Operations
         end
 
         def transform_person(person)
-          Operations::Transformers::PersonTo::Cv3Person.new.call(person).value!
+          Operations::Transformers::PersonTo::Cv3Person.new.call(person)
         end
       end
     end

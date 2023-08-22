@@ -41,6 +41,20 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
   let(:benefit_sponsorship) { FactoryBot.build(:benefit_sponsorship) }
   let!(:hbx_profile) { FactoryBot.create :hbx_profile, benefit_sponsorship: benefit_sponsorship}
 
+  context 'nested cv3 transform failures' do
+    context 'when cv3 Person transform fails' do
+      before do
+        allow(Operations::Transformers::PersonTo::Cv3Person).to receive_message_chain('new.call').with(primary_applicant).and_return(Dry::Monads::Result::Failure.new(primary_applicant))
+      end
+
+      subject { Operations::Transformers::FamilyTo::Cv3Family.new.call(family) }
+
+      it "should return a failure if cv3 person transform returns failure" do
+        expect(subject).to be_a(Dry::Monads::Result::Failure)
+      end
+    end
+  end
+
   describe '#transform_applications' do
 
     subject { Operations::Transformers::FamilyTo::Cv3Family.new.transform_applications(family, false) }
@@ -53,7 +67,7 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
         allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Failure.new(application))
       end
 
-      it "should throw a failure if cv3 application throws failure" do
+      it "should return a failure if cv3 application returns failure" do
         expect(subject).to be_a(Dry::Monads::Result::Failure)
       end
     end
@@ -181,14 +195,12 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
       end
 
       it 'should not return special_enrollment_period_reference' do
-        # expect(subject[0][:hbx_enrollments][0][:special_enrollment_period_reference]).to be_nil
         expect(subject[0][:special_enrollment_period_reference]).to be_nil
       end
     end
 
     context "when enrollment fails transform" do
       before do
-        # allow(Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment).to receive_message_chain('new.call').and_call_original
         allow(Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment).to receive_message_chain('new.call').with(coverage_selected_enrollment, {}).and_return(Dry::Monads::Result::Failure.new("failed to transform enrollment"))
       end
 
@@ -196,7 +208,7 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
         Operations::Transformers::FamilyTo::Cv3Family.new.transform_hbx_enrollments(enrollments, {})
       end
 
-      it "should throw a failure if cv3 hbx enrollment throws failure" do
+      it "should return a failure if cv3 hbx enrollment returns failure" do
         expect(subject).to be_a(Dry::Monads::Result::Failure)
       end
     end
