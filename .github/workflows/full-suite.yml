@@ -310,6 +310,7 @@ jobs:
         run: yarn install
       - name: Run tests
         env:
+          COVERAGE: 'true'
           RSPEC_SPLIT_CONFIGURATION_PATH: 'ci/rspec-split-config.json'
           TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: '{spec,components/benefit_markets,components/benefit_sponsors,components/financial_assistance,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb'
         run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
@@ -420,6 +421,8 @@ jobs:
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
       - name: Run tests
+        env:
+          COVERAGE: 'true'
         run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   quality-workbench:
     needs: [engines, benefit-sponsors, rspec, cucumber]
@@ -434,3 +437,5 @@ jobs:
           CHECK: ${{ matrix.check }}
         if: needs[env.CHECK].result != 'success'
         run: exit 1
+      - name: Code Coverage Summary
+        uses: irongut/CodeCoverageSummary@v1.3.0
