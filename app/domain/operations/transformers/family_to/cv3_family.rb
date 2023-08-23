@@ -34,7 +34,6 @@ module Operations
         private
 
         def construct_payload(family, exclude_applications, args)
-          # options = args.first || {}
           @family_hbx_id = family.hbx_assigned_id.to_s
           payload = {
             hbx_id: @family_hbx_id,
@@ -54,8 +53,7 @@ module Operations
           payload.merge!(irs_groups: transform_irs_groups(family.irs_groups)) if family.irs_groups.present?
           payload.merge!(households: @transformed_households) if @transformed_households.present?
           payload.merge!(tax_household_groups: transform_tax_household_groups(family.tax_household_groups)) if family.tax_household_groups.present?
-          failed_payloads = payload.values.select { |value| value.is_a?(Dry::Monads::Result::Failure) }
-          return Failure("Unable to transform payload values: #{failed_payloads}") if failed_payloads.present?
+
           Success(payload)
         end
 
