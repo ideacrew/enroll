@@ -211,6 +211,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     describe "To test passive renewals with only ivl health products" do
       include_context "setup families enrollments"
 
+      before :each do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+      end
+
       context "Given a database of Families" do
         it "at least one Family with an active 'Individual Market Health product Enrollment only'" do
           expect(family_unassisted.active_household.hbx_enrollments.first.kind).to eq "individual"
@@ -269,6 +273,38 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             end
           end
         end
+
+        context 'osse renewal' do
+          subject { Enrollments::IndividualMarket::OpenEnrollmentBegin.new }
+
+          before do
+            allow_any_instance_of(BenefitCoveragePeriod).to receive(:eligibility_for).and_return true
+          end
+
+          context 'when osse renewal success' do
+            let(:ivl_osse_eligibility) { double('IvlOsseEligibility', call: double('Monad', success?: true)) }
+
+            before do
+              allow(Operations::IvlOsseEligibilities::CreateIvlOsseEligibility).to receive(:new).and_return ivl_osse_eligibility
+            end
+
+            it 'should generate renewal enrollment for unassisted family' do
+              subject.process_renewals
+              family_unassisted.active_household.reload
+              expect(family_unassisted.active_household.hbx_enrollments.count).to eq 3
+            end
+          end
+
+
+          context 'when osse renewal failed' do
+
+            it 'should not generate renewal enrollment for unassisted family' do
+              subject.process_renewals
+              family_unassisted.active_household.reload
+              expect(family_unassisted.active_household.hbx_enrollments.count).to eq 2
+            end
+          end
+        end
       end
 
       describe ".kollection" do
@@ -293,6 +329,43 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         it "pull enrollments for both IVL and coverall" do
           query = subject.kollection(["health"], coverage_period)
           expect(family_unassisted.active_household.hbx_enrollments.where(query).count).to eq 2
+        end
+      end
+    end
+
+    describe 'when async processing is enabled' do
+      include_context "setup families enrollments"
+
+      before :each do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+      end
+
+      let(:subject) { Enrollments::IndividualMarket::OpenEnrollmentBegin.new }
+
+      it 'should invoke an event' do
+        expect(subject).to receive(:event).twice
+        subject.process_renewals
+      end
+
+      context '#records' do
+        context 'when osse disabled' do
+          before do
+            allow_any_instance_of(BenefitCoveragePeriod).to receive(:eligibility_for).and_return false
+          end
+
+          it 'should return family collection' do
+            expect(subject.records.first.class).to eq Family
+          end
+        end
+
+        context 'when osse enabled' do
+          before do
+            allow_any_instance_of(BenefitCoveragePeriod).to receive(:eligibility_for).and_return true
+          end
+
+          it 'should return family collection' do
+            expect(subject.records.first.class).to eq Person
+          end
         end
       end
     end
