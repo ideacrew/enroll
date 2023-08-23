@@ -15,7 +15,7 @@ namespace :dry_run do
       end
     end
 
-    desc "begin open enrollment for a given year"
+    desc "initiate open enrollment for a given year"
     task :open_enrollment, [:year] => :environment do |t, args|
       year = args[:year].to_i
       log "Ending open enrollment for #{year.pred}"
