@@ -3,6 +3,14 @@ require_relative 'helpers'
 namespace :dry_run do
   namespace :reports do
 
+    desc "run all reports for a given year"
+    task :all, [:year] => :environment do |_t, args|
+      year = args[:year].to_i
+      Rake::Task['dry_run:reports:renewals'].invoke(year)
+      Rake::Task['dry_run:reports:determinations'].invoke(year)
+      Rake::Task['dry_run:reports:notices'].invoke(year)
+    end
+
     desc "run the renewal report for a given year"
     task :renewals, [:year] => :environment do |_t, args|
       year = args[:year].to_i
@@ -14,6 +22,7 @@ namespace :dry_run do
 
     desc "run the renewal eligible families report for a given year"
     task :renewal_eligible_families, [:year] => :environment do |_t, args|
+      log "Running renewal eligible families report for #{args[:year]}"
       applications = renewal_eligible_applications(args[:year])
       to_csv("renewal_eligible_families_#{args[:year]}") do |csv|
         csv << ["family_id", "primary_applicant.person_hbx_id", "primary_applicant.full_name"]
@@ -21,13 +30,14 @@ namespace :dry_run do
           csv << [app.family_id, app.primary_applicant.person_hbx_id, app.primary_applicant.full_name]
         end
       end
+      log "Finished renewal eligible families report for #{args[:year]} with #{applications.size} applications."
     end
 
     desc "run the renewal eligible families who renewed report for a given year"
     task :renewal_eligible_families_who_renewed, [:year] => :environment do |_t, args|
+      log "Running renewal eligible families who renewed report for #{args[:year]}"
       renewal_eligible_applications = renewal_eligible_applications(args[:year])
-      existing_family_ids = ::FinancialAssistance::Application.by_year(args[:year]).pluck(:family_id)
-
+      existing_family_ids = ::FinancialAssistance::Application.by_year(args[:year]).pluck(:family_id).uniq
       # A list of applications that are renewal-eligible and have a matching family_id in the existing applications for the specified year.
       applications = renewal_eligible_applications.select { |app| existing_family_ids.include?(app.family_id) }
       to_csv("renewal_eligible_families_who_renewed_#{args[:year]}") do |csv|
@@ -36,10 +46,12 @@ namespace :dry_run do
           csv << [app.family_id, app.primary_applicant.person_hbx_id, app.primary_applicant.full_name, app.hbx_id, app.aasm_state]
         end
       end
+      log "Finished renewal eligible families who renewed report for #{args[:year]} with #{applications.size} applications."
     end
 
     desc "run the renewal eligible families who did not renew report for a given year"
     task :renewal_eligible_families_who_did_not_renew, [:year] => :environment do |_t, args|
+      log "Running renewal eligible families who did not renew report for #{args[:year]}"
       renewal_eligible_applications = renewal_eligible_applications(args[:year])
       existing_family_ids = ::FinancialAssistance::Application.by_year(args[:year]).pluck(:family_id)
 
@@ -51,6 +63,7 @@ namespace :dry_run do
           csv << [app.family_id, app.primary_applicant.person_hbx_id, app.primary_applicant.full_name]
         end
       end
+      log "Finished renewal eligible families who did not renew report for #{args[:year]} with #{applications.size} applications."
     end
 
     desc "run the determinations report for a given year"
@@ -79,6 +92,7 @@ namespace :dry_run do
     task :notices_by_dates, [:start_date, :end_date] => :environment do |_t, args|
       start_date = args[:start_date] || TimeKeeper.date_of_record
       end_date = args[:end_date] || TimeKeeper.date_of_record
+      log "Running notices report for #{start_date} to #{end_date}"
       title_code_mapping = { 'Welcome to CoverME.gov!' => 'IVLMWE',
                              'Your Plan Enrollment' => 'IVLENR',
                              'Your Eligibility Results - Tax Credit' => 'IVLERA',
@@ -97,12 +111,14 @@ namespace :dry_run do
                              "Don't Forget - You Must Submit Documents" => 'IVLDR2',
                              "Don't Miss the Deadline - You Must Submit Documents" => 'IVLDR3',
                              'Final Notice - You Must Submit Documents' => 'IVLDR4' }
+      documents = notices(start_date, end_date)
       to_csv("notices_by_dates_#{start_date.strftime('%Y_%m_%d')}_#{end_date.strftime('%Y_%m_%d')}") do |csv|
         csv << ['HBX ID', 'Notice Title', 'Notice Code', 'Date']
-        notices(start_date, end_date).each do |notice|
+        documents.each do |notice|
           csv << [notice.person.hbx_id, notice.title, title_code_mapping[notice.title], notice.created_at]
         end
       end
+      log "Finished notices report for #{start_date} to #{end_date} with #{documents.size} notices."
     end
 
     def family_ids(year)
