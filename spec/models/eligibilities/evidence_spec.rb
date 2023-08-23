@@ -29,126 +29,131 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
   end
 
   describe 'Evidences present the applicant' do
-    context '.extend_due_on' do
-      before do
-        applicant.create_income_evidence(
-          key: :income,
-          title: 'Income',
-          aasm_state: 'pending',
-          due_on: nil,
-          verification_outstanding: false,
-          is_satisfied: true
-        )
-        applicant.create_esi_evidence(
-          key: :esi_mec,
-          title: 'Esi',
-          aasm_state: 'pending',
-          due_on: nil,
-          verification_outstanding: false,
-          is_satisfied: true
-        )
-      end
+    let(:esi_evidence) do
+      applicant.create_esi_evidence(
+        key: :esi_mec,
+        title: 'Esi',
+        aasm_state: 'pending',
+        due_on: nil,
+        verification_outstanding: false,
+        is_satisfied: true
+      )
+    end
 
+    let(:income_evidence) do
+      applicant.create_income_evidence(
+        key: :income,
+        title: 'Income',
+        aasm_state: 'pending',
+        due_on: nil,
+        verification_outstanding: false,
+        is_satisfied: true
+      )
+    end
+
+    context '.extend_due_on' do
       let(:new_due_date) do
         applicant.schedule_verification_due_on + 30.days
       end
 
       it 'should update due date' do
-        evidence = applicant.income_evidence
+        expect(income_evidence.due_on).to be_nil
+        expect(income_evidence.verification_histories).to be_empty
 
-        expect(evidence.due_on).to be_nil
-        expect(evidence.verification_histories).to be_empty
-
-        output = evidence.extend_due_on(30.days, 'system')
-        evidence.reload
+        output = income_evidence.extend_due_on(30.days, 'system')
+        income_evidence.reload
 
         expect(output).to be_truthy
-        expect(evidence.due_on).to eq new_due_date
-        expect(evidence.verification_histories).to be_present
+        expect(income_evidence.due_on).to eq new_due_date
+        expect(income_evidence.verification_histories).to be_present
 
-        history = evidence.verification_histories.first
+        history = income_evidence.verification_histories.first
         expect(history.action).to eq 'extend_due_date'
-        expect(history.update_reason).to eq "Extended due date to #{evidence.due_on.strftime('%m/%d/%Y')}"
+        expect(history.update_reason).to eq "Extended due date to #{income_evidence.due_on.strftime('%m/%d/%Y')}"
         expect(history.updated_by).to eq 'system'
       end
 
       it 'should update default due date for 30 days' do
-        evidence = applicant.income_evidence
-        expect(evidence.extend_due_on).to be_truthy
+        expect(income_evidence.extend_due_on).to be_truthy
       end
     end
 
     context '.request_determination' do
-      before do
-        applicant.create_income_evidence(
-          key: :income,
-          title: 'Income',
-          aasm_state: 'pending',
-          due_on: nil,
-          verification_outstanding: false,
-          is_satisfied: true
-        )
-        applicant.create_esi_evidence(
-          key: :esi_mec,
-          title: 'Esi',
-          aasm_state: 'pending',
-          due_on: nil,
-          verification_outstanding: false,
-          is_satisfied: true
-        )
-      end
-
       let(:updated_by) { '12345' }
       let(:update_reason) { "Requested Hub for verification" }
       let(:action) { 'request_hub' }
-      let(:event) { double(success?: true, value!: double(publish: true)) }
+      let(:success_event) { double(success?: true, value!: double(publish: true)) }
+      let(:failure_event) { double(success?: false, value!: double(publish: false)) }
+      let(:failure_publish) { double(success?: true, value!: double(publish: false)) }
+      let(:success_payload) { double(failure?: false, value!: {}) }
 
-      it 'should update due date' do
-        evidence = applicant.esi_evidence
+      before do
+        esi_evidence.stub(:generate_evidence_updated_event) { true }
+        esi_evidence.stub(:construct_payload) { success_payload }
+      end
 
-        evidence.stub(:construct_payload) { {} }
-        evidence.stub(:event) { event }
-        evidence.stub(:generate_evidence_updated_event) { true }
+      it 'should not update due date' do
+        esi_evidence.stub(:event) { failure_event }
+        esi_evidence.request_determination(action, update_reason, updated_by)
+        esi_evidence.reload
+        expect(esi_evidence.verification_histories).to be_empty
+      end
 
-        expect(evidence.verification_histories).to be_empty
-
-        result = evidence.request_determination(action, update_reason, updated_by)
-        evidence.reload
-
+      it 'should update due date with history' do
+        esi_evidence.stub(:event) { success_event }
+        expect(esi_evidence.verification_histories).to be_empty
+        result = esi_evidence.request_determination(action, update_reason, updated_by)
+        esi_evidence.reload
         expect(result).to be_truthy
-        expect(evidence.verification_histories).to be_present
+        expect(esi_evidence.verification_histories).to be_present
 
-        history = evidence.verification_histories.first
+        history = esi_evidence.verification_histories.first
         expect(history.action).to eq action
         expect(history.update_reason).to eq update_reason
         expect(history.updated_by).to eq updated_by
       end
+
+      it 'should not update due date with history' do
+        esi_evidence.stub(:event) { failure_publish }
+        expect(esi_evidence.verification_histories).to be_empty
+        result = esi_evidence.request_determination(action, update_reason, updated_by)
+        esi_evidence.reload
+        expect(result).to be_falsey
+        expect(esi_evidence.verification_histories).to be_present
+
+        history = esi_evidence.verification_histories.first
+        expect(history.action).to eq action
+        expect(history.update_reason).to eq "Failed to request determination"
+        expect(history.updated_by).to eq "system"
+      end
+    end
+
+    context "construct_payload" do
+      it 'should have failure history' do
+        allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Failure.new(application))
+        esi_evidence.construct_payload(application, "system")
+        expect(esi_evidence.verification_histories.last.update_reason).to eq 'Failed to construct payload'
+      end
+
+      it 'should have failure history' do
+        allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Success.new(application))
+        allow(::AcaEntities::MagiMedicaid::Operations::InitializeApplication).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Failure.new(application))
+        esi_evidence.construct_payload(application, "system")
+        expect(esi_evidence.verification_histories.last.update_reason).to eq 'Failed to validate application'
+      end
     end
 
     context 'reject' do
-      let(:evidence) do
-        evidence = applicant.create_income_evidence(
-          key: :income,
-          title: 'Income',
-          aasm_state: 'pending',
-          due_on: nil,
-          verification_outstanding: false,
-          is_satisfied: true
-        )
-
-        evidence
-      end
-
       before do
-        evidence.move_to_rejected!
-        evidence.reload
+        income_evidence.move_to_rejected!
+        income_evidence.reload
       end
 
       shared_examples_for 'transition to rejected' do |initial_state|
         let(:aasm_state) { initial_state }
 
         it 'should transition to rejected' do
-          expect(evidence.aasm_state).to eq 'rejected'
+          expect(income_evidence.aasm_state).to eq 'rejected'
         end
       end
 
