@@ -11,7 +11,7 @@ module FinancialAssistance
         include Dry::Monads[:result, :do]
 
         # @param [Hash] opts The options to update an income evidence due on date
-        # @option opts [Date] :current_due_on  (optional)
+        # @option opts [Date] :current_due_on (optional)
         # @option opts [String] :modified_by (optional)
         # @option opts [Integer] :extend_by (optional)
         # @return [Dry::Monads::Result]
@@ -33,7 +33,7 @@ module FinancialAssistance
         end
 
         def update_evidences(params)
-          applications = FinancialAssistance::Application.determined.where(:"applicants.income_evidence.due_on" => params[:current_due_on])
+          applications = FinancialAssistance::Application.determined.where(:"applicants.income_evidence.due_on" => params[:current_due_on], :"applicants.income_evidence.aasm_state".in => ['rejected', 'outstanding'])
           updated_applicants = []
           applications.each do |application|
             application.applicants.each do |applicant|
@@ -41,10 +41,25 @@ module FinancialAssistance
               updated_applicants << applicant.person_hbx_id
               applicant.income_evidence.auto_extend_due_on(params[:extend_by].days, params[:modified_by])
             end
+
+            update_family_level_verification_due_date(application)
           end
+
           Success(updated_applicants)
         rescue StandardError => e
           Failure("Failed to auto extend income evidence due on because of #{e.message}")
+        end
+
+        def update_family_level_verification_due_date(application)
+          family = application.family
+          eligibility_determination = family&.eligibility_determination
+          return unless eligibility_determination
+
+          applicants_earliest_due_date = family&.min_verification_due_date_on_family
+          family_earliest_due_date = eligibility_determination&.outstanding_verification_earliest_due_date
+          return unless applicants_earliest_due_date && family_earliest_due_date
+
+          family.eligibility_determination.update(outstanding_verification_earliest_due_date: applicants_earliest_due_date) if applicants_earliest_due_date > family_earliest_due_date
         end
       end
     end
