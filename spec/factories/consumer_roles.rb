@@ -1,7 +1,16 @@
 FactoryBot.define do
   factory :consumer_role do
     association :person
-    sequence(:ssn) { |n| "7"+SecureRandom.random_number.to_s[2..8][0..-((Math.log(n+1,10))+1)]+"#{n+1}"}
+    sequence(:ssn) do |n|
+      ssn = ''
+      loop do
+        ssn_number = SecureRandom.random_number(1_000_000_000)
+        ssn = "7#{ssn_number.to_s[2..3]}#{ssn_number.to_s[4]}#{n + 1}#{ssn_number.to_s[5..7]}#{n + 1}"
+        break if ssn.match?(/^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$/)
+      end
+
+      ssn
+    end
     dob { "01/01/1980" }
     gender { 'male' }
     is_state_resident { 'yes' }

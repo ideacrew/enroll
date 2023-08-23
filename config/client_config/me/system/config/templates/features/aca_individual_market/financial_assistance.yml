@@ -122,7 +122,7 @@ registry:
       - key: :non_applicant_citizen_status
         is_enabled: true
       - key: :out_of_state_primary
-        is_enabled: false
+        is_enabled: <%= ENV['OUT_OF_STATE_PRIMARY_IS_ENABLED'] || false %>
       - key: :temporary_configuration_enable_multi_tax_household_feature
         is_enabled: <%= ENV['TEMPORARY_CONFIGURATION_OF_MULTI_TAX_HOUSEHOLD_FEATURE_IS_ENABLED'] || false %>
       - key: :draft_application_after_ridp
