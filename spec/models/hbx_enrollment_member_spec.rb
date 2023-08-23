@@ -96,6 +96,61 @@ describe HbxEnrollmentMember, dbclean: :around_each do
     end
   end
 
+  context 'is_eligible_for_osse_grant?' do
+    let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
+    let!(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+    let!(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+    let(:catalog_eligibility) do
+      Operations::Eligible::CreateCatalogEligibility.new.call(
+        {
+          subject: benefit_coverage_period.to_global_id,
+          eligibility_feature: "aca_ivl_osse_eligibility",
+          effective_date: benefit_coverage_period.start_on.to_date,
+          domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+        }
+      )
+    end
+    let(:consumer_role) { create(:consumer_role, person: person) }
+    let(:person) { enrollment_member.person }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+    let(:enrollment) { create(:hbx_enrollment, family: family, household: family.active_household, effective_on: effective_on)}
+    let(:enrollment_member) { create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, hbx_enrollment: enrollment, coverage_start_on: effective_on) }
+    let(:effective_on) { TimeKeeper.date_of_record }
+    let(:start_on) { TimeKeeper.date_of_record }
+    let(:osse_eligible) { true }
+    let(:osse_subsidy_key) { :aca_individual_osse_plan_subsidy }
+
+    before do
+      allow(::EnrollRegistry).to receive(:feature?).and_return(true)
+      allow(::EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+      catalog_eligibility
+      allow(enrollment_member).to receive(:ivl_osse_eligibility_is_enabled?).and_return(osse_eligible)
+    end
+
+    context 'when consumer is osse eligible' do
+      before do
+        consumer_role.create_or_term_eligibility({ evidence_key: :ivl_osse_evidence, evidence_value: true, effective_date: TimeKeeper.date_of_record })
+        consumer_role.reload
+      end
+
+      context 'when osse is enabled for the given year' do
+        it { expect(enrollment_member.is_eligible_for_osse_grant?(osse_subsidy_key)).to be_truthy }
+      end
+
+      context 'when osse is disabled for the given year' do
+        let(:osse_eligible) { false }
+
+        it { expect(enrollment_member.is_eligible_for_osse_grant?(osse_subsidy_key)).to be_falsey }
+      end
+    end
+
+    context 'when consumer is not osse eligible' do
+      context 'when osse is enabled for the given year' do
+        it { expect(enrollment_member.is_eligible_for_osse_grant?(osse_subsidy_key)).to be_falsey }
+      end
+    end
+  end
+
   context 'osse_eligible_on_effective_date?' do
     let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
     let!(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
