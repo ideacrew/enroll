@@ -61,16 +61,6 @@ RSpec.describe Services::IvlOsseEligibilityService, type: :model, :dbclean => :a
     end
   end
 
-  describe "#get_osse_term_date" do
-    it "returns term date based on published_on" do
-      result = subject.get_osse_term_date(TimeKeeper.date_of_record.last_year)
-      expect(result).to eq(TimeKeeper.date_of_record.last_year)
-
-      result = subject.get_osse_term_date(TimeKeeper.date_of_record.beginning_of_year)
-      expect(result).to eq(TimeKeeper.date_of_record)
-    end
-  end
-
   describe "#update_osse_eligibilities_by_year" do
     it "updates osse eligibilities by year" do
       allow(subject).to receive(:store_osse_eligibility).and_return("Success")
@@ -82,7 +72,7 @@ RSpec.describe Services::IvlOsseEligibilityService, type: :model, :dbclean => :a
   end
 
   describe "#store_osse_eligibility" do
-    it "creates or terms osse eligibility" do
+    it "persist osse eligibility" do
       allow(::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new).to receive(:call).and_return(double("Result", success?: true))
 
       result = subject.store_osse_eligibility(role, "true", TimeKeeper.date_of_record.beginning_of_year)
