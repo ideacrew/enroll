@@ -23,7 +23,7 @@ RSpec.describe "broker_agencies/profiles/_assign.html.erb", dbclean: :after_each
           expect(rendered).to have_selector('h3', text: 'General Agencies')
         end
       end
-      else
+
       context "when disabled" do
         let(:general_agency_enabled) { false }
         it "does not show General Agency in the title" do

@@ -41,6 +41,8 @@ class BenefitCoveragePeriod
 
   scope :by_date, ->(date) { where({:"start_on".lte => date, :"end_on".gte => date}) }
 
+  scope :by_year, ->(year) { where(start_on: (Date.new(year)..Date.new(year).end_of_year)) }
+
   # Gets the successor coverage period.
   # @return [BenefitCoveragePeriod, nil] the successor
   def successor

@@ -40,7 +40,7 @@ namespace :load do
         product_class.by_product_package(product_package).collect { |prod| prod.create_copy_for_embedding }
       end
 
-      if kind == :aca_shop
+      if kind == :aca_shop && EnrollRegistry.feature?("aca_shop_osse_eligibility_#{calender_year}") && EnrollRegistry.feature_enabled?("aca_shop_osse_eligibility_#{calender_year}")
         puts "Creating eligibilities......"
         effective_date = benefit_market_catalog.application_period.min.to_date
 
@@ -55,9 +55,34 @@ namespace :load do
 
         if result.success?
           p "Success: created eligibility for #{effective_date.year} benefit market catalog"
+
+          puts "::: Creating SHOP OSSE eligibilities"
+
+          count = 0
+          ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"eligibilities.key" => "aca_shop_osse_eligibility_#{calender_year}".to_sym).each do |benefit_sponsorship|
+            count += 1
+            start_on = effective_date - 1.day
+            eligibility = benefit_sponsorship.eligibility_for("aca_shop_osse_eligibility_#{start_on.year}".to_sym, start_on)
+            osse_eligibility = eligibility.blank? ? false : eligibility.is_eligible_on?(start_on)
+
+            result = ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(
+              {
+                subject: benefit_sponsorship.to_global_id,
+                evidence_key: :shop_osse_evidence,
+                evidence_value: osse_eligibility.to_s,
+                effective_date: effective_date
+              }
+            )
+            unless result.success?
+              puts "Failed to create OSSE shop eligibility for benefit_sponsorship with id: #{benefit_sponsorship.id}"
+            end
+            puts "Processsed #{count} SHOP OSSE eligibilities" if (count % 1000) == 0
+          end
         else
           p "Failed to create eligibility for #{effective_date.year} benefit market catalog"
         end
+      else
+        puts "SHOP OSSE is disabled; Skipping catalog creation & benefit sponsorship renewal"
       end
 
 

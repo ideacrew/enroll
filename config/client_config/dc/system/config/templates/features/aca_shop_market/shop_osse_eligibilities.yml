@@ -118,5 +118,5 @@ registry:
         item: 'employer_metal_level_products'
         is_enabled: true
       - key: :lowest_cost_silver_product_2024
-        item: '94506DC0350033-01'
+        item: '94506DC0350032-01'
         is_enabled: true
