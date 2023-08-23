@@ -36,6 +36,18 @@ RSpec.describe ::Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment, db
                                               coverage_end_on: TimeKeeper.date_of_record.end_of_month)
   end
 
+  context 'failure' do
+    before do
+      allow(subject).to receive(:tax_household_enrollments).with(enrollment).and_raise(StandardError)
+    end
+
+    it 'should return failure with error message' do
+      result = subject.call(enrollment)
+      expect(result).to be_failure
+      expect(result.failure).to match(/Cv3HbxEnrollment hbx id: #{enrollment.hbx_id} | exception:/)
+    end
+  end
+
   context 'slcsp' do
     before do
       transformed_payload = subject.call(enrollment).success

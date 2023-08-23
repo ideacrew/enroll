@@ -120,17 +120,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       end
     end
 
-    context 'application_renewal_request_created' do
-      before do
-        params = { payload: { family_id: application.family_id, renewal_year: application.assistance_year.next }, event_name: 'application_renewal_request_created' }
-        @result = subject.call(params)
-      end
-
-      it 'should return success' do
-        expect(@result).to be_success
-      end
-    end
-
     context 'submit_renewal_draft' do
       before do
         application.update_attributes!(aasm_state: 'renewal_draft')
@@ -148,7 +137,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
     context 'missing keys' do
       context 'missing payload' do
         before do
-          @result = subject.call({ event_name: ['determine_eligibility', 'application_renewal_request_created', 'submit_renewal_draft'].sample })
+          @result = subject.call({ event_name: ['determine_eligibility', 'submit_renewal_draft'].sample })
         end
 
         it 'should return failure with error message' do
@@ -170,7 +159,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
     context 'missing values or invalid values' do
       context 'missing value for payload' do
         before do
-          @result = subject.call({ payload: nil, event_name: ['determine_eligibility', 'application_renewal_request_created', 'submit_renewal_draft'].sample })
+          @result = subject.call({ payload: nil, event_name: ['determine_eligibility', 'submit_renewal_draft'].sample })
         end
 
         it 'should return failure with error message' do
@@ -190,7 +179,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
 
       context 'invalid value for payload' do
         before do
-          @result = subject.call({ payload: { test: 'test' }.to_s, event_name: ['determine_eligibility', 'application_renewal_request_created', 'submit_renewal_draft'].sample })
+          @result = subject.call({ payload: { test: 'test' }.to_s, event_name: ['determine_eligibility', 'submit_renewal_draft'].sample })
         end
 
         it 'should return failure with error message' do
@@ -214,7 +203,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
         end
 
         it 'should return failure with error message' do
-          expect(@result.failure).to eq("Invalid event_name: test_event for key event_name, must be one of [\"determine_eligibility\", \"application_renewal_request_created\", \"submit_renewal_draft\"]")
+          expect(@result.failure).to eq("Invalid event_name: test_event for key event_name, must be one of [\"determine_eligibility\", \"submit_renewal_draft\"]")
         end
       end
     end
