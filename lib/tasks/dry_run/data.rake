@@ -133,8 +133,8 @@ namespace :dry_run do
       end
     end
 
-    def plans_by_year(year)
-      ::Plan.where(active_year: year)
+    def plans_by_year(year, **options)
+      ::Plan.where(active_year: year, **options)
     end
 
     desc "plans for a given year"
@@ -183,8 +183,10 @@ namespace :dry_run do
       end
     end
 
-    def products_by_year(year)
-      ::BenefitMarkets::Products::Product.where(active_year: year)
+    def products_by_year(year, **options)
+      products = ::BenefitMarkets::Products::Product.by_year(year)
+      products = products.where(**options) if options.present?
+      products
     end
 
     desc "products for a given year"
@@ -377,7 +379,7 @@ namespace :dry_run do
       log "Creating benefit coverage period for #{year}"
       coverage_start = DateTime.parse("#{year}-01-01 00:00:00 UTC")
       coverage_end = DateTime.parse("#{year}-12-31 00:00:00 UTC")
-      open_enrollment_start_on = Date.yesterday # or TimeKeeper.date_of_record.yesterday
+      open_enrollment_start_on = TimeKeeper.date_of_record.yesterday
       open_enrollment_end_on = coverage_start
 
       benefit_coverage_periods = HbxProfile&.current_hbx&.benefit_sponsorship&.benefit_coverage_periods
@@ -757,7 +759,7 @@ namespace :dry_run do
       previous_year = year.pred
       log "Creating mappings between #{previous_year} and #{year} Products and Plans"
       begin
-        Plan.where(active_year: previous_year).each do |old_plan|
+        plans_by_year(previous_year).each do |old_plan|
           new_plan = Plan.where(active_year: year, hios_id: old_plan.hios_id).first
           next unless new_plan.present?
 
@@ -765,12 +767,11 @@ namespace :dry_run do
           new_plan.update(sbc_document: old_plan.sbc_document)
         end
 
-        ::BenefitMarkets::Products::Product.by_year(previous_year).each do |old_product|
-          new_product = ::BenefitMarkets::Products::Product.where(
-            hios_id: old_product.hios_id,
-            benefit_market_kind: old_product.benefit_market_kind,
-            metal_level_kind: old_product.metal_level_kind
-          ).by_year(year).first
+        products_by_year(previous_year).each do |old_product|
+          new_product = products_by_year(year,
+                                         hios_id: old_product.hios_id,
+                                         benefit_market_kind: old_product.benefit_market_kind,
+                                         metal_level_kind: old_product.metal_level_kind).first
           next unless new_product.present?
 
           # @todo THIS is broken

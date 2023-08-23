@@ -4,19 +4,19 @@ namespace :dry_run do
   desc "Run all validations for a given year"
   task :validations, [:year] => :environment do |_t, args|
     year = args[:year].to_i
-    puts "Running all validations for #{year}"
+    log "Running all validations for #{year}"
 
     validate_environment(year)
   end
 
   def validate_environment(year)
-    puts "Validating the environment for #{year}"
+    log "Validating the environment for #{year}"
 
     validate_income_thresholds(year)
 
-    puts "Environment validation successful for #{year}"
+    log "Environment validation successful for #{year}"
   rescue ValidationFailed => e
-    puts "Environment validation failed for #{year}: #{e.message}"
+    log "Environment validation failed for #{year}: #{e.message}"
     exit 1
   end
 

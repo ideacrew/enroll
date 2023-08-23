@@ -67,10 +67,18 @@ namespace :dry_run do
       # who was not notified with what notice
     end
 
+    # Find notices generated for a given date range (default is all notices)
+    def notices(start_date = Date.new(1900, 1, 1), end_date = TimeKeeper.date_of_record)
+      Person.where(:'documents.created_at' => { :$gte => start_date, :$lte => end_date }).flat_map do |person|
+        person.documents.where(:created_at.gte => start_date,
+                               :created_at.lte => end_date)
+      end
+    end
+
     desc "notices generated for a given date range"
     task :notices_by_dates, [:start_date, :end_date] => :environment do |_t, args|
-      start_date = args[:start_date] || Date.today
-      end_date = args[:end_date] || Date.today
+      start_date = args[:start_date] || TimeKeeper.date_of_record
+      end_date = args[:end_date] || TimeKeeper.date_of_record
       title_code_mapping = { 'Welcome to CoverME.gov!' => 'IVLMWE',
                              'Your Plan Enrollment' => 'IVLENR',
                              'Your Eligibility Results - Tax Credit' => 'IVLERA',
@@ -89,15 +97,10 @@ namespace :dry_run do
                              "Don't Forget - You Must Submit Documents" => 'IVLDR2',
                              "Don't Miss the Deadline - You Must Submit Documents" => 'IVLDR3',
                              'Final Notice - You Must Submit Documents' => 'IVLDR4' }
-      people = Person.where(:'documents.created_at' => { :$gte => start_date, :$lte => end_date }).to_a
       to_csv("notices_by_dates_#{start_date.strftime('%Y_%m_%d')}_#{end_date.strftime('%Y_%m_%d')}") do |csv|
         csv << ['HBX ID', 'Notice Title', 'Notice Code', 'Date']
-        people.each do |person|
-          documents = person.documents.where(:created_at.gte => start_date,
-                                             :created_at.lte => end_date).to_a
-          documents.each do |document|
-            csv << [person.hbx_id, document.title, title_code_mapping[document.title], document.created_at]
-          end
+        notices(start_date, end_date).each do |notice|
+          csv << [notice.person.hbx_id, notice.title, title_code_mapping[notice.title], notice.created_at]
         end
       end
     end
