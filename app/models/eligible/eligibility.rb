@@ -42,7 +42,7 @@ module Eligible
       state_histories.last
     end
 
-    # Following method is to check if given date is with in 
+    # Following method is to check if given date is with in
     # the eligibility published expired date range
     def eligibility_period_cover?(date)
       if current_state == :initial

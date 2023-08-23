@@ -19,8 +19,6 @@ module BenefitSponsors
 
       # Needed to display valid osse eligible application period date ranges in multi year interface
       def osse_status_by_year
-        calendar_year = TimeKeeper.date_of_record.year
-
         osse_eligibility_years_for_display.each_with_object({}) do |year, data|
           data[year] = {}
           effective_on = effective_on_for_year(year.to_i)
@@ -35,6 +33,7 @@ module BenefitSponsors
         end
       end
 
+      # rubocop:disable Metrics/CyclomaticComplexity
       def update_osse_eligibilities_by_year
         eligibility_result = {}
         args[:osse].each do |year, osse_eligibility|
@@ -44,14 +43,14 @@ module BenefitSponsors
           current_eligibility_status = eligibility&.is_eligible_on?(effective_on)&.to_s || 'false'
           next if current_eligibility_status == osse_eligibility.to_s
 
-          if eligibility&.is_eligible_on?(effective_on) && osse_eligibility.to_s == 'false'
-            effective_on = eligibility.effective_on
-          end
+          effective_on = eligibility.effective_on if eligibility&.is_eligible_on?(effective_on) && osse_eligibility.to_s == 'false'
 
           eligibility_result[year] = store_osse_eligibility(osse_eligibility, effective_on)
         end
         eligibility_result.group_by { |_key, value| value }.transform_values { |items| items.map(&:first) }
       end
+      # rubocop:enable Metrics/CyclomaticComplexity
+
 
       def store_osse_eligibility(osse_eligibility, effective_on)
         result = ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(

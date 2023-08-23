@@ -12,7 +12,7 @@
 
   <%= form_tag(update_osse_eligibilities_insured_families_path(person_id: @service.person.id), method: "put") do %>
     <%= hidden_field_tag 'eligibilities[person_id]', @service.person.id %>
-    <%= submit_tag "Save Changes", class: 'btn btn-primary active pull-left col-12', style: 'background-color: #007bc4'%></br>
+    <%= submit_tag l10n('save_changes'), class: 'btn btn-primary active pull-left col-12', style: 'background-color: #007bc4'%></br>
     <div class='table-responsive col-12 mt-3' style="padding-top: 10px">
       <table style='width: 70%; border-collapse: collapse; border: 0px solid #d5d5d5'>
         <thead style='height: 40px;'>
@@ -33,6 +33,6 @@
         <% end %>
       </table>
     </div></br>
-    <%= submit_tag "Save Changes", class: 'btn btn-primary active pull-left col-12', style: 'background-color: #007bc4' %>
+    <%= submit_tag l10n('save_changes'), class: 'btn btn-primary active pull-left col-12', style: 'background-color: #007bc4' %>
   <% end %>
 </div>
