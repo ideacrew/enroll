@@ -211,7 +211,7 @@ module Operations
               transformed_enrollments = transform_hbx_enrollments(enrollments, options)
               return transformed_enrollments if transformed_enrollments.failure?
 
-              household_data.merge!(hbx_enrollments: transformed_enrollments.value!) 
+              household_data.merge!(hbx_enrollments: transformed_enrollments.value!)
             end
             household_data
           end
