@@ -3,10 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe BenefitSponsorship, :type => :model do
-
-  context "when an Employer is instantiated as the benefit sponsor" do
-  end
-
   context "when an HBX is instantiated as a benefit sponsor" do
     let(:hbx_profile)             { FactoryBot.create(:hbx_profile) }
     let(:service_markets)         { %w[individual] }
@@ -171,4 +167,48 @@ RSpec.describe BenefitSponsorship, :type => :model do
     end
   end
 
+  describe '#create_benefit_coverage_period' do
+    let(:hbx_profile) { FactoryBot.create(:hbx_profile) }
+
+    let(:benefit_sponsorship) do
+      FactoryBot.create(:benefit_sponsorship, hbx_profile: hbx_profile, benefit_coverage_periods: benefit_coverage_periods)
+    end
+    let(:current_year) { TimeKeeper.date_of_record.year }
+    let(:prospective_year) { current_year.next }
+
+    context 'with an existing benefit_coverage_period for the given year' do
+      let(:benefit_coverage_periods) { [FactoryBot.build(:benefit_coverage_period, coverage_year: current_year)] }
+      let!(:renewal_benefit_coverage_period) do
+        FactoryBot.create(:benefit_coverage_period, benefit_sponsorship: benefit_sponsorship, coverage_year: prospective_year)
+      end
+
+      it 'returns the existing benefit_coverage_period' do
+        expect(
+          benefit_sponsorship.create_benefit_coverage_period(prospective_year)
+        ).to eq(renewal_benefit_coverage_period)
+      end
+    end
+
+    context 'without an existing benefit_coverage_period for the given year' do
+      let(:benefit_coverage_periods) { [FactoryBot.build(:benefit_coverage_period, coverage_year: current_year)] }
+
+      it 'returns the newly created benefit_coverage_period' do
+        expect(
+          benefit_sponsorship.create_benefit_coverage_period(prospective_year)
+        ).to eq(
+          benefit_sponsorship.benefit_coverage_periods.by_year(prospective_year).first
+        )
+      end
+    end
+
+    context 'without any benefit_coverage_periods' do
+      let(:benefit_coverage_periods) { [] }
+
+      it 'returns the existing benefit_coverage_period' do
+        expect(
+          benefit_sponsorship.create_benefit_coverage_period(prospective_year)
+        ).to be_a(BenefitCoveragePeriod)
+      end
+    end
+  end
 end
