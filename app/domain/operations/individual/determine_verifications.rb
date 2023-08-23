@@ -55,14 +55,13 @@ module Operations
 
       def add_verification_type_history(consumer_role)
         consumer_role.verification_types.where(:type_name.in => ["Citizenship", "Immigration status", "Social Security Number"]).each do |vt|
-          vt.add_type_history_element(action: "Hub Request", modifier: "System", update_reason: "#{vt.type_name} Requested due to person update for applying coverage")
+          vt.add_type_history_element(action: "Hub Request", modifier: "System", update_reason: "#{vt.type_name} call hub was requested because of a person update for applying coverage")
         end
       end
 
       def trigger_residency(consumer_role)
         vt = consumer_role.verification_types.where(:type_name.in => ::VerificationType::LOCATION_RESIDENCY).first
-        add_verification_type_history(vt)
-        vt.add_type_history_element(action: "Hub Request", modifier: "System", update_reason: "#{vt.type_name} Requested due to person update for applying coverage")
+        vt.add_type_history_element(action: "Hub Request", modifier: "System", update_reason: "#{vt.type_name} call hub was requested because of a person update for applying coverage")
         consumer_role.trigger_residency!
       end
 
