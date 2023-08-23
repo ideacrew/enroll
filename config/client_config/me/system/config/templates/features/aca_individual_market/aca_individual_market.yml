@@ -147,4 +147,10 @@ registry:
             item: 15
           - key: :year_offset
             item: 0
-
+      - key: :create_bcp_on_date_change
+        is_enabled: <%= ENV['CREATE_BCP_ON_DATE_CHANGE_IS_ENABLED'] || false %>
+        settings:
+          - key: :bcp_creation_month
+            item: <%= ENV['BCP_CREATION_MONTH'] || 7 %>
+          - key: :bcp_creation_day
+            item: <%= ENV['BCP_CREATION_DAY'] || 10 %>
