@@ -439,3 +439,6 @@ jobs:
         run: exit 1
       - name: Code Coverage Summary
         uses: irongut/CodeCoverageSummary@v1.3.0
+        with:
+          filename: coverage/coverage.xml
+          badge: true
