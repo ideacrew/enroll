@@ -60,7 +60,7 @@ module Operations
       end
 
       def trigger_residency(consumer_role)
-        vt = consumer_role.verification_types.where(:type_name.in => ::VerificationType::LOCATION_RESIDENCY).first
+        vt = consumer_role.verification_types.where(:type_name => ::VerificationType::LOCATION_RESIDENCY).first
         vt.add_type_history_element(action: "Hub Request", modifier: "System", update_reason: "#{vt.type_name} call hub was requested because of a person update for applying coverage")
         consumer_role.trigger_residency!
       end
