@@ -39,7 +39,7 @@ namespace :cv3_family_failures_report do
       end
     end
 
-    CSV.open(csv_file_path, 'wb') { |csv| csv << %w[family_hbx_id result output] } unless File.exists?(csv_file_path)
+    CSV.open(csv_file_path, 'wb') { |csv| csv << %w[family_hbx_id primary_hbx_id result output] } unless File.exists?(csv_file_path)
     family_ids = families_to_process(list_of_ids_file_path, last_id_file_path, csv_file_path)
 
     total = family_ids&.count
@@ -75,14 +75,15 @@ namespace :cv3_family_failures_report do
 
   def process_family_batch(families, csv)
     families.each do |family|
-      id = family.hbx_assigned_id
+      family_hbx_id = family.hbx_assigned_id
+      primary_hbx_id = family.primary_applicant&.person&.hbx_id
       begin
         result = Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
         if result.failure?
-          csv << [id, 'failure', result.failure]
+          csv << [family_hbx_id, primary_hbx_id, 'failure', result.failure]
         end
       rescue StandardError => e
-        csv << [id, 'error', e.message]
+        csv << [family_hbx_id, primary_hbx_id, 'error', e.message]
       end
     end
   end
