@@ -105,9 +105,13 @@
           <% unless @person.has_active_resident_role? %>
             <div class="col-md-3 col-sm-3 no-pd">
               <div class="form-group form-group-lg">
-                <%= f.text_field :ssn, value: dependent.ssn,class: "home required floatlabel form-control mask-ssn",
-                  pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
-                  oninput: "this.setCustomValidity('')", placeholder: "#{l10n("social_security").to_s.upcase}" %>
+                <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
+                  <%= f.text_field :ssn, value: dependent.ssn,class: "home required floatlabel form-control mask-ssn",
+                    pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
+                    oninput: "this.setCustomValidity('')", placeholder: "#{l10n("social_security").to_s.upcase}" %>
+                <% else %>
+                  <%= f.text_field :ssn, value: dependent.ssn,class: "home required floatlabel form-control mask-ssn", placeholder: "#{l10n("social_security").to_s.upcase}" %>
+                <% end %>
               </div>
             </div>
 
