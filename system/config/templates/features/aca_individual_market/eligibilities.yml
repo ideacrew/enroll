@@ -93,7 +93,7 @@ registry:
           - key: :evidence_ref
             item: 'gid://enroll_app/FinancialAssitance::Application'
       - key: :local_mec_evidence
-        is_enabled: <%= ENV['LOCAL_MEC_EVIDENCE_IS_ENABLED'] || false %>
+        is_enabled: true
         settings:
           - key: :subject_ref
             item: 'gid://enroll_app/Family::FamilyMember'
@@ -128,7 +128,7 @@ registry:
           - key: :evidence_ref
             item: 'gid://enroll_app/Person'
       - key: :residency
-        is_enabled: true
+        is_enabled: false
         settings:
           - key: :subject_ref
             item: 'gid://enroll_app/Family::FamilyMember'
@@ -176,7 +176,7 @@ registry:
         is_enabled: true
         settings:
           - key: :offset_prior_to_due_date
-            item: 70
+            item: 65
           - key: :units
             item: :days
           - key: :event_name
@@ -185,7 +185,7 @@ registry:
         is_enabled: true
         settings:
           - key: :offset_prior_to_due_date
-            item: 45
+            item: 35
           - key: :units
             item: :days
           - key: :event_name
@@ -194,7 +194,7 @@ registry:
         is_enabled: true
         settings:
           - key: :offset_prior_to_due_date
-            item: 30
+            item: 20
           - key: :units
             item: :days
           - key: :event_name

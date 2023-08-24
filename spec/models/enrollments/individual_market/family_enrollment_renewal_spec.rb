@@ -48,7 +48,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       FactoryBot.create(:family_member, person: child, family: family)
     end
 
-    let(:primary_dob){ current_date.next_month - 57.years }
+    let(:primary_dob) { current_date.next_month - 57.years }
     let(:spouse_dob) { current_date.next_month - 55.years }
     let(:child1_dob) { current_date.next_month - 26.years }
     let(:child2_dob) { current_date.next_month - 20.years }

@@ -19,3 +19,5 @@ registry:
         is_enabled: <%= ENV['RENEWAL_ELIGIBILITY_VERIFICATION_USING_RRV_IS_ENABLED'] || true %>
       - key: :validate_and_record_publish_errors
         is_enabled: <%= ENV['VALIDATE_AND_RECORD_PUBLISH_ERRORS_IS_ENABLED'] || false %>
+      - key: :validate_income_evidence_and_record_publish_errors
+        is_enabled: <%= ENV['VALIDATE_INCOME_EVIDENCE_AND_RECORD_PUBLISH_ERRORS_IS_ENABLED'] || false %>

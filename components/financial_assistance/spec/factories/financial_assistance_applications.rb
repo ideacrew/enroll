@@ -11,6 +11,11 @@ FactoryBot.define do
     aasm_state {"determined"}
     parent_living_out_of_home_terms { false }
 
+    trait :with_family_and_effective_date do
+      family_id { 1 }
+      effective_date { Date.today }
+    end
+
     trait :with_applicants do
       applicants do
         [
