@@ -136,6 +136,10 @@ RSpec.describe Operations::Individual::DetermineVerifications, dbclean: :after_e
     end
 
     context '#invalid ssn ' do
+      before :all do
+        DatabaseCleaner.clean
+      end
+
       context 'when validate_and_record_publish_errors feature is enabled' do
         let!(:person) {FactoryBot.create(:person, ssn: '999001234')}
         let!(:consumer_role) do
@@ -173,6 +177,7 @@ RSpec.describe Operations::Individual::DetermineVerifications, dbclean: :after_e
         end
 
         it 'should set verification_type to pending' do
+          consumer_role.reload
           types = consumer_role.verification_types
           expect(types.ssn_type.first.validation_status).to eq 'negative_response_received'
           expect(types.citizenship_type.first.validation_status).to eq 'pending'
