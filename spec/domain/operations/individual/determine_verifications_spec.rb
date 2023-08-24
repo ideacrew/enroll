@@ -122,8 +122,10 @@ RSpec.describe Operations::Individual::DetermineVerifications, dbclean: :after_e
 
       it 'should record history in ssn_type for requested hub calls' do
         types = consumer_role.verification_types
-        expect(types.ssn_type.first.type_history_elements.count).to eq 1
-        expect(types.citizenship_type.first.type_history_elements.count).to eq 1
+        ssn_type_histories = types.ssn_type.first.type_history_elements
+        ssn_type_histories.map(&:action).should include('Hub Request')
+        citizenship_type_histories = types.citizenship_type.first.type_history_elements
+        citizenship_type_histories.map(&:action).should include('Hub Request')
       end
 
       it 'should set verification_type to pending' do
@@ -148,6 +150,7 @@ RSpec.describe Operations::Individual::DetermineVerifications, dbclean: :after_e
           allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:ssa_h3).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:vlp_h92).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_errors).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:trigger_verifications_before_enrollment_purchase).and_return(true)
           allow(ConsumerRole).to receive(:find).and_return(consumer_role)
@@ -190,6 +193,7 @@ RSpec.describe Operations::Individual::DetermineVerifications, dbclean: :after_e
           allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:ssa_h3).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:vlp_h92).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_errors).and_return(false)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:trigger_verifications_before_enrollment_purchase).and_return(true)
           allow(ConsumerRole).to receive(:find).and_return(consumer_role)
