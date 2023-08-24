@@ -5,7 +5,9 @@ require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_site_spec
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application"
 
-RSpec.describe Operations::Eligible::MigrateBenefitSponsorCatalog, type: :model, dbclean: :around_each do
+RSpec.describe Operations::Eligible::MigrateBenefitSponsorCatalog,
+               type: :model,
+               dbclean: :around_each do
   describe "benefit sponsor catalog migrations" do
     include_context "setup benefit market with market catalogs and product packages"
 
@@ -81,11 +83,11 @@ RSpec.describe Operations::Eligible::MigrateBenefitSponsorCatalog, type: :model,
         sponsored_benefit = benefit_package.health_sponsored_benefit
         sponsored_benefit.reference_product_id =
           sponsored_benefit
-          .product_package
-          .products
-          .detect do |product|
-            product.metal_level_kind.to_s == reference_product_metal.to_s
-          end
+            .product_package
+            .products
+            .detect do |product|
+              product.metal_level_kind.to_s == reference_product_metal.to_s
+            end
             &.id
       end
       application.save
@@ -126,18 +128,17 @@ RSpec.describe Operations::Eligible::MigrateBenefitSponsorCatalog, type: :model,
           result =
             subject.call(sponsorship_id: benefit_sponsorship.to_global_id)
 
-          result.success.each do |catalog|
-            packages =
-              catalog.product_packages.select do |pk|
-                pk.product_kind == :health
-              end
-            expect(packages.size).to eq 1
-            product_package = packages.first
-            expect(product_package.package_kind).to eq :metal_level
-            expect(
-              product_package.products.map(&:metal_level_kind)
-            ).not_to include(:bronze)
-          end
+          catalog = application.benefit_sponsor_catalog.reload
+          packages =
+            catalog.product_packages.select { |pk| pk.product_kind == :health }
+          expect(packages.size).to eq 1
+          product_package = packages.first
+          expect(product_package.package_kind).to eq :metal_level
+          expect(
+            product_package.products.map(&:metal_level_kind)
+          ).not_to include(:bronze)
+
+          expect(catalog.eligibilities).to be_present
         end
       end
     end
