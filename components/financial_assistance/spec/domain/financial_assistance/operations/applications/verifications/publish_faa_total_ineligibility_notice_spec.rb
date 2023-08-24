@@ -2,13 +2,15 @@
 
 require 'rails_helper'
 require "#{FinancialAssistance::Engine.root}/spec/dummy/app/domain/operations/individual/open_enrollment_start_on"
+require "#{FinancialAssistance::Engine.root}/spec/shared_examples/medicaid_gateway/test_case_d_response"
 
 RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::PublishFaaTotalIneligibilityNotice, dbclean: :after_each do
   include Dry::Monads[:result, :do]
+  include_context 'cms ME simple_scenarios test_case_d'
 
   let!(:person) { FactoryBot.create(:person, :with_ssn, hbx_id: "732020")}
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'determined', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
+  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'determined', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year, eligibility_response_payload: response_payload.to_json) }
   let!(:applicant) do
     FactoryBot.create(:applicant,
                       first_name: person.first_name,
