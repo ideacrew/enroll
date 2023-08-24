@@ -138,8 +138,6 @@ module Operations
       def update_application_catalog(application)
         sponsor_catalog = application.benefit_sponsor_catalog
 
-        db = Mongoid::Clients.default
-        collection = db[:benefit_markets_benefit_sponsor_catalogs]
         catalog =
           collection.find({ _id: BSON.ObjectId(sponsor_catalog.id.to_s) }).first
 
@@ -177,6 +175,16 @@ module Operations
 
       def applications_for(benefit_sponsorship)
         benefit_sponsorship.benefit_applications.approved_and_terminated
+      end
+
+      def db
+        return @db if defined?(@db)
+        @db = Mongoid::Clients.default
+      end
+
+      def collection
+        return @collection if defined?(@collection)
+        @collection = db[:benefit_markets_benefit_sponsor_catalogs]
       end
 
       def calendar_years
