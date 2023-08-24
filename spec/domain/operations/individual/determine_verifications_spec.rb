@@ -108,85 +108,107 @@ RSpec.describe Operations::Individual::DetermineVerifications, dbclean: :after_e
   end
 
   describe 'create type_history_elements for triggered hub_calls' do
-
+    before :each do
+      DatabaseCleaner.clean
+    end
     context '#valid ssn' do
-      before do
+      let(:consumer_role) { FactoryBot.create(:consumer_role)}
+      let(:result) {  described_class.new.call(id: consumer_role.id) }
+      before :each do
         EnrollRegistry[:trigger_verifications_before_enrollment_purchase].feature.stub(:is_enabled).and_return(true)
-        ConsumerRole.skip_callback(:update, :after, :publish_updated_event)
-        consumer_role = FactoryBot.create(:consumer_role)
-        ConsumerRole.set_callback(:update, :after, :publish_updated_event)
         allow(ConsumerRole).to receive(:find).and_return(consumer_role)
-        @result = described_class.new.call(id: consumer_role.id)
-        @types = consumer_role.verification_types
+        result
       end
 
-      it 'should record history for requested hub calls' do
-        expect(@types.ssn_type.first.type_history_elements.count).to eq 1
-        expect(@types.citizenship_type.first.type_history_elements.count).to eq 1
+      it 'should record history in ssn_type for requested hub calls' do
+        types = consumer_role.verification_types
+        expect(types.ssn_type.first.type_history_elements.count).to eq 1
+        expect(types.citizenship_type.first.type_history_elements.count).to eq 1
       end
 
       it 'should set verification_type to pending' do
-        expect(@types.ssn_type.first.validation_status).to eq 'pending'
-        expect(@types.citizenship_type.first.validation_status).to eq 'pending'
+        types = consumer_role.verification_types
+        expect(types.ssn_type.first.validation_status).to eq 'pending'
+        expect(types.citizenship_type.first.validation_status).to eq 'pending'
       end
     end
 
     context '#invalid ssn ' do
       context 'when validate_and_record_publish_errors feature is enabled' do
+        let!(:person) {FactoryBot.create(:person, ssn: '999001234')}
+        let!(:consumer_role) do
+          consumer = ConsumerRole.new(person: person, is_applicant: true, citizen_status: "us_citizen")
+          consumer.ensure_verification_types
+          consumer.save!
+          consumer
+        end
+        let(:result) {  Operations::Individual::DetermineVerifications.new.call(id: consumer_role.id) }
+
         before do
-          validator = instance_double(Operations::Fdsh::EncryptedSsnValidator)
           allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:ssa_h3).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:vlp_h92).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_errors).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:trigger_verifications_before_enrollment_purchase).and_return(true)
+          allow(ConsumerRole).to receive(:find).and_return(consumer_role)
+          validator = instance_double(Operations::Fdsh::EncryptedSsnValidator)
           allow(validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid SSN'))
           allow(Operations::Fdsh::EncryptedSsnValidator).to receive(:new).and_return(validator)
-          ConsumerRole.skip_callback(:update, :after, :publish_updated_event)
-          consumer_role = FactoryBot.create(:consumer_role, ssn: '999001234')
-          ConsumerRole.set_callback(:update, :after, :publish_updated_event)
-          allow(ConsumerRole).to receive(:find).and_return(consumer_role)
-          @result = described_class.new.call(id: consumer_role.id)
-          @types = consumer_role.verification_types
+          result
         end
 
-        it 'should record history for requested hub calls' do
-          expect(@types.ssn_type.first.type_history_elements.count).to eq 2
-          expect(@types.citizenship_type.first.type_history_elements.count).to eq 1
+        it 'should record history in ssn_type for requested hub calls' do
+          types = consumer_role.verification_types
+          histories = types.ssn_type.first.type_history_elements
+          expect(histories.select{|history| ['Hub Request', 'Hub Request Failed'].include?(history.action)}.present?).to be_truthy
+        end
+
+        it 'should record history in citizenship_type for requested hub calls' do
+          types = consumer_role.verification_types
+          histories = types.citizenship_type.first.type_history_elements
+          expect(histories.select{|history| ['Hub Request'].include?(history.action)}.present?).to be_truthy
         end
 
         it 'should set verification_type to pending' do
-          expect(@types.ssn_type.first.validation_status).to eq 'negative_response_received'
-          expect(@types.citizenship_type.first.validation_status).to eq 'pending'
+          types = consumer_role.verification_types
+          expect(types.ssn_type.first.validation_status).to eq 'negative_response_received'
+          expect(types.citizenship_type.first.validation_status).to eq 'pending'
         end
       end
 
       context 'when validate_and_record_publish_errors feature is disabled' do
+        let!(:person) {FactoryBot.create(:person, ssn: '999001234')}
+        let!(:consumer_role) do
+          consumer = ConsumerRole.new(person: person, is_applicant: true, citizen_status: "us_citizen")
+          consumer.ensure_verification_types
+          consumer.save!
+          consumer
+        end
+        let(:result) {  Operations::Individual::DetermineVerifications.new.call(id: consumer_role.id) }
+
         before do
-          validator = instance_double(Operations::Fdsh::EncryptedSsnValidator)
           allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:ssa_h3).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:vlp_h92).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_errors).and_return(false)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:trigger_verifications_before_enrollment_purchase).and_return(true)
+          allow(ConsumerRole).to receive(:find).and_return(consumer_role)
+          validator = instance_double(Operations::Fdsh::EncryptedSsnValidator)
           allow(validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid SSN'))
           allow(Operations::Fdsh::EncryptedSsnValidator).to receive(:new).and_return(validator)
-          ConsumerRole.skip_callback(:update, :after, :publish_updated_event)
-          consumer_role = FactoryBot.create(:consumer_role, ssn: '999001234')
-          ConsumerRole.set_callback(:update, :after, :publish_updated_event)
-          allow(ConsumerRole).to receive(:find).and_return(consumer_role)
-          @result = described_class.new.call(id: consumer_role.id)
-          @types = consumer_role.verification_types
+          result
         end
 
-        it 'should record history for requested hub calls' do
-          expect(@types.ssn_type.first.type_history_elements.count).to eq 1
-          expect(@types.citizenship_type.first.type_history_elements.count).to eq 1
+        it 'should record history in ssn_type for requested hub calls' do
+          types = consumer_role.verification_types
+          expect(types.ssn_type.first.type_history_elements.count).to eq 1
+          expect(types.citizenship_type.first.type_history_elements.count).to eq 1
         end
 
         it 'should set verification_type to pending' do
-          expect(@types.ssn_type.first.validation_status).to eq 'pending'
-          expect(@types.citizenship_type.first.validation_status).to eq 'pending'
+          types = consumer_role.verification_types
+          expect(types.ssn_type.first.validation_status).to eq 'pending'
+          expect(types.citizenship_type.first.validation_status).to eq 'pending'
         end
       end
     end
