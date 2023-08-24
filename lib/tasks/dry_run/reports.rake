@@ -136,7 +136,7 @@ namespace :dry_run do
       family_ids = family_ids(year)
 
       family_ids.map do |family_id|
-        ::FinancialAssistance::Application.by_year(year.to_i.pred).where(family_id: family_id).first
+        ::FinancialAssistance::Application.by_year(year.to_i.pred).where(family_id: family_id).determined.created_asc.last
       end.compact
     end
 
