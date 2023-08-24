@@ -1785,6 +1785,29 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     # end
   end
 
+  describe 'notify_totally_ineligible_members' do
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:totally_ineligible_notice).and_return(true)
+
+      application.active_applicants.each{|applicant| applicant.update_attributes!(is_ia_eligible: true) }
+      application.send(:create_evidences)
+      application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'renewal_draft', to_state: 'submitted')
+      application.save!
+    end
+
+    it "should not notify members when no applicants are totally ineligible" do
+      result = application.notify_totally_ineligible_members
+      expect(result).to eq nil
+    end
+
+    it "should notify members when any applicants are totally_ineligible" do
+      application.active_applicants.first.update_attributes!(is_totally_ineligible: true)
+
+      result = application.notify_totally_ineligible_members
+      expect(result).to eq true
+    end
+  end
+
   describe 'apply_aggregate_to_enrollment' do
     before do
       allow(::Operations::Individual::OnNewDetermination).to receive_message_chain(:new, :call).and_return(Dry::Monads::Result::Failure)

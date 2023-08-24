@@ -27,6 +27,7 @@ module Eligible
 
     scope :by_state, ->(state) { where(to_state: state.to_sym) }
     scope :non_initial, -> { where(:to_state.ne => :initial) }
+    scope :eligible, -> { where(:is_eligible => true) }
 
     def timestamps=(timestamps)
       self.transition_at = timestamps[:modified_at]

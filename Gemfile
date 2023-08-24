@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.5.9'
+ruby '2.6.3'
 gem 'rails', '~> 5.2.4.3'
 gem 'sidekiq'
 gem 'globalid'
@@ -173,8 +173,8 @@ group :test do
   gem 'simplecov',                    '~> 0.14',  :require => false
   gem 'test-prof'
   gem 'warden',                       '~> 1.2.7'
-  gem 'watir',                        '~> 6.10.3'
-  gem 'webdrivers', '~> 3.0'
+  gem 'watir',                        '~> 6.18.0'
+  gem 'webdrivers', '~> 5.3.1'
   gem 'webmock',                      '~> 3.0.1'
 end
 
