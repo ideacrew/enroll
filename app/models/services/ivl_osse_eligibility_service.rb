@@ -42,7 +42,6 @@ module Services
         data
       end
     end
-    # rubocop:enable Metrics/CyclomaticComplexity
 
     def update_osse_eligibilities_by_year
       eligibility_result = {}
@@ -54,15 +53,15 @@ module Services
         current_eligibility_status = eligibility&.is_eligible_on?(effective_on)&.to_s || 'false'
         next if current_eligibility_status == osse_eligibility.to_s
 
-        if eligibility&.is_eligible_on?(effective_on) && osse_eligibility.to_s == 'false'
-          effective_on = eligibility.effective_on
-        end
+        effective_on = eligibility.effective_on if eligibility&.is_eligible_on?(effective_on) && (osse_eligibility.to_s == 'false')
 
         eligibility_result[year] = store_osse_eligibility(role, osse_eligibility, effective_on)
       end
 
       eligibility_result.group_by { |_key, value| value }.transform_values { |items| items.map(&:first) }
     end
+    # rubocop:enable Metrics/CyclomaticComplexity
+
 
     def store_osse_eligibility(role, osse_eligibility, effective_on)
       result = ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new.call(

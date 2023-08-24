@@ -192,8 +192,8 @@ class Insured::FamiliesController < FamiliesController
     @service = ::Services::IvlOsseEligibilityService.new(args)
     result = @service.update_osse_eligibilities_by_year
 
-    flash[:notice] = "Sucessfully updated #{@service.person.full_name}'s OSSE eligibility for years #{result['Success'].join(', ')}" if result["Success"]
-    flash[:error] = "Failed to updated #{@service.person.full_name}'s OSSE eligibility for years #{result['Failure'].join(', ')}" if result["Failure"]
+    flash[:notice] = "Sucessfully updated #{@service.person.full_name}'s HC4CC eligibility for years #{result['Success'].join(', ')}" if result["Success"]
+    flash[:error] = "Failed to updated #{@service.person.full_name}'s HC4CC eligibility for years #{result['Failure'].join(', ')}" if result["Failure"]
 
     redirect_to(healthcare_for_childcare_program_form_insured_families_path(person_id: @service.person.id))
   end

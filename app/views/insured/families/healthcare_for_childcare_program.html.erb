@@ -11,10 +11,10 @@
         <h4><strong><%= person.full_name.titleize %></strong></h4>
         <div class="row no-buffer vertically-aligned-row form-row" style="width: 100%; border: 1px solid #ddd; border-top: none; margin-top: 15px; padding: 3px; background-color: #fff;">
           <div class="col-md-9">
-            <%= "OSSE Subsidies |" %><%= current_osse_status_for_role(form.role) %>
+            <%= l10n('hc4cc_subsidy_with_pipe') %><%= current_osse_status_for_role(form.role) %>
           </div>
           <div class="col-md-3">
-            <%= link_to 'Select Eligibility Year(s)', healthcare_for_childcare_program_form_insured_families_path(person_id: person.id), id: "check_osse_eligibilities", class: 'btn btn-primary active', style: 'background-color: #007bc4' %>
+            <%= link_to l10n('select_eligibility_years'), healthcare_for_childcare_program_form_insured_families_path(person_id: person.id), id: "check_osse_eligibilities", class: 'btn btn-primary active', style: 'background-color: #007bc4' %>
           </div>
         </div>
       </div>
