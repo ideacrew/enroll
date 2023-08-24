@@ -148,7 +148,7 @@ class TimeKeeper
 
     event.success.publish
   rescue StandardError => e
-    Rails.logger.error { "Couldn't trigger benefit application date change events due to #{e.inspect}" }
+    Rails.logger.error { "Couldn't trigger system date change event due to #{e.inspect}" }
   end
 
   def send_date_advanced_event
