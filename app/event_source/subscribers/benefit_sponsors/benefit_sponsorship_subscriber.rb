@@ -27,7 +27,7 @@ module Subscribers
         if result.success?
           subscriber_logger.info "OSSE renewed; FEIN - #{benefit_sponsorship.fein}"
         else
-          subscriber_logger.info "OSSE renewal failed; FEIN - #{benefit_sponsorship.fein}; Error: #{result.failure}"
+          subscriber_logger.error "OSSE renewal failed; FEIN - #{benefit_sponsorship.fein}; Error: #{result.failure}"
         end
 
         subscriber_logger.info "on_benefit_sponsorship_osse_renewal, FEIN - #{benefit_sponsorship.fein}"
@@ -35,7 +35,7 @@ module Subscribers
 
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e
-        subscriber_logger.info "BenefitSponsorshipSubscriber, FEIN - #{benefit_sponsorship.fein}, error message: #{e.message}, backtrace: #{e.backtrace}"
+        subscriber_logger.error "BenefitSponsorshipSubscriber, FEIN - #{benefit_sponsorship.fein}, error message: #{e.message}, backtrace: #{e.backtrace}"
         ack(delivery_info.delivery_tag)
       end
 
