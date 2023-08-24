@@ -149,6 +149,8 @@ RSpec.describe Operations::Individual::DetermineVerifications, dbclean: :after_e
           consumer
         end
         let(:result) {  Operations::Individual::DetermineVerifications.new.call(id: consumer_role.id) }
+        let(:ssa_validator) { instance_double(Operations::Fdsh::Ssa::H3::RequestSsaVerification) }
+        let(:vlp_validator) { instance_double(Operations::Fdsh::Vlp::H92::RequestInitialVerification) }
 
         before do
           allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
@@ -157,10 +159,11 @@ RSpec.describe Operations::Individual::DetermineVerifications, dbclean: :after_e
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_errors).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:trigger_verifications_before_enrollment_purchase).and_return(true)
+          allow(ssa_validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid payload'))
+          allow(Operations::Fdsh::Ssa::H3::RequestSsaVerification).to receive(:new).and_return(ssa_validator)
+          allow(vlp_validator).to receive(:call).and_return(Dry::Monads::Success())
+          allow(Operations::Fdsh::Vlp::H92::RequestInitialVerification).to receive(:new).and_return(vlp_validator)
           allow(ConsumerRole).to receive(:find).and_return(consumer_role)
-          validator = instance_double(Operations::Fdsh::EncryptedSsnValidator)
-          allow(validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid SSN'))
-          allow(Operations::Fdsh::EncryptedSsnValidator).to receive(:new).and_return(validator)
           result
         end
 
@@ -193,6 +196,8 @@ RSpec.describe Operations::Individual::DetermineVerifications, dbclean: :after_e
           consumer
         end
         let(:result) {  Operations::Individual::DetermineVerifications.new.call(id: consumer_role.id) }
+        let(:ssa_validator) { instance_double(Operations::Fdsh::Ssa::H3::RequestSsaVerification) }
+        let(:vlp_validator) { instance_double(Operations::Fdsh::Vlp::H92::RequestInitialVerification) }
 
         before do
           allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
@@ -202,9 +207,10 @@ RSpec.describe Operations::Individual::DetermineVerifications, dbclean: :after_e
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_errors).and_return(false)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:trigger_verifications_before_enrollment_purchase).and_return(true)
           allow(ConsumerRole).to receive(:find).and_return(consumer_role)
-          validator = instance_double(Operations::Fdsh::EncryptedSsnValidator)
-          allow(validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid SSN'))
-          allow(Operations::Fdsh::EncryptedSsnValidator).to receive(:new).and_return(validator)
+          allow(ssa_validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid payload'))
+          allow(Operations::Fdsh::Ssa::H3::RequestSsaVerification).to receive(:new).and_return(ssa_validator)
+          allow(vlp_validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid payload'))
+          allow(Operations::Fdsh::Vlp::H92::RequestInitialVerification).to receive(:new).and_return(vlp_validator)
           result
         end
 
