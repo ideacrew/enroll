@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Enrollments::IndividualMarket::OpenEnrollmentBegin
+  include EventSource::Command
   # Active IVL hbx enrollments
   # without a termination date in the current year
   # kind 'individual'
@@ -22,9 +23,45 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
 
   def process_renewals
     @logger.info "Started process at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
-    process_ivl_osse_renewals if renewal_bcp.eligibility_for("aca_ivl_osse_eligibility_#{renewal_effective_on.year}".to_sym, renewal_effective_on)
-    process_qhp_renewals
-    @logger.info "Process ended at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
+    if ::EnrollRegistry.feature_enabled?(:ivl_enrollment_renewal_async)
+      process_async_renewals
+    else
+      process_ivl_osse_renewals if renewal_bcp.eligibility_for("aca_ivl_osse_eligibility_#{renewal_effective_on.year}".to_sym, renewal_effective_on)
+      process_qhp_renewals
+      @logger.info "Process ended at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
+    end
+  end
+
+  def process_async_renewals
+    records.no_timeout.each do |record|
+      trigger_event(record.to_global_id.uri)
+    rescue StandardError => e
+      @logger.info "ERROR: Failed Renewal for family hbx_id: #{record.try(:hbx_id) || record.try(:hbx_assigned_id)}; Exception: #{e.inspect}"
+    end
+  end
+
+  def records
+    if renewal_bcp.eligibility_for("aca_ivl_osse_eligibility_#{renewal_effective_on.year}".to_sym, renewal_effective_on)
+      Person.where({
+                     '$or' => [
+                        { 'consumer_role' => { '$exists' => true } },
+                        { 'resident_role' => { '$exists' => true } }
+                     ]
+                   })
+    else
+      query = kollection(HbxEnrollment::COVERAGE_KINDS, current_bcp)
+      family_ids = HbxEnrollment.where(query).pluck(:family_id).uniq
+      Family.where(:id.in => family_ids)
+    end
+  end
+
+  def trigger_event(gid)
+    event = event('events.individual.open_enrollment.begin', attributes: { gid: gid })
+    if event.success?
+      event.success.publish
+    else
+      @logger.info "ERROR: Event trigger failed: person hbx_id: #{person.hbx_id}"
+    end
   end
 
   def kollection(kind, coverage_period)
@@ -108,7 +145,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     ConsumerRole.set_callback(:validation, :before, :ensure_verification_types)
     ConsumerRole.set_callback(:validation, :before, :ensure_validation_states)
     @logger.info "Setting callbacks"
-    @osse_renewal_failed_families.flatten!.uniq!
+    @osse_renewal_failed_families.flatten!&.uniq!
   end
 
   def process_qhp_renewals
