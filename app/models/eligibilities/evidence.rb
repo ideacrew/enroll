@@ -66,12 +66,16 @@ module Eligibilities
 
     def request_determination(action_name, update_reason, updated_by = nil)
       application = self.evidenceable.application
-      payload = construct_payload(application, action_name)
-      return false if payload.failure?
-      payload = payload.value!
+      payload_2 = construct_payload(application)
+      payload = Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application, :income_evidence)
+
+      # {:family_reference=>{:hbx_id=>"169289092467539"}, :assistance_year=>2023, :aptc_effective_date=>Sun, 01 Jan 2023 00:00:00 +0000, :years_to_renew=>nil, :renewal_consent_through_year=>nil, :is_ridp_verified=>true, :is_renewal_authorized=>true, :applicants=>[{:name=>{:first_name=>"John", :middle_name=>nil, :last_name=>"Smith1", :name_sfx=>nil, :name_pfx=>nil}, :identifying_information=>{:has_ssn=>true, :encrypted_ssn=>"Te5Utx5cnO5OhFMjvtYi+IYKvPwBLMBPlQ==\n"}, :demographic=>{:gender=>"Male", :dob=>Tue, 04 Apr 1972, :ethnicity=>[], :race=>nil, :is_veteran_or_active_military=>true, :is_vets_spouse_or_child=>false}, :attestation=>{:is_incarcerated=>false, :is_self_attested_disabled=>false, :is_self_attested_blind=>false, :is_self_attested_long_term_care=>false}, :is_primary_applicant=>true, :native_american_information=>{:indian_tribe_member=>nil, :tribal_name=>nil, :tribal_state=>nil}, :citizenship_immigration_status_information=>{:citizen_status=>"us_citizen", :is_lawful_presence_self_attested=>false, :is_resident_post_092296=>nil}, :is_consumer_role=>false, :is_resident_role=>false, :is_applying_coverage=>true, :five_year_bar_applies=>false, :five_year_bar_met=>false, :qualified_non_citizen=>false, :is_consent_applicant=>false, :vlp_document=>nil, :family_member_reference=>{:family_member_hbx_id=>"100095", :first_name=>"John", :last_name=>"Smith1", :person_hbx_id=>"100095", :is_primary_family_member=>true}, :person_hbx_id=>"100095", :is_required_to_file_taxes=>true, :is_filing_as_head_of_household=>true, :is_joint_tax_filing=>false, :is_claimed_as_tax_dependent=>false, :claimed_as_tax_dependent_by=>nil, :tax_filer_kind=>"tax_filer", :student=>{:is_student=>true, :student_kind=>:full_time, :student_school_kind=>:graduate_school, :student_status_end_on=>Thu, 31 Aug 2023}, :is_refugee=>false, :is_trafficking_victim=>false, :foster_care=>{:is_former_foster_care=>false, :age_left_foster_care=>0, :foster_care_us_state=>nil, :had_medicaid_during_foster_care=>false}, :pregnancy_information=>{:is_pregnant=>false, :is_enrolled_on_medicaid=>false, :is_post_partum_period=>false, :expected_children_count=>0, :pregnancy_due_on=>nil, :pregnancy_end_on=>nil}, :is_primary_caregiver=>true, :is_subject_to_five_year_bar=>false, :is_five_year_bar_met=>false, :is_forty_quarters=>false, :is_ssn_applied=>false, :non_ssn_apply_reason=>nil, :moved_on_or_after_welfare_reformed_law=>false, :is_currently_enrolled_in_health_plan=>false, :has_daily_living_help=>false, :need_help_paying_bills=>false, :has_job_income=>false, :has_self_employment_income=>false, :has_unemployment_income=>false, :has_other_income=>false, :has_deductions=>false, :has_enrolled_health_coverage=>false, :has_eligible_health_coverage=>false, :job_coverage_ended_in_past_3_months=>false, :job_coverage_end_date=>nil, :medicaid_and_chip=>{:not_eligible_in_last_90_days=>false, :denied_on=>nil, :ended_as_change_in_eligibility=>false, :hh_income_or_size_changed=>false, :medicaid_or_chip_coverage_end_date=>nil, :ineligible_due_to_immigration_in_last_5_years=>false, :immigration_status_changed_since_ineligibility=>false}, :other_health_service=>{:has_received=>false, :is_eligible=>false}, :addresses=>[], :emails=>[], :phones=>[], :incomes=>[], :benefits=>[], :deductions=>[], :is_medicare_eligible=>false, :is_self_attested_long_term_care=>false, :has_insurance=>false, :has_state_health_benefit=>false, :had_prior_insurance=>false, :prior_insurance_end_date=>nil, :age_of_applicant=>51, :hours_worked_per_week=>0, :is_temporarily_out_of_state=>false, :is_claimed_as_dependent_by_non_applicant=>false, :benchmark_premium=>{:health_only_lcsp_premiums=>[{:cost=>100.0, :member_identifier=>"100095", :monthly_premium=>100.0}], :health_only_slcsp_premiums=>[{:cost=>200.0, :member_identifier=>"100095", :monthly_premium=>200.0}]}, :is_homeless=>false, :mitc_income=>{:amount=>0, :taxable_interest=>0, :tax_exempt_interest=>0, :taxable_refunds=>0, :alimony=>0, :capital_gain_or_loss=>0, :pensions_and_annuities_taxable_amount=>0, :farm_income_or_loss=>0, :unemployment_compensation=>0, :other_income=>0, :magi_deductions=>0, :adjusted_gross_income=>10078.9, :deductible_part_of_self_employment_tax=>0, :ira_deduction=>0, :student_loan_interest_deduction=>0, :tution_and_fees=>0, :other_magi_eligible_income=>0}, :income_evidence=>{:key=>:income, :title=>"Income", :aasm_state=>"negative_response_received", :description=>nil, :received_at=>Thu, 24 Aug 2023 15:28:45 +0000, :is_satisfied=>false, :verification_outstanding=>true, :update_reason=>nil, :due_on=>Thu, 24 Aug 2023, :external_service=>nil, :updated_by=>nil, :verification_histories=>[], :request_results=>[]}, :esi_evidence=>nil, :non_esi_evidence=>nil, :local_mec_evidence=>nil, :mitc_relationships=>[], :mitc_is_required_to_file_taxes=>true, :mitc_state_resident=>false}], :relationships=>[], :tax_households=>[{:hbx_id=>"10000", :max_aptc=>#<Money fractional:72000 currency:USD>, :yearly_expected_contribution=>#<Money fractional:0 currency:USD>, :effective_on=>Sun, 01 Jan 2023, :determined_on=>Thu, 24 Aug 2023, :is_insurance_assistance_eligible=>"UnDetermined", :annual_tax_household_income=>0.0, :tax_household_members=>[]}], :us_state=>"ME", :hbx_id=>"830293", :oe_start_on=>Sun, 01 Jan 2023, :submitted_at=>Sat, 24 Jun 2023 15:28:44 +0000, :notice_options=>{:send_eligibility_notices=>true, :send_open_enrollment_notices=>false, :paper_notification=>true}, :mitc_households=>[{:household_id=>"1", :people=>[{:person_id=>"100095"}]}], :mitc_tax_returns=>[{:filers=>[], :dependents=>[]}]}
+
+      # return hub_call_negative_response_received(application) if payload.failure? && admin_hub_call_payload_generation_failure_conditions_met?(application)
       headers = self.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: application.id }
 
       request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: headers)
+      binding.irb
       return false unless request_event.success?
       response = request_event.value!.publish
 
@@ -88,6 +92,7 @@ module Eligibilities
       self.verification_histories.build(action: action, update_reason: update_reason, updated_by: updated_by)
     end
 
+<<<<<<< HEAD
     def construct_payload(application, action_name = "")
       cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
       if cv3_application.failure?
@@ -101,6 +106,23 @@ module Eligibilities
       add_verification_history(action_name, "Failed to validate application", "system") if action_name.present?
       self.save
       application
+=======
+    def construct_payload(application)
+      cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application).value!
+      # AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application).value!
+    end
+
+    def admin_hub_call_payload_generation_failure_conditions_met?(application)
+      # Relation to income_evidences?
+
+      # Add var to FinancialAssistanceRegistry
+      outstanding_csr_codes = ['csr_02', 'csr_04', 'csr_05', 'csr_06']
+      application.eligibility_determinations.any? { |ed| ed.max_aptc > 0 || valid_csr_codes.include?(ed.csr_eligibility_kind) }
+    end
+
+    def hub_call_negative_response_received(application)
+      binding.irb
+>>>>>>> 47bd7fe72b (Changes to eli rules)
     end
 
     def extend_due_on(period = 30.days, updated_by = nil)
