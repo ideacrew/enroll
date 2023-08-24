@@ -141,11 +141,13 @@ namespace :dry_run do
     end
 
     def renewal_eligible_applications(year)
-      determined_applications(year)
+      determined_applications(year).map do |app|
+        app if app.eligible_for_renewal?
+      end.compact
     end
 
     def renewal_eligible_family_ids(year)
-      determined_family_ids(year)
+      renewal_eligible_applications(year).map(&:family_id)
     end
 
     def actual_renewals(year)
