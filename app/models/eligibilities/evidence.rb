@@ -75,10 +75,8 @@ module Eligibilities
 
       if response
         add_verification_history(action_name, update_reason, updated_by)
-      else
-        add_verification_history(action_name, "Failed to request determination", "system")
+        self.save
       end
-      self.save
       response
     end
 
@@ -86,48 +84,15 @@ module Eligibilities
       self.verification_histories.build(action: action, update_reason: update_reason, updated_by: updated_by)
     end
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-    def construct_payload(application, action_name = "")
-      cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
-      if cv3_application.failure?
-        add_verification_history(action_name, "Failed to construct payload", "system") if action_name.present?
-        self.save
-        return cv3_application
-      end
-
-      application = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application.value!)
-      return application if application.success?
-      add_verification_history(action_name, "Failed to validate application", "system") if action_name.present?
-      self.save
-      application
-=======
-    def construct_payload(application)
-      cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application).value!
-      # AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application).value!
-=======
-    def build_and_validate_payload(application)
-=======
     def build_and_validate_payload_entity(application)
->>>>>>> 149f85551e (Fixes spec tests for BuildAndValidatePersonPayload)
       Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application, self.key)
->>>>>>> 4984b9e4d9 (Add build_event method to evidence.rb)
     end
 
     def build_event(payload, application)
       binding.irb
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 47bd7fe72b (Changes to eli rules)
-=======
-      request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: headers)
->>>>>>> 4984b9e4d9 (Add build_event method to evidence.rb)
-=======
       headers = self.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: payload[:hbx_id] }
       binding.irb
       request_event = event(FDSH_EVENTS[self.key], attributes: payload, headers: headers)
->>>>>>> 149f85551e (Fixes spec tests for BuildAndValidatePersonPayload)
     end
 
     def extend_due_on(period = 30.days, updated_by = nil)

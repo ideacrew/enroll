@@ -1,15 +1,19 @@
 # frozen_string_literal: true
+require 'dry/monads'
+require 'dry/monads/do'
 
 module Operations
   module Fdsh
     # This class is responsible for validating an application object and constructing a payload entity for FDSH service.
     class BuildAndValidateApplicationPayload
-      include Dry::Monads[:result, :do, :try]
+      include Dry::Monads[:result, :do]
+      include EventSource::Command
+      include EventSource::Logging
 
       def call(application, request_type, can_check_rules: true)
         cv3_application = yield construct_cv3_application(application)
         payload_entity = yield construct_payload_entity(cv3_application)
-        yield check_eligibility_rules(payload_entity, request_type) if can_check_rules && EnrollRegistry.feature_enabled?(:validate_income_evidence_and_record_publish_errors)
+        yield check_eligibility_rules(payload_entity, request_type) if can_check_rules && EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
 
         Success(payload_entity)
       end
@@ -18,16 +22,20 @@ module Operations
 
       def construct_cv3_application(application)
         if application.is_a?(::FinancialAssistance::Application)
-          ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
+
+          begin
+            ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
+          rescue StandardError => error
+            Failure("Error while generating CV3 Application: #{error}")
+          end
         else
           Failure("Could not generate CV3 Application Object with #{application}")
         end
       end
 
       def construct_payload_entity(cv3_application)
-        result = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application)
-        # addtl validations here?
-        result
+        # the result from the InitializeApplication call here returns a failure if malformed/errors present -- no need to add additional error handling here
+        AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application)
       end
 
       def check_eligibility_rules(payload, request_type)
