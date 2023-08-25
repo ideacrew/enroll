@@ -26,6 +26,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     if ::EnrollRegistry.feature_enabled?(:ivl_enrollment_renewal_async)
       process_async_renewals
     else
+      # TODO: Do we really need sync process ?
       process_ivl_osse_renewals if renewal_bcp.eligibility_for("aca_ivl_osse_eligibility_#{renewal_effective_on.year}".to_sym, renewal_effective_on)
       process_qhp_renewals
       @logger.info "Process ended at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
@@ -34,32 +35,29 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
 
   def process_async_renewals
     count = 0
-    records.no_timeout.each do |record|
+    records.no_timeout.each do |family|
       count += 1
       @logger.info "Processsed #{count} IVL OSSE eligibilities" if (count % 1000) == 0
-      trigger_event(record.to_global_id.uri)
+      trigger_event(family.to_global_id.uri)
     rescue StandardError => e
-      @logger.info "ERROR: Failed Renewal for family hbx_id: #{record.try(:hbx_id) || record.try(:hbx_assigned_id)}; Exception: #{e.inspect}"
+      @logger.info "ERROR: Failed Renewal for family hbx_id: #{family.hbx_assigned_id}; Exception: #{e.inspect}"
     end
   end
 
   def records
-    if renewal_bcp.eligibility_for("aca_ivl_osse_eligibility_#{renewal_effective_on.year}".to_sym, renewal_effective_on)
-      Person.where({
-                     '$or' => [
-                        { 'consumer_role' => { '$exists' => true } },
-                        { 'resident_role' => { '$exists' => true } }
-                     ]
-                   })
-    else
-      query = kollection(HbxEnrollment::COVERAGE_KINDS, current_bcp)
-      family_ids = HbxEnrollment.where(query).pluck(:family_id).uniq
-      Family.where(:id.in => family_ids)
-    end
+    query = kollection(HbxEnrollment::COVERAGE_KINDS, current_bcp)
+    family_ids = HbxEnrollment.where(query).pluck(:family_id).uniq
+    Family.where(:id.in => family_ids)
   end
 
   def trigger_event(gid)
-    event = event('events.individual.open_enrollment.begin', attributes: { gid: gid })
+    event = event('events.individual.open_enrollment.begin', attributes: {
+                    family_gid: gid,
+                    renewal_effective_on: renewal_effective_on,
+                    current_start_on: current_start_on,
+                    current_end_on: current_end_on,
+                    osse_enabled: osse_enabled
+                  })
     if event.success?
       event.success.publish
     else
@@ -92,6 +90,18 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     @renewal_effective_on ||= renewal_bcp.start_on
   end
 
+  def current_start_on
+    @current_start_on ||= current_bcp.start_on
+  end
+
+  def current_end_on
+    @current_end_on ||= current_bcp.end_on
+  end
+
+  def osse_enabled
+    @osse_enabled ||= renewal_bcp.eligibility_for("aca_ivl_osse_eligibility_#{renewal_effective_on.year}".to_sym, renewal_effective_on)
+  end
+
   def fetch_role(person)
     if person.has_active_resident_role?
       person.resident_role
@@ -101,6 +111,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
   end
 
   def process_ivl_osse_renewals
+    # TODO: query for only previous year osse eligible people
     @logger.info "Started processing IVL OSSE renewals at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
     @osse_renewal_failed_families = []
     people = Person.where({
