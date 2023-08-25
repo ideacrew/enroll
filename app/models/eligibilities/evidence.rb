@@ -66,14 +66,12 @@ module Eligibilities
 
     def request_determination(action_name, update_reason, updated_by = nil)
       application = self.evidenceable.application
-      payload = Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application, :income_evidence)
-
-      # return hub_call_negative_response_received(application) if payload.failure? && admin_hub_call_payload_generation_failure_conditions_met?(application)
-      headers = self.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: application.id }
-
+      payload = build_and_validate_payload(application)
+      event = build_event(payload)
       binding.irb
-      request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: headers)
-      binding.irb
+      
+      
+
       return false unless request_event.success?
       response = request_event.value!.publish
 
@@ -88,21 +86,14 @@ module Eligibilities
       self.verification_histories.build(action: action, update_reason: update_reason, updated_by: updated_by)
     end
 
-    def construct_payload(application)
-      cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application).value!
-      # AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application).value!
+    def build_and_validate_payload(application)
+      Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application, self.key)
     end
 
-    def admin_hub_call_payload_generation_failure_conditions_met?(application)
-      # Relation to income_evidences?
-
-      # Add var to FinancialAssistanceRegistry
-      outstanding_csr_codes = ['csr_02', 'csr_04', 'csr_05', 'csr_06']
-      application.eligibility_determinations.any? { |ed| ed.max_aptc > 0 || valid_csr_codes.include?(ed.csr_eligibility_kind) }
-    end
-
-    def hub_call_negative_response_received(application)
+    def build_event(payload)
+      headers = self.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: application.id }
       binding.irb
+      request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: headers)
     end
 
     def extend_due_on(period = 30.days, updated_by = nil)

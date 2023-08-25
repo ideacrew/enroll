@@ -14,10 +14,10 @@ module Operations
           ssa: [:validate_ssn],
           dhs: [],
           local_residency: [],
-          income_evidence: [:validate_ssn],
-          esi_evidence: [:validate_ssn],
-          non_esi_evidence: [:validate_ssn],
-          local_mec_evidence: [:validate_ssn]
+          income: [:validate_ssn],
+          esi: [:validate_ssn],
+          non_esi: [:validate_ssn],
+          local_mec: [:validate_ssn]
         }.freeze
 
         # Call the validation process for the given payload and request type
