@@ -14,7 +14,6 @@ RSpec.describe Operations::Fdsh::PayloadEligibility::CheckPersonEligibilityRules
 
     context 'when all validation rules pass' do
       it 'returns a Success result' do
-        binding.irb
         result = described_class.new.call(payload_entity, request_type)
         expect(result).to be_success
       end
