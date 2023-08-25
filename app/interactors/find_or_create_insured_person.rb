@@ -48,7 +48,8 @@ class FindOrCreateInsuredPerson
           ssn: context.ssn,
           no_ssn: context.no_ssn,
           dob: context.dob,
-          gender: context.gender)
+          gender: context.gender
+        )
 
         if person.persisted?
           is_new = true
