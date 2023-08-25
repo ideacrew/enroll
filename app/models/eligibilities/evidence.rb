@@ -66,11 +66,9 @@ module Eligibilities
 
     def request_determination(action_name, update_reason, updated_by = nil)
       application = self.evidenceable.application
-      payload = build_and_validate_payload(application)
-      event = build_event(payload)
+      payload_entity = build_and_validate_payload_entity(application)
+      event = build_event(payload_entity.to_h, application)
       binding.irb
-      
-      
 
       return false unless request_event.success?
       response = request_event.value!.publish
@@ -88,6 +86,7 @@ module Eligibilities
       self.verification_histories.build(action: action, update_reason: update_reason, updated_by: updated_by)
     end
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     def construct_payload(application, action_name = "")
@@ -109,18 +108,26 @@ module Eligibilities
       # AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application).value!
 =======
     def build_and_validate_payload(application)
+=======
+    def build_and_validate_payload_entity(application)
+>>>>>>> 149f85551e (Fixes spec tests for BuildAndValidatePersonPayload)
       Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application, self.key)
 >>>>>>> 4984b9e4d9 (Add build_event method to evidence.rb)
     end
 
-    def build_event(payload)
-      headers = self.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: application.id }
+    def build_event(payload, application)
       binding.irb
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 47bd7fe72b (Changes to eli rules)
 =======
       request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: headers)
 >>>>>>> 4984b9e4d9 (Add build_event method to evidence.rb)
+=======
+      headers = self.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: payload[:hbx_id] }
+      binding.irb
+      request_event = event(FDSH_EVENTS[self.key], attributes: payload, headers: headers)
+>>>>>>> 149f85551e (Fixes spec tests for BuildAndValidatePersonPayload)
     end
 
     def extend_due_on(period = 30.days, updated_by = nil)

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Operations::Fdsh::CheckEligibilityRules do
+RSpec.describe Operations::Fdsh::PayloadEligibility::CheckPersonEligibilityRules do
   describe 'request_type ssa' do
     let(:person) { FactoryBot.create(:person, :with_consumer_role) }
     let(:payload_entity) do
@@ -14,6 +14,7 @@ RSpec.describe Operations::Fdsh::CheckEligibilityRules do
 
     context 'when all validation rules pass' do
       it 'returns a Success result' do
+        binding.irb
         result = described_class.new.call(payload_entity, request_type)
         expect(result).to be_success
       end
