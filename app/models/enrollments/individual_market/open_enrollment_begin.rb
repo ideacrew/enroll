@@ -65,7 +65,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       if event.success?
         event.success.publish
       else
-        @logger.error "ERROR: Event trigger failed: benefit_sponsorship FEIN: #{benefit_sponsorship.fein}"
+        @logger.error "ERROR: Event trigger failed: role hbx_id: #{role.hbx_id}"
       end
     end
   end

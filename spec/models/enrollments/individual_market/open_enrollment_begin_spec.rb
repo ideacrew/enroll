@@ -343,7 +343,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       let(:subject) { Enrollments::IndividualMarket::OpenEnrollmentBegin.new }
 
       it 'should invoke an event' do
-        expect(subject).to receive(:event).twice
+        expect(subject).to receive(:event).exactly(4).times.and_call_original
         subject.process_renewals
       end
 
@@ -364,7 +364,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
 
           it 'should return family collection' do
-            expect(subject.records.first.class).to eq Person
+            expect(subject.records.first.class).to eq Family
           end
         end
       end
