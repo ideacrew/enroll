@@ -2,9 +2,11 @@
 
 require 'rails_helper'
 require 'aasm/rspec'
+require "#{FinancialAssistance::Engine.root}/spec/shared_examples/medicaid_gateway/test_case_d_response"
 
 RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after_each do
   include Dry::Monads[:result, :do]
+  include_context 'cms ME simple_scenarios test_case_d'
 
   let(:family_id) { BSON::ObjectId.new }
   let!(:year) { TimeKeeper.date_of_record.year }
@@ -1789,6 +1791,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     before do
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:totally_ineligible_notice).and_return(true)
 
+      application.update_attributes!(eligibility_response_payload: response_payload.to_json)
       application.active_applicants.each{|applicant| applicant.update_attributes!(is_ia_eligible: true) }
       application.send(:create_evidences)
       application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'renewal_draft', to_state: 'submitted')
