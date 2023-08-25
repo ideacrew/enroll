@@ -43,7 +43,7 @@ module Operations
       end
 
       def check_eligibility_rules(payload, request_type)
-        Operations::Fdsh::CheckEligibilityRules.new.call(payload, request_type)
+        Operations::Fdsh::PayloadEligibility::CheckPersonEligibilityRules.new.call(payload, request_type)
       end
     end
   end
