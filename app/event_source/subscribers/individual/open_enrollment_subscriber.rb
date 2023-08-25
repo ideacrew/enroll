@@ -24,9 +24,9 @@ module Subscribers
 
       def renew_family(payload)
         id = GlobalID::Locator.locate(payload[:family_gid]).id
-        @renewal_effective_on = payload[:renewal_effective_on]
-        @current_start_on = payload[:current_start_on]
-        @current_end_on = payload[:current_end_on]
+        @renewal_effective_on = payload[:renewal_effective_on].to_date
+        @current_start_on = payload[:current_start_on].to_date
+        @current_end_on = payload[:current_end_on].to_date
 
         family = Family.find(id)
 
