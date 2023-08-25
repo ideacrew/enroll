@@ -57,22 +57,22 @@ module Operations
 
         logger.info "validating  #{benefit_sponsorship.legal_name}(#{benefit_sponsorship.fein})"
         applications.each do |application|
-          if application.benefit_packages.any? do |benefit_package|
+          if application.benefit_packages.any? { |benefit_package|
                benefit_package
-             .health_sponsored_benefit
+                 .health_sponsored_benefit
                  &.product_package_kind
-             .to_s != "metal_level"
-             end
+                 .to_s != "metal_level"
+             }
             errors << "found non metal level product package for application #{application.start_on} #{application.aasm_state}"
           end
 
-          if application.benefit_packages.any? do |benefit_package|
+          if application.benefit_packages.any? { |benefit_package|
                benefit_package
-             .health_sponsored_benefit
+                 .health_sponsored_benefit
                  &.reference_product
                  &.metal_level_kind
-             .to_s == "bronze"
-             end
+                 .to_s == "bronze"
+             }
             errors << "found bronze reference plan for application #{application.start_on} #{application.aasm_state}"
           end
 
@@ -85,25 +85,25 @@ module Operations
       end
 
       def verify_bronze_plan_coverages(application, errors)
-        if application.benefit_packages.any? do |benefit_package|
+        if application.benefit_packages.any? { |benefit_package|
              enrolled_families(benefit_package).any? do |family|
                enrollments_by_package(family, benefit_package).any? do |en|
                  en.product&.metal_level_kind.to_s == "bronze"
                end
              end
-           end
+           }
           errors << "found employees enrolled in bronze plan for application #{application.start_on} #{application.aasm_state}"
         end
       end
 
       def verify_employee_subsidies(application, errors)
-        if application.benefit_packages.any? do |benefit_package|
+        if application.benefit_packages.any? { |benefit_package|
              enrolled_families(benefit_package).all? do |family|
                enrollments_by_package(family, benefit_package).none? do |en|
                  en.eligible_child_care_subsidy > 0
                end
              end
-           end
+           }
           errors << "found no employees with subsidy for application #{application.start_on} #{application.aasm_state}"
         end
       end
@@ -137,25 +137,28 @@ module Operations
       # rubocop:disable Style/MultilineBlockChain
       def update_application_catalog(application)
         sponsor_catalog = application.benefit_sponsor_catalog
-        sponsor_catalog.tap do |catalog|
-          catalog.product_packages.delete_if do |package|
-            package.product_kind == :health &&
-              package.package_kind != :metal_level
-          end
 
-          catalog
-            .product_packages
-            .detect do |package|
-              package.product_kind == :health &&
-                package.package_kind == :metal_level
-            end
-            .tap do |package|
-              package.products.delete_if do |product|
-                product.health? && product.metal_level_kind == :bronze
-              end
-            end
+        catalog =
+          collection.find({ _id: BSON.ObjectId(sponsor_catalog.id.to_s) }).first
+
+        packages = catalog["product_packages"]
+        packages.delete_if do |package|
+          package["product_kind"] == :health &&
+            package["package_kind"] != :metal_level
         end
-        sponsor_catalog.save
+
+        packages.each do |package|
+          next if package["product_kind"] == :dental
+          if package["package_kind"] == :metal_level
+            package["products"].delete_if do |product|
+              product["metal_level_kind"] == :bronze
+            end
+          end
+        end
+
+        catalog["product_packages"] = packages
+        collection.update_one({ _id: catalog["_id"] }, catalog)
+        sponsor_catalog.reload
         sponsor_catalog.create_sponsor_eligibilities
       end
       # rubocop:enable Style/MultilineBlockChain
@@ -164,7 +167,7 @@ module Operations
         unless defined?(@logger)
           @logger =
             Logger.new(
-              "#{Rails.root}/log/migrate_benefit_sponsor_catalogs_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+              "#{Rails.root}/log/migrate_benefit_sponsor_catalogs_#{TimeKeeper.date_of_record.strftime("%Y_%m_%d")}.log"
             )
         end
         @logger
@@ -172,6 +175,16 @@ module Operations
 
       def applications_for(benefit_sponsorship)
         benefit_sponsorship.benefit_applications.approved_and_terminated
+      end
+
+      def db
+        return @db if defined?(@db)
+        @db = Mongoid::Clients.default
+      end
+
+      def collection
+        return @collection if defined?(@collection)
+        @collection = db[:benefit_markets_benefit_sponsor_catalogs]
       end
 
       def calendar_years
