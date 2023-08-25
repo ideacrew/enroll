@@ -57,24 +57,22 @@ module Operations
 
         logger.info "validating  #{benefit_sponsorship.legal_name}(#{benefit_sponsorship.fein})"
         applications.each do |application|
-          if application.benefit_packages.any? { |benefit_package|
-               benefit_package
-                 .health_sponsored_benefit
-                 &.product_package_kind
-                 .to_s != "metal_level"
-             }
-            errors << "found non metal level product package for application #{application.start_on} #{application.aasm_state}"
+          non_metal_level_product_package = application.benefit_packages.any? do |benefit_package|
+            benefit_package.health_sponsored_benefit&.product_package_kind.to_s != "metal_level"
           end
 
-          if application.benefit_packages.any? { |benefit_package|
-               benefit_package
-                 .health_sponsored_benefit
-                 &.reference_product
-                 &.metal_level_kind
-                 .to_s == "bronze"
-             }
-            errors << "found bronze reference plan for application #{application.start_on} #{application.aasm_state}"
+          errors << "found non metal level product package for application #{application.start_on} #{application.aasm_state}" if non_metal_level_product_package
+
+          application_with_bronze_ref_plan = application.benefit_packages.any? do |benefit_package|
+            benefit_package
+              .health_sponsored_benefit
+                &.reference_product
+                  &.metal_level_kind
+              .to_s == "bronze"
           end
+
+
+          errors << "found bronze reference plan for application #{application.start_on} #{application.aasm_state}" if application_with_bronze_ref_plan
 
           verify_bronze_plan_coverages(application, errors)
           verify_employee_subsidies(application, errors)
@@ -85,27 +83,26 @@ module Operations
       end
 
       def verify_bronze_plan_coverages(application, errors)
-        if application.benefit_packages.any? { |benefit_package|
-             enrolled_families(benefit_package).any? do |family|
-               enrollments_by_package(family, benefit_package).any? do |en|
-                 en.product&.metal_level_kind.to_s == "bronze"
-               end
-             end
-           }
-          errors << "found employees enrolled in bronze plan for application #{application.start_on} #{application.aasm_state}"
+        employees_enrolled_in_bronze_plan = application.benefit_packages.any? do |benefit_package|
+          enrolled_families(benefit_package).any? do |family|
+            enrollments_by_package(family, benefit_package).any? do |en|
+              en.product&.metal_level_kind.to_s == "bronze"
+            end
+          end
         end
+
+        errors << "found employees enrolled in bronze plan for application #{application.start_on} #{application.aasm_state}" if employees_enrolled_in_bronze_plan
       end
 
       def verify_employee_subsidies(application, errors)
-        if application.benefit_packages.any? { |benefit_package|
-             enrolled_families(benefit_package).all? do |family|
-               enrollments_by_package(family, benefit_package).none? do |en|
-                 en.eligible_child_care_subsidy > 0
-               end
-             end
-           }
-          errors << "found no employees with subsidy for application #{application.start_on} #{application.aasm_state}"
+        all_employees_without_osse = application.benefit_packages.any? do |benefit_package|
+          enrolled_families(benefit_package).all? do |family|
+            enrollments_by_package(family, benefit_package).none? do |en|
+              en.eligible_child_care_subsidy > 0
+            end
+          end
         end
+        errors << "found no employees with subsidy for application #{application.start_on} #{application.aasm_state}" if all_employees_without_osse
       end
 
       def enrolled_families(benefit_package)
@@ -134,7 +131,6 @@ module Operations
         Success(catalogs)
       end
 
-      # rubocop:disable Style/MultilineBlockChain
       def update_application_catalog(application)
         sponsor_catalog = application.benefit_sponsor_catalog
 
@@ -149,10 +145,9 @@ module Operations
 
         packages.each do |package|
           next if package["product_kind"] == :dental
-          if package["package_kind"] == :metal_level
-            package["products"].delete_if do |product|
-              product["metal_level_kind"] == :bronze
-            end
+          next unless package["package_kind"] == :metal_level
+          package["products"].delete_if do |product|
+            product["metal_level_kind"] == :bronze
           end
         end
 
@@ -161,13 +156,12 @@ module Operations
         sponsor_catalog.reload
         sponsor_catalog.create_sponsor_eligibilities
       end
-      # rubocop:enable Style/MultilineBlockChain
 
       def logger
         unless defined?(@logger)
           @logger =
             Logger.new(
-              "#{Rails.root}/log/migrate_benefit_sponsor_catalogs_#{TimeKeeper.date_of_record.strftime("%Y_%m_%d")}.log"
+              "#{Rails.root}/log/migrate_benefit_sponsor_catalogs_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
             )
         end
         @logger

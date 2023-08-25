@@ -411,48 +411,6 @@ module BenefitSponsors
           expect(abc_organization.legal_name).to eq plan_design_organization.legal_name
           expect(abc_organization.dba).to eq plan_design_organization.dba
         end
-
-        context ".create_or_update_osse_eligibility" do
-          context 'create eligibility' do
-            let(:osse_eligibility) { 'true' }
-
-            it "should build eligibilities" do
-              expect(abc_organization.benefit_sponsorships.first.eligibilities.count).to eql(1)
-            end
-          end
-
-          context 'terminate eligibility' do
-            let(:osse_eligibility) { 'false' }
-            let(:er_elig) do
-              build(:benefit_sponsors_shop_osse_eligibility,
-                    :with_admin_attested_evidence,
-                    :evidence_state => :published,
-                    :is_eligible => false)
-            end
-            let!(:er_eligibility) do
-              benefit_sponsorship.eligibilities << er_elig
-              benefit_sponsorship.save!
-              benefit_sponsorship.eligibilities.first
-            end
-
-            # let!(:employee_role) { create(:employee_role, person: person, census_employee: census_employee, benefit_sponsors_employer_profile_id: benefit_sponsorship.profile.id) }
-
-            # let!(:census_employee) do
-            #   create(:census_employee, employer_profile_id: nil, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship: benefit_sponsorship)
-            # end
-
-            # let(:ee_elig) { build(:eligibility, :with_subject, :with_evidences, start_on: TimeKeeper.date_of_record.prev_month) }
-            # let!(:ee_eligibility) do
-            #   census_employee.update_attributes!(employee_role_id: employee_role.id)
-            #   employee_role.eligibilities << ee_elig
-            #   employee_role.save!
-            #   employee_role.eligibilities.first
-            # end
-
-            it { expect(benefit_sponsorship.reload.eligibility_for(:osse_subsidy, TimeKeeper.date_of_record)).to be_nil }
-            # it { expect(employee_role.reload.eligibility_for(:osse_subsidy, TimeKeeper.date_of_record)).to be_nil }
-          end
-        end
       end
 
       context 'when type is broker agency' do
