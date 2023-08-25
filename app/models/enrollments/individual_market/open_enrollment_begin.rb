@@ -33,7 +33,10 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
   end
 
   def process_async_renewals
+    count = 0
     records.no_timeout.each do |record|
+      count += 1
+      @logger.info "Processsed #{count} IVL OSSE eligibilities" if (count % 1000) == 0
       trigger_event(record.to_global_id.uri)
     rescue StandardError => e
       @logger.info "ERROR: Failed Renewal for family hbx_id: #{record.try(:hbx_id) || record.try(:hbx_assigned_id)}; Exception: #{e.inspect}"

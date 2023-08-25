@@ -1,3 +1,5 @@
+include EventSource::Command
+
 namespace :load do
   task :dc_benefit_market_catalog, [:year] => :environment do |task, args|
 
@@ -56,25 +58,18 @@ namespace :load do
         if result.success?
           p "Success: created eligibility for #{effective_date.year} benefit market catalog"
 
-          puts "::: Creating SHOP OSSE eligibilities"
+          puts "::: Creating SHOP OSSE eligibilities (This is Async)"
+          puts ":::::::::::::::: THIS IS ASYNC PROCESS ::::::::::::::::"
 
           count = 0
-          ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"eligibilities.key" => "aca_shop_osse_eligibility_#{calender_year}".to_sym).each do |benefit_sponsorship|
+          eligibility_date = effective_date - 1.day
+          ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.all.no_timeout.each do |benefit_sponsorship|
             count += 1
-            start_on = effective_date - 1.day
-            eligibility = benefit_sponsorship.eligibility_for("aca_shop_osse_eligibility_#{start_on.year}".to_sym, start_on)
-            osse_eligibility = eligibility.blank? ? false : eligibility.is_eligible_on?(start_on)
-
-            result = ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(
-              {
-                subject: benefit_sponsorship.to_global_id,
-                evidence_key: :shop_osse_evidence,
-                evidence_value: osse_eligibility.to_s,
-                effective_date: effective_date
-              }
-            )
-            unless result.success?
-              puts "Failed to create OSSE shop eligibility for benefit_sponsorship with id: #{benefit_sponsorship.id}"
+            event = event('events.benefit_sponsors.osse_renewal', attributes: { gid: benefit_sponsorship.to_global_id.uri, eligibility_date: eligibility_date, effective_date: effective_date })
+            if event.success?
+              event.success.publish
+            else
+              puts "ERROR: Event trigger failed: benefit_sponsorship FEIN: #{benefit_sponsorship.fein}"
             end
             puts "Processsed #{count} SHOP OSSE eligibilities" if (count % 1000) == 0
           end
