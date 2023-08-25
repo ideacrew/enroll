@@ -18,20 +18,21 @@ module Operations
 
       def construct_cv3_application(application)
         if application.is_a?(::FinancialAssistance::Application)
-          Success(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application))
+          result = ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
+          result
         else
           Failure("Could not generate CV3 Application Object with #{application}")
         end
       end
 
       def construct_payload_entity(cv3_application)
-        value = cv3_application.success
-        result = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(value)
+        result = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application)
+        # add addtl validation here
         Success(result)
       end
 
       def check_eligibility_rules(payload, request_type)
-        Operations::Fdsh::CheckEligibilityRules.new.call(payload, request_type)
+        Operations::Fdsh::PayloadEligibility::CheckApplicationEligibilityRules.new.call(payload, request_type)
       end
     end
   end
