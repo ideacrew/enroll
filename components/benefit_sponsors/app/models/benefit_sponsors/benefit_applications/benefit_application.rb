@@ -1282,6 +1282,8 @@ module BenefitSponsors
       return unless benefit_sponsor_catalog&.persisted?
 
       benefit_sponsor_catalog.create_sponsor_eligibilities
+    rescue StandardError => e
+      Rails.logger.error("Unable to create sponsor catalog eligibilities due to #{e.inspect}")
     end
 
     private

@@ -8,9 +8,7 @@ describe LawfulPresenceDetermination do
     DatabaseCleaner.clean
   end
 
-  let(:consumer_role) {
-    FactoryBot.create(:consumer_role_object)
-  }
+  let(:consumer_role) { FactoryBot.create(:consumer_role_object) }
   let(:person_id) { consumer_role.person.id }
   let(:payload) { "lsjdfioennnklsjdfe" }
 

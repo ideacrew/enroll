@@ -138,11 +138,11 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
 
   def all_consumers_or_residents
     Person.active.where({
-                  '$or' => [
-                     { 'consumer_role' => { '$exists' => true } },
-                     { 'resident_role' => { '$exists' => true } }
-                  ]
-                })
+                          '$or' => [
+                             { 'consumer_role' => { '$exists' => true } },
+                             { 'resident_role' => { '$exists' => true } }
+                          ]
+                        })
   end
 
   def process_ivl_osse_renewals

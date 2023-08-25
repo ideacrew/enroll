@@ -10,7 +10,7 @@ module Subscribers
         logger_name = "on_create_default_eligibility_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}"
         subscriber_logger = Logger.new("#{Rails.root}/log/#{logger_name}.log")
         subscriber_logger.info '-' * 100 unless Rails.env.test?
-        
+
         payload = JSON.parse(response, symbolize_names: true)
         subscriber_logger.info "EligibilitySubscriber, payload: #{payload}"
 
@@ -31,6 +31,8 @@ module Subscribers
               effective_date: effective_date
             }
           )
+
+          subscriber_logger.error "EligibilitySubscriber, payload: #{payload}. Failed due to #{result.failure}" unless result.success?
         end
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e
@@ -67,6 +69,8 @@ module Subscribers
               effective_date: effective_date
             }
           )
+
+          subscriber_logger.error "EligibilitySubscriber, payload: #{payload}. Failed due to #{result.failure}" unless result.success?
         end
 
         ack(delivery_info.delivery_tag)
