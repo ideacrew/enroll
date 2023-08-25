@@ -14,7 +14,6 @@ module Operations
         payload_entity = yield create_payload_entity(payload_value)
         yield check_eligibility_rules(payload_entity, request_type) if can_check_rules && EnrollRegistry.feature_enabled?(:validate_and_record_publish_errors)
 
-
         Success(payload_entity)
       end
 
