@@ -30,13 +30,11 @@ RSpec.describe Operations::Fdsh::PayloadEligibility::CheckApplicationEligibility
 
     context 'when all validation rules pass' do
       before do
-        binding.irb
         allow(payload_entity).to receive(:applicants).and_return(application.applicants)
         allow(:applicant).to receive(:identifying_information).and_return(self)
       end
 
       it 'returns a Success result' do
-        binding.irb
         result = described_class.new.call(payload_entity, request_type)
         expect(result).to be_success
       end
