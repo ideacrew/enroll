@@ -26,7 +26,8 @@ module FinancialAssistance
 
             def find_families(renewal_year)
               family_ids = ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id)
-              determined_family_ids = ::FinancialAssistance::Application.by_year(renewal_year.pred).where(:family_id.in => family_ids).distinct(:family_id)
+              # selection logic here matches the selection logic in ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::Renew
+              determined_family_ids = ::FinancialAssistance::Application.by_year(renewal_year.pred).where(:family_id.in => family_ids).select(&:eligible_for_renewal?).map(&:family_id).uniq
 
               Success(determined_family_ids)
             end
