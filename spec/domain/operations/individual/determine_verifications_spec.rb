@@ -210,13 +210,13 @@ RSpec.describe Operations::Individual::DetermineVerifications, dbclean: :after_e
         it 'should record history in ssn_type for requested hub calls' do
           types = consumer_role.verification_types
           histories = types.ssn_type.first.type_history_elements
-          expect(histories.select{|history| ['Hub Request'].include?(history.action)}.present?).to be_truthy
+          expect(histories.select{|history| ['Hub Request'].include?(history.action)}.present?).to be_falsey
         end
 
         it 'should record history in citizenship_type for requested hub calls' do
           types = consumer_role.verification_types
           histories = types.citizenship_type.first.type_history_elements
-          expect(histories.select{|history| ['Hub Request'].include?(history.action)}.present?).to be_truthy
+          expect(histories.select{|history| ['Hub Request'].include?(history.action)}.present?).to be_falsey
         end
       end
     end

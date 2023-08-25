@@ -46,7 +46,7 @@ module Operations
         attrs = OpenStruct.new({:determined_at => Time.now, :vlp_authority => 'hbx'})
 
         consumer_role.revert!(attrs)
-        add_verification_type_history(consumer_role)
+        add_verification_type_history(consumer_role) if EnrollRegistry.feature_enabled?(:validate_and_record_publish_errors)
         consumer_role.coverage_purchased_no_residency!(attrs)
         trigger_residency(consumer_role) if can_trigger_residency?(person)
         consumer_role.person.save!
@@ -60,8 +60,10 @@ module Operations
       end
 
       def trigger_residency(consumer_role)
-        vt = consumer_role.verification_types.where(:type_name => ::VerificationType::LOCATION_RESIDENCY).first
-        vt.add_type_history_element(action: "Hub Request", modifier: "System", update_reason: "#{vt.type_name} call hub was requested because of a person update for applying coverage")
+        if EnrollRegistry.feature_enabled?(:validate_and_record_publish_errors)
+          vt = consumer_role.verification_types.where(:type_name => ::VerificationType::LOCATION_RESIDENCY).first
+          vt.add_type_history_element(action: "Hub Request", modifier: "System", update_reason: "#{vt.type_name} call hub was requested because of a person update for applying coverage")
+        end
         consumer_role.trigger_residency!
       end
 
