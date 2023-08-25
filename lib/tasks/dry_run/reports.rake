@@ -127,23 +127,9 @@ namespace :dry_run do
       @family_ids ||= ::HbxEnrollment.individual_market.enrolled.where(:effective_on.gte => beginning_of_year, :effective_on.lte => end_of_year).distinct(:family_id)
     end
 
-    def determined_family_ids(year)
-      @determined_family_ids ||= determined_applications(year).distinct(:family_id)
-    end
-
-    # This method will return a collection of unique application documents based on the family_id for the given year.
-    def determined_applications(year)
-      family_ids = family_ids(year)
-
-      family_ids.map do |family_id|
-        ::FinancialAssistance::Application.by_year(year.to_i.pred).where(family_id: family_id).determined.created_asc.last
-      end.compact
-    end
-
-    def renewal_eligible_applications(year)
-      determined_applications(year).map do |app|
-        app if app.eligible_for_renewal?
-      end.compact
+    def renewal_eligible_applications(renewal_year)
+      family_ids = ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id)
+      ::FinancialAssistance::Application.by_year(renewal_year.pred).determined.where(:family_id.in => family_ids).group_by(&:family_id).transform_values { |group| group.max_by(&:created_at) }.select { |_k, v| v.eligible_for_renewal? }.values
     end
 
     def renewal_eligible_family_ids(year)
