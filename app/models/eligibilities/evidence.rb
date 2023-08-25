@@ -64,12 +64,47 @@ module Eligibilities
       "events.individual.eligibilities.application.applicant.#{self.key}_evidence_updated"
     end
 
+# ///////////////////////////// NEW REQUEST DETERMINATION ////////////////////////////////////
+    # def request_determination(action_name, update_reason, updated_by = nil)
+    #   application = self.evidenceable.application
+    #   binding.irb
+    #   payload_entity = build_and_validate_payload_entity(application)
+    #   event = build_event(payload_entity.to_h, application)
+    #   binding.irb
+
+    #   return false unless request_event.success?
+    #   response = request_event.value!.publish
+
+    #   if response
+    #     add_verification_history(action_name, update_reason, updated_by)
+    #     self.save
+    #   end
+    #   response
+    # end
+
+    # def build_and_validate_payload_entity(application)
+    #   Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application, self.key)
+    # end
+
+    # def build_event(payload, application)
+    #   binding.irb
+    #   headers = self.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: payload[:hbx_id] }
+    #   binding.irb
+    #   request_event = event(FDSH_EVENTS[self.key], attributes: payload, headers: headers)
+    # end
+
+# ////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+# ///////////////////////////// OLD REQUEST DETERMINATION ////////////////////////////////////
+
     def request_determination(action_name, update_reason, updated_by = nil)
       application = self.evidenceable.application
-      payload_entity = build_and_validate_payload_entity(application)
-      event = build_event(payload_entity.to_h, application)
-      binding.irb
+      payload = construct_payload(application)
+      headers = self.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: application.id }
 
+      request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: headers)
       return false unless request_event.success?
       response = request_event.value!.publish
 
@@ -80,19 +115,15 @@ module Eligibilities
       response
     end
 
+    def construct_payload(application)
+      cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application).value!
+      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application).value!
+    end
+
+# ////////////////////////////////////////////////////////////////////////////////////////
+
     def add_verification_history(action, update_reason, updated_by)
       self.verification_histories.build(action: action, update_reason: update_reason, updated_by: updated_by)
-    end
-
-    def build_and_validate_payload_entity(application)
-      Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application, self.key)
-    end
-
-    def build_event(payload, application)
-      binding.irb
-      headers = self.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: payload[:hbx_id] }
-      binding.irb
-      request_event = event(FDSH_EVENTS[self.key], attributes: payload, headers: headers)
     end
 
     def extend_due_on(period = 30.days, updated_by = nil)
