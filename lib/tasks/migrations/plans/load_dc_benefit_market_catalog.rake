@@ -65,7 +65,13 @@ namespace :load do
           eligibility_date = effective_date - 1.day
           ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.all.no_timeout.each do |benefit_sponsorship|
             count += 1
-            event = event('events.benefit_sponsors.osse_renewal', attributes: { gid: benefit_sponsorship.to_global_id.uri, eligibility_date: eligibility_date, effective_date: effective_date })
+            payload = {
+              subject_gid: benefit_sponsorship.to_global_id.uri,
+              effective_date: effective_date,
+              evidence_key: :shop_osse_evidence
+            }
+
+            event = event('events.eligible.renew_eligibility', attributes: payload)
             if event.success?
               event.success.publish
             else
