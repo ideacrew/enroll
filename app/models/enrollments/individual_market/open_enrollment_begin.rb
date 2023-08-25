@@ -111,7 +111,6 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
   end
 
   def process_ivl_osse_renewals
-    # TODO: query for only previous year osse eligible people
     @logger.info "Started processing IVL OSSE renewals at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
     @osse_renewal_failed_families = []
     people = Person.where({

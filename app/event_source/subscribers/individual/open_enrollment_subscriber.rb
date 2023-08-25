@@ -11,7 +11,6 @@ module Subscribers
         @logger = subscriber_logger_for(:on_enroll_individual_open_enrollment_begin)
         payload = JSON.parse(response, symbolize_names: true)
         @logger.info "OpenEnrollmentSubscriber, response: #{payload}"
-        # renew_individual(payload)
         renew_family(payload)
 
         ack(delivery_info.delivery_tag)
