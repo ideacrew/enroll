@@ -25,7 +25,7 @@
 
 	<xs:complexType name="verificationQuestionResponseOptionListType">
 		<xs:sequence>
-	          <xs:element name="response_option" type="verificationQuestionResponseOptionType" minOccurs="1" maxOccurs="10"/>
+	          <xs:element name="response_option" type="verificationQuestionResponseOptionType" minOccurs="1" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
 
@@ -48,7 +48,7 @@
 		<xs:sequence>
 			<xs:element name="session_id" type="xs:string"/>
 			<xs:element name="transaction_id" type="xs:string"/>
-			<xs:element name="question_response" type="verificationQuestionResponseType" minOccurs="1" maxOccurs="10"/>
+			<xs:element name="question_response" type="verificationQuestionResponseType" minOccurs="1" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
 
@@ -85,7 +85,7 @@
 			<xs:element name="response_text" type="xs:string" minOccurs="0"/>
 			<xs:element name="transaction_id" type="xs:string"/>
 			<xs:element name="session_id" type="xs:string" minOccurs="0"/>
-		        <xs:element name="question" type="verificationQuestionPromptType" minOccurs="0" maxOccurs="10"/>
+		        <xs:element name="question" type="verificationQuestionPromptType" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
 
@@ -108,7 +108,7 @@
 					<xs:element name="response_code" type="interactiveVerificationSessionResponseCodeType"/>
 					<xs:element name="transaction_id" type="xs:string"/>
 					<xs:element name="session_id" type="xs:string"/>
-					<xs:element name="question" type="verificationQuestionPromptType" minOccurs="1" maxOccurs="10"/>
+					<xs:element name="question" type="verificationQuestionPromptType" minOccurs="1" maxOccurs="unbounded"/>
 				</xs:sequence>
 			</xs:restriction>
 		</xs:complexContent>
@@ -549,8 +549,8 @@
 			<xs:element name="interactive_verification_results" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="lawful_presence_verification_results" type="ExternalLawfulPresenceResultType" minOccurs="0"/>
 			<xs:element name="residency_verification_results" type="residencyVerificationResultCodeType" minOccurs="0"/>
-			<xs:element name="income_verification_result" type="IncomeVerificationResultType" minOccurs="0" maxOccurs="10"/>
-			<xs:element name="mec_verification_result" type="MECVerificationResultType" minOccurs="0" maxOccurs="10"/>
+			<xs:element name="income_verification_result" type="IncomeVerificationResultType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="mec_verification_result" type="MECVerificationResultType" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="ExternalVerificationsType">
@@ -625,7 +625,7 @@
 
 	<xs:complexType name="VerifiedFamilyMembersListType">
 		<xs:sequence>
-			<xs:element name="family_member" type="VerifiedFamilyMemberType" minOccurs="1" maxOccurs="10"/>
+			<xs:element name="family_member" type="VerifiedFamilyMemberType" minOccurs="1" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
 
