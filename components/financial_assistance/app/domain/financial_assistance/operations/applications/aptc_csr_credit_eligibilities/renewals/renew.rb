@@ -47,7 +47,7 @@ module FinancialAssistance
 
               application = applications_by_family.by_year(validated_params[:renewal_year].pred).determined.created_asc.last
 
-              if application
+              if application&.eligible_for_renewal?
                 Success(application)
               else
                 Failure("Could not find any applications that are renewal eligible: #{validated_params}.")

@@ -32,6 +32,14 @@ module FinancialAssistance
               Success(determined_family_ids)
             end
 
+            # Returns all family_ids where the family has a current enrollment and their most recent determined
+            # fa application for the previous year is renewal eligible
+            # @return [Array] family_ids
+            def renewal_eligible_family_ids(renewal_year)
+              family_ids = ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id)
+              ::FinancialAssistance::Application.by_year(renewal_year.pred).determined.where(:family_id.in => family_ids).group_by(&:family_id).select { |_family_id, group| group.max_by(&:created_at).eligible_for_renewal? }.keys
+            end
+
             # rubocop:disable Style/MultilineBlockChain
             def generate_renewal_events(renewal_year, family_ids)
               logger = Logger.new("#{Rails.root}/log/aptc_credit_eligibilities_request_all.log")
