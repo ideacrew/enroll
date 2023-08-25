@@ -131,5 +131,16 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::P
         expect("Invalid Application object application_id, expected FinancialAssistance::Application")
       end
     end
+
+    context 'missing eligibility results' do
+      before do
+        application.update_attributes!(eligibility_response_payload: nil)
+        @result = subject.construct_payload(application)
+      end
+
+      it 'should return a failure with error message' do
+        expect("PublishFaaTotalIneligibilityNotice_error: Could not initialize application for undetermined application #{application.id}")
+      end
+    end
   end
 end
