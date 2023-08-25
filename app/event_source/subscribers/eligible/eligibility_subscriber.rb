@@ -55,14 +55,19 @@ module Subscribers
         eligibility = subject.eligibility_for(eligibility_key, eligibility_date)
         osse_eligibility = eligibility.blank? ? false : eligibility.is_eligible_on?(eligibility_date)
 
-        result = eligibility_operation_for(subject).new.call(
-          {
-            subject: subject.to_global_id,
-            evidence_key: evidence_key,
-            evidence_value: osse_eligibility.to_s,
-            effective_date: effective_date
-          }
-        )
+        renew_eligibility_key = eligibility_key_for(subject, effective_date)
+        renewal_eligibility = subject.eligibility_for(renew_eligibility_key, effective_date)
+
+        unless renewal_eligibility
+          result = eligibility_operation_for(subject).new.call(
+            {
+              subject: subject.to_global_id,
+              evidence_key: evidence_key,
+              evidence_value: osse_eligibility.to_s,
+              effective_date: effective_date
+            }
+          )
+        end
 
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e

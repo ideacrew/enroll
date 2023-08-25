@@ -24,7 +24,12 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
   def process_renewals
     @logger.info "Started process at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
     if ::EnrollRegistry.feature_enabled?(:ivl_enrollment_renewal_async)
+      @logger.info "Started async enrollment renewals at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
       process_async_renewals
+      @logger.info "Ended async enrollment renewals at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
+      @logger.info "Started async osse renewals at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
+      process_default_osse_eligibility_renewals
+      @logger.info "Ended async osse renewals at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
     else
       # TODO: Do we really need sync process ?
       process_ivl_osse_renewals if renewal_bcp.eligibility_for("aca_ivl_osse_eligibility_#{renewal_effective_on.year}".to_sym, renewal_effective_on)
@@ -40,7 +45,28 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       @logger.info "Processsed #{count} IVL OSSE eligibilities" if (count % 1000) == 0
       trigger_event(family.to_global_id.uri)
     rescue StandardError => e
-      @logger.info "ERROR: Failed Renewal for family hbx_id: #{family.hbx_assigned_id}; Exception: #{e.inspect}"
+      @logger.error "ERROR: Failed Renewal for family hbx_id: #{family.hbx_assigned_id}; Exception: #{e.inspect}"
+    end
+  end
+
+  def process_default_osse_eligibility_renewals
+    all_consumers_or_residents.no_timeout.each do |person|
+      role = fetch_role(person)
+      next unless role
+
+      payload = {
+        subject_gid: role.to_global_id.uri,
+        effective_date: renewal_effective_on,
+        evidence_key: :ivl_osse_evidence
+      }
+
+      event = event('events.eligible.renew_eligibility', attributes: payload)
+
+      if event.success?
+        event.success.publish
+      else
+        @logger.error "ERROR: Event trigger failed: benefit_sponsorship FEIN: #{benefit_sponsorship.fein}"
+      end
     end
   end
 
@@ -61,7 +87,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     if event.success?
       event.success.publish
     else
-      @logger.info "ERROR: Event trigger failed: person hbx_id: #{person.hbx_id}"
+      @logger.error "ERROR: Event trigger failed: person hbx_id: #{person.hbx_id}"
     end
   end
 
@@ -110,16 +136,19 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     end
   end
 
+  def all_consumers_or_residents
+    Person.active.where({
+                  '$or' => [
+                     { 'consumer_role' => { '$exists' => true } },
+                     { 'resident_role' => { '$exists' => true } }
+                  ]
+                })
+  end
+
   def process_ivl_osse_renewals
     @logger.info "Started processing IVL OSSE renewals at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
     @osse_renewal_failed_families = []
-    people = Person.where({
-                            '$or' => [
-                               { 'consumer_role' => { '$exists' => true } },
-                               { 'resident_role' => { '$exists' => true } }
-                            ]
-                          })
-
+    people = all_consumers_or_residents
     @logger.info "OSSE:: processing #{people.size} records"
 
     @logger.info "Skipping callbacks"
@@ -151,7 +180,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
         @logger.info "Failed Osse Renewal: #{person.hbx_id}; Error: #{result.failure}"
       end
     rescue StandardError => e
-      @logger.info "Failed Osse Renewal: #{person.hbx_id}; Exception: #{e.inspect}"
+      @logger.error "Failed Osse Renewal: #{person.hbx_id}; Exception: #{e.inspect}"
     end
     @logger.info "Finished processing IVL OSSE renewals at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
     ConsumerRole.set_callback(:update, :after, :publish_updated_event)
@@ -185,7 +214,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
           result.failure? ? result.failure : result.success
         end
       rescue Exception => e
-        @logger.info "Failed ECaseId: #{family.e_case_id} Primary: #{primary_hbx_id} Exception: #{e.inspect}"
+        @logger.error "Failed ECaseId: #{family.e_case_id} Primary: #{primary_hbx_id} Exception: #{e.inspect}"
       end
     end
   end
