@@ -11,7 +11,7 @@ module Operations
 
         def validate(payload_entity, request_type)
           return Failure("Invalid Person Object #{payload_entity}") unless payload_entity.is_a?(::AcaEntities::People::Person)
-          super(RULES, request_type)
+          super(request_type)
         end
 
         def validate_ssn(payload)
