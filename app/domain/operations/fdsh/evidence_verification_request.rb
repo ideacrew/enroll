@@ -12,16 +12,12 @@ module Operations
         application = evidence.evidenceable.application
         response = send_fdsh_hub_call(application, evidence)
 
-        # return false unless request_event.success?
-        # response = request_event.value!.publish
-
         if response.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
           determine_evidence_aasm_status(application, evidence)
 
           update_reason = "#{evidence.key} Evidence Verification Request Failed due to #{result.failure}"
           evidence.add_verification_history(action: "Hub Request Failed", modifier: "System", update_reason: update_reason)
 
-          binding.irb
           # Original determination method returned false on failure -- keep this as to not break existing functionality/specs?
           return false
         elsif response.failure?
@@ -56,7 +52,8 @@ module Operations
       def determine_evidence_aasm_status(application, evidence)
 
         binding.irb
-        eligibilities = application.eligibilities
+        eligibilities = application.eligibility_determinations
+        family = application.family
         binding.irb
 
         case
@@ -66,6 +63,7 @@ module Operations
           update_evidence_aasm_state(evidence, :negative_response_received)
         when csr_eligible?(evidence)
           update_evidence_aasm_state(evidence, :negative_response_received)
+          
           # change aasm to negative_response_received
         else
           update_evidence_aasm_state(evidence, :outstanding)
@@ -81,6 +79,7 @@ module Operations
 
       def csr_eligible?(evidence)
         # Navigate thru evidence
+        Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
       end
 
       def update_evidence_aasm_state(evidence, state)
