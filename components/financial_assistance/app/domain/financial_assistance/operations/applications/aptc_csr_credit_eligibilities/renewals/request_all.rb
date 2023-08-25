@@ -16,7 +16,7 @@ module FinancialAssistance
             include EventSource::Command
 
             def call(params)
-              family_ids = yield find_families(params[:renewal_year])
+              family_ids = yield renewal_eligible_family_ids(params[:renewal_year])
               family_ids = yield generate_renewal_events(params[:renewal_year], family_ids)
 
               Success(family_ids)
@@ -24,20 +24,15 @@ module FinancialAssistance
 
             private
 
-            def find_families(renewal_year)
-              family_ids = ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id)
-              # selection logic here matches the selection logic in ::FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::Renew
-              determined_family_ids = ::FinancialAssistance::Application.by_year(renewal_year.pred).determined.where(:family_id.in => family_ids).select(&:eligible_for_renewal?).map(&:family_id).uniq
-
-              Success(determined_family_ids)
-            end
-
             # Returns all family_ids where the family has a current enrollment and their most recent determined
             # fa application for the previous year is renewal eligible
             # @return [Array] family_ids
             def renewal_eligible_family_ids(renewal_year)
               family_ids = ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id)
-              ::FinancialAssistance::Application.by_year(renewal_year.pred).determined.where(:family_id.in => family_ids).group_by(&:family_id).select { |_family_id, group| group.max_by(&:created_at).eligible_for_renewal? }.keys
+              eligible_family_ids = ::FinancialAssistance::Application.by_year(renewal_year.pred).determined.where(:family_id.in => family_ids).group_by(&:family_id).select { |_family_id, group| group.max_by(&:created_at).eligible_for_renewal? }.keys
+              Success(eligible_family_ids)
+            rescue StandardError => e
+              Failure("Failed to find renewal eligible family_ids, error: #{e}")
             end
 
             # rubocop:disable Style/MultilineBlockChain
