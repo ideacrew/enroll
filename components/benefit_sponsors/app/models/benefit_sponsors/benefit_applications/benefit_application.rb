@@ -142,7 +142,7 @@ module BenefitSponsors
     add_observer BenefitSponsors::Observers::EdiObserver.new, [:process_application_edi_events]
 
     before_validation :pull_benefit_sponsorship_attributes
-    after_create      :create_sponsor_eligibilities, :renew_benefit_package_assignments
+    after_create      :create_sponsor_catalog_eligibilities, :renew_benefit_package_assignments
     after_save        :notify_on_save
     after_create      :notify_on_create, :set_expiration_date
 
@@ -1278,7 +1278,7 @@ module BenefitSponsors
       end
     end
 
-    def create_sponsor_eligibilities
+    def create_sponsor_catalog_eligibilities
       return unless benefit_sponsor_catalog&.persisted?
 
       benefit_sponsor_catalog.create_sponsor_eligibilities
