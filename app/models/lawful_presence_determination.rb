@@ -75,7 +75,16 @@ class LawfulPresenceDetermination
 
   def start_ssa_process
     if EnrollRegistry.feature_enabled?(:ssa_h3)
-      Operations::Fdsh::Ssa::H3::RequestSsaVerification.new.call(self.ivl_role.person)
+      result = Operations::Fdsh::Ssa::H3::RequestSsaVerification.new.call(ivl_role.person)
+      ssa_verification_type = ivl_role.verification_types.ssn_type.first
+
+      if result.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_errors)
+        ssa_verification_type.add_type_history_element(action: "Hub Request Failed", modifier: "System", update_reason: "SSA Verification Request Failed due to #{result.failure}")
+        args = OpenStruct.new(determined_at: Time.now, vlp_authority: 'ssa')
+        ivl_role.ssn_invalid!(args)
+      else
+        ssa_verification_type.pending_type
+      end
     else
       notify(SSA_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.ivl_role.person})
     end
@@ -83,7 +92,16 @@ class LawfulPresenceDetermination
 
   def start_vlp_process(requested_start_date)
     if EnrollRegistry.feature_enabled?(:vlp_h92)
-      Operations::Fdsh::Vlp::H92::RequestInitialVerification.new.call(self.ivl_role.person)
+      result = Operations::Fdsh::Vlp::H92::RequestInitialVerification.new.call(ivl_role.person)
+      verification_type = ivl_role.verification_types.active.where(:type_name.in => ["Citizenship", "Immigration status"]).first
+
+      if result.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_errors)
+        verification_type.add_type_history_element(action: "Hub Request Failed", modifier: "System", update_reason: "#{verification_type.type_name} Request Failed due to #{result.failure}")
+        args = OpenStruct.new(determined_at: Time.now, vlp_authority: 'dhs')
+        ivl_role.fail_dhs!(args)
+      else
+        verification_type.pending_type
+      end
     else
       notify(VLP_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.ivl_role.person, :coverage_start_date => requested_start_date})
     end

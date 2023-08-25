@@ -7,11 +7,9 @@ describe LawfulPresenceDetermination do
   after :each do
     DatabaseCleaner.clean
   end
-
-  let(:consumer_role) {
-    FactoryBot.create(:consumer_role_object)
-  }
-  let(:person_id) { consumer_role.person.id }
+  let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:consumer_role) { person.consumer_role}
+  let(:person_id) { person.id }
   let(:payload) { "lsjdfioennnklsjdfe" }
 
   describe "in a verification pending state with no responses" do
@@ -24,7 +22,7 @@ describe LawfulPresenceDetermination do
 
   describe "being given an ssa response which fails" do
     before :each do
-      consumer_role.coverage_purchased!
+      consumer_role.coverage_purchased_no_residency!
     end
     it "should have the ssa response document" do
       consumer_role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: Time.now, body: payload})
@@ -69,6 +67,210 @@ describe LawfulPresenceDetermination do
       found_person = Person.find(person_id)
       lawful_presence_determination = found_person.consumer_role.lawful_presence_determination
       expect(lawful_presence_determination.latest_denial_date).to be_within(1.second).of(TimeKeeper.datetime_of_record - 1.month)
+    end
+  end
+end
+
+describe '#start_ssa_process' do
+  before :each do
+    consumer_role.update_attributes!(aasm_state: 'verification_outstanding')
+    allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:ssa_h3).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(false)
+  end
+  let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:consumer_role) { person.consumer_role}
+  let(:validator) { instance_double(Operations::Fdsh::EncryptedSsnValidator) }
+
+  context 'when validate_and_record_publish_errors feature is enabled' do
+    before :each do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_errors).and_return(true)
+    end
+    context 'when ssa_h3 feature is enabled' do
+      context 'when there is no active enrollment' do
+        context 'when ssa verification request is successful' do
+          it 'should be pending' do
+            consumer_role.lawful_presence_determination.start_ssa_process
+            ssa_verification_type = consumer_role.verification_types.where(type_name: "Social Security Number").first
+            expect(ssa_verification_type.validation_status).to eq('pending')
+          end
+        end
+
+        context 'when ssa verification request is not successful' do
+          before do
+            allow(validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid SSN'))
+            allow(Operations::Fdsh::EncryptedSsnValidator).to receive(:new).and_return(validator)
+          end
+
+          it 'should be in negative_response_received' do
+            consumer_role.lawful_presence_determination.start_ssa_process
+            ssa_verification_type = consumer_role.verification_types.where(type_name: "Social Security Number").first
+            expect(ssa_verification_type.validation_status).to eq('negative_response_received')
+          end
+        end
+      end
+
+      context 'when there is an active enrollment' do
+        let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+        let!(:hbx_enrollment) do
+          FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_health_product,
+                            family: family, enrollment_members: [family.primary_applicant],
+                            aasm_state: 'coverage_selected', kind: 'individual')
+        end
+
+        context 'when ssa verification request is successful' do
+          it 'should be pending' do
+            consumer_role.lawful_presence_determination.start_ssa_process
+            ssa_verification_type = consumer_role.verification_types.where(type_name: "Social Security Number").first
+            expect(ssa_verification_type.validation_status).to eq('pending')
+          end
+        end
+
+        context 'when ssa verification request is not successful' do
+          before do
+            allow(validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid SSN'))
+            allow(Operations::Fdsh::EncryptedSsnValidator).to receive(:new).and_return(validator)
+          end
+
+          it 'should be in outstanding' do
+            consumer_role.lawful_presence_determination.start_ssa_process
+            ssa_verification_type = consumer_role.verification_types.where(type_name: "Social Security Number").first
+            expect(ssa_verification_type.validation_status).to eq('outstanding')
+          end
+        end
+      end
+    end
+  end
+
+  context 'when validate_and_record_publish_errors feature is enabled' do
+    before :each do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_errors).and_return(false)
+    end
+
+    context 'when ssa_h3 feature is enabled' do
+      context 'when there is no active enrollment' do
+        context 'when ssa verification request is successful' do
+          it 'should be pending' do
+            consumer_role.lawful_presence_determination.start_ssa_process
+            ssa_verification_type = consumer_role.verification_types.where(type_name: "Social Security Number").first
+            expect(ssa_verification_type.validation_status).to eq('pending')
+          end
+        end
+
+        context 'when ssa verification request is not successful' do
+          before do
+            allow(validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid SSN'))
+            allow(Operations::Fdsh::EncryptedSsnValidator).to receive(:new).and_return(validator)
+          end
+
+          it 'should be in negative_response_received' do
+            consumer_role.lawful_presence_determination.start_ssa_process
+            ssa_verification_type = consumer_role.verification_types.where(type_name: "Social Security Number").first
+            expect(ssa_verification_type.validation_status).to eq('pending')
+          end
+        end
+      end
+
+      context 'when there is an active enrollment' do
+        let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+        let!(:hbx_enrollment) do
+          FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_health_product,
+                            family: family, enrollment_members: [family.primary_applicant],
+                            aasm_state: 'coverage_selected', kind: 'individual')
+        end
+
+        context 'when ssa verification request is successful' do
+          it 'should be pending' do
+            consumer_role.lawful_presence_determination.start_ssa_process
+            ssa_verification_type = consumer_role.verification_types.where(type_name: "Social Security Number").first
+            expect(ssa_verification_type.validation_status).to eq('pending')
+          end
+        end
+
+        context 'when ssa verification request is not successful' do
+          before do
+            allow(validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid SSN'))
+            allow(Operations::Fdsh::EncryptedSsnValidator).to receive(:new).and_return(validator)
+          end
+
+          it 'should be in outstanding' do
+            consumer_role.lawful_presence_determination.start_ssa_process
+            ssa_verification_type = consumer_role.verification_types.where(type_name: "Social Security Number").first
+            expect(ssa_verification_type.validation_status).to eq('pending')
+          end
+        end
+      end
+    end
+  end
+end
+
+describe '#start_vlp_process' do
+  before :each do
+    consumer_role.update_attributes!(aasm_state: 'verification_outstanding')
+    allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:vlp_h92).and_return(true)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(false)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(false)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_errors).and_return(true)
+  end
+  let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:consumer_role) { person.consumer_role}
+  let(:validator) { instance_double(Operations::Fdsh::EncryptedSsnValidator) }
+  let(:requested_start_date) { double }
+
+  context 'when vlp_h92 feature is enabled' do
+    context 'when there is no active enrollment' do
+      context 'when vlp verification request is successful' do
+        it 'should be pending' do
+          consumer_role.lawful_presence_determination.start_vlp_process(requested_start_date)
+          vlp_verification_type = consumer_role.verification_types.where(type_name: "Citizenship").first
+          expect(vlp_verification_type.validation_status).to eq('pending')
+        end
+      end
+
+      context 'when vlp verification request is not successful' do
+        before do
+          allow(validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid SSN'))
+          allow(Operations::Fdsh::EncryptedSsnValidator).to receive(:new).and_return(validator)
+        end
+
+        it 'should be in negative_response_received' do
+          consumer_role.lawful_presence_determination.start_vlp_process(requested_start_date)
+          vlp_verification_type = consumer_role.verification_types.where(type_name: "Citizenship").first
+          expect(vlp_verification_type.validation_status).to eq('pending')
+        end
+      end
+    end
+
+    context 'when there is an active enrollment' do
+      let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+      let!(:hbx_enrollment) do
+        FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_health_product,
+                          family: family, enrollment_members: [family.primary_applicant],
+                          aasm_state: 'coverage_selected', kind: 'individual')
+      end
+
+      context 'when vlp verification request is successful' do
+        it 'should be pending' do
+          consumer_role.lawful_presence_determination.start_vlp_process(requested_start_date)
+          vlp_verification_type = consumer_role.verification_types.where(type_name: "Citizenship").first
+          expect(vlp_verification_type.validation_status).to eq('pending')
+        end
+      end
+
+      context 'when vlp verification request is not successful' do
+        before do
+          allow(validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid SSN'))
+          allow(Operations::Fdsh::EncryptedSsnValidator).to receive(:new).and_return(validator)
+        end
+
+        it 'should be in outstanding' do
+          consumer_role.lawful_presence_determination.start_vlp_process(requested_start_date)
+          vlp_verification_type = consumer_role.verification_types.where(type_name: "Citizenship").first
+          expect(vlp_verification_type.validation_status).to eq('pending')
+        end
+      end
     end
   end
 end
