@@ -39,7 +39,7 @@ module Subscribers
           set_callbacks
         end
 
-        if results&.any? {|result| result.failure? }
+        if results&.compact&.any? {|result| result.failure? }
           @logger.info "Skipping enrollment renewal as it failed Osse Renewal: #{family.hbx_assigned_id};"
           return
         end
