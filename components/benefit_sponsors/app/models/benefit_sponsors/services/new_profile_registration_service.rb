@@ -37,16 +37,9 @@ module BenefitSponsors
           :profile_id => profile_id,
           :staff_roles => staff_role_params(staff_roles),
           :organization => Serializers::OrganizationSerializer.new(obj).to_hash.merge(
-            :profile => Serializers::ProfileSerializer.new(pluck_profile(obj)).to_hash.merge(:osse_eligibility => osse_eligibility(obj))
+            "profile": Serializers::ProfileSerializer.new(pluck_profile(obj)).to_hash
           )
         }
-      end
-
-      def osse_eligibility(object)
-        return false unless object.active_benefit_sponsorship
-        osse_key = "aca_shop_osse_eligibility_#{TimeKeeper.date_of_record.year}".to_sym
-        eligibility = object.active_benefit_sponsorship.eligibility_for(osse_key, TimeKeeper.date_of_record)
-        eligibility.present? ? eligibility.is_eligible_on?(TimeKeeper.date_of_record) : false
       end
 
       def load_form_metadata(form)
@@ -103,7 +96,6 @@ module BenefitSponsors
         [profile].each_with_index.inject({}) do |result, (form, index_val)|
           result[index_val] = sanitize_params(profile_attributes(form)).merge({
                                                                                 :office_locations_attributes => office_locations_form_to_params(form.office_locations),
-                                                                                :osse_eligibility => form.osse_eligibility
                                                                               })
           result
         end

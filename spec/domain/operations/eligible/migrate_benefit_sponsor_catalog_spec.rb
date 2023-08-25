@@ -83,11 +83,11 @@ RSpec.describe Operations::Eligible::MigrateBenefitSponsorCatalog,
         sponsored_benefit = benefit_package.health_sponsored_benefit
         sponsored_benefit.reference_product_id =
           sponsored_benefit
-            .product_package
-            .products
-            .detect do |product|
-              product.metal_level_kind.to_s == reference_product_metal.to_s
-            end
+          .product_package
+          .products
+          .detect do |product|
+            product.metal_level_kind.to_s == reference_product_metal.to_s
+          end
             &.id
       end
       application.save
@@ -125,12 +125,10 @@ RSpec.describe Operations::Eligible::MigrateBenefitSponsorCatalog,
 
       context "when sponsorship passed" do
         it "should migrate benefit sponsor catalog" do
-          result =
-            subject.call(sponsorship_id: benefit_sponsorship.to_global_id)
-
+          result = subject.call(sponsorship_id: benefit_sponsorship.to_global_id)
+          expect(result).to be_success
           catalog = application.benefit_sponsor_catalog.reload
-          packages =
-            catalog.product_packages.select { |pk| pk.product_kind == :health }
+          packages = catalog.product_packages.select { |pk| pk.product_kind == :health }
           expect(packages.size).to eq 1
           product_package = packages.first
           expect(product_package.package_kind).to eq :metal_level
