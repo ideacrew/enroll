@@ -10,7 +10,7 @@ module Operations
         cv3_application = yield construct_cv3_application(application)
         payload_entity = yield construct_payload_entity(cv3_application)
         yield check_eligibility_rules(payload_entity.success, request_type) if can_check_rules && EnrollRegistry.feature_enabled?(:validate_income_evidence_and_record_publish_errors)
-
+        binding.irb
         Success(payload_entity)
       end
 
@@ -18,8 +18,7 @@ module Operations
 
       def construct_cv3_application(application)
         if application.is_a?(::FinancialAssistance::Application)
-          result = ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
-          result
+          ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
         else
           Failure("Could not generate CV3 Application Object with #{application}")
         end
@@ -27,7 +26,7 @@ module Operations
 
       def construct_payload_entity(cv3_application)
         result = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application)
-        # add addtl validation here
+        # add addtl validation here?
         Success(result)
       end
 

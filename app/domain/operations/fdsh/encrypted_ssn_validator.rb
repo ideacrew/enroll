@@ -15,10 +15,8 @@ module Operations
       SSN_FORMAT_REGEX = /^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$/.freeze
 
       def call(encrypted_ssn)
-        binding.irb
         decrypted_ssn = yield decrypt_ssn(encrypted_ssn)
         validated_ssn = yield validate_ssn(decrypted_ssn)
-        binding.irb
 
         Success(validated_ssn)
       end
