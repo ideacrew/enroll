@@ -65,13 +65,29 @@ module Eligibilities
     end
 
 # ///////////////////////////// NEW REQUEST DETERMINATION ////////////////////////////////////
+
+    def request_determination(action_name, update_reason, updated_by = nil)
+      event_payload = {
+        action_name: action_name,
+        update_reason: update_reason,
+        updated_by: updated_by
+      }
+
+      Operations::Fdsh::EvidenceVerificationRequest.new.call(self, event_payload)
+    end
+
+# ////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+# ///////////////////////////// OLD REQUEST DETERMINATION ////////////////////////////////////
+
     # def request_determination(action_name, update_reason, updated_by = nil)
     #   application = self.evidenceable.application
-    #   binding.irb
-    #   payload_entity = build_and_validate_payload_entity(application)
-    #   event = build_event(payload_entity.to_h, application)
-    #   binding.irb
+    #   payload = construct_payload(application)
+    #   headers = self.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: application.id }
 
+    #   request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: headers)
     #   return false unless request_event.success?
     #   response = request_event.value!.publish
 
@@ -82,61 +98,31 @@ module Eligibilities
     #   response
     # end
 
-    # def build_and_validate_payload_entity(application)
-    #   Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application, self.key)
+    # def construct_payload(application)
+    #   cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application).value!
+    #   AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application).value!
     # end
-
-    # def build_event(payload, application)
-    #   binding.irb
-    #   headers = self.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: payload[:hbx_id] }
-    #   binding.irb
-    #   request_event = event(FDSH_EVENTS[self.key], attributes: payload, headers: headers)
-    # end
-
-# ////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-# ///////////////////////////// OLD REQUEST DETERMINATION ////////////////////////////////////
-
-    def request_determination(action_name, update_reason, updated_by = nil)
-      application = self.evidenceable.application
-      payload = construct_payload(application)
-      headers = self.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: application.id }
-
-      request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: headers)
-      return false unless request_event.success?
-      response = request_event.value!.publish
-
-      if response
-        add_verification_history(action_name, update_reason, updated_by)
-        self.save
-      end
-      response
-    end
-
-    def construct_payload(application)
-      cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application).value!
-      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application).value!
-    end
 
 # ////////////////////////////////////////////////////////////////////////////////////////
 
     def add_verification_history(action, update_reason, updated_by)
-      self.verification_histories.build(action: action, update_reason: update_reason, updated_by: updated_by)
+      result = self.verification_histories.build(action: action, update_reason: update_reason, updated_by: updated_by)
+      self.save
+      result
     end
 
     def extend_due_on(period = 30.days, updated_by = nil)
       self.due_on = verif_due_date + period
       add_verification_history('extend_due_date', "Extended due date to #{due_on.strftime('%m/%d/%Y')}", updated_by)
-      self.save
+      # consider adding .save to add_verification_history method?
+      # self.save
     end
 
     def auto_extend_due_on(period = 30.days, updated_by = nil)
       current = verif_due_date
       self.due_on = current + period
       add_verification_history('auto_extend_due_date', "Auto extended due date from #{current.strftime('%m/%d/%Y')} to #{due_on.strftime('%m/%d/%Y')}", updated_by)
-      self.save
+      # self.save
     end
 
     def verif_due_date
