@@ -68,6 +68,7 @@ end
 
 Then(/the user will navigate to the assistance year selection page/) do
   expect(page).to have_content(l10n("faa.year_selection_header"))
+  expect(page).to have_content(l10n("faa.assitance_year_option2"))
 end
 
 Then(/the user will navigate to the non-OE assistance year selection page/) do
