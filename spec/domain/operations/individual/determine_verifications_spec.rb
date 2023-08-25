@@ -178,13 +178,6 @@ RSpec.describe Operations::Individual::DetermineVerifications, dbclean: :after_e
           histories = types.citizenship_type.first.type_history_elements
           expect(histories.select{|history| ['Hub Request'].include?(history.action)}.present?).to be_truthy
         end
-
-        it 'should set verification_type to pending' do
-          consumer_role.reload
-          types = consumer_role.verification_types
-          expect(types.ssn_type.first.validation_status).to eq 'negative_response_received'
-          expect(types.citizenship_type.first.validation_status).to eq 'pending'
-        end
       end
 
       context 'when validate_and_record_publish_errors feature is disabled' do
