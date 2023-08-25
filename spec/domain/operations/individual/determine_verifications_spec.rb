@@ -115,7 +115,9 @@ RSpec.describe Operations::Individual::DetermineVerifications, dbclean: :after_e
       let(:consumer_role) { FactoryBot.create(:consumer_role)}
       let(:result) {  described_class.new.call(id: consumer_role.id) }
       before :each do
-        EnrollRegistry[:trigger_verifications_before_enrollment_purchase].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_errors).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:trigger_verifications_before_enrollment_purchase).and_return(true)
         allow(ConsumerRole).to receive(:find).and_return(consumer_role)
         result
       end
