@@ -13,4 +13,14 @@ RSpec.describe 'default enrollments namespace client specific configurations' do
       end
     end
   end
+
+  describe 'cancel_superseded_terminated_enrollments' do
+    context 'for default value' do
+      it 'returns default value false' do
+        expect(
+          EnrollRegistry.feature_enabled?(:cancel_superseded_terminated_enrollments)
+        ).to be_falsey
+      end
+    end
+  end
 end
