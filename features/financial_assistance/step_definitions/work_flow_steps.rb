@@ -68,7 +68,14 @@ end
 
 Then(/the user will navigate to the assistance year selection page/) do
   expect(page).to have_content(l10n("faa.year_selection_header"))
-  expect(page).to have_content(l10n("faa.assitance_year_option2"))
+end
+
+Then(/the user will navigate to the assistance year selection page with multiple options/) do
+  oe_year = Family.application_applicable_year
+  current_year = oe_year - 1
+  expect(page).to have_content(l10n("faa.year_selection_header"))
+  expect(page).to have_content(l10n("faa.assitance_year_option1", year: oe_year))
+  expect(page).to have_content(l10n("faa.assitance_year_option2", year: current_year))
 end
 
 Then(/the user will navigate to the non-OE assistance year selection page/) do
