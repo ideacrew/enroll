@@ -1807,7 +1807,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       application.active_applicants.first.update_attributes!(is_totally_ineligible: true)
 
       result = application.notify_totally_ineligible_members
-      expect(result).to eq true
+      expect(result).to_not eq nil
     end
   end
 

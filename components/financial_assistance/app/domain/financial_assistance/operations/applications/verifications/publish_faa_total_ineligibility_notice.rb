@@ -37,19 +37,14 @@ module FinancialAssistance
           def construct_payload(application)
             if application.determined? && application.eligibility_response_payload.present?
               parsed_payload = JSON.parse(application.eligibility_response_payload, symbolize_names: true)
-              result = ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(parsed_payload)
-              if result.success?
-                Success(result)
-              else
-                Failure("PublishFaaTotalIneligibilityNotice_error: Could not initialize application for application #{application.id}")
-              end
+              ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(parsed_payload)
             else
               Failure("PublishFaaTotalIneligibilityNotice_error: Could not initialize application for undetermined application #{application.id}")
             end
           end
 
           def publish(payload)
-            FinancialAssistance::Operations::Applications::Verifications::FaaTotalIneligibilityNotice.new.call(payload)
+            FinancialAssistance::Operations::Applications::Verifications::FaaTotalIneligibilityNotice.new.call(payload.to_h)
           end
         end
       end
