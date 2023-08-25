@@ -52,6 +52,8 @@ module Operations
             timestamp: {created_at: person.created_at.to_datetime, modified_at: person.updated_at.to_datetime}
           }
           Success(payload)
+        rescue StandardError => e
+          Failure("Cv3Person hbx id: #{person&.hbx_id} | exception: #{e.inspect} | backtrace: #{e.backtrace.inspect}")
         end
 
         def transform_person_health(person)
