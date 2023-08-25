@@ -170,8 +170,8 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
                                       last_name: person.last_name,
                                       dob: person.dob,
                                       gender: person.gender,
-                                      ssn: '000356837',
-                                      # ssn: person.ssn,
+                                      # ssn: '000356837',
+                                      ssn: person.ssn,
                                       application: application,
                                       ethnicity: nil,
                                       is_primary_applicant: true,
@@ -269,6 +269,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
           # expect(evidence.verification_histories).to be_empty
 
           result = evidence.request_determination(action, update_reason, updated_by)
+          binding.irb
           evidence.reload
           binding.irb
 

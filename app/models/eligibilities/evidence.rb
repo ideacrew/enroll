@@ -71,6 +71,7 @@ module Eligibilities
       # return hub_call_negative_response_received(application) if payload.failure? && admin_hub_call_payload_generation_failure_conditions_met?(application)
       headers = self.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: application.id }
 
+      binding.irb
       request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: headers)
       binding.irb
       return false unless request_event.success?
