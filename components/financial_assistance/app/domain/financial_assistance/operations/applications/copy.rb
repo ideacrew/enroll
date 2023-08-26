@@ -32,10 +32,10 @@ module FinancialAssistance
         private
 
         def validate_input_params(params)
-          return Failure(I18n.t('faa.errors.key_application_id_missing_error')) unless params.key?(:application_id)
+          return Failure({simple_error_message: I18n.t('faa.errors.key_application_id_missing_error')}) unless params.key?(:application_id)
           application = ::FinancialAssistance::Application.where(id: params[:application_id]).first
-          return Failure(I18n.t('faa.errors.unable_to_find_application_error')) if application.blank?
-          return Failure(I18n.t('faa.errors.given_application_is_not_submitted_error', valid_states: VALID_APPLICATION_STATES)) unless VALID_APPLICATION_STATES.include?(application.aasm_state)
+          return Failure({simple_error_message: I18n.t('faa.errors.unable_to_find_application_error')}) if application.blank?
+          return Failure({simple_error_message: I18n.t('faa.errors.given_application_is_not_submitted_error', valid_states: VALID_APPLICATION_STATES)}) unless VALID_APPLICATION_STATES.include?(application.aasm_state)
 
           Success(application)
         end
