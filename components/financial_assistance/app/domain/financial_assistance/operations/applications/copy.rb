@@ -59,13 +59,15 @@ module FinancialAssistance
             Success(draft_app)
           else
             # Log additional information
-            failure_message = I18n.t('faa.errors.invalid_application') + " Errors: #{draft_app.errors.full_messages}"
-            Failure(failure_message)
+            simple_error_message = I18n.t('faa.errors.invalid_application')
+            detailed_error_message = simple_error_message + " Errors: #{draft_app.errors.full_messages}"
+            Failure(simple_error_message: simple_error_message, detailed_error_message: detailed_error_message)
           end
         rescue StandardError => e
           # Log additional information
-          failure_message = I18n.t('faa.errors.copy_application_error') + " Error message: #{e.message}"
-          Failure(failure_message)
+          simple_error_message = I18n.t('faa.errors.copy_application_error')
+          detailed_error_message = simple_error_message + " Error message: #{e.message}"
+          Failure(simple_error_message: simple_error_message, detailed_error_message: detailed_error_message)
         end
 
         def build_application(source_application, active_fms_applicant_params)

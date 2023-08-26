@@ -86,13 +86,12 @@ module FinancialAssistance
                 ::FinancialAssistance::Operations::Applications::Copy.new
               end.bind do |renewal_application_factory|
                 copied_result = renewal_application_factory.call(application_id: application.id)
-                return copied_result if copied_result.failure?
-                renewal_application = copied_result.success
+                return Failure(copied_result.failure[:detailed_error_message]) if copied_result.failure?
 
+                renewal_application = copied_result.success
                 family_members_changed = renewal_application_factory.family_members_changed
                 relationships_changed = renewal_application_factory.relationships_changed
                 calculated_renewal_base_year = calculate_renewal_base_year(application)
-
                 renewal_application.assign_attributes(
                   aasm_state: find_aasm_state(
                     application,
