@@ -58,14 +58,14 @@ module Operations
       def build_eligibility_options(values, eligibility_record = nil)
         ::Operations::Eligible::BuildEligibility.new(
           configuration:
-            ::Operations::IvlOsseEligibilities::OsseEligibilityConfiguration.new(
+            ::Operations::IvlOsseEligibilities::IvlOsseEligibilityConfiguration.new(
               values[:effective_date]
             )
         ).call(
           values.merge(
             eligibility_record: eligibility_record,
             evidence_configuration:
-              ::Operations::IvlOsseEligibilities::OsseEvidenceConfiguration.new
+              ::Operations::IvlOsseEligibilities::IvlOsseEvidenceConfiguration.new
           )
         )
       end
