@@ -730,10 +730,176 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
 
           eligibility_2022.tap do |e|
             expect(e.is_eligible).to be_truthy
-            expect(e.effective_on.to_date).to eq eligibilities.first.start_on.to_date
+            expect(e.effective_on.to_date).to eq eligibilities
+              .first
+              .start_on
+              .to_date
             expect(e.evidences.last.current_state).to eq :approved
             expect(e.evidences.last.state_histories.pluck(:to_state)).to eq %i[
                  initial
+                 approved
+               ]
+          end
+
+          eligibility_2023.tap do |e|
+            expect(e.is_eligible).to be_truthy
+            expect(e.effective_on.to_date).to eq Date.new(2023, 1, 1)
+            expect(e.evidences.last.current_state).to eq :approved
+            expect(e.evidences.last.state_histories.pluck(:to_state)).to eq %i[
+                 initial
+                 approved
+               ]
+          end
+        end
+      end
+    end
+    context ".scenario 2 (multiple eligibility records present)" do
+      let(:options1) do
+        {
+          "_id" => BSON.ObjectId("636c00ad200ce7001082a14b"),
+          "start_on" => DateTime.parse("2022-11-09 00:00:00 UTC"),
+          "eligibility_id" => BSON.ObjectId("577beb2f082e761e59000034"),
+          "eligibility_type" =>
+            "BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
+          "updated_at" => DateTime.parse("2022-11-14 19:04:36 UTC"),
+          "created_at" => DateTime.parse("2022-11-09 19:34:05 UTC"),
+          "subject" => {
+            "_id" => BSON.ObjectId("636c00ad200ce7001082a14c"),
+            "title" => "Subject for Osse Subsidy",
+            "key" => benefit_sponsorship.to_global_id,
+            "klass" =>
+              "BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
+            "updated_at" => DateTime.parse("2022-11-09 19:34:05 UTC"),
+            "created_at" => DateTime.parse("2022-11-09 19:34:05 UTC")
+          },
+          "evidences" => [
+            {
+              "_id" => BSON.ObjectId("636c00ad200ce7001082a14d"),
+              "key" => :osse_subsidy,
+              "title" => "Evidence for Osse Subsidy",
+              "is_satisfied" => true,
+              "updated_at" => DateTime.parse("2022-11-09 19:34:05 UTC"),
+              "created_at" => DateTime.parse("2022-11-09 19:34:05 UTC")
+            },
+            {
+              "_id" => BSON.ObjectId("637291447b8cde0010954975"),
+              "title" => "Osse Subsidy Evidence",
+              "key" => :osse_subsidy,
+              "is_satisfied" => false,
+              "updated_at" => DateTime.parse("2022-11-14 19:04:36 UTC"),
+              "created_at" => DateTime.parse("2022-11-14 19:04:36 UTC")
+            }
+          ],
+          "grants" => [
+            {
+              "_id" => BSON.ObjectId("636c00ae200ce7001082a14f"),
+              "title" => "minimum_participation_rule_relaxed_2022",
+              "key" => :minimum_participation_rule,
+              "start_on" => DateTime.parse("2022-11-09 00:00:00 UTC"),
+              "updated_at" => DateTime.parse("2022-11-09 19:34:06 UTC"),
+              "created_at" => DateTime.parse("2022-11-09 19:34:06 UTC"),
+              "value" => {
+                "_id" => BSON.ObjectId("636c00ae200ce7001082a14e"),
+                "_type" => "Eligibilities::Osse::BenefitSponsorshipOssePolicy",
+                "title" => "minimum_participation_rule_relaxed_2022",
+                "key" => :minimum_participation_rule,
+                "value" => "minimum_participation_rule",
+                "updated_at" => DateTime.parse("2022-11-09 19:34:06 UTC"),
+                "created_at" => DateTime.parse("2022-11-09 19:34:06 UTC")
+              }
+            }
+          ],
+          "end_on" => DateTime.parse("2022-11-14 00:00:00 UTC")
+        }
+      end
+      let(:options2) do
+        {
+          "_id" => BSON.ObjectId("637be926b14b360010fcbe34"),
+          "start_on" => DateTime.parse("2022-11-21 00:00:00 UTC"),
+          "eligibility_id" => BSON.ObjectId("577beb2f082e761e59000034"),
+          "eligibility_type" =>
+            "BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
+          "updated_at" => DateTime.parse("2022-11-21 21:09:58 UTC"),
+          "created_at" => DateTime.parse("2022-11-21 21:09:58 UTC"),
+          "subject" => {
+            "_id" => BSON.ObjectId("637be926b14b360010fcbe35"),
+            "title" => "Subject for Osse Subsidy",
+            "key" => benefit_sponsorship.to_global_id,
+            "klass" =>
+              "BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
+            "updated_at" => DateTime.parse("2022-11-21 21:09:58 UTC"),
+            "created_at" => DateTime.parse("2022-11-21 21:09:58 UTC")
+          },
+          "evidences" => [
+            {
+              "_id" => BSON.ObjectId("637be926b14b360010fcbe36"),
+              "key" => :osse_subsidy,
+              "title" => "Evidence for Osse Subsidy",
+              "is_satisfied" => true,
+              "updated_at" => DateTime.parse("2022-11-21 21:09:58 UTC"),
+              "created_at" => DateTime.parse("2022-11-21 21:09:58 UTC")
+            }
+          ],
+          "grants" => [
+            {
+              "_id" => BSON.ObjectId("637be926b14b360010fcbe38"),
+              "title" => "minimum_participation_rule_relaxed_2022",
+              "key" => :minimum_participation_rule,
+              "start_on" => DateTime.parse("2022-11-21 00:00:00 UTC"),
+              "updated_at" => DateTime.parse("2022-11-21 21:09:58 UTC"),
+              "created_at" => DateTime.parse("2022-11-21 21:09:58 UTC"),
+              "value" => {
+                "_id" => BSON.ObjectId("637be926b14b360010fcbe37"),
+                "_type" => "Eligibilities::Osse::BenefitSponsorshipOssePolicy",
+                "title" => "minimum_participation_rule_relaxed_2022",
+                "key" => :minimum_participation_rule,
+                "value" => "minimum_participation_rule",
+                "updated_at" => DateTime.parse("2022-11-21 21:09:58 UTC"),
+                "created_at" => DateTime.parse("2022-11-21 21:09:58 UTC")
+              }
+            }
+          ]
+        }
+      end
+      context "when eligibility active last year" do
+        let(:eligibilities) do
+          [options1, options2].collect do |options|
+            Eligibilities::Osse::Eligibility.new(options)
+          end
+        end
+
+        it "should migrate eligibility record and create renewal eligibility" do
+          result =
+            described_class.new.call(
+              current_eligibilities: eligibilities,
+              eligibility_type:
+                "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+            )
+
+          expect(result.success).to be_truthy
+          benefit_sponsorship.reload
+          expect(benefit_sponsorship.eligibilities).to be_present
+          expect(benefit_sponsorship.eligibilities.count).to eq 2
+
+          eligibility_2022 =
+            benefit_sponsorship
+            .eligibilities
+            .by_key(:aca_shop_osse_eligibility_2022)
+            .first
+          eligibility_2023 =
+            benefit_sponsorship
+            .eligibilities
+            .by_key(:aca_shop_osse_eligibility_2023)
+            .first
+
+          eligibility_2022.tap do |e|
+            expect(e.is_eligible).to be_truthy
+            expect(e.effective_on.to_date).to eq eligibilities[1].start_on.to_date
+            expect(e.evidences.last.current_state).to eq :approved
+            expect(e.evidences.last.state_histories.pluck(:to_state)).to eq %i[
+                 initial
+                 approved
+                 denied
                  approved
                ]
           end
