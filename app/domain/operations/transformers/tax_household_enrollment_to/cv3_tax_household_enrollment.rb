@@ -104,8 +104,7 @@ module Operations
         end
 
         def construct_payload(th_enr)
-          Success(
-            { tax_household_reference: tax_household_reference_hash(th_enr),
+          payload = { tax_household_reference: tax_household_reference_hash(th_enr),
               hbx_enrollment_reference: hbx_enrollment_reference_hash(th_enr),
               health_product_hios_id: th_enr.health_product_hios_id,
               dental_product_hios_id: th_enr.dental_product_hios_id,
@@ -115,7 +114,9 @@ module Operations
               applied_aptc: money_to_currency(th_enr.applied_aptc),
               available_max_aptc: money_to_currency(th_enr.available_max_aptc),
               tax_household_members_enrollment_members: tax_household_members_enrollment_members_hash(th_enr) }
-          )
+          Success(payload)
+        rescue StandardError => e
+          Failure("Cv3TaxHouseholdEnrollment transform failure for enrollment hbx id: #{th_enr&.enrollment&.hbx_id} | exception: #{e.inspect} | backtrace: #{e.backtrace.inspect}")
         end
 
         def money_to_currency(value)
