@@ -18,11 +18,11 @@ module Operations
           update_reason = "#{evidence.key} Evidence Verification Request Failed due to #{result.failure}"
           evidence.add_verification_history(action: "Hub Request Failed", modifier: "System", update_reason: update_reason)
 
-          # Original determination method returned false on failure -- keep this as to not break existing functionality/specs?
-          return false
+          # Original determination method returned false on failure -- keeping this as to not break existing functionality/specs
+          false
         elsif response.failure?
-          # Original determination method returned false on failure -- keep this as to not break existing functionality/specs?
-          return false
+          # Original determination method returned false on failure -- keeping this as to not break existing functionality/specs
+          false
         else
           evidence.add_verification_history(event[:action_name], event[:update_reason], event[:updated_by])
           response

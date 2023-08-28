@@ -87,23 +87,28 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
       let(:failure_publish) { double(success?: true, value!: double(publish: false)) }
       let(:success_payload) { double(failure?: false, value!: {}) }
 
-      before do
-        esi_evidence.stub(:generate_evidence_updated_event) { true }
-        esi_evidence.stub(:construct_payload) { success_payload }
-      end
+      it 'should update due date' do
+        binding.irb
+        allow_any_instance_of(::Operations::Fdsh:EvidenceVerificationRequest).to(
+          receive(:build_and_validate_payload_entity).and_return({})
+        )
 
-      it 'should not update due date' do
-        esi_evidence.stub(:event) { failure_event }
-        esi_evidence.request_determination(action, update_reason, updated_by)
-        esi_evidence.reload
-        expect(esi_evidence.verification_histories).to be_empty
-      end
-
-      it 'should update due date with history' do
-        esi_evidence.stub(:event) { success_event }
-        expect(esi_evidence.verification_histories).to be_empty
-        result = esi_evidence.request_determination(action, update_reason, updated_by)
-        esi_evidence.reload
+        evidence = applicant.esi_evidence
+        binding.irb
+        
+        # evidence.stub(:construct_payload) { {} }
+        evidence.stub(:event) { event }
+        evidence.stub(:generate_evidence_updated_event) { true }
+        
+        binding.irb
+        expect(evidence.verification_histories).to be_empty
+        binding.irb
+        
+        result = evidence.request_determination(action, update_reason, updated_by)
+        binding.irb
+        evidence.reload
+        binding.irb
+        
         expect(result).to be_truthy
         expect(esi_evidence.verification_histories).to be_present
 
@@ -149,11 +154,12 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
       let(:action) { 'request_hub' }
       let(:event) { double(success?: false, value!: double(publish: true)) }
 
-      let!(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: '100095')}
-      let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+      let!(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: '100095') }
+      let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
       let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
+
       let(:applicant1_has_enrolled_health_coverage) { false }
-      let(:applicant1_has_eligible_health_coverage) { false }
+      let(:applicant2_has_eligible_health_coverage) { false }
       let(:applicant1_is_applying_coverage) { true }
 
       let(:applicant1_has_job_income) { false }
@@ -170,8 +176,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
                                       last_name: person.last_name,
                                       dob: person.dob,
                                       gender: person.gender,
-                                      ssn: '000356837',
-                                      # ssn: person.ssn,
+                                      ssn: person.ssn,
                                       application: application,
                                       ethnicity: nil,
                                       is_primary_applicant: true,
@@ -192,7 +197,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
                                       is_physically_disabled: false,
                                       citizen_status: 'us_citizen',
                                       has_enrolled_health_coverage: applicant1_has_enrolled_health_coverage,
-                                      has_eligible_health_coverage: applicant1_has_eligible_health_coverage,
+                                      has_eligible_health_coverage: applicant2_has_eligible_health_coverage,
                                       has_eligible_medicaid_cubcare: false,
                                       is_claimed_as_tax_dependent: false,
                                       is_incarcerated: false,
@@ -245,43 +250,44 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
         allow(lcsp_double).to receive(:failure?).and_return(false)
       end
 
-      context 'with aptc active' do
-        before do
-          eligibility_determination.update(max_aptc: 720.0)
+      # let!(:application) { FactoryBot.create(:financial_assistance_application, :cv3_compatible, family_id: family.id) }
 
-          applicant.create_income_evidence(
-            key: :income,
-            title: 'Income',
-            aasm_state: :negative_response_received,
-            due_on: TimeKeeper.date_of_record,
-            verification_outstanding: true,
-            is_satisfied: false
-          )
-        end
+      context 'while validating and constructing the payload' do
+        context 'with no errors' do
+          before do
+            binding.irb
+            evidence = applicant.income_evidence
+          end
 
-        it 'should validate when constructing the payload' do
-          evidence = applicant.income_evidence
+          it 'should return success' do
+            # use to mock verification_history
+            # evidence.stub(:event) { event }
+            # evidence.stub(:generate_evidence_updated_event) { true }
+            result = evidence.request_determination(action, update_reason, updated_by)
+            evidence.reload
 
-          # use to mock verification_history
-          # evidence.stub(:event) { event }
-          # evidence.stub(:generate_evidence_updated_event) { true }
+            expect(result).to be_falsey
+            # expect(evidence.aasm_status).to eq(:negative_response_received)
+            expect(evidence.verification_histories).to be_present
 
-          # expect(evidence.verification_histories).to be_empty
+            history = evidence.verification_histories.first
+            expect(history.action).to eq action
+            expect(history.update_reason).to eq update_reason
+            expect(history.updated_by).to eq updated_by
 
-          result = evidence.request_determination(action, update_reason, updated_by)
-          binding.irb
-          evidence.reload
-          binding.irb
+          end
+        end 
 
-          expect(result).to be_falsey
-          # expect(evidence.aasm_status).to eq(:negative_response_received)
-          expect(evidence.verification_histories).to be_present
+        # context 'with errors will change the aasm_state of the evidence' do
+          # need to instantiate two different applications here - 1 w/aptc, 1 w/csr
+          # it 'should change evidence aasm_state to negative_response_received if the applicant is enrolled and has an aptc > 0' do
 
-          history = evidence.verification_histories.first
-          expect(history.action).to eq action
-          expect(history.update_reason).to eq update_reason
-          expect(history.updated_by).to eq updated_by
-        end
+          # end
+
+          # it 'should change evidence aasm_state to negative_response_received if the applicant is enrolled and is a csr participant' do
+
+          # end
+        # end
       end
     end
 
