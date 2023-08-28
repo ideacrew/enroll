@@ -18,8 +18,10 @@ module Operations
 
       def to_state_for(evidence_state)
         case evidence_state
-        when :approved, :denied
-          :published
+        when :approved
+          :eligible
+        when :denied, :not_eligible
+          :ineligible
         else
           :initial
         end

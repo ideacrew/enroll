@@ -6,7 +6,7 @@ module Eligible
     include Mongoid::Document
     include Mongoid::Timestamps
 
-    STATUSES = %i[initial published expired].freeze
+    STATUSES = %i[initial eligible ineligible].freeze
 
     embedded_in :eligible, polymorphic: true
 

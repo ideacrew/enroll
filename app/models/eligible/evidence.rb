@@ -8,7 +8,7 @@ module Eligible
 
     embedded_in :eligibility, class_name: "::Eligible::Eligibility"
 
-    STATUSES = %i[initial approved denied].freeze
+    STATUSES = %i[initial not_approved approved denied].freeze
     ELIGIBLE_STATUSES = %i[approved].freeze
 
     field :key, type: Symbol
