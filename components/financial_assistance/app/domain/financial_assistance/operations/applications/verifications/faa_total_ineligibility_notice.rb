@@ -22,7 +22,7 @@ module FinancialAssistance
           private
 
           def build_event(payload)
-            event('events.families.notices.faa_totally_ineligible_notice.requested', attributes: payload.to_h)
+            event('events.families.notices.faa_totally_ineligible_notice.requested', attributes: payload)
           end
 
           def publish(event)

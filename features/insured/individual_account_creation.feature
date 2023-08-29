@@ -41,3 +41,21 @@ Feature: UI validations for Email, Username and SSN already in use
     When Individual visits the Consumer portal during open enrollment
     And Individual creates an HBX account with SSN already in use
     Then Individual should see error message The Social Security number entered is associated with an existing user
+
+  Scenario: New user attempts to create account with invalid SSN and validate SSN feature is enabled
+    When Individual creates a new HBX account
+    Then Individual should see a successful sign up message
+    And Individual sees Your Information page
+    When validate SSN feature is enabled
+    When the user registers as an individual with invalid SSN
+    When Individual clicks on continue
+    And Individual sees the error message Invalid SSN
+
+  Scenario: New user attempts to create account with invalid SSN and validate SSN feature is disabled
+    When Individual creates a new HBX account
+    Then Individual should see a successful sign up message
+    And Individual sees Your Information page
+    When validate SSN feature is disabled
+    When the user registers as an individual with invalid SSN
+    When Individual clicks on continue
+    And Individual should not see the error message Invalid SSN

@@ -18,8 +18,7 @@ module FinancialAssistance
           # @return [ BenefitMarkets::Entities::Applicant ] applicant Applicant
           def call(application)
             valid_application  = yield validate_application(application)
-            payload_param      = yield construct_payload(valid_application)
-            payload_value      = yield validate_payload(payload_param)
+            payload_value      = yield construct_payload(valid_application)
             payload            = yield publish(payload_value)
 
             Success(payload)
@@ -36,15 +35,16 @@ module FinancialAssistance
           end
 
           def construct_payload(application)
-            FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
-          end
-
-          def validate_payload(payload)
-            AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(payload)
+            if application.determined? && application.eligibility_response_payload.present?
+              parsed_payload = JSON.parse(application.eligibility_response_payload, symbolize_names: true)
+              ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(parsed_payload)
+            else
+              Failure("PublishFaaTotalIneligibilityNotice_error: Could not initialize application for undetermined application #{application.id}")
+            end
           end
 
           def publish(payload)
-            FinancialAssistance::Operations::Applications::Verifications::FaaTotalIneligibilityNotice.new.call(payload)
+            FinancialAssistance::Operations::Applications::Verifications::FaaTotalIneligibilityNotice.new.call(payload.to_h)
           end
         end
       end

@@ -4,21 +4,21 @@
 	<xs:element name="coverages">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="coverage" type="CoverageType" maxOccurs="10"/>
+				<xs:element name="coverage" type="CoverageType" maxOccurs="unbounded"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="deductables">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="deductables" type="DeductableType" maxOccurs="10"/>
+				<xs:element name="deductables" type="DeductableType" maxOccurs="unbounded"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="maximums">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="maximum" type="MaximumType" maxOccurs="10"/>
+				<xs:element name="maximum" type="MaximumType" maxOccurs="unbounded"/>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -71,7 +71,7 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="custom_scenarios" minOccurs="0" maxOccurs="10">
+			<xs:element name="custom_scenarios" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:sequence>
 						<xs:element name="name">
