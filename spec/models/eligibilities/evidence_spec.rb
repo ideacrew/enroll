@@ -131,71 +131,53 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
     end
 
     context 'validating a payload in during an admin FDSH hub call' do
-      let(:updated_by) { 'admin' }
-      let(:update_reason) { "Requested Hub for verification" }
-      let(:action) { 'request_hub' }
-      let(:event) { double(success?: false, value!: double(publish: true)) }
-
       let(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: '100095') }
       let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
       let(:has_enrolled_health_coverage) { true }
+      let(:is_primary_applicant) { true }
 
       let(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
       let(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application, max_aptc: 0) }
       let!(:applicant) do
         applicant = FactoryBot.create(:financial_assistance_applicant,
+                                      :with_student_information,
+                                      :with_home_address,
                                       application: application,
+                                      is_primary_applicant: is_primary_applicant,
                                       ssn: '889984400',
                                       dob: Date.new(1993,12,9),
                                       first_name: 'Max',
                                       last_name: 'Zorin',
+                                      gender: person.gender,
+                                      person_hbx_id: person.hbx_id,
                                       eligibility_determination_id: eligibility_determination.id,
                                       has_enrolled_health_coverage: has_enrolled_health_coverage)
         applicant
       end
 
       let(:premiums_hash) do
-        {
-          [person.hbx_id] => {:health_only => {person.hbx_id => [{:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}]}}
-        }
+        { [person.hbx_id] => {:health_only => {person.hbx_id => [{:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}]}} }
       end
 
       let(:slcsp_info) do
-        {
-          person.hbx_id => {:health_only_slcsp_premiums => {:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}}
-        }
+        { person.hbx_id => {:health_only_slcsp_premiums => {:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}} }
       end
 
       let(:lcsp_info) do
-        {
-          person.hbx_id => {:health_only_lcsp_premiums => {:cost => 100.0, :member_identifier => person.hbx_id, :monthly_premium => 100.0}}
-        }
+        { person.hbx_id => {:health_only_lcsp_premiums => {:cost => 100.0, :member_identifier => person.hbx_id, :monthly_premium => 100.0}} }
       end
 
       let(:premiums_double) { double(:success => premiums_hash) }
       let(:slcsp_double) { double(:success => slcsp_info) }
       let(:lcsp_double) { double(:success => lcsp_info) }
 
-      let(:fetch_double) { double(:new => double(call: premiums_double))}
-      let(:fetch_slcsp_double) { double(:new => double(call: slcsp_double))}
-      let(:fetch_lcsp_double) { double(:new => double(call: lcsp_double))}
-      let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
+      let(:fetch_double) { double(:new => double(call: premiums_double)) }
+      let(:fetch_slcsp_double) { double(:new => double(call: slcsp_double)) }
+      let(:fetch_lcsp_double) { double(:new => double(call: lcsp_double)) }
 
+      let(:hbx_profile) { FactoryBot.create(:hbx_profile) }
       let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
       let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
-
-      # Document not found for class HbxEnrollment with attributes {:family_id=>BSON::ObjectId('64ed015850309724e3b20854')}
-      # ^Check if is_active?
-
-      # let(:hbx_enrollment) do
-      #   FactoryBot.create(
-      #     :hbx_enrollment,
-      #     :with_enrollment_members,
-      #     :with_product,
-      #     household: family.active_household,
-      #     aasm_state: "coverage_selected",
-      #     benefit_sponsorship_id: initial_application.benefit_sponsorship.id)
-      # end
 
       before do
         allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
@@ -211,7 +193,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
         applicant.create_income_evidence(
           key: :income,
           title: 'Income',
-          aasm_state: :outstanding,
+          aasm_state: :pending,
           due_on: TimeKeeper.date_of_record,
           verification_outstanding: true,
           is_satisfied: false
@@ -220,27 +202,34 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
 
       context 'while validating and constructing the payload' do
         context 'with no errors' do
+          let(:updated_by) { 'admin' }
+          let(:update_reason) { "Requested Hub for verification" }
+          let(:action) { 'request_hub' }
+
           it 'should return success' do
             evidence = applicant.income_evidence
-            # use to mock verification_history
-            # evidence.stub(:event) { event }
-            # evidence.stub(:generate_evidence_updated_event) { true }
+            current_aasm_state = evidence.aasm_state
+
             result = evidence.request_determination(action, update_reason, updated_by)
             evidence.reload
 
+            binding.irb
             expect(result).to be_falsey
-            # expect(evidence.aasm_status).to eq(:negative_response_received)
+            expect(evidence.aasm_state).to eq(current_aasm_state)
             expect(evidence.verification_histories).to be_present
 
             history = evidence.verification_histories.first
             expect(history.action).to eq action
             expect(history.update_reason).to eq update_reason
             expect(history.updated_by).to eq updated_by
-
           end
         end
 
         context 'with errors' do
+          let(:updated_by) { 'admin' }
+          let(:action) { 'Hub Request Failed' }
+          let(:update_reason) { 'Requested Hub for verification' }
+
           before do
             applicant.update(ssn: '000238754')
           end
@@ -268,7 +257,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
 
           context 'with an applicant with active enrollment and csr' do
             before do
-              # applicant.update(csr_percent_as_integer: 73, csr_eligibility_kind: 'csr_73')
+              applicant.update(csr_percent_as_integer: 73, csr_eligibility_kind: 'csr_73')
             end
 
             it 'should change evidence aasm_state to negative_response_received' do
