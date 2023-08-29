@@ -32,10 +32,14 @@ module Forms
     validate :age_less_than_18
     attr_reader :dob
 
+    VALIDATE_SSN = EnrollRegistry[:validate_ssn]
+    SSN_REGEX = VALIDATE_SSN.enabled? ? /#{VALIDATE_SSN.item}/ : /\A\d{9}\z/
+
     def ssn_or_checkbox
       return unless is_applying_coverage? # Override SSN/Checkbox validations if is_applying_coverage is "false"
 
-      errors.add(:base, "Enter a valid social security number or select 'I don't have an SSN'") if ssn.blank? && no_ssn == "0"
+      return errors.add(:base, "Enter a valid social security number or select 'I don't have an SSN'") if ssn.blank? && no_ssn == "0"
+      errors.add(:base, l10n("invalid_ssn")) unless ssn.match?(SSN_REGEX)
     end
 
     def is_applying_coverage?
