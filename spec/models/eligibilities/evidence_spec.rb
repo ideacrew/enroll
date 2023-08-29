@@ -78,10 +78,15 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
       end
     end
 
+    let(:updated_by) { 'admin' }
+    let(:update_reason) { "Requested Hub for verification" }
+    let(:action) { 'request_hub' }
+
     context '.request_determination' do
-      let(:updated_by) { 'admin' }
-      let(:update_reason) { "Requested Hub for verification" }
-      let(:action) { 'request_hub' }
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
+      end
 
       let(:evidence_verification_request) { instance_double(Operations::Fdsh::EvidenceVerificationRequest) }
 
@@ -92,45 +97,45 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
         end
 
         it 'should return success' do
-          evidence = applicant.income_evidence
-          current_aasm_state = evidence.aasm_state
+          result = income_evidence.request_determination(action, update_reason, updated_by)
+          income_evidence.reload
 
-          result = described_class.new.call(evidence)
+          expect(result).to be_success
+          expect(income_evidence.verification_histories).to be_present
 
-          # result = evidence.request_determination(action, update_reason, updated_by)
-          evidence.reload
-          binding.irb
-
-          expect(result).to be_truthy
-          expect(evidence.aasm_state).to eq(current_aasm_state)
+          history = income_evidence.verification_histories.first
+          expect(history.action).to eq action
+          expect(history.update_reason).to eq update_reason
+          expect(history.updated_by).to eq updated_by
         end
       end
 
-      # context 'builds and publishes with errors' do
-      #   let(:action) { 'Hub Request Failed' }
-      #   let(:updated_by) { 'System' }
-      #   let(:update_reason) { "Income Evidence Verification Request Failed due to [\"Invalid SSN\"]" }
+      context 'builds and publishes with errors' do
+        let(:failed_action) { 'Hub Request Failed' }
+        let(:failed_updated_by) { 'System' }
+        let(:failed_update_reason) { "Income Evidence Verification Request Failed due to [\"Invalid SSN\"]" }
 
-      #   before do
-      #     applicant.update(ssn: '000238754')
-      #   end
+        before do
+          allow(evidence_verification_request).to receive(:call).and_return(Dry::Monads::Failure(failed_update_reason))
+          allow(Operations::Fdsh::EvidenceVerificationRequest).to receive(:new).and_return(evidence_verification_request)
+        end
 
-      #   context 'with an applicant who does not have an active enrollment' do
-      #     it 'should change evidence aasm_state to outstanding' do
-      #       evidence = applicant.income_evidence
-      #       result = described_class.new.call(evidence)
-      #       evidence.reload
+        context 'with an applicant who does not have an active enrollment' do
+          it 'should change evidence aasm_state to outstanding' do
+            result = income_evidence.request_determination(action, update_reason, updated_by)
+            evidence.reload
+            binding.irb
 
-      #       expect(result).to be_falsey
-      #       expect(evidence.aasm_state).to eq('outstanding')
-      #       expect(evidence.verification_histories).to be_present
+            expect(result).to be_falsey
+            expect(evidence.aasm_state).to eq('outstanding')
+            expect(evidence.verification_histories).to be_present
 
-      #       history = evidence.verification_histories.first
-      #       expect(history.action).to eq action
-      #       expect(history.update_reason).to eq update_reason
-      #       expect(history.updated_by).to eq updated_by
-      #     end
-      #   end
+            history = evidence.verification_histories.first
+            expect(history.action).to eq action
+            expect(history.update_reason).to eq update_reason
+            expect(history.updated_by).to eq updated_by
+          end
+        end
 
       #   context 'with an applicant with active enrollment and aptc' do
       #     before do
@@ -173,7 +178,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
       #       expect(history.updated_by).to eq updated_by
       #     end
       #   end
-      # end
+      end
     end
 
     context 'reject' do

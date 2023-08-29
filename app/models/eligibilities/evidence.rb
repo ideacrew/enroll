@@ -68,8 +68,10 @@ module Eligibilities
       self.add_verification_history(action_name, update_reason, updated_by)
       application = self.evidenceable.application
       response = Operations::Fdsh::EvidenceVerificationRequest.new.call(self)
-
+      binding.irb
+      
       if response.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
+        binding.irb
         determine_evidence_aasm_status(self.evidenceable)
 
         update_reason = "#{self.key.capitalize} Evidence Verification Request Failed due to #{response.failure}"
