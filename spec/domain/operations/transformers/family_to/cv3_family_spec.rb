@@ -12,9 +12,9 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
   let(:family_member2) { FactoryBot.create(:family_member, family: family, person: dependent1) }
   let(:family_member3) { FactoryBot.create(:family_member, family: family, person: dependent2) }
   let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'determined', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
-  let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: application, family_member_id: primary_applicant.id, is_primary_applicant: true, person_hbx_id: primary_applicant.hbx_id) }
-  let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, application: application, family_member_id: family_member2.id, person_hbx_id: dependent1.hbx_id) }
-  let!(:applicant3) { FactoryBot.create(:financial_assistance_applicant, application: application, family_member_id: family_member3.id, person_hbx_id: dependent2.hbx_id) }
+  let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, :male, application: application, family_member_id: primary_applicant.id, is_primary_applicant: true, person_hbx_id: primary_applicant.hbx_id) }
+  let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, :male, application: application, family_member_id: family_member2.id, person_hbx_id: dependent1.hbx_id) }
+  let!(:applicant3) { FactoryBot.create(:financial_assistance_applicant, :female, application: application, family_member_id: family_member3.id, person_hbx_id: dependent2.hbx_id) }
   let(:create_instate_addresses) do
     application.applicants.each do |appl|
       appl.addresses = [FactoryBot.build(:financial_assistance_address,
@@ -41,6 +41,74 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
   let(:benefit_sponsorship) { FactoryBot.build(:benefit_sponsorship) }
   let!(:hbx_profile) { FactoryBot.create :hbx_profile, benefit_sponsorship: benefit_sponsorship}
 
+  context 'nested cv3 transform failures' do
+
+    subject { Operations::Transformers::FamilyTo::Cv3Family.new.call(family) }
+
+    context 'when cv3 Person transform fails' do
+      before do
+        allow(Operations::Transformers::PersonTo::Cv3Person).to receive_message_chain('new.call').with(primary_applicant).and_return(Dry::Monads::Result::Failure.new(primary_applicant))
+      end
+
+      it "should return a failure if cv3 person transform returns failure" do
+        expect(subject).to be_a(Dry::Monads::Result::Failure)
+      end
+    end
+
+    context 'when cv3 Application transform fails' do
+      before do
+        allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Failure.new(application))
+      end
+
+      it "should return a failure if cv3 Application transform returns failure" do
+        expect(subject).to be_a(Dry::Monads::Result::Failure)
+      end
+    end
+
+    context 'when cv3 hbx enrollment transform fails' do
+      let!(:enrollment) do
+        create(
+          :hbx_enrollment,
+          :with_product,
+          family: family
+        )
+      end
+
+      before do
+        enrollment.update(product_id: enrollment.product.id)
+        allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Success.new(application))
+        allow(Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment).to receive_message_chain('new.call').with(enrollment, {}).and_return(Dry::Monads::Result::Failure.new(enrollment))
+      end
+
+      it "should return a failure if cv3 HbxEnrollment transform returns failure" do
+        expect(subject).to be_a(Dry::Monads::Result::Failure)
+      end
+    end
+
+    context 'when cv3 Tax Household Enrollment transform fails' do
+      let!(:enrollment) do
+        create(
+          :hbx_enrollment,
+          :with_product,
+          family: family
+        )
+      end
+
+      let!(:tax_household_enrollment) do
+        create(:tax_household_enrollment, enrollment_id: enrollment.id)
+      end
+
+      before do
+        allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Success.new(application))
+        allow(Operations::Transformers::TaxHouseholdEnrollmentTo::Cv3TaxHouseholdEnrollment).to receive_message_chain('new.call').with(tax_household_enrollment).and_return(Dry::Monads::Result::Failure.new(tax_household_enrollment))
+      end
+
+      it "should return a failure if cv3 Tax Household Enrollment transform returns failure" do
+        expect(subject).to be_a(Dry::Monads::Result::Failure)
+      end
+    end
+  end
+
   describe '#transform_applications' do
 
     subject { Operations::Transformers::FamilyTo::Cv3Family.new.transform_applications(family, false) }
@@ -53,7 +121,7 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
         allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Failure.new(application))
       end
 
-      it "should throw a failure if cv3 application throws failure" do
+      it "should return a failure if cv3 application returns failure" do
         expect(subject).to be_a(Dry::Monads::Result::Failure)
       end
     end
@@ -66,9 +134,10 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
         allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Failure.new(application))
       end
 
-      it "should return an empty array when exclue applications true" do
+      it "should return an empty array wrapped in Success when exclue applications true" do
         result = Operations::Transformers::FamilyTo::Cv3Family.new.transform_applications(family, true)
-        expect(result).to be_empty
+        expect(result).to be_a(Dry::Monads::Result::Success)
+        expect(result.value!).to be_empty
       end
 
       it "should still be a valid cv3 family when exclude applications true" do
@@ -87,7 +156,7 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
       end
 
       it "should successfully submit a cv3 application and get a response back" do
-        expect(subject).to include(application)
+        expect(subject.value!).to include(application)
       end
     end
   end
@@ -115,19 +184,19 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
     context 'when enrollment is in shopping state' do
       let(:aasm_state) { 'shopping' }
       it 'should not include hbx_enrollments in the hash' do
-        expect(subject[0][:hbx_enrollments]).to be_nil
+        expect(subject.value![0][:hbx_enrollments]).to be_nil
       end
     end
 
     context 'when enrollment is coverage_selected state' do
       let(:aasm_state) { 'coverage_selected' }
-      it 'should include hbx_enrollments in the hash' do
-        expect(subject[0][:hbx_enrollments]).to be_present
+      it 'should include hbx_enrollments in the household hash' do
+        expect(subject.value![0][:hbx_enrollments]).to be_present
       end
     end
   end
 
-  describe '#transform hbx_enrollments' do
+  describe '#transform_hbx_enrollments' do
     let(:aasm_state) { 'coverage_selected' }
     let!(:coverage_selected_enrollment) do
       create(
@@ -168,13 +237,34 @@ RSpec.describe ::Operations::Transformers::FamilyTo::Cv3Family, dbclean: :around
 
     let(:product) { create(:benefit_markets_products_health_products_health_product, :ivl_product, issuer_profile: issuer) }
     let(:issuer) { create(:benefit_sponsors_organizations_issuer_profile, abbrev: 'ANTHM') }
-
-    subject { Operations::Transformers::FamilyTo::Cv3Family.new.transform_households(family.households, {exclude_seps: true}) }
+    let(:enrollments) do
+      # this matches the current selection logic in the CV3 Family transformer
+      family.households.first.hbx_enrollments.where(:aasm_state.ne => "shopping", :product_id.ne => nil)
+    end
 
     context 'when enrollment is outside of sep periods and exclude_seps is true' do
       let(:aasm_state) { 'coverage_selected' }
+
+      subject do
+        Operations::Transformers::FamilyTo::Cv3Family.new.transform_hbx_enrollments(enrollments, {exclude_seps: true})
+      end
+
       it 'should not return special_enrollment_period_reference' do
-        expect(subject[0][:hbx_enrollments][0][:special_enrollment_period_reference]).to be_nil
+        expect(subject.value![0][:special_enrollment_period_reference]).to be_nil
+      end
+    end
+
+    context "when enrollment fails transform" do
+      before do
+        allow(Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment).to receive_message_chain('new.call').with(coverage_selected_enrollment, {}).and_return(Dry::Monads::Result::Failure.new("failed to transform enrollment"))
+      end
+
+      subject do
+        Operations::Transformers::FamilyTo::Cv3Family.new.transform_hbx_enrollments(enrollments, {})
+      end
+
+      it "should return a failure if cv3 hbx enrollment returns failure" do
+        expect(subject).to be_a(Dry::Monads::Result::Failure)
       end
     end
   end

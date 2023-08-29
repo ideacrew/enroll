@@ -121,6 +121,7 @@ registry:
       - key: :display_you_pay
         is_enabled: <%= ENV['DISPLAY_YOU_PAY_IS_ENABLED'] || false %>
       - key: :validate_ssn
+        item: ^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$
         is_enabled: <%= ENV['VALIDATE_SSN_IS_ENABLED'] || false %>
   - namespace:
     - :enroll_app
@@ -147,4 +148,10 @@ registry:
             item: 15
           - key: :year_offset
             item: 0
-
+      - key: :create_bcp_on_date_change
+        is_enabled: <%= ENV['CREATE_BCP_ON_DATE_CHANGE_IS_ENABLED'] || false %>
+        settings:
+          - key: :bcp_creation_month
+            item: <%= ENV['BCP_CREATION_MONTH'] || 7 %>
+          - key: :bcp_creation_day
+            item: <%= ENV['BCP_CREATION_DAY'] || 10 %>

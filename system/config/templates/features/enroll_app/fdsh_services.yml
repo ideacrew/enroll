@@ -24,3 +24,4 @@ registry:
         settings:
           - key: :csr_codes
             item:  <%= ENV['FDSH_HUB_CALL_APPLICATION_ERROR_CSR_CODES'] || ["02", "04", "05", "06"] %>
+        is_enabled: <%= ENV['RENEWAL_ELIGIBILITY_VERIFICATION_USING_RRV_IS_ENABLED'] || false %>

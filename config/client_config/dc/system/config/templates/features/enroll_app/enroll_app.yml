@@ -359,6 +359,9 @@ registry:
       - key: :adtl_contact_required_for_text
         item: :adtl_contact_required_for_text
         is_enabled: <%= ENV['ADTL_CONTACT_REQUIRED_FOR_TEXT_IS_ENABLED'] || false %>
+      - key: :ssn_ui_validation
+        item: :ssn_ui_validation
+        is_enabled: <%= ENV['SSN_UI_VALIDATION_IS_ENABLED'] || false %>
       - key: :counties_import
         is_enabled: false
         item: ""
@@ -856,6 +859,8 @@ registry:
     features:
       - key: :display_enr_summary
         is_enabled: <%= ENV['DISPLAY_ENR_SUMMARY_IS_ENABLED'] || false %>
+      - key: :silent_transition_enrollment
+        is_enabled: <%= ENV['SILENT_TRANSITION_ENROLLMENT_IS_ENABLED'] || false %>
       - key: :domestic_partner_rating
         is_enabled: <%= ENV['DOMESTIC_PARTNER_RATING_IS_ENABLED'] || false %>
       - key: issuer_provided_code

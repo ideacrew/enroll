@@ -36,6 +36,20 @@ RSpec.describe ::Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment, db
                                               coverage_end_on: TimeKeeper.date_of_record.end_of_month)
   end
 
+  context 'failure' do
+    let(:tax_household_enrollment) { FactoryBot.create(:tax_household_enrollment, enrollment_id: enrollment.id)}
+
+    before do
+      allow(Operations::Transformers::TaxHouseholdEnrollmentTo::Cv3TaxHouseholdEnrollment).to receive_message_chain(:new, :call).with(tax_household_enrollment).and_return(Dry::Monads::Result::Failure.new("transform failed"))
+    end
+
+    it 'should return failure with error message' do
+      result = subject.call(enrollment)
+      expect(result).to be_failure
+      expect(result.failure).to match("Could not transform tax household enrollment(s): [\"transform failed\"]")
+    end
+  end
+
   context 'slcsp' do
     before do
       transformed_payload = subject.call(enrollment).success
