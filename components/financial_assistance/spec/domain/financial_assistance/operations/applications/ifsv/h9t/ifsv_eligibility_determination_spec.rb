@@ -210,5 +210,25 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
         expect(@result.success).to eq('Successfully updated Applicant with evidence')
       end
     end
+
+    context 'when Retry with Ifsv ineligible response' do
+      let(:income_evidence) { applicant.income_evidence }
+
+      before do
+        income_evidence.verification_histories.create(action: "retry")
+        income_evidence.save
+        subject.call(payload: response_payload_2)
+        income_evidence.reload
+      end
+
+      it 'should not update income' do
+        expect(income_evidence.pending?).to be_truthy
+        expect(income_evidence.due_on).to eq nil
+      end
+
+      it 'should record the payload on the retry' do
+        expect(income_evidence.request_results.count).to eq 1
+      end
+    end
   end
 end

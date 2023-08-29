@@ -6,7 +6,7 @@
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
 
-ENV["RAILS_ENV"] ||= 'test'
+ENV['RAILS_ENV'] ||= 'test'
 $LOADING_CUCUMBER_ENV = true
 require 'webdrivers'
 require 'cucumber/rails'
@@ -74,7 +74,6 @@ Cucumber::Rails::Database.javascript_strategy = :truncation
 # Capybara::Screenshot.webkit_options = { width: 2280, height: 1800 }
 # Capybara::Screenshot.prune_strategy = :keep_last_run
 Webdrivers.cache_time = 86_400
-Webdrivers::Chromedriver.required_version = "114.0.5735.90"
 
 # Selenium::WebDriver::Chrome.path = '/opt/homebrew-cask/Caskroom/google-chrome/latest/Google Chrome.app/Contents/MacOS/Google Chrome'
 

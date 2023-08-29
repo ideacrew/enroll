@@ -3,17 +3,17 @@
 require 'dry/monads'
 require 'dry/monads/do'
 
-module Operations
-  module Fdsh
-    module Vlp
-      module H92
-        # Publish class will build event and publish the payload
-        class PublishInitialVerificationRequest
+module FinancialAssistance
+  module Operations
+    module Applications
+      module Verifications
+          # publishing request for FAA Total Ineligibility Notice
+        class FaaTotalIneligibilityNotice
           send(:include, Dry::Monads[:result, :do, :try])
           include EventSource::Command
 
           def call(payload)
-            event  = yield build_event(payload)
+            event = yield build_event(payload)
             result = yield publish(event)
 
             Success(result)
@@ -22,13 +22,13 @@ module Operations
           private
 
           def build_event(payload)
-            event('events.fdsh.vlp.h92.initial_verification_requested', attributes: payload.to_h, headers: { correlation_id: payload.to_h[:hbx_id] })
+            event('events.families.notices.faa_totally_ineligible_notice.requested', attributes: payload)
           end
 
           def publish(event)
             event.publish
 
-            Success("Successfully published the payload to fdsh_gateway")
+            Success("Successfully published the payload for FAA Total Ineligibility Notice")
           end
         end
       end
