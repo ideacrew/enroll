@@ -3,7 +3,7 @@ require "forwardable"
 module Eligible
   class EligiblePeriodHandler
     extend Forwardable
-    def_delegators :@eligible_record, :active_state, :inactive_state, :current_state
+    def_delegators :@eligible_record, :state_histories, :active_state, :inactive_state, :current_state
 
     def initialize(eligible_record)
       @eligible_record = eligible_record
