@@ -479,6 +479,73 @@ context 'Verification process and notices' do
     end
   end
 
+  describe 'state machine transactions for failed payload' do
+    let(:consumer) { person.consumer_role }
+    let(:verification_types) { consumer.verification_types }
+    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.zone.now, :vlp_authority => 'hbx' })}
+
+    before :each do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:ssa_h3).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:vlp_h92).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_errors).and_return(true)
+    end
+
+    context 'success payload' do
+      shared_examples_for 'IVL state machine transitions and verification_types validation_status' do |ssn, citizen, from_state, to_state, event, type_name, verification_type_validation_status|
+        before do
+          EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+          person.ssn = ssn
+          consumer.citizen_status = citizen
+        end
+
+        it "moves from #{from_state} to #{to_state} on #{event}" do
+          expect(consumer).to transition_from(from_state).to(to_state).on_event(event.to_sym, verification_attr)
+          expect(consumer.verification_types.where(:type_name.in => type_name).first.validation_status).to eq verification_type_validation_status
+        end
+      end
+
+      context 'coverage_purchased_no_residency' do
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '999001234', 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Social Security Number"],
+                        "negative_response_received"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '999001234', 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Citizenship"], "pending"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '111111111', 'us_citizen', :unverified, :ssa_pending, 'coverage_purchased_no_residency!', ["Social Security Number"], "pending"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '111111111', 'us_citizen', :unverified, :ssa_pending, 'coverage_purchased_no_residency!', ["Citizenship"], "pending"
+      end
+    end
+
+    context 'failure payload' do
+      let(:ssa_validator) { instance_double(Operations::Fdsh::Ssa::H3::RequestSsaVerification) }
+      let(:vlp_validator) { instance_double(Operations::Fdsh::Vlp::H92::RequestInitialVerification) }
+
+      shared_examples_for 'IVL state machine transitions and verification_types validation_status' do |ssn, citizen, from_state, to_state, event, type_name, verification_type_validation_status|
+        before do
+          allow(ssa_validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid payload'))
+          allow(Operations::Fdsh::Ssa::H3::RequestSsaVerification).to receive(:new).and_return(ssa_validator)
+          allow(vlp_validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid payload'))
+          allow(Operations::Fdsh::Vlp::H92::RequestInitialVerification).to receive(:new).and_return(vlp_validator)
+          EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+          person.ssn = ssn
+          consumer.citizen_status = citizen
+        end
+
+        it "moves from #{from_state} to #{to_state} on #{event}" do
+          expect(consumer).to transition_from(from_state).to(to_state).on_event(event.to_sym, verification_attr)
+          expect(consumer.verification_types.where(:type_name.in => type_name).first.validation_status).to eq verification_type_validation_status
+        end
+      end
+
+      context 'coverage_purchased_no_residency' do
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '999001234', 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Social Security Number"],
+                        "negative_response_received"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '999001234', 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Citizenship"], "negative_response_received"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '111111111', 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Social Security Number"],
+                        "negative_response_received"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '111111111', 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Citizenship"], "negative_response_received"
+      end
+    end
+  end
+
   describe 'state machine' do
     let(:consumer) { person.consumer_role }
     let(:verification_types) { consumer.verification_types }
