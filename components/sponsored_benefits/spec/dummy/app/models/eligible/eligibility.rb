@@ -69,12 +69,8 @@ module Eligible
       ResourceReference = Struct.new(:class_name, :optional, :meta)
 
       RESOURCE_KINDS = [
-        BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::AdminAttestedEvidence,
-        BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::ShopOsseGrant,
         SponsoredBenefits::BenefitSponsorships::BqtOsseEligibilities::AdminAttestedEvidence,
         SponsoredBenefits::BenefitSponsorships::BqtOsseEligibilities::BqtOsseGrant,
-        IvlOsseEligibilities::AdminAttestedEvidence,
-        IvlOsseEligibilities::IvlOsseGrant,
         Eligible::Evidence,
         Eligible::Grant
       ].freeze
