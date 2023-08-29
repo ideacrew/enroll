@@ -389,8 +389,8 @@ private
       { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county, :id, :_destroy] },
       { :phones_attributes => [:kind, :full_phone_number, :id, :_destroy] },
       { :emails_attributes => [:kind, :address, :id, :_destroy] },
-      { :consumer_role_attributes => [:contact_method, :language_preference, :id] },
-      { :employee_roles_attributes => [:id, :contact_method, :language_preference] },
+      { :consumer_role_attributes => [:contact_method, :language_preference, :id]},
+      { :employee_roles_attributes => [:id, :contact_method, :language_preference]},
 
       :first_name,
       :middle_name,

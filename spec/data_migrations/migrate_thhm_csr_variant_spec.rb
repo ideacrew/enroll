@@ -17,7 +17,7 @@ describe MigrateThhmCsrVariant do
   describe 'changing tax household member csr percent' do
     let(:family)  { FactoryBot.create(:family, :with_primary_family_member) }
     let!(:tax_household){ FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil) }
-    let!(:tax_household_member) { tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: family.family_members[0].id, csr_percent_as_integer: 1) }
+    let!(:tax_household_member) { tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: family.family_members[0].id, csr_percent_as_integer: nil) }
     let!(:eligibility_determinations){ FactoryBot.create(:eligibility_determination, tax_household: tax_household, csr_percent_as_integer: '-1') }
 
     it "should change thhm csr" do

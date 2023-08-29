@@ -31,10 +31,10 @@ module FinancialAssistance
       if result
         @evidence.move_to_pending!
         key = :success
-        message = "request submitted successfully"
+        message = "request submited successfully"
       else
         key = :error
-        message = "unable to submit request"
+        message = "unable to submited request"
       end
 
       respond_to do |format|
