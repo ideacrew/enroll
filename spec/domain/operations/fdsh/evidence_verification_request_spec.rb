@@ -34,14 +34,14 @@ RSpec.describe Operations::Fdsh::EvidenceVerificationRequest, dbclean: :after_ea
           allow(Operations::Fdsh::BuildAndValidateApplicationPayload).to receive(:new).and_return(build_and_validate_payload_entity)
         end
 
-        it 'should return an error and not update evidence' do
+        it 'should return an error and not update evidence aasm_state' do
           evidence = applicant.income_evidence
           current_aasm_state = evidence.aasm_state
           result = described_class.new.call(evidence)
           evidence.reload
-          binding.irb
+
           expect(result).to be_failure
-          expect(result).to eq(error_reponse)
+          expect(result.failure).to eq(error_reponse)
           expect(evidence.aasm_state).to eq(current_aasm_state)
         end
       end
