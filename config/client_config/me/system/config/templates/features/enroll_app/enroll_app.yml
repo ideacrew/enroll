@@ -846,6 +846,10 @@ registry:
     features:
       - key: :display_enr_summary
         is_enabled: <%= ENV['DISPLAY_ENR_SUMMARY_IS_ENABLED'] || true %>
+      - key: :silent_transition_enrollment
+        is_enabled: <%= ENV['SILENT_TRANSITION_ENROLLMENT_IS_ENABLED'] || false %>
+      - key: :cancel_superseded_terminated_enrollments
+        is_enabled: <%= ENV['CANCEL_SUPERSEDED_TERMINATED_ENROLLMENTS_IS_ENABLED'] || false %>
       - key: :domestic_partner_rating
         is_enabled: <%= ENV['DOMESTIC_PARTNER_RATING_IS_ENABLED'] || false %>
       - key: issuer_provided_code

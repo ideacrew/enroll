@@ -19,6 +19,7 @@ module Operations
         # **Do not pass in options(exclude_seps) elsewhere unless approved from Dan/leadership team**
         # !!!Important!!!
         def call(enrollment, options = {})
+          @transformed_th_enrs = yield transform_enr_tax_households(enrollment)
           request_payload = yield construct_payload(enrollment, options)
 
           Success(request_payload)
@@ -51,8 +52,7 @@ module Operations
           end
           payload.merge!(issuer_profile_reference: issuer_profile_reference(issuer)) if issuer
           payload.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment? && !options[:exclude_seps]
-          enr_tax_households = tax_household_enrollments(enr)
-          payload.merge!(tax_households_references: transform_enr_tax_households(enr_tax_households)) if enr_tax_households.present?
+          payload.merge!(tax_households_references: @transformed_th_enrs) if @transformed_th_enrs.present?
           Success(payload)
         rescue StandardError => e
           Failure("Cv3HbxEnrollment hbx id: #{enr&.hbx_id} | exception: #{e.inspect} | backtrace: #{e.backtrace.inspect}")
@@ -63,12 +63,20 @@ module Operations
           TaxHouseholdEnrollment.where(enrollment_id: enr.id)
         end
 
-        def transform_enr_tax_households(tax_household_enrollments)
-          tax_household_enrollments.map { |tax_household_enr| transform_tax_household_enr(tax_household_enr) }
+        def transform_enr_tax_households(enrollment)
+          th_enrs = tax_household_enrollments(enrollment)
+          return Success([]) unless th_enrs.present?
+
+          transformed_th_enrs = th_enrs.map do |tax_household_enr|
+            transform_tax_household_enr(tax_household_enr)
+          end
+          return Failure("Could not transform tax household enrollment(s): #{transformed_th_enrs.select(&:failure?).map(&:failure)}") unless transformed_th_enrs.all?(&:success?)
+
+          transformed_th_enrs.map(&:value!)
         end
 
         def transform_tax_household_enr(tax_household_enr)
-          Operations::Transformers::TaxHouseholdEnrollmentTo::Cv3TaxHouseholdEnrollment.new.call(tax_household_enr).value!
+          Operations::Transformers::TaxHouseholdEnrollmentTo::Cv3TaxHouseholdEnrollment.new.call(tax_household_enr)
         end
 
         def fetch_special_enrollment_period(enrollment)
