@@ -38,7 +38,9 @@ module Eligible
     end
 
     def is_eligible_on?(date)
-      return true if current_state == :approved
+      if date == TimeKeeper.date_of_record && current_state == :approved
+        return true
+      end
 
       eligible_periods.any? do |period|
         if period[:end_on].present?
@@ -56,7 +58,9 @@ module Eligible
       eligible_periods = []
       date_range = {}
       state_histories.non_initial.each do |state_history|
-        date_range[:start_on] ||= state_history.effective_on if state_history.to_state == :approved
+        date_range[
+          :start_on
+        ] ||= state_history.effective_on if state_history.to_state == :approved
 
         next unless date_range.present? && state_history.to_state == :denied
         date_range[:end_on] = state_history.effective_on.prev_day

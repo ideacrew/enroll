@@ -18,7 +18,7 @@ module Operations
           :approved
         when "false"
           case from_state
-          when :approved, :denied
+          when :not_approved, :approved, :denied
             :denied
           else
             :not_approved

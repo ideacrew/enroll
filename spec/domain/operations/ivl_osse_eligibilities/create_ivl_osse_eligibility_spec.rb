@@ -66,9 +66,9 @@ RSpec.describe ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility,
       eligibility_state_history = eligibility.state_histories.first
       evidence_state_history = evidence.state_histories.first
 
-      expect(eligibility_state_history.event).to eq(:move_to_initial)
+      expect(eligibility_state_history.event).to eq(:move_to_ineligible)
       expect(eligibility_state_history.from_state).to eq(:initial)
-      expect(eligibility_state_history.to_state).to eq(:initial)
+      expect(eligibility_state_history.to_state).to eq(:ineligible)
       expect(eligibility_state_history.is_eligible).to be_falsey
 
       expect(evidence_state_history.event).to eq(:move_to_not_approved)

@@ -74,6 +74,7 @@ module Operations
               e[:_id].to_s == evidence_options[:_id].to_s
             end
         end
+
         if index
           options[:evidences][index] = evidence_options
         else
@@ -81,7 +82,7 @@ module Operations
         end
 
         options[:state_histories] ||= []
-        new_state_history = build_state_history(values, evidence_options)
+        new_state_history = build_elgibility_state_history(values, options[:evidences])
         options[:state_histories] << new_state_history
         options[:current_state] = new_state_history[:to_state]
 
@@ -110,8 +111,8 @@ module Operations
         end
       end
 
-      def build_state_history(values, evidence_options)
-        to_state = to_state_for(evidence_options)
+      def build_elgibility_state_history(values, evidences_options)
+        to_state = configuration.to_state_for(evidences_options)
         from_state =
           values[:eligibility_record]&.state_histories&.last&.to_state
 
@@ -121,16 +122,10 @@ module Operations
           effective_on: values[:effective_date],
           from_state: from_state || :initial,
           to_state: to_state,
-          is_eligible: evidence_options[:is_satisfied]
+          is_eligible: (to_state == :eligible ? true : false)
         }
         options[:timestamps] = values[:timestamps] if values[:timestamps]
         options
-      end
-
-      def to_state_for(evidence_options)
-        latest_history = evidence_options[:state_histories].last
-
-        configuration.to_state_for(latest_history[:to_state])
       end
     end
   end
