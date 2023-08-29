@@ -120,7 +120,7 @@ module FinancialAssistance
                 applicant = determined_app&.active_applicants&.where(family_member_id: fm.id)&.first
                 program_eligibility = fetch_eligibility(applicant)
                 data_to_append << [
-                  determined_app.id,
+                  determined_app.hbx_id,
                   family.hbx_assigned_id,
                   fm.person&.hbx_id,
                   fm.is_primary_applicant,
@@ -139,7 +139,7 @@ module FinancialAssistance
           end
 
           def fetch_csv_headers
-            %w[DeterminedApplicationID FamilyHbxID MemberHbxId IsPrimaryApplicant EnrollmentHbxId EnrollmentType EnrollmentState HiosId AppliedAptc ProgramEligibility]
+            %w[DeterminedApplicationHBXID FamilyHbxID MemberHbxId IsPrimaryApplicant EnrollmentHbxId EnrollmentType EnrollmentState HiosId AppliedAptc ProgramEligibility]
           end
 
           def fetch_eligibility(applicant)

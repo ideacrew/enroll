@@ -160,7 +160,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
         csv_data = CSV.read(csv_file_paths[0])
 
         # validate csv has right headers
-        expected_headers = %w[DeterminedApplicationID FamilyHbxID MemberHbxId IsPrimaryApplicant EnrollmentHbxId EnrollmentType EnrollmentState HiosId AppliedAptc ProgramEligibility]
+        expected_headers = %w[DeterminedApplicationHBXID FamilyHbxID MemberHbxId IsPrimaryApplicant EnrollmentHbxId EnrollmentType EnrollmentState HiosId AppliedAptc ProgramEligibility]
         expect(csv_data[0]).to eq(expected_headers)
 
         # validate csv has data
