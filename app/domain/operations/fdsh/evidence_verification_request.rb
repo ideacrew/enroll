@@ -13,12 +13,10 @@ module Operations
         response = send_fdsh_hub_call(evidence)
 
         if response.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
-          binding.irb
           determine_evidence_aasm_status(application, evidence) if evidence.evidenceable.has_enrolled_health_coverage
-          binding.irb
 
           update_reason = "#{evidence.key} Evidence Verification Request Failed due to #{response.failure}"
-          evidence.add_verification_history(action: "Hub Request Failed", modifier: "System", update_reason: update_reason)
+          evidence.add_verification_history("Hub Request Failed", "System", update_reason)
 
           # Original determination method returned false on failure -- keeping this as to not break existing functionality/specs
           false
@@ -35,7 +33,7 @@ module Operations
 
       def send_fdsh_hub_call(evidence)
         payload_entity = yield build_and_validate_payload_entity(evidence)
-        event_result = yield build_event(payload_entity.to_h, evidence.key)
+        event_result = yield build_event(payload_entity.to_h, evidence)
         yield event_result.publish
       end
 
@@ -44,14 +42,14 @@ module Operations
         Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application, evidence.key)
       end
 
-      def build_event(payload, evidence_key)
+      def build_event(payload, evidence)
         fdsh_events = ::Eligibilities::Evidence::FDSH_EVENTS
-        headers = evidence_key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: payload[:hbx_id] }
-        event(fdsh_events[self.key], attributes: payload, headers: headers)
+        headers = evidence.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: payload[:hbx_id] }
+        binding.irb
+        event(fdsh_events[evidence.key], attributes: payload, headers: headers)
       end
 
       def determine_evidence_aasm_status(application, evidence)
-        binding.irb
         case
 
         when aptc_active?(application)
@@ -71,13 +69,10 @@ module Operations
       end
 
       def csr_eligible?(evidence)
-        binding.irb
         applicant = evidence.evidenceable
-        binding.irb
         csr_codes = EnrollRegistry[:validate_and_record_publish_application_errors].setting(:csr_codes).item
-        binding.irb
+
         applicant_csr_code = ::EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[applicant.csr_eligibility_kind]
-        binding.irb
         csr_codes.include?(applicant_csr_code)
       end
 

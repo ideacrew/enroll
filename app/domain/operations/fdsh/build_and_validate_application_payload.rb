@@ -23,8 +23,8 @@ module Operations
 
           begin
             ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
-          rescue StandardError => error
-            Failure("Error while generating CV3 Application: #{error}")
+          rescue StandardError => e
+            Failure("Error while generating CV3 Application: #{e}")
           end
         else
           Failure("Could not generate CV3 Application Object with #{application}")
