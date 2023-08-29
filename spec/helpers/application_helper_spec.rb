@@ -903,6 +903,7 @@ describe "Enabled/Disabled IVL market" do
     end
 
     it_behaves_like 'rounding float number', 102.1693244, 102.16
+    it_behaves_like 'rounding float number', nil, 0
     it_behaves_like 'rounding float number', 102.177777777, 102.17
     it_behaves_like 'rounding float number', 866.07512, 866.07
     it_behaves_like 'rounding float number', (2.76 + 2.43), 5.19
