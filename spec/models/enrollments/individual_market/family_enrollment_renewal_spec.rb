@@ -949,10 +949,12 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             allow_any_instance_of(HbxEnrollment).to receive(:ivl_osse_eligible?).and_return(true)
             allow_any_instance_of(HbxEnrollment).to receive(:is_eligible_for_osse_grant?).and_return(true)
             enrollment.update_osse_childcare_subsidy
+            expect(enrollment.product.is_hc4cc_plan).to be_truthy
             expect(enrollment.eligible_child_care_subsidy.to_f).to be > 0
 
             renewal = subject.renew
             expect(renewal.auto_renewing?).to be_truthy
+            expect(renewal.product.is_hc4cc_plan).to be_truthy
             expect(renewal.eligible_child_care_subsidy.to_f).to be > 0
             expect(renewal.eligible_child_care_subsidy.to_f).to eq(renewal.total_premium.to_f)
           end
