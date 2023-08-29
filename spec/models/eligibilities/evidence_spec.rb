@@ -239,8 +239,8 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
         end
 
         context 'with errors' do
-          let(:updated_by) { 'admin' }
           let(:action) { 'Hub Request Failed' }
+          let(:updated_by) { 'System' }
           let(:update_reason) { 'Requested Hub for verification' }
 
           before do
@@ -254,8 +254,10 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
 
             it 'should change evidence aasm_state to negative_response_received' do
               evidence = applicant.income_evidence
+              binding.irb
               result = evidence.request_determination(action, update_reason, updated_by)
               evidence.reload
+              binding.irb
 
               expect(result).to be_falsey
               # expect(evidence.aasm_status).to eq(:negative_response_received)

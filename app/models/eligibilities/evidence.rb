@@ -76,7 +76,8 @@ module Eligibilities
 
     def add_verification_history(action, update_reason, updated_by)
       result = self.verification_histories.build(action: action, update_reason: update_reason, updated_by: updated_by)
-      self.save
+      binding.irb
+      # self.save
       result
     end
 
