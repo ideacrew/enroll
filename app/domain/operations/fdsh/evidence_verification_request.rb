@@ -10,15 +10,11 @@ module Operations
       include Dry::Monads[:result, :do]
 
       def call(evidence)
-        binding.irb
         payload_entity = yield build_and_validate_payload_entity(evidence)
-        binding.irb
         event_result = yield build_event(payload_entity.to_h, evidence)
-        binding.irb
-        yeet = yield publish_event_result(event_result)
-        binding.irb
+        publish_result = yield publish_event_result(event_result)
 
-        yeet
+        Success(publish_result)
       end
 
       private

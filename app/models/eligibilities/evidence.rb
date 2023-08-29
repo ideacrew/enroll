@@ -30,7 +30,7 @@ module Eligibilities
 
     FDSH_HUB_CALL_EVIDENCE_TYPES = {
       :income => true
-    }
+    }.freeze
 
     embedded_in :evidenceable, polymorphic: true
 
@@ -69,9 +69,7 @@ module Eligibilities
     end
 
     def request_determination(action_name, update_reason, updated_by = nil)
-      binding.irb
       self.add_verification_history(action_name, update_reason, updated_by)
-      application = self.evidenceable.application
       response = Operations::Fdsh::EvidenceVerificationRequest.new.call(self)
 
       if response.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
@@ -91,7 +89,7 @@ module Eligibilities
     def determine_evidence_aasm_status(applicant)
       family_id = applicant.application.family_id
       enrollments = HbxEnrollment.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, family_id: family_id)
-      
+
       if enrolled?(applicant, enrollments)
         enrollments.each do |enrollment|
           applicant.enrolled_with(enrollment)

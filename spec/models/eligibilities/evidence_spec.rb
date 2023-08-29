@@ -115,8 +115,8 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
         let(:failed_updated_by) { 'System' }
         let(:failed_update_reason) { "Invalid SSN" }
 
-        let(:person) { FactoryBot.create(:person, :with_consumer_role, ) }
-        let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+        let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+        let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
 
         before do
           allow(evidence_verification_request).to receive(:call).and_return(Dry::Monads::Failure(failed_update_reason))
@@ -140,7 +140,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
             expect(admin_call_history.action).to eq action
             expect(admin_call_history.update_reason).to eq update_reason
             expect(admin_call_history.updated_by).to eq updated_by
-            
+
             failure_history = income_evidence.verification_histories.last
             expect(failure_history.action).to eq failed_action
             expect(failure_history.update_reason).to include(failed_update_reason)
@@ -179,7 +179,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
               expect(admin_call_history.action).to eq action
               expect(admin_call_history.update_reason).to eq update_reason
               expect(admin_call_history.updated_by).to eq updated_by
-              
+
               failure_history = income_evidence.verification_histories.last
               expect(failure_history.action).to eq failed_action
               expect(failure_history.update_reason).to include(failed_update_reason)
@@ -193,11 +193,11 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
               # csr_variant_id "01" is not one of the valid csr codes to change aasm_state
               hbx_enrollment.product.update(csr_variant_id: '01')
             end
-  
+
             it 'should change evidence aasm_state to outstanding' do
               result = income_evidence.request_determination(action, update_reason, updated_by)
               income_evidence.reload
-  
+
               expect(result).to be_falsey
               expect(income_evidence.aasm_state).to eq('outstanding')
               expect(income_evidence.verification_histories.size).to eq(2)
@@ -208,7 +208,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
             it 'should change evidence aasm_state to outstanding' do
               result = income_evidence.request_determination(action, update_reason, updated_by)
               income_evidence.reload
-  
+
               expect(result).to be_falsey
               expect(income_evidence.aasm_state).to eq('outstanding')
               expect(income_evidence.verification_histories).to be_present
