@@ -20,7 +20,7 @@ FactoryBot.define do
     is_without_assistance { false }
     is_totally_ineligible { false }
     has_fixed_address { true }
-    tax_filer_kind { 'tax_filer' }
+    tax_filer_kind { "tax_filer" }
     relationship { nil }
     is_consumer_role { true }
     is_applying_coverage { true }
