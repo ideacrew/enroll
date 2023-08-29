@@ -251,4 +251,36 @@ describe Forms::ConsumerCandidate, "ssn validations" do
       expect(subject.errors.messages.present?).to eq false
     end
   end
+
+  context 'invalid ssn when enabled' do
+    before do
+      stub_const('Forms::ConsumerCandidate::SSN_REGEX', /^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$/)
+    end
+
+    subject do
+      Forms::ConsumerCandidate.new({:dob => "2012-10-12", :ssn => "999001234", :first_name => "yo", :last_name => "guy",
+                                    :gender => "m", :user_id => 20, :is_applying_coverage => "true" })
+    end
+
+    it "doesnt add errors when SSN is blank" do
+      subject.ssn_or_checkbox
+      expect(subject.errors.messages.present?).to eq true
+    end
+  end
+
+  context 'invalid ssn when disabled' do
+    before do
+      stub_const('Forms::ConsumerCandidate::SSN_REGEX', /\A\d{9}\z/)
+    end
+
+    subject do
+      Forms::ConsumerCandidate.new({:dob => "2012-10-12", :ssn => "999001234", :first_name => "yo", :last_name => "guy",
+                                    :gender => "m", :user_id => 20, :is_applying_coverage => "true" })
+    end
+
+    it "doesnt add errors when SSN is blank" do
+      subject.ssn_or_checkbox
+      expect(subject.errors.messages.present?).to eq false
+    end
+  end
 end
