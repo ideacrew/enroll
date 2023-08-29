@@ -26,7 +26,9 @@ module Operations
       def validate(params)
         errors = []
         errors << "eligibility key missing" unless params[:eligibility_type]
-        errors << "current eligibilities missing" unless params[:current_eligibilities].present?
+        unless params[:current_eligibilities].present?
+          errors << "current eligibilities missing"
+        end
 
         errors.empty? ? Success(params) : Failure(errors)
       end
@@ -44,12 +46,16 @@ module Operations
         current_year = Date.today.year
         prev_year = current_year - 1
 
-        eligibility_years = values[:current_eligibilities].collect(&:start_on).map(&:year).uniq
+        eligibility_years =
+          values[:current_eligibilities].collect(&:start_on).map(&:year).uniq
         return unless eligibility_years == [prev_year]
 
         last_eligibility = values[:current_eligibilities].max_by(&:updated_at)
         return if last_eligibility.end_on.present?
-        renewal_eligibility = ::Eligibilities::Osse::Eligibility.new(renewal_eligibility_params(last_eligibility))
+        renewal_eligibility =
+          ::Eligibilities::Osse::Eligibility.new(
+            renewal_eligibility_params(last_eligibility)
+          )
         values[:current_eligibilities] << renewal_eligibility
       end
 
@@ -64,16 +70,19 @@ module Operations
       end
 
       def migrate_eligibility(subject, values, eligibility)
-        logger(
-          "initialize_eligibility_is_satisfied_as_false for #{subject.to_global_id}"
-        ) { initialize_eligibility(subject, values, eligibility) }
+        unless subject.reload.eligibility_on(eligibility.start_on)
+          logger(
+            "initialize_eligibility_is_satisfied_as_false for #{subject.to_global_id}"
+          ) { initialize_eligibility(subject, values, eligibility) }
+        end
 
         eligibility
           .evidences
           .sort_by(&:updated_at)
           .each do |evidence|
             effective_date = eligibility.start_on.to_date
-            effective_date = evidence.updated_at.to_date unless evidence.is_satisfied
+            effective_date =
+              evidence.updated_at.to_date unless evidence.is_satisfied
             logger(
               "update_eligibility_is_satisfied_as_#{evidence.is_satisfied} for #{subject.to_global_id}"
             ) do
@@ -108,7 +117,9 @@ module Operations
               reset_timestamps(evidence_instance)
             end
           end
-          print_error "unable to reset timestamps #{result.failure}" unless eligibility.save
+          unless eligibility.save
+            print_error "unable to reset timestamps #{result.failure}"
+          end
         end
         result
       end
@@ -118,7 +129,7 @@ module Operations
         return unless state_history
         record.updated_at = state_history.updated_at
         record.created_at = state_history.created_at if record.created_at >
-                                                        record.updated_at
+          record.updated_at
       end
 
       def initialize_eligibility(subject, values, eligibility)

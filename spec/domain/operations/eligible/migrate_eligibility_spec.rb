@@ -909,7 +909,7 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
             expect(e.effective_on.to_date).to eq Date.new(2023, 1, 1)
             expect(e.evidences.last.current_state).to eq :approved
             expect(e.evidences.last.state_histories.pluck(:to_state)).to eq %i[
-                 initial
+                 not_approved
                  approved
                ]
           end
