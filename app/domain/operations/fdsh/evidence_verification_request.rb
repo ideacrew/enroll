@@ -14,7 +14,6 @@ module Operations
 
         if response.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
           determine_evidence_aasm_status(application, evidence) if evidence.evidenceable.has_enrolled_health_coverage
-          binding.irb
 
           update_reason = "#{evidence.key} Evidence Verification Request Failed due to #{response.failure}"
           evidence.add_verification_history("Hub Request Failed", "System", update_reason)
@@ -51,9 +50,9 @@ module Operations
 
       def determine_evidence_aasm_status(application, evidence)
         if aptc_active?(application) || csr_code_active?(evidence)
-          evidence.negative_response_received!
+          evidence.negative_response_received
         else
-          evidence.move_to_outstanding!
+          evidence.move_to_outstanding
         end
       end
 

@@ -15,7 +15,6 @@ RSpec.describe :HavenEligibilityDeterminationsParser do
     end
 
     it 'should get maximum_aptc' do
-      binding.irb
       subject.each_with_index do |sub, index|
         expect(sub.maximum_aptc).to eq maximum_aptc[index].text.strip
       end
