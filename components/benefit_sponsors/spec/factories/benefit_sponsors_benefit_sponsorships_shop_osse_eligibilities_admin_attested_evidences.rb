@@ -14,7 +14,7 @@ FactoryBot.define do
 
     transient do
       from_state { :initial }
-      to_state { :initial }
+      to_state { :not_approved }
       is_eligible { false }
       effective_on { TimeKeeper.date_of_record.beginning_of_month }
     end
