@@ -34,6 +34,7 @@ module Operations
       def send_fdsh_hub_call(evidence)
         payload_entity = yield build_and_validate_payload_entity(evidence)
         event_result = yield build_event(payload_entity.to_h, evidence)
+        binding.irb
         yield event_result.publish
       end
 
@@ -45,8 +46,7 @@ module Operations
       def build_event(payload, evidence)
         fdsh_events = ::Eligibilities::Evidence::FDSH_EVENTS
         headers = evidence.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: payload[:hbx_id] }
-        binding.irb
-        event(fdsh_events[evidence.key], attributes: payload, headers: headers)
+        evidence.event(fdsh_events[evidence.key], attributes: payload, headers: headers)
       end
 
       def determine_evidence_aasm_status(application, evidence)
