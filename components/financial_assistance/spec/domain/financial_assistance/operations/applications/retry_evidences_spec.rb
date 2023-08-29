@@ -78,7 +78,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::RetryEvidences, 
       end
 
       it 'should add a verification history recording the retry failure' do
-        # A small change on this test to take into account that the request_determination call on the evidence model will record 
+        # A small change on this test to take into account that the request_determination call on the evidence model will record
         # histories before they've started running, and then add another history if they fail
         history = applicant.income_evidence.verification_histories.first
         expect(history.action).to eq("retry")
