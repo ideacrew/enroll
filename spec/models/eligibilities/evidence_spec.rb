@@ -141,7 +141,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
       let(:has_enrolled_health_coverage) { true }
 
       let(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
-      let(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
+      let(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application, max_aptc: 0) }
       let!(:applicant) do
         applicant = FactoryBot.create(:financial_assistance_applicant,
                                       application: application,
@@ -268,7 +268,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
 
           context 'with an applicant with active enrollment and csr' do
             before do
-              applicant.update(csr_percent_as_integer: 73, csr_eligibility_kind: 'csr_73')
+              # applicant.update(csr_percent_as_integer: 73, csr_eligibility_kind: 'csr_73')
             end
 
             it 'should change evidence aasm_state to negative_response_received' do

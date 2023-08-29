@@ -13,9 +13,11 @@ module Operations
         response = send_fdsh_hub_call(evidence)
 
         if response.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
-          determine_evidence_aasm_status(application, evidence) if applicant.has_enrolled_health_coverage
+          binding.irb
+          determine_evidence_aasm_status(application, evidence) if evidence.evidenceable.has_enrolled_health_coverage
+          binding.irb
 
-          update_reason = "#{evidence.key} Evidence Verification Request Failed due to #{result.failure}"
+          update_reason = "#{evidence.key} Evidence Verification Request Failed due to #{response.failure}"
           evidence.add_verification_history(action: "Hub Request Failed", modifier: "System", update_reason: update_reason)
 
           # Original determination method returned false on failure -- keeping this as to not break existing functionality/specs
@@ -48,29 +50,19 @@ module Operations
         event(fdsh_events[self.key], attributes: payload, headers: headers)
       end
 
-      # The below methods could arguably be placed into an application_error_handling class
-
       def determine_evidence_aasm_status(application, evidence)
-
         binding.irb
-        eligibilities = application.eligibility_determinations
-        family = application.family
-        binding.irb
-
         case
 
-        # addtl check for active/valid enrollment?
         when aptc_active?(application)
           update_evidence_aasm_state(evidence, :negative_response_received)
-        when csr_eligible?(application, evidence)
+
+        when csr_eligible?(evidence)
           update_evidence_aasm_state(evidence, :negative_response_received)
-          # change aasm to negative_response_received
+
         else
           update_evidence_aasm_state(evidence, :outstanding)
-          # change aasm to outstanding
         end
-
-        # create event verification history
       end
 
       def aptc_active?(application)
@@ -78,36 +70,15 @@ module Operations
         eligibilities.any? { |el| el.max_aptc > 0 }
       end
 
-      def csr_eligible?(application, evidence)
+      def csr_eligible?(evidence)
+        binding.irb
         applicant = evidence.evidenceable
-        
-        
-
-        # household = family.active_thhg(year) ? _ : family.active_household
-
-        # How to access an evidence's applicant??
         binding.irb
-        # family.households[0].tax_households[0].tax_members[0]
-        # 1:1 w/active tax_household & tax_member
-        # Big oof
-        # DC households -> tax_households
-        # ME tax_household_groups -> tax_households
-        # Can a single family have multiple applications?
-        # Check csr ONLY on tax_member, or anyone in family/household/tax_household?
-
-
-        # family.households.each do |household|
-        #   households.tax_households.each do |tax_household|
-        #     tax_household.tax_members.each do |tax_member|
-        #       
-        #     end
-        #   end
-        # end
-
-
-        tax_info = Operations::Transformers::FamilyTo::Cv3Family.new.call(family)
+        csr_codes = EnrollRegistry[:validate_and_record_publish_application_errors].setting(:csr_codes).item
         binding.irb
-
+        applicant_csr_code = ::EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[applicant.csr_eligibility_kind]
+        binding.irb
+        csr_codes.include?(applicant_csr_code)
       end
 
       def update_evidence_aasm_state(evidence, state)
