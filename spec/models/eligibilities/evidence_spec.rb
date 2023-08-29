@@ -103,28 +103,23 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
       let(:action) { 'request_hub' }
       let(:event) { double(success?: true, value!: double(publish: true)) }
 
-      it 'should update due date' do
-        binding.irb
-        allow_any_instance_of(::Operations::Fdsh:EvidenceVerificationRequest).to(
-          receive(:build_and_validate_payload_entity).and_return({})
-        )
+      let(:constructed_payload) { instance_double(Operations::Fdsh::BuildAndValidateApplicationPayload) }
 
+      before do
+        allow(constructed_payload).to receive(:call).and_return(Dry::Monads::Success({}))
+        allow(Operations::Fdsh::EvidenceVerificationRequest).to receive(:new).and_return(constructed_payload)
+      end
+
+      it 'should update due date' do
         evidence = applicant.esi_evidence
-        binding.irb
-        
-        # evidence.stub(:construct_payload) { {} }
+
         evidence.stub(:event) { event }
         evidence.stub(:generate_evidence_updated_event) { true }
-        
-        binding.irb
+
         expect(evidence.verification_histories).to be_empty
-        binding.irb
-        
         result = evidence.request_determination(action, update_reason, updated_by)
-        binding.irb
         evidence.reload
-        binding.irb
-        
+
         expect(result).to be_truthy
         expect(evidence.verification_histories).to be_present
 
@@ -141,60 +136,23 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
       let(:action) { 'request_hub' }
       let(:event) { double(success?: false, value!: double(publish: true)) }
 
-      let!(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: '100095') }
-      let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
-      let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
+      let(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: '100095') }
+      let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+      let(:has_enrolled_health_coverage) { true }
 
-      let(:applicant1_has_enrolled_health_coverage) { false }
-      let(:applicant2_has_eligible_health_coverage) { false }
-      let(:applicant1_is_applying_coverage) { true }
-
-      let(:applicant1_has_job_income) { false }
-      let(:applicant1_has_self_employment_income) { false }
-      let(:applicant1_has_unemployment_income) { false }
-      let(:applicant1_has_other_income) { false }
-
-      let(:applicant1_has_deductions) { false }
-
+      let(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
+      let(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
       let!(:applicant) do
-        applicant = FactoryBot.create(:applicant,
-                                      :with_student_information,
-                                      first_name: person.first_name,
-                                      last_name: person.last_name,
-                                      dob: person.dob,
-                                      gender: person.gender,
-                                      ssn: person.ssn,
+        applicant = FactoryBot.create(:financial_assistance_applicant,
                                       application: application,
-                                      ethnicity: nil,
-                                      is_primary_applicant: true,
-                                      person_hbx_id: person.hbx_id,
-                                      is_self_attested_blind: false,
-                                      is_applying_coverage: applicant1_is_applying_coverage,
-                                      is_required_to_file_taxes: true,
-                                      is_filing_as_head_of_household: true,
-                                      is_pregnant: false,
-                                      is_primary_caregiver: true,
-                                      is_primary_caregiver_for: [],
-                                      has_job_income: applicant1_has_job_income,
-                                      has_self_employment_income: applicant1_has_self_employment_income,
-                                      has_unemployment_income: applicant1_has_unemployment_income,
-                                      has_other_income: applicant1_has_other_income,
-                                      has_deductions: applicant1_has_deductions,
-                                      is_self_attested_disabled: true,
-                                      is_physically_disabled: false,
-                                      citizen_status: 'us_citizen',
-                                      has_enrolled_health_coverage: applicant1_has_enrolled_health_coverage,
-                                      has_eligible_health_coverage: applicant2_has_eligible_health_coverage,
-                                      has_eligible_medicaid_cubcare: false,
-                                      is_claimed_as_tax_dependent: false,
-                                      is_incarcerated: false,
-                                      net_annual_income: 10_078.90,
-                                      is_post_partum_period: false,
-                                      is_veteran_or_active_military: true)
+                                      ssn: '889984400',
+                                      dob: Date.new(1993,12,9),
+                                      first_name: 'Max',
+                                      last_name: 'Zorin',
+                                      eligibility_determination_id: eligibility_determination.id,
+                                      has_enrolled_health_coverage: has_enrolled_health_coverage)
         applicant
       end
-
-      let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
 
       let(:premiums_hash) do
         {
@@ -222,8 +180,22 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
       let(:fetch_slcsp_double) { double(:new => double(call: slcsp_double))}
       let(:fetch_lcsp_double) { double(:new => double(call: lcsp_double))}
       let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
+
       let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
       let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+
+      # Document not found for class HbxEnrollment with attributes {:family_id=>BSON::ObjectId('64ed015850309724e3b20854')}
+      # ^Check if is_active?
+
+      # let(:hbx_enrollment) do
+      #   FactoryBot.create(
+      #     :hbx_enrollment,
+      #     :with_enrollment_members,
+      #     :with_product,
+      #     household: family.active_household,
+      #     aasm_state: "coverage_selected",
+      #     benefit_sponsorship_id: initial_application.benefit_sponsorship.id)
+      # end
 
       before do
         allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
@@ -235,18 +207,21 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
         allow(premiums_double).to receive(:failure?).and_return(false)
         allow(slcsp_double).to receive(:failure?).and_return(false)
         allow(lcsp_double).to receive(:failure?).and_return(false)
-      end
 
-      # let!(:application) { FactoryBot.create(:financial_assistance_application, :cv3_compatible, family_id: family.id) }
+        applicant.create_income_evidence(
+          key: :income,
+          title: 'Income',
+          aasm_state: :outstanding,
+          due_on: TimeKeeper.date_of_record,
+          verification_outstanding: true,
+          is_satisfied: false
+        )
+      end
 
       context 'while validating and constructing the payload' do
         context 'with no errors' do
-          before do
-            binding.irb
-            evidence = applicant.income_evidence
-          end
-
           it 'should return success' do
+            evidence = applicant.income_evidence
             # use to mock verification_history
             # evidence.stub(:event) { event }
             # evidence.stub(:generate_evidence_updated_event) { true }
@@ -263,18 +238,55 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
             expect(history.updated_by).to eq updated_by
 
           end
-        end 
+        end
 
-        # context 'with errors will change the aasm_state of the evidence' do
-          # need to instantiate two different applications here - 1 w/aptc, 1 w/csr
-          # it 'should change evidence aasm_state to negative_response_received if the applicant is enrolled and has an aptc > 0' do
+        context 'with errors' do
+          before do
+            applicant.update(ssn: '000238754')
+          end
 
-          # end
+          context 'with an applicant with active enrollment and aptc' do
+            before do
+              eligibility_determination.update(max_aptc: 720.0)
+            end
 
-          # it 'should change evidence aasm_state to negative_response_received if the applicant is enrolled and is a csr participant' do
+            it 'should change evidence aasm_state to negative_response_received' do
+              evidence = applicant.income_evidence
+              result = evidence.request_determination(action, update_reason, updated_by)
+              evidence.reload
 
-          # end
-        # end
+              expect(result).to be_falsey
+              # expect(evidence.aasm_status).to eq(:negative_response_received)
+              expect(evidence.verification_histories).to be_present
+
+              history = evidence.verification_histories.first
+              expect(history.action).to eq action
+              expect(history.update_reason).to eq update_reason
+              expect(history.updated_by).to eq updated_by
+            end
+          end
+
+          context 'with an applicant with active enrollment and csr' do
+            before do
+              applicant.update(csr_percent_as_integer: 73, csr_eligibility_kind: 'csr_73')
+            end
+
+            it 'should change evidence aasm_state to negative_response_received' do
+              evidence = applicant.income_evidence
+              result = evidence.request_determination(action, update_reason, updated_by)
+              evidence.reload
+
+              expect(result).to be_falsey
+              # expect(evidence.aasm_status).to eq(:negative_response_received)
+              expect(evidence.verification_histories).to be_present
+
+              history = evidence.verification_histories.first
+              expect(history.action).to eq action
+              expect(history.update_reason).to eq update_reason
+              expect(history.updated_by).to eq updated_by
+            end
+          end
+        end
       end
     end
 

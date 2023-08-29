@@ -64,6 +64,12 @@ module Eligibilities
       "events.individual.eligibilities.application.applicant.#{self.key}_evidence_updated"
     end
 
+    def applicant
+      applicants = self.evidenceable.application.applicants
+
+      applicants.detect { |applicant| applicant }
+    end
+
     def request_determination(action_name, update_reason, updated_by = nil)
       event_payload = {
         action_name: action_name,
