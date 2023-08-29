@@ -148,10 +148,10 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
                false,
                Date.today.beginning_of_year,
                :initial,
-               :initial,
-               :move_to_initial
+               :not_approved,
+               :move_to_not_approved
              ],
-             [true, Date.today, :initial, :approved, :move_to_approved]
+             [true, Date.today, :not_approved, :approved, :move_to_approved]
            ]
       end
     end
@@ -394,7 +394,7 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
           expect(eligibility_2022.evidences.last.current_state).to eq :approved
           expect(
             eligibility_2022.evidences.last.state_histories.pluck(:to_state)
-          ).to eq %i[initial approved]
+          ).to eq %i[not_approved approved]
 
           expect(eligibility_2023.is_eligible).to be_falsey
           expect(eligibility_2023.effective_on.to_date).to eq Date.new(
@@ -405,7 +405,7 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
           expect(eligibility_2023.evidences.last.current_state).to eq :denied
           expect(
             eligibility_2023.evidences.last.state_histories.pluck(:to_state)
-          ).to eq %i[initial denied]
+          ).to eq %i[not_approved denied]
         end
       end
     end
@@ -480,7 +480,7 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
             expect(e.effective_on.to_date).to eq Date.new(2022, 12, 13)
             expect(e.evidences.last.current_state).to eq :denied
             expect(e.evidences.last.state_histories.pluck(:to_state)).to eq %i[
-                 initial
+                 not_approved
                  approved
                  denied
                ]
@@ -555,7 +555,7 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
             expect(e.effective_on.to_date).to eq Date.new(2022, 12, 13)
             expect(e.evidences.last.current_state).to eq :approved
             expect(e.evidences.last.state_histories.pluck(:to_state)).to eq %i[
-                 initial
+                 not_approved
                  approved
                ]
           end
@@ -565,7 +565,7 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
             expect(e.effective_on.to_date).to eq Date.new(2023, 1, 1)
             expect(e.evidences.last.current_state).to eq :approved
             expect(e.evidences.last.state_histories.pluck(:to_state)).to eq %i[
-                 initial
+                 not_approved
                  approved
                ]
           end
@@ -736,7 +736,7 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
               .to_date
             expect(e.evidences.last.current_state).to eq :approved
             expect(e.evidences.last.state_histories.pluck(:to_state)).to eq %i[
-                 initial
+                 not_approved
                  approved
                ]
           end
@@ -746,7 +746,7 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
             expect(e.effective_on.to_date).to eq Date.new(2023, 1, 1)
             expect(e.evidences.last.current_state).to eq :approved
             expect(e.evidences.last.state_histories.pluck(:to_state)).to eq %i[
-                 initial
+                 not_approved
                  approved
                ]
           end
@@ -897,7 +897,7 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
             expect(e.effective_on.to_date).to eq eligibilities[1].start_on.to_date
             expect(e.evidences.last.current_state).to eq :approved
             expect(e.evidences.last.state_histories.pluck(:to_state)).to eq %i[
-                 initial
+                 not_approved
                  approved
                  denied
                  approved

@@ -19,7 +19,8 @@ module ChildcareSubsidyConcern
     end
 
     def has_osse_grant?(key, effective_date)
-      return false unless is_osse_eligibility_satisfied?(effective_date)
+      eligibility = active_eligibility_on(effective_date)
+      return unless eligibility
 
       eligibility.grant_for(key).present?
     end

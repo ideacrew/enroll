@@ -57,14 +57,14 @@ RSpec.describe Operations::Eligible::BuildEligibility,
       eligibility_state_history = eligibility[:state_histories].last
       evidence_state_history = evidence[:state_histories].last
 
-      expect(eligibility_state_history[:event]).to eq(:move_to_initial)
+      expect(eligibility_state_history[:event]).to eq(:move_to_ineligible)
       expect(eligibility_state_history[:from_state]).to eq(:initial)
-      expect(eligibility_state_history[:to_state]).to eq(:initial)
+      expect(eligibility_state_history[:to_state]).to eq(:ineligible)
       expect(eligibility_state_history[:is_eligible]).to be_falsey
 
-      expect(evidence_state_history[:event]).to eq(:move_to_initial)
+      expect(evidence_state_history[:event]).to eq(:move_to_not_approved)
       expect(evidence_state_history[:from_state]).to eq(:initial)
-      expect(evidence_state_history[:to_state]).to eq(:initial)
+      expect(evidence_state_history[:to_state]).to eq(:not_approved)
       expect(evidence_state_history[:is_eligible]).to be_falsey
       expect(evidence[:is_satisfied]).to be_falsey
     end
@@ -81,9 +81,9 @@ RSpec.describe Operations::Eligible::BuildEligibility,
       eligibility_state_history = eligibility[:state_histories].last
       evidence_state_history = evidence[:state_histories].last
 
-      expect(eligibility_state_history[:event]).to eq(:move_to_published)
+      expect(eligibility_state_history[:event]).to eq(:move_to_eligible)
       expect(eligibility_state_history[:from_state]).to eq(:initial)
-      expect(eligibility_state_history[:to_state]).to eq(:published)
+      expect(eligibility_state_history[:to_state]).to eq(:eligible)
       expect(eligibility_state_history[:is_eligible]).to be_truthy
 
       expect(evidence_state_history[:event]).to eq(:move_to_approved)
@@ -119,9 +119,9 @@ RSpec.describe Operations::Eligible::BuildEligibility,
       eligibility_state_history = eligibility[:state_histories].last
       evidence_state_history = evidence[:state_histories].last
 
-      expect(eligibility_state_history[:event]).to eq(:move_to_published)
+      expect(eligibility_state_history[:event]).to eq(:move_to_eligible)
       expect(eligibility_state_history[:from_state]).to eq(:initial)
-      expect(eligibility_state_history[:to_state]).to eq(:published)
+      expect(eligibility_state_history[:to_state]).to eq(:eligible)
       expect(eligibility_state_history[:is_eligible]).to be_truthy
 
       expect(evidence_state_history[:event]).to eq(:move_to_approved)
