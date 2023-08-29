@@ -15,13 +15,11 @@ module Operations
         if response.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
           determine_evidence_aasm_status(application, evidence) if evidence.evidenceable.has_enrolled_health_coverage
 
-          update_reason = "#{evidence.key} Evidence Verification Request Failed due to #{response.failure}"
-          evidence.add_verification_history("Hub Request Failed", "System", update_reason)
-
-          # Original determination method returned false on failure -- keeping this as to not break existing functionality/specs
+          update_reason = "#{evidence.key.capitalize} Evidence Verification Request Failed due to #{response.failure}"
+          evidence.add_verification_history("Hub Request Failed", update_reason, "System")
           false
         elsif response.failure?
-          # Original determination method returned false on failure -- keeping this as to not break existing functionality/specs
+          # Original determination method returned only false on failure -- keeping this as to not break existing functionality/specs
           false
         else
           evidence.add_verification_history(event[:action_name], event[:update_reason], event[:updated_by])
