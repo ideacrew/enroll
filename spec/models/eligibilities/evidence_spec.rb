@@ -113,71 +113,108 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
       context 'builds and publishes with errors' do
         let(:failed_action) { 'Hub Request Failed' }
         let(:failed_updated_by) { 'System' }
-        let(:failed_update_reason) { "Income Evidence Verification Request Failed due to [\"Invalid SSN\"]" }
+        let(:failed_update_reason) { "Invalid SSN" }
+
+        let(:person) { FactoryBot.create(:person, :with_consumer_role, ) }
+        let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
 
         before do
           allow(evidence_verification_request).to receive(:call).and_return(Dry::Monads::Failure(failed_update_reason))
           allow(Operations::Fdsh::EvidenceVerificationRequest).to receive(:new).and_return(evidence_verification_request)
+
+          family_member_id = family.family_members[0].id
+          applicant.update(family_member_id: family_member_id)
+          application.update(family_id: family.id)
         end
 
-        context 'with an applicant who does not have an active enrollment' do
-          it 'should change evidence aasm_state to outstanding' do
+        context 'with an applicant without an active enrollment' do
+          it 'should change evidence aasm_state to negative_response_received' do
             result = income_evidence.request_determination(action, update_reason, updated_by)
-            evidence.reload
-            binding.irb
+            income_evidence.reload
 
             expect(result).to be_falsey
-            expect(evidence.aasm_state).to eq('outstanding')
-            expect(evidence.verification_histories).to be_present
+            expect(income_evidence.aasm_state).to eq('negative_response_received')
+            expect(income_evidence.verification_histories).to be_present
 
-            history = evidence.verification_histories.first
-            expect(history.action).to eq action
-            expect(history.update_reason).to eq update_reason
-            expect(history.updated_by).to eq updated_by
+            admin_call_history = income_evidence.verification_histories.first
+            expect(admin_call_history.action).to eq action
+            expect(admin_call_history.update_reason).to eq update_reason
+            expect(admin_call_history.updated_by).to eq updated_by
+            
+            failure_history = income_evidence.verification_histories.last
+            expect(failure_history.action).to eq failed_action
+            expect(failure_history.update_reason).to include(failed_update_reason)
+            expect(failure_history.updated_by).to eq(failed_updated_by)
           end
         end
 
-      #   context 'with an applicant with active enrollment and aptc' do
-      #     before do
-      #       eligibility_determination.update(max_aptc: 720.0)
-      #     end
+        context 'with an applicant who has an active enrollment' do
+          let!(:hbx_enrollment) do
+            FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_health_product,
+                              family: family, enrollment_members: [family.primary_applicant],
+                              aasm_state: 'coverage_selected', kind: 'individual')
+          end
 
-      #     it 'should change evidence aasm_state to negative_response_received' do
-      #       evidence = applicant.income_evidence
-      #       result = evidence.request_determination(action, update_reason, updated_by)
-      #       evidence.reload
+          before do
+            family_member_id = family.family_members[0].id
+            applicant.update(family_member_id: family_member_id)
+            application.update(family_id: family.id)
+          end
 
-      #       expect(result).to be_falsey
-      #       expect(evidence.aasm_state).to eq('negative_response_received')
-      #       expect(evidence.verification_histories).to be_present
+          context 'and not using aptc or valid csr' do
+            before do
+              # csr_variant_id "01" is not one of the valid csr codes to change aasm_state
+              hbx_enrollment.product.update(csr_variant_id: '01')
+            end
 
-      #       history = evidence.verification_histories.first
-      #       expect(history.action).to eq action
-      #       expect(history.update_reason).to eq update_reason
-      #       expect(history.updated_by).to eq updated_by
-      #     end
-      #   end
+            it 'should change evidence aasm_state to negative_response_received' do
+              result = income_evidence.request_determination(action, update_reason, updated_by)
+              income_evidence.reload
 
-      #   context 'with an applicant with active enrollment and csr' do
-      #     before do
-      #       applicant.update(csr_percent_as_integer: 73, csr_eligibility_kind: 'csr_73')
-      #     end
+              expect(result).to be_falsey
+              expect(income_evidence.aasm_state).to eq('negative_response_received')
+              expect(income_evidence.verification_histories).to be_present
 
-      #     it 'should change evidence aasm_state to negative_response_received' do
-      #       evidence = applicant.income_evidence
-      #       result = evidence.request_determination(action, update_reason, updated_by)
-      #       evidence.reload
+              admin_call_history = income_evidence.verification_histories.first
+              expect(admin_call_history.action).to eq action
+              expect(admin_call_history.update_reason).to eq update_reason
+              expect(admin_call_history.updated_by).to eq updated_by
+              
+              failure_history = income_evidence.verification_histories.last
+              expect(failure_history.action).to eq failed_action
+              expect(failure_history.update_reason).to include(failed_update_reason)
+              expect(failure_history.updated_by).to eq(failed_updated_by)
+            end
+          end
 
-      #       expect(result).to be_falsey
-      #       expect(evidence.aasm_state).to eq('negative_response_received')
-      #       expect(evidence.verification_histories).to be_present
+          context 'and using aptc' do
+            before do
+              hbx_enrollment.update(applied_aptc_amount: 720)
+              # csr_variant_id "01" is not one of the valid csr codes to change aasm_state
+              hbx_enrollment.product.update(csr_variant_id: '01')
+            end
+  
+            it 'should change evidence aasm_state to outstanding' do
+              result = income_evidence.request_determination(action, update_reason, updated_by)
+              income_evidence.reload
+  
+              expect(result).to be_falsey
+              expect(income_evidence.aasm_state).to eq('outstanding')
+              expect(income_evidence.verification_histories.size).to eq(2)
+            end
+          end
 
-      #       history = evidence.verification_histories.first
-      #       expect(history.action).to eq action
-      #       expect(history.update_reason).to eq update_reason
-      #       expect(history.updated_by).to eq updated_by
-      #     end
-      #   end
+          context 'and using csr' do
+            it 'should change evidence aasm_state to outstanding' do
+              result = income_evidence.request_determination(action, update_reason, updated_by)
+              income_evidence.reload
+  
+              expect(result).to be_falsey
+              expect(income_evidence.aasm_state).to eq('outstanding')
+              expect(income_evidence.verification_histories).to be_present
+            end
+          end
+        end
       end
     end
 

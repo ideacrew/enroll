@@ -28,6 +28,10 @@ module Eligibilities
       :local_mec => "events.iap.mec_check.mec_check_requested"
     }.freeze
 
+    FDSH_HUB_CALL_EVIDENCE_TYPES = {
+      :income => true
+    }
+
     embedded_in :evidenceable, polymorphic: true
 
     field :key, type: Symbol
@@ -68,11 +72,10 @@ module Eligibilities
       self.add_verification_history(action_name, update_reason, updated_by)
       application = self.evidenceable.application
       response = Operations::Fdsh::EvidenceVerificationRequest.new.call(self)
-      binding.irb
-      
+
       if response.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
-        binding.irb
-        determine_evidence_aasm_status(self.evidenceable)
+        # Currently only active for evidence type :income
+        determine_evidence_aasm_status(self.evidenceable) if FDSH_HUB_CALL_EVIDENCE_TYPES[self.key]
 
         update_reason = "#{self.key.capitalize} Evidence Verification Request Failed due to #{response.failure}"
         self.add_verification_history("Hub Request Failed", update_reason, "System")
@@ -84,35 +87,25 @@ module Eligibilities
       end
     end
 
-    # def determine_evidence_aasm_status(application, evidence)
     def determine_evidence_aasm_status(applicant)
       family_id = applicant.application.family_id
       enrollments = HbxEnrollment.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, family_id: family_id)
-  
+      
       if enrolled?(applicant, enrollments)
         enrollments.each do |enrollment|
           applicant.enrolled_with(enrollment)
         end
+      else
+        applicant.set_evidence_to_negative_response(self)
       end
-      # if aptc_active?(application) || csr_code_active?(evidence)
-      #   evidence.negative_response_received
-      # else
-      #   evidence.move_to_outstanding
-      # end
     end
 
-    # def aptc_active?(application)
-    #   eligibilities = application.eligibility_determinations
-    #   eligibilities.any? { |el| el.max_aptc > 0 }
-    # end
+    def enrolled?(applicant, enrollments)
+      return false if enrollments.blank?
 
-    # def csr_code_active?(evidence)
-    #   applicant = evidence.evidenceable
-    #   csr_codes = EnrollRegistry[:validate_and_record_publish_application_errors].setting(:csr_codes).item
-
-    #   applicant_csr_code = ::EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[applicant.csr_eligibility_kind]
-    #   csr_codes.include?(applicant_csr_code)
-    # end
+      family_member_ids = enrollments.flat_map(&:hbx_enrollment_members).flat_map(&:applicant_id).uniq
+      family_member_ids.map(&:to_s).include?(applicant.family_member_id.to_s)
+    end
 
     def add_verification_history(action, update_reason, updated_by)
       result = self.verification_histories.build(action: action, update_reason: update_reason, updated_by: updated_by)
@@ -129,13 +122,6 @@ module Eligibilities
       current = verif_due_date
       self.due_on = current + period
       add_verification_history('auto_extend_due_date', "Auto extended due date from #{current.strftime('%m/%d/%Y')} to #{due_on.strftime('%m/%d/%Y')}", updated_by)
-    end
-
-    def enrolled?(applicant, enrollments)
-      return false if enrollments.blank?
-
-      family_member_ids = enrollments.flat_map(&:hbx_enrollment_members).flat_map(&:applicant_id).uniq
-      family_member_ids.map(&:to_s).include?(applicant.family_member_id.to_s)
     end
 
     def verif_due_date
