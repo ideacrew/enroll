@@ -62,7 +62,6 @@ module Services
     end
     # rubocop:enable Metrics/CyclomaticComplexity
 
-
     def store_osse_eligibility(role, osse_eligibility, effective_on)
       result = ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new.call(
         {

@@ -23,7 +23,11 @@ module BenefitSponsors
           data[year] = {}
           effective_on = effective_on_for_year(year.to_i)
           eligibility = benefit_sponsorship.active_eligibility_on(effective_on)
-          data[year][:is_eligible] = eligibility&.present?
+          if eligibility
+            data[year][:is_eligible] = true
+          else
+            data[year][:is_eligible] = false
+          end
           application = benefit_sponsorship.benefit_applications.by_year(year).approved_and_terminated.select(&:osse_eligible?).last
           next unless application
 
@@ -37,14 +41,13 @@ module BenefitSponsors
         eligibility_result = {}
 
         args[:osse].each do |year, osse_eligibility|
-          year = year.to_i
-          effective_on = effective_on_for_year(year)
+          effective_on = effective_on_for_year(year.to_i)
           active_eligibility = benefit_sponsorship.active_eligibility_on(effective_on)
           current_eligibility_status = active_eligibility.present?
 
-          next if current_eligibility_status == osse_eligibility
+          next if current_eligibility_status.to_s == osse_eligibility
 
-          effective_on = active_eligibility.effective_on if osse_eligibility == false # FIXME
+          effective_on = active_eligibility.effective_on if osse_eligibility == "false" # FIXME
           eligibility_result[year] = store_osse_eligibility(osse_eligibility, effective_on)
         end
 
