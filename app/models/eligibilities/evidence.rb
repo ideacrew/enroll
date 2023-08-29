@@ -69,6 +69,7 @@ module Eligibilities
     end
 
     def request_determination(action_name, update_reason, updated_by = nil)
+      binding.irb
       self.add_verification_history(action_name, update_reason, updated_by)
       application = self.evidenceable.application
       response = Operations::Fdsh::EvidenceVerificationRequest.new.call(self)

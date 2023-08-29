@@ -50,8 +50,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::RetryEvidences, 
       before do
         allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Success.new(application))
         allow(::AcaEntities::MagiMedicaid::Operations::InitializeApplication).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Success.new(application.attributes))
-
         @result = subject.call(test_params)
+        binding.irb
         applicant.reload
       end
 
