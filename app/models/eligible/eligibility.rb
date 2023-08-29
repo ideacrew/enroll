@@ -35,39 +35,30 @@ module Eligible
              to: :latest_state_history,
              allow_nil: false
 
+    delegate :eligible?,
+             :is_eligible_on?,
+             :eligible_periods,
+             to: :decorated_eligible_record,
+             allow_nil: true
+
     scope :by_key, ->(key) { where(key: key.to_sym) }
-    scope :effectuated, -> { where(:current_state.ne => :initial) }
+    scope :eligible, -> { where(current_state: :eligible) }
+    scope :ineligible, -> { where(current_state: :ineligible) }
 
     def latest_state_history
       state_histories.last
     end
 
-    # Following method is to check if given date is with in
-    # the eligibility published expired date range
-    def eligibility_period_cover?(date)
-      if current_state == :initial
-        (effective_on..effective_on.end_of_year).cover?(date)
-      else
-        return false unless published_on
-        (published_on..expired_on).cover?(date)
-      end
+    def active_state
+      :eligible
     end
 
-    def published_on
-      publish_history = state_histories.by_state(:published).min_by(&:created_at)
-      publish_history&.effective_on
+    def inactive_state
+      :ineligible
     end
 
-    #default expired_on will be last day of calendar year of the eligibility
-    #eligibility can't span across multiple years
-    #once eligibility is expired, it can never be moved back to published state
-    def expired_on
-      expiration_history = state_histories.by_state(:expired).min_by(&:created_at)
-      expiration_history&.effective_on&.prev_day || published_on&.end_of_year
-    end
-
-    def is_eligible_on?(date)
-      evidences.all? { |evidence| evidence.is_eligible_on?(date) }
+    def decorated_eligible_record
+      EligiblePeriodHandler.new(self)
     end
 
     def grant_for(grant_key)
@@ -120,13 +111,18 @@ module Eligible
       end
 
       def create_objects(collection, type)
-        collection.map do |item|
-          resource_name = send("#{type}_resource_for", item.key)
-          item_class = RESOURCE_KINDS.find { |kind| kind.name == (resource_name.sub(/^::/, '')) }
+        collection
+          .map do |item|
+            resource_name = send("#{type}_resource_for", item.key)
+            item_class =
+              RESOURCE_KINDS.find do |kind|
+                kind.name == (resource_name.sub(/^::/, ""))
+              end
 
-          next unless item_class
-          item_class.new(item.to_h)
-        end.compact
+            next unless item_class
+            item_class.new(item.to_h)
+          end
+          .compact
       end
     end
   end

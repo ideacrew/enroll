@@ -31,6 +31,12 @@ module Eligible
              to: :latest_state_history,
              allow_nil: false
 
+    delegate :eligible?,
+             :is_eligible_on?,
+             :eligible_periods,
+             to: :decorated_eligible_record,
+             allow_nil: true
+
     scope :by_key, ->(key) { where(key: key.to_sym) }
 
     def latest_state_history
