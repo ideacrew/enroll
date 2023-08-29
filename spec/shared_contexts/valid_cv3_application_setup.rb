@@ -15,9 +15,9 @@ RSpec.shared_context 'valid cv3 application setup', :shared_context => :metadata
                                   application: application,
                                   is_primary_applicant: is_primary_applicant,
                                   ssn: '889984400',
-                                  dob: Date.new(1993,12,9),
-                                  first_name: 'Max',
-                                  last_name: 'Zorin',
+                                  dob: Date.new(1994,11,17),
+                                  first_name: person.first_name,
+                                  last_name: person.last_name,
                                   gender: person.gender,
                                   person_hbx_id: person.hbx_id,
                                   eligibility_determination_id: eligibility_determination.id,
@@ -50,6 +50,9 @@ RSpec.shared_context 'valid cv3 application setup', :shared_context => :metadata
   let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
 
   before do
+    allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
+
     allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
     allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
     allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
