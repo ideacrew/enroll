@@ -13,7 +13,7 @@ RSpec.describe Operations::Fdsh::EvidenceVerificationRequest, dbclean: :after_ea
       context 'builds and publishes with no errors' do
         it 'should return success' do
           current_aasm_state = evidence.aasm_state
-          result = described_class.new.call(evidence)
+          result = described_class.new.call(evidence).success
           evidence.reload
 
           expect(result).to eq("Event published successfully")
