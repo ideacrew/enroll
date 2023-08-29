@@ -19,12 +19,12 @@ module Operations
       def to_state_for(evidences_options)
         evidence_states =
           evidences_options
-            .collect do |evidence_options|
-              latest_history = evidence_options[:state_histories].last
-              next unless latest_history
-              latest_history[:to_state]
-            end
-            .compact
+          .collect do |evidence_options|
+            latest_history = evidence_options[:state_histories].last
+            next unless latest_history
+            latest_history[:to_state]
+          end
+          .compact
 
         return :eligible if evidence_states.all? { |state| state == :approved }
         :ineligible

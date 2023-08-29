@@ -85,8 +85,7 @@ module Services
     end
 
     def get_eligibility_by_date(start_on)
-      eligibility_key = "aca_ivl_osse_eligibility_#{start_on.year}".to_sym
-      role.eligibility_for(eligibility_key, start_on)
+      role.eligibility_on(start_on)
     end
   end
 end

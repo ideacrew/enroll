@@ -19,9 +19,7 @@ module Subscribers
         effective_date = payload[:effective_date].to_date
         evidence_key = payload[:evidence_key].to_sym
 
-        eligibility_key = eligibility_key_for(subject, eligibility_date)
-        eligibility = subject.eligibility_for(eligibility_key, eligibility_date)
-
+        eligibility = subject.eligibility_on(eligibility_date)
         unless eligibility
           result = eligibility_operation_for(subject).new.call(
             {
@@ -52,14 +50,11 @@ module Subscribers
         eligibility_date = TimeKeeper.date_of_record
         effective_date = payload[:effective_date].to_date
         evidence_key = payload[:evidence_key].to_sym
-        eligibility_key = eligibility_key_for(subject, eligibility_date)
 
-        eligibility = subject.eligibility_for(eligibility_key, eligibility_date)
+        eligibility = subject.eligibility_on(eligibility_date)
         osse_eligibility = eligibility.blank? ? false : eligibility.is_eligible_on?(eligibility_date)
 
-        renew_eligibility_key = eligibility_key_for(subject, effective_date)
-        renewal_eligibility = subject.eligibility_for(renew_eligibility_key, effective_date)
-
+        renewal_eligibility = subject.eligibility_on(effective_date)
         unless renewal_eligibility
           result = eligibility_operation_for(subject).new.call(
             {
@@ -87,15 +82,6 @@ module Subscribers
           ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility
         when "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
           ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility
-        end
-      end
-
-      def eligibility_key_for(subject, eligibility_date)
-        case subject.class.to_s
-        when "ConsumerRole" || "ResidentRole"
-          "aca_ivl_osse_eligibility_#{eligibility_date.year}".to_sym
-        when "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
-          "aca_shop_osse_eligibility_#{eligibility_date.year}".to_sym
         end
       end
     end

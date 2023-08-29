@@ -1016,8 +1016,13 @@ module ApplicationHelper
 
   def current_osse_status_for_role(role)
     date = TimeKeeper.date_of_record
-    osse_eligibility = role.eligibility_for("aca_ivl_osse_eligibility_#{date.year}".to_sym, date)
-    osse_eligibility&.is_eligible_on?(date) ? "Active for (#{date.year})" : "Not Active for (#{date.year})"
+    active_eligibility = role.active_eligibility_on(date)
+
+    if active_eligibility.present?
+      "Active for (#{date.year})"
+    else
+      "Not Active for (#{date.year})"
+    end
   end
 
   def individual_osse_eligibility_years_for_display

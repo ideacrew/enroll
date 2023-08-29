@@ -155,10 +155,10 @@ module Effective
       end
 
       def check_employer_osse_eligibility(employer)
-        bs = employer.employer_profile.organization.active_benefit_sponsorship
-        osse_key = "aca_shop_osse_eligibility_#{TimeKeeper.date_of_record.year}".to_sym
-        eligibility = bs&.eligibility_for(osse_key, TimeKeeper.date_of_record)
-        eligibility&.is_eligible_on?(TimeKeeper.date_of_record)
+        active_benefit_sponsorship = employer.employer_profile.organization.active_benefit_sponsorship
+        active_eligibility = active_benefit_sponsorship&.active_eligibility_on(TimeKeeper.date_of_record)
+
+        active_eligibility.present?
       end
 
       def authorized?(current_user, _controller, _action, _resource)

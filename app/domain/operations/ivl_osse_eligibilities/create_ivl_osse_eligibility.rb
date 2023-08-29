@@ -48,9 +48,9 @@ module Operations
       # We'll be adding State Histories when the eligibility changes
       def find_eligibility(values)
         eligibility =
-          subject.find_eligibility_by(
+          subject.eligibilities.by_key(
             "aca_ivl_osse_eligibility_#{values[:effective_date].year}".to_sym
-          )
+          ).last
 
         Success(eligibility)
       end
@@ -126,8 +126,10 @@ module Operations
           )
 
         eligibility_record.tap do |record|
-          record.evidences = record.class.create_objects(eligibility.evidences, :evidences)
-          record.grants = record.class.create_objects(eligibility.grants, :grants)
+          record.evidences =
+            record.class.create_objects(eligibility.evidences, :evidences)
+          record.grants =
+            record.class.create_objects(eligibility.grants, :grants)
         end
 
         eligibility_record

@@ -39,7 +39,7 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignProposal, type: :model, dbcle
       let(:osse_eligibility) { 'true' }
 
       it 'should store eligibility' do
-        osse_eligibility = benefit_sponsorship.reload.eligibility_for(:bqt_osse_eligibility, plan_design_proposal.effective_date)
+        osse_eligibility = benefit_sponsorship.reload.eligibility_on(plan_design_proposal.effective_date)
         expect(osse_eligibility).to be_present
         expect(osse_eligibility.is_eligible_on?(plan_design_proposal.effective_date)).to be_truthy
       end
@@ -49,8 +49,7 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignProposal, type: :model, dbcle
       let(:osse_eligibility) { 'true' }
 
       it 'should term eligibility' do
-        osse_eligibility = benefit_sponsorship.reload.eligibility_for(
-          :bqt_osse_eligibility,
+        osse_eligibility = benefit_sponsorship.reload.eligibility_on(
           plan_design_proposal.effective_date
         )
         expect(osse_eligibility.is_eligible_on?(plan_design_proposal.effective_date)).to be_truthy
@@ -64,8 +63,7 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignProposal, type: :model, dbcle
           )
         form.save
 
-        osse_eligibility = benefit_sponsorship.reload.eligibility_for(
-          :bqt_osse_eligibility,
+        osse_eligibility = benefit_sponsorship.reload.eligibility_on(
           plan_design_proposal.effective_date
         )
         expect(osse_eligibility.is_eligible_on?(plan_design_proposal.effective_date)).to be_falsey

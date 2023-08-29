@@ -429,31 +429,26 @@ module BenefitSponsors
       benefit_market.benefit_market_catalog_effective_on(effective_date)
     end
 
-    def eligibilities_on(date, eligibility_collection = nil)
-      eligibility_collection ||= eligibilities.effectuated
-      eligibility_collection.select{|e| e.eligibility_period_cover?(date)}
+    def eligibilities_on(date)
+      eligibility_key = "aca_shop_osse_eligibility_#{date.year}".to_sym
+
+      eligibilities.by_key(eligibility_key)
     end
 
-    def active_eligibilities_on(date, eligibility_collection = nil)
-      eligibilities_on(date, eligibility_collection).select{|e| e.is_eligible_on?(date) }
+    def eligibility_on(effective_date)
+      eligibilities_on(effective_date).last
     end
 
-    def eligibility_for(eligibility_key, effective_date)
-      active_eligibilities_on(effective_date, eligibilities.by_key(eligibility_key)).last
+    def active_eligibilities_on(date)
+      eligibilities_on(date).select{|e| e.is_eligible_on?(date) }
+    end
+
+    def active_eligibility_on(effective_date)
+      active_eligibilities_on(effective_date).last
     end
 
     def is_grant_eligible_on?(grant_value, effective_date)
       active_eligibilities_on(effective_date).any?{|e| e.grant_for(grant_value)}
-    end
-
-    # we cannot have multiple eligibilities with same key in a given calender year
-    # Following method should be used only when we're pulling all matching eligibilities irrespective of eligible or not
-    def find_eligibility_by(eligibility_key, start_on = nil)
-      eligibilities = self.eligibilities.by_key(eligibility_key)
-      return eligibilities.last unless start_on
-      eligibilities.detect do |eligibility|
-        eligibility.eligibility_period_cover?(start_on)
-      end
     end
 
     def benefit_sponsor_catalog_for(effective_date)
@@ -940,6 +935,8 @@ module BenefitSponsors
 
     def create_default_osse_eligibility
       return unless shop_osse_eligibility_is_enabled?
+      return if eligibility_on(TimeKeeper.date_of_record)
+
       ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(initial_osse_eligibility_params)
     rescue StandardError => e
       Rails.logger.error { "Default Osse Eligibility not created for #{self.to_global_id} due to #{e.backtrace}" }

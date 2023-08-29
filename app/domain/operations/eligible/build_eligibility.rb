@@ -122,7 +122,7 @@ module Operations
           effective_on: values[:effective_date],
           from_state: from_state || :initial,
           to_state: to_state,
-          is_eligible: (to_state == :eligible ? true : false)
+          is_eligible: (to_state == :eligible)
         }
         options[:timestamps] = values[:timestamps] if values[:timestamps]
         options

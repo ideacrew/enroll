@@ -22,9 +22,8 @@ module BenefitSponsors
         osse_eligibility_years_for_display.each_with_object({}) do |year, data|
           data[year] = {}
           effective_on = effective_on_for_year(year.to_i)
-          eligibility = get_eligibility_by_date(effective_on)
-          data[year][:is_eligible] = eligibility.present?
-
+          eligibility = benefit_sponsorship.active_eligibility_on(effective_on)
+          data[year][:is_eligible] = eligibility&.present?
           application = benefit_sponsorship.benefit_applications.by_year(year).approved_and_terminated.select(&:osse_eligible?).last
           next unless application
 
@@ -36,21 +35,23 @@ module BenefitSponsors
       # rubocop:disable Metrics/CyclomaticComplexity
       def update_osse_eligibilities_by_year
         eligibility_result = {}
+
         args[:osse].each do |year, osse_eligibility|
-          effective_on = effective_on_for_year(year.to_i)
-          eligibility = get_eligibility_by_date(effective_on)
+          year = year.to_i
+          effective_on = effective_on_for_year(year)
+          active_eligibility = benefit_sponsorship.active_eligibility_on(effective_on)
+          current_eligibility_status = active_eligibility.present?
 
-          current_eligibility_status = eligibility&.is_eligible_on?(effective_on)&.to_s || 'false'
-          next if current_eligibility_status == osse_eligibility.to_s
+          next if current_eligibility_status == osse_eligibility
 
-          effective_on = eligibility.effective_on if eligibility&.is_eligible_on?(effective_on) && osse_eligibility.to_s == 'false'
-
+          effective_on = active_eligibility.effective_on if osse_eligibility == false # FIXME
           eligibility_result[year] = store_osse_eligibility(osse_eligibility, effective_on)
         end
-        eligibility_result.group_by { |_key, value| value }.transform_values { |items| items.map(&:first) }
+
+        grouped_eligibilities = eligibility_result.group_by { |_year, value| value }
+        grouped_eligibilities.transform_values { |items| items.map(&:first) }
       end
       # rubocop:enable Metrics/CyclomaticComplexity
-
 
       def store_osse_eligibility(osse_eligibility, effective_on)
         result = ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(
@@ -70,11 +71,6 @@ module BenefitSponsors
         start_on = TimeKeeper.date_of_record if year == calendar_year
         start_on = start_on.end_of_year if year < calendar_year
         start_on
-      end
-
-      def get_eligibility_by_date(start_on)
-        eligibility_key = "aca_shop_osse_eligibility_#{start_on.year}".to_sym
-        benefit_sponsorship.eligibility_for(eligibility_key, start_on)
       end
     end
   end

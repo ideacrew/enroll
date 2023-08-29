@@ -240,17 +240,22 @@ class BenefitCoveragePeriod
     eligible_packages.push(cat_benefit_package)
   end
 
-  def eligibilities_on(date, eligibility_collection = nil)
-    eligibility_collection ||= eligibilities.effectuated
-    eligibility_collection.select{|e| e.eligibility_period_cover?(date)}
+  def eligibilities_on(date)
+    eligibility_key = "aca_ivl_osse_eligibility_#{date.year}".to_sym
+
+    eligibilities.by_key(eligibility_key)
   end
 
-  def active_eligibilities_on(date, eligibility_collection = nil)
-    eligibilities_on(date, eligibility_collection).select{|e| e.is_eligible_on?(date) }
+  def eligibility_on(effective_date)
+    eligibilities_on(effective_date).last
   end
 
-  def eligibility_for(eligibility_key, effective_date)
-    active_eligibilities_on(effective_date, eligibilities.by_key(eligibility_key)).last
+  def active_eligibilities_on(date)
+    eligibilities_on(date).select { |e| e.is_eligible_on?(date) }
+  end
+
+  def active_eligibility_on(effective_date)
+    active_eligibilities_on(effective_date).last
   end
 
   ## Class methods

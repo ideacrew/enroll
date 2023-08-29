@@ -71,11 +71,15 @@ module BenefitSponsors
         Settings.aca.employer_has_sic_field
       end
 
-      def ivl_osse_eligibility_is_enabled?(year = TimeKeeper.date_of_record.year)
+      def ivl_osse_eligibility_is_enabled?(year = nil)
+        year ||= TimeKeeper.date_of_record.year
+
         EnrollRegistry.feature?("aca_ivl_osse_eligibility_#{year}") && EnrollRegistry.feature_enabled?("aca_ivl_osse_eligibility_#{year}")
       end
 
-      def shop_osse_eligibility_is_enabled?(year = TimeKeeper.date_of_record.year)
+      def shop_osse_eligibility_is_enabled?(year = nil)
+        year ||= TimeKeeper.date_of_record.year
+
         EnrollRegistry.feature?("aca_shop_osse_eligibility_#{year}") && EnrollRegistry.feature_enabled?("aca_shop_osse_eligibility_#{year}")
       end
 
@@ -98,9 +102,7 @@ module BenefitSponsors
       def employer_current_year_osse_status
         benefit_sponsorship = find_employer_profile.active_benefit_sponsorship
         date = TimeKeeper.date_of_record
-        osse_key = "aca_shop_osse_eligibility_#{date.year}".to_sym
-        osse_eligibility = benefit_sponsorship&.eligibility_for(osse_key, date)
-        osse_eligibility&.is_eligible_on?(date) ? "Active for (#{date.year})" : "Not Active for (#{date.year})"
+        benefit_sponsorship&.active_eligibility_on(date)&.present? ? "Active for (#{date.year})" : "Not Active for (#{date.year})"
       end
 
       def can_skip_calculations_for(benefit_application)

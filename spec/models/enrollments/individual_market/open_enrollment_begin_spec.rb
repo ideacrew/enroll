@@ -278,7 +278,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           subject { Enrollments::IndividualMarket::OpenEnrollmentBegin.new }
 
           before do
-            allow_any_instance_of(BenefitCoveragePeriod).to receive(:eligibility_for).and_return true
+            allow_any_instance_of(BenefitCoveragePeriod).to receive(:eligibility_on).and_return true
           end
 
           context 'when osse renewal success' do
@@ -350,7 +350,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       context '#records' do
         context 'when osse disabled' do
           before do
-            allow_any_instance_of(BenefitCoveragePeriod).to receive(:eligibility_for).and_return false
+            allow_any_instance_of(BenefitCoveragePeriod).to receive(:eligibility_on).and_return false
           end
 
           it 'should return family collection' do
@@ -360,7 +360,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
         context 'when osse enabled' do
           before do
-            allow_any_instance_of(BenefitCoveragePeriod).to receive(:eligibility_for).and_return true
+            allow_any_instance_of(BenefitCoveragePeriod).to receive(:eligibility_on).and_return true
           end
 
           it 'should return family collection' do

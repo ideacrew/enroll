@@ -5,6 +5,8 @@ class EmployeeRole
   include Acapi::Notifiers
   include BenefitSponsors::ModelEvents::EmployeeRole
   include BenefitSponsors::Concerns::Observable
+  include Mongoid::History::Trackable
+  include EventSource::Command
   include GlobalID::Identification
 
   EMPLOYMENT_STATUS_KINDS   = ["active", "full-time", "part-time", "retired", "terminated"]
@@ -23,8 +25,18 @@ class EmployeeRole
   field :terminated_on, type: Date
   field :is_active, type: Boolean, default: true
   field :bookmark_url, type: String, default: nil
-  field :contact_method, type: String, default: ::Settings.aca.shop_market.employee.default_contact_method
+  field :contact_method, type: String, default: Settings.aca.shop_market.employee.default_contact_method
   field :language_preference, type: String, default: "English"
+
+  track_history :on => [:fields],
+                :scope => :person,
+                :modifier_field => :modifier,
+                :modifier_field_optional => true,
+                :version_field => :tracking_version,
+                :track_create  => true,    # track document creation, default is false
+                :track_update  => true,    # track document updates, default is true
+                :track_destroy => true
+
   delegate :hbx_id, to: :person, allow_nil: true
   delegate :ssn, :ssn=, to: :person, allow_nil: true
   delegate :dob, :dob=, to: :person, allow_nil: true
@@ -33,7 +45,8 @@ class EmployeeRole
 #  delegate :hired_on, to: :census_employee, allow_nil: true
   delegate :benefit_package_for_date, to: :census_employee, allow_nil: true
 
-  validates_presence_of :ssn, :dob, :gender, :hired_on
+  validates_presence_of :dob, :gender, :hired_on
+  validates_presence_of :ssn, :if => Proc.new { |m| !m.person.no_ssn }
   # validates_presence_of :employer_profile_id
   # validates_presence_of :benefit_sponsors_employer_profile_id
   validates_presence_of :employer_profile_id, :if => Proc.new { |m| m.benefit_sponsors_employer_profile_id.blank? }
@@ -46,6 +59,20 @@ class EmployeeRole
 
   after_create :notify_on_create
   add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_employee_role_events]
+
+  after_create :publish_employee_role_created
+
+  def publish_employee_role_created
+    publish_event('created', { employee_role_global_id: self.to_global_id.to_s })
+  end
+
+  def publish_event(event, payload)
+    event = event("events.benefit_sponsors.employee_role.#{event}", attributes: payload)
+
+    event.success.publish if event.success?
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't publish #{event} for employee_role: #{self.id} event due to #{e.backtrace}" }
+  end
 
   # hacky fix for nested attributes
   # TODO: remove this when it is no longer needed
@@ -112,26 +139,56 @@ class EmployeeRole
     else
       @employer_profile =  BenefitSponsors::Organizations::Organization.employer_profiles.where(
         :"profiles._id" => BSON::ObjectId.from_string(benefit_sponsors_employer_profile_id)
-      ).first&.employer_profile
+      ).first.employer_profile
     end
   end
 
   def qle_benefit_package
-    effective_on = person.primary_family.current_sep.effective_on
-    census_employee.benefit_package_for_date(effective_on)
+    sep_effective_on                 = person.primary_family.current_sep.effective_on
+    employee_earliest_eligible_date  = census_employee.earliest_eligible_date
+    possible_effective_date          = [sep_effective_on, employee_earliest_eligible_date].compact.max
+
+    census_employee.benefit_package_for_date(possible_effective_date)
   end
 
-  def benefit_package(qle: false)
+  def benefit_package(qle: false, shop_under_current: false, shop_under_future: false)
     if qle.present?
       qle_benefit_package if (qle_benefit_package.present? && !qle_benefit_package.is_conversion?)
+    elsif shop_under_current
+      census_employee.published_benefit_group
+    elsif shop_under_future
+      census_employee.renewal_published_benefit_group || census_employee.off_cycle_published_benefit_group || census_employee.published_benefit_group
     else
-      if census_employee.under_new_hire_enrollment_period?
-        benefit_package = census_employee.benefit_package_for_date(census_employee.earliest_eligible_date)
-        return benefit_package if benefit_package.present?
-      end
-
-      census_employee.renewal_published_benefit_group || census_employee.published_benefit_group
+      new_hire_or_possible_benefit_package
     end
+  end
+
+  def new_hire_or_possible_benefit_package
+    if census_employee.under_new_hire_enrollment_period?
+      benefit_package = census_employee.benefit_package_for_date(census_employee.earliest_eligible_date)
+      return benefit_package if benefit_package.present?
+    end
+
+    census_employee.renewal_published_benefit_group || census_employee.off_cycle_published_benefit_group || census_employee.published_benefit_group
+  end
+
+  def has_multiple_shop_oe_periods?
+    can_enroll_as_new_hire? && (is_under_open_enrollment? || is_under_off_cycle_open_enrollment?) && can_get_coverage_under_current_py?
+  end
+
+  # Check if a new hire can get immediate coverage under active application if employee is in off cycle/renewal open enrollment
+  def can_get_coverage_under_current_py?
+    active_package = census_employee.active_benefit_group_assignment&.benefit_package
+    future_package = census_employee.off_cycle_benefit_group_assignment&.benefit_package || census_employee.renewal_benefit_group_assignment&.benefit_package
+    return false if active_package.nil? || future_package.nil?
+
+    census_employee.coverage_effective_on(future_package) != census_employee.coverage_effective_on(active_package)
+  end
+
+  # Use this method to pull earliest effective on for new hire when there is no sep
+  def earliest_effective_on_for_new_hire_in_current_py
+    package = census_employee.active_benefit_group_assignment&.benefit_package
+    census_employee.coverage_effective_on(package)&.to_date
   end
 
   def benefit_group(qle: false)
@@ -172,6 +229,15 @@ class EmployeeRole
   def is_under_open_enrollment?
     return employer_profile.show_plan_year.present? && employer_profile.show_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record) if is_case_old?
     employer_profile.published_benefit_application.present? && employer_profile.published_benefit_application.open_enrollment_contains?(TimeKeeper.date_of_record)
+  end
+
+  def is_under_off_cycle_open_enrollment?
+    employer_profile.published_off_cycle_application.present? && employer_profile.published_off_cycle_application.open_enrollment_contains?(TimeKeeper.date_of_record)
+  end
+
+  def benefit_begin_date
+    return employer_profile.show_plan_year.start_on if is_case_old?
+    employer_profile.published_benefit_application.start_on
   end
 
   def is_eligible_to_enroll_without_qle?
@@ -228,18 +294,12 @@ class EmployeeRole
     benefit_group_assignment.present? && benefit_group_assignment.benefit_group.is_offering_dental? ? true : false
   end
 
-  def osse_eligible?(start_on)
-    eligibility = eligibility_for(:osse_subsidy, start_on)
-    return false unless eligibility
-    evidence = eligibility.evidences.by_key(:osse_subsidy).max_by(&:created_at)
-    evidence&.is_satisfied == true
+  def can_receive_paper_communication?
+    ["Only Paper communication", "Paper and Electronic communications"].include?(contact_method)
   end
 
-  def eligibility_for(evidence_key, start_on)
-    eligibilities.by_date(start_on).select do |eligibility|
-      el = eligibility.evidences.by_key(evidence_key).max_by(&:created_at)
-      el&.is_satisfied == true
-    end.max_by(&:created_at)
+  def can_receive_electronic_communication?
+    ["Only Electronic communications", "Paper and Electronic communications"].include?(contact_method)
   end
 
   class << self
@@ -263,7 +323,7 @@ class EmployeeRole
     def find_by_employer_profile(employer_profile)
       return find_by_old_employer_profile(employer_profile) if employer_profile.is_a?(EmployerProfile)
       Person.where("employee_roles.benefit_sponsors_employer_profile_id" => employer_profile.id).reduce([]) do |list, person|
-        list << person.employee_roles.detect { |ee| ee.benefit_sponsors_employer_profile_id == employer_profile.id }
+        list << person.active_employee_roles.detect { |ee| ee.benefit_sponsors_employer_profile_id == employer_profile.id }
       end
     end
 
