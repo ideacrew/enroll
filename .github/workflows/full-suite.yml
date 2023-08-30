@@ -432,6 +432,15 @@ jobs:
         env:
           COVERAGE: 'true'
         run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
+      - name: copy coverage report
+        run: |
+          cp coverage/coverage.xml ${{ github.workspace }}/coverage/cuke-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: code-coverage
+          path: ${{ github.workspace }}/coverage/cuke-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+
   quality-workbench:
     needs: [engines, benefit-sponsors, rspec, cucumber]
     if: always()
@@ -445,16 +454,20 @@ jobs:
           CHECK: ${{ matrix.check }}
         if: needs[env.CHECK].result != 'success'
         run: exit 1
+  code-coverage-summary:
+    needs: [rspec, cucumber]
+    runs-on: ubuntu-latest
+    steps:
       - name: Download code coverage artifact
         uses: actions/download-artifact@v3
         with:
           name: code-coverage
           path: coverage
-      - name: Display structure of downloaded files
-        run: ls -R
-      - name: Display structure of downloaded files
-        run: ls -R
-        working-directory: coverage
+      # - name: Display structure of downloaded files
+      #   run: ls -R
+      # - name: Display structure of downloaded files
+      #   run: ls -R
+      #   working-directory: coverage
       - name: Code Coverage Summary
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
