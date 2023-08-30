@@ -553,13 +553,17 @@ class HbxEnrollment
     @benefit_group = BenefitGroup.find(self.benefit_group_id)
   end
 
-  def record_transition
+  def record_transition(*args)
     generate_enrollment_saved_event
+
+    meta_args = {}
+    meta_args = args[0] if args[0].is_a?(Hash)
 
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
       to_state: aasm.to_state,
-      event: aasm.current_event
+      event: aasm.current_event,
+      metadata: meta_args
     )
   end
 
