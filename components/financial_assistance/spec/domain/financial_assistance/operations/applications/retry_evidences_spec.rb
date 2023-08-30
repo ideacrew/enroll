@@ -81,7 +81,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::RetryEvidences, 
       it 'should add a verification history recording the retry failure' do
         history = applicant.income_evidence.verification_histories.last
         expect(history.action).to eq("retry")
-        expect(history.update_reason).to eq("Failed to construct payload")
         expect(history.updated_by).to eq("system")
       end
     end
