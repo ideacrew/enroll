@@ -2345,7 +2345,7 @@ class HbxEnrollment
     current_bcp.contains?(effective_on)
   end
 
-  def can_select_coverage?(arg)
+  def can_select_coverage?(arg = {})
     qle = arg[:qle] || false
     return true if is_cobra_status?
     if is_shop?
