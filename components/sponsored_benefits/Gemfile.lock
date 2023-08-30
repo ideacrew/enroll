@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: bd24041abc4bfaf62f1f010b7caaab1627c39412
-  branch: trunk
+  revision: 33199ef529d16c793532a9942e86fca4a70aee41
+  branch: 185910152_eligibility_state_changes
   specs:
     aca_entities (0.10.0)
       deep_merge
