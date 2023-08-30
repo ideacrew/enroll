@@ -28,10 +28,6 @@ module Eligibilities
       :local_mec => "events.iap.mec_check.mec_check_requested"
     }.freeze
 
-    FDSH_HUB_CALL_EVIDENCE_TYPES = {
-      :income => true
-    }.freeze
-
     embedded_in :evidenceable, polymorphic: true
 
     field :key, type: Symbol
@@ -70,13 +66,13 @@ module Eligibilities
 
     def request_determination(action_name, update_reason, updated_by = nil)
       self.add_verification_history(action_name, update_reason, updated_by)
-      response = Operations::Fdsh::EvidenceVerificationRequest.new.call(self)
+      response = Operations::Fdsh::RequestEvidenceDetermination.new.call(self)
 
       if response.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
         # Currently only active for evidence type :income
-        determine_evidence_aasm_status(self.evidenceable) if FDSH_HUB_CALL_EVIDENCE_TYPES[self.key]
+        determine_evidence_aasm_status(self.evidenceable)
 
-        update_reason = "#{self.key.capitalize} Evidence Verification Request Failed due to #{response.failure}"
+        update_reason = "#{self.key.capitalize} Evidence Determination Request Failed due to #{response.failure}"
         self.add_verification_history("Hub Request Failed", update_reason, "system")
         false
       elsif response.failure?

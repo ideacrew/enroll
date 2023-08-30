@@ -6,8 +6,9 @@ require 'dry/monads/do'
 module Operations
   module Fdsh
     # This class is responsible for validating an application object and constructing a payload entity for FDSH service.
-    class EvidenceVerificationRequest
+    class RequestEvidenceDetermination
       include Dry::Monads[:result, :do]
+      include EventSource::Command
 
       def call(evidence)
         payload_entity = yield build_and_validate_payload_entity(evidence)
@@ -25,9 +26,9 @@ module Operations
       end
 
       def build_event(payload, evidence)
-        fdsh_events = ::Eligibilities::Evidence::FDSH_EVENTS
+        fdsh_events = fdsh_events = ::Eligibilities::Evidence::FDSH_EVENTS
         headers = evidence.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: payload[:hbx_id] }
-        evidence.event(fdsh_events[evidence.key], attributes: payload, headers: headers)
+        event(fdsh_events[evidence.key], attributes: payload, headers: headers)
       end
 
       def publish_event_result(event_result)

@@ -19,7 +19,7 @@ module Operations
             return Failure("No SSN for applicant") if encrypted_ssn.nil? || encrypted_ssn.empty?
 
             result = Operations::Fdsh::EncryptedSsnValidator.new.call(encrypted_ssn)
-            return Failure("Invalid SSN") unless result.success?
+            return result unless result.success?
           end
 
           Success()

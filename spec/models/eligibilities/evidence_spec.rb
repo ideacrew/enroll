@@ -88,12 +88,12 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
       end
 
-      let(:evidence_verification_request) { instance_double(Operations::Fdsh::EvidenceVerificationRequest) }
+      let(:evidence_verification_request) { instance_double(Operations::Fdsh::RequestEvidenceDetermination) }
 
       context 'with no errors' do
         before do
           allow(evidence_verification_request).to receive(:call).and_return(Dry::Monads::Success({}))
-          allow(Operations::Fdsh::EvidenceVerificationRequest).to receive(:new).and_return(evidence_verification_request)
+          allow(Operations::Fdsh::RequestEvidenceDetermination).to receive(:new).and_return(evidence_verification_request)
         end
 
         it 'should return success' do
@@ -120,7 +120,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
 
         before do
           allow(evidence_verification_request).to receive(:call).and_return(Dry::Monads::Failure(failed_update_reason))
-          allow(Operations::Fdsh::EvidenceVerificationRequest).to receive(:new).and_return(evidence_verification_request)
+          allow(Operations::Fdsh::RequestEvidenceDetermination).to receive(:new).and_return(evidence_verification_request)
 
           family_member_id = family.family_members[0].id
           applicant.update(family_member_id: family_member_id)

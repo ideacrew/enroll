@@ -27,7 +27,7 @@ RSpec.describe Operations::Fdsh::BuildAndValidateApplicationPayload, dbclean: :a
             result = described_class.new.call(application, request_type)
 
             expect(result).to be_failure
-            expect(result.failure).to include('Error while generating CV3 Application: ')
+            expect(result.failure).to include('Failed to construct payload:')
           end
         end
 

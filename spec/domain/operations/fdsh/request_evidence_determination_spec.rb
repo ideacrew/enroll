@@ -3,7 +3,7 @@
 require 'rails_helper'
 require Rails.root.join('spec/shared_contexts/valid_cv3_application_setup.rb')
 
-RSpec.describe Operations::Fdsh::EvidenceVerificationRequest, dbclean: :after_each do
+RSpec.describe Operations::Fdsh::RequestEvidenceDetermination, dbclean: :after_each do
   include_context "valid cv3 application setup"
 
   describe '#call' do
@@ -27,7 +27,7 @@ RSpec.describe Operations::Fdsh::EvidenceVerificationRequest, dbclean: :after_ea
 
         let(:action) { 'Hub Request Failed' }
         let(:updated_by) { 'system' }
-        let(:update_reason) { "Income Evidence Verification Request Failed due to [\"Invalid SSN\"]" }
+        let(:update_reason) { "Income Evidence Determination Request Failed due to [\"Invalid SSN\"]" }
 
         before do
           allow(build_and_validate_payload_entity).to receive(:call).and_return(Dry::Monads::Failure(error_reponse))
