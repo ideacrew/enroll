@@ -489,7 +489,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
             appl.update_attributes!(is_totally_ineligible: true)
           end
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(true)
-          @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+          @input_params = { family_id: application.family_id, renewal_year: application.assistance_year.next }
+          @result = subject.call(@input_params)
         end
 
         it 'should return failure' do
@@ -497,7 +498,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
         end
 
         it 'should return failure with error message' do
-          expect(@result.failure).to eq("Application is not eligible for renewal: #{application.id}")
+          expect(@result.failure).to eq("Could not find any applications that are renewal eligible: #{@input_params}.")
         end
       end
 
@@ -507,7 +508,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
             appl.update_attributes!(is_applying_coverage: false)
           end
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(true)
-          @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+          @input_params = { family_id: application.family_id, renewal_year: application.assistance_year.next }
+          @result = subject.call(@input_params)
         end
 
         it 'should return failure' do
@@ -515,7 +517,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
         end
 
         it 'should return failure with error message' do
-          expect(@result.failure).to eq("Application is not eligible for renewal: #{application.id}")
+          expect(@result.failure).to eq("Could not find any applications that are renewal eligible: #{@input_params}.")
         end
       end
 
@@ -525,7 +527,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
             appl.update_attributes!(is_medicaid_chip_eligible: true)
           end
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(true)
-          @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
+          @input_params = { family_id: application.family_id, renewal_year: application.assistance_year.next }
+          @result = subject.call(@input_params)
         end
 
         it 'should return failure' do
@@ -533,7 +536,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
         end
 
         it 'should return failure with error message' do
-          expect(@result.failure).to eq("Application is not eligible for renewal: #{application.id}")
+          expect(@result.failure).to eq("Could not find any applications that are renewal eligible: #{@input_params}.")
         end
       end
 
