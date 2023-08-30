@@ -473,3 +473,7 @@ jobs:
         with:
           filename: coverage/*.xml
           badge: true
+          output: both
+      - name: Write to Job Summary
+        run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
+
