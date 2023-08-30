@@ -26,7 +26,7 @@ module Operations
       end
 
       def build_event(payload, evidence)
-        fdsh_events = fdsh_events = ::Eligibilities::Evidence::FDSH_EVENTS
+        fdsh_events = ::Eligibilities::Evidence::FDSH_EVENTS
         headers = evidence.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: payload[:hbx_id] }
         event(fdsh_events[evidence.key], attributes: payload, headers: headers)
       end

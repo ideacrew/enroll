@@ -89,7 +89,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::RetryEvidences, 
         expect(first_history.action).to eq("retry")
         expect(first_history.update_reason).to include(test_params[:update_reason])
         expect(first_history.updated_by).to eq("system")
-        
+
         expect(last_history.action).to eq("Hub Request Failed")
         expect(last_history.update_reason).to include("Evidence Determination Request Failed")
         expect(last_history.updated_by).to eq("system")
