@@ -1,12 +1,15 @@
+include ::L10nHelper
+
 class HbxFormBuilder < ActionView::Helpers::FormBuilder
   def ssn_field(method, options = {})
     is_required = options.delete(:required) || false
     is_readonly = options.delete(:readonly) || false
+    class_list = "#{'required' if is_required} floatlabel form-control mask-ssn"
     shared_options = {
-        class: 'required floatlabel mask-ssn form-control',
+        class: class_list,
         maxlength: 11,
         required: is_required,
-        placeholder: (is_required ? l10n('census_employee.ssn_text') : "SOCIAL SECURITY"),
+        placeholder: "#{l10n("social_security").to_s.upcase} #{'*' if is_required}",
         readonly: is_readonly
     }
     if EnrollRegistry.feature_enabled?(:ssn_ui_validation)
