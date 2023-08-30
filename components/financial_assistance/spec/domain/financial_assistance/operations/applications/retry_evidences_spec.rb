@@ -50,6 +50,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::RetryEvidences, 
       before do
         allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Success.new(application))
         allow(::AcaEntities::MagiMedicaid::Operations::InitializeApplication).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Success.new(application.attributes))
+
         @result = subject.call(test_params)
         applicant.reload
       end
@@ -78,11 +79,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::RetryEvidences, 
       end
 
       it 'should add a verification history recording the retry failure' do
-        # A small change on this test to take into account that the request_determination call on the evidence model will record
-        # histories before they've started running, and then add another history if they fail
-        history = applicant.income_evidence.verification_histories.first
+        history = applicant.income_evidence.verification_histories.last
         expect(history.action).to eq("retry")
-        expect(history.update_reason).to eq("For testing purposes")
+        expect(history.update_reason).to eq("Failed to construct payload")
         expect(history.updated_by).to eq("system")
       end
     end
