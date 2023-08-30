@@ -83,8 +83,8 @@ module FinancialAssistance
               determined_application = fetch_application(family, params[:assistance_year])
               next unless determined_application.present?
               create_mec_evidence_if_needed(determined_application)
-              is_processed = process_mec_check(determined_application, params)
-              append_data_to_csv(family, enrollments, determined_application) if is_processed
+              append_to_csv = params[:dry_run_mec] || process_mec_check(determined_application, params)
+              append_data_to_csv(family, enrollments, determined_application) if append_to_csv
             end
           end
 
@@ -164,7 +164,6 @@ module FinancialAssistance
 
           def process_mec_check(application, params)
             @logger.info "process mec_check for determined application #{application.id}"
-            return true if params[:dry_run_mec]
             mec_check_published = publish_mec_check(application.id, params)
             if mec_check_published.success?
               @total_applications_published += 1
