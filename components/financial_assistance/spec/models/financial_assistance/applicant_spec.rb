@@ -1621,7 +1621,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       # Added to test changes of which csr codes can determine the aasm_state of an evidence
       # Recently (08/30/2023) a bug was discovered in which csr code '03' should have been changed to 'csr_02'
       context 'enrolled with a product with a specific csr code' do
-        # income evidence is only being used as an example here -- this can be applied to 
+        # income evidence is only being used as an example here -- this can be applied to
         let(:product_csr_02) {double(id: '124', csr_variant_id: '02')}
         let(:product_csr_03) {double(id: '125', csr_variant_id: '03')}
         let(:evidence) { applicant.income_evidence }
@@ -1630,7 +1630,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           # need to set aptc amount to 0 to ensure only csr codes being evaluated against
           enrollment.update(applied_aptc_amount: 0)
         end
-        
+
         context 'with a csr_variant_id of 02' do
           before do
             allow(enrollment).to receive(:product).and_return(product_csr_02)
