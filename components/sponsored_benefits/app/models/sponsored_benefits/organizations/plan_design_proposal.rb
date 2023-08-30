@@ -64,7 +64,7 @@ module SponsoredBenefits
       end
 
       def metal_level_products_restricted?
-        grant = osse_eligibility&.grant_for(:metal_level_products_restricted_grant)
+        grant = osse_eligibility&.grant_for(:employer_metal_level_products)
         return false unless grant
         grant.value.run
       end
