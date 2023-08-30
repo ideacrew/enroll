@@ -47,7 +47,7 @@ namespace :products do
   desc "load Service areas"
   task :load_service_areas, [:year] => :environment do |t, args|
     puts ':::: Loading Service Areas ::::'
-    
+
     files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}/xls_templates/service_areas", args[:year], "*.{xlsx, xls}"))
 
     files.each do |file|
