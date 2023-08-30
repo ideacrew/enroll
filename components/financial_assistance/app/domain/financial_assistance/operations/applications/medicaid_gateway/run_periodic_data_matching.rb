@@ -83,7 +83,7 @@ module FinancialAssistance
               determined_application = fetch_application(family, params[:assistance_year])
               next unless determined_application.present?
               create_mec_evidence_if_needed(determined_application)
-              append_to_csv = params[:dry_run_mec] || process_mec_check(determined_application, params)
+              append_to_csv = params[:skip_mec_call] || process_mec_check(determined_application, params)
               append_data_to_csv(family, enrollments, determined_application) if append_to_csv
             end
           end
