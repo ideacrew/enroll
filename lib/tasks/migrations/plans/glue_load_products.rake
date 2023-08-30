@@ -1,5 +1,35 @@
+# This rake task generates an array of JSON objects representing all Product data in Enroll for the given year
+# The output file is used to load Product data into Glue
+
+# Examples
+# RAILS_ENV=production bundle exec rake seed:load_products[2024]
+
 namespace :seed do
+  desc 'Generate Product JSON Dump for Loading into Glue'
   task :load_products, [:year] => :environment do |task, args|
+
+    @json_file_name = Rails.root.join("#{args[:year]}_plans.json")
+    @error_file_name = Rails.root.join("#{args[:year]}_plans_error.txt")
+
+    def write_to_json_file(content)
+      if !File.exist?(@json_file_name)
+        File.write(@json_file_name, content)
+      else
+        File.open(@json_file_name, 'a') do |f|
+          f.write content
+        end
+      end
+    end
+
+    def write_to_error_file(content)
+      if !File.exist?(@error_file_name)
+        File.write(@error_file_name, content)
+      else
+        File.open(@error_file_name, 'a') do |f|
+          f.write content
+        end
+      end
+    end
 
     def build_premium_tables(premium_tables)
       results = premium_tables
@@ -15,6 +45,7 @@ namespace :seed do
       end
       results
     end
+
     def dump_product_for_enroll(product)
       product_json = {
         id: product.id.to_s,
@@ -48,23 +79,36 @@ namespace :seed do
         end
       end
 
-      puts JSON.dump(product_json.merge({:premium_tables => build_premium_tables(premium_tables).uniq}))
+      output = JSON.dump(product_json.merge({:premium_tables => build_premium_tables(premium_tables).uniq}))
+      write_to_json_file(output)
+    rescue Exception => e
+      error_message = "Error dumping product: #{product.hios_id}, #{e.message}"
+      write_to_error_file(error_message)
     end
 
     def fein(product)
+      return if product.benefit_market_kind == :aca_individual
       Rails.cache.fetch("#{product.active_year}_#{product.id}", expires_in: 1.month) do
         carrier_profile_id = CarrierProfile.find_by_legal_name(product.issuer_profile.legal_name)
         CarrierProfile.find(carrier_profile_id).fein
       end
     rescue Exception => e
-      puts "the product is : #{product.hios_id}"
+      error_message = "Error finding fein for product: #{product.hios_id}\n"
+      write_to_error_file(error_message)
     end
 
-    puts "["
-    ::BenefitMarkets::Products::Product.by_year(args[:year]).where(:benefit_market_kind.in => [:aca_shop, :aca_individual]).each do |product|
+    write_to_json_file("[\n")
+    products = ::BenefitMarkets::Products::Product.by_year(args[:year]).where(:benefit_market_kind.in => [:aca_shop, :aca_individual])
+    products.each_with_index do |product, index| 
       dump_product_for_enroll(product)
-      puts(",")
+      write_to_json_file("\n,\n") unless products.count == index + 1
     end
-    puts "]"
+    write_to_json_file("]")
+
+    unless Rails.env.test?
+      puts "Rake complete!"
+      puts "Product dump can be found at #{@json_file_name}"
+      puts "Error log can be found at #{@error_file_name}"
+    end
   end
 end
