@@ -313,9 +313,8 @@ class BenefitCoveragePeriod
       all.collect do |bcp|
         year = bcp.start_on.year
         eligibility = bcp.eligibilities.by_key("aca_ivl_osse_eligibility_#{year}".to_sym).first
-        evidence = eligibility&.evidences&.first
-        next unless evidence&.current_state == :approved
-        bcp.start_on.year
+        next unless eligibility&.eligible?
+        year
       end.compact
     end
   end

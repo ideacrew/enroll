@@ -57,6 +57,10 @@ module Eligible
       :ineligible
     end
 
+    def eligible?
+      current_state == active_state
+    end
+
     def decorated_eligible_record
       EligiblePeriodHandler.new(self)
     end
