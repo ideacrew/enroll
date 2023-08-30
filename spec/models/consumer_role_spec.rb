@@ -2159,7 +2159,7 @@ describe '.create_or_term_eligibility' do
       it 'should create eligibility with given effective date' do
         verify_active_family_members do |consumer_role|
           expect(consumer_role.eligibilities.count).to eq 1
-          expect(consumer_role.eligibilities.first.published_on).to eq valid_params[:effective_date]
+          expect(consumer_role.eligibilities.first.effective_on).to eq valid_params[:effective_date]
         end
       end
 
@@ -2241,12 +2241,12 @@ describe 'create default osse eligibility on create' do
       expect(consumer_role.reload.eligibilities.count).to eq 1
       eligibility = consumer_role.eligibilities.first
       expect(eligibility.key).to eq "aca_ivl_osse_eligibility_#{TimeKeeper.date_of_record.year}".to_sym
-      expect(eligibility.current_state).to eq :initial
+      expect(eligibility.current_state).to eq :ineligible
       expect(eligibility.state_histories.count).to eq 1
       expect(eligibility.evidences.count).to eq 1
       evidence = eligibility.evidences.first
       expect(evidence.key).to eq :ivl_osse_evidence
-      expect(evidence.current_state).to eq :initial
+      expect(evidence.current_state).to eq :not_approved
       expect(evidence.state_histories.count).to eq 1
     end
   end

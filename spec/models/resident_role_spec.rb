@@ -97,12 +97,12 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           expect(resident_role.eligibilities.count).to eq 1
           eligibility = resident_role.eligibilities.first
           expect(eligibility.key).to eq "aca_ivl_osse_eligibility_#{TimeKeeper.date_of_record.year}".to_sym
-          expect(eligibility.current_state).to eq :initial
+          expect(eligibility.current_state).to eq :ineligible
           expect(eligibility.state_histories.count).to eq 1
           expect(eligibility.evidences.count).to eq 1
           evidence = eligibility.evidences.first
           expect(evidence.key).to eq :ivl_osse_evidence
-          expect(evidence.current_state).to eq :initial
+          expect(evidence.current_state).to eq :not_approved
           expect(evidence.state_histories.count).to eq 1
         end
       end

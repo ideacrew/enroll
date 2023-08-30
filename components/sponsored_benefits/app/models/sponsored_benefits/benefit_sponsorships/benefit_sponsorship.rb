@@ -93,24 +93,24 @@ module SponsoredBenefits
         end
       end
 
-      # we cannot have multiple eligibilities with same key in a given calender year
-      def find_eligibility_by(eligibility_key, start_on = nil)
-        eligibilities = self.eligibilities&.by_key(eligibility_key)
-        return eligibilities.last unless start_on
-        eligibilities.detect do |eligibility|
-          eligibility.eligibility_period_cover?(start_on)
-        end
+      def eligibilities_on(_date)
+        eligibilities.by_key(:bqt_osse_eligibility)
       end
 
-      def eligibility_for(eligibility_key, start_on)
-        eligibilities = self.eligibilities.by_key(eligibility_key)
-        eligibilities.effectuated.detect do |eligibility|
-          eligibility.eligibility_period_cover?(start_on.to_date)
-        end
+      def eligibility_on(effective_date)
+        eligibilities_on(effective_date).last
+      end
+
+      def active_eligibilities_on(date)
+        eligibilities_on(date).select{|e| e.is_eligible_on?(date) }
+      end
+
+      def active_eligibility_on(effective_date)
+        active_eligibilities_on(effective_date).last
       end
 
       def osse_eligible?(start_on)
-        eligibility_for(:bqt_osse_eligibility, start_on).present? && EnrollRegistry.feature_enabled?(:broker_quote_osse_eligibility)
+        eligibility_on(start_on).present? && EnrollRegistry.feature_enabled?(:broker_quote_osse_eligibility)
       end
 
       def save_inbox

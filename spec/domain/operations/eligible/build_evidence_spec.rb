@@ -54,9 +54,9 @@ RSpec.describe Operations::Eligible::BuildEvidence,
       evidence = described_class.new.call(required_params).success
 
       state_history = evidence[:state_histories].last
-      expect(state_history[:event]).to eq(:move_to_initial)
+      expect(state_history[:event]).to eq(:move_to_not_approved)
       expect(state_history[:from_state]).to eq(:initial)
-      expect(state_history[:to_state]).to eq(:initial)
+      expect(state_history[:to_state]).to eq(:not_approved)
       expect(state_history[:is_eligible]).to eq(false)
       expect(evidence[:is_satisfied]).to eq(false)
     end

@@ -389,8 +389,8 @@ And(/^Primary broker clicks Actions dropdown and clicks Assign General Agency$/)
 end
 
 And(/^Broker HC4CC feature enabled$/) do
-  EnrollRegistry[:broker_quote_osse_eligibility].feature.stub(:is_enabled).and_return(true)
   EnrollRegistry[:aca_shop_osse_eligibility].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry[:broker_quote_osse_eligibility].feature.stub(:is_enabled).and_return(true)
 end
 
 And(/^Primary Broker should see HC4CC option$/) do

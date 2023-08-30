@@ -32,7 +32,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       @logger.info "Ended async osse renewals at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
     else
       # TODO: Do we really need sync process ?
-      process_ivl_osse_renewals if renewal_bcp.eligibility_for("aca_ivl_osse_eligibility_#{renewal_effective_on.year}".to_sym, renewal_effective_on)
+      process_ivl_osse_renewals if renewal_bcp.eligibility_on(renewal_effective_on)
       process_qhp_renewals
       @logger.info "Process ended at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
     end
@@ -125,7 +125,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
   end
 
   def osse_enabled
-    @osse_enabled ||= renewal_bcp.eligibility_for("aca_ivl_osse_eligibility_#{renewal_effective_on.year}".to_sym, renewal_effective_on)
+    @osse_enabled ||= renewal_bcp.eligibility_on(renewal_effective_on)
   end
 
   def fetch_role(person)

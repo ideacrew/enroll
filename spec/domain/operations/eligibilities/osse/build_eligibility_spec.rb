@@ -92,6 +92,10 @@ RSpec.describe ::Operations::Eligibilities::Osse::BuildEligibility, type: :model
         expect(result.success).to be_a(AcaEntities::Eligibilities::Osse::Eligibility)
       end
 
+      before do
+        EnrollRegistry[:aca_ivl_osse_eligibility].feature.stub(:is_enabled).and_return(true)
+      end
+
       context 'when aca_ivl_osse_effective_beginning_of_year got enabled' do
         before do
           EnrollRegistry[:aca_ivl_osse_effective_beginning_of_year].feature.stub(:is_enabled).and_return(true)
