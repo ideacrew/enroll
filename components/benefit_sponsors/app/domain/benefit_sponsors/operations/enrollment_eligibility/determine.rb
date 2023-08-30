@@ -57,7 +57,7 @@ module BenefitSponsors
         end
 
         def osse_eligibility(benefit_sponsorship, effective_date)
-          eligibility = benefit_sponsorship&.eligibility_for(:osse_subsidy, effective_date)
+          eligibility = benefit_sponsorship&.active_eligibility_on(effective_date)
           eligibility&.grant_for(:all_contribution_levels_min_met).present?
         end
 

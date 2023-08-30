@@ -3,20 +3,25 @@
 FactoryBot.define do
   factory :benefit_sponsors_shop_osse_eligibility,
           class:
-            'BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::ShopOsseEligibility' do
-
-    title { 'Contribution Subsidy' }
-    description { 'Osse Contribution Subsidy' }
+            "BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::ShopOsseEligibility" do
+    title { "Contribution Subsidy" }
+    description { "Osse Contribution Subsidy" }
 
     transient do
       from_state { :initial }
-      evidence_state { :initial }
+      evidence_state { :not_approved }
       is_eligible { false }
       effective_on { TimeKeeper.date_of_record.beginning_of_month }
     end
 
     after :build do |eligibility, evaluator|
-      eligibility_state = :published unless evaluator.evidence_state == :initial
+      eligibility_state =
+        if evaluator.evidence_state == :approved
+          :eligible
+        else
+          :ineligible
+        end
+
       eligibility.state_histories << FactoryBot.build(
         :eligible_state_history,
         from_state: evaluator.from_state,
@@ -29,9 +34,10 @@ FactoryBot.define do
       eligibility.grants << FactoryBot.build(
         :shop_osse_eligibilities_shop_osse_grant,
         key: :contribution_subsidy_grant,
-        title: 'Contribution Subsidy Grant'
+        title: "Contribution Subsidy Grant"
       )
-      eligibility.key = "aca_shop_osse_eligibility_#{eligibility.effective_on.year}".to_sym
+      eligibility.key =
+        "aca_shop_osse_eligibility_#{eligibility.effective_on.year}".to_sym
       eligibility.current_state = eligibility.latest_state_history.to_state
     end
 

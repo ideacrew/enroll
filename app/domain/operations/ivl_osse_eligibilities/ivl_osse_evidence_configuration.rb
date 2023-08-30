@@ -3,7 +3,7 @@
 module Operations
   module IvlOsseEligibilities
     # Overrides top level evidence_configuration for ivl osse specific configurations
-    class OsseEvidenceConfiguration < ::Operations::Eligible::EvidenceConfiguration
+    class IvlOsseEvidenceConfiguration < ::Operations::Eligible::EvidenceConfiguration
       def key
         :ivl_osse_evidence
       end

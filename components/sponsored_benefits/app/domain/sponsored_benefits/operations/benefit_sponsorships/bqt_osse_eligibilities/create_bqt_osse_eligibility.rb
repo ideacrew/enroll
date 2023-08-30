@@ -22,7 +22,8 @@ module SponsoredBenefits
           def call(params)
             values = yield validate(params)
             eligibility_record = yield find_eligibility(values)
-            eligibility_options = yield build_eligibility_options(values, eligibility_record)
+            eligibility_options =
+              yield build_eligibility_options(values, eligibility_record)
             eligibility = yield create_eligibility(eligibility_options)
             persisted_eligibility = yield store(values, eligibility)
 
@@ -48,7 +49,8 @@ module SponsoredBenefits
           # Given calendar year there will be only one instance of osse eligibility with single evidence record.
           # When eligibility changes we create new state histories for evidence and eligibility
           def find_eligibility(_values)
-            eligibility = subject.find_eligibility_by(:bqt_osse_eligibility)
+            eligibility =
+              subject.eligibilities.by_key(:bqt_osse_eligibility).last
 
             Success(eligibility)
           end
@@ -76,7 +78,8 @@ module SponsoredBenefits
           end
 
           def store(_values, eligibility)
-            eligibility_record = subject.eligibilities.where(id: eligibility._id).first
+            eligibility_record =
+              subject.eligibilities.where(id: eligibility._id).first
 
             if eligibility_record
               update_eligibility_record(eligibility_record, eligibility)
@@ -85,7 +88,11 @@ module SponsoredBenefits
               subject.eligibilities << eligibility_record
             end
 
-            subject.save ? Success(eligibility_record) : Failure(subject.errors.full_messages)
+            if subject.save
+              Success(eligibility_record)
+            else
+              Failure(subject.errors.full_messages)
+            end
           end
 
           def update_eligibility_record(eligibility_record, eligibility)
@@ -110,7 +117,8 @@ module SponsoredBenefits
           end
 
           def create_eligibility_record(eligibility)
-            osse_eligibility_params = eligibility.to_h.except(:evidences, :grants)
+            osse_eligibility_params =
+              eligibility.to_h.except(:evidences, :grants)
 
             eligibility_record =
               SponsoredBenefits::BenefitSponsorships::BqtOsseEligibilities::BqtOsseEligibility.new(
@@ -118,8 +126,10 @@ module SponsoredBenefits
               )
 
             eligibility_record.tap do |record|
-              record.evidences = record.class.create_objects(eligibility.evidences, :evidences)
-              record.grants = record.class.create_objects(eligibility.grants, :grants)
+              record.evidences =
+                record.class.create_objects(eligibility.evidences, :evidences)
+              record.grants =
+                record.class.create_objects(eligibility.grants, :grants)
             end
 
             eligibility_record

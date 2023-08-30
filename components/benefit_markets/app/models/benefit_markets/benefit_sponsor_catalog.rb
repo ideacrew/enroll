@@ -34,6 +34,7 @@ module BenefitMarkets
     # :sponsor_market_policy, :member_market_policy - commenting out the validations until we have
     # the seed for both of these on benefit market catalog.
 
+    index({"effective_date" => 1})
     index({"benefit_application_id" => 1})
     index({"product_packages._id" => 1})
 
@@ -103,21 +104,22 @@ module BenefitMarkets
       end
     end
 
-    def find_eligibility_by(eligibility_key, start_on = nil)
-      benefit_sponsorship.find_eligibility_by(eligibility_key, start_on)
+    def eligibilities_on(date)
+      eligibility_key = "aca_shop_osse_eligibility_#{date.year}".to_sym
+
+      eligibilities.by_key(eligibility_key)
     end
 
-    def eligibilities_on(date, eligibility_collection = nil)
-      eligibility_collection ||= eligibilities.effectuated
-      eligibility_collection.select{|e| e.eligibility_period_cover?(date)}
+    def eligibility_on(effective_date)
+      eligibilities_on(effective_date).last
     end
 
-    def active_eligibilities_on(date, eligibility_collection = nil)
-      eligibilities_on(date, eligibility_collection).select{|e| e.is_eligible_on?(date) }
+    def active_eligibilities_on(date)
+      eligibilities_on(date).select{|e| e.is_eligible_on?(date) }
     end
 
-    def eligibility_for(eligibility_key, effective_date)
-      active_eligibilities_on(effective_date, eligibilities.by_key(eligibility_key)).last
+    def active_eligibility_on(effective_date)
+      active_eligibilities_on(effective_date).last
     end
 
     def create_sponsor_eligibilities

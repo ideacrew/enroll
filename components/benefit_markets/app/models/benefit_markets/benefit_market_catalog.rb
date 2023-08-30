@@ -142,15 +142,11 @@ module BenefitMarkets
 
     #TODO: update the logic once settings moved to benefit market catalog
     def self.osse_eligibility_years_for_display
-      years = [
-        TimeKeeper.date_of_record.year - 1,
-        TimeKeeper.date_of_record.year,
-        TimeKeeper.date_of_record.year + 1
-      ]
-
-      years.map do |year|
-        year if EnrollRegistry.feature?("aca_shop_osse_eligibility_#{year}") &&
-                EnrollRegistry.feature_enabled?("aca_shop_osse_eligibility_#{year}")
+      all.collect do |market_catalog|
+        year = market_catalog.product_active_year
+        eligibility = market_catalog.eligibilities.by_key("aca_shop_osse_eligibility_#{year}".to_sym).first
+        next unless eligibility&.eligible?
+        year
       end.compact
     end
 
