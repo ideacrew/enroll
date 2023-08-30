@@ -4,9 +4,10 @@ class HbxFormBuilder < ActionView::Helpers::FormBuilder
   def ssn_field(method, options = {})
     is_required = options.delete(:required) || false
     is_readonly = options.delete(:readonly) || false
-    class_list = "#{'required' if is_required} floatlabel form-control mask-ssn"
+    class_list  = options.delete(:class)    || ""
+    class_list += " #{'required' if is_required} floatlabel form-control mask-ssn"
     shared_options = {
-        class: class_list,
+        class: class_list.split(/\s+/).uniq.join(" "),
         maxlength: 11,
         required: is_required,
         placeholder: "#{l10n("social_security").to_s.upcase} #{'*' if is_required}",
