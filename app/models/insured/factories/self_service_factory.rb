@@ -101,6 +101,8 @@ module Insured
       end
 
       def self.update_child_care_subsidy_amount_for(enrollment)
+        return unless enrollment.product.is_hc4cc_plan
+
         cost_calculator = enrollment.build_plan_premium(qhp_plan: enrollment.product, elected_aptc: enrollment.applied_aptc_amount, apply_aptc: true)
         enrollment.update(eligible_child_care_subsidy: cost_calculator.total_childcare_subsidy_amount)
       end
