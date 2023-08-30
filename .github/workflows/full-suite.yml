@@ -432,15 +432,14 @@ jobs:
         env:
           COVERAGE: 'true'
         run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
-      # - name: copy coverage report
-      #   run: |
-      #     cp coverage/coverage.xml ${{ github.workspace }}/coverage/cuke-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
-      # - name: Upload coverage artifact
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: code-coverage
-      #     path: ${{ github.workspace }}/coverage/cuke-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
-
+      - name: copy coverage report
+        run: |
+          cp coverage/coverage.xml ${{ github.workspace }}/coverage/cukes-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: code-coverage
+          path: ${{ github.workspace }}/coverage/cuke-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
   quality-workbench:
     needs: [engines, benefit-sponsors, rspec, cucumber]
     if: always()
@@ -473,6 +472,7 @@ jobs:
         with:
           filename: coverage/*.xml
           badge: true
+          format: 'markdown'
           output: both
       - name: Write to Job Summary
         run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
