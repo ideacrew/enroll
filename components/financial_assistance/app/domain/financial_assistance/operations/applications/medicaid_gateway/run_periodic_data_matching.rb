@@ -83,8 +83,8 @@ module FinancialAssistance
               determined_application = fetch_application(family, params[:assistance_year])
               next unless determined_application.present?
               create_mec_evidence_if_needed(determined_application)
-              append_data_to_csv(family, enrollments, determined_application)
-              process_mec_check(determined_application, params)
+              is_processed = process_mec_check(determined_application, params)
+              append_data_to_csv(family, enrollments, determined_application) if is_processed
             end
           end
 
@@ -120,7 +120,7 @@ module FinancialAssistance
                 applicant = determined_app&.active_applicants&.where(family_member_id: fm.id)&.first
                 program_eligibility = fetch_eligibility(applicant)
                 data_to_append << [
-                  determined_app.id,
+                  determined_app.hbx_id,
                   family.hbx_assigned_id,
                   fm.person&.hbx_id,
                   fm.is_primary_applicant,
@@ -139,7 +139,7 @@ module FinancialAssistance
           end
 
           def fetch_csv_headers
-            %w[DeterminedApplicationID FamilyHbxID MemberHbxId IsPrimaryApplicant EnrollmentHbxId EnrollmentType EnrollmentState HiosId AppliedAptc ProgramEligibility]
+            %w[ApplicationHBXID FamilyHbxID MemberHbxId IsPrimaryApplicant EnrollmentHbxId EnrollmentType EnrollmentState HiosId AppliedAptc ProgramEligibility]
           end
 
           def fetch_eligibility(applicant)
@@ -164,13 +164,15 @@ module FinancialAssistance
 
           def process_mec_check(application, params)
             @logger.info "process mec_check for determined application #{application.id}"
-            return if params[:skip_mec_call]
+            return true if params[:dry_run_mec]
             mec_check_published = publish_mec_check(application.id, params)
             if mec_check_published.success?
               @total_applications_published += 1
               @logger.info "Successfully published mec_check for determined application #{application.id}"
+              true
             else
               @logger.error "Error publishing mec_check for determined application #{application.id}"
+              false
             end
           end
 
