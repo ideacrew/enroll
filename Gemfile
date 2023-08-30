@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.6.3'
+ruby '2.7.3'
 gem 'rails', '~> 5.2.4.3'
 gem 'sidekiq'
 gem 'globalid'
@@ -30,7 +30,7 @@ gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar.git
 # Local components/engines
 #######################################################
 gem 'acapi',              git: "https://github.com/ideacrew/acapi.git", branch: 'amqp_proc_title'
-gem 'aca_entities',       git: 'https://github.com/ideacrew/aca_entities.git', branch: '185910152_eligibility_state_changes'
+gem 'aca_entities',       git: 'https://github.com/ideacrew/aca_entities.git', branch: 'trunk'
 gem 'event_source',       git:  'https://github.com/ideacrew/event_source.git', branch: 'trunk'
 gem "benefit_markets",    path: "components/benefit_markets"
 gem "benefit_sponsors",   path: "components/benefit_sponsors"
