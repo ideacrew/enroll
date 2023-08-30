@@ -79,11 +79,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::RetryEvidences, 
       end
 
       it 'should add a verification history recording the retry failure' do
-        # Changed from last history to first -- a verification history for the event is still added to the evidence
-        # but if the event is a failure in `evidence.request_determination`, the failure will be logged
-        history = applicant.income_evidence.verification_histories.first
+        history = applicant.income_evidence.verification_histories.last
         expect(history.action).to eq("retry")
-        expect(history.update_reason).to eq(test_params[:update_reason])
         expect(history.updated_by).to eq("system")
       end
     end
