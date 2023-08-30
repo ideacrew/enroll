@@ -112,7 +112,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
 
       context 'builds and publishes with errors' do
         let(:failed_action) { 'Hub Request Failed' }
-        let(:failed_updated_by) { 'System' }
+        let(:failed_updated_by) { 'system' }
         let(:failed_update_reason) { "Invalid SSN" }
 
         let(:person) { FactoryBot.create(:person, :with_consumer_role) }

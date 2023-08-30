@@ -26,7 +26,7 @@ RSpec.describe Operations::Fdsh::EvidenceVerificationRequest, dbclean: :after_ea
         let(:error_reponse) { 'Could not generate CV3 Application Object' }
 
         let(:action) { 'Hub Request Failed' }
-        let(:updated_by) { 'System' }
+        let(:updated_by) { 'system' }
         let(:update_reason) { "Income Evidence Verification Request Failed due to [\"Invalid SSN\"]" }
 
         before do

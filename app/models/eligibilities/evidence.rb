@@ -77,7 +77,7 @@ module Eligibilities
         determine_evidence_aasm_status(self.evidenceable) if FDSH_HUB_CALL_EVIDENCE_TYPES[self.key]
 
         update_reason = "#{self.key.capitalize} Evidence Verification Request Failed due to #{response.failure}"
-        self.add_verification_history("Hub Request Failed", update_reason, "System")
+        self.add_verification_history("Hub Request Failed", update_reason, "system")
         false
       elsif response.failure?
         false
