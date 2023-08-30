@@ -223,6 +223,14 @@ jobs:
           cd components/benefit_sponsors
           bundle config path ../../vendor/bundle
           rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
+      - name: copy coverage report
+        run: |
+          cp coverage/coverage.xml ${{ github.workspace }}/coverage/${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-report-${{ matrix.group }}-${{ strategy.job-total }}
+          path: ${{ github.workspace }}/coverage/${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
   rspec:
     runs-on: ubuntu-latest
     services:
@@ -440,5 +448,5 @@ jobs:
       - name: Code Coverage Summary
         uses: irongut/CodeCoverageSummary@v1.3.0
         with:
-          filename: coverage/coverage.xml
+          filename: coverage/*.xml
           badge: true
