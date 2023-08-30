@@ -1547,107 +1547,218 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
   end
 
   describe 'enrolled_with' do
-    let(:person) { FactoryBot.create(:person, :with_consumer_role)}
-    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-    let(:product) {double(id: '123', csr_variant_id: '01')}
+    context 'a product with csr_variant_id of 01' do
+      let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+      let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+      let(:product) {double(id: '123', csr_variant_id: '01')}
 
-    let!(:enrollment) do
-      FactoryBot.create(
-        :hbx_enrollment,
-        :with_enrollment_members,
-        :individual_assisted,
-        family: family,
-        applied_aptc_amount: Money.new(44_500),
-        consumer_role_id: person.consumer_role.id,
-        enrollment_members: family.family_members
-      )
-    end
+      let!(:enrollment) do
+        FactoryBot.create(
+          :hbx_enrollment,
+          :with_enrollment_members,
+          :individual_assisted,
+          family: family,
+          applied_aptc_amount: Money.new(44_500),
+          consumer_role_id: person.consumer_role.id,
+          enrollment_members: family.family_members
+        )
+      end
 
-    let!(:applicant) do
-      FactoryBot.create(:financial_assistance_applicant,
-                        application: application,
-                        dob: Date.today - 38.years,
-                        is_primary_applicant: false,
-                        family_member_id: family.family_members.first.id)
-    end
+      let!(:applicant) do
+        FactoryBot.create(:financial_assistance_applicant,
+                          application: application,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: false,
+                          family_member_id: family.family_members.first.id)
+      end
 
-    before do
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
-      allow(enrollment).to receive(:product).and_return(product)
-      applicant.create_evidences
-      applicant.create_eligibility_income_evidence
-      applicant.income_evidence.move_to_pending!
-    end
-
-    context "when aptc is applied on enrolment member" do
       before do
-        enrollment.hbx_enrollment_members.each {|hem| hem.applied_aptc_amount = 150 }
-        enrollment.save!
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
+        allow(enrollment).to receive(:product).and_return(product)
+        applicant.create_evidences
+        applicant.create_eligibility_income_evidence
+        applicant.income_evidence.move_to_pending!
       end
 
-      context "when evidence is in pending state" do
-        it "move to outstanding state" do
-          applicant.enrolled_with(enrollment)
-          FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
-            evidence = applicant.send(evidence_type)
-            expect(evidence.outstanding?).to eq true
-            expect(evidence.due_on).to eq applicant.schedule_verification_due_on
+      context "when aptc is applied on enrolment member" do
+        before do
+          enrollment.hbx_enrollment_members.each {|hem| hem.applied_aptc_amount = 150 }
+          enrollment.save!
+        end
+
+        context "when evidence is in pending state" do
+          it "move to outstanding state" do
+            applicant.enrolled_with(enrollment)
+            FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+              evidence = applicant.send(evidence_type)
+              expect(evidence.outstanding?).to eq true
+              expect(evidence.due_on).to eq applicant.schedule_verification_due_on
+            end
+          end
+        end
+
+        context "when evidence is in negative_response_received state" do
+          it "move to outstanding state" do
+            FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+              evidence = applicant.send(evidence_type)
+              evidence.negative_response_received!
+            end
+
+            applicant.enrolled_with(enrollment)
+
+            FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+              evidence = applicant.send(evidence_type)
+              expect(evidence.outstanding?).to eq true
+              expect(evidence.due_on).to eq applicant.schedule_verification_due_on
+            end
           end
         end
       end
 
-      context "when evidence is in negative_response_received state" do
-        it "move to outstanding state" do
-          FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
-            evidence = applicant.send(evidence_type)
-            evidence.negative_response_received!
+      # Added to test changes of which csr codes can determine the aasm_state of an evidence
+      # Recently (08/30/2023) a bug was discovered in which csr code '03' should have been changed to 'csr_02'
+      context 'enrolled with a product with a specific csr code' do
+        # income evidence is only being used as an example here -- this can be applied to 
+        let(:product_csr_02) {double(id: '124', csr_variant_id: '02')}
+        let(:product_csr_03) {double(id: '125', csr_variant_id: '03')}
+        let(:evidence) { applicant.income_evidence }
+
+        before do
+          # need to set aptc amount to 0 to ensure only csr codes being evaluated against
+          enrollment.update(applied_aptc_amount: 0)
+        end
+        
+        context 'with a csr_variant_id of 02' do
+          before do
+            allow(enrollment).to receive(:product).and_return(product_csr_02)
           end
 
-          applicant.enrolled_with(enrollment)
+          it 'moves evidence to an outstanding state' do
+            applicant.enrolled_with(enrollment)
+            expect(evidence.aasm_state).to eq('outstanding')
+          end
+        end
 
-          FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
-            evidence = applicant.send(evidence_type)
-            expect(evidence.outstanding?).to eq true
-            expect(evidence.due_on).to eq applicant.schedule_verification_due_on
+        context 'with a csr_variant_id of 03' do
+          before do
+            allow(enrollment).to receive(:product).and_return(product_csr_03)
+          end
+
+          it 'moves evidence to a negative_response_received state' do
+            applicant.enrolled_with(enrollment)
+            expect(evidence.aasm_state).to eq('negative_response_received')
+          end
+        end
+      end
+
+      context "when aptc & csr are not applied on enrollment member" do
+        context "when evidence is in pending state" do
+          it "move to outstanding" do
+            applicant.enrolled_with(enrollment)
+            FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+              evidence = applicant.send(evidence_type)
+              expect(evidence.outstanding?).to eq true
+              expect(evidence.negative_response_received?).to eq false
+              expect(evidence.due_on).to eq applicant.schedule_verification_due_on
+            end
+          end
+        end
+
+        context "when evidence is in negative_response_received state" do
+          it "will move to outstanding" do
+            FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+              evidence = applicant.send(evidence_type)
+              evidence.negative_response_received!
+            end
+
+            applicant.enrolled_with(enrollment)
+
+            FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+              evidence = applicant.send(evidence_type)
+              expect(evidence.outstanding?).to eq true
+              expect(evidence.negative_response_received?).to eq false
+              expect(evidence.due_on).to eq applicant.schedule_verification_due_on
+            end
           end
         end
       end
     end
+    # context 'enrolled with csr_02' do
+    #   let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+    #   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    #   let(:product) { double(id: '123', csr_variant_id: '02') }
 
-    context "when aptc & csr are not applied on enrollment member" do
-      context "when evidence is in pending state" do
-        it "move to outstanding" do
-          applicant.enrolled_with(enrollment)
-          FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
-            evidence = applicant.send(evidence_type)
-            expect(evidence.outstanding?).to eq true
-            expect(evidence.negative_response_received?).to eq false
-            expect(evidence.due_on).to eq applicant.schedule_verification_due_on
-          end
-        end
-      end
+    #   let!(:enrollment) do
+    #     FactoryBot.create(
+    #       :hbx_enrollment,
+    #       :with_enrollment_members,
+    #       :individual_assisted,
+    #       family: family,
+    #       applied_aptc_amount: Money.new(44_500),
+    #       consumer_role_id: person.consumer_role.id,
+    #       enrollment_members: family.family_members
+    #     )
+    #   end
 
-      context "when evidence is in negative_response_received state" do
-        it "will move to outstanding" do
-          FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
-            evidence = applicant.send(evidence_type)
-            evidence.negative_response_received!
-          end
+    #   let!(:applicant) do
+    #     FactoryBot.create(:financial_assistance_applicant,
+    #                       application: application,
+    #                       dob: Date.today - 38.years,
+    #                       is_primary_applicant: false,
+    #                       family_member_id: family.family_members.first.id)
+    #   end
 
-          applicant.enrolled_with(enrollment)
+    #   before do
+    #     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
+    #     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
+    #     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
+    #     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
+    #     allow(enrollment).to receive(:product).and_return(product)
+    #     applicant.create_evidences
+    #     applicant.create_eligibility_income_evidence
+    #     applicant.income_evidence.move_to_pending!
+    #   end
+    # end
 
-          FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
-            evidence = applicant.send(evidence_type)
-            expect(evidence.outstanding?).to eq true
-            expect(evidence.negative_response_received?).to eq false
-            expect(evidence.due_on).to eq applicant.schedule_verification_due_on
-          end
-        end
-      end
-    end
+    # context 'enrolled with csr_03' do
+    #   let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+    #   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    #   let(:product) { double(id: '123', csr_variant_id: '02') }
+
+    #   let!(:enrollment) do
+    #     FactoryBot.create(
+    #       :hbx_enrollment,
+    #       :with_enrollment_members,
+    #       :individual_assisted,
+    #       family: family,
+    #       applied_aptc_amount: Money.new(44_500),
+    #       consumer_role_id: person.consumer_role.id,
+    #       enrollment_members: family.family_members
+    #     )
+    #   end
+
+    #   let!(:applicant) do
+    #     FactoryBot.create(:financial_assistance_applicant,
+    #                       application: application,
+    #                       dob: Date.today - 38.years,
+    #                       is_primary_applicant: false,
+    #                       family_member_id: family.family_members.first.id)
+    #   end
+
+    #   before do
+    #     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
+    #     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
+    #     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
+    #     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
+    #     allow(enrollment).to receive(:product).and_return(product)
+    #     applicant.create_evidences
+    #     applicant.create_eligibility_income_evidence
+    #     applicant.income_evidence.move_to_pending!
+    #   end
+    # end
   end
 
   describe '#embedded_document_section_entry_complete?' do
