@@ -488,7 +488,12 @@ jobs:
         with:
           reports: coverage/*.xml
           targetdir: coveragereport
-          reporttypes: Html;Cobertura;MarkdownSummaryGithub
+          reporttypes: MHtml;Cobertura;MarkdownSummary;MarkdownSummaryGithub;Badges
       - name: Display structure of downloaded files
         run: ls -R
+      - name: Upload coverage report artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: code-coverage-report
+          path: coveragereport/*
 
