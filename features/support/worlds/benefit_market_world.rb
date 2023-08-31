@@ -222,6 +222,19 @@ Given(/^Qualifying life events are present$/) do
   qualifying_life_events
 end
 
+And(/^benefit market catalog exists with eligibility$/) do
+  create_benefit_market_catalog_for(TimeKeeper.date_of_record)
+
+  ::Operations::Eligible::CreateCatalogEligibility.new.call(
+    {
+      subject: @benefit_market_catalog.to_global_id,
+      eligibility_feature: "aca_shop_osse_eligibility",
+      effective_date: @benefit_market_catalog.application_period.begin.to_date,
+      domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+    }
+  )
+end
+
 # Following step can be used to initialize benefit market catalog for initial employer with health/dental benefits
 # It will also create products needed for requested coverage kinds
 # ex: benefit market catalog exists for enrollment_open initial employer with health benefits
