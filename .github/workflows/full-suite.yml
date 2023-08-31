@@ -457,6 +457,7 @@ jobs:
     needs: [rspec, cucumber]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Download code coverage artifact
         uses: actions/download-artifact@v3
         with:
@@ -488,7 +489,7 @@ jobs:
         with:
           reports: coverage/*.xml
           targetdir: coveragereport
-          reporttypes: Html;Cobertura;MarkdownSummary;MarkdownSummaryGithub;Badges
+          reporttypes: HtmlInline;MarkdownSummary;MarkdownSummaryGithub;Badges
       - name: Display structure of downloaded files
         run: ls -R
       - name: Upload coverage report artifact
