@@ -23,11 +23,11 @@ module BenefitSponsors
           data[year] = {}
           effective_on = effective_on_for_year(year.to_i)
           eligibility = benefit_sponsorship.active_eligibility_on(effective_on)
-          if eligibility
-            data[year][:is_eligible] = true
-          else
-            data[year][:is_eligible] = false
-          end
+          data[year][:is_eligible] = if eligibility
+                                       true
+                                     else
+                                       false
+                                     end
           application = benefit_sponsorship.benefit_applications.by_year(year).approved_and_terminated.select(&:osse_eligible?).last
           next unless application
 
@@ -36,7 +36,6 @@ module BenefitSponsors
         end
       end
 
-      # rubocop:disable Metrics/CyclomaticComplexity
       def update_osse_eligibilities_by_year
         eligibility_result = {}
 
@@ -54,7 +53,6 @@ module BenefitSponsors
         grouped_eligibilities = eligibility_result.group_by { |_year, value| value }
         grouped_eligibilities.transform_values { |items| items.map(&:first) }
       end
-      # rubocop:enable Metrics/CyclomaticComplexity
 
       def store_osse_eligibility(osse_eligibility, effective_on)
         result = ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(

@@ -21,9 +21,8 @@ module SponsoredBenefits
           # @return [Dry::Monad] result
           def call(params)
             values = yield validate(params)
-            eligibility_record = yield find_eligibility(values)
-            eligibility_options =
-              yield build_eligibility_options(values, eligibility_record)
+            eligibility_record = yield find_eligibility
+            eligibility_options = yield build_eligibility_options(values, eligibility_record)
             eligibility = yield create_eligibility(eligibility_options)
             persisted_eligibility = yield store(values, eligibility)
 
@@ -33,8 +32,7 @@ module SponsoredBenefits
           private
 
           def validate(params)
-            params[:event] ||= :initialize
-            params[:effective_date] ||= Date.today
+            params[:effective_date] ||= TimeKeeper.date_of_record
 
             errors = []
             errors << "evidence key missing" unless params[:evidence_key]
@@ -48,17 +46,18 @@ module SponsoredBenefits
 
           # Given calendar year there will be only one instance of osse eligibility with single evidence record.
           # When eligibility changes we create new state histories for evidence and eligibility
-          def find_eligibility(_values)
-            eligibility =
-              subject.eligibilities.by_key(:bqt_osse_eligibility).last
-
+          def find_eligibility
+            eligibility = subject.eligibilities.by_key(:bqt_osse_eligibility).last
             Success(eligibility)
           end
 
           def build_eligibility_options(values, eligibility_record = nil)
             ::Operations::Eligible::BuildEligibility.new(
               configuration:
-                SponsoredBenefits::Operations::BenefitSponsorships::BqtOsseEligibilities::OsseEligibilityConfiguration.new
+                SponsoredBenefits::Operations::BenefitSponsorships::BqtOsseEligibilities::OsseEligibilityConfiguration.new(
+                  subject: subject,
+                  effective_date: values[:effective_date]
+                )
             ).call(
               values.merge(
                 eligibility_record: eligibility_record,

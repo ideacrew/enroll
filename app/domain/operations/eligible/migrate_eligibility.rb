@@ -26,9 +26,7 @@ module Operations
       def validate(params)
         errors = []
         errors << "eligibility key missing" unless params[:eligibility_type]
-        unless params[:current_eligibilities].present?
-          errors << "current eligibilities missing"
-        end
+        errors << "current eligibilities missing" unless params[:current_eligibilities].present?
 
         errors.empty? ? Success(params) : Failure(errors)
       end
@@ -81,8 +79,10 @@ module Operations
           .sort_by(&:updated_at)
           .each do |evidence|
             effective_date = eligibility.start_on.to_date
-            effective_date =
-              evidence.updated_at.to_date unless evidence.is_satisfied
+            unless evidence.is_satisfied
+              effective_date =
+                evidence.updated_at.to_date
+            end
             logger(
               "update_eligibility_is_satisfied_as_#{evidence.is_satisfied} for #{subject.to_global_id}"
             ) do
@@ -117,9 +117,7 @@ module Operations
               reset_timestamps(evidence_instance)
             end
           end
-          unless eligibility.save
-            print_error "unable to reset timestamps #{result.failure}"
-          end
+          print_error "unable to reset timestamps #{result.failure}" unless eligibility.save
         end
         result
       end
@@ -129,7 +127,7 @@ module Operations
         return unless state_history
         record.updated_at = state_history.updated_at
         record.created_at = state_history.created_at if record.created_at >
-          record.updated_at
+                                                        record.updated_at
       end
 
       def initialize_eligibility(subject, values, eligibility)

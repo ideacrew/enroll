@@ -4,6 +4,18 @@ require 'rails_helper'
 
 RSpec.describe SponsoredBenefits::Forms::PlanDesignProposal, type: :model, dbclean: :after_each do
   context 'osse eligibility' do
+
+    before { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
+
+    let!(:site) { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :dc) }
+    let!(:current_effective_date)  { TimeKeeper.date_of_record }
+    let!(:benefit_market) { site.benefit_markets.first }
+    let!(:benefit_market_catalog) do
+      create(:benefit_markets_benefit_market_catalog, :with_product_packages,
+             benefit_market: benefit_market,
+             title: "SHOP Benefits for #{current_effective_date.year}",
+             application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
+    end
     let!(:organization) do
       create(
         :sponsored_benefits_plan_design_organization,
@@ -30,7 +42,21 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignProposal, type: :model, dbcle
       }
     end
 
+    let(:catalog_eligibility) do
+      ::Operations::Eligible::CreateCatalogEligibility.new.call(
+        {
+          subject: benefit_market_catalog.to_global_id,
+          eligibility_feature: "aca_shop_osse_eligibility",
+          effective_date: benefit_market_catalog.application_period.begin.to_date,
+          domain_model:
+            "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+        }
+      )
+    end
+
     before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+      catalog_eligibility
       form = described_class.new(params.merge('proposal_id' => plan_design_proposal.id.to_s))
       form.save
     end

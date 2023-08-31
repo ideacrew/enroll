@@ -10,6 +10,8 @@ module Eligible
 
     embedded_in :eligible, polymorphic: true
 
+    embedded_in :eligible, polymorphic: true
+
     field :key, type: Symbol
     field :title, type: String
     field :description, type: String
