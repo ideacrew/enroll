@@ -6,64 +6,44 @@ namespace :dry_run do
     desc "run all reports for a given year"
     task :all, [:year] => :environment do |_t, args|
       year = args[:year].to_i
-      Rake::Task['dry_run:reports:renewals'].invoke(year)
-      Rake::Task['dry_run:reports:determinations'].invoke(year)
-      Rake::Task['dry_run:reports:notices'].invoke(year)
+      Rake::Task['dry_run:reports:application_renewals'].invoke(year)
+      # Not yet implemented
+      # Rake::Task['dry_run:reports:determinations'].invoke(year)
+      # Rake::Task['dry_run:reports:notices'].invoke(year)
     end
 
-    desc "run the renewal report for a given year"
-    task :renewals, [:year] => :environment do |_t, args|
+    desc "Run the renewal report for a given year"
+    task :application_renewals, [:year] => :environment do |_t, args|
       year = args[:year].to_i
-      # who should have been renewed
-      Rake::Task['dry_run:reports:renewal_eligible_families'].invoke(year)
-      Rake::Task['dry_run:reports:renewal_eligible_families_who_renewed'].invoke(year)
-      Rake::Task['dry_run:reports:renewal_eligible_families_who_did_not_renew'].invoke(year)
-    end
+      benchmark "Running renewal report for #{year}." do
+        renewal_eligible_file = "renewal_eligible_families_#{year}"
+        renewal_not_renewed_file = "renewal_eligible_families_who_did_not_renew_#{year}"
+        renewal_renewed_file = "renewal_eligible_families_who_renewed_#{year}"
+        renewed_family_ids = ::FinancialAssistance::Application.by_year(year).pluck(:family_id)
 
-    desc "run the renewal eligible families report for a given year"
-    task :renewal_eligible_families, [:year] => :environment do |_t, args|
-      log "Running renewal eligible families report for #{args[:year]}"
-      applications = renewal_eligible_applications(args[:year])
-      to_csv("renewal_eligible_families_#{args[:year]}") do |csv|
-        csv << ["family_id", "primary_applicant.person_hbx_id", "primary_applicant.full_name"]
-        applications.each do |app|
-          csv << [app.family_id, app.primary_applicant.person_hbx_id, app.primary_applicant.full_name]
+        # Define CSV headers
+        csv_headers = %w[family_id primary_applicant.person_hbx_id primary_applicant.full_name]
+
+        # Create CSV files with headers
+        to_csv(renewal_eligible_file, "w+") { |csv| csv << csv_headers }
+        to_csv(renewal_not_renewed_file, "w+") { |csv| csv << csv_headers }
+        to_csv(renewal_renewed_file, "w+") { |csv| csv << csv_headers.concat(%w[application_hbx_id aasm_state]) }
+
+        each_renewal_eligible_app year do |app|
+          csv_data = [app.family_id, app.primary_applicant.person_hbx_id, app.primary_applicant.full_name]
+
+          to_csv(renewal_eligible_file) { |csv| csv << csv_data }
+
+          if renewed_family_ids.include?(app.family_id)
+            to_csv(renewal_renewed_file) { |csv| csv << csv_data.concat([app.hbx_id, app.aasm_state]) }
+          else
+            to_csv(renewal_not_renewed_file) { |csv| csv << csv_data }
+          end
+
         end
-      end
-      log "Finished renewal eligible families report for #{args[:year]} with #{applications.size} applications."
-    end
 
-    desc "run the renewal eligible families who renewed report for a given year"
-    task :renewal_eligible_families_who_renewed, [:year] => :environment do |_t, args|
-      log "Running renewal eligible families who renewed report for #{args[:year]}"
-      renewal_eligible_applications = renewal_eligible_applications(args[:year])
-      existing_family_ids = ::FinancialAssistance::Application.by_year(args[:year]).pluck(:family_id).uniq
-      # A list of applications that are renewal-eligible and have a matching family_id in the existing applications for the specified year.
-      applications = renewal_eligible_applications.select { |app| existing_family_ids.include?(app.family_id) }
-      to_csv("renewal_eligible_families_who_renewed_#{args[:year]}") do |csv|
-        csv << ["family_id", "primary_applicant.person_hbx_id", "primary_applicant.full_name", "hbx_id" "aasm_state"]
-        applications.each do |app|
-          csv << [app.family_id, app.primary_applicant.person_hbx_id, app.primary_applicant.full_name, app.hbx_id, app.aasm_state]
-        end
+        log "Finished renewal report for #{args[:year]}."
       end
-      log "Finished renewal eligible families who renewed report for #{args[:year]} with #{applications.size} applications."
-    end
-
-    desc "run the renewal eligible families who did not renew report for a given year"
-    task :renewal_eligible_families_who_did_not_renew, [:year] => :environment do |_t, args|
-      log "Running renewal eligible families who did not renew report for #{args[:year]}"
-      renewal_eligible_applications = renewal_eligible_applications(args[:year])
-      existing_family_ids = ::FinancialAssistance::Application.by_year(args[:year]).pluck(:family_id)
-
-      # A list of applications that are renewal-eligible and do not have a matching family_id in the existing applications for the specified year.
-      applications = renewal_eligible_applications.reject { |app| existing_family_ids.include?(app.family_id) }
-      to_csv("renewal_eligible_families_who_did_not_renew_#{args[:year]}") do |csv|
-        csv << %w[family_id primary_applicant.person_hbx_id primary_applicant.full_name]
-        applications.each do |app|
-          csv << [app.family_id, app.primary_applicant.person_hbx_id, app.primary_applicant.full_name]
-        end
-      end
-      log "Finished renewal eligible families who did not renew report for #{args[:year]} with #{applications.size} applications."
     end
 
     desc "run the determinations report for a given year"
@@ -127,17 +107,24 @@ namespace :dry_run do
       @family_ids ||= ::HbxEnrollment.individual_market.enrolled.where(:effective_on.gte => beginning_of_year, :effective_on.lte => end_of_year).distinct(:family_id)
     end
 
-    def renewal_eligible_applications(renewal_year)
+    # To avoid loading each application into memory at once we yield the results in batches.
+    # @param [Integer] renewal_year
+    # @param [Integer] batch_size - number of family_ids to process at once (default 1000)
+    # @yield [FinancialAssistance::Application] - the application that is eligible for renewal
+    # @return [void]
+    # @example
+    #  each_renewal_eligible_app(2021) do |app|
+    #   puts app.family_id
+    # end
+    # @note - this method is used in the renewal report
+    def each_renewal_eligible_app(renewal_year, batch_size = 1000)
       family_ids = ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id)
-      ::FinancialAssistance::Application.by_year(renewal_year.pred).determined.where(:family_id.in => family_ids).group_by(&:family_id).transform_values { |group| group.max_by(&:created_at) }.select { |_k, v| v.eligible_for_renewal? }.values
-    end
-
-    def renewal_eligible_family_ids(year)
-      renewal_eligible_applications(year).map(&:family_id)
-    end
-
-    def actual_renewals(year)
-      @actual_renewals ||= ::FinancialAssistance::Application.by_year(year).renewal_enrolled.distinct(:family_id)
+      family_ids.each_slice(batch_size) do |family_id_slice|
+        results = ::FinancialAssistance::Application.by_year(renewal_year.pred).determined.where(:family_id.in => family_id_slice).to_a.group_by(&:family_id).transform_values { |group| group.max_by(&:created_at) }.select { |_, v| v.eligible_for_renewal? }.values
+        results.each do |app|
+          yield app
+        end
+      end
     end
   end
 end

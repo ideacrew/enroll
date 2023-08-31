@@ -63,6 +63,7 @@ namespace :dry_run do
       Rake::Task['dry_run:data:delete_benefit_market_catalogs'].invoke(year)
       Rake::Task['dry_run:data:delete_mappings'].invoke(year)
       Rake::Task['dry_run:data:delete_financial_assistance_applications'].invoke(year)
+      Rake::Task['dry_run:data:delete_enrollments'].invoke(year)
     end
 
     def service_areas_by_year(year)
@@ -377,19 +378,13 @@ namespace :dry_run do
     task :create_benefit_coverage_period, [:year] => :environment do |t, args|
       year = args[:year].to_i
       log "Creating benefit coverage period for #{year}"
-      coverage_start = DateTime.parse("#{year}-01-01 00:00:00 UTC")
-      coverage_end = DateTime.parse("#{year}-12-31 00:00:00 UTC")
-      open_enrollment_start_on = TimeKeeper.date_of_record.yesterday
-      open_enrollment_end_on = coverage_start
-
-      benefit_coverage_periods = HbxProfile&.current_hbx&.benefit_sponsorship&.benefit_coverage_periods
-      service_market = benefit_coverage_periods.first&.service_market
-      benefit_coverage_periods.create!(
-        start_on: coverage_start,
-        end_on: coverage_end,
-        open_enrollment_start_on: open_enrollment_start_on,
-        open_enrollment_end_on: open_enrollment_end_on,
-        service_market: service_market
+      HbxProfile&.current_hbx&.benefit_sponsorship&.benefit_coverage_periods.create!(
+        title: "Individual Market Benefits #{year}",
+        service_market: 'individual',
+        start_on: Date.new(year, 1, 1),
+        end_on: Date.new(year, 12, 31),
+        open_enrollment_start_on: TimeKeeper.date_of_record.yesterday,
+        open_enrollment_end_on: Date.new(year, 1, 31)
       )
     end
 
@@ -796,6 +791,16 @@ namespace :dry_run do
     desc "delete financial assistance applications for a given year"
     task :delete_financial_assistance_applications, [:year] => :environment do |_t, args|
       delete_all(financial_assistance_applications_by_year(args[:year]))
+    end
+
+    desc "enrollments for a given year"
+    task :enrollments, [:year] => :environment do |_t, args|
+      get_all(::HbxEnrollment.by_year(args[:year]))
+    end
+
+    desc "delete enrollments for a given year"
+    task :delete_enrollments, [:year] => :environment do |_t, args|
+      delete_all(::HbxEnrollment.by_year(args[:year]))
     end
 
   end

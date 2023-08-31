@@ -5,6 +5,14 @@ def log(*message)
   log_to_file(*message)
 end
 
+def benchmark(*message)
+  log(*message)
+  start_time = Time.now
+  yield
+  end_time = Time.now
+  log("Finished in #{end_time - start_time} seconds.")
+end
+
 def log_to_console(*messages)
   prefix = "[DRY RUN] "
   messages.each { |m| puts "#{prefix}#{m}" } unless Rails.env.test?
@@ -28,8 +36,8 @@ def root_path
   "#{Rails.root}/dry_run_report/"
 end
 
-def to_csv(file_name, &block)
-  CSV.open(file_path("#{file_name}.csv"), "wb", &block)
+def to_csv(file_name, mode="a+", &block)
+  CSV.open(file_path("#{file_name}.csv"), mode, &block)
 end
 
 # Delete all records from a mongo collection and log the result

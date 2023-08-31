@@ -3,16 +3,15 @@ require_relative 'helpers'
 namespace :dry_run do
   namespace :commands do
     def update_open_enrollment(title, start_date: nil, end_date: nil)
-      benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
-      bcp = benefit_sponsorship.benefit_coverage_periods.find_by(title: title)
+      bcp = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.find_by(title: title)
 
-      if bcp
-        updates = {}
-        updates[:open_enrollment_start_on] = Date.strptime(start_date.to_s, "%m/%d/%Y") if start_date.present?
-        updates[:open_enrollment_end_on] = Date.strptime(end_date.to_s, "%m/%d/%Y") if end_date.present?
+      log("No benefit coverage period found for #{title}") && exit unless bcp
 
-        bcp.update(updates) unless updates.empty?
-      end
+      updates = {}
+      updates[:open_enrollment_start_on] = Date.strptime(start_date.to_s, "%m/%d/%Y") if start_date.present?
+      updates[:open_enrollment_end_on] = Date.strptime(end_date.to_s, "%m/%d/%Y") if end_date.present?
+
+      bcp.update(updates) unless updates.empty?
     end
 
     desc "initiate open enrollment for a given year"
@@ -25,15 +24,24 @@ namespace :dry_run do
     end
 
     desc "run the renewal process for a given year"
-    task :renew, [:year] => :environment do |_t, args|
+    task :renew_applications, [:year] => :environment do |_t, args|
       year = args[:year].to_i
       log "Beginning renewal process for #{year}"
       result = FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::RequestAll.new.call({ renewal_year: year })
       log "Renewal process for #{year} - #{result_type(result)}", result_message(result)
     end
 
+    desc "Run enrollment renewals for a given year"
+    task :renew_enrollments, [:year] => :environment do |_t, args|
+      log "Beginning enrollment renewal process for #{args[:year]}"
+      renewal_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
+      log("Missing renewal coverage period for #{args[:year]}") && exit unless renewal_coverage_period
+      log("Renewal coverage period for #{args[:year]} is not open.") && exit unless renewal_coverage_period&.open_enrollment_start_on <= TimeKeeper.date_of_record
+      Enrollments::IndividualMarket::OpenEnrollmentBegin.new.process_renewals
+    end
+
     desc "run the determination process for a given year"
-    task :determine, [:year] => :environment do |_t, args|
+    task :determine_applications, [:year] => :environment do |_t, args|
       year = args[:year].to_i
       log "Beginning determination process for #{year}"
       result = FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::DetermineAll.new.call({ renewal_year: year })
