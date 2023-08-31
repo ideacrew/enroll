@@ -43,6 +43,11 @@ module Enroll
     config.paths.add "app/api", glob: "**/*.rb"
     config.autoload_paths += Dir["#{Rails.root}/app/api/api/*/*"]
 
+
+    config.after_initialize do
+      ActionView::Base.default_form_builder = ::HbxFormBuilder
+    end
+
     #Thanks to Wojtek Kruszewski: https://gist.github.com/WojtekKruszewski
     config.log_tags = [    #'-anything',
       ->(req){
