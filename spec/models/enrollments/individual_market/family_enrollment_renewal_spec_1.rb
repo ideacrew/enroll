@@ -1,0 +1,153 @@
+# frozen_string_literal: true
+
+require 'rails_helper'
+require "#{Rails.root}/spec/shared_contexts/family_enrollment_renewal.rb"
+
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
+  RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :model, :dbclean => :after_each do
+    include FloatHelper
+    include_context "setup family initial and renewal enrollments data"
+
+    let(:ivl_benefit) { double('BenefitPackage', residency_status: ['any']) }
+
+    before do
+      allow(subject).to receive(:ivl_benefit).and_return(ivl_benefit)
+    end
+
+    before do
+      TimeKeeper.set_date_of_record_unprotected!(current_date)
+    end
+
+    after :each do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
+    subject do
+      enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
+      enrollment_renewal.enrollment = input_enrollment
+      enrollment_renewal.assisted = assisted
+      enrollment_renewal.aptc_values = aptc_values
+      enrollment_renewal.renewal_coverage_start = renewal_benefit_coverage_period.start_on
+      enrollment_renewal
+    end
+
+    describe '#eligible_enrollment_members' do
+      context 'members with resident_role' do
+        let(:input_enrollment) { enrollment }
+      end
+
+      context 'members with consumer_role' do
+        let(:input_enrollment) { enrollment }
+
+        context 'when a member is not applying coverage' do
+          let(:person_child3) { FactoryBot.create(:person, dob: child3_dob) }
+          let!(:consumer_role) { FactoryBot.create(:consumer_role, is_applying_coverage: false, person: person_child3) }
+
+          it 'returns enrollment without member not applying for coverage' do
+            expect(
+              subject.eligible_enrollment_members.map(&:applicant_id)
+            ).not_to include(child3.id)
+          end
+        end
+
+        context 'when a member is incarcerated' do
+          let(:person_child3) { FactoryBot.create(:person, :with_consumer_role, dob: child3_dob, is_incarcerated: true) }
+
+          it 'returns enrollment without incarcerated member' do
+            expect(
+              subject.eligible_enrollment_members.map(&:applicant_id)
+            ).not_to include(child3.id)
+          end
+        end
+
+        # Valid Citizenship Statuses: us_citizen, naturalized_citizen, indian_tribe_member, alien_lawfully_present, lawful_permanent_resident
+        context 'when a member does not have valid citizenship' do
+          let(:person3_citizen_status) { ConsumerRole::INELIGIBLE_CITIZEN_VERIFICATION.sample }
+          let(:person_child3) { FactoryBot.create(:person, dob: child3_dob) }
+          let!(:consumer_role) { FactoryBot.create(:consumer_role, person: person_child3, citizen_status: person3_citizen_status) }
+
+          it 'returns enrollment without the ineligible citizen' do
+            expect(
+              subject.eligible_enrollment_members.map(&:applicant_id)
+            ).not_to include(child3.id)
+          end
+        end
+
+        context 'when the members have invalid residency status' do
+          let(:child1_dob) { current_date - 6.years }
+          let(:child2_dob) { current_date - 3.years }
+          let(:child3_dob) { current_date - 2.years }
+
+          let(:ivl_benefit) { double('BenefitPackage', residency_status: ['state_resident']) }
+
+          context 'when all adults are ineligible for residency' do
+            let(:primary) do
+              per = FactoryBot.create(:person, :with_consumer_role, dob: primary_dob, is_homeless: false, is_temporarily_out_of_state: false)
+              per.addresses.update_all(state: 'NV')
+              per
+            end
+
+            let(:spouse_person) do
+              per = FactoryBot.create(:person, :with_consumer_role, dob: spouse_dob, is_homeless: false, is_temporarily_out_of_state: false)
+              per.addresses.update_all(state: 'NV')
+              per
+            end
+
+            it 'returns enrollment without the member who is not eligible for residency' do
+              expect(
+                subject.eligible_enrollment_members.map(&:applicant_id)
+              ).not_to include(spouse_person.id)
+            end
+          end
+        end
+
+        context 'when a member has valid residency status' do
+          let(:ivl_benefit) { double('BenefitPackage', residency_status: ['state_resident']) }
+
+          context 'when member is homeless' do
+            let(:person_child3) { FactoryBot.create(:person, :with_consumer_role, dob: child3_dob, is_homeless: true) }
+
+            it 'returns enrollment with the homeless member' do
+              expect(
+                subject.eligible_enrollment_members.map(&:applicant_id)
+              ).to include(child3.id)
+            end
+          end
+
+          context 'when member is temporarily out of state' do
+            let(:person_child3) { FactoryBot.create(:person, :with_consumer_role, dob: child3_dob, is_temporarily_out_of_state: true) }
+
+            it 'returns enrollment with the member who is temporarily out of state' do
+              expect(
+                subject.eligible_enrollment_members.map(&:applicant_id)
+              ).to include(child3.id)
+            end
+          end
+
+          context 'when adults are eligible for residency' do
+            let(:person_child2) do
+              per = FactoryBot.create(:person, :with_consumer_role, dob: child2_dob, is_homeless: false, is_temporarily_out_of_state: false)
+              per.addresses.update_all(state: 'NV')
+              per
+            end
+
+            let(:person_child3) { FactoryBot.create(:person, :with_consumer_role, dob: child3_dob, is_temporarily_out_of_state: true) }
+
+            it 'returns enrollment with the member who is not eligible for residency' do
+              expect(
+                subject.eligible_enrollment_members.map(&:applicant_id)
+              ).to include(child2.id)
+            end
+          end
+        end
+      end
+
+    end
+  end
+
+  def update_age_off_excluded(fam, true_or_false)
+    fam.family_members.map(&:person).each do |per|
+      per.update_attributes!(age_off_excluded: true_or_false)
+    end
+  end
+end
