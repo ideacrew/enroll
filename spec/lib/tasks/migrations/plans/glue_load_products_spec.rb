@@ -33,14 +33,11 @@ describe 'glue_load_products' do
       expect(@file_contents).to include(ivl_product.hios_id)
     end
 
-    # Testing specifically with the load method b/c that is what is used to load the data in Glue
-    # rubocop:disable Security/JSONLoad
     it 'should write output that can be loaded as array of json' do
       invoke_rake
       expect(@loaded_json).to be_truthy
       expect(@loaded_json.is_a?(Array)).to be_truthy
     end
-    # rubocop:enable Security/JSONLoad
   end
 
   context 'when CarrierProfile does not return fein' do
@@ -62,5 +59,8 @@ def invoke_rake
   Rake::Task["seed:load_products"].reenable
   Rake::Task["seed:load_products"].invoke(year)
   @file_contents = File.read(json_file_name)
+  # Testing specifically with the load method b/c that is what is used to load the data in Glue
+  # rubocop:disable Security/JSONLoad
   @loaded_json = JSON.load(@file_contents)
+  # rubocop:enable Security/JSONLoad
 end
