@@ -1011,6 +1011,7 @@ module ApplicationHelper
   end
 
   def plan_childcare_subsidy_eligible(plan)
+    return false unless EnrollRegistry.feature_enabled?(:aca_ivl_osse_subsidy)
     return true unless EnrollRegistry.feature_enabled?("individual_osse_plan_filter")
 
     plan.ivl_osse_eligible? && plan.is_hc4cc_plan
