@@ -3,6 +3,7 @@ class Insured::FamiliesController < FamiliesController
   include Acapi::Notifiers
   include ::ApplicationHelper
   include Config::SiteConcern
+  include Insured::FamiliesHelper
 
   before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
@@ -14,6 +15,7 @@ class Insured::FamiliesController < FamiliesController
   before_action :transition_family_members_update_params, only: [:transition_family_members_update]
   before_action :upload_notice_form_enabled?, only: [:upload_notice_form]
   before_action :set_cache_headers, only: [:home, :inbox]
+  before_action :is_user_authorized?, only: [:purchase]
 
   def home
     Caches::CurrentHbx.with_cache do
@@ -604,5 +606,18 @@ class Insured::FamiliesController < FamiliesController
       @resident_role_id = @person.resident_role.id
     end
 
+  end
+
+  def is_user_authorized?
+    redirect_to root_path if current_user.blank? || @family.blank?
+
+    return if current_user.has_hbx_staff_role? || is_family_authorized?(current_user, @family) || is_broker_authorized?(current_user, @family) || is_general_agency_authorized?(current_user, @family)
+
+    error_message = 'User not authorized to perform this operation'
+    flash[:error] = error_message
+    redirect_to root_path
+  rescue StandardError => e
+    logger.error "[Insured::FamiliesController] Failed to authorize user #{current_user.id},
+                  class #{e.class} with message #{e.message}\n#{e.backtrace&.join("\n")}"
   end
 end
