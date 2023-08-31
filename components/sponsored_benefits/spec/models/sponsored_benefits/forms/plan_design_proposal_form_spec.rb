@@ -10,11 +10,12 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignProposal, type: :model, dbcle
     let!(:site) { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :dc) }
     let!(:current_effective_date)  { TimeKeeper.date_of_record }
     let!(:benefit_market) { site.benefit_markets.first }
-    let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
-      benefit_market: benefit_market,
-      title: "SHOP Benefits for #{current_effective_date.year}",
-      application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
-    }
+    let!(:benefit_market_catalog) do
+      create(:benefit_markets_benefit_market_catalog, :with_product_packages,
+             benefit_market: benefit_market,
+             title: "SHOP Benefits for #{current_effective_date.year}",
+             application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
+    end
     let!(:organization) do
       create(
         :sponsored_benefits_plan_design_organization,

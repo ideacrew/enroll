@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
 require "forwardable"
 
 module Eligible
+  #helper class to get eligible periods on eligibility
   class EligiblePeriodHandler
     extend Forwardable
     def_delegators :@eligible_record, :state_histories, :active_state, :inactive_state, :current_state, :eligible?
@@ -28,14 +31,14 @@ module Eligible
       eligible_periods = []
       date_range = {}
       state_histories.non_initial.each do |state_history|
-        date_range[
-          :start_on
-        ] ||= state_history.effective_on if state_history.to_state ==
-          active_state
-
-        unless date_range.present? && state_history.to_state == inactive_state
-          next
+        if state_history.to_state ==
+           active_state
+          date_range[
+            :start_on
+          ] ||= state_history.effective_on
         end
+
+        next unless date_range.present? && state_history.to_state == inactive_state
         date_range[:end_on] = state_history.effective_on.prev_day
         eligible_periods << date_range
         date_range = {}
