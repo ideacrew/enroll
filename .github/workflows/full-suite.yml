@@ -497,5 +497,5 @@ jobs:
           name: code-coverage-report
           path: coveragereport/*
       - name: Write to Job Summary
-        run: cat SummaryGithub.md >> $GITHUB_STEP_SUMMARY
+        run: cat coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
 
