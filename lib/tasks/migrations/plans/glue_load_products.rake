@@ -10,6 +10,10 @@ namespace :seed do
 
     @json_file_name = Rails.root.join("#{args[:year]}_plans.json")
     @error_file_name = Rails.root.join("#{args[:year]}_plans_error.txt")
+    if File.exist?(@json_file_name)
+      puts "File #{@json_file_name} already exists!"
+      abort
+    end
 
     def write_to_json_file(content)
       if !File.exist?(@json_file_name)
@@ -84,24 +88,32 @@ namespace :seed do
     rescue Exception => e
       error_message = "Error dumping product: #{product.hios_id}, #{e.message}"
       write_to_error_file(error_message)
+      nil
     end
 
     def fein(product)
-      return if product.benefit_market_kind == :aca_individual
-      Rails.cache.fetch("#{product.active_year}_#{product.id}", expires_in: 1.month) do
+      fein = Rails.cache.fetch("#{product.active_year}_#{product.id}", expires_in: 1.month) do
         carrier_profile_id = CarrierProfile.find_by_legal_name(product.issuer_profile.legal_name)
-        CarrierProfile.find(carrier_profile_id).fein
+        CarrierProfile.find(carrier_profile_id).fein if carrier_profile_id.present?
       end
-    rescue Exception => e
+
+      if fein.nil? && product.issuer_profile.present?
+        fein = product.issuer_profile.fein
+      end
+      return fein if fein.present?
+
+      raise StandardError.new
+    rescue Exception => _e
       error_message = "Error finding fein for product: #{product.hios_id}\n"
       write_to_error_file(error_message)
+      nil
     end
 
     write_to_json_file("[\n")
     products = ::BenefitMarkets::Products::Product.by_year(args[:year]).where(:benefit_market_kind.in => [:aca_shop, :aca_individual])
     products.each_with_index do |product, index| 
-      dump_product_for_enroll(product)
-      write_to_json_file("\n,\n") unless products.count == index + 1
+      result = dump_product_for_enroll(product)
+      write_to_json_file("\n,\n") if result.present? && products.count != index + 1
     end
     write_to_json_file("]")
 
