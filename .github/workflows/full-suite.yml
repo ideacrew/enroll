@@ -467,14 +467,28 @@ jobs:
       # - name: Display structure of downloaded files
       #   run: ls -R
       #   working-directory: coverage
-      - name: Code Coverage Summary
-        uses: irongut/CodeCoverageSummary@v1.3.0
+      # original request;
+      # - name: Code Coverage Summary
+      #   uses: irongut/CodeCoverageSummary@v1.3.0
+      #   with:
+      #     filename: coverage/*.xml
+      #     badge: true
+      #     format: 'markdown'
+      #     output: both
+      #     hide_branch_rate: true
+      # - name: Write to Job Summary
+      #   run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
+      - name: Setup .NET Core # Required to execute ReportGenerator
+        uses: actions/setup-dotnet@v3
         with:
-          filename: coverage/*.xml
-          badge: true
-          format: 'markdown'
-          output: both
-          hide_branch_rate: true
-      - name: Write to Job Summary
-        run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
+          dotnet-version: 6.x
+          dotnet-quality: 'ga'
+      - name: ReportGenerator
+        uses: danielpalme/ReportGenerator-GitHub-Action@5.1.24
+        with:
+          reports: coverage/*.xml
+          targetdir: coveragereport
+          reporttypes: Html;Cobertura;MarkdownSummaryGithub
+      - name: Display structure of downloaded files
+        run: ls -R
 
