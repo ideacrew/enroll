@@ -78,24 +78,21 @@ describe FindOrCreateInsuredPerson, :dbclean => :after_each do
       context_arguments[:ssn] = '000000000'
       person = result.person
 
-      expect(person.valid?).to be_falsey
-      expect(person.errors[:ssn]).to include('Invalid SSN')
+      expect(person.nil?).to be_truthy
     end
 
     it "will throw an error if the first three digits of an SSN consists of only zeroes" do
       context_arguments[:ssn] = '000834231'
       person = result.person
 
-      expect(person.valid?).to be_falsey
-      expect(person.errors[:ssn]).to include('Invalid SSN')
+      expect(person.nil?).to be_truthy
     end
 
     it "will throw an error if the first three digits of an SSN consists of only sixes" do
       context_arguments[:ssn] = '666834231'
       person = result.person
 
-      expect(person.valid?).to be_falsey
-      expect(person.errors[:ssn]).to include('Invalid SSN')
+      expect(person.nil?).to be_truthy
     end
 
     it "will throw an error if the first three digits of an SSN is between 900-999" do
@@ -103,24 +100,21 @@ describe FindOrCreateInsuredPerson, :dbclean => :after_each do
       context_arguments[:ssn] = ssn
       person = result.person
 
-      expect(person.valid?).to be_falsey
-      expect(person.errors[:ssn]).to include('Invalid SSN')
+      expect(person.nil?).to be_truthy
     end
 
     it "will throw an error if the fourth and fifth digit of an SSN are zeroes" do
       context_arguments[:ssn] = '789004231'
       person = result.person
 
-      expect(person.valid?).to be_falsey
-      expect(person.errors[:ssn]).to include('Invalid SSN')
+      expect(person.nil?).to be_truthy
     end
 
     it "will throw an error if the last four digits of an SSN are zeroes" do
       context_arguments[:ssn] = '789830000'
       person = result.person
 
-      expect(person.valid?).to be_falsey
-      expect(person.errors[:ssn]).to include('Invalid SSN')
+      expect(person.nil?).to be_truthy
     end
   end
 end
