@@ -50,9 +50,9 @@ module BenefitSponsors
           # When eligibility changes we create new state histories for evidence and eligibility
           def find_eligibility(values)
             eligibility =
-              subject.find_eligibility_by(
+              subject.eligibilities.by_key(
                 "aca_shop_osse_eligibility_#{values[:effective_date].year}".to_sym
-              )
+              ).last
 
             Success(eligibility)
           end
@@ -60,7 +60,7 @@ module BenefitSponsors
           def build_eligibility_options(values, eligibility_record = nil)
             ::Operations::Eligible::BuildEligibility.new(
               configuration:
-                BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::OsseEligibilityConfiguration.new(
+                BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::ShopOsseEligibilityConfiguration.new(
                   subject: subject,
                   effective_date: values[:effective_date]
                 )
@@ -68,7 +68,7 @@ module BenefitSponsors
               values.merge(
                 eligibility_record: eligibility_record,
                 evidence_configuration:
-                  BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::OsseEvidenceConfiguration.new
+                  BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::ShopOsseEvidenceConfiguration.new
               )
             )
           end

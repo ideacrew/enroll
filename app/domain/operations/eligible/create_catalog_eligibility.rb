@@ -160,7 +160,7 @@ module Operations
       end
 
       def save_eligibility(eligibility_record)
-        if subject.instance_of?(BenefitCoveragePeriod)
+        if subject.instance_of?(::BenefitCoveragePeriod)
           organization =
             Organization.where(
               "hbx_profile.benefit_sponsorship.benefit_coverage_periods._id" =>

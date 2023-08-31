@@ -18,11 +18,10 @@ module Operations
           :approved
         when "false"
           case from_state
-          when :approved
+          when :not_approved, :approved, :denied
             :denied
-          when :initial
-            return :initial unless values[:evidence_record]
-            :denied
+          else
+            :not_approved
           end
         end
       end

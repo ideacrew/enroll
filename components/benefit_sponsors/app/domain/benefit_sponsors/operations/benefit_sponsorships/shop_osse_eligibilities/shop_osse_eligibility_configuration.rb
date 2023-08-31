@@ -5,7 +5,7 @@ module BenefitSponsors
     module BenefitSponsorships
       module ShopOsseEligibilities
         # Overrides top level eligibility_configuration for feature specific configurations
-        class OsseEligibilityConfiguration < ::Operations::Eligible::EligibilityConfiguration
+        class ShopOsseEligibilityConfiguration < ::Operations::Eligible::EligibilityConfiguration
           attr_reader :subject, :effective_date
 
           def initialize(params)

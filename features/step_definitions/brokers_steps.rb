@@ -471,6 +471,7 @@ end
 
 Given(/the osse subsidy feature is enabled/) do
   year = TimeKeeper.date_of_record.year
+  EnrollRegistry[:aca_ivl_osse_eligibility].feature.stub(:is_enabled).and_return(true)
   EnrollRegistry[:aca_shop_osse_eligibility].feature.stub(:is_enabled).and_return(true)
   EnrollRegistry[:broker_quote_osse_eligibility].feature.stub(:is_enabled).and_return(true)
   EnrollRegistry["aca_shop_osse_eligibility_#{year}"].feature.stub(:is_enabled).and_return(true)

@@ -236,14 +236,13 @@ module SponsoredBenefits
       end
 
       def osse_eligibility_with(benefit_sponsorship)
-        benefit_sponsorship.eligibility_for(:bqt_osse_eligibility, effective_date)
+        benefit_sponsorship.eligibility_on(effective_date)
       end
 
       def create_or_term_osse_eligibility(benefit_sponsorship)
         return unless osse_eligibility.present?
 
-        eligibility_record = benefit_sponsorship.eligibility_for(:bqt_osse_eligibility, effective_date)
-
+        eligibility_record = benefit_sponsorship.eligibility_on(effective_date)
         if eligibility_record&.is_eligible_on?(TimeKeeper.date_of_record)
           terminate_eligibility(benefit_sponsorship) if osse_eligibility.to_s == 'false'
           return

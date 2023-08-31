@@ -62,7 +62,7 @@ describe Forms::HealthcareForChildcareProgramForm do
         subject.load_eligibility(primary)
         expect(subject.osse_eligibility).to be_truthy
         osse_eligibility = subject.role.eligibilities.first
-        expect(osse_eligibility.published_on).to eq(TimeKeeper.date_of_record.beginning_of_year)
+        expect(osse_eligibility.effective_on).to eq(TimeKeeper.date_of_record.beginning_of_year)
         expect(osse_eligibility.evidences.first.is_satisfied).to be_truthy
       end
     end
@@ -91,7 +91,7 @@ describe Forms::HealthcareForChildcareProgramForm do
         subject.load_eligibility(primary)
         expect(subject.osse_eligibility).to be_truthy
         osse_eligibility = subject.role.eligibilities.first
-        expect(osse_eligibility.published_on).to eq(TimeKeeper.date_of_record.beginning_of_year)
+        expect(osse_eligibility.effective_on).to eq(TimeKeeper.date_of_record.beginning_of_year)
         expect(osse_eligibility.evidences.first.is_satisfied).to be_truthy
       end
     end

@@ -5,7 +5,7 @@ module BenefitSponsors
     module BenefitSponsorships
       module ShopOsseEligibilities
         # Overrides top level evidence_configuration for feature specific configurations
-        class OsseEvidenceConfiguration < ::Operations::Eligible::EvidenceConfiguration
+        class ShopOsseEvidenceConfiguration < ::Operations::Eligible::EvidenceConfiguration
           def key
             :shop_osse_evidence
           end

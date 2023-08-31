@@ -2847,7 +2847,6 @@ class HbxEnrollment
       osse_childcare_subsidy = osse_subsidy_for_member(primary_hbx_enrollment_member)
     else
       return unless ivl_osse_eligible?
-      return unless product.is_hc4cc_plan
 
       cost_calculator = build_plan_premium(qhp_plan: product, elected_aptc: applied_aptc_amount, apply_aptc: applied_aptc_amount > 0)
       osse_childcare_subsidy = cost_calculator.total_childcare_subsidy_amount

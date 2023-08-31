@@ -33,11 +33,7 @@ module Operations
         applications = []
         applications_for(benefit_sponsorship).each do |application|
           start_on = application.start_on
-          eligibility =
-            benefit_sponsorship.eligibility_for(
-              "aca_shop_osse_eligibility_#{start_on.year}".to_sym,
-              start_on
-            )
+          eligibility = benefit_sponsorship.eligibility_on(start_on)
 
           next unless eligibility
           next unless calendar_years.include?(start_on.year)
@@ -57,20 +53,24 @@ module Operations
 
         logger.info "validating  #{benefit_sponsorship.legal_name}(#{benefit_sponsorship.fein})"
         applications.each do |application|
-          non_metal_level_product_package = application.benefit_packages.any? do |benefit_package|
-            benefit_package.health_sponsored_benefit&.product_package_kind.to_s != "metal_level"
-          end
+          non_metal_level_product_package =
+            application.benefit_packages.any? do |benefit_package|
+              benefit_package
+                .health_sponsored_benefit
+                &.product_package_kind
+                .to_s != "metal_level"
+            end
 
           errors << "found non metal level product package for application #{application.start_on} #{application.aasm_state}" if non_metal_level_product_package
 
-          application_with_bronze_ref_plan = application.benefit_packages.any? do |benefit_package|
-            benefit_package
-              .health_sponsored_benefit
+          application_with_bronze_ref_plan =
+            application.benefit_packages.any? do |benefit_package|
+              benefit_package
+                .health_sponsored_benefit
                 &.reference_product
-                  &.metal_level_kind
-              .to_s == "bronze"
-          end
-
+                &.metal_level_kind
+                .to_s == "bronze"
+            end
 
           errors << "found bronze reference plan for application #{application.start_on} #{application.aasm_state}" if application_with_bronze_ref_plan
 
@@ -83,25 +83,27 @@ module Operations
       end
 
       def verify_bronze_plan_coverages(application, errors)
-        employees_enrolled_in_bronze_plan = application.benefit_packages.any? do |benefit_package|
-          enrolled_families(benefit_package).any? do |family|
-            enrollments_by_package(family, benefit_package).any? do |en|
-              en.product&.metal_level_kind.to_s == "bronze"
+        employees_enrolled_in_bronze_plan =
+          application.benefit_packages.any? do |benefit_package|
+            enrolled_families(benefit_package).any? do |family|
+              enrollments_by_package(family, benefit_package).any? do |en|
+                en.product&.metal_level_kind.to_s == "bronze"
+              end
             end
           end
-        end
 
         errors << "found employees enrolled in bronze plan for application #{application.start_on} #{application.aasm_state}" if employees_enrolled_in_bronze_plan
       end
 
       def verify_employee_subsidies(application, errors)
-        all_employees_without_osse = application.benefit_packages.any? do |benefit_package|
-          enrolled_families(benefit_package).all? do |family|
-            enrollments_by_package(family, benefit_package).none? do |en|
-              en.eligible_child_care_subsidy > 0
+        all_employees_without_osse =
+          application.benefit_packages.any? do |benefit_package|
+            enrolled_families(benefit_package).all? do |family|
+              enrollments_by_package(family, benefit_package).none? do |en|
+                en.eligible_child_care_subsidy > 0
+              end
             end
           end
-        end
         errors << "found no employees with subsidy for application #{application.start_on} #{application.aasm_state}" if all_employees_without_osse
       end
 
