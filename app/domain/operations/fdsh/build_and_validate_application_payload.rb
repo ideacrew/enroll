@@ -38,7 +38,9 @@ module Operations
       end
 
       def check_eligibility_rules(payload, request_type)
-        Operations::Fdsh::PayloadEligibility::CheckApplicationEligibilityRules.new.call(payload, request_type)
+        payload.applicants.map do |applicant|
+          Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules.new.call(applicant, request_type)
+        end
       end
     end
   end

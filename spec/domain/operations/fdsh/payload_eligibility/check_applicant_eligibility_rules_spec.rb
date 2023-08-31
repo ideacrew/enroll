@@ -3,7 +3,7 @@
 require 'rails_helper'
 require Rails.root.join('spec/shared_contexts/valid_cv3_application_setup.rb')
 
-RSpec.describe Operations::Fdsh::PayloadEligibility::CheckApplicationEligibilityRules, dbclean: :after_each do
+RSpec.describe Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules, dbclean: :after_each do
   include_context "valid cv3 application setup"
 
   describe '#call' do
@@ -13,7 +13,9 @@ RSpec.describe Operations::Fdsh::PayloadEligibility::CheckApplicationEligibility
 
     context 'when all validation rules pass' do
       it 'returns a Success result' do
-        result = described_class.new.call(payload_entity, request_type)
+        applicant = payload_entity.applicants[0]
+
+        result = described_class.new.call(applicant, request_type)
         expect(result).to be_success
       end
     end
@@ -27,12 +29,16 @@ RSpec.describe Operations::Fdsh::PayloadEligibility::CheckApplicationEligibility
       end
 
       it 'returns a Failure result' do
-        result = described_class.new.call(payload_entity, request_type)
+        applicant = payload_entity.applicants[0]
+
+        result = described_class.new.call(applicant, request_type)
         expect(result).to be_failure
       end
 
       it 'returns an error message' do
-        result = described_class.new.call(payload_entity, request_type)
+        applicant = payload_entity.applicants[0]
+
+        result = described_class.new.call(applicant, request_type)
         expect(result.failure).to eq(["Invalid SSN"])
       end
     end
