@@ -64,41 +64,64 @@ module Eligibilities
       "events.individual.eligibilities.application.applicant.#{self.key}_evidence_updated"
     end
 
+    # This method requests a determination for the evidence and updates the verification history accordingly.
+    # Returns the response object if successful, false otherwise.
     def request_determination(action_name, update_reason, updated_by = nil)
-      self.add_verification_history(action_name, update_reason, updated_by)
+      add_verification_history(action_name, update_reason, updated_by)
+
       response = Operations::Fdsh::RequestEvidenceDetermination.new.call(self)
 
-      if response.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
-        determine_evidence_aasm_status(self.evidenceable)
+      if response.failure?
+        if EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
+          method_name = "determine_#{key.to_s.split('_').last}_evidence_aasm_status".to_sym
+          send(method_name, evidenceable)
 
-        update_reason = "#{self.key.capitalize} Evidence Determination Request Failed due to #{response.failure}"
-        self.add_verification_history("Hub Request Failed", update_reason, "system")
-        false
-      elsif response.failure?
+          update_reason = "#{key.capitalize} Evidence Determination Request Failed due to #{response.failure}"
+          add_verification_history("Hub Request Failed", update_reason, "system")
+        end
+
         false
       else
         response
       end
     end
 
-    def determine_evidence_aasm_status(applicant)
+    # This method sets the evidence to the attested state for the following types of evidence:
+    # - esi_mec
+    # - non_esi_mec
+    # - local_mec
+    def determine_mec_evidence_aasm_status(applicant)
+      applicant.set_evidence_attested(self)
+    end
+
+    # This method sets the evidence to the attested state for the following types of evidence:
+    # - income
+    def determine_income_evidence_aasm_status(applicant)
       family_id = applicant.application.family_id
       enrollments = HbxEnrollment.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, family_id: family_id)
+      aptc_or_csr_used = enrolled_in_any_aptc_csr_enrollments?(applicant, enrollments)
 
-      if enrolled?(applicant, enrollments)
-        enrollments.each do |enrollment|
-          applicant.enrolled_with(enrollment)
-        end
+      if aptc_or_csr_used
+        applicant.set_evidence_outstanding(self)
       else
         applicant.set_evidence_to_negative_response(self)
       end
     end
 
-    def enrolled?(applicant, enrollments)
-      return false if enrollments.blank?
+    # This method checks if the applicant is enrolled in any APTC or CSR enrollments.
+    # returns Boolean
+    def enrolled_in_any_aptc_csr_enrollments?(applicant, enrollments)
+      enrollments.any? do |enrollment|
+        applicant_enrolled?(applicant, enrollment) &&
+          enrollment.is_health_enrollment? &&
+          (enrollment.applied_aptc_amount > 0 || ['03', '04', '05', '06'].include?(enrollment.product.csr_variant_id))
+      end
+    end
 
-      family_member_ids = enrollments.flat_map(&:hbx_enrollment_members).flat_map(&:applicant_id).uniq
-      family_member_ids.map(&:to_s).include?(applicant.family_member_id.to_s)
+    # This method checks if the applicant is enrolled in the given enrollment.
+    # returns Boolean
+    def applicant_enrolled?(applicant, enrollment)
+      enrollment.hbx_enrollment_members.any? { |member| member.applicant_id.to_s == applicant.family_member_id.to_s }
     end
 
     def add_verification_history(action, update_reason, updated_by)
