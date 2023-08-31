@@ -488,7 +488,7 @@ jobs:
         with:
           reports: coverage/*.xml
           targetdir: coveragereport
-          reporttypes: MHtml;Cobertura;MarkdownSummary;MarkdownSummaryGithub;Badges
+          reporttypes: Html;Cobertura;MarkdownSummary;MarkdownSummaryGithub;Badges
       - name: Display structure of downloaded files
         run: ls -R
       - name: Upload coverage report artifact
@@ -496,4 +496,6 @@ jobs:
         with:
           name: code-coverage-report
           path: coveragereport/*
+      - name: Write to Job Summary
+        run: cat SummaryGithub.md >> $GITHUB_STEP_SUMMARY
 
