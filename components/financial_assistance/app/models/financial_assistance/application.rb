@@ -877,7 +877,7 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => [:record_transition, :create_tax_household_groups, :send_determination_to_ea, :create_evidences, :publish_application_determined] do
+      event :determine, :after => [:record_transition, :create_tax_household_groups, :send_determination_to_ea, :create_evidences, :publish_application_determined, :notify_totally_ineligible_members] do
         transitions from: :submitted, to: :determined
       end
 
@@ -1024,6 +1024,14 @@ module FinancialAssistance
       ::FinancialAssistance::Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined.new.call(self)
     rescue StandardError => e
       Rails.logger.error { "FAA trigger_fdsh_calls error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
+    end
+
+    def notify_totally_ineligible_members
+      return unless any_applicants_totally_ineligible? && FinancialAssistanceRegistry.feature_enabled?(:totally_ineligible_notice)
+
+      ::FinancialAssistance::Operations::Applications::Verifications::PublishFaaTotalIneligibilityNotice.new.call(self)
+    rescue StandardError => e
+      Rails.logger.error { "FAA faa_totally_ineligible_notice error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
     def apply_aggregate_to_enrollment
@@ -1244,6 +1252,10 @@ module FinancialAssistance
 
     def all_applicants_totally_ineligible?
       active_applicants.all?(&:is_totally_ineligible)
+    end
+
+    def any_applicants_totally_ineligible?
+      active_applicants.any?(&:is_totally_ineligible)
     end
 
     def all_applicants_without_applying_for_coverage?
