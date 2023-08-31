@@ -41,7 +41,7 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignProposal, type: :model, dbcle
       }
     end
 
-    let!(:catalog_eligibility) do
+    let(:catalog_eligibility) do
       ::Operations::Eligible::CreateCatalogEligibility.new.call(
         {
           subject: benefit_market_catalog.to_global_id,
@@ -54,6 +54,8 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignProposal, type: :model, dbcle
     end
 
     before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+      catalog_eligibility
       form = described_class.new(params.merge('proposal_id' => plan_design_proposal.id.to_s))
       form.save
     end
