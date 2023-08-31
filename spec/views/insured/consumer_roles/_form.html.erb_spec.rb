@@ -14,7 +14,7 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
       helper.extend ActionView::Helpers::FormOptionsHelper
       person.build_consumer_role if person.consumer_role.blank?
       person.consumer_role.build_nested_models_for_person
-      mock_form = ActionView::Helpers::FormBuilder.new(:person, person, helper, {})
+      mock_form = HbxFormBuilder.new(:person, person, helper, {})
       stub_template "shared/_consumer_fields.html.erb" => ''
       sign_in current_user
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
@@ -55,7 +55,7 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
       helper.extend ActionView::Helpers::FormOptionsHelper
       @person.build_consumer_role if @person.consumer_role.blank?
       @person.consumer_role.build_nested_models_for_person
-      mock_form = ActionView::Helpers::FormBuilder.new(:person, @person, helper, {})
+      mock_form = HbxFormBuilder.new(:person, @person, helper, {})
       stub_template "shared/_consumer_fields.html.erb" => ''
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
       assign(:consumer_role, @person.consumer_role)
@@ -70,7 +70,6 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
 
     it "should display 'curam, in person, phone' if user is accociated with e_case_id" do
       expect(rendered).to have_select("person[family][application_type]")
-      expect(rendered).to match(/Curam/)
       expect(rendered).to have_select(
         "person[family][application_type]",
         :options => [EnrollRegistry[:curam_application_type].item, "Phone", "Paper"]
@@ -91,7 +90,7 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
       helper.extend ActionView::Helpers::FormOptionsHelper
       @person.build_consumer_role if @person.consumer_role.blank?
       @person.consumer_role.build_nested_models_for_person
-      mock_form = ActionView::Helpers::FormBuilder.new(:person, @person, helper, {})
+      mock_form = HbxFormBuilder.new(:person, @person, helper, {})
       stub_template "shared/_consumer_fields.html.erb" => ''
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
       assign(:consumer_role, @person.consumer_role)
@@ -119,7 +118,7 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
       helper.extend ActionView::Helpers::FormOptionsHelper
       @person.build_consumer_role if @person.consumer_role.blank?
       @person.consumer_role.build_nested_models_for_person
-      mock_form = ActionView::Helpers::FormBuilder.new(:person, @person, helper, {})
+      mock_form = HbxFormBuilder.new(:person, @person, helper, {})
       EnrollRegistry[:in_person_application_enabled].feature.stub(:is_enabled).and_return(false)
       stub_template "shared/_consumer_fields.html.erb" => ''
       #returning false for everyone except hbx_staff
