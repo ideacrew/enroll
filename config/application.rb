@@ -43,7 +43,8 @@ module Enroll
     config.paths.add "app/api", glob: "**/*.rb"
     config.autoload_paths += Dir["#{Rails.root}/app/api/api/*/*"]
 
-
+    # NOTE: this is configured here in addition to ApplicationController
+    # to ensure Rspec view tests use the correct form builder
     config.after_initialize do
       ActionView::Base.default_form_builder = ::HbxFormBuilder
     end
