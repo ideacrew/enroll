@@ -124,6 +124,7 @@ group :development do
 end
 
 group :development, :test do
+  gem 'pry-rails'
   gem 'dotenv-rails'
   gem 'action-cable-testing'
   gem 'addressable',             '~> 2.3'
