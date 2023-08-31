@@ -439,7 +439,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: code-coverage
-          path: ${{ github.workspace }}/coverage/cuke-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+          path: ${{ github.workspace }}/coverage/cukes-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
   quality-workbench:
     needs: [engines, benefit-sponsors, rspec, cucumber]
     if: always()
