@@ -8,12 +8,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     include FloatHelper
     include_context "setup family initial and renewal enrollments data"
 
-    let(:ivl_benefit) { double('BenefitPackage', residency_status: ['any']) }
-
-    before do
-      allow(subject).to receive(:ivl_benefit).and_return(ivl_benefit)
-    end
-
     before do
       TimeKeeper.set_date_of_record_unprotected!(current_date)
     end
@@ -22,16 +16,22 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       TimeKeeper.set_date_of_record_unprotected!(Date.today)
     end
 
-    subject do
-      enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
-      enrollment_renewal.enrollment = input_enrollment
-      enrollment_renewal.assisted = assisted
-      enrollment_renewal.aptc_values = aptc_values
-      enrollment_renewal.renewal_coverage_start = renewal_benefit_coverage_period.start_on
-      enrollment_renewal
-    end
-
     describe '#eligible_enrollment_members' do
+      let(:ivl_benefit) { double('BenefitPackage', residency_status: ['any']) }
+
+      subject do
+        enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
+        enrollment_renewal.enrollment = input_enrollment
+        enrollment_renewal.assisted = assisted
+        enrollment_renewal.aptc_values = aptc_values
+        enrollment_renewal.renewal_coverage_start = renewal_benefit_coverage_period.start_on
+        enrollment_renewal
+      end
+
+      before do
+        allow(subject).to receive(:ivl_benefit).and_return(ivl_benefit)
+      end
+
       context 'members with resident_role' do
         let(:input_enrollment) { enrollment }
       end
@@ -141,13 +141,25 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
         end
       end
-
     end
-  end
 
-  def update_age_off_excluded(fam, true_or_false)
-    fam.family_members.map(&:person).each do |per|
-      per.update_attributes!(age_off_excluded: true_or_false)
+    describe '#ivl_benefit' do
+      let(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
+      let(:benefit_package) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first }
+      let(:renewal_coverage_start) { Date.new(benefit_package.effective_year) }
+
+      subject do
+        enrollment_renewal = described_class.new
+        enrollment_renewal.enrollment = double('Enrollment', coverage_kind: 'health')
+        enrollment_renewal.renewal_coverage_start = renewal_coverage_start
+        enrollment_renewal
+      end
+
+      context 'when matching ivl benefit package exists' do
+        it 'returns ivl benefit package' do
+          expect(subject.ivl_benefit).to be_a(BenefitPackage)
+        end
+      end
     end
   end
 end

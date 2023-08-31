@@ -345,7 +345,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
     @ivl_benefit = benefit_cp.benefit_packages.detect do |bp|
       bp.effective_year == renewal_coverage_start.year && bp.benefit_categories.include?(@enrollment.coverage_kind)
-    end.first
+    end
   end
   # End: Residency Status & Citizenship Member Eligibility Checks
 
