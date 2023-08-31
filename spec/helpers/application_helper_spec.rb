@@ -908,8 +908,6 @@ describe "Enabled/Disabled IVL market" do
         expect(helper.plan_childcare_subsidy_eligible(plan)).to eq(false)
       end
     end
-
-    
   end
 
   describe 'round_down_float_two_decimals' do
