@@ -23,7 +23,7 @@ RSpec.shared_context 'family with one member and one enrollment', :shared_contex
 
   let(:person2) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
 
-  let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person) }
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let!(:family_member) { family.primary_applicant }
   let!(:family_member1) { FactoryBot.create(:family_member, family: family, person: person2) }
   let!(:renewal_product) do
