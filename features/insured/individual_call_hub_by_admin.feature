@@ -1,6 +1,6 @@
 Feature: Consumer verification process
 
-  Scenario: Consumer has determined Financial Assistance application
+  Scenario: Failed consumer esi evidence determination request
     Given the FAA feature configuration is enabled
     And FAA display_medicaid_question feature is enabled
     And FAA mec_check feature is enabled
@@ -16,3 +16,6 @@ Feature: Consumer verification process
     When evidence determination payload is failed to publish
     Then Admin should see the error message unable to submited request
     And Admin should see the esi evidence state as attested
+    And Admin clicks on esi evidence action dropdown
+    Then Admin navigates to view history section
+    Then Admin should see the failed request recorded in the view history table

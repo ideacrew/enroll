@@ -151,6 +151,15 @@ Then(/^Individual should see view history option/) do
   expect(page).to have_content('View History')
 end
 
+Then(/^Admin navigates to view history section/) do
+  expect(page).to have_content('View History')
+  find(:xpath, IvlDocumentsPage.view_history_option).click
+end
+
+Then(/^Admin should see the failed request recorded in the view history table/) do
+  expect(page).to have_content("Hub request failed")
+end
+
 And(/^Individual clicks on verify/) do
   find(:xpath, IvlDocumentsPage.verify_option).click
 end
