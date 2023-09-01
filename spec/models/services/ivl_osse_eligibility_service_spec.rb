@@ -87,7 +87,7 @@ RSpec.describe Services::IvlOsseEligibilityService, type: :model, :dbclean => :a
       result = subject.store_osse_eligibility(role, "true", TimeKeeper.date_of_record)
 
       expect(result.success?).to be_truthy
-      expect(result.success.effective_on) .to eq TimeKeeper.date_of_record.beginning_of_year
+      expect(result.success.effective_on).to eq TimeKeeper.date_of_record.beginning_of_year
     end
 
     it "returns Failure if operation fails" do

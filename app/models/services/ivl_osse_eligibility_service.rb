@@ -58,9 +58,7 @@ module Services
         current_eligibility_status = eligibility&.is_eligible_on?(effective_on)&.to_s || 'false'
         next if current_eligibility_status == osse_eligibility.to_s
 
-        if eligibility&.is_eligible_on?(effective_on) && (osse_eligibility.to_s == 'false')
-          effective_on = get_eligibility_end_date(year.to_i, eligibility)
-        end
+        effective_on = get_eligibility_end_date(year.to_i, eligibility) if eligibility&.is_eligible_on?(effective_on) && (osse_eligibility.to_s == 'false')
 
         result = store_osse_eligibility(role, osse_eligibility, effective_on)
         eligibility_result[year] = result.success? ? "Success" : "Failure"
@@ -71,9 +69,7 @@ module Services
     # rubocop:enable Metrics/CyclomaticComplexity
 
     def store_osse_eligibility(role, osse_eligibility, effective_on)
-      if EnrollRegistry.feature_enabled?("aca_ivl_osse_effective_beginning_of_year") && osse_eligibility.to_s == "true"
-        effective_on = effective_on.beginning_of_year
-      end
+      effective_on = effective_on.beginning_of_year if EnrollRegistry.feature_enabled?("aca_ivl_osse_effective_beginning_of_year") && osse_eligibility.to_s == "true"
       ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new.call(
         {
           subject: role.to_global_id,
