@@ -101,7 +101,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
           result = income_evidence.request_determination(action, update_reason, updated_by)
           income_evidence.reload
 
-          expect(result).to be_success
+          expect(result).to be_truthy
           expect(income_evidence.verification_histories).to be_present
 
           history = income_evidence.verification_histories.first
@@ -232,6 +232,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
           allow(evidence_verification_request).to receive(:call).and_return(Dry::Monads::Success({}))
           allow(Operations::Fdsh::RequestEvidenceDetermination).to receive(:new).and_return(evidence_verification_request)
           esi_evidence.update_attributes!(aasm_state: 'unverified')
+          income_evidence.update_attributes!(aasm_state: 'unverified')
           @result = esi_evidence.request_determination(action, update_reason, updated_by)
           esi_evidence.reload
         end
@@ -240,8 +241,12 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
           expect(@result).to be_truthy
         end
 
-        it 'should change evidence aasm_state to pending' do
+        it 'should change esi evidence aasm_state to pending' do
           expect(esi_evidence).to have_state(:pending)
+        end
+
+        it 'should not change income evidence aasm_state to pending' do
+          expect(income_evidence).not_to have_state(:pending)
         end
 
         it 'should create verification history for the requested call' do
@@ -272,6 +277,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
         context 'with an applicant without an active enrollment' do
           before do
             esi_evidence.update_attributes!(aasm_state: 'unverified')
+            income_evidence.update_attributes!(aasm_state: 'unverified')
             @result = esi_evidence.request_determination(action, update_reason, updated_by)
             esi_evidence.reload
           end
@@ -280,8 +286,12 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
             expect(@result).to be_falsey
           end
 
-          it 'should change evidence aasm_state to attested' do
+          it 'should change esi evidence aasm_state to attested' do
             expect(esi_evidence).to have_state(:attested)
+          end
+
+          it 'should not change income evidence aasm_state to attested' do
+            expect(income_evidence).not_to have_state(:attested)
           end
 
           it 'should create history for requested call' do
