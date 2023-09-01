@@ -40,6 +40,11 @@ module BenefitSponsors
         eligibility_result = {}
 
         args[:osse].each do |year, osse_eligibility|
+          current_year = TimeKeeper.date_of_record.year
+          if year.to_i < (current_year - 1)
+            eligibility_result[year] = "Failure"
+            next
+          end
           effective_on = effective_on_for_year(year.to_i)
           active_eligibility = benefit_sponsorship.active_eligibility_on(effective_on)
           current_eligibility_status = active_eligibility.present?
