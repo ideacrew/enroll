@@ -390,6 +390,7 @@ end
 
 And(/^Broker HC4CC feature enabled$/) do
   EnrollRegistry[:aca_shop_osse_eligibility].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry["aca_shop_osse_eligibility_#{TimeKeeper.date_of_record.year}".to_sym].feature.stub(:is_enabled).and_return(true)
   EnrollRegistry[:broker_quote_osse_eligibility].feature.stub(:is_enabled).and_return(true)
 end
 
