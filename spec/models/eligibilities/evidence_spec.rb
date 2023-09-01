@@ -245,8 +245,8 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
           expect(esi_evidence).to have_state(:pending)
         end
 
-        it 'should not change income evidence aasm_state to pending' do
-          expect(income_evidence).not_to have_state(:pending)
+        it 'should not change income evidence aasm_state to unverified' do
+          expect(income_evidence).to have_state(:unverified)
         end
 
         it 'should create verification history for the requested call' do
