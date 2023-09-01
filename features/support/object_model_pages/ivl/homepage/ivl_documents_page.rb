@@ -23,6 +23,10 @@ class IvlDocumentsPage
     "//div[@class='selectric-scroll']/ul/li[contains(text(), 'View History')]"
   end
 
+  def self.call_hub_option
+    "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Call HUB')]"
+  end
+
   def self.verify_option
     "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Verify')]"
   end
