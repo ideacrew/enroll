@@ -71,7 +71,7 @@ module Eligibilities
       payload = payload.value!
       headers = self.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: application.id }
 
-      request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: headers)
+      request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: headers.merge!(payload_format))
       return false unless request_event.success?
       response = request_event.value!.publish
 
@@ -82,6 +82,15 @@ module Eligibilities
       end
       self.save
       response
+    end
+
+    def payload_format
+      case self.key
+      when :non_esi_mec
+        { non_esi_payload_format: EnrollRegistry[:non_esi_h31].setting(:payload_format).item }
+      else
+        {}
+      end
     end
 
     def add_verification_history(action, update_reason, updated_by)
