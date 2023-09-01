@@ -91,7 +91,7 @@ module BenefitSponsors
 
     describe "#update_osse_eligibilities_by_year" do
       it "updates osse eligibilities by year" do
-        allow(subject).to receive(:store_osse_eligibility).and_return("Success")
+        allow(subject).to receive(:store_osse_eligibility).and_return(double("eligibility", success?: true))
         result = subject.update_osse_eligibilities_by_year
         expect(result).to eq({ "Success" => [current_date.year.to_s]})
       end
@@ -111,13 +111,13 @@ module BenefitSponsors
     describe "#store_osse_eligibility" do
       it "creates or terms osse eligibility" do
         allow(::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new).to receive(:call).and_return(double("Result", success?: true))
-        result = subject.store_osse_eligibility("true", TimeKeeper.date_of_record.beginning_of_year)
-        expect(result).to eq("Success")
+        result = subject.store_osse_eligibility("true", TimeKeeper.date_of_record)
+        expect(result.success?).to be_truthy
       end
 
       it "returns Failure if operation fails" do
         result = subject.store_osse_eligibility("true", Date.today.to_s)
-        expect(result).to eq("Failure")
+        expect(result.success?).to be_falsy
       end
     end
   end
