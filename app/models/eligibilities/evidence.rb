@@ -64,8 +64,12 @@ module Eligibilities
       "events.individual.eligibilities.application.applicant.#{self.key}_evidence_updated"
     end
 
-    # This method requests a determination for the evidence and updates the verification history accordingly.
-    # Returns the response object if successful, false otherwise.
+    # Requests a determination of the evidence's status from the Federal Data Services Hub (FDSH).
+    #
+    # @param action_name [String] The name of the action that triggered the request.
+    # @param update_reason [String] The reason for the update.
+    # @param updated_by [String, nil] The name of the user who updated the evidence.
+    # @return [Boolean] `true` if the request was successful and the evidence's status was updated; `false` otherwise.
     def request_determination(action_name, update_reason, updated_by = nil)
       add_verification_history(action_name, update_reason, updated_by)
 
@@ -86,16 +90,14 @@ module Eligibilities
       end
     end
 
-    # This method sets the evidence to the attested state for the following types of evidence:
-    # - esi_mec
-    # - non_esi_mec
-    # - local_mec
+    # Sets the evidence's status to "attested" for the following types of evidence:
+    ### :esi_mec, :non_esi_mec and :local_mec
     def determine_mec_evidence_aasm_status(applicant)
       applicant.set_evidence_attested(self)
     end
 
-    # This method sets the evidence to the attested state for the following types of evidence:
-    # - income
+    # Sets the Income evidence's status to "outstanding" if the applicant is enrolled in any APTC or CSR enrollments;
+    # otherwise, sets the evidence's status to "negative response".
     def determine_income_evidence_aasm_status(applicant)
       family_id = applicant.application.family_id
       enrollments = HbxEnrollment.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, family_id: family_id)
@@ -108,8 +110,11 @@ module Eligibilities
       end
     end
 
-    # This method checks if the applicant is enrolled in any APTC or CSR enrollments.
-    # returns Boolean
+    # Checks if the applicant is enrolled in any APTC or CSR enrollments.
+    #
+    # @param applicant [Applicant] The applicant to check.
+    # @param enrollments [Array<HbxEnrollment>] The enrollments to check.
+    # @return [Boolean] `true` if the applicant is enrolled in any APTC or CSR enrollments; `false` otherwise.
     def enrolled_in_any_aptc_csr_enrollments?(applicant, enrollments)
       enrollments.any? do |enrollment|
         applicant_enrolled?(applicant, enrollment) &&
@@ -118,8 +123,6 @@ module Eligibilities
       end
     end
 
-    # This method checks if the applicant is enrolled in the given enrollment.
-    # returns Boolean
     def applicant_enrolled?(applicant, enrollment)
       enrollment.hbx_enrollment_members.any? { |member| member.applicant_id.to_s == applicant.family_member_id.to_s }
     end
