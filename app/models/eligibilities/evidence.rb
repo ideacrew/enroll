@@ -82,7 +82,7 @@ module Eligibilities
 
         false
       else
-        response
+        move_to_pending!
       end
     end
 
