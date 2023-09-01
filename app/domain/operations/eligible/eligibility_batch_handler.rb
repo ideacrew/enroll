@@ -24,10 +24,6 @@ module Operations
       @record_kind = params[:record_kind]
     end
 
-    def validate
-      logger.info '.validate Implementation Required!!'
-    end
-
     def trigger_batch_requests
       validate
       total_records = query.count
@@ -41,6 +37,7 @@ module Operations
 
         break if offset > total_records
       end
+      logger.info ".trigger_batch_request sent #{batch} batch requests"
     end
 
     def trigger_batch_request(offset)
@@ -57,7 +54,6 @@ module Operations
       {
         batch_handler: self.class.name,
         record_kind: :individual,
-        effective_date: effective_date,
         batch_options: {
           batch_size: batch_size,
           offset: offset
@@ -75,12 +71,16 @@ module Operations
         .each { |record| process_record(record) }
     end
 
+    def validate
+      raise NotImplementedError.new("This is a documentation only interface.")
+    end
+
     def process_record(record)
-      logger.info '.process_record Implementation Required!!'
+      raise NotImplementedError.new("This is a documentation only interface.")
     end
 
     def query
-      logger.info '.query Implementation Required!!'
+      raise NotImplementedError.new("This is a documentation only interface.")
     end
 
     def logger
@@ -107,7 +107,7 @@ module Operations
         errors = []
         errors << "record_kind missing" unless record_kind
         errors << "effective_date missing" unless effective_date
-  
+
         raise StandardError, errors.join(",") if errors.present?
       end
 
@@ -118,7 +118,7 @@ module Operations
 
       def process_record(record)
         subject = find_subject(record)
-        logger.info "processing hbx_id: #{record.hbx_id} of #{record.classs.to_s}"
+        logger.info "processing hbx_id: #{subject.hbx_id} of #{subject.class.to_s}"
 
         event =
           event(
@@ -133,7 +133,7 @@ module Operations
         if event.success?
           event.success.publish
         else
-          logger.error "ERROR: Event trigger failed: role hbx_id: #{record.hbx_id}"
+          logger.error "ERROR: Event trigger failed: role hbx_id: #{subject.hbx_id}"
         end
       end
 
