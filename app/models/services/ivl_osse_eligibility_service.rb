@@ -58,9 +58,12 @@ module Services
         current_eligibility_status = eligibility&.is_eligible_on?(effective_on)&.to_s || 'false'
         next if current_eligibility_status == osse_eligibility.to_s
 
-        effective_on = eligibility.effective_on if eligibility&.is_eligible_on?(effective_on) && (osse_eligibility.to_s == 'false')
+        if eligibility&.is_eligible_on?(effective_on) && (osse_eligibility.to_s == 'false')
+          effective_on = get_eligibility_end_date(year.to_i, eligibility)
+        end
 
-        eligibility_result[year] = store_osse_eligibility(role, osse_eligibility, effective_on)
+        result = store_osse_eligibility(role, osse_eligibility, effective_on)
+        eligibility_result[year] = result.success? ? "Success" : "Failure"
       end
 
       eligibility_result.group_by { |_key, value| value }.transform_values { |items| items.map(&:first) }
@@ -68,7 +71,10 @@ module Services
     # rubocop:enable Metrics/CyclomaticComplexity
 
     def store_osse_eligibility(role, osse_eligibility, effective_on)
-      result = ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new.call(
+      if EnrollRegistry.feature_enabled?("aca_ivl_osse_effective_beginning_of_year") && osse_eligibility.to_s == "true"
+        effective_on = effective_on.beginning_of_year
+      end
+      ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new.call(
         {
           subject: role.to_global_id,
           evidence_key: :ivl_osse_evidence,
@@ -76,8 +82,13 @@ module Services
           effective_date: effective_on
         }
       )
+    end
 
-      result.success? ? "Success" : "Failure"
+    def get_eligibility_end_date(year, eligibility)
+      calendar_year = TimeKeeper.date_of_record.year
+      end_on = eligibility.effective_on
+      end_on = TimeKeeper.date_of_record if year == calendar_year
+      end_on
     end
 
     def effective_on_for_year(year)

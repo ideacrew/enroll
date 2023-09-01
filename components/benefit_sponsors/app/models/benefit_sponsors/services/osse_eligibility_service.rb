@@ -23,11 +23,7 @@ module BenefitSponsors
           data[year] = {}
           effective_on = effective_on_for_year(year.to_i)
           eligibility = benefit_sponsorship.active_eligibility_on(effective_on)
-          data[year][:is_eligible] = if eligibility
-                                       true
-                                     else
-                                       false
-                                     end
+          data[year][:is_eligible] = eligibility.present? ? true : false
           application = benefit_sponsorship.benefit_applications.by_year(year).approved_and_terminated.select(&:osse_eligible?).last
           next unless application
 
@@ -49,18 +45,26 @@ module BenefitSponsors
           active_eligibility = benefit_sponsorship.active_eligibility_on(effective_on)
           current_eligibility_status = active_eligibility.present?
 
-          next if current_eligibility_status.to_s == osse_eligibility
+          next if current_eligibility_status.to_s == osse_eligibility.to_s
 
-          effective_on = active_eligibility.effective_on if osse_eligibility == "false" # FIXME
-          eligibility_result[year] = store_osse_eligibility(osse_eligibility, effective_on)
+          effective_on = get_eligibility_end_date(year.to_i, active_eligibility) if osse_eligibility.to_s == 'false'
+          result = store_osse_eligibility(osse_eligibility, effective_on)
+          eligibility_result[year] = result.success? ? "Success" : "Failure"
         end
 
         grouped_eligibilities = eligibility_result.group_by { |_year, value| value }
         grouped_eligibilities.transform_values { |items| items.map(&:first) }
       end
 
+      def get_eligibility_end_date(year, eligibility)
+        calendar_year = TimeKeeper.date_of_record.year
+        end_on = eligibility.effective_on
+        end_on = TimeKeeper.date_of_record if year == calendar_year
+        end_on
+      end
+
       def store_osse_eligibility(osse_eligibility, effective_on)
-        result = ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(
+        ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(
           {
             subject: benefit_sponsorship.to_global_id,
             evidence_key: :shop_osse_evidence,
@@ -68,7 +72,6 @@ module BenefitSponsors
             effective_date: effective_on
           }
         )
-        result.success? ? "Success" : "Failure"
       end
 
       def effective_on_for_year(year)
