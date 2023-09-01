@@ -109,8 +109,11 @@ Then(/^Individual should see cost saving documents for evidences$/) do
   expect(page).to have_content(l10n('faa.evidence_type_aces'))
 end
 
-Then(/^validate_and_record_publish_application_errors is enabled$/) do
-  EnrollRegistry[:validate_and_record_publish_application_errors].feature.stub(:is_enabled).and_return(true)
+Then(/^validate_and_record_publish_application_errors feature is (.*)$/) do |config|
+  EnrollRegistry[:validate_and_record_publish_application_errors].feature.stub(:is_enabled).and_return(config == 'enabled')
+end
+
+When(/^evidence determination payload is failed to publish$/) do
   evidence_verification_request = instance_double(Operations::Fdsh::RequestEvidenceDetermination)
   allow(evidence_verification_request).to receive(:call).and_return(Dry::Monads::Failure("test"))
   allow(Operations::Fdsh::RequestEvidenceDetermination).to receive(:new).and_return(evidence_verification_request)
