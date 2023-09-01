@@ -15,6 +15,14 @@ class IvlDocumentsPage
     '#evidence_kind_income_evidence'
   end
 
+  def self.income_evidence_row_for(name)
+    "[data-cuke='income_evidence_for_#{name.parameterize.underscore}']"
+  end
+
+  def self.esi_evidence_row_for(name)
+    "[data-cuke='esi_evidence_for_#{name.parameterize.underscore}']"
+  end
+
   def self.local_mec_evidence_actions
     "#v-action-#{@applicant.id}-local-mec"
   end
