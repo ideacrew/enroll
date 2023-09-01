@@ -1,16 +1,5 @@
 # frozen_string_literal: true
 
-# event(
-#   "events.batch_process.batch_events_requested",
-#   attributes: {
-#     batch_handler: "::Operations::Eligible::EligibilityBatchHandler",
-#     record_kind: :individual,
-#     effective_date: effective_date,
-#     batch_size: 1000,
-#   }
-# )
-# event.success.publish if event.success?
-
 module Operations
   class BatchHandler
     include EventSource::Command
