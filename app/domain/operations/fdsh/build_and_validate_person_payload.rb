@@ -23,7 +23,7 @@ module Operations
         if person.is_a?(::Person)
           Operations::Transformers::PersonTo::Cv3Person.new.call(person)
         else
-          Failure("Invalid Person Object #{person}")
+          Failure("Invalid Person Object")
         end
       end
 
