@@ -1,6 +1,6 @@
-include ::L10nHelper
-
 class HbxFormBuilder < ActionView::Helpers::FormBuilder
+  include ::L10nHelper
+
   def ssn_field(method, options = {})
     is_required = options.delete(:required) || false
     is_readonly = options.delete(:readonly) || false
