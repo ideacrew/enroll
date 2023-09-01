@@ -138,8 +138,8 @@ Then /^Admin should see the error message ([^"]*)$/ do |error_message|
 end
 
 Then /^Admin should see the esi evidence state as attested$/ do
-  txt = "//*[@id='home']/div/div/div[2]/div[2]/div[5]/div/div/div/div[2]/div[8]"
-  page.all(:xpath, txt).each do |element|
+  txt = IvlDocumentsPage.esi_evidence_row_for(@applicant.full_name)
+  page.all(:css, txt).each do |element|
     expect(element).to have_selector('.label', text: 'Attested')
   end
 end
