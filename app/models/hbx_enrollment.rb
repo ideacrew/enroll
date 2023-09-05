@@ -2227,6 +2227,16 @@ class HbxEnrollment
                   guard: :prior_plan_year_coverage?
     end
 
+    # This event is used to cancel coverage for superseded terminated enrollments
+    # This is specific to Individual Market enrollments
+    # Example:
+    #   When enrollments are purchased with a retroactive effective date,
+    #   and there are terminated enrollments in the current year with the same enrollment signature,
+    #   then the terminated enrollments should be canceled.
+    event :cancel_coverage_for_superseded_term, after: :record_transition do
+      transitions from: :coverage_terminated, to: :coverage_canceled, guard: :is_ivl_by_kind?
+    end
+
     event :cancel_for_non_payment, :after => :record_transition do
       transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected,
                          :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected,
