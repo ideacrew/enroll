@@ -2,6 +2,7 @@ class Insured::GroupSelectionController < ApplicationController
   include Insured::GroupSelectionHelper
   include Config::SiteConcern
   include L10nHelper
+  include Insured::FamiliesHelper
 
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   before_action :validate_rating_address, only: [:create]
