@@ -29,6 +29,8 @@ module Operations
               next previous_enrollment if ineligible_for_termination?(previous_enrollment, enrollment)
 
               previous_enrollment.terminate_coverage!(enrollment.effective_on - 1.day)
+            elsif previous_enrollment.enrollment_superseded_and_eligible_for_cancellation?(enrollment.effective_on)
+              previous_enrollment.cancel_coverage_for_superseded_term!
             elsif previous_enrollment.may_cancel_coverage?
               previous_enrollment.cancel_coverage!
             end
