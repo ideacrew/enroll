@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# new form builder that includes an SSN field method to make implementing standard
+# ssn_fields simpler and much more consistent
 class HbxFormBuilder < ActionView::Helpers::FormBuilder
   include ::L10nHelper
 
