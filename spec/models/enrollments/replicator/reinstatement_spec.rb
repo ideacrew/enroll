@@ -507,4 +507,59 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
       end
     end
   end
+
+  describe '#build' do
+    subject { described_class.new(base_enrollment, new_enrollment_effective_on) }
+
+    let(:coverage_year) { Date.today.year }
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let(:new_enrollment_effective_on) { Date.new(coverage_year, 3) }
+    let(:base_enrollment_effective_on) { new_enrollment_effective_on }
+    let(:base_enrollment_terminated_on) { base_enrollment_effective_on.end_of_month }
+    let(:base_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        :individual_unassisted,
+                        :with_silver_health_product,
+                        :with_enrollment_members,
+                        aasm_state: 'coverage_terminated',
+                        consumer_role_id: person.consumer_role.id,
+                        effective_on: base_enrollment_effective_on,
+                        enrollment_members: family.family_members,
+                        family: family,
+                        household: family.active_household,
+                        terminated_on: base_enrollment_terminated_on)
+    end
+
+    let(:prev_enr_term_to_cancel_superseded_transition) do
+      base_enrollment.workflow_state_transitions.where(
+        event: 'cancel_coverage_for_superseded_term!',
+        from_state: 'coverage_terminated',
+        to_state: 'coverage_canceled'
+      ).first
+    end
+
+    context "when:
+      - base_enrollment is terminated
+      - base_enrollment's effective_on greater than or equal to new_effective_on
+      - RR configuration feature :cancel_superseded_terminated_enrollments is enabled
+      " do
+
+      before do
+        allow(
+          EnrollRegistry[:cancel_superseded_terminated_enrollments].feature
+        ).to receive(:is_enabled).and_return(true)
+
+        subject.build
+      end
+
+      it 'transitions enrollment to canceled state' do
+        expect(base_enrollment.reload.coverage_canceled?).to be_truthy
+      end
+
+      it 'transitions enrollment via cancel_coverage_for_superseded_term' do
+        expect(prev_enr_term_to_cancel_superseded_transition).to be_truthy
+      end
+    end
+  end
 end
