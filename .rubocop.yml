@@ -109,7 +109,7 @@ Style/BlockComments:
   Enabled: false
 
 Style/Documentation:
-  Enabled: false
+  Enabled: true
 
 Style/EachWithObject:
   Enabled: false
