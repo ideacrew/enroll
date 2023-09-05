@@ -73,6 +73,31 @@ When(/the user registers as an individual$/) do
   find(IvlPersonalInformation.continue_btn).click
 end
 
+When(/the user registers as an individual with invalid SSN$/) do
+  fill_in IvlPersonalInformation.first_name, :with => (@u.first_name :first_name)
+  fill_in IvlPersonalInformation.last_name, :with => (@u.last_name :last_name)
+  fill_in IvlPersonalInformation.dob, :with => (@u.adult_dob :adult_dob)
+  fill_in IvlPersonalInformation.ssn, :with => "999-00-1234"
+  find(IvlPersonalInformation.male_radiobtn).click
+  find(IvlPersonalInformation.continue_btn).click
+end
+
+Then(/^Individual sees the error message (.*)$/) do |error_message|
+  page.should have_content(error_message)
+end
+
+Then(/^Individual should not see the error message (.*)$/) do |error_message|
+  expect(page).not_to have_content(error_message)
+end
+
+When(/^validate SSN feature is (.*)$/) do |feature|
+  if feature == "enabled"
+    stub_const('Forms::ConsumerCandidate::SSN_REGEX', /^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$/)
+  else
+    stub_const('Forms::ConsumerCandidate::SSN_REGEX', /\A\d{9}\z/)
+  end
+end
+
 And(/the user will have to accept alert pop up for missing field$/) do
   sleep 1
   page.driver.browser.switch_to.alert.accept

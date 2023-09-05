@@ -38,7 +38,7 @@ class FindOrCreateInsuredPerson
           return
         end
       else
-        person, is_new = Person.create(
+        person = Person.create(
           user: user,
           name_pfx: context.name_pfx,
           first_name: context.first_name,
@@ -48,7 +48,16 @@ class FindOrCreateInsuredPerson
           ssn: context.ssn,
           no_ssn: context.no_ssn,
           dob: context.dob,
-          gender: context.gender), true
+          gender: context.gender
+        )
+
+        if person.persisted?
+          is_new = true
+        else
+          context.person = nil
+          context.is_new = nil
+          return
+        end
       end
     else
       # what am I doing here?  More than one person had the same SSN?
