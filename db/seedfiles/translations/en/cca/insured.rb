@@ -277,6 +277,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.insured.verification_information' => "We verify the information you give us using electronic data sources. If the data sources do not match the information you gave us, we need you to provide documents to prove what you told us.",
   :'en.date_of_birth' => "Date Of Birth",
   :'en.social_security' => "Social Security",
+  :'en.social_security_invalid' => "Invalid Social Security number.",
   :'en.relationship' => "Relationship",
   :'en.gender' => "Gender",
   :'en.kind' => "Kind",

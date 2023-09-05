@@ -21,7 +21,7 @@ class HbxFormBuilder < ActionView::Helpers::FormBuilder
         method,
         options.merge(
           pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}",
-          oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
+          oninvalid: "this.setCustomValidity('#{l10n('social_security_invalid')}')",
           oninput: "this.setCustomValidity('')"
         ).merge(
           shared_options

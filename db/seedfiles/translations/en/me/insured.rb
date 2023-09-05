@@ -334,6 +334,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.verification_information' => "We verify the information you give us using electronic data sources. If the data sources do not match the information you gave us, we need you to provide documents to prove what you told us.",
   :'en.date_of_birth' => "Date Of Birth",
   :'en.social_security' => "Social Security",
+  :'en.social_security_invalid' => "Invalid Social Security number.",
   :'en.relationship' => "Relationship",
   :'en.gender' => "Sex",
   :'en.kind' => "Kind",
