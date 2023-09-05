@@ -307,12 +307,21 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
                           renewal_product_id: renewal_product.id)
       end
 
+      let(:dental_benefit_package) do
+        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each do |bcp|
+          bcp.benefit_packages.each do |bp|
+            bp.update_attributes!(benefit_categories: ['dental'], title: "individual_dental_benefits_#{effective_on.year}")
+          end
+        end
+      end
+
       before :each do
         enrollment.expire_coverage!
         enrollment.update_attributes!(coverage_kind: 'dental',
                                       elected_aptc_pct: 0.7,
                                       applied_aptc_amount: 100.00,
                                       product_id: product.id)
+        dental_benefit_package
         @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
       end
 

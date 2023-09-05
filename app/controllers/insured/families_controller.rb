@@ -3,6 +3,7 @@ class Insured::FamiliesController < FamiliesController
   include Acapi::Notifiers
   include ::ApplicationHelper
   include Config::SiteConcern
+  include Insured::FamiliesHelper
 
   before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
@@ -275,6 +276,13 @@ class Insured::FamiliesController < FamiliesController
       @enrollment = HbxEnrollment.find(params[:hbx_enrollment_id])
     else
       @enrollment = @family.active_household.hbx_enrollments.active.last if @family.present?
+    end
+
+    family = @enrollment.family
+    unless current_user.has_hbx_staff_role? || is_family_authorized?(current_user, family) || is_broker_authorized?(current_user, family) || is_general_agency_authorized?(current_user, family)
+      flash[:error] = 'User not authorized to perform this operation'
+      redirect_to root_path
+      return
     end
 
     if @enrollment.present?
