@@ -317,11 +317,15 @@ jobs:
       - name: copy coverage report
         run: |
           cp coverage/coverage.xml ${{ github.workspace }}/coverage/${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
-      - name: Upload coverage artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: code-coverage
-          path: ${{ github.workspace }}/coverage/${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      # - name: Upload coverage artifact
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: code-coverage
+      #     path: ${{ github.workspace }}/coverage/${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
   cucumber:
     runs-on: ubuntu-latest
     services:
@@ -435,11 +439,15 @@ jobs:
       - name: copy coverage report
         run: |
           cp coverage/coverage.xml ${{ github.workspace }}/coverage/cukes-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
-      - name: Upload coverage artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: code-coverage
-          path: ${{ github.workspace }}/coverage/cukes-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+      # - name: Upload coverage artifact
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: code-coverage
+      #     path: ${{ github.workspace }}/coverage/cukes-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   quality-workbench:
     needs: [engines, benefit-sponsors, rspec, cucumber]
     if: always()
@@ -453,21 +461,16 @@ jobs:
           CHECK: ${{ matrix.check }}
         if: needs[env.CHECK].result != 'success'
         run: exit 1
-  code-coverage-summary:
-    needs: [rspec, cucumber]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Download code coverage artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: code-coverage
-          path: coverage
-      # - name: Display structure of downloaded files
-      #   run: ls -R
-      # - name: Display structure of downloaded files
-      #   run: ls -R
-      #   working-directory: coverage
+  # code-coverage-summary:
+  #   needs: [rspec, cucumber]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Download code coverage artifact
+  #       uses: actions/download-artifact@v3
+  #       with:
+  #         name: code-coverage
+  #         path: coverage
       # original request;
       # - name: Code Coverage Summary
       #   uses: irongut/CodeCoverageSummary@v1.3.0
@@ -479,24 +482,25 @@ jobs:
       #     hide_branch_rate: true
       # - name: Write to Job Summary
       #   run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
-      - name: Setup .NET Core # Required to execute ReportGenerator
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: 6.x
-          dotnet-quality: 'ga'
-      - name: ReportGenerator
-        uses: danielpalme/ReportGenerator-GitHub-Action@5.1.24
-        with:
-          reports: coverage/*.xml
-          targetdir: coveragereport
-          reporttypes: HtmlInline;MarkdownSummary;MarkdownSummaryGithub;Badges
-      - name: Display structure of downloaded files
-        run: ls -R
-      - name: Upload coverage report artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: code-coverage-report
-          path: coveragereport/*
-      - name: Write to Job Summary
-        run: cat coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
+      # Report Generator
+      # - name: Setup .NET Core # Required to execute ReportGenerator
+      #   uses: actions/setup-dotnet@v3
+      #   with:
+      #     dotnet-version: 6.x
+      #     dotnet-quality: 'ga'
+      # - name: ReportGenerator
+      #   uses: danielpalme/ReportGenerator-GitHub-Action@5.1.24
+      #   with:
+      #     reports: coverage/*.xml
+      #     targetdir: coveragereport
+      #     reporttypes: HtmlInline;MarkdownSummary;MarkdownSummaryGithub;Badges
+      # - name: Display structure of downloaded files
+      #   run: ls -R
+      # - name: Upload coverage report artifact
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: code-coverage-report
+      #     path: coveragereport/*
+      # - name: Write to Job Summary
+      #   run: cat coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
 
