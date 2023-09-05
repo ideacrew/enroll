@@ -316,4 +316,49 @@ RSpec.describe HbxEnrollment, type: :model do
       end
     end
   end
+
+  describe '#cancel_coverage_for_superseded_term' do
+    context "when:
+      - enrollment is of kind 'individual'
+      - enrollment is in 'coverage_terminated' state
+      " do
+
+      let(:aasm_state) { 'coverage_terminated' }
+
+      it 'transitions enrollment to canceled' do
+        expect(hbx_enrollment.may_cancel_coverage_for_superseded_term?).to be_truthy
+        hbx_enrollment.cancel_coverage_for_superseded_term!
+        expect(hbx_enrollment.reload.coverage_canceled?).to be_truthy
+      end
+    end
+
+    context "when:
+      - enrollment is of kind 'individual'
+      - enrollment is not in 'coverage_terminated' state
+      " do
+
+      it 'returns false for transition check' do
+        expect(hbx_enrollment.may_cancel_coverage_for_superseded_term?).to be_falsey
+        expect do
+          hbx_enrollment.cancel_coverage_for_superseded_term!
+        end.to raise_error(AASM::InvalidTransition)
+      end
+    end
+
+    context "when:
+      - enrollment is not of kind 'individual'
+      - enrollment is in 'coverage_terminated' state
+      " do
+
+      let(:aasm_state) { 'coverage_terminated' }
+
+      it 'returns false for transition check' do
+        allow(hbx_enrollment).to receive(:is_ivl_by_kind?).and_return(false)
+        expect(hbx_enrollment.may_cancel_coverage_for_superseded_term?).to be_falsey
+        expect do
+          hbx_enrollment.cancel_coverage_for_superseded_term!
+        end.to raise_error(AASM::InvalidTransition)
+      end
+    end
+  end
 end
