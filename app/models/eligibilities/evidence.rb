@@ -119,7 +119,7 @@ module Eligibilities
       enrollments.any? do |enrollment|
         applicant_enrolled?(applicant, enrollment) &&
           enrollment.is_health_enrollment? &&
-          (enrollment.applied_aptc_amount > 0 || ['03', '04', '05', '06'].include?(enrollment.product.csr_variant_id))
+          (enrollment.applied_aptc_amount > 0 || ['02', '04', '05', '06'].include?(enrollment.product.csr_variant_id))
       end
     end
 
