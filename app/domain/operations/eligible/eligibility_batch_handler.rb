@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Operations
+  # Batch handler for processing long running jobs
   class BatchHandler
     include EventSource::Command
 
@@ -61,22 +62,22 @@ module Operations
     end
 
     def validate
-      raise NotImplementedError.new("This is a documentation only interface.")
+      raise NotImplementedError, "This is a documentation only interface."
     end
 
-    def process_record(record)
-      raise NotImplementedError.new("This is a documentation only interface.")
+    def process_record(_record)
+      raise NotImplementedError, "This is a documentation only interface."
     end
 
     def query
-      raise NotImplementedError.new("This is a documentation only interface.")
+      raise NotImplementedError, "This is a documentation only interface."
     end
 
     def logger
       return @logger if defined?(@logger)
       @logger =
         Logger.new(
-          "#{Rails.root}/log/on_#{self.class.name.demodulize.underscore}_#{TimeKeeper.date_of_record.strftime("%Y_%m_%d")}.log"
+          "#{Rails.root}/log/on_#{self.class.name.demodulize.underscore}_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
         )
     end
   end
@@ -107,7 +108,7 @@ module Operations
 
       def process_record(record)
         subject = find_subject(record)
-        logger.info "processing hbx_id: #{subject.hbx_id} of #{subject.class.to_s}"
+        logger.info "processing hbx_id: #{subject.hbx_id} of #{subject.class}"
 
         event =
           event(
