@@ -894,7 +894,9 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
 
           eligibility_2022.tap do |e|
             expect(e.is_eligible).to be_truthy
-            expect(e.effective_on.to_date).to eq eligibilities[1].start_on.to_date
+            expect(e.effective_on.to_date).to eq eligibilities[
+                 1
+               ].start_on.to_date
             expect(e.evidences.last.current_state).to eq :approved
             expect(e.evidences.last.state_histories.pluck(:to_state)).to eq %i[
                  not_approved
@@ -912,6 +914,112 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
                  not_approved
                  approved
                ]
+          end
+        end
+
+        context ".scenario 3 (multiple eligibility records present)" do
+          let(:options1) do
+            {
+              "_id" => BSON.ObjectId("639a09db1632a300106da7ab"),
+              "start_on" => DateTime.parse("2022-12-14 00:00:00 UTC"),
+              "eligibility_id" => BSON.ObjectId("5f231ad0cc35a87379edab16"),
+              "eligibility_type" =>
+                "BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
+              "updated_at" => DateTime.parse("2022-12-14 17:37:31 UTC"),
+              "created_at" => DateTime.parse("2022-12-14 17:37:31 UTC"),
+              "subject" => {
+                "_id" => BSON.ObjectId("639a09db1632a300106da7ac"),
+                "title" => "Subject for Osse Subsidy",
+                "key" => benefit_sponsorship.to_global_id,
+                "klass" =>
+                  "BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
+                "updated_at" => DateTime.parse("2022-12-14 17:37:31 UTC"),
+                "created_at" => DateTime.parse("2022-12-14 17:37:31 UTC")
+              },
+              "evidences" => [
+                {
+                  "_id" => BSON.ObjectId("639a09db1632a300106da7ad"),
+                  "key" => :osse_subsidy,
+                  "title" => "Evidence for Osse Subsidy",
+                  "is_satisfied" => false,
+                  "updated_at" => DateTime.parse("2022-12-14 17:37:31 UTC"),
+                  "created_at" => DateTime.parse("2022-12-14 17:37:31 UTC")
+                }
+              ]
+            }
+          end
+
+          let(:options2) do
+            {
+              "_id" => BSON.ObjectId("639a0bb59590da0010b53f6e"),
+              "start_on" => DateTime.parse("2022-12-14 00:00:00 UTC"),
+              "eligibility_id" => BSON.ObjectId("5f231ad0cc35a87379edab16"),
+              "eligibility_type" =>
+                "BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
+              "updated_at" => DateTime.parse("2022-12-14 17:45:25 UTC"),
+              "created_at" => DateTime.parse("2022-12-14 17:45:25 UTC"),
+              "subject" => {
+                "_id" => BSON.ObjectId("639a0bb59590da0010b53f6f"),
+                "title" => "Subject for Osse Subsidy",
+                "key" => benefit_sponsorship.to_global_id,
+                "klass" =>
+                  "BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
+                "updated_at" => DateTime.parse("2022-12-14 17:45:25 UTC"),
+                "created_at" => DateTime.parse("2022-12-14 17:45:25 UTC")
+              },
+              "evidences" => [
+                {
+                  "_id" => BSON.ObjectId("639a0bb59590da0010b53f70"),
+                  "key" => :osse_subsidy,
+                  "title" => "Evidence for Osse Subsidy",
+                  "is_satisfied" => false,
+                  "updated_at" => DateTime.parse("2022-12-14 17:45:25 UTC"),
+                  "created_at" => DateTime.parse("2022-12-14 17:45:25 UTC")
+                }
+              ]
+            }
+          end
+
+          context "when eligibility active last year" do
+            let(:eligibilities) do
+              [options1, options2].collect do |options|
+                Eligibilities::Osse::Eligibility.new(options)
+              end
+            end
+
+            it "should migrate eligibility record and create renewal eligibility" do
+              result =
+                described_class.new.call(
+                  current_eligibilities: eligibilities,
+                  eligibility_type:
+                    "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+                )
+
+              expect(result.success).to be_truthy
+              benefit_sponsorship.reload
+              expect(benefit_sponsorship.eligibilities).to be_present
+              expect(benefit_sponsorship.eligibilities.count).to eq 1
+
+              eligibility_2022 =
+                benefit_sponsorship
+                .eligibilities
+                .by_key(:aca_shop_osse_eligibility_2022)
+                .first
+
+              eligibility_2022.tap do |e|
+                expect(e.is_eligible).to be_falsey
+                # expect(e.effective_on.to_date).to eq eligibilities[
+                #      1
+                #    ].start_on.to_date
+                expect(e.evidences.last.current_state).to eq :denied
+                expect(
+                  e.evidences.last.state_histories.pluck(:to_state)
+                ).to eq %i[not_approved denied denied]
+                # expect(
+                #   e.evidences.last.state_histories.pluck(:from_state)
+                # ).to eq %i[initial not_approved denied]
+              end
+            end
           end
         end
       end

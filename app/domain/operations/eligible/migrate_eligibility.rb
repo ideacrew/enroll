@@ -50,6 +50,9 @@ module Operations
 
         last_eligibility = values[:current_eligibilities].max_by(&:updated_at)
         return if last_eligibility.end_on.present?
+        evidence_satisfied = last_eligibility.evidences.last&.is_satisfied.to_s
+        return if evidence_satisfied == "false"
+
         renewal_eligibility =
           ::Eligibilities::Osse::Eligibility.new(
             renewal_eligibility_params(last_eligibility)
