@@ -166,9 +166,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
           @result = subject.call(renewal_year: renewal_year)
         end
 
-        it 'should return only family ids with determined applications that are eligible for redetermination' do
-          expect(@result.success.count).to eq 1
-          expect(@result.success.first).to eq family.id
+        it 'returns family ids with all determined apps irrespective of application eligibility' do
+          expect(@result.success.count).to eq 2
+          expect(@result.success).to include(family.id)
+          expect(@result.success).to include(family2.id)
         end
       end
     end
