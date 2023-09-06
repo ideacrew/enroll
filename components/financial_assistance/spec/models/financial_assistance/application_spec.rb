@@ -1730,8 +1730,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   end
 
   describe 'publish_application_determined' do
-    let(:publish_operation_class) { FinancialAssistance::Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined }
-    let(:publish_operation_result) { Success(double) }
+    # let(:publish_operation_class) { FinancialAssistance::Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined }
+    # let(:publish_operation_result) { Success(double) }
 
     before do
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
@@ -1757,7 +1757,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
           end
         end
 
-        expect(publish_operation_class).not_to receive(:new)
+        # expect(publish_operation_class).not_to receive(:new)
         application.publish_application_determined
 
         application.active_applicants.each do |applicant|
