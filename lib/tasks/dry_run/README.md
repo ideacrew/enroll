@@ -225,7 +225,30 @@ rake dry_run:reports:all[2024]
 #### Expectations
 
 The following reports are generated for the given year:
+
 - Application Renewal Reports
   - Summary of all financial assistance applications that should be renewed. (`dry_run/renewal_eligible_families_[year].csv`)
   - Summary of all financial assistance applications that were renewed. (`dry_run/renewal_eligible_families_who_renewed_[year].csv`)
   - Summary of all financial assistance applications that were not renewed with possible causes. (`dry_run/renewal_eligible_families_who_did_not_renew_[year].csv`)
+
+## Development
+
+It is encouraged to add new tasks to simulate new processes. Here are some guidelines to follow:
+
+- **Modular and flexible**: Tasks should be modular and flexible such that you can run individual tasks or groups of tasks to test specific processes.
+- **Repeatable**: Tasks should be repeatable such that you can run the same tasks multiple times to test and verify the system's behavior.
+- **Reversible**: Tasks should be reversible such that you can undo the effects of the dry run process.
+- **Customizable**: Tasks should be customizable such that you can specify options to customize the dry run process.
+- **Extensible**: Tasks should be extensible such that you can add new tasks to simulate new processes.
+- **Robust**: Tasks should be robust such that they provide helpful error messages and suggestions for resolving issues.
+- **Informative**: Tasks should be informative such that they generate reports to summarize the results of the dry run process.
+- **Easy to use**: Tasks should be easy to use such that they provide a top level task to run the entire dry run process.
+- **Well documented**: Top level tasks should be well documented such that they provide helpful information about their usages, steps, and expectations.
+  This documentation serves as a source of truth for the dry run process.
+- **Well maintained**: Tasks should be well maintained such that they are kept up to date with the latest changes to the system.
+- **Well organized**: Tasks should be well organized and named such that they are easy to find and understand.
+
+## Notes
+
+- Many of the tasks are useful outside of the dry run process. For example, `dry_run:data:create_all` is useful for creating all necessary data for `dry_run:commands:open_enrollment` when testing features depended on open enrollment.
+  We should consider moving these tasks to a more appropriate namespace.
