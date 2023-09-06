@@ -26,7 +26,7 @@ namespace :dry_run do
 
         # Create CSV files with headers
         to_csv(renewal_eligible_file, "w+") { |csv| csv << csv_headers }
-        to_csv(renewal_not_renewed_file, "w+") { |csv| csv << csv_headers }
+        to_csv(renewal_not_renewed_file, "w+") { |csv| csv << csv_headers.concat(%w[errors]) }
         to_csv(renewal_renewed_file, "w+") { |csv| csv << csv_headers.concat(%w[application_hbx_id aasm_state]) }
 
         each_renewal_eligible_app year do |app|
@@ -37,7 +37,7 @@ namespace :dry_run do
           if renewed_family_ids.include?(app.family_id)
             to_csv(renewal_renewed_file) { |csv| csv << csv_data.concat([app.hbx_id, app.aasm_state]) }
           else
-            to_csv(renewal_not_renewed_file) { |csv| csv << csv_data }
+            to_csv(renewal_not_renewed_file) { |csv| csv << csv_data.concat([application_renewal_errors(app)]) }
           end
 
         end
@@ -125,6 +125,25 @@ namespace :dry_run do
           yield app
         end
       end
+    end
+
+    # Try and find any know issues with the application that would prevent it from being renewed.
+    def application_renewal_errors(app)
+      errors = []
+      errors << missing_in_state_address(app)
+      errors << missing_relationships(app)
+      errors.compact.join("\n")
+    end
+
+    def missing_in_state_address(app)
+      message = "Family primary applicant is missing an in-state address."
+      # @todo - get state from config and only check if ff is enabled
+      # app.family.primary_applicant.person.addresses.where(state: "DC").empty? ? message : nil
+    end
+
+    def missing_relationships(app)
+      missing = app.find_missing_relationships
+      "Family members are missing relationships: #{missing}." unless missing.empty?
     end
   end
 end

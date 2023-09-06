@@ -27,8 +27,12 @@ namespace :dry_run do
     task :renew_applications, [:year] => :environment do |_t, args|
       year = args[:year].to_i
       log "Beginning renewal process for #{year}"
+      # The renewals requests are published by the following command.
       result = FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::RequestAll.new.call({ renewal_year: year })
-      log "Renewal process for #{year} - #{result_type(result)}", result_message(result)
+      # The renewal requests are picked up by the renewal worker and the actual renewal results logged to the following file.
+      results_log_file = "/log/on_enroll_applications_aptc_csr_credits_renewals_renewal_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+
+      log "Renewal process for #{year} - #{result_type(result)}", "Results logged to #{results_log_file}"
     end
 
     desc "Run enrollment renewals for a given year"
@@ -44,8 +48,11 @@ namespace :dry_run do
     task :determine_applications, [:year] => :environment do |_t, args|
       year = args[:year].to_i
       log "Beginning determination process for #{year}"
+      # The determination requests are published by the following command.
       result = FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::DetermineAll.new.call({ renewal_year: year })
-      log "Determination process for #{year} - #{result_type(result)}", result_message(result)
+      # The determination requests are picked up by the determination worker and the actual determination results logged to the following file.
+      results_log_file = "/log/on_magi_medicaid_applications_aptc_csr_credits_renewals_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+      log "Determination process for #{year} - #{result_type(result)}", "Results logged to #{results_log_file}"
     end
 
     desc "Run the post-renewals notice triggers for a given year"

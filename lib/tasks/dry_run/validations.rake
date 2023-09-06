@@ -7,6 +7,23 @@ namespace :dry_run do
     validate_environment(year)
   end
 
+  task :validation_help => :environment do
+    help = "Before running a dry run certain conditions must be met.\n" \
+      "Some conditions can be validated automatically and others must be validated manually.\n" \
+      "The difference is if the condition can be checked within Enroll or it is a part of another system.\n" \
+      "Automatically validated conditions will raise an error and exit if not valid.\n" \
+      "Manually validated conditions will only log warning to remind you to validate them.\n\n" \
+      "Those that are validated automatically are:\n" \
+      "  - Income thresholds must be present for the given year\n" \
+      "  - Date of record must be in the previous year to the given year\n" \
+      "Those that must be validated manually are:\n" \
+      "  - Affordability thresholds must be set for the given year\n\n" \
+      "Usage: rake dry_run:validations[year]\n" \
+      "Example: rake dry_run:validations[2024]\n" \
+
+      puts help
+  end
+
   def validate_environment(year)
     log "Validating the environment for #{year}"
 
@@ -32,6 +49,13 @@ namespace :dry_run do
   def validate_date_of_record(year)
     current_year = TimeKeeper.date_of_record.year
     raise ValidationFailed, "TimeKeeper.date_of_record.year is #{current_year}. Please set the date of record or dry-run year to #{year.pred}" if current_year.next != year
+  end
+
+  def warn_affordability_thresholds(year)
+    log "ATTENTION: Affordability thresholds must be set for #{year} in the following files: \n" \
+          "\t- medicaid_gateway/app/models/types.rb\n" \
+          "\t- medicaid_gateway/components/mitc_service/spec/dummy/app/models/types.rb\n\n" \
+          "Try https://www.google.com/search?q=#{year}+ACA+Affordability+Rate for the correct values."
   end
 
   class ValidationFailed < StandardError; end
