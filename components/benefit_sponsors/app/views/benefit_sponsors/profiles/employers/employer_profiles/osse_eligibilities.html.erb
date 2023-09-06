@@ -21,10 +21,11 @@
           <th style='width: 40%'>Details</th>
         </thead>
         <% shop_osse_eligibility_years_for_display.each do |year| %>
+          <% previous_year = TimeKeeper.date_of_record.year - 1 %>
           <tr style='border: 0px solid #d5d5d5; height: 50px; '>
             <td style='padding: 20px'><strong><%= year %></strong></td>
-            <td><%= radio_button_tag "eligibilities[osse][#{year}]", "true", @osse_status_by_year[year][:is_eligible], class: "radio-button",  disabled: !pundit_allow(HbxProfile, :can_edit_osse_eligibility?) %></td>
-            <td><%= radio_button_tag "eligibilities[osse][#{year}]", "false", !@osse_status_by_year[year][:is_eligible], class: "radio-button", disabled: !pundit_allow(HbxProfile, :can_edit_osse_eligibility?) %></td>
+            <td><%= radio_button_tag "eligibilities[osse][#{year}]", "true", @osse_status_by_year[year][:is_eligible], class: "radio-button",  disabled: !pundit_allow(HbxProfile, :can_edit_osse_eligibility?) || (year < previous_year) %></td>
+            <td><%= radio_button_tag "eligibilities[osse][#{year}]", "false", !@osse_status_by_year[year][:is_eligible], class: "radio-button", disabled: !pundit_allow(HbxProfile, :can_edit_osse_eligibility?) || (year < previous_year) %></td>
             <% if @osse_status_by_year[year][:start_on].present? %>
               <td><%= "#{@osse_status_by_year[year][:start_on].to_s} - #{@osse_status_by_year[year][:end_on].to_s}" %></td>
             <% end %>

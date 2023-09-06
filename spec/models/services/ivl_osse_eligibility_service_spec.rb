@@ -63,27 +63,37 @@ RSpec.describe Services::IvlOsseEligibilityService, type: :model, :dbclean => :a
 
   describe "#update_osse_eligibilities_by_year" do
     it "updates osse eligibilities by year" do
-      allow(subject).to receive(:store_osse_eligibility).and_return("Success")
+      allow(subject).to receive(:store_osse_eligibility).and_return(double("eligibility", success?: true))
 
       result = subject.update_osse_eligibilities_by_year
 
       expect(result).to eq({ "Success" => [current_date.year.to_s]})
     end
+
+    context "when the year is more than 1 year old" do
+      let(:old_year) { TimeKeeper.date_of_record.year - 2 }
+      let(:params_1) { {person_id: person.id, osse: { old_year.to_s => "true" } } }
+      let(:subject_1) { described_class.new(params_1) }
+
+      it "should not update osse eligibility" do
+        result = subject_1.update_osse_eligibilities_by_year
+        expect(result).to eq({ "Failure" => [old_year.to_s]})
+      end
+    end
   end
 
   describe "#store_osse_eligibility" do
     it "persist osse eligibility" do
-      allow(::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new).to receive(:call).and_return(double("Result", success?: true))
+      result = subject.store_osse_eligibility(role, "true", TimeKeeper.date_of_record)
 
-      result = subject.store_osse_eligibility(role, "true", TimeKeeper.date_of_record.beginning_of_year)
-
-      expect(result).to eq("Success")
+      expect(result.success?).to be_truthy
+      expect(result.success.effective_on).to eq TimeKeeper.date_of_record.beginning_of_year
     end
 
     it "returns Failure if operation fails" do
-      result = subject.store_osse_eligibility(role, "true", Date.today.to_s)
+      result = subject.store_osse_eligibility(role, "", TimeKeeper.date_of_record)
 
-      expect(result).to eq("Failure")
+      expect(result.success?).to be_falsy
     end
   end
 end
