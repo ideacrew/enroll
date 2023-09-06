@@ -283,4 +283,30 @@ describe Forms::ConsumerCandidate, "ssn validations" do
       expect(subject.errors.messages.present?).to eq false
     end
   end
+
+  context 'when ssn is blank' do
+    context "no_ssn is '1'" do
+      subject do
+        Forms::ConsumerCandidate.new({:dob => "2012-10-12", :ssn => nil, :no_ssn => "1", :first_name => "yo", :last_name => "guy",
+                                      :gender => "m", :user_id => 20, :is_applying_coverage => "true" })
+      end
+
+      it "does not add any errors" do
+        subject.ssn_or_checkbox
+        expect(subject.errors).to be_empty
+      end
+    end
+
+    context "no_ssn is '0'" do
+      subject do
+        Forms::ConsumerCandidate.new({:dob => "2012-10-12", :ssn => nil, :no_ssn => "0", :first_name => "yo", :last_name => "guy",
+                                      :gender => "m", :user_id => 20, :is_applying_coverage => "true" })
+      end
+
+      it "adds an error" do
+        subject.ssn_or_checkbox
+        expect(subject.errors[:base]).to include("Enter a valid social security number or select 'I don't have an SSN'")
+      end
+    end
+  end
 end
