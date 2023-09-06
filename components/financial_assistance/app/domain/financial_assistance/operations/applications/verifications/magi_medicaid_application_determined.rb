@@ -22,6 +22,7 @@ module FinancialAssistance
           private
 
           def build_event(payload, application_id, local_mec_check)
+            binidng.irb
             headers = local_mec_check ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: application_id }
             event('events.iap.applications.magi_medicaid_application_determined', attributes: payload.to_h, headers: headers)
           end
