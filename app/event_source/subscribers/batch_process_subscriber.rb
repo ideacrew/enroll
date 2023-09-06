@@ -20,7 +20,7 @@ module Subscribers
       subscriber_logger.info "BatchProcessSubscriber, response: #{payload}"
       logger.info "BatchProcessSubscriber payload: #{payload}" unless Rails.env.test?
 
-      batch_handler = payload[:batch_hander].constantize
+      batch_handler = payload[:batch_handler].constantize
       batch_handler.new(payload).trigger_batch_requests
 
       ack(delivery_info.delivery_tag)
@@ -46,7 +46,7 @@ module Subscribers
       subscriber_logger.info "BatchProcessSubscriber#on_enroll_enterprise_events, response: #{payload}"
       logger.info "BatchProcessSubscriber#on_enroll_enterprise_events payload: #{payload}" unless Rails.env.test?
 
-      batch_handler = payload[:batch_hander].constantize
+      batch_handler = payload[:batch_handler].constantize
       batch_handler.new(payload).process_batch_request(payload[:batch_options])
 
       ack(delivery_info.delivery_tag)
