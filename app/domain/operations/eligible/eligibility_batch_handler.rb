@@ -42,7 +42,7 @@ module Operations
     def batch_request_options(offset)
       {
         batch_handler: self.class.name,
-        record_kind: :individual,
+        record_kind: record_kind,
         batch_options: {
           batch_size: batch_size,
           offset: offset
