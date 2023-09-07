@@ -136,11 +136,11 @@ And(/^Admin clicks confirm$/) do
   find('.v-type-confirm-button').click
 end
 
-Then /^Admin should see the error message ([^"]*)$/ do |error_message|
+Then(/^Admin should see the error message ([^"]*)$/) do |error_message|
   expect(page).to have_content(error_message)
 end
 
-Then /^Admin should see the esi evidence state as attested$/ do
+Then(/^Admin should see the esi evidence state as attested$/) do
   txt = IvlDocumentsPage.esi_evidence_row_for(@applicant.full_name)
   page.all(:css, txt).each do |element|
     expect(element).to have_selector('.label', text: 'Attested')
