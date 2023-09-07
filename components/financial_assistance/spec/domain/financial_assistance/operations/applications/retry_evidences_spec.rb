@@ -48,8 +48,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::RetryEvidences, 
   context 'success' do
     context 'with valid params submitted and cv3 valid application' do
       before do
-        allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Success.new(application))
-        allow(::AcaEntities::MagiMedicaid::Operations::InitializeApplication).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Success.new(application.attributes))
+        allow(::Operations::Fdsh::RequestEvidenceDetermination).to receive_message_chain('new.call').with(income_evidence).and_return(Dry::Monads::Result::Success.new(application))
 
         @result = subject.call(test_params)
         applicant.reload
@@ -69,6 +68,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::RetryEvidences, 
 
     context 'with cv3 invalid application' do
       before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
+
         allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Failure.new(application))
         @result = subject.call(test_params)
         applicant.reload
@@ -79,10 +81,18 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::RetryEvidences, 
       end
 
       it 'should add a verification history recording the retry failure' do
-        history = applicant.income_evidence.verification_histories.last
-        expect(history.action).to eq("retry")
-        expect(history.update_reason).to eq("Failed to construct payload")
-        expect(history.updated_by).to eq("system")
+        first_history = applicant.income_evidence.verification_histories.first
+        last_history = applicant.income_evidence.verification_histories.last
+
+        # This test had to be slightly altered due to the new way of handling evidence histories
+        # We want to record both the attempt at the determination, as well as the failure if it fails
+        expect(first_history.action).to eq("retry")
+        expect(first_history.update_reason).to include(test_params[:update_reason])
+        expect(first_history.updated_by).to eq("system")
+
+        expect(last_history.action).to eq("Hub Request Failed")
+        expect(last_history.update_reason).to include("Evidence Determination Request Failed")
+        expect(last_history.updated_by).to eq("system")
       end
     end
   end
