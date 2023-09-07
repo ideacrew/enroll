@@ -23,7 +23,13 @@ module FinancialAssistance
 
           def build_event(payload, application_id, local_mec_check)
             headers = local_mec_check ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: application_id }
-            event('events.iap.applications.magi_medicaid_application_determined', attributes: payload.to_h, headers: headers)
+            event('events.iap.applications.magi_medicaid_application_determined', attributes: payload.to_h, headers: headers.merge!(payload_format))
+          end
+
+          def payload_format
+            {
+              non_esi_payload_format: EnrollRegistry[:non_esi_h31].setting(:payload_format).item
+            }
           end
 
           def publish(event)
