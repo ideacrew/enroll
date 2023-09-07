@@ -2909,14 +2909,14 @@ class HbxEnrollment
   #   - Checks if the enrollment is of kind individual market
   #   - Checks if the previous enrollment is in terminated state
   #   - Checks if the new enrollment has an effective_on date
-  #   - Checks if the new enrollment's effective_on is same as the current year
+  #   - Checks if the new enrollment's effective_on is same as the current enrollment's effective_on year
   #   - Checks if the previous enrollment can be canceled via event 'cancel_coverage_for_superseded_term'
   #   - The base/previous enrollment must have the same signature as the new enrollment, which is checked before calling this method
   def enrollment_superseded_and_eligible_for_cancellation?(new_effective_on)
     EnrollRegistry.feature_enabled?(:cancel_superseded_terminated_enrollments) &&
       coverage_terminated? &&
       new_effective_on.present? &&
-      new_effective_on.year == TimeKeeper.date_of_record.year &&
+      new_effective_on.year == effective_on.year &&
       may_cancel_coverage_for_superseded_term?
   end
 

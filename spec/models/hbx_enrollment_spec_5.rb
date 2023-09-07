@@ -394,7 +394,7 @@ RSpec.describe HbxEnrollment, type: :model do
       - enrollment is of kind individual market
       - enrollment is terminated
       - new effective exists
-      - new effective on's year is same as system year
+      - new effective on's year is same as enrollment's effective_on's year
       " do
 
       it 'returns true' do
@@ -409,7 +409,7 @@ RSpec.describe HbxEnrollment, type: :model do
       - enrollment is of kind individual market
       - enrollment is terminated
       - new effective exists
-      - new effective on's year is same as system year
+      - new effective on's year is same as enrollment's effective_on's year
       " do
 
       let(:feature_enabled) { false }
@@ -426,7 +426,7 @@ RSpec.describe HbxEnrollment, type: :model do
       - enrollment is not of kind individual market
       - enrollment is terminated
       - new effective exists
-      - new effective on's year is same as system year
+      - new effective on's year is same as enrollment's effective_on's year
       " do
 
       let(:kind) { 'employer_sponsored' }
@@ -443,7 +443,7 @@ RSpec.describe HbxEnrollment, type: :model do
       - enrollment is of kind individual market
       - enrollment is not terminated
       - new effective exists
-      - new effective on's year is same as system year
+      - new effective on's year is same as enrollment's effective_on's year
       " do
 
       let(:aasm_state) { 'coverage_selected' }
@@ -476,7 +476,7 @@ RSpec.describe HbxEnrollment, type: :model do
       - enrollment is of kind individual market
       - enrollment is not terminated
       - new effective exists
-      - new effective on's year is not same as system year
+      - new effective on's year is not same as enrollment's effective_on's year
       " do
 
       let(:new_effective_on) { TimeKeeper.date_of_record.next_year }
