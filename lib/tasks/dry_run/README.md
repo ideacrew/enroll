@@ -231,6 +231,10 @@ The following reports are generated for the given year:
   - Summary of all financial assistance applications that were renewed. (`dry_run/renewal_eligible_families_who_renewed_[year].csv`)
   - Summary of all financial assistance applications that were not renewed with possible causes. (`dry_run/renewal_eligible_families_who_did_not_renew_[year].csv`)
 
+## Logging
+
+The dry run process logs all steps and results to the file `dry_run/dry_run.log`. This log file is useful for debugging issues and verifying results.
+
 ## Development
 
 It is encouraged to add new tasks to simulate new processes. Here are some guidelines to follow:
@@ -240,7 +244,7 @@ It is encouraged to add new tasks to simulate new processes. Here are some guide
 - **Reversible**: Tasks should be reversible such that you can undo the effects of the dry run process.
 - **Customizable**: Tasks should be customizable such that you can specify options to customize the dry run process.
 - **Extensible**: Tasks should be extensible such that you can add new tasks to simulate new processes.
-- **Robust**: Tasks should be robust such that they provide helpful error messages and suggestions for resolving issues.
+- **Robust**: Tasks should be robust such that they provide helpful error messages and suggestions for resolving issues. Use the `log` method found in `lib/dry_run/helpers.rb` to log messages.
 - **Informative**: Tasks should be informative such that they generate reports to summarize the results of the dry run process.
 - **Easy to use**: Tasks should be easy to use such that they provide a top level task to run the entire dry run process.
 - **Well documented**: Top level tasks should be well documented such that they provide helpful information about their usages, steps, and expectations.
