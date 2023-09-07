@@ -2863,6 +2863,7 @@ class HbxEnrollment
     return if lcsp.nil?
 
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(self)
+    sponsored_cost_calculator.action = :calc_childcare_subsidy
     member_groups_lcsp = sponsored_cost_calculator.groups_for_products([lcsp])
 
     member_enrollment = member_groups_lcsp[0].group_enrollment.member_enrollments.detect{ |me| me.member_id.to_s == hbx_enrollment_member.id.to_s }
