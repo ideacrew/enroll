@@ -68,6 +68,7 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignProposal, type: :model, dbcle
         osse_eligibility = benefit_sponsorship.reload.eligibility_on(plan_design_proposal.effective_date)
         expect(osse_eligibility).to be_present
         expect(osse_eligibility.is_eligible_on?(plan_design_proposal.effective_date)).to be_truthy
+        expect(plan_design_proposal.osse_eligibility.present?).to eq true
       end
     end
 
@@ -93,6 +94,7 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignProposal, type: :model, dbcle
           plan_design_proposal.effective_date
         )
         expect(osse_eligibility.is_eligible_on?(plan_design_proposal.effective_date)).to be_falsey
+        expect(plan_design_proposal.osse_eligibility.present?).to eq false
       end
     end
   end
