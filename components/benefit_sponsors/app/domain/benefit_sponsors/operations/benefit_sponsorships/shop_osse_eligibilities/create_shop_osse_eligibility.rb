@@ -42,6 +42,7 @@ module BenefitSponsors
             errors << "effective date missing" unless params[:effective_date].is_a?(::Date)
             @subject = GlobalID::Locator.locate(params[:subject])
             errors << "subject missing or not found for #{params[:subject]}" unless @subject.present?
+            errors << "subject should belong to shop market" unless subject.market_kind == :aca_shop
 
             errors.empty? ? Success(params) : Failure(errors)
           end
