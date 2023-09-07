@@ -226,14 +226,11 @@ rake dry_run:reports:all[2024]
 
 The following reports are generated for the given year:
 
-- Application Renewal Reports
-  - Summary of all financial assistance applications that should be renewed. (`dry_run/renewal_eligible_families_[year].csv`)
-  - Summary of all financial assistance applications that were renewed. (`dry_run/renewal_eligible_families_who_renewed_[year].csv`)
-  - Summary of all financial assistance applications that were not renewed with possible causes. (`dry_run/renewal_eligible_families_who_did_not_renew_[year].csv`)
-
+- Application re-determination report
+  - Summary of all financial assistance applications that should be renewed, their redetermination results, and possible issues. (`dry_run_report/redetermination_report_[year].csv`)
 ## Logging
 
-The dry run process logs all steps and results to the file `dry_run/dry_run.log`. This log file is useful for debugging issues and verifying results.
+The dry run process logs all steps and results to the file `dry_run_report/dry_run.log`. This log file is useful for a summary of results, and debugging issues.
 
 ## Development
 

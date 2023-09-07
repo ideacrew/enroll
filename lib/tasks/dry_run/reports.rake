@@ -6,51 +6,39 @@ namespace :dry_run do
     desc "run all reports for a given year"
     task :all, [:year] => :environment do |_t, args|
       year = args[:year].to_i
-      Rake::Task['dry_run:reports:application_renewals'].invoke(year)
-      # Not yet implemented
-      # Rake::Task['dry_run:reports:determinations'].invoke(year)
+      Rake::Task['dry_run:reports:redeterminations'].invoke(year)
       # Rake::Task['dry_run:reports:notices'].invoke(year)
     end
 
-    desc "Run the renewal report for a given year"
-    task :application_renewals, [:year] => :environment do |_t, args|
+    desc "Run the redetermination report for a given year"
+    task :redeterminations, [:year] => :environment do |_t, args|
       year = args[:year].to_i
-      benchmark "Running renewal report for #{year}." do
-        renewal_eligible_file = "renewal_eligible_families_#{year}"
-        renewal_not_renewed_file = "renewal_eligible_families_who_did_not_renew_#{year}"
-        renewal_renewed_file = "renewal_eligible_families_who_renewed_#{year}"
-        renewed_family_ids = ::FinancialAssistance::Application.by_year(year).pluck(:family_id)
+      total_eligible = 0
+      total_renewed = 0
+      total_determined = 0
+      benchmark "Running re-determination report for #{year}." do
+        report_file = "redetermination_report_#{year}"
+        # We are reporting on the renewal eligible application and the actual renewed application if it exists.
+        csv_headers = %W[family_id primary_applicant.person_hbx_id primary_applicant.full_name #{year.pred}_application_hbx_id #{year.pred}_aasm_state #{year}_application_hbx_id #{year}_application_aasm_state redetermination_errors]
 
-        # Define CSV headers
-        csv_headers = %w[family_id primary_applicant.person_hbx_id primary_applicant.full_name]
+        to_csv(report_file, "w+") { |csv| csv << csv_headers }
 
-        # Create CSV files with headers
-        to_csv(renewal_eligible_file, "w+") { |csv| csv << csv_headers }
-        to_csv(renewal_not_renewed_file, "w+") { |csv| csv << csv_headers.concat(%w[errors]) }
-        to_csv(renewal_renewed_file, "w+") { |csv| csv << csv_headers.concat(%w[application_hbx_id aasm_state]) }
-
+        # For each renewal eligible application, see if there is a renewed application and if so, what is the status. If there is no renewal application, log the errors. Either way, log the renewal eligible application.
         each_renewal_eligible_app year do |app|
-          csv_data = [app.family_id, app.primary_applicant.person_hbx_id, app.primary_applicant.full_name]
+          renewed_app = ::FinancialAssistance::Application.by_year(year).where(family_id: app.family_id)&.first
+          errors = renewed_app&.is_determined? ? nil : redetermination_errors(app)
+          csv_data = [app.family_id, app.primary_applicant.person_hbx_id, app.primary_applicant.full_name, app.hbx_id, app.aasm_state, renewed_app&.hbx_id, renewed_app&.aasm_state, errors]
 
-          to_csv(renewal_eligible_file) { |csv| csv << csv_data }
+          to_csv(report_file) { |csv| csv << csv_data }
 
-          if renewed_family_ids.include?(app.family_id)
-            to_csv(renewal_renewed_file) { |csv| csv << csv_data.concat([app.hbx_id, app.aasm_state]) }
-          else
-            to_csv(renewal_not_renewed_file) { |csv| csv << csv_data.concat([application_renewal_errors(app)]) }
-          end
-
+          total_eligible += 1
+          total_renewed += 1 if renewed_app.present?
+          total_determined += 1 if renewed_app&.is_determined?
         end
 
-        log "Finished renewal report for #{args[:year]}."
+        log "Total applications eligible for renewal: #{total_eligible}", "Total applications renewed: #{total_renewed}", "Total applications determined: #{total_determined}"
+        log "Finished re-determination report for #{args[:year]}."
       end
-    end
-
-    desc "run the determinations report for a given year"
-    task :determinations, [:year] => :environment do |_t, args|
-      # who should have been determined
-      # who was determined
-      # who was not determined
     end
 
     desc "run the notices report for a given year"
@@ -127,23 +115,15 @@ namespace :dry_run do
       end
     end
 
-    # Try and find any know issues with the application that would prevent it from being renewed.
-    def application_renewal_errors(app)
-      errors = []
-      errors << missing_in_state_address(app)
-      errors << missing_relationships(app)
-      errors.compact.join("\n")
+    # Try and find any know issues with the application that would prevent it from being renewed or re-determined.
+    def redetermination_errors(app)
+      # Mirrors the validations from the application model. We need to do this manually because we want all possible errors, not just the first one.
+      # enroll/components/financial_assistance/app/models/financial_assistance/application.rb#is_application_valid?
+      app.required_attributes_valid?
+      app.relationships_complete?
+      app.applicants_have_valid_addresses?
+      app.errors.full_messages.join('\n')
     end
 
-    def missing_in_state_address(app)
-      message = "Family primary applicant is missing an in-state address."
-      # @todo - get state from config and only check if ff is enabled
-      # app.family.primary_applicant.person.addresses.where(state: "DC").empty? ? message : nil
-    end
-
-    def missing_relationships(app)
-      missing = app.find_missing_relationships
-      "Family members are missing relationships: #{missing}." unless missing.empty?
-    end
   end
 end
