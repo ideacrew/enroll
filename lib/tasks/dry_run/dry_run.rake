@@ -49,7 +49,7 @@ namespace :dry_run do
     Rake::Task['dry_run:commands:notify'].invoke(year)
 
     # Step 9: Generate reports for the dry run. Once all applications and enrollments are renewed and notifications are sent, generate reports to verify the expected results.
-    Rake::Task['dry_run:reports:all'].invoke(year)
+    Rake::Task['dry_run:reports:generate'].invoke(year)
   end
 
   desc "Display the path to the readme with usage, descriptions, steps, and expectations."

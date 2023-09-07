@@ -27,6 +27,30 @@ def log_to_file(*message)
   end
 end
 
+def dry_run_start_date
+  File.foreach(file_path("dry_run.log")) do |line|
+    # datetime_format = "%Y-%m-%d %H:%M:%S.%L"
+    # Example: 2021-03-31 15:00:00.000
+    # Make sure this matches the format used in log_to_file
+    datetime_match = line.match(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}/)
+    next unless datetime_match
+
+    datetime_string = datetime_match[0]
+    begin
+      datetime = datetime_string ? DateTime.parse(datetime_string) : DateTime.now
+      return datetime
+    rescue ArgumentError
+      # Ignore invalid datetime strings
+    end
+  end
+
+  nil # No valid datetime matching the format found
+end
+
+def dry_run_end_date
+  DateTime.now
+end
+
 def file_path(file_name)
   Dir.mkdir(root_path) unless Dir.exist?(root_path)
   "#{root_path}#{file_name.to_s}"
@@ -36,7 +60,7 @@ def root_path
   "#{Rails.root}/dry_run_report/"
 end
 
-def to_csv(file_name, mode="a+", &block)
+def to_csv(file_name, mode = "a+", &block)
   CSV.open(file_path("#{file_name}.csv"), mode, &block)
 end
 
