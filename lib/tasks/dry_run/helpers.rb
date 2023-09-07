@@ -21,7 +21,7 @@ end
 def log_to_file(*message)
   File.open(file_path("dry_run.log"), 'a+') do |f|
     f.write("-" * 80 + "\n")
-    f.write(DateTime.now.to_s + "\n")
+    f.write(DateTime.now.strftime("%Y-%m-%d %H:%M:%S.%L") + "\n")
     message.each { |m| f.write("#{m}\n") }
     f.write("-" * 80 + "\n")
   end
