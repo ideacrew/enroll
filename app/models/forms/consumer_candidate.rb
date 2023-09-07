@@ -38,8 +38,11 @@ module Forms
     def ssn_or_checkbox
       return unless is_applying_coverage? # Override SSN/Checkbox validations if is_applying_coverage is "false"
 
-      return errors.add(:base, "Enter a valid social security number or select 'I don't have an SSN'") if ssn.blank? && no_ssn == "0"
-      errors.add(:base, l10n("invalid_ssn")) unless ssn.match?(SSN_REGEX)
+      if ssn.present?
+        errors.add(:base, l10n("invalid_ssn")) unless ssn.match?(SSN_REGEX)
+      elsif no_ssn == "0"
+        errors.add(:base, "Enter a valid social security number or select 'I don't have an SSN'")
+      end
     end
 
     def is_applying_coverage?

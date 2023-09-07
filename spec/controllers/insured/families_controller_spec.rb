@@ -1437,6 +1437,27 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         expect(assigns(:plan)).to be_kind_of(UnassistedPlanCostDecorator)
       end
     end
+
+    context 'when a user does not have access' do
+      let(:other_person) { FactoryBot.create(:person, :with_family)}
+      let(:other_user) { FactoryBot.create(:user, person: other_person) }
+
+      before :each do
+        allow(::HbxEnrollmentSponsoredCostCalculator).to receive(:new).with(hbx_enrollment).and_return(spon_cal)
+        allow(spon_cal).to receive(:groups_for_products).with([hbx_enrollment.product]).and_return('')
+        allow(person).to receive(:primary_family).and_return(family)
+        allow(hbx_enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
+        sign_in(other_user)
+        get :purchase, params: { id: family.id,
+                                 hbx_enrollment_id: hbx_enrollment.id,
+                                 terminate: 'terminate',
+                                 "terminate_date_#{hbx_enrollment.hbx_id}": TimeKeeper.date_of_record.to_s}
+      end
+
+      it 'should redirect to root path' do
+        expect(response).to redirect_to("/")
+      end
+    end
   end
 end
 
