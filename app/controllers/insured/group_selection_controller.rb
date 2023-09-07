@@ -2,6 +2,7 @@ class Insured::GroupSelectionController < ApplicationController
   include Insured::GroupSelectionHelper
   include Config::SiteConcern
   include L10nHelper
+  include Insured::FamiliesHelper
 
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   before_action :validate_rating_address, only: [:create]
@@ -246,17 +247,16 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def is_user_authorized?
-    is_authorized = false
-    hbx_enrollment_id = params.require(:hbx_enrollment_id)
-    return if current_user.has_hbx_staff_role?
-    return if is_broker_authorized?(current_user, hbx_enrollment_id)
-    return if is_general_agency_authorized?(current_user, hbx_enrollment_id)
+    redirect_to root_path if current_user.blank? || params[:hbx_enrollment_id].blank?
+
+    family = HbxEnrollment.where(id: params[:hbx_enrollment_id]).first&.family
+    redirect_to root_path if family.blank?
+
+    return if current_user.has_hbx_staff_role? || is_family_authorized?(current_user, family) || is_broker_authorized?(current_user, family) || is_general_agency_authorized?(current_user, family)
+
     error_message = 'User not authorized to perform this operation'
-    is_authorized = current_user.person.primary_family.hbx_enrollments.where(id: hbx_enrollment_id).present? if current_user.person&.primary_family
-    unless is_authorized
-      flash[:error] = error_message
-      redirect_to root_path
-    end
+    flash[:error] = error_message
+    redirect_to root_path
   rescue StandardError => e
     # The code should robustly handle all authorization use cases, but it's important to understand that there may be exceptional scenarios where we encounter
     # difficulties in identifying the user and their enrollment relationship.
@@ -276,9 +276,7 @@ class Insured::GroupSelectionController < ApplicationController
            end
     family_member_ids = @family.family_members.active.map(&:id)
 
-    market_kind = @market_kind == "shop" ? "shop" : get_ivl_market_kind(@person)
-
-    rule = InsuredEligibleForBenefitRule.new(role, @benefit, {family: @family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: market_kind, shopping_family_members_ids: family_member_ids})
+    rule = InsuredEligibleForBenefitRule.new(role, @benefit, {family: @family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: get_ivl_market_kind(@person), shopping_family_members_ids: family_member_ids})
 
     is_ivl_coverage, errors = rule.satisfied?
     person = family_member.person

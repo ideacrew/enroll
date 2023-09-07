@@ -185,8 +185,6 @@ class Person
 
   validates :encrypted_ssn, uniqueness: true, allow_blank: true
 
-  validate :is_ssn_composition_correct?
-
   validate :is_only_one_individual_role_active?
 
   validates :gender,
@@ -1310,38 +1308,7 @@ class Person
     end
   end
 
-  def fetch_writing_agents_for_employee_role
-    writing_agents = []
-    if has_active_employee_role?
-      active_employee_roles.each do |role|
-        writing_agents << role.employer_profile&.active_broker_agency_account&.writing_agent&.id
-      end
-    end
-    writing_agents
-  end
-
   private
-  def is_ssn_composition_correct?
-    # Invalid compositions:
-    #   All zeros or 000, 666, 900-999 in the area numbers (first three digits);
-    #   00 in the group number (fourth and fifth digit); or
-    #   0000 in the serial number (last four digits)
-
-    if ssn.present?
-      invalid_area_numbers = %w(000 666)
-      invalid_area_range = 900..999
-      invalid_group_numbers = %w(00)
-      invalid_serial_numbers = %w(0000)
-
-      return false if ssn.to_s.blank?
-      return false if invalid_area_numbers.include?(ssn.to_s[0,3])
-      return false if invalid_area_range.include?(ssn.to_s[0,3].to_i)
-      return false if invalid_group_numbers.include?(ssn.to_s[3,2])
-      return false if invalid_serial_numbers.include?(ssn.to_s[5,4])
-    end
-
-    true
-  end
 
   def is_only_one_individual_role_active?
     if self.is_consumer_role_active? && self.is_resident_role_active?

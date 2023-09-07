@@ -665,6 +665,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       context 'has living_outside_state feature disabled' do
         before do
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:living_outside_state).and_return(false)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
           allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:has_medicare_cubcare_eligible).and_return(false)
           applicant.update_attributes!({is_temporarily_out_of_state: nil})
         end
@@ -1038,6 +1039,187 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
     end
   end
 
+  describe '#valid_family_relationships' do
+    let!(:applicant2) do
+      FactoryBot.create(:applicant,
+                        application: application,
+                        dob: Date.today - 38.years,
+                        is_primary_applicant: false,
+                        family_member_id: BSON::ObjectId.new)
+    end
+
+    let!(:applicant3) do
+      FactoryBot.create(:applicant,
+                        application: application,
+                        dob: Date.today - 38.years,
+                        is_primary_applicant: false,
+                        family_member_id: BSON::ObjectId.new)
+    end
+
+    context "spousal relationships" do
+
+      context "invalid spousal relationships" do
+        let!(:relationship_1) do
+          application.ensure_relationship_with_primary(applicant2, 'spouse')
+          applicant.save!
+        end
+
+        let!(:relationship_2) do
+          application.add_or_update_relationships(applicant2, applicant3, 'siblings')
+          applicant2.save!
+        end
+
+        let!(:relationship_3) do
+          application.add_or_update_relationships(applicant3, applicant, 'domestic_partner')
+          applicant3.save!
+        end
+
+        it "returns false" do
+          expect(applicant.valid_spousal_relationship?).to eq false
+        end
+      end
+
+      context "valid spousal relationships" do
+
+        let!(:relationship_1) do
+          application.ensure_relationship_with_primary(applicant2, 'spouse')
+          application.reload
+        end
+
+        let!(:relationship_2) do
+          application.add_or_update_relationships(applicant2, applicant3, 'parent')
+          applicant2.save!
+        end
+
+        let!(:relationship_3) do
+          application.add_or_update_relationships(applicant3, applicant, 'child')
+          applicant3.save!
+        end
+
+        it "returns true" do
+          expect(applicant.valid_spousal_relationship?).to eq true
+        end
+      end
+    end
+
+    context "child relationships" do
+
+      context "invalid child relationships" do
+
+        let!(:relationship_1) do
+          application.ensure_relationship_with_primary(applicant2, 'domestic_partner')
+          application.reload
+        end
+
+        let!(:relationship_2) do
+          application.add_or_update_relationships(applicant2, applicant3, 'parent')
+          applicant2.save!
+        end
+
+        let!(:relationship_3) do
+          application.add_or_update_relationships(applicant3, applicant, 'unrelated')
+          applicant3.save!
+        end
+
+        it "returns false" do
+          expect(applicant3.valid_family_relationships?).to eql(false)
+        end
+      end
+
+      context "valid child relationships" do
+
+        let!(:relationship_1) do
+          application.ensure_relationship_with_primary(applicant2, 'domestic_partner')
+          application.reload
+        end
+
+        let!(:relationship_2) do
+          application.add_or_update_relationships(applicant2, applicant3, 'parent')
+          applicant2.save!
+        end
+
+        let!(:relationship_3) do
+          application.add_or_update_relationships(applicant3, applicant, 'child_of_domestic_partner')
+          applicant3.save!
+        end
+
+        it "returns true" do
+          expect(applicant.valid_family_relationships?).to eql(true)
+        end
+      end
+    end
+
+    context "in-law relationships" do
+      let!(:applicant4) do
+        FactoryBot.create(:applicant,
+                          application: application,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+
+      let!(:applicant5) do
+        FactoryBot.create(:applicant,
+                          application: application,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: false,
+                          family_member_id: BSON::ObjectId.new)
+      end
+
+      context "invalid in-law relationships" do
+        let(:set_up_relationships) do
+          application.ensure_relationship_with_primary(applicant2, 'child')
+          application.ensure_relationship_with_primary(applicant3, 'spouse')
+          application.ensure_relationship_with_primary(applicant4, 'sibling')
+          application.ensure_relationship_with_primary(applicant5, 'unrelated')
+          application.add_or_update_relationships(applicant2, applicant3, 'child')
+          application.add_or_update_relationships(applicant2, applicant4, 'nephew_or_niece')
+          application.add_or_update_relationships(applicant2, applicant5, 'nephew_or_niece')
+          application.add_or_update_relationships(applicant3, applicant4, 'brother_or_sister_in_law')
+          application.add_or_update_relationships(applicant3, applicant5, 'unrelated')
+          application.add_or_update_relationships(applicant4, applicant5, 'spouse')
+
+          application.build_relationship_matrix
+          application.save(validate: false)
+        end
+
+        before do
+          set_up_relationships
+        end
+
+        it "returns false" do
+          expect(applicant5.valid_family_relationships?).to eql(false)
+        end
+      end
+
+      context "valid in-law relationships" do
+        let(:set_up_relationships) do
+          application.ensure_relationship_with_primary(applicant2, 'child')
+          application.ensure_relationship_with_primary(applicant3, 'spouse')
+          application.ensure_relationship_with_primary(applicant4, 'sibling')
+          application.ensure_relationship_with_primary(applicant5, 'brother_or_sister_in_law')
+          application.add_or_update_relationships(applicant2, applicant3, 'child')
+          application.add_or_update_relationships(applicant2, applicant4, 'nephew_or_niece')
+          application.add_or_update_relationships(applicant2, applicant5, 'nephew_or_niece')
+          application.add_or_update_relationships(applicant3, applicant4, 'brother_or_sister_in_law')
+          application.add_or_update_relationships(applicant3, applicant5, 'brother_or_sister_in_law')
+          application.add_or_update_relationships(applicant4, applicant5, 'spouse')
+
+          application.build_relationship_matrix
+          application.save(validate: false)
+        end
+
+        before do
+          set_up_relationships
+        end
+
+        it "returns true" do
+          expect(applicant5.valid_family_relationships?).to eql(true)
+        end
+      end
+    end
+  end
+
   describe '#is_spouse_of_primary' do
     let!(:applicant2) do
       FactoryBot.create(:applicant,
@@ -1095,6 +1277,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         expect(applicant2.is_spouse_of_primary).to eq(false)
       end
     end
+
 
     context 'when is_spouse_of_primary id called for primary_applicant' do
       it 'should return false' do
@@ -1364,103 +1547,141 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
   end
 
   describe 'enrolled_with' do
-    let(:person) { FactoryBot.create(:person, :with_consumer_role)}
-    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-    let(:product) {double(id: '123', csr_variant_id: '01')}
+    context 'a product with csr_variant_id of 01' do
+      let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+      let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+      let(:product) {double(id: '123', csr_variant_id: '01')}
 
-    let!(:enrollment) do
-      FactoryBot.create(
-        :hbx_enrollment,
-        :with_enrollment_members,
-        :individual_assisted,
-        family: family,
-        applied_aptc_amount: Money.new(44_500),
-        consumer_role_id: person.consumer_role.id,
-        enrollment_members: family.family_members
-      )
-    end
+      let!(:enrollment) do
+        FactoryBot.create(
+          :hbx_enrollment,
+          :with_enrollment_members,
+          :individual_assisted,
+          family: family,
+          applied_aptc_amount: Money.new(44_500),
+          consumer_role_id: person.consumer_role.id,
+          enrollment_members: family.family_members
+        )
+      end
 
-    let!(:applicant) do
-      FactoryBot.create(:financial_assistance_applicant,
-                        application: application,
-                        dob: Date.today - 38.years,
-                        is_primary_applicant: false,
-                        family_member_id: family.family_members.first.id)
-    end
+      let!(:applicant) do
+        FactoryBot.create(:financial_assistance_applicant,
+                          application: application,
+                          dob: Date.today - 38.years,
+                          is_primary_applicant: false,
+                          family_member_id: family.family_members.first.id)
+      end
 
-    before do
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
-      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
-      allow(enrollment).to receive(:product).and_return(product)
-      applicant.create_evidences
-      applicant.create_eligibility_income_evidence
-      applicant.income_evidence.move_to_pending!
-    end
-
-    context "when aptc is applied on enrolment member" do
       before do
-        enrollment.hbx_enrollment_members.each {|hem| hem.applied_aptc_amount = 150 }
-        enrollment.save!
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
+        allow(enrollment).to receive(:product).and_return(product)
+        applicant.create_evidences
+        applicant.create_eligibility_income_evidence
+        applicant.income_evidence.move_to_pending!
       end
 
-      context "when evidence is in pending state" do
-        it "move to outstanding state" do
-          applicant.enrolled_with(enrollment)
-          FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
-            evidence = applicant.send(evidence_type)
-            expect(evidence.outstanding?).to eq true
-            expect(evidence.due_on).to eq applicant.schedule_verification_due_on
+      context "when aptc is applied on enrolment member" do
+        before do
+          enrollment.hbx_enrollment_members.each {|hem| hem.applied_aptc_amount = 150 }
+          enrollment.save!
+        end
+
+        context "when evidence is in pending state" do
+          it "move to outstanding state" do
+            applicant.enrolled_with(enrollment)
+            FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+              evidence = applicant.send(evidence_type)
+              expect(evidence.outstanding?).to eq true
+              expect(evidence.due_on).to eq applicant.schedule_verification_due_on
+            end
+          end
+        end
+
+        context "when evidence is in negative_response_received state" do
+          it "move to outstanding state" do
+            FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+              evidence = applicant.send(evidence_type)
+              evidence.negative_response_received!
+            end
+
+            applicant.enrolled_with(enrollment)
+
+            FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+              evidence = applicant.send(evidence_type)
+              expect(evidence.outstanding?).to eq true
+              expect(evidence.due_on).to eq applicant.schedule_verification_due_on
+            end
           end
         end
       end
 
-      context "when evidence is in negative_response_received state" do
-        it "move to outstanding state" do
-          FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
-            evidence = applicant.send(evidence_type)
-            evidence.negative_response_received!
+      # Added to test changes of which csr codes can determine the aasm_state of an evidence
+      # Recently (08/30/2023) a bug was discovered in which csr code '03' should have been changed to 'csr_02'
+      context 'enrolled with a product with a specific csr code' do
+        # income evidence is only being used as an example here -- this can be applied to
+        let(:product_csr_02) {double(id: '124', csr_variant_id: '02')}
+        let(:product_csr_03) {double(id: '125', csr_variant_id: '03')}
+        let(:evidence) { applicant.income_evidence }
+
+        before do
+          # need to set aptc amount to 0 to ensure only csr codes being evaluated against
+          enrollment.update(applied_aptc_amount: 0)
+        end
+
+        context 'with a csr_variant_id of 02' do
+          before do
+            allow(enrollment).to receive(:product).and_return(product_csr_02)
           end
 
-          applicant.enrolled_with(enrollment)
+          it 'moves evidence to an outstanding state' do
+            applicant.enrolled_with(enrollment)
+            expect(evidence.aasm_state).to eq('outstanding')
+          end
+        end
 
-          FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
-            evidence = applicant.send(evidence_type)
-            expect(evidence.outstanding?).to eq true
-            expect(evidence.due_on).to eq applicant.schedule_verification_due_on
+        context 'with a csr_variant_id of 03' do
+          before do
+            allow(enrollment).to receive(:product).and_return(product_csr_03)
+          end
+
+          it 'moves evidence to a negative_response_received state' do
+            applicant.enrolled_with(enrollment)
+            expect(evidence.aasm_state).to eq('negative_response_received')
           end
         end
       end
-    end
 
-    context "when aptc & csr are not applied on enrollment member" do
-      context "when evidence is in pending state" do
-        it "move to outstanding" do
-          applicant.enrolled_with(enrollment)
-          FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
-            evidence = applicant.send(evidence_type)
-            expect(evidence.outstanding?).to eq true
-            expect(evidence.negative_response_received?).to eq false
-            expect(evidence.due_on).to eq applicant.schedule_verification_due_on
+      context "when aptc & csr are not applied on enrollment member" do
+        context "when evidence is in pending state" do
+          it "move to outstanding" do
+            applicant.enrolled_with(enrollment)
+            FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+              evidence = applicant.send(evidence_type)
+              expect(evidence.outstanding?).to eq true
+              expect(evidence.negative_response_received?).to eq false
+              expect(evidence.due_on).to eq applicant.schedule_verification_due_on
+            end
           end
         end
-      end
 
-      context "when evidence is in negative_response_received state" do
-        it "will move to outstanding" do
-          FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
-            evidence = applicant.send(evidence_type)
-            evidence.negative_response_received!
-          end
+        context "when evidence is in negative_response_received state" do
+          it "will move to outstanding" do
+            FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+              evidence = applicant.send(evidence_type)
+              evidence.negative_response_received!
+            end
 
-          applicant.enrolled_with(enrollment)
+            applicant.enrolled_with(enrollment)
 
-          FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
-            evidence = applicant.send(evidence_type)
-            expect(evidence.outstanding?).to eq true
-            expect(evidence.negative_response_received?).to eq false
-            expect(evidence.due_on).to eq applicant.schedule_verification_due_on
+            FinancialAssistance::Applicant::EVIDENCES.each do |evidence_type|
+              evidence = applicant.send(evidence_type)
+              expect(evidence.outstanding?).to eq true
+              expect(evidence.negative_response_received?).to eq false
+              expect(evidence.due_on).to eq applicant.schedule_verification_due_on
+            end
           end
         end
       end
@@ -1678,6 +1899,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       before do
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:out_of_state_primary).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
       end
 
       context 'valid addresses' do
@@ -1714,6 +1936,7 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
       before do
         allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:out_of_state_primary).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
       end
 
       context 'valid addresses' do

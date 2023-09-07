@@ -50,7 +50,7 @@ registry:
             item: 0.85
       - key: :cancel_renewals_for_term
         item: Operations::Individual::CancelRenewalEnrollment.new
-        is_enabled: true
+        is_enabled: <%= ENV['CANCEL_RENEWALS_FOR_TERM_IS_ENABLED'] || false %>
       - key: :calculate_monthly_aggregate
         item: Operations::Individual::CalculateMonthlyAggregate.new
         is_enabled: <%= ENV['CALCULATE_MONTHLY_AGGREGATE_IS_ENABLED'] || true %>
@@ -105,7 +105,7 @@ registry:
         item: "Curam"
         is_enabled: true
       - key: :verification_reasons
-        item: ["Document in EnrollApp", "Document in DIMS", "SAVE system", "E-Verified in Curam"]
+        item: ["Document in EnrollApp", "Document in DIMS", "SAVE system", "E-Verified in Curam", "Salesforce", "Self-Attestation"]
         is_enabled: true
       - key: :total_minimum_responsibility
         is_enabled: false
@@ -117,6 +117,9 @@ registry:
         is_enabled: <%= ENV['QHP_PRODUCT_FOR_INCLUDE_ACA_INDIVIDUAL_IS_ENABLED'] || false %>
       - key: :display_you_pay
         is_enabled: <%= ENV['DISPLAY_YOU_PAY_IS_ENABLED'] || false %>
+      - key: :validate_ssn
+        item: ^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$
+        is_enabled: <%= ENV['VALIDATE_SSN_IS_ENABLED'] || false %>
   - namespace:
     - :enroll_app
     - :aca_individual_market
@@ -142,4 +145,10 @@ registry:
             item: 31
           - key: :year_offset
             item: 0
-
+      - key: :create_bcp_on_date_change
+        is_enabled: <%= ENV['CREATE_BCP_ON_DATE_CHANGE_IS_ENABLED'] || false %>
+        settings:
+          - key: :bcp_creation_month
+            item: <%= ENV['BCP_CREATION_MONTH'] || 7 %>
+          - key: :bcp_creation_day
+            item: <%= ENV['BCP_CREATION_DAY'] || 10 %>

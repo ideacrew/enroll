@@ -1,180 +1,19 @@
- # frozen_string_literal: true
+# frozen_string_literal: true
 
 require 'rails_helper'
 require "#{Rails.root}/spec/shared_contexts/enrollment.rb"
+require "#{Rails.root}/spec/shared_contexts/family_enrollment_renewal.rb"
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
   RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :model, :dbclean => :after_each do
     include FloatHelper
+    include_context "setup family initial and renewal enrollments data"
 
-    let(:current_date) { Date.new(calender_year, 11, 1) }
+    let(:ivl_benefit) { double('BenefitPackage', residency_status: ['any']) }
 
-    let(:current_benefit_coverage_period) { OpenStruct.new(start_on: current_date.beginning_of_year, end_on: current_date.end_of_year) }
-    let(:renewal_benefit_coverage_period) { OpenStruct.new(start_on: current_date.next_year.beginning_of_year, end_on: current_date.next_year.end_of_year) }
-
-    let(:aptc_values) {{}}
-    let(:assisted) { nil }
-
-    let!(:family) do
-      primary = FactoryBot.create(:person, :with_consumer_role, dob: primary_dob, is_tobacco_user: 'y')
-      FactoryBot.create(:family, :with_primary_family_member, :person => primary)
+    before do
+      allow(subject).to receive(:ivl_benefit).and_return(ivl_benefit)
     end
-
-    let!(:coverall_family) do
-      primary = FactoryBot.create(:person, :with_resident_role, dob: primary_dob)
-      FactoryBot.create(:family, :with_primary_family_member, :person => primary)
-    end
-
-    let!(:spouse_rec) do
-      FactoryBot.create(:person, dob: spouse_dob, is_tobacco_user: 'y')
-    end
-
-    let!(:spouse) do
-      FactoryBot.create(:family_member, person: spouse_rec, family: family)
-    end
-
-    let!(:child1) do
-      child = FactoryBot.create(:person, dob: child1_dob)
-      FactoryBot.create(:family_member, person: child, family: family)
-    end
-
-    let!(:child2) do
-      child = FactoryBot.create(:person, dob: child2_dob)
-      FactoryBot.create(:family_member, person: child, family: family)
-    end
-
-    let!(:child3) do
-      child = FactoryBot.create(:person, dob: child3_dob)
-      FactoryBot.create(:family_member, person: child, family: family)
-    end
-
-    let(:primary_dob){ current_date.next_month - 57.years }
-    let(:spouse_dob) { current_date.next_month - 55.years }
-    let(:child1_dob) { current_date.next_month - 26.years }
-    let(:child2_dob) { current_date.next_month - 20.years }
-    let(:child3_dob) { current_benefit_coverage_period.start_on + 2.months - 25.years}
-
-    let!(:enrollment) do
-      FactoryBot.create(:hbx_enrollment,
-                        :with_enrollment_members,
-                        family: family,
-                        enrollment_members: enrollment_members,
-                        household: family.active_household,
-                        coverage_kind: coverage_kind,
-                        effective_on: current_benefit_coverage_period.start_on,
-                        kind: "individual",
-                        product_id: current_product.id,
-                        rating_area_id: rating_area.id,
-                        consumer_role_id: family.primary_person.consumer_role.id,
-                        aasm_state: 'coverage_selected')
-    end
-
-    let!(:coverall_enrollment) do
-      FactoryBot.create(:hbx_enrollment,
-                        :with_enrollment_members,
-                        family: coverall_family,
-                        enrollment_members: coverall_enrollment_members,
-                        household: coverall_family.active_household,
-                        coverage_kind: coverage_kind,
-                        rating_area_id: rating_area.id,
-                        resident_role_id: coverall_family.primary_person.resident_role.id,
-                        effective_on: current_benefit_coverage_period.start_on,
-                        kind: "coverall",
-                        product_id: current_product.id,
-                        aasm_state: 'coverage_selected')
-    end
-
-    let!(:catastrophic_enrollment) do
-      FactoryBot.create(:hbx_enrollment,
-                        :with_enrollment_members,
-                        family: family,
-                        enrollment_members: enrollment_members,
-                        household: family.active_household,
-                        coverage_kind: coverage_kind,
-                        rating_area_id: rating_area.id,
-                        resident_role_id: family.primary_person.consumer_role.id,
-                        effective_on: Date.new(Date.current.year,1,1),
-                        kind: "coverall",
-                        product_id: current_cat_product.id,
-                        aasm_state: 'coverage_selected')
-    end
-
-    let(:enrollment_members) { family.family_members }
-    let(:coverall_enrollment_members) { coverall_family.family_members }
-    let(:calender_year) { TimeKeeper.date_of_record.year }
-    let(:coverage_kind) { 'health' }
-    let!(:rating_area) do
-      ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: start_on) || FactoryBot.create_default(:benefit_markets_locations_rating_area)
-    end
-    let!(:service_area) do
-      ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: start_on).first || FactoryBot.create_default(:benefit_markets_locations_service_area)
-    end
-    let!(:renewal_rating_area) do
-      ::BenefitMarkets::Locations::RatingArea.rating_area_for(address, during: start_on.next_year) || FactoryBot.create_default(:benefit_markets_locations_rating_area, active_year: start_on.next_year.year)
-    end
-    let!(:renewal_service_area) do
-      ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: start_on.next_year).first || FactoryBot.create_default(:benefit_markets_locations_service_area, active_year: start_on.next_year.year)
-    end
-    let(:start_on) { current_benefit_coverage_period.start_on }
-    let(:address) { family.primary_person.rating_address }
-    let(:application_period) { start_on.beginning_of_year..start_on.end_of_year }
-    let(:renewal_application_period) { start_on.beginning_of_year.next_year..start_on.end_of_year.next_year}
-
-    let!(:current_product) do
-      prod =
-        FactoryBot.create(
-          :benefit_markets_products_health_products_health_product,
-          :with_issuer_profile,
-          benefit_market_kind: :aca_individual,
-          kind: :health,
-          service_area: service_area,
-          csr_variant_id: '01',
-          metal_level_kind: 'silver',
-          hios_id: '11111111122302-01',
-          renewal_product_id: renewal_product.id,
-          application_period: application_period
-        )
-      prod.premium_tables = [premium_table]
-      prod.save
-      prod
-    end
-    let(:premium_table)        { build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area) }
-    let!(:renewal_product) do
-      prod =
-        FactoryBot.create(
-          :benefit_markets_products_health_products_health_product,
-          :with_issuer_profile,
-          benefit_market_kind: :aca_individual,
-          kind: :health,
-          service_area: renewal_service_area,
-          csr_variant_id: '01',
-          metal_level_kind: 'silver',
-          hios_id: '11111111122302-01',
-          application_period: renewal_application_period
-        )
-      prod.premium_tables = [renewal_premium_table]
-      prod.save
-      prod
-    end
-    let(:renewal_premium_table)        { build(:benefit_markets_products_premium_table, effective_period: renewal_application_period, rating_area: renewal_rating_area) }
-    let!(:current_cat_product) do
-      prod =
-        FactoryBot.create(
-          :active_ivl_silver_health_product,
-          :with_issuer_profile,
-          benefit_market_kind: :aca_individual,
-          kind: :health,
-          service_area: service_area,
-          csr_variant_id: '01',
-          metal_level_kind: :catastrophic,
-          hios_base_id: "94506DC0390008",
-          application_period: application_period
-        )
-      prod.premium_tables = [cat_premium_table]
-      prod.save
-      prod
-    end
-    let(:cat_premium_table)        { build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area) }
 
     subject do
       enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
@@ -191,6 +30,109 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
     after :each do
       TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
+    describe '.turned_19_during_renewal_with_pediatric_only_qdp?' do
+      let(:renewal_coverage_start) { renewal_benefit_coverage_period.start_on }
+      let(:person) { FactoryBot.create(:person, :with_consumer_role, dob: TimeKeeper.date_of_record - dependent_age.years) }
+      let(:dependent) { double('HbxEnrollmentMember', person: person) }
+      let(:dependent_age) { rand(1..18) }
+
+      context 'when slcsp feature is disabled' do
+        before do
+          allow(subject).to receive(:slcsp_feature_enabled?).with(renewal_coverage_start.year).and_return(false)
+        end
+
+        it 'returns false as the feature is disabled' do
+          expect(
+            subject.turned_19_during_renewal_with_pediatric_only_qdp?(dependent)
+          ).to be_falsey
+        end
+      end
+
+      context 'when enrollment is of coverage_kind health' do
+        before do
+          allow(subject).to receive(:slcsp_feature_enabled?).with(renewal_coverage_start.year).and_return(true)
+        end
+
+        it 'returns false as the enrollment is health' do
+          expect(
+            subject.turned_19_during_renewal_with_pediatric_only_qdp?(dependent)
+          ).to be_falsey
+        end
+      end
+
+      context 'when renewal dental product allows adult offerings' do
+        let(:coverage_kind) { 'dental' }
+        let(:dental_renewal_product) do
+          double('::BenefitMarkets::Products::DentalProducts::DentalProduct', allows_child_only_offering?: false)
+        end
+
+        before do
+          allow(subject).to receive(:slcsp_feature_enabled?).with(renewal_coverage_start.year).and_return(true)
+          allow(subject).to receive(:dental_renewal_product).and_return(dental_renewal_product)
+        end
+
+        it 'returns false as the dental product allows adult offerings' do
+          expect(
+            subject.turned_19_during_renewal_with_pediatric_only_qdp?(dependent)
+          ).to be_falsey
+        end
+      end
+
+      context 'when member is aged less than 19 as of the renewal_coverage_start' do
+        let(:coverage_kind) { 'dental' }
+        let(:dental_renewal_product) do
+          double('::BenefitMarkets::Products::DentalProducts::DentalProduct', allows_child_only_offering?: true)
+        end
+
+        before do
+          allow(subject).to receive(:slcsp_feature_enabled?).with(renewal_coverage_start.year).and_return(true)
+          allow(subject).to receive(:dental_renewal_product).and_return(dental_renewal_product)
+        end
+
+        it 'returns false as member is aged less 19' do
+          expect(
+            subject.turned_19_during_renewal_with_pediatric_only_qdp?(dependent)
+          ).to be_falsey
+        end
+      end
+
+      # when slcsp feature enabled
+      # enrollment is dental
+      # renewal dental product only offers child only
+      # member is turning 19 as of renewal_coverage_start
+      context 'member is ineligible for pediatric only dental renewal' do
+        let(:coverage_kind) { 'dental' }
+        let(:dental_renewal_product) do
+          double('::BenefitMarkets::Products::DentalProducts::DentalProduct', allows_child_only_offering?: true)
+        end
+
+        before do
+          allow(subject).to receive(:slcsp_feature_enabled?).with(renewal_coverage_start.year).and_return(true)
+          allow(subject).to receive(:dental_renewal_product).and_return(dental_renewal_product)
+        end
+
+        context 'when member is turning 19 as of renewal_coverage_start' do
+          let(:dependent_age) { 19 }
+
+          it 'returns true as member is ineligible for pediatric only dental renewal' do
+            expect(
+              subject.turned_19_during_renewal_with_pediatric_only_qdp?(dependent)
+            ).to be_truthy
+          end
+        end
+
+        context 'when member is aged more than 19 as of renewal_coverage_start' do
+          let(:dependent_age) { rand(20..100) }
+
+          it 'returns true as member is ineligible for pediatric only dental renewal' do
+            expect(
+              subject.turned_19_during_renewal_with_pediatric_only_qdp?(dependent)
+            ).to be_truthy
+          end
+        end
+      end
     end
 
     describe ".clone_enrollment_members" do
@@ -212,9 +154,9 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             expect(applicant_ids).to include(child2.id)
           end
 
-          it "should generate passive renewal in coverage_selected state" do
+          it "should generate passive renewal in auto_renewing state" do
             renewal = subject.renew
-            expect(renewal.coverage_selected?).to be_truthy
+            expect(renewal.auto_renewing?).to be_truthy
           end
         end
       end
@@ -279,7 +221,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
           it "should generate passive renewal" do
             renewal = subject.renew
-            expect(renewal.aasm_state).to eq "coverage_selected"
+            expect(renewal.auto_renewing?).to be_truthy
             expect(renewal.effective_on).to eq renewal_benefit_coverage_period.start_on
           end
 
@@ -299,9 +241,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       # Don't we need this for all the dependents
       # Are we using is_disabled flag in the system
       context "When a child person record is disabled" do
-        let!(:spouse_rec) do
-          FactoryBot.create(:person, dob: spouse_dob, is_disabled: true)
-        end
+        let(:spouse_person) { FactoryBot.create(:person, dob: spouse_dob, is_disabled: true) }
 
         it "should not include child person record" do
           applicant_ids = subject.clone_enrollment_members.collect(&:applicant_id)
@@ -372,7 +312,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
 
         it 'should return nil and log an error' do
-          expect_any_instance_of(Logger).to receive(:info).with(/Enrollment renewal failed for #{enrollment.hbx_id} with Exception: /i)
+          expect_any_instance_of(Logger).to receive(:info).with(/Enrollment renewal failed for #{enrollment.hbx_id} with error message: /i)
           expect(subject.renew).to eq nil
         end
       end
@@ -383,7 +323,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
 
         it 'should return nil and log an error' do
-          expect_any_instance_of(Logger).to receive(:info).with(/Enrollment renewal failed for #{enrollment.hbx_id} with Exception: /i)
+          expect_any_instance_of(Logger).to receive(:info).with(/Enrollment renewal failed for #{enrollment.hbx_id} with error message: /i)
           expect(subject.renew).to eq nil
         end
       end
@@ -1031,16 +971,16 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             enrollment_renewal.assisted = true
             enrollment_renewal.aptc_values = {:applied_percentage => 1, :applied_aptc => 730.0, :max_aptc => 730.0, :csr_amt => 73}
             enrollment_renewal.renewal_coverage_start = Date.new(Date.current.year + 1,1,1)
-            enrollment_renewal.renew
+            enrollment_renewal
           end
           let(:child1_dob) { current_date.next_month - 30.years }
 
           it "should return new renewal product with applied aptc" do
-            expect(subject.applied_aptc_amount.to_f > 0.0).to be_truthy
+            expect(subject.renew.applied_aptc_amount.to_f > 0.0).to be_truthy
           end
 
           it "should return new renewal enrollment without catastrophic product" do
-            expect(subject.product.metal_level_kind).not_to be :catastrophic
+            expect(subject.renew.product.metal_level_kind).not_to be :catastrophic
           end
         end
 
@@ -1051,16 +991,16 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             enrollment_renewal.assisted = true
             enrollment_renewal.aptc_values = {:applied_percentage => 1, :applied_aptc => 0, :max_aptc => 0, :csr_amt => 73}
             enrollment_renewal.renewal_coverage_start = Date.new(Date.current.year + 1,1,1)
-            enrollment_renewal.renew
+            enrollment_renewal
           end
           let(:child1_dob) { current_date.next_month - 30.years }
 
           it "should return new renewal product without applied aptc" do
-            expect(subject.applied_aptc_amount.to_f).to eq 0.0
+            expect(subject.renew.applied_aptc_amount.to_f).to eq 0.0
           end
 
           it "should return new renewal enrollment without catastrophic product" do
-            expect(subject.product.metal_level_kind).not_to be :catastrophic
+            expect(subject.renew.product.metal_level_kind).not_to be :catastrophic
           end
         end
       end

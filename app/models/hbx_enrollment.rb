@@ -859,6 +859,8 @@ class HbxEnrollment
     # SHOP: Implement if we have requirement from buiness, event need to happen after cancel in shop.
     # IVL: cancel renewals on cancelling active coverage.
     return if is_shop?
+
+    return unless EnrollRegistry[:cancel_renewals_for_term].enabled?
     ::EnrollRegistry[:cancel_renewals_for_term] { {hbx_enrollment: self} }
   end
 
@@ -875,6 +877,7 @@ class HbxEnrollment
       notify(ENROLLMENT_UPDATED_EVENT_NAME, {policy_id: self.hbx_id})
     end
 
+    return unless EnrollRegistry[:cancel_renewals_for_term].enabled?
     ::EnrollRegistry[:cancel_renewals_for_term] { {hbx_enrollment: self} }
   end
 
@@ -2461,10 +2464,6 @@ class HbxEnrollment
 
   def is_health_enrollment?
     coverage_kind == "health"
-  end
-
-  def is_dental_enrollment?
-    coverage_kind == "dental"
   end
 
   def plan_year_check(employee_role)

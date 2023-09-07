@@ -65,34 +65,66 @@ module Eligibilities
     end
 
     def request_determination(action_name, update_reason, updated_by = nil)
-      application = self.evidenceable.application
-      payload = construct_payload(application)
-      headers = self.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: application.id }
+      self.add_verification_history(action_name, update_reason, updated_by)
+      response = Operations::Fdsh::RequestEvidenceDetermination.new.call(self)
 
-      request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: headers)
-      return false unless request_event.success?
-      response = request_event.value!.publish
+      if response.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
+        determine_evidence_aasm_status(self.evidenceable)
 
-      if response
-        add_verification_history(action_name, update_reason, updated_by)
-        self.save
+        update_reason = "#{self.key.capitalize} Evidence Determination Request Failed due to #{response.failure}"
+        self.add_verification_history("Hub Request Failed", update_reason, "system")
+        false
+      elsif response.failure?
+        false
+      else
+        response
       end
-      response
+    end
+
+    def determine_evidence_aasm_status(applicant)
+      family_id = applicant.application.family_id
+      enrollments = HbxEnrollment.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, family_id: family_id)
+
+      if enrolled?(applicant, enrollments)
+        enrollments.each do |enrollment|
+          applicant.enrolled_with(enrollment)
+        end
+      else
+        applicant.set_evidence_to_negative_response(self)
+      end
+    end
+
+    def enrolled?(applicant, enrollments)
+      return false if enrollments.blank?
+
+      family_member_ids = enrollments.flat_map(&:hbx_enrollment_members).flat_map(&:applicant_id).uniq
+      family_member_ids.map(&:to_s).include?(applicant.family_member_id.to_s)
+    end
+
+    def payload_format
+      case self.key
+      when :non_esi_mec
+        { non_esi_payload_format: EnrollRegistry[:non_esi_h31].setting(:payload_format).item }
+      else
+        {}
+      end
     end
 
     def add_verification_history(action, update_reason, updated_by)
-      self.verification_histories.build(action: action, update_reason: update_reason, updated_by: updated_by)
-    end
-
-    def construct_payload(application)
-      cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application).value!
-      AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application).value!
+      result = self.verification_histories.build(action: action, update_reason: update_reason, updated_by: updated_by)
+      self.save
+      result
     end
 
     def extend_due_on(period = 30.days, updated_by = nil)
       self.due_on = verif_due_date + period
       add_verification_history('extend_due_date', "Extended due date to #{due_on.strftime('%m/%d/%Y')}", updated_by)
-      self.save
+    end
+
+    def auto_extend_due_on(period = 30.days, updated_by = nil)
+      current = verif_due_date
+      self.due_on = current + period
+      add_verification_history('auto_extend_due_date', "Auto extended due date from #{current.strftime('%m/%d/%Y')} to #{due_on.strftime('%m/%d/%Y')}", updated_by)
     end
 
     def verif_due_date
@@ -102,6 +134,17 @@ module Eligibilities
     # bypasses regular guards for changing the date
     def change_due_on!(new_date)
       self.due_on = new_date
+    end
+
+    def can_be_extended?
+      return false unless type_unverified?
+      extensions = verification_histories.where(action: "auto_extend_due_date")
+      return true unless extensions.any?
+      #  want this limitation on due date extensions to reset anytime an evidence no longer requires a due date
+      # (is moved to 'verified' or 'attested' state) so that an individual can benefit from the extension again in the future.
+      auto_extend_time = extensions.last&.created_at
+      return true unless auto_extend_time
+      workflow_state_transitions.where(:to_state.in => ['verified', 'attested'], :created_at.gt => auto_extend_time).any?
     end
 
     # rubocop:disable Metrics/CyclomaticComplexity
