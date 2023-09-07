@@ -143,6 +143,31 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
       end
     end
 
+    context 'payload_format' do
+      let(:non_esi_evidence) do
+        applicant.create_esi_evidence(
+          key: :non_esi_mec,
+          title: 'Non Esi',
+          aasm_state: 'pending',
+          due_on: nil,
+          verification_outstanding: false,
+          is_satisfied: true
+        )
+      end
+
+      it 'should return payload format as json when it is set' do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:non_esi_h31).and_return(true)
+        allow(EnrollRegistry[:non_esi_h31].setting(:payload_format)).to receive(:item).and_return('json')
+        expect(non_esi_evidence.payload_format).to eq({:non_esi_payload_format => 'json'})
+      end
+
+      it 'should return payload format as xml when it is set' do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:non_esi_h31).and_return(true)
+        allow(EnrollRegistry[:non_esi_h31].setting(:payload_format)).to receive(:item).and_return('xml')
+        expect(non_esi_evidence.payload_format).to eq({:non_esi_payload_format => 'xml'})
+      end
+    end
+
     context 'reject' do
       before do
         income_evidence.move_to_rejected!
