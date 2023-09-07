@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe HbxEnrollment, "created in the shopping mode, then transitioned with a reason", db_clean: :after_each do
+RSpec.describe HbxEnrollment, "created in the shopping mode, then transitioned with a reason", dbclean: :after_each do
   let(:product) do
     FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health)
   end
@@ -25,8 +25,17 @@ RSpec.describe HbxEnrollment, "created in the shopping mode, then transitioned w
     hbx_enrollment
   end
 
-  it "can be found using the reason" do
-    enrollment.select_coverage!(:reason => "because")
+  it "can be found using the reason when coverage is canceled" do
+    enrollment.select_coverage!({:reason => "because"})
+    found_enrollment = HbxEnrollment.where(
+      "workflow_state_transitions.metadata.reason" => "because"
+    ).first
+    expect(found_enrollment.id).to eq(enrollment.id)
+  end
+
+  it "can be found using the reason when coverage is canceled" do
+    enrollment.select_coverage!
+    enrollment.cancel_coverage!(Date.today, {:reason => "because"})
     found_enrollment = HbxEnrollment.where(
       "workflow_state_transitions.metadata.reason" => "because"
     ).first

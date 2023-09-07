@@ -557,7 +557,7 @@ class HbxEnrollment
     generate_enrollment_saved_event
 
     meta_args = {}
-    meta_args = args[0] if args[0].is_a?(Hash)
+    meta_args = args.last if !args.empty? && args.last.is_a?(Hash)
 
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
