@@ -32,7 +32,7 @@ module SponsoredBenefits
       unless claim_code_status == "invalid"
         osse_quote = quote.osse_eligibility&.present? && EnrollRegistry.feature_enabled?(:broker_quote_osse_eligibility)
         effective_on = quote.profile.benefit_application.effective_period.min
-        employer_osse_eligible = employer_profile.active_benefit_sponsorship&.eligibility_on(effective_on).present?
+        employer_osse_eligible = employer_profile.active_benefit_sponsorship&.active_eligibility_on(effective_on).present?
 
         error_message = quote.present? && aca_state_abbreviation == "MA" ? check_if_county_zip_are_same(quote, employer_profile) : " "
       end
