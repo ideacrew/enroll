@@ -2231,6 +2231,16 @@ class HbxEnrollment
                   guard: :prior_plan_year_coverage?
     end
 
+    # This event is used to cancel coverage for superseded terminated enrollments
+    # This is specific to Individual Market enrollments
+    # Example:
+    #   When enrollments are purchased with a retroactive effective date,
+    #   and there are terminated enrollments in the current year with the same enrollment signature,
+    #   then the terminated enrollments should be canceled.
+    event :cancel_coverage_for_superseded_term, after: :record_transition do
+      transitions from: :coverage_terminated, to: :coverage_canceled, guard: :is_ivl_by_kind?
+    end
+
     event :cancel_for_non_payment, :after => :record_transition do
       transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected,
                          :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected,
@@ -2897,6 +2907,22 @@ class HbxEnrollment
         :family_member_id.in => thh_enr.tax_household.aptc_members.map(&:applicant_id)
       ).present?
     end
+  end
+
+  # Checks to see if the new enrollment superseded the previous enrollment and is eligible for cancellation.
+  #   - Checks if RR configuration is enabled
+  #   - Checks if the enrollment is of kind individual market
+  #   - Checks if the previous enrollment is in terminated state
+  #   - Checks if the new enrollment has an effective_on date
+  #   - Checks if the new enrollment's effective_on is same as the current enrollment's effective_on year
+  #   - Checks if the previous enrollment can be canceled via event 'cancel_coverage_for_superseded_term'
+  #   - The base/previous enrollment must have the same signature as the new enrollment, which is checked before calling this method
+  def enrollment_superseded_and_eligible_for_cancellation?(new_effective_on)
+    EnrollRegistry.feature_enabled?(:cancel_superseded_terminated_enrollments) &&
+      coverage_terminated? &&
+      new_effective_on.present? &&
+      new_effective_on.year == effective_on.year &&
+      may_cancel_coverage_for_superseded_term?
   end
 
   private
