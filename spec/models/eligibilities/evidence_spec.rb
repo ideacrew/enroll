@@ -78,68 +78,143 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
       end
     end
 
+    let(:updated_by) { 'admin' }
+    let(:update_reason) { "Requested Hub for verification" }
+    let(:action) { 'request_hub' }
+
     context '.request_determination' do
-      let(:updated_by) { '12345' }
-      let(:update_reason) { "Requested Hub for verification" }
-      let(:action) { 'request_hub' }
-      let(:success_event) { double(success?: true, value!: double(publish: true)) }
-      let(:failure_event) { double(success?: false, value!: double(publish: false)) }
-      let(:failure_publish) { double(success?: true, value!: double(publish: false)) }
-      let(:success_payload) { double(failure?: false, value!: {}) }
-
       before do
-        esi_evidence.stub(:generate_evidence_updated_event) { true }
-        esi_evidence.stub(:construct_payload) { success_payload }
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
       end
 
-      it 'should not update due date' do
-        esi_evidence.stub(:event) { failure_event }
-        esi_evidence.request_determination(action, update_reason, updated_by)
-        esi_evidence.reload
-        expect(esi_evidence.verification_histories).to be_empty
+      let(:evidence_verification_request) { instance_double(Operations::Fdsh::RequestEvidenceDetermination) }
+
+      context 'with no errors' do
+        before do
+          allow(evidence_verification_request).to receive(:call).and_return(Dry::Monads::Success({}))
+          allow(Operations::Fdsh::RequestEvidenceDetermination).to receive(:new).and_return(evidence_verification_request)
+        end
+
+        it 'should return success' do
+          result = income_evidence.request_determination(action, update_reason, updated_by)
+          income_evidence.reload
+
+          expect(result).to be_success
+          expect(income_evidence.verification_histories).to be_present
+
+          history = income_evidence.verification_histories.first
+          expect(history.action).to eq action
+          expect(history.update_reason).to eq update_reason
+          expect(history.updated_by).to eq updated_by
+        end
       end
 
-      it 'should update due date with history' do
-        esi_evidence.stub(:event) { success_event }
-        expect(esi_evidence.verification_histories).to be_empty
-        result = esi_evidence.request_determination(action, update_reason, updated_by)
-        esi_evidence.reload
-        expect(result).to be_truthy
-        expect(esi_evidence.verification_histories).to be_present
+      context 'builds and publishes with errors' do
+        let(:failed_action) { 'Hub Request Failed' }
+        let(:failed_updated_by) { 'system' }
+        let(:failed_update_reason) { "Invalid SSN" }
 
-        history = esi_evidence.verification_histories.first
-        expect(history.action).to eq action
-        expect(history.update_reason).to eq update_reason
-        expect(history.updated_by).to eq updated_by
-      end
+        let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+        let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
 
-      it 'should not update due date with history' do
-        esi_evidence.stub(:event) { failure_publish }
-        expect(esi_evidence.verification_histories).to be_empty
-        result = esi_evidence.request_determination(action, update_reason, updated_by)
-        esi_evidence.reload
-        expect(result).to be_falsey
-        expect(esi_evidence.verification_histories).to be_present
+        before do
+          allow(evidence_verification_request).to receive(:call).and_return(Dry::Monads::Failure(failed_update_reason))
+          allow(Operations::Fdsh::RequestEvidenceDetermination).to receive(:new).and_return(evidence_verification_request)
 
-        history = esi_evidence.verification_histories.first
-        expect(history.action).to eq action
-        expect(history.update_reason).to eq "Failed to request determination"
-        expect(history.updated_by).to eq "system"
-      end
-    end
+          family_member_id = family.family_members[0].id
+          applicant.update(family_member_id: family_member_id)
+          application.update(family_id: family.id)
+        end
 
-    context "construct_payload" do
-      it 'should have failure history' do
-        allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Failure.new(application))
-        esi_evidence.construct_payload(application, "system")
-        expect(esi_evidence.verification_histories.last.update_reason).to eq 'Failed to construct payload'
-      end
+        context 'with an applicant without an active enrollment' do
+          it 'should change evidence aasm_state to negative_response_received' do
+            result = income_evidence.request_determination(action, update_reason, updated_by)
+            income_evidence.reload
 
-      it 'should have failure history' do
-        allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Success.new(application))
-        allow(::AcaEntities::MagiMedicaid::Operations::InitializeApplication).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Failure.new(application))
-        esi_evidence.construct_payload(application, "system")
-        expect(esi_evidence.verification_histories.last.update_reason).to eq 'Failed to validate application'
+            expect(result).to be_falsey
+            expect(income_evidence.aasm_state).to eq('negative_response_received')
+            expect(income_evidence.verification_histories).to be_present
+
+            admin_call_history = income_evidence.verification_histories.first
+            expect(admin_call_history.action).to eq action
+            expect(admin_call_history.update_reason).to eq update_reason
+            expect(admin_call_history.updated_by).to eq updated_by
+
+            failure_history = income_evidence.verification_histories.last
+            expect(failure_history.action).to eq failed_action
+            expect(failure_history.update_reason).to include(failed_update_reason)
+            expect(failure_history.updated_by).to eq(failed_updated_by)
+          end
+        end
+
+        context 'with an applicant who has an active enrollment' do
+          let!(:hbx_enrollment) do
+            FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_health_product,
+                              family: family, enrollment_members: [family.primary_applicant],
+                              aasm_state: 'coverage_selected', kind: 'individual')
+          end
+
+          before do
+            family_member_id = family.family_members[0].id
+            applicant.update(family_member_id: family_member_id)
+            application.update(family_id: family.id)
+          end
+
+          context 'and not using aptc or valid csr' do
+            before do
+              # csr_variant_id "01" is not one of the valid csr codes to change aasm_state
+              hbx_enrollment.product.update(csr_variant_id: '01')
+            end
+
+            it 'should change evidence aasm_state to negative_response_received' do
+              result = income_evidence.request_determination(action, update_reason, updated_by)
+              income_evidence.reload
+
+              expect(result).to be_falsey
+              expect(income_evidence.aasm_state).to eq('negative_response_received')
+              expect(income_evidence.verification_histories).to be_present
+
+              admin_call_history = income_evidence.verification_histories.first
+              expect(admin_call_history.action).to eq action
+              expect(admin_call_history.update_reason).to eq update_reason
+              expect(admin_call_history.updated_by).to eq updated_by
+
+              failure_history = income_evidence.verification_histories.last
+              expect(failure_history.action).to eq failed_action
+              expect(failure_history.update_reason).to include(failed_update_reason)
+              expect(failure_history.updated_by).to eq(failed_updated_by)
+            end
+          end
+
+          context 'and using aptc' do
+            before do
+              hbx_enrollment.update(applied_aptc_amount: 720)
+              # csr_variant_id "01" is not one of the valid csr codes to change aasm_state
+              hbx_enrollment.product.update(csr_variant_id: '01')
+            end
+
+            it 'should change evidence aasm_state to outstanding' do
+              result = income_evidence.request_determination(action, update_reason, updated_by)
+              income_evidence.reload
+
+              expect(result).to be_falsey
+              expect(income_evidence.aasm_state).to eq('outstanding')
+              expect(income_evidence.verification_histories.size).to eq(2)
+            end
+          end
+
+          context 'and using csr' do
+            it 'should change evidence aasm_state to outstanding' do
+              result = income_evidence.request_determination(action, update_reason, updated_by)
+              income_evidence.reload
+
+              expect(result).to be_falsey
+              expect(income_evidence.aasm_state).to eq('outstanding')
+              expect(income_evidence.verification_histories).to be_present
+            end
+          end
+        end
       end
     end
 
