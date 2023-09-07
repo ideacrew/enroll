@@ -92,8 +92,8 @@ module Eligibilities
 
     # Sets the evidence's status to "attested" for the following types of evidence:
     ### :esi_mec, :non_esi_mec and :local_mec
-    def determine_mec_evidence_aasm_status(applicant)
-      applicant.set_evidence_attested(self)
+    def determine_mec_evidence_aasm_status(_applicant)
+      move_evidence_to_attested
     end
 
     # Sets the Income evidence's status to "outstanding" if the applicant is enrolled in any APTC or CSR enrollments;
@@ -104,10 +104,28 @@ module Eligibilities
       aptc_or_csr_used = enrolled_in_any_aptc_csr_enrollments?(applicant, enrollments)
 
       if aptc_or_csr_used
-        applicant.set_evidence_outstanding(self)
+        move_evidence_to_outstanding
       else
-        applicant.set_evidence_to_negative_response(self)
+        move_evidence_to_negative_response_received
       end
+    end
+
+    def move_evidence_to_outstanding
+      return unless may_move_to_outstanding?
+
+      update(verification_outstanding: true, is_satisfied: false)
+      move_to_outstanding
+    end
+
+    def move_evidence_to_negative_response_received
+      return unless may_negative_response_received?
+
+      negative_response_received!
+    end
+
+    def move_evidence_to_attested
+      update(verification_outstanding: false, is_satisfied: true, due_on: nil)
+      attest
     end
 
     # Checks if the applicant is enrolled in any APTC or CSR enrollments.
