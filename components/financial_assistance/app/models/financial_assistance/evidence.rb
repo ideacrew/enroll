@@ -51,7 +51,16 @@ module FinancialAssistance
       application = self.applicant.application
       payload = construct_payload(application)
       headers = self.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: application.id }
-      event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: headers)
+      event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: headers.merge!(payload_format))
+    end
+
+    def payload_format
+      case self.key
+      when :non_esi_mec
+        { non_esi_payload_format: EnrollRegistry[:non_esi_h31].setting(:payload_format).item }
+      else
+        {}
+      end
     end
 
     def construct_payload(application)
