@@ -9,7 +9,7 @@ module Operations
     class CreateIvlOsseEligibility
       send(:include, Dry::Monads[:result, :do])
 
-      attr_reader :subject
+      attr_accessor :subject, :default_eligibility
 
       # @param [Hash] opts Options to build eligibility
       # @option opts [<GlobalId>] :subject required
@@ -37,9 +37,13 @@ module Operations
         errors = []
         errors << "evidence key missing" unless params[:evidence_key]
         errors << "evidence value missing" unless params[:evidence_value]
-        errors << "effective date missing or it should be a date" unless params[:effective_date].is_a?(::Date)
+        unless params[:effective_date].is_a?(::Date)
+          errors << "effective date missing or it should be a date"
+        end
         @subject = GlobalID::Locator.locate(params[:subject])
-        errors << "subject missing or not found for #{params[:subject]}" unless subject.present?
+        unless subject.present?
+          errors << "subject missing or not found for #{params[:subject]}"
+        end
 
         errors.empty? ? Success(params) : Failure(errors)
       end
@@ -48,9 +52,12 @@ module Operations
       # We'll be adding State Histories when the eligibility changes
       def find_eligibility(values)
         eligibility =
-          subject.eligibilities.by_key(
-            "aca_ivl_osse_eligibility_#{values[:effective_date].year}".to_sym
-          ).last
+          subject
+            .eligibilities
+            .by_key(
+              "aca_ivl_osse_eligibility_#{values[:effective_date].year}".to_sym
+            )
+            .last
 
         Success(eligibility)
       end
@@ -84,16 +91,34 @@ module Operations
 
         if eligibility_record
           update_eligibility_record(eligibility_record, eligibility)
+          eligibility_record.save
         else
           eligibility_record = create_eligibility_record(eligibility)
           subject.eligibilities << eligibility_record
         end
 
-        if subject.save
-          Success(eligibility_record)
+        save_proc = proc do
+            if subject.save
+              Success(eligibility_record)
+            else
+              Failure(subject.errors.full_messages)
+            end
+          end
+
+        if default_eligibility
+          Person.without_callbacks(callbacks_to_skip, &save_proc)
         else
-          Failure(subject.errors.full_messages)
+          save_proc.call
         end
+      end
+
+      def callbacks_to_skip
+        callbacks = []
+        callbacks << %i[update after notify_updated]
+        callbacks << %i[update after person_create_or_update_handler]
+        callbacks << %i[update after publish_updated_event]
+        callbacks << %i[save after generate_person_saved_event]
+        callbacks
       end
 
       def update_eligibility_record(eligibility_record, eligibility)
@@ -107,9 +132,6 @@ module Operations
         evidence_record.state_histories.build(evidence_history_params)
         eligibility_record.state_histories.build(eligibility_history_params)
         eligibility_record.current_state = eligibility.current_state
-
-        eligibility_record.save
-        subject.save
       end
 
       def build_history_params_for(record)

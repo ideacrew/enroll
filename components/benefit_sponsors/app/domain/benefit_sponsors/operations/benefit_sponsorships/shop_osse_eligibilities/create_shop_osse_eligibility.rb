@@ -11,7 +11,7 @@ module BenefitSponsors
         class CreateShopOsseEligibility
           send(:include, Dry::Monads[:result, :do])
 
-          attr_reader :subject
+          attr_accessor :subject, :default_eligibility
 
           # @param [Hash] opts Options to build eligibility
           # @option opts [<GlobalId>] :subject required

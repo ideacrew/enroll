@@ -4,12 +4,17 @@ module Subscribers
   module Eligible
     # Subscriber will receive Enterprise requests like date change
     class EligibilitySubscriber
-      include ::EventSource::Subscriber[amqp: 'enroll.eligible.eligibility.events']
+      include ::EventSource::Subscriber[
+                amqp: "enroll.eligible.eligibility.events"
+              ]
 
-      subscribe(:on_create_default_eligibility) do |delivery_info, _metadata, response|
-        logger_name = "on_create_default_eligibility_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}"
+      subscribe(
+        :on_create_default_eligibility
+      ) do |delivery_info, _metadata, response|
+        logger_name =
+          "on_create_default_eligibility_#{TimeKeeper.date_of_record.strftime("%Y_%m_%d")}"
         subscriber_logger = Logger.new("#{Rails.root}/log/#{logger_name}.log")
-        subscriber_logger.info '-' * 100 unless Rails.env.test?
+        subscriber_logger.info "-" * 100 unless Rails.env.test?
 
         payload = JSON.parse(response, symbolize_names: true)
         subscriber_logger.info "EligibilitySubscriber, payload: #{payload}"
@@ -21,16 +26,19 @@ module Subscribers
 
         eligibility = subject.eligibility_on(eligibility_date)
         unless eligibility
-          result = eligibility_operation_for(subject).new.call(
-            {
-              subject: subject.to_global_id,
-              evidence_key: evidence_key,
-              evidence_value: "false",
-              effective_date: effective_date
-            }
-          )
+          result =
+            create_eligibility(
+              {
+                subject: subject,
+                evidence_key: evidence_key,
+                evidence_value: "false",
+                effective_date: effective_date
+              }
+            )
 
-          subscriber_logger.error "EligibilitySubscriber, payload: #{payload}. Failed due to #{result.failure}" unless result.success?
+          unless result.success?
+            subscriber_logger.error "EligibilitySubscriber, payload: #{payload}. Failed due to #{result.failure}"
+          end
         end
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e
@@ -39,9 +47,10 @@ module Subscribers
       end
 
       subscribe(:on_renew_eligibility) do |delivery_info, _metadata, response|
-        logger_name = "on_renew_eligibility_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}"
+        logger_name =
+          "on_renew_eligibility_#{TimeKeeper.date_of_record.strftime("%Y_%m_%d")}"
         subscriber_logger = Logger.new("#{Rails.root}/log/#{logger_name}.log")
-        subscriber_logger.info '-' * 100 unless Rails.env.test?
+        subscriber_logger.info "-" * 100 unless Rails.env.test?
 
         payload = JSON.parse(response, symbolize_names: true)
         subscriber_logger.info "EligibilitySubscriber#on_enroll_enterprise_events, response: #{payload}"
@@ -56,16 +65,19 @@ module Subscribers
 
         renewal_eligibility = subject.eligibility_on(effective_date)
         unless renewal_eligibility
-          result = eligibility_operation_for(subject).new.call(
-            {
-              subject: subject.to_global_id,
-              evidence_key: evidence_key,
-              evidence_value: osse_eligibility.to_s,
-              effective_date: effective_date
-            }
-          )
+          result =
+            create_eligibility(
+              {
+                subject: subject,
+                evidence_key: evidence_key,
+                evidence_value: osse_eligibility.to_s,
+                effective_date: effective_date
+              }
+            )
 
-          subscriber_logger.error "EligibilitySubscriber, payload: #{payload}. Failed due to #{result.failure}" unless result.success?
+          unless result.success?
+            subscriber_logger.error "EligibilitySubscriber, payload: #{payload}. Failed due to #{result.failure}"
+          end
         end
 
         ack(delivery_info.delivery_tag)
@@ -83,6 +95,22 @@ module Subscribers
         when "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
           ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility
         end
+      end
+
+      def create_eligibility(options)
+        operation = eligibility_operation_for(options[:subject]).new
+        if options[:evidence_value] == "false"
+          operation.default_eligibility = true
+        end
+
+        operation.call(
+          {
+            subject: options[:subject].to_global_id,
+            evidence_key: options[:evidence_key],
+            evidence_value: options[:evidence_value],
+            effective_date: options[:effective_date]
+          }
+        )
       end
     end
   end
