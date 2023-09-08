@@ -1,0 +1,34 @@
+<% if local_assigns[:punctuation].present? %>
+  <% term_display = "#{term}#{local_assigns[:punctuation]}" %>
+<% else %>
+  <% term_display = term %>
+<% end %>
+
+<span class="glossary"
+      data-toggle="popover"
+      data-placement="auto top"
+      data-trigger="click focus"
+      data-boundary="window"
+      data-fallbackPlacement="flip"
+      data-html="true"
+      data-content="<%= l10n("glossary.#{key}") %>"
+      data-title="<%= term_display %>">
+  <button data-dismiss='modal'
+          type='button'
+          class='close'
+          aria-label='Close'
+          onclick="$('.glossary').popover('hide');">
+  </button>
+<%= term_display %></span>
+
+<script>
+$(document).click(function(e){
+  if (e.target.className == 'glossary') {
+    e.preventDefault();
+    $('.glossary').not($(e.target)).popover('hide');
+  }
+  else if (!$(e.target).parents('.popover').length) {
+    $('.glossary').popover('hide');
+  }
+});
+</script>
