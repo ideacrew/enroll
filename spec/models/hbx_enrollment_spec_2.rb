@@ -201,13 +201,11 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
           let(:dental_renewals) { family.active_household.hbx_enrollments.renewing.by_dental }
 
           it 'does renew both health and dental enrollment' do
-            binding.pry
             expect(health_renewals.size).to eq 1
             expect(health_renewals[0].product).to eq enrollment_1.product.renewal_product
             expect(dental_renewals.size).to eq 1
             expect(dental_renewals[0].product).to eq enrollment_2.product.renewal_product
-            binding.pry
-            expect (health_renewals[0].eligible_child_care_subsidy)
+            expect (health_renewals[0].eligible_child_care_subsidy).not_to eq nil
           end
         end
 
