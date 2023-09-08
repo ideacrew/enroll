@@ -33,6 +33,7 @@ The following sections describe various top level tasks and their usages.
 
 ### Rake Task: `dry_run:all[year]`
 
+- EXPERIMENTAL: This task may not work as expected due to the async nature of the dry run process.
 - This is the main Rake task for initiating a complete dry run for a specific year.
 - It provides options to customize the dry run process.
 
