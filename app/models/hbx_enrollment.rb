@@ -553,13 +553,17 @@ class HbxEnrollment
     @benefit_group = BenefitGroup.find(self.benefit_group_id)
   end
 
-  def record_transition
+  def record_transition(*args)
     generate_enrollment_saved_event
+
+    meta_args = {}
+    meta_args = args.last if !args.empty? && args.last.is_a?(Hash)
 
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
       to_state: aasm.to_state,
-      event: aasm.current_event
+      event: aasm.current_event,
+      metadata: meta_args
     )
   end
 
@@ -2351,7 +2355,8 @@ class HbxEnrollment
     current_bcp.contains?(effective_on)
   end
 
-  def can_select_coverage?(qle: false)
+  def can_select_coverage?(arg = {})
+    qle = arg[:qle] || false
     return true if is_cobra_status?
     if is_shop?
       if employee_role.can_enroll_as_new_hire?
