@@ -21,7 +21,6 @@ module Operations
               cv3_application = yield transform_application(application)
               event = yield build_event(cv3_application)
               publish(event)
-              create_evidence_history(application)
 
               Success("Successfully published payload for rrv ifsv and created history event")
             end
@@ -53,12 +52,34 @@ module Operations
                 applicant.create_eligibility_income_evidence
               end
 
+              create_evidence_history(application, 'RRV_Submitted', 'RRV - Renewal verifications submitted', 'system')
               Success(true)
             end
 
             def transform_application(application)
-              payload = ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
-              AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(payload.value!)
+              payload_entity = Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application)
+
+              return payload_entity unless EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
+
+              if payload_entity.success?
+                result = payload_entity.value!.applicants.collect do  |applicant_entity,hash|
+                  check_eligibility_rules(applicant_entity, :income)
+                end.flatten.compact
+
+                # Return a Failure result if any of the validation rules fail
+                if result.any?(Failure)
+                  errors = result.select { |r| r.is_a?(Failure) }.map(&:failure)
+                  create_evidence_history(application, 'RRV_Submission_Failed', "RRV - Renewal verifications submission failed due to #{errors}", 'system')
+                  update_evidence_state_for_all_applicants(application)
+                  Failure(errors)
+                else
+                  payload_entity
+                end
+              elsif payload_entity.failure?
+                create_evidence_history(application, 'RRV_Submission_Failed', "RRV - Renewal verifications submission failed due to #{payload_entity.failure.messages}", 'system')
+                update_evidence_state_for_all_applicants(application)
+                payload_entity
+              end
             rescue StandardError => e
               rrv_logger.error("Failed to transform application with hbx_id #{application.hbx_id} due to #{e.inspect}")
               Failure("Failed to transform application with hbx_id #{application.hbx_id}")
@@ -74,13 +95,24 @@ module Operations
               Success("Successfully published payload for rrv ifsv")
             end
 
-            def create_evidence_history(application)
+            def create_evidence_history(application, action, update_reason, update_by)
               application.active_applicants.each do |applicant|
                 evidence = applicant.income_evidence
-                evidence.add_verification_history('RRV_Submitted', 'RRV - Renewal verifications submitted', 'system')
+                evidence.add_verification_history(action, update_reason, update_by)
               end
 
               application.save
+            end
+
+            def update_evidence_state_for_all_applicants(application)
+              application.active_applicants.each do |applicant|
+                update_income_evidence_to_default_state(applicant)
+              end
+            end
+
+            # update income evidence state to default aasm state for applicant
+            def update_income_evidence_to_default_state(applicant)
+              applicant.income_evidence.determine_income_evidence_aasm_status
             end
 
             def rrv_logger
