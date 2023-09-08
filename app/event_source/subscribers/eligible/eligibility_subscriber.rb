@@ -12,7 +12,7 @@ module Subscribers
         :on_create_default_eligibility
       ) do |delivery_info, _metadata, response|
         logger_name =
-          "on_create_default_eligibility_#{TimeKeeper.date_of_record.strftime("%Y_%m_%d")}"
+          "on_create_default_eligibility_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}"
         subscriber_logger = Logger.new("#{Rails.root}/log/#{logger_name}.log")
         subscriber_logger.info "-" * 100 unless Rails.env.test?
 
@@ -36,9 +36,7 @@ module Subscribers
               }
             )
 
-          unless result.success?
-            subscriber_logger.error "EligibilitySubscriber, payload: #{payload}. Failed due to #{result.failure}"
-          end
+          subscriber_logger.error "EligibilitySubscriber, payload: #{payload}. Failed due to #{result.failure}" unless result.success?
         end
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e
@@ -48,7 +46,7 @@ module Subscribers
 
       subscribe(:on_renew_eligibility) do |delivery_info, _metadata, response|
         logger_name =
-          "on_renew_eligibility_#{TimeKeeper.date_of_record.strftime("%Y_%m_%d")}"
+          "on_renew_eligibility_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}"
         subscriber_logger = Logger.new("#{Rails.root}/log/#{logger_name}.log")
         subscriber_logger.info "-" * 100 unless Rails.env.test?
 
@@ -75,9 +73,7 @@ module Subscribers
               }
             )
 
-          unless result.success?
-            subscriber_logger.error "EligibilitySubscriber, payload: #{payload}. Failed due to #{result.failure}"
-          end
+          subscriber_logger.error "EligibilitySubscriber, payload: #{payload}. Failed due to #{result.failure}" unless result.success?
         end
 
         ack(delivery_info.delivery_tag)
@@ -99,9 +95,7 @@ module Subscribers
 
       def create_eligibility(options)
         operation = eligibility_operation_for(options[:subject]).new
-        if options[:evidence_value] == "false"
-          operation.default_eligibility = true
-        end
+        operation.default_eligibility = true if options[:evidence_value] == "false"
 
         operation.call(
           {

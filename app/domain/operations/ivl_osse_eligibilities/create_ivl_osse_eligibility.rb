@@ -37,13 +37,9 @@ module Operations
         errors = []
         errors << "evidence key missing" unless params[:evidence_key]
         errors << "evidence value missing" unless params[:evidence_value]
-        unless params[:effective_date].is_a?(::Date)
-          errors << "effective date missing or it should be a date"
-        end
+        errors << "effective date missing or it should be a date" unless params[:effective_date].is_a?(::Date)
         @subject = GlobalID::Locator.locate(params[:subject])
-        unless subject.present?
-          errors << "subject missing or not found for #{params[:subject]}"
-        end
+        errors << "subject missing or not found for #{params[:subject]}" unless subject.present?
 
         errors.empty? ? Success(params) : Failure(errors)
       end
@@ -53,11 +49,11 @@ module Operations
       def find_eligibility(values)
         eligibility =
           subject
-            .eligibilities
-            .by_key(
-              "aca_ivl_osse_eligibility_#{values[:effective_date].year}".to_sym
-            )
-            .last
+          .eligibilities
+          .by_key(
+            "aca_ivl_osse_eligibility_#{values[:effective_date].year}".to_sym
+          )
+          .last
 
         Success(eligibility)
       end
@@ -98,12 +94,12 @@ module Operations
         end
 
         save_proc = proc do
-            if subject.save
-              Success(eligibility_record)
-            else
-              Failure(subject.errors.full_messages)
-            end
+          if subject.save
+            Success(eligibility_record)
+          else
+            Failure(subject.errors.full_messages)
           end
+        end
 
         if default_eligibility
           Person.without_callbacks(callbacks_to_skip, &save_proc)
