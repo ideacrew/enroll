@@ -105,6 +105,8 @@ module Eligibilities
       case self.key
       when :non_esi_mec
         { non_esi_payload_format: EnrollRegistry[:non_esi_h31].setting(:payload_format).item }
+      when :esi_mec
+        { esi_mec_payload_format: EnrollRegistry[:esi_mec].setting(:payload_format).item }
       else
         {}
       end
