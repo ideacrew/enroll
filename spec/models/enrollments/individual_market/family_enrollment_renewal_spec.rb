@@ -9,6 +9,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     include FloatHelper
     include_context "setup family initial and renewal enrollments data"
 
+    before :all do
+      DatabaseCleaner.clean
+    end
+
     let(:ivl_benefit) { double('BenefitPackage', residency_status: ['any']) }
 
     before do
