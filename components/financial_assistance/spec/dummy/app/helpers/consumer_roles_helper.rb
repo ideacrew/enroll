@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
+# copy of app/helpers/consumer_roles_helper.rb
 module ConsumerRolesHelper
   def ethnicity_collection
     [
-      ["White", "Black or African American", "Asian Indian", "Chinese" ],
+      ["White", "Black or African American", "Asian Indian", "Chinese"],
       ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"],
-      ["Native Hawaiian", "Samoan", "Guamanian or Chamorro", ],
+      ["Native Hawaiian", "Samoan", "Guamanian or Chamorro"],
       ["Other Pacific Islander", "American Indian/Alaska Native", "Other"]
-
-    ].inject([]){ |sets, ethnicities|
+    ].inject([]) do |sets, ethnicities|
       sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
-    }
+    end
   end
 
   def latino_collection
@@ -16,9 +18,9 @@ module ConsumerRolesHelper
       ["Mexican", "Mexican American"],
       ["Chicano/a", "Puerto Rican"],
       ["Cuban", "Other"]
-    ].inject([]){ |sets, ethnicities|
+    ].inject([]) do |sets, ethnicities|
       sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
-    }
+    end
   end
 
   def find_consumer_role_for_fields(obj)
@@ -76,15 +78,13 @@ module ConsumerRolesHelper
       first_checked = consumer_role.is_applying_coverage
       second_checked = !consumer_role.is_applying_coverage
     end
-    return first_checked, second_checked
+    [first_checked, second_checked]
   end
 
   # Allow flow to the next page if app or ID verified, otherwise stay on the same page
   def ridp_redirection_link(person)
     consumer_redirection_path = EnrollRegistry.feature_enabled?(:financial_assistance) ? help_paying_coverage_insured_consumer_role_index_path : insured_family_members_path(consumer_role_id: person.consumer_role.id)
     consumer = person.consumer_role
-    app_type = person.primary_family.application_type
-    admin_user =  current_user.has_hbx_staff_role?
     id_verified = consumer.identity_verified?
     app_verified = consumer.application_verified?
     return consumer_redirection_path if app_verified || id_verified
