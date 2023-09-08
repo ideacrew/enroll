@@ -632,6 +632,13 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
       expect(shop_enrollment.reload.eligible_child_care_subsidy.to_f).to eq(premium)
     end
 
+    context 'when plan shopping with osse_eligible' do
+      it 'does not update eligibility coverage start on as enrollment new effective on' do
+        start_on_date = shop_enrollment.reload.effective_on
+        expect(shop_enrollment.reload.subscriber.coverage_start_on.to_s).not_to eq start_on_date.to_s
+      end
+    end
+
     context 'when enrollment is dental' do
       let(:coverage_kind) { :dental }
 
