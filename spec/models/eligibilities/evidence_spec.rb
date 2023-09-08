@@ -443,7 +443,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
       end
 
       let(:applicant_1_esi_evidence) { esi_evidence}
-
+      let(:applicant_1_income_evidence) { income_evidence}
       let(:applicant_2_income_evidence) do
         applicant2.create_income_evidence(
           key: :income,
@@ -455,100 +455,205 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
         )
       end
 
-      context 'builds and publishes with errors' do
-        let(:failed_action) { 'Hub Request Failed' }
-        let(:failed_updated_by) { 'system' }
-        let(:failed_update_reason) { "Invalid SSN" }
+      context 'for esi evidence call hub' do
+        context 'builds and publishes with errors' do
+          let(:failed_action) { 'Hub Request Failed' }
+          let(:failed_updated_by) { 'system' }
+          let(:failed_update_reason) { "Invalid SSN" }
 
-        let(:person) { FactoryBot.create(:person, :with_consumer_role) }
-        let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+          let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+          let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
 
-        before do
-          family_member_id = family.family_members[0].id
-          applicant.update(family_member_id: family_member_id)
-          application.update(family_id: family.id)
-        end
-
-        context 'when hub call made for applicant 2' do
           before do
-            @result = applicant_2_esi_evidence.request_determination(action, update_reason, updated_by)
-            applicant_2_esi_evidence.reload
-            applicant_1_esi_evidence.reload
+            family_member_id = family.family_members[0].id
+            applicant.update(family_member_id: family_member_id)
+            application.update(family_id: family.id)
           end
 
-          it 'should return false' do
-            expect(@result).to be_falsey
-          end
-
-          it 'should change applicant_2 esi evidence aasm_state to attested' do
-            expect(applicant_2_esi_evidence).to have_state(:attested)
-          end
-
-          it 'should not change applicant_1 esi evidence aasm_state' do
-            expect(applicant_1_esi_evidence).to have_state(:pending)
-          end
-
-          context 'for applicant_2' do
-            it 'should create history for requested call' do
-              admin_call_history = applicant_2_esi_evidence.verification_histories.first
-              expect(admin_call_history.action).to eq action
-              expect(admin_call_history.update_reason).to eq update_reason
-              expect(admin_call_history.updated_by).to eq updated_by
+          context 'when hub call made for applicant 2' do
+            before do
+              @result = applicant_2_esi_evidence.request_determination(action, update_reason, updated_by)
+              applicant_2_esi_evidence.reload
+              applicant_1_esi_evidence.reload
             end
 
-            it 'should create history for failed publish' do
-              failure_history = applicant_2_esi_evidence.verification_histories.last
-              expect(failure_history.action).to eq failed_action
-              expect(failure_history.update_reason).to include(failed_update_reason)
-              expect(failure_history.updated_by).to eq(failed_updated_by)
+            it 'should return false' do
+              expect(@result).to be_falsey
+            end
+
+            it 'should change applicant_2 esi evidence aasm_state to attested' do
+              expect(applicant_2_esi_evidence).to have_state(:attested)
+            end
+
+            it 'should not change applicant_1 esi evidence aasm_state' do
+              expect(applicant_1_esi_evidence).to have_state(:pending)
+            end
+
+            context 'for applicant_2' do
+              it 'should create history for requested call' do
+                admin_call_history = applicant_2_esi_evidence.verification_histories.first
+                expect(admin_call_history.action).to eq action
+                expect(admin_call_history.update_reason).to eq update_reason
+                expect(admin_call_history.updated_by).to eq updated_by
+              end
+
+              it 'should create history for failed publish' do
+                failure_history = applicant_2_esi_evidence.verification_histories.last
+                expect(failure_history.action).to eq failed_action
+                expect(failure_history.update_reason).to include(failed_update_reason)
+                expect(failure_history.updated_by).to eq(failed_updated_by)
+              end
+            end
+
+            context 'for applicant_1' do
+              it 'should not create applicant_1 history for applicant_2 requested call' do
+                admin_call_history = applicant_1_esi_evidence.verification_histories.first
+                expect(admin_call_history.nil?).to be_truthy
+              end
             end
           end
 
-          context 'for applicant_1' do
-            it 'should not create applicant_1 history for applicant_2 requested call' do
-              admin_call_history = applicant_1_esi_evidence.verification_histories.first
-              expect(admin_call_history.nil?).to be_truthy
+          context 'when hub call made for applicant 1' do
+            before do
+              @result = applicant_1_esi_evidence.request_determination(action, update_reason, updated_by)
+              applicant_2_esi_evidence.reload
+              applicant_1_esi_evidence.reload
+            end
+
+            it 'should return false' do
+              expect(@result).to be_truthy
+            end
+
+            it 'should not change applicant_2 esi evidence aasm_state to attested' do
+              expect(applicant_2_esi_evidence).to have_state(:pending)
+            end
+
+            it 'should not change applicant_1 evidence state even when applicant_2 is invalid' do
+              expect(applicant_1_esi_evidence).to have_state(:pending)
+            end
+
+            context 'for applicant_1' do
+              it 'should create history only for requested call' do
+                admin_call_histories = applicant_1_esi_evidence.verification_histories
+                expect(admin_call_histories.size).to eq(1)
+              end
+
+              it 'should create success history for requested call' do
+                admin_call_history = applicant_1_esi_evidence.verification_histories.first
+                expect(admin_call_history.action).to eq action
+                expect(admin_call_history.update_reason).to eq update_reason
+                expect(admin_call_history.updated_by).to eq updated_by
+              end
+            end
+
+            context 'for applicant_2' do
+              it 'should not create applicant_2 history for applicant_1 requested call' do
+                admin_call_history = applicant_2_esi_evidence.verification_histories.first
+                expect(admin_call_history.nil?).to be_truthy
+              end
             end
           end
         end
+      end
 
-        context 'when hub call made for applicant 1' do
+      context 'for income evidence call hub' do
+        context 'builds and publishes with errors' do
+          let(:failed_action) { 'Hub Request Failed' }
+          let(:failed_updated_by) { 'system' }
+          let(:failed_update_reason) { "Invalid SSN" }
+
+          let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+          let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+
           before do
-            @result = applicant_1_esi_evidence.request_determination(action, update_reason, updated_by)
-            applicant_2_esi_evidence.reload
-            applicant_1_esi_evidence.reload
+            family_member_id = family.family_members[0].id
+            applicant.update(family_member_id: family_member_id)
+            application.update(family_id: family.id)
           end
 
-          it 'should return false' do
-            expect(@result).to be_truthy
-          end
-
-          it 'should not change applicant_2 esi evidence aasm_state to attested' do
-            expect(applicant_2_esi_evidence).to have_state(:pending)
-          end
-
-          it 'should not change applicant_1 evidence state even when applicant_2 is invalid' do
-            expect(applicant_1_esi_evidence).to have_state(:pending)
-          end
-
-          context 'for applicant_1' do
-            it 'should create history only for requested call' do
-              admin_call_histories = applicant_1_esi_evidence.verification_histories
-              expect(admin_call_histories.size).to eq(1)
+          context 'when hub call made for applicant 2' do
+            before do
+              @result = applicant_2_income_evidence.request_determination(action, update_reason, updated_by)
+              applicant_2_income_evidence.reload
+              applicant_1_income_evidence.reload
             end
 
-            it 'should create success history for requested call' do
-              admin_call_history = applicant_1_esi_evidence.verification_histories.first
-              expect(admin_call_history.action).to eq action
-              expect(admin_call_history.update_reason).to eq update_reason
-              expect(admin_call_history.updated_by).to eq updated_by
+            it 'should return false' do
+              expect(@result).to be_falsey
+            end
+
+            it 'should change applicant_2 income evidence aasm_state to negative_response_received' do
+              expect(applicant_2_income_evidence).to have_state(:negative_response_received)
+            end
+
+            it 'should not change income evidence aasm_state' do
+              expect(applicant_1_income_evidence).to have_state(:pending)
+            end
+
+            context 'for applicant_2' do
+              it 'should create history for requested call' do
+                admin_call_history = applicant_2_income_evidence.verification_histories.first
+                expect(admin_call_history.action).to eq action
+                expect(admin_call_history.update_reason).to eq update_reason
+                expect(admin_call_history.updated_by).to eq updated_by
+              end
+
+              it 'should create history for failed publish' do
+                failure_history = applicant_2_income_evidence.verification_histories.last
+                expect(failure_history.action).to eq failed_action
+                expect(failure_history.update_reason).to include(failed_update_reason)
+                expect(failure_history.updated_by).to eq(failed_updated_by)
+              end
+            end
+
+            context 'for applicant_1' do
+              it 'should not create applicant_1 history for applicant_2 requested call' do
+                admin_call_history = applicant_1_income_evidence.verification_histories.first
+                expect(admin_call_history.nil?).to be_truthy
+              end
             end
           end
 
-          context 'for applicant_2' do
-            it 'should not create applicant_2 history for applicant_1 requested call' do
-              admin_call_history = applicant_2_esi_evidence.verification_histories.first
-              expect(admin_call_history.nil?).to be_truthy
+          context 'when hub call made for applicant 1' do
+            before do
+              @result = applicant_1_income_evidence.request_determination(action, update_reason, updated_by)
+              applicant_2_income_evidence.reload
+              applicant_1_income_evidence.reload
+            end
+
+            it 'should return false' do
+              expect(@result).to be_falsey
+            end
+
+            it 'should not change applicant_2 income evidence aasm_state to attested' do
+              expect(applicant_2_income_evidence).to have_state(:pending)
+            end
+
+            it 'should not change applicant_1 evidence state even when applicant_2 is invalid' do
+              expect(applicant_1_income_evidence).to have_state(:negative_response_received)
+            end
+
+            context 'for applicant_1' do
+              it 'should create history for requested call' do
+                admin_call_history = applicant_1_income_evidence.verification_histories.first
+                expect(admin_call_history.action).to eq action
+                expect(admin_call_history.update_reason).to eq update_reason
+                expect(admin_call_history.updated_by).to eq updated_by
+              end
+
+              it 'should create history for failed publish' do
+                failure_history = applicant_1_income_evidence.verification_histories.last
+                expect(failure_history.action).to eq failed_action
+                expect(failure_history.update_reason).to include(failed_update_reason)
+                expect(failure_history.updated_by).to eq(failed_updated_by)
+              end
+            end
+
+            context 'for applicant_2' do
+              it 'should not create applicant_2 history for applicant_1 requested call' do
+                admin_call_history = applicant_2_income_evidence.verification_histories.first
+                expect(admin_call_history.nil?).to be_truthy
+              end
             end
           end
         end
