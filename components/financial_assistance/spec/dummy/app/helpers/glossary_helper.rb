@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# copy of app/helpers/glossary_helper.rb
 module GlossaryHelper
   def support_texts(key)
     if l10n("support_texts.#{key}").include? 'application_applicable_year'
