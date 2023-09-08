@@ -25,9 +25,16 @@ module Operations
         payload_entity = Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application)
 
         if payload_entity.success? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
-          applicant_entity = payload_entity.value!.applicants.select { |applicant| applicant.person_hbx_id == evidence.evidenceable.person_hbx_id }.first
-          result = check_eligibility_rules(applicant_entity, evidence.key)
-          return result if result.failure?
+          if evidence.key == :income
+            result = payload_entity.value!.applicants.collect do |applicant_entity|
+              check_eligibility_rules(applicant_entity, evidence.key)
+            end
+            return result.select { |r| r.is_a?(Failure) } if result.any?(&:failure?)
+          else
+            applicant_entity = payload_entity.value!.applicants.select { |applicant| applicant.person_hbx_id == evidence.evidenceable.person_hbx_id }.first
+            result = check_eligibility_rules(applicant_entity, evidence.key)
+            return result if result.failure?
+          end
         end
         payload_entity
       end
