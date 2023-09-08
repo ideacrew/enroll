@@ -10,7 +10,7 @@ module SponsoredBenefits
         @plan_design_organization = plan_design_organization
         @effective_date = effective_date
         @osse_eligibility ||= 'false'
-        @plan_design_proposal = plan_design_organization.plan_design_proposals.build(title: "Plan Design #{@effective_date.year}")
+        @plan_design_proposal = plan_design_organization.plan_design_proposals.find_or_initialize_by(title: "Plan Design #{@effective_date.year}")
       end
 
       def add_plan_design_profile

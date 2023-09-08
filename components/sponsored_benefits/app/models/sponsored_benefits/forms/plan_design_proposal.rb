@@ -82,8 +82,7 @@ module SponsoredBenefits
           .strftime('%Y-%m-%d')
         @quote_date = @proposal.updated_at.strftime('%m/%d/%Y')
         sponsorship = @proposal.profile.benefit_sponsorships.first
-        @osse_eligibility ||= 'true' if sponsorship &&
-                                        osse_eligibility_with(sponsorship)&.is_eligible_on?(TimeKeeper.date_of_record)
+        @osse_eligibility ||= 'true' if osse_eligibility_with(sponsorship)&.is_eligible_on?(TimeKeeper.date_of_record)
       end
 
       def ensure_proposal
@@ -236,7 +235,7 @@ module SponsoredBenefits
       end
 
       def osse_eligibility_with(benefit_sponsorship)
-        benefit_sponsorship.eligibility_on(effective_date)
+        benefit_sponsorship&.eligibility_on(effective_date)
       end
 
       def create_or_term_osse_eligibility(benefit_sponsorship)

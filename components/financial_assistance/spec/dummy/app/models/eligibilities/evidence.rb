@@ -3,7 +3,6 @@
 module Eligibilities
   # A fact - usually obtained from an external service - that contributes to determining
   # whether a subject is eligible to make use of a benefit resource
-  # rubocop:disable Metrics/ClassLength
   class Evidence
     include Mongoid::Document
     include Mongoid::Timestamps
@@ -66,58 +65,67 @@ module Eligibilities
     end
 
     def request_determination(action_name, update_reason, updated_by = nil)
-      application = self.evidenceable.application
-      payload = construct_payload(application, action_name)
-      return false if payload.failure?
-      payload = payload.value!
-      headers = self.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: application.id }
-      response = publish_evidence_event_dummy(payload, headers) # Had to do it for testing purpose under the engine.
-      if response
-        add_verification_history(action_name, update_reason, updated_by)
+      self.add_verification_history(action_name, update_reason, updated_by)
+      response = Operations::Fdsh::RequestEvidenceDetermination.new.call(self)
+
+      if response.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
+        # Currently only active for evidence type :income
+        determine_evidence_aasm_status(self.evidenceable)
+
+        update_reason = "#{self.key.capitalize} Evidence Determination Request Failed due to #{response.failure}"
+        self.add_verification_history("Hub Request Failed", update_reason, "system")
+        false
+      elsif response.failure?
+        false
       else
-        add_verification_history(action_name, "Failed to request determination", "system")
+        response
       end
-      self.save
-      response
     end
 
-    def publish_evidence_event_dummy(payload, headers)
-      return true if Rails.env.test?
-      request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: headers)
-      return false unless request_event.success?
-      request_event.value!.publish
+    def determine_evidence_aasm_status(applicant)
+      family_id = applicant.application.family_id
+      enrollments = HbxEnrollment.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, family_id: family_id)
+
+      if enrolled?(applicant, enrollments)
+        enrollments.each do |enrollment|
+          applicant.enrolled_with(enrollment)
+        end
+      else
+        applicant.set_evidence_to_negative_response(self)
+      end
+    end
+
+    def enrolled?(applicant, enrollments)
+      return false if enrollments.blank?
+
+      family_member_ids = enrollments.flat_map(&:hbx_enrollment_members).flat_map(&:applicant_id).uniq
+      family_member_ids.map(&:to_s).include?(applicant.family_member_id.to_s)
+    end
+
+    def payload_format
+      case self.key
+      when :non_esi_mec
+        { non_esi_payload_format: EnrollRegistry[:non_esi_h31].setting(:payload_format).item }
+      else
+        {}
+      end
     end
 
     def add_verification_history(action, update_reason, updated_by)
-      self.verification_histories.build(action: action, update_reason: update_reason, updated_by: updated_by)
-    end
-
-    def construct_payload(application, action_name = "")
-      cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
-      if cv3_application.failure?
-        add_verification_history(action_name, "Failed to construct payload", "system") if action_name.present?
-        self.save
-        return cv3_application
-      end
-
-      application = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application.value!)
-      return application if application.success?
-      add_verification_history(action_name, "Failed to validate application", "system") if action_name.present?
+      result = self.verification_histories.build(action: action, update_reason: update_reason, updated_by: updated_by)
       self.save
-      application
+      result
     end
 
     def extend_due_on(period = 30.days, updated_by = nil)
       self.due_on = verif_due_date + period
       add_verification_history('extend_due_date', "Extended due date to #{due_on.strftime('%m/%d/%Y')}", updated_by)
-      self.save
     end
 
     def auto_extend_due_on(period = 30.days, updated_by = nil)
       current = verif_due_date
       self.due_on = current + period
       add_verification_history('auto_extend_due_date', "Auto extended due date from #{current.strftime('%m/%d/%Y')} to #{due_on.strftime('%m/%d/%Y')}", updated_by)
-      self.save
     end
 
     def verif_due_date
@@ -344,14 +352,14 @@ module Eligibilities
 
     def clone_verification_histories(new_evidence)
       verification_histories.each do |verification|
-        verification_attrs = verification.attributes.deep_symbolize_keys.slice(:action, :modifier, :update_reason, :updated_by, :is_satisfied, :verification_outstanding, :due_on, :aasm_state)
+        verification_attrs = verification.attributes.deep_symbolize_keys.slice(:action, :modifier, :update_reason, :updated_by, :is_satisfied, :verification_outstanding, :due_on, :aasm_state, :date_of_action)
         new_evidence.verification_histories.build(verification_attrs)
       end
     end
 
     def clone_request_results(new_evidence)
       request_results.each do |request_result|
-        request_result_attrs = request_result.attributes.deep_symbolize_keys.slice(:result, :source, :source_transaction_id, :code, :code_description, :raw_payload)
+        request_result_attrs = request_result.attributes.deep_symbolize_keys.slice(:result, :source, :source_transaction_id, :code, :code_description, :raw_payload, :date_of_action)
         new_evidence.request_results.build(request_result_attrs)
       end
     end
@@ -372,4 +380,3 @@ module Eligibilities
     end
   end
 end
-# rubocop:enable Metrics/ClassLength
