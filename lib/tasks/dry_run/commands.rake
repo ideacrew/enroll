@@ -1,4 +1,4 @@
-require_relative 'helpers'
+require_relative 'utils'
 
 namespace :dry_run do
   namespace :commands do
@@ -30,7 +30,7 @@ namespace :dry_run do
       # The renewals requests are published by the following command.
       result = FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::RequestAll.new.call({ renewal_year: year })
       # The renewal requests are picked up by the renewal worker and the actual renewal results logged to the following file.
-      results_log_file = "/log/on_enroll_applications_aptc_csr_credits_renewals_renewal_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+      results_log_file = "/log/aptc_credit_eligibilities_renew_all.log"
 
       log "Renewal process for #{year} - #{result_type(result)}", "Results logged to #{results_log_file}"
     end
@@ -51,7 +51,7 @@ namespace :dry_run do
       # The determination requests are published by the following command.
       result = FinancialAssistance::Operations::Applications::AptcCsrCreditEligibilities::Renewals::DetermineAll.new.call({ renewal_year: year })
       # The determination requests are picked up by the determination worker and the actual determination results logged to the following file.
-      results_log_file = "/log/on_magi_medicaid_applications_aptc_csr_credits_renewals_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+      results_log_file = "/log/aptc_credit_eligibilities_determine_all.log"
       log "Determination process for #{year} - #{result_type(result)}", "Results logged to #{results_log_file}"
     end
 

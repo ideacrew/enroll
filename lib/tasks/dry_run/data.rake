@@ -1,4 +1,4 @@
-require_relative 'helpers'
+require_relative 'utils'
 # Each of the following tasks can be run individually or as part of a larger
 # task. For example, you can run `rake dry_run:data:refresh_database[2019]` to
 # delete all data for 2019 and then create all data for 2019.

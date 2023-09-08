@@ -1,4 +1,4 @@
-require_relative 'helpers'
+require_relative 'utils'
 
 namespace :dry_run do
   namespace :reports do
