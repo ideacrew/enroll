@@ -2920,6 +2920,22 @@ class HbxEnrollment
       may_cancel_coverage_for_superseded_term?
   end
 
+  # Checks to see if the previous enrollment is ineligible for termination.
+  # Previous enrollment is ineligible for termination if all the below are true
+  #   - Checks if the enrollment is of kind individual market
+  #   - Checks if the enrollment is in terminated state
+  #   - Checks if the enrollment has a terminated_on date
+  #   - Checks if the new_effective_on date exists
+  #   - Checks if new effective on is one day after the enrollment's terminated_on
+  #   - The base/previous enrollment must have the same signature as the new enrollment, which is 'given' before calling this method
+  def ineligible_for_termination?(new_effective_on)
+    is_ivl_by_kind? &&
+      coverage_terminated? &&
+      terminated_on.present? &&
+      new_effective_on.present? &&
+      (new_effective_on - 1.day) == terminated_on
+  end
+
   private
 
   # Calculates sum of enrolled aptc member's of TaxHouseholdEnrollment ehb_premiums including Minimum Responsibility.
