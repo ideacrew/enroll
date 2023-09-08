@@ -26,7 +26,7 @@ module Operations
           enrollment.generate_signature(previous_enrollment)
           if enrollment.same_signatures(previous_enrollment) && !previous_enrollment.is_shop?
             if enrollment.effective_on > previous_enrollment.effective_on && previous_enrollment.may_terminate_coverage?
-              next previous_enrollment if ineligible_for_termination?(previous_enrollment, enrollment)
+              next previous_enrollment if previous_enrollment.ineligible_for_termination?(enrollment.effective_on)
 
               previous_enrollment.terminate_coverage!(enrollment.effective_on - 1.day)
             elsif previous_enrollment.enrollment_superseded_and_eligible_for_cancellation?(enrollment.effective_on)
@@ -36,21 +36,6 @@ module Operations
             end
           end
         end
-      end
-
-      private
-
-      # Checks to see if the previous enrollment is eligible for termination.
-      # Previous enrollment is ineligible for termination if all the below are true
-      #   - The previous enrollment is already in terminated state
-      #   - The previous enrollment has a terminated_on date
-      #   - The new enrollment has an effective_on date
-      #   - The new enrollment's effective_on is same as previous enrollment's terminated_on date
-      def ineligible_for_termination?(previous_enrollment, enrollment)
-        previous_enrollment.coverage_terminated? &&
-          previous_enrollment.terminated_on.present? &&
-          enrollment.effective_on.present? &&
-          (enrollment.effective_on - 1.day) == previous_enrollment.terminated_on
       end
     end
   end

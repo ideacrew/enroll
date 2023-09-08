@@ -488,4 +488,115 @@ RSpec.describe HbxEnrollment, type: :model do
       end
     end
   end
+
+  describe '#ineligible_for_termination?' do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let(:system_year) { TimeKeeper.date_of_record.year }
+    let(:new_effective_on) { Date.new(system_year, 2) }
+    let(:terminated_on) { Date.new(system_year, 2) - 1.day }
+    let(:aasm_state) { 'coverage_terminated' }
+    let(:kind) { 'individual' }
+
+    let(:prev_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        :with_silver_health_product,
+                        :with_enrollment_members,
+                        kind: kind,
+                        enrollment_members: family.family_members,
+                        aasm_state: aasm_state,
+                        terminated_on: terminated_on,
+                        household: family.active_household,
+                        effective_on: Date.new(system_year),
+                        family: family)
+    end
+
+    context "when:
+      - enrollment is of kind individual market
+      - enrollment is terminated
+      - enrollment has terminated_on
+      - new effective exists
+      - new effective on is one day after the enrollment's terminated_on
+      " do
+
+      it 'returns true' do
+        expect(prev_enrollment.ineligible_for_termination?(new_effective_on)).to be_truthy
+      end
+    end
+
+    context "when:
+      - enrollment is not of kind individual market
+      - enrollment is terminated
+      - enrollment has terminated_on
+      - new effective exists
+      - new effective on is one day after the enrollment's terminated_on
+      " do
+
+      let(:kind) { 'employer_sponsored' }
+
+      it 'returns false' do
+        expect(prev_enrollment.ineligible_for_termination?(new_effective_on)).to be_falsey
+      end
+    end
+
+    context "when:
+      - enrollment is of kind individual market
+      - enrollment is not terminated
+      - enrollment has terminated_on
+      - new effective exists
+      - new effective on is one day after the enrollment's terminated_on
+      " do
+
+      let(:aasm_state) { 'coverage_selected' }
+
+      it 'returns false' do
+        expect(prev_enrollment.ineligible_for_termination?(new_effective_on)).to be_falsey
+      end
+    end
+
+    context "when:
+      - enrollment is of kind individual market
+      - enrollment is terminated
+      - enrollment does not have terminated_on
+      - new effective exists
+      - new effective on is one day after the enrollment's terminated_on
+      " do
+
+      let(:terminated_on) { nil }
+
+      it 'returns false' do
+        expect(prev_enrollment.ineligible_for_termination?(new_effective_on)).to be_falsey
+      end
+    end
+
+    context "when:
+      - enrollment is of kind individual market
+      - enrollment is terminated
+      - enrollment has terminated_on
+      - new effective does not exist
+      - new effective on is one day after the enrollment's terminated_on
+      " do
+
+      let(:new_effective_on) { nil }
+
+      it 'returns false' do
+        expect(prev_enrollment.ineligible_for_termination?(new_effective_on)).to be_falsey
+      end
+    end
+
+    context "when:
+      - enrollment is of kind individual market
+      - enrollment is terminated
+      - enrollment has terminated_on
+      - new effective exists
+      - new effective on is not one day after the enrollment's terminated_on
+      " do
+
+      let(:new_effective_on) { Date.new(system_year, 5) }
+
+      it 'returns false' do
+        expect(prev_enrollment.ineligible_for_termination?(new_effective_on)).to be_falsey
+      end
+    end
+  end
 end

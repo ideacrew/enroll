@@ -553,13 +553,17 @@ class HbxEnrollment
     @benefit_group = BenefitGroup.find(self.benefit_group_id)
   end
 
-  def record_transition
+  def record_transition(*args)
     generate_enrollment_saved_event
+
+    meta_args = {}
+    meta_args = args.last if !args.empty? && args.last.is_a?(Hash)
 
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
       to_state: aasm.to_state,
-      event: aasm.current_event
+      event: aasm.current_event,
+      metadata: meta_args
     )
   end
 
@@ -2351,7 +2355,8 @@ class HbxEnrollment
     current_bcp.contains?(effective_on)
   end
 
-  def can_select_coverage?(qle: false)
+  def can_select_coverage?(arg = {})
+    qle = arg[:qle] || false
     return true if is_cobra_status?
     if is_shop?
       if employee_role.can_enroll_as_new_hire?
@@ -2918,6 +2923,22 @@ class HbxEnrollment
       new_effective_on.present? &&
       new_effective_on.year == effective_on.year &&
       may_cancel_coverage_for_superseded_term?
+  end
+
+  # Checks to see if the previous enrollment is ineligible for termination.
+  # Previous enrollment is ineligible for termination if all the below are true
+  #   - Checks if the enrollment is of kind individual market
+  #   - Checks if the enrollment is in terminated state
+  #   - Checks if the enrollment has a terminated_on date
+  #   - Checks if the new_effective_on date exists
+  #   - Checks if new effective on is one day after the enrollment's terminated_on
+  #   - The base/previous enrollment must have the same signature as the new enrollment, which is 'given' before calling this method
+  def ineligible_for_termination?(new_effective_on)
+    is_ivl_by_kind? &&
+      coverage_terminated? &&
+      terminated_on.present? &&
+      new_effective_on.present? &&
+      (new_effective_on - 1.day) == terminated_on
   end
 
   private
