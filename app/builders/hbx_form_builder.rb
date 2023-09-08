@@ -14,7 +14,7 @@ class HbxFormBuilder < ActionView::Helpers::FormBuilder
       class: class_list.split(/\s+/).uniq.join(" "),
       maxlength: 11,
       required: is_required,
-      placeholder: "#{l10n('social_security').to_s.upcase} #{'*' if is_required}",
+      placeholder: "#{l10n('social_security').to_s.upcase}#{' *' if is_required}",
       readonly: is_readonly
     }
     if EnrollRegistry.feature_enabled?(:ssn_ui_validation)

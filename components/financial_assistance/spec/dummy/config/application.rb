@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'boot'
+require_relative "boot"
 
 require "rails"
 require "action_controller/railtie"
@@ -10,7 +10,7 @@ require "sprockets/railtie"
 
 Bundler.require(*Rails.groups)
 require "devise"
-require 'resource_registry'
+require "resource_registry"
 require "financial_assistance"
 require "symmetric-encryption"
 
@@ -24,6 +24,12 @@ module Dummy
     # -- all .rb files in that directory are automatically loaded after loading
     # the framework and any gems in your application.
     config.autoload_paths += ["#{config.root}/lib", "#{config.root}/app/notices", "#{config}/app/jobs"]
+
+    # NOTE: this is configured here in addition to ApplicationController
+    # to ensure Rspec view tests use the correct form builder
+    config.after_initialize do
+      ActionView::Base.default_form_builder = ::HbxFormBuilder
+    end
   end
 end
 

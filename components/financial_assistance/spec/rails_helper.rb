@@ -16,6 +16,7 @@ require 'capybara/rspec'
 require 'factory_bot_rails'
 require 'test_prof'
 require 'test_prof/recipes/rspec/factory_default'
+require 'pundit/rspec'
 
 FactoryBot.definition_file_paths = [
   "spec/dummy/spec/factories"
@@ -72,12 +73,8 @@ RSpec.configure do |config|
   # https://relishapp.com/rspec/rspec-rails/docs
   DatabaseCleaner[:mongoid].strategy = :deletion
   config.infer_spec_type_from_file_location!
-
-  # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!
-  # arbitrary gems may also be filtered via:
-  # config.filter_gems_from_backtrace("gem name")
-#  config.include ModelMatcherHelpers, :type => :model
+
   config.include Mongoid::Matchers, type: :model
   config.include Devise::Test::ControllerHelpers, :type => :controller
   config.include Devise::Test::ControllerHelpers, :type => :view
