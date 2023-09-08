@@ -62,7 +62,7 @@ module Operations
               return payload_entity unless EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
 
               if payload_entity.success?
-                result = payload_entity.value!.applicants.collect do  |applicant_entity,hash|
+                result = payload_entity.value!.applicants.collect do  |applicant_entity|
                   check_eligibility_rules(applicant_entity, :income)
                 end.flatten.compact
 
