@@ -42,7 +42,10 @@ module BenefitSponsors
             errors << "effective date missing" unless params[:effective_date].is_a?(::Date)
             @subject = GlobalID::Locator.locate(params[:subject])
             errors << "subject missing or not found for #{params[:subject]}" unless @subject.present?
-            errors << "subject should belong to shop market" unless subject.market_kind == :aca_shop
+            if subject.respond_to?(:market_kind) &&
+               subject.market_kind != :aca_shop
+              errors << "subject should belong to shop market"
+            end
 
             errors.empty? ? Success(params) : Failure(errors)
           end
@@ -51,9 +54,12 @@ module BenefitSponsors
           # When eligibility changes we create new state histories for evidence and eligibility
           def find_eligibility(values)
             eligibility =
-              subject.eligibilities.by_key(
+              subject
+              .eligibilities
+              .by_key(
                 "aca_shop_osse_eligibility_#{values[:effective_date].year}".to_sym
-              ).last
+              )
+              .last
 
             Success(eligibility)
           end
