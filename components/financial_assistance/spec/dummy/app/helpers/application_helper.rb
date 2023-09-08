@@ -9,6 +9,7 @@ module ApplicationHelper
     link_to(name, path, options.merge(rel: 'noopener noreferrer'))
   end
 
+  # rubocop:disable Naming/MethodParameterName
   def datepicker_control(f, field_name, options = {}, value = "")
     sanitized_field_name = field_name.to_s.sub(/\?$/,"")
     opts = options.dup
@@ -23,7 +24,7 @@ module ApplicationHelper
     jq_tag_classes = (html_class_list.split(/\s+/) + ["jq-datepicker"]).join(" ")
     generated_field_name = "jq_datepicker_ignore_#{obj_name}[#{sanitized_field_name}]"
     provided_id = options[:id] || options["id"]
-    generate_target_id = nil
+    generated_target_id = nil
     generated_target_id = "#{provided_id}_jq_datepicker_plain_field" unless provided_id.blank?
     sanitized_object_name = "#{obj_name}_#{sanitized_field_name}".delete(']').tr('^-a-zA-Z0-9:.', "_")
     generated_target_id ||= "#{sanitized_object_name}_jq_datepicker_plain_field"
@@ -32,9 +33,9 @@ module ApplicationHelper
       concat text_field_tag(generated_field_name, current_value, opts.merge(:class => jq_tag_classes, :start_date => "07/01/2016", :style => "display: none;", "data-submission-field" => "##{generated_target_id}"))
     end
   end
+  # rubocop:enable Naming/MethodParameterName
 
   # Not sure if this is the best way to handle templates that call for javascript_pack_tag
   # but I'm not sure how to mock it out otherwise
-  def javascript_pack_tag(*args)
-  end
+  def javascript_pack_tag(*args); end
 end
