@@ -11,7 +11,7 @@ class WorkflowStateTransition
   field :reason, type: String
   field :comment, type: String
   field :user_id, type: BSON::ObjectId
-  field :metadata, type: Hash, default: ->{ {} }
+  field :metadata, type: Hash, default: {}
 
   before_validation :set_transition_timestamp
 
