@@ -80,7 +80,7 @@ module Eligibilities
           method_name = "determine_#{key.to_s.split('_').last}_evidence_aasm_status".to_sym
           send(method_name, evidenceable)
 
-          update_reason = "#{key.titleize} Evidence Determination Request Failed due to #{response.failure}"
+          update_reason = "#{key.to_s.titleize} Evidence Determination Request Failed due to #{response.failure}"
           add_verification_history("Hub Request Failed", update_reason, "system")
         end
 
