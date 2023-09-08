@@ -533,92 +533,139 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
 
     let(:aasm_state) { 'coverage_terminated' }
 
-    let(:prev_enr_term_to_cancel_superseded_transition) do
-      base_enrollment.workflow_state_transitions.where(
-        event: 'cancel_coverage_for_superseded_term!',
-        from_state: 'coverage_terminated',
-        to_state: 'coverage_canceled'
-      ).first
-    end
-    let(:feature_enabled) { true }
+    context 'for enrollment_superseded_and_eligible_for_cancellation?' do
+      let(:prev_enr_term_to_cancel_superseded_transition) do
+        base_enrollment.workflow_state_transitions.where(
+          event: 'cancel_coverage_for_superseded_term!',
+          from_state: 'coverage_terminated',
+          to_state: 'coverage_canceled'
+        ).first
+      end
+      let(:feature_enabled) { true }
 
-    before do
-      allow(
-        EnrollRegistry[:cancel_superseded_terminated_enrollments].feature
-      ).to receive(:is_enabled).and_return(feature_enabled)
-    end
-
-    context "when:
-      - base_enrollment is terminated
-      - base_enrollment's effective_on greater than or equal to new_effective_on
-      - RR configuration feature :cancel_superseded_terminated_enrollments is enabled
-      " do
-
-      before { subject.build }
-
-      it 'transitions enrollment to canceled state' do
-        expect(base_enrollment.reload.coverage_canceled?).to be_truthy
+      before do
+        allow(
+          EnrollRegistry[:cancel_superseded_terminated_enrollments].feature
+        ).to receive(:is_enabled).and_return(feature_enabled)
       end
 
-      it 'transitions enrollment via cancel_coverage_for_superseded_term' do
-        expect(prev_enr_term_to_cancel_superseded_transition).to be_truthy
+      context "when:
+        - base_enrollment is terminated
+        - base_enrollment's effective_on greater than or equal to new_effective_on
+        - RR configuration feature :cancel_superseded_terminated_enrollments is enabled
+        " do
+
+        before { subject.build }
+
+        it 'transitions enrollment to canceled state' do
+          expect(base_enrollment.reload.coverage_canceled?).to be_truthy
+        end
+
+        it 'transitions enrollment via cancel_coverage_for_superseded_term' do
+          expect(prev_enr_term_to_cancel_superseded_transition).to be_truthy
+        end
+      end
+
+      context "when:
+        - base_enrollment is not terminated
+        - base_enrollment's effective_on greater than or equal to new_effective_on
+        - RR configuration feature :cancel_superseded_terminated_enrollments is enabled
+        " do
+
+        let(:aasm_state) { 'coverage_selected' }
+
+        before { subject.build }
+
+        it 'transitions enrollment to canceled state' do
+          expect(base_enrollment.reload.coverage_canceled?).to be_truthy
+        end
+
+        it 'does not transition enrollment via cancel_coverage_for_superseded_term' do
+          expect(prev_enr_term_to_cancel_superseded_transition).not_to be_truthy
+        end
+      end
+
+      context "when:
+        - base_enrollment is terminated
+        - base_enrollment's effective_on not greater than or equal to new_effective_on
+        - RR configuration feature :cancel_superseded_terminated_enrollments is enabled
+        " do
+
+        let(:base_enrollment_effective_on) { Date.new(coverage_year, 2) }
+
+        before { subject.build }
+
+        it 'transitions enrollment to non canceled state' do
+          expect(base_enrollment.reload.coverage_canceled?).to be_falsey
+        end
+
+        it 'does not transition enrollment via cancel_coverage_for_superseded_term' do
+          expect(prev_enr_term_to_cancel_superseded_transition).not_to be_truthy
+        end
+      end
+
+      context "when:
+        - base_enrollment is terminated
+        - base_enrollment's effective_on is greater than or equal to new_effective_on
+        - RR configuration feature :cancel_superseded_terminated_enrollments is disabled
+        " do
+
+        let(:feature_enabled) { false }
+
+        before { subject.build }
+
+        it 'does not transition enrollment' do
+          expect(base_enrollment.aasm_state).to eq(aasm_state)
+        end
+
+        it 'does not transition enrollment via cancel_coverage_for_superseded_term' do
+          expect(prev_enr_term_to_cancel_superseded_transition).not_to be_truthy
+        end
       end
     end
 
-    context "when:
-      - base_enrollment is not terminated
-      - base_enrollment's effective_on greater than or equal to new_effective_on
-      - RR configuration feature :cancel_superseded_terminated_enrollments is enabled
-      " do
-
-      let(:aasm_state) { 'coverage_selected' }
-
-      before { subject.build }
-
-      it 'transitions enrollment to canceled state' do
-        expect(base_enrollment.reload.coverage_canceled?).to be_truthy
-      end
-
-      it 'does not transition enrollment via cancel_coverage_for_superseded_term' do
-        expect(prev_enr_term_to_cancel_superseded_transition).not_to be_truthy
-      end
-    end
-
-    context "when:
-      - base_enrollment is terminated
-      - base_enrollment's effective_on not greater than or equal to new_effective_on
-      - RR configuration feature :cancel_superseded_terminated_enrollments is enabled
-      " do
-
+    context 'for ineligible_for_termination?' do
       let(:base_enrollment_effective_on) { Date.new(coverage_year, 2) }
+      let(:base_enrollment_terminated_on) { new_enrollment_effective_on - 1.day }
 
-      before { subject.build }
-
-      it 'transitions enrollment to non canceled state' do
-        expect(base_enrollment.reload.coverage_canceled?).to be_falsey
+      let(:prev_enr_transition_to_terminated_via_terminate_coverage) do
+        base_enrollment.workflow_state_transitions.where(
+          event: 'terminate_coverage!',
+          from_state: aasm_state,
+          to_state: 'coverage_terminated'
+        ).first
       end
 
-      it 'does not transition enrollment via cancel_coverage_for_superseded_term' do
-        expect(prev_enr_term_to_cancel_superseded_transition).not_to be_truthy
-      end
-    end
+      context "when:
+        - base_enrollment is of market kind individual
+        - base_enrollment is terminated
+        - base_enrollment has terminated_on
+        - new_effective_on exists
+        - base_enrollment's effective_on is one day before new_effective_on
+        " do
 
-    context "when:
-      - base_enrollment is terminated
-      - base_enrollment's effective_on is greater than or equal to new_effective_on
-      - RR configuration feature :cancel_superseded_terminated_enrollments is disabled
-      " do
+        before { subject.build }
 
-      let(:feature_enabled) { false }
-
-      before { subject.build }
-
-      it 'does not transition enrollment' do
-        expect(base_enrollment.aasm_state).to eq(aasm_state)
+        it 'skips transition to terminated' do
+          expect(prev_enr_transition_to_terminated_via_terminate_coverage).not_to be_truthy
+        end
       end
 
-      it 'does not transition enrollment via cancel_coverage_for_superseded_term' do
-        expect(prev_enr_term_to_cancel_superseded_transition).not_to be_truthy
+      context "when:
+        - base_enrollment is of market kind individual
+        - base_enrollment is not terminated
+        - base_enrollment has terminated_on
+        - new_effective_on exists
+        - base_enrollment's effective_on is one day before new_effective_on
+        " do
+
+        let(:aasm_state) { 'coverage_selected' }
+
+        before { subject.build }
+
+        it 'transition to enrollment to terminated state' do
+          expect(prev_enr_transition_to_terminated_via_terminate_coverage).to be_truthy
+        end
       end
     end
   end
