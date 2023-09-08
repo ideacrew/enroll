@@ -780,7 +780,7 @@ namespace :dry_run do
     end
 
     def financial_assistance_applications_by_year(year)
-      ::FinancialAssistance::Application.where(application_year: year)
+      ::FinancialAssistance::Application.by_year(year)
     end
 
     desc "financial assistance applications for a given year"
