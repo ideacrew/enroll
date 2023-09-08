@@ -409,7 +409,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
       end
     end
 
-    context 'when application has one valid applicant and invalid applicant' do
+    context 'when applicant_1 is valid and applicant_2 is invalid' do
       include_context "valid cv3 application setup"
       before do
         allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
@@ -629,7 +629,7 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
               expect(applicant_2_income_evidence).to have_state(:pending)
             end
 
-            it 'should not change applicant_1 evidence state even when applicant_2 is invalid' do
+            it 'should change applicant_1 evidence state' do
               expect(applicant_1_income_evidence).to have_state(:negative_response_received)
             end
 

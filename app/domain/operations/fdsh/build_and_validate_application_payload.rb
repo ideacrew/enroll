@@ -12,7 +12,6 @@ module Operations
       def call(application)
         cv3_application = yield construct_cv3_application(application)
         payload_entity = yield construct_payload_entity(cv3_application)
-        # yield check_eligibility_rules(payload_entity, request_type) if can_check_rules && EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
 
         Success(payload_entity)
       end
@@ -36,12 +35,6 @@ module Operations
         # the result from the InitializeApplication call here returns a failure if malformed/errors present -- no need to add additional error handling here
         AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application)
       end
-
-      # def check_eligibility_rules(payload, request_type)
-      #   payload.applicants.map do |applicant|
-      #     Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules.new.call(applicant, request_type)
-      #   end
-      # end
     end
   end
 end
