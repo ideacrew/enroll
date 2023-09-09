@@ -385,27 +385,29 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
             .by_key(:aca_ivl_osse_eligibility_2023)
             .first
 
-          expect(eligibility_2022.is_eligible).to be_truthy
-          expect(eligibility_2022.effective_on.to_date).to eq Date.new(
-            2022,
-            10,
-            3
-          )
-          expect(eligibility_2022.evidences.last.current_state).to eq :approved
-          expect(
-            eligibility_2022.evidences.last.state_histories.pluck(:to_state)
-          ).to eq %i[not_approved approved]
+          eligibility_2022.tap do |e|
+            expect(e.is_eligible).to be_truthy
+            expect(e.effective_on.to_date).to eq eligibilities
+              .first
+              .start_on
+              .to_date
+            expect(e.evidences.last.current_state).to eq :approved
+            expect(e.evidences.last.state_histories.pluck(:to_state)).to eq %i[
+                 not_approved
+                 approved
+               ]
+          end
 
-          expect(eligibility_2023.is_eligible).to be_falsey
-          expect(eligibility_2023.effective_on.to_date).to eq Date.new(
-            2023,
-            5,
-            9
-          )
-          expect(eligibility_2023.evidences.last.current_state).to eq :denied
-          expect(
-            eligibility_2023.evidences.last.state_histories.pluck(:to_state)
-          ).to eq %i[not_approved denied]
+          eligibility_2023.tap do |e|
+            expect(e.is_eligible).to be_falsey
+            expect(e.effective_on.to_date).to eq Date.new(2023, 5, 9)
+            expect(e.evidences.last.current_state).to eq :denied
+            expect(e.evidences.last.state_histories.pluck(:to_state)).to eq %i[
+                 not_approved
+                 approved
+                 denied
+               ]
+          end
         end
       end
     end
@@ -753,6 +755,7 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
         end
       end
     end
+
     context ".scenario 2 (multiple eligibility records present)" do
       let(:options1) do
         {
@@ -921,7 +924,7 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
           let(:options1) do
             {
               "_id" => BSON.ObjectId("639a09db1632a300106da7ab"),
-              "start_on" => DateTime.parse("2022-12-14 00:00:00 UTC"),
+              "start_on" => Date.parse("2022-12-14 00:00:00 UTC"),
               "eligibility_id" => BSON.ObjectId("5f231ad0cc35a87379edab16"),
               "eligibility_type" =>
                 "BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
@@ -952,7 +955,7 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
           let(:options2) do
             {
               "_id" => BSON.ObjectId("639a0bb59590da0010b53f6e"),
-              "start_on" => DateTime.parse("2022-12-14 00:00:00 UTC"),
+              "start_on" => Date.parse("2022-12-14 00:00:00 UTC"),
               "eligibility_id" => BSON.ObjectId("5f231ad0cc35a87379edab16"),
               "eligibility_type" =>
                 "BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
@@ -1008,18 +1011,136 @@ RSpec.describe Operations::Eligible::MigrateEligibility,
 
               eligibility_2022.tap do |e|
                 expect(e.is_eligible).to be_falsey
-                # expect(e.effective_on.to_date).to eq eligibilities[
-                #      1
-                #    ].start_on.to_date
+                expect(e.effective_on.to_date).to eq eligibilities[
+                     1
+                   ].start_on.to_date
                 expect(e.evidences.last.current_state).to eq :denied
                 expect(
                   e.evidences.last.state_histories.pluck(:to_state)
                 ).to eq %i[not_approved denied denied]
                 # expect(
                 #   e.evidences.last.state_histories.pluck(:from_state)
-                # ).to eq %i[initial not_approved denied]
+                # ).to eq %i[initial not_approved not_approved]
               end
             end
+          end
+        end
+      end
+    end
+
+    context ".scenario 3 (eligibility span across multiple years)" do
+      let(:options1) do
+        {
+          "_id" => BSON.ObjectId("638e1f139f9fc600111fdb23"),
+          "start_on" => Date.parse("2022-12-05 00:00:00 UTC"),
+          "eligibility_id" => BSON.ObjectId("5838a0e6faca14672000065b"),
+          "eligibility_type" =>
+            "BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
+          "updated_at" => DateTime.parse("2023-08-17 15:55:14 UTC"),
+          "created_at" => DateTime.parse("2022-12-05 16:40:51 UTC"),
+          "subject" => {
+            "_id" => BSON.ObjectId("638e1f139f9fc600111fdb24"),
+            "title" => "Subject for Osse Subsidy",
+            "key" => benefit_sponsorship.to_global_id,
+            "klass" =>
+              "BenefitSponsors::BenefitSponsorships::BenefitSponsorship",
+            "updated_at" => DateTime.parse("2022-12-05 16:40:51 UTC"),
+            "created_at" => DateTime.parse("2022-12-05 16:40:51 UTC")
+          },
+          "evidences" => [
+            {
+              "_id" => BSON.ObjectId("638e1f139f9fc600111fdb25"),
+              "key" => :osse_subsidy,
+              "title" => "Evidence for Osse Subsidy",
+              "is_satisfied" => true,
+              "updated_at" => DateTime.parse("2022-12-05 16:40:51 UTC"),
+              "created_at" => DateTime.parse("2022-12-05 16:40:51 UTC")
+            },
+            {
+              "_id" => BSON.ObjectId("64de42e29c2463001094531b"),
+              "title" => "Osse Subsidy Evidence",
+              "key" => :osse_subsidy,
+              "is_satisfied" => false,
+              "updated_at" => DateTime.parse("2023-08-17 15:55:14 UTC"),
+              "created_at" => DateTime.parse("2023-08-17 15:55:14 UTC")
+            }
+          ],
+          "grants" => [
+            {
+              "_id" => BSON.ObjectId("638e1f139f9fc600111fdb27"),
+              "title" => "minimum_participation_rule_relaxed_2022",
+              "key" => :minimum_participation_rule,
+              "start_on" => DateTime.parse("2022-12-05 00:00:00 UTC"),
+              "updated_at" => DateTime.parse("2022-12-05 16:40:51 UTC"),
+              "created_at" => DateTime.parse("2022-12-05 16:40:51 UTC"),
+              "value" => {
+                "_id" => BSON.ObjectId("638e1f139f9fc600111fdb26"),
+                "_type" => "Eligibilities::Osse::BenefitSponsorshipOssePolicy",
+                "title" => "minimum_participation_rule_relaxed_2022",
+                "key" => :minimum_participation_rule,
+                "value" => "minimum_participation_rule",
+                "updated_at" => DateTime.parse("2022-12-05 16:40:51 UTC"),
+                "created_at" => DateTime.parse("2022-12-05 16:40:51 UTC")
+              }
+            }
+          ],
+          "end_on" => Date.parse("2023-08-17 00:00:00 UTC")
+        }
+      end
+
+      context "when eligibility active last year" do
+        let(:eligibilities) do
+          [options1].collect do |options|
+            Eligibilities::Osse::Eligibility.new(options)
+          end
+        end
+
+        it "should migrate eligibility record and create renewal eligibility" do
+          result =
+            described_class.new.call(
+              current_eligibilities: eligibilities,
+              eligibility_type:
+                "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+            )
+
+          expect(result.success).to be_truthy
+          benefit_sponsorship.reload
+          expect(benefit_sponsorship.eligibilities).to be_present
+          expect(benefit_sponsorship.eligibilities.count).to eq 2
+
+          eligibility_2022 =
+            benefit_sponsorship
+            .eligibilities
+            .by_key(:aca_shop_osse_eligibility_2022)
+            .first
+          eligibility_2023 =
+            benefit_sponsorship
+            .eligibilities
+            .by_key(:aca_shop_osse_eligibility_2023)
+            .first
+
+          eligibility_2022.tap do |e|
+            expect(e.is_eligible).to be_truthy
+            expect(e.effective_on.to_date).to eq eligibilities
+              .first
+              .start_on
+              .to_date
+            expect(e.evidences.last.current_state).to eq :approved
+            expect(e.evidences.last.state_histories.pluck(:to_state)).to eq %i[
+                 not_approved
+                 approved
+               ]
+          end
+
+          eligibility_2023.tap do |e|
+            expect(e.is_eligible).to be_falsey
+            expect(e.effective_on.to_date).to eq Date.new(2023, 8, 17)
+            expect(e.evidences.last.current_state).to eq :denied
+            expect(e.evidences.last.state_histories.pluck(:to_state)).to eq %i[
+                 not_approved
+                 approved
+                 denied
+               ]
           end
         end
       end
