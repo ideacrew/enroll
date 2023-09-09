@@ -115,6 +115,29 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
     end
   end
 
+  context "with event approved" do
+    let(:evidence_value) { "false" }
+
+    it "should create eligibility with :approved state evidence" do
+      eligibility = described_class.new.call(required_params).success
+
+      evidence = eligibility.evidences.last
+      eligibility_state_history = eligibility.state_histories.last
+      evidence_state_history = evidence.state_histories.last
+
+      expect(eligibility_state_history.event).to eq(:move_to_ineligible)
+      expect(eligibility_state_history.from_state).to eq(:initial)
+      expect(eligibility_state_history.to_state).to eq(:ineligible)
+      expect(eligibility_state_history.is_eligible).to be_falsey
+
+      expect(evidence_state_history.event).to eq(:move_to_not_approved)
+      expect(evidence_state_history.from_state).to eq(:initial)
+      expect(evidence_state_history.to_state).to eq(:not_approved)
+      expect(evidence_state_history.is_eligible).to be_falsey
+      expect(evidence.is_satisfied).to be_falsey
+    end
+  end
+
   context "when existing eligibility present" do
     let(:evidence_value) { "true" }
 

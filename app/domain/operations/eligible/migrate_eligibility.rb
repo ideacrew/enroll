@@ -49,15 +49,41 @@ module Operations
         return unless eligibility_years == [prev_year]
 
         last_eligibility = values[:current_eligibilities].max_by(&:updated_at)
-        return if last_eligibility.end_on.present?
-        evidence_satisfied = last_eligibility.evidences.last&.is_satisfied.to_s
-        return if evidence_satisfied == "false"
+        if last_eligibility.end_on.present? &&
+           last_eligibility.end_on.year == prev_year
+          return
+        end
 
+        last_evidence = last_eligibility.evidences.last
+        if last_evidence.created_at.year == prev_year &&
+           last_evidence&.is_satisfied.to_s == "false"
+          return
+        end
+
+        values[:current_eligibilities] << renewal_eligibility_for(
+          last_eligibility
+        )
+      end
+
+      def renewal_eligibility_for(last_eligibility)
+        last_evidence = last_eligibility.evidences.last
         renewal_eligibility =
           ::Eligibilities::Osse::Eligibility.new(
             renewal_eligibility_params(last_eligibility)
           )
-        values[:current_eligibilities] << renewal_eligibility
+
+        if last_evidence&.is_satisfied.to_s == "false"
+          renewal_eligibility.evidences << ::Eligibilities::Osse::Evidence.new(
+            {
+              "key" => :osse_subsidy,
+              "title" => "Evidence for Osse Subsidy",
+              "is_satisfied" => last_evidence.is_satisfied,
+              "updated_at" => last_evidence.updated_at,
+              "created_at" => last_evidence.created_at
+            }
+          )
+        end
+        renewal_eligibility
       end
 
       def migrate(subject, values)
@@ -77,33 +103,32 @@ module Operations
           ) { initialize_eligibility(subject, values, eligibility) }
         end
 
-        eligibility
-          .evidences
-          .sort_by(&:updated_at)
-          .each do |evidence|
-            effective_date = eligibility.start_on.to_date
-            unless evidence.is_satisfied
-              effective_date =
-                evidence.updated_at.to_date
-            end
-            logger(
-              "update_eligibility_is_satisfied_as_#{evidence.is_satisfied} for #{subject.to_global_id}"
-            ) do
-              migrate_record(
-                values,
-                {
-                  subject: subject.to_global_id,
-                  evidence_key: evidence_key_for(values[:eligibility_type]),
-                  evidence_value: evidence.is_satisfied.to_s,
-                  effective_date: effective_date,
-                  timestamps: {
-                    created_at: evidence.created_at.to_datetime,
-                    modified_at: evidence.updated_at.to_datetime
-                  }
-                }
-              )
-            end
+        eligibility.evidences.each do |evidence|
+          next if evidence.created_at.year > eligibility.start_on.year
+          effective_date = eligibility.start_on.to_date
+          unless evidence.is_satisfied
+            effective_date =
+              evidence.updated_at.to_date
           end
+
+          logger(
+            "update_eligibility_is_satisfied_as_#{evidence.is_satisfied} for #{subject.to_global_id}"
+          ) do
+            migrate_record(
+              values,
+              {
+                subject: subject.to_global_id,
+                evidence_key: evidence_key_for(values[:eligibility_type]),
+                evidence_value: evidence.is_satisfied.to_s,
+                effective_date: effective_date,
+                timestamps: {
+                  created_at: evidence.created_at.to_datetime,
+                  modified_at: evidence.updated_at.to_datetime
+                }
+              }
+            )
+          end
+        end
       end
 
       def migrate_record(values, eligibility_options)
@@ -213,26 +238,36 @@ module Operations
       end
 
       def renewal_eligibility_params(last_eligibility)
+        created_at = DateTime.now
+        updated_at = DateTime.now
+
+        last_evidence = last_eligibility.evidences.last
+        last_before_evidence = last_eligibility.evidences[-2]
+        if last_evidence.is_satisfied.to_s == "false" && last_before_evidence
+          created_at = last_before_evidence.created_at
+          updated_at = last_before_evidence.updated_at
+        end
+
         {
           "start_on" => last_eligibility.start_on.next_year.beginning_of_year,
           "eligibility_id" => last_eligibility.eligibility_id,
           "eligibility_type" => last_eligibility.eligibility_type,
-          "updated_at" => DateTime.now,
-          "created_at" => DateTime.now,
+          "updated_at" => updated_at,
+          "created_at" => created_at,
           "subject" => {
             "title" => "Subject for Osse Subsidy",
             "key" => last_eligibility.subject.key,
             "klass" => last_eligibility.eligibility_type,
-            "updated_at" => DateTime.now,
-            "created_at" => DateTime.now
+            "updated_at" => updated_at,
+            "created_at" => created_at
           },
           "evidences" => [
             {
               "key" => :osse_subsidy,
               "title" => "Evidence for Osse Subsidy",
               "is_satisfied" => true,
-              "updated_at" => DateTime.now,
-              "created_at" => DateTime.now
+              "updated_at" => updated_at,
+              "created_at" => created_at
             }
           ]
         }
