@@ -32,7 +32,7 @@ module Subscribers
 
         if payload[:osse_enabled]
           skip_callbacks
-          results = family.family_members.active.each do |family_member|
+          results = family.family_members.active.collect do |family_member|
             person = family_member.person
             renew_osse_eligibility(person)
           end
