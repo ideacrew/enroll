@@ -1,12 +1,6 @@
 # frozen_string_literal: true
-require "pry"
+
 require "rails_helper"
-include FinancialAssistance::Engine.routes.url_helpers
-include FinancialAssistance::ApplicationHelper
-include FinancialAssistance::L10nHelper
-include ActionView::Helpers::TranslationHelper
-include GlossaryHelper
-include ConsumerRolesHelper
 
 RSpec.describe "components/financial_assistance/app/views/financial_assistance/applicants/_edit.html.erb" do
 

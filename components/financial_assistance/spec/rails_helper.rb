@@ -75,6 +75,13 @@ RSpec.configure do |config|
   config.infer_spec_type_from_file_location!
   config.filter_rails_from_backtrace!
 
+  config.include FinancialAssistance::Engine.routes.url_helpers
+  config.include FinancialAssistance::ApplicationHelper
+  config.include FinancialAssistance::L10nHelper
+  config.include ActionView::Helpers::TranslationHelper
+  config.include GlossaryHelper
+  config.include ConsumerRolesHelper
+
   config.include Mongoid::Matchers, type: :model
   config.include Devise::Test::ControllerHelpers, :type => :controller
   config.include Devise::Test::ControllerHelpers, :type => :view
