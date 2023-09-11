@@ -64,41 +64,67 @@ module Eligibilities
       "events.individual.eligibilities.application.applicant.#{self.key}_evidence_updated"
     end
 
+    # Requests a determination of the evidence's status from the Federal Data Services Hub (FDSH).
+    #
+    # @param action_name [String] The name of the action that triggered the request.
+    # @param update_reason [String] The reason for the update.
+    # @param updated_by [String, nil] The name of the user who updated the evidence.
+    # @return [Boolean] `true` if the request was successful and the evidence's status was updated; `false` otherwise.
     def request_determination(action_name, update_reason, updated_by = nil)
-      self.add_verification_history(action_name, update_reason, updated_by)
+      add_verification_history(action_name, update_reason, updated_by)
+
       response = Operations::Fdsh::RequestEvidenceDetermination.new.call(self)
 
-      if response.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
-        determine_evidence_aasm_status(self.evidenceable)
+      if response.failure?
+        if EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
+          method_name = "determine_#{key.to_s.split('_').last}_evidence_aasm_status".to_sym
+          send(method_name, evidenceable)
 
-        update_reason = "#{self.key.capitalize} Evidence Determination Request Failed due to #{response.failure}"
-        self.add_verification_history("Hub Request Failed", update_reason, "system")
-        false
-      elsif response.failure?
+          update_reason = "#{key.capitalize} Evidence Determination Request Failed due to #{response.failure}"
+          add_verification_history("Hub Request Failed", update_reason, "system")
+        end
+
         false
       else
-        response
+        move_to_pending!
       end
     end
 
-    def determine_evidence_aasm_status(applicant)
+    # Sets the evidence's status to "attested" for the following types of evidence:
+    ### :esi_mec, :non_esi_mec and :local_mec
+    def determine_mec_evidence_aasm_status(applicant)
+      applicant.set_evidence_attested(self)
+    end
+
+    # Sets the Income evidence's status to "outstanding" if the applicant is enrolled in any APTC or CSR enrollments;
+    # otherwise, sets the evidence's status to "negative response".
+    def determine_income_evidence_aasm_status(applicant)
       family_id = applicant.application.family_id
       enrollments = HbxEnrollment.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, family_id: family_id)
+      aptc_or_csr_used = enrolled_in_any_aptc_csr_enrollments?(applicant, enrollments)
 
-      if enrolled?(applicant, enrollments)
-        enrollments.each do |enrollment|
-          applicant.enrolled_with(enrollment)
-        end
+      if aptc_or_csr_used
+        applicant.set_evidence_outstanding(self)
       else
         applicant.set_evidence_to_negative_response(self)
       end
     end
 
-    def enrolled?(applicant, enrollments)
-      return false if enrollments.blank?
+    # Checks if the applicant is enrolled in any APTC or CSR enrollments.
+    #
+    # @param applicant [Applicant] The applicant to check.
+    # @param enrollments [Array<HbxEnrollment>] The enrollments to check.
+    # @return [Boolean] `true` if the applicant is enrolled in any APTC or CSR enrollments; `false` otherwise.
+    def enrolled_in_any_aptc_csr_enrollments?(applicant, enrollments)
+      enrollments.any? do |enrollment|
+        applicant_enrolled?(applicant, enrollment) &&
+          enrollment.is_health_enrollment? &&
+          (enrollment.applied_aptc_amount > 0 || ['02', '04', '05', '06'].include?(enrollment.product.csr_variant_id))
+      end
+    end
 
-      family_member_ids = enrollments.flat_map(&:hbx_enrollment_members).flat_map(&:applicant_id).uniq
-      family_member_ids.map(&:to_s).include?(applicant.family_member_id.to_s)
+    def applicant_enrolled?(applicant, enrollment)
+      enrollment.hbx_enrollment_members.any? { |member| member.applicant_id.to_s == applicant.family_member_id.to_s }
     end
 
     def payload_format

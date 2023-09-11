@@ -29,7 +29,6 @@ module FinancialAssistance
       result = @evidence.request_determination(params[:admin_action], "Requested Hub for verification", current_user.oim_id)
 
       if result
-        @evidence.move_to_pending!
         key = :success
         message = "request submited successfully"
       else

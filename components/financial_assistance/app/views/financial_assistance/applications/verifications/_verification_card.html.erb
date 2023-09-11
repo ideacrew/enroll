@@ -1,5 +1,5 @@
 <% evidence_type = evidence.title %>
-<div class="row">
+<div class="row" data-cuke="<%=evidence_kind%>_for_<%=applicant.full_name.parameterize.underscore%>">
   <div class="v-type col-md-12">
     <div class="v-type-name col-md-2" id="evidence_kind_<%= evidence_kind %>">
       <%= l10n(display_evidence_type(evidence_type)) %>
