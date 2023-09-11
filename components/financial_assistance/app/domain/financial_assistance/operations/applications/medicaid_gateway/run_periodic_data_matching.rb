@@ -76,15 +76,15 @@ module FinancialAssistance
           end
 
           def process_family_batch(batch, params)
-            batch.each do |family|
+            batch.no_timeout.each do |family|
               enrollments = family.hbx_enrollments.by_health.enrolled_and_renewal
               next unless eligible_for_mec_check?(enrollments)
 
               determined_application = fetch_application(family, params[:assistance_year])
               next unless determined_application.present?
               create_mec_evidence_if_needed(determined_application)
-              append_data_to_csv(family, enrollments, determined_application)
-              process_mec_check(determined_application, params)
+              append_to_csv = params[:skip_mec_call] || process_mec_check(determined_application, params)
+              append_data_to_csv(family, enrollments, determined_application) if append_to_csv
             end
           end
 
@@ -120,7 +120,7 @@ module FinancialAssistance
                 applicant = determined_app&.active_applicants&.where(family_member_id: fm.id)&.first
                 program_eligibility = fetch_eligibility(applicant)
                 data_to_append << [
-                  determined_app.id,
+                  determined_app.hbx_id,
                   family.hbx_assigned_id,
                   fm.person&.hbx_id,
                   fm.is_primary_applicant,
@@ -139,7 +139,7 @@ module FinancialAssistance
           end
 
           def fetch_csv_headers
-            %w[DeterminedApplicationID FamilyHbxID MemberHbxId IsPrimaryApplicant EnrollmentHbxId EnrollmentType EnrollmentState HiosId AppliedAptc ProgramEligibility]
+            %w[ApplicationHBXID FamilyHbxID MemberHbxId IsPrimaryApplicant EnrollmentHbxId EnrollmentType EnrollmentState HiosId AppliedAptc ProgramEligibility]
           end
 
           def fetch_eligibility(applicant)
@@ -148,7 +148,7 @@ module FinancialAssistance
                 "IA Eligible"
               elsif applicant.is_medicaid_chip_eligible
                 "Medicaid Chip Eligible"
-              elsif is_non_magi_medicaid_eligible
+              elsif applicant.is_non_magi_medicaid_eligible
                 "Non Magi Medicaid Eligible"
               elsif applicant.is_totally_ineligible
                 "Totally Ineligible"
@@ -164,13 +164,14 @@ module FinancialAssistance
 
           def process_mec_check(application, params)
             @logger.info "process mec_check for determined application #{application.id}"
-            return if params[:skip_mec_call]
             mec_check_published = publish_mec_check(application.id, params)
             if mec_check_published.success?
               @total_applications_published += 1
               @logger.info "Successfully published mec_check for determined application #{application.id}"
+              true
             else
               @logger.error "Error publishing mec_check for determined application #{application.id}"
+              false
             end
           end
 
