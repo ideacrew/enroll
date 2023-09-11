@@ -237,6 +237,18 @@ module IvlAssistanceWorld
     end
   end
 
+  def create_family_faa_application_with_applicants_and_unverified_evidences(state)
+    create_family_faa_application_with_applicants(state)
+
+    @application.applicants.each do |applicant|
+      applicant.income_evidence = FactoryBot.build(:evidence, :with_request_results, :with_verification_histories, key: :income, title: 'Income', aasm_state: 'unverified', is_satisfied: false)
+      applicant.esi_evidence = FactoryBot.build(:evidence, :with_request_results, :with_verification_histories, key: :esi_mec, title: 'ESI MEC', aasm_state: 'unverified', is_satisfied: false)
+      applicant.non_esi_evidence = FactoryBot.build(:evidence, :with_request_results, :with_verification_histories, key: :non_esi_mec, title: 'Non ESI MEC', aasm_state: 'unverified', is_satisfied: false)
+      applicant.local_mec_evidence = FactoryBot.build(:evidence, :with_request_results, :with_verification_histories, key: :local_mec, title: 'Local MEC', aasm_state: 'unverified', is_satisfied: false)
+      applicant.save
+    end
+  end
+
   def create_enrollment_for_family(family, carrier_name = nil)
     case carrier_name
     when 'Kaiser Permanente', 'Kaiser'

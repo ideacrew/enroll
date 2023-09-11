@@ -25,7 +25,7 @@ module Operations
           begin
             ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
           rescue StandardError => e
-            Failure("Failed to construct payload: #{e.message}")
+            Failure(e.message)
           end
         else
           Failure("Could not generate CV3 Application -- wrong object type")
