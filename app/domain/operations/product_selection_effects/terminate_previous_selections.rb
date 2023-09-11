@@ -49,11 +49,10 @@ module Operations
       end
 
       def fetch_transition_args(index)
-        if index.zero? || !EnrollRegistry.feature_enabled?(:silent_transition_enrollment)
-          {}
-        else
-          { reason: 'SILENT_SUPERSEDE' }
-        end
+        return {} unless EnrollRegistry.feature_enabled?(:silent_transition_enrollment)
+        return {} if index.zero?
+
+        { reason: 'superseded_silent' }
       end
     end
   end

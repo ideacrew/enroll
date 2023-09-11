@@ -153,7 +153,7 @@ describe Operations::ProductSelectionEffects::TerminatePreviousSelections, dbcle
                           terminated_on: previous_enrollment_terminated_on)
       end
 
-      let(:metadata_query) { { 'metadata.reason' => 'SILENT_SUPERSEDE' } }
+      let(:metadata_query) { { 'metadata.reason' => 'superseded_silent' } }
 
       before do
         allow(
