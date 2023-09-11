@@ -67,7 +67,7 @@ module Operations
                   result = Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules.new.call(applicant_entity, :non_esi_mec)
 
                   next unless result.failure?
-                  applicant = application.active_applicants.select{|applicant| applicant.hbx_id == applicant_entity.identifying_information.id}.first
+                  applicant = application.active_applicants.select{|member| member.person_hbx_id == applicant_entity.person_hbx_id}.first
                   add_verification_history(applicant.non_esi_evidence, 'RRV_Submission_Failed', "RRV - Renewal verifications submission failed due to #{errors}", 'system')
                   update_evidence_to_default_state(applicant.non_esi_evidence)
                 end
