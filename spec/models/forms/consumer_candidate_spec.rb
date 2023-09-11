@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 describe Forms::ConsumerCandidate, "asked to match a person", dbclean: :after_each do
 
@@ -8,15 +10,17 @@ describe Forms::ConsumerCandidate, "asked to match a person", dbclean: :after_ea
   let(:user){ create(:user) }
   let!(:person) { create(:person, :with_ssn, user: user) }
 
-  let!(:params) { {
-    :dob => "2012-10-12",
-    :ssn => person.reload.ssn,
-    :first_name => "yo",
-    :last_name => "guy",
-    :gender => "m",
-    :user_id => 20,
-    :is_applying_coverage => false
-    } }
+  let!(:params) do
+    {
+      :dob => "2012-10-12",
+      :ssn => person.reload.ssn,
+      :first_name => "yo",
+      :last_name => "guy",
+      :gender => "m",
+      :user_id => 20,
+      :is_applying_coverage => false
+    }
+  end
 
   let(:subject) { Forms::ConsumerCandidate.new(params) }
 
@@ -84,20 +88,20 @@ end
 
 
 describe "match a person in db" do
-  let(:subject) {
+  let(:subject) do
     Forms::ConsumerCandidate.new({
-                                     :dob => search_params.dob,
-                                     :ssn => search_params.ssn,
-                                     :first_name => search_param_name.first_name,
-                                     :last_name => search_param_name.last_name,
-                                     :gender => "m",
-                                     :user_id => 20,
-                                     :is_applying_coverage => false
+                                   :dob => search_params.dob,
+                                   :ssn => search_params.ssn,
+                                   :first_name => search_param_name.first_name,
+                                   :last_name => search_param_name.last_name,
+                                   :gender => "m",
+                                   :user_id => 20,
+                                   :is_applying_coverage => false
                                  })
-  }
+  end
 
-  let(:search_params) { double(dob: db_person.dob.strftime("%Y-%m-%d"), ssn: db_person.ssn, )}
-  let(:search_param_name) { double( first_name: db_person.first_name, last_name: db_person.last_name)}
+  let(:search_params) { double(dob: db_person.dob.strftime("%Y-%m-%d"), ssn: db_person.ssn)}
+  let(:search_param_name) { double(first_name: db_person.first_name, last_name: db_person.last_name)}
 
   after(:each) do
     DatabaseCleaner.clean
@@ -215,8 +219,10 @@ describe Forms::ConsumerCandidate, "ssn validations" do
   end
 
   context "is applying coverage is TRUE" do
-    subject { Forms::ConsumerCandidate.new({:dob => "2012-10-12", :ssn => "453213333", :first_name => "yo", :last_name => "guy",
-                                        :gender => "m", :user_id => 20, :is_applying_coverage => "true" })}
+    subject do
+      Forms::ConsumerCandidate.new({:dob => "2012-10-12", :ssn => "453213333", :first_name => "yo", :last_name => "guy",
+                                    :gender => "m", :user_id => 20, :is_applying_coverage => "true" })
+    end
 
     it "add errors when SSN is blank" do
       allow(subject).to receive(:ssn).and_return("")
@@ -234,8 +240,10 @@ describe Forms::ConsumerCandidate, "ssn validations" do
   end
 
   context "is applying coverage is FALSE" do
-    subject { Forms::ConsumerCandidate.new({:dob => "2012-10-12", :ssn => "453213333", :first_name => "yo", :last_name => "guy",
-                                    :gender => "m", :user_id => 20, :is_applying_coverage => "false" })}
+    subject do
+      Forms::ConsumerCandidate.new({:dob => "2012-10-12", :ssn => "453213333", :first_name => "yo", :last_name => "guy",
+                                    :gender => "m", :user_id => 20, :is_applying_coverage => "false" })
+    end
 
     it "doesnt add errors when SSN is blank" do
       allow(subject).to receive(:ssn).and_return("")
@@ -249,6 +257,64 @@ describe Forms::ConsumerCandidate, "ssn validations" do
       allow(subject).to receive(:no_ssn).and_return("0")
       subject.ssn_or_checkbox
       expect(subject.errors.messages.present?).to eq false
+    end
+  end
+
+  context 'invalid ssn when enabled' do
+    before do
+      stub_const('Forms::ConsumerCandidate::SSN_REGEX', /^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$/)
+    end
+
+    subject do
+      Forms::ConsumerCandidate.new({:dob => "2012-10-12", :ssn => "999001234", :first_name => "yo", :last_name => "guy",
+                                    :gender => "m", :user_id => 20, :is_applying_coverage => "true" })
+    end
+
+    it "doesnt add errors when SSN is blank" do
+      subject.ssn_or_checkbox
+      expect(subject.errors.messages.present?).to eq true
+    end
+  end
+
+  context 'invalid ssn when disabled' do
+    before do
+      stub_const('Forms::ConsumerCandidate::SSN_REGEX', /\A\d{9}\z/)
+    end
+
+    subject do
+      Forms::ConsumerCandidate.new({:dob => "2012-10-12", :ssn => "999001234", :first_name => "yo", :last_name => "guy",
+                                    :gender => "m", :user_id => 20, :is_applying_coverage => "true" })
+    end
+
+    it "doesnt add errors when SSN is blank" do
+      subject.ssn_or_checkbox
+      expect(subject.errors.messages.present?).to eq false
+    end
+  end
+
+  context 'when ssn is blank' do
+    context "no_ssn is '1'" do
+      subject do
+        Forms::ConsumerCandidate.new({:dob => "2012-10-12", :ssn => nil, :no_ssn => "1", :first_name => "yo", :last_name => "guy",
+                                      :gender => "m", :user_id => 20, :is_applying_coverage => "true" })
+      end
+
+      it "does not add any errors" do
+        subject.ssn_or_checkbox
+        expect(subject.errors).to be_empty
+      end
+    end
+
+    context "no_ssn is '0'" do
+      subject do
+        Forms::ConsumerCandidate.new({:dob => "2012-10-12", :ssn => nil, :no_ssn => "0", :first_name => "yo", :last_name => "guy",
+                                      :gender => "m", :user_id => 20, :is_applying_coverage => "true" })
+      end
+
+      it "adds an error" do
+        subject.ssn_or_checkbox
+        expect(subject.errors[:base]).to include("Enter a valid social security number or select 'I don't have an SSN'")
+      end
     end
   end
 end

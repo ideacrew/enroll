@@ -121,6 +121,7 @@ registry:
       - key: :display_you_pay
         is_enabled: <%= ENV['DISPLAY_YOU_PAY_IS_ENABLED'] || false %>
       - key: :validate_ssn
+        item: ^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$
         is_enabled: <%= ENV['VALIDATE_SSN_IS_ENABLED'] || false %>
   - namespace:
     - :enroll_app

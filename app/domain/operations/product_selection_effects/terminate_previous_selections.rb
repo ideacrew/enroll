@@ -26,7 +26,11 @@ module Operations
           enrollment.generate_signature(previous_enrollment)
           if enrollment.same_signatures(previous_enrollment) && !previous_enrollment.is_shop?
             if enrollment.effective_on > previous_enrollment.effective_on && previous_enrollment.may_terminate_coverage?
+              next previous_enrollment if previous_enrollment.ineligible_for_termination?(enrollment.effective_on)
+
               previous_enrollment.terminate_coverage!(enrollment.effective_on - 1.day)
+            elsif previous_enrollment.enrollment_superseded_and_eligible_for_cancellation?(enrollment.effective_on)
+              previous_enrollment.cancel_coverage_for_superseded_term!
             elsif previous_enrollment.may_cancel_coverage?
               previous_enrollment.cancel_coverage!
             end

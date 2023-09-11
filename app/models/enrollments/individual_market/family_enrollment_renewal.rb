@@ -251,7 +251,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   def slcsp_feature_enabled?(renewal_year)
     EnrollRegistry.feature_enabled?(:atleast_one_silver_plan_donot_cover_pediatric_dental_cost) &&
-      EnrollRegistry[:atleast_one_silver_plan_donot_cover_pediatric_dental_cost]&.settings(renewal_year)&.item
+      EnrollRegistry[:atleast_one_silver_plan_donot_cover_pediatric_dental_cost]&.settings(renewal_year.to_s.to_sym)&.item
   end
 
   # Check if member turned 19 during renewal and has pediatric only Qualified Dental Plan
@@ -296,10 +296,58 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   # rubocop:enable Style/RedundantReturn
 
   def eligible_enrollment_members
-    @enrollment.hbx_enrollment_members.reject do |member|
-      member.person.is_disabled || !eligible_to_get_covered?(member)
+    @enrollment.hbx_enrollment_members.select do |member|
+      if member.person.is_consumer_role_active?
+        consumer_role = member.person.consumer_role
+
+        eligible_to_get_covered?(member) &&
+          residency_status_satisfied?(member, consumer_role) &&
+          citizenship_status_satisfied?(consumer_role) &&
+          !member.person.is_disabled &&
+          !member.person.is_incarcerated &&
+          member.person.is_applying_coverage
+      elsif member.person.is_resident_role_active?
+        eligible_to_get_covered?(member) && !member.person.is_disabled && !member.person.is_incarcerated
+      else
+        false
+      end
     end
   end
+
+  # TODO: IndividualMarket
+  #   1. Research on the differences b/w the eligibility checks in the enrollment renewal code and InsuredEligibleForBenefitRule
+  #   2. Point to InsuredEligibleForBenefitRule for all member eligibility checks in the enrollment renewal context
+  # Start: Residency Status & Citizenship Member Eligibility Checks
+  def citizenship_status_satisfied?(role)
+    return true if role.is_a?(ResidentRole)
+    return false if role.citizen_status.blank?
+
+    ConsumerRole::INELIGIBLE_CITIZEN_VERIFICATION.exclude?(role.citizen_status)
+  end
+
+  def residency_status_satisfied?(member, role)
+    return false if ivl_benefit.blank?
+    return true if ivl_benefit.residency_status.include?('any')
+    return false unless ivl_benefit.residency_status.include?('state_resident') && role.present?
+    return true if role.person.is_dc_resident?
+
+    member.hbx_enrollment.family.active_family_members.any? do |family_member|
+      family_member.age_on(renewal_coverage_start) >= 19 && family_member.is_dc_resident?
+    end
+  end
+
+  def ivl_benefit
+    return @ivl_benefit if defined?(@ivl_benefit)
+    benefit_cp = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.detect do |bcp|
+      bcp.contains?(renewal_coverage_start)
+    end
+    return nil unless benefit_cp
+
+    @ivl_benefit = benefit_cp.benefit_packages.detect do |bp|
+      bp.effective_year == renewal_coverage_start.year && bp.benefit_categories.include?(@enrollment.coverage_kind)
+    end
+  end
+  # End: Residency Status & Citizenship Member Eligibility Checks
 
   def clone_enrollment_members
     old_enrollment_members = eligible_enrollment_members
