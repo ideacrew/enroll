@@ -535,31 +535,12 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             end
 
             let!(:eligibility_determination) do
-              determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
-              determination.grants.create(
-                key: "AdvancePremiumAdjustmentGrant",
-                value: yearly_expected_contribution,
-                start_on: TimeKeeper.date_of_record.beginning_of_year,
-                end_on: TimeKeeper.date_of_record.end_of_year,
-                assistance_year: TimeKeeper.date_of_record.year,
-                member_ids: family.family_members.map(&:id).map(&:to_s),
-                tax_household_id: tax_household.id
-              )
-
-              determination.grants.create(
-                key: "AdvancePremiumAdjustmentGrant",
-                value: yearly_expected_contribution,
-                start_on: TimeKeeper.date_of_record.beginning_of_year.next_year,
-                end_on: TimeKeeper.date_of_record.end_of_year.next_year,
-                assistance_year: TimeKeeper.date_of_record.year + 1,
-                member_ids: family.family_members.map(&:id).map(&:to_s),
-                tax_household_id: tax_household.id
-              )
-
-              determination
+              create_eligibility_determination(family, yearly_expected_contribution, tax_household)
             end
 
             it 'will set aptc values & will generate renewal' do
+              create_eligibility_determination(family, yearly_expected_contribution, tax_household) if enrollment.family.eligibility_determination.reload.grants.count.zero?
+
               renewal = subject.renew
               expect(renewal.is_a?(HbxEnrollment)).to eq true
               expect(subject.aptc_values).to eq({
@@ -1177,6 +1158,31 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
       end
     end
+  end
+
+  def create_eligibility_determination(family, yearly_expected_contribution, tax_household)
+    determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+    determination.grants.create(
+      key: "AdvancePremiumAdjustmentGrant",
+      value: yearly_expected_contribution,
+      start_on: TimeKeeper.date_of_record.beginning_of_year,
+      end_on: TimeKeeper.date_of_record.end_of_year,
+      assistance_year: TimeKeeper.date_of_record.year,
+      member_ids: family.family_members.map(&:id).map(&:to_s),
+      tax_household_id: tax_household.id
+    )
+
+    determination.grants.create(
+      key: "AdvancePremiumAdjustmentGrant",
+      value: yearly_expected_contribution,
+      start_on: TimeKeeper.date_of_record.beginning_of_year.next_year,
+      end_on: TimeKeeper.date_of_record.end_of_year.next_year,
+      assistance_year: TimeKeeper.date_of_record.year + 1,
+      member_ids: family.family_members.map(&:id).map(&:to_s),
+      tax_household_id: tax_household.id
+    )
+
+    determination
   end
 
   def update_age_off_excluded(fam, true_or_false)
