@@ -7,6 +7,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
   include Dry::Monads[:result, :do]
 
   let!(:person) { FactoryBot.create(:person, :with_ssn, hbx_id: "732020")}
+  let!(:person_2) { FactoryBot.create(:person, :with_ssn, hbx_id: "732021")}
+  let!(:person_3) { FactoryBot.create(:person, :with_ssn, hbx_id: "732022")}
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'determined', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
   let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
@@ -15,10 +17,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
     FactoryBot.build(:financial_assistance_applicant,
                       :with_student_information,
                       :with_home_address,
-                      # :with_income_evidence,
-                      # :with_esi_evidence,
-                      # :with_non_esi_evidence,
-                      # :with_local_mec_evidence,
+                      :with_esi_evidence,
+                      :with_non_esi_evidence,
+                      :with_local_mec_evidence,
                       application: application,
                       is_primary_applicant: true,
                       ssn: '889984400',
@@ -29,6 +30,45 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
                       person_hbx_id: person.hbx_id,
                       eligibility_determination_id: eligibility_determination.id)
   end
+
+  let!(:applicant_2) do
+    FactoryBot.build(:financial_assistance_applicant,
+                      :with_student_information,
+                      :with_home_address,
+                      :with_income_evidence,
+                      :with_esi_evidence,
+                      :with_non_esi_evidence,
+                      :with_local_mec_evidence,
+                      application: application,
+                      is_primary_applicant: false,
+                      ssn: '889984400',
+                      dob: Date.new(1995,11,17),
+                      first_name: person_2.first_name,
+                      last_name: person_2.last_name,
+                      gender: person_2.gender,
+                      person_hbx_id: person_2.hbx_id,
+                      eligibility_determination_id: eligibility_determination.id)
+  end
+
+  let!(:applicant_3) do
+    FactoryBot.build(:financial_assistance_applicant,
+                      :with_student_information,
+                      :with_home_address,
+                      :with_income_evidence,
+                      :with_esi_evidence,
+                      :with_non_esi_evidence,
+                      :with_local_mec_evidence,
+                      application: application,
+                      is_primary_applicant: false,
+                      ssn: '889984400',
+                      dob: Date.new(2007,11,17),
+                      first_name: person_3.first_name,
+                      last_name: person_3.last_name,
+                      gender: person_3.gender,
+                      person_hbx_id: person_3.hbx_id,
+                      eligibility_determination_id: eligibility_determination.id)
+  end
+
   let!(:create_home_address) do
     add = ::FinancialAssistance::Locations::Address.new({
                                                           kind: 'home',
@@ -85,15 +125,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
     applicant.build_income_evidence(
       key: :income,
       title: 'Income',
-      aasm_state: :pending,
-      due_on: TimeKeeper.date_of_record,
-      verification_outstanding: true,
-      is_satisfied: false
-    )
-
-    applicant.build_esi_evidence(
-      key: :esi,
-      title: 'ESI',
       aasm_state: :pending,
       due_on: TimeKeeper.date_of_record,
       verification_outstanding: true,

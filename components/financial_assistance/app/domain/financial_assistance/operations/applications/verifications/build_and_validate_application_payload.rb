@@ -40,28 +40,29 @@ module FinancialAssistance
           end
 
           def check_eligibility_rules(payload, application)
+            evidence_types = ::FinancialAssistance::Applicant::EVIDENCES
             applicants_by_hbx_id = {}
             application.applicants.each { |applicant| applicants_by_hbx_id[applicant.person_hbx_id] = applicant }
             # income_evidences = application.applicants { |applicant| applicant.income_evidence }.compact
 
-            applicant_array = payload.applicants.map do |cv3_applicant|
-              binding.irb
+            applicant_array = payload.applicants.select do |cv3_applicant|
               valid_cv3_applicant = ::FinancialAssistance::Operations::Applications::Verifications::CheckEligibilityRules.new.call(cv3_applicant)
-
+              
               if valid_cv3_applicant.failure?
+                binding.irb
                 evidence_types.each do |evidence_type|
                   next unless cv3_applicant.send(evidence_type)
 
                   applicant = retrieve_application_applicant(cv3_applicant, applicants_by_hbx_id)
                   change_application_income = true if applicant.income_evidence
+
                   handle_failed_applicant(applicant, evidence_type, valid_cv3_applicant.failure)
+                  applicant
                 end
               end
-              valid_cv3_applicant
             end
 
             binding.irb
-
 
             # valid_application_income_evidences = (applicant_array.any?) { |applicant| applicant&.income_evidence }
             handle_application_income_evidence(application) if change_application_income
@@ -78,8 +79,8 @@ module FinancialAssistance
           # The purpose of this method is to update all other evidence types that are NOT income_evidence
           # This is because income evidence is determined by family, not the individual applicant
           def handle_failed_applicant(applicant, evidence_type, failure_reason)
-            evidence = application_applicant.send(evidence_type)
-            failure_message = "#{key.capitalize} Evidence Determination Request Failed due to #{failure_reason}"
+            evidence = applicant.send(evidence_type)
+            failure_message = "#{evidence_type.to_s.titleize} Determination Request Failed due to #{failure_reason}"
             
             if evidence_type != :income_evidence
               evidence.determine_mec_evidence_aasm_status
