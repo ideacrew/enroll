@@ -53,12 +53,30 @@ module Operations
                 applicant.create_evidence(:non_esi_mec, "Non ESI MEC")
               end
 
+              create_evidence_history(application, 'RRV_Submitted', 'RRV - Renewal verifications submitted', 'system')
               Success(true)
             end
 
             def transform_application(application)
-              payload = ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
-              AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(payload.value!)
+              payload_entity = Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application)
+
+              return payload_entity unless EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
+
+              if payload_entity.success?
+                payload_entity.value!.applicants.each do  |applicant_entity|
+                  result = Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules.new.call(applicant_entity, :non_esi_mec)
+
+                  next unless result.failure?
+                  applicant = application.active_applicants.select{|applicant| applicant.hbx_id == applicant_entity.identifying_information.id}.first
+                  add_verification_history(applicant.non_esi_evidence, 'RRV_Submission_Failed', "RRV - Renewal verifications submission failed due to #{errors}", 'system')
+                  update_evidence_to_default_state(applicant.non_esi_evidence)
+                end
+                payload_entity
+              elsif payload_entity.failure?
+                create_evidence_history(application, 'RRV_Submission_Failed', "RRV - Renewal verifications submission failed due to #{payload_entity.failure.messages}", 'system')
+                update_evidence_state_for_all_applicants(application)
+                payload_entity
+              end
             rescue StandardError => e
               rrv_logger.error("Failed to transform application with hbx_id #{application.hbx_id} due to #{e.inspect}")
               Failure("Failed to transform application with hbx_id #{application.hbx_id}")
@@ -74,13 +92,29 @@ module Operations
               Success("Successfully published payload for rrv non esi")
             end
 
-            def create_evidence_history(application)
+            def create_evidence_history(application, action, update_reason, update_by)
               application.active_applicants.each do |applicant|
                 evidence = applicant.non_esi_evidence
-                evidence.add_verification_history('RRV_Submitted', 'RRV - Renewal verifications submitted', 'system')
+                add_verification_history(evidence, action, update_reason, update_by)
               end
 
               application.save
+            end
+
+            def add_verification_history(evidence, action, update_reason, update_by)
+              evidence.add_verification_history(action, update_reason, update_by)
+              evidence.save!
+            end
+
+            def update_evidence_state_for_all_applicants(application)
+              application.active_applicants.each do |applicant|
+                update_evidence_to_default_state(applicant.non_esi_evidence)
+              end
+            end
+
+            # update income evidence state to default aasm state for applicant
+            def update_evidence_to_default_state(evidence)
+              evidence.determine_mec_evidence_aasm_status
             end
 
             def rrv_logger

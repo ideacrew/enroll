@@ -63,7 +63,7 @@ module Operations
 
               if payload_entity.success?
                 result = payload_entity.value!.applicants.collect do  |applicant_entity|
-                  check_eligibility_rules(applicant_entity, :income)
+                  Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules.new.call(applicant_entity, :income)
                 end.flatten.compact
 
                 # Return a Failure result if any of the validation rules fail
