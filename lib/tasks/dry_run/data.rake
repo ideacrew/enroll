@@ -159,7 +159,7 @@ namespace :dry_run do
             issuer_profile_id: plan.carrier_profile_id
           ).first
 
-          next if plans(year).where(hios_id: plan.hios_id, market: plan.market).present?
+          next if plans_by_year(year, hios_id: plan.hios_id, market: plan.market).present?
 
           new_plan = plan.dup
           new_plan.active_year = year
