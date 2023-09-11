@@ -231,16 +231,43 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
         )
       end
 
-      it 'should return payload format as json when it is set' do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:non_esi_h31).and_return(true)
-        allow(EnrollRegistry[:non_esi_h31].setting(:payload_format)).to receive(:item).and_return('json')
-        expect(non_esi_evidence.payload_format).to eq({:non_esi_payload_format => 'json'})
+      let(:esi_evidence) do
+        applicant.create_esi_evidence(
+          key: :esi_mec,
+          title: 'Esi',
+          aasm_state: 'pending',
+          due_on: nil,
+          verification_outstanding: false,
+          is_satisfied: true
+        )
       end
 
-      it 'should return payload format as xml when it is set' do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:non_esi_h31).and_return(true)
-        allow(EnrollRegistry[:non_esi_h31].setting(:payload_format)).to receive(:item).and_return('xml')
-        expect(non_esi_evidence.payload_format).to eq({:non_esi_payload_format => 'xml'})
+      context 'non_esi_mec' do
+        it 'should return payload format as json when it is set' do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:non_esi_h31).and_return(true)
+          allow(EnrollRegistry[:non_esi_h31].setting(:payload_format)).to receive(:item).and_return('json')
+          expect(non_esi_evidence.payload_format).to eq({:non_esi_payload_format => 'json'})
+        end
+
+        it 'should return payload format as xml when it is set' do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:non_esi_h31).and_return(true)
+          allow(EnrollRegistry[:non_esi_h31].setting(:payload_format)).to receive(:item).and_return('xml')
+          expect(non_esi_evidence.payload_format).to eq({:non_esi_payload_format => 'xml'})
+        end
+      end
+
+      context 'esi_mec' do
+        it 'should return payload format as json when it is set' do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:esi_mec).and_return(true)
+          allow(EnrollRegistry[:esi_mec].setting(:payload_format)).to receive(:item).and_return('json')
+          expect(esi_evidence.payload_format).to eq({:esi_mec_payload_format => 'json'})
+        end
+
+        it 'should return payload format as xml when it is set' do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:esi_mec).and_return(true)
+          allow(EnrollRegistry[:esi_mec].setting(:payload_format)).to receive(:item).and_return('xml')
+          expect(esi_evidence.payload_format).to eq({:esi_mec_payload_format => 'xml'})
+        end
       end
     end
 
