@@ -191,7 +191,7 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
         context 'renewing employee A' do
           before(:each) do
             EnrollRegistry["aca_shop_osse_eligibility_#{current_effective_date.year}".to_sym].feature.stub(:is_enabled).and_return(true)
-            EnrollRegistry["aca_shop_osse_eligibility_#{current_effective_date.year+1}".to_sym].feature.stub(:is_enabled).and_return(true)
+            EnrollRegistry["aca_shop_osse_eligibility_#{current_effective_date.year + 1}".to_sym].feature.stub(:is_enabled).and_return(true)
             renewal_benefit_package.renew_member_benefit(census_employees[0])
             family.reload
           end

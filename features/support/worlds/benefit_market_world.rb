@@ -199,16 +199,28 @@ module BenefitMarketWorld
     reset_product_cache
   end
 
+  def create_catalog_eligibility(catalog)
+    ::Operations::Eligible::CreateCatalogEligibility.new.call(
+      {
+        subject: catalog.to_global_id,
+        eligibility_feature: "aca_shop_osse_eligibility",
+        effective_date: catalog.application_period.begin.to_date,
+        domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+      }
+    )
+  end
+
   def create_benefit_market_catalog_for(effective_date)
-    @benefit_market_catalog =
-      benefit_market.benefit_market_catalog_for(effective_date).presence || FactoryBot.create(
-        :benefit_markets_benefit_market_catalog,
-        :with_product_packages,
-        benefit_market: benefit_market,
-        product_kinds: product_kinds,
-        title: "SHOP Benefits for #{effective_date.year}",
-        application_period: (effective_date.beginning_of_year..effective_date.end_of_year)
-      )
+    @benefit_market_catalog = benefit_market.benefit_market_catalog_for(effective_date).presence || FactoryBot.create(
+      :benefit_markets_benefit_market_catalog,
+      :with_product_packages,
+      benefit_market: benefit_market,
+      product_kinds: product_kinds,
+      title: "SHOP Benefits for #{effective_date.year}",
+      application_period: (effective_date.beginning_of_year..effective_date.end_of_year)
+    )
+    create_catalog_eligibility(@benefit_market_catalog)
+    @benefit_market_catalog
   end
 end
 
@@ -224,15 +236,6 @@ end
 
 And(/^benefit market catalog exists with eligibility$/) do
   create_benefit_market_catalog_for(TimeKeeper.date_of_record)
-
-  ::Operations::Eligible::CreateCatalogEligibility.new.call(
-    {
-      subject: @benefit_market_catalog.to_global_id,
-      eligibility_feature: "aca_shop_osse_eligibility",
-      effective_date: @benefit_market_catalog.application_period.begin.to_date,
-      domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
-    }
-  )
 end
 
 # Following step can be used to initialize benefit market catalog for initial employer with health/dental benefits
