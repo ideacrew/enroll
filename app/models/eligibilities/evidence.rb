@@ -94,20 +94,25 @@ module Eligibilities
     ### :esi_mec, :non_esi_mec and :local_mec
     def determine_mec_evidence_aasm_status(applicant)
       applicant.set_evidence_attested(self)
+      # adding verif hist here
     end
 
     # Sets the Income evidence's status to "outstanding" if the applicant is enrolled in any APTC or CSR enrollments;
     # otherwise, sets the evidence's status to "negative response".
     def determine_income_evidence_aasm_status(applicant)
-      family_id = applicant.application.family_id
-      enrollments = HbxEnrollment.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, family_id: family_id)
-      aptc_or_csr_used = enrolled_in_any_aptc_csr_enrollments?(applicant, enrollments)
+      # Income evidence validity is determined at a household level -- if a single applicant is invalid, 
+      # all applicants' income evidences need to have their aasm status updated and verification histories added
+      # iterate thru all applicants' income_evidences, update aasm + add verif hist
+        family_id = applicant.application.family_id
+        enrollments = HbxEnrollment.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, family_id: family_id)
+        aptc_or_csr_used = enrolled_in_any_aptc_csr_enrollments?(applicant, enrollments)
 
-      if aptc_or_csr_used
-        applicant.set_evidence_outstanding(self)
-      else
-        applicant.set_evidence_to_negative_response(self)
-      end
+        if aptc_or_csr_used
+          applicant.set_evidence_outstanding(self)
+        else
+          applicant.set_evidence_to_negative_response(self)
+        end
+      # end
     end
 
     # Checks if the applicant is enrolled in any APTC or CSR enrollments.

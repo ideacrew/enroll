@@ -9,36 +9,25 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
   let!(:person) { FactoryBot.create(:person, :with_ssn, hbx_id: "732020")}
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'determined', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
+  let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
+
   let!(:applicant) do
-    FactoryBot.create(:applicant,
+    FactoryBot.build(:financial_assistance_applicant,
+                      :with_student_information,
+                      :with_home_address,
+                      # :with_income_evidence,
+                      # :with_esi_evidence,
+                      # :with_non_esi_evidence,
+                      # :with_local_mec_evidence,
+                      application: application,
+                      is_primary_applicant: true,
+                      ssn: '889984400',
+                      dob: Date.new(1994,11,17),
                       first_name: person.first_name,
                       last_name: person.last_name,
-                      dob: person.dob,
                       gender: person.gender,
-                      ssn: person.ssn,
-                      application: application,
-                      eligibility_determination_id: eligibility_determination.id,
-                      citizen_status: 'us_citizen',
                       person_hbx_id: person.hbx_id,
-                      ethnicity: [],
-                      is_primary_applicant: true,
-                      is_self_attested_blind: false,
-                      is_applying_coverage: true,
-                      is_required_to_file_taxes: true,
-                      is_pregnant: false,
-                      has_job_income: false,
-                      has_self_employment_income: false,
-                      has_unemployment_income: false,
-                      has_other_income: false,
-                      has_deductions: false,
-                      has_enrolled_health_coverage: false,
-                      has_eligible_health_coverage: false,
-                      has_eligible_medicaid_cubcare: false,
-                      is_claimed_as_tax_dependent: false,
-                      is_incarcerated: false,
-                      is_student: false,
-                      is_former_foster_care: false,
-                      is_post_partum_period: false)
+                      eligibility_determination_id: eligibility_determination.id)
   end
   let!(:create_home_address) do
     add = ::FinancialAssistance::Locations::Address.new({
@@ -53,7 +42,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
     applicant.save!
   end
 
-  let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
   let(:event) { Success(double) }
   let(:obj)  { ::FinancialAssistance::Operations::Applications::Verifications::MagiMedicaidApplicationDetermined.new }
 
@@ -93,6 +81,24 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
     allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
     allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
     allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
+
+    applicant.build_income_evidence(
+      key: :income,
+      title: 'Income',
+      aasm_state: :pending,
+      due_on: TimeKeeper.date_of_record,
+      verification_outstanding: true,
+      is_satisfied: false
+    )
+
+    applicant.build_esi_evidence(
+      key: :esi,
+      title: 'ESI',
+      aasm_state: :pending,
+      due_on: TimeKeeper.date_of_record,
+      verification_outstanding: true,
+      is_satisfied: false
+    )
   end
 
   context 'success' do
@@ -113,13 +119,18 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
 
 
   context 'failure' do
-    context 'invalid application id' do
+    context 'single applicant with invalid ssn' do
       before do
-        @result = subject.call('application_id')
+        applicant.update(ssn: '000348745')
+        @result = subject.call(application)
       end
 
       it 'should return a failure with error message' do
         expect("Invalid Application object application_id, expected FinancialAssistance::Application")
+      end
+
+      it 'should add verification histories for all applicant evidences where applicable' do
+        income = applicant.income_evidence
       end
     end
   end
