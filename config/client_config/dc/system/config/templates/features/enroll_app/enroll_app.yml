@@ -696,7 +696,7 @@ registry:
         is_enabled: false
       - key: :show_download_tax_documents
         item: :show_download_tax_documents
-        is_enabled: true
+        is_enabled: <%= ENV['SHOW_DOWNLOAD_TAX_DOCUMENTS_IS_ENABLED'] || false %>
       - key: :tobacco_user_field
         item: :tobacco_user_field
         is_enabled: false
