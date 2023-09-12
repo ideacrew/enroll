@@ -23,19 +23,9 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
 
   def process_renewals
     @logger.info "Started process at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
-    if ::EnrollRegistry.feature_enabled?(:ivl_enrollment_renewal_async)
-      @logger.info "Started async enrollment renewals at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
-      process_async_renewals
-      @logger.info "Ended async enrollment renewals at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
-      @logger.info "Started async osse renewals at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
-      process_default_osse_eligibility_renewals
-      @logger.info "Ended async osse renewals at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
-    else
-      # TODO: Do we really need sync process ?
-      process_ivl_osse_renewals if renewal_bcp.eligibility_on(renewal_effective_on)
-      process_qhp_renewals
-      @logger.info "Process ended at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
-    end
+    @logger.info "Started async enrollment renewals at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
+    process_async_renewals
+    @logger.info "Ended async enrollment renewals at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
   end
 
   def process_async_renewals
@@ -46,27 +36,6 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       trigger_event(family.to_global_id.uri)
     rescue StandardError => e
       @logger.error "ERROR: Failed Renewal for family hbx_id: #{family.hbx_assigned_id}; Exception: #{e.inspect}"
-    end
-  end
-
-  def process_default_osse_eligibility_renewals
-    all_consumers_or_residents.no_timeout.each do |person|
-      role = fetch_role(person)
-      next unless role
-
-      payload = {
-        subject_gid: role.to_global_id.uri,
-        effective_date: renewal_effective_on,
-        evidence_key: :ivl_osse_evidence
-      }
-
-      event = event('events.eligible.renew_eligibility', attributes: payload)
-
-      if event.success?
-        event.success.publish
-      else
-        @logger.error "ERROR: Event trigger failed: role hbx_id: #{role.hbx_id}"
-      end
     end
   end
 
@@ -126,96 +95,5 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
 
   def osse_enabled
     @osse_enabled ||= renewal_bcp.eligibility_on(renewal_effective_on)
-  end
-
-  def fetch_role(person)
-    if person.has_active_resident_role?
-      person.resident_role
-    elsif person.has_active_consumer_role?
-      person.consumer_role
-    end
-  end
-
-  def all_consumers_or_residents
-    Person.active.where({
-                          '$or' => [
-                             { 'consumer_role' => { '$exists' => true } },
-                             { 'resident_role' => { '$exists' => true } }
-                          ]
-                        })
-  end
-
-  def process_ivl_osse_renewals
-    @logger.info "Started processing IVL OSSE renewals at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
-    @osse_renewal_failed_families = []
-    people = all_consumers_or_residents
-    @logger.info "OSSE:: processing #{people.size} records"
-
-    @logger.info "Skipping callbacks"
-    ConsumerRole.skip_callback(:update, :after, :publish_updated_event)
-    ConsumerRole.skip_callback(:validation, :before, :ensure_verification_types)
-    ConsumerRole.skip_callback(:validation, :before, :ensure_validation_states)
-
-    count = 0
-
-    people.no_timeout.each do |person|
-      count += 1
-      role = fetch_role(person)
-      next if role.blank?
-
-      osse_eligibility = role.is_osse_eligibility_satisfied?(renewal_effective_on - 1.day)
-
-      result = ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new.call(
-        {
-          subject: role.to_global_id,
-          evidence_key: :ivl_osse_evidence,
-          evidence_value: osse_eligibility.to_s,
-          effective_date: renewal_effective_on
-        }
-      )
-
-      @logger.info "processed #{count} records" if count % 100 == 0
-      unless result.success?
-        @osse_renewal_failed_families << person.families.map(&:id)
-        @logger.info "Failed Osse Renewal: #{person.hbx_id}; Error: #{result.failure}"
-      end
-    rescue StandardError => e
-      @logger.error "Failed Osse Renewal: #{person.hbx_id}; Exception: #{e.inspect}"
-    end
-    @logger.info "Finished processing IVL OSSE renewals at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
-    ConsumerRole.set_callback(:update, :after, :publish_updated_event)
-    ConsumerRole.set_callback(:validation, :before, :ensure_verification_types)
-    ConsumerRole.set_callback(:validation, :before, :ensure_validation_states)
-    @logger.info "Setting callbacks"
-    @osse_renewal_failed_families.flatten!&.uniq!
-  end
-
-  def process_qhp_renewals
-    query = kollection(HbxEnrollment::COVERAGE_KINDS, current_bcp)
-    family_ids = HbxEnrollment.where(query).pluck(:family_id).uniq
-
-    if @osse_renewal_failed_families.present?
-      @logger.info "Renewals not generated as they failed osse renewal: #{@osse_renewal_failed_families}"
-      family_ids -= @osse_renewal_failed_families
-    end
-
-    @logger.info "Families count #{family_ids.count}"
-    count = 0
-    family_ids.each do |family_id|
-      family = Family.find(family_id.to_s)
-      primary_hbx_id = family.primary_applicant.person.hbx_id
-      begin
-        enrollments = family.active_household.hbx_enrollments.where(query).order(:effective_on.desc)
-        enrollments.each do |enrollment|
-          count += 1
-          @logger.info "Found #{count} enrollments" if count % 100 == 0
-          result = ::Operations::Individual::RenewEnrollment.new.call(hbx_enrollment: enrollment,
-                                                                      effective_on: renewal_effective_on)
-          result.failure? ? result.failure : result.success
-        end
-      rescue Exception => e
-        @logger.error "Failed ECaseId: #{family.e_case_id} Primary: #{primary_hbx_id} Exception: #{e.inspect}"
-      end
-    end
   end
 end
