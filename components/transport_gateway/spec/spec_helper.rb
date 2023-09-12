@@ -12,6 +12,11 @@
 # the additional setup, and require it from the spec files that actually need
 # it.
 #
+if ENV["COVERAGE"]
+  require 'simplecov'
+  SimpleCov.command_name "specs_#{Process.pid.to_s}_#{ENV['TEST_ENV_NUMBER'] || '1'}"
+  SimpleCov.start 'rails'
+end
 
 require File.expand_path("../dummy/config/environment", __FILE__)
 require 'shoulda/matchers'

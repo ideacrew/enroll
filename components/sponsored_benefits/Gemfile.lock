@@ -227,6 +227,7 @@ GEM
       responders
       warden (~> 1.2.3)
     diff-lcs (1.3)
+    docile (1.4.0)
     dry-auto_inject (0.6.1)
       dry-container (>= 0.3.4)
     dry-configurable (0.9.0)
@@ -265,8 +266,7 @@ GEM
     dry-types (1.5.1)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.3)
-      dry-core (~> 0.4, >= 0.4.4)
-      dry-equalizer (~> 0.3)
+      dry-core (~> 0.5, >= 0.5)
       dry-inflector (~> 0.1, >= 0.1.2)
       dry-logic (~> 1.0, >= 1.0.2)
     dry-validation (1.5.0)
@@ -420,6 +420,7 @@ GEM
     responders (3.0.1)
       actionpack (>= 5.0)
       railties (>= 5.0)
+    rexml (3.2.6)
     roo (2.1.1)
       nokogiri (~> 1)
       rubyzip (~> 1.1, < 2.0.0)
@@ -437,6 +438,8 @@ GEM
     rspec-expectations (3.9.1)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.9.0)
+    rspec-instafail (1.0.0)
+      rspec
     rspec-mocks (3.9.1)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.9.0)
@@ -473,6 +476,15 @@ GEM
     simple_form (5.0.2)
       actionpack (>= 5.0)
       activemodel (>= 5.0)
+    simplecov (0.22.0)
+      docile (~> 1.1)
+      simplecov-html (~> 0.11)
+      simplecov_json_formatter (~> 0.1)
+    simplecov-cobertura (2.1.0)
+      rexml
+      simplecov (~> 0.19)
+    simplecov-html (0.12.3)
+    simplecov_json_formatter (0.1.4)
     slim (3.0.9)
       temple (>= 0.7.6, < 0.9)
       tilt (>= 1.3.3, < 2.1)
@@ -526,11 +538,14 @@ DEPENDENCIES
   rails-controller-testing
   resource_registry!
   rspec-benchmark
+  rspec-instafail (~> 1.0.0)
   rspec-rails
   shoulda-matchers (~> 3)
+  simplecov (~> 0.22.0)
+  simplecov-cobertura (~> 2.1.0)
   sponsored_benefits!
   test-prof (~> 0.5.0)
   webpacker (~> 4.0.2)
 
 BUNDLED WITH
-   2.3.23
+   2.3.24
