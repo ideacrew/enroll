@@ -7,9 +7,7 @@
 
 assistance_year = ENV['assistance_year'].to_i
 
-family_ids = ::FinancialAssistance::Application.where(:aasm_state => "determined",
-    :assistance_year => assistance_year,
-    :"applicants.is_ia_eligible" => true).exists(:predecessor_id => true).distinct(:family_id)
+family_ids = ::FinancialAssistance::Application.by_year(assistance_year).determined.exists(:predecessor_id => true).where(:"applicants.is_ia_eligible" => true).distinct(:family_id)
 
 p "found #{family_ids.count} families"  unless Rails.env.test?
 
