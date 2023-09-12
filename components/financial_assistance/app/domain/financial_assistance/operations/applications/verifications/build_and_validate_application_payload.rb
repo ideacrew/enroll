@@ -43,31 +43,29 @@ module FinancialAssistance
             evidence_types = ::FinancialAssistance::Applicant::EVIDENCES
             applicants_by_hbx_id = {}
             application.applicants.each { |applicant| applicants_by_hbx_id[applicant.person_hbx_id] = applicant }
-            # income_evidences = application.applicants { |applicant| applicant.income_evidence }.compact
 
-            applicant_array = payload.applicants.select do |cv3_applicant|
+            # Less readable
+            # applicants_by_hbx_id = Hash[application.applicants.map { |applicant| [applicant.person_hbx_id, applicant] }]
+
+            invalid_applicant_array = payload.applicants.map do |cv3_applicant|
               valid_cv3_applicant = ::FinancialAssistance::Operations::Applications::Verifications::CheckEligibilityRules.new.call(cv3_applicant)
+              applicant = retrieve_application_applicant(cv3_applicant, applicants_by_hbx_id)
               
               if valid_cv3_applicant.failure?
-                binding.irb
                 evidence_types.each do |evidence_type|
                   next unless cv3_applicant.send(evidence_type)
 
-                  applicant = retrieve_application_applicant(cv3_applicant, applicants_by_hbx_id)
-                  change_application_income = true if applicant.income_evidence
-
                   handle_failed_applicant(applicant, evidence_type, valid_cv3_applicant.failure)
-                  applicant
+                  applicants_by_hbx_id[]
                 end
+
+                { applicant: applicant, failure_reason: valid_cv3_applicant.failure }
               end
-            end
+            end.compact
 
-            binding.irb
+            return Failure('No valid applicants') if invalid_applicant_array.length == application.applicants.length
 
-            # valid_application_income_evidences = (applicant_array.any?) { |applicant| applicant&.income_evidence }
-            handle_application_income_evidence(application) if change_application_income
-
-            return Failure('No valid applicants') if applicant_array.all? { |applicant| applicant.failure? }
+            handle_application_income_evidences(invalid_applicant_array) if invalid_applicant_array.any? { |applicant| applicant.income_evidence }
             Success()
           end
 
@@ -90,10 +88,16 @@ module FinancialAssistance
             Failure(failure_reason)
           end
 
-          def handle_application_income_evidence(application)
-            # something
-          end
+          def handle_application_income_evidences(invalid_applicant_array)
+            invalid_applicant_array[0][:failure_reason]
 
+            # personal_hbx_id needs to be included in verification history message
+            application.applicants.each do |applicant|
+              if applicant.income_evidence
+                applicant.income_evidence.determine_income_evidence_aasm_status
+              end
+            end
+          end
         end
       end
     end

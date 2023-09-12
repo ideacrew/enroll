@@ -122,6 +122,16 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
     allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
     allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
 
+    applicant.esi_evidence.update(aasm_state: 'pending')
+    applicant_2.esi_evidence.update(aasm_state: 'pending')
+    applicant_3.esi_evidence.update(aasm_state: 'pending')
+    applicant.non_esi_evidence.update(aasm_state: 'pending')
+    applicant_2.non_esi_evidence.update(aasm_state: 'pending')
+    applicant_3.non_esi_evidence.update(aasm_state: 'pending')
+    applicant.local_mec_evidence.update(aasm_state: 'pending')
+    applicant_2.local_mec_evidence.update(aasm_state: 'pending')
+    applicant_3.local_mec_evidence.update(aasm_state: 'pending')
+
     applicant.build_income_evidence(
       key: :income,
       title: 'Income',
