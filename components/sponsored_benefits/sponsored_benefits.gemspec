@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'devise',                    '~> 4.5'
   s.add_dependency 'config',  '~> 2.0'
   s.add_dependency 'symmetric-encryption'
-  s.add_dependency 'roo', '~> 2.1.0'
+  s.add_dependency 'roo', '~> 2.7.0'
   s.add_dependency 'pundit',                    '~> 2.0'
   s.add_dependency 'ffi', '~> 1.9'
   s.add_dependency 'kaminari', '~> 0.17.0'
