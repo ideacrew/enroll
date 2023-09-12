@@ -11,10 +11,9 @@ family_ids = ::FinancialAssistance::Application.where(:aasm_state => "determined
     :assistance_year => assistance_year,
     :"applicants.is_ia_eligible" => true).exists(:predecessor_id => true).distinct(:family_id)
 
-p "found #{family_ids.count} families"
+p "found #{family_ids.count} families"  unless Rails.env.test?
 
 CSV.open("export_rrv_families_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv", "w") do |csv|
-
     csv << [
       'Primary HbxId',
       "Most recent determined #{assistance_year} application ID", 
@@ -29,7 +28,6 @@ CSV.open("export_rrv_families_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.
 
     family_ids.each do |family_id|
       family = Family.where(:_id => family_id).first
-    
 
       applications = ::FinancialAssistance::Application.where(:family_id => family.id,
         :assistance_year => assistance_year,
@@ -43,10 +41,6 @@ CSV.open("export_rrv_families_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.
       health_coverage = family.active_household.hbx_enrollments.enrolled_and_renewing.individual_market.by_health.max_by(&:created_at)
       
       counter += 1
-
-      if counter % 100 == 0
-        p "processed #{counter} families"
-      end
 
       result = determined_application.applicants.each_with_object({}) do |applicant, hash|
         hash[applicant.person_hbx_id] = applicant.ssn.present?
@@ -65,5 +59,5 @@ CSV.open("export_rrv_families_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.
       ]
   end
 
-  p counter
+  p "processed #{counter} families"  unless Rails.env.test?
 end
