@@ -64,56 +64,95 @@ module Eligibilities
       "events.individual.eligibilities.application.applicant.#{self.key}_evidence_updated"
     end
 
+    # Requests a determination of the evidence's status from the Federal Data Services Hub (FDSH).
+    #
+    # @param action_name [String] The name of the action that triggered the request.
+    # @param update_reason [String] The reason for the update.
+    # @param updated_by [String, nil] The name of the user who updated the evidence.
+    # @return [Boolean] `true` if the request was successful and the evidence's status was updated; `false` otherwise.
     def request_determination(action_name, update_reason, updated_by = nil)
-      application = self.evidenceable.application
-      payload = construct_payload(application, action_name)
-      return false if payload.failure?
-      payload = payload.value!
-      headers = self.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: application.id }
+      add_verification_history(action_name, update_reason, updated_by)
 
-      request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: headers)
-      return false unless request_event.success?
-      response = request_event.value!.publish
+      response = Operations::Fdsh::RequestEvidenceDetermination.new.call(self)
 
-      if response
-        add_verification_history(action_name, update_reason, updated_by)
+      if response.failure?
+        if EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
+          method_name = "determine_#{key.to_s.split('_').last}_evidence_aasm_status".to_sym
+          send(method_name, evidenceable)
+
+          update_reason = "#{key.capitalize} Evidence Determination Request Failed due to #{response.failure}"
+          add_verification_history("Hub Request Failed", update_reason, "system")
+        end
+
+        false
       else
-        add_verification_history(action_name, "Failed to request determination", "system")
+        move_to_pending!
       end
-      self.save
-      response
+    end
+
+    # Sets the evidence's status to "attested" for the following types of evidence:
+    ### :esi_mec, :non_esi_mec and :local_mec
+    def determine_mec_evidence_aasm_status(applicant)
+      applicant.set_evidence_attested(self)
+    end
+
+    # Sets the Income evidence's status to "outstanding" if the applicant is enrolled in any APTC or CSR enrollments;
+    # otherwise, sets the evidence's status to "negative response".
+    def determine_income_evidence_aasm_status(applicant)
+      family_id = applicant.application.family_id
+      enrollments = HbxEnrollment.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, family_id: family_id)
+      aptc_or_csr_used = enrolled_in_any_aptc_csr_enrollments?(applicant, enrollments)
+
+      if aptc_or_csr_used
+        applicant.set_evidence_outstanding(self)
+      else
+        applicant.set_evidence_to_negative_response(self)
+      end
+    end
+
+    # Checks if the applicant is enrolled in any APTC or CSR enrollments.
+    #
+    # @param applicant [Applicant] The applicant to check.
+    # @param enrollments [Array<HbxEnrollment>] The enrollments to check.
+    # @return [Boolean] `true` if the applicant is enrolled in any APTC or CSR enrollments; `false` otherwise.
+    def enrolled_in_any_aptc_csr_enrollments?(applicant, enrollments)
+      enrollments.any? do |enrollment|
+        applicant_enrolled?(applicant, enrollment) &&
+          enrollment.is_health_enrollment? &&
+          (enrollment.applied_aptc_amount > 0 || ['02', '04', '05', '06'].include?(enrollment.product.csr_variant_id))
+      end
+    end
+
+    def applicant_enrolled?(applicant, enrollment)
+      enrollment.hbx_enrollment_members.any? { |member| member.applicant_id.to_s == applicant.family_member_id.to_s }
+    end
+
+    def payload_format
+      case self.key
+      when :non_esi_mec
+        { non_esi_payload_format: EnrollRegistry[:non_esi_h31].setting(:payload_format).item }
+      when :esi_mec
+        { esi_mec_payload_format: EnrollRegistry[:esi_mec].setting(:payload_format).item }
+      else
+        {}
+      end
     end
 
     def add_verification_history(action, update_reason, updated_by)
-      self.verification_histories.build(action: action, update_reason: update_reason, updated_by: updated_by)
-    end
-
-    def construct_payload(application, action_name = "")
-      cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
-      if cv3_application.failure?
-        add_verification_history(action_name, "Failed to construct payload", "system") if action_name.present?
-        self.save
-        return cv3_application
-      end
-
-      application = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application.value!)
-      return application if application.success?
-      add_verification_history(action_name, "Failed to validate application", "system") if action_name.present?
+      result = self.verification_histories.build(action: action, update_reason: update_reason, updated_by: updated_by)
       self.save
-      application
+      result
     end
 
     def extend_due_on(period = 30.days, updated_by = nil)
       self.due_on = verif_due_date + period
       add_verification_history('extend_due_date', "Extended due date to #{due_on.strftime('%m/%d/%Y')}", updated_by)
-      self.save
     end
 
     def auto_extend_due_on(period = 30.days, updated_by = nil)
       current = verif_due_date
       self.due_on = current + period
       add_verification_history('auto_extend_due_date', "Auto extended due date from #{current.strftime('%m/%d/%Y')} to #{due_on.strftime('%m/%d/%Y')}", updated_by)
-      self.save
     end
 
     def verif_due_date
