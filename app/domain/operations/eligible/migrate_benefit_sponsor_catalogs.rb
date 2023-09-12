@@ -170,7 +170,13 @@ module Operations
       end
 
       def applications_for(benefit_sponsorship)
-        benefit_sponsorship.benefit_applications.approved_and_terminated
+        application_states =
+          BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES +
+          [:terminated]
+
+        benefit_sponsorship.benefit_applications.where(
+          :aasm_state.in => application_states
+        )
       end
 
       def db

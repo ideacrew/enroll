@@ -18,7 +18,7 @@ module BenefitSponsors
           def call(params)
             values = yield validate(params)
             catalog = yield find_or_create_catalog(values)
-            eligibility = yield renew_catalog_eligibilities(values, catalog)
+            _eligibility = yield renew_catalog_eligibilities(values, catalog)
             result = yield renew_shop_eligibilities(values)
 
             Success(result)
@@ -32,9 +32,7 @@ module BenefitSponsors
 
             params[:effective_date] ||= prospective_effective_date
 
-            unless params[:effective_date].is_a?(Date)
-              return Failure("effective date is not a Date kind")
-            end
+            return Failure("effective date is not a Date kind") unless params[:effective_date].is_a?(Date)
 
             unless params[:effective_date] == prospective_effective_date
               return(
@@ -44,9 +42,7 @@ module BenefitSponsors
               )
             end
 
-            unless shop_osse_enabled?(params)
-              return(Failure("shop osse disabled for #{year}"))
-            end
+            return(Failure("shop osse disabled for #{year}")) unless shop_osse_enabled?(params)
 
             Success(params)
           end

@@ -150,6 +150,16 @@ module BenefitMarkets
       end.compact
     end
 
+    def eligibilities_on(date)
+      eligibility_key = "aca_shop_osse_eligibility_#{date.year}".to_sym
+
+      eligibilities.by_key(eligibility_key)
+    end
+
+    def eligibility_on(effective_date)
+      eligibilities_on(effective_date).last
+    end
+
     private
 
     def unique_application_period_range

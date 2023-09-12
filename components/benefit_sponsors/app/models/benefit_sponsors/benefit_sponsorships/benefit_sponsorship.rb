@@ -920,12 +920,13 @@ module BenefitSponsors
       write_attribute(:hbx_id, BenefitSponsors::Organizations::HbxIdGenerator.generate_benefit_sponsorship_id) if hbx_id.blank?
     end
 
-    def initial_osse_eligibility_params
+    def initial_osse_eligibility_params(effective_date)
+      effective_date ||= TimeKeeper.date_of_record.beginning_of_year
       {
         subject: self.to_global_id,
         evidence_key: :shop_osse_evidence,
         evidence_value: 'false',
-        effective_date: TimeKeeper.date_of_record.beginning_of_year
+        effective_date: effective_date
       }
     end
 
@@ -935,11 +936,21 @@ module BenefitSponsors
 
     def create_default_osse_eligibility
       return unless shop_osse_eligibility_is_enabled?
-      return if eligibility_on(TimeKeeper.date_of_record)
 
-      ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(initial_osse_eligibility_params)
-    rescue StandardError => e
-      Rails.logger.error { "Default Osse Eligibility not created for #{self.to_global_id} due to #{e.backtrace}" }
+      ::BenefitMarkets::BenefitMarketCatalog.osse_eligibility_years_for_display.each do |year|
+        next unless year >= TimeKeeper.date_of_record.year
+
+        begin
+          effective_date = Date.new(year, 1, 1)
+          next if eligibility_on(effective_date)
+
+          ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(
+            initial_osse_eligibility_params(effective_date)
+          )
+        rescue StandardError => e
+          Rails.logger.error { "Default Osse Eligibility not created for #{self.to_global_id} due to #{e.backtrace}" }
+        end
+      end
     end
 
     def employer_profile_to_benefit_sponsor_states_map

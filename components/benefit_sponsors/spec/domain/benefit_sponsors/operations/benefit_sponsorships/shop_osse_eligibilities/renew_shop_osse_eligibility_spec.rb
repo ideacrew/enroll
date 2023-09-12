@@ -9,7 +9,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
                type: :model,
                dbclean: :after_each do
   include_context "setup benefit market with market catalogs and product packages"
-  
+
   let(:site) do
     ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market
   end
@@ -69,9 +69,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
 
     it "should create eligibility with :initial state evidence" do
       expect(renewal_benefit_market_catalog.reload.eligibilities).to be_empty
-
-      result = described_class.new.call(required_params)
-
+      described_class.new.call(required_params)
       expect(renewal_benefit_market_catalog.reload).to be_present
       expect(renewal_benefit_market_catalog.eligibilities).to be_present
       expect(renewal_benefit_market_catalog.eligibilities.pluck(:key)).to eq [

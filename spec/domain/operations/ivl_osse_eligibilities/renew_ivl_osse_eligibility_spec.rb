@@ -61,7 +61,7 @@ RSpec.describe ::Operations::IvlOsseEligibilities::RenewIvlOsseEligibility,
 
     it "should create eligibility with :initial state evidence" do
       expect(coverage_period).to be_blank
-      result = described_class.new.call(required_params)
+      described_class.new.call(required_params)
 
       expect(coverage_period).to be_present
       expect(coverage_period.eligibilities).to be_present

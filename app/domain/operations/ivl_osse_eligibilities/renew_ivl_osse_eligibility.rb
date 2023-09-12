@@ -16,7 +16,7 @@ module Operations
       def call(params)
         values = yield validate(params)
         catalog = yield find_or_create_catalog(values)
-        eligibility = yield renew_catalog_eligibilities(values, catalog)
+        _eligibility = yield renew_catalog_eligibilities(values, catalog)
         result = yield renew_ivl_eligibilities(values)
 
         Success(result)
@@ -30,9 +30,7 @@ module Operations
 
         params[:effective_date] ||= prospective_effective_date
 
-        unless params[:effective_date].is_a?(Date)
-          return Failure("effective date is not a Date kind")
-        end
+        return Failure("effective date is not a Date kind") unless params[:effective_date].is_a?(Date)
 
         unless params[:effective_date] == prospective_effective_date
           return(
@@ -42,9 +40,7 @@ module Operations
           )
         end
 
-        unless ivl_osse_enabled?(params)
-          return(Failure("ivl osse disabled for #{year}"))
-        end
+        return(Failure("ivl osse disabled for #{year}")) unless ivl_osse_enabled?(params)
 
         Success(params)
       end
@@ -52,9 +48,9 @@ module Operations
       def find_or_create_catalog(values)
         coverage_period =
           HbxProfile
-            .current_hbx
-            .benefit_sponsorship
-            .create_benefit_coverage_period(values[:effective_date].year)
+          .current_hbx
+          .benefit_sponsorship
+          .create_benefit_coverage_period(values[:effective_date].year)
 
         Success(coverage_period)
       rescue StandardError => e
