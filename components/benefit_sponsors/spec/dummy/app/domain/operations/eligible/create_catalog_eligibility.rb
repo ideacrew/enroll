@@ -115,10 +115,12 @@ module Operations
       end
 
       def build(values)
+        return Failure('feature not found!!') unless eligibility_feature
+
         options = {
           subject: subject.to_global_id,
           evidence_key: "#{eligibility_feature.key}_evidence",
-          evidence_value: eligibility_feature.enabled?.to_s,
+          evidence_value: "true",
           effective_date: values[:effective_date]
         }
 
@@ -160,7 +162,7 @@ module Operations
       end
 
       def save_eligibility(eligibility_record)
-        if defined?(::BenefitCoveragePeriod) && subject.instance_of?(::BenefitCoveragePeriod)
+        if subject.instance_of?(::BenefitCoveragePeriod)
           organization =
             Organization.where(
               "hbx_profile.benefit_sponsorship.benefit_coverage_periods._id" =>
