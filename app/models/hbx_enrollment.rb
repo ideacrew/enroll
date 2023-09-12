@@ -868,7 +868,13 @@ class HbxEnrollment
     ::EnrollRegistry[:cancel_renewals_for_term] { {hbx_enrollment: self} }
   end
 
-  def propogate_terminate(term_date = TimeKeeper.date_of_record.end_of_month)
+  def propogate_terminate(*args)
+    term_date = if args.present? && args.first.respond_to?(:to_date)
+                  args.first
+                else
+                  TimeKeeper.date_of_record.end_of_month
+                end
+
     if terminated_on.present? && term_date < terminated_on
       self.terminated_on = term_date
     else
