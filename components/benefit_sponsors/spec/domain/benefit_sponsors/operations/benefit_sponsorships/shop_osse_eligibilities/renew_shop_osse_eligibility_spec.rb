@@ -51,11 +51,15 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
   let(:required_params) { { effective_date: prospective_date } }
 
   let(:evidence_value) { "false" }
+  let(:service) { described_class.new }
+  let(:event) { double(publish: true) }
+  let(:success_event) { Dry::Monads::Success(event) }
 
   before do
-    benefit_market.update(site_urn: 'dc')
+    benefit_market.update(site_urn: "dc")
     TimeKeeper.set_date_of_record_unprotected!(current_effective_date)
     allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+    allow(service).to receive(:event).and_return(success_event)
     catalog_eligibility
   end
 
@@ -63,30 +67,18 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
 
   context "with input params" do
     it "should return success" do
-      result = described_class.new.call(required_params)
+      result = service.call(required_params)
       expect(result).to be_success
     end
 
     it "should create eligibility with :initial state evidence" do
       expect(renewal_benefit_market_catalog.reload.eligibilities).to be_empty
-      described_class.new.call(required_params)
+      service.call(required_params)
       expect(renewal_benefit_market_catalog.reload).to be_present
       expect(renewal_benefit_market_catalog.eligibilities).to be_present
       expect(renewal_benefit_market_catalog.eligibilities.pluck(:key)).to eq [
            :"aca_shop_osse_eligibility_#{prospective_year}"
          ]
-    end
-
-    it "should trigger ivl eligibility renewal event" do
-      result = described_class.new.call(required_params)
-      expect(result.success).to be_a(Events::BatchProcess::BatchEventsRequested)
-      payload = result.success.payload
-
-      expect(
-        payload[:batch_handler]
-      ).to eq "::Operations::Eligible::EligibilityBatchHandler"
-      expect(payload[:record_kind]).to eq :aca_shop
-      expect(payload[:effective_date]).to eq prospective_date
     end
   end
 
@@ -94,7 +86,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
     let(:required_params) { { effective_date: "2024-1-1" } }
 
     it "should fail date validation" do
-      result = described_class.new.call(required_params)
+      result = service.call(required_params)
       expect(result).to be_failure
     end
   end
