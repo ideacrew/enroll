@@ -589,10 +589,25 @@ RSpec.describe HbxEnrollment, type: :model do
       - enrollment is terminated
       - enrollment has terminated_on
       - new effective exists
-      - new effective on is not one day after the enrollment's terminated_on
+      - previous day of the new effective on is greater than the enrollment's terminated_on
       " do
 
       let(:new_effective_on) { Date.new(system_year, 5) }
+
+      it 'returns true' do
+        expect(prev_enrollment.ineligible_for_termination?(new_effective_on)).to be_truthy
+      end
+    end
+
+    context "when:
+      - enrollment is of kind individual market
+      - enrollment is terminated
+      - enrollment has terminated_on
+      - new effective exists
+      - previous day of the new effective on is less than the enrollment's terminated_on
+      " do
+
+      let(:new_effective_on) { Date.new(system_year, 1) }
 
       it 'returns false' do
         expect(prev_enrollment.ineligible_for_termination?(new_effective_on)).to be_falsey

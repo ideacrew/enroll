@@ -2937,14 +2937,14 @@ class HbxEnrollment
   #   - Checks if the enrollment is in terminated state
   #   - Checks if the enrollment has a terminated_on date
   #   - Checks if the new_effective_on date exists
-  #   - Checks if new effective on is one day after the enrollment's terminated_on
+  #   - Checks if the previous day of the new effective on is greater or equal to the enrollment's terminated_on
   #   - The base/previous enrollment must have the same signature as the new enrollment, which is 'given' before calling this method
   def ineligible_for_termination?(new_effective_on)
     is_ivl_by_kind? &&
       coverage_terminated? &&
       terminated_on.present? &&
       new_effective_on.present? &&
-      (new_effective_on - 1.day) == terminated_on
+      (new_effective_on - 1.day) >= terminated_on
   end
 
   private

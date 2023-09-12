@@ -1,6 +1,8 @@
 require "rails_helper"
+require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
 
 RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  do
+  include_context "set up broker agency profile for BQT, by using configuration settings"
 
   describe "#plan_shopping_dependent_text", dbclean: :after_each  do
     let(:person) { FactoryBot.build_stubbed(:person)}
@@ -756,4 +758,60 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
     end
   end
 
+  describe '#is_general_agency_authorized' do
+    context 'when current user is not a ga staff' do
+      let(:user) { FactoryBot.create(:user, :with_consumer_role) }
+      let(:family) { FactoryBot.create(:person, :with_family) }
+
+      it 'return false' do
+        expect(helper.is_general_agency_authorized?(user, family)).to eq false
+      end
+    end
+
+    context 'when family does not have an assigned broker' do
+      let(:user) { FactoryBot.create(:user, :with_consumer_role) }
+      let(:family) { FactoryBot.create(:person, :with_family).primary_family }
+
+      before do
+        allow(user).to receive_message_chain(:person, :active_general_agency_staff_roles).and_return [double('GeneralAgencyStaffRole')]
+      end
+
+      it 'return false' do
+        expect(helper.is_general_agency_authorized?(user, family)).to eq false
+      end
+    end
+
+    context 'when family an assigned broker & current user has ga staff role' do
+      context 'when current user ga does not belong to family broker' do
+        let(:user) { FactoryBot.create(:user, :with_consumer_role) }
+        let(:family) { FactoryBot.create(:person, :with_family).primary_family }
+
+        before do
+          allow(user).to receive_message_chain(:person, :active_general_agency_staff_roles).and_return [double('GeneralAgencyStaffRole', benefit_sponsors_general_agency_profile_id: general_agency_profile.id)]
+          allow(family).to receive(:current_broker_agency).and_return double('BrokerAgencyAccount', benefit_sponsors_broker_agency_profile_id: BSON::ObjectId.new)
+          plan_design_organization_with_assigned_ga
+        end
+
+        it 'return false' do
+          expect(helper.is_general_agency_authorized?(user, family)).to eq false
+        end
+      end
+
+      context 'when current user ga belongs to family broker' do
+        let(:user) { FactoryBot.create(:user, :with_consumer_role) }
+        let(:family) { FactoryBot.create(:person, :with_family).primary_family }
+
+        before do
+          allow(user).to receive_message_chain(:person, :active_general_agency_staff_roles).and_return [double('GeneralAgencyStaffRole', benefit_sponsors_general_agency_profile_id: general_agency_profile.id)]
+          allow(family).to receive(:current_broker_agency).and_return double('BrokerAgencyAccount', benefit_sponsors_broker_agency_profile_id: owner_profile.id)
+          plan_design_organization_with_assigned_ga
+        end
+
+        it 'return true' do
+          expect(helper.is_general_agency_authorized?(user, family)).to eq true
+        end
+      end
+    end
+
+  end
 end
