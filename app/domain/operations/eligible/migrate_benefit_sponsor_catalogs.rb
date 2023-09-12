@@ -171,7 +171,7 @@ module Operations
 
       def applications_for(benefit_sponsorship)
         application_states =
-          BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES +
+          ::BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES +
           [:terminated]
 
         benefit_sponsorship.benefit_applications.where(
