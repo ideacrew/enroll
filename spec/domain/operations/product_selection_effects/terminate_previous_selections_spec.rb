@@ -25,13 +25,15 @@ describe Operations::ProductSelectionEffects::TerminatePreviousSelections, dbcle
 
     let(:previous_enrollment_terminated_on) { previous_enrollment_effective_on.end_of_month }
 
+    let(:previous_enrollment_aasm_state) { 'coverage_terminated' }
+
     let(:previous_enrollment) do
       FactoryBot.create(:hbx_enrollment,
                         :individual_unassisted,
                         :with_silver_health_product,
                         :with_enrollment_members,
                         enrollment_members: family.family_members,
-                        aasm_state: 'coverage_terminated',
+                        aasm_state: previous_enrollment_aasm_state,
                         household: family.active_household,
                         effective_on: previous_enrollment_effective_on,
                         family: family,
@@ -102,7 +104,6 @@ describe Operations::ProductSelectionEffects::TerminatePreviousSelections, dbcle
       end
     end
 
-
     # For event cancel_coverage_for_superseded_term
     context "when:
       - previous_enrollment is terminated
@@ -127,6 +128,122 @@ describe Operations::ProductSelectionEffects::TerminatePreviousSelections, dbcle
       it 'transitions enrollment via cancel_coverage_for_superseded_term' do
         subject
         expect(prev_enr_term_to_cancel_superseded_transition).to be_truthy
+      end
+    end
+
+    context 'for silent superseded enrollments' do
+      let(:enrollment3) do
+        FactoryBot.create(:hbx_enrollment, :individual_unassisted, :with_silver_health_product, :with_enrollment_members,
+                          enrollment_members: family.family_members, aasm_state: 'coverage_terminated',
+                          household: family.active_household, effective_on: Date.new(coverage_year, 3), family: family,
+                          terminated_on: previous_enrollment_terminated_on)
+      end
+
+      let(:enrollment4) do
+        FactoryBot.create(:hbx_enrollment, :individual_unassisted, :with_silver_health_product, :with_enrollment_members,
+                          enrollment_members: family.family_members, aasm_state: 'coverage_selected',
+                          household: family.active_household, effective_on: Date.new(coverage_year, 4), family: family,
+                          terminated_on: previous_enrollment_terminated_on)
+      end
+
+      let(:enrollment5) do
+        FactoryBot.create(:hbx_enrollment, :individual_unassisted, :with_silver_health_product, :with_enrollment_members,
+                          enrollment_members: family.family_members, aasm_state: 'coverage_terminated',
+                          household: family.active_household, effective_on: Date.new(coverage_year, 5), family: family,
+                          terminated_on: previous_enrollment_terminated_on)
+      end
+
+      let(:metadata_query) { { 'metadata.reason' => 'superseded_silent' } }
+
+      before do
+        allow(
+          EnrollRegistry[:cancel_superseded_terminated_enrollments].feature
+        ).to receive(:is_enabled).and_return(true)
+
+        allow(
+          EnrollRegistry[:silent_transition_enrollment].feature
+        ).to receive(:is_enabled).and_return(true)
+
+        [enrollment5, enrollment3, enrollment4].each(&:generate_hbx_signature)
+
+        subject
+      end
+
+      context "when:
+        - previous_enrollment is coverage_selected
+        - RR configuration feature :cancel_superseded_terminated_enrollments is enabled
+        - RR configuration feature :silent_transition_enrollment is enabled
+        - enrollments exists with same enrollment signature
+        - enrollemnts exists with same coverage_kind
+        - enrollments exists with same plan_year effective dates
+        " do
+
+        let(:new_enrollment_effective_on) { Date.new(coverage_year, 1) }
+        let(:previous_enrollment_effective_on) { Date.new(coverage_year, 1) }
+        let(:previous_enrollment_aasm_state) { 'coverage_selected' }
+        let(:previous_enrollment_terminated_on) { new_enrollment_effective_on.end_of_month }
+
+        it 'does not add metadata as this is first enrollment' do
+          expect(
+            previous_enrollment.workflow_state_transitions.where(metadata_query).first
+          ).to be_falsey
+        end
+
+        it 'adds metadata as this is not first enrollment' do
+          expect(
+            enrollment3.reload.workflow_state_transitions.where(metadata_query).first
+          ).to be_truthy
+        end
+
+        it 'adds metadata as this is not first enrollment' do
+          expect(
+            enrollment4.reload.workflow_state_transitions.where(metadata_query).first
+          ).to be_truthy
+        end
+
+        it 'adds metadata as this is not first enrollment' do
+          expect(
+            enrollment5.reload.workflow_state_transitions.where(metadata_query).first
+          ).to be_truthy
+        end
+      end
+
+      context "when:
+        - previous_enrollment is coverage_terminated
+        - RR configuration feature :cancel_superseded_terminated_enrollments is enabled
+        - RR configuration feature :silent_transition_enrollment is enabled
+        - enrollments exists with same enrollment signature
+        - enrollemnts exists with same coverage_kind
+        - enrollments exists with same plan_year effective dates
+        " do
+
+        let(:new_enrollment_effective_on) { Date.new(coverage_year, 2) }
+        let(:previous_enrollment_effective_on) { Date.new(coverage_year, 1) }
+        let(:previous_enrollment_terminated_on) { new_enrollment_effective_on.end_of_month }
+
+        it 'does not add metadata as this is first enrollment' do
+          expect(
+            previous_enrollment.workflow_state_transitions.where(metadata_query).first
+          ).to be_falsey
+        end
+
+        it 'adds metadata as this is not first enrollment' do
+          expect(
+            enrollment3.reload.workflow_state_transitions.where(metadata_query).first
+          ).to be_truthy
+        end
+
+        it 'adds metadata as this is not first enrollment' do
+          expect(
+            enrollment4.reload.workflow_state_transitions.where(metadata_query).first
+          ).to be_truthy
+        end
+
+        it 'adds metadata as this is not first enrollment' do
+          expect(
+            enrollment5.reload.workflow_state_transitions.where(metadata_query).first
+          ).to be_truthy
+        end
       end
     end
   end

@@ -599,4 +599,38 @@ RSpec.describe HbxEnrollment, type: :model do
       end
     end
   end
+
+  describe '#propogate_terminate' do
+    let(:aasm_state) { 'coverage_terminated' }
+
+    context 'without arguments' do
+      it 'assigns terminated_on without raising any error' do
+        expect { hbx_enrollment.propogate_terminate }.not_to raise_error(StandardError)
+        expect(hbx_enrollment.terminated_on).to be_truthy
+      end
+    end
+
+    context 'with only terminated_on' do
+      let(:terminated_on_date) { hbx_enrollment.effective_on.end_of_month }
+
+      it 'assigns terminated_on without raising any error' do
+        expect do
+          hbx_enrollment.propogate_terminate(terminated_on_date)
+        end.not_to raise_error(StandardError)
+        expect(hbx_enrollment.terminated_on).to eq(terminated_on_date)
+      end
+    end
+
+    context 'with terminated_on and additional transition args' do
+      let(:terminated_on_date) { hbx_enrollment.effective_on.end_of_month }
+      let(:transition_args) { { reason: 'superseded_silent' } }
+
+      it 'assigns terminated_on without raising any error' do
+        expect do
+          hbx_enrollment.propogate_terminate(terminated_on_date, transition_args)
+        end.not_to raise_error(StandardError)
+        expect(hbx_enrollment.terminated_on).to eq(terminated_on_date)
+      end
+    end
+  end
 end
