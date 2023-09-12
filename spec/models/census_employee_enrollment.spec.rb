@@ -86,7 +86,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     before do
       census_employee.benefit_group_assignments = [benefit_group_assignment]
       census_employee.save!
-      benefit_group.plan_year.update_attributes(:aasm_state => 'published')
+      benefit_group.benefit_application.update_attributes(:aasm_state => 'published')
     end
 
     context 'when hired_on date is in the past' do

@@ -60,7 +60,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
       let(:benefit_group_assignment)  { BenefitGroupAssignment.new(**params) }
 
       context "start too early" do
-        before { benefit_group_assignment.start_on = benefit_package.plan_year.start_on - 1.day }
+        before { benefit_group_assignment.start_on = benefit_package.benefit_application.start_on - 1.day }
 
         it "should be invalid" do
           expect(benefit_group_assignment.valid?).to be_falsey
@@ -70,7 +70,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
       end
 
       context "start too late" do
-        before { benefit_group_assignment.start_on = benefit_package.plan_year.end_on + 1.day }
+        before { benefit_group_assignment.start_on = benefit_package.benefit_application.end_on + 1.day }
 
         it "should be invalid" do
           expect(benefit_group_assignment.valid?).to be_falsey
@@ -80,7 +80,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
       end
 
       context "end too early" do
-        before { benefit_group_assignment.end_on = benefit_package.plan_year.start_on - 1.day }
+        before { benefit_group_assignment.end_on = benefit_package.benefit_application.start_on - 1.day }
 
         it "should be invalid" do
           expect(benefit_group_assignment.valid?).to be_falsey
@@ -90,7 +90,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
       end
 
       context "end too late" do
-        before { benefit_group_assignment.end_on = benefit_package.plan_year.end_on + 1.day }
+        before { benefit_group_assignment.end_on = benefit_package.benefit_application.end_on + 1.day }
 
         it "should be invalid" do
           expect(benefit_group_assignment.valid?).to be_falsey
@@ -106,8 +106,8 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
 
       context "start and end timely" do
         before do
-          benefit_group_assignment.start_on = benefit_package.plan_year.start_on
-          benefit_group_assignment.end_on   = benefit_package.plan_year.end_on
+          benefit_group_assignment.start_on = benefit_package.benefit_application.start_on
+          benefit_group_assignment.end_on   = benefit_package.benefit_application.end_on
         end
 
         it "should be valid" do

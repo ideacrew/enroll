@@ -409,7 +409,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     let(:waived_hbx_enrollment_double) { double('WaivedHbxEnrollment', is_coverage_waived?: true) }
     before do
       benefit_group_assignment.update_attribute(:updated_at, benefit_group_assignment.updated_at + 1.day)
-      benefit_group_assignment.plan_year.update_attribute(:aasm_state, "renewing_enrolled")
+      benefit_group_assignment.benefit_application.update_attribute(:aasm_state, "renewing_enrolled")
     end
 
     it "returns true when employees waive the coverage" do

@@ -1792,12 +1792,12 @@ class HbxEnrollment
       if plan_year&.is_renewing? && census_employee.renewal_benefit_group_assignment
         census_employee.renewal_benefit_group_assignment
       elsif plan_year&.aasm_state == "expired" && qle
-        census_employee.benefit_group_assignments.order_by(:created_at.desc).detect { |bga| bga.plan_year.aasm_state == "expired"}
+        census_employee.benefit_group_assignments.order_by(:created_at.desc).detect { |bga| bga.benefit_application.aasm_state == "expired"}
       else
         census_employee.active_benefit_group_assignment
       end
 
-    if benefit_group_assignment.blank? || benefit_group_assignment.plan_year != plan_year
+    if benefit_group_assignment.blank? || benefit_group_assignment.benefit_application != plan_year
       enrollment_errors[:base] << "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date&.year}"
     end
 
@@ -2990,7 +2990,7 @@ class HbxEnrollment
 
   def benefit_group_assignment_valid?(coverage_effective_date)
     plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(coverage_effective_date)
-    if plan_year.present? && benefit_group_assignment.plan_year == plan_year
+    if plan_year.present? && benefit_group_assignment.benefit_application == plan_year
       true
     else
       self.errors.add(:base, "You can not keep an existing plan which belongs to previous plan year")

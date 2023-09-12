@@ -157,7 +157,7 @@ module Eligibility
       benefit_group_assignments.select { |assignment| assignment.start_on <= TimeKeeper.date_of_record }.each do |benefit_group_assignment|
         end_on = benefit_group_assignment.end_on || (new_benefit_group.start_on - 1.day)
         if is_case_old?
-          end_on = benefit_group_assignment.plan_year.end_on unless benefit_group_assignment.plan_year.coverage_period_contains?(end_on)
+          end_on = benefit_group_assignment.benefit_application.end_on unless benefit_group_assignment.benefit_application.coverage_period_contains?(end_on)
         else
           end_on = benefit_group_assignment.benefit_application.end_on unless benefit_group_assignment.benefit_application.effective_period.cover?(end_on)
         end

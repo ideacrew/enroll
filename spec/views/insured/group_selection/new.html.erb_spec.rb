@@ -89,7 +89,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       allow(view).to receive(:policy_helper).and_return(double("Policy", can_access_progress?: true))
-      census_employee.benefit_group_assignments.first.benefit_group.plan_year.aasm_state = "enrolling"
+      census_employee.benefit_group_assignments.first.benefit_group.benefit_application.aasm_state = "enrolling"
     end
 
     context "when benefit group plan option kind is not solesource", dbclean: :after_each do
