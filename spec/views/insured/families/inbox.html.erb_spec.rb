@@ -17,6 +17,7 @@ describe "insured/families/inbox.html.erb", dbclean: :after_each do
 
   context "as admin" do
     before :each do
+      EnrollRegistry[:show_download_tax_documents].feature.stub(:is_enabled).and_return(true)
       allow(view).to receive_message_chain("current_user.has_hbx_staff_role?").and_return(true)
     end
 
@@ -76,6 +77,7 @@ describe "insured/families/inbox.html.erb", dbclean: :after_each do
     
     context "as consumer" do
       before do
+        EnrollRegistry[:show_download_tax_documents].feature.stub(:is_enabled).and_return(true)
         allow(view).to receive_message_chain("current_user.has_hbx_staff_role?").and_return(false)
         allow(view).to receive(:individual_market_is_enabled?).and_return(true)
         allow(person).to receive(:consumer_role).and_return consumer_role
