@@ -72,7 +72,7 @@ module Operations
           end
           return Failure("Could not transform tax household enrollment(s): #{transformed_th_enrs.select(&:failure?).map(&:failure)}") unless transformed_th_enrs.all?(&:success?)
 
-          transformed_th_enrs.map(&:value!)
+          Success(transformed_th_enrs.map(&:value!))
         end
 
         def transform_tax_household_enr(tax_household_enr)
