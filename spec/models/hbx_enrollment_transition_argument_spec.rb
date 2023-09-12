@@ -25,19 +25,19 @@ RSpec.describe HbxEnrollment, "created in the shopping mode, then transitioned w
     hbx_enrollment
   end
 
-  it "can be found using the reason when coverage is canceled" do
-    enrollment.select_coverage!({:reason => "because"})
+  it "can be found using the reason when coverage is selected" do
+    enrollment.select_coverage!({:reason => "aptc_update"})
     found_enrollment = HbxEnrollment.where(
-      "workflow_state_transitions.metadata.reason" => "because"
+      "workflow_state_transitions.metadata.reason" => "aptc_update"
     ).first
     expect(found_enrollment.id).to eq(enrollment.id)
   end
 
   it "can be found using the reason when coverage is canceled" do
     enrollment.select_coverage!
-    enrollment.cancel_coverage!(Date.today, {:reason => "because"})
+    enrollment.cancel_coverage!(Date.today, {:reason => Enrollments::TerminationReasons::SUPERSEDED_SILENT})
     found_enrollment = HbxEnrollment.where(
-      "workflow_state_transitions.metadata.reason" => "because"
+      "workflow_state_transitions.metadata.reason" => Enrollments::TerminationReasons::SUPERSEDED_SILENT
     ).first
     expect(found_enrollment.id).to eq(enrollment.id)
   end
