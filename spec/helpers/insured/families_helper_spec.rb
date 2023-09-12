@@ -488,6 +488,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
       let(:consumer_role) {FactoryBot.build(:consumer_role)}
       context "had a SSN" do
         before do
+          EnrollRegistry[:show_download_tax_documents].feature.stub(:is_enabled).and_return(true)
           person.consumer_role = consumer_role
             person.ssn = '123456789'
         end
