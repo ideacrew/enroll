@@ -143,12 +143,14 @@ jobs:
           bundle exec rspec
       - name: copy coverage report
         run: |
-          cp coverage/coverage.xml ${{ github.workspace }}/coverage/engines-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+          root=`pwd -P`
+          cd $root/components/${{ matrix.engine-name }}
+          cp coverage/coverage.xml ${{ github.workspace }}/engines-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v2
         with:
           name: code-coverage
-          path: ${{ github.workspace }}/coverage/engines-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+          path: ${{ github.workspace }}/engines-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
   benefit-sponsors:
     runs-on: ubuntu-20.04
     services:
@@ -236,12 +238,14 @@ jobs:
           rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
       - name: copy coverage report
         run: |
-          cp coverage/coverage.xml ${{ github.workspace }}/coverage/bs-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+          root=`pwd -P`
+          cd $root/components/${{ matrix.engine-name }}
+          cp coverage/coverage.xml ${{ github.workspace }}/bs-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v2
         with:
           name: code-coverage
-          path: ${{ github.workspace }}/coverage/bs-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
+          path: ${{ github.workspace }}/bs-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
   rspec:
     runs-on: ubuntu-latest
     services:
