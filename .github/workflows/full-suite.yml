@@ -238,8 +238,7 @@ jobs:
           rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
       - name: copy coverage report
         run: |
-          root=`pwd -P`
-          cd $root/components/${{ matrix.engine-name }}
+          cd components/benefit_sponsors
           cp coverage/coverage.xml ${{ github.workspace }}/bs-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v2
