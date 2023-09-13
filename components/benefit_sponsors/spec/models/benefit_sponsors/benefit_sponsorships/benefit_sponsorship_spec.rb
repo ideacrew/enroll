@@ -1539,7 +1539,7 @@ module BenefitSponsors
           allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
         end
 
-        it 'should create osse eligibility in initial state' do
+        it 'should not create osse eligibility in initial state' do
           expect(benefit_sponsorship.eligibilities.count).to eq 0
           benefit_sponsorship.save
           expect(benefit_sponsorship.reload.eligibilities.count).to eq 0
@@ -1553,7 +1553,7 @@ module BenefitSponsors
           catalog_eligibility
         end
 
-        it 'should create osse eligibility in initial state' do
+        it 'should create new osse eligibility' do
           expect(benefit_sponsorship.eligibilities.count).to eq 0
           benefit_sponsorship.save!
           expect(benefit_sponsorship.reload.eligibilities.count).to eq 1

@@ -310,6 +310,7 @@ class BenefitCoveragePeriod
 
     #TODO: update the logic once settings moved to benefit coverage period
     def osse_eligibility_years_for_display
+      return [] if all.blank?
       all.collect do |bcp|
         year = bcp.start_on.year
         eligibility = bcp.eligibilities.by_key("aca_ivl_osse_eligibility_#{year}".to_sym).first

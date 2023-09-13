@@ -115,10 +115,12 @@ module Operations
       end
 
       def build(values)
+        return Failure('feature not found!!') unless eligibility_feature
+
         options = {
           subject: subject.to_global_id,
           evidence_key: "#{eligibility_feature.key}_evidence",
-          evidence_value: eligibility_feature.enabled?.to_s,
+          evidence_value: "true",
           effective_date: values[:effective_date]
         }
 

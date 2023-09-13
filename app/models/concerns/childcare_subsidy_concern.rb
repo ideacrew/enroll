@@ -89,14 +89,22 @@ module ChildcareSubsidyConcern
 
     def create_default_osse_eligibility
       return unless osse_feature_enabled_for?(TimeKeeper.date_of_record.year)
-      return if eligibility_on(TimeKeeper.date_of_record)
 
-      ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new.call(
-        osse_eligibility_params(false)
-      )
-    rescue StandardError => e
-      Rails.logger.error do
-        "Default Osse Eligibility not created for #{self.to_global_id} due to #{e.backtrace}"
+      ::BenefitCoveragePeriod.osse_eligibility_years_for_display.each do |year|
+        next unless year >= TimeKeeper.date_of_record.year
+
+        begin
+          effective_date = Date.new(year, 1, 1)
+          next if eligibility_on(effective_date)
+
+          ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility.new.call(
+            osse_eligibility_params(false, effective_date)
+          )
+        rescue StandardError => e
+          Rails.logger.error do
+            "Default Osse Eligibility not created for #{self.to_global_id} due to #{e.backtrace}"
+          end
+        end
       end
     end
   end

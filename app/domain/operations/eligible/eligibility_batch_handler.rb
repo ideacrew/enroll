@@ -85,12 +85,13 @@ module Operations
   module Eligible
     # Configurations for the Eligibility
     class EligibilityBatchHandler < ::Operations::BatchHandler
-      attr_reader :effective_date
+      attr_reader :effective_date, :operation_kind
 
       def initialize(params)
         super
 
         @effective_date = params[:effective_date]&.to_date
+        @operation_kind = (params[:operation_kind] || :renew)
       end
 
       def validate
@@ -103,7 +104,10 @@ module Operations
 
       def batch_request_options(offset)
         default_options = super
-        default_options.merge(effective_date: effective_date)
+        default_options.merge(
+          effective_date: effective_date,
+          operation_kind: operation_kind
+        )
       end
 
       def process_record(record)
@@ -112,11 +116,10 @@ module Operations
 
         event =
           event(
-            "events.eligible.create_default_eligibility",
+            eligibility_event_name,
             attributes: {
               subject_gid: subject.to_global_id.uri,
-              effective_date:
-                (effective_date || TimeKeeper.date_of_record.beginning_of_year),
+              effective_date: (effective_date || default_eligibility_date),
               evidence_key: evidence_key
             }
           )
@@ -154,6 +157,22 @@ module Operations
 
       def individual
         record_kind.to_s == "individual"
+      end
+
+      def eligibility_event_name
+        if operation_kind.to_s == "renew"
+          "events.eligible.renew_eligibility"
+        else
+          "events.eligible.create_default_eligibility"
+        end
+      end
+
+      def default_eligibility_date
+        if operation_kind.to_s == "renew"
+          TimeKeeper.date_of_record.end_of_year.next_day
+        else
+          TimeKeeper.date_of_record.beginning_of_year
+        end
       end
 
       def evidence_key
