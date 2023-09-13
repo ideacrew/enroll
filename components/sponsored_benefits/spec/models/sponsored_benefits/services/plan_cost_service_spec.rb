@@ -102,7 +102,7 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
       allow(Caches::PlanDetails).to receive(:lookup_rate).and_return 78.0
     end
 
-    context "when broker_quote_hc4cc_subsidy is disabled" do
+    context "when broker_quote_osse_eligibility is disabled" do
       before do
         allow(benefit_application).to receive(:osse_eligible?).and_return false
       end
@@ -126,7 +126,7 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
       end
     end
 
-    context "when broker_quote_hc4cc_subsidy is enabled" do
+    context "when broker_quote_osse_eligibility is enabled" do
       before do
         allow(benefit_application).to receive(:osse_eligible?).and_return true
         allow(subject).to receive(:lcsp).and_return(reference_plan)
@@ -145,7 +145,7 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
       allow(Caches::PlanDetails).to receive(:lookup_rate).and_return 78.0
     end
 
-    context "when broker_quote_hc4cc_subsidy is disabled" do
+    context "when broker_quote_osse_eligibility is disabled" do
       before do
         allow(benefit_application).to receive(:osse_eligible?).and_return false
       end
@@ -157,7 +157,7 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
       end
     end
 
-    context "when broker_quote_hc4cc_subsidy is enabled" do
+    context "when broker_quote_osse_eligibility is enabled" do
       before do
         allow(benefit_application).to receive(:osse_eligible?).and_return true
       end
@@ -178,7 +178,7 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
       allow(subject).to receive(:plan).and_return(reference_plan)
     end
 
-    context "when broker_quote_hc4cc_subsidy is disabled" do
+    context "when broker_quote_osse_eligibility is disabled" do
       before do
         allow(benefit_application).to receive(:osse_eligible?).and_return false
       end
@@ -190,7 +190,7 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
       end
     end
 
-    context "when broker_quote_hc4cc_subsidy is enabled" do
+    context "when broker_quote_osse_eligibility is enabled" do
       before do
         allow(benefit_application).to receive(:osse_eligible?).and_return true
       end
@@ -211,9 +211,9 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
       allow(subject).to receive(:plan).and_return(reference_plan)
     end
 
-    context "when broker_quote_hc4cc_subsidy is enabled" do
+    context "when broker_quote_osse_eligibility is enabled" do
       before :each do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_quote_hc4cc_subsidy).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_quote_osse_eligibility).and_return(true)
         allow(benefit_application).to receive(:osse_eligible?).and_return true
       end
 
@@ -230,9 +230,9 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
       end
     end
 
-    context "when broker_quote_hc4cc_subsidy is disabled" do
+    context "when broker_quote_osse_eligibility is disabled" do
       before :each do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_quote_hc4cc_subsidy).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_quote_osse_eligibility).and_return(false)
       end
 
       it "should return osse subsidy amount as 0 for each census employee" do

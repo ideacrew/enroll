@@ -62,7 +62,8 @@ module BenefitSponsors
       end
     end
 
-    def clone_for_coverage(new_product)
+    def clone_for_coverage(new_product, action = nil)
+      group_enrollment.previous_product = new_product if action.to_s == 'calc_childcare_subsidy'
       self.class.new(
         members,
         {
