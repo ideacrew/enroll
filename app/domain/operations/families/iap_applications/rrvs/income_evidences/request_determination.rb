@@ -58,7 +58,6 @@ module Operations
 
             def transform_application(application)
               payload_entity = Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application)
-
               return payload_entity unless EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
 
               if payload_entity.success?
@@ -71,6 +70,7 @@ module Operations
                   errors = result.select { |r| r.is_a?(Failure) }.map(&:failure)
                   create_evidence_history(application, 'RRV_Submission_Failed', "RRV - Renewal verifications submission failed due to #{errors}", 'system')
                   update_evidence_state_for_all_applicants(application)
+                  application.save!
                   Failure(errors)
                 else
                   payload_entity
@@ -78,6 +78,7 @@ module Operations
               elsif payload_entity.failure?
                 create_evidence_history(application, 'RRV_Submission_Failed', "RRV - Renewal verifications submission failed due to #{payload_entity.failure.messages}", 'system')
                 update_evidence_state_for_all_applicants(application)
+                application.save!
                 payload_entity
               end
             rescue StandardError => e
