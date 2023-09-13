@@ -113,6 +113,8 @@ module Operations
             ConsumerRole.without_callbacks(callbacks_to_skip, &save_proc)
           end
         else
+          subject.eligibilities << eligibility_record if eligibility_record.new_record?
+
           save_proc.call
         end
       end
@@ -120,7 +122,9 @@ module Operations
       def save_with_mongo(subject, eligibility_record)
         update = {
           "$set" => {
-            "consumer_role.eligibilities" => [eligibility_record.serializable_hash]
+            "#{subject.class.name.underscore}.eligibilities" => [
+              eligibility_record.serializable_hash
+            ]
           }
         }
 
