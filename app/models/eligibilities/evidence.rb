@@ -116,7 +116,7 @@ module Eligibilities
       return unless may_move_to_outstanding?
 
       update(verification_outstanding: true, is_satisfied: false)
-      move_to_outstanding
+      move_to_outstanding!
     end
 
     def move_evidence_to_negative_response_received
@@ -127,7 +127,7 @@ module Eligibilities
 
     def move_evidence_to_attested
       update(verification_outstanding: false, is_satisfied: true, due_on: nil)
-      attest
+      attest!
     end
 
     # Checks if the applicant is enrolled in any APTC or CSR enrollments.

@@ -103,8 +103,6 @@ module Operations
                 evidence = applicant.income_evidence
                 evidence.add_verification_history(action, update_reason, update_by)
               end
-
-              application.save
             end
 
             def update_evidence_state_for_all_applicants(application)
@@ -116,7 +114,6 @@ module Operations
             # update income evidence state to default aasm state for applicant
             def update_income_evidence_to_default_state(income_evidence)
               income_evidence.determine_income_evidence_aasm_status
-              income_evidence.save!
             end
 
             def rrv_logger
