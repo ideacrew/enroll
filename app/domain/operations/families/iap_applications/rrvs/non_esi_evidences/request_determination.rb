@@ -64,7 +64,7 @@ module Operations
                 all_applicants_valid = validate_applicants(payload_entity, application)
                 return all_applicants_valid.any?(&:last) ? payload_entity : Failure("Failed to transform application with hbx_id #{application.hbx_id} due to all applicants are invalid")
               elsif payload_entity.failure?
-                record_application_failure(application, payload_entity)
+                record_application_failure(application, payload_entity.failure.messages)
               end
 
               payload_entity
@@ -90,8 +90,8 @@ module Operations
               evidence.save!
             end
 
-            def record_application_failure(application, payload_entity)
-              create_evidence_history(application, 'RRV_Submission_Failed', "RRV - Renewal verifications submission failed due to #{payload_entity.failure.messages}", 'system')
+            def record_application_failure(application, error_messages)
+              create_evidence_history(application, 'RRV_Submission_Failed', "RRV - Renewal verifications submission failed due to #{error_messages}", 'system')
               update_evidence_state_for_all_applicants(application)
             end
 

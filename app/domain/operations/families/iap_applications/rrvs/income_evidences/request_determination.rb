@@ -18,7 +18,7 @@ module Operations
               values = yield validate(params)
               application = yield fetch_application(values)
               _evidences = yield create_income_evidences(application)
-              cv3_application = yield transform_application(application)
+              cv3_application = yield transform_and_validate_application(application)
               event = yield build_event(cv3_application)
               publish(event)
 
@@ -56,34 +56,36 @@ module Operations
               Success(true)
             end
 
-            def transform_application(application)
+            def transform_and_validate_application(application)
               payload_entity = Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application)
               return payload_entity unless EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
 
               if payload_entity.success?
-                result = payload_entity.value!.applicants.collect do  |applicant_entity|
-                  Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules.new.call(applicant_entity, :income)
-                end.flatten.compact
-
-                # Return a Failure result if any of the validation rules fail
+                result = validate_applicants(payload_entity)
                 if result.any?(Failure)
                   errors = result.select { |r| r.is_a?(Failure) }.map(&:failure)
-                  create_evidence_history(application, 'RRV_Submission_Failed', "RRV - Renewal verifications submission failed due to #{errors}", 'system')
-                  update_evidence_state_for_all_applicants(application)
-                  application.save!
-                  Failure(errors)
-                else
-                  payload_entity
+                  record_application_failure(application, errors)
+                  return Failure(errors)
                 end
               elsif payload_entity.failure?
-                create_evidence_history(application, 'RRV_Submission_Failed', "RRV - Renewal verifications submission failed due to #{payload_entity.failure.messages}", 'system')
-                update_evidence_state_for_all_applicants(application)
-                application.save!
-                payload_entity
+                record_application_failure(application, payload_entity.failure.messages)
               end
+
+              payload_entity
             rescue StandardError => e
               rrv_logger.error("Failed to transform application with hbx_id #{application.hbx_id} due to #{e.inspect}")
               Failure("Failed to transform application with hbx_id #{application.hbx_id}")
+            end
+
+            def validate_applicants(payload_entity)
+              payload_entity.value!.applicants.collect do |applicant_entity|
+                Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules.new.call(applicant_entity, :income)
+              end.flatten.compact
+            end
+
+            def record_application_failure(application, error_messages)
+              create_evidence_history(application, 'RRV_Submission_Failed', "RRV - Renewal verifications submission failed due to #{error_messages}", 'system')
+              update_evidence_state_for_all_applicants(application)
             end
 
             def build_event(cv3_application)
@@ -107,13 +109,14 @@ module Operations
 
             def update_evidence_state_for_all_applicants(application)
               application.active_applicants.each do |applicant|
-                update_income_evidence_to_default_state(applicant)
+                update_income_evidence_to_default_state(applicant.income_evidence)
               end
             end
 
             # update income evidence state to default aasm state for applicant
-            def update_income_evidence_to_default_state(applicant)
-              applicant.income_evidence.determine_income_evidence_aasm_status
+            def update_income_evidence_to_default_state(income_evidence)
+              income_evidence.determine_income_evidence_aasm_status
+              income_evidence.save!
             end
 
             def rrv_logger
