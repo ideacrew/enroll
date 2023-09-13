@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: bf5be46e4a5ec2ef00fdcb0eeeddf8ec2c189865
+  revision: 6a232951549089c011f8af2bcee67a777efe05b4
   branch: trunk
   specs:
     aca_entities (0.10.0)
@@ -11,13 +11,14 @@ GIT
       dry-types (~> 1.0)
       dry-validation (~> 1.2)
       iso_country_codes
+      json-schema
       nokogiri-happymapper
       oj (~> 3.11)
       rbnacl (~> 7.1)
 
 GIT
   remote: https://github.com/ideacrew/resource_registry.git
-  revision: 7b8f396afde849e584d0a749ade9ee88f1717e26
+  revision: 02f549334dc8eecce557daa45a543b00d8787d93
   branch: trunk
   specs:
     resource_registry (0.7.0)
@@ -265,8 +266,7 @@ GEM
     dry-types (1.5.1)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.3)
-      dry-core (~> 0.4, >= 0.4.4)
-      dry-equalizer (~> 0.3)
+      dry-core (~> 0.5, >= 0.5)
       dry-inflector (~> 0.1, >= 0.1.2)
       dry-logic (~> 1.0, >= 1.0.2)
     dry-validation (1.5.0)
@@ -285,7 +285,7 @@ GEM
     factory_bot_rails (4.11.1)
       factory_bot (~> 4.11.1)
       railties (>= 3.0.0)
-    ffi (1.12.2)
+    ffi (1.15.5)
     forgery (0.7.0)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
@@ -311,6 +311,8 @@ GEM
       interactor (~> 3.0)
       rails (>= 4.2)
     iso_country_codes (0.7.8)
+    json-schema (2.8.1)
+      addressable (>= 2.4)
     jsonapi-renderer (0.2.2)
     kaminari (0.17.0)
       actionpack (>= 3.0.0)
@@ -370,7 +372,7 @@ GEM
       racc (~> 1.4)
     nokogiri-happymapper (0.9.0)
       nokogiri (~> 1.5)
-    oj (3.14.2)
+    oj (3.15.1)
     orm_adapter (0.5.0)
     ox (2.14.2)
     public_suffix (4.0.4)
@@ -533,4 +535,4 @@ DEPENDENCIES
   webpacker (~> 4.0.2)
 
 BUNDLED WITH
-   2.3.23
+   2.3.24

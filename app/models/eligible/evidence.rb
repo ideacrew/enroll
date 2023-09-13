@@ -6,7 +6,9 @@ module Eligible
     include Mongoid::Document
     include Mongoid::Timestamps
 
-    STATUSES = %i[initial approved denied].freeze
+    embedded_in :eligibility, class_name: "::Eligible::Eligibility"
+
+    STATUSES = %i[initial not_approved approved denied].freeze
     ELIGIBLE_STATUSES = %i[approved].freeze
 
     field :key, type: Symbol
@@ -14,7 +16,6 @@ module Eligible
     field :description, type: String
     field :is_satisfied, type: Boolean, default: false
     field :current_state, type: Symbol, default: :initial
-    field :current_state, type: Symbol
     field :subject_ref, type: String
     field :evidence_ref, type: String
 
@@ -30,36 +31,32 @@ module Eligible
              to: :latest_state_history,
              allow_nil: false
 
+    delegate :eligible?,
+             :is_eligible_on?,
+             :eligible_periods,
+             to: :decorated_eligible_record,
+             allow_nil: true
+
     scope :by_key, ->(key) { where(key: key.to_sym) }
 
     def latest_state_history
-      state_histories.latest_history
+      state_histories.last
     end
 
-    def is_eligible_on?(date)
-      eligible_periods.any? do |period|
-        if period[:end_on].present?
-          (period[:start_on]..period[:end_on]).cover?(date)
-        else
-          period[:start_on] <= date
-        end
-      end
+    def active_state
+      :approved
     end
 
-    def eligible_periods
-      eligible_periods = []
-      date_range = {}
-      state_histories.non_initial.each do |state_history|
-        date_range[:start_on] ||= state_history.effective_on if state_history.to_state == :approved
+    def inactive_state
+      :denied
+    end
 
-        next unless date_range.present? && state_history.to_state == :denied
-        date_range[:end_on] = state_history.effective_on.prev_day
-        eligible_periods << date_range
-        date_range = {}
-      end
+    def eligible?
+      current_state == active_state
+    end
 
-      eligible_periods << date_range unless date_range.empty?
-      eligible_periods
+    def decorated_eligible_record
+      EligiblePeriodHandler.new(self)
     end
   end
 end

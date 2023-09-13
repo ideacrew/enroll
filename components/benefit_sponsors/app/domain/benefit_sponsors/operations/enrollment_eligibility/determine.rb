@@ -15,10 +15,12 @@ module BenefitSponsors
         # @return [ enrollment_eligibility_hash ] enrollment_eligibility_hash
         def call(effective_date:, benefit_sponsorship:)
           effective_date             = yield validate_effective_date(effective_date)
-          service_areas_entities     = yield get_service_areas_entities(effective_date, benefit_sponsorship)
+          sponsorship_record         = yield find_benefit_sponsorship(benefit_sponsorship)
+          service_areas_entities     = yield get_service_areas_entities(sponsorship_record, effective_date)
           eligibility_params         = yield eligibility_params(effective_date, benefit_sponsorship, service_areas_entities)
+          eligibility_options        = yield attach_sponsor_eligibility_params(sponsorship_record, effective_date, eligibility_params)
 
-          Success(eligibility_params)
+          Success(eligibility_options)
         end
 
         private
@@ -36,27 +38,30 @@ module BenefitSponsors
           end
         end
 
-        def eligibility_params(effective_date, benefit_sponsorship, service_areas_entities)
+        def eligibility_params(effective_date, benefit_sponsorship_entity, service_areas_entities)
           params = {
-            market_kind: benefit_sponsorship.market_kind,
-            benefit_sponsorship_id: benefit_sponsorship._id,
+            market_kind: benefit_sponsorship_entity.market_kind,
+            benefit_sponsorship_id: benefit_sponsorship_entity._id,
             effective_date: effective_date,
-            benefit_application_kind: application_type(effective_date, benefit_sponsorship),
-            service_areas: service_areas_entities.as_json,
-            osse_min_employer_contribution: osse_eligibility(benefit_sponsorship, effective_date)
+            benefit_application_kind: application_type(effective_date, benefit_sponsorship_entity),
+            service_areas: service_areas_entities.as_json
           }
 
           Success(params)
         end
 
-        def osse_eligibility(entity, effective_date)
-          benefit_sponsorship = find_benefit_sponsorship(entity._id)
-          eligibility = benefit_sponsorship&.eligibility_for(:osse_subsidy, effective_date)
+        def attach_sponsor_eligibility_params(sponsorship_record, effective_date, eligibility_params)
+          eligibility_params[:sponsor_eligibilities] = sponsorship_record.active_eligibilities_on(effective_date)
+
+          Success(eligibility_params)
+        end
+
+        def osse_eligibility(benefit_sponsorship, effective_date)
+          eligibility = benefit_sponsorship&.active_eligibility_on(effective_date)
           eligibility&.grant_for(:all_contribution_levels_min_met).present?
         end
 
-        def get_service_areas_entities(effective_date, benefit_sponsorship_entity)
-          benefit_sponsorship = find_benefit_sponsorship(benefit_sponsorship_entity._id)
+        def get_service_areas_entities(benefit_sponsorship, effective_date)
           service_areas = benefit_sponsorship.service_areas_on(effective_date).collect do |service_area|
             result = BenefitMarkets::Operations::ServiceAreas::Create.new.call(service_area_params: service_area.as_json)
             if result.success?
@@ -69,13 +74,8 @@ module BenefitSponsors
           Success(service_areas)
         end
 
-        def find_benefit_sponsorship(benefit_sponsorship_entity_id)
-          result = BenefitSponsors::Operations::BenefitSponsorship::FindModel.new.call(benefit_sponsorship_id: benefit_sponsorship_entity_id)
-          if result.success?
-            result.value!
-          else
-            result.failure
-          end
+        def find_benefit_sponsorship(benefit_sponsorship_entity)
+          BenefitSponsors::Operations::BenefitSponsorship::FindModel.new.call(benefit_sponsorship_id: benefit_sponsorship_entity._id)
         end
 
         def is_initial_sponsor?(benefit_applications, effective_date)

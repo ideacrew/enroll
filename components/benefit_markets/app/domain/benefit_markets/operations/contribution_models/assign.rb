@@ -55,7 +55,7 @@ module BenefitMarkets
         # TODO: hard coded contribution model key for OSSE for now
         def assign(product_package_values, matched_criterion, enrollment_eligibility)
           criterion_contribution_key =
-            if enrollment_eligibility.osse_min_employer_contribution
+            if enrollment_eligibility.employer_contribution_minimum_relaxed?
               :zero_percent_sponsor_fixed_percent_contribution_model
             else
               matched_criterion.setting(:contribution_model_key).item

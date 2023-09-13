@@ -2,8 +2,8 @@
 
 require 'rails_helper'
 
-describe 'applicant_outreach_report' do
-  before do
+describe 'applicant_outreach_report', :dbclean => :after_each do
+  before :all do
     DatabaseCleaner.clean
   end
 

@@ -120,4 +120,9 @@ class FamilyPolicy < ApplicationPolicy
     role.permission.can_transition_family_members
   end
 
+  def healthcare_for_childcare_program?
+    return false if user.blank? || user.person.blank?
+
+    user.has_hbx_staff_role? && user.person.hbx_staff_role.permission.can_edit_osse_eligibility
+  end
 end
