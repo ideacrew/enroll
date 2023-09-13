@@ -18,10 +18,9 @@ module Operations
               values = yield validate(params)
               application = yield fetch_application(values)
               _evidences = yield create_non_esi_evidences(application)
-              cv3_application = yield transform_application(application)
+              cv3_application = yield transform_and_validate_application(application)
               event = yield build_event(cv3_application)
               publish(event)
-              create_evidence_history(application)
 
               Success("Successfully published payload for rrv non esi and created history event")
             end
@@ -57,29 +56,42 @@ module Operations
               Success(true)
             end
 
-            def transform_application(application)
+            def transform_and_validate_application(application)
               payload_entity = Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application)
-
               return payload_entity unless EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
 
               if payload_entity.success?
-                payload_entity.value!.applicants.each do  |applicant_entity|
-                  result = Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules.new.call(applicant_entity, :non_esi_mec)
-
-                  next unless result.failure?
-                  applicant = application.active_applicants.select{|member| member.person_hbx_id == applicant_entity.person_hbx_id}.first
-                  add_verification_history(applicant.non_esi_evidence, 'RRV_Submission_Failed', "RRV - Renewal verifications submission failed due to #{errors}", 'system')
-                  update_evidence_to_default_state(applicant.non_esi_evidence)
-                end
-                payload_entity
+                all_applicants_valid = validate_applicants(payload_entity, application)
+                return all_applicants_valid.any?(&:last) ? payload_entity : Failure("Failed to transform application with hbx_id #{application.hbx_id} due to all applicants are invalid")
               elsif payload_entity.failure?
-                create_evidence_history(application, 'RRV_Submission_Failed', "RRV - Renewal verifications submission failed due to #{payload_entity.failure.messages}", 'system')
-                update_evidence_state_for_all_applicants(application)
-                payload_entity
+                record_application_failure(application, payload_entity)
               end
+
+              payload_entity
             rescue StandardError => e
               rrv_logger.error("Failed to transform application with hbx_id #{application.hbx_id} due to #{e.inspect}")
               Failure("Failed to transform application with hbx_id #{application.hbx_id}")
+            end
+
+            def validate_applicants(payload_entity, application)
+              payload_entity.value!.applicants.map do |applicant_entity|
+                result = Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules.new.call(applicant_entity, :non_esi_mec)
+                next [applicant_entity.person_hbx_id, true] unless result.failure?
+
+                applicant = application.active_applicants.select { |member| member.person_hbx_id == applicant_entity.person_hbx_id }.first
+                record_applicant_failure(applicant.non_esi_evidence, result)
+                [applicant_entity.person_hbx_id, false]
+              end
+            end
+
+            def record_applicant_failure(evidence, result)
+              add_verification_history(evidence, 'RRV_Submission_Failed', "RRV - Renewal verifications submission failed due to #{result.failure}", 'system')
+              update_evidence_to_default_state(evidence)
+            end
+
+            def record_application_failure(application, payload_entity)
+              create_evidence_history(application, 'RRV_Submission_Failed', "RRV - Renewal verifications submission failed due to #{payload_entity.failure.messages}", 'system')
+              update_evidence_state_for_all_applicants(application)
             end
 
             def build_event(cv3_application)
