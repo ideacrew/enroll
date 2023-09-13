@@ -154,6 +154,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     allow(employee_role).to receive(:benefit_group).and_return benefit_group
     allow(person).to receive(:current_individual_market_transition).and_return(individual_market_transition)
     allow(individual_market_transition).to receive(:role_type).and_return(nil)
+    allow(controller).to receive(:is_user_authorized?).and_return(true)
   end
 
   context "GET new" do
@@ -446,6 +447,41 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         expect(response).to redirect_to(insured_plan_shopping_path(id: new_household.hbx_enrollments(true).first.id, change_plan: 'change', coverage_kind: 'health', market_kind: 'individual', enrollment_kind: 'sep'))
       end
 
+      context 'when user not authorized' do
+        before do
+          allow(controller).to receive(:is_user_authorized?).and_return(false)
+        end
+
+        context '#new' do
+          it "should redirect to root path" do
+            sign_in user
+            get :new, params: { person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: "123", coverage_kind: hbx_enrollment.coverage_kind }
+            expect(response).to have_http_status(:redirect)
+            expect(response).to redirect_to('/')
+          end
+        end
+
+        context '#create' do
+          let(:params) do
+            {
+              person_id: person.id,
+              consumer_role_id: consumer_role.id,
+              market_kind: "individual",
+              change_plan: "change",
+              hbx_enrollment_id: "123",
+              family_member_ids: family_member_ids,
+              enrollment_kind: 'sep',
+              coverage_kind: hbx_enrollment.coverage_kind
+            }
+          end
+          it "should redirect to root path" do
+            sign_in user
+            post :create, params: params
+            expect(response).to have_http_status(:redirect)
+            expect(response).to redirect_to('/')
+          end
+        end
+      end
     end
 
     context 'dual role household' do
