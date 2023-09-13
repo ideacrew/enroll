@@ -4,7 +4,10 @@ require "rails_helper"
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
   describe Subscribers::FamilyApplicationCompleted do
-    let(:hbx_profile_organization) { double("HbxProfile", benefit_sponsorship:  double(current_benefit_coverage_period: double(slcsp: Plan.new.id)))}
+    let(:hbx_profile_organization) do
+      double("HbxProfile", benefit_sponsorship: double(current_benefit_coverage_period: double(slcsp: Plan.new.id),
+                                                       benefit_coverage_periods: double(by_date: double(first: nil))))
+    end
     let(:max_aptc) do
       household = parser.households.select do |h|
         h.integrated_case_id == parser.integrated_case_id

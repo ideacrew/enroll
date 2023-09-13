@@ -12,5 +12,10 @@ module Eligible
     field :item, type: String
 
     validates_presence_of :title, :key
+
+    # fetch from legacy implementation, need to be revisited
+    def run
+      true
+    end
   end
 end

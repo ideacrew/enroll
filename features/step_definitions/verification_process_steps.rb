@@ -109,12 +109,55 @@ Then(/^Individual should see cost saving documents for evidences$/) do
   expect(page).to have_content(l10n('faa.evidence_type_aces'))
 end
 
+Then(/^validate_and_record_publish_application_errors feature is (.*)$/) do |config|
+  EnrollRegistry[:validate_and_record_publish_application_errors].feature.stub(:is_enabled).and_return(config == 'enabled')
+end
+
+When(/^evidence determination payload is failed to publish$/) do
+  evidence_verification_request = instance_double(Operations::Fdsh::RequestEvidenceDetermination)
+  allow(evidence_verification_request).to receive(:call).and_return(Dry::Monads::Failure("test"))
+  allow(Operations::Fdsh::RequestEvidenceDetermination).to receive(:new).and_return(evidence_verification_request)
+end
+
 And(/^Individual clicks on Actions dropdown$/) do
   find_all('.v-type-actions')[-1].click
 end
 
+And(/^Admin clicks on esi evidence action dropdown$/) do
+  find_all('.v-type-actions')[-3].click
+end
+
+And(/^Admin should see and click (.*) option$/) do |option|
+  expect(page).to have_content(option)
+  find(:xpath, IvlDocumentsPage.send("#{option.parameterize.underscore}_option".to_sym)).click
+end
+
+And(/^Admin clicks confirm$/) do
+  find('.v-type-confirm-button').click
+end
+
+Then(/^Admin should see the error message ([^"]*)$/) do |error_message|
+  expect(page).to have_content(error_message)
+end
+
+Then(/^Admin should see the esi evidence state as attested$/) do
+  txt = IvlDocumentsPage.esi_evidence_row_for(@applicant.full_name)
+  page.all(:css, txt).each do |element|
+    expect(element).to have_selector('.label', text: 'Attested')
+  end
+end
+
 Then(/^Individual should see view history option/) do
   expect(page).to have_content('View History')
+end
+
+Then(/^Admin navigates to view history section/) do
+  expect(page).to have_content('View History')
+  find(:xpath, IvlDocumentsPage.view_history_option).click
+end
+
+Then(/^Admin should see the failed request recorded in the view history table/) do
+  expect(page).to have_content("Hub request failed")
 end
 
 And(/^Individual clicks on verify/) do
