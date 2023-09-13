@@ -881,7 +881,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
 
       before do
-        general_agency_profile.update_attributes(primary_broker_role_id: broker_role.id)
+        allow(::SponsoredBenefits::Organizations::PlanDesignOrganization).to receive(:where).and_return([double('PlanDesignOrganization')])
       end
 
       it "should be able to terminate coverage if user is valid and has active ga staff role" do
