@@ -93,16 +93,17 @@ module Operations
           subject.eligibilities << eligibility_record
         end
 
-        save_proc = proc do
-          if subject.save
-            Success(eligibility_record)
-          else
-            Failure(subject.errors.full_messages)
+        save_proc =
+          proc do
+            if subject.save
+              Success(eligibility_record)
+            else
+              Failure(subject.errors.full_messages)
+            end
           end
-        end
 
         if default_eligibility
-          Person.without_callbacks(callbacks_to_skip, &save_proc)
+          ConsumerRole.without_callbacks(callbacks_to_skip, &save_proc)
         else
           save_proc.call
         end
@@ -110,10 +111,7 @@ module Operations
 
       def callbacks_to_skip
         callbacks = []
-        callbacks << %i[update after notify_updated]
-        callbacks << %i[update after person_create_or_update_handler]
         callbacks << %i[update after publish_updated_event]
-        callbacks << %i[save after generate_person_saved_event]
         callbacks
       end
 
