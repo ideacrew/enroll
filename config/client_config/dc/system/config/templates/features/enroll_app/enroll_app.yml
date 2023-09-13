@@ -394,7 +394,7 @@ registry:
           - key: :ivl_enrollment_renewal_begin_effective_day
             item: 1
           - key: :ivl_enrollment_renewal_begin_effective_month
-            item: 11
+            item: <%= ENV['IVL_ENROLLMENT_RENEWAL_BEGIN_EFFECTIVE_MONTH'] || 11 %>
       - key: :exclude_child_only_offering
         item: :exclude_child_only_offering
         is_enabled: false
@@ -699,7 +699,7 @@ registry:
         is_enabled: false
       - key: :show_download_tax_documents
         item: :show_download_tax_documents
-        is_enabled: true
+        is_enabled: <%= ENV['SHOW_DOWNLOAD_TAX_DOCUMENTS_IS_ENABLED'] || false %>
       - key: :tobacco_user_field
         item: :tobacco_user_field
         is_enabled: false

@@ -214,7 +214,7 @@ describe HbxEnrollment, "reinstate and change end date", type: :model, :dbclean 
         let(:eligible_child_care_subsidy) { 850.0 }
 
         before do
-          allow_any_instance_of(UnassistedPlanCostDecorator).to receive(:ivl_osse_eligible?).and_return(false)
+          allow_any_instance_of(UnassistedPlanCostDecorator).to receive(:is_eligible_for_osse_grant?).and_return(false)
         end
 
         it 'should have same amount of subsidy on reinstated enrollment' do
@@ -229,7 +229,7 @@ describe HbxEnrollment, "reinstate and change end date", type: :model, :dbclean 
         let(:eligible_child_care_subsidy) { 0.0 }
 
         before do
-          allow_any_instance_of(UnassistedPlanCostDecorator).to receive(:ivl_osse_eligible?).and_return(true)
+          allow_any_instance_of(UnassistedPlanCostDecorator).to receive(:is_eligible_for_osse_grant?).and_return(true)
         end
 
         it 'should not have subsidy on reinstated enrollment' do

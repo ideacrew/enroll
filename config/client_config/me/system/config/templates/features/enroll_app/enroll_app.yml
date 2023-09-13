@@ -710,7 +710,7 @@ registry:
         is_enabled: false
       - key: :show_download_tax_documents
         item: :show_download_tax_documents
-        is_enabled: false
+        is_enabled: <%= ENV['SHOW_DOWNLOAD_TAX_DOCUMENTS_IS_ENABLED'] || false %>
       - key: :show_upload_notices
         item: :show_upload_notices
         is_enabled: false
