@@ -508,8 +508,8 @@ jobs:
           reports: coverage/*.xml
           targetdir: coveragereport
           reporttypes: HtmlInline;MarkdownSummary;MarkdownSummaryGithub;Badges
-      # - name: Display structure of downloaded files
-      #   run: ls -R
+      - name: Display structure of downloaded files
+        run: ls -R
       - name: Upload coverage report artifact
         uses: actions/upload-artifact@v2
         with:
