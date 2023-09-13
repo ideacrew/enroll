@@ -90,7 +90,6 @@ module Operations
           eligibility_record.save
         else
           eligibility_record = create_eligibility_record(eligibility)
-          subject.eligibilities << eligibility_record
         end
 
         save_proc =
@@ -103,16 +102,45 @@ module Operations
           end
 
         if default_eligibility
-          ConsumerRole.without_callbacks(callbacks_to_skip, &save_proc)
+          if eligibility_record.new_record? &&
+             eligibility_record.current_state == :ineligible
+            save_with_mongo(subject, eligibility_record)
+
+            Success(eligibility_record)
+          else
+            subject.eligibilities << eligibility_record if eligibility_record.new_record?
+
+            ConsumerRole.without_callbacks(callbacks_to_skip, &save_proc)
+          end
         else
           save_proc.call
         end
+      end
+
+      def save_with_mongo(subject, eligibility_record)
+        update = {
+          "$set" => {
+            "consumer_role.eligibilities" => [eligibility_record.serializable_hash]
+          }
+        }
+
+        collection.update_one(subject.person.attributes.slice("_id"), update)
       end
 
       def callbacks_to_skip
         callbacks = []
         callbacks << %i[update after publish_updated_event]
         callbacks
+      end
+
+      def db
+        return @db if defined?(@db)
+        @db = Mongoid::Clients.default
+      end
+
+      def collection
+        return @collection if defined?(@collection)
+        @collection = db[:people]
       end
 
       def update_eligibility_record(eligibility_record, eligibility)

@@ -53,6 +53,12 @@ RSpec.describe ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility,
   end
 
   context "with input params" do
+    let(:operation) do
+      operation = described_class.new
+      operation.default_eligibility = true
+      operation
+    end
+
     it "should build admin attested evidence options" do
       result = described_class.new.call(required_params)
 
@@ -60,9 +66,10 @@ RSpec.describe ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility,
     end
 
     it "should create eligibility with :initial state evidence" do
-      eligibility = described_class.new.call(required_params).success
+      operation.call(required_params).success
 
-      evidence = eligibility.reload.evidences.first
+      eligibility = consumer_role.reload.eligibilities.last
+      evidence = eligibility.evidences.first
       eligibility_state_history = eligibility.state_histories.first
       evidence_state_history = evidence.state_histories.first
 
@@ -117,8 +124,14 @@ RSpec.describe ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility,
       eligibility
     end
 
+    let(:operation) do
+      operation = described_class.new
+      operation.default_eligibility = true
+      operation
+    end
+
     it "should create state history in tandem with existing evidence" do
-      eligibility = described_class.new.call(required_params).success
+      eligibility = operation.call(required_params).success
 
       evidence = eligibility.evidences.last
       eligibility_state_history = eligibility.state_histories.last
