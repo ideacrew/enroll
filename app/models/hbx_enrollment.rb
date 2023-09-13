@@ -868,7 +868,13 @@ class HbxEnrollment
     ::EnrollRegistry[:cancel_renewals_for_term] { {hbx_enrollment: self} }
   end
 
-  def propogate_terminate(term_date = TimeKeeper.date_of_record.end_of_month)
+  def propogate_terminate(*args)
+    term_date = if args.present? && args.first.respond_to?(:to_date)
+                  args.first
+                else
+                  TimeKeeper.date_of_record.end_of_month
+                end
+
     if terminated_on.present? && term_date < terminated_on
       self.terminated_on = term_date
     else
@@ -2931,14 +2937,14 @@ class HbxEnrollment
   #   - Checks if the enrollment is in terminated state
   #   - Checks if the enrollment has a terminated_on date
   #   - Checks if the new_effective_on date exists
-  #   - Checks if new effective on is one day after the enrollment's terminated_on
+  #   - Checks if the previous day of the new effective on is greater or equal to the enrollment's terminated_on
   #   - The base/previous enrollment must have the same signature as the new enrollment, which is 'given' before calling this method
   def ineligible_for_termination?(new_effective_on)
     is_ivl_by_kind? &&
       coverage_terminated? &&
       terminated_on.present? &&
       new_effective_on.present? &&
-      (new_effective_on - 1.day) == terminated_on
+      (new_effective_on - 1.day) >= terminated_on
   end
 
   private
