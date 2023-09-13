@@ -87,6 +87,7 @@ module Operations
             def record_applicant_failure(evidence, result)
               add_verification_history(evidence, 'RRV_Submission_Failed', "RRV - Renewal verifications submission failed due to #{result.failure}", 'system')
               update_evidence_to_default_state(evidence)
+              evidence.save!
             end
 
             def record_application_failure(application, payload_entity)
@@ -115,12 +116,12 @@ module Operations
 
             def add_verification_history(evidence, action, update_reason, update_by)
               evidence.add_verification_history(action, update_reason, update_by)
-              evidence.save!
             end
 
             def update_evidence_state_for_all_applicants(application)
               application.active_applicants.each do |applicant|
                 update_evidence_to_default_state(applicant.non_esi_evidence)
+                applicant.non_esi_evidence.save!
               end
             end
 
