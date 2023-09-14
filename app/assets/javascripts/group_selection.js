@@ -66,6 +66,9 @@ function setGroupSelectionHandlers(){
       disableIvlIneligible();
       setPrimaryForIvl();
 
+      var ivl_effective_on = $('#ivl_effective_on').val();
+      $("#effective_date_for_display").html( ivl_effective_on );
+
     });
 
     $('#market_kind_coverall').on('change', function() {
@@ -99,6 +102,9 @@ function setGroupSelectionHandlers(){
       disableShopHealthIneligible(employer_id)
       $(".health_errors_" + employer_id ).show();
       setPrimaryForShop();
+
+      var shop_effective_on = $('#shop_effective_on').val();
+      $("#effective_date_for_display").html( shop_effective_on );
     });
   }
 

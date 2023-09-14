@@ -52,6 +52,11 @@ class Insured::GroupSelectionController < ApplicationController
     @shop_under_future = @adapter.shop_under_future
     @new_effective_on = @adapter.calculate_new_effective_on(params)
 
+    if @person.consumer_role.present? && @person.active_employee_roles.present?
+      @ivl_effective_on = @adapter.calculate_ivl_effective_on
+      @shop_effective_on = @adapter.calculate_new_effective_on(params)
+    end
+
     @adapter.if_should_generate_coverage_family_members_for_cobra(params) do |cobra_members|
       @coverage_family_members_for_cobra = cobra_members
     end
