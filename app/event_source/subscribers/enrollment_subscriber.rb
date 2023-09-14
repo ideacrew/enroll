@@ -103,7 +103,7 @@ module Subscribers
 
       if HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(enrollment.aasm_state)
         family.fail_negative_and_pending_verifications
-        application = fetch_application(enrollment, family)
+        application = fetch_application(enrollment)
         subscriber_logger.info "EnrollmentSubscriber, redetermine_family_eligibility for enrollment #{enrollment.hbx_id} with the application #{application&.hbx_id}"
         application&.enrolled_with(enrollment)
       end
@@ -114,7 +114,7 @@ module Subscribers
 
     private
 
-    def fetch_application(enrollment, family)
+    def fetch_application(enrollment)
       application = if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
                       thhe = TaxHouseholdEnrollment.where(enrollment_id: enrollment.id).first
                       application_hbx_id = thhe&.tax_household&.tax_household_group&.application_id
@@ -123,7 +123,7 @@ module Subscribers
 
       return application if application.present?
 
-      family.active_financial_assistance_application(enrollment.effective_on.year)
+      enrollment.family.active_financial_assistance_application(enrollment.effective_on.year)
     end
 
     def pre_process_message(subscriber_logger, payload)
