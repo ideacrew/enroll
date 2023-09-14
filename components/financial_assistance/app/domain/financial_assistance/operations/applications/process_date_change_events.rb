@@ -17,12 +17,10 @@ module FinancialAssistance
         # @option opts [Integer] :renewal_year (required)
         # @return [Dry::Monads::Result]
         def call(params)
-          # adv_day_logger = Logger.new("#{Rails.root}/log/fa_application_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
           # { events_execution_date: TimeKeeper.date_of_record, logger: adv_day_logger, renewal_year: TimeKeeper.date_of_record.year.next }
           _validated_params        = yield validate_input_params(params)
           _renewal_drafts_result   = yield generate_renewal_drafts
           _draft_submission_result = yield submit_renewal_drafts
-          _income_evidences = yield auto_extend_income_evidence
 
           Success('Successfully processed all the date change events.')
         end
@@ -95,18 +93,6 @@ module FinancialAssistance
           day = FinancialAssistanceRegistry[:create_renewals_on_date_change].settings(:renewals_creation_day).item
           month = FinancialAssistanceRegistry[:create_renewals_on_date_change].settings(:renewals_creation_month).item
           @bulk_application_renewal_trigger_date = Date.new(@new_date.year, month, day)
-        end
-
-        def auto_extend_income_evidence
-          if FinancialAssistanceRegistry.feature_enabled?(:auto_update_income_evidence_due_on)
-            @logger.info 'Started auto_extend_income_evidence process'
-            ::FinancialAssistance::Operations::Applications::AutoExtendIncomeEvidence.new.call({})
-            @logger.info 'Ended auto_extend_income_evidence process'
-          else
-            Success("auto_update_income_evidence_due_on not enabled")
-          end
-        rescue StandardError => e
-          @logger.info "Failed to execute auto_extend_income_evidence, error: #{e.backtrace}"
         end
       end
     end

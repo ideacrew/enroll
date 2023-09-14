@@ -76,7 +76,7 @@ module FinancialAssistance
           end
 
           def process_family_batch(batch, params)
-            batch.each do |family|
+            batch.no_timeout.each do |family|
               enrollments = family.hbx_enrollments.by_health.enrolled_and_renewal
               next unless eligible_for_mec_check?(enrollments)
 
@@ -148,7 +148,7 @@ module FinancialAssistance
                 "IA Eligible"
               elsif applicant.is_medicaid_chip_eligible
                 "Medicaid Chip Eligible"
-              elsif is_non_magi_medicaid_eligible
+              elsif applicant.is_non_magi_medicaid_eligible
                 "Non Magi Medicaid Eligible"
               elsif applicant.is_totally_ineligible
                 "Totally Ineligible"

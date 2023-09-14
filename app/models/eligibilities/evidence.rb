@@ -60,60 +60,119 @@ module Eligibilities
 
     scope :by_name, ->(type_name) { where(:key => type_name) }
 
+    alias applicant evidenceable
+
     def eligibility_event_name
       "events.individual.eligibilities.application.applicant.#{self.key}_evidence_updated"
     end
 
+    # Requests a determination of the evidence's status from the Federal Data Services Hub (FDSH).
+    #
+    # @param action_name [String] The name of the action that triggered the request.
+    # @param update_reason [String] The reason for the update.
+    # @param updated_by [String, nil] The name of the user who updated the evidence.
+    # @return [Boolean] `true` if the request was successful and the evidence's status was updated; `false` otherwise.
     def request_determination(action_name, update_reason, updated_by = nil)
-      application = self.evidenceable.application
-      payload = construct_payload(application, action_name)
-      return false if payload.failure?
-      payload = payload.value!
-      headers = self.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: application.id }
+      add_verification_history(action_name, update_reason, updated_by)
 
-      request_event = event(FDSH_EVENTS[self.key], attributes: payload.to_h, headers: headers)
-      return false unless request_event.success?
-      response = request_event.value!.publish
+      response = Operations::Fdsh::RequestEvidenceDetermination.new.call(self)
 
-      if response
-        add_verification_history(action_name, update_reason, updated_by)
+      if response.failure?
+        if EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
+          method_name = "determine_#{key.to_s.split('_').last}_evidence_aasm_status".to_sym
+          send(method_name)
+
+          update_reason = "#{key.to_s.titleize} Evidence Determination Request Failed due to #{response.failure}"
+          add_verification_history("Hub Request Failed", update_reason, "system")
+        end
+
+        false
       else
-        add_verification_history(action_name, "Failed to request determination", "system")
+        move_to_pending!
       end
-      self.save
-      response
+    end
+
+    # Sets the evidence's status to "attested" for the following types of evidence:
+    ### :esi_mec, :non_esi_mec and :local_mec
+    def determine_mec_evidence_aasm_status
+      move_evidence_to_attested
+    end
+
+    # Sets the Income evidence's status to "outstanding" if the applicant is enrolled in any APTC or CSR enrollments;
+    # otherwise, sets the evidence's status to "negative response".
+    def determine_income_evidence_aasm_status
+      family_id = applicant.application.family_id
+      enrollments = HbxEnrollment.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, family_id: family_id)
+      aptc_or_csr_used = enrolled_in_any_aptc_csr_enrollments?(enrollments)
+
+      if aptc_or_csr_used
+        move_evidence_to_outstanding
+      else
+        move_evidence_to_negative_response_received
+      end
+    end
+
+    def move_evidence_to_outstanding
+      return unless may_move_to_outstanding?
+
+      update(verification_outstanding: true, is_satisfied: false)
+      move_to_outstanding
+    end
+
+    def move_evidence_to_negative_response_received
+      return unless may_negative_response_received?
+
+      negative_response_received!
+    end
+
+    def move_evidence_to_attested
+      update(verification_outstanding: false, is_satisfied: true, due_on: nil)
+      attest
+    end
+
+    # Checks if the applicant is enrolled in any APTC or CSR enrollments.
+    #
+    # @param applicant [Applicant] The applicant to check.
+    # @param enrollments [Array<HbxEnrollment>] The enrollments to check.
+    # @return [Boolean] `true` if the applicant is enrolled in any APTC or CSR enrollments; `false` otherwise.
+    def enrolled_in_any_aptc_csr_enrollments?(enrollments)
+      enrollments.any? do |enrollment|
+        applicant_enrolled?(enrollment) &&
+          enrollment.is_health_enrollment? &&
+          (enrollment.applied_aptc_amount > 0 || ['02', '04', '05', '06'].include?(enrollment.product.csr_variant_id))
+      end
+    end
+
+    def applicant_enrolled?(enrollment)
+      enrollment.hbx_enrollment_members.any? { |member| member.applicant_id.to_s == applicant.family_member_id.to_s }
+    end
+
+    def payload_format
+      case self.key
+      when :non_esi_mec
+        { non_esi_payload_format: EnrollRegistry[:non_esi_h31].setting(:payload_format).item }
+      when :esi_mec
+        { esi_mec_payload_format: EnrollRegistry[:esi_mec].setting(:payload_format).item }
+      else
+        {}
+      end
     end
 
     def add_verification_history(action, update_reason, updated_by)
-      self.verification_histories.build(action: action, update_reason: update_reason, updated_by: updated_by)
-    end
-
-    def construct_payload(application, action_name = "")
-      cv3_application = FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
-      if cv3_application.failure?
-        add_verification_history(action_name, "Failed to construct payload", "system") if action_name.present?
-        self.save
-        return cv3_application
-      end
-
-      application = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application.value!)
-      return application if application.success?
-      add_verification_history(action_name, "Failed to validate application", "system") if action_name.present?
+      result = self.verification_histories.build(action: action, update_reason: update_reason, updated_by: updated_by)
       self.save
-      application
+      result
     end
 
     def extend_due_on(period = 30.days, updated_by = nil)
       self.due_on = verif_due_date + period
       add_verification_history('extend_due_date', "Extended due date to #{due_on.strftime('%m/%d/%Y')}", updated_by)
-      self.save
     end
 
     def auto_extend_due_on(period = 30.days, updated_by = nil)
       current = verif_due_date
       self.due_on = current + period
       add_verification_history('auto_extend_due_date', "Auto extended due date from #{current.strftime('%m/%d/%Y')} to #{due_on.strftime('%m/%d/%Y')}", updated_by)
-      self.save
     end
 
     def verif_due_date
