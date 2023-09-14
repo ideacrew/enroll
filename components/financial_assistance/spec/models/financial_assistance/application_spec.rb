@@ -170,6 +170,21 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       expect(FinancialAssistance::Application.all.for_verifications.map(&:aasm_state)).not_to include 'draft'
       expect(FinancialAssistance::Application.all.for_verifications.map(&:aasm_state)).to include 'determined'
     end
+
+    context 'income_verification_required' do
+      it 'should return only income_verification_required applications' do
+        state = 'income_verification_extension_required'
+        application.update_attributes!(aasm_state: state)
+        applications = FinancialAssistance::Application.all.income_verification_extension_required
+        expect(applications.map(&:aasm_state)).to include state
+      end
+
+      it 'should not return any income_verification_required applications' do
+        state = 'submitted'
+        application.update_attributes!(aasm_state: state)
+        expect(FinancialAssistance::Application.all.income_verification_extension_required.to_a).to eq []
+      end
+    end
   end
 
   describe '.compute_actual_days_worked' do
