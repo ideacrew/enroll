@@ -421,6 +421,9 @@ registry:
         is_enabled: <%= ENV['ELIGIBILITY_AUDIT_LOG_IS_ENABLED'] || false %>
       - key: :notify_address_changed
         is_enabled: <%= ENV['NOTIFY_ADDRESS_CHANGED_IS_ENABLED'] || false %>
+      - key: :ce_roster_bulk_upload
+        item: :ce_roster_bulk_upload
+        is_enabled: <%= ENV['CE_ROSTER_BULK_UPLOAD_ENABLED'] || false %>
   - namespace:
       - :pay_now_feature
     features:
