@@ -42,7 +42,7 @@ module BenefitSponsors
               )
             end
 
-            return(Failure("shop osse disabled for #{year}")) unless shop_osse_enabled?(params)
+            return(Failure("shop osse disabled for #{params[:effective_date].year}")) unless shop_osse_enabled?(params)
 
             Success(params)
           end
