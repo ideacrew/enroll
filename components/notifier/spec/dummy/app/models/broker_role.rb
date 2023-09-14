@@ -1,2 +1,0 @@
-class BrokerRole
-end

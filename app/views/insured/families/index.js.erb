@@ -1,3 +1,0 @@
-$('#families').html('<%= escape_javascript render("insured/families/families_table",families: @families) %>');
-$('#families_paginator').html('<%= escape_javascript(paginate(@families, :remote => true, :param_name => "families_page").to_s) %>');
-$('#families_count').html('<p><%= "#{number_with_delimiter(@families.count)} / #{number_with_delimiter(@total)} " %><small>(families selected / total)</small></p>');

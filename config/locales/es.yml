@@ -1,5 +1,0 @@
----
-es:
-  date:
-    formats:
-      default: "%m/%d/%Y"

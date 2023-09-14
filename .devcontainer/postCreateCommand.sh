@@ -1,2 +1,0 @@
-bundle install
-yarn install

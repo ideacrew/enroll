@@ -1,5 +1,0 @@
-%relationship_benefit
-  - relationship = relationship_benefit.contribution_unit.name == "dependent" ? "child_under_26" : relationship_benefit.contribution_unit.name
-  %relationship= "urn:openhbx:terms:v1:employee_census_relationship##{relationship}"
-  %offered= relationship_benefit.offered?
-  %contribution_percent= relationship_benefit.contribution_pct

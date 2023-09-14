@@ -1,5 +1,0 @@
-<% if FinancialAssistanceRegistry[:display_eligibility_results_per_tax_household].enabled? %>
-  <%= render partial: 'eligibility_results_per_tax_household'  %>
-<% else %>
-  <%= render partial: 'combined_eligibility_results'  %>
-<% end %>

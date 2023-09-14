@@ -1,9 +1,0 @@
-$("#message_list_form").hide();
-$("#inbox_form").show();
-$('#show_message_form').show().html("<%= escape_javascript(render "shared/inboxes/message", message: @message) %>");
-$(".btn-danger").click(function(){
-  $('#show_message_form').hide();
-  $('#inbox').show().html("<%= escape_javascript(render "shared/inboxes/message_list", provider: @inbox_provider) %>");
-});
-$("#employer-nav").load(location.href+" #employer-nav>*", "");
-$("#inbox_form").load(location.href+" #inbox_form>*", "");

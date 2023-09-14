@@ -1,5 +1,0 @@
-<% if @favorite_status %>
-    $("td#ga-<%= @general_agency_profile.id %>").find('span').removeClass("glyphicon-star-empty").addClass("glyphicon-star");
-<% else %>
-    $("td#ga-<%= @general_agency_profile.id %>").find('span').removeClass("glyphicon-star").addClass("glyphicon-star-empty");
-<% end %>
