@@ -15,8 +15,8 @@ module Operations
           dhs: [],
           local_residency: [],
           income: [:validate_ssn],
-          esi: [:validate_ssn],
-          non_esi: [:validate_ssn],
+          esi_mec: [:validate_ssn],
+          non_esi_mec: [:validate_ssn],
           local_mec: [:validate_ssn]
         }.freeze
 

@@ -64,9 +64,9 @@ end
 
 Given(/self service osse feature is enabled/) do
   year = TimeKeeper.date_of_record.year
-  EnrollRegistry[:aca_ivl_osse_subsidy].feature.stub(:is_enabled).and_return(true)
-  EnrollRegistry["aca_ivl_osse_subsidy_#{year}"].feature.stub(:is_enabled).and_return(true)
-  EnrollRegistry["aca_ivl_osse_subsidy_#{year - 1}"].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry[:aca_ivl_osse_eligibility].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry["aca_ivl_osse_eligibility_#{year}"].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry["aca_ivl_osse_eligibility_#{year - 1}"].feature.stub(:is_enabled).and_return(true)
   EnrollRegistry[:self_service_osse_subsidy].feature.stub(:is_enabled).and_return(true)
   EnrollRegistry[:individual_osse_plan_filter].feature.stub(:is_enabled).and_return(true)
 end
@@ -75,7 +75,9 @@ Given(/active enrollment is OSSE eligible with APTC/) do
   hbx = HbxEnrollment.first
   member = hbx.hbx_enrollment_members.first
   hbx.update_attributes!(applied_aptc_amount: 476)
-  member.person.consumer_role.eligibilities << FactoryBot.build(:eligibility, :with_evidences, :with_subject, start_on: member.coverage_start_on)
+  member.person.consumer_role.eligibilities = []
+  member.person.consumer_role.eligibilities << FactoryBot.build(:ivl_osse_eligibility, :with_admin_attested_evidence, evidence_state: :approved)
+  member.person.save!
 end
 
 Then(/APTC slider should show minimum 85%/) do

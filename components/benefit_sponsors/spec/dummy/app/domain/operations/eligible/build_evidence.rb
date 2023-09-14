@@ -18,6 +18,7 @@ module Operations
       # @option opts [<String>]   :evidence_value required
       # @option opts [Date]       :effective_date required
       # @option opts [Date]       :evidence_record optional
+      # @option opts [Hash]       :timestamps optional timestamps for data migrations purposes
       # @return [Dry::Monad] result
       def call(params)
         values = yield validate(params)
@@ -57,9 +58,9 @@ module Operations
           options[:subject_ref] = URI(options[:subject_ref]) unless options[
             :subject_ref
           ].is_a? URI
-          options[:evidence_ref] = URI(options[:evidence_ref]) unless options[
+          options[:evidence_ref] = URI(options[:evidence_ref]) if options[
             :evidence_ref
-          ].is_a? URI
+          ] && !(options[:evidence_ref].is_a? URI)
           options
         else
           {
@@ -76,7 +77,7 @@ module Operations
         from_state = recent_record&.to_state || :initial
         to_state = configuration.to_state_for(values, from_state)
 
-        {
+        options = {
           event: "move_to_#{to_state}".to_sym,
           transition_at: DateTime.now,
           effective_on: values[:effective_date],
@@ -84,6 +85,8 @@ module Operations
           is_eligible: configuration.is_eligible?(to_state),
           to_state: to_state
         }
+        options[:timestamps] = values[:timestamps] if values[:timestamps]
+        options
       end
     end
   end

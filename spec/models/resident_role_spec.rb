@@ -47,5 +47,65 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
       end
     end
+
+    describe 'create default osse eligibility on create', :dbclean => :after_each do
+      let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
+      let!(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+      let!(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+      let(:person) { create(:person, addresses: [home_address]) }
+      let(:home_address) { build(:address, kind: :home) }
+      let(:resident_role) { build(:resident_role) }
+      let(:current_year) { TimeKeeper.date_of_record.year }
+      let(:catalog_eligibility) do
+        Operations::Eligible::CreateCatalogEligibility.new.call(
+          {
+            subject: benefit_coverage_period.to_global_id,
+            eligibility_feature: "aca_ivl_osse_eligibility",
+            effective_date: benefit_coverage_period.start_on.to_date,
+            domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+          }
+        )
+      end
+
+      context 'when osse feature for the given year is disabled' do
+        before do
+          EnrollRegistry["aca_ivl_osse_eligibility_#{current_year}"].feature.stub(:is_enabled).and_return(false)
+          catalog_eligibility
+        end
+
+        it 'should create osse eligibility in initial state' do
+          expect(resident_role.eligibilities.count).to eq 0
+          person.build_resident_role(resident_role.attributes).save
+          resident_role = person.reload.resident_role
+          resident_role.reload
+          expect(person.reload.resident_role.eligibilities.count).to eq 0
+        end
+      end
+
+      context 'when osse feature for the given year is enabled' do
+        before do
+          allow(EnrollRegistry).to receive(:feature?).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+          catalog_eligibility
+        end
+
+        it 'should create osse eligibility in initial state' do
+          expect(resident_role.eligibilities.count).to eq 0
+          person.build_resident_role(resident_role.attributes).save
+          resident_role = person.reload.resident_role
+          resident_role.reload
+          expect(resident_role.eligibilities.count).to eq 1
+          eligibility = resident_role.eligibilities.first
+          expect(eligibility.key).to eq "aca_ivl_osse_eligibility_#{TimeKeeper.date_of_record.year}".to_sym
+          expect(eligibility.current_state).to eq :ineligible
+          expect(eligibility.state_histories.count).to eq 1
+          expect(eligibility.evidences.count).to eq 1
+          evidence = eligibility.evidences.first
+          expect(evidence.key).to eq :ivl_osse_evidence
+          expect(evidence.current_state).to eq :not_approved
+          expect(evidence.state_histories.count).to eq 1
+        end
+      end
+    end
   end
 end

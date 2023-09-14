@@ -43,8 +43,24 @@ module Config::SiteConcern
     EnrollRegistry.feature_enabled?(:aca_individual_market)
   end
 
+  def ivl_osse_enabled?
+    EnrollRegistry.feature_enabled?(:aca_ivl_osse_eligibility)
+  end
+
+  def shop_osse_enabled?
+    EnrollRegistry.feature_enabled?(:aca_shop_osse_eligibility)
+  end
+
+  def osse_self_serve_enabled?
+    EnrollRegistry.feature_enabled?(:self_service_osse_subsidy)
+  end
+
+  def minimum_applied_aptc_pct_for_osse
+    EnrollRegistry[:aca_individual_assistance_benefits].setting(:minimum_applied_aptc_percentage_for_osse).item
+  end
+
   def ivl_osse_filtering_enabled?
-    EnrollRegistry.feature_enabled?("individual_osse_plan_filter")
+    EnrollRegistry.feature_enabled?(:individual_osse_plan_filter)
   end
 
   def is_shop_and_individual_market_enabled?

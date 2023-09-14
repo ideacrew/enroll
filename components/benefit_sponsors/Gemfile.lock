@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: ae0788b2612f97088259a50eef3c298850d2c5cf
+  revision: 6a232951549089c011f8af2bcee67a777efe05b4
   branch: trunk
   specs:
     aca_entities (0.10.0)
@@ -54,7 +54,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/resource_registry.git
-  revision: 7b8f396afde849e584d0a749ade9ee88f1717e26
+  revision: 02f549334dc8eecce557daa45a543b00d8787d93
   branch: trunk
   specs:
     resource_registry (0.7.0)
@@ -233,7 +233,7 @@ GEM
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
       tzinfo (~> 1.1)
-    addressable (2.7.0)
+    addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
     amq-protocol (1.9.2)
     arel (9.0.0)
@@ -402,8 +402,8 @@ GEM
       rails (>= 4.2)
     iso_country_codes (0.7.8)
     jaro_winkler (1.5.4)
-    json-schema (2.8.1)
-      addressable (>= 2.4)
+    json-schema (4.0.0)
+      addressable (>= 2.8)
     jsonapi-renderer (0.2.2)
     kaminari (0.17.0)
       actionpack (>= 3.0.0)

@@ -8,6 +8,8 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility,
                type: :model,
                dbclean: :after_each do
+  include_context "setup benefit market with market catalogs and product packages"
+
   let(:site) do
     ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market
   end
@@ -26,6 +28,24 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
     sponsorship
   end
 
+  let(:current_effective_date) { Date.new(Date.today.year, 3, 1) }
+
+  let(:catalog_eligibility) do
+    catalog_eligibility =
+      ::Operations::Eligible::CreateCatalogEligibility.new.call(
+        {
+          subject: current_benefit_market_catalog.to_global_id,
+          eligibility_feature: "aca_shop_osse_eligibility",
+          effective_date:
+            current_benefit_market_catalog.application_period.begin.to_date,
+          domain_model:
+            "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+        }
+      )
+
+    catalog_eligibility
+  end
+
   let(:required_params) do
     {
       subject: benefit_sponsorship.to_global_id,
@@ -36,6 +56,14 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
   end
 
   let(:evidence_value) { "false" }
+
+  before do
+    TimeKeeper.set_date_of_record_unprotected!(current_effective_date)
+    allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+    catalog_eligibility
+  end
+
+  after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
 
   context "with input params" do
     it "should build admin attested evidence options" do
@@ -51,14 +79,14 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
       eligibility_state_history = eligibility.state_histories.last
       evidence_state_history = evidence.state_histories.last
 
-      expect(eligibility_state_history.event).to eq(:move_to_initial)
+      expect(eligibility_state_history.event).to eq(:move_to_ineligible)
       expect(eligibility_state_history.from_state).to eq(:initial)
-      expect(eligibility_state_history.to_state).to eq(:initial)
+      expect(eligibility_state_history.to_state).to eq(:ineligible)
       expect(eligibility_state_history.is_eligible).to be_falsey
 
-      expect(evidence_state_history.event).to eq(:move_to_initial)
+      expect(evidence_state_history.event).to eq(:move_to_not_approved)
       expect(evidence_state_history.from_state).to eq(:initial)
-      expect(evidence_state_history.to_state).to eq(:initial)
+      expect(evidence_state_history.to_state).to eq(:not_approved)
       expect(evidence_state_history.is_eligible).to be_falsey
       expect(evidence.is_satisfied).to be_falsey
     end
@@ -74,9 +102,9 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
       eligibility_state_history = eligibility.state_histories.last
       evidence_state_history = evidence.state_histories.last
 
-      expect(eligibility_state_history.event).to eq(:move_to_published)
+      expect(eligibility_state_history.event).to eq(:move_to_eligible)
       expect(eligibility_state_history.from_state).to eq(:initial)
-      expect(eligibility_state_history.to_state).to eq(:published)
+      expect(eligibility_state_history.to_state).to eq(:eligible)
       expect(eligibility_state_history.is_eligible).to be_truthy
 
       expect(evidence_state_history.event).to eq(:move_to_approved)
@@ -87,18 +115,41 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
     end
   end
 
+  context "with event approved" do
+    let(:evidence_value) { "false" }
+
+    it "should create eligibility with :approved state evidence" do
+      eligibility = described_class.new.call(required_params).success
+
+      evidence = eligibility.evidences.last
+      eligibility_state_history = eligibility.state_histories.last
+      evidence_state_history = evidence.state_histories.last
+
+      expect(eligibility_state_history.event).to eq(:move_to_ineligible)
+      expect(eligibility_state_history.from_state).to eq(:initial)
+      expect(eligibility_state_history.to_state).to eq(:ineligible)
+      expect(eligibility_state_history.is_eligible).to be_falsey
+
+      expect(evidence_state_history.event).to eq(:move_to_not_approved)
+      expect(evidence_state_history.from_state).to eq(:initial)
+      expect(evidence_state_history.to_state).to eq(:not_approved)
+      expect(evidence_state_history.is_eligible).to be_falsey
+      expect(evidence.is_satisfied).to be_falsey
+    end
+  end
+
   context "when existing eligibility present" do
     let(:evidence_value) { "true" }
 
     let!(:shop_osse_eligibility) do
       eligibility =
         build(
-          :benefit_sponsors_benefit_sponsorships_shop_osse_eligibilities_shop_osse_eligibility,
+          :benefit_sponsors_shop_osse_eligibility,
           :with_admin_attested_evidence,
           evidence_state: :initial,
           is_eligible: false
         )
-      benefit_sponsorship.shop_eligibilities << eligibility
+      benefit_sponsorship.eligibilities << eligibility
       benefit_sponsorship.save!
       eligibility
     end
@@ -110,9 +161,9 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
       eligibility_state_history = eligibility.state_histories.last
       evidence_state_history = evidence.state_histories.last
 
-      expect(eligibility_state_history.event).to eq(:move_to_published)
-      expect(eligibility_state_history.from_state).to eq(:initial)
-      expect(eligibility_state_history.to_state).to eq(:published)
+      expect(eligibility_state_history.event).to eq(:move_to_eligible)
+      expect(eligibility_state_history.from_state).to eq(:ineligible)
+      expect(eligibility_state_history.to_state).to eq(:eligible)
       expect(eligibility_state_history.is_eligible).to be_truthy
 
       expect(evidence_state_history.event).to eq(:move_to_approved)
