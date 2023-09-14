@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 # rubocop:disable Metrics/ModuleLength
+  # Config module for ACAHelper
 module Config
-  # aca helper module
+  # Aca Helper module
   module AcaHelper
     def aca_state_abbreviation
       Settings.aca.state_abbreviation
@@ -423,10 +424,6 @@ module Config
 
     def ivl_osse_filtering_enabled?
       EnrollRegistry.feature_enabled?(:individual_osse_plan_filter)
-    end
-
-    def default_applied_aptc_pct
-      EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
     end
 
     def minimum_applied_aptc_pct_for_osse
