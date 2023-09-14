@@ -453,6 +453,7 @@ Then(/Primary Broker should see Employer and click on legal name$/) do
 end
 
 Then(/Primary Broker clicks on shop for plans$/) do
+  allow_any_instance_of(Insured::GroupSelectionController).to receive(:is_user_authorized?).and_return(true)
   find('.interaction-click-control-shop-for-plans').click
   find("#btn-continue").click
 end
