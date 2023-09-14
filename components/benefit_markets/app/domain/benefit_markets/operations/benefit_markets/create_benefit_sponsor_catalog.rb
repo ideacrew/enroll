@@ -11,6 +11,8 @@ module BenefitMarkets
         # send(:include, Dry::Monads::Do.for(:call))
         send(:include, Dry::Monads[:result, :do])
 
+        attr_reader :enrollment_eligibility
+
         # @param [ Date ] effective_date Effective date of the benefit application
         # @param [ Array<BenefitMarkets::Entities::ServiceArea> ] service_areas Service Areas based on Benefit Sponsor primary office location
         # @param [ Symbol ] market_kind Benefit Marketplace Type
@@ -40,10 +42,17 @@ module BenefitMarkets
           Success(policies)
         end
 
+        def eligible_product_packages(catalog)
+          if enrollment_eligibility.metal_level_products_restricted?
+            catalog.product_packages.reject{|package| package.product_kind == :health && package.package_kind != :metal_level}
+          else
+            catalog.product_packages
+          end
+        end
+
         def build_product_packages(benefit_market_catalog, application_period, enrollment_eligibility)
           benefit_market_catalog = benefit_market_catalog.value!
-
-          product_packages = benefit_market_catalog.product_packages.collect do |product_package|
+          product_packages = eligible_product_packages(benefit_market_catalog).collect do |product_package|
             product_package_entity_for(product_package, application_period, enrollment_eligibility)
           end
 
@@ -67,7 +76,14 @@ module BenefitMarkets
           product_package_params[:contribution_model]            = build_contribution_model_entity(contribution_model_params)
           product_package_params[:pricing_model][:pricing_units] = build_pricing_units_entities(pricing_units_params, package_kind)
 
+          apply_product_eligibility_grants(product_package_params)
+
           ::BenefitMarkets::Operations::ProductPackages::Create.new.call(product_package_params: product_package_params, enrollment_eligibility: enrollment_eligibility)
+        end
+
+        def apply_product_eligibility_grants(product_package_params)
+          return unless enrollment_eligibility.metal_level_products_restricted?
+          product_package_params[:products].reject!{|product| product.kind == :health && product.metal_level_kind == :bronze}
         end
 
         def create(sponsor_catalog_params, product_packages)
@@ -81,6 +97,7 @@ module BenefitMarkets
         end
 
         def find_benefit_market_catalog(enrollment_eligibility)
+          @enrollment_eligibility = enrollment_eligibility
           market_catalog = ::BenefitMarkets::Operations::BenefitMarketCatalogs::FindModel.new.call(effective_date: enrollment_eligibility.effective_date, market_kind: enrollment_eligibility.market_kind)
 
           Success(market_catalog)

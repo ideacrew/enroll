@@ -119,8 +119,6 @@ describe ConsumerRole, dbclean: :after_each do
   end
 end
 
-
-
 describe "#find_document" do
   let(:consumer_role) {ConsumerRole.new}
   context 'consumer role does not have any vlp_documents' do
@@ -2103,6 +2101,19 @@ end
 describe '.create_or_term_eligibility' do
 
   context 'family members with consumer roles present' do
+    let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
+    let!(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+    let!(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+    let(:catalog_eligibility) do
+      Operations::Eligible::CreateCatalogEligibility.new.call(
+        {
+          subject: benefit_coverage_period.to_global_id,
+          eligibility_feature: "aca_ivl_osse_eligibility",
+          effective_date: benefit_coverage_period.start_on.to_date,
+          domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+        }
+      )
+    end
     let(:primary) { FactoryBot.create(:person, :with_consumer_role) }
     let(:spouse) { FactoryBot.create(:person, :with_consumer_role) }
     let(:child1) { FactoryBot.create(:person, :with_consumer_role) }
@@ -2116,15 +2127,18 @@ describe '.create_or_term_eligibility' do
     context 'it should create eligibility for active family members' do
       let(:valid_params) do
         {
-          evidence_key: :osse_subsidy,
+          evidence_key: :ivl_osse_evidence,
           evidence_value: 'true',
-          effective_date: TimeKeeper.date_of_record.next_year.beginning_of_year
+          effective_date: TimeKeeper.date_of_record.beginning_of_year
         }
       end
 
       before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+        catalog_eligibility
         osse_eligible_members.each do |person|
           person.consumer_role.create_or_term_eligibility(valid_params)
+          person.consumer_role.reload
         end
       end
 
@@ -2145,7 +2159,7 @@ describe '.create_or_term_eligibility' do
       it 'should create eligibility with given effective date' do
         verify_active_family_members do |consumer_role|
           expect(consumer_role.eligibilities.count).to eq 1
-          expect(consumer_role.eligibilities.first.start_on).to eq valid_params[:effective_date]
+          expect(consumer_role.eligibilities.first.effective_on).to eq valid_params[:effective_date]
         end
       end
 
@@ -2160,25 +2174,80 @@ describe '.create_or_term_eligibility' do
 
     context 'it should term eligibility' do
       let(:consumer_role) { primary.consumer_role }
-      let(:consumer_elig) { build(:eligibility, :with_subject, :with_evidences, start_on: TimeKeeper.date_of_record.prev_month) }
-      let!(:eligibility) do
-        consumer_role.eligibilities << consumer_elig
+      let!(:ivl_osse_eligibility) do
+        eligibility = build(:ivl_osse_eligibility,
+                            :with_admin_attested_evidence,
+                            :evidence_state => :approved,
+                            :is_eligible => false)
+        consumer_role.eligibilities << eligibility
         consumer_role.save!
-        consumer_role.eligibilities.first
+        eligibility
       end
 
       let(:valid_params) do
         {
-          evidence_key: :osse_subsidy,
+          evidence_key: :ivl_osse_evidence,
           evidence_value: 'false',
           effective_date: TimeKeeper.date_of_record
         }
       end
 
       before { consumer_role.create_or_term_eligibility(valid_params) }
-
-      it { expect(eligibility.reload.end_on).to eq(TimeKeeper.date_of_record) }
       it { expect(consumer_role.reload.osse_eligible?(TimeKeeper.date_of_record)).to be_falsey }
+    end
+  end
+end
+
+describe 'create default osse eligibility on create' do
+  let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
+  let!(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+  let!(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+  let(:catalog_eligibility) do
+    Operations::Eligible::CreateCatalogEligibility.new.call(
+      {
+        subject: benefit_coverage_period.to_global_id,
+        eligibility_feature: "aca_ivl_osse_eligibility",
+        effective_date: benefit_coverage_period.start_on.to_date,
+        domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+      }
+    )
+  end
+  let(:consumer_role) { FactoryBot.build(:consumer_role) }
+  let(:current_year) { TimeKeeper.date_of_record.year }
+
+  context 'when osse feature for the given year is disabled' do
+    before do
+      EnrollRegistry["aca_ivl_osse_eligibility_#{current_year}"].feature.stub(:is_enabled).and_return(false)
+      catalog_eligibility
+    end
+
+    it 'should create osse eligibility in initial state' do
+      expect(consumer_role.eligibilities.count).to eq 0
+      consumer_role.save
+      expect(consumer_role.reload.eligibilities.count).to eq 0
+    end
+  end
+
+  context 'when osse feature for the given year is enabled' do
+    before do
+      allow(EnrollRegistry).to receive(:feature?).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+      catalog_eligibility
+    end
+
+    it 'should create osse eligibility in initial state' do
+      expect(consumer_role.eligibilities.count).to eq 0
+      consumer_role.save!
+      expect(consumer_role.reload.eligibilities.count).to eq 1
+      eligibility = consumer_role.eligibilities.first
+      expect(eligibility.key).to eq "aca_ivl_osse_eligibility_#{TimeKeeper.date_of_record.year}".to_sym
+      expect(eligibility.current_state).to eq :ineligible
+      expect(eligibility.state_histories.count).to eq 1
+      expect(eligibility.evidences.count).to eq 1
+      evidence = eligibility.evidences.first
+      expect(evidence.key).to eq :ivl_osse_evidence
+      expect(evidence.current_state).to eq :not_approved
+      expect(evidence.state_histories.count).to eq 1
     end
   end
 end

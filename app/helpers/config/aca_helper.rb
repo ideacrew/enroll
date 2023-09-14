@@ -383,14 +383,6 @@ module Config
       Settings.aca.default_dental_option_kind
     end
 
-    def ivl_osse_eligibility_is_enabled?(year = TimeKeeper.date_of_record.year)
-      EnrollRegistry.feature?("aca_ivl_osse_subsidy_#{year}") && EnrollRegistry.feature_enabled?("aca_ivl_osse_subsidy_#{year}")
-    end
-
-    def ivl_osse_filtering_enabled?
-      EnrollRegistry.feature_enabled?("individual_osse_plan_filter")
-    end
-
     def eligibility_audit_log_is_enabled?
       EnrollRegistry.feature?("eligibility_audit_log") && EnrollRegistry.feature_enabled?("eligibility_audit_log")
     end
@@ -417,6 +409,26 @@ module Config
       EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
     end
 
+    def ivl_osse_enabled?
+      EnrollRegistry.feature_enabled?(:aca_ivl_osse_eligibility)
+    end
+
+    def shop_osse_enabled?
+      EnrollRegistry.feature_enabled?(:aca_shop_osse_eligibility)
+    end
+
+    def ivl_osse_eligibility_is_enabled?(year = TimeKeeper.date_of_record.year)
+      EnrollRegistry.feature?("aca_ivl_osse_eligibility_#{year}") && EnrollRegistry.feature_enabled?("aca_ivl_osse_eligibility_#{year}")
+    end
+
+    def ivl_osse_filtering_enabled?
+      EnrollRegistry.feature_enabled?(:individual_osse_plan_filter)
+    end
+
+    def default_applied_aptc_pct
+      EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
+    end
+
     def minimum_applied_aptc_pct_for_osse
       EnrollRegistry[:aca_individual_assistance_benefits].setting(:minimum_applied_aptc_percentage_for_osse).item
     end
@@ -424,6 +436,14 @@ module Config
     def ce_roster_bulk_upload_enabled?
       EnrollRegistry.feature?(:ce_roster_bulk_upload) && EnrollRegistry.feature_enabled?(:ce_roster_bulk_upload)
     end
+  end
+
+  def shop_osse_eligibility_years_for_display
+    BenefitMarkets::BenefitMarketCatalog.osse_eligibility_years_for_display.sort.reverse
+  end
+
+  def individual_osse_eligibility_years_for_display
+    ::BenefitCoveragePeriod.osse_eligibility_years_for_display.sort.reverse
   end
 end
 # rubocop:enable Metrics/ModuleLength

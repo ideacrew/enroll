@@ -15,6 +15,11 @@ class Insured::FamiliesController < FamiliesController
   before_action :transition_family_members_update_params, only: [:transition_family_members_update]
   before_action :upload_notice_form_enabled?, only: [:upload_notice_form]
   before_action :set_cache_headers, only: [:home, :inbox]
+  before_action :ivl_osse_enabled?, only: [
+    :healthcare_for_childcare_program,
+    :healthcare_for_childcare_program_form,
+    :update_osse_eligibilities
+  ]
 
   def home
     Caches::CurrentHbx.with_cache do
@@ -170,13 +175,28 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def healthcare_for_childcare_program
+    authorize @family, :healthcare_for_childcare_program?
+
     @childcare_forms = ::Forms::HealthcareForChildcareProgramForm.build_forms_for(@person.primary_family)
   end
 
-  def update_healthcare_for_childcare_program_eligibility
-    ::Forms::HealthcareForChildcareProgramForm.submit_with(healthcare_for_childcare_program_params)
+  def healthcare_for_childcare_program_form
+    authorize @family, :healthcare_for_childcare_program?
 
-    redirect_to(healthcare_for_childcare_program_insured_families_path)
+    @service = ::Services::IvlOsseEligibilityService.new(params.permit(:person_id))
+    @osse_status_by_year = @service.osse_status_by_year
+  end
+
+  def update_osse_eligibilities
+    authorize @family, :healthcare_for_childcare_program?
+    args = params.require(:eligibilities).permit(:person_id, :osse => {})
+    @service = ::Services::IvlOsseEligibilityService.new(args)
+    result = @service.update_osse_eligibilities_by_year
+
+    flash[:notice] = "Sucessfully updated #{@service.person.full_name}'s HC4CC eligibility for years #{result['Success'].join(', ')}" if result["Success"]
+    flash[:error] = "Failed to updated #{@service.person.full_name}'s HC4CC eligibility for years #{result['Failure'].join(', ')}" if result["Failure"]
+
+    redirect_to(healthcare_for_childcare_program_form_insured_families_path(person_id: @service.person.id))
   end
 
   def verification
