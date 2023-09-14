@@ -26,7 +26,7 @@ namespace :dry_run do
       Rake::Task['dry_run:data:service_areas'].invoke(year)
       Rake::Task['dry_run:data:rating_areas'].invoke(year)
       Rake::Task['dry_run:data:actuarial_factors'].invoke(year)
-      Rake::Task['dry_run:data:plans'].invoke(year)
+      # Rake::Task['dry_run:data:plans'].invoke(year) NOT USED SINCE 2019, PRODUCTS ARE USED INSTEAD
       Rake::Task['dry_run:data:products'].invoke(year)
       Rake::Task['dry_run:data:benefit_coverage_period'].invoke(year)
       Rake::Task['dry_run:data:benefit_packages'].invoke(year)

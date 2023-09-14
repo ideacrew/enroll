@@ -132,6 +132,34 @@ namespace :dry_run do
       end
     end
 
+    def renewal_eligible_apps_by_families(renewal_year, family_ids = nil)
+      latest_applications = ::FinancialAssistance::Application.collection.aggregate([
+                                                                                      {
+                                                                                        '$match': {
+                                                                                          'assistance_year': renewal_year.pred,
+                                                                                          'aasm_state': 'determined',
+                                                                                          'family_id': { '$in': family_ids }
+                                                                                        }
+                                                                                      },
+                                                                                      {
+                                                                                        '$sort': {
+                                                                                          'family_id': 1,
+                                                                                          'created_at': -1
+                                                                                        }
+                                                                                      },
+                                                                                      {
+                                                                                        '$group': {
+                                                                                          '_id': '$family_id',
+                                                                                          'latest_application_id': { '$first': '$_id' }
+                                                                                        }
+                                                                                      }
+                                                                                    ])
+
+      latest_application_ids = latest_applications.map { |doc| doc['latest_application_id'] }
+
+      ::FinancialAssistance::Application.where(:_id.in => latest_application_ids).to_a.select { |app| app.eligible_for_renewal? }
+    end
+
     # Try and find any know issues with the application that would prevent it from being renewed or re-determined.
     def redetermination_errors(app)
       # Mirrors the validations from the application model. We need to do this manually because we want all possible errors, not just the first one.

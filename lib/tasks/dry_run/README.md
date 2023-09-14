@@ -211,7 +211,7 @@ rake dry_run:commands:notify[2024]
 
 All eligible renewal notices are generated for the given year.
 
-### Rake Task: `dry_run:reports:all[year]`
+### Rake Task: `dry_run:reports:generate[year, redetermination_report?, notice_report?]`
 
 - This Rake task generates all reports for the specified year.
 - It is useful for generating all reports after a dry run is complete.
@@ -220,8 +220,13 @@ All eligible renewal notices are generated for the given year.
 #### Usage:
 
 ```bash
-rake dry_run:reports:all[2024]
+rake dry_run:reports:generate[2024, true, false]
 ```
+
+#### Parameters
+- `year` (optional): The year for which the dry run will be performed. Defaults to the next year if not provided.
+- `redetermination_report?` (optional): Specify `false` to skip generating a redetermination report. Defaults to `true`.
+- `notice_report?` (optional): Specify `false` to skip generating a notice report. Defaults to `true`.
 
 #### Expectations
 
@@ -229,6 +234,8 @@ The following reports are generated for the given year:
 
 - Application re-determination report
   - Summary of all financial assistance applications that should be renewed, their redetermination results, and possible issues. (`dry_run_report/redetermination_report_[year].csv`)
+- Notice report
+  - Summary of all renewal notices that should be generated, their generation results, and possible issues. (`dry_run_report/notices_report_[year].csv`)
 ## Logging
 
 The dry run process logs all steps and results to the file `dry_run_report/dry_run.log`. This log file is useful for a summary of results, and debugging issues.

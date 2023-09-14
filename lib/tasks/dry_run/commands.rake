@@ -55,6 +55,17 @@ namespace :dry_run do
       log "Determination process for #{year} - #{result_type(result)}", "Results logged to #{results_log_file}"
     end
 
+    desc "retry the determination process for a given year"
+    task :retry_determine_applications, [:year] => :environment do |_t, args|
+      log "Beginning retry determination process for #{args[:year]}"
+      # Unsubmit all applications stuck in a submitted state to allow them to be resubmitted. Otherwise they will not be picked up by the determination worker.
+      FinancialAssistance::Application.by_year(args[:year].to_i).where(aasm_state: "submitted").each { |app| app.unsubmit }
+
+      Rake::Task["dry_run:commands:determine_applications"].invoke(args[:year])
+
+      log "Completed retry determination process for #{args[:year]}"
+    end
+
     desc "Run the post-renewals notice triggers for a given year"
     task :notify, [:year] => :environment do |_t, args|
       year = args[:year].to_i
