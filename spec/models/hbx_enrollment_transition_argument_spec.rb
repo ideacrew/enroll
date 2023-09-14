@@ -15,6 +15,7 @@ RSpec.describe HbxEnrollment, "created in the shopping mode, then transitioned w
     hbx_enrollment = HbxEnrollment.new(
       :aasm_state => "shopping",
       :kind => "individual",
+      :effective_on => TimeKeeper.date_of_record.beginning_of_month,
       :enrollment_kind => "open_enrollment",
       :coverage_kind => "health",
       :family => family,
