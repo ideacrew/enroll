@@ -476,6 +476,7 @@ jobs:
         if: needs[env.CHECK].result != 'success'
         run: exit 1
   code-coverage-summary:
+    if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk') #disable this if you want to run on every PR, right now is only push with trunk
     needs: [rspec, cucumber]
     runs-on: ubuntu-latest
     steps:
@@ -485,18 +486,6 @@ jobs:
         with:
           name: code-coverage
           path: coverage
-      # original request;
-      # - name: Code Coverage Summary
-      #   uses: irongut/CodeCoverageSummary@v1.3.0
-      #   with:
-      #     filename: coverage/*.xml
-      #     badge: true
-      #     format: 'markdown'
-      #     output: both
-      #     hide_branch_rate: true
-      # - name: Write to Job Summary
-      #   run: cat code-coverage-results.md >> $GITHUB_STEP_SUMMARY
-      # Report Generator
       - name: Setup .NET Core # Required to execute ReportGenerator
         uses: actions/setup-dotnet@v3
         with:
