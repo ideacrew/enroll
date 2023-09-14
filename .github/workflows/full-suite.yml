@@ -519,12 +519,12 @@ jobs:
         run: cat coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
       - name: copy coverage badge
         run: |
-          mkdir coverage-badge
-          cp coveragereport/badge_linecoverage.svg coverage-badge/
+          mkdir coverage-save
+          cp coveragereport/badge_linecoverage.svg coverage-save/
       - name: Publish coverage badge to coverage-badge branch
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: coverage-artifacts
-          folder: coverage-badge/
+          folder: coverage-save/
 
 

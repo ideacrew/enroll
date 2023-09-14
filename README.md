@@ -1,4 +1,4 @@
-![Rspec and Cucumbers](https://github.com/dchbx/enroll/workflows/Rspec%20and%20Cucumbers/badge.svg)
+![code coverage](https://raw.githubusercontent.com/ideacrew/enroll/coverage-artifacts/badge_linecoverage.svg?raw=true)
 
 # Enroll
 
