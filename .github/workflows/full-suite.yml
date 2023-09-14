@@ -476,7 +476,6 @@ jobs:
         if: needs[env.CHECK].result != 'success'
         run: exit 1
   code-coverage-summary:
-    if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk') #disable this if you want to run on every PR, right now is only push with trunk
     needs: [rspec, cucumber]
     runs-on: ubuntu-latest
     steps:
@@ -507,10 +506,12 @@ jobs:
       - name: Write to Job Summary
         run: cat coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
       - name: copy coverage badge
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         run: |
           mkdir coverage-save
           cp coveragereport/badge_linecoverage.svg coverage-save/
       - name: Publish coverage badge to coverage-badge branch
+        if: (github.event_name == 'push') && (github.ref == 'refs/heads/trunk')
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: coverage-artifacts
