@@ -9,6 +9,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     include FloatHelper
     include_context "setup family initial and renewal enrollments data"
 
+    before :all do
+      DatabaseCleaner.clean
+    end
+
     let(:ivl_benefit) { double('BenefitPackage', residency_status: ['any']) }
 
     before do
@@ -531,31 +535,12 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             end
 
             let!(:eligibility_determination) do
-              determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
-              determination.grants.create(
-                key: "AdvancePremiumAdjustmentGrant",
-                value: yearly_expected_contribution,
-                start_on: TimeKeeper.date_of_record.beginning_of_year,
-                end_on: TimeKeeper.date_of_record.end_of_year,
-                assistance_year: TimeKeeper.date_of_record.year,
-                member_ids: family.family_members.map(&:id).map(&:to_s),
-                tax_household_id: tax_household.id
-              )
-
-              determination.grants.create(
-                key: "AdvancePremiumAdjustmentGrant",
-                value: yearly_expected_contribution,
-                start_on: TimeKeeper.date_of_record.beginning_of_year.next_year,
-                end_on: TimeKeeper.date_of_record.end_of_year.next_year,
-                assistance_year: TimeKeeper.date_of_record.year + 1,
-                member_ids: family.family_members.map(&:id).map(&:to_s),
-                tax_household_id: tax_household.id
-              )
-
-              determination
+              create_eligibility_determination(family, yearly_expected_contribution, tax_household)
             end
 
             it 'will set aptc values & will generate renewal' do
+              create_eligibility_determination(family, yearly_expected_contribution, tax_household) if enrollment.family.eligibility_determination.reload.grants.count.zero?
+
               renewal = subject.renew
               expect(renewal.is_a?(HbxEnrollment)).to eq true
               expect(subject.aptc_values).to eq({
@@ -782,14 +767,16 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         let(:child1_dob) { current_date.next_month - 24.years }
 
         context 'when osse eligibility present for renewal year' do
-
           it "should renew and apply child care subsidy" do
             allow_any_instance_of(HbxEnrollment).to receive(:ivl_osse_eligible?).and_return(true)
+            allow_any_instance_of(HbxEnrollment).to receive(:is_eligible_for_osse_grant?).and_return(true)
             enrollment.update_osse_childcare_subsidy
+            expect(enrollment.product.is_hc4cc_plan).to be_truthy
             expect(enrollment.eligible_child_care_subsidy.to_f).to be > 0
 
             renewal = subject.renew
             expect(renewal.auto_renewing?).to be_truthy
+            expect(renewal.product.is_hc4cc_plan).to be_truthy
             expect(renewal.eligible_child_care_subsidy.to_f).to be > 0
             expect(renewal.eligible_child_care_subsidy.to_f).to eq(renewal.total_premium.to_f)
           end
@@ -798,7 +785,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         context 'when osse eligibility not present for renewal year' do
 
           it "should renew and don't apply child care subsidy" do
-            allow(enrollment).to receive(:ivl_osse_eligible?).and_return(true)
+            allow_any_instance_of(HbxEnrollment).to receive(:ivl_osse_eligible?).and_return(true)
+            allow(enrollment).to receive(:is_eligible_for_osse_grant?).and_return(true)
             enrollment.update_osse_childcare_subsidy
             expect(enrollment.eligible_child_care_subsidy.to_f).to be > 0
 
@@ -830,7 +818,9 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         context 'when osse eligibility present for renewal year' do
           before do
             allow_any_instance_of(HbxEnrollment).to receive(:ivl_osse_eligible?).and_return(true)
+            allow_any_instance_of(HbxEnrollment).to receive(:is_eligible_for_osse_grant?).and_return(true)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:temporary_configuration_enable_multi_tax_household_feature).and_return(true)
+            allow(EnrollRegistry).to receive(:feature_enabled?).with("aca_ivl_osse_eligibility_#{enrollment.effective_on.year}").and_return(false)
             allow(EnrollRegistry).to receive(:feature_enabled?).with(:total_minimum_responsibility).and_return(false)
             enrollment.update_osse_childcare_subsidy
           end
@@ -1168,6 +1158,31 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
       end
     end
+  end
+
+  def create_eligibility_determination(family, yearly_expected_contribution, tax_household)
+    determination = family.create_eligibility_determination(effective_date: TimeKeeper.date_of_record.beginning_of_year)
+    determination.grants.create(
+      key: "AdvancePremiumAdjustmentGrant",
+      value: yearly_expected_contribution,
+      start_on: TimeKeeper.date_of_record.beginning_of_year,
+      end_on: TimeKeeper.date_of_record.end_of_year,
+      assistance_year: TimeKeeper.date_of_record.year,
+      member_ids: family.family_members.map(&:id).map(&:to_s),
+      tax_household_id: tax_household.id
+    )
+
+    determination.grants.create(
+      key: "AdvancePremiumAdjustmentGrant",
+      value: yearly_expected_contribution,
+      start_on: TimeKeeper.date_of_record.beginning_of_year.next_year,
+      end_on: TimeKeeper.date_of_record.end_of_year.next_year,
+      assistance_year: TimeKeeper.date_of_record.year + 1,
+      member_ids: family.family_members.map(&:id).map(&:to_s),
+      tax_household_id: tax_household.id
+    )
+
+    determination
   end
 
   def update_age_off_excluded(fam, true_or_false)

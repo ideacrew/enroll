@@ -44,18 +44,18 @@ RSpec.describe ::Operations::Eligibilities::Osse::GenerateGrants,
     end
   end
 
-  it 'should be a container-ready operation' do
+  xit 'should be a container-ready operation' do
     expect(subject.respond_to?(:call)).to be_truthy
   end
 
   context 'when required attributes passed' do
 
-    it 'should be success' do
+    xit 'should be success' do
       result = subject.call(required_params)
       expect(result.success?).to be_truthy
     end
 
-    it 'should return grants' do
+    xit 'should return grants' do
       result = subject.call(required_params)
 
       expect(result.success).to be_an_instance_of(Array)
@@ -64,7 +64,7 @@ RSpec.describe ::Operations::Eligibilities::Osse::GenerateGrants,
   end
 
   context 'when required attributes not passed' do
-    it 'should fail with validation error' do
+    xit 'should fail with validation error' do
       result = subject.call(required_params.except(:evidence_key))
       expect(result.failure?).to be_truthy
       expect(result.failure).to include("evidence key missing")

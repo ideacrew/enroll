@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 module BenefitSponsors
-  RSpec.describe Profiles::Employers::BrokerAgencyController, type: :controller, dbclean: :after_each do
+  RSpec.describe Profiles::Employers::BrokerAgencyController, type: :controller, dbclean: :around_each do
 
     routes { BenefitSponsors::Engine.routes }
     let!(:security_question)  { FactoryBot.create_default :security_question }
@@ -30,7 +30,8 @@ module BenefitSponsors
     let(:broker_managenement_form_class) { BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm }
 
     before :each do
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+      allow(EnrollRegistry).to receive(:feature?).and_return(true)
       BenefitSponsors::Organizations::BrokerAgencyProfile::MARKET_KINDS << :shop
       Person.create_indexes
       user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id)

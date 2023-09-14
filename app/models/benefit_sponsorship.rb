@@ -121,10 +121,11 @@ class BenefitSponsorship
       oe_begin.process_renewals
     end
 
+    # Creates BCP for the prospective year
     def create_prospective_year_benefit_coverage_period(new_date)
       return unless eligible_for_new_benefit_coverage_period?(new_date)
 
-      HbxProfile.current_hbx.benefit_sponsorship.create_benefit_coverage_period(new_date.year)
+      HbxProfile.current_hbx.benefit_sponsorship.create_benefit_coverage_period(new_date.year.next)
     rescue StandardError => e
       Rails.logger.error { "Couldn't create prospective year benefit coverage period due to #{e.inspect}" }
     end
