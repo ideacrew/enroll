@@ -46,5 +46,38 @@ RSpec.describe Operations::Fdsh::RequestEvidenceDetermination, dbclean: :after_e
         end
       end
     end
+
+    context 'on applicant esi evidence' do
+      let(:esi_evidence) do
+        applicant.esi_evidence = FactoryBot.build(:evidence, :with_request_results, :with_verification_histories, key: :esi_mec, title: 'ESI MEC', aasm_state: 'pending', is_satisfied: false)
+        applicant.save!
+        applicant.esi_evidence
+      end
+
+      context 'builds and publishes with no errors' do
+        it 'should return success' do
+          result = described_class.new.call(esi_evidence).success
+
+          expect(result).to eq("Event published successfully")
+        end
+      end
+
+      context 'should return with errors' do
+        let(:build_and_validate_payload_entity) { instance_double(Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules) }
+        let(:error_reponse) { 'Invalid SSN' }
+
+        before do
+          allow(build_and_validate_payload_entity).to receive(:call).and_return(Dry::Monads::Failure(error_reponse))
+          allow(Operations::Fdsh::BuildAndValidateApplicationPayload).to receive(:new).and_return(build_and_validate_payload_entity)
+        end
+
+        it 'should return an error and not update evidence aasm_state' do
+          result = described_class.new.call(esi_evidence)
+
+          expect(result).to be_failure
+          expect(result.failure).to eq(error_reponse)
+        end
+      end
+    end
   end
 end
