@@ -410,14 +410,14 @@ module Insured::FamiliesHelper
     if enrollment.latest_wfst.present?
       if enrollment.latest_wfst_is_superseded_silent?
         l10n(
-          'enrollment.latest_transition_data',
+          'enrollment.latest_transition_data_with_silent_reason',
           from_state: enrollment.latest_wfst.from_state,
           to_state: enrollment.latest_wfst.to_state,
           created_at: enrollment.latest_wfst.created_at.in_time_zone('Eastern Time (US & Canada)').strftime("%m/%d/%Y %-I:%M%p")
         )
       else
         l10n(
-          'enrollment.latest_transition_data_with_silent_reason',
+          'enrollment.latest_transition_data',
           from_state: enrollment.latest_wfst.from_state,
           to_state: enrollment.latest_wfst.to_state,
           created_at: enrollment.latest_wfst.created_at.in_time_zone('Eastern Time (US & Canada)').strftime("%m/%d/%Y %-I:%M%p")
