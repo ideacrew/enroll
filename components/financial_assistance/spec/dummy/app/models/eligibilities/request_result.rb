@@ -14,5 +14,6 @@ module Eligibilities
     field :code, type: String
     field :code_description, type: Date
     field :raw_payload, type: String
+    field :action, type: String
   end
 end

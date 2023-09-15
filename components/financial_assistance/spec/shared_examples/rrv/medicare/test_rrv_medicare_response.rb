@@ -248,7 +248,9 @@ RSpec.shared_context 'FDSH RRV Medicare sample response', :shared_context => :me
             :tution_and_fees => 0,
             :other_magi_eligible_income => 0
           },
-          :non_esi_evidence => {:key => :non_esi_mec, :title => "NON ESI MEC", :aasm_state => "outstanding"},
+          :non_esi_evidence => {:key => :non_esi_mec, :title => "NON ESI MEC", :aasm_state => "outstanding", request_results: [{
+            source: "FDSH"
+          }]},
           :mitc_relationships => [],
           :mitc_is_required_to_file_taxes => false
         }
@@ -557,7 +559,9 @@ RSpec.shared_context 'FDSH RRV Medicare sample response', :shared_context => :me
             :tution_and_fees => 0,
             :other_magi_eligible_income => 0
           },
-          :non_esi_evidence => {:key => :non_esi_mec, :title => "NON ESI MEC", aasm_state: "attested"},
+          :non_esi_evidence => {:key => :non_esi_mec, :title => "NON ESI MEC", aasm_state: "attested", request_results: [{
+            source: "FDSH"
+          }]},
           :mitc_relationships => [],
           :mitc_is_required_to_file_taxes => false
         }
