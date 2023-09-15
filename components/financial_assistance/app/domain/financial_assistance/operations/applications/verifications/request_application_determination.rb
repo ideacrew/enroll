@@ -10,6 +10,7 @@ module FinancialAssistance
         # This class is responsible for validating an application object and constructing a payload entity for FDSH service.
         class RequestApplicationDetermination
           include Dry::Monads[:result, :do]
+          include Acapi::Notifiers
           include EventSource::Command
 
           def call(application)

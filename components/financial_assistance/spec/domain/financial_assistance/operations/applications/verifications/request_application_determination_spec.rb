@@ -107,10 +107,14 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
   let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
   let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
 
+  let(:event) { Success(double) }
 
   before do
     allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
     allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
+
+    allow(subject).to receive(:build_event).and_return(event)
+    allow(subject).to receive(:publish_event_result).and_return(Success("Event published successfully"))
 
     stub_const('::Operations::Products::Fetch', fetch_double)
     stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
