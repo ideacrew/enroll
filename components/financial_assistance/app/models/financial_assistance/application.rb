@@ -381,6 +381,35 @@ module FinancialAssistance
 
     scope :has_outstanding_verifications, -> { where(:"applicants.evidences.eligibility_status".in => ["outstanding", "in_review"]) }
 
+    scope :latest_determined_for_families, ->(year = TimeKeeper.date_of_record.year, family_ids = nil) do
+      family_ids ||= ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id)
+      latest_applications = collection.aggregate([
+                                                   {
+                                                     '$match': {
+                                                       'assistance_year': year,
+                                                       'aasm_state': 'determined',
+                                                       'family_id': { '$in': family_ids }
+                                                     }
+                                                   },
+                                                   {
+                                                     '$sort': {
+                                                       'family_id': 1,
+                                                       'created_at': -1
+                                                     }
+                                                   },
+                                                   {
+                                                     '$group': {
+                                                       '_id': '$family_id',
+                                                       'latest_application_id': { '$first': '$_id' }
+                                                     }
+                                                   }
+                                                 ])
+
+      latest_application_ids = latest_applications.map { |doc| doc['latest_application_id'] }
+
+      where(:_id.in => latest_application_ids)
+    end
+
     alias is_joint_tax_filing? is_joint_tax_filing
     alias is_renewal_authorized? is_renewal_authorized
 

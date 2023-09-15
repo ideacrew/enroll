@@ -125,39 +125,16 @@ namespace :dry_run do
     def each_renewal_eligible_app(renewal_year, batch_size = 1000)
       family_ids = ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id)
       family_ids.each_slice(batch_size) do |family_id_slice|
-        results = ::FinancialAssistance::Application.by_year(renewal_year.pred).determined.where(:family_id.in => family_id_slice).to_a.group_by(&:family_id).transform_values { |group| group.max_by(&:created_at) }.select { |_, v| v.eligible_for_renewal? }.values
-        results.each do |app|
-          yield app
+        ::FinancialAssistance::Application.latest_determined_for_families(renewal_year.pred, family_id_slice).each do |app|
+          yield app if app.eligible_for_renewal?
         end
       end
     end
 
-    def renewal_eligible_apps_by_families(renewal_year, family_ids = nil)
-      latest_applications = ::FinancialAssistance::Application.collection.aggregate([
-                                                                                      {
-                                                                                        '$match': {
-                                                                                          'assistance_year': renewal_year.pred,
-                                                                                          'aasm_state': 'determined',
-                                                                                          'family_id': { '$in': family_ids }
-                                                                                        }
-                                                                                      },
-                                                                                      {
-                                                                                        '$sort': {
-                                                                                          'family_id': 1,
-                                                                                          'created_at': -1
-                                                                                        }
-                                                                                      },
-                                                                                      {
-                                                                                        '$group': {
-                                                                                          '_id': '$family_id',
-                                                                                          'latest_application_id': { '$first': '$_id' }
-                                                                                        }
-                                                                                      }
-                                                                                    ])
-
-      latest_application_ids = latest_applications.map { |doc| doc['latest_application_id'] }
-
-      ::FinancialAssistance::Application.where(:_id.in => latest_application_ids).to_a.select { |app| app.eligible_for_renewal? }
+    # They are only candidates because for the sake of time we dont check the eligible_for_renewal? method and rather just check if there is a determined application for the family in the previous year.
+    def missing_faa_renewal_candidates(renewal_year)
+      family_ids = ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id)
+      ::FinancialAssistance::Application.latest_determined_for_families(renewal_year.pred, family_ids).pluck(:family_id) - ::FinancialAssistance::Application.by_year(renewal_year).where(:family_id.in => family_ids).pluck(:family_id)
     end
 
     # Try and find any know issues with the application that would prevent it from being renewed or re-determined.
