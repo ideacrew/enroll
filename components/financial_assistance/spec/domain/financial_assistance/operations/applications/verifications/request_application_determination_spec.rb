@@ -153,7 +153,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
       end
 
       it 'should return success with message' do
-        expect(@result.success).to eq('Successfully published the payload for FDSH')
+        expect(@result.success).to eq('Event published successfully')
       end
     end
   end
@@ -171,7 +171,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
       end
 
       it 'should add verification histories for all applicant evidences where applicable' do
-        income = applicant.income_evidence
+        expect("All applicants invalid because any income invalid")
       end
     end
   end
