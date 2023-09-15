@@ -55,14 +55,14 @@ module Operations
 
       def add_verification_type_history(consumer_role)
         consumer_role.verification_types.where(:type_name.in => ["Citizenship", "Immigration status", "Social Security Number"]).each do |vt|
-          vt.add_type_history_element(action: "Hub Request", modifier: "System", update_reason: "#{vt.type_name} call hub was requested because of a person update for applying coverage")
+          vt.add_type_history_element(action: "Hub Request", modifier: "System", update_reason: "#{vt.type_name} call hub was requested due to demographic update")
         end
       end
 
       def trigger_residency(consumer_role)
         if EnrollRegistry.feature_enabled?(:validate_and_record_publish_errors)
           vt = consumer_role.verification_types.where(:type_name => ::VerificationType::LOCATION_RESIDENCY).first
-          vt.add_type_history_element(action: "Hub Request", modifier: "System", update_reason: "#{vt.type_name} call hub was requested because of a person update for applying coverage")
+          vt.add_type_history_element(action: "Hub Request", modifier: "System", update_reason: "#{vt.type_name} call hub was requested due to demographic update")
         end
         consumer_role.trigger_residency!
       end
