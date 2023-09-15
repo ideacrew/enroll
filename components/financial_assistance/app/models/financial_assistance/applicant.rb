@@ -1233,15 +1233,6 @@ module FinancialAssistance
       create_evidence(:non_esi_mec, "Non ESI MEC") if FinancialAssistanceRegistry.feature_enabled?(:non_esi_mec_determination)
     end
 
-    def all_evidences
-      [
-        self.income_evidence,
-        self.esi_evidence,
-        self.non_esi_evidence,
-        self.local_mec_evidence
-      ].compact
-    end
-
     def create_eligibility_income_evidence
       return unless FinancialAssistanceRegistry.feature_enabled?(:ifsv_determination) && income_evidence.blank?
 
