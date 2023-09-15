@@ -6,7 +6,9 @@ module Eligible
     include Mongoid::Document
     include Mongoid::Timestamps
 
-    STATUSES = %i[initial published expired].freeze
+    STATUSES = %i[initial eligible ineligible].freeze
+
+    embedded_in :eligible, polymorphic: true
 
     field :key, type: Symbol
     field :title, type: String
@@ -26,45 +28,41 @@ module Eligible
                 as: :status_trackable
 
     validates_presence_of :title
+    validates_uniqueness_of :key
 
     delegate :effective_on,
              :is_eligible,
              to: :latest_state_history,
              allow_nil: false
 
+    delegate :eligible?,
+             :is_eligible_on?,
+             :eligible_periods,
+             to: :decorated_eligible_record,
+             allow_nil: true
+
     scope :by_key, ->(key) { where(key: key.to_sym) }
-    scope :by_date, ->(key) { where(key: key.to_sym) }
+    scope :eligible, -> { where(current_state: :eligible) }
+    scope :ineligible, -> { where(current_state: :ineligible) }
 
     def latest_state_history
-      state_histories.max_by(&:created_at)
+      state_histories.last
     end
 
-    def current_state
-      latest_state_history&.to_state
+    def active_state
+      :eligible
     end
 
-    def effectuated?
-      current_state != :initial
+    def inactive_state
+      :ineligible
     end
 
-    def eligibility_period_cover?(date)
-      end_on.present? ? (start_on..end_on).cover?(date) : start_on <= date
+    def decorated_eligible_record
+      EligiblePeriodHandler.new(self)
     end
 
-    def start_on
-      publish_history =
-        state_histories.by_state(:published).min_by(&:created_at)
-      publish_history&.effective_on
-    end
-
-    def end_on
-      expiration_history =
-        state_histories.by_state(:expired).min_by(&:created_at)
-      expiration_history&.effective_on&.prev_day
-    end
-
-    def is_eligible_on?(date)
-      evidences.all? { |evidence| evidence.is_eligible_on?(date) }
+    def grant_for(grant_key)
+      grants.detect { |grant| grant.value&.item&.to_s == grant_key.to_s }
     end
 
     class << self
@@ -72,7 +70,9 @@ module Eligible
 
       RESOURCE_KINDS = [
         BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::AdminAttestedEvidence,
-        BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::ShopOsseGrant
+        BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::ShopOsseGrant,
+        Eligible::Evidence,
+        Eligible::Grant
       ].freeze
 
       def resource_ref_dir
@@ -97,14 +97,28 @@ module Eligible
         register(:evidence, name, options)
       end
 
-      def create_objects(collection, type)
-        collection.map do |item|
-          model = resource_ref_dir[type][item.key].class_name.sub(/^::/, '')
-          item_class = RESOURCE_KINDS.find { |kind| kind.name == model }
+      def evidences_resource_for(key)
+        resource_ref_dir[:evidences]&.dig(key)&.class_name ||
+          "Eligible::Evidence"
+      end
 
-          next unless item_class
-          item_class.new(item.to_h)
-        end.compact
+      def grants_resource_for(key)
+        resource_ref_dir[:grants]&.dig(key)&.class_name || "Eligible::Grant"
+      end
+
+      def create_objects(collection, type)
+        collection
+          .map do |item|
+            resource_name = send("#{type}_resource_for", item.key)
+            item_class =
+              RESOURCE_KINDS.find do |kind|
+                kind.name == (resource_name.sub(/^::/, ""))
+              end
+
+            next unless item_class
+            item_class.new(item.to_h)
+          end
+          .compact
       end
     end
   end

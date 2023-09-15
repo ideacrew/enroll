@@ -30,10 +30,9 @@ module BenefitSponsors
         :health_insurance_exchange,
       ]
 
-
       belongs_to  :site, inverse_of: :site_organizations, counter_cache: true,
-        class_name: "BenefitSponsors::Site",
-        optional: true
+                         class_name: "BenefitSponsors::Site",
+                         optional: true
 
       belongs_to  :site_owner, inverse_of: :owner_organization,
                   class_name: "BenefitSponsors::Site",

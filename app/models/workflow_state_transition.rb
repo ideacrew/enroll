@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class WorkflowStateTransition
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -11,6 +13,7 @@ class WorkflowStateTransition
   field :reason, type: String
   field :comment, type: String
   field :user_id, type: BSON::ObjectId
+  field :metadata, type: Hash, default: {}
 
   before_validation :set_transition_timestamp
 
@@ -24,6 +27,16 @@ class WorkflowStateTransition
       "<div>#{transition_at.strftime("%m/%d/%Y %H:%M UTC")} - Application received.</div>".html_safe
     else
       "<div>#{transition_at.strftime("%m/%d/%Y %H:%M UTC")} - State changed from <b>#{from_state.camelcase}</b> to <b>#{to_state.camelcase}</b>.</div>".html_safe
+    end
+  end
+
+  def metadata_has?(matching_hash)
+    return false if metadata.blank? || !matching_hash.is_a?(Hash)
+
+    compare_hash = metadata.stringify_keys
+
+    matching_hash.all? do |k, v|
+      compare_hash.key?(k.to_s) && compare_hash[k.to_s] == v
     end
   end
 
