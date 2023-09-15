@@ -2,6 +2,15 @@
 
 require "rails_helper"
 
+# rubocop:disable Style/MixinUsage
+include FinancialAssistance::Engine.routes.url_helpers
+include FinancialAssistance::ApplicationHelper
+include FinancialAssistance::L10nHelper
+include ActionView::Helpers::TranslationHelper
+include GlossaryHelper
+include ConsumerRolesHelper
+# rubocop:enable Style/MixinUsage
+
 RSpec.describe "components/financial_assistance/app/views/financial_assistance/applicants/_dependent_form.html.erb" do
   let(:application)       { FactoryBot.create(:financial_assistance_application, :with_applicants) }
   let(:primary_applicant) { application.applicants.first }
