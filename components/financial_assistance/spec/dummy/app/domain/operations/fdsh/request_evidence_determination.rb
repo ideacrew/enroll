@@ -29,6 +29,7 @@ module Operations
         fdsh_events = ::Eligibilities::Evidence::FDSH_EVENTS
         headers = evidence.key == :local_mec ? { payload_type: 'application', key: 'local_mec_check' } : { correlation_id: payload[:hbx_id] }
         formatted_payload = evidence.payload_format
+
         event(fdsh_events[evidence.key], attributes: payload, headers: headers.merge!(formatted_payload))
       end
 
