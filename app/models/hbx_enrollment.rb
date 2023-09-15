@@ -2838,7 +2838,7 @@ class HbxEnrollment
   end
 
   def latest_wfst
-    workflow_state_transitions.order(created_at: :desc).first
+    @latest_wfst ||= workflow_state_transitions.order(created_at: :desc).first
   end
 
   def is_eligible_for_osse_grant?(key)
@@ -2958,6 +2958,13 @@ class HbxEnrollment
       terminated_on.present? &&
       new_effective_on.present? &&
       (new_effective_on - 1.day) >= terminated_on
+  end
+
+  # Checks to see if the latest workflow state transition is 'superseded_silent'
+  def latest_wfst_is_superseded_silent?
+    latest_wfst.metadata_has?(
+      { 'reason' => Enrollments::TerminationReasons::SUPERSEDED_SILENT }
+    )
   end
 
   private
