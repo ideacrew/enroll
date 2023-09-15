@@ -23,13 +23,9 @@ module Operations
       end
 
       def benefit_coverage_period
-        coverage_period = nil
         calendar_year = @effective_date.year
 
-        if defined?(memoized_coverage_periods) &&
-             memoized_coverage_periods.key?(calendar_year)
-          return memoized_coverage_periods[calendar_year]
-        end
+        return memoized_coverage_periods[calendar_year] if memoized_coverage_periods.key?(calendar_year)
 
         memoized_coverage_periods[calendar_year] = HbxProfile
           &.current_hbx
@@ -43,15 +39,12 @@ module Operations
         return unless benefit_coverage_period
         calendar_year = benefit_coverage_period.start_on.year
 
-        if defined?(memoized_eligibilities) &&
-             memoized_eligibilities.key?(calendar_year)
-          return memoized_eligibilities[calendar_year]
-        end
+        return memoized_eligibilities[calendar_year] if memoized_eligibilities.key?(calendar_year)
 
         memoized_eligibilities[calendar_year] = benefit_coverage_period
-          .eligibilities
-          .by_key("aca_ivl_osse_eligibility_#{calendar_year}")
-          .first
+                                                .eligibilities
+                                                .by_key("aca_ivl_osse_eligibility_#{calendar_year}")
+                                                .first
       end
 
       def grants
