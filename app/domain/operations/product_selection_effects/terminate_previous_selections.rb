@@ -20,35 +20,39 @@ module Operations
         cancel_previous(enrollment, product.active_year)
       end
 
+      private
+
       def cancel_previous(enrollment, year)
         #Perform cancel/terms of previous enrollments for the same plan year
-        enrollment.previous_enrollments(year).each do |previous_enrollment|
-          enrollment.generate_signature(previous_enrollment)
-          if enrollment.same_signatures(previous_enrollment) && !previous_enrollment.is_shop?
-            if enrollment.effective_on > previous_enrollment.effective_on && previous_enrollment.may_terminate_coverage?
-              next previous_enrollment if ineligible_for_termination?(previous_enrollment, enrollment)
+        eligible_enrollments = fetch_eligible_enrollments(enrollment, year)
 
-              previous_enrollment.terminate_coverage!(enrollment.effective_on - 1.day)
-            elsif previous_enrollment.may_cancel_coverage?
-              previous_enrollment.cancel_coverage!
-            end
+        eligible_enrollments.each_with_index do |previous_enrollment, index|
+          transition_args = fetch_transition_args(index)
+
+          if enrollment.effective_on > previous_enrollment.effective_on && previous_enrollment.may_terminate_coverage?
+            next previous_enrollment if previous_enrollment.ineligible_for_termination?(enrollment.effective_on)
+
+            previous_enrollment.terminate_coverage!(enrollment.effective_on - 1.day, transition_args)
+          elsif previous_enrollment.enrollment_superseded_and_eligible_for_cancellation?(enrollment.effective_on)
+            previous_enrollment.cancel_coverage_for_superseded_term!(transition_args)
+          elsif previous_enrollment.may_cancel_coverage?
+            previous_enrollment.cancel_coverage!(transition_args)
           end
         end
       end
 
-      private
+      def fetch_eligible_enrollments(enrollment, year)
+        enrollment.previous_enrollments(year).select do |previous_enrollment|
+          enrollment.generate_signature(previous_enrollment)
+          enrollment.same_signatures(previous_enrollment) && !previous_enrollment.is_shop?
+        end.sort_by(&:effective_on)
+      end
 
-      # Checks to see if the previous enrollment is eligible for termination.
-      # Previous enrollment is ineligible for termination if all the below are true
-      #   - The previous enrollment is already in terminated state
-      #   - The previous enrollment has a terminated_on date
-      #   - The new enrollment has an effective_on date
-      #   - The new enrollment's effective_on is same as previous enrollment's terminated_on date
-      def ineligible_for_termination?(previous_enrollment, enrollment)
-        previous_enrollment.coverage_terminated? &&
-          previous_enrollment.terminated_on.present? &&
-          enrollment.effective_on.present? &&
-          (enrollment.effective_on - 1.day) == previous_enrollment.terminated_on
+      def fetch_transition_args(index)
+        return {} unless EnrollRegistry.feature_enabled?(:silent_transition_enrollment)
+        return {} if index.zero?
+
+        { reason: 'superseded_silent' }
       end
     end
   end

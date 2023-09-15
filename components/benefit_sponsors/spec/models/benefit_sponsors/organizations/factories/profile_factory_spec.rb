@@ -287,6 +287,24 @@ module BenefitSponsors
 
     context '.update' do
       context 'when type is benefit sponsor' do
+        include_context "setup benefit market with market catalogs and product packages"
+        let(:current_effective_date) { Date.new(Date.today.year, 3, 1) }
+
+        let(:catalog_eligibility) do
+          catalog_eligibility =
+            ::Operations::Eligible::CreateCatalogEligibility.new.call(
+              {
+                subject: current_benefit_market_catalog.to_global_id,
+                eligibility_feature: "aca_shop_osse_eligibility",
+                effective_date:
+                  current_benefit_market_catalog.application_period.begin.to_date,
+                domain_model:
+                  "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+              }
+            )
+
+          catalog_eligibility
+        end
 
         let!(:abc_organization) do
           FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, :with_broker_agency_profile, site: site)
@@ -365,7 +383,12 @@ module BenefitSponsors
         let(:osse_eligibility) { 'true' }
         let!(:ee_eligibility) { nil }
 
+        after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
+
         before do
+          TimeKeeper.set_date_of_record_unprotected!(current_effective_date)
+          allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+          catalog_eligibility
           valid_employer_params_update[:organization][:profiles_attributes][0].merge!(:osse_eligibility => osse_eligibility)
           profile_factory
           abc_organization.reload
@@ -387,43 +410,6 @@ module BenefitSponsors
           plan_design_organization.reload
           expect(abc_organization.legal_name).to eq plan_design_organization.legal_name
           expect(abc_organization.dba).to eq plan_design_organization.dba
-        end
-
-        context ".create_or_term_osse_eligibility" do
-          context 'create eligibility' do
-            let(:osse_eligibility) { 'true' }
-
-            it "should build eligibilities" do
-              expect(abc_organization.benefit_sponsorships.first.eligibilities.count).to eql(1)
-            end
-          end
-
-          context 'terminate eligibility' do
-            let(:osse_eligibility) { 'false' }
-            let(:er_elig) { build(:eligibility, :with_subject, :with_evidences, start_on: TimeKeeper.date_of_record.prev_month) }
-            let!(:er_eligibility) do
-              benefit_sponsorship.eligibilities << er_elig
-              benefit_sponsorship.save!
-              benefit_sponsorship.eligibilities.first
-            end
-
-            let!(:employee_role) { create(:employee_role, person: person, census_employee: census_employee, benefit_sponsors_employer_profile_id: benefit_sponsorship.profile.id) }
-
-            let!(:census_employee) do
-              create(:census_employee, employer_profile_id: nil, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship: benefit_sponsorship)
-            end
-
-            let(:ee_elig) { build(:eligibility, :with_subject, :with_evidences, start_on: TimeKeeper.date_of_record.prev_month) }
-            let!(:ee_eligibility) do
-              census_employee.update_attributes!(employee_role_id: employee_role.id)
-              employee_role.eligibilities << ee_elig
-              employee_role.save!
-              employee_role.eligibilities.first
-            end
-
-            it { expect(benefit_sponsorship.reload.eligibility_for(:osse_subsidy, TimeKeeper.date_of_record)).to be_nil }
-            it { expect(employee_role.reload.eligibility_for(:osse_subsidy, TimeKeeper.date_of_record)).to be_nil }
-          end
         end
       end
 

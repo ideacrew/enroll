@@ -4,6 +4,7 @@ Feature: Broker HC4CC quote creation
     Given the shop market configuration is enabled
     And Broker HC4CC feature enabled
     And a CCA site exists with a benefit market
+    And benefit market catalog exists with eligibility
     And Health and Dental plans exist
     And there is a Broker Agency exists for District Brokers Inc
     And the broker Max Planck is primary broker for District Brokers Inc

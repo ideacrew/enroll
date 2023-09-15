@@ -7,6 +7,10 @@ RSpec.describe ::HbxEnrollments::UpdateMthhAptcValuesOnEnrollment, :dbclean => :
     TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 6, 1))
   end
 
+  after :all do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+  end
+
   let!(:site_key) { EnrollRegistry[:enroll_app].setting(:site_key).item.upcase }
   let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
   let!(:family)        { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person) }

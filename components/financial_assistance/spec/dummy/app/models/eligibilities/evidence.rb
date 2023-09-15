@@ -102,6 +102,17 @@ module Eligibilities
       family_member_ids.map(&:to_s).include?(applicant.family_member_id.to_s)
     end
 
+    def payload_format
+      case self.key
+      when :non_esi_mec
+        { non_esi_payload_format: EnrollRegistry[:non_esi_h31].setting(:payload_format).item }
+      when :esi_mec
+        { esi_mec_payload_format: EnrollRegistry[:esi_mec].setting(:payload_format).item }
+      else
+        {}
+      end
+    end
+
     def add_verification_history(action, update_reason, updated_by)
       result = self.verification_histories.build(action: action, update_reason: update_reason, updated_by: updated_by)
       self.save

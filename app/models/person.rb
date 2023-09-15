@@ -269,6 +269,9 @@ class Person
 
   index({ "verification_types.validation_status" => 1 })
 
+  index({ "consumer_role.eligibilities.key" => 1 })
+  index({ "resident_role.eligibilities.key" => 1 })
+
   scope :all_consumer_roles,          -> { exists(consumer_role: true) }
   scope :all_resident_roles,          -> { exists(resident_role: true) }
   scope :all_employee_roles,          -> { exists(employee_roles: true) }

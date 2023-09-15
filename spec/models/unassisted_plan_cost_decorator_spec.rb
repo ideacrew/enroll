@@ -297,7 +297,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
 
         context "for hc4cc plan" do
           before do
-            allow(plan_cost_decorator).to receive(:ivl_osse_eligible?).and_return true
+            allow(plan_cost_decorator).to receive(:is_eligible_for_osse_grant?).and_return true
             allow(plan_cost_decorator).to receive(:is_hc4cc_plan).and_return true
           end
 

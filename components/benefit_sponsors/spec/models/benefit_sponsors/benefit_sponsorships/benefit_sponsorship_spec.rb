@@ -1515,5 +1515,59 @@ module BenefitSponsors
         expect(benefit_sponsorship.future_active_reinstated_benefit_application).to eq nil
       end
     end
+
+    describe 'create default osse eligibility on create' do
+      include_context "setup benefit market with market catalogs and product packages"
+
+      let(:benefit_sponsorship) { employer_profile.add_benefit_sponsorship }
+      let(:current_year) { TimeKeeper.date_of_record.year }
+      let(:current_effective_date) { Date.new(Date.today.year, 3, 1) }
+
+      let(:catalog_eligibility) do
+        ::Operations::Eligible::CreateCatalogEligibility.new.call(
+          {
+            subject: current_benefit_market_catalog.to_global_id,
+            eligibility_feature: "aca_shop_osse_eligibility",
+            effective_date: current_benefit_market_catalog.application_period.begin.to_date,
+            domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+          }
+        )
+      end
+
+      context 'when osse feature for the given year is disabled' do
+        before do
+          allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+        end
+
+        it 'should not create osse eligibility in initial state' do
+          expect(benefit_sponsorship.eligibilities.count).to eq 0
+          benefit_sponsorship.save
+          expect(benefit_sponsorship.reload.eligibilities.count).to eq 0
+        end
+      end
+
+      context 'when osse feature for the given year is enabled' do
+        before do
+          allow(EnrollRegistry).to receive(:feature?).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+          catalog_eligibility
+        end
+
+        it 'should create new osse eligibility' do
+          expect(benefit_sponsorship.eligibilities.count).to eq 0
+          benefit_sponsorship.save!
+          expect(benefit_sponsorship.reload.eligibilities.count).to eq 1
+          eligibility = benefit_sponsorship.eligibilities.first
+          expect(eligibility.key).to eq "aca_shop_osse_eligibility_#{TimeKeeper.date_of_record.year}".to_sym
+          expect(eligibility.current_state).to eq :ineligible
+          expect(eligibility.state_histories.count).to eq 1
+          expect(eligibility.evidences.count).to eq 1
+          evidence = eligibility.evidences.first
+          expect(evidence.key).to eq :shop_osse_evidence
+          expect(evidence.current_state).to eq :not_approved
+          expect(evidence.state_histories.count).to eq 1
+        end
+      end
+    end
   end
 end
