@@ -55,6 +55,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::Ifsv::AddRr
         @result = subject.call(payload: response_payload)
         @application = ::FinancialAssistance::Application.by_hbx_id(response_payload[:hbx_id]).first.reload
         @app_entity = ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(response_payload).success
+        @applicant.reload
       end
 
       it 'should return success' do
@@ -66,6 +67,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::Ifsv::AddRr
         expect(@applicant.income_evidence.aasm_state).to eq "verified"
         expect(@applicant.income_evidence.request_results.present?).to eq true
         expect(@result.success).to eq('Successfully updated Applicant with evidence')
+      end
+
+      it "should record request results" do
+        expect(@applicant.income_evidence.request_results.first.action).to eq "Hub Response"
       end
     end
 
@@ -86,6 +91,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::Ifsv::AddRr
 
         @application = ::FinancialAssistance::Application.by_hbx_id(response_payload_2[:hbx_id]).first.reload
         @app_entity = ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(response_payload_2).success
+        @applicant.reload
       end
 
       it 'should return success' do
@@ -97,6 +103,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::Ifsv::AddRr
         expect(@applicant.income_evidence.aasm_state).to eq "outstanding"
         expect(@applicant.income_evidence.request_results.present?).to eq true
         expect(@result.success).to eq('Successfully updated Applicant with evidence')
+      end
+
+      it "should record request results" do
+        expect(@applicant.income_evidence.request_results.first.action).to eq "Hub Response"
       end
     end
   end

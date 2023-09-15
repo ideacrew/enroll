@@ -69,7 +69,7 @@ module FinancialAssistance
               end
 
               response_income_evidence.request_results&.each do |request_result|
-                income_evidence.request_results << Eligibilities::RequestResult.new(request_result.to_h)
+                income_evidence.request_results << Eligibilities::RequestResult.new(request_result.to_h.merge(action: "Hub Response"))
               end
               applicant.save!
             end
