@@ -7,6 +7,7 @@ describe LawfulPresenceDetermination do
   after :each do
     DatabaseCleaner.clean
   end
+
   let(:person) { FactoryBot.create(:person, :with_consumer_role) }
   let(:consumer_role) { person.consumer_role}
   let(:person_id) { person.id }

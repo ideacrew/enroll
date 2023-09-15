@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'aasm/rspec'
+
+require Rails.root.join('spec/shared_contexts/valid_cv3_application_setup.rb')
 
 RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
   let!(:application) do
@@ -51,6 +54,10 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
       )
     end
 
+    let(:updated_by) { 'admin' }
+    let(:update_reason) { "Requested Hub for verification" }
+    let(:action) { 'request_hub' }
+
     context '.extend_due_on' do
       let(:new_due_date) do
         applicant.schedule_verification_due_on + 30.days
@@ -78,68 +85,139 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
       end
     end
 
-    context '.request_determination' do
-      let(:updated_by) { '12345' }
-      let(:update_reason) { "Requested Hub for verification" }
-      let(:action) { 'request_hub' }
-      let(:success_event) { double(success?: true, value!: double(publish: true)) }
-      let(:failure_event) { double(success?: false, value!: double(publish: false)) }
-      let(:failure_publish) { double(success?: true, value!: double(publish: false)) }
-      let(:success_payload) { double(failure?: false, value!: {}) }
-
+    context '.request_determination for income evidence' do
       before do
-        esi_evidence.stub(:generate_evidence_updated_event) { true }
-        esi_evidence.stub(:construct_payload) { success_payload }
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
       end
 
-      it 'should not update due date' do
-        esi_evidence.stub(:event) { failure_event }
-        esi_evidence.request_determination(action, update_reason, updated_by)
-        esi_evidence.reload
-        expect(esi_evidence.verification_histories).to be_empty
+      let(:evidence_verification_request) { instance_double(Operations::Fdsh::RequestEvidenceDetermination) }
+
+      context 'with no errors' do
+        before do
+          allow(evidence_verification_request).to receive(:call).and_return(Dry::Monads::Success({}))
+          allow(Operations::Fdsh::RequestEvidenceDetermination).to receive(:new).and_return(evidence_verification_request)
+        end
+
+        it 'should return success' do
+          result = income_evidence.request_determination(action, update_reason, updated_by)
+          income_evidence.reload
+
+          expect(result).to be_truthy
+          expect(income_evidence.verification_histories).to be_present
+
+          history = income_evidence.verification_histories.first
+          expect(history.action).to eq action
+          expect(history.update_reason).to eq update_reason
+          expect(history.updated_by).to eq updated_by
+        end
       end
 
-      it 'should update due date with history' do
-        esi_evidence.stub(:event) { success_event }
-        expect(esi_evidence.verification_histories).to be_empty
-        result = esi_evidence.request_determination(action, update_reason, updated_by)
-        esi_evidence.reload
-        expect(result).to be_truthy
-        expect(esi_evidence.verification_histories).to be_present
+      context 'builds and publishes with errors' do
+        let(:failed_action) { 'Hub Request Failed' }
+        let(:failed_updated_by) { 'system' }
+        let(:failed_update_reason) { "Invalid SSN" }
 
-        history = esi_evidence.verification_histories.first
-        expect(history.action).to eq action
-        expect(history.update_reason).to eq update_reason
-        expect(history.updated_by).to eq updated_by
-      end
+        let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+        let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
 
-      it 'should not update due date with history' do
-        esi_evidence.stub(:event) { failure_publish }
-        expect(esi_evidence.verification_histories).to be_empty
-        result = esi_evidence.request_determination(action, update_reason, updated_by)
-        esi_evidence.reload
-        expect(result).to be_falsey
-        expect(esi_evidence.verification_histories).to be_present
+        before do
+          allow(evidence_verification_request).to receive(:call).and_return(Dry::Monads::Failure(failed_update_reason))
+          allow(Operations::Fdsh::RequestEvidenceDetermination).to receive(:new).and_return(evidence_verification_request)
 
-        history = esi_evidence.verification_histories.first
-        expect(history.action).to eq action
-        expect(history.update_reason).to eq "Failed to request determination"
-        expect(history.updated_by).to eq "system"
-      end
-    end
+          family_member_id = family.family_members[0].id
+          applicant.update(family_member_id: family_member_id)
+          application.update(family_id: family.id)
+        end
 
-    context "construct_payload" do
-      it 'should have failure history' do
-        allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Failure.new(application))
-        esi_evidence.construct_payload(application, "system")
-        expect(esi_evidence.verification_histories.last.update_reason).to eq 'Failed to construct payload'
-      end
+        context 'with an applicant without an active enrollment' do
+          it 'should change evidence aasm_state to negative_response_received' do
+            result = income_evidence.request_determination(action, update_reason, updated_by)
+            income_evidence.reload
 
-      it 'should have failure history' do
-        allow(::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Success.new(application))
-        allow(::AcaEntities::MagiMedicaid::Operations::InitializeApplication).to receive_message_chain('new.call').with(application).and_return(Dry::Monads::Result::Failure.new(application))
-        esi_evidence.construct_payload(application, "system")
-        expect(esi_evidence.verification_histories.last.update_reason).to eq 'Failed to validate application'
+            expect(result).to be_falsey
+            expect(income_evidence.aasm_state).to eq('negative_response_received')
+            expect(income_evidence.verification_histories).to be_present
+
+            admin_call_history = income_evidence.verification_histories.first
+            expect(admin_call_history.action).to eq action
+            expect(admin_call_history.update_reason).to eq update_reason
+            expect(admin_call_history.updated_by).to eq updated_by
+
+            failure_history = income_evidence.verification_histories.last
+            expect(failure_history.action).to eq failed_action
+            expect(failure_history.update_reason).to include(failed_update_reason)
+            expect(failure_history.updated_by).to eq(failed_updated_by)
+          end
+        end
+
+        context 'with an applicant who has an active enrollment' do
+          let!(:hbx_enrollment) do
+            FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_health_product,
+                              family: family, enrollment_members: [family.primary_applicant],
+                              aasm_state: 'coverage_selected', kind: 'individual')
+          end
+
+          before do
+            family_member_id = family.family_members[0].id
+            applicant.update(family_member_id: family_member_id)
+            application.update(family_id: family.id)
+          end
+
+          context 'and not using aptc or valid csr' do
+            before do
+              # csr_variant_id "01" is not one of the valid csr codes to change aasm_state
+              hbx_enrollment.product.update(csr_variant_id: '01')
+            end
+
+            it 'should change evidence aasm_state to negative_response_received' do
+              result = income_evidence.request_determination(action, update_reason, updated_by)
+              income_evidence.reload
+
+              expect(result).to be_falsey
+              expect(income_evidence.aasm_state).to eq('negative_response_received')
+              expect(income_evidence.verification_histories).to be_present
+
+              admin_call_history = income_evidence.verification_histories.first
+              expect(admin_call_history.action).to eq action
+              expect(admin_call_history.update_reason).to eq update_reason
+              expect(admin_call_history.updated_by).to eq updated_by
+
+              failure_history = income_evidence.verification_histories.last
+              expect(failure_history.action).to eq failed_action
+              expect(failure_history.update_reason).to include(failed_update_reason)
+              expect(failure_history.updated_by).to eq(failed_updated_by)
+            end
+          end
+
+          context 'and using aptc' do
+            before do
+              hbx_enrollment.update(applied_aptc_amount: 720)
+              # csr_variant_id "01" is not one of the valid csr codes to change aasm_state
+              hbx_enrollment.product.update(csr_variant_id: '01')
+            end
+
+            it 'should change evidence aasm_state to outstanding' do
+              result = income_evidence.request_determination(action, update_reason, updated_by)
+              income_evidence.reload
+
+              expect(result).to be_falsey
+              expect(income_evidence.aasm_state).to eq('outstanding')
+              expect(income_evidence.verification_histories.size).to eq(2)
+            end
+          end
+
+          context 'and using csr' do
+            it 'should change evidence aasm_state to outstanding' do
+              result = income_evidence.request_determination(action, update_reason, updated_by)
+              income_evidence.reload
+
+              expect(result).to be_falsey
+              expect(income_evidence.aasm_state).to eq('outstanding')
+              expect(income_evidence.verification_histories).to be_present
+            end
+          end
+        end
       end
     end
 
@@ -155,16 +233,457 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
         )
       end
 
-      it 'should return payload format as json when it is set' do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:non_esi_h31).and_return(true)
-        allow(EnrollRegistry[:non_esi_h31].setting(:payload_format)).to receive(:item).and_return('json')
-        expect(non_esi_evidence.payload_format).to eq({:non_esi_payload_format => 'json'})
+      let(:esi_evidence) do
+        applicant.create_esi_evidence(
+          key: :esi_mec,
+          title: 'Esi',
+          aasm_state: 'pending',
+          due_on: nil,
+          verification_outstanding: false,
+          is_satisfied: true
+        )
       end
 
-      it 'should return payload format as xml when it is set' do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:non_esi_h31).and_return(true)
-        allow(EnrollRegistry[:non_esi_h31].setting(:payload_format)).to receive(:item).and_return('xml')
-        expect(non_esi_evidence.payload_format).to eq({:non_esi_payload_format => 'xml'})
+      context 'non_esi_mec' do
+        it 'should return payload format as json when it is set' do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:non_esi_h31).and_return(true)
+          allow(EnrollRegistry[:non_esi_h31].setting(:payload_format)).to receive(:item).and_return('json')
+          expect(non_esi_evidence.payload_format).to eq({:non_esi_payload_format => 'json'})
+        end
+
+        it 'should return payload format as xml when it is set' do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:non_esi_h31).and_return(true)
+          allow(EnrollRegistry[:non_esi_h31].setting(:payload_format)).to receive(:item).and_return('xml')
+          expect(non_esi_evidence.payload_format).to eq({:non_esi_payload_format => 'xml'})
+        end
+      end
+
+      context 'esi_mec' do
+        it 'should return payload format as json when it is set' do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:esi_mec).and_return(true)
+          allow(EnrollRegistry[:esi_mec].setting(:payload_format)).to receive(:item).and_return('json')
+          expect(esi_evidence.payload_format).to eq({:esi_mec_payload_format => 'json'})
+        end
+
+        it 'should return payload format as xml when it is set' do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:esi_mec).and_return(true)
+          allow(EnrollRegistry[:esi_mec].setting(:payload_format)).to receive(:item).and_return('xml')
+          expect(esi_evidence.payload_format).to eq({:esi_mec_payload_format => 'xml'})
+        end
+      end
+    end
+
+    context '.request_determination for esi mec evidence' do
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
+      end
+
+      let(:evidence_verification_request) { instance_double(Operations::Fdsh::RequestEvidenceDetermination) }
+
+      context 'with no errors' do
+        before do
+          allow(evidence_verification_request).to receive(:call).and_return(Dry::Monads::Success({}))
+          allow(Operations::Fdsh::RequestEvidenceDetermination).to receive(:new).and_return(evidence_verification_request)
+          esi_evidence.update_attributes!(aasm_state: 'unverified')
+          income_evidence.update_attributes!(aasm_state: 'unverified')
+          @result = esi_evidence.request_determination(action, update_reason, updated_by)
+          esi_evidence.reload
+        end
+
+        it 'should return true' do
+          expect(@result).to be_truthy
+        end
+
+        it 'should change esi evidence aasm_state to pending' do
+          expect(esi_evidence).to have_state(:pending)
+        end
+
+        it 'should not change income evidence aasm_state to unverified' do
+          expect(income_evidence).to have_state(:unverified)
+        end
+
+        it 'should create verification history for the requested call' do
+          history = esi_evidence.verification_histories.first
+          expect(history.action).to eq action
+          expect(history.update_reason).to eq update_reason
+          expect(history.updated_by).to eq updated_by
+        end
+      end
+
+      context 'builds and publishes with errors' do
+        let(:failed_action) { 'Hub Request Failed' }
+        let(:failed_updated_by) { 'system' }
+        let(:failed_update_reason) { "Invalid SSN" }
+
+        let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+        let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+
+        before do
+          allow(evidence_verification_request).to receive(:call).and_return(Dry::Monads::Failure(failed_update_reason))
+          allow(Operations::Fdsh::RequestEvidenceDetermination).to receive(:new).and_return(evidence_verification_request)
+
+          family_member_id = family.family_members[0].id
+          applicant.update(family_member_id: family_member_id)
+          application.update(family_id: family.id)
+        end
+
+        context 'with an applicant without an active enrollment' do
+          before do
+            esi_evidence.update_attributes!(aasm_state: 'unverified')
+            income_evidence.update_attributes!(aasm_state: 'unverified')
+            @result = esi_evidence.request_determination(action, update_reason, updated_by)
+            esi_evidence.reload
+          end
+
+          it 'should return false' do
+            expect(@result).to be_falsey
+          end
+
+          it 'should change esi evidence aasm_state to attested' do
+            expect(esi_evidence).to have_state(:attested)
+          end
+
+          it 'should not change income evidence aasm_state to attested' do
+            expect(income_evidence).not_to have_state(:attested)
+          end
+
+          it 'should create history for requested call' do
+            admin_call_history = esi_evidence.verification_histories.first
+            expect(admin_call_history.action).to eq action
+            expect(admin_call_history.update_reason).to eq update_reason
+            expect(admin_call_history.updated_by).to eq updated_by
+          end
+
+          it 'should create history for failed publish' do
+            failure_history = esi_evidence.verification_histories.last
+            expect(failure_history.action).to eq failed_action
+            expect(failure_history.update_reason).to include(failed_update_reason)
+            expect(failure_history.updated_by).to eq(failed_updated_by)
+          end
+        end
+
+        context 'with an applicant who has an active enrollment' do
+          let!(:hbx_enrollment) do
+            FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_health_product,
+                              family: family, enrollment_members: [family.primary_applicant],
+                              aasm_state: 'coverage_selected', kind: 'individual')
+          end
+
+          context 'and not using aptc or valid csr' do
+            before do
+              # csr_variant_id "01" is not one of the valid csr codes to change aasm_state
+              hbx_enrollment.product.update(csr_variant_id: '01')
+              esi_evidence.update_attributes!(aasm_state: 'unverified')
+              @result = esi_evidence.request_determination(action, update_reason, updated_by)
+              esi_evidence.reload
+            end
+
+            it 'should return false' do
+              expect(@result).to be_falsey
+            end
+
+            it 'should change evidence aasm_state to attested' do
+              expect(esi_evidence).to have_state(:attested)
+            end
+
+            it 'should create history for requested call' do
+              admin_call_history = esi_evidence.verification_histories.first
+              expect(admin_call_history.action).to eq action
+              expect(admin_call_history.update_reason).to eq update_reason
+              expect(admin_call_history.updated_by).to eq updated_by
+            end
+
+            it 'should create history for failed publish' do
+              failure_history = esi_evidence.verification_histories.last
+              expect(failure_history.action).to eq failed_action
+              expect(failure_history.update_reason).to include(failed_update_reason)
+              expect(failure_history.updated_by).to eq(failed_updated_by)
+            end
+          end
+
+          context 'and using aptc' do
+            before do
+              hbx_enrollment.update(applied_aptc_amount: 720)
+              esi_evidence.update_attributes!(aasm_state: 'unverified')
+              @result = esi_evidence.request_determination(action, update_reason, updated_by)
+              esi_evidence.reload
+            end
+
+            it 'should return false' do
+              expect(@result).to be_falsey
+            end
+
+            it 'should change evidence aasm_state to attested' do
+              expect(esi_evidence).to have_state(:attested)
+            end
+
+            it 'should create history for requested call' do
+              admin_call_history = esi_evidence.verification_histories.first
+              expect(admin_call_history.action).to eq action
+              expect(admin_call_history.update_reason).to eq update_reason
+              expect(admin_call_history.updated_by).to eq updated_by
+            end
+
+            it 'should create history for failed publish' do
+              failure_history = esi_evidence.verification_histories.last
+              expect(failure_history.action).to eq failed_action
+              expect(failure_history.update_reason).to include(failed_update_reason)
+              expect(failure_history.updated_by).to eq(failed_updated_by)
+            end
+          end
+        end
+      end
+    end
+
+    context 'when applicant_1 is valid and applicant_2 is invalid' do
+      include_context "valid cv3 application setup"
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
+      end
+      let(:person2) { FactoryBot.create(:person, :with_consumer_role) }
+      let!(:family_member2) { FactoryBot.create(:family_member, family: family, person: person2) }
+      let!(:applicant2) do
+        applicant = FactoryBot.create(:financial_assistance_applicant,
+                                      application: application,
+                                      is_primary_applicant: false,
+                                      ssn: '999001234',
+                                      dob: Date.today - 30.years,
+                                      first_name: person2.first_name,
+                                      last_name: person2.last_name,
+                                      gender: person2.gender,
+                                      person_hbx_id: person2.hbx_id,
+                                      family_member_id: family_member2.id)
+        applicant
+      end
+
+      let(:applicant_2_esi_evidence) do
+        applicant2.create_esi_evidence(
+          key: :esi_mec,
+          title: 'Esi',
+          aasm_state: 'pending',
+          due_on: nil,
+          verification_outstanding: false,
+          is_satisfied: true
+        )
+      end
+
+      let(:applicant_1_esi_evidence) { esi_evidence}
+      let(:applicant_1_income_evidence) { income_evidence}
+      let(:applicant_2_income_evidence) do
+        applicant2.create_income_evidence(
+          key: :income,
+          title: 'Income',
+          aasm_state: 'pending',
+          due_on: nil,
+          verification_outstanding: false,
+          is_satisfied: true
+        )
+      end
+
+      context 'for esi evidence call hub' do
+        context 'builds and publishes with errors' do
+          let(:failed_action) { 'Hub Request Failed' }
+          let(:failed_updated_by) { 'system' }
+          let(:failed_update_reason) { "Invalid SSN" }
+
+          let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+          let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+
+          before do
+            family_member_id = family.family_members[0].id
+            applicant.update(family_member_id: family_member_id)
+            application.update(family_id: family.id)
+          end
+
+          context 'when hub call made for applicant 2' do
+            before do
+              @result = applicant_2_esi_evidence.request_determination(action, update_reason, updated_by)
+              applicant_2_esi_evidence.reload
+              applicant_1_esi_evidence.reload
+            end
+
+            it 'should return false' do
+              expect(@result).to be_falsey
+            end
+
+            it 'should change applicant_2 esi evidence aasm_state to attested' do
+              expect(applicant_2_esi_evidence).to have_state(:attested)
+            end
+
+            it 'should not change applicant_1 esi evidence aasm_state' do
+              expect(applicant_1_esi_evidence).to have_state(:pending)
+            end
+
+            context 'for applicant_2' do
+              it 'should create history for requested call' do
+                admin_call_history = applicant_2_esi_evidence.verification_histories.first
+                expect(admin_call_history.action).to eq action
+                expect(admin_call_history.update_reason).to eq update_reason
+                expect(admin_call_history.updated_by).to eq updated_by
+              end
+
+              it 'should create history for failed publish' do
+                failure_history = applicant_2_esi_evidence.verification_histories.last
+                expect(failure_history.action).to eq failed_action
+                expect(failure_history.update_reason).to include(failed_update_reason)
+                expect(failure_history.updated_by).to eq(failed_updated_by)
+              end
+            end
+
+            context 'for applicant_1' do
+              it 'should not create applicant_1 history for applicant_2 requested call' do
+                admin_call_history = applicant_1_esi_evidence.verification_histories.first
+                expect(admin_call_history.nil?).to be_truthy
+              end
+            end
+          end
+
+          context 'when hub call made for applicant 1' do
+            before do
+              @result = applicant_1_esi_evidence.request_determination(action, update_reason, updated_by)
+              applicant_2_esi_evidence.reload
+              applicant_1_esi_evidence.reload
+            end
+
+            it 'should return false' do
+              expect(@result).to be_truthy
+            end
+
+            it 'should not change applicant_2 esi evidence aasm_state to attested' do
+              expect(applicant_2_esi_evidence).to have_state(:pending)
+            end
+
+            it 'should not change applicant_1 evidence state even when applicant_2 is invalid' do
+              expect(applicant_1_esi_evidence).to have_state(:pending)
+            end
+
+            context 'for applicant_1' do
+              it 'should create history only for requested call' do
+                admin_call_histories = applicant_1_esi_evidence.verification_histories
+                expect(admin_call_histories.size).to eq(1)
+              end
+
+              it 'should create success history for requested call' do
+                admin_call_history = applicant_1_esi_evidence.verification_histories.first
+                expect(admin_call_history.action).to eq action
+                expect(admin_call_history.update_reason).to eq update_reason
+                expect(admin_call_history.updated_by).to eq updated_by
+              end
+            end
+
+            context 'for applicant_2' do
+              it 'should not create applicant_2 history for applicant_1 requested call' do
+                admin_call_history = applicant_2_esi_evidence.verification_histories.first
+                expect(admin_call_history.nil?).to be_truthy
+              end
+            end
+          end
+        end
+      end
+
+      context 'for income evidence call hub' do
+        context 'builds and publishes with errors' do
+          let(:failed_action) { 'Hub Request Failed' }
+          let(:failed_updated_by) { 'system' }
+          let(:failed_update_reason) { "Invalid SSN" }
+
+          let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+          let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+
+          before do
+            family_member_id = family.family_members[0].id
+            applicant.update(family_member_id: family_member_id)
+            application.update(family_id: family.id)
+          end
+
+          context 'when hub call made for applicant 2' do
+            before do
+              @result = applicant_2_income_evidence.request_determination(action, update_reason, updated_by)
+              applicant_2_income_evidence.reload
+              applicant_1_income_evidence.reload
+            end
+
+            it 'should return false' do
+              expect(@result).to be_falsey
+            end
+
+            it 'should change applicant_2 income evidence aasm_state to negative_response_received' do
+              expect(applicant_2_income_evidence).to have_state(:negative_response_received)
+            end
+
+            it 'should not change income evidence aasm_state' do
+              expect(applicant_1_income_evidence).to have_state(:pending)
+            end
+
+            context 'for applicant_2' do
+              it 'should create history for requested call' do
+                admin_call_history = applicant_2_income_evidence.verification_histories.first
+                expect(admin_call_history.action).to eq action
+                expect(admin_call_history.update_reason).to eq update_reason
+                expect(admin_call_history.updated_by).to eq updated_by
+              end
+
+              it 'should create history for failed publish' do
+                failure_history = applicant_2_income_evidence.verification_histories.last
+                expect(failure_history.action).to eq failed_action
+                expect(failure_history.update_reason).to include(failed_update_reason)
+                expect(failure_history.updated_by).to eq(failed_updated_by)
+              end
+            end
+
+            context 'for applicant_1' do
+              it 'should not create applicant_1 history for applicant_2 requested call' do
+                admin_call_history = applicant_1_income_evidence.verification_histories.first
+                expect(admin_call_history.nil?).to be_truthy
+              end
+            end
+          end
+
+          context 'when hub call made for applicant 1' do
+            before do
+              @result = applicant_1_income_evidence.request_determination(action, update_reason, updated_by)
+              applicant_2_income_evidence.reload
+              applicant_1_income_evidence.reload
+            end
+
+            it 'should return false' do
+              expect(@result).to be_falsey
+            end
+
+            it 'should not change applicant_2 income evidence aasm_state to attested' do
+              expect(applicant_2_income_evidence).to have_state(:pending)
+            end
+
+            it 'should change applicant_1 evidence state' do
+              expect(applicant_1_income_evidence).to have_state(:negative_response_received)
+            end
+
+            context 'for applicant_1' do
+              it 'should create history for requested call' do
+                admin_call_history = applicant_1_income_evidence.verification_histories.first
+                expect(admin_call_history.action).to eq action
+                expect(admin_call_history.update_reason).to eq update_reason
+                expect(admin_call_history.updated_by).to eq updated_by
+              end
+
+              it 'should create history for failed publish' do
+                failure_history = applicant_1_income_evidence.verification_histories.last
+                expect(failure_history.action).to eq failed_action
+                expect(failure_history.update_reason).to include(failed_update_reason)
+                expect(failure_history.updated_by).to eq(failed_updated_by)
+              end
+            end
+
+            context 'for applicant_2' do
+              it 'should not create applicant_2 history for applicant_1 requested call' do
+                admin_call_history = applicant_2_income_evidence.verification_histories.first
+                expect(admin_call_history.nil?).to be_truthy
+              end
+            end
+          end
+        end
       end
     end
 

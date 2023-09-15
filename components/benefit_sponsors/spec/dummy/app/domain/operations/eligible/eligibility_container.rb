@@ -9,11 +9,11 @@ module Operations
       extend Dry::Container::Mixin
 
       register "eligibility_defaults" do
-        EligibilityConfiguration
+        EligibilityConfiguration.new
       end
 
       register "evidence_defaults" do
-        EvidenceConfiguration
+        EvidenceConfiguration.new
       end
     end
   end

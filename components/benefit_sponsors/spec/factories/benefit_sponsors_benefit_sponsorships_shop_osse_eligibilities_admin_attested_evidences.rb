@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :benefit_sponsors_benefit_sponsorships_shop_osse_eligibilities_admin_attested_evidence,
+  factory :shop_osse_eligibilities_admin_attested_evidence,
           class:
             'BenefitSponsors::BenefitSponsorships::ShopOsseEligibilities::AdminAttestedEvidence' do
 
@@ -14,7 +14,7 @@ FactoryBot.define do
 
     transient do
       from_state { :initial }
-      to_state { :initial }
+      to_state { :not_approved }
       is_eligible { false }
       effective_on { TimeKeeper.date_of_record.beginning_of_month }
     end
