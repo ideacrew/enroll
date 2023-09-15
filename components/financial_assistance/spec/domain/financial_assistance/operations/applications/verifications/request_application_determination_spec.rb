@@ -15,58 +15,58 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
 
   let!(:applicant) do
     FactoryBot.build(:financial_assistance_applicant,
-                      :with_student_information,
-                      :with_home_address,
-                      :with_esi_evidence,
-                      :with_non_esi_evidence,
-                      :with_local_mec_evidence,
-                      application: application,
-                      is_primary_applicant: true,
-                      ssn: '889984400',
-                      dob: Date.new(1994,11,17),
-                      first_name: person.first_name,
-                      last_name: person.last_name,
-                      gender: person.gender,
-                      person_hbx_id: person.hbx_id,
-                      eligibility_determination_id: eligibility_determination.id)
+                     :with_student_information,
+                     :with_home_address,
+                     :with_esi_evidence,
+                     :with_non_esi_evidence,
+                     :with_local_mec_evidence,
+                     application: application,
+                     is_primary_applicant: true,
+                     ssn: '889984400',
+                     dob: Date.new(1994,11,17),
+                     first_name: person.first_name,
+                     last_name: person.last_name,
+                     gender: person.gender,
+                     person_hbx_id: person.hbx_id,
+                     eligibility_determination_id: eligibility_determination.id)
   end
 
   let!(:applicant_2) do
     FactoryBot.build(:financial_assistance_applicant,
-                      :with_student_information,
-                      :with_home_address,
-                      :with_income_evidence,
-                      :with_esi_evidence,
-                      :with_non_esi_evidence,
-                      :with_local_mec_evidence,
-                      application: application,
-                      is_primary_applicant: false,
-                      ssn: '889984400',
-                      dob: Date.new(1995,11,17),
-                      first_name: person_2.first_name,
-                      last_name: person_2.last_name,
-                      gender: person_2.gender,
-                      person_hbx_id: person_2.hbx_id,
-                      eligibility_determination_id: eligibility_determination.id)
+                     :with_student_information,
+                     :with_home_address,
+                     :with_income_evidence,
+                     :with_esi_evidence,
+                     :with_non_esi_evidence,
+                     :with_local_mec_evidence,
+                     application: application,
+                     is_primary_applicant: false,
+                     ssn: '889984400',
+                     dob: Date.new(1995,11,17),
+                     first_name: person_2.first_name,
+                     last_name: person_2.last_name,
+                     gender: person_2.gender,
+                     person_hbx_id: person_2.hbx_id,
+                     eligibility_determination_id: eligibility_determination.id)
   end
 
   let!(:applicant_3) do
     FactoryBot.build(:financial_assistance_applicant,
-                      :with_student_information,
-                      :with_home_address,
-                      :with_income_evidence,
-                      :with_esi_evidence,
-                      :with_non_esi_evidence,
-                      :with_local_mec_evidence,
-                      application: application,
-                      is_primary_applicant: false,
-                      ssn: '889984400',
-                      dob: Date.new(2007,11,17),
-                      first_name: person_3.first_name,
-                      last_name: person_3.last_name,
-                      gender: person_3.gender,
-                      person_hbx_id: person_3.hbx_id,
-                      eligibility_determination_id: eligibility_determination.id)
+                     :with_student_information,
+                     :with_home_address,
+                     :with_income_evidence,
+                     :with_esi_evidence,
+                     :with_non_esi_evidence,
+                     :with_local_mec_evidence,
+                     application: application,
+                     is_primary_applicant: false,
+                     ssn: '889984400',
+                     dob: Date.new(2007,11,17),
+                     first_name: person_3.first_name,
+                     last_name: person_3.last_name,
+                     gender: person_3.gender,
+                     person_hbx_id: person_3.hbx_id,
+                     eligibility_determination_id: eligibility_determination.id)
   end
 
   let!(:create_home_address) do
@@ -131,48 +131,115 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
     applicant.local_mec_evidence.update(aasm_state: 'pending')
     applicant_2.local_mec_evidence.update(aasm_state: 'pending')
     applicant_3.local_mec_evidence.update(aasm_state: 'pending')
-
-    applicant.build_income_evidence(
-      key: :income,
-      title: 'Income',
-      aasm_state: :pending,
-      due_on: TimeKeeper.date_of_record,
-      verification_outstanding: true,
-      is_satisfied: false
-    )
   end
 
-  context 'success' do
-    context 'with valid application' do
-      before do
-        @result = subject.call(application)
-      end
+  context 'with valid application' do
+    before do
+      @result = subject.call(application)
+    end
 
-      it 'should return success' do
-        expect(@result).to be_success
-      end
+    it 'should return success' do
+      expect(@result).to be_success
+    end
 
-      it 'should return success with message' do
-        expect(@result.success).to eq('Event published successfully')
-      end
+    it 'should return success with message' do
+      expect(@result.success).to eq('Event published successfully')
     end
   end
 
+  context 'with invalid application' do
+    before do
+      @result = subject.call("application_id")
+    end
 
-  context 'failure' do
-    context 'single applicant with invalid ssn' do
+    it 'should return a failure with error message' do
+      expect("Invalid Application object application_id, expected FinancialAssistance::Application")
+    end
+  end
+
+  context 'elgibility validation' do
+
+    context 'with an invalid applicant' do
+      context 'on mec evidence' do
+        before do
+          applicant.update(ssn: '000348745')
+          @result = subject.call(application)
+        end
+
+        it 'should be sucessful' do
+          expect(@result).to be_success
+        end
+
+        it "should update invalid applicants' verification history" do
+          evidence = applicant.esi_evidence
+          expect(evidence.verification_histories.length).to eq 1
+          expect(evidence.verification_histories.first.update_reason).to include "Invalid SSN"
+        end
+
+        it "should NOT modify valid applicants' verification histories" do
+          evidence2 = applicant_2.esi_evidence
+          evidence3 = applicant_3.esi_evidence
+          expect(evidence2.verification_histories.length).to eq 0
+          expect(evidence3.verification_histories.length).to eq 0
+        end
+
+        it 'should update the invalid applicants aasm_states to attested' do
+          evidence = applicant.esi_evidence
+          expect(evidence.aasm_state).to eq "attested"
+        end
+      end
+
+      context 'on income evidence' do
+        before do
+          applicant.build_income_evidence(
+            key: :income,
+            title: 'Income',
+            aasm_state: :pending,
+            due_on: TimeKeeper.date_of_record,
+            verification_outstanding: true,
+            is_satisfied: false
+          )
+          applicant.update(ssn: '000348745')
+          @result = subject.call(application)
+        end
+
+        it 'should fail' do
+          expect(@result).to_not be_success
+        end
+
+        it "should update all applicants' verification histories" do
+          evidence1 = applicant.income_evidence
+          evidence2 = applicant_2.income_evidence
+          evidence3 = applicant_3.income_evidence
+          expect(evidence1.verification_histories.length).to eq 1
+          expect(evidence2.verification_histories.length).to eq 1
+          expect(evidence3.verification_histories.length).to eq 1
+        end
+
+        it 'should update the aasm_states to negative_response_received' do
+          evidence1 = applicant.income_evidence
+          evidence2 = applicant_2.income_evidence
+          evidence3 = applicant_3.income_evidence
+          expect(evidence1.aasm_state).to eq "negative_response_received"
+          expect(evidence2.aasm_state).to eq "negative_response_received"
+          expect(evidence3.aasm_state).to eq "negative_response_received"
+        end
+      end
+    end
+
+    context 'with ALL invalid applicants' do
       before do
         applicant.update(ssn: '000348745')
+        applicant_2.update(ssn: '000348746')
+        applicant_3.update(ssn: '000348747')
         @result = subject.call(application)
       end
 
-      it 'should return a failure with error message' do
-        expect("Invalid Application object application_id, expected FinancialAssistance::Application")
-      end
-
-      it 'should add verification histories for all applicant evidences where applicable' do
-        expect("All applicants invalid because any income invalid")
+      it 'should fail' do
+        expect(@result).to_not be_success
       end
     end
+
   end
+
 end

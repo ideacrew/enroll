@@ -39,7 +39,6 @@ module FinancialAssistance
             AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application)
           end
 
-
           def check_eligibility_rules(magi_medicaid_application, financial_assistance_application)
             invalid_applicant_array = magi_medicaid_application.applicants.map do |mma_applicant|
               checked_applicant = ::FinancialAssistance::Operations::Applications::Verifications::CheckEligibilityRules.new.call(mma_applicant)
@@ -53,15 +52,14 @@ module FinancialAssistance
 
             return Failure('All applicants invalid') if invalid_applicant_array.length == financial_assistance_application.applicants.length
 
-            if invalid_applicant_array.any? { |app| app.income_evidence }
-              invalid_app_ids = invalid_applicant_array.select { |app| app.income_evidence }.map(&:person_hbx_id) #.to_sentence
+            if invalid_applicant_array.any?(&:income_evidence)
+              invalid_app_ids = invalid_applicant_array.select(&:income_evidence).map(&:person_hbx_id) #.to_sentence
               log_invalid_income_evidence_to_history(financial_assistance_application, invalid_app_ids)
               return Failure('All applicants invalid because any income invalid')
             end
 
             Success()
           end
-
 
           def log_invalid_evidence_to_history(faa_applicant, failure_message)
             evidence_types = Array.new(::FinancialAssistance::Applicant::EVIDENCES)
@@ -78,7 +76,6 @@ module FinancialAssistance
             end
           end
 
-
           def log_invalid_income_evidence_to_history(financial_assistance_application, invalid_app_ids)
             failure_message = "Income Evidence Determination Request Failed due to Invalid SSN on applicants #{invalid_app_ids.to_sentence}"
 
@@ -87,7 +84,6 @@ module FinancialAssistance
               applicant.income_evidence.add_verification_history("Hub Request Failed", failure_message, "system")
             end
           end
-
 
         end
       end
