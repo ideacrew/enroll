@@ -118,7 +118,7 @@ class Organization
 
   index({"hbx_profile.benefit_sponsorship.benefit_coverage_periods.start_on" => 1,
          "hbx_profile.benefit_sponsorship.benefit_coverage_periods.end_on" => 1},
-         { name: 'benefit_coverage_period_start_on_end_on' })
+        { name: 'benefit_coverage_period_start_on_end_on' })
 
   before_save :generate_hbx_id
   after_update :legal_name_or_fein_change_attributes,:if => :check_legal_name_or_fein_changed?
