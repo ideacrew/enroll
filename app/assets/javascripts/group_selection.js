@@ -56,7 +56,6 @@ function setGroupSelectionHandlers(){
     }
 
     $('#market_kind_individual').on('change', function() {
-      //debugger;
       disableEmployerSelection();
 
       $('#dental-radio-button').slideDown();
@@ -67,8 +66,7 @@ function setGroupSelectionHandlers(){
       setPrimaryForIvl();
 
       var ivl_effective_on = $('#ivl_effective_on').val();
-      $("#effective_date_for_display").html( ivl_effective_on );
-
+      $("#effective_date_for_display").html(ivl_effective_on);
     });
 
     $('#market_kind_coverall').on('change', function() {
@@ -104,7 +102,7 @@ function setGroupSelectionHandlers(){
       setPrimaryForShop();
 
       var shop_effective_on = $('#shop_effective_on').val();
-      $("#effective_date_for_display").html( shop_effective_on );
+      $("#effective_date_for_display").html(shop_effective_on);
     });
   }
 
