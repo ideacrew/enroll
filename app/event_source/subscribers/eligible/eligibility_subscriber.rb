@@ -86,7 +86,7 @@ module Subscribers
 
       def eligibility_operation_for(subject)
         case subject.class.to_s
-        when "ConsumerRole" || "ResidentRole"
+        when "ConsumerRole", "ResidentRole"
           ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility
         when "BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
           ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility
