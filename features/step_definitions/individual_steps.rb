@@ -1041,7 +1041,7 @@ end
 
 And(/consumer has osse eligibility/) do
   person = Person.all.first
-  person.consumer_role.eligibilities << FactoryBot.build(:eligibility, :with_evidences, :with_subject, start_on: TimeKeeper.date_of_record.beginning_of_year)
+  person.consumer_role.eligibilities << FactoryBot.build(:ivl_osse_eligibility, :with_admin_attested_evidence, evidence_state: :approved)
 end
 
 When(/consumer visits home page after successful ridp/) do
@@ -1275,9 +1275,9 @@ end
 
 Given(/plan filter feature is disabled and osse subsidy feature is enabled/) do
   year = TimeKeeper.date_of_record.year
-  EnrollRegistry[:aca_ivl_osse_subsidy].feature.stub(:is_enabled).and_return(true)
-  EnrollRegistry["aca_ivl_osse_subsidy_#{year}"].feature.stub(:is_enabled).and_return(true)
-  EnrollRegistry["aca_ivl_osse_subsidy_#{year - 1}"].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry[:aca_ivl_osse_eligibility].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry["aca_ivl_osse_eligibility_#{year}"].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry["aca_ivl_osse_eligibility_#{year - 1}"].feature.stub(:is_enabled).and_return(true)
   EnrollRegistry[:individual_osse_plan_filter].feature.stub(:is_enabled).and_return(false)
 end
 

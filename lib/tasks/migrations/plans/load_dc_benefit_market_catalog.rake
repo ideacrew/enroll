@@ -1,3 +1,5 @@
+include EventSource::Command
+
 namespace :load do
   task :dc_benefit_market_catalog, [:year] => :environment do |task, args|
 
@@ -39,6 +41,51 @@ namespace :load do
         puts "Found #{product_class.by_product_package(product_package).count} #{product_package.product_kind.to_s} products for #{calender_year} #{product_package.package_kind.to_s}"
         product_class.by_product_package(product_package).collect { |prod| prod.create_copy_for_embedding }
       end
+
+      if kind == :aca_shop && EnrollRegistry.feature?("aca_shop_osse_eligibility_#{calender_year}") && EnrollRegistry.feature_enabled?("aca_shop_osse_eligibility_#{calender_year}")
+        puts "Creating eligibilities......"
+        effective_date = benefit_market_catalog.application_period.min.to_date
+
+        result = Operations::Eligible::CreateCatalogEligibility.new.call(
+          {
+            subject: benefit_market_catalog.to_global_id,
+            eligibility_feature: "aca_shop_osse_eligibility",
+            effective_date: effective_date,
+            domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+          }
+        )
+
+        if result.success?
+          p "Success: created eligibility for #{effective_date.year} benefit market catalog"
+
+          puts "::: Creating SHOP OSSE eligibilities (This is Async)"
+          puts ":::::::::::::::: THIS IS ASYNC PROCESS ::::::::::::::::"
+
+          count = 0
+          eligibility_date = effective_date - 1.day
+          ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.all.no_timeout.each do |benefit_sponsorship|
+            count += 1
+            payload = {
+              subject_gid: benefit_sponsorship.to_global_id.uri,
+              effective_date: effective_date,
+              evidence_key: :shop_osse_evidence
+            }
+
+            event = event('events.eligible.renew_eligibility', attributes: payload)
+            if event.success?
+              event.success.publish
+            else
+              puts "ERROR: Event trigger failed: benefit_sponsorship FEIN: #{benefit_sponsorship.fein}"
+            end
+            puts "Processsed #{count} SHOP OSSE eligibilities" if (count % 1000) == 0
+          end
+        else
+          p "Failed to create eligibility for #{effective_date.year} benefit market catalog"
+        end
+      else
+        puts "SHOP OSSE is disabled; Skipping catalog creation & benefit sponsorship renewal"
+      end
+
 
       puts "Creating Product Packages..." unless Rails.env.test?
 
