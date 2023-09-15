@@ -109,6 +109,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
 
 
   before do
+    allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
+
     stub_const('::Operations::Products::Fetch', fetch_double)
     stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
     stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
