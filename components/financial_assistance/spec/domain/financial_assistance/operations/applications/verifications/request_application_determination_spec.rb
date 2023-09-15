@@ -6,9 +6,9 @@ require "#{FinancialAssistance::Engine.root}/spec/dummy/app/domain/operations/in
 RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::RequestApplicationDetermination, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
-  let!(:person) { FactoryBot.create(:person, :with_ssn, hbx_id: "732020")}
-  let!(:person_2) { FactoryBot.create(:person, :with_ssn, hbx_id: "732021")}
-  let!(:person_3) { FactoryBot.create(:person, :with_ssn, hbx_id: "732022")}
+  let!(:person) { FactoryBot.create(:person, :with_ssn, hbx_id: "732020") }
+  let!(:person_2) { FactoryBot.create(:person, :with_ssn, hbx_id: "732021") }
+  let!(:person_3) { FactoryBot.create(:person, :with_ssn, hbx_id: "732022") }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'determined', hbx_id: "830293", effective_date: TimeKeeper.date_of_record.beginning_of_year) }
   let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
@@ -82,9 +82,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
     applicant.save!
   end
 
-  let(:event) { Success(double) }
-  let(:obj)  { ::FinancialAssistance::Operations::Applications::Verifications::MagiMedicaidApplicationDetermined.new }
-
   let(:premiums_hash) do
     {
       [person.hbx_id] => {:health_only => {person.hbx_id => [{:cost => 200.0, :member_identifier => person.hbx_id, :monthly_premium => 200.0}]}}
@@ -112,9 +109,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
 
 
   before do
-    # allow(::FinancialAssistance::Operations::Applications::Verifications::MagiMedicaidApplicationDetermined).to receive(:new).and_return(obj)
-    # allow(obj).to receive(:build_event).and_return(event)
-    allow(event.success).to receive(:publish).and_return(true)
     stub_const('::Operations::Products::Fetch', fetch_double)
     stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
     stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
@@ -239,7 +233,5 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::R
         expect(@result).to_not be_success
       end
     end
-
   end
-
 end
