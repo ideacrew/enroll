@@ -39,65 +39,56 @@ module FinancialAssistance
             AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application)
           end
 
-          def check_eligibility_rules(payload, application)
-            evidence_types = ::FinancialAssistance::Applicant::EVIDENCES
-            applicants_by_hbx_id = {}
-            application.applicants.each { |applicant| applicants_by_hbx_id[applicant.person_hbx_id] = applicant }
 
-            # Less readable
-            # applicants_by_hbx_id = Hash[application.applicants.map { |applicant| [applicant.person_hbx_id, applicant] }]
+          def check_eligibility_rules(magi_medicaid_application, financial_assistance_application)
+            invalid_applicant_array = magi_medicaid_application.applicants.map do |mma_applicant|
+              checked_applicant = ::FinancialAssistance::Operations::Applications::Verifications::CheckEligibilityRules.new.call(mma_applicant)
+              next if checked_applicant.success?
 
-            invalid_applicant_array = payload.applicants.map do |cv3_applicant|
-              valid_cv3_applicant = ::FinancialAssistance::Operations::Applications::Verifications::CheckEligibilityRules.new.call(cv3_applicant)
-              applicant = retrieve_application_applicant(cv3_applicant, applicants_by_hbx_id)
-              
-              if valid_cv3_applicant.failure?
-                evidence_types.each do |evidence_type|
-                  next unless cv3_applicant.send(evidence_type)
+              faa_applicant = financial_assistance_application.applicants.find_by{|a| a.person_hbx_id == mma_applicant.person_hbx_id}
+              log_invalid_evidence_to_history(faa_applicant, checked_applicant.failure)
 
-                  handle_failed_applicant(applicant, evidence_type, valid_cv3_applicant.failure)
-                  applicants_by_hbx_id[]
-                end
-
-                { applicant: applicant, failure_reason: valid_cv3_applicant.failure }
-              end
+              faa_applicant
             end.compact
 
-            return Failure('No valid applicants') if invalid_applicant_array.length == application.applicants.length
+            return Failure('All applicants invalid') if invalid_applicant_array.length == financial_assistance_application.applicants.length
 
-            handle_application_income_evidences(invalid_applicant_array) if invalid_applicant_array.any? { |applicant| applicant.income_evidence }
+            if invalid_applicant_array.any? { |app| app.income_evidence }
+              invalid_app_ids = invalid_applicant_array.select { |app| app.income_evidence }.map(&:person_hbx_id) #.to_sentence
+              log_invalid_income_evidence_to_history(financial_assistance_application, invalid_app_ids)
+              return Failure('All applicants invalid because any income invalid')
+            end
+
             Success()
           end
 
-          def retrieve_application_applicant(cv3_applicant, applicants_by_hbx_id)
-            hbx_id = cv3_applicant.person_hbx_id
-            application_applicant = applicants_by_hbx_id[hbx_id]
-          end
 
-          # The purpose of this method is to update all other evidence types that are NOT income_evidence
-          # This is because income evidence is determined by family, not the individual applicant
-          def handle_failed_applicant(applicant, evidence_type, failure_reason)
-            evidence = applicant.send(evidence_type)
-            failure_message = "#{evidence_type.to_s.titleize} Determination Request Failed due to #{failure_reason}"
-            
-            if evidence_type != :income_evidence
+          def log_invalid_evidence_to_history(faa_applicant, failure_message)
+            evidence_types = Array.new(::FinancialAssistance::Applicant::EVIDENCES)
+            evidence_types -= [:income_evidence] #income evidence error logging handled at family level, with log_invalid_income_evidence_to_history() def
+
+            evidence_types.each do |evidence_type|
+              next unless faa_applicant.send(evidence_type)
+
+              evidence = faa_applicant.send(evidence_type)
+              failure_message = "#{evidence_type.to_s.titleize} Determination Request Failed due to #{failure_message}"
+
               evidence.determine_mec_evidence_aasm_status
               evidence.add_verification_history("Hub Request Failed", failure_message, "system")
             end
-
-            Failure(failure_reason)
           end
 
-          def handle_application_income_evidences(invalid_applicant_array)
-            invalid_applicant_array[0][:failure_reason]
 
-            # personal_hbx_id needs to be included in verification history message
-            application.applicants.each do |applicant|
-              if applicant.income_evidence
-                applicant.income_evidence.determine_income_evidence_aasm_status
-              end
+          def log_invalid_income_evidence_to_history(financial_assistance_application, invalid_app_ids)
+            failure_message = "Income Evidence Determination Request Failed due to Invalid SSN on applicants #{invalid_app_ids.to_sentence}"
+
+            financial_assistance_application.applicants.each do |applicant|
+              applicant.income_evidence.determine_income_evidence_aasm_status
+              applicant.income_evidence.add_verification_history("Hub Request Failed", failure_message, "system")
             end
           end
+
+
         end
       end
     end
