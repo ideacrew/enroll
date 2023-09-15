@@ -251,6 +251,9 @@ registry:
       - key: :counties_import
         is_enabled: false
         item: ""
+      - key: :ce_roster_bulk_upload
+        item: :ce_roster_bulk_upload
+        is_enabled: <%= ENV['CE_ROSTER_BULK_UPLOAD_ENABLED'] || false %>
   - namespace:
       - :features
       - :enroll_app

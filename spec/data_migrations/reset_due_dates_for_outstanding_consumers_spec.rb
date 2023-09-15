@@ -55,7 +55,7 @@ describe ResetDueDatesForOutstandingConsumers, dbclean: :around_each do
         consumer_role.update_attributes!(aasm_state: "verified")
         subject.migrate
         hbx_enrollment.reload
-        consumer_role.verification_types.map(&:reload)
+        consumer_role.reload
       end
 
       it "should change the aasm_state" do
