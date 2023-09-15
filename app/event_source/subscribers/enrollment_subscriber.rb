@@ -122,7 +122,7 @@ module Subscribers
 
       return application if application.present?
 
-      family.active_financial_assistance_application(enrollment.effective_on.year)
+      enrollment.family.active_financial_assistance_application(enrollment.effective_on.year)
     end
 
     def pre_process_message(subscriber_logger, payload)
