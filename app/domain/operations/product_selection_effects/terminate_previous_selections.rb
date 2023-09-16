@@ -27,7 +27,7 @@ module Operations
         eligible_enrollments = fetch_eligible_enrollments(enrollment, year)
 
         eligible_enrollments.each_with_index do |previous_enrollment, index|
-          transition_args = fetch_transition_args(index)
+          transition_args = fetch_transition_args(enrollment, index, previous_enrollment)
 
           if enrollment.effective_on > previous_enrollment.effective_on && previous_enrollment.may_terminate_coverage?
             next previous_enrollment if previous_enrollment.ineligible_for_termination?(enrollment.effective_on)
@@ -48,9 +48,10 @@ module Operations
         end.sort_by(&:effective_on)
       end
 
-      def fetch_transition_args(index)
+      def fetch_transition_args(enrollment, index, previous_enrollment)
         return {} unless EnrollRegistry.feature_enabled?(:silent_transition_enrollment)
         return {} if index.zero?
+        return {} unless enrollment.product.is_same_plan_by_hios_id_and_active_year?(previous_enrollment.product)
 
         { reason: 'superseded_silent' }
       end
