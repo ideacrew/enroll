@@ -51,7 +51,7 @@ module Operations
       def fetch_transition_args(enrollment, index, previous_enrollment)
         return {} unless EnrollRegistry.feature_enabled?(:silent_transition_enrollment)
         return {} if index.zero?
-        return {} unless enrollment.product.is_same_plan_by_hios_id_and_active_year?(previous_enrollment.product)
+        return {} unless enrollment.product.hios_id == previous_enrollment.product.hios_id
 
         { reason: Enrollments::TerminationReasons::SUPERSEDED_SILENT }
       end

@@ -19,6 +19,15 @@ describe Operations::ProductSelectionEffects::TerminatePreviousSelections, dbcle
       )
     end
 
+    let(:silver_product_with_variant02) do
+      FactoryBot.create(
+        :benefit_markets_products_health_products_health_product,
+        metal_level_kind: :silver,
+        hios_id: '012345ME01234567-02',
+        hios_base_id: '012345ME01234567'
+      )
+    end
+
     let(:silver_product2) do
       FactoryBot.create(
         :benefit_markets_products_health_products_health_product,
@@ -229,7 +238,7 @@ describe Operations::ProductSelectionEffects::TerminatePreviousSelections, dbcle
         - enrollments exists with same enrollment signature
         - enrollments exists with same coverage_kind
         - enrollments exists with same plan_year effective dates
-        - enrollment's product has same hios_base_id as all previous enrollments
+        - enrollment's product has same hios_id as all previous enrollments
         " do
 
         let(:new_enrollment_effective_on) { Date.new(coverage_year, 1) }
@@ -269,7 +278,7 @@ describe Operations::ProductSelectionEffects::TerminatePreviousSelections, dbcle
         - enrollments exists with same enrollment signature
         - enrollments exists with same coverage_kind
         - enrollments exists with same plan_year effective dates
-        - enrollment's product has same hios_base_id as all previous enrollments
+        - enrollment's product has same hios_id as all previous enrollments
         " do
 
         let(:new_enrollment_effective_on) { Date.new(coverage_year, 2) }
@@ -308,7 +317,7 @@ describe Operations::ProductSelectionEffects::TerminatePreviousSelections, dbcle
         - enrollments exists with same enrollment signature
         - enrollments exists with same coverage_kind
         - enrollments exists with same plan_year effective dates
-        - enrollment's product does not havw same hios_base_id as all previous enrollments
+        - enrollment's product does not havw same hios_id as all previous enrollments
         " do
 
         let(:new_enr_silver_product) { silver_product2 }
@@ -322,19 +331,19 @@ describe Operations::ProductSelectionEffects::TerminatePreviousSelections, dbcle
           ).to be_falsey
         end
 
-        it 'does not add metadata as hios_base_id is different' do
+        it 'does not add metadata as hios_id is different' do
           expect(
             enrollment3.reload.workflow_state_transitions.where(metadata_query).first
           ).to be_falsey
         end
 
-        it 'does not add metadata as hios_base_id is different' do
+        it 'does not add metadata as hios_id is different' do
           expect(
             enrollment4.reload.workflow_state_transitions.where(metadata_query).first
           ).to be_falsey
         end
 
-        it 'does not add metadata as hios_base_id is different' do
+        it 'does not add metadata as hios_id is different' do
           expect(
             enrollment5.reload.workflow_state_transitions.where(metadata_query).first
           ).to be_falsey
@@ -348,11 +357,11 @@ describe Operations::ProductSelectionEffects::TerminatePreviousSelections, dbcle
         - enrollments exists with same enrollment signature
         - enrollments exists with same coverage_kind
         - enrollments exists with same plan_year effective dates
-        - some of the in-between enrollment does not have same hios_base_id as new_enrollment
+        - some of the in-between enrollment does not have same hios_id as new_enrollment
         " do
 
         let(:enrollment3_silver_product) { silver_product2 }
-        let(:enrollment4_silver_product) { silver_product2 }
+        let(:enrollment4_silver_product) { silver_product_with_variant02 }
         let(:new_enrollment_effective_on) { Date.new(coverage_year, 2) }
         let(:previous_enrollment_effective_on) { Date.new(coverage_year, 1) }
         let(:previous_enrollment_terminated_on) { new_enrollment_effective_on.end_of_month }
@@ -363,19 +372,19 @@ describe Operations::ProductSelectionEffects::TerminatePreviousSelections, dbcle
           ).to be_falsey
         end
 
-        it 'does not add metadata as hios_base_id is different' do
+        it 'does not add metadata as hios_id is different' do
           expect(
             enrollment3.reload.workflow_state_transitions.where(metadata_query).first
           ).to be_falsey
         end
 
-        it 'does not add metadata as hios_base_id is different' do
+        it 'does not add metadata as csr_variant_id is different' do
           expect(
             enrollment4.reload.workflow_state_transitions.where(metadata_query).first
           ).to be_falsey
         end
 
-        it 'adds metadata as hios_base_id is same' do
+        it 'adds metadata as hios_id is same' do
           expect(
             enrollment5.reload.workflow_state_transitions.where(metadata_query).first
           ).to be_truthy
