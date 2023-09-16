@@ -53,7 +53,7 @@ module Operations
         return {} if index.zero?
         return {} unless enrollment.product.is_same_plan_by_hios_id_and_active_year?(previous_enrollment.product)
 
-        { reason: 'superseded_silent' }
+        { reason: Enrollments::TerminationReasons::SUPERSEDED_SILENT }
       end
     end
   end
