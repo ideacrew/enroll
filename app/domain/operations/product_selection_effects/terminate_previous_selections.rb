@@ -50,7 +50,7 @@ module Operations
         coverage_bins = construct_continous_coverage_bins(impacted_enrollments)
         coverage_bins.each do |bin|
           bin.each_with_index do |previous_enrollment, index|
-            termination_args = index > 0 ? { reason: Enrollments::TerminationReasons::SUPERSEDED_SILENT } : {}
+            termination_args = index > 0 ? { "reason" => Enrollments::TerminationReasons::SUPERSEDED_SILENT } : {}
             process_termination(enrollment, previous_enrollment, termination_args)
           end
         end

@@ -177,9 +177,11 @@ describe Operations::ProductSelectionEffects::TerminatePreviousSelections, dbcle
           household: family.active_household,
           effective_on: Date.new(coverage_year, 3),
           family: family,
-          terminated_on: previous_enrollment_terminated_on
+          terminated_on: enrollment_3_termination_date
         )
       end
+
+      let(:enrollment_3_termination_date) { Date.new(coverage_year, 4) - 1.day }
 
       let(:enrollment4_silver_product) { silver_product }
 
@@ -194,9 +196,11 @@ describe Operations::ProductSelectionEffects::TerminatePreviousSelections, dbcle
           household: family.active_household,
           effective_on: Date.new(coverage_year, 4),
           family: family,
-          terminated_on: previous_enrollment_terminated_on
+          terminated_on: enrollment_4_termination_date
         )
       end
+
+      let(:enrollment_4_termination_date) { Date.new(coverage_year, 5) - 1.day }
 
       let(:enrollment5_silver_product) { silver_product }
 
@@ -252,10 +256,10 @@ describe Operations::ProductSelectionEffects::TerminatePreviousSelections, dbcle
           ).to be_falsey
         end
 
-        it 'adds metadata as this is not first enrollment' do
+        it 'does not add metadata as there is a gap in coverage' do
           expect(
             enrollment3.reload.workflow_state_transitions.where(metadata_query).first
-          ).to be_truthy
+          ).to be_falsey
         end
 
         it 'adds metadata as this is not first enrollment' do
@@ -317,7 +321,7 @@ describe Operations::ProductSelectionEffects::TerminatePreviousSelections, dbcle
         - enrollments exists with same enrollment signature
         - enrollments exists with same coverage_kind
         - enrollments exists with same plan_year effective dates
-        - enrollment's product does not havw same hios_id as all previous enrollments
+        - enrollment's product does not have same hios_id as all previous enrollments
         " do
 
         let(:new_enr_silver_product) { silver_product2 }
@@ -331,22 +335,22 @@ describe Operations::ProductSelectionEffects::TerminatePreviousSelections, dbcle
           ).to be_falsey
         end
 
-        it 'does not add metadata as hios_id is different' do
+        it 'adds metadata as previous coverage was continguous' do
           expect(
             enrollment3.reload.workflow_state_transitions.where(metadata_query).first
-          ).to be_falsey
+          ).to be_truthy
         end
 
-        it 'does not add metadata as hios_id is different' do
+        it 'adds metadata as previous coverage was continguous' do
           expect(
             enrollment4.reload.workflow_state_transitions.where(metadata_query).first
-          ).to be_falsey
+          ).to be_truthy
         end
 
-        it 'does not add metadata as hios_id is different' do
+        it 'adds metadata as previous coverage was continguous' do
           expect(
             enrollment5.reload.workflow_state_transitions.where(metadata_query).first
-          ).to be_falsey
+          ).to be_truthy
         end
       end
 
@@ -384,10 +388,10 @@ describe Operations::ProductSelectionEffects::TerminatePreviousSelections, dbcle
           ).to be_falsey
         end
 
-        it 'adds metadata as hios_id is same' do
+        it 'does not add metadata to enrollment 5 as coverage is not contiguous' do
           expect(
             enrollment5.reload.workflow_state_transitions.where(metadata_query).first
-          ).to be_truthy
+          ).to be_falsey
         end
       end
     end
