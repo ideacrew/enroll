@@ -381,7 +381,7 @@ module FinancialAssistance
 
     scope :has_outstanding_verifications, -> { where(:"applicants.evidences.eligibility_status".in => ["outstanding", "in_review"]) }
 
-    scope :latest_determined_for_families, ->(year = TimeKeeper.date_of_record.year, family_ids = nil) do
+    scope :latest_determined_for_families, year = TimeKeeper.date_of_record.year do
       family_ids ||= ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id)
       latest_applications = collection.aggregate([
                                                    {
@@ -1080,7 +1080,6 @@ module FinancialAssistance
       self.effective_date.year < TimeKeeper.date_of_record.year
     end
 
-    # rubocop:disable Metrics/AbcSize
     def create_tax_household_groups
       return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
@@ -1103,7 +1102,6 @@ module FinancialAssistance
     rescue StandardError => e
       Rails.logger.error { "FAA create_tax_household_groups error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
-    # rubocop:enable Metrics/AbcSize
 
     def trigger_local_mec
       ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: id) if is_local_mec_checkable?
