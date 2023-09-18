@@ -365,6 +365,30 @@ context 'Verification process and notices' do
         expect(person.consumer_role.native_validation).to eq(state)
       end
     end
+
+    context "native american verification types" do
+      let!(:person1) { FactoryBot.create(:person, :with_consumer_role, :with_valid_native_american_information) }
+      let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person1)}
+      let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, :with_enrollment_members, family: family, enrollment_members: family.family_members)}
+
+      before do
+        EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:indian_alaskan_tribe_codes].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:enroll_app].setting(:state_abbreviation)).to receive(:item).and_return('ME')
+        person.update_attributes!(tribal_state: "ME", tribe_codes: ["", "PE"]) 
+        v_type = VerificationType.new(type_name: "American Indian Status", validation_status: 'outstanding', inactive: false)
+        person1.verification_types << v_type
+        person1.save!
+      end
+
+      it "does not deactivate native american verification type" do
+        ai_an_type = person1.verification_types.where(type_name: "American Indian Status").first
+        ai_an_type.update_attributes!(validation_status: 'negative_response_received')
+        person1.save!
+        expect(ai_an_type.inactive).to eql(false)
+      end
+    end
+  
     context "native validation doesn't exist" do
       it_behaves_like 'ensures native american field value', 'assigns', 'na', 'NON native american consumer', nil, nil
 
@@ -374,6 +398,37 @@ context 'Verification process and notices' do
       it_behaves_like 'ensures native american field value', 'assigns', 'pending', 'pending native american consumer', 'tribe', 'pending'
       it_behaves_like 'ensures native american field value', "doesn't change", 'outstanding', 'outstanding native american consumer', 'tribe', 'outstanding'
       it_behaves_like 'ensures native american field value', 'assigns', 'outstanding', 'na native american consumer', 'tribe', 'na'
+    end
+  end
+
+  describe "#check_tribal_name" do
+
+    before do
+      EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:indian_alaskan_tribe_codes].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:enroll_app].setting(:state_abbreviation)).to receive(:item).and_return('ME')
+      
+    end
+
+    context "tribal state is ME" do
+
+      before do
+        person.update_attributes!(tribal_state: "ME", tribe_codes: ["", "PE"]) 
+      end
+
+      it "returns tribal codes" do
+        expect(person.consumer_role.check_tribal_name).to eq(["", "PE"])
+      end
+    end
+
+    context "tribal state is outside ME" do
+      before do 
+        person.update_attributes!(tribal_state: "CA", tribe_codes: [], tribal_name: 'tribal name1') 
+      end
+     
+      it "returns tribal name" do
+        expect(person.consumer_role.check_tribal_name).to eq("tribal name1")
+      end
     end
   end
 

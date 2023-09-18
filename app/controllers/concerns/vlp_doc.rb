@@ -98,7 +98,21 @@ module VlpDoc
 
   def native_status_changed?(role)
     return unless role
-    params_hash = params.permit("tribal_id").to_h
-    role.person.send("tribal_id") != params_hash["tribal_id"]
+    
+    if EnrollRegistry.feature_enabled?(:indian_alaskan_tribe_codes)
+      person_params = params[:person]
+      tribal_state = person_params[:tribal_state]
+      tribe_codes =  person_params[:tribe_codes]
+      tribal_name = person_params[:tribal_name]
+
+      if tribal_state == EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
+        role.person.send("tribe_codes") != tribe_codes
+      else
+        role.person.send("tribal_name") != tribal_name
+      end
+    else
+      params_hash = params.permit("tribal_id").to_h
+      role.person.send("tribal_id") != params_hash["tribal_id"]
+    end
   end
 end

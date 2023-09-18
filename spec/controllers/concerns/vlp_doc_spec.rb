@@ -323,4 +323,93 @@ describe FakesController do
       end
     end
   end
+
+  describe "#native_status_changed?" do
+
+    let(:consumer_role) { FactoryBot.build(:consumer_role, tribal_state: 'ME', tribe_codes: ["PR"], tribal_name: "Tribe1") }
+
+    before :each do
+      EnrollRegistry[:indian_alaskan_tribe_codes].feature.stub(:is_enabled).and_return(true)
+      allow(subject).to receive(:params).and_return params.deep_symbolize_keys
+      allow(EnrollRegistry[:enroll_app].setting(:state_abbreviation)).to receive(:item).and_return('ME')
+    end
+
+    context "tribe located inside ME" do
+
+      context "tribe codes have changed" do
+
+        let(:params) do
+          {
+            'person' => {
+              "tribal_state" => "ME",
+              "tribal_name" => "",
+              "tribe_codes" => ["LA"],
+            }
+          }
+        end
+
+        it "returns true if tribe codes have changed" do
+          expect(subject.native_status_changed?(consumer_role)).to eql(true)
+        end
+      end
+
+      context "tribe codes have not changed"  do
+
+        let(:params) do
+          {
+            'person' => {
+              "tribal_state" => "ME",
+              "tribal_name" => "",
+              "tribe_codes" => ["PR"],
+            }
+          }
+        end
+  
+        it "returns false if tribe codes have not changed" do
+          expect(subject.native_status_changed?(consumer_role)).to eql(false)
+        end
+      end
+    end
+
+    context "tribe located outside ME" do
+
+      context "tribe name has changed" do
+
+        let(:params) do
+          {
+            'person' => {
+              "tribal_state" => "CA",
+              "tribal_name" => "Tribe2",
+              "tribe_codes" => "",
+            }
+          }
+        end
+  
+        it "returns true if tribal name has changed" do
+          expect(subject.native_status_changed?(consumer_role)).to eql(true)
+        end
+      end
+
+      context "tribe name has not changed" do
+
+        let(:params) do
+          {
+            'person' => {
+              "tribal_state" => "CA",
+              "tribal_name" => "Tribe1",
+              "tribe_codes" => "",
+            }
+          }
+        end
+  
+        it "returns false if tribal name has not changed" do
+          expect(subject.native_status_changed?(consumer_role)).to eql(false)
+        end
+
+      end
+
+      
+    end
+
+  end
 end
