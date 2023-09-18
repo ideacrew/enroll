@@ -7,8 +7,11 @@ FactoryBot.define do
     from_state { :draft }
     to_state { :eligible }
     transition_at { TimeKeeper.date_of_record }
-    event { :mark_eligible }
     reason { 'met minimum criteria' }
     comment { 'consumer provided proper documentation' }
+
+    before(:create) do |instance|
+      instance.event = :mark_eligible
+    end
   end
 end

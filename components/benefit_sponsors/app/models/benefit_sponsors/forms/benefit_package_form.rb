@@ -151,6 +151,22 @@ module BenefitSponsors
         end
       end
 
+      def health_product_packages
+        catalog.product_packages.by_product_kind(:health)
+      end
+
+      def dental_product_packages
+        catalog.product_packages.by_product_kind(:dental)
+      end
+
+      def health_package_kinds
+        health_product_packages.pluck(:package_kind)
+      end
+
+      def dental_package_kinds
+        dental_product_packages.pluck(:package_kind)
+      end
+
       def products_total
         case sponsored_benefits.first.product_package_kind
         when "single_issuer"

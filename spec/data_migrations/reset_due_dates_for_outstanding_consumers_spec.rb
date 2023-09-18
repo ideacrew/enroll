@@ -1,6 +1,6 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "reset_due_dates_for_outstanding_consumers")
-describe ResetDueDatesForOutstandingConsumers, dbclean: :after_each do
+describe ResetDueDatesForOutstandingConsumers, dbclean: :around_each do
 
   let(:given_task_name) { "remove_enrolled_contingent_state" }
   subject { ResetDueDatesForOutstandingConsumers.new(given_task_name, double(:current_scope => nil)) }
@@ -55,7 +55,7 @@ describe ResetDueDatesForOutstandingConsumers, dbclean: :after_each do
         consumer_role.update_attributes!(aasm_state: "verified")
         subject.migrate
         hbx_enrollment.reload
-        consumer_role.verification_types.map(&:reload)
+        consumer_role.reload
       end
 
       it "should change the aasm_state" do

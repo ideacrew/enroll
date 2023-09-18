@@ -621,7 +621,8 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
 
   context 'when employee is eligible for OSSE' do
     before do
-      allow_any_instance_of(EmployeeRole).to receive(:osse_eligible?).and_return(true)
+      allow(shop_enrollment).to receive(:sponsored_benefit_package).and_return(current_benefit_package)
+      allow(initial_application).to receive(:osse_eligible?).and_return(true)
       allow_any_instance_of(HbxEnrollment).to receive(:shop_osse_eligibility_is_enabled?).and_return(true)
       allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(premium)
       shop_enrollment.update_osse_childcare_subsidy
@@ -629,6 +630,13 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
 
     it 'should update OSSE subsidy' do
       expect(shop_enrollment.reload.eligible_child_care_subsidy.to_f).to eq(premium)
+    end
+
+    context 'when plan shopping with osse_eligible' do
+      it 'does not update eligibility coverage start on as enrollment new effective on' do
+        start_on_date = shop_enrollment.reload.effective_on
+        expect(shop_enrollment.reload.subscriber.coverage_start_on.to_s).not_to eq start_on_date.to_s
+      end
     end
 
     context 'when enrollment is dental' do
@@ -642,7 +650,6 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
 
   context 'when employee is not eligible for OSSE' do
     before do
-      allow_any_instance_of(EmployeeRole).to receive(:osse_eligible?).and_return(false)
       allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(premium)
       shop_enrollment.update_osse_childcare_subsidy
     end
@@ -662,7 +669,6 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
 
   context 'when employer is not eligible to sponsor OSSE in a given year' do
     before do
-      allow_any_instance_of(EmployeeRole).to receive(:osse_eligible?).and_return(true)
       allow_any_instance_of(HbxEnrollment).to receive(:shop_osse_eligibility_is_enabled?).and_return(false)
       allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(premium)
       shop_enrollment.update_osse_childcare_subsidy
@@ -675,7 +681,6 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
 
   context '.verify_and_reset_osse_subsidy_amount' do
     before do
-      allow_any_instance_of(EmployeeRole).to receive(:osse_eligible?).and_return(true)
       allow_any_instance_of(HbxEnrollment).to receive(:shop_osse_eligibility_is_enabled?).and_return(true)
       allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(premium)
       shop_enrollment.update_osse_childcare_subsidy

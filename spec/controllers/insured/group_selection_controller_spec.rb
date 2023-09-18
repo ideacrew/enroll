@@ -881,7 +881,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
 
       before do
-        general_agency_profile.update_attributes(primary_broker_role_id: broker_role.id)
+        allow(::SponsoredBenefits::Organizations::PlanDesignOrganization).to receive(:where).and_return([double('PlanDesignOrganization')])
       end
 
       it "should be able to terminate coverage if user is valid and has active ga staff role" do
@@ -1377,8 +1377,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         family.save
         user = FactoryBot.create(:user, person: FactoryBot.create(:person))
 
-        allow_any_instance_of(EmployeeRole).to receive(:osse_eligible?).and_return(true)
         allow_any_instance_of(HbxEnrollment).to receive(:shop_osse_eligibility_is_enabled?).and_return(true)
+        allow_any_instance_of(BenefitSponsors::BenefitApplications::BenefitApplication).to receive(:osse_eligible?).and_return(true)
         allow_any_instance_of(HbxEnrollment).to receive(:osse_subsidy_for_member).and_return(subsidy_amount)
 
         sign_in user

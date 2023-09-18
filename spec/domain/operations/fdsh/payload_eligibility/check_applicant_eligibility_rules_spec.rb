@@ -6,9 +6,10 @@ require Rails.root.join('spec/shared_contexts/valid_cv3_application_setup.rb')
 RSpec.describe Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules, dbclean: :after_each do
   include_context "valid cv3 application setup"
 
+  let(:cv3_application) { ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application).success }
+  let(:payload_entity) { AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application).success }
+
   describe '#call' do
-    let(:cv3_application) { ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application).success }
-    let(:payload_entity) { AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(cv3_application).success }
     let(:request_type) { :income }
 
     context 'when all validation rules pass' do
@@ -40,6 +41,40 @@ RSpec.describe Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRu
 
         result = described_class.new.call(applicant, request_type)
         expect(result.failure).to eq(["Invalid SSN"])
+      end
+    end
+  end
+
+  describe 'request_type esi_mec' do
+    let(:request_type) { :esi_mec }
+
+    context 'when all validation rules pass' do
+      before do
+        applicant_entity = payload_entity.applicants[0]
+        @result = described_class.new.call(applicant_entity, request_type)
+      end
+
+      it 'returns a Success result' do
+        expect(@result).to be_success
+      end
+    end
+
+    context 'when a validation rule fails' do
+      let(:validator) { instance_double(Operations::Fdsh::EncryptedSsnValidator) }
+
+      before do
+        allow(validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid SSN'))
+        allow(Operations::Fdsh::EncryptedSsnValidator).to receive(:new).and_return(validator)
+        applicant_entity = payload_entity.applicants[0]
+        @result = described_class.new.call(applicant_entity, request_type)
+      end
+
+      it 'returns a Failure result' do
+        expect(@result).to be_failure
+      end
+
+      it 'returns a Failure result' do
+        expect(@result.failure).to eq(["Invalid SSN"])
       end
     end
   end

@@ -5,8 +5,6 @@ module BenefitSponsors
       include ActiveModel::Validations
       include Config::AcaHelper
 
-      attr_accessor :osse_eligibility
-
       attribute :id, String
       attribute :market_kind, Symbol
       attribute :is_benefit_sponsorship_eligible, String
@@ -44,7 +42,6 @@ module BenefitSponsors
       validates_presence_of :referred_reason, if: :is_referred_by_other?
 
       def initialize(params = {})
-        @osse_eligibility = params[:osse_eligibility] || false
         super(params)
       end
 

@@ -46,7 +46,6 @@ module BenefitSponsors
     # TODO -- come up with scheme to manage/store these attributes and provide defaults
     field :colors,  type: Array
 
-
     # Organization responsible for administering this site
     has_one   :owner_organization, inverse_of: :site_owner,
               class_name: "BenefitSponsors::Organizations::ExemptOrganization"
@@ -56,9 +55,7 @@ module BenefitSponsors
     #           class_name: "BenefitSponsors::Organizations::Organization"
 
     # Curated collections of benefits intended for specific sponsor and member groups
-    # has_many :benefit_markets,
-    #          class_name: "::BenefitMarkets::BenefitMarket"
-
+    has_many :benefit_markets, inverse_of: :site, class_name: "::BenefitMarkets::BenefitMarket"
 
     # accepts_nested_attributes_for :owner_organization
 

@@ -13,7 +13,7 @@ RSpec.describe Operations::Fdsh::BuildAndValidateApplicationPayload, dbclean: :a
 
         context 'when all validation rules pass' do
           it 'returns a Success result' do
-            result = described_class.new.call(application, request_type)
+            result = described_class.new.call(application)
             expect(result).to be_success
           end
         end
@@ -24,28 +24,9 @@ RSpec.describe Operations::Fdsh::BuildAndValidateApplicationPayload, dbclean: :a
           end
 
           it 'raises an error' do
-            result = described_class.new.call(application, request_type)
+            result = described_class.new.call(application)
 
             expect(result).to be_failure
-          end
-        end
-
-        context 'when the encrypted SSN is invalid' do
-          let(:validator) { instance_double(Operations::Fdsh::EncryptedSsnValidator) }
-
-          before do
-            allow(validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid SSN'))
-            allow(Operations::Fdsh::EncryptedSsnValidator).to receive(:new).and_return(validator)
-          end
-
-          it 'returns a Failure result' do
-            result = described_class.new.call(application, request_type)
-            expect(result).to be_failure
-          end
-
-          it 'returns an error message' do
-            result = described_class.new.call(application, request_type)
-            expect(result.failure).to eq(['Invalid SSN'])
           end
         end
       end
