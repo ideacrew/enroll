@@ -21,7 +21,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::Medicare::A
                       last_name: 'evidence',
                       ssn: "518124854",
                       dob: Date.new(1988, 11, 11),
-                      application: application)
+                      application: application,
+                      is_ia_eligible: true)
   end
 
   context 'success' do

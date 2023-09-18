@@ -40,6 +40,7 @@ module FinancialAssistance
               response_applicant = response_app_entity.applicants.detect {|applicant| applicant.person_hbx_id == applicant_identifier}
               applicant = application.applicants.where(person_hbx_id: applicant_identifier).first
 
+              return Success("Applicant is not ia_eligible to update evidences") unless applicant.is_ia_eligible
               return Failure("applicant not found with #{applicant_identifier} for pvc Medicare") unless applicant
               return Failure("applicant not found in response with #{applicant_identifier} for pvc Medicare") unless response_applicant
 
