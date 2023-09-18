@@ -381,8 +381,9 @@ module FinancialAssistance
 
     scope :has_outstanding_verifications, -> { where(:"applicants.evidences.eligibility_status".in => ["outstanding", "in_review"]) }
 
-    scope :latest_determined_for_families, lambda do |year|
-      year ||= TimeKeeper.date_of_record.year
+    # rubocop insists on a lambda syntax that breaks the remote build
+    # rubocop:disable Style/Lambda
+    scope :latest_determined_for_families, ->(year = TimeKeeper.date_of_record.year) do
       family_ids ||= ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id)
       latest_applications = collection.aggregate([
                                                    {
@@ -410,6 +411,7 @@ module FinancialAssistance
 
       where(:_id.in => latest_application_ids)
     end
+    # rubocop:enable Style/Lambda
 
     alias is_joint_tax_filing? is_joint_tax_filing
     alias is_renewal_authorized? is_renewal_authorized
