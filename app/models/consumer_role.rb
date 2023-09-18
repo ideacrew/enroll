@@ -1267,7 +1267,6 @@ class ConsumerRole
   end
 
   def ensure_native_validation
-  
     self.native_validation = "na" if EnrollRegistry[:indian_alaskan_tribe_details].enabled? && (tribal_state.nil? || tribal_state.empty? || check_tribal_name.nil? || check_tribal_name.empty?)
 
     if tribal_id.nil? || tribal_id.empty?

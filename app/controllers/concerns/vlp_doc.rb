@@ -98,7 +98,7 @@ module VlpDoc
 
   def native_status_changed?(role)
     return unless role
-    
+
     if EnrollRegistry.feature_enabled?(:indian_alaskan_tribe_codes)
       person_params = params[:person]
       tribal_state = person_params[:tribal_state]

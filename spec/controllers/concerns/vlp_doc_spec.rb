@@ -343,7 +343,7 @@ describe FakesController do
             'person' => {
               "tribal_state" => "ME",
               "tribal_name" => "",
-              "tribe_codes" => ["LA"],
+              "tribe_codes" => ["LA"]
             }
           }
         end
@@ -360,11 +360,11 @@ describe FakesController do
             'person' => {
               "tribal_state" => "ME",
               "tribal_name" => "",
-              "tribe_codes" => ["PR"],
+              "tribe_codes" => ["PR"]
             }
           }
         end
-  
+
         it "returns false if tribe codes have not changed" do
           expect(subject.native_status_changed?(consumer_role)).to eql(false)
         end
@@ -380,11 +380,11 @@ describe FakesController do
             'person' => {
               "tribal_state" => "CA",
               "tribal_name" => "Tribe2",
-              "tribe_codes" => "",
+              "tribe_codes" => ""
             }
           }
         end
-  
+
         it "returns true if tribal name has changed" do
           expect(subject.native_status_changed?(consumer_role)).to eql(true)
         end
@@ -397,19 +397,15 @@ describe FakesController do
             'person' => {
               "tribal_state" => "CA",
               "tribal_name" => "Tribe1",
-              "tribe_codes" => "",
+              "tribe_codes" => ""
             }
           }
         end
-  
+
         it "returns false if tribal name has not changed" do
           expect(subject.native_status_changed?(consumer_role)).to eql(false)
         end
-
       end
-
-      
     end
-
   end
 end

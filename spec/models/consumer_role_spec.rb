@@ -375,7 +375,7 @@ context 'Verification process and notices' do
         EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(true)
         EnrollRegistry[:indian_alaskan_tribe_codes].feature.stub(:is_enabled).and_return(true)
         allow(EnrollRegistry[:enroll_app].setting(:state_abbreviation)).to receive(:item).and_return('ME')
-        person.update_attributes!(tribal_state: "ME", tribe_codes: ["", "PE"]) 
+        person.update_attributes!(tribal_state: "ME", tribe_codes: ["", "PE"])
         v_type = VerificationType.new(type_name: "American Indian Status", validation_status: 'outstanding', inactive: false)
         person1.verification_types << v_type
         person1.save!
@@ -388,7 +388,7 @@ context 'Verification process and notices' do
         expect(ai_an_type.inactive).to eql(false)
       end
     end
-  
+
     context "native validation doesn't exist" do
       it_behaves_like 'ensures native american field value', 'assigns', 'na', 'NON native american consumer', nil, nil
 
@@ -407,13 +407,13 @@ context 'Verification process and notices' do
       EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(true)
       EnrollRegistry[:indian_alaskan_tribe_codes].feature.stub(:is_enabled).and_return(true)
       allow(EnrollRegistry[:enroll_app].setting(:state_abbreviation)).to receive(:item).and_return('ME')
-      
+
     end
 
     context "tribal state is ME" do
 
       before do
-        person.update_attributes!(tribal_state: "ME", tribe_codes: ["", "PE"]) 
+        person.update_attributes!(tribal_state: "ME", tribe_codes: ["", "PE"])
       end
 
       it "returns tribal codes" do
@@ -422,10 +422,10 @@ context 'Verification process and notices' do
     end
 
     context "tribal state is outside ME" do
-      before do 
-        person.update_attributes!(tribal_state: "CA", tribe_codes: [], tribal_name: 'tribal name1') 
+      before do
+        person.update_attributes!(tribal_state: "CA", tribe_codes: [], tribal_name: 'tribal name1')
       end
-     
+
       it "returns tribal name" do
         expect(person.consumer_role.check_tribal_name).to eq("tribal name1")
       end
