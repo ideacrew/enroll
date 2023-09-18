@@ -99,7 +99,6 @@ class Insured::GroupSelectionController < ApplicationController
     update_tobacco_field(hbx_enrollment.hbx_enrollment_members) if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
 
     if @market_kind == 'shop' || @market_kind == 'fehb'
-
       raise @adapter.no_employer_benefits_error_message(hbx_enrollment) unless hbx_enrollment.sponsored_benefit_package.shoppable?
 
       census_effective_on = @employee_role.census_employee.coverage_effective_on(hbx_enrollment.sponsored_benefit_package)
@@ -235,11 +234,11 @@ class Insured::GroupSelectionController < ApplicationController
     aptc_applied = params[:aptc_applied_total].delete_prefix('$')
     hbx_enrollment = HbxEnrollment.find(enrollment_id)
     max_aptc = params[:max_aptc]&.to_f
-    osse_eligible = hbx_enrollment&.ivl_osse_eligible?(hbx_enrollment.effective_on) && ivl_osse_filtering_enabled?
+    osse_eligible = hbx_enrollment&.ivl_osse_eligible? && ivl_osse_filtering_enabled?
     return aptc_applied unless osse_eligible && max_aptc > 0.00
 
     aptc_pct = (aptc_applied.to_f / max_aptc).round(2)
-    aptc_pct < 0.85 ? (max_aptc * 0.85) : aptc_applied
+    aptc_pct < minimum_applied_aptc_pct_for_osse ? (max_aptc * minimum_applied_aptc_pct_for_osse) : aptc_applied
   end
 
   def calculate_elected_aptc_pct(aptc_applied_amount, aggregate_aptc_amount)

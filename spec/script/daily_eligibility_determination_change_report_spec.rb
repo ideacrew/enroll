@@ -3,8 +3,8 @@
 require 'rails_helper'
 require File.join(Rails.root, 'spec/shared_contexts/ivl_eligibility')
 
-describe 'daily_eligibility_determination_change_report' do
-  before do
+describe 'daily_eligibility_determination_change_report', :dbclean => :after_each do
+  before :all do
     DatabaseCleaner.clean
   end
   include_context 'setup one tax household with one ia member'

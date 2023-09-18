@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: ae0788b2612f97088259a50eef3c298850d2c5cf
+  revision: 6a232951549089c011f8af2bcee67a777efe05b4
   branch: trunk
   specs:
     aca_entities (0.10.0)
@@ -54,7 +54,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/resource_registry.git
-  revision: 7b8f396afde849e584d0a749ade9ee88f1717e26
+  revision: 02f549334dc8eecce557daa45a543b00d8787d93
   branch: trunk
   specs:
     resource_registry (0.7.0)
@@ -233,7 +233,7 @@ GEM
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
       tzinfo (~> 1.1)
-    addressable (2.7.0)
+    addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
     amq-protocol (1.9.2)
     arel (9.0.0)
@@ -293,6 +293,7 @@ GEM
       responders
       warden (~> 1.2.3)
     diff-lcs (1.3)
+    docile (1.4.0)
     dry-auto_inject (0.6.1)
       dry-container (>= 0.3.4)
     dry-configurable (0.9.0)
@@ -401,8 +402,8 @@ GEM
       rails (>= 4.2)
     iso_country_codes (0.7.8)
     jaro_winkler (1.5.4)
-    json-schema (2.8.1)
-      addressable (>= 2.4)
+    json-schema (4.0.0)
+      addressable (>= 2.8)
     jsonapi-renderer (0.2.2)
     kaminari (0.17.0)
       actionpack (>= 3.0.0)
@@ -570,6 +571,8 @@ GEM
     rspec-expectations (3.9.1)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.9.0)
+    rspec-instafail (1.0.0)
+      rspec
     rspec-mocks (3.9.1)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.9.0)
@@ -624,6 +627,15 @@ GEM
     simple_form (5.0.2)
       actionpack (>= 5.0)
       activemodel (>= 5.0)
+    simplecov (0.22.0)
+      docile (~> 1.1)
+      simplecov-html (~> 0.11)
+      simplecov_json_formatter (~> 0.1)
+    simplecov-cobertura (2.1.0)
+      rexml
+      simplecov (~> 0.19)
+    simplecov-html (0.12.3)
+    simplecov_json_formatter (0.1.4)
     sinatra (2.1.0)
       mustermann (~> 1.0)
       rack (~> 2.2)
@@ -701,12 +713,15 @@ DEPENDENCIES
   rails-controller-testing
   rails-perftest (~> 0.0.7)
   resource_registry!
+  rspec-instafail (~> 1.0.0)
   rspec-rails (~> 3.8)
   rubocop-rspec (~> 1.31)
   shoulda-matchers (~> 3)
+  simplecov (~> 0.22.0)
+  simplecov-cobertura (~> 2.1.0)
   sponsored_benefits!
   test-prof (~> 0.5.0)
   webpacker (~> 4.0.2)
 
 BUNDLED WITH
-   2.3.23
+   2.3.24

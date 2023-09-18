@@ -21,7 +21,10 @@ module Subscribers
       logger.info "EnterpriseSubscriber payload: #{payload}" unless Rails.env.test?
 
       parsed_date = Date.parse(payload[:date_of_record])
-      Operations::Eligibilities::Notices::RequestDocumentReminderNotices.new.call(date_of_record: parsed_date) if EnrollRegistry.feature_enabled?(:aca_individual_market)
+      if EnrollRegistry.feature_enabled?(:aca_individual_market)
+        ::FinancialAssistance::Operations::Applications::AutoExtendIncomeEvidence.new.call(current_due_on: parsed_date) if FinancialAssistanceRegistry.feature_enabled?(:auto_update_income_evidence_due_on)
+        Operations::Eligibilities::Notices::RequestDocumentReminderNotices.new.call(date_of_record: parsed_date)
+      end
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e

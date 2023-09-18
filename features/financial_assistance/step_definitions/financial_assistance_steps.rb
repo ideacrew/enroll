@@ -676,6 +676,10 @@ Then(/^a family with financial application and applicants in (.*) state exists w
   create_family_faa_application_with_applicants_and_evidences(state)
 end
 
+Then(/^a family with financial application and applicants in (.*) state exists with unverified evidences$/) do |state|
+  create_family_faa_application_with_applicants_and_unverified_evidences(state)
+end
+
 When(/^an applicant with other income exists for a (.*) financial application$/) do |state|
   create_application_applicant_with_incomes(state)
 end

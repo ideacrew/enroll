@@ -4,30 +4,29 @@ module Operations
   module Eligible
     # Configurations for the Evidence
     class EvidenceConfiguration
-      def self.key
+      def key
         :evidence
       end
 
-      def self.title
+      def title
         "Evidence"
       end
 
-      def self.to_state_for(values, from_state)
+      def to_state_for(values, from_state)
         case values[:evidence_value]
         when "true"
           :approved
         when "false"
           case from_state
-          when :approved
+          when :not_approved, :approved, :denied
             :denied
-          when :initial
-            return :initial unless values[:evidence_record]
-            :denied
+          else
+            :not_approved
           end
         end
       end
 
-      def self.is_eligible?(state)
+      def is_eligible?(state)
         ::Eligible::Evidence::ELIGIBLE_STATUSES.include?(state)
       end
     end
