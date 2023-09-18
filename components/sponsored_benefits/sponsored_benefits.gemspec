@@ -41,6 +41,9 @@ Gem::Specification.new do |s|
   s.test_files = Dir["spec/**/*"]
 
   s.add_development_dependency "rspec-rails"
+  s.add_development_dependency 'simplecov',                 '~> 0.22.0'
+  s.add_development_dependency 'simplecov-cobertura',       '~> 2.1.0'
+  s.add_development_dependency 'rspec-instafail',           '~> 1.0.0'
   s.add_development_dependency 'shoulda-matchers',          '~> 3'
   s.add_development_dependency 'database_cleaner'
   s.add_development_dependency 'capybara',                  '~> 3.12'
