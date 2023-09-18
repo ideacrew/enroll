@@ -34,6 +34,9 @@ Gem::Specification.new do |s|
   s.add_dependency 'pundit', '~> 2.0'
 
   s.add_development_dependency 'rspec-rails'
+  s.add_development_dependency 'simplecov',                 '~> 0.22.0'
+  s.add_development_dependency 'simplecov-cobertura',       '~> 2.1.0'
+  s.add_development_dependency 'rspec-instafail',           '~> 1.0.0'
   s.add_development_dependency 'shoulda-matchers'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'database_cleaner'

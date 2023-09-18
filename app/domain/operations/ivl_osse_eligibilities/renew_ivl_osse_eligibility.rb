@@ -40,7 +40,7 @@ module Operations
           )
         end
 
-        return(Failure("ivl osse disabled for #{year}")) unless ivl_osse_enabled?(params)
+        return(Failure("ivl osse disabled for #{params[:effective_date].year}")) unless ivl_osse_enabled?(params)
 
         Success(params)
       end
