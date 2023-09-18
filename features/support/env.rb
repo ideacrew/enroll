@@ -8,6 +8,11 @@
 
 ENV['RAILS_ENV'] ||= 'test'
 $LOADING_CUCUMBER_ENV = true
+if ENV["COVERAGE"]
+  require 'simplecov'
+  SimpleCov.command_name "specs_#{Process.pid}_#{ENV['TEST_ENV_NUMBER'] || '1'}"
+  SimpleCov.start 'rails'
+end
 require 'webdrivers'
 require 'cucumber/rails'
 require 'email_spec/cucumber'

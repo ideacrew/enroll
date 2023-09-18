@@ -4,8 +4,13 @@ module Operations
   module IvlOsseEligibilities
     # Overrides top level eligibility_configuration for ivl osse specific configurations
     class IvlOsseEligibilityConfiguration < ::Operations::Eligible::EligibilityConfiguration
+      attr_reader :memoized_eligibilities, :memoized_coverage_periods
+
       def initialize(effective_date)
         @effective_date = effective_date
+        @memoized_eligibilities = {}
+        @memoized_coverage_periods = {}
+
         super()
       end
 
@@ -18,7 +23,11 @@ module Operations
       end
 
       def benefit_coverage_period
-        HbxProfile
+        calendar_year = @effective_date.year
+
+        return memoized_coverage_periods[calendar_year] if memoized_coverage_periods.key?(calendar_year)
+
+        memoized_coverage_periods[calendar_year] = HbxProfile
           &.current_hbx
           &.benefit_sponsorship
           &.benefit_coverage_periods
@@ -28,12 +37,14 @@ module Operations
 
       def catalog_eligibility
         return unless benefit_coverage_period
-        benefit_coverage_period
-          .eligibilities
-          .by_key(
-            "aca_ivl_osse_eligibility_#{benefit_coverage_period.start_on.year}"
-          )
-          .first
+        calendar_year = benefit_coverage_period.start_on.year
+
+        return memoized_eligibilities[calendar_year] if memoized_eligibilities.key?(calendar_year)
+
+        memoized_eligibilities[calendar_year] = benefit_coverage_period
+                                                .eligibilities
+                                                .by_key("aca_ivl_osse_eligibility_#{calendar_year}")
+                                                .first
       end
 
       def grants
