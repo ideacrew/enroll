@@ -51,6 +51,7 @@ class Insured::GroupSelectionController < ApplicationController
     @shop_under_current = @adapter.shop_under_current
     @shop_under_future = @adapter.shop_under_future
     @new_effective_on = @adapter.calculate_new_effective_on(params)
+    fetch_effective_dates_for_dual_role
 
     @adapter.if_should_generate_coverage_family_members_for_cobra(params) do |cobra_members|
       @coverage_family_members_for_cobra = cobra_members
@@ -229,6 +230,17 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   private
+
+  def person_has_dual_role?
+    @person.has_consumer_role? && @person.has_active_employee_role?
+  end
+
+  def fetch_effective_dates_for_dual_role
+    return unless person_has_dual_role?
+
+    @ivl_effective_on = @adapter.calculate_ivl_effective_on
+    @shop_effective_on = @adapter.calculate_new_effective_on(params)
+  end
 
   def revise_aptc_applied_total(params, enrollment_id)
     aptc_applied = params[:aptc_applied_total].delete_prefix('$')
