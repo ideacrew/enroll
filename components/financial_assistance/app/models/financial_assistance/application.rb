@@ -364,7 +364,6 @@ module FinancialAssistance
     scope :by_year, ->(year) { where(:assistance_year => year) }
     scope :created_asc,      -> { order(created_at: :asc) }
     scope :renewal_draft,    ->{ any_in(aasm_state: 'renewal_draft') }
-    scope :income_verification_extension_required, ->{ any_in(aasm_state: 'income_verification_extension_required') }
 
     # Applications that are in submitted and after submission states. Non work in progress applications.
     scope :submitted_and_after, lambda {
@@ -382,7 +381,8 @@ module FinancialAssistance
 
     scope :has_outstanding_verifications, -> { where(:"applicants.evidences.eligibility_status".in => ["outstanding", "in_review"]) }
 
-    scope :latest_determined_for_families, year = TimeKeeper.date_of_record.year do
+    scope :latest_determined_for_families, lambda do |year|
+      year ||= TimeKeeper.date_of_record.year
       family_ids ||= ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id)
       latest_applications = collection.aggregate([
                                                    {
@@ -1081,6 +1081,7 @@ module FinancialAssistance
       self.effective_date.year < TimeKeeper.date_of_record.year
     end
 
+    # rubocop:disable Metrics/AbcSize
     def create_tax_household_groups
       return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
@@ -1103,6 +1104,7 @@ module FinancialAssistance
     rescue StandardError => e
       Rails.logger.error { "FAA create_tax_household_groups error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
+    # rubocop:enable Metrics/AbcSize
 
     def trigger_local_mec
       ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: id) if is_local_mec_checkable?
