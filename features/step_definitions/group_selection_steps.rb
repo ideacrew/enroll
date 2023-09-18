@@ -489,6 +489,22 @@ When(/employee switched for (.*) benefits/) do |market_kind|
   end
 end
 
+And(/system date is (.*) date/) do |period|
+  if period == "open enrollment"
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year,11,1))
+  else
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+  end
+end
+
+Then(/user should see the effective date of (.*) coverage/) do |market|
+  if market == "employer-sponsored"
+    expect(page).to have_content @person.employee_roles.first.census_employee.coverage_effective_on
+  else
+    expect(page).to have_content HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period.start_on
+  end
+end
+
 Then(/user should (.*) the ivl error message/) do |var|
   if var == "see"
     expect(page).to have_content "Did not apply for coverage"

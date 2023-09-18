@@ -31,12 +31,13 @@ class WorkflowStateTransition
   end
 
   def metadata_has?(matching_hash)
-    return false unless metadata.present?
-    matching_hash.each_pair do |k,v|
-      return false unless metadata.key?(k.to_s)
-      return false unless metadata[k.to_s] == v
+    return false if metadata.blank? || !matching_hash.is_a?(Hash)
+
+    compare_hash = metadata.stringify_keys
+
+    matching_hash.all? do |k, v|
+      compare_hash.key?(k.to_s) && compare_hash[k.to_s] == v
     end
-    true
   end
 
 private
