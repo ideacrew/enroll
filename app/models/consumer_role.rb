@@ -785,7 +785,7 @@ class ConsumerRole
         live_types << 'Immigration status' if us_citizen != nil
       end
       inactive = verification_types.map(&:type_name) - live_types
-      new_types = live_types - person.verification_types.active.map(&:type_name)
+      new_types = live_types - verification_types.active.map(&:type_name)
       person.deactivate_types(inactive)
       new_types.each do |new_type|
         person.add_new_verification_type(new_type)
