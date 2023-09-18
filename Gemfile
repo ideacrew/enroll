@@ -162,7 +162,8 @@ group :test do
   gem 'rspec-benchmark'
   gem 'ruby-progressbar',             '~> 1'
   gem 'shoulda-matchers',             '~> 3'
-  gem 'simplecov',                    '~> 0.14',  :require => false
+  gem 'simplecov',                    '~> 0.22.0',  :require => false
+  gem 'simplecov-cobertura'
   gem 'test-prof'
   gem 'warden',                       '~> 1.2.7'
   gem 'watir',                        '~> 6.18.0'

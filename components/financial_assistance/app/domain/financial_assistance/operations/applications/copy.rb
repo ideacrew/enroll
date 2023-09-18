@@ -32,10 +32,10 @@ module FinancialAssistance
         private
 
         def validate_input_params(params)
-          return Failure(I18n.t('faa.errors.key_application_id_missing_error')) unless params.key?(:application_id)
+          return Failure({simple_error_message: I18n.t('faa.errors.key_application_id_missing_error')}) unless params.key?(:application_id)
           application = ::FinancialAssistance::Application.where(id: params[:application_id]).first
-          return Failure(I18n.t('faa.errors.unable_to_find_application_error')) if application.blank?
-          return Failure(I18n.t('faa.errors.given_application_is_not_submitted_error', valid_states: VALID_APPLICATION_STATES)) unless VALID_APPLICATION_STATES.include?(application.aasm_state)
+          return Failure({simple_error_message: I18n.t('faa.errors.unable_to_find_application_error')}) if application.blank?
+          return Failure({simple_error_message: I18n.t('faa.errors.given_application_is_not_submitted_error', valid_states: VALID_APPLICATION_STATES)}) unless VALID_APPLICATION_STATES.include?(application.aasm_state)
 
           Success(application)
         end
@@ -56,15 +56,18 @@ module FinancialAssistance
 
           if draft_app.valid?
             draft_app.save!
-            # Log additional information
             Success(draft_app)
           else
             # Log additional information
-            Failure(I18n.t('faa.errors.invalid_application'))
+            simple_error_message = I18n.t('faa.errors.invalid_application')
+            detailed_error_message = simple_error_message + " Errors: #{draft_app.errors.full_messages}"
+            Failure(simple_error_message: simple_error_message, detailed_error_message: detailed_error_message)
           end
-        rescue StandardError => _e
+        rescue StandardError => e
           # Log additional information
-          Failure(I18n.t('faa.errors.copy_application_error'))
+          simple_error_message = I18n.t('faa.errors.copy_application_error')
+          detailed_error_message = simple_error_message + " Error message: #{e.message}"
+          Failure(simple_error_message: simple_error_message, detailed_error_message: detailed_error_message)
         end
 
         def build_application(source_application, active_fms_applicant_params)
