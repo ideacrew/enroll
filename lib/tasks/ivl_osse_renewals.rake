@@ -12,13 +12,21 @@ namespace :reports do
       is_enrolled
     ]
 
-    file_name = "#{Rails.root}/public/ivl_osse_renewals_#{args[:renewal_year]}.csv"
+    year = args[:renewal_year]
+    file_name = "#{Rails.root}/public/ivl_osse_renewals_#{year}.csv"
 
     CSV.open(file_name, "w", force_quotes: true) do |csv|
-      puts "Started reporting #{args[:renewal_year]} IVL OSSE renewals"
+      puts "Started reporting #{year} IVL OSSE renewals"
       csv << field_names
 
-      Person.where(:'consumer_role.eligibilities' => {:$elemMatch => { key: "aca_ivl_osse_eligibility_#{args[:renewal_year]}".to_sym, current_state: :eligible } }).each do |person|
+      eligible_people = Person.where({
+        '$or' => [
+          { 'consumer_role.eligibilities' => { :$elemMatch => { key: "aca_ivl_osse_eligibility_#{year}".to_sym, current_state: :eligible }}},
+          { 'resident_role.eligibilities' => { :$elemMatch => { key: "aca_ivl_osse_eligibility_#{year}".to_sym, current_state: :eligible }}}
+        ]
+      })
+
+      eligible_people.no_timeout.each do |person|
         csv << [
           person.hbx_id,
           person.has_active_enrollment
