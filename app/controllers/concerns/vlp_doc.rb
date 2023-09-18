@@ -104,9 +104,12 @@ module VlpDoc
       tribal_state = person_params[:tribal_state]
       tribe_codes =  person_params[:tribe_codes]
       tribal_name = person_params[:tribal_name]
+      tribal_id = person_params[:tribal_id]
 
       if tribal_state == EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
         role.person.send("tribe_codes") != tribe_codes
+      elsif tribal_id.present?
+        role.person.send("tribal_id") != tribal_id
       else
         role.person.send("tribal_name") != tribal_name
       end
