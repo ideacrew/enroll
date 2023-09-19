@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'utils'
 
 namespace :dry_run do
@@ -28,7 +30,7 @@ namespace :dry_run do
         end
 
         if run_notices
-          notices_csv_headers = %W[family_id primary_applicant.person_hbx_id primary_applicant.full_name notice_title notice_description notice_date]
+          notices_csv_headers = %w[family_id primary_applicant.person_hbx_id primary_applicant.full_name notice_title notice_description notice_date]
           to_csv(notices_report_file, "w+") { |csv| csv << notices_csv_headers }
         end
 
@@ -45,13 +47,12 @@ namespace :dry_run do
             total_determined += 1 if renewed_app&.is_determined?
           end
 
-          if run_notices
-            # For each renewal eligible application, see if there are any notices generated for the primary applicant.
-            notices = notices_for_person(app.primary_applicant.person_hbx_id, dry_run_start_date, dry_run_end_date)
-            notices.each do |notice|
-              notices_csv_data = [app.family_id, app.primary_applicant.person_hbx_id, app.primary_applicant.full_name, notice.title, notice_description(notice.title), notice.created_at]
-              to_csv(notices_report_file) { |csv| csv << notices_csv_data }
-            end
+          next unless run_notices
+          # For each renewal eligible application, see if there are any notices generated for the primary applicant.
+          notices = notices_for_person(app.primary_applicant.person_hbx_id, dry_run_start_date, dry_run_end_date)
+          notices.each do |notice|
+            notices_csv_data = [app.family_id, app.primary_applicant.person_hbx_id, app.primary_applicant.full_name, notice.title, notice_description(notice.title), notice.created_at]
+            to_csv(notices_report_file) { |csv| csv << notices_csv_data }
           end
         end
 
@@ -125,7 +126,7 @@ namespace :dry_run do
     def each_renewal_eligible_app(renewal_year, batch_size = 1000)
       family_ids = ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id)
       family_ids.each_slice(batch_size) do |family_id_slice|
-        ::FinancialAssistance::Application.latest_determined_for_families(renewal_year.pred, family_id_slice).each do |app|
+        latest_determined_for_families(renewal_year.pred, family_id_slice).each do |app|
           yield app if app.eligible_for_renewal?
         end
       end
@@ -134,7 +135,38 @@ namespace :dry_run do
     # They are only candidates because for the sake of time we dont check the eligible_for_renewal? method and rather just check if there is a determined application for the family in the previous year.
     def missing_faa_renewal_candidates(renewal_year)
       family_ids = ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id)
-      ::FinancialAssistance::Application.latest_determined_for_families(renewal_year.pred, family_ids).pluck(:family_id) - ::FinancialAssistance::Application.by_year(renewal_year).where(:family_id.in => family_ids).pluck(:family_id)
+      latest_determined_for_families(renewal_year.pred, family_ids).pluck(:family_id) - ::FinancialAssistance::Application.by_year(renewal_year).where(:family_id.in => family_ids).pluck(:family_id)
+    end
+
+    # Retrieve the latest determined application for each family in the year prior to the renewal year.
+    def latest_determined_for_families(renewal_year, family_ids = nil)
+      renewal_year ||= TimeKeeper.date_of_record.year + 1
+      family_ids ||= ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id)
+      latest_applications = ::FinancialAssistance::Application.collection.aggregate([
+                                                                                      {
+                                                                                        '$match': {
+                                                                                          'assistance_year': renewal_year.pred,
+                                                                                          'aasm_state': 'determined',
+                                                                                          'family_id': { '$in': family_ids }
+                                                                                        }
+                                                                                      },
+                                                                                      {
+                                                                                        '$sort': {
+                                                                                          'family_id': 1,
+                                                                                          'created_at': -1
+                                                                                        }
+                                                                                      },
+                                                                                      {
+                                                                                        '$group': {
+                                                                                          '_id': '$family_id',
+                                                                                          'latest_application_id': { '$first': '$_id' }
+                                                                                        }
+                                                                                      }
+                                                                                    ])
+
+      latest_application_ids = latest_applications.map { |doc| doc['latest_application_id'] }
+
+      ::FinancialAssistance::Application.where(:_id.in => latest_application_ids)
     end
 
     # Try and find any know issues with the application that would prevent it from being renewed or re-determined.
