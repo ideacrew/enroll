@@ -106,15 +106,15 @@ module VlpDoc
       tribal_id = params.dig("person", "tribal_id")
 
       if tribal_state == EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
-        role.person.send("tribe_codes") != tribe_codes
+        role.person.tribe_codes != tribe_codes
       elsif tribal_id.present?
-        role.person.send("tribal_id") != tribal_id
+        role.person.tribal_id != tribal_id
       else
-        role.person.send("tribal_name") != tribal_name
+        role.person.tribal_name != tribal_name
       end
     else
       params_hash = params.permit("tribal_id").to_h
-      role.person.send("tribal_id") != params_hash["tribal_id"]
+      role.person.tribal_id != params_hash["tribal_id"]
     end
   end
 end
