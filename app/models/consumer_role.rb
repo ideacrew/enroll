@@ -703,10 +703,14 @@ class ConsumerRole
     invoke_verification! if [:dhs_pending, :ssa_pending].include?(aasm.current_state)
   end
 
+  def eligible_for_invoking_dhs?
+    [NATURALIZED_CITIZEN_STATUS, ALIEN_LAWFULLY_PRESENT_STATUS].include?(citizen_status)
+  end
+
   def invoke_verification!(*args)
     return if skip_residency_verification == true
     invoke_ssa if person.ssn.present? || is_native?
-    invoke_dhs
+    invoke_dhs if eligible_for_invoking_dhs?
   end
 
   def verify_ivl_by_admin(*args)
