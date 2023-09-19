@@ -76,7 +76,7 @@ module FinancialAssistance
           def fetch_evidence_due_date_for_bulk_actions(applicant_local_mec_evidence, response_evidence)
             return applicant_local_mec_evidence.due_on if applicant_local_mec_evidence.due_on.present?
             return unless response_evidence.request_results.any? do |result|
-              FinancialAssistance::Applicant::HUB_CALL_ACTION_TYPES.include?(result.action)
+              FinancialAssistance::Applicant::BULK_REDETERMINATION_ACTION_TYPES.include?(result.action)
             end
 
             TimeKeeper.date_of_record + EnrollRegistry[:bulk_call_verification_due_in_days].item.to_i
