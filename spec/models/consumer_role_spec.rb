@@ -560,12 +560,22 @@ context 'Verification process and notices' do
         end
       end
 
-      context 'coverage_purchased_no_residency' do
+      # DHS calls will not made for people who are 'us_citizen'
+      context 'coverage_purchased_no_residency with us_citizen' do
         it_behaves_like 'IVL state machine transitions and verification_types validation_status', '999001234', 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Social Security Number"],
                         "negative_response_received"
-        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '999001234', 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Citizenship"], "pending"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '999001234', 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Citizenship"], "negative_response_received"
         it_behaves_like 'IVL state machine transitions and verification_types validation_status', '111111111', 'us_citizen', :unverified, :ssa_pending, 'coverage_purchased_no_residency!', ["Social Security Number"], "pending"
-        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '111111111', 'us_citizen', :unverified, :ssa_pending, 'coverage_purchased_no_residency!', ["Citizenship"], "pending"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '111111111', 'us_citizen', :unverified, :ssa_pending, 'coverage_purchased_no_residency!', ["Citizenship"], "unverified"
+      end
+
+      # DHS calls will be made for people who are 'naturalized_citizen'
+      context 'coverage_purchased_no_residency with naturalized_citizen' do
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '999001234', 'naturalized_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Social Security Number"],
+                        "negative_response_received"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '999001234', 'naturalized_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Citizenship"], "pending"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '111111111', 'naturalized_citizen', :unverified, :ssa_pending, 'coverage_purchased_no_residency!', ["Social Security Number"], "pending"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '111111111', 'naturalized_citizen', :unverified, :ssa_pending, 'coverage_purchased_no_residency!', ["Citizenship"], "pending"
       end
     end
 
@@ -707,6 +717,9 @@ context 'Verification process and notices' do
           consumer.verification_types.each do |verif|
             if verif.type_name == 'American Indian Status'
               expect(verif.validation_status).to eq('negative_response_received')
+            elsif verif.type_name == 'Citizenship'
+              # Validation Status stays same as we will not make DHS call for people who are 'us_citizen'
+              expect(verif.validation_status).to eq('unverified')
             else
               expect(verif.validation_status).to eq('pending')
             end
