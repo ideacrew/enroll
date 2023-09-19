@@ -15,6 +15,7 @@ module FinancialAssistance
     embedded_in :application, class_name: "::FinancialAssistance::Application", inverse_of: :applicants
 
     TAX_FILER_KINDS = %w[tax_filer single joint separate dependent non_filer].freeze
+    BULK_REDETERMINATION_ACTION_TYPES = ["Bulk Call"].freeze
     STUDENT_KINDS = %w[
       dropped_out
       elementary
@@ -1320,10 +1321,11 @@ module FinancialAssistance
       save!
     end
 
-    def set_evidence_outstanding(evidence)
+    def set_evidence_outstanding(evidence, desired_due_date = nil)
       return unless evidence.may_move_to_outstanding?
 
       evidence.verification_outstanding = true
+      evidence.due_on = desired_due_date if desired_due_date.present?
       evidence.is_satisfied = false
       evidence.move_to_outstanding
       save!
