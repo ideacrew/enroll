@@ -337,7 +337,7 @@ describe FakesController do
 
       context "tribe codes have changed" do
 
-        before do 
+        before do
           allow(subject).to receive(:params).and_return params
         end
 
@@ -358,7 +358,7 @@ describe FakesController do
 
       context "tribe codes have not changed"  do
 
-        before do 
+        before do
           allow(subject).to receive(:params).and_return params
         end
 
@@ -382,7 +382,7 @@ describe FakesController do
 
       context "tribe name has changed" do
 
-        before do 
+        before do
           allow(subject).to receive(:params).and_return params
         end
 
@@ -403,7 +403,7 @@ describe FakesController do
 
       context "tribe name has not changed" do
 
-        before do 
+        before do
           allow(subject).to receive(:params).and_return params
         end
 
