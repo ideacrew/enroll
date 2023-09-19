@@ -330,13 +330,16 @@ describe FakesController do
 
     before :each do
       EnrollRegistry[:indian_alaskan_tribe_codes].feature.stub(:is_enabled).and_return(true)
-      allow(subject).to receive(:params).and_return params.deep_symbolize_keys
       allow(EnrollRegistry[:enroll_app].setting(:state_abbreviation)).to receive(:item).and_return('ME')
     end
 
     context "tribe located inside ME" do
 
       context "tribe codes have changed" do
+
+        before do 
+          allow(subject).to receive(:params).and_return params
+        end
 
         let(:params) do
           {
@@ -354,6 +357,10 @@ describe FakesController do
       end
 
       context "tribe codes have not changed"  do
+
+        before do 
+          allow(subject).to receive(:params).and_return params
+        end
 
         let(:params) do
           {
@@ -375,6 +382,10 @@ describe FakesController do
 
       context "tribe name has changed" do
 
+        before do 
+          allow(subject).to receive(:params).and_return params
+        end
+
         let(:params) do
           {
             'person' => {
@@ -391,6 +402,10 @@ describe FakesController do
       end
 
       context "tribe name has not changed" do
+
+        before do 
+          allow(subject).to receive(:params).and_return params
+        end
 
         let(:params) do
           {

@@ -100,11 +100,10 @@ module VlpDoc
     return unless role
 
     if EnrollRegistry.feature_enabled?(:indian_alaskan_tribe_codes)
-      person_params = params[:person]
-      tribal_state = person_params[:tribal_state]
-      tribe_codes =  person_params[:tribe_codes]
-      tribal_name = person_params[:tribal_name]
-      tribal_id = person_params[:tribal_id]
+      tribal_state = params.dig("person", "tribal_state")
+      tribe_codes =  params.dig("person", "tribe_codes")
+      tribal_name = params.dig("person", "tribal_name")
+      tribal_id = params.dig("person", "tribal_id")
 
       if tribal_state == EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
         role.person.send("tribe_codes") != tribe_codes
