@@ -79,7 +79,7 @@ module FinancialAssistance
               FinancialAssistance::Applicant::HUB_CALL_ACTION_TYPES.include?(result.action)
             end
 
-            TimeKeeper.date_of_record + EnrollRegistry[:bulk_call_verification_due_in_days].item
+            TimeKeeper.date_of_record + EnrollRegistry[:bulk_call_verification_due_in_days].item.to_i
           end
 
           def enrolled?(applicant, enrollments)

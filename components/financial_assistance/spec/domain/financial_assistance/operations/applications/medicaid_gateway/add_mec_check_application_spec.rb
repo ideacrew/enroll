@@ -171,7 +171,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
           end
 
           it 'should set due_on on local mec evidence' do
-            due_date = TimeKeeper.date_of_record + EnrollRegistry[:bulk_call_verification_due_in_days].item
+            due_date = TimeKeeper.date_of_record + EnrollRegistry[:bulk_call_verification_due_in_days].item.to_i
             @applicant.reload
             expect(@applicant.local_mec_evidence.aasm_state).to eq "outstanding"
             expect(@applicant.local_mec_evidence.due_on).to eq due_date
