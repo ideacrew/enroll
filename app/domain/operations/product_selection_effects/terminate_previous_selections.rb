@@ -50,8 +50,8 @@ module Operations
         coverage_bins = construct_continous_coverage_bins(impacted_enrollments)
         coverage_bins.each do |bin|
           bin.each_with_index do |previous_enrollment, index|
-            termination_args = index > 0 ? { "reason" => Enrollments::TerminationReasons::SUPERSEDED_SILENT } : {}
-            process_termination(enrollment, previous_enrollment, termination_args)
+            transition_args = index > 0 ? { "reason" => Enrollments::TerminationReasons::SUPERSEDED_SILENT } : {}
+            process_termination(enrollment, previous_enrollment, transition_args)
           end
         end
       end
@@ -75,14 +75,14 @@ module Operations
       end
       # rubocop:enable Style/SelfAssignment
 
-      def process_termination(enrollment, previous_enrollment, termination_args = {})
+      def process_termination(enrollment, previous_enrollment, transition_args = {})
         if enrollment.effective_on > previous_enrollment.effective_on && previous_enrollment.may_terminate_coverage?
           return if previous_enrollment.ineligible_for_termination?(enrollment.effective_on)
-          previous_enrollment.terminate_coverage!(enrollment.effective_on - 1.day)
+          previous_enrollment.terminate_coverage!(enrollment.effective_on - 1.day, transition_args)
         elsif previous_enrollment.enrollment_superseded_and_eligible_for_cancellation?(enrollment.effective_on)
-          previous_enrollment.cancel_coverage_for_superseded_term!(termination_args)
+          previous_enrollment.cancel_coverage_for_superseded_term!(transition_args)
         elsif previous_enrollment.may_cancel_coverage?
-          previous_enrollment.cancel_coverage!(termination_args)
+          previous_enrollment.cancel_coverage!(transition_args)
         end
       end
     end
