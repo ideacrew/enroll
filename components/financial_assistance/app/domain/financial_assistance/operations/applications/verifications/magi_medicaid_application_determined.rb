@@ -23,7 +23,7 @@ module FinancialAssistance
 
           def build_event(payload, application_id, local_mec_check)
             headers = { correlation_id: application_id }
-            headers = headers.merge!(payload_type: 'application', key: 'local_mec_check') if local_mec_check
+            headers.merge!(payload_type: 'application', key: 'local_mec_check') if local_mec_check
             event('events.iap.applications.magi_medicaid_application_determined', attributes: payload.to_h, headers: headers.merge!(payload_format))
           end
 
