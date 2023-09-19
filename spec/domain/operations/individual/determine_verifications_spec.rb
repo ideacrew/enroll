@@ -145,7 +145,7 @@ RSpec.describe Operations::Individual::DetermineVerifications, dbclean: :after_e
       context 'when validate_and_record_publish_errors feature is enabled' do
         let!(:person) {FactoryBot.create(:person, ssn: '999001234')}
         let!(:consumer_role) do
-          consumer = ConsumerRole.new(person: person, is_applicant: true, citizen_status: "us_citizen")
+          consumer = ConsumerRole.new(person: person, is_applicant: true, citizen_status: 'naturalized_citizen')
           consumer.ensure_verification_types
           consumer.save!
           consumer
@@ -185,7 +185,7 @@ RSpec.describe Operations::Individual::DetermineVerifications, dbclean: :after_e
       context 'when validate_and_record_publish_errors feature is disabled' do
         let!(:person) {FactoryBot.create(:person, ssn: '999001234')}
         let!(:consumer_role) do
-          consumer = ConsumerRole.new(person: person, is_applicant: true, citizen_status: "us_citizen")
+          consumer = ConsumerRole.new(person: person, is_applicant: true, citizen_status: 'naturalized_citizen')
           consumer.ensure_verification_types
           consumer.save!
           consumer
