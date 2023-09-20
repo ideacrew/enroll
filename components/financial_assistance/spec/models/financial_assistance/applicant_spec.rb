@@ -1464,11 +1464,13 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
         let(:current_evidence) { applicant.income_evidence }
 
-        it 'should set evidence verified' do
+        it 'should move evidence to outstanding and set due date' do
           expect(current_evidence.pending?).to be_truthy
+          expect(current_evidence.due_on).to eq nil
           applicant.set_evidence_outstanding(current_evidence)
           current_evidence.reload
           expect(current_evidence.verification_outstanding).to be_truthy
+          expect(current_evidence.due_on).not_to eq nil
         end
 
         it 'should set is_satisfied and verification_outstanding' do
