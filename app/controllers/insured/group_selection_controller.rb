@@ -7,7 +7,7 @@ class Insured::GroupSelectionController < ApplicationController
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   before_action :validate_rating_address, only: [:create]
   before_action :set_cache_headers, only: [:new, :edit_plan]
-  before_action :is_user_authorized?, only: [:edit_plan, :terminate_confirm, :term_or_cancel]
+  before_action :is_user_authorized?, only: [:new, :create, :edit_plan, :terminate_confirm, :term_or_cancel]
   # before_action :set_vars_for_market, only: [:new]
   # before_action :is_under_open_enrollment, only: [:new]
 
@@ -51,6 +51,7 @@ class Insured::GroupSelectionController < ApplicationController
     @shop_under_current = @adapter.shop_under_current
     @shop_under_future = @adapter.shop_under_future
     @new_effective_on = @adapter.calculate_new_effective_on(params)
+    fetch_effective_dates_for_dual_role
 
     @adapter.if_should_generate_coverage_family_members_for_cobra(params) do |cobra_members|
       @coverage_family_members_for_cobra = cobra_members
@@ -230,6 +231,17 @@ class Insured::GroupSelectionController < ApplicationController
 
   private
 
+  def person_has_dual_role?
+    @person.has_consumer_role? && @person.has_active_employee_role?
+  end
+
+  def fetch_effective_dates_for_dual_role
+    return unless person_has_dual_role?
+
+    @ivl_effective_on = @adapter.calculate_ivl_effective_on
+    @shop_effective_on = @adapter.calculate_new_effective_on(params)
+  end
+
   def revise_aptc_applied_total(params, enrollment_id)
     aptc_applied = params[:aptc_applied_total].delete_prefix('$')
     hbx_enrollment = HbxEnrollment.find(enrollment_id)
@@ -246,9 +258,9 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def is_user_authorized?
-    redirect_to root_path if current_user.blank? || params[:hbx_enrollment_id].blank?
+    redirect_to root_path if current_user.blank? || (params[:hbx_enrollment_id].blank? && @family.blank?)
 
-    family = HbxEnrollment.where(id: params[:hbx_enrollment_id]).first&.family
+    family = params[:hbx_enrollment_id].present? ? HbxEnrollment.where(id: params[:hbx_enrollment_id]).first&.family : @family
     redirect_to root_path if family.blank?
 
     return if current_user.has_hbx_staff_role? || is_family_authorized?(current_user, family) || is_broker_authorized?(current_user, family) || is_general_agency_authorized?(current_user, family)

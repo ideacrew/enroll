@@ -365,6 +365,30 @@ context 'Verification process and notices' do
         expect(person.consumer_role.native_validation).to eq(state)
       end
     end
+
+    context "native american verification types" do
+      let!(:person1) { FactoryBot.create(:person, :with_consumer_role, :with_valid_native_american_information) }
+      let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person1)}
+      let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, :with_enrollment_members, family: family, enrollment_members: family.family_members)}
+
+      before do
+        EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:indian_alaskan_tribe_codes].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:enroll_app].setting(:state_abbreviation)).to receive(:item).and_return('ME')
+        person.update_attributes!(tribal_state: "ME", tribe_codes: ["", "PE"])
+        v_type = VerificationType.new(type_name: "American Indian Status", validation_status: 'outstanding', inactive: false)
+        person1.verification_types << v_type
+        person1.save!
+      end
+
+      it "does not deactivate native american verification type" do
+        ai_an_type = person1.verification_types.where(type_name: "American Indian Status").first
+        ai_an_type.update_attributes!(validation_status: 'negative_response_received')
+        person1.save!
+        expect(ai_an_type.inactive).to eql(false)
+      end
+    end
+
     context "native validation doesn't exist" do
       it_behaves_like 'ensures native american field value', 'assigns', 'na', 'NON native american consumer', nil, nil
 
@@ -374,6 +398,37 @@ context 'Verification process and notices' do
       it_behaves_like 'ensures native american field value', 'assigns', 'pending', 'pending native american consumer', 'tribe', 'pending'
       it_behaves_like 'ensures native american field value', "doesn't change", 'outstanding', 'outstanding native american consumer', 'tribe', 'outstanding'
       it_behaves_like 'ensures native american field value', 'assigns', 'outstanding', 'na native american consumer', 'tribe', 'na'
+    end
+  end
+
+  describe "#check_tribal_name" do
+
+    before do
+      EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:indian_alaskan_tribe_codes].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:enroll_app].setting(:state_abbreviation)).to receive(:item).and_return('ME')
+
+    end
+
+    context "tribal state is ME" do
+
+      before do
+        person.update_attributes!(tribal_state: "ME", tribe_codes: ["", "PE"])
+      end
+
+      it "returns tribal codes" do
+        expect(person.consumer_role.check_tribal_name).to eq(["", "PE"])
+      end
+    end
+
+    context "tribal state is outside ME" do
+      before do
+        person.update_attributes!(tribal_state: "CA", tribe_codes: [], tribal_name: 'tribal name1')
+      end
+
+      it "returns tribal name" do
+        expect(person.consumer_role.check_tribal_name).to eq("tribal name1")
+      end
     end
   end
 
@@ -505,12 +560,22 @@ context 'Verification process and notices' do
         end
       end
 
-      context 'coverage_purchased_no_residency' do
+      # DHS calls will not made for people who are 'us_citizen'
+      context 'coverage_purchased_no_residency with us_citizen' do
         it_behaves_like 'IVL state machine transitions and verification_types validation_status', '999001234', 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Social Security Number"],
                         "negative_response_received"
-        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '999001234', 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Citizenship"], "pending"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '999001234', 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Citizenship"], "negative_response_received"
         it_behaves_like 'IVL state machine transitions and verification_types validation_status', '111111111', 'us_citizen', :unverified, :ssa_pending, 'coverage_purchased_no_residency!', ["Social Security Number"], "pending"
-        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '111111111', 'us_citizen', :unverified, :ssa_pending, 'coverage_purchased_no_residency!', ["Citizenship"], "pending"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '111111111', 'us_citizen', :unverified, :ssa_pending, 'coverage_purchased_no_residency!', ["Citizenship"], "unverified"
+      end
+
+      # DHS calls will be made for people who are 'naturalized_citizen'
+      context 'coverage_purchased_no_residency with naturalized_citizen' do
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '999001234', 'naturalized_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Social Security Number"],
+                        "negative_response_received"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '999001234', 'naturalized_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Citizenship"], "pending"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '111111111', 'naturalized_citizen', :unverified, :ssa_pending, 'coverage_purchased_no_residency!', ["Social Security Number"], "pending"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '111111111', 'naturalized_citizen', :unverified, :ssa_pending, 'coverage_purchased_no_residency!', ["Citizenship"], "pending"
       end
     end
 
@@ -652,6 +717,9 @@ context 'Verification process and notices' do
           consumer.verification_types.each do |verif|
             if verif.type_name == 'American Indian Status'
               expect(verif.validation_status).to eq('negative_response_received')
+            elsif verif.type_name == 'Citizenship'
+              # Validation Status stays same as we will not make DHS call for people who are 'us_citizen'
+              expect(verif.validation_status).to eq('unverified')
             else
               expect(verif.validation_status).to eq('pending')
             end
