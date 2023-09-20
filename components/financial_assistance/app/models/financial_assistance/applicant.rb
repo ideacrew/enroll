@@ -1326,7 +1326,7 @@ module FinancialAssistance
       evidence.verification_outstanding = true
       evidence.due_on = desired_due_date if desired_due_date.present?
       evidence.is_satisfied = false
-      evidence.due_on = schedule_verification_due_on if evidence.due_on.blank?
+      evidence.due_on = (desired_due_date || schedule_verification_due_on) if evidence.due_on.blank?
       evidence.move_to_outstanding
       save!
     end
