@@ -8,11 +8,14 @@ puts "OEQ_OEG_notice_triggers start_time: #{start_time}"
 failures = 0
 renewal_year = TimeKeeper.date_of_record.next_year.year
 
-_determined_applications = ::FinancialAssistance::Application.determined.by_year(renewal_year).distinct(:family_id)
-income_verification_required_applications = ::FinancialAssistance::Application.by_year(renewal_year).income_verification_extension_required.distinct(:family_id)
+oeg_family_ids = if EnrollRegistry.feature_enabled?(:oeg_notice_income_verification_only)
+                   ::FinancialAssistance::Application.by_year(renewal_year).income_verification_extension_required.distinct(:family_id)
+                 else
+                   ::FinancialAssistance::Application.determined.by_year(renewal_year).distinct(:family_id)
+                 end
 faa_application_families = ::FinancialAssistance::Application.by_year(renewal_year).distinct(:family_id)
 oeq_enrollments = HbxEnrollment.active.enrolled.current_year.where(:family_id.nin=> faa_application_families).distinct(:family_id)
-oeg_enrollments = HbxEnrollment.active.enrolled.current_year.where(:family_id.in=> income_verification_required_applications).distinct(:family_id)
+oeg_enrollments = HbxEnrollment.active.enrolled.current_year.where(:family_id.in=> oeg_family_ids).distinct(:family_id)
 families = oeq_enrollments + oeg_enrollments
 
 families.each_with_index do |family_id, index|
