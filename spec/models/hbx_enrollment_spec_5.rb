@@ -638,7 +638,7 @@ RSpec.describe HbxEnrollment, type: :model do
 
     context 'with terminated_on and additional transition args' do
       let(:terminated_on_date) { hbx_enrollment.effective_on.end_of_month }
-      let(:transition_args) { { reason: 'superseded_silent' } }
+      let(:transition_args) { { reason: Enrollments::TerminationReasons::SUPERSEDED_SILENT } }
 
       it 'assigns terminated_on without raising any error' do
         expect do
