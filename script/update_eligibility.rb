@@ -75,7 +75,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
         csr_int = csr_hash[person_hbx_id]
         csr_int = (csr_int == 'limited' ? '-1' : csr_int)
         person_fm = primary_family.family_members.active.where(person_id: person.id) if person.present?
-        unless person_fm.empty?
+        if person_fm.present?
           person_fm_id = person_fm.first.id
           person_thhm = active_thh.tax_household_members.where(applicant_id: person_fm_id).first
           next if person_thhm.csr_percent_as_integer == csr_int.to_i
@@ -98,8 +98,5 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
     end
 
   end
-  [ran: ran,
-   not_run: not_run,
-   updated_member_csr: updated_member_csr,
-   created_eligibility: created_eligibility]
+  puts "SUMMARY: #{[ran: ran, not_run: not_run, updated_member_csr: updated_member_csr, created_eligibility: created_eligibility]}"
 end
