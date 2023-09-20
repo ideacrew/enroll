@@ -571,6 +571,7 @@ class HbxEnrollment
     begin
       enrollment = BenefitSponsors::Factories::EnrollmentRenewalFactory.call(self, new_benefit_package)
       if enrollment.save
+        enrollment.update_osse_childcare_subsidy
         assignment = self.employee_role.census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id, enrollment.effective_on)
         assignment.update_attributes(hbx_enrollment_id: enrollment.id)
       else
@@ -2837,23 +2838,33 @@ class HbxEnrollment
   end
 
   def latest_wfst
-    workflow_state_transitions.order(created_at: :desc).first
+    @latest_wfst ||= workflow_state_transitions.order(created_at: :desc).first
+  end
+
+  def is_eligible_for_osse_grant?(key)
+    return false if is_shop? || dental?
+    hbx_enrollment_members.any? do |member|
+      member.is_eligible_for_osse_grant?(key, effective_on)
+    end
   end
 
   def ivl_osse_eligible?(new_effective_date = nil)
     return false if is_shop? || dental?
 
+    new_effective_date ||= effective_on
     hbx_enrollment_members.any? do |member|
       member.osse_eligible_on_effective_date?(new_effective_date)
     end
   end
 
   def update_osse_childcare_subsidy
+    return if dental?
+
     if is_shop?
-      effective_year = sponsored_benefit_package.start_on.year
-      return if coverage_kind.to_s == 'dental'
-      return unless employee_role&.osse_eligible?(effective_on)
+      application = sponsored_benefit_package.benefit_application
+      effective_year = application.start_on.year
       return unless shop_osse_eligibility_is_enabled?(effective_year)
+      return unless application.osse_eligible?
 
       osse_childcare_subsidy = osse_subsidy_for_member(primary_hbx_enrollment_member)
     else
@@ -2874,6 +2885,7 @@ class HbxEnrollment
     return if lcsp.nil?
 
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(self)
+    sponsored_cost_calculator.action = :calc_childcare_subsidy
     member_groups_lcsp = sponsored_cost_calculator.groups_for_products([lcsp])
 
     member_enrollment = member_groups_lcsp[0].group_enrollment.member_enrollments.detect{ |me| me.member_id.to_s == hbx_enrollment_member.id.to_s }
@@ -2884,6 +2896,7 @@ class HbxEnrollment
 
   def verify_and_reset_osse_subsidy_amount(member_group)
     return unless is_shop?
+
     hbx_enrollment_members.each do |member|
       next unless member.is_subscriber?
       product_price = member_group.group_enrollment.member_enrollments.find{|enrollment| enrollment.member_id == member.id }.product_price
@@ -2945,6 +2958,13 @@ class HbxEnrollment
       terminated_on.present? &&
       new_effective_on.present? &&
       (new_effective_on - 1.day) >= terminated_on
+  end
+
+  # Checks to see if the latest workflow state transition is 'superseded_silent'
+  def latest_wfst_is_superseded_silent?
+    latest_wfst.metadata_has?(
+      { 'reason' => Enrollments::TerminationReasons::SUPERSEDED_SILENT }
+    )
   end
 
   private

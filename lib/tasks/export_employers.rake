@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #RAILS_ENV=production bundle exec rake employers:export
 
 require 'csv'
@@ -19,11 +21,23 @@ namespace :employers do
 
     def published_on(application)
       return nil if application.blank? || application.workflow_state_transitions.blank?
-      application.workflow_state_transitions.where(:"event".in => ["approve_application", "approve_application!", "publish", "force_publish", "publish!", "force_publish!"]).first.try(:transition_at)
+      application.workflow_state_transitions.where(:event.in => ["approve_application", "approve_application!", "publish", "force_publish", "publish!", "force_publish!"]).first.try(:transition_at)
     end
 
-    def import_to_csv(csv, profile, package=nil, sponsored_benefit=nil)
+    def osse_eligibility(benefit_sponsorship)
+      year = TimeKeeper.date_of_record.year
+      osse_eligibility = benefit_sponsorship.eligibilities.where(key: "aca_shop_osse_eligibility_#{year}").first
+      if osse_eligibility&.eligible?
+        true
+      else
+        false
+      end
+    end
 
+    # rubocop:disable Metrics/AbcSize
+    # rubocop:disable Metrics/MethodLength
+    # rubocop:disable Metrics/CyclomaticComplexity
+    def import_to_csv(csv, profile, package = nil, sponsored_benefit = nil)
       primary_ol = profile.primary_office_location
       primary_address = primary_ol.address if primary_ol
 
@@ -49,7 +63,8 @@ namespace :employers do
 
       benefit_sponsorship ||= profile.active_benefit_sponsorship
 
-      if assigned_contribution_model = sponsored_benefit&.contribution_model
+      assigned_contribution_model = sponsored_benefit&.contribution_model
+      if assigned_contribution_model
         flexible_contributions_enabled  = (assigned_contribution_model.key.to_s == 'zero_percent_sponsor_fixed_percent_contribution_model') ? true : false
       end
 
@@ -69,7 +84,7 @@ namespace :employers do
         profile.entity_kind,
         profile.profile_source,
         benefit_sponsorship.aasm_state,
-        benefit_sponsorship.eligibility_for(:osse_subsidy, TimeKeeper.date_of_record).present?,
+        osse_eligibility(benefit_sponsorship),
         general_agency_account.try(:general_agency_profile).try(:legal_name),
         general_agency_account.try(:general_agency_profile).try(:fein),
         general_agency_account.try(:start_on),
@@ -124,42 +139,44 @@ namespace :employers do
         flexible_contributions_enabled || ''
       ]
     end
+    # rubocop:enable Metrics/AbcSize
+    # rubocop:enable Metrics/MethodLength
+    # rubocop:enable Metrics/CyclomaticComplexity
 
     CSV.open(file_name, "w") do |csv|
 
-      headers = %w(employer.legal_name employer.dba employer.fein employer.hbx_id employer.entity_kind employer_profile.profile_source employer.status employer_profile.osse_eligible? ga_fein ga_agency_name ga_start_on
-                                office_location.is_primary office_location.address.address_1 office_location.address.address_2
-                                office_location.address.city office_location.address.state office_location.address.zip mailing_location.address_1 mailing_location.address_2 mailing_location.city mailing_location.state mailing_location.zip
-                                office_location.phone.full_phone_number staff.name staff.phone staff.email
-                                employee offered spouce offered domestic_partner offered child_under_26 offered child_26_and_over
-                                offered benefit_group.title benefit_group.plan_option_kind
-                                benefit_group.carrier_for_elected_plan benefit_group.metal_level_for_elected_plan benefit_group.single_plan_type?
-                                benefit_group.reference_plan.name benefit_group.effective_on_kind benefit_group.effective_on_offset
-                                plan_year.start_on plan_year.end_on plan_year.open_enrollment_start_on plan_year.open_enrollment_end_on plan_year.osse_eligible?
-                                plan_year.fte_count plan_year.pte_count plan_year.msp_count plan_year.status plan_year.publish_date broker_agency_account.corporate_npn broker_agency_account.legal_name
-                                broker.name broker.npn broker.assigned_on flexible_contributions_enabled)
+      headers = %w[employer.legal_name employer.dba employer.fein employer.hbx_id employer.entity_kind employer_profile.profile_source employer.status employer_profile.osse_eligible? ga_fein ga_agency_name ga_start_on
+                   office_location.is_primary office_location.address.address_1 office_location.address.address_2
+                   office_location.address.city office_location.address.state office_location.address.zip mailing_location.address_1 mailing_location.address_2 mailing_location.city mailing_location.state mailing_location.zip
+                   office_location.phone.full_phone_number staff.name staff.phone staff.email
+                   employee offered spouce offered domestic_partner offered child_under_26 offered child_26_and_over
+                   offered benefit_group.title benefit_group.plan_option_kind
+                   benefit_group.carrier_for_elected_plan benefit_group.metal_level_for_elected_plan benefit_group.single_plan_type?
+                   benefit_group.reference_plan.name benefit_group.effective_on_kind benefit_group.effective_on_offset
+                   plan_year.start_on plan_year.end_on plan_year.open_enrollment_start_on plan_year.open_enrollment_end_on plan_year.osse_eligible?
+                   plan_year.fte_count plan_year.pte_count plan_year.msp_count plan_year.status plan_year.publish_date broker_agency_account.corporate_npn broker_agency_account.legal_name
+                   broker.name broker.npn broker.assigned_on flexible_contributions_enabled]
       csv << headers
 
       puts "No general agency profile for CCA Employers" unless general_agency_enabled?
 
       organizations.no_timeout.each do |organization|
-        begin
-          profile = organization.employer_profile
 
-          packages = profile.benefit_applications.map(&:benefit_packages).flatten
+        profile = organization.employer_profile
+        packages = profile.benefit_applications.map(&:benefit_packages).flatten
 
-          if packages.present?
-            packages.each do |package|
-              package.sponsored_benefits.each do |sponsored_benefit|
-                import_to_csv(csv, profile, package, sponsored_benefit)
-              end
+        if packages.present?
+          packages.each do |package|
+            package.sponsored_benefits.each do |sponsored_benefit|
+              import_to_csv(csv, profile, package, sponsored_benefit)
             end
-          else
-            import_to_csv(csv, profile)
           end
-        rescue Exception => e
-          puts "ERROR: #{organization.legal_name} " + e.message
+        else
+          import_to_csv(csv, profile)
         end
+      rescue StandardError => e
+        puts "ERROR: #{organization.legal_name} " + e.message
+
       end
 
     end

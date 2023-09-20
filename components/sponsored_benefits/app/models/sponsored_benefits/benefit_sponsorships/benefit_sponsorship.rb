@@ -40,7 +40,7 @@ module SponsoredBenefits
       field :contact_method, type: String, default: "Paper and Electronic communications"
 
       embeds_many :benefit_applications, class_name: "SponsoredBenefits::BenefitApplications::BenefitApplication"
-      has_many :eligibilities, class_name: "::Eligibilities::Osse::Eligibility", as: :eligibility
+      embeds_many :eligibilities, class_name: '::Eligible::Eligibility', as: :eligible, cascade_callbacks: true
 
       validates_presence_of :benefit_market, :contact_method
 
@@ -93,15 +93,24 @@ module SponsoredBenefits
         end
       end
 
-      def eligibility_for(evidence_key, start_on)
-        eligibilities.by_date(start_on).select do |eligibility|
-          el = eligibility.evidences.by_key(evidence_key).max_by(&:created_at)
-          el&.is_satisfied == true
-        end.last
+      def eligibilities_on(_date)
+        eligibilities.by_key(:bqt_osse_eligibility)
+      end
+
+      def eligibility_on(effective_date)
+        eligibilities_on(effective_date).last
+      end
+
+      def active_eligibilities_on(date)
+        eligibilities_on(date).select{|e| e.is_eligible_on?(date) }
+      end
+
+      def active_eligibility_on(effective_date)
+        active_eligibilities_on(effective_date).last
       end
 
       def osse_eligible?(start_on)
-        eligibility_for(:osse_subsidy, start_on).present? && EnrollRegistry.feature_enabled?(:broker_quote_hc4cc_subsidy)
+        eligibility_on(start_on).present? && EnrollRegistry.feature_enabled?(:broker_quote_osse_eligibility)
       end
 
       def save_inbox

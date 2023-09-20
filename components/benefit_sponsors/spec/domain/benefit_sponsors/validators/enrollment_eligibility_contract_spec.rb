@@ -14,8 +14,7 @@ RSpec.describe BenefitSponsors::Validators::EnrollmentEligibilityContract do
     {
       market_kind: market_kind,
       effective_date: effective_date,
-      benefit_sponsorship_id: benefit_sponsorship_id,
-      osse_min_employer_contribution: false
+      benefit_sponsorship_id: benefit_sponsorship_id
     }
   end
   let(:invalid_params)             { missing_params.merge({service_areas: service_area.as_json, benefit_application_kind: 'initial' })}

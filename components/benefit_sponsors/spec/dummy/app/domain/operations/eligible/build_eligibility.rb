@@ -19,6 +19,7 @@ module Operations
       # @option opts [Date]       :effective_date required
       # @option opts [ShopOsseEligibility]  :eligibility_record optional
       # @option opts [EvidenceConfiguration]  :evidence_configuration optional
+      # @option opts [Hash]       :timestamps optional timestamps for data migrations purposes
       # @return [Dry::Monad] result
       def call(params)
         values = yield validate(params)
@@ -37,7 +38,7 @@ module Operations
         errors << "subject missing" unless params[:subject]
         errors << "evidence key missing" unless params[:evidence_key]
         errors << "evidence value missing" unless params[:evidence_value]
-        errors << "effective date missing" unless params[:effective_date]
+        errors << "effective date missing or it should be a date" unless params[:effective_date].is_a?(::Date)
 
         errors.empty? ? Success(params) : Failure(errors)
       end
@@ -73,6 +74,7 @@ module Operations
               e[:_id].to_s == evidence_options[:_id].to_s
             end
         end
+
         if index
           options[:evidences][index] = evidence_options
         else
@@ -80,7 +82,7 @@ module Operations
         end
 
         options[:state_histories] ||= []
-        new_state_history = build_state_history(values, evidence_options)
+        new_state_history = build_elgibility_state_history(values, options[:evidences])
         options[:state_histories] << new_state_history
         options[:current_state] = new_state_history[:to_state]
 
@@ -102,30 +104,28 @@ module Operations
       end
 
       def build_grants
-        configuration.grants.collect do |key|
-          BuildGrant.new.call(grant_key: key, grant_value: true).success
+        configuration.grants.compact.collect do |value_pair|
+          params = { grant_key: value_pair[0], grant_value: value_pair[1].to_s }
+          result = BuildGrant.new.call(params)
+          result.success? ? result.value! : nil
         end
       end
 
-      def build_state_history(values, evidence_options)
-        to_state = to_state_for(evidence_options)
+      def build_elgibility_state_history(values, evidences_options)
+        to_state = configuration.to_state_for(evidences_options)
         from_state =
           values[:eligibility_record]&.state_histories&.last&.to_state
 
-        {
+        options = {
           event: "move_to_#{to_state}".to_sym,
           transition_at: DateTime.now,
           effective_on: values[:effective_date],
           from_state: from_state || :initial,
           to_state: to_state,
-          is_eligible: evidence_options[:is_satisfied]
+          is_eligible: (to_state == :eligible)
         }
-      end
-
-      def to_state_for(evidence_options)
-        latest_history = evidence_options[:state_histories].last
-
-        configuration.to_state_for(latest_history[:to_state])
+        options[:timestamps] = values[:timestamps] if values[:timestamps]
+        options
       end
     end
   end

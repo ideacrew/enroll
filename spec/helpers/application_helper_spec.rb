@@ -895,15 +895,9 @@ describe "Enabled/Disabled IVL market" do
   end
 
   describe "#plan_childcare_subsidy_eligible" do
-
-    let(:plan) {double("Plan")}
+    let(:plan) {double("Plan", :is_eligible_for_osse_grant? => false)}
 
     context "when aca_ivl_osse_subsidy feature is disabled" do
-
-      before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_ivl_osse_subsidy).and_return(false)
-      end
-
       it "returns false" do
         expect(helper.plan_childcare_subsidy_eligible(plan)).to eq(false)
       end
