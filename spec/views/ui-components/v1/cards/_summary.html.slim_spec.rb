@@ -211,7 +211,7 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
     end
 
     it 'should include latest transition text' do
-      expect(rendered).to have_content(l10n('enrollment.latest_transition'))
+      expect(rendered).to have_content(l10n('enrollment.transitions'))
     end
 
     it 'should include Product HIOS ID text' do
@@ -249,7 +249,7 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
     end
 
     it 'should not include latest transition text' do
-      expect(rendered).to_not have_content(l10n('enrollment.latest_transition'))
+      expect(rendered).to_not have_content(l10n('enrollment.transitions'))
     end
 
     it 'should not include Product HIOS ID text' do
@@ -277,7 +277,7 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
     end
 
     it 'should not include latest transition text' do
-      expect(rendered).to_not have_content(l10n('enrollment.latest_transition'))
+      expect(rendered).to_not have_content(l10n('enrollment.transitions'))
     end
 
     it 'should not include Product HIOS ID text' do
@@ -314,7 +314,7 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
     end
 
     it 'should include latest transition text' do
-      expect(rendered).to have_content(l10n('enrollment.latest_transition'))
+      expect(rendered).to have_content(l10n('enrollment.transitions'))
     end
 
     it 'should include Product HIOS ID text' do
@@ -344,7 +344,7 @@ RSpec.describe "_summary.html.slim.rb", :type => :view, dbclean: :after_each  do
     end
 
     it 'should not include latest transition text' do
-      expect(rendered).to_not have_content(l10n('enrollment.latest_transition'))
+      expect(rendered).to_not have_content(l10n('enrollment.transitions'))
     end
 
     it 'should not include Product HIOS ID text' do
