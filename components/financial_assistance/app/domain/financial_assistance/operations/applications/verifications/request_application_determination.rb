@@ -34,13 +34,13 @@ module FinancialAssistance
             payload_entity = ::Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application)
             evidence_types = Array.new(::FinancialAssistance::Applicant::EVIDENCES)
             invalid_income_evidence_errors_by_id = []
-            
+
             if payload_entity.success? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
               applicant_evidence_validations = payload_entity.value!.applicants.map do |mma_applicant|
                 # create an array of all evidence types held by the applicant
                 applicant_evidence_keys = evidence_types.map { |evidence_type| mma_applicant.send(evidence_type)&.key }.compact
                 faa_applicant = application.applicants.find_by { |a| a.person_hbx_id == mma_applicant.person_hbx_id }
-                
+
                 # need to run validations against all evidence types for all applicants -- different evidence types _may_ require different validations
                 applicant_evidence_keys.map do |evidence_key|
                   evidence_validation = ::Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules.new.call(mma_applicant, evidence_key)
