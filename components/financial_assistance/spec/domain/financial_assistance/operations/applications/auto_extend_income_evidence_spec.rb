@@ -59,20 +59,20 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
 
   let!(:income_evidence2) do
     applicant2.create_income_evidence(key: :income,
-                                     title: 'Income',
-                                     aasm_state: 'pending',
-                                     due_on: TimeKeeper.date_of_record,
-                                     verification_outstanding: true,
-                                     is_satisfied: false)
+                                      title: 'Income',
+                                      aasm_state: 'pending',
+                                      due_on: TimeKeeper.date_of_record,
+                                      verification_outstanding: true,
+                                      is_satisfied: false)
   end
 
   let!(:income_evidence3) do
     applicant3.create_income_evidence(key: :income,
-                                     title: 'Income',
-                                     aasm_state: 'outstanding',
-                                     due_on: TimeKeeper.date_of_record + 2.weeks,
-                                     verification_outstanding: true,
-                                     is_satisfied: false)
+                                      title: 'Income',
+                                      aasm_state: 'outstanding',
+                                      due_on: TimeKeeper.date_of_record + 2.weeks,
+                                      verification_outstanding: true,
+                                      is_satisfied: false)
   end
 
   context 'success' do
