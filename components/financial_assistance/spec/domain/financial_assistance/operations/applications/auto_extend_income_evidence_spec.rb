@@ -51,11 +51,11 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
   describe 'extending income evidence verification due date on an individual applicant level' do
     let!(:income_evidence) do
       applicant.create_income_evidence(key: :income,
-                                        title: 'Income',
-                                        aasm_state: 'outstanding',
-                                        due_on: TimeKeeper.date_of_record,
-                                        verification_outstanding: true,
-                                        is_satisfied: false)
+                                       title: 'Income',
+                                       aasm_state: 'outstanding',
+                                       due_on: TimeKeeper.date_of_record,
+                                       verification_outstanding: true,
+                                       is_satisfied: false)
     end
 
     let!(:income_evidence2) do
@@ -212,29 +212,29 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
 
     let!(:income_evidence_1) do
       applicant.create_income_evidence(key: :income,
-                                         title: 'Income',
-                                         aasm_state: 'outstanding',
-                                         due_on: applicant_1_due_date,
-                                         verification_outstanding: true,
-                                         is_satisfied: false)
+                                       title: 'Income',
+                                       aasm_state: 'outstanding',
+                                       due_on: applicant_1_due_date,
+                                       verification_outstanding: true,
+                                       is_satisfied: false)
     end
 
     let!(:income_evidence_2) do
       applicant2.create_income_evidence(key: :income,
-                                         title: 'Income',
-                                         aasm_state: 'outstanding',
-                                         due_on: applicant_2_due_date,
-                                         verification_outstanding: true,
-                                         is_satisfied: false)
+                                        title: 'Income',
+                                        aasm_state: 'outstanding',
+                                        due_on: applicant_2_due_date,
+                                        verification_outstanding: true,
+                                        is_satisfied: false)
     end
 
     let!(:income_evidence_3) do
       applicant3.create_income_evidence(key: :income,
-                                         title: 'Income',
-                                         aasm_state: 'outstanding',
-                                         due_on: applicant_3_due_date,
-                                         verification_outstanding: true,
-                                         is_satisfied: false)
+                                        title: 'Income',
+                                        aasm_state: 'outstanding',
+                                        due_on: applicant_3_due_date,
+                                        verification_outstanding: true,
+                                        is_satisfied: false)
     end
 
     before do
@@ -244,7 +244,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:include_faa_outstanding_verifications).and_return(true)
       family.create_eligibility_determination
       family.eligibility_determination.update!(outstanding_verification_status: 'outstanding',
-                                               outstanding_verification_earliest_due_date: (TimeKeeper.date_of_record),
+                                               outstanding_verification_earliest_due_date: TimeKeeper.date_of_record,
                                                outstanding_verification_document_status: 'Partially Uploaded')
     end
 
