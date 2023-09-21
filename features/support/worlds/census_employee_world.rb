@@ -19,7 +19,10 @@ module CensusEmployeeWorld
       employee_role: attributes[:employee_role],
       rating_area_id: attributes[:rating_area_id],
       sponsored_benefit_id: attributes[:sponsored_benefit_id],
-      sponsored_benefit_package_id: attributes[:sponsored_benefit_package_id]
+      sponsored_benefit_package_id: attributes[:sponsored_benefit_package_id],
+      enrollment_members: attributes[:family].family_members.to_a,
+      effective_on: attributes[:effective_on],
+      product_id: attributes[:product_id]
     )
   end
 
@@ -209,6 +212,19 @@ Given(/^there exists (.*?) employee for employer (.*?)(?: and (.*?))?$/) do |nam
   end
 end
 
+And(/employee (.*?) of (.*?) has DOB after plan year start/) do |named_person, legal_name|
+  sponsorship = employer(legal_name).benefit_sponsorships.first
+  application = sponsorship.benefit_applications.active.first
+  application_begin =  application.start_on
+
+  person = people[named_person]
+  person_record = Person.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
+  new_date = application_begin + 10.days
+  new_dob = Date.new(person_record.dob.year, new_date.month, new_date.day)
+
+  person_record.update(dob: new_dob)
+end
+
 And(/employee (.*?) has (.*?) hired on date/) do |named_person, ee_hire_date|
   date = ee_hire_date == "current" ? TimeKeeper.date_of_record : (TimeKeeper.date_of_record - 1.year).beginning_of_year
   person = people[named_person]
@@ -245,7 +261,6 @@ And(/employee (.*) already matched with employer (.*?)(?: and (.*?))? and logged
                                                                                                                          census_employee_id: ce.id,
                                                                                                                          benefit_sponsors_employer_profile_id: profile.id,
                                                                                                                          hired_on: ce.hired_on)
-
   sponsorship.benefit_applications.each do |benefit_application|
     benefit_application.benefit_packages.each do |benefit_package|
       ce.add_benefit_group_assignment(benefit_package) unless ce.benefit_group_assignments.any?{|bga| bga.benefit_package == benefit_package}
@@ -349,9 +364,10 @@ And(/^employees for (.*?) have a selected coverage$/) do |legal_name|
                     employee_role: @census_employees.first.employee_role,
                     sponsored_benefit_package_id: benefit_package.id,
                     rating_area_id: rating_area_id,
-                    sponsored_benefit_id: sponsored_benefit_id}, :with_health_product)
+                    product_id: benefit_package.health_sponsored_benefit.reference_product.id,
+                    effective_on: benefit_package.start_on,
+                    sponsored_benefit_id: sponsored_benefit_id})
 end
-
 
 And(/employees for employer (.*?) have selected a coverage$/) do |legal_name|
   employer_profile = employer(legal_name).employer_profile

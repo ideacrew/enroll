@@ -6,7 +6,7 @@ FactoryBot.define do
 
     after(:build) do |premium_table, evaluator|
       (0..65).each do |age| # build tuple for default product premium ages
-        premium_table.premium_tuples << build_list(:benefit_markets_products_premium_tuple, 1, age: age, cost: 200)
+        premium_table.premium_tuples << build_list(:benefit_markets_products_premium_tuple, 1, age: age, cost: (200 + (age*5)))
       end
     end
   end
