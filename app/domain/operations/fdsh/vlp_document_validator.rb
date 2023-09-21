@@ -3,7 +3,7 @@
 module Operations
   module Fdsh
     # This class provides a way to validate immigration documents based on their type and required fields using monadic abstractions for error handling and control flow
-    class VlpDocumentTypeValidator
+    class VlpDocumentValidator
       include Dry::Monads[:result, :do, :try]
 
       REQUIRED_FIELDS = {

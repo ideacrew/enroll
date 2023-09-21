@@ -12,7 +12,7 @@ module Operations
         # # Define the validation rules for each request type
         RULES = {
           ssa: [:validate_ssn],
-          dhs: [],
+          dhs: [:validate_vlp_documents],
           local_residency: [],
           income: [:validate_ssn],
           esi_mec: [:validate_ssn],
@@ -21,9 +21,9 @@ module Operations
         }.freeze
 
         # Call the validation process for the given payload and request type
-        def call(payload_entity, request_type)
-          yield validate(payload_entity, request_type)
-          rules_verified = yield process(payload_entity, request_type)
+        def call(entity_obj, request_type)
+          yield validate(entity_obj, request_type)
+          rules_verified = yield process(entity_obj, request_type)
 
           Success(rules_verified)
         end
@@ -36,12 +36,15 @@ module Operations
           Success()
         end
 
-        # Process the validation rules for the given payload and request type
-        def process(payload, request_type)
+        # Processes the validation rules for a given entity object and request type.
+        #
+        # @param entity_obj [Object] The entity object is a person_entity or applicant_entity.
+        # @param request_type [Symbol] The request type is one of the keys from RULES.
+        # @return [Dry::Monads::Result] A monadic result indicating success or failure.
+        def process(entity_obj, request_type)
           rules = RULES[request_type]
-          result = rules.map { |rule| send(rule, payload) }.flatten.compact
+          result = rules.map { |rule| send(rule, entity_obj) }.flatten.compact
 
-          # Return a Failure result if any of the validation rules fail
           if result.any?(Failure)
             errors = result.select { |r| r.is_a?(Failure) }.map(&:failure)
             Failure(errors)
