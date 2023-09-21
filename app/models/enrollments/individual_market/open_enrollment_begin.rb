@@ -99,6 +99,6 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
   end
 
   def osse_enabled
-    @osse_enabled ||= renewal_bcp.eligibility_on(renewal_effective_on)
+    @osse_enabled ||= renewal_bcp.eligibility_on(renewal_effective_on).present?
   end
 end
