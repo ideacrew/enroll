@@ -147,7 +147,7 @@ PATH
       mongoid-autoinc (~> 6.0)
       pundit (~> 2.0)
       rails (~> 5.2.4.3)
-      roo (~> 2.1)
+      roo (~> 2.7.0)
       slim (~> 3.0)
       symmetric-encryption (= 3.9.1)
       virtus (~> 1.0)
@@ -187,7 +187,7 @@ PATH
       pundit (~> 2.0)
       rails (~> 5.2.4.3)
       redcarpet (~> 3.4.0)
-      roo (~> 2.1.0)
+      roo (~> 2.7.0)
       slim (= 3.0.9)
       virtus (~> 1.0.5)
       wicked_pdf (= 1.1.0)
@@ -213,7 +213,7 @@ PATH
       mongoid (~> 7.0.2)
       pundit (~> 2.0)
       rails (~> 5.2.4.3)
-      roo (~> 2.1.0)
+      roo (~> 2.7.0)
       sass (~> 3.7.3)
       slim (~> 3.0.8)
       symmetric-encryption
@@ -822,7 +822,7 @@ GEM
       resque (>= 1.26)
       rufus-scheduler (~> 3.2)
     rexml (3.2.6)
-    roo (2.1.1)
+    roo (2.7.1)
       nokogiri (~> 1)
       rubyzip (~> 1.1, < 2.0.0)
     rspec (3.9.0)
@@ -1128,7 +1128,7 @@ DEPENDENCIES
   redis-rails (~> 5.0.2)
   resource_registry!
   resque (~> 1.26.0)
-  roo (~> 2.1)
+  roo (~> 2.7.0)
   rspec-benchmark
   rspec-instafail (~> 1)
   rspec-rails
