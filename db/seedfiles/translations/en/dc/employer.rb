@@ -35,7 +35,6 @@ EMPLOYER_TRANSLATIONS = {
   :'en.osse_eligibility_question' => 'Does this business qualify for HC4CC subsidies?',
   :'en.osse_bqt_eligibility_question' => 'Are you creating a quote for a business participating in HC4CC?',
   :'en.osse_eligibility_ivl_question' => 'Does this consumer qualify for HC4CC?',
-  :'en.eligibility_history' => 'View eligibility history',
   :'en.osse_subsidy_title' => 'HealthCare4ChildCare (HC4CC) Program',
   :'en.ivl_osse_subsidy_title_line_1' => 'HealthCare4ChildCare Through DC Health Link:',
   :'en.ivl_osse_subsidy_title_line_2' => 'Affordable health coverage for early childhood providers and their teams',
