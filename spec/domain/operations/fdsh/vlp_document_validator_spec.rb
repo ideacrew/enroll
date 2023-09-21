@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Operations::Fdsh::VlpDocumentValidator do
   let(:validator) { described_class.new }
 
