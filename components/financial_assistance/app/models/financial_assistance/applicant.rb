@@ -1284,7 +1284,6 @@ module FinancialAssistance
         aptc_or_csr_used = enrollment.applied_aptc_amount > 0 || ['02', '04', '05', '06'].include?(enrollment.product.csr_variant_id)
 
         if aptc_or_csr_used && ['pending', 'negative_response_received'].include?(evidence.aasm_state)
-          evidence.due_on = schedule_verification_due_on if evidence.due_on.blank?
           set_evidence_outstanding(evidence)
         elsif !aptc_or_csr_used
           set_evidence_to_negative_response(evidence)
@@ -1327,6 +1326,7 @@ module FinancialAssistance
       evidence.verification_outstanding = true
       evidence.due_on = desired_due_date if desired_due_date.present?
       evidence.is_satisfied = false
+      evidence.due_on = (desired_due_date || schedule_verification_due_on) if evidence.due_on.blank?
       evidence.move_to_outstanding
       save!
     end

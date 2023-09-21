@@ -149,7 +149,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
             @applicant.reload
             expect(@applicant.local_mec_evidence.aasm_state).to eq "outstanding"
             expect(@applicant.local_mec_evidence.request_results.present?).to eq true
-            expect(@applicant.local_mec_evidence.due_on).to eq nil
+            expect(@applicant.local_mec_evidence.due_on).not_to eq nil
             expect(@result.success).to eq('Successfully updated Applicant with evidences and verifications')
           end
         end
