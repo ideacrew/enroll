@@ -7,7 +7,7 @@ def start_date_of_next_year
   @start_date_of_next_year ||= TimeKeeper.date_of_record.next_year.beginning_of_year
 end
 
-report_name = "#{Rails.root}/eligibilities_not_updated_list_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
+report_name = "#{Rails.root}/eligibilities_updated_list_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
 field_names = %w(
         primary_ssn
         primary_hbx_id
