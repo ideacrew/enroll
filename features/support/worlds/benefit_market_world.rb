@@ -219,7 +219,19 @@ module BenefitMarketWorld
       title: "SHOP Benefits for #{effective_date.year}",
       application_period: (effective_date.beginning_of_year..effective_date.end_of_year)
     )
-    create_catalog_eligibility(@benefit_market_catalog)
+    result = create_catalog_eligibility(@benefit_market_catalog)
+    if result.success?
+      health_product = BenefitMarkets::Products::Product.by_year(2023).by_kind(:health).first
+      effective_year_for_lcsp = @benefit_market_catalog.application_period.begin.year
+      feature_key = "lowest_cost_silver_product_#{effective_year_for_lcsp}"
+      if EnrollRegistry.feature?(feature_key)
+        hios_id = EnrollRegistry[feature_key].item
+        health_product.update_attributes(
+          hios_id: hios_id,
+          hios_base_id: hios_id.split("-")[0]
+        ) if hios_id
+      end
+    end
     @benefit_market_catalog
   end
 end

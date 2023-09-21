@@ -367,6 +367,8 @@ And(/^employees for (.*?) have a selected coverage$/) do |legal_name|
                     product_id: benefit_package.health_sponsored_benefit.reference_product.id,
                     effective_on: benefit_package.start_on,
                     sponsored_benefit_id: sponsored_benefit_id})
+
+  @hbx_enrollment&.update_osse_childcare_subsidy
 end
 
 And(/employees for employer (.*?) have selected a coverage$/) do |legal_name|
