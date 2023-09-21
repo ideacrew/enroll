@@ -55,7 +55,8 @@ module FinancialAssistance
             if applicant_local_mec_evidence.present?
               if response_evidence.aasm_state == 'outstanding'
                 if enrolled?(applicant, enrollments)
-                  applicant.set_evidence_outstanding(applicant_local_mec_evidence)
+                  due_date = fetch_evidence_due_date_for_bulk_actions(applicant_local_mec_evidence, response_evidence)
+                  applicant.set_evidence_outstanding(applicant_local_mec_evidence, due_date)
                 else
                   applicant.set_evidence_to_negative_response(applicant_local_mec_evidence)
                 end
@@ -70,6 +71,15 @@ module FinancialAssistance
             end
 
             Success(applicant)
+          end
+
+          def fetch_evidence_due_date_for_bulk_actions(applicant_local_mec_evidence, response_evidence)
+            return applicant_local_mec_evidence.due_on if applicant_local_mec_evidence.due_on.present?
+            return unless response_evidence.request_results.any? do |result|
+              FinancialAssistance::Applicant::BULK_REDETERMINATION_ACTION_TYPES.include?(result.action)
+            end
+
+            TimeKeeper.date_of_record + EnrollRegistry[:bulk_call_verification_due_in_days].item.to_i
           end
 
           def enrolled?(applicant, enrollments)
