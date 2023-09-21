@@ -8,7 +8,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   CAT_AGE_OFF_HIOS_IDS = ["94506DC0390008", "86052DC0400004"]
 
   def initialize
-    @logger = Logger.new("#{Rails.root}/log/ivl_open_enrollment_begin_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log") unless defined? @logger
+    @logger = Logger.new("#{Rails.root}/log/family_enrollment_renewal_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
   end
 
   def renew
