@@ -8,8 +8,8 @@ module Operations
 
       REQUIRED_FIELDS = {
         'I-327 (Reentry Permit)' => {
-          required: ['i94_number'],
-          error_message: 'i94_number Number is required for I-327 (Reentry Permit)'
+          required: ['alien_number'],
+          error_message: 'alien_number Number is required for I-327 (Reentry Permit)'
         },
         'I-551 (Permanent Resident Card)' => {
           required: ['alien_number', 'receipt_number'],
@@ -32,7 +32,7 @@ module Operations
           error_message: 'Naturalization Number is required for Naturalization Certificate'
         },
         'Machine Readable Immigrant Visa (with Temporary I-551 Language)' => {
-          required: ['alien_number', 'passport_number', 'three_letter_country_of_citizenship'],
+          required: ['alien_number', 'passport_number', 'country_of_citizenship'],
           error_message: 'Alien Number, Passport Number, and Three Letter Country of Citizenship are required for Machine Readable Immigrant Visa (with Temporary I-551 Language)'
         },
         'Temporary I-551 Stamp (on passport or I-94)' => {
@@ -44,11 +44,11 @@ module Operations
           error_message: 'I-94 Number is required for I-94 (Arrival/Departure Record)'
         },
         'I-94 (Arrival/Departure Record) in Unexpired Foreign Passport' => {
-          required: ['i94_number', 'passport_number', 'three_letter_country_of_citizenship', 'expiration_date'],
+          required: ['i94_number', 'passport_number', 'country_of_citizenship', 'expiration_date'],
           error_message: 'I-94 Number, Passport Number, Three Letter Country of Citizenship, and Expiration Date are required for I-94 (Arrival/Departure Record) in Unexpired Foreign Passport'
         },
         'Unexpired Foreign Passport' => {
-          required: ['passport_number', 'three_letter_country_of_citizenship', 'expiration_date'],
+          required: ['passport_number', 'country_of_citizenship', 'expiration_date'],
           error_message: 'Passport Number, Three Letter Country of Citizenship, and Expiration Date are required for Unexpired Foreign Passport'
         },
         'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' => {
