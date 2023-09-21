@@ -704,7 +704,7 @@ class ConsumerRole
   end
 
   def eligible_for_invoking_dhs?
-    [NATURALIZED_CITIZEN_STATUS, ALIEN_LAWFULLY_PRESENT_STATUS].include?(citizen_status)
+    is_applying_coverage && [NATURALIZED_CITIZEN_STATUS, ALIEN_LAWFULLY_PRESENT_STATUS].include?(citizen_status)
   end
 
   def invoke_verification!(*args)
