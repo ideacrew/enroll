@@ -34,11 +34,14 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
       include_context 'ACES MEC Check sample response'
 
       let(:payload) { response_payload }
+      let(:due_on) { nil }
+      let(:aasm_state) { 'attested' }
 
       before do
         enrollment
         @applicant = application.applicants.first
-        @applicant.build_local_mec_evidence(key: :local_mec, title: "Local MEC")
+        @applicant.build_local_mec_evidence(key: :local_mec, title: "Local MEC", aasm_state: aasm_state,
+                                            due_on: due_on)
         @applicant.save
         @result = subject.call(payload)
 
@@ -96,6 +99,45 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
           end
         end
 
+        context 'Bulk Local Mec call and not enrolled' do
+          let(:request_result_hash) do
+            {
+              :result => "eligible",
+              :source => "MEDC",
+              :code => "7313",
+              :code_description => "Applicant Not Found",
+              :action => 'Bulk Call'
+            }
+          end
+
+
+          it 'should return success' do
+            expect(@result).to be_success
+          end
+
+          it 'should not set due_on on local mec evidence' do
+            @applicant.reload
+            expect(@applicant.local_mec_evidence.aasm_state).to eq "negative_response_received"
+            expect(@applicant.local_mec_evidence.due_on).to eq nil
+          end
+        end
+
+        context 'Bulk Local Mec call, enrolled and due date already exists on evidence' do
+          let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, family: family, enrollment_members: family.family_members) }
+          let(:due_on) { TimeKeeper.date_of_record }
+          let(:aasm_state) { 'outstanding' }
+
+          it 'should return success' do
+            expect(@result).to be_success
+          end
+
+          it 'should not update due_on on local mec evidence' do
+            @applicant.reload
+            expect(@applicant.local_mec_evidence.aasm_state).to eq "outstanding"
+            expect(@applicant.local_mec_evidence.due_on).to eq TimeKeeper.date_of_record
+          end
+        end
+
         context 'when enrolled' do
           let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, family: family, enrollment_members: family.family_members) }
 
@@ -107,7 +149,32 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
             @applicant.reload
             expect(@applicant.local_mec_evidence.aasm_state).to eq "outstanding"
             expect(@applicant.local_mec_evidence.request_results.present?).to eq true
+            expect(@applicant.local_mec_evidence.due_on).not_to eq nil
             expect(@result.success).to eq('Successfully updated Applicant with evidences and verifications')
+          end
+        end
+
+        context "Bulk Local Mec call and enrolled" do
+          let(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, family: family, enrollment_members: family.family_members) }
+          let(:request_result_hash) do
+            {
+              :result => "eligible",
+              :source => "MEDC",
+              :code => "7313",
+              :code_description => "Applicant Not Found",
+              :action => 'Bulk Call'
+            }
+          end
+
+          it 'should return success' do
+            expect(@result).to be_success
+          end
+
+          it 'should set due_on on local mec evidence' do
+            due_date = TimeKeeper.date_of_record + EnrollRegistry[:bulk_call_verification_due_in_days].item.to_i
+            @applicant.reload
+            expect(@applicant.local_mec_evidence.aasm_state).to eq "outstanding"
+            expect(@applicant.local_mec_evidence.due_on).to eq due_date
           end
         end
       end
