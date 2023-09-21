@@ -31,12 +31,10 @@ module Subscribers
         family = Family.find(id)
 
         if payload[:osse_enabled]
-          skip_callbacks
           results = family.family_members.active.collect do |family_member|
             person = family_member.person
             renew_osse_eligibility(person)
           end
-          set_callbacks
         end
 
         if results&.compact&.any? {|result| result.failure? }
