@@ -226,10 +226,14 @@ module BenefitMarketWorld
       feature_key = "lowest_cost_silver_product_#{effective_year_for_lcsp}"
       if EnrollRegistry.feature?(feature_key)
         hios_id = EnrollRegistry[feature_key].item
-        health_product.update_attributes(
-          hios_id: hios_id,
-          hios_base_id: hios_id.split("-")[0]
-        ) if hios_id
+        if hios_id
+          health_product.update_attributes(
+            {
+              hios_id: hios_id,
+              hios_base_id: hios_id.split("-")[0]
+            }
+          )
+        end
       end
     end
     @benefit_market_catalog

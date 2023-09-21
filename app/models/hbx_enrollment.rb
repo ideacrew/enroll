@@ -2873,7 +2873,7 @@ class HbxEnrollment
       cost_calculator = build_plan_premium(qhp_plan: product, elected_aptc: applied_aptc_amount, apply_aptc: applied_aptc_amount > 0)
       osse_childcare_subsidy = cost_calculator.total_childcare_subsidy_amount
     end
-
+    osse_childcare_subsidy ||= 0.0
     update(eligible_child_care_subsidy: osse_childcare_subsidy)
   end
 

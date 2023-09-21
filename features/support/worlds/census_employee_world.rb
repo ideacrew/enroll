@@ -215,7 +215,7 @@ end
 And(/employee (.*?) of (.*?) has DOB after plan year start/) do |named_person, legal_name|
   sponsorship = employer(legal_name).benefit_sponsorships.first
   application = sponsorship.benefit_applications.active.first
-  application_begin =  application.start_on
+  application_begin = application.start_on
 
   person = people[named_person]
   person_record = Person.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
