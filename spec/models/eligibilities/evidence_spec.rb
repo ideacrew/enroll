@@ -699,6 +699,11 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
         it 'should transition to rejected' do
           expect(income_evidence.aasm_state).to eq 'rejected'
         end
+
+        it 'should have event on workflow state transistions' do
+          workflow_st = income_evidence.workflow_state_transitions.last
+          expect(workflow_st.event).to eq 'move_to_rejected!'
+        end
       end
 
       it_behaves_like "transition to rejected", 'pending'
