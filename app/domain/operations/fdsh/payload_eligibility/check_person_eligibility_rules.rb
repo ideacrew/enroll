@@ -19,6 +19,12 @@ module Operations
           return Failure('No SSN for member') if encrypted_ssn.nil? || encrypted_ssn.empty?
           Operations::Fdsh::EncryptedSsnValidator.new.call(encrypted_ssn)
         end
+
+        def validate_dhs_document(payload)
+          payload.consumer_role.vlp_documents.map do |document|
+            Operations::Fdsh::VlpDocumentTypeValidator.new.call(document)
+          end
+        end
       end
     end
   end
