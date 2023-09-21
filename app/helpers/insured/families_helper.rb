@@ -410,24 +410,19 @@ module Insured::FamiliesHelper
     if enrollment.workflow_state_transitions.present?
       all_transitions = []
       enrollment.workflow_state_transitions.each do |transition|
-        # if transition.metadata_has?( { 'reason' => Enrollments::TerminationReasons::SUPERSEDED_SILENT } )
-        if enrollment.is_transition_superseded_silent?(transition)
-          all_transitions << l10n(
-            'enrollment.latest_transition_data_with_silent_reason',
-            from_state: transition.from_state,
-            to_state: transition.to_state,
-            created_at: transition.created_at.in_time_zone('Eastern Time (US & Canada)').strftime("%m/%d/%Y %-I:%M%p")
-          )
-        else
-          all_transitions << l10n(
-            'enrollment.latest_transition_data',
-            from_state: transition.from_state,
-            to_state: transition.to_state,
-            created_at: transition.created_at.in_time_zone('Eastern Time (US & Canada)').strftime("%m/%d/%Y %-I:%M%p")
-          )
-        end
+        all_transitions << if enrollment.is_transition_superseded_silent?(transition)
+                             l10n('enrollment.latest_transition_data_with_silent_reason',
+                                  from_state: transition.from_state,
+                                  to_state: transition.to_state,
+                                  created_at: transition.created_at.in_time_zone('Eastern Time (US & Canada)').strftime("%m/%d/%Y %-I:%M%p"))
+                           else
+                             l10n('enrollment.latest_transition_data',
+                                  from_state: transition.from_state,
+                                  to_state: transition.to_state,
+                                  created_at: transition.created_at.in_time_zone('Eastern Time (US & Canada)').strftime("%m/%d/%Y %-I:%M%p"))
+                           end
       end
-      return all_transitions.join("\n")
+      all_transitions.join("\n")
     else
       l10n('not_available')
     end
