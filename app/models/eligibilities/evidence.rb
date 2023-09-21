@@ -184,10 +184,10 @@ module Eligibilities
       self.due_on = new_date
     end
 
-    def can_be_extended?
-      return false unless type_unverified?
-      extensions = verification_histories.where(action: "auto_extend_due_date")
-      return true unless extensions.any?
+    def can_be_extended?(date)
+      return false unless due_on == date && ['rejected', 'outstanding'].include?(self.aasm_state)
+      extensions = verification_histories&.where(action: "auto_extend_due_date")
+      return true unless extensions&.any?
       #  want this limitation on due date extensions to reset anytime an evidence no longer requires a due date
       # (is moved to 'verified' or 'attested' state) so that an individual can benefit from the extension again in the future.
       auto_extend_time = extensions.last&.created_at
