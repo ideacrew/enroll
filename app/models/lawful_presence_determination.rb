@@ -98,7 +98,12 @@ class LawfulPresenceDetermination
       if result.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_errors)
         verification_type.add_type_history_element(action: "Hub Request Failed", modifier: "System", update_reason: "#{verification_type.type_name} Request Failed due to #{result.failure}")
         args = OpenStruct.new(determined_at: Time.now, vlp_authority: 'dhs')
-        ivl_role.fail_dhs!(args)
+
+        if ivl_role.may_fail_dhs?
+          ivl_role.fail_dhs!(args)
+        else
+          ivl_role.fail_lawful_presence(args)
+        end
       else
         verification_type.pending_type
       end

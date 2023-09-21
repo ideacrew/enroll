@@ -20,9 +20,9 @@ module Operations
           Operations::Fdsh::EncryptedSsnValidator.new.call(encrypted_ssn)
         end
 
-        def validate_dhs_document(payload)
-          payload.consumer_role.vlp_documents.map do |document|
-            Operations::Fdsh::VlpDocumentTypeValidator.new.call(document)
+        def validate_vlp_documents(person_entity)
+          person_entity.consumer_role.vlp_documents.map do |vlp_document_entity|
+            Operations::Fdsh::VlpDocumentValidator.new.call(vlp_document_entity)
           end
         end
       end
