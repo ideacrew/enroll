@@ -230,16 +230,43 @@ describe '#start_vlp_process' do
         end
       end
 
-      context 'when vlp verification request is not successful' do
+      context "when:
+      - consumer_role state is in dhs_pending
+      - vlp document is invalid
+      - vlp verification request is not successful" do
         before do
-          allow(validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid SSN'))
-          allow(Operations::Fdsh::EncryptedSsnValidator).to receive(:new).and_return(validator)
+          consumer_role.update_attributes!(aasm_state: 'dhs_pending')
+          consumer_role.vlp_documents.first.update_attributes!(alien_number: nil)
+          consumer_role.lawful_presence_determination.start_vlp_process(requested_start_date)
+        end
+
+        it 'changes consumer_role aasm state to verification_outstanding' do
+          expect(consumer_role.aasm_state).to eq('verification_outstanding')
         end
 
         it 'should be in negative_response_received' do
-          consumer_role.lawful_presence_determination.start_vlp_process(requested_start_date)
           vlp_verification_type = consumer_role.verification_types.where(type_name: "Citizenship").first
-          expect(vlp_verification_type.validation_status).to eq('pending')
+          expect(vlp_verification_type.validation_status).to eq('negative_response_received')
+        end
+      end
+
+      context "when:
+        - consumer_role state is in ssa_pending
+        - vlp document is invalid
+        - vlp verification request is not successful" do
+        before do
+          consumer_role.update_attributes!(aasm_state: 'ssa_pending')
+          consumer_role.vlp_documents.first.update_attributes!(alien_number: nil)
+          consumer_role.lawful_presence_determination.start_vlp_process(requested_start_date)
+        end
+
+        it 'does not change consumer_role aasm state' do
+          expect(consumer_role.aasm_state).to eq('ssa_pending')
+        end
+
+        it 'changes vlp_verification_type to negative_response_received' do
+          vlp_verification_type = consumer_role.verification_types.where(type_name: "Citizenship").first
+          expect(vlp_verification_type.validation_status).to eq('negative_response_received')
         end
       end
     end
