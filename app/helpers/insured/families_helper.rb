@@ -406,23 +406,23 @@ module Insured::FamiliesHelper
     BenefitMarkets::Locations::CountyZip.where(zip: address.zip.slice(/\d{5}/)).pluck(:county_name).uniq
   end
 
-  def latest_transition(enrollment)
-    if enrollment.latest_wfst.present?
-      if enrollment.latest_wfst_is_superseded_silent?
-        l10n(
-          'enrollment.latest_transition_data_with_silent_reason',
-          from_state: enrollment.latest_wfst.from_state,
-          to_state: enrollment.latest_wfst.to_state,
-          created_at: enrollment.latest_wfst.created_at.in_time_zone('Eastern Time (US & Canada)').strftime("%m/%d/%Y %-I:%M%p")
-        )
-      else
-        l10n(
-          'enrollment.latest_transition_data',
-          from_state: enrollment.latest_wfst.from_state,
-          to_state: enrollment.latest_wfst.to_state,
-          created_at: enrollment.latest_wfst.created_at.in_time_zone('Eastern Time (US & Canada)').strftime("%m/%d/%Y %-I:%M%p")
-        )
+  def all_transitions(enrollment)
+    if enrollment.workflow_state_transitions.present?
+      all_transitions = []
+      enrollment.workflow_state_transitions.each do |transition|
+        all_transitions << if enrollment.is_transition_superseded_silent?(transition)
+                             l10n('enrollment.latest_transition_data_with_silent_reason',
+                                  from_state: transition.from_state,
+                                  to_state: transition.to_state,
+                                  created_at: transition.created_at.in_time_zone('Eastern Time (US & Canada)').strftime("%m/%d/%Y %-I:%M%p"))
+                           else
+                             l10n('enrollment.latest_transition_data',
+                                  from_state: transition.from_state,
+                                  to_state: transition.to_state,
+                                  created_at: transition.created_at.in_time_zone('Eastern Time (US & Canada)').strftime("%m/%d/%Y %-I:%M%p"))
+                           end
       end
+      all_transitions.join("\n")
     else
       l10n('not_available')
     end
