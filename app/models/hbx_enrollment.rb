@@ -368,11 +368,16 @@ class HbxEnrollment
       effective_on: :desc, submitted_at: :desc, coverage_kind: :desc
     )
   end
+
+  # Scope for finding enrollments with non payment termination reason
+  scope :npt, -> { where(terminate_reason: TermReason::NON_PAYMENT) }
+  scope :without_npt, -> { where(:terminate_reason.ne => TermReason::NON_PAYMENT) }
+
   scope :family_non_pay_canceled_enrollments, lambda { |family|
     where(
       :family_id => family.id,
       :aasm_state => "coverage_canceled",
-      :terminate_reason => "non_payment"
+      :terminate_reason => TermReason::NON_PAYMENT
     ).order(
       effective_on: :desc, submitted_at: :desc, coverage_kind: :desc
     )
@@ -2727,8 +2732,11 @@ class HbxEnrollment
     CAN_TERMINATE_ENROLLMENTS.map(&:to_s).include?(aasm_state.to_s)
   end
 
+  # Non Pay enrollments are not eligible for cancellations or terminations.
+  #   1. Previously terminated enrollments terminated by the carrier will NOT be Canceled if the member shops for an effective date of a new transaction which overlaps the effective date.
+  #   2. Previously terminated enrollments terminated by the carrier will NOT have the coverage end date updated if the effective date of a new transaction overlaps the coverage end date.
   def previous_enrollments(year)
-    household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).show_enrollments_sans_canceled.by_kind(self.kind)
+    household.hbx_enrollments.ne(id: id).by_coverage_kind(coverage_kind).by_year(year).show_enrollments_sans_canceled.by_kind(kind).without_npt
   end
 
   def generate_signature(previous_enrollment)
