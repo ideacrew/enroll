@@ -2960,9 +2960,9 @@ class HbxEnrollment
       (new_effective_on - 1.day) >= terminated_on
   end
 
-  # Checks to see if the latest workflow state transition is 'superseded_silent'
-  def latest_wfst_is_superseded_silent?
-    latest_wfst.metadata_has?(
+  # Checks to see if a workflow state transition is 'superseded_silent'
+  def is_transition_superseded_silent?(wfts)
+    wfts.metadata_has?(
       { 'reason' => Enrollments::TerminationReasons::SUPERSEDED_SILENT }
     )
   end

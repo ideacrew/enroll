@@ -191,5 +191,22 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
       end
     end
+
+    describe '.new' do
+      context 'logger file' do
+        it 'creates logger' do
+          subject
+
+          expect(
+            File.exist?("#{Rails.root}/log/family_enrollment_renewal_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+          ).to be_truthy
+        end
+      end
+    end
+
+    after :all do
+      file_path = "#{Rails.root}/log/family_enrollment_renewal_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+      FileUtils.rm_rf(file_path) if File.file?(file_path)
+    end
   end
 end

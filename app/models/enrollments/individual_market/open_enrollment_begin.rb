@@ -33,7 +33,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     records.no_timeout.each do |family|
       count += 1
       @logger.info "Processsed #{count} IVL OSSE eligibilities" if (count % 1000) == 0
-      trigger_event(family.to_global_id.uri)
+      trigger_event(count, family.to_global_id.uri)
     rescue StandardError => e
       @logger.error "ERROR: Failed Renewal for family hbx_id: #{family.hbx_assigned_id}; Exception: #{e.inspect}"
     end
@@ -45,19 +45,24 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
     Family.where(:id.in => family_ids)
   end
 
-  def trigger_event(gid)
-    event = event('events.individual.open_enrollment.begin', attributes: {
-                    family_gid: gid,
-                    renewal_effective_on: renewal_effective_on,
-                    current_start_on: current_start_on,
-                    current_end_on: current_end_on,
-                    osse_enabled: osse_enabled
-                  })
+  def trigger_event(family_index, gid)
+    event = event('events.individual.open_enrollment.begin', attributes: payload_attributes(family_index, gid))
     if event.success?
       event.success.publish
     else
       @logger.error "ERROR: Event trigger failed: person hbx_id: #{person.hbx_id}"
     end
+  end
+
+  def payload_attributes(family_index, gid)
+    {
+      current_end_on: current_end_on,
+      current_start_on: current_start_on,
+      family_gid: gid,
+      index_id: family_index,
+      osse_enabled: osse_enabled,
+      renewal_effective_on: renewal_effective_on
+    }
   end
 
   def kollection(kind, coverage_period)
@@ -94,6 +99,6 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
   end
 
   def osse_enabled
-    @osse_enabled ||= renewal_bcp.eligibility_on(renewal_effective_on)
+    @osse_enabled ||= renewal_bcp.eligibility_on(renewal_effective_on).present?
   end
 end
