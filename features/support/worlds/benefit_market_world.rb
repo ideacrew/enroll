@@ -221,7 +221,7 @@ module BenefitMarketWorld
     )
     result = create_catalog_eligibility(@benefit_market_catalog)
     if result.success?
-      health_product = BenefitMarkets::Products::Product.by_year(2023).by_kind(:health).first
+      health_product = BenefitMarkets::Products::Product.by_year(2023).by_kind(:health)[2]
       effective_year_for_lcsp = @benefit_market_catalog.application_period.begin.year
       feature_key = "lowest_cost_silver_product_#{effective_year_for_lcsp}"
       if EnrollRegistry.feature?(feature_key)
