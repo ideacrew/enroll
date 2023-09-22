@@ -4,12 +4,14 @@ require 'rails_helper'
 require "#{Rails.root}/spec/shared_contexts/enrollment.rb"
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
-  RSpec.describe "Enrollments::IndividualMarket::OpenEnrollmentBegin", type: :model do
+  RSpec.describe Enrollments::IndividualMarket::OpenEnrollmentBegin, type: :model do
     include FloatHelper
 
     before do
       DatabaseCleaner.clean
     end
+
+    let(:hbx_profile) { FactoryBot.create(:hbx_profile, :current_oe_period_with_past_coverage_periods) }
 
     context "Given a database of Families" do
 
@@ -288,9 +290,28 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
     end
 
+    describe '#osse_enabled' do
+      it 'returns boolean for osse_enabled' do
+        hbx_profile
+        expect(subject.osse_enabled).to be_a(FalseClass)
+      end
+    end
+
+    describe '.new' do
+      it 'creates logger' do
+        subject
+
+        expect(
+          File.exist?(
+            "#{Rails.root}/log/ivl_open_enrollment_begin_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+          )
+        ).to be_truthy
+      end
+    end
+
     after :all do
-      path = "#{Rails.root}/pids/"
-      FileUtils.rm_rf(path) if Dir.exist?(path)
+      file_path = "#{Rails.root}/log/ivl_open_enrollment_begin_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+      FileUtils.rm_rf(file_path) if File.file?(file_path)
     end
   end
 end

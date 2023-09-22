@@ -523,6 +523,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
 
           context 'when renewal grants present' do
+            let(:max_aptc) { 375.0 }
+
             let!(:tax_household_group) do
               family.tax_household_groups.create!(
                 assistance_year: TimeKeeper.date_of_record.year + 1,
@@ -539,6 +541,14 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             end
 
             it 'will set aptc values & will generate renewal' do
+              allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
+                double(
+                  call: double(
+                    success?: true,
+                    value!: max_aptc
+                  )
+                )
+              )
               create_eligibility_determination(family, yearly_expected_contribution, tax_household) if enrollment.family.eligibility_determination.reload.grants.count.zero?
 
               renewal = subject.renew
