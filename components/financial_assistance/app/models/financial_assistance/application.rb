@@ -1022,7 +1022,7 @@ module FinancialAssistance
       return unless can_trigger_fdsh_calls? || is_local_mec_checkable?
       return if previously_renewal_draft? && FinancialAssistanceRegistry.feature_enabled?(:renewal_eligibility_verification_using_rrv)
 
-      ::FinancialAssistance::Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined.new.call(self)
+      ::FinancialAssistance::Operations::Applications::Verifications::RequestApplicationDetermination.new.call(self)
     rescue StandardError => e
       Rails.logger.error { "FAA trigger_fdsh_calls error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
