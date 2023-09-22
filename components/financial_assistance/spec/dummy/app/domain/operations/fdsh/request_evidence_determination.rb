@@ -22,7 +22,28 @@ module Operations
 
       def build_and_validate_payload_entity(evidence)
         application = evidence.evidenceable.application
-        Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application, evidence.key)
+        payload_entity = Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application)
+
+        if payload_entity.success? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
+          result = if evidence.key == :income
+                     payload_entity.value!.applicants.collect do |applicant_entity|
+                       check_eligibility_rules(applicant_entity, evidence.key)
+                     end
+                   else
+                     applicant_entity = payload_entity.value!.applicants.select { |applicant| applicant.person_hbx_id == evidence.evidenceable.person_hbx_id }.first
+                     [check_eligibility_rules(applicant_entity, evidence.key)]
+                   end
+
+          if result.any?(Failure)
+            errors = result.select { |r| r.is_a?(Failure) }.map(&:failure).flatten.compact
+            return Failure(errors)
+          end
+        end
+        payload_entity
+      end
+
+      def check_eligibility_rules(applicant_entity, request_type)
+        Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules.new.call(applicant_entity, request_type)
       end
 
       def build_event(payload, evidence)
