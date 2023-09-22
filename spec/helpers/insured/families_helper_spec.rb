@@ -694,11 +694,11 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
       before { hbx_enr.renew_enrollment!(transition_reason) }
 
       it 'returns latest_transition_data' do
-        expect(helper.latest_transition(hbx_enr)).to match(/From shopping to auto_renewing at/)
+        expect(helper.all_transitions(hbx_enr)).to match(/From shopping to auto_renewing at/)
       end
 
       it 'returns transition reason' do
-        expect(helper.latest_transition(hbx_enr)).to match(/Silent/)
+        expect(helper.all_transitions(hbx_enr)).to match(/Silent/)
       end
     end
 
@@ -706,17 +706,17 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
       before { hbx_enr.renew_enrollment! }
 
       it 'returns latest_transition_data' do
-        expect(helper.latest_transition(hbx_enr)).to match(/From shopping to auto_renewing at/)
+        expect(helper.all_transitions(hbx_enr)).to match(/From shopping to auto_renewing at/)
       end
 
       it 'does not return transition reason' do
-        expect(helper.latest_transition(hbx_enr)).not_to match(/Silent/)
+        expect(helper.all_transitions(hbx_enr)).not_to match(/Silent/)
       end
     end
 
     context 'without state transitions' do
       it 'does not return latest_transition_data' do
-        expect(helper.latest_transition(hbx_enr)).to eq(l10n('not_available'))
+        expect(helper.all_transitions(hbx_enr)).to eq(l10n('not_available'))
       end
     end
   end
