@@ -81,6 +81,8 @@ function setGroupSelectionHandlers(){
       //setPrimaryForIvl();
       enableIvlEligibleForCoverall();
 
+      var ivl_effective_on = $('#ivl_effective_on').val();
+      $("#effective_date_for_display").html(ivl_effective_on);
     });
 
 

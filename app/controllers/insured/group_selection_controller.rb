@@ -232,7 +232,7 @@ class Insured::GroupSelectionController < ApplicationController
   private
 
   def person_has_dual_role?
-    @person.has_consumer_role? && @person.has_active_employee_role?
+    (@person.has_consumer_role? && @person.has_active_employee_role?) || (@person.has_active_employee_role? && @person.has_resident_role?)
   end
 
   def fetch_effective_dates_for_dual_role
