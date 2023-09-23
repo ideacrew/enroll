@@ -21,9 +21,14 @@ module Operations
         end
 
         def validate_vlp_documents(person_entity)
-          person_entity.consumer_role.vlp_documents.map do |vlp_document_entity|
-            Operations::Fdsh::VlpDocumentValidator.new.call(vlp_document_entity)
-          end
+          errors = person_entity.consumer_role.vlp_documents.collect do |vlp_document_entity|
+            next if vlp_document_entity.subject.nil?
+            vlp_errors = ::Validators::VlpV37Contract.new.call(JSON.parse(vlp_document_entity.to_json).compact).errors.to_h
+            vlp_errors if vlp_errors.present?
+          end.compact
+
+          return Failure("Missing/Invalid information on vlp document") if errors.present?
+          Success()
         end
       end
     end
