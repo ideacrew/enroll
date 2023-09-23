@@ -19,6 +19,17 @@ module Operations
           return Failure('No SSN for member') if encrypted_ssn.nil? || encrypted_ssn.empty?
           Operations::Fdsh::EncryptedSsnValidator.new.call(encrypted_ssn)
         end
+
+        def validate_vlp_documents(person_entity)
+          errors = person_entity.consumer_role.vlp_documents.collect do |vlp_document_entity|
+            next if vlp_document_entity.subject.nil?
+            vlp_errors = ::Validators::VlpV37Contract.new.call(JSON.parse(vlp_document_entity.to_json).compact).errors.to_h
+            vlp_errors if vlp_errors.present?
+          end.compact
+
+          return Failure("Missing/Invalid information on vlp document") if errors.present?
+          Success()
+        end
       end
     end
   end
