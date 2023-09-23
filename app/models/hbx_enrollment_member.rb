@@ -54,8 +54,7 @@ class HbxEnrollmentMember
   end
 
   def primary_relationship
-    return @primary_relationship unless @primary_relationship.blank?
-    @primary_relationship = family_member.primary_relationship
+    @primary_relationship ||= family_member&.primary_relationship
   end
 
   def hbx_id
