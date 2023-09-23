@@ -26,8 +26,8 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
 
   CSV.foreach(eligibility_file_name) do |row_with_ssn|
     primary_ssn, primary_hbx_id, aptc, date, individual_csr = row_with_ssn
-    date ||= start_date_of_next_year.to_s
-    effective_date = date.to_date
+    # ignore input date in case of bad formatting; effective date will always be start_date_of_next_year for renewals
+    effective_date = start_date_of_next_year
 
     if aptc.blank?
       not_run += 1
@@ -91,6 +91,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
         end
       end
     else
+      puts "Creating eligibility for family with primary_person_hbx_id: #{primary_person.hbx_id}"
       active_household.build_thh_and_eligibility(aptc, 0, effective_date, @slcsp, 'Renewals', csr_hash) # send 0 csr as default
       ran += 1
       created_eligibility += 1
