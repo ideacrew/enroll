@@ -36,7 +36,7 @@ namespace :reports do
 
           next unless evidence &&
                       evidence.aasm_state == 'outstanding' &&
-                      (evidence.due_on >= today - 160.days && evidence.due_on <= today - 95.days)
+                      (evidence.due_on > today - 160.days && evidence.due_on <= today - 95.days)
 
           original_due_date = evidence.due_on
           new_due_date = (original_due_date + 160.days)
@@ -55,11 +55,10 @@ end
 
 def update_family_level_due_date_info(family)
   ed = family&.eligibility_determination
-  return unless ed
+  return puts("Family Object with ID #{family.id.to_s} missing Eligibility Determination") unless ed
 
   min_due_date = family&.min_verification_due_date_on_family
   current_ed_outstanding_due_date = ed&.outstanding_verification_earliest_due_date
-
   return unless min_due_date && current_ed_outstanding_due_date
 
   ed.update(outstanding_verification_earliest_due_date: min_due_date) if min_due_date > current_ed_outstanding_due_date
