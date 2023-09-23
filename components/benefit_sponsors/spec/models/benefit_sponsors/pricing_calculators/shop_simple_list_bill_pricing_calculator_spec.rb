@@ -201,6 +201,53 @@ module BenefitSponsors
             expect(member_entry.eligible_child_care_subsidy).to eq(0.00)
           end
         end
+
+        context 'when enrollment has member with parent relationship' do
+          let(:roster_members) { [employee, spouse, parent] }
+          let(:member_enrollments) do
+            [
+            employee_enrollment,
+            spouse_member_enrollment,
+            parent_enrollment
+          ]
+          end
+
+          let(:parent_member_id) { "parent_id" }
+          let(:parent_age) { 45 }
+          let(:parent_enrollment) do
+            ::BenefitSponsors::Enrollments::MemberEnrollment.new(
+              member_id: parent_member_id
+            )
+          end
+
+          let(:parent_dob) { coverage_start_date - 45.years }
+          let(:parent) do
+            instance_double(
+              "::BenefitMarkets::SponsoredBenefits::RosterMember",
+              member_id: parent_member_id,
+              relationship: "parent",
+              is_disabled?: false,
+              dob: parent_dob,
+              is_primary_member?: false
+            )
+          end
+
+          before do
+            allow(pricing_model).to receive(:map_relationship_for).with("parent", parent_age, false).and_return(nil)
+            allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
+              product,
+              rate_schedule_date,
+              parent_age,
+              "MA1"
+            ).and_return(110.00)
+          end
+
+          it 'calculates cost of members that are not in member relationships' do
+            result_entry = pricing_calculator.calculate_price_for(pricing_model, roster_entry, sponsor_contribution)
+            member_entry = result_entry.group_enrollment.member_enrollments.detect { |me| me.member_id == parent_member_id }
+            expect(member_entry.product_price).to eq(110.00)
+          end
+        end
       end
     end
 
