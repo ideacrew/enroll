@@ -238,7 +238,12 @@ class Insured::GroupSelectionController < ApplicationController
   def fetch_effective_dates_for_dual_role
     return unless person_has_dual_role?
 
-    @ivl_effective_on = @adapter.calculate_ivl_effective_on
+    @ivl_effective_on = if @person.has_consumer_role?
+      @adapter.calculate_ivl_effective_on
+    else
+      @adapter.calculate_coverall_effective_on
+    end
+
     @shop_effective_on = @adapter.calculate_new_effective_on(params)
   end
 
