@@ -59,7 +59,7 @@ class HbxEnrollmentMember
   end
 
   def hbx_id
-    person.hbx_id
+    person&.hbx_id
   end
 
   def <=>(other)
@@ -67,16 +67,15 @@ class HbxEnrollmentMember
   end
 
   def person
-    return @person unless @person.blank?
-    @person = family_member.person
+    @person ||= family_member&.person
   end
 
   def age_on_effective_date
     return @age_on_effective_date unless @age_on_effective_date.blank?
-    dob = person.dob
-    return unless coverage_start_on.present?
+    dob = person&.dob
+    return unless coverage_start_on.present? && dob.present?
 
-    age = calculate_age(coverage_start_on,dob)
+    age = calculate_age(coverage_start_on, dob)
     @age_on_effective_date = age
   end
 
@@ -96,9 +95,9 @@ class HbxEnrollmentMember
   end
 
   def role_for_subsidy
-    if person.has_active_resident_role?
+    if person&.has_active_resident_role?
       person.resident_role
-    elsif person.has_active_consumer_role?
+    elsif person&.has_active_consumer_role?
       person.consumer_role
     end
   end
@@ -166,7 +165,7 @@ class HbxEnrollmentMember
   end
 
   def full_name
-    person.full_name
+    person&.full_name
   end
 
   private
