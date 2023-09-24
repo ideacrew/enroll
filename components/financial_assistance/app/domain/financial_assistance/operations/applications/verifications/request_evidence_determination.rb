@@ -18,6 +18,7 @@ module FinancialAssistance
           }.freeze
 
           def call(application)
+            update_application_evidence_histories(application)
             payload_entity = yield validate_and_construct_application_payload(application)
             event_result = yield build_event(payload_entity, application)
             publish_result = yield publish_event_result(event_result)
@@ -26,6 +27,11 @@ module FinancialAssistance
           end
 
           private
+
+          # UpdateEvidenceHistories of Application
+          def update_application_evidence_histories(application)
+            application.update_evidence_histories
+          end
 
           def validate_and_construct_application_payload(application)
             payload_entity = ::Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application)
