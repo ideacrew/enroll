@@ -14,7 +14,8 @@ module Subscribers
       # create_tax_household_group(subscriber_logger, payload) if !Rails.env.test? && EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
       # generate_enrollments(subscriber_logger, payload) if !Rails.env.test? && EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
-      update_application_evidence_histories(payload)
+      # This method was moved to components/financial_assistance/app/domain/financial_assistance/operations/applications/verifications/request_evidence_determination.rb
+      # update_application_evidence_histories(payload)
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
