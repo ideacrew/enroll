@@ -18,7 +18,7 @@ module FinancialAssistance
           }.freeze
 
           def call(application)
-            update_application_evidence_histories(application)
+            yield update_application_evidence_histories(application)
             payload_entity = yield validate_and_construct_application_payload(application)
             event_result = yield build_event(payload_entity, application)
             publish_result = yield publish_event_result(event_result)
@@ -28,20 +28,25 @@ module FinancialAssistance
 
           private
 
-          # UpdateEvidenceHistories of Application
           def update_application_evidence_histories(application)
             application.update_evidence_histories
+            Success()
           end
 
           def validate_and_construct_application_payload(application)
             payload_entity = ::Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application)
+            return payload_entity unless EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
 
-            if payload_entity.success? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
+            if payload_entity.success?
               applicant_evidence_validations, invalid_income_evidence_errors_by_id = check_all_applicant_evidences(payload_entity.value!, application)
-
-              # only stop submission of application if all evidence types for every applicant are invalid
+              # stop submission of application if all evidence types for every applicant are invalid
               handle_invalid_income_evidence(application, invalid_income_evidence_errors_by_id) unless invalid_income_evidence_errors_by_id.empty?
               return Failure('All applicantion evidences invalid') if applicant_evidence_validations.flatten.all?(&:failure?)
+            else
+              # stop submission of application if cv3/aca application build fails
+              error_message = payload_entity.failure
+              update_all_evidences(application, error_message)
+              return Failure(error_message)
             end
             payload_entity
           end
@@ -83,6 +88,23 @@ module FinancialAssistance
             financial_assistance_application.applicants.select(&:income_evidence).each do |applicant|
               applicant.income_evidence.determine_income_evidence_aasm_status
               applicant.income_evidence.add_verification_history("Hub Request Failed", failure_message, "system")
+            end
+          end
+
+          def update_all_evidences(application, error_message)
+            application.applicants.each do |applicant|
+              EVIDENCE_ALIASES.values.each do |evidence_key|
+                evidence = applicant.send(evidence_key)
+                next unless evidence
+                
+                if evidence.key == :income
+                  evidence.determine_income_evidence_aasm_status
+                else
+                  evidence.determine_mec_evidence_aasm_status
+                end
+
+                evidence.add_verification_history("Hub Request Failed", error_message, "system")
+              end
             end
           end
 
