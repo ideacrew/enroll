@@ -4,6 +4,7 @@ module FinancialAssistance
   module Operations
     module Applications
       module Verifications
+        # This class handles the validation of an applicant and updates the evidences as needed
         class ValidateApplicantAndUpdateEvidence
           include Dry::Monads[:result, :do]
 
@@ -76,7 +77,7 @@ module FinancialAssistance
             error_message = payload_entity.failure
             update_all_evidences(application, error_message)
 
-            return Failure(error_message)
+            Failure(error_message)
           end
 
           def update_all_evidences(application, error_message)
