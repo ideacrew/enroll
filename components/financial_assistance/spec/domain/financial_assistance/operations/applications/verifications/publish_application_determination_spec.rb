@@ -3,7 +3,7 @@
 require 'rails_helper'
 require "#{FinancialAssistance::Engine.root}/spec/dummy/app/domain/operations/individual/open_enrollment_start_on"
 
-RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::RequestApplicationDetermination, dbclean: :after_each do
+RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::PublishApplicationDetermination, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
   let!(:person_1) { FactoryBot.create(:person, :with_ssn, hbx_id: "732020") }
