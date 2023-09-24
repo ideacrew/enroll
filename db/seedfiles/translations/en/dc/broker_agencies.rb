@@ -24,7 +24,6 @@ BROKER_AGENCIES_TRANSLATIONS = {
 	"en.broker_agencies.profiles.broker_agency_message" => "Broker Agency Message",
 	"en.broker_agencies.profiles.send_secure_message" => "Send Secure Message to %{site_short_name}",
 	"en.assign" => "Assign",
-  "en.broker_agency" => "Broker Agency",
   "en.add_broker_staff_role" => "Add Broker Staff Role",
   "en.broker_agency_staff" => "Broker Agency Staff",
 	"en.general_agencies" => "General Agencies",

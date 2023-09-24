@@ -33,7 +33,7 @@ module Operations
       end
 
       def deactivate(values)
-        tax_household_groups = values[:family].tax_household_groups.active.by_year(values[:new_effective_date].year)
+        tax_household_groups = values[:family].tax_household_groups.active.current_and_prospective_by_year(values[:new_effective_date].year)
         return Success('No Active Tax Household Groups to deactivate') if tax_household_groups.blank?
 
         tax_household_groups.each do |th_group|

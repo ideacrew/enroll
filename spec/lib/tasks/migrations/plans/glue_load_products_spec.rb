@@ -13,7 +13,8 @@ describe 'glue_load_products' do
   let!(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile, fein: '123456789') }
 
   before :all do
-    Rails.application.load_tasks
+    DatabaseCleaner.clean
+    Rake.application.rake_require 'tasks/migrations/plans/glue_load_products'
     Rake::Task.define_task(:environment)
   end
 
@@ -21,8 +22,8 @@ describe 'glue_load_products' do
     year = TimeKeeper.date_of_record.year
     json_file_name = Rails.root.join("#{year}_plans.json")
     error_file_name = Rails.root.join("#{year}_plans_error.txt")
-    File.delete(json_file_name)
-    File.delete(error_file_name)
+    File.delete(json_file_name) if File.file?(json_file_name)
+    File.delete(error_file_name) if File.file?(error_file_name)
   end
 
   describe 'load_products' do
