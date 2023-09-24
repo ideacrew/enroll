@@ -46,12 +46,12 @@ namespace :reports do
           csv << [applicant.person_hbx_id, original_due_date, new_due_date, successful_save]
 
         rescue StandardError => e
-          puts "Invalid Applicant for Application with hbx_id #{application.hbx_id}: #{e.message}"
+          puts "Invalid Applicant for Application with hbx_id #{application&.hbx_id}, Applicant person_hbx_id #{applicant&.person_hbx_id}: #{e.message}"
         end
 
         update_family_level_due_date_info(application.family)
       rescue StandardError => e
-        puts "An error occurred while processing an application: #{e.message}"
+        puts "An error occurred while processing an application with hbx_id #{application&.hbx_id}: #{e.message}"
       end
     end
 
