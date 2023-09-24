@@ -74,7 +74,7 @@ And(/(.*) has a dependent in (.*) relationship with age (.*) than 26/) do |role,
   final_person.save
 end
 
-Given (/a matched Employee exists with resident role/) do
+Given(/a matched Employee exists with resident role/) do
   FactoryBot.create(:employee_role, person: @person, employer_profile: @profile, benefit_sponsors_employer_profile_id: @profile.id)
   ce = FactoryBot.build(
     :benefit_sponsors_census_employee_with_active_assignment,
