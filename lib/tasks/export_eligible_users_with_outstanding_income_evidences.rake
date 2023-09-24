@@ -31,7 +31,6 @@ namespace :reports do
 
     CSV.open(file_name, "w", write_headers: true, headers: field_names) do |csv|
       applications.each do |application|
-        binding.irb
 
         application.applicants.each do |applicant|
           evidence = applicant&.income_evidence
