@@ -55,7 +55,7 @@ module FinancialAssistance
             invalid_income_evidence_errors_by_id = []
             applicant_evidences = payload_entity.applicants.map do |mma_applicant|
               # create an array of all evidence types held by the applicant
-              applicant_evidence_keys = EVIDENCE_ALIASES.values.map { |evidence_type| mma_applicant.send(evidence_type)&.key }.compact
+              applicant_evidence_keys = EVIDENCE_ALIASES.each_value.map { |evidence_type| mma_applicant.send(evidence_type)&.key }.compact
               faa_applicant = application.applicants.find_by { |a| a.person_hbx_id == mma_applicant.person_hbx_id }
 
               # need to run validations against all evidence types for all applicants -- different evidence types _may_ require different validations
@@ -93,10 +93,10 @@ module FinancialAssistance
 
           def update_all_evidences(application, error_message)
             application.applicants.each do |applicant|
-              EVIDENCE_ALIASES.values.each do |evidence_key|
+              EVIDENCE_ALIASES.each_values.each do |evidence_key|
                 evidence = applicant.send(evidence_key)
                 next unless evidence
-                
+
                 if evidence.key == :income
                   evidence.determine_income_evidence_aasm_status
                 else
