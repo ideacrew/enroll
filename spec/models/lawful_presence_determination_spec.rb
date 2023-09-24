@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require 'aasm/rspec'
 
@@ -140,6 +142,37 @@ describe '#start_ssa_process' do
             expect(ssa_verification_type.validation_status).to eq('outstanding')
           end
         end
+      end
+    end
+
+    context 'when person does not have ssn and is us_citizen' do
+      let(:non_ssn_person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+      let(:ivl_role) { non_ssn_person.consumer_role }
+      let(:lawful_presence) { FactoryBot.create(:lawful_presence_determination, :us_citizen, ivl_role: ivl_role) }
+      let(:citizenship_v_type) { ivl_role.verification_types.citizenship_type.first }
+
+      before { non_ssn_person.update_attributes!(encrypted_ssn: nil) }
+
+      it 'modifies aasm_state of lawful_presence_determination' do
+        expect(lawful_presence.verification_successful?).to be_truthy
+        lawful_presence.start_ssa_process
+        expect(lawful_presence.reload.verification_outstanding?).to be_truthy
+      end
+
+      it 'modifies validation_status of the Citizenship verification type' do
+        expect(citizenship_v_type.validation_status).to eq('unverified')
+        lawful_presence.start_ssa_process
+        expect(citizenship_v_type.reload.validation_status).to eq('negative_response_received')
+      end
+
+      it 'adds type history element to Citizenship verification type' do
+        expect(citizenship_v_type.type_history_elements).to be_empty
+        lawful_presence.start_ssa_process
+        type_history_element = citizenship_v_type.type_history_elements.first.reload
+        expect(type_history_element.action).to eq('Hub Request Failed')
+        expect(type_history_element.modifier).to eq('System')
+        expect(type_history_element.update_reason).to match(/SSA Verification Request/)
+        expect(type_history_element.update_reason).to match(/No SSN for member/)
       end
     end
   end
