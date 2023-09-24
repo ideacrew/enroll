@@ -32,20 +32,25 @@ namespace :reports do
     CSV.open(file_name, "w", write_headers: true, headers: field_names) do |csv|
       applications.each do |application|
         application.applicants.each do |applicant|
-          evidence = applicant.income_evidence
+          evidence = applicant&.income_evidence
 
           next unless evidence &&
-                      evidence.aasm_state == 'outstanding' &&
-                      (evidence.due_on > today - 160.days && evidence.due_on <= today - 95.days)
+                      evidence&.aasm_state == 'outstanding' &&
+                      (evidence&.due_on > today - 160.days && evidence&.due_on <= today - 95.days)
 
           original_due_date = evidence.due_on
           new_due_date = (original_due_date + 160.days)
           successful_save = evidence.update(due_on: new_due_date) if args[:migrate_users]
 
           csv << [applicant.person_hbx_id, original_due_date, new_due_date, successful_save]
+
+        rescue StandardError => e
+          puts "Invalid Applicant for Application with hbx_id #{application.hbx_id}: #{e.message}"
         end
 
         update_family_level_due_date_info(application.family)
+      rescue StandardError => e
+        puts "An error occurred while processing an application: #{e.message}"
       end
     end
 

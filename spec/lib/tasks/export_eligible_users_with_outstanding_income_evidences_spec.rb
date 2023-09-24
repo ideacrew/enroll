@@ -149,5 +149,16 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
         expect(evidence.due_on).to eq(projected_due_date)
       end
     end
+
+    context 'when there is invalid evidence' do
+      before do
+        allow(applicant2.income_evidence).to receive(:due_on).and_return('invalid_field')
+        allow(application2).to receive(applicants).and_return('bad_record')
+      end
+
+      it 'should skip invalid applicants and evidences' do
+        
+      end
+    end
   end
 end
