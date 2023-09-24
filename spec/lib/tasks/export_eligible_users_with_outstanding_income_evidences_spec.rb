@@ -150,14 +150,18 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
       end
     end
 
-    context 'when there is invalid evidence' do
+    context 'when there are invalid records' do
       before do
-        allow(applicant2.income_evidence).to receive(:due_on).and_return('invalid_field')
-        allow(application2).to receive(applicants).and_return('bad_record')
+        allow_any_instance_of(Eligibilities::Evidence).to receive(:update).and_raise(StandardError)
+
+        rake.reenable
+        rake.invoke(true)
       end
 
-      it 'should skip invalid applicants and evidences' do
-        
+      it 'should create the csv despite invalid records' do
+        csv = CSV.read(file_name, headers: true)
+
+        expect(csv.size).to eq(0)
       end
     end
   end
