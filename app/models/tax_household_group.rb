@@ -40,6 +40,7 @@ class TaxHouseholdGroup
   scope :by_year,   ->(year) { where(assistance_year: year) }
   scope :active,    ->{ where(end_on: nil) }
   scope :inactive,  ->{ where(:end_on.ne => nil) }
+  scope :current_and_prospective_by_year, ->(year) { where(:assistance_year.gte => year) }
 
   def latest_active_tax_household_with_year(year)
     tax_households.tax_household_with_year(year).active_tax_household.order_by(:created_at.desc).first
