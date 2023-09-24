@@ -172,7 +172,7 @@ describe '#start_ssa_process' do
         expect(type_history_element.action).to eq('Hub Request Failed')
         expect(type_history_element.modifier).to eq('System')
         expect(type_history_element.update_reason).to match(/SSA Verification Request/)
-        expect(type_history_element.update_reason).to match(/No SSN for member/)
+        expect(type_history_element.update_reason).to match(/No SSN/)
       end
     end
   end

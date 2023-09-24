@@ -16,7 +16,7 @@ module Operations
 
         def validate_ssn(payload)
           encrypted_ssn = payload.person_demographics.encrypted_ssn
-          return Failure('No SSN for member') if encrypted_ssn.nil? || encrypted_ssn.empty?
+          return Failure('No SSN') if encrypted_ssn.nil? || encrypted_ssn.empty?
           Operations::Fdsh::EncryptedSsnValidator.new.call(encrypted_ssn)
         end
 
