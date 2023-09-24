@@ -28,6 +28,7 @@ module FinancialAssistance
 
           private
 
+          # UpdateEvidenceHistories of Application
           def update_application_evidence_histories(application)
             application.update_evidence_histories
             Success()
