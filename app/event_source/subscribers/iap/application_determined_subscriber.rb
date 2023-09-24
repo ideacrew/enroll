@@ -24,12 +24,6 @@ module Subscribers
 
     private
 
-    # UpdateEvidenceHistories of Application
-    def update_application_evidence_histories(payload)
-      application = FinancialAssistance::Application.by_hbx_id(payload[:hbx_id]).first
-      application.update_evidence_histories
-    end
-
     # Creates tax_household_groups and its accociations for a Family with Financial Assistance Application's Eligibility Determination
     def create_tax_household_group(subscriber_logger, payload)
       result = ::Operations::Families::CreateTaxHouseholdGroupOnFaDetermination.new.call(payload)

@@ -146,11 +146,25 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::P
     it 'should return success with message' do
       expect(@result.success).to eq('Event published successfully')
     end
+
+    it 'should add verification histories to all evidences' do
+      evidence_1 = applicant_1.esi_evidence
+      evidence_2 = applicant_2.esi_evidence
+      evidence_3 = applicant_3.esi_evidence
+
+      expect(evidence_1.verification_histories.length).to eq 1
+      expect(evidence_2.verification_histories.length).to eq 1
+      expect(evidence_3.verification_histories.length).to eq 1
+
+      expect(evidence_1.verification_histories.last.action).to eq 'application_determined'
+    end
   end
 
   context 'with invalid application' do
     before do
-      @result = subject.call("application_id")
+      application.applicants.destroy_all
+
+      @result = subject.call(application)
     end
 
     it 'should return a failure with error message' do
@@ -171,22 +185,30 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::P
           expect(@result).to be_success
         end
 
-        it "should update invalid applicants' verification history" do
+        it "should update invalid applicants' verification history with additional error history" do
           evidence = applicant_1.esi_evidence
-          expect(evidence.verification_histories.length).to eq 1
-          expect(evidence.verification_histories.first.update_reason).to include "Invalid SSN"
+          expect(evidence.verification_histories.length).to eq 2
+          expect(evidence.verification_histories.last.update_reason).to include 'Invalid SSN'
         end
 
-        it "should NOT modify valid applicants' verification histories" do
+        it "should NOT add an error to valid applicants' verification histories" do
           evidence_2 = applicant_2.esi_evidence
           evidence_3 = applicant_3.esi_evidence
-          expect(evidence_2.verification_histories.length).to eq 0
-          expect(evidence_3.verification_histories.length).to eq 0
+          expect(evidence_2.verification_histories.length).to eq 1
+          expect(evidence_3.verification_histories.length).to eq 1
+        end
+
+        it 'should not affect the valid applicants evidence aasm_states' do
+          evidence_2 = applicant_2.esi_evidence
+          evidence_3 = applicant_3.esi_evidence
+
+          expect(evidence_2.aasm_state).to eq 'pending'
+          expect(evidence_3.aasm_state).to eq 'pending'
         end
 
         it 'should update the invalid applicants aasm_states to attested' do
           evidence = applicant_1.esi_evidence
-          expect(evidence.aasm_state).to eq "attested"
+          expect(evidence.aasm_state).to eq 'attested'
         end
       end
 
@@ -212,18 +234,18 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::P
           evidence_1 = applicant_1.income_evidence
           evidence_2 = applicant_2.income_evidence
           evidence_3 = applicant_3.income_evidence
-          expect(evidence_1.verification_histories.length).to eq 1
-          expect(evidence_2.verification_histories.length).to eq 1
-          expect(evidence_3.verification_histories.length).to eq 1
+          expect(evidence_1.verification_histories.length).to eq 2
+          expect(evidence_2.verification_histories.length).to eq 2
+          expect(evidence_3.verification_histories.length).to eq 2
         end
 
         it 'should update the aasm_states to negative_response_received' do
           evidence_1 = applicant_1.income_evidence
           evidence_2 = applicant_2.income_evidence
           evidence_3 = applicant_3.income_evidence
-          expect(evidence_1.aasm_state).to eq "negative_response_received"
-          expect(evidence_2.aasm_state).to eq "negative_response_received"
-          expect(evidence_3.aasm_state).to eq "negative_response_received"
+          expect(evidence_1.aasm_state).to eq 'negative_response_received'
+          expect(evidence_2.aasm_state).to eq 'negative_response_received'
+          expect(evidence_3.aasm_state).to eq 'negative_response_received'
         end
       end
     end
