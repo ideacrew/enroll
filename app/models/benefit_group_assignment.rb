@@ -146,7 +146,6 @@ class BenefitGroupAssignment
   end
 
   def plan_year
-    # [Deprecated] Instead use benefit application
     benefit_application
   end
 
