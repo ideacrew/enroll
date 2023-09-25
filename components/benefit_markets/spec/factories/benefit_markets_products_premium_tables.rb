@@ -4,9 +4,13 @@ FactoryBot.define do
     effective_period    { Date.new(Date.today.year, 1, 1)..Date.new(Date.today.year, 12, 31) }
     association :rating_area, factory: :benefit_markets_locations_rating_area, strategy: :create
 
+    transient do
+      premium_factor { 0 }
+    end
+
     after(:build) do |premium_table, evaluator|
       (0..65).each do |age| # build tuple for default product premium ages
-        premium_table.premium_tuples << build_list(:benefit_markets_products_premium_tuple, 1, age: age, cost: (200 + (age * 5)))
+        premium_table.premium_tuples << build_list(:benefit_markets_products_premium_tuple, 1, age: age, cost: (200 + (age * evaluator.premium_factor)))
       end
     end
   end
