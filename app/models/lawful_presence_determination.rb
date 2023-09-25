@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class LawfulPresenceDetermination
   SSA_VERIFICATION_REQUEST_EVENT_NAME = "local.enroll.lawful_presence.ssa_verification_request"
   VLP_VERIFICATION_REQUEST_EVENT_NAME = "local.enroll.lawful_presence.vlp_verification_request"
@@ -79,9 +81,7 @@ class LawfulPresenceDetermination
       ssa_verification_type = ivl_role.verification_types.ssn_type.first
 
       if result.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_errors)
-        ssa_verification_type.add_type_history_element(action: "Hub Request Failed", modifier: "System", update_reason: "SSA Verification Request Failed due to #{result.failure}")
-        args = OpenStruct.new(determined_at: Time.now, vlp_authority: 'ssa')
-        ivl_role.ssn_invalid!(args)
+        process_ssa_request_failure(result, ssa_verification_type)
       else
         ssa_verification_type.pending_type
       end
@@ -98,7 +98,12 @@ class LawfulPresenceDetermination
       if result.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_errors)
         verification_type.add_type_history_element(action: "Hub Request Failed", modifier: "System", update_reason: "#{verification_type.type_name} Request Failed due to #{result.failure}")
         args = OpenStruct.new(determined_at: Time.now, vlp_authority: 'dhs')
-        ivl_role.fail_dhs!(args)
+
+        if ivl_role.may_fail_dhs?
+          ivl_role.fail_dhs!(args)
+        else
+          ivl_role.fail_lawful_presence(args)
+        end
       else
         verification_type.pending_type
       end
@@ -168,5 +173,28 @@ class LawfulPresenceDetermination
       event: aasm.current_event,
       transition_at: Time.now
     )
+  end
+
+  # Method to process the Failure Response from SSA Verification Request when feature :validate_and_record_publish_errors is enabled
+  def process_ssa_request_failure(failure_request_result, ssa_v_type)
+    args = OpenStruct.new(determined_at: Time.now, vlp_authority: 'ssa')
+
+    type_history_params = {
+      action: 'Hub Request Failed',
+      modifier: 'System',
+      update_reason: "SSA Verification Request Failed due to #{failure_request_result.failure}"
+    }
+
+    # Only handles case where SSN is blank and member is US Citizen
+    if ivl_role.encrypted_ssn.blank? && ivl_role.is_native?
+      citizenship_v_type = ivl_role.verification_types.citizenship_type.first
+      # "SSA Verification Request Failed due to No SSN for member"
+      citizenship_v_type.add_type_history_element(type_history_params)
+      # We are not failing SSN DMI as it is not present and only handling Citizenship DMI
+      ivl_role.fail_lawful_presence(args)
+    else
+      ssa_v_type.add_type_history_element(type_history_params)
+      ivl_role.ssn_invalid!(args)
+    end
   end
 end

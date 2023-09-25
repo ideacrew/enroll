@@ -112,6 +112,8 @@ class ConsumerRole
   delegate :citizen_status, :citizenship_result,:vlp_verified_date, :vlp_authority, :vlp_document_id, to: :lawful_presence_determination_instance
   delegate :citizen_status=, :citizenship_result=,:vlp_verified_date=, :vlp_authority=, :vlp_document_id=, to: :lawful_presence_determination_instance
 
+  delegate :encrypted_ssn, to: :person
+
   field :is_applicant, type: Boolean  # Consumer is applying for benefits coverage
   field :birth_location, type: String
   field :marital_status, type: String
