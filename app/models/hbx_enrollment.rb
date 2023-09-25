@@ -2972,6 +2972,12 @@ class HbxEnrollment
     )
   end
 
+  def predecessor_enrollment_hbx_id
+    return nil unless predecessor_enrollment_id
+
+    HbxEnrollment.where(id: predecessor_enrollment_id).first&.hbx_id
+  end
+
   private
 
   # Calculates sum of enrolled aptc member's of TaxHouseholdEnrollment ehb_premiums including Minimum Responsibility.
