@@ -7,7 +7,7 @@ Rake::Task.define_task(:environment)
 
 RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences', :type => :task, dbclean: :after_each do
   let(:rake) { Rake::Task["reports:export_eligible_users_with_outstanding_income_evidences"] }
-  let(:file_name) { "#{Rails.root}/users_with_outstanding_income_evidence_due_dates_between_95_and_160_days.csv" }
+  let(:file_name) { "#{Rails.root}/users_with_outstanding_income_evidence_eligible_for_extension.csv" }
 
   describe "Rake Task" do
     let!(:person) { FactoryBot.create(:person) }
@@ -54,10 +54,10 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
                         person_hbx_id: family2.family_members[0].person.hbx_id)
     end
 
-    let(:applicant_1_original_due_date) { TimeKeeper.date_of_record - 159.days }
-    let(:applicant_2_original_due_date) { TimeKeeper.date_of_record - 125.days }
-    let(:applicant_3_original_due_date) { TimeKeeper.date_of_record - 50.days }
-    let(:applicant_4_original_due_date) { TimeKeeper.date_of_record - 97.days }
+    let(:applicant_1_original_due_date) { TimeKeeper.date_of_record - 65.days }
+    let(:applicant_2_original_due_date) { TimeKeeper.date_of_record - 66.days }
+    let(:applicant_3_original_due_date) { TimeKeeper.date_of_record - 97.days }
+    let(:applicant_4_original_due_date) { TimeKeeper.date_of_record - 64.days }
 
     let!(:income_evidence_1) do
       applicant.create_income_evidence(key: :income,
@@ -142,7 +142,7 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
 
       it "should update the income evidence due_on to the correct due date" do
         evidence = applicant.income_evidence
-        projected_due_date = applicant_1_original_due_date + 160.days
+        projected_due_date = applicant_1_original_due_date + 65.days
         evidence.reload
 
         expect(evidence.due_on).to_not eq(applicant_1_original_due_date)
