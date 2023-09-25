@@ -47,6 +47,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment.hbx_enrollment_members = clone_enrollment_members
     renewal_enrollment.product_id = fetch_product_id(renewal_enrollment)
     renewal_enrollment.is_any_enrollment_member_outstanding = @enrollment.is_any_enrollment_member_outstanding
+    renewal_enrollment.predecessor_enrollment_id = @enrollment.id
 
     renewal_enrollment
   end
