@@ -176,7 +176,7 @@ describe '#start_ssa_process' do
       end
     end
 
-    context 'when person does not have ssn and is us_citizen' do
+    context 'when person have invalid ssn and is us_citizen' do
       let(:invalid_ssn_person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
       let(:ivl_role) { invalid_ssn_person.consumer_role }
       let(:lawful_presence) { FactoryBot.create(:lawful_presence_determination, :us_citizen, ivl_role: ivl_role) }
