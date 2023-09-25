@@ -21,7 +21,10 @@ module Operations
         end
 
         def validate_vlp_documents(person_entity)
-          errors = person_entity.consumer_role.vlp_documents.collect do |vlp_document_entity|
+          vlp_documents = person_entity.consumer_role.vlp_documents
+          return Failure("No VLP Documents") if vlp_documents.empty?
+
+          errors = vlp_documents.collect do |vlp_document_entity|
             next if vlp_document_entity.subject.nil?
             vlp_errors = ::Validators::VlpV37Contract.new.call(JSON.parse(vlp_document_entity.to_json).compact).errors.to_h
             vlp_errors if vlp_errors.present?
