@@ -364,6 +364,7 @@ module FinancialAssistance
     scope :by_year, ->(year) { where(:assistance_year => year) }
     scope :created_asc,      -> { order(created_at: :asc) }
     scope :renewal_draft,    ->{ any_in(aasm_state: 'renewal_draft') }
+    scope :income_verification_extension_required, ->{ any_in(aasm_state: 'income_verification_extension_required') }
 
     # Applications that are in submitted and after submission states. Non work in progress applications.
     scope :submitted_and_after, lambda {
@@ -1021,7 +1022,7 @@ module FinancialAssistance
       return unless can_trigger_fdsh_calls? || is_local_mec_checkable?
       return if previously_renewal_draft? && FinancialAssistanceRegistry.feature_enabled?(:renewal_eligibility_verification_using_rrv)
 
-      ::FinancialAssistance::Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined.new.call(self)
+      ::FinancialAssistance::Operations::Applications::Verifications::RequestEvidenceDetermination.new.call(self)
     rescue StandardError => e
       Rails.logger.error { "FAA trigger_fdsh_calls error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end

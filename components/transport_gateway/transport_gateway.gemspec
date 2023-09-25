@@ -22,6 +22,9 @@ Gem::Specification.new do |s|
   s.add_dependency 'aws-sdk', '~> 2.2.4'
 
   s.add_development_dependency 'rspec-rails'
+  s.add_development_dependency 'simplecov',                 '~> 0.22.0'
+  s.add_development_dependency 'simplecov-cobertura',       '~> 2.1.0'
+  s.add_development_dependency 'rspec-instafail',           '~> 1.0.0'
   s.add_development_dependency 'shoulda-matchers'
   s.add_development_dependency 'webmock'
   s.add_development_dependency 'rspec'

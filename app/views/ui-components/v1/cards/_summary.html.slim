@@ -101,8 +101,9 @@
         = @hbx_enrollment&.effective_on
         br/
         span.ttu.lg.twelve.font-weight-bold
-          = l10n('enrollment.latest_transition')
-        = latest_transition(@hbx_enrollment)
+          = l10n('enrollment.transitions')
+        div style='white-space: pre-line;'
+          = all_transitions(@hbx_enrollment)
         br/
         span.ttu.lg.twelve.font-weight-bold
           = l10n('product_hios_id')

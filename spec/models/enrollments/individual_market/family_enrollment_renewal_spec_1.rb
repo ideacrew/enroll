@@ -161,5 +161,52 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
       end
     end
+
+    describe '#slcsp_feature_enabled?' do
+      let(:renewal_year) { TimeKeeper.date_of_record.year }
+
+      before do
+        EnrollRegistry[
+          :atleast_one_silver_plan_donot_cover_pediatric_dental_cost
+        ].feature.stub(:is_enabled).and_return(feature_enabled)
+
+        EnrollRegistry[
+          :atleast_one_silver_plan_donot_cover_pediatric_dental_cost
+        ].settings(renewal_year.to_s.to_sym).stub(:item).and_return(feature_enabled)
+      end
+
+      context 'when feature is enabled' do
+        let(:feature_enabled) { true }
+
+        it 'returns true' do
+          expect(subject.slcsp_feature_enabled?(renewal_year)).to be_truthy
+        end
+      end
+
+      context 'when feature is disabled' do
+        let(:feature_enabled) { false }
+
+        it 'returns false' do
+          expect(subject.slcsp_feature_enabled?(renewal_year)).to be_falsey
+        end
+      end
+    end
+
+    describe '.new' do
+      context 'logger file' do
+        it 'creates logger' do
+          subject
+
+          expect(
+            File.exist?("#{Rails.root}/log/family_enrollment_renewal_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+          ).to be_truthy
+        end
+      end
+    end
+
+    after :all do
+      file_path = "#{Rails.root}/log/family_enrollment_renewal_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+      FileUtils.rm_rf(file_path) if File.file?(file_path)
+    end
   end
 end

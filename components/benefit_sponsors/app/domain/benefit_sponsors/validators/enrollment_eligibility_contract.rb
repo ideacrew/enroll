@@ -10,7 +10,7 @@ module BenefitSponsors
         required(:effective_date).filled(:date)
         required(:benefit_application_kind).filled(:symbol)
         required(:service_areas).array(:hash)
-        required(:osse_min_employer_contribution).filled(:bool)
+        optional(:sponsor_eligibilities).maybe(:array)
       end
     end
   end

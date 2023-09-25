@@ -8,7 +8,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   CAT_AGE_OFF_HIOS_IDS = ["94506DC0390008", "86052DC0400004"]
 
   def initialize
-    @logger = Logger.new("#{Rails.root}/log/ivl_open_enrollment_begin_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log") unless defined? @logger
+    @logger = Logger.new("#{Rails.root}/log/family_enrollment_renewal_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
   end
 
   def renew
@@ -47,6 +47,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     renewal_enrollment.hbx_enrollment_members = clone_enrollment_members
     renewal_enrollment.product_id = fetch_product_id(renewal_enrollment)
     renewal_enrollment.is_any_enrollment_member_outstanding = @enrollment.is_any_enrollment_member_outstanding
+    renewal_enrollment.predecessor_enrollment_id = @enrollment.id
 
     renewal_enrollment
   end
@@ -251,7 +252,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   def slcsp_feature_enabled?(renewal_year)
     EnrollRegistry.feature_enabled?(:atleast_one_silver_plan_donot_cover_pediatric_dental_cost) &&
-      EnrollRegistry[:atleast_one_silver_plan_donot_cover_pediatric_dental_cost]&.settings(renewal_year)&.item
+      EnrollRegistry[:atleast_one_silver_plan_donot_cover_pediatric_dental_cost]&.settings(renewal_year.to_s.to_sym)&.item
   end
 
   # Check if member turned 19 during renewal and has pediatric only Qualified Dental Plan

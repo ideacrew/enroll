@@ -5,6 +5,7 @@
 class BenefitCoveragePeriod
   include Mongoid::Document
   include Mongoid::Timestamps
+  include GlobalID::Identification
 
   embedded_in :benefit_sponsorship
 
@@ -25,6 +26,7 @@ class BenefitCoveragePeriod
 
   # embeds_many :open_enrollment_periods, class_name: "EnrollmentPeriod"
   embeds_many :benefit_packages
+  embeds_many :eligibilities, class_name: '::Eligible::Eligibility', as: :eligible, cascade_callbacks: true
 
   accepts_nested_attributes_for :benefit_packages
 
@@ -238,6 +240,24 @@ class BenefitCoveragePeriod
     eligible_packages.push(cat_benefit_package)
   end
 
+  def eligibilities_on(date)
+    eligibility_key = "aca_ivl_osse_eligibility_#{date.year}".to_sym
+
+    eligibilities.by_key(eligibility_key)
+  end
+
+  def eligibility_on(effective_date)
+    eligibilities_on(effective_date).last
+  end
+
+  def active_eligibilities_on(date)
+    eligibilities_on(date).select { |e| e.is_eligible_on?(date) }
+  end
+
+  def active_eligibility_on(effective_date)
+    active_eligibilities_on(effective_date).last
+  end
+
   ## Class methods
   class << self
 
@@ -251,7 +271,10 @@ class BenefitCoveragePeriod
     # @return [ BenefitCoveragePeriod ] the matching HBX benefit coverage period instance
     def find(id)
       organizations = Organization.where("hbx_profile.benefit_sponsorship.benefit_coverage_periods._id" => BSON::ObjectId.from_string(id))
-      organizations.size > 0 ? all.select{ |bcp| bcp.id == id }.first : nil
+      return unless organizations.present?
+      hbx_profile = organizations.first.hbx_profile
+      benefit_sponsorship = hbx_profile&.benefit_sponsorship
+      benefit_sponsorship&.benefit_coverage_periods&.find(BSON::ObjectId.from_string(id))
     end
 
     # The HBX benefit coverage period instance that includes this date within its start and end dates
@@ -285,6 +308,16 @@ class BenefitCoveragePeriod
       organizations.size > 0 ? organizations.first.hbx_profile.benefit_sponsorship.benefit_coverage_periods : nil
     end
 
+    #TODO: update the logic once settings moved to benefit coverage period
+    def osse_eligibility_years_for_display
+      return [] if all.blank?
+      all.collect do |bcp|
+        year = bcp.start_on.year
+        eligibility = bcp.eligibilities.by_key("aca_ivl_osse_eligibility_#{year}".to_sym).first
+        next unless eligibility&.eligible?
+        year
+      end.compact
+    end
   end
 
   private

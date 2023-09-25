@@ -25,11 +25,15 @@ RSpec.describe BenefitMarkets::Operations::BenefitMarkets::CreateBenefitSponsorC
       market_kind: market_kind,
       benefit_application_kind: :initial,
       service_areas: service_areas,
-      benefit_sponsorship_id: benefit_sponsorship_id,
-      osse_min_employer_contribution: false
+      benefit_sponsorship_id: benefit_sponsorship_id
     )
   end
   let(:params) { { enrollment_eligibility: enrollment_eligibility} }
+
+  before do
+    allow(enrollment_eligibility).to receive(:metal_level_products_restricted?).and_return(false)
+    allow(enrollment_eligibility).to receive(:employer_contribution_minimum_relaxed?).and_return(false)
+  end
 
   context 'sending required parameters' do
 

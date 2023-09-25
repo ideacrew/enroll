@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require 'aasm/rspec'
 
@@ -7,6 +9,7 @@ describe LawfulPresenceDetermination do
   after :each do
     DatabaseCleaner.clean
   end
+
   let(:person) { FactoryBot.create(:person, :with_consumer_role) }
   let(:consumer_role) { person.consumer_role}
   let(:person_id) { person.id }
@@ -141,6 +144,37 @@ describe '#start_ssa_process' do
         end
       end
     end
+
+    context 'when person does not have ssn and is us_citizen' do
+      let(:non_ssn_person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+      let(:ivl_role) { non_ssn_person.consumer_role }
+      let(:lawful_presence) { FactoryBot.create(:lawful_presence_determination, :us_citizen, ivl_role: ivl_role) }
+      let(:citizenship_v_type) { ivl_role.verification_types.citizenship_type.first }
+
+      before { non_ssn_person.update_attributes!(encrypted_ssn: nil) }
+
+      it 'modifies aasm_state of lawful_presence_determination' do
+        expect(lawful_presence.verification_successful?).to be_truthy
+        lawful_presence.start_ssa_process
+        expect(lawful_presence.reload.verification_outstanding?).to be_truthy
+      end
+
+      it 'modifies validation_status of the Citizenship verification type' do
+        expect(citizenship_v_type.validation_status).to eq('unverified')
+        lawful_presence.start_ssa_process
+        expect(citizenship_v_type.reload.validation_status).to eq('negative_response_received')
+      end
+
+      it 'adds type history element to Citizenship verification type' do
+        expect(citizenship_v_type.type_history_elements).to be_empty
+        lawful_presence.start_ssa_process
+        type_history_element = citizenship_v_type.type_history_elements.first.reload
+        expect(type_history_element.action).to eq('Hub Request Failed')
+        expect(type_history_element.modifier).to eq('System')
+        expect(type_history_element.update_reason).to match(/SSA Verification Request/)
+        expect(type_history_element.update_reason).to match(/No SSN/)
+      end
+    end
   end
 
   context 'when validate_and_record_publish_errors feature is enabled' do
@@ -229,16 +263,43 @@ describe '#start_vlp_process' do
         end
       end
 
-      context 'when vlp verification request is not successful' do
+      context "when:
+      - consumer_role state is in dhs_pending
+      - vlp document is invalid
+      - vlp verification request is not successful" do
         before do
-          allow(validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid SSN'))
-          allow(Operations::Fdsh::EncryptedSsnValidator).to receive(:new).and_return(validator)
+          consumer_role.update_attributes!(aasm_state: 'dhs_pending')
+          consumer_role.vlp_documents.first.update_attributes!(alien_number: nil)
+          consumer_role.lawful_presence_determination.start_vlp_process(requested_start_date)
+        end
+
+        it 'changes consumer_role aasm state to verification_outstanding' do
+          expect(consumer_role.aasm_state).to eq('verification_outstanding')
         end
 
         it 'should be in negative_response_received' do
-          consumer_role.lawful_presence_determination.start_vlp_process(requested_start_date)
           vlp_verification_type = consumer_role.verification_types.where(type_name: "Citizenship").first
-          expect(vlp_verification_type.validation_status).to eq('pending')
+          expect(vlp_verification_type.validation_status).to eq('negative_response_received')
+        end
+      end
+
+      context "when:
+        - consumer_role state is in ssa_pending
+        - vlp document is invalid
+        - vlp verification request is not successful" do
+        before do
+          consumer_role.update_attributes!(aasm_state: 'ssa_pending')
+          consumer_role.vlp_documents.first.update_attributes!(alien_number: nil)
+          consumer_role.lawful_presence_determination.start_vlp_process(requested_start_date)
+        end
+
+        it 'does not change consumer_role aasm state' do
+          expect(consumer_role.aasm_state).to eq('ssa_pending')
+        end
+
+        it 'changes vlp_verification_type to negative_response_received' do
+          vlp_verification_type = consumer_role.verification_types.where(type_name: "Citizenship").first
+          expect(vlp_verification_type.validation_status).to eq('negative_response_received')
         end
       end
     end

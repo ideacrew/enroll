@@ -39,7 +39,6 @@ namespace :cv3_family_failures_report do
       end
     end
 
-    CSV.open(csv_file_path, 'wb') { |csv| csv << %w[family_hbx_id primary_hbx_id result output] } unless File.exists?(csv_file_path)
     family_ids = families_to_process(list_of_ids_file_path, last_id_file_path, csv_file_path)
 
     total = family_ids&.count
@@ -52,6 +51,7 @@ namespace :cv3_family_failures_report do
     total_batches = (total.to_f / batch_size).ceil
     log "There are #{total} families to process in #{total_batches} batches of #{batch_size}."
 
+    CSV.open(csv_file_path, 'wb') { |csv| csv << %w[family_hbx_id primary_hbx_id result output] } unless File.exists?(csv_file_path)
     # Process families in batches and write to CSV file logging progress as we go
     family_ids.sort.each_slice(batch_size).with_index do |family_id_batch, batch_number|
       families = Family.in(hbx_assigned_id: family_id_batch).to_a

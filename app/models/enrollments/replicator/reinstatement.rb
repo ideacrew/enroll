@@ -100,8 +100,12 @@ module Enrollments
         reinstated_enrollment.hbx_enrollment_members = clone_hbx_enrollment_members
         unless base_enrollment.coverage_expired?
           if base_enrollment.may_terminate_coverage? && (reinstate_enrollment.effective_on > base_enrollment.effective_on)
-            base_enrollment.terminate_coverage!
-            base_enrollment.update_attributes!(terminated_on: new_effective_date - 1.day)
+            unless base_enrollment.ineligible_for_termination?(new_effective_date)
+              base_enrollment.terminate_coverage!
+              base_enrollment.update_attributes!(terminated_on: new_effective_date - 1.day)
+            end
+          elsif base_enrollment.enrollment_superseded_and_eligible_for_cancellation?(new_effective_date)
+            base_enrollment.cancel_coverage_for_superseded_term!
           elsif base_enrollment.may_cancel_coverage?
             base_enrollment.cancel_coverage!
           end

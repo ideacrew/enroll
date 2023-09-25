@@ -49,7 +49,7 @@ module Forms
 
     def eligibility_params
       {
-        evidence_key: :osse_subsidy,
+        evidence_key: :ivl_osse_evidence,
         evidence_value: @osse_eligibility,
         effective_date: ::TimeKeeper.date_of_record
       }
