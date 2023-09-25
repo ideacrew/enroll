@@ -37,8 +37,30 @@ module FinancialAssistance
           def validate_and_construct_application_payload(application)
             payload_entity = ::Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application)
             return payload_entity unless EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
+            return handle_malformed_payload_entity(payload_entity, application) if payload_entity.failure?
 
-            FinancialAssistance::Operations::Applications::Verifications::ValidateApplicantAndUpdateEvidence.new.call(payload_entity, application)
+            FinancialAssistance::Operations::Applications::Verifications::ValidateApplicantAndUpdateEvidence.new.call(payload_entity.value!, application)
+          end
+
+          def handle_malformed_payload_entity(payload_entity, application)
+            error_message = payload_entity.failure
+            update_all_evidences(application, error_message)
+
+            Failure(error_message)
+          end
+
+          def update_all_evidences(application, error_message)
+            application.applicants.each do |applicant|
+              EVIDENCE_ALIASES.each_values.each do |evidence_key|
+                evidence = applicant.send(evidence_key)
+                next unless evidence
+
+                method = "determine_#{evidence.key.split('_').last}_evidence_aasm_status"
+                evidence.send(method)
+
+                evidence.add_verification_history("Hub Request Failed", error_message, "system")
+              end
+            end
           end
 
           def build_event(payload, application)
