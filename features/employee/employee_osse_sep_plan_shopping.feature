@@ -7,7 +7,7 @@ Feature: Employees plan shopping using QLE
     Given the osse subsidy feature is enabled
     Given all announcements are enabled for user to select
     Given a CCA site exists with a benefit market
-    Given benefit market catalog exists for active initial employer with health benefits
+    Given osse benefit market catalog exists for active initial employer with health benefits
     Given Qualifying life events are present
     And there is an employer ABC Widgets with a OSSE eligibility
 

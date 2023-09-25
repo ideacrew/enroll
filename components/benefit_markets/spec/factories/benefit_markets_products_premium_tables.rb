@@ -5,7 +5,7 @@ FactoryBot.define do
     association :rating_area, factory: :benefit_markets_locations_rating_area, strategy: :create
 
     transient do
-      premium_factor { 0 }
+      premium_factor { 0 } # multiplier for premium increments
     end
 
     after(:build) do |premium_table, evaluator|
