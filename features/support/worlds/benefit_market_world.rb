@@ -263,7 +263,7 @@ Given(/^osse benefit market catalog exists for (.*) initial employer with (.*) b
   product_kinds(coverage_kinds)
   health_products(5)
   dental_products if coverage_kinds.include?(:dental)
-  reset_product_cache  
+  reset_product_cache
   create_benefit_market_catalog_for(current_effective_date - 1.month) if current_effective_date.month == 1
   create_benefit_market_catalog_for(current_effective_date)
 end
