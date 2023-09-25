@@ -127,7 +127,12 @@ class HbxEnrollment
   field :external_id, type: String
   field :external_group_identifiers, type: Array
   field :special_enrollment_period_id, type: BSON::ObjectId
+
+  # In Individual Market's context the predecessor_enrollment_id is:
+  #   1. The id of the enrollment that is renewed.
+  #   2. The id of the enrollment that is superseded.(Expand in the future)
   field :predecessor_enrollment_id, type: BSON::ObjectId
+
   field :enrollment_signature, type: String
 
   field :consumer_role_id, type: BSON::ObjectId
@@ -2965,6 +2970,12 @@ class HbxEnrollment
     wfts.metadata_has?(
       { 'reason' => Enrollments::TerminationReasons::SUPERSEDED_SILENT }
     )
+  end
+
+  def predecessor_enrollment_hbx_id
+    return nil unless predecessor_enrollment_id
+
+    HbxEnrollment.where(id: predecessor_enrollment_id).first&.hbx_id
   end
 
   private

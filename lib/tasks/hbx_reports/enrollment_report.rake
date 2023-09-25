@@ -144,7 +144,7 @@ namespace :reports do
               "Purchase Date", "Coverage Start", "Coverage End", "SEP Reason", "Term Reason",
               "Home Address", "Mailing Address","Work Email", "Home Email", "Phone Number","Broker", "Broker NPN",
               "Broker Assignment Date","Race", "Ethnicity", "Citizen Status",
-              "Broker Assisted"]
+              "Broker Assisted", "Predecessor Enrollment HbxID"]
       while offset <= total_count
         enrollments.offset(offset).limit(batch_size).no_timeout.each do |enr|
           count += 1
@@ -201,7 +201,8 @@ namespace :reports do
                   per.ethnicity,
                   ethnicity_status(per.ethnicity),
                   per.citizen_status,
-                  broker_assisted(enr, primary_person)
+                  broker_assisted(enr, primary_person),
+                  enr.predecessor_enrollment_hbx_id
                 ]
               end
             end
