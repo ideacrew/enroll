@@ -202,7 +202,7 @@ namespace :reports do
                   ethnicity_status(per.ethnicity),
                   per.citizen_status,
                   broker_assisted(enr, primary_person),
-                  en.predecessor_enrollment_hbx_id
+                  enr.predecessor_enrollment_hbx_id
                 ]
               end
             end
