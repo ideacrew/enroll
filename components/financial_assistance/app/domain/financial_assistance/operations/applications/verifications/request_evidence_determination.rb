@@ -18,6 +18,7 @@ module FinancialAssistance
           }.freeze
 
           def call(application)
+            yield update_application_evidence_histories(application)
             payload_entity = yield validate_and_construct_application_payload(application)
             event_result = yield build_event(payload_entity, application)
             publish_result = yield publish_event_result(event_result)
@@ -27,56 +28,38 @@ module FinancialAssistance
 
           private
 
+          # UpdateEvidenceHistories of Application
+          def update_application_evidence_histories(application)
+            application.update_evidence_histories
+            Success()
+          end
+
           def validate_and_construct_application_payload(application)
             payload_entity = ::Operations::Fdsh::BuildAndValidateApplicationPayload.new.call(application)
+            return payload_entity unless EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
+            return handle_malformed_payload_entity(payload_entity, application) if payload_entity.failure?
 
-            if payload_entity.success? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_application_errors)
-              applicant_evidence_validations, invalid_income_evidence_errors_by_id = check_all_applicant_evidences(payload_entity.value!, application)
-
-              # only stop submission of application if all evidence types for every applicant are invalid
-              handle_invalid_income_evidence(application, invalid_income_evidence_errors_by_id) unless invalid_income_evidence_errors_by_id.empty?
-              return Failure('All applicantion evidences invalid') if applicant_evidence_validations.flatten.all?(&:failure?)
-            end
-            payload_entity
+            FinancialAssistance::Operations::Applications::Verifications::ValidateApplicantAndUpdateEvidence.new.call(payload_entity.value!, application)
           end
 
-          def check_all_applicant_evidences(payload_entity, application)
-            invalid_income_evidence_errors_by_id = []
-            applicant_evidences = payload_entity.applicants.map do |mma_applicant|
-              # create an array of all evidence types held by the applicant
-              applicant_evidence_keys = EVIDENCE_ALIASES.values.map { |evidence_type| mma_applicant.send(evidence_type)&.key }.compact
-              faa_applicant = application.applicants.find_by { |a| a.person_hbx_id == mma_applicant.person_hbx_id }
+          def handle_malformed_payload_entity(payload_entity, application)
+            error_message = payload_entity.failure
+            update_all_evidences(application, error_message)
 
-              # need to run validations against all evidence types for all applicants -- different evidence types _may_ require different validations
-              applicant_evidence_keys.map do |evidence_key|
-                evidence_validation = ::Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules.new.call(mma_applicant, evidence_key)
-                if evidence_validation.failure?
-                  invalid_income_evidence_errors_by_id << "#{mma_applicant.person_hbx_id} - #{evidence_validation.failure}" if evidence_key == :income
-                  handle_invalid_non_income_evidence(faa_applicant, evidence_key, evidence_validation.failure) if evidence_key != :income
-                end
+            Failure(error_message)
+          end
 
-                evidence_validation
+          def update_all_evidences(application, error_message)
+            application.applicants.each do |applicant|
+              EVIDENCE_ALIASES.each_values.each do |evidence_key|
+                evidence = applicant.send(evidence_key)
+                next unless evidence
+
+                method = "determine_#{evidence.key.split('_').last}_evidence_aasm_status"
+                evidence.send(method)
+
+                evidence.add_verification_history("Hub Request Failed", error_message, "system")
               end
-            end
-
-            [applicant_evidences, invalid_income_evidence_errors_by_id]
-          end
-
-          def handle_invalid_non_income_evidence(faa_applicant, evidence_type, failure_message)
-            evidence_alias = EVIDENCE_ALIASES[evidence_type]
-            evidence = faa_applicant.send(evidence_alias)
-            failure_message = "#{evidence_type.to_s.titleize} Determination Request Failed due to #{failure_message}"
-
-            evidence.determine_mec_evidence_aasm_status
-            evidence.add_verification_history("Hub Request Failed", failure_message, "system")
-          end
-
-          def handle_invalid_income_evidence(financial_assistance_application, invalid_app_ids)
-            failure_message = "Income Evidence Determination Request Failed due to invalid fields on the following applicants: #{invalid_app_ids.join(', ')}"
-
-            financial_assistance_application.applicants.select(&:income_evidence).each do |applicant|
-              applicant.income_evidence.determine_income_evidence_aasm_status
-              applicant.income_evidence.add_verification_history("Hub Request Failed", failure_message, "system")
             end
           end
 
