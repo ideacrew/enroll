@@ -6,7 +6,7 @@ require 'aasm/rspec'
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 describe LawfulPresenceDetermination do
 
-  after :each do
+  before :all do
     DatabaseCleaner.clean
   end
 
@@ -173,6 +173,40 @@ describe '#start_ssa_process' do
         expect(type_history_element.modifier).to eq('System')
         expect(type_history_element.update_reason).to match(/SSA Verification Request/)
         expect(type_history_element.update_reason).to match(/No SSN/)
+      end
+    end
+
+    context 'when person does not have ssn and is us_citizen' do
+      let(:invalid_ssn_person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+      let(:ivl_role) { invalid_ssn_person.consumer_role }
+      let(:lawful_presence) { FactoryBot.create(:lawful_presence_determination, :us_citizen, ivl_role: ivl_role) }
+      let(:citizenship_v_type) { ivl_role.verification_types.citizenship_type.first }
+
+      before :each do
+        allow(Operations::Fdsh::Ssa::H3::RequestSsaVerification).to receive_message_chain('new.call').with(invalid_ssn_person).and_return(Dry::Monads::Result::Failure.new("[Invalid SSN]"))
+        invalid_ssn_person.consumer_role.update_attributes(aasm_state: 'ssa_pending')
+      end
+
+      it 'modifies aasm_state of lawful_presence_determination' do
+        expect(lawful_presence.verification_successful?).to be_truthy
+        lawful_presence.start_ssa_process
+        expect(lawful_presence.reload.verification_outstanding?).to be_truthy
+      end
+
+      it 'modifies validation_status of the Citizenship verification type' do
+        expect(citizenship_v_type.validation_status).to eq('unverified')
+        lawful_presence.start_ssa_process
+        expect(citizenship_v_type.reload.validation_status).to eq('negative_response_received')
+      end
+
+      it 'adds type history element to Citizenship verification type' do
+        expect(citizenship_v_type.type_history_elements).to be_empty
+        lawful_presence.start_ssa_process
+        type_history_element = citizenship_v_type.type_history_elements.first.reload
+        expect(type_history_element.action).to eq('Hub Request Failed')
+        expect(type_history_element.modifier).to eq('System')
+        expect(type_history_element.update_reason).to match(/SSA Verification Request/)
+        expect(type_history_element.update_reason).to match(/Invalid SSN/)
       end
     end
   end

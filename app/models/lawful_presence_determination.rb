@@ -185,15 +185,14 @@ class LawfulPresenceDetermination
       update_reason: "SSA Verification Request Failed due to #{failure_request_result.failure}"
     }
 
+    citizenship_v_type = ivl_role.verification_types.citizenship_type.first
     # Only handles case where SSN is blank and member is US Citizen
     if ivl_role.encrypted_ssn.blank? && ivl_role.is_native?
-      citizenship_v_type = ivl_role.verification_types.citizenship_type.first
-      # "SSA Verification Request Failed due to No SSN for member"
       citizenship_v_type.add_type_history_element(type_history_params)
-      # We are not failing SSN DMI as it is not present and only handling Citizenship DMI
       ivl_role.fail_lawful_presence(args)
     else
       ssa_v_type.add_type_history_element(type_history_params)
+      citizenship_v_type.add_type_history_element(type_history_params)
       ivl_role.ssn_invalid!(args)
     end
   end
