@@ -8,12 +8,7 @@ module FinancialAssistance
         class ValidateApplicantAndUpdateEvidence
           include Dry::Monads[:result, :do]
 
-          EVIDENCE_ALIASES = {
-            income: :income_evidence,
-            esi_mec: :esi_evidence,
-            non_esi_mec: :non_esi_evidence,
-            local_mec: :local_mec_evidence
-          }.freeze
+          EVIDENCE_ALIASES = RequestEvidenceDetermination::EVIDENCE_ALIASES
 
           def call(payload_entity, application)
             yield check_all_applicant_evidences(payload_entity, application)
@@ -24,15 +19,19 @@ module FinancialAssistance
 
           def check_all_applicant_evidences(payload_entity, application)
             income_evidence_errors = []
-            evidence_validations = payload_entity.applicants.map do |mma_applicant|
-              evidence_keys, faa_applicant = get_applicant_info(application, mma_applicant)
+            evidence_validations = payload_entity.applicants.map do |applicant_entity|
+              evidence_keys, faa_applicant = get_applicant_info(application, applicant_entity)
 
               # need to run validations against all evidence types for all applicants -- different evidence types _may_ require different validations
               evidence_keys.map do |evidence_key|
-                evidence_validation = ::Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules.new.call(mma_applicant, evidence_key)
+                evidence_validation = ::Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules.new.call(applicant_entity, evidence_key)
                 if evidence_validation.failure?
-                  income_evidence_errors << "#{mma_applicant.person_hbx_id} - #{evidence_validation.failure}" if evidence_key == :income
-                  handle_invalid_non_income_evidence(faa_applicant, evidence_key, evidence_validation.failure) if evidence_key != :income
+
+                  if evidence_key == :income
+                    income_evidence_errors << "#{applicant_entity.person_hbx_id} - #{evidence_validation.failure}"
+                  else
+                    handle_invalid_non_income_evidence(faa_applicant, evidence_key, evidence_validation.failure)
+                  end
                 end
 
                 evidence_validation
@@ -44,10 +43,10 @@ module FinancialAssistance
             Success(evidence_validations)
           end
 
-          def get_applicant_info(application, mma_applicant)
+          def get_applicant_info(application, applicant_entity)
             # create an array of all evidence types held by the applicant
-            evidence_keys = EVIDENCE_ALIASES.each_value.map { |evidence_type| mma_applicant.send(evidence_type)&.key }.compact
-            faa_applicant = application.applicants.find_by { |a| a.person_hbx_id == mma_applicant.person_hbx_id }
+            evidence_keys = EVIDENCE_ALIASES.each_value.map { |evidence_type| applicant_entity.send(evidence_type)&.key }.compact
+            faa_applicant = application.applicants.find_by { |a| a.person_hbx_id == applicant_entity.person_hbx_id }
 
             [evidence_keys, faa_applicant]
           end
