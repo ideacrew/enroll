@@ -9,7 +9,7 @@ Feature: Employees plan shopping using QLE
     Given a CCA site exists with a benefit market
     Given osse benefit market catalog exists for active initial employer with health benefits
     Given Qualifying life events are present
-    And there is an employer ABC Widgets with a OSSE eligibility
+    And there is employer ABC Widgets with a OSSE eligibility
 
   Scenario: Employee Reports Qualifying Life Event (QLE) and Shops for a New Plan
     Given there exists Patrick Doe employee for employer ABC Widgets

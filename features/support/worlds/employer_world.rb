@@ -53,7 +53,7 @@ end
 
 World(EmployerWorld)
 
-And(/^there is an employer (.*?) with a OSSE eligibility$/) do |legal_name|
+And(/^there is employer (.*?) with a OSSE eligibility$/) do |legal_name|
   step "there is an employer #{legal_name}"
 
   organization = @organization[legal_name]
