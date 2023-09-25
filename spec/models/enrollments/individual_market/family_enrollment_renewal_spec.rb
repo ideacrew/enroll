@@ -414,6 +414,12 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                                                 ehb_premium: 1390
                                               })
           end
+
+          it 'populates predecessor_enrollment_id for health enrollments' do
+            expect(
+              subject.renew.predecessor_enrollment_id
+            ).to eq(enrollment.id)
+          end
         end
 
         context 'assisted renewal' do
@@ -628,6 +634,12 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             renewal = subject.renew
             expect(renewal.is_a?(HbxEnrollment)).to eq true
             expect(subject.aptc_values).to eq({})
+          end
+
+          it 'populates predecessor_enrollment_id for dental enrollments' do
+            expect(
+              subject.renew.predecessor_enrollment_id
+            ).to eq(enrollment.id)
           end
         end
 
