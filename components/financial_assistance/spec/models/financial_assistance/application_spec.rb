@@ -1730,7 +1730,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   end
 
   describe 'publish_application_determined' do
-    let(:publish_operation_class) { FinancialAssistance::Operations::Applications::Verifications::RequestApplicationDetermination }
+    let(:publish_operation_class) { FinancialAssistance::Operations::Applications::Verifications::RequestEvidenceDetermination }
 
     before do
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)

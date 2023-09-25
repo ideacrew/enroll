@@ -95,7 +95,7 @@ module BenefitSponsors
             puts(exception_message)
             log(exception_message)
           end
-          [pricing_model.map_relationship_for(rm.relationship, coverage_age, rm.is_disabled?), rm.dob]
+          [pricing_model.map_relationship_for(rm.relationship, coverage_age, rm.is_disabled?).to_s, rm.dob]
         end
         calc_state = CalculatorState.new(age_calculator, roster_coverage.product, pricing_model, pricing_unit_map, roster_coverage, coverage_eligibility_dates)
         calc_results = sorted_members.inject(calc_state) do |calc, mem|
