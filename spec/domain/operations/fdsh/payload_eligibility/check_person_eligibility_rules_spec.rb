@@ -35,6 +35,20 @@ RSpec.describe Operations::Fdsh::PayloadEligibility::CheckPersonEligibilityRules
         expect(result.failure).to eq(["Invalid SSN"])
       end
     end
+
+    context 'person without SSN' do
+      let(:person) do
+        per = FactoryBot.create(:person, :with_consumer_role)
+        per.update_attributes!(encrypted_ssn: nil)
+        per
+      end
+
+      it 'returns a failure result with an error message' do
+        expect(
+          subject.call(payload_entity, request_type).failure
+        ).to include('No SSN')
+      end
+    end
   end
 
   describe 'request_type dhs' do
