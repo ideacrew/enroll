@@ -18,7 +18,7 @@ namespace :reports do
 
     field_names  = [
       :user_hbx_id,
-      :original_due_date,
+      :beginning_of_reasonable_opportunity_period,
       :due_date_after_extension,
       :due_date_successfully_extended
     ]
