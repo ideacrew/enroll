@@ -141,6 +141,13 @@ Given(/a consumer role person with family/) do
   FactoryBot.create(:user, person: @person, email: person[:email], password: person[:password], password_confirmation: person[:password])
 end
 
+Given(/a resident role person with family/) do
+  person = people['Patrick Doe']
+  @person = FactoryBot.create(:person, :with_resident_role, first_name: 'Employee', last_name: person[:last_name], dob: person[:dob])
+  FactoryBot.create :family, :with_primary_family_member, person: @person
+  FactoryBot.create(:user, person: @person, email: person[:email], password: person[:password], password_confirmation: person[:password])
+end
+
 Given(/all products with issuer profile/) do
   @issuer_profile = FactoryBot.create :benefit_sponsors_organizations_issuer_profile
   BenefitMarkets::Products::Product.all.each {|product| product.update_attributes(issuer_profile: @issuer_profile)}

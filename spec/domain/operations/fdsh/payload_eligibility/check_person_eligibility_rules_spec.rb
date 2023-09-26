@@ -77,6 +77,18 @@ RSpec.describe Operations::Fdsh::PayloadEligibility::CheckPersonEligibilityRules
       end
     end
 
+    context 'when a no vlp documents exists for a consumer' do
+      let!(:person_entity) do
+        person_payload.to_h[:consumer_role].merge!(vlp_documents: [])
+        AcaEntities::People::Person.new(person_payload.to_h)
+      end
+
+      it 'returns a Success' do
+        result = described_class.new.call(person_entity, request_type)
+        expect(result.failure).to include('No VLP Documents')
+      end
+    end
+
     context 'when document type I-327 (Reentry Permit) has missing alien_number' do
       let!(:person_entity) do
         person_payload.to_h[:consumer_role][:vlp_documents][0].merge!(alien_number: nil)
