@@ -53,7 +53,8 @@ module FinancialAssistance
 
               if applicant_non_esi_evidence.present?
                 if response_non_esi_evidence.aasm_state == 'outstanding'
-                  applicant.set_evidence_outstanding(applicant_non_esi_evidence)
+                  due_date = fetch_evidence_due_date_for_bulk_actions(applicant_non_esi_evidence, response_non_esi_evidence)
+                  applicant.set_evidence_outstanding(applicant_non_esi_evidence, due_date)
                 else
                   applicant.set_evidence_attested(applicant_non_esi_evidence)
                 end
@@ -67,6 +68,16 @@ module FinancialAssistance
               end
 
               Success(applicant)
+            end
+
+            def fetch_evidence_due_date_for_bulk_actions(applicant_non_esi_evidence, response_evidence)
+              return if response_evidence.request_results.blank?
+              return applicant_non_esi_evidence.due_on if applicant_non_esi_evidence.due_on.present?
+              return unless response_evidence.request_results.any? do |result|
+                FinancialAssistance::Applicant::BULK_REDETERMINATION_ACTION_TYPES.include?(result.action)
+              end
+
+              TimeKeeper.date_of_record + EnrollRegistry[:bulk_call_verification_due_in_days].item.to_i
             end
           end
         end

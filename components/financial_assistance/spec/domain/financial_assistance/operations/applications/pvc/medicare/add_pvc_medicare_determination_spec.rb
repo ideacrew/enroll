@@ -24,13 +24,17 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::Medicare::A
                       application: application)
   end
 
+  let(:due_on) { nil }
+  let(:aasm_state) { 'attested' }
+
   context 'success' do
     context 'FDSH PVC Medicare outstanding response' do
       include_context 'FDSH PVC Medicare sample response'
 
       before do
         @applicant = application.applicants.first
-        @applicant.build_non_esi_evidence(key: :non_esi_mec, title: "NON ESI MEC")
+        @applicant.build_non_esi_evidence(key: :non_esi_mec, title: "NON ESI MEC", aasm_state: aasm_state,
+                                          due_on: due_on)
         @applicant.save!
         @result = subject.call({payload: response_payload, applicant_identifier: '1629165429385938'})
 
@@ -46,6 +50,34 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::Medicare::A
         @applicant.reload
         expect(@applicant.non_esi_evidence.aasm_state).to eq "outstanding"
         expect(@result.success).to eq('Successfully updated Applicant with evidences and verifications')
+      end
+
+      context "due_date does not exists" do
+        let(:request_result_hash) do
+          {
+            :result => "eligible",
+            :source => "MEDC",
+            :code => "7313",
+            :code_description => "Applicant Not Found",
+            :action => 'pvc_bulk_call'
+          }
+        end
+
+        it 'should set due date to system_date + 35.days it is a bulk call' do
+          due_date = TimeKeeper.date_of_record + EnrollRegistry[:bulk_call_verification_due_in_days].item.to_i
+          @applicant.reload
+          expect(@applicant.non_esi_evidence.due_on).to eq due_date
+        end
+      end
+
+      context 'due_date exists' do
+        let(:due_on) { TimeKeeper.date_of_record }
+        let(:aasm_state) { 'outstanding' }
+
+        it 'should not update due_on on local mec evidence' do
+          @applicant.reload
+          expect(@applicant.non_esi_evidence.due_on).to eq TimeKeeper.date_of_record
+        end
       end
     end
 
@@ -69,6 +101,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::Medicare::A
       it 'should update applicant verification' do
         @applicant.reload
         expect(@applicant.non_esi_evidence.aasm_state).to eq "attested"
+        expect(@applicant.non_esi_evidence.due_on).to be nil
         expect(@result.success).to eq('Successfully updated Applicant with evidences and verifications')
       end
     end
