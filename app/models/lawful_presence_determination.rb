@@ -192,7 +192,7 @@ class LawfulPresenceDetermination
       ivl_role.fail_lawful_presence(args)
     else
       ssa_v_type.add_type_history_element(type_history_params)
-      citizenship_v_type.add_type_history_element(type_history_params)
+      citizenship_v_type.add_type_history_element(type_history_params) if ivl_role.is_native?
       ivl_role.ssn_invalid!(args)
     end
   end
