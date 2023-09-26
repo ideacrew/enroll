@@ -19,7 +19,7 @@ module Subscribers
       end
       ack(delivery_info.delivery_tag)
     rescue StandardError => e
-      logger.error "Enroll: enroll_document_meta_data_subscriber_error: #{e.backtrace} for payload: #{payload}"
+      logger.error "Enroll: enroll_document_meta_data_subscriber_error: error message: #{e.message}, backtrace: #{e.backtrace} for payload: #{payload}"
       ack(delivery_info.delivery_tag)
     end
   end

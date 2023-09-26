@@ -25,9 +25,9 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "BatchProcessSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      logger.info "BatchProcessSubscriber: errored & acked. Backtrace: #{e.backtrace}"
-      subscriber_logger.info "BatchProcessSubscriber, ack: #{payload}"
+      subscriber_logger.error "BatchProcessSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      logger.error "BatchProcessSubscriber: errored & acked. error message: #{e.message}, Backtrace: #{e.backtrace}"
+      subscriber_logger.error "BatchProcessSubscriber, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
 
@@ -51,9 +51,9 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "BatchProcessSubscriber#on_enroll_enterprise_events, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      logger.info "BatchProcessSubscriber#on_enroll_enterprise_events: errored & acked. Backtrace: #{e.backtrace}"
-      subscriber_logger.info "BatchProcessSubscriber#on_enroll_enterprise_events, ack: #{payload}"
+      subscriber_logger.error "BatchProcessSubscriber#on_enroll_enterprise_events, payload: #{payload}, error_message: #{e.message}, backtrace: #{e.backtrace}"
+      logger.error "BatchProcessSubscriber#on_enroll_enterprise_events: errored & acked. error_message: #{e.message}, Backtrace: #{e.backtrace}"
+      subscriber_logger.error "BatchProcessSubscriber#on_enroll_enterprise_events, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
   end

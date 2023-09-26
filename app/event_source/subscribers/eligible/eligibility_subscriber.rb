@@ -40,7 +40,7 @@ module Subscribers
         end
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e
-        subscriber_logger.info "EligibilitySubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+        subscriber_logger.error "EligibilitySubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
         ack(delivery_info.delivery_tag)
       end
 
@@ -78,7 +78,7 @@ module Subscribers
 
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e
-        subscriber_logger.info "EligibilitySubscriber#on_enroll_enterprise_events, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+        subscriber_logger.error "EligibilitySubscriber#on_enroll_enterprise_events, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
         ack(delivery_info.delivery_tag)
       end
 

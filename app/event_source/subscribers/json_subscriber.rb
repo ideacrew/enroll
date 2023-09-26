@@ -20,7 +20,7 @@ module Subscribers
         nack(delivery_info.delivery_tag)
       end
     rescue StandardError => e
-      logger.info "on_stream: subscriber_error backtrace: #{e.backtrace} #{'-' * 50}"
+      logger.error "on_stream: subscriber_error error message: #{e.message}, backtrace: #{e.backtrace} #{'-' * 50}"
       nack(delivery_info.delivery_tag)
     end
   end

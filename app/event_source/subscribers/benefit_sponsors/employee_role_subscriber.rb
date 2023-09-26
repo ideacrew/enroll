@@ -21,8 +21,8 @@ module Subscribers
 
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e
-        subscriber_logger.info "EmployeeRoleSubscriber, employee_role: #{person&.full_name}, employer: #{employer&.legal_name}, error message: #{e.message}, backtrace: #{e.backtrace}"
-        logger.info "EmployeeRoleSubscriber: errored & acked. payload: #{payload} Backtrace: #{e.backtrace}"
+        subscriber_logger.error "EmployeeRoleSubscriber, employee_role: #{person&.full_name}, employer: #{employer&.legal_name}, error message: #{e.message}, backtrace: #{e.backtrace}"
+        logger.error "EmployeeRoleSubscriber: errored & acked. payload: #{payload} error message: #{e.message}, backtrace: #{e.backtrace}"
         ack(delivery_info.delivery_tag)
       end
 

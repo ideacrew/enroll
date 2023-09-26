@@ -23,7 +23,7 @@ module Subscribers
         ack(delivery_info.delivery_tag)
       rescue StandardError => e
         ack(delivery_info.delivery_tag)
-        logger.info "FTIGateway::IfsvDeterminationSubscriberr: on_fdsh_eligibilities_ifsv_determined error: #{e.backtrace}"
+        logger.error "FTIGateway::IfsvDeterminationSubscriberr: on_fdsh_eligibilities_ifsv_determined error_message: #{e.message}, backtrace: #{e.backtrace}"
       end
     end
   end

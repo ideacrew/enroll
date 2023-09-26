@@ -20,8 +20,8 @@ module Subscribers
 
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e
-        subscriber_logger.info "BenefitApplicationsSubscriber, employer fein: #{benefit_sponsorship.fein}, error message: #{e.message}, backtrace: #{e.backtrace}"
-        logger.info "BenefitApplicationsSubscriber: errored & acked. payload: #{payload} Backtrace: #{e.backtrace}"
+        subscriber_logger.error "BenefitApplicationsSubscriber, employer fein: #{benefit_sponsorship.fein}, error message: #{e.message}, backtrace: #{e.backtrace}"
+        logger.error "BenefitApplicationsSubscriber: errored & acked. payload: #{payload} error message: #{e.message}, backtrace: #{e.backtrace}"
         ack(delivery_info.delivery_tag)
       end
 
