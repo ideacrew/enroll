@@ -179,7 +179,7 @@ registry:
         is_enabled: true
         settings:
           - key: :offset_prior_to_due_date
-            item: 70
+            item: <%= ENV['DR2_DUE_DATE_OFFSET'] || 70 %>
           - key: :units
             item: :days
           - key: :event_name
