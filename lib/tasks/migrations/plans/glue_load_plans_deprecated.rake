@@ -1,5 +1,7 @@
+#! This rake is deprecated. Please use the rake `bundle exec rake seed:load_products`
+
 namespace :seed do
-  task :load_plans, [:year] => :environment do |task, args|
+  task :load_plans_deprecated, [:year] => :environment do |task, args|
 
     def build_premium_tables(premium_tables)
       results = premium_tables

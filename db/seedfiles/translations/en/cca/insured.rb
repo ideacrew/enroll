@@ -423,7 +423,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.enrollment.details.header' => 'Enrollment Detail',
   :'en.enrollment.members.header' => 'Enrollment Member Detail',
   :'en.enrollment.effective_on' => 'Effective Date: ',
-  :'en.enrollment.latest_transition' => 'Latest Transition: ',
+  :'en.enrollment.transitions' => 'Status Transition History: ',
   :'en.enrollment.latest_transition_data' => "From %{from_state} to %{to_state} at %{created_at}",
   :'en.enrollment.latest_transition_data_with_silent_reason' => "From %{from_state} to %{to_state} at %{created_at} (Silent)",
   :'en.product_hios_id' => 'Product HIOS ID: ',
