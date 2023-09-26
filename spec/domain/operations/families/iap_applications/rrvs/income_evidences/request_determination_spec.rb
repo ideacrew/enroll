@@ -2,7 +2,7 @@
 
 require 'aasm/rspec'
 
-RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::RequestDetermination, dbclean: :after_each do
+RSpec.describe Operations::Families::IapApplications::Rrvs::IncomeEvidences::RequestDetermination, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
   let!(:person) { FactoryBot.create(:person, hbx_id: "732020")}
@@ -19,6 +19,7 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
                       created_at: Date.new(2021, 10, 1))
   end
 
+  let(:incomes) { [FactoryBot.build(:financial_assistance_income)] }
   let!(:applicant) do
     applicant = FactoryBot.create(:applicant,
                                   :with_student_information,
@@ -51,7 +52,8 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
                                   is_incarcerated: false,
                                   net_annual_income: 10_078.90,
                                   is_post_partum_period: false,
-                                  is_ia_eligible: true)
+                                  is_ia_eligible: true,
+                                  incomes: incomes)
     applicant
   end
 
@@ -62,7 +64,7 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
                                   last_name: person2.last_name,
                                   dob: person2.dob,
                                   gender: person2.gender,
-                                  ssn: nil,
+                                  ssn: "856471234",
                                   application: application,
                                   ethnicity: [],
                                   is_primary_applicant: true,
@@ -87,7 +89,8 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
                                   is_incarcerated: false,
                                   net_annual_income: 10_078.90,
                                   is_post_partum_period: false,
-                                  is_ia_eligible: true)
+                                  is_ia_eligible: true,
+                                  incomes: incomes)
     applicant
   end
 
@@ -161,7 +164,6 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
     before do
       allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
-      applicant2.update_attributes!(ssn: "756841234")
       @result = subject.call({application_hbx_id: application.hbx_id, family_hbx_id: family.hbx_assigned_id})
       application.reload
     end
@@ -171,23 +173,23 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
     end
 
     it 'should record failure for valid applicant1' do
-      non_esi_evidence = application.applicants[0].non_esi_evidence
-      expect(non_esi_evidence.verification_histories.last.action).to eq 'RRV_Submitted'
+      income_evidence = application.applicants[0].income_evidence
+      expect(income_evidence.verification_histories.last.action).to eq 'RRV_Submitted'
     end
 
-    it 'non_esi_evidence state for valid applicant1 is pending' do
-      non_esi_evidence = application.applicants[0].non_esi_evidence
-      expect(non_esi_evidence).to have_state(:pending)
+    it 'income_evidence state for valid applicant1 is pending' do
+      income_evidence = application.applicants[0].income_evidence
+      expect(income_evidence).to have_state(:pending)
     end
 
     it 'should record failure for invalid applicant' do
-      non_esi_evidence = application.applicants[1].non_esi_evidence
-      expect(non_esi_evidence.verification_histories.last.action).to eq 'RRV_Submitted'
+      income_evidence = application.applicants[1].income_evidence
+      expect(income_evidence.verification_histories.last.action).to eq 'RRV_Submitted'
     end
 
-    it 'non_esi_evidence for invalid applicant is pending' do
-      non_esi_evidence = application.applicants[1].non_esi_evidence
-      expect(non_esi_evidence).to have_state(:pending)
+    it 'income_evidence for invalid applicant is pending' do
+      income_evidence = application.applicants[1].income_evidence
+      expect(income_evidence).to have_state(:pending)
     end
   end
 
@@ -196,32 +198,34 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
       before do
         allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
+        application.applicants.last.unset(:encrypted_ssn)
+        application.save!
         @result = subject.call({application_hbx_id: application.hbx_id, family_hbx_id: family.hbx_assigned_id})
         application.reload
       end
 
-      it 'should return success' do
-        expect(@result).to be_success
+      it 'should return failure' do
+        expect(@result).to be_failure
       end
 
-      it 'should record success for valid applicant1' do
-        non_esi_evidence = application.applicants[0].non_esi_evidence
-        expect(non_esi_evidence.verification_histories.last.action).to eq 'RRV_Submitted'
+      it 'should record failure for valid applicant1' do
+        income_evidence = application.applicants[0].income_evidence
+        expect(income_evidence.verification_histories.last.action).to eq 'RRV_Submission_Failed'
       end
 
-      it 'non_esi_evidence for valid applicant1 is pending' do
-        non_esi_evidence = application.applicants[0].non_esi_evidence
-        expect(non_esi_evidence).to have_state(:pending)
+      it 'income_evidence state for valid applicant1 is negative_response_received' do
+        income_evidence = application.applicants[0].income_evidence
+        expect(income_evidence).to have_state(:negative_response_received)
       end
 
       it 'should record failure for invalid applicant' do
-        non_esi_evidence = application.applicants[1].non_esi_evidence
-        expect(non_esi_evidence.verification_histories.last.action).to eq 'RRV_Submission_Failed'
+        income_evidence = application.applicants[1].income_evidence
+        expect(income_evidence.verification_histories.last.action).to eq 'RRV_Submission_Failed'
       end
 
-      it 'non_esi_evidence for invalid applicant is attested' do
-        non_esi_evidence = application.applicants[1].non_esi_evidence
-        expect(non_esi_evidence).to have_state(:attested)
+      it 'income_evidence for invalid applicant is negative_response_received' do
+        income_evidence = application.applicants[1].income_evidence
+        expect(income_evidence).to have_state(:negative_response_received)
       end
     end
 
@@ -242,23 +246,23 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
       end
 
       it 'should record failure for invalid applicant1' do
-        non_esi_evidence = application.applicants[0].non_esi_evidence
-        expect(non_esi_evidence.verification_histories.last.action).to eq 'RRV_Submission_Failed'
+        income_evidence = application.applicants[0].income_evidence
+        expect(income_evidence.verification_histories.last.action).to eq 'RRV_Submission_Failed'
       end
 
-      it 'non_esi_evidence for invalid applicant1 is attested' do
-        non_esi_evidence = application.applicants[0].non_esi_evidence
-        expect(non_esi_evidence).to have_state(:attested)
+      it 'income_evidence for invalid applicant1 is negative_response_received' do
+        income_evidence = application.applicants[0].income_evidence
+        expect(income_evidence).to have_state(:negative_response_received)
       end
 
       it 'should record failure for invalid applicant1' do
-        non_esi_evidence = application.applicants[1].non_esi_evidence
-        expect(non_esi_evidence.verification_histories.last.action).to eq 'RRV_Submission_Failed'
+        income_evidence = application.applicants[1].income_evidence
+        expect(income_evidence.verification_histories.last.action).to eq 'RRV_Submission_Failed'
       end
 
-      it 'non_esi_evidence for invalid applicant1 is attested' do
-        non_esi_evidence = application.applicants[1].non_esi_evidence
-        expect(non_esi_evidence).to have_state(:attested)
+      it 'income_evidence for invalid applicant1 is negative_response_received' do
+        income_evidence = application.applicants[1].income_evidence
+        expect(income_evidence).to have_state(:negative_response_received)
       end
     end
   end
