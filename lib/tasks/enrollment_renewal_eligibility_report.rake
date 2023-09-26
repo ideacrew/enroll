@@ -1,5 +1,5 @@
 desc "Run a report for enrollment eligibility"
-task :enrollment_eligibility_report => :environment do
+task :enrollment_renewal_eligibility_report => :environment do
   file_name = "#{Rails.root}/enrollment_eligibility_report_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.csv"
   field_names = %w[EnrollmentHbxId EnrollmentAASMState PrimaryHbxID MemberHbxID MemberFirstName MemberLastName MemberDOB member-is_applying_coverage member-citizen_status member-is_incarcerated member-state member_present_in_manage_family? applicant-is_applying_coverage applicant-citizen_status applicant-is_incarcerated applicant-state error_message]
   CSV.open(file_name, 'w', force_quotes: true) do |csv|
@@ -42,7 +42,7 @@ task :enrollment_eligibility_report => :environment do
           end
         rescue => e
           puts "Error: #{e.message}"
-          csv << [enrollment.hbx_id, enrollment.aasm_state, field_names[2..-2].map { |field| nil }, e.message]
+          csv << [enrollment.hbx_id, enrollment.aasm_state, field_names[2..-2].map { |_field| nil }, e.message].flatten
           next
         end
       end
