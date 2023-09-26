@@ -41,25 +41,11 @@ module FinancialAssistance
               updated_applicants << applicant.person_hbx_id
               applicant.income_evidence.auto_extend_due_on(params[:extend_by].days, params[:modified_by])
             end
-
-            update_family_level_verification_due_date(application)
           end
 
           Success(updated_applicants)
         rescue StandardError => e
           Failure("Failed to auto extend income evidence due on because of #{e.message}")
-        end
-
-        def update_family_level_verification_due_date(application)
-          family = application.family
-          eligibility_determination = family&.eligibility_determination
-          return unless eligibility_determination
-
-          applicants_earliest_due_date = family&.min_verification_due_date_on_family
-          family_earliest_due_date = eligibility_determination&.outstanding_verification_earliest_due_date
-          return unless applicants_earliest_due_date && family_earliest_due_date
-
-          family.eligibility_determination.update(outstanding_verification_earliest_due_date: applicants_earliest_due_date) if applicants_earliest_due_date > family_earliest_due_date
         end
       end
     end

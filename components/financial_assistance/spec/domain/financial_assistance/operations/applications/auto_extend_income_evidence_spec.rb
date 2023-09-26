@@ -273,11 +273,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
           expect(applicant2.income_evidence.due_on).to eq(applicant_2_due_date) # extensions only happen if evidence due on is the current_due_on
           expect(applicant3.income_evidence.due_on).to eq(applicant_3_due_date) # Extension period not applicable to applicants ineligible for auto-renewal
         end
-
-        it 'should update the family outstanding_verification_earliest_due_date to the earliest income_evidence due_on date' do
-          # applicant2 has the earliest income_evidence due_on date -- meaning the overall earliest due date for the family should also be this date
-          expect(family.eligibility_determination.outstanding_verification_earliest_due_date).to eq(applicant2.income_evidence.due_on)
-        end
       end
     end
   end
