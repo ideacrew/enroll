@@ -15,7 +15,7 @@ module FinancialAssistance
     embedded_in :application, class_name: "::FinancialAssistance::Application", inverse_of: :applicants
 
     TAX_FILER_KINDS = %w[tax_filer single joint separate dependent non_filer].freeze
-    BULK_REDETERMINATION_ACTION_TYPES = ["Bulk Call"].freeze
+    BULK_REDETERMINATION_ACTION_TYPES = ["Bulk Call", "pvc_bulk_call"].freeze
     STUDENT_KINDS = %w[
       dropped_out
       elementary
