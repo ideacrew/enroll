@@ -227,7 +227,7 @@ module BenefitMarketWorld
       health_product = BenefitMarkets::Products::Product.by_year(2023).by_kind(:health)[2]
       effective_year_for_lcsp = @benefit_market_catalog.application_period.begin.year
       feature_key = "lowest_cost_silver_product_#{effective_year_for_lcsp}"
-      if EnrollRegistry.feature?(feature_key)
+      if EnrollRegistry.feature?(feature_key) && EnrollRegistry.feature_enabled?(feature_key)
         hios_id = EnrollRegistry[feature_key].item
         if hios_id
           health_product.update_attributes(

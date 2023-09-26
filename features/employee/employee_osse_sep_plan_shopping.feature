@@ -28,7 +28,9 @@ Feature: Employees plan shopping using QLE
     And Patrick Doe should see the plans from the active plan year
     When Employee selects a last plan on the plan shopping page
     Then Patrick Doe should see coverage summary page with qle effective date
+    Then Patrick Doe should see employee premium and subsidy based on qle effective date
     Then Patrick Doe should see the receipt page with qle effective date as effective date
+    Then Patrick Doe should see employee premium and subsidy based on qle effective date
     Then Patrick Doe should see "my account" page with enrollment
 
   Scenario: Employee Reports Qualifying Life Event (QLE) and Maintains Current Plan
@@ -45,5 +47,7 @@ Feature: Employees plan shopping using QLE
     Then Employee should see the group selection page
     When employee clicked on clicked on keep existing plan button
     Then Patrick Doe should see coverage summary page with qle effective date
+    Then Patrick Doe should see employee premium and subsidy based on plan year effective date
     Then Patrick Doe should see the receipt page with qle effective date as effective date
+    Then Patrick Doe should see employee premium and subsidy based on plan year effective date
     Then Patrick Doe should see "my account" page with enrollment
