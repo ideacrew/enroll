@@ -756,7 +756,6 @@ module BenefitSponsors
     end
 
     def refresh(new_benefit_sponsor_catalog)
-      warn "[Deprecated] Instead use refresh_benefit_sponsor_catalog" unless Rails.env.test?
       refresh_benefit_sponsor_catalog(new_benefit_sponsor_catalog)
     end
 
@@ -1129,7 +1128,7 @@ module BenefitSponsors
 
 
     def all_enrolled_members_count
-      warn "[Deprecated] Instead use: all_enrolled_and_waived_member_count" unless Rails.env.production?
+      # [Deprecated] Instead use: all_enrolled_and_waived_member_count
       all_enrolled_and_waived_member_count
     end
 
@@ -1144,42 +1143,42 @@ module BenefitSponsors
     end
 
     def total_enrolled_count
-      warn "[Deprecated] Instead use: all_enrolled_and_waived_member_count" unless Rails.env.production?
+      # [Deprecated] Instead use: all_enrolled_and_waived_member_count
       all_enrolled_and_waived_member_count
     end
 
     def non_business_owner_enrolled
-      warn "[Deprecated] Instead use: enrolled_non_business_owner_members" unless Rails.env.production?
+      # [Deprecated] Instead use: enrolled_non_business_owner_members
       enrolled_non_business_owner_members
     end
 
     def is_published? # Deprecate in future
-      warn "[Deprecated] Instead use is_submitted?"  unless Rails.env.production?
+      # [Deprecated] Instead use is_submitted?
       is_submitted?
     end
 
     def benefit_groups # Deprecate in future
-      warn "[Deprecated] Instead use benefit_packages"  unless Rails.env.production?
+      # [Deprecated] Instead use benefit_packages
       benefit_packages
     end
 
     def employees_are_matchable? # Deprecate in future
-      warn "[Deprecated] Instead use is_submitted?"  unless Rails.env.production?
+      # [Deprecated] Instead use is_submitted?
       is_submitted?
     end
 
     def waived
-      warn "[Deprecated] Instead use: waived_members" unless Rails.env.production?
+      # [Deprecated] Instead use: waived_members
       waived_members
     end
 
     def waived_count
-      warn "[Deprecated] Instead use: waived_member_count" unless Rails.env.production?
+      # [Deprecated] Instead use: waived_member_count
       waived_member_count
     end
 
     def covered
-      warn "[Deprecated] Instead use: enrolled_members" unless Rails.env.production?
+      # [Deprecated] Instead use: enrolled_members
       enrolled_members
     end
 
@@ -1189,22 +1188,22 @@ module BenefitSponsors
     end
 
     def covered_count
-      warn "[Deprecated] Instead use: enrolled_member_count" unless Rails.env.production?
+      # [Deprecated] Instead use: enrolled_member_count
       enrolled_member_count
     end
 
     def eligible_to_enroll
-      warn "[Deprecated] Instead use: members_eligible_to_enroll" unless Rails.env.production?
+      # [Deprecated] Instead use: members_eligible_to_enroll
       members_eligible_to_enroll
     end
 
     def eligible_to_enroll_count
-      warn "[Deprecated] Instead use: members_eligible_to_enroll_count" unless Rails.env.production?
+      # [Deprecated] Instead use: members_eligible_to_enroll_count
       members_eligible_to_enroll_count
     end
 
     def employer_profile
-      warn "[Deprecated] Instead use: sponsor_profile" unless Rails.env.production?
+      # [Deprecated] Instead use: sponsor_profile
       sponsor_profile
     end
 
