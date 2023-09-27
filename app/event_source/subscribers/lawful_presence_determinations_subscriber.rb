@@ -13,8 +13,8 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "LawfulPresenceDeterminationsSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      subscriber_logger.info "LawfulPresenceDeterminationsSubscriber, ack: #{payload}"
+      subscriber_logger.error "LawfulPresenceDeterminationsSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.error "LawfulPresenceDeterminationsSubscriber, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
 
@@ -32,7 +32,7 @@ module Subscribers
       result_str = result.success? ? "Success: #{result.success}" : "Failure: #{result.failure}"
       subscriber_logger.info "LawfulPresenceDeterminationsSubscriber, determine_verifications result: #{result_str}"
     rescue StandardError => e
-      subscriber_logger.info "Error: LawfulPresenceDeterminationsSubscriber, response: #{e}"
+      subscriber_logger.error "Error: LawfulPresenceDeterminationsSubscriber, error message: #{e.message}, backtrace: #{e.backtrace}"
     end
 
     private

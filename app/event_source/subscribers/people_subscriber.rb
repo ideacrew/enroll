@@ -14,8 +14,8 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "PeopleSubscriber::Save, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      subscriber_logger.info "PeopleSubscriber::Save, ack: #{payload}"
+      subscriber_logger.error "PeopleSubscriber::Save, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.error "PeopleSubscriber::Save, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
 
@@ -28,8 +28,8 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "PeopleSubscriber::Update, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      subscriber_logger.info "PeopleSubscriber::Update,  ack: #{payload}"
+      subscriber_logger.error "PeopleSubscriber::Update, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.error "PeopleSubscriber::Update,  ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
 
@@ -57,7 +57,7 @@ module Subscribers
         subscriber_logger.info "PeopleSubscriber::Update, determine_verifications result: #{result_str}"
       end
     rescue StandardError => e
-      subscriber_logger.info "Error: PeopleSubscriber::Update, response: #{e}"
+      subscriber_logger.error "Error: PeopleSubscriber::Update, error message: #{e.message}, backtrace: #{e.backtrace}"
     end
 
     private

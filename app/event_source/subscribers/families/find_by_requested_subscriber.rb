@@ -18,7 +18,7 @@ module Subscribers
 
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e
-        logger.error "on_find_by_requested error: #{e} backtrace: #{e.backtrace}; acked (nacked)"
+        logger.error "on_find_by_requested error: #{e.message} backtrace: #{e.backtrace}; acked (nacked)"
         ack(delivery_info.delivery_tag)
       end
 
@@ -37,7 +37,7 @@ module Subscribers
         generate_and_publish_payload(subscriber_logger, correlation_id, response)
         subscriber_logger.info "process_find_by_requested_event: ------- end"
       rescue StandardError => e
-        subscriber_logger.error "process_find_by_requested_event: error: #{e} backtrace: #{e.backtrace}"
+        subscriber_logger.error "process_find_by_requested_event: error: #{e.message} backtrace: #{e.backtrace}"
         subscriber_logger.error "process_find_by_requested_event: ------- end"
       end
 

@@ -40,8 +40,8 @@ module Subscribers
 
             ack(delivery_info.delivery_tag)
           rescue StandardError, SystemStackError => e
-            logger.info "RenewalDeterminedSubscriber error: #{e.backtrace}"
-            subscriber_logger.info "RenewalDeterminedSubscriber error: #{e.backtrace}"
+            logger.error "RenewalDeterminedSubscriber error message: #{e.message}, backtrace: #{e.backtrace}"
+            subscriber_logger.error "RenewalDeterminedSubscriber error message: #{e.message}, backtrace: #{e.backtrace}"
             ack(delivery_info.delivery_tag)
           end
         end
