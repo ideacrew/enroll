@@ -410,5 +410,23 @@ RSpec.describe Operations::Fdsh::PayloadEligibility::CheckPersonEligibilityRules
         expect(@result).to be_failure
       end
     end
+
+    context 'when given an invalid I-551 type' do
+      let!(:person_entity) do
+        person_payload.to_h[:consumer_role][:vlp_documents][0].merge!({
+                                                                        :subject => 'I551 1234',
+                                                                        :card_number => '123456789'
+                                                                      })
+        AcaEntities::People::Person.new(person_payload.to_h)
+      end
+
+      before do
+        @result = described_class.new.call(person_entity, request_type)
+      end
+
+      it 'returns a failure' do
+        expect(@result).to be_failure
+      end
+    end
   end
 end
