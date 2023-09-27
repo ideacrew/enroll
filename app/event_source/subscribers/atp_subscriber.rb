@@ -36,7 +36,7 @@ module Subscribers
       FinancialAssistance::Operations::Transfers::MedicaidGateway::PublishTransferResponse.new.call(transfer_details)
     rescue StandardError => e
       nack(delivery_info.delivery_tag)
-      logger.info "AtpSubscriber: error: #{e.backtrace}"
+      logger.error "AtpSubscriber: error_message: #{e.message}, backtrace: #{e.backtrace}"
     end
   end
 end

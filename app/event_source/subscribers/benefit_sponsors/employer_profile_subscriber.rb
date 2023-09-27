@@ -37,13 +37,13 @@ module Subscribers
             logger.info "BulkCeUpload: acked, FailureResult, errors: #{errors}"
           end
         rescue StandardError => e
-          logger.info "EmployerProfileSubscriber: on_bulk_ce_upload error: #{e.backtrace}"
+          logger.error "EmployerProfileSubscriber: on_bulk_ce_upload error_message: #{e.message}, backtrace: #{e.backtrace}"
         ensure
           Aws::S3Storage.delete_file(payload['bucket_name'], payload['s3_reference_key'])
         end
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e
-        logger.info "EmployerProfileSubscriber: on_bulk_ce_upload error: #{e.backtrace}"
+        logger.error "EmployerProfileSubscriber: on_bulk_ce_upload error_message: #{e.message}, backtrace: #{e.backtrace}"
         ack(delivery_info.delivery_tag)
       end
 
