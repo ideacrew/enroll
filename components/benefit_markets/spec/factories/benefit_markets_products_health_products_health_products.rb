@@ -27,6 +27,7 @@ FactoryBot.define do
 
     transient do
       build_premium_tables true
+      premium_factor { 0 } # multiplier for premium increments
       issuer_name { 'BlueChoice' }
     end
 
@@ -117,7 +118,7 @@ FactoryBot.define do
 
     after(:build) do |product, evaluator|
       if evaluator.build_premium_tables
-        product.premium_tables << build_list(:benefit_markets_products_premium_table, 1, effective_period: product.application_period,
+        product.premium_tables << build_list(:benefit_markets_products_premium_table, 1, effective_period: product.application_period, premium_factor: evaluator.premium_factor,
                                                                                          rating_area: FactoryBot.create(:benefit_markets_locations_rating_area, active_year: product.application_period.min.year))
       end
     end
