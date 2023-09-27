@@ -14,6 +14,7 @@ require 'csv'
 namespace :reports do
   task :export_eligible_users_with_outstanding_income_evidences, [:migrate_users] => :environment do |_t, args|
     file_name = "#{Rails.root}/users_with_outstanding_income_evidence_eligible_for_extension.csv"
+
     field_names  = [
       :primary_applicant_hbx_id,
       :family_eligibility_determination_outstanding_verification_status,
@@ -48,12 +49,12 @@ namespace :reports do
           evidence = applicant&.income_evidence
 
           next unless evidence &&
-                      ['outstanding', 'rejected'].include?(evidence.aasm_state) &&
-                      # evidence.aasm_state == 'outstanding' &&
+                      evidence.aasm_state == 'outstanding' &&
                       (evidence.due_on >= start_range && evidence.due_on <= end_range)
 
           original_due_date = (evidence.due_on - 95.days)
           new_due_date = (original_due_date + 160.days)
+
           successful_save = evidence.update(due_on: new_due_date) if args[:migrate_users]
 
           csv << populate_csv_row(family, applicant, new_due_date, successful_save)

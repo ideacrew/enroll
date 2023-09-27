@@ -42,9 +42,9 @@ module Subscribers
 
             ack(delivery_info.delivery_tag)
           rescue StandardError, SystemStackError => e
-            subscriber_logger.info "RenewalRequestSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-            logger.info "RenewalRequestSubscriber: errored & acked. Backtrace: #{e.backtrace}"
-            subscriber_logger.info "RenewalRequestSubscriber, ack: #{payload}"
+            subscriber_logger.error "RenewalRequestSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+            logger.error "RenewalRequestSubscriber: errored & acked. error message: #{e.message}, backtrace: #{e.backtrace}"
+            subscriber_logger.error "RenewalRequestSubscriber, ack: #{payload}"
             ack(delivery_info.delivery_tag)
           end
         end

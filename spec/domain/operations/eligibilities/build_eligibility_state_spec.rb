@@ -160,6 +160,27 @@ RSpec.describe ::Operations::Eligibilities::BuildEligibilityState,
     end
   end
 
+  context 'when there is no income for the applicant' do
+    before do
+      application.applicants[1].update_attributes(incomes: [])
+      @result = subject.call(required_params)
+    end
+
+    it 'should return success' do
+      expect(@result.success?).to be_truthy
+    end
+
+    it 'should have evidence states built' do
+      eligibility_state = @result.success
+      expect(eligibility_state.key?(:determined_at)).to be_truthy
+      expect(eligibility_state.key?(:evidence_states)).to be_truthy
+      expect(eligibility_state[:evidence_states].keys).to eq eligibility_item
+        .evidence_items
+        .map(&:key)
+        .map(&:to_sym)
+    end
+  end
+
   context '.fetch_document_status' do
 
     context 'fully uploaded' do

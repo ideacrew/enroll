@@ -121,7 +121,7 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
     end
 
     after do
-      # File.delete(file_name)
+      File.delete(file_name)
     end
 
     context "when generating a report on a dry run" do
