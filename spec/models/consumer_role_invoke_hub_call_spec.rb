@@ -57,9 +57,11 @@ describe ConsumerRole, dbclean: :around_each do
       )
     end
     let!(:lawful_presence_determination) { FactoryBot.build(:lawful_presence_determination, citizen_status: citizen_status) }
+    let!(:citizen_status) { 'us_citizen' }
+    let!(:is_applying_coverage) { true }
 
     context 'validate_and_record_publish_errors enabled' do
-      shared_examples_for 'IVL state machine transitions and verification_types validation_status' do |ssn, citizen, from_state, to_state, event, type_name, verification_type_validation_status|
+      shared_examples_for 'IVL state machine transitions and verification_types validation_status' do |from_state, to_state, event, type_name, verification_type_validation_status|
         before do
           EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
           allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
@@ -67,13 +69,10 @@ describe ConsumerRole, dbclean: :around_each do
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:vlp_h92).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_errors).and_return(true)
 
-          person.ssn = ssn
+          person.ssn = nil
           person.save!
           consumer_role.reload
         end
-
-        let(:citizen_status) { citizen }
-        let(:is_applying_coverage) { true }
 
         it "moves from #{from_state} to #{to_state} on #{event}" do
           expect(consumer_role).to transition_from(from_state).to(to_state).on_event(event.to_sym, verification_attr)
@@ -84,12 +83,12 @@ describe ConsumerRole, dbclean: :around_each do
       end
 
       context 'coverage_purchased_no_residency with us_citizen and no ssn' do
-        it_behaves_like 'IVL state machine transitions and verification_types validation_status', nil, 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Citizenship"], "negative_response_received"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Citizenship"], "negative_response_received"
       end
     end
 
     context 'validate_and_record_publish_errors disabled' do
-      shared_examples_for 'IVL state machine transitions and verification_types validation_status' do |ssn, citizen, from_state, to_state, event, type_name, verification_type_validation_status|
+      shared_examples_for 'IVL state machine transitions and verification_types validation_status' do |from_state, to_state, event, type_name, verification_type_validation_status|
         before do
           EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
           allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
@@ -97,13 +96,10 @@ describe ConsumerRole, dbclean: :around_each do
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:vlp_h92).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_errors).and_return(false)
 
-          person.ssn = ssn
+          person.ssn = nil
           person.save!
           consumer_role.reload
         end
-
-        let(:citizen_status) { citizen }
-        let(:is_applying_coverage) { true }
 
         it "moves from #{from_state} to #{to_state} on #{event}" do
           expect(consumer_role).to transition_from(from_state).to(to_state).on_event(event.to_sym, verification_attr)
@@ -114,7 +110,7 @@ describe ConsumerRole, dbclean: :around_each do
       end
 
       context 'coverage_purchased_no_residency with us_citizen and no ssn' do
-        it_behaves_like 'IVL state machine transitions and verification_types validation_status', nil, 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Citizenship"], "negative_response_received"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Citizenship"], "negative_response_received"
       end
     end
   end
