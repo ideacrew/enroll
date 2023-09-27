@@ -14,7 +14,7 @@ Feature: Consumer verification process
     Then Admin should see and click Call HUB option
     And Admin clicks confirm
     When evidence determination payload is failed to publish
-    Then Admin should see the error message unable to submited request
+    Then Admin should see the error message unable to submit request
     And Admin should see the esi evidence state as attested
     And Admin clicks on esi evidence action dropdown
     Then Admin navigates to view history section
