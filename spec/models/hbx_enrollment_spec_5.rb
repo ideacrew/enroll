@@ -13,11 +13,13 @@ RSpec.describe HbxEnrollment, type: :model do
   let(:person) { create(:person, :with_consumer_role, :with_active_consumer_role, first_name: 'test1') }
   let(:family) { create(:family, :with_primary_family_member, person: person) }
   let(:aasm_state) { 'coverage_selected' }
+  let(:predecessor_enrollment_id) { nil }
   let(:hbx_enrollment) do
     create(:hbx_enrollment, :individual_aptc, :with_silver_health_product, aasm_state: aasm_state,
                                                                            applied_aptc_amount: applied_aptc_amount,
                                                                            elected_aptc_pct: elected_aptc_pct,
                                                                            family: family,
+                                                                           predecessor_enrollment_id: predecessor_enrollment_id,
                                                                            consumer_role_id: person.consumer_role.id,
                                                                            ehb_premium: enrollment_ehb_premium)
   end
@@ -645,6 +647,60 @@ RSpec.describe HbxEnrollment, type: :model do
           hbx_enrollment.propogate_terminate(terminated_on_date, transition_args)
         end.not_to raise_error(StandardError)
         expect(hbx_enrollment.terminated_on).to eq(terminated_on_date)
+      end
+    end
+  end
+
+  describe '#predecessor_enrollment_hbx_id' do
+    let(:enrollment2) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        :individual_aptc,
+        :with_silver_health_product,
+        aasm_state: aasm_state,
+        family: family,
+        consumer_role_id: person.consumer_role.id
+      )
+    end
+
+    context 'with predecessor_enrollment_id' do
+      let(:predecessor_enrollment_id) { enrollment2.id }
+
+      it 'returns predecessor_enrollment_id' do
+        expect(hbx_enrollment.predecessor_enrollment_hbx_id).to eq(enrollment2.hbx_id)
+      end
+    end
+
+    context 'without predecessor_enrollment_id' do
+      it 'returns nil' do
+        expect(hbx_enrollment.predecessor_enrollment_hbx_id).to be_nil
+      end
+    end
+  end
+
+  describe '#predecessor_enrollment' do
+    let(:enrollment2) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        :individual_aptc,
+        :with_silver_health_product,
+        aasm_state: aasm_state,
+        family: family,
+        consumer_role_id: person.consumer_role.id
+      )
+    end
+
+    context 'with predecessor_enrollment_id' do
+      let(:predecessor_enrollment_id) { enrollment2.id }
+
+      it 'returns predecessor_enrollment_id' do
+        expect(hbx_enrollment.predecessor_enrollment).to eq(enrollment2)
+      end
+    end
+
+    context 'without predecessor_enrollment_id' do
+      it 'returns nil' do
+        expect(hbx_enrollment.predecessor_enrollment).to be_nil
       end
     end
   end
