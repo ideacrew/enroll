@@ -473,6 +473,7 @@ class HbxEnrollment
       effective_on: { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }
     )
   end
+  scope :effectuated, -> { where(:aasm_state.nin => ['coverage_canceled', 'shopping']) }
 
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -2973,9 +2974,13 @@ class HbxEnrollment
   end
 
   def predecessor_enrollment_hbx_id
+    predecessor_enrollment&.hbx_id
+  end
+
+  def predecessor_enrollment
     return nil unless predecessor_enrollment_id
 
-    HbxEnrollment.where(id: predecessor_enrollment_id).first&.hbx_id
+    HbxEnrollment.where(id: predecessor_enrollment_id).first
   end
 
   private
