@@ -26,7 +26,7 @@ module Operations
 
           errors = vlp_documents.collect do |vlp_document_entity|
             next if vlp_document_entity.subject.nil?
-            vlp_errors = ::Validators::VlpV37Contract.new.call(JSON.parse(vlp_document_entity.to_json).compact).errors.to_h
+            vlp_errors = AcaEntities::Fdsh::Vlp::H92::VlpV37Contract.new.call(JSON.parse(vlp_document_entity.to_json).compact).errors.to_h
             vlp_errors if vlp_errors.present?
           end.compact
 
