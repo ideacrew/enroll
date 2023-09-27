@@ -53,6 +53,22 @@ end
 
 World(EmployerWorld)
 
+And(/^there is employer (.*?) with a OSSE eligibility$/) do |legal_name|
+  step "there is an employer #{legal_name}"
+
+  organization = @organization[legal_name]
+  employer_profile = organization.employer_profile
+
+  ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(
+    {
+      subject: employer_profile.active_benefit_sponsorship.to_global_id,
+      evidence_key: :shop_osse_evidence,
+      evidence_value: 'true',
+      effective_date: TimeKeeper.date_of_record.beginning_of_year
+    }
+  )
+end
+
 And(/^there is an employer (.*?)$/) do |legal_name|
   employer legal_name, legal_name: legal_name, dba: legal_name
   benefit_sponsorship(employer(legal_name))
