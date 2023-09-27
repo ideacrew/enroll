@@ -31,9 +31,9 @@ namespace :reports do
       :due_date_successfully_extended
     ]
 
-    days_to_extend = (FinancialAssistanceRegistry[:auto_update_income_evidence_due_on].settings(:days).item + 1)
+    days_to_extend = FinancialAssistanceRegistry[:auto_update_income_evidence_due_on].settings(:days).item
     end_range = TimeKeeper.date_of_record
-    start_range = (end_range - days_to_extend.days)
+    start_range = (end_range - (days_to_extend + 1).days)
 
     eligibile_families = Family.where(
       :eligibility_determination => { :$exists => true },
@@ -44,17 +44,13 @@ namespace :reports do
     CSV.open(file_name, "w", write_headers: true, headers: field_names) do |csv|
       eligibile_families.each do |family|
         application = FinancialAssistance::Application.where(family_id: family.id).determined.max_by(&:submitted_at)
+        applicants = get_applicants(application, start_range, end_range)
 
-        application.applicants.each do |applicant|
-          evidence = applicant&.income_evidence
-          valid_aasm_states = ['outstanding', 'rejected']
+        next if applicants.blank?
 
-          next unless evidence &&
-                      valid_aasm_states.include?(evidence.aasm_state) &&
-                      (evidence.due_on >= start_range && evidence.due_on <= end_range)
-
-          original_due_date = (evidence.due_on - 95.days)
-          new_due_date = (original_due_date + 160.days)
+        applicants.each do |applicant|
+          evidence = applicant.income_evidence
+          new_due_date = (evidence.due_on + days_to_extend.days)
 
           successful_save = evidence.update(due_on: new_due_date) if args[:migrate_users]
 
@@ -70,6 +66,18 @@ namespace :reports do
     end
 
     puts "Generates a report of all applicants with income evidences eligible for an extension"
+  end
+end
+
+def get_applicants(application, start_range, end_range)
+  valid_aasm_states = ['outstanding', 'rejected']
+
+  application.applicants.select do |applicant|
+    evidence = applicant.income_evidence
+
+    evidence &&
+      valid_aasm_states.include?(evidence.aasm_state) &&
+      (evidence.due_on >= start_range && evidence.due_on <= end_range)
   end
 end
 

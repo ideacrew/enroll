@@ -50,6 +50,15 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
 
     let!(:applicant4) do
       FactoryBot.create(:applicant,
+                        application: application2,
+                        dob: TimeKeeper.date_of_record - 27.years,
+                        is_primary_applicant: false,
+                        family_member_id: family2.family_members[1].id,
+                        person_hbx_id: family2.family_members[1].person.hbx_id)
+    end
+
+    let!(:applicant5) do
+      FactoryBot.create(:applicant,
                         application: application3,
                         dob: TimeKeeper.date_of_record - 40.years,
                         is_primary_applicant: true,
@@ -60,7 +69,7 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
     let(:applicant_1_original_due_date) { TimeKeeper.date_of_record - 65.days }
     let(:applicant_2_original_due_date) { TimeKeeper.date_of_record - 66.days }
     let(:applicant_3_original_due_date) { TimeKeeper.date_of_record - 97.days }
-    let(:applicant_4_original_due_date) { TimeKeeper.date_of_record - 64.days }
+    let(:applicant_5_original_due_date) { TimeKeeper.date_of_record - 64.days }
 
     let!(:income_evidence_1) do
       applicant.create_income_evidence(key: :income,
@@ -90,10 +99,10 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
     end
 
     let!(:income_evidence_4) do
-      applicant4.create_income_evidence(key: :income,
+      applicant5.create_income_evidence(key: :income,
                                         title: 'Income',
-                                        aasm_state: 'outstanding',
-                                        due_on: applicant_4_original_due_date,
+                                        aasm_state: 'rejected',
+                                        due_on: applicant_5_original_due_date,
                                         verification_outstanding: true,
                                         is_satisfied: false)
     end
@@ -137,13 +146,13 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
 
         expect(csv[0]["applicant_person_hbx_id"]).to eq(applicant.person_hbx_id)
         expect(csv[1]["applicant_person_hbx_id"]).to eq(applicant2.person_hbx_id)
-        expect(csv[2]["applicant_person_hbx_id"]).to eq(applicant4.person_hbx_id)
+        expect(csv[2]["applicant_person_hbx_id"]).to eq(applicant5.person_hbx_id)
       end
 
       it "should not update the income evidence due dates for any user" do
         expect(applicant.income_evidence.due_on).to eq(applicant_1_original_due_date)
         expect(applicant2.income_evidence.due_on).to eq(applicant_2_original_due_date)
-        expect(applicant4.income_evidence.due_on).to eq(applicant_4_original_due_date)
+        expect(applicant5.income_evidence.due_on).to eq(applicant_5_original_due_date)
       end
     end
 
