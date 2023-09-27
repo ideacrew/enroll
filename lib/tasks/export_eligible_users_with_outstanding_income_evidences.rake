@@ -47,9 +47,10 @@ namespace :reports do
 
         application.applicants.each do |applicant|
           evidence = applicant&.income_evidence
+          valid_aasm_states = ['outstanding', 'rejected']
 
           next unless evidence &&
-                      evidence.aasm_state == 'outstanding' &&
+                      valid_aasm_states.include?(evidence.aasm_state) &&
                       (evidence.due_on >= start_range && evidence.due_on <= end_range)
 
           original_due_date = (evidence.due_on - 95.days)
