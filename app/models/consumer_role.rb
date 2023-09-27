@@ -738,7 +738,8 @@ class ConsumerRole
       invoke_verification!(verification_attr)
       fail_indian_tribe
     elsif native_no_ssn?
-      fail_lawful_presence(verification_attr)
+      invoke_ssa
+      fail_lawful_presence(verification_attr) unless EnrollRegistry.feature_enabled?(:validate_and_record_publish_errors)
     end
   end
 
