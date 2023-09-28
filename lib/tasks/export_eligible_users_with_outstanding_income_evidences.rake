@@ -31,7 +31,7 @@ namespace :reports do
       :due_date_successfully_extended
     ]
 
-    days_to_extend = FinancialAssistanceRegistry[:auto_update_income_evidence_due_on].settings(:days).item
+    days_to_extend = (FinancialAssistanceRegistry[:auto_update_income_evidence_due_on]&.settings(:days)&.item || 65)
     end_range = TimeKeeper.date_of_record
     start_range = (end_range - (days_to_extend + 1).days)
 
