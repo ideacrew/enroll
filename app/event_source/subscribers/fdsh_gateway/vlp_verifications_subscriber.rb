@@ -24,7 +24,7 @@ module Subscribers
         ack(delivery_info.delivery_tag)
       rescue StandardError => e
         ack(delivery_info.delivery_tag)
-        logger.info "Vlp::VlpverificationsSubscriber: on_initial_verification_complete error: #{e.backtrace}"
+        logger.error "Vlp::VlpverificationsSubscriber: on_initial_verification_complete error_message: #{e.message}, backtrace: #{e.backtrace}"
       end
     end
   end

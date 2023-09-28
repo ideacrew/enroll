@@ -61,8 +61,8 @@ module Subscribers
     end
 
     def log_error(subscriber_logger, logger, name, err)
-      logger.info "#{name} Error raised when processing given payload message: #{err}, backtrace: #{err.backtrace.join('\n')}" if logger.present?
-      subscriber_logger.info "#{name} Error raised when processing given payload message: #{err}, backtrace: #{err.backtrace.join('\n')}"
+      logger.error "#{name} Error raised when processing given payload message: #{err.message}, backtrace: #{err.backtrace.join('\n')}" if logger.present?
+      subscriber_logger.error "#{name} Error raised when processing given payload message: #{err.message}, backtrace: #{err.backtrace.join('\n')}"
     end
 
     def log_payload(subscriber_logger, logger, payload)

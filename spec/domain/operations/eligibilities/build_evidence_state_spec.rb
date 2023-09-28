@@ -159,4 +159,20 @@ RSpec.describe ::Operations::Eligibilities::BuildEvidenceState,
       expect(result.success.key?(evidence_item.key.to_sym)).to be_truthy
     end
   end
+
+  context 'when there is no income for the applicant' do
+    before do
+      application.applicants[1].update_attributes(incomes: [])
+      @result = subject.call(required_params)
+    end
+
+    it 'should return success' do
+      expect(@result.success?).to be_truthy
+    end
+
+    it 'should build with evidence details' do
+      expect(@result.success).to be_a(Hash)
+      expect(@result.success.key?(evidence_item.key.to_sym)).to be_truthy
+    end
+  end
 end
