@@ -31,7 +31,7 @@ namespace :reports do
       :due_date_successfully_extended
     ]
 
-    days_to_extend = FinancialAssistanceRegistry[:auto_update_income_evidence_due_on].settings(:days).item
+    days_to_extend = (FinancialAssistanceRegistry[:auto_update_income_evidence_due_on]&.settings(:days)&.item || 65)
     end_range = TimeKeeper.date_of_record
     start_range = (end_range - (days_to_extend + 1).days)
 
@@ -51,9 +51,11 @@ namespace :reports do
 
         applicants.each do |applicant|
           evidence = applicant.income_evidence
-          new_due_date = (evidence.due_on + days_to_extend.days)
+          total_extension_days = days_to_extend.days
+          new_due_date = (evidence.due_on + total_extension_days)
 
-          successful_save = evidence.update(due_on: new_due_date) if args[:migrate_users]
+          evidence.extend_due_on(total_extension_days, 'system', 'auto_extend_due_date') if args[:migrate_users]
+          successful_save = (evidence.due_on == new_due_date)
 
           csv << populate_csv_row(family, applicant, new_due_date, successful_save)
         rescue StandardError => e
@@ -75,14 +77,13 @@ def get_applicants(application, start_range, end_range)
   application.applicants.select do |applicant|
     evidence = applicant.income_evidence
 
-    if evidence.due_on.blank?
-      puts "Income evidence missing date: Application #{application.hbx_id}, Applicant #{applicant.person_hbx_id}, Income Evidence: #{evidence.id}, state: #{evidence.aasm_state}"
-    end
-  
-    evidence &&
-      evidence.due_on &&
-      valid_aasm_states.include?(evidence.aasm_state) &&
-      (evidence.due_on >= start_range && evidence.due_on <= end_range)
+    # NOTE: this line is rubocop's fault
+    puts "Income evidence missing date: Application #{application.hbx_id}, Applicant #{applicant.person_hbx_id}, Income Evidence: #{evidence.id}, state: #{evidence.aasm_state}" if evidence&.due_on&.blank?
+
+    evidence&.due_on &&
+      valid_aasm_states.include?(evidence&.aasm_state) &&
+      (evidence.due_on >= start_range && evidence.due_on <= end_range) &&
+      evidence&.can_be_extended?('auto_extend_due_date')
   end
 end
 
@@ -104,6 +105,6 @@ def populate_csv_row(family, applicant, new_due_date, successful_save)
     evidence.id,
     evidence.due_on,
     new_due_date,
-    (successful_save ? successful_save : 'NOT EXTENDED')
+    (successful_save ? 'TRUE' : 'NOT EXTENDED')
   ]
 end
