@@ -37,7 +37,7 @@ module FinancialAssistance
           updated_applicants = []
           applications.each do |application|
             application.applicants.each do |applicant|
-              next unless applicant.income_evidence&.can_be_extended?(params[:current_due_on])
+              next unless applicant.income_evidence&.can_be_auto_extended?(params[:current_due_on])
               updated_applicants << applicant.person_hbx_id
               applicant.income_evidence.auto_extend_due_on(params[:extend_by].days, params[:modified_by])
             end

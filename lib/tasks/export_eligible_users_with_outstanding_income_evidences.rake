@@ -50,9 +50,10 @@ namespace :reports do
 
         applicants.each do |applicant|
           evidence = applicant.income_evidence
-          new_due_date = (evidence.due_on + days_to_extend.days)
+          total_extension_days = days_to_extend.days
+          new_due_date = (evidence.due_on + total_extension_days)
 
-          successful_save = evidence.update(due_on: new_due_date) if args[:migrate_users]
+          successful_save = evidence.extend_due_on(total_extension_days, 'system', 'migration_extend_due_date') if args[:migrate_users]
 
           csv << populate_csv_row(family, applicant, new_due_date, successful_save)
         rescue StandardError => e
@@ -77,7 +78,8 @@ def get_applicants(application, start_range, end_range)
 
     evidence &&
       valid_aasm_states.include?(evidence.aasm_state) &&
-      (evidence.due_on >= start_range && evidence.due_on <= end_range)
+      (evidence.due_on >= start_range && evidence.due_on <= end_range) &&
+      evidence.can_be_extended?('migration_extend_due_date')
   end
 end
 
@@ -99,6 +101,6 @@ def populate_csv_row(family, applicant, new_due_date, successful_save)
     evidence.id,
     evidence.due_on,
     new_due_date,
-    (successful_save ? _ : 'NOT EXTENDED')
+    (successful_save ? 'TRUE' : 'NOT EXTENDED')
   ]
 end
