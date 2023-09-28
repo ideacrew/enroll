@@ -77,13 +77,11 @@ def get_applicants(application, start_range, end_range)
   application.applicants.select do |applicant|
     evidence = applicant.income_evidence
 
-    if evidence&.due_on&.blank?
-      puts "Income evidence missing date: Application #{application.hbx_id}, Applicant #{applicant.person_hbx_id}, Income Evidence: #{evidence.id}, state: #{evidence.aasm_state}"
-    end
-  
-    evidence &&
-      evidence.due_on &&
-      valid_aasm_states.include?(evidence.aasm_state) &&
+    # NOTE: this line is rubocop's fault
+    puts "Income evidence missing date: Application #{application.hbx_id}, Applicant #{applicant.person_hbx_id}, Income Evidence: #{evidence.id}, state: #{evidence.aasm_state}" if evidence&.due_on&.blank?
+
+    evidence&.due_on &&
+      valid_aasm_states.include?(evidence&.aasm_state) &&
       (evidence.due_on >= start_range && evidence.due_on <= end_range) &&
       evidence.can_be_extended?('migration_extend_due_date')
   end
