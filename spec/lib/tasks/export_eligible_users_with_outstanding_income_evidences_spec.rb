@@ -83,7 +83,7 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
     let!(:income_evidence_2) do
       applicant2.create_income_evidence(key: :income,
                                         title: 'Income',
-                                        aasm_state: 'outstanding',
+                                        aasm_state: 'rejected',
                                         due_on: applicant_2_original_due_date,
                                         verification_outstanding: true,
                                         is_satisfied: false)
