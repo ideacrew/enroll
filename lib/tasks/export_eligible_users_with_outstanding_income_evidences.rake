@@ -45,10 +45,10 @@ namespace :reports do
       eligibile_families.each do |family|
         application = FinancialAssistance::Application.where(family_id: family.id).determined.max_by(&:submitted_at)
         next unless application
-        
+
         applicants = get_applicants(application, start_range, end_range)
         next if applicants&.blank?
-        
+
         applicants.each do |applicant|
           evidence = applicant.income_evidence
           total_extension_days = days_to_extend.days
@@ -77,10 +77,9 @@ def get_applicants(application, start_range, end_range)
   application.applicants.select do |applicant|
     evidence = applicant.income_evidence
 
-    if evidence&.due_on&.blank?
-      puts "Income evidence missing date: Application #{application.hbx_id}, Applicant #{applicant.person_hbx_id}, Income Evidence: #{evidence.id}, state: #{evidence.aasm_state}"
-    end
-  
+    # NOTE: this line is rubocop's fault
+    puts "Income evidence missing date: Application #{application.hbx_id}, Applicant #{applicant.person_hbx_id}, Income Evidence: #{evidence.id}, state: #{evidence.aasm_state}" if evidence&.due_on&.blank?
+
     evidence&.due_on &&
       valid_aasm_states.include?(evidence&.aasm_state) &&
       (evidence.due_on >= start_range && evidence.due_on <= end_range)

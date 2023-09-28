@@ -143,7 +143,7 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
       it "should have a verification history with the correct action and updated_by fields" do
         applicant.reload
         evidence_histories = applicant.income_evidence.verification_histories
-        
+
         expect(evidence_histories.first.action).to eq('migration_extend_due_date')
         expect(evidence_histories.first.updated_by).to eq('system')
       end
