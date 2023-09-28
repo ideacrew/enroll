@@ -4,7 +4,6 @@ class Insured::FamilyMembersController < ApplicationController
   include VlpDoc
   include ApplicationHelper
   include ::L10nHelper
-  include EventSource::Command
 
   before_action :dependent_person_params, only: [:create, :update]
   before_action :set_current_person
@@ -117,7 +116,7 @@ class Insured::FamilyMembersController < ApplicationController
       Rails.logger.info("In FamilyMembersController create action #{params}, #{@family.inspect}") unless active_family_members_count == immediate_household_members_count + extended_family_members_count
       @created = true
       consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
-      fire_consumer_roles_create(consumer_role) if consumer_role
+      fire_consumer_roles_create_for_vlp_docs(consumer_role) if consumer_role
       respond_to do |format|
         format.html { render 'show' }
         format.js { render 'show' }
@@ -195,7 +194,7 @@ class Insured::FamilyMembersController < ApplicationController
           params[:dependent][:is_applying_coverage]
         )
       end
-      fire_consumer_roles_update(consumer_role, original_applying_for_coverage)
+      fire_consumer_roles_update_for_vlp_docs(consumer_role, original_applying_for_coverage)
       respond_to do |format|
         format.html { render 'show' }
         format.js { render 'show' }
@@ -261,35 +260,6 @@ class Insured::FamilyMembersController < ApplicationController
       format.html
       format.js
     end
-  end
-
-  # These methods are a fix to make sure that any associated events are
-  # fired correctly.
-  # It's placed here because:
-  #   1. Embedded documents can frequently change the state of consumer
-  #      roles, but those writes/changes can happen after the consumer
-  #      role itself is updated.
-  #   2. If we place the event broadcast into the embedded document itself,
-  #      the result is a tremendous amount of thrashing when this update
-  #      should actually be considered atomic.
-  #   3. We have no desire right now to impact the behaviour of primary family
-  #      members during the entry process.
-  #
-  # All of this logic should be refactored into the correct single operation
-  # when this controller is corrected into the clean code pattern.
-
-  def fire_consumer_roles_create(consumer_role)
-    event = event('events.individual.consumer_roles.created', attributes: { gid: consumer_role.to_global_id.uri })
-    event.success.publish if event.success?
-  rescue StandardError => e
-    Rails.logger.error { "Couldn't generate consumer role create event due to #{e.backtrace}" }
-  end
-
-  def fire_consumer_roles_update(consumer_role, original_applying_for_coverage)
-    event = event('events.individual.consumer_roles.updated', attributes: { gid: consumer_role.to_global_id.uri, previous: {is_applying_coverage: original_applying_for_coverage} })
-    event.success.publish if event.success?
-  rescue StandardError => e
-    Rails.logger.error { "Couldn't generate consumer role updated event due to #{e.backtrace}" }
   end
 
   private

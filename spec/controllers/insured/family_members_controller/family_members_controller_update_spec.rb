@@ -45,8 +45,13 @@ RSpec.describe Insured::FamilyMembersController do
         ConsumerRole,
         person: double(is_homeless: false, is_temporarily_out_of_state: false),
         local_residency_validation: nil,
-        residency_determined_at: nil
+        residency_determined_at: nil,
+        global_id: global_id
       )
+    end
+
+    let(:global_id) do
+      ConsumerRole.new.to_global_id
     end
 
     let(:dependent_controller_parameters) do
