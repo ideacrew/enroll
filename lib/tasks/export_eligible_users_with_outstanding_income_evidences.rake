@@ -44,9 +44,10 @@ namespace :reports do
     CSV.open(file_name, "w", write_headers: true, headers: field_names) do |csv|
       eligibile_families.each do |family|
         application = FinancialAssistance::Application.where(family_id: family.id).determined.max_by(&:submitted_at)
-        applicants = get_applicants(application, start_range, end_range)
+        next unless application
 
-        next if applicants.blank?
+        applicants = get_applicants(application, start_range, end_range)
+        next if applicants&.blank?
 
         applicants.each do |applicant|
           evidence = applicant.income_evidence
@@ -59,7 +60,6 @@ namespace :reports do
           puts "Invalid Applicant for Application with hbx_id #{application&.hbx_id}, Applicant person_hbx_id #{applicant&.person_hbx_id}: #{e.message}"
         end
 
-        update_family_level_due_date_info(application.family)
       rescue StandardError => e
         puts "An error occurred while processing an application with hbx_id #{application&.hbx_id}: #{e.message}"
       end
@@ -75,7 +75,12 @@ def get_applicants(application, start_range, end_range)
   application.applicants.select do |applicant|
     evidence = applicant.income_evidence
 
+    if evidence.due_on.blank?
+      puts "Income evidence missing date: Application #{application.hbx_id}, Applicant #{applicant.person_hbx_id}, Income Evidence: #{evidence.id}, state: #{evidence.aasm_state}"
+    end
+  
     evidence &&
+      evidence.due_on &&
       valid_aasm_states.include?(evidence.aasm_state) &&
       (evidence.due_on >= start_range && evidence.due_on <= end_range)
   end
@@ -99,6 +104,6 @@ def populate_csv_row(family, applicant, new_due_date, successful_save)
     evidence.id,
     evidence.due_on,
     new_due_date,
-    (successful_save ? _ : 'NOT EXTENDED')
+    (successful_save ? successful_save : 'NOT EXTENDED')
   ]
 end
