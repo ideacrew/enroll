@@ -9,10 +9,6 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
   let(:rake) { Rake::Task["reports:export_eligible_users_with_outstanding_income_evidences"] }
   let(:file_name) { "#{Rails.root}/users_with_outstanding_income_evidence_eligible_for_extension.csv" }
 
-  before :all do
-    DatabaseCleaner.clean
-  end
-
   let!(:person1) { FactoryBot.create(:person) }
   let!(:person2) { FactoryBot.create(:person) }
   let!(:person3) { FactoryBot.create(:person) }
@@ -50,46 +46,45 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
   let(:applicant_6_original_due_date) { TimeKeeper.date_of_record - 40.days }
   let(:applicant_7_original_due_date) { TimeKeeper.date_of_record - 80.days }
 
+  let!(:evidence1) { applicant1.create_income_evidence(key: :income, title: 'Income', aasm_state: 'outstanding', due_on: applicant_1_original_due_date, verification_outstanding: true, is_satisfied: false) }
+  let!(:evidence2) { applicant2.create_income_evidence(key: :income, title: 'Income', aasm_state: 'rejected', due_on: applicant_2_original_due_date, verification_outstanding: true, is_satisfied: false) }
+  let!(:evidence3) { applicant3.create_income_evidence(key: :income, title: 'Income', aasm_state: 'outstanding', due_on: applicant_3_original_due_date, verification_outstanding: true, is_satisfied: false) }
+  let!(:evidence5) { applicant5.create_income_evidence(key: :income, title: 'Income', aasm_state: 'outstanding', due_on: applicant_5_original_due_date, verification_outstanding: true, is_satisfied: false) }
+  let!(:evidence6) { applicant6.create_income_evidence(key: :income, title: 'Income', aasm_state: 'rejected', due_on: applicant_6_original_due_date, verification_outstanding: true, is_satisfied: false) }
+  let!(:evidence7) { applicant7.create_income_evidence(key: :income, title: 'Income', aasm_state: 'outstanding', due_on: applicant_7_original_due_date, verification_outstanding: true, is_satisfied: false) }
+
+  before do
+    min_date1 = family1.min_verification_due_date_on_family
+    min_date2 = family2.min_verification_due_date_on_family
+    min_date3 = family3.min_verification_due_date_on_family
+    min_date4 = family4.min_verification_due_date_on_family
+
+    family1.create_eligibility_determination
+    family1.eligibility_determination.update!(outstanding_verification_status: 'outstanding',
+                                              outstanding_verification_earliest_due_date: min_date1,
+                                              outstanding_verification_document_status: 'Partially Uploaded')
+
+    family2.create_eligibility_determination
+    family2.eligibility_determination.update!(outstanding_verification_status: 'outstanding',
+                                              outstanding_verification_earliest_due_date: min_date2,
+                                              outstanding_verification_document_status: 'Partially Uploaded')
+
+    family3.create_eligibility_determination
+    family3.eligibility_determination.update!(outstanding_verification_status: 'outstanding',
+                                              outstanding_verification_earliest_due_date: min_date3,
+                                              outstanding_verification_document_status: 'Partially Uploaded')
+
+    family4.create_eligibility_determination
+    family4.eligibility_determination.update!(outstanding_verification_status: 'outstanding',
+                                              outstanding_verification_earliest_due_date: min_date4,
+                                              outstanding_verification_document_status: 'Partially Uploaded')
+  end
+
+  after do
+    File.delete(file_name)
+  end
+
   describe "Generating a report of users eligible to have their income_evidence due_on date extended" do
-
-    let!(:evidence1) { applicant1.create_income_evidence(key: :income, title: 'Income', aasm_state: 'outstanding', due_on: applicant_1_original_due_date, verification_outstanding: true, is_satisfied: false) }
-    let!(:evidence2) { applicant2.create_income_evidence(key: :income, title: 'Income', aasm_state: 'rejected', due_on: applicant_2_original_due_date, verification_outstanding: true, is_satisfied: false) }
-    let!(:evidence3) { applicant3.create_income_evidence(key: :income, title: 'Income', aasm_state: 'outstanding', due_on: applicant_3_original_due_date, verification_outstanding: true, is_satisfied: false) }
-    let!(:evidence5) { applicant5.create_income_evidence(key: :income, title: 'Income', aasm_state: 'outstanding', due_on: applicant_5_original_due_date, verification_outstanding: true, is_satisfied: false) }
-    let!(:evidence6) { applicant6.create_income_evidence(key: :income, title: 'Income', aasm_state: 'rejected', due_on: applicant_6_original_due_date, verification_outstanding: true, is_satisfied: false) }
-    let!(:evidence7) { applicant7.create_income_evidence(key: :income, title: 'Income', aasm_state: 'outstanding', due_on: applicant_7_original_due_date, verification_outstanding: true, is_satisfied: false) }
-
-    before do
-      min_date1 = family1.min_verification_due_date_on_family
-      min_date2 = family2.min_verification_due_date_on_family
-      min_date3 = family3.min_verification_due_date_on_family
-      min_date4 = family4.min_verification_due_date_on_family
-
-      family1.create_eligibility_determination
-      family1.eligibility_determination.update!(outstanding_verification_status: 'outstanding',
-                                                outstanding_verification_earliest_due_date: min_date1,
-                                                outstanding_verification_document_status: 'Partially Uploaded')
-
-      family2.create_eligibility_determination
-      family2.eligibility_determination.update!(outstanding_verification_status: 'outstanding',
-                                                outstanding_verification_earliest_due_date: min_date2,
-                                                outstanding_verification_document_status: 'Partially Uploaded')
-
-      family3.create_eligibility_determination
-      family3.eligibility_determination.update!(outstanding_verification_status: 'outstanding',
-                                                outstanding_verification_earliest_due_date: min_date3,
-                                                outstanding_verification_document_status: 'Partially Uploaded')
-
-      family4.create_eligibility_determination
-      family4.eligibility_determination.update!(outstanding_verification_status: 'outstanding',
-                                                outstanding_verification_earliest_due_date: min_date4,
-                                                outstanding_verification_document_status: 'Partially Uploaded')
-    end
-
-    after do
-      File.delete(file_name)
-    end
-
     context "when generating a report on a dry run" do
       before do
         rake.reenable
