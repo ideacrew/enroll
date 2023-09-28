@@ -153,6 +153,7 @@ module Operations
             next if vlp_document.subject.nil?
             {
               subject: vlp_document.subject,
+              description: vlp_document.description,
               alien_number: vlp_document.alien_number,
               i94_number: vlp_document.i94_number,
               visa_number: vlp_document.visa_number,
