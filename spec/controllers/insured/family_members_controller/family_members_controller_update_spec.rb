@@ -64,6 +64,10 @@ RSpec.describe Insured::FamilyMembersController do
     end
 
     describe "when the value for 'is_applying_coverage' is provided" do
+      before :each do
+        allow(consumer_role).to receive(:is_applying_coverage).and_return(!is_applying_coverage_value)
+      end
+
       let(:is_applying_coverage_value) { "false" }
       let(:dependent_update_properties) do
         { "first_name" => "Dependent First Name", "same_with_primary" => "true", "is_applying_coverage" => is_applying_coverage_value }
@@ -77,6 +81,10 @@ RSpec.describe Insured::FamilyMembersController do
     end
 
     describe "when the value for 'is_applying_coverage' is NOT provided" do
+      before :each do
+        allow(consumer_role).to receive(:is_applying_coverage).and_return(true)
+      end
+
       let(:dependent_update_properties) do
         { "first_name" => "Dependent First Name", "same_with_primary" => "true" }
       end
