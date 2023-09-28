@@ -82,6 +82,25 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
     end
   end
 
+  describe 'consumer_role with active and inactive vlp documents should pass payload validation' do
+    let!(:vlp_document) {person.consumer_role.vlp_documents.first}
+    let(:consumer_role) { FactoryBot.create(:consumer_role) }
+    let(:person) { FactoryBot.create(:person, consumer_role: consumer_role) }
+
+    before do
+      person.consumer_role.update_attributes!(active_vlp_document_id: vlp_document.id)
+      person.consumer_role.vlp_documents.create!(subject: "I-551 (Permanent Resident Card)")
+      person_payload = ::Operations::Transformers::PersonTo::Cv3Person.new.call(person).success
+      person_contract = AcaEntities::Contracts::People::PersonContract.new.call(person_payload)
+      person_entity = AcaEntities::People::Person.new(person_contract.to_h)
+      @result = Operations::Fdsh::PayloadEligibility::CheckPersonEligibilityRules.new.call(person_entity, :dhs)
+    end
+
+    it 'should return success' do
+      expect(@result).to be_success
+    end
+  end
+
   describe '#construct_person_demographics' do
 
     subject { ::Operations::Transformers::PersonTo::Cv3Person.new.construct_person_demographics(person) }
