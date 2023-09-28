@@ -264,32 +264,32 @@ module BenefitSponsors
       end
 
       def show_plan_year
-        # warn [Deprecated] Instead use published_benefit_application
+        # [Deprecated] Instead use published_benefit_application
         @show_plan_year ||= published_benefit_application
       end
 
       def renewing_plan_year
-        warn "[Deprecated] Instead use renewal_benefit_application" unless Rails.env.test?
+        # [Deprecated] Instead use renewal_benefit_application
         renewal_benefit_application
       end
 
       def plan_years
-        warn "[Deprecated] Instead use benefit_applications" unless Rails.env.test?
+        # [Deprecated] Instead use benefit_applications
         benefit_applications
       end
 
       def active_plan_year
-        warn "[Deprecated] Instead use active_benefit_application" unless Rails.env.test?
+        # [Deprecated] Instead use active_benefit_application
         active_benefit_application
       end
 
       def published_plan_year
-        warn "[Deprecated] Instead use published_benefit_application" unless Rails.env.test?
+        # [Deprecated] Instead use published_benefit_application
         published_benefit_application
       end
 
       def renewing_published_plan_year
-        warn "[Deprecated] Instead use published_benefit_application" unless Rails.env.test?
+        # [Deprecated] Instead use published_benefit_application
         renewing_published_benefit_application
       end
 
@@ -299,7 +299,7 @@ module BenefitSponsors
       end
 
       def latest_plan_year
-        warn "[Deprecated] Instead use latest_benefit_application" unless Rails.env.test?
+        # [Deprecated] Instead use latest_benefit_application
         latest_benefit_application
       end
 

@@ -691,7 +691,7 @@ module BenefitSponsors
       # Deprecate below methods in future
 
       def plan_year
-        warn "[Deprecated] Instead use benefit_application" unless Rails.env.test?
+        # [Deprecated] Instead use benefit_application
         benefit_application
       end
 

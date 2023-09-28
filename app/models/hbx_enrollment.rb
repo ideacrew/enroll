@@ -1813,9 +1813,7 @@ class HbxEnrollment
         census_employee.active_benefit_group_assignment
       end
 
-    if benefit_group_assignment.blank? || benefit_group_assignment.benefit_application != plan_year
-      enrollment_errors[:base] << "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date&.year}"
-    end
+    enrollment_errors[:base] << "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date&.year}" if benefit_group_assignment.blank? || benefit_group_assignment.benefit_application != plan_year
 
     return benefit_group_assignment.benefit_group, benefit_group_assignment
   end
