@@ -63,6 +63,7 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
     let!(:vlp_document) {person.consumer_role.vlp_documents.first}
 
     subject do
+      person.consumer_role.update_attributes!(active_vlp_document_id: nil)
       ::Operations::Transformers::PersonTo::Cv3Person.new.construct_consumer_role(person.consumer_role)
     end
 
@@ -166,7 +167,7 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
   end
 
   describe '#transform_vlp_documents' do
-    let(:consumer_role) { FactoryBot.create(:consumer_role, vlp_documents: vlp_documents) }
+    let(:consumer_role) { FactoryBot.create(:consumer_role, vlp_documents: vlp_documents, active_vlp_document_id: vlp_document.id) }
     let(:person) { FactoryBot.create(:person, consumer_role: consumer_role) }
     let(:vlp_documents) { [vlp_document] }
     let(:vlp_document) { FactoryBot.build(:vlp_document, :other_with_i94_number) }
