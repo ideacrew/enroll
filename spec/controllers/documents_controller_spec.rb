@@ -145,7 +145,7 @@ RSpec.describe DocumentsController, :type => :controller do
 
           person.reload
           @immigration_type.reload
-          expect(@immigration_type.validation_status).to eq  'negative_response_received'
+          expect(@immigration_type.validation_status).to eq 'negative_response_received'
           error_message = @immigration_type.type_history_elements.last.update_reason
           expect(error_message).to match(/Failed due to VLP Document not found/)
         end
