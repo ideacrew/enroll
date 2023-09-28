@@ -112,11 +112,14 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
       before do
         rake.reenable
         rake.invoke(true) # including 'true' as an arg when running the rake task will migrate the data
+
+        evidence1.reload
+        evidence2.reload
+        evidence3.reload
+        evidence5.reload
       end
 
       it "should update the income evidence due_on to the correct due date" do
-        evidence1.reload
-        evidence3.reload
         projected_due_date1 = applicant_1_original_due_date + 65.days
         projected_due_date3 = applicant_3_original_due_date + 65.days
 
@@ -127,8 +130,6 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
       end
 
       it "should add a verification history to all relevant evidences" do
-        evidence1.reload
-        evidence2.reload
         evidence_histories = evidence1.verification_histories
         evidence_histories2 = evidence2.verification_histories
 
@@ -137,7 +138,6 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
       end
 
       it "should have a verification history with the correct action and updated_by fields" do
-        evidence1.reload
         evidence_histories = evidence1.verification_histories
 
         expect(evidence_histories.first.action).to eq('migration_extend_due_date')
@@ -145,7 +145,6 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
       end
 
       it "should not add a verification history to ineligilble evidences" do
-        evidence5.reload
         evidence_histories = evidence5.verification_histories
 
         expect(evidence_histories.size).to eq(0)
