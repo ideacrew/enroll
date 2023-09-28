@@ -83,7 +83,7 @@ def get_applicants(application, start_range, end_range)
     evidence&.due_on &&
       valid_aasm_states.include?(evidence&.aasm_state) &&
       (evidence.due_on >= start_range && evidence.due_on <= end_range) &&
-      evidence.can_be_extended?('auto_extend_due_date')
+      evidence&.can_be_extended?('auto_extend_due_date')
   end
 end
 
