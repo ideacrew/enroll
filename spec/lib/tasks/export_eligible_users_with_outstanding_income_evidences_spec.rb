@@ -54,6 +54,8 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
   let!(:evidence7) { applicant7.create_income_evidence(key: :income, title: 'Income', aasm_state: 'outstanding', due_on: applicant_7_original_due_date, verification_outstanding: true, is_satisfied: false) }
 
   before do
+    allow(FinancialAssistanceRegistry[:auto_update_income_evidence_due_on].setting(:days)).to receive(:item).and_return(65)
+
     min_date1 = family1.min_verification_due_date_on_family
     min_date2 = family2.min_verification_due_date_on_family
     min_date3 = family3.min_verification_due_date_on_family
