@@ -46,7 +46,7 @@ RSpec.describe Insured::FamilyMembersController do
         person: double(is_homeless: false, is_temporarily_out_of_state: false),
         local_residency_validation: nil,
         residency_determined_at: nil,
-        global_id: global_id
+        to_global_id: global_id
       )
     end
 
