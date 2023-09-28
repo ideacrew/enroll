@@ -105,6 +105,6 @@ def populate_csv_row(family, applicant, new_due_date, successful_save)
     evidence.id,
     evidence.due_on,
     new_due_date,
-    (successful_save ? successful_save : 'NOT EXTENDED')
+    (successful_save ? 'TRUE' : 'NOT EXTENDED')
   ]
 end
