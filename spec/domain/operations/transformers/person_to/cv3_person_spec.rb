@@ -41,6 +41,47 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
     end
   end
 
+  describe '#construct_consumer_role with active and inactive vlp documents' do
+    let!(:vlp_document) {person.consumer_role.vlp_documents.first}
+
+    subject do
+      person.consumer_role.update_attributes!(active_vlp_document_id: vlp_document.id)
+      person.consumer_role.vlp_documents.create!(subject: "I-551 (Permanent Resident Card)")
+      ::Operations::Transformers::PersonTo::Cv3Person.new.construct_consumer_role(person.consumer_role)
+    end
+
+    it 'should have one active vlp_document' do
+      expect(subject[:vlp_documents].count).to eq 1
+    end
+
+    it 'retuns valid vlp document' do
+      expect(subject[:vlp_documents][0][:subject]).to eq vlp_document.subject
+    end
+  end
+
+  describe '#construct_consumer_role with only inactive vlp documents' do
+    let!(:vlp_document) {person.consumer_role.vlp_documents.first}
+
+    subject do
+      ::Operations::Transformers::PersonTo::Cv3Person.new.construct_consumer_role(person.consumer_role)
+    end
+
+    it 'should not return vlp_documents' do
+      expect(subject[:vlp_documents].count).to eq 0
+    end
+  end
+
+  describe '#construct_consumer_role with no vlp documents' do
+    subject do
+      person.consumer_role.vlp_documents.destroy_all
+      ::Operations::Transformers::PersonTo::Cv3Person.new.construct_consumer_role(person.consumer_role)
+    end
+
+    it 'should not return vlp_documents' do
+      expect(subject[:vlp_documents].count).to eq 0
+    end
+  end
+
   describe '#construct_person_demographics' do
 
     subject { ::Operations::Transformers::PersonTo::Cv3Person.new.construct_person_demographics(person) }
