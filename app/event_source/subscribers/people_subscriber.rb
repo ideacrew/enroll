@@ -51,7 +51,7 @@ module Subscribers
       identifying_information_attributes = EnrollRegistry[:consumer_role_hub_call].setting(:identifying_information_attributes).item.map(&:to_sym)
       tribe_status_attributes = EnrollRegistry[:consumer_role_hub_call].setting(:indian_tribe_attributes).item.map(&:to_sym)
       valid_attributes = identifying_information_attributes + tribe_status_attributes
-      if consumer_role.present? && (valid_attributes & params[:payload].keys).present?
+      if consumer_role.present? && ((valid_attributes & params[:payload].keys).present? || removed_ssn?(params))
         result = ::Operations::Individual::DetermineVerifications.new.call({id: consumer_role.id})
         result_str = result.success? ? "Success: #{result.success}" : "Failure: #{result.failure}"
         subscriber_logger.info "PeopleSubscriber::Update, determine_verifications result: #{result_str}"
@@ -61,6 +61,11 @@ module Subscribers
     end
 
     private
+
+    def removed_ssn?(params)
+      # We get changed attributes here which are the old values of the attributes
+      params[:payload][:no_ssn] == '0'
+    end
 
     def pre_process_message(subscriber_logger, payload)
       subscriber_logger.info "PeopleSubscriber, response: #{payload}"
