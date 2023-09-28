@@ -234,7 +234,7 @@ module Operations
             identity_rejected: consumer_role.identity_rejected,
             application_rejected: consumer_role.application_rejected,
             documents: transform_documents(consumer_role.documents),
-            vlp_documents: transform_vlp_documents(consumer_role.vlp_documents),
+            vlp_documents: transform_vlp_documents([consumer_role.active_vlp_document].compact),
             ridp_documents: transform_ridp_documents(consumer_role.ridp_documents),
             verification_type_history_elements: transform_verification_type_history_elements(consumer_role.verification_type_history_elements),
             lawful_presence_determination: construct_lawful_presence_determination(consumer_role.lawful_presence_determination),
