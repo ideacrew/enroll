@@ -132,6 +132,24 @@ RSpec.describe DocumentsController, :type => :controller do
           expect(flash[:danger]).to eq('Please fill in your information for Document Description.')
         end
       end
+
+      context 'no vlp document type' do
+        before do
+          person.consumer_role.vlp_documents = []
+          person.save!
+          @immigration_type.update_attributes!(inactive: false)
+        end
+
+        it 'should redirect if verification type is Immigration status' do
+          post :fed_hub_request, params: { verification_type: @immigration_type.id, person_id: person.id }
+
+          person.reload
+          @immigration_type.reload
+          expect(@immigration_type.validation_status).to eq  'negative_response_received'
+          error_message = @immigration_type.type_history_elements.last.update_reason
+          expect(error_message).to match(/Failed due to VLP Document not found/)
+        end
+      end
     end
 
     context 'when admin does not have permissions' do
