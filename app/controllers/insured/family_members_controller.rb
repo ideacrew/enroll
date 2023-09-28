@@ -180,7 +180,7 @@ class Insured::FamilyMembersController < ApplicationController
       return
     end
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
-    original_applying_for_coverage = consumer_role.is_applying_coverage
+    original_applying_for_coverage = consumer_role.present? ? consumer_role.is_applying_coverage : nil
     if @address_errors.blank? && @dependent.update_attributes(dependent_person_params[:dependent]) && update_vlp_documents(consumer_role, 'dependent', @dependent)
       active_family_members_count = @family.active_family_members.count
       household = @family.active_household
