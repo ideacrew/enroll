@@ -535,12 +535,7 @@ context 'Verification process and notices' do
   end
 
   describe 'state machine transactions for failed payload' do
-    let(:consumer) do
-      cr = person.consumer_role
-      vlp_document = cr.vlp_documents.first
-      cr.update_attributes!(active_vlp_document_id: vlp_document.id)
-      cr
-    end
+    let(:consumer) { person.consumer_role }
 
     let(:verification_types) { consumer.verification_types }
     let(:verification_attr) { OpenStruct.new({ :determined_at => Time.zone.now, :vlp_authority => 'hbx' })}
