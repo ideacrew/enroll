@@ -17,8 +17,9 @@ module FinancialAssistance
         # @return [Dry::Monads::Result]
         def call(params)
           validated_params = yield validate_input_params(params)
-          families = yield fetch_families
-          update_evidences(validated_params, families)
+          eligible_application_ids, eligibile_family_ids = yield fetch_applications(validated_params)
+          eligible_families = yield fetch_families(validated_params, eligibile_family_ids)
+          update_evidences(validated_params, eligible_families, eligible_application_ids)
         end
 
         private
@@ -33,16 +34,22 @@ module FinancialAssistance
           Success(params)
         end
 
-        def fetch_families
-          eligibile_family_ids = Family.where(:eligibility_determination => { :$exists => true }, :"eligibility_determination.outstanding_verification_status" => { :$eq => "outstanding" })&.distinct(:id)
-          return Success(eligibile_family_ids) if eligibile_family_ids.present?
-          Failure("No families found with outstanding verification status")
+        def fetch_applications(params)
+          applications = FinancialAssistance::Application.determined.where(:"applicants.income_evidence.due_on" => params[:current_due_on], :"applicants.income_evidence.aasm_state".in => ['rejected', 'outstanding'])&.pluck(:_id, :family_id)
+          return Failure("Failed to query applications with income evidence due on #{params[:current_due_on]}") unless applications.present?
+          Success([applications.map(&:first), applications.map(&:last)])
         end
 
-        def update_evidences(params, families)
+        def fetch_families(_params, eligibile_family_ids)
+          eligibile_family_ids = Family.where(:_id.in => eligibile_family_ids, :eligibility_determination => { :$exists => true }, :"eligibility_determination.outstanding_verification_status" => { :$eq => "outstanding" })&.distinct(:id)
+          return Failure("No families found with outstanding verification status") unless eligibile_family_ids.present?
+          Success(eligibile_family_ids)
+        end
+
+        def update_evidences(params, families, eligible_applications)
           updated_applicants = []
           families.each do |family_id|
-            application = fetch_eligible_application(family_id, params[:current_due_on])
+            application = fetch_eligible_application(family_id, eligible_applications)
             next unless application
             application.applicants.each do |applicant|
               next unless applicant.income_evidence&.can_be_auto_extended?(params[:current_due_on])
@@ -55,14 +62,14 @@ module FinancialAssistance
           Failure("Failed to auto extend income evidence due on because of #{e.message}")
         end
 
-        def fetch_eligible_application(family_id, due_on)
+        def fetch_eligible_application(family_id, eligible_applications)
           applications = FinancialAssistance::Application.where(
             family_id: family_id,
             aasm_state: 'determined'
           )
           return nil unless applications.any?
           application = applications.max_by(&:created_at)
-          return nil unless application.applicants.detect { |applicant| applicant.income_evidence&.can_be_extended?(due_on) }
+          return nil unless application.id.in? eligible_applications
           application
         end
       end
