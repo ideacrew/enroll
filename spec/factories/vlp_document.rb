@@ -8,5 +8,27 @@ FactoryBot.define do
     country_of_citizenship { "Ukraine" }
     passport_number { "123456" }
     subject { VlpDocument::VLP_DOCUMENT_KINDS[0] } #I-327 (Reentry Permit) and validates on :alien_number
+
+    trait :other_with_i94_number do
+      alien_number { '' }
+      visa_number { '' }
+      naturalization_number { '' }
+      receipt_number { '' }
+      citizenship_number { '' }
+      issuing_country { '' }
+      card_number { '' }
+      title { "untitled" }
+      type { "text" }
+      source { "enroll_system" }
+      language { "en" }
+      status { "not submitted" }
+      subject { "Other (With I-94 Number)" }
+      passport_number { "" }
+      sevis_id { "" }
+      expiration_date { nil }
+      description { "test" }
+      i94_number { "28798256761" }
+      country_of_citizenship { "" }
+    end
   end
 end

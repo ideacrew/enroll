@@ -104,4 +104,23 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
       end
     end
   end
+
+  describe '#transform_vlp_documents' do
+    let(:consumer_role) { FactoryBot.create(:consumer_role, vlp_documents: vlp_documents) }
+    let(:person) { FactoryBot.create(:person, consumer_role: consumer_role) }
+    let(:vlp_documents) { [vlp_document] }
+    let(:vlp_document) { FactoryBot.build(:vlp_document, :other_with_i94_number) }
+
+    context 'with vlp document of type Other (With I-94 Number)' do
+      it 'returns success without raising errors' do
+        person_hash = subject.call(person).success
+        contract_person_hash = AcaEntities::Contracts::People::PersonContract.new.call(person_hash).to_h
+        person_entity = AcaEntities::People::Person.new(contract_person_hash)
+        contract_validation_result = AcaEntities::Fdsh::Vlp::H92::VlpV37Contract.new.call(
+          JSON.parse(person_entity.consumer_role.vlp_documents.first.to_json).compact
+        )
+        expect(contract_validation_result.errors.to_h).to be_empty
+      end
+    end
+  end
 end
