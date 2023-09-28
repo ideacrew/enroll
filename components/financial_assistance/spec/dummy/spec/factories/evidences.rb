@@ -11,5 +11,36 @@ FactoryBot.define do
     aasm_state { :attested }
     due_on { nil }
 
+    trait :with_request_results do
+      after :build do |evidence, _evaluator|
+        evidence.request_results << FactoryBot.build(:request_result)
+      end
+    end
+
+    trait :with_verification_histories do
+      after :build do |evidence, _evaluator|
+        evidence.verification_histories << FactoryBot.build(:verification_history)
+      end
+    end
+
+    trait :outstanding do
+      aasm_state { 'outstanding' }
+      verification_outstanding { true }
+      is_satisfied { false }
+    end
+  end
+
+  factory :osse_evidence, :class => 'Eligibilities::Osse::Evidence' do
+    title { 'Osse Eligibility Evidence' }
+    description { 'Osse Eligibility' }
+    key { :osse_subsidy }
+    is_satisfied { true }
+
+    trait :with_eligibility do
+      after(:build) do |evidence, _evaluator|
+        eligibility ||= evidence.eligibility
+        eligibility { create(:eligibility)} unless eligibility.present?
+      end
+    end
   end
 end
