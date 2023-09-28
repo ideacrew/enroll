@@ -83,7 +83,7 @@ class LawfulPresenceDetermination
       if result.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_errors)
         process_ssa_request_failure(result, ssa_verification_type)
       else
-        ssa_verification_type.pending_type
+        ssa_verification_type&.pending_type
       end
     else
       notify(SSA_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.ivl_role.person})

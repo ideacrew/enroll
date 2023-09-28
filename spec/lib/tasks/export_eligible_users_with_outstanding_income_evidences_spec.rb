@@ -54,6 +54,7 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
     let!(:income_evidence_6) { applicant6.create_income_evidence(key: :income, title: 'Income', aasm_state: 'rejected', due_on: applicant_6_original_due_date, verification_outstanding: true, is_satisfied: false) }
     let!(:income_evidence_7) { applicant7.create_income_evidence(key: :income, title: 'Income', aasm_state: 'outstanding', due_on: applicant_7_original_due_date, verification_outstanding: true, is_satisfied: false) }
 
+
     before do
       min_date_1 = family.min_verification_due_date_on_family
       min_date_2 = family2.min_verification_due_date_on_family

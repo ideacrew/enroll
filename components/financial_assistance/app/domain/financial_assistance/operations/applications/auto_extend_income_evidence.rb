@@ -17,7 +17,8 @@ module FinancialAssistance
         # @return [Dry::Monads::Result]
         def call(params)
           validated_params = yield validate_input_params(params)
-          update_evidences(validated_params)
+          families = yield fetch_families
+          update_evidences(validated_params, families)
         end
 
         private
@@ -32,20 +33,37 @@ module FinancialAssistance
           Success(params)
         end
 
-        def update_evidences(params)
-          applications = FinancialAssistance::Application.determined.where(:"applicants.income_evidence.due_on" => params[:current_due_on], :"applicants.income_evidence.aasm_state".in => ['rejected', 'outstanding'])
+        def fetch_families
+          eligibile_family_ids = Family.where(:eligibility_determination => { :$exists => true }, :"eligibility_determination.outstanding_verification_status" => { :$eq => "outstanding" })&.distinct(:id)
+          return Success(eligibile_family_ids) if eligibile_family_ids.present?
+          Failure("No families found with outstanding verification status")
+        end
+
+        def update_evidences(params, families)
           updated_applicants = []
-          applications.each do |application|
+          families.each do |family_id|
+            application = fetch_eligible_application(family_id, params[:current_due_on])
+            next unless application
             application.applicants.each do |applicant|
               next unless applicant.income_evidence&.can_be_auto_extended?(params[:current_due_on])
               updated_applicants << applicant.person_hbx_id
               applicant.income_evidence.auto_extend_due_on(params[:extend_by].days, params[:modified_by])
             end
           end
-
           Success(updated_applicants)
         rescue StandardError => e
           Failure("Failed to auto extend income evidence due on because of #{e.message}")
+        end
+
+        def fetch_eligible_application(family_id, due_on)
+          applications = FinancialAssistance::Application.where(
+            family_id: family_id,
+            aasm_state: 'determined'
+          )
+          return nil unless applications.any?
+          application = applications.max_by(&:created_at)
+          return nil unless application.applicants.detect { |applicant| applicant.income_evidence&.can_be_extended?(due_on) }
+          application
         end
       end
     end
