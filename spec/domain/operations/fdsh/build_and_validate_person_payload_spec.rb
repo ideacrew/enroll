@@ -44,7 +44,6 @@ RSpec.describe Operations::Fdsh::BuildAndValidatePersonPayload do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_errors).and_return(true)
       end
       let(:person) { FactoryBot.create(:person, :with_consumer_role) }
-
       let(:validator) { instance_double(Operations::Fdsh::EncryptedSsnValidator) }
       let(:request_type) { :dhs }
 
