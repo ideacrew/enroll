@@ -17,7 +17,6 @@ FactoryBot.define do
       citizenship_number { '' }
       issuing_country { '' }
       card_number { '' }
-      title { "untitled" }
       type { "text" }
       source { "enroll_system" }
       language { "en" }
@@ -29,6 +28,27 @@ FactoryBot.define do
       description { "test" }
       i94_number { "28798256761" }
       country_of_citizenship { "" }
+    end
+
+    trait :i766 do
+      alien_number { '123456789' }
+      visa_number { '' }
+      naturalization_number { '' }
+      receipt_number { '' }
+      citizenship_number { '' }
+      issuing_country { '' }
+      card_number { '9876543211234' }
+      type { 'text' }
+      source { 'enroll_system' }
+      language { 'en' }
+      status { 'not submitted' }
+      subject { 'I-766 (Employment Authorization Card)' }
+      passport_number { '' }
+      sevis_id { '' }
+      expiration_date { nil }
+      description { '' }
+      i94_number { '' }
+      country_of_citizenship { '' }
     end
   end
 end
