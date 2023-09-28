@@ -192,7 +192,7 @@ class EmployeeRole
   end
 
   def benefit_group(qle: false)
-    warn "[Deprecated] Instead use benefit_package(qle: true/false(default))"
+    # warn "[Deprecated] Instead use benefit_package(qle: true/false(default))"
     benefit_package(qle: qle)
   end
 

@@ -227,6 +227,9 @@ module BenefitSponsors
       end
 
       def billing_benefit_application(billing_date=nil)
+        return @billing_benefit_application if defined? @billing_benefit_application
+
+
         billing_report_date = billing_date.is_a?(Date) ? billing_date : TimeKeeper.date_of_record.next_month
         valid_applications = benefit_applications.non_draft.non_canceled
 
@@ -261,7 +264,7 @@ module BenefitSponsors
       end
 
       def show_plan_year
-        warn "[Deprecated] Instead use published_benefit_application" unless Rails.env.test?
+        # warn [Deprecated] Instead use published_benefit_application
         @show_plan_year ||= published_benefit_application
       end
 
@@ -291,8 +294,7 @@ module BenefitSponsors
       end
 
       def billing_plan_year(billing_date=nil)
-        return @billing_benefit_application if defined? @billing_benefit_application
-        warn "[Deprecated] Instead use billing_benefit_application" unless Rails.env.test?
+        # [Deprecated] Instead use billing_benefit_application
         @billing_benefit_application = billing_benefit_application(billing_date)
       end
 

@@ -756,7 +756,7 @@ module BenefitSponsors
     end
 
     def refresh(new_benefit_sponsor_catalog)
-      warn "[Deprecated] Instead use refresh_benefit_sponsor_catalog" unless Rails.env.test?
+      # warn "[Deprecated] Instead use refresh_benefit_sponsor_catalog"
       refresh_benefit_sponsor_catalog(new_benefit_sponsor_catalog)
     end
 
