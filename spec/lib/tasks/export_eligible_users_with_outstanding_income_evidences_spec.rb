@@ -45,10 +45,10 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
 
   let(:applicant_1_original_due_date) { TimeKeeper.date_of_record - 65.days }
   let(:applicant_2_original_due_date) { TimeKeeper.date_of_record - 66.days }
-  let(:applicant_3_original_due_date) { TimeKeeper.date_of_record - 64.days }
+  let(:applicant_3_original_due_date) { TimeKeeper.date_of_record - 34.days }
   let(:applicant_5_original_due_date) { TimeKeeper.date_of_record - 97.days }
   let(:applicant_6_original_due_date) { TimeKeeper.date_of_record - 40.days }
-  let(:applicant_7_original_due_date) { TimeKeeper.date_of_record - 67.days }
+  let(:applicant_7_original_due_date) { TimeKeeper.date_of_record - 80.days }
 
   describe "Generating a report of users eligible to have their income_evidence due_on date extended" do
 
