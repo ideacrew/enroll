@@ -76,7 +76,7 @@ def get_applicants(application, start_range, end_range)
     evidence = applicant.income_evidence
 
     if evidence.due_on.blank?
-      puts "Application #{application.hbx_id}, Applicant #{applicant.person_hbx_id}, Income Evidence: #{evidence.id}, state: #{evidence.aasm_state}"
+      puts "Income evidence missing date: Application #{application.hbx_id}, Applicant #{applicant.person_hbx_id}, Income Evidence: #{evidence.id}, state: #{evidence.aasm_state}"
     end
   
     evidence &&
