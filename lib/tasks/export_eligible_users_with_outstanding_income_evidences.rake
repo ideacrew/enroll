@@ -54,7 +54,7 @@ namespace :reports do
           total_extension_days = days_to_extend.days
           new_due_date = (evidence.due_on + total_extension_days)
 
-          evidence.extend_due_on(total_extension_days, 'system', 'migration_extend_due_date') if args[:migrate_users]
+          evidence.extend_due_on(total_extension_days, 'system', 'auto_extend_due_date') if args[:migrate_users]
           successful_save = (evidence.due_on == new_due_date)
 
           csv << populate_csv_row(family, applicant, new_due_date, successful_save)
@@ -83,7 +83,7 @@ def get_applicants(application, start_range, end_range)
     evidence&.due_on &&
       valid_aasm_states.include?(evidence&.aasm_state) &&
       (evidence.due_on >= start_range && evidence.due_on <= end_range) &&
-      evidence.can_be_extended?('migration_extend_due_date')
+      evidence.can_be_extended?('auto_extend_due_date')
   end
 end
 
