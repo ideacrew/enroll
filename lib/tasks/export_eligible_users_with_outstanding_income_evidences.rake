@@ -45,10 +45,10 @@ namespace :reports do
       eligibile_families.each do |family|
         application = FinancialAssistance::Application.where(family_id: family.id).determined.max_by(&:submitted_at)
         next unless application
-        
+
         applicants = get_applicants(application, start_range, end_range)
         next if applicants&.blank?
-        
+
         applicants.each do |applicant|
           evidence = applicant.income_evidence
           total_extension_days = days_to_extend.days
