@@ -9,6 +9,10 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
   let(:rake) { Rake::Task["reports:export_eligible_users_with_outstanding_income_evidences"] }
   let(:file_name) { "#{Rails.root}/users_with_outstanding_income_evidence_eligible_for_extension.csv" }
 
+  before :all do
+    DatabaseCleaner.clean
+  end
+
   let!(:person1) { FactoryBot.create(:person) }
   let!(:person2) { FactoryBot.create(:person) }
   let!(:person3) { FactoryBot.create(:person) }
