@@ -131,8 +131,8 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
       end
 
       it "should add a verification history to all relevant evidences" do
-        applicant.reload
-        applicant2.reload
+        applicant.income_evidence.reload
+        applicant2.income_evidence.reload
         evidence_histories = applicant.income_evidence.verification_histories
         evidence_histories2 = applicant2.income_evidence.verification_histories
 
@@ -158,16 +158,16 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
 
     context 'when there are invalid records' do
       before do
-        allow_any_instance_of(Eligibilities::Evidence).to receive(:update).and_raise(StandardError)
+        applicant.income_evidence.update(due_on: nil)
 
         rake.reenable
         rake.invoke(true)
       end
 
-      it 'should create the csv despite invalid records' do
+      it 'should create the csv despite and ignore invalid records' do
         csv = CSV.read(file_name, headers: true)
 
-        expect(csv.size).to eq(0)
+        expect(csv.size).to eq(2)
       end
     end
   end
