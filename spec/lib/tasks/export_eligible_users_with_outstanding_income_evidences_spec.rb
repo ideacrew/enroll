@@ -9,43 +9,48 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
   let(:rake) { Rake::Task["reports:export_eligible_users_with_outstanding_income_evidences"] }
   let(:file_name) { "#{Rails.root}/users_with_outstanding_income_evidence_eligible_for_extension.csv" }
 
+  before :all do
+    DatabaseCleaner.clean
+  end
+
+  let!(:person1) { FactoryBot.create(:person) }
+  let!(:person2) { FactoryBot.create(:person) }
+  let!(:person3) { FactoryBot.create(:person) }
+  let!(:person4) { FactoryBot.create(:person) }
+
+  let!(:family1) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person1) }
+  let!(:family2) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person2) }
+  let!(:family3) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person3) }
+  let!(:family4) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person4) }
+
+  let!(:application1) { FactoryBot.create(:application, family_id: family1.id, aasm_state: "determined") }
+  let!(:application2) { FactoryBot.create(:application, family_id: family2.id, aasm_state: "determined") }
+  let!(:application3) { FactoryBot.create(:application, family_id: family3.id, aasm_state: "determined") }
+  let!(:application4) { FactoryBot.create(:application, family_id: family4.id, aasm_state: "determined") }
+
+  # Both eligible for income_evidence extension
+  let!(:applicant1) { FactoryBot.create(:applicant, application: application1, is_primary_applicant: true, family_member_id: family1.family_members[0].id, person_hbx_id: person1.hbx_id) }
+  let!(:applicant2) { FactoryBot.create(:applicant, application: application1, family_member_id: family1.family_members[1].id, person_hbx_id: family1.family_members[1].person.hbx_id) }
+
+  # One ineligible, one w/o income_evidence
+  let!(:applicant3) { FactoryBot.create(:applicant, application: application2, is_primary_applicant: true, family_member_id: family2.family_members[0].id, person_hbx_id: person2.hbx_id) }
+  let!(:applicant4) { FactoryBot.create(:applicant, application: application2, family_member_id: family2.family_members[1].id, person_hbx_id: family2.family_members[1].person.hbx_id) }
+
+  # All members ineligible
+  let!(:applicant5) { FactoryBot.create(:applicant, application: application3, is_primary_applicant: true, family_member_id: family3.family_members[0].id, person_hbx_id: person3.hbx_id) }
+
+  # First member eligible, second ineligible for income_evidence extension
+  let!(:applicant6) { FactoryBot.create(:applicant, application: application4, is_primary_applicant: true, family_member_id: family4.family_members[0].id, person_hbx_id: person4.hbx_id) }
+  let!(:applicant7) { FactoryBot.create(:applicant, application: application4, family_member_id: family4.family_members[1].id, person_hbx_id: family4.family_members[1].person.hbx_id) }
+
+  let(:applicant_1_original_due_date) { TimeKeeper.date_of_record - 65.days }
+  let(:applicant_2_original_due_date) { TimeKeeper.date_of_record - 66.days }
+  let(:applicant_3_original_due_date) { TimeKeeper.date_of_record - 64.days }
+  let(:applicant_5_original_due_date) { TimeKeeper.date_of_record - 97.days }
+  let(:applicant_6_original_due_date) { TimeKeeper.date_of_record - 40.days }
+  let(:applicant_7_original_due_date) { TimeKeeper.date_of_record - 67.days }
+
   describe "Generating a report of users eligible to have their income_evidence due_on date extended" do
-    let!(:person1) { FactoryBot.create(:person) }
-    let!(:person2) { FactoryBot.create(:person) }
-    let!(:person3) { FactoryBot.create(:person) }
-    let!(:person4) { FactoryBot.create(:person) }
-
-    let!(:family1) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person1) }
-    let!(:family2) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person2) }
-    let!(:family3) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person3) }
-    let!(:family4) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person4) }
-
-    let!(:application1) { FactoryBot.create(:application, family_id: family1.id, aasm_state: "determined") }
-    let!(:application2) { FactoryBot.create(:application, family_id: family2.id, aasm_state: "determined") }
-    let!(:application3) { FactoryBot.create(:application, family_id: family3.id, aasm_state: "determined") }
-    let!(:application4) { FactoryBot.create(:application, family_id: family4.id, aasm_state: "determined") }
-
-    # Both eligible for income_evidence extension
-    let!(:applicant1) { FactoryBot.create(:applicant, application: application1, is_primary_applicant: true, family_member_id: family1.family_members[0].id, person_hbx_id: person1.hbx_id) }
-    let!(:applicant2) { FactoryBot.create(:applicant, application: application1, family_member_id: family1.family_members[1].id, person_hbx_id: family1.family_members[1].person.hbx_id) }
-
-    # One ineligible, one w/o income_evidence
-    let!(:applicant3) { FactoryBot.create(:applicant, application: application2, is_primary_applicant: true, family_member_id: family2.family_members[0].id, person_hbx_id: person2.hbx_id) }
-    let!(:applicant4) { FactoryBot.create(:applicant, application: application2, family_member_id: family2.family_members[1].id, person_hbx_id: family2.family_members[1].person.hbx_id) }
-
-    # All members ineligible
-    let!(:applicant5) { FactoryBot.create(:applicant, application: application3, is_primary_applicant: true, family_member_id: family3.family_members[0].id, person_hbx_id: person3.hbx_id) }
-
-    # First member eligible, second ineligible for income_evidence extension
-    let!(:applicant6) { FactoryBot.create(:applicant, application: application4, is_primary_applicant: true, family_member_id: family4.family_members[0].id, person_hbx_id: person4.hbx_id) }
-    let!(:applicant7) { FactoryBot.create(:applicant, application: application4, family_member_id: family4.family_members[1].id, person_hbx_id: family4.family_members[1].person.hbx_id) }
-
-    let(:applicant_1_original_due_date) { TimeKeeper.date_of_record - 65.days }
-    let(:applicant_2_original_due_date) { TimeKeeper.date_of_record - 66.days }
-    let(:applicant_3_original_due_date) { TimeKeeper.date_of_record - 64.days }
-    let(:applicant_5_original_due_date) { TimeKeeper.date_of_record - 97.days }
-    let(:applicant_6_original_due_date) { TimeKeeper.date_of_record - 40.days }
-    let(:applicant_7_original_due_date) { TimeKeeper.date_of_record - 67.days }
 
     let!(:evidence1) { applicant1.create_income_evidence(key: :income, title: 'Income', aasm_state: 'outstanding', due_on: applicant_1_original_due_date, verification_outstanding: true, is_satisfied: false) }
     let!(:evidence2) { applicant2.create_income_evidence(key: :income, title: 'Income', aasm_state: 'rejected', due_on: applicant_2_original_due_date, verification_outstanding: true, is_satisfied: false) }
@@ -91,7 +96,7 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
         rake.invoke
       end
 
-      it "should generate a csv with correct number of eligible users" do
+      it "should make a csv with correct number of eligible users" do
         csv = CSV.read(file_name, headers: true)
 
         expect(csv.size).to eq(3)
