@@ -146,11 +146,12 @@ class BenefitGroupAssignment
   end
 
   def plan_year
-   # [Deprecated] Instead use benefit application
+    # [Deprecated] Instead use benefit application
     benefit_application
   end
 
   def benefit_application
+    return benefit_group.plan_year if is_case_old?
     benefit_package.benefit_application if benefit_package.present?
   end
 
