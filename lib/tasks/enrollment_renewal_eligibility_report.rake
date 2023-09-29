@@ -4,7 +4,7 @@ task :enrollment_renewal_eligibility_report => :environment do
   field_names = %w[EnrollmentHbxId EnrollmentAASMState PrimaryHbxID MemberHbxID MemberFirstName MemberLastName MemberDOB member-is_applying_coverage member-citizen_status member-is_incarcerated member-state member_present_in_manage_family? applicant-is_applying_coverage applicant-citizen_status applicant-is_incarcerated applicant-state error_message]
   CSV.open(file_name, 'w', force_quotes: true) do |csv|
     csv << field_names
-    active_enrollments = HbxEnrollment.where(:aasm_state.nin => %w[shopping coverage_canceled coverage_terminated coverage_expired])
+    active_enrollments = HbxEnrollment.where(:kind.in => %w[individual coverall], :aasm_state.nin => %w[shopping coverage_canceled coverage_terminated coverage_expired])
     total_count = active_enrollments.count
     block_size = 1_000.0
     number_of_iterations = (total_count / block_size).ceil
