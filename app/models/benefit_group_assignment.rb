@@ -177,29 +177,23 @@ class BenefitGroupAssignment
   end
 
   def benefit_package=(options_or_new_bp)
-    # Logic pulled from deprecated method benefit_group=
-    if options_or_new_bp.is_a?(Hash) && options_or_new_bp[:dep_method_call]
-      new_benefit_package = options_or_new_bp[:new_benefit_group]
-      if new_benefit_package.is_a?(BenefitGroup)
-        self.benefit_group_id = new_benefit_package._id
-        return @benefit_group = new_benefit_package
-      end
+    # if Logic pulled from deprecated method benefit_group=
+    new_benefit_package = options_or_new_bp.is_a?(Hash) ? options_or_new_bp[:new_benefit_group] : options_or_new_bp
+    if options_or_new_bp.is_a?(Hash) && options_or_new_bp[:dep_method_call] && new_benefit_package.is_a?(BenefitGroup)
+      self.benefit_group_id = new_benefit_package._id
+      @benefit_group = new_benefit_package
     else
-      new_benefit_package = options_or_new_bp
+      raise ArgumentError, "expected BenefitPackage" unless new_benefit_package.is_a? BenefitSponsors::BenefitPackages::BenefitPackage
+      self.benefit_package_id = new_benefit_package._id
+      @benefit_package = new_benefit_package
     end
-
-    raise ArgumentError.new("expected BenefitPackage") unless new_benefit_package.is_a? BenefitSponsors::BenefitPackages::BenefitPackage
-    self.benefit_package_id = new_benefit_package._id
-    @benefit_package = new_benefit_package
   end
 
   def benefit_package(dep_method_call: false)
     # Logic pulled from deprecated method benefit_group
     if dep_method_call
       return @benefit_group if defined? @benefit_group
-      if is_case_old?
-        return @benefit_group = BenefitGroup.find(self.benefit_group_id)
-      end
+      return @benefit_group = BenefitGroup.find(self.benefit_group_id) if is_case_old?
     end
 
     return if benefit_package_id.nil?
@@ -441,9 +435,7 @@ class BenefitGroupAssignment
   end
 
   def propogate_delink
-    if hbx_enrollment.present?
-      hbx_enrollment.terminate_coverage! if hbx_enrollment.may_terminate_coverage?
-    end
+    hbx_enrollment.terminate_coverage! if hbx_enrollment.present? && hbx_enrollment.may_terminate_coverage?
     # self.hbx_enrollment_id = nil
   end
 
