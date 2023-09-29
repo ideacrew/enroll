@@ -28,9 +28,9 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "EnterpriseSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      logger.info "EnterpriseSubscriber: errored & acked. Backtrace: #{e.backtrace}"
-      subscriber_logger.info "EnterpriseSubscriber, ack: #{payload}"
+      subscriber_logger.error "EnterpriseSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      logger.error "EnterpriseSubscriber: errored & acked. error message: #{e.message}, Backtrace: #{e.backtrace}"
+      subscriber_logger.error "EnterpriseSubscriber, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
 
@@ -51,9 +51,9 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "EnterpriseSubscriber#on_enroll_enterprise_events, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      logger.info "EnterpriseSubscriber#on_enroll_enterprise_events: errored & acked. Backtrace: #{e.backtrace}"
-      subscriber_logger.info "EnterpriseSubscriber#on_enroll_enterprise_events, ack: #{payload}"
+      subscriber_logger.error "EnterpriseSubscriber#on_enroll_enterprise_events, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      logger.error "EnterpriseSubscriber#on_enroll_enterprise_events: errored & acked. error message: #{e.message}, Backtrace: #{e.backtrace}"
+      subscriber_logger.error "EnterpriseSubscriber#on_enroll_enterprise_events, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
   end

@@ -113,7 +113,8 @@ module BenefitMarketWorld
     ['CareFirst', 'Kaiser Permanente']
   end
 
-  def health_products
+  def health_products(premium_factor = nil)
+    premium_factor ||= 0
     health_issuers.each do |issuer_name|
       create_list(:benefit_markets_products_health_products_health_product,
                   3,
@@ -123,6 +124,7 @@ module BenefitMarketWorld
                   service_area: service_area,
                   issuer_profile_id: issuer_profiles(issuer_name).id,
                   issuer_name: issuer_name,
+                  premium_factor: premium_factor,
                   metal_level_kind: :gold)
 
       next unless current_effective_date.month == 1
@@ -134,6 +136,7 @@ module BenefitMarketWorld
                   service_area: previous_year_service_area,
                   issuer_profile_id: issuer_profiles(issuer_name).id,
                   issuer_name: issuer_name,
+                  premium_factor: premium_factor,
                   metal_level_kind: :gold)
     end
   end
@@ -219,7 +222,23 @@ module BenefitMarketWorld
       title: "SHOP Benefits for #{effective_date.year}",
       application_period: (effective_date.beginning_of_year..effective_date.end_of_year)
     )
-    create_catalog_eligibility(@benefit_market_catalog)
+    result = create_catalog_eligibility(@benefit_market_catalog)
+    if result.success?
+      health_product = BenefitMarkets::Products::Product.by_year(2023).by_kind(:health)[2]
+      effective_year_for_lcsp = @benefit_market_catalog.application_period.begin.year
+      feature_key = "lowest_cost_silver_product_#{effective_year_for_lcsp}"
+      if EnrollRegistry.feature?(feature_key) && EnrollRegistry.feature_enabled?(feature_key)
+        hios_id = EnrollRegistry[feature_key].item
+        if hios_id
+          health_product.update_attributes(
+            {
+              hios_id: hios_id,
+              hios_base_id: hios_id.split("-")[0]
+            }
+          )
+        end
+      end
+    end
     @benefit_market_catalog
   end
 end
@@ -236,6 +255,17 @@ end
 
 And(/^benefit market catalog exists with eligibility$/) do
   create_benefit_market_catalog_for(TimeKeeper.date_of_record)
+end
+
+Given(/^osse benefit market catalog exists for (.*) initial employer with (.*) benefits$/) do |status, coverage_kinds|
+  coverage_kinds = coverage_kinds.split('&').map(&:strip).map(&:to_sym)
+  initial_application_dates(status.to_sym)
+  product_kinds(coverage_kinds)
+  health_products(5)
+  dental_products if coverage_kinds.include?(:dental)
+  reset_product_cache
+  create_benefit_market_catalog_for(current_effective_date - 1.month) if current_effective_date.month == 1
+  create_benefit_market_catalog_for(current_effective_date)
 end
 
 # Following step can be used to initialize benefit market catalog for initial employer with health/dental benefits

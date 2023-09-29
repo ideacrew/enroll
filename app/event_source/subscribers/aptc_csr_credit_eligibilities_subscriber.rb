@@ -56,9 +56,9 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "AptcCsrCreditEligibilitiesSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.error "AptcCsrCreditEligibilitiesSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
       # logger.info "AptcCsrCreditEligibilitiesSubscriber: errored & acked. Backtrace: #{e.backtrace}"
-      subscriber_logger.info "AptcCsrCreditEligibilitiesSubscriber, ack: #{payload}"
+      subscriber_logger.error "AptcCsrCreditEligibilitiesSubscriber, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
 
