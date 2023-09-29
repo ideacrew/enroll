@@ -25,7 +25,7 @@ module Subscribers
         ack(delivery_info.delivery_tag)
       rescue StandardError => e
         ack(delivery_info.delivery_tag)
-        logger.info "FdshGateway::EligibilitiesSubscriber: on_primary_determination error: #{e.backtrace}"
+        logger.error "FdshGateway::EligibilitiesSubscriber: on_primary_determination error_message: #{e.message}, backtrace: #{e.backtrace}"
       end
 
       subscribe(:on_secondary_determination_complete) do |delivery_info, metadata, response|
@@ -46,7 +46,7 @@ module Subscribers
         ack(delivery_info.delivery_tag)
       rescue StandardError => e
         ack(delivery_info.delivery_tag)
-        logger.info "FdshGateway::EligibilitiesSubscriber: on_secondary_determination error: #{e.backtrace}"
+        logger.error "FdshGateway::EligibilitiesSubscriber: on_secondary_determination error_message: #{e.message}, backtrace: #{e.backtrace}"
       end
     end
   end

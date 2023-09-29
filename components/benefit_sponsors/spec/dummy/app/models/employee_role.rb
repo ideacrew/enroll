@@ -11,9 +11,6 @@ class EmployeeRole
 
   embedded_in :person
 
-  has_many :eligibilities, class_name: "::Eligibilities::Osse::Eligibility",
-                           as: :eligibility
-
   field :employer_profile_id, type: BSON::ObjectId
   field :benefit_sponsors_employer_profile_id, type: BSON::ObjectId
   field :census_employee_id, type: BSON::ObjectId
@@ -226,20 +223,6 @@ class EmployeeRole
     benefit_group_assignments = [census_employee.renewal_benefit_group_assignment, census_employee.active_benefit_group_assignment].compact
     benefit_group_assignment  = benefit_group_assignments.detect{|bpkg| bpkg.plan_year == plan_year}
     benefit_group_assignment.present? && benefit_group_assignment.benefit_group.is_offering_dental? ? true : false
-  end
-
-  def osse_eligible?(start_on)
-    eligibility = eligibility_for(:osse_subsidy, start_on)
-    return false unless eligibility
-    evidence = eligibility.evidences.by_key(:osse_subsidy).max_by(&:created_at)
-    evidence&.is_satisfied == true
-  end
-
-  def eligibility_for(evidence_key, start_on)
-    eligibilities.by_date(start_on).select do |eligibility|
-      el = eligibility.evidences.by_key(evidence_key).max_by(&:created_at)
-      el&.is_satisfied == true
-    end.max_by(&:created_at)
   end
 
   class << self

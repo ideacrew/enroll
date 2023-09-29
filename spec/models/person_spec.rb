@@ -566,8 +566,8 @@ describe Person, :dbclean => :after_each do
   describe '.match_by_id_info' do
     before(:each) do
       @p0 = Person.create!(first_name: "Jack",   last_name: "Bruce",   dob: "1943-05-14", ssn: "517994321")
-      @p1 = Person.create!(first_name: "Ginger", last_name: "Baker",   dob: "1939-08-19", ssn: "888007654")
-      @p2 = Person.create!(first_name: "Eric",   last_name: "Clapton", dob: "1945-03-30", ssn: "666332345")
+      @p1 = Person.create!(first_name: "Ginger", last_name: "Baker",   dob: "1939-08-19", ssn: "888797654")
+      @p2 = Person.create!(first_name: "Eric",   last_name: "Clapton", dob: "1945-03-30", ssn: "798332345")
       @p4 = Person.create!(first_name: "Joe",   last_name: "Kramer", dob: "1993-03-30")
       @p5 = Person.create(first_name: "Justin", last_name: "Kenny", dob: "1983-06-20", is_active: false)
     end
@@ -995,6 +995,101 @@ describe Person, :dbclean => :after_each do
         expect(person.save).to be_falsey
         expect(person.errors[:date_of_death].any?).to be_truthy
         expect(person.errors[:date_of_death].to_s).to match(/future date: #{date_of_death} is invalid date of death/)
+      end
+    end
+  end
+
+  describe "validation of ssn" do
+    let(:params) do
+      {
+        first_name: "Martina",
+        last_name: "Williams",
+        gender: "male",
+        address: FactoryBot.build(:address).attributes
+      }
+    end
+
+    context 'with certain person attributes enabled' do
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_publish_primary_subscriber).and_return(true)
+      end
+
+      context "when the validates_ssn feature flag is disabled" do
+        before do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
+        end
+
+        it "will create a person without errors with an invalid SSN" do
+          params[:ssn] = "000637863"
+          person = Person.create(**params)
+
+          expect(person.valid?).to be_truthy
+          expect(person.errors[:ssn].present?).to be_falsey
+        end
+      end
+
+      context "when the validates_ssn feature flag is enabled" do
+        before do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(true)
+        end
+
+        it "will create a person without errors with a valid SSN" do
+          params[:ssn] = "657637863"
+          person = Person.create(**params)
+
+          expect(person.valid?).to be_truthy
+          expect(person.errors[:ssn].present?).to be_falsey
+        end
+
+        it "will throw an error if the SSN consists of only zeroes" do
+          params[:ssn] = '000000000'
+          person = Person.create(**params)
+
+          expect(person.valid?).to be_falsey
+          expect(person.errors[:ssn]).to include('Invalid SSN')
+        end
+
+        it "will throw an error if the first three digits of an SSN consists of only zeroes" do
+          params[:ssn] = '000834231'
+          person = Person.create(**params)
+
+          expect(person.valid?).to be_falsey
+          expect(person.errors[:ssn]).to include('Invalid SSN')
+        end
+
+        it "will throw an error if the first three digits of an SSN consists of only sixes" do
+          params[:ssn] = '666834231'
+          person = Person.create(**params)
+
+          expect(person.valid?).to be_falsey
+          expect(person.errors[:ssn]).to include('Invalid SSN')
+        end
+
+        it "will throw an error if the first three digits of an SSN is between 900-999" do
+          ssn = "#{rand(900..999)}834231"
+          params[:ssn] = ssn
+          person = Person.create(**params)
+
+          expect(person.valid?).to be_falsey
+          expect(person.errors[:ssn]).to include('Invalid SSN')
+        end
+
+        it "will throw an error if the fourth and fifth digit of an SSN are zeroes" do
+          params[:ssn] = '789004231'
+          person = Person.create(**params)
+
+          expect(person.valid?).to be_falsey
+          expect(person.errors[:ssn]).to include('Invalid SSN')
+        end
+
+        it "will throw an error if the last four digits of an SSN are zeroes" do
+          params[:ssn] = '789830000'
+          person = Person.create(**params)
+
+          expect(person.valid?).to be_falsey
+          expect(person.errors[:ssn]).to include('Invalid SSN')
+        end
       end
     end
   end
@@ -1703,42 +1798,5 @@ describe Person, :dbclean => :after_each do
       person.set(crm_notifiction_needed: false)
       expect(person.reload.send(:trigger_async_publish)).to eq nil
     end
-  end
-
-  context "fetch_writing_agents_for_employee_role" do
-    let(:person) { FactoryBot.create(:person) }
-    let(:broker_role) { FactoryBot.create(:broker_role, person: person) }
-
-    before do
-      site = FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
-      organization = FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)
-      benefit_sponsorship = FactoryBot.create(
-        :benefit_sponsors_benefit_sponsorship,
-        :with_rating_area,
-        :with_service_areas,
-        organization: organization,
-        profile_id: organization.profiles.first.id
-      )
-      census_employee = FactoryBot.create(:benefit_sponsors_census_employee,
-                                          employer_profile: benefit_sponsorship.profile,
-                                          benefit_sponsorship: benefit_sponsorship)
-      employee_role = FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee.id)
-
-      FactoryBot.create(:family, :with_primary_family_member, person: person)
-      employee_role.person.save!
-      FactoryBot.create(:broker_agency_profile, primary_broker_role: broker_role)
-      broker_agency_account = BenefitSponsors::Accounts::BrokerAgencyAccount.new(writing_agent_id: broker_role.id, start_on: TimeKeeper.date_of_record)
-      allow(benefit_sponsorship.profile).to receive(:active_broker_agency_account).and_return(broker_agency_account)
-    end
-
-    it "should fetch writing agents for employee role" do
-      expect(person.fetch_writing_agents_for_employee_role.first).to eq(broker_role.id)
-    end
-
-    it "should not fetch writing agents for employee role if no broker_agency_accounts" do
-      new_person = FactoryBot.create(:person)
-      expect(new_person.fetch_writing_agents_for_employee_role).to eq([])
-    end
-
   end
 end

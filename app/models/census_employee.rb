@@ -1654,10 +1654,18 @@ class CensusEmployee < CensusMember
 
   # Enrollments eligible for Cobra
 
+  def active_benefit_group_enrollments_for_cobra
+    return nil if active_benefit_application.blank?
+    return active_benefit_group_enrollments if active_benefit_application.active?
+    active_bga = benefit_group_assignments.detect(&:is_application_active?)
+    active_benefit_application_for_cobra = active_bga&.benefit_package&.benefit_application
+    enrollments_under_benefit_application(active_benefit_application_for_cobra)
+  end
+
   # Picking latest health & dental enrollments
   def active_benefit_group_cobra_eligible_enrollments
-    return [] if active_benefit_group_enrollments.blank?
-    eligible_enrollments = active_benefit_group_enrollments.non_cobra.enrollments_for_cobra
+    return [] if active_benefit_group_enrollments_for_cobra.blank?
+    eligible_enrollments = active_benefit_group_enrollments_for_cobra.non_cobra.enrollments_for_cobra
     [eligible_enrollments.by_health.first, eligible_enrollments.by_dental.first].compact
   end
 

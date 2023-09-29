@@ -1,17 +1,30 @@
 FactoryBot.define do
   factory :consumer_role do
     association :person
-    sequence(:ssn) { |n| "7"+SecureRandom.random_number.to_s[2..8][0..-((Math.log(n+1,10))+1)]+"#{n+1}"}
+    sequence(:ssn) do |n|
+      ssn = ''
+      loop do
+        ssn_number = SecureRandom.random_number(1_000_000_000)
+        ssn = "7#{ssn_number.to_s[2..3]}#{ssn_number.to_s[4]}#{n + 1}#{ssn_number.to_s[5..7]}#{n + 1}"
+        break if ssn.match?(/^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$/)
+      end
+
+      ssn
+    end
     dob { "01/01/1980" }
     gender { 'male' }
     is_state_resident { 'yes' }
     citizen_status { 'us_citizen' }
-    is_incarcerated { 'yes' }
     is_applicant { 'yes' }
-    vlp_documents {[FactoryBot.build(:vlp_document)]}
+    active_vlp_document_id { vlp_document.id }
+    vlp_documents { [vlp_document] }
     ridp_documents {[FactoryBot.build(:ridp_document)]}
     bookmark_url { nil }
     is_applying_coverage { true }
+
+    transient do
+      vlp_document { FactoryBot.build(:vlp_document) }
+    end
   end
 
   factory(:consumer_role_person, {class: ::Person}) do

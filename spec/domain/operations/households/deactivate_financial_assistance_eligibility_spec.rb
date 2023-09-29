@@ -6,6 +6,29 @@ RSpec.describe Operations::Households::DeactivateFinancialAssistanceEligibility,
   let!(:tax_household) { FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil, is_eligibility_determined: true) }
   let!(:eligibility_determination) {FactoryBot.create(:eligibility_determination, tax_household: tax_household, csr_percent_as_integer: 0)}
 
+  let(:household) { family.active_household }
+  let(:prospective_year_tax_household) { FactoryBot.create(:tax_household, :active_previous_year, household: household) }
+  let(:retrospective_year_tax_household) { FactoryBot.create(:tax_household, :active_next_year, household: household) }
+
+  let(:current_year_start) { TimeKeeper.date_of_record.beginning_of_year }
+
+  describe '#call' do
+    context 'with prospective and retrospective year tax household' do
+      before do
+        prospective_year_tax_household
+        retrospective_year_tax_household
+      end
+
+      it 'deactivates current and future year active tax households' do
+        expect(household.tax_households.active_tax_household.pluck(:id)).to include(prospective_year_tax_household.id, tax_household.id, retrospective_year_tax_household.id)
+        subject.call(params: { family_id: family.id, date: current_year_start })
+        household.reload
+        expect(household.tax_households.active_tax_household.pluck(:id)).to include(prospective_year_tax_household.id)
+        expect(household.tax_households.inactive.pluck(:id)).to include(tax_household.id, retrospective_year_tax_household.id)
+      end
+    end
+  end
+
   it 'should be a container-ready operation' do
     expect(subject.respond_to?(:call)).to be_truthy
   end

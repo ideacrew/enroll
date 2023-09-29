@@ -3,7 +3,7 @@
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-RSpec.describe Operations::BenefitSponsors::DependentAgeOff::Terminate, type: :model, dbclean: :after_each do
+RSpec.describe Operations::BenefitSponsors::DependentAgeOff::Terminate, type: :model, dbclean: :around_each do
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
   include_context "setup employees with benefits"

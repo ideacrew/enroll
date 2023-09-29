@@ -14,7 +14,8 @@ module Subscribers
       # create_tax_household_group(subscriber_logger, payload) if !Rails.env.test? && EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
       # generate_enrollments(subscriber_logger, payload) if !Rails.env.test? && EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
-      update_application_evidence_histories(payload)
+      # This method was moved to components/financial_assistance/app/domain/financial_assistance/operations/applications/verifications/request_evidence_determination.rb
+      # update_application_evidence_histories(payload)
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
@@ -23,12 +24,6 @@ module Subscribers
     end
 
     private
-
-    # UpdateEvidenceHistories of Application
-    def update_application_evidence_histories(payload)
-      application = FinancialAssistance::Application.by_hbx_id(payload[:hbx_id]).first
-      application.update_evidence_histories
-    end
 
     # Creates tax_household_groups and its accociations for a Family with Financial Assistance Application's Eligibility Determination
     def create_tax_household_group(subscriber_logger, payload)
@@ -66,8 +61,8 @@ module Subscribers
     end
 
     def log_error(subscriber_logger, logger, name, err)
-      logger.info "#{name} Error raised when processing given payload message: #{err}, backtrace: #{err.backtrace.join('\n')}" if logger.present?
-      subscriber_logger.info "#{name} Error raised when processing given payload message: #{err}, backtrace: #{err.backtrace.join('\n')}"
+      logger.error "#{name} Error raised when processing given payload message: #{err.message}, backtrace: #{err.backtrace.join('\n')}" if logger.present?
+      subscriber_logger.error "#{name} Error raised when processing given payload message: #{err.message}, backtrace: #{err.backtrace.join('\n')}"
     end
 
     def log_payload(subscriber_logger, logger, payload)

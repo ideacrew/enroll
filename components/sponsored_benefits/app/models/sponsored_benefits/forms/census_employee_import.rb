@@ -423,7 +423,7 @@ module SponsoredBenefits
 
       private
       def sanitize_value(value)
-        value = value.to_s.split('.')[0] if value.is_a? Float
+        value = value.to_s.split('.')[0] if value.is_a? Numeric
         value.gsub(/[[:cntrl:]]|^[\p{Space}]+|[\p{Space}]+$/, '')
       end
 

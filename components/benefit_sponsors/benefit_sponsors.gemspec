@@ -31,7 +31,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'language_list',             '~> 1'
   s.add_dependency 'money-rails',               '~> 1.13'
   s.add_dependency 'pundit',                    '~> 2.0'
-  s.add_dependency 'roo',                       '~> 2.1'
+  s.add_dependency 'roo',                       '~> 2.7.0'
   s.add_dependency 'virtus',                    '~> 1.0'
   s.add_dependency "slim",                      "~> 3.0"
   s.add_dependency 'symmetric-encryption',      '3.9.1'
@@ -54,6 +54,9 @@ Gem::Specification.new do |s|
   s.add_development_dependency "mongoid-rspec",             '~> 4'
   s.add_development_dependency 'rails-perftest',            '~> 0.0.7'
   s.add_development_dependency "rspec-rails",               '~> 3.8'
+  s.add_development_dependency 'simplecov',                 '~> 0.22.0'
+  s.add_development_dependency 'simplecov-cobertura',       '~> 2.1.0'
+  s.add_development_dependency 'rspec-instafail',           '~> 1.0.0'
   s.add_development_dependency 'rubocop-rspec',             '~> 1.31'
   s.add_development_dependency 'shoulda-matchers',          '~> 3'
   s.add_development_dependency 'test-prof',                 '~> 0.5.0'

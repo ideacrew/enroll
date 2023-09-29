@@ -15,6 +15,7 @@ module Eligibilities
     field :code_description, type: Date
     field :raw_payload, type: String
     field :date_of_action, type: DateTime
+    field :action, type: String
 
     after_create :set_date_of_action
 
