@@ -364,6 +364,7 @@ module FinancialAssistance
     scope :by_year, ->(year) { where(:assistance_year => year) }
     scope :created_asc,      -> { order(created_at: :asc) }
     scope :renewal_draft,    ->{ any_in(aasm_state: 'renewal_draft') }
+    scope :income_verification_extension_required, ->{ any_in(aasm_state: 'income_verification_extension_required') }
 
     # Applications that are in submitted and after submission states. Non work in progress applications.
     scope :submitted_and_after, lambda {
@@ -640,7 +641,7 @@ module FinancialAssistance
 
     def validate_relationships(matrix)
       # validates the child has relationship as parent for 'spouse of the primary'.
-      return false if applicants.any? { |applicant| !applicant.valid_spousal_relationship? }
+      return false if applicants.any? { |applicant| !applicant.valid_family_relationships? }
       all_relationships = find_all_relationships(matrix)
       spouse_relation = all_relationships.select{|hash| hash[:relation] == "spouse"}.first
       return true unless spouse_relation.present?
@@ -877,7 +878,7 @@ module FinancialAssistance
         transitions from: :submitted, to: :determination_response_error
       end
 
-      event :determine, :after => [:record_transition, :create_tax_household_groups, :send_determination_to_ea, :create_evidences, :publish_application_determined] do
+      event :determine, :after => [:record_transition, :create_tax_household_groups, :send_determination_to_ea, :create_evidences, :publish_application_determined, :notify_totally_ineligible_members] do
         transitions from: :submitted, to: :determined
       end
 
@@ -1021,9 +1022,17 @@ module FinancialAssistance
       return unless can_trigger_fdsh_calls? || is_local_mec_checkable?
       return if previously_renewal_draft? && FinancialAssistanceRegistry.feature_enabled?(:renewal_eligibility_verification_using_rrv)
 
-      ::FinancialAssistance::Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined.new.call(self)
+      ::FinancialAssistance::Operations::Applications::Verifications::RequestEvidenceDetermination.new.call(self)
     rescue StandardError => e
       Rails.logger.error { "FAA trigger_fdsh_calls error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
+    end
+
+    def notify_totally_ineligible_members
+      return unless any_applicants_totally_ineligible? && FinancialAssistanceRegistry.feature_enabled?(:totally_ineligible_notice)
+
+      ::FinancialAssistance::Operations::Applications::Verifications::PublishFaaTotalIneligibilityNotice.new.call(self)
+    rescue StandardError => e
+      Rails.logger.error { "FAA faa_totally_ineligible_notice error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
 
     def apply_aggregate_to_enrollment
@@ -1222,6 +1231,36 @@ module FinancialAssistance
       active_applicants.each do |applicant|
         return applicant if applicant.applicant_validation_complete? == false
       end
+    end
+
+    def eligible_for_renewal?
+      return true unless FinancialAssistanceRegistry.feature_enabled?(:skip_eligibility_redetermination)
+      return true if has_eligible_applicants_for_assistance?
+      return false if all_applicants_medicaid_or_chip_eligible?
+      return false if all_applicants_totally_ineligible?
+      return false if all_applicants_without_applying_for_coverage?
+
+      true
+    end
+
+    def has_eligible_applicants_for_assistance?
+      active_applicants.any? { |applicant| applicant.is_without_assistance || applicant.is_ia_eligible }
+    end
+
+    def all_applicants_medicaid_or_chip_eligible?
+      active_applicants.all?(&:is_medicaid_chip_eligible)
+    end
+
+    def all_applicants_totally_ineligible?
+      active_applicants.all?(&:is_totally_ineligible)
+    end
+
+    def any_applicants_totally_ineligible?
+      active_applicants.any?(&:is_totally_ineligible)
+    end
+
+    def all_applicants_without_applying_for_coverage?
+      active_applicants.all? { |applicant| !applicant.is_applying_coverage }
     end
 
     def active_applicants

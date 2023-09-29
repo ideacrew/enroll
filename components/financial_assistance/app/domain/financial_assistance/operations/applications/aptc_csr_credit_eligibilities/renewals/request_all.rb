@@ -16,7 +16,7 @@ module FinancialAssistance
             include EventSource::Command
 
             def call(params)
-              family_ids = yield find_families(params[:renewal_year])
+              family_ids = yield renewal_eligible_family_ids(params[:renewal_year])
               family_ids = yield generate_renewal_events(params[:renewal_year], family_ids)
 
               Success(family_ids)
@@ -24,13 +24,19 @@ module FinancialAssistance
 
             private
 
-            def find_families(renewal_year)
-              # Success(::Family.all_active_assistance_receiving_for_assistance_year(renewal_year.pred).all_enrollments.distinct(:id))
-
+            # Returns all family_ids where the family has a current enrollment and their most recent determined
+            # fa application for the previous year is renewal eligible
+            # @return [Array] family_ids
+            def renewal_eligible_family_ids(renewal_year)
               family_ids = ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id)
-              determined_family_ids = ::FinancialAssistance::Application.by_year(renewal_year.pred).where(:family_id.in => family_ids).distinct(:family_id)
 
-              Success(determined_family_ids)
+              eligible_family_ids = ::FinancialAssistance::Application.by_year(
+                renewal_year.pred
+              ).determined.where(:family_id.in => family_ids).distinct(:family_id)
+
+              Success(eligible_family_ids)
+            rescue StandardError => e
+              Failure("Failed to find renewal eligible family_ids, error: #{e}")
             end
 
             # rubocop:disable Style/MultilineBlockChain

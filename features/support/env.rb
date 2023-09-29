@@ -6,8 +6,13 @@
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
 
-ENV["RAILS_ENV"] ||= 'test'
+ENV['RAILS_ENV'] ||= 'test'
 $LOADING_CUCUMBER_ENV = true
+if ENV["COVERAGE"]
+  require 'simplecov'
+  SimpleCov.command_name "specs_#{Process.pid}_#{ENV['TEST_ENV_NUMBER'] || '1'}"
+  SimpleCov.start 'rails'
+end
 require 'webdrivers'
 require 'cucumber/rails'
 require 'email_spec/cucumber'
@@ -74,7 +79,6 @@ Cucumber::Rails::Database.javascript_strategy = :truncation
 # Capybara::Screenshot.webkit_options = { width: 2280, height: 1800 }
 # Capybara::Screenshot.prune_strategy = :keep_last_run
 Webdrivers.cache_time = 86_400
-Webdrivers::Chromedriver.required_version = "114.0.5735.90"
 
 # Selenium::WebDriver::Chrome.path = '/opt/homebrew-cask/Caskroom/google-chrome/latest/Google Chrome.app/Contents/MacOS/Google Chrome'
 

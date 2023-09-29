@@ -21,13 +21,16 @@ module Subscribers
       logger.info "EnterpriseSubscriber payload: #{payload}" unless Rails.env.test?
 
       parsed_date = Date.parse(payload[:date_of_record])
-      Operations::Eligibilities::Notices::RequestDocumentReminderNotices.new.call(date_of_record: parsed_date) if EnrollRegistry.feature_enabled?(:aca_individual_market)
+      if EnrollRegistry.feature_enabled?(:aca_individual_market)
+        ::FinancialAssistance::Operations::Applications::AutoExtendIncomeEvidence.new.call(current_due_on: parsed_date) if FinancialAssistanceRegistry.feature_enabled?(:auto_update_income_evidence_due_on)
+        Operations::Eligibilities::Notices::RequestDocumentReminderNotices.new.call(date_of_record: parsed_date)
+      end
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "EnterpriseSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      logger.info "EnterpriseSubscriber: errored & acked. Backtrace: #{e.backtrace}"
-      subscriber_logger.info "EnterpriseSubscriber, ack: #{payload}"
+      subscriber_logger.error "EnterpriseSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      logger.error "EnterpriseSubscriber: errored & acked. error message: #{e.message}, Backtrace: #{e.backtrace}"
+      subscriber_logger.error "EnterpriseSubscriber, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
 
@@ -48,9 +51,9 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "EnterpriseSubscriber#on_enroll_enterprise_events, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      logger.info "EnterpriseSubscriber#on_enroll_enterprise_events: errored & acked. Backtrace: #{e.backtrace}"
-      subscriber_logger.info "EnterpriseSubscriber#on_enroll_enterprise_events, ack: #{payload}"
+      subscriber_logger.error "EnterpriseSubscriber#on_enroll_enterprise_events, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      logger.error "EnterpriseSubscriber#on_enroll_enterprise_events: errored & acked. error message: #{e.message}, Backtrace: #{e.backtrace}"
+      subscriber_logger.error "EnterpriseSubscriber#on_enroll_enterprise_events, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
   end

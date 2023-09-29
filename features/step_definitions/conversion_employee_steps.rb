@@ -248,6 +248,32 @@ Then(/(.+) should see coverage summary page with qle effective date/) do |named_
   find('.interaction-click-control-confirm').click
 end
 
+Then(/(.+) should see employee premium and subsidy based on (.+) effective date/) do |named_person, event|
+  person = people[named_person]
+  person_record = Person.where(first_name: /#{person[:first_name]}/i, last_name: /#{person[:last_name]}/i).first
+  qle_effective_on = person_record.primary_family.special_enrollment_periods.last.effective_on
+  new_enrollment = HbxEnrollment.where(family_id: person_record.primary_family.id, effective_on: qle_effective_on).last
+  plan_year_start = new_enrollment.sponsored_benefit_package.start_on
+
+  feature_key = "lowest_cost_silver_product_#{new_enrollment.effective_on.year}"
+  benchmark_product = BenefitMarkets::Products::Product.where(hios_id: EnrollRegistry[feature_key].item).first
+  employee_coverage_date = qle_effective_on
+  employee_coverage_date = plan_year_start if event == 'plan year'
+  employee_age = person_record.age_on(employee_coverage_date)
+  display_employee_age = person_record.age_on(TimeKeeper.date_of_record)
+
+  premium_amount = ::BenefitMarkets::Products::ProductRateCache.lookup_rate(new_enrollment.product, plan_year_start, employee_age, "R-DC001", 'N')
+  subsidy_amount = ::BenefitMarkets::Products::ProductRateCache.lookup_rate(benchmark_product, plan_year_start, employee_age, "R-DC001", 'N')
+
+  find('.coverage_effective_date', text: new_enrollment.effective_on.strftime("%m/%d/%Y"))
+  find(:xpath, "//table/tbody[1]/tr[1]/td[1][contains(text(), '#{named_person}')]")
+  find(:xpath, "//table/tbody[1]/tr[1]/td[2][contains(text(), 'self')]")
+  find(:xpath, "//table/tbody[1]/tr[1]/td[3][contains(text(), '#{display_employee_age}')]")
+  find(:xpath, "//table/tbody[1]/tr[1]/td[4][contains(text(), '#{premium_amount}')]")
+  find(:xpath, "//table/tbody[1]/tr[1]/td[5][contains(text(), 'HC4CC')]")
+  find(:xpath, "//table/tbody[1]/tr[1]/td[6][contains(text(), '#{subsidy_amount}')]")
+end
+
 Then(/(.*) should see the receipt page with qle effective date as effective date/) do |named_person|
   expect(page).to have_content('Enrollment Submitted')
   step "#{named_person} should get qle effective date as coverage effective date"

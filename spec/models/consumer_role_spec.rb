@@ -119,8 +119,6 @@ describe ConsumerRole, dbclean: :after_each do
   end
 end
 
-
-
 describe "#find_document" do
   let(:consumer_role) {ConsumerRole.new}
   context 'consumer role does not have any vlp_documents' do
@@ -367,6 +365,30 @@ context 'Verification process and notices' do
         expect(person.consumer_role.native_validation).to eq(state)
       end
     end
+
+    context "native american verification types" do
+      let!(:person1) { FactoryBot.create(:person, :with_consumer_role, :with_valid_native_american_information) }
+      let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person1)}
+      let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, :with_enrollment_members, family: family, enrollment_members: family.family_members)}
+
+      before do
+        EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:indian_alaskan_tribe_codes].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:enroll_app].setting(:state_abbreviation)).to receive(:item).and_return('ME')
+        person.update_attributes!(tribal_state: "ME", tribe_codes: ["", "PE"])
+        v_type = VerificationType.new(type_name: "American Indian Status", validation_status: 'outstanding', inactive: false)
+        person1.verification_types << v_type
+        person1.save!
+      end
+
+      it "does not deactivate native american verification type" do
+        ai_an_type = person1.verification_types.where(type_name: "American Indian Status").first
+        ai_an_type.update_attributes!(validation_status: 'negative_response_received')
+        person1.save!
+        expect(ai_an_type.inactive).to eql(false)
+      end
+    end
+
     context "native validation doesn't exist" do
       it_behaves_like 'ensures native american field value', 'assigns', 'na', 'NON native american consumer', nil, nil
 
@@ -376,6 +398,37 @@ context 'Verification process and notices' do
       it_behaves_like 'ensures native american field value', 'assigns', 'pending', 'pending native american consumer', 'tribe', 'pending'
       it_behaves_like 'ensures native american field value', "doesn't change", 'outstanding', 'outstanding native american consumer', 'tribe', 'outstanding'
       it_behaves_like 'ensures native american field value', 'assigns', 'outstanding', 'na native american consumer', 'tribe', 'na'
+    end
+  end
+
+  describe "#check_tribal_name" do
+
+    before do
+      EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry[:indian_alaskan_tribe_codes].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:enroll_app].setting(:state_abbreviation)).to receive(:item).and_return('ME')
+
+    end
+
+    context "tribal state is ME" do
+
+      before do
+        person.update_attributes!(tribal_state: "ME", tribe_codes: ["", "PE"])
+      end
+
+      it "returns tribal codes" do
+        expect(person.consumer_role.check_tribal_name).to eq(["", "PE"])
+      end
+    end
+
+    context "tribal state is outside ME" do
+      before do
+        person.update_attributes!(tribal_state: "CA", tribe_codes: [], tribal_name: 'tribal name1')
+      end
+
+      it "returns tribal name" do
+        expect(person.consumer_role.check_tribal_name).to eq("tribal name1")
+      end
     end
   end
 
@@ -477,6 +530,83 @@ context 'Verification process and notices' do
         it 'returns false' do
           expect(subject).to be_falsey
         end
+      end
+    end
+  end
+
+  describe 'state machine transactions for failed payload' do
+    let(:consumer) { person.consumer_role }
+    let(:verification_types) { consumer.verification_types }
+    let(:verification_attr) { OpenStruct.new({ :determined_at => Time.zone.now, :vlp_authority => 'hbx' })}
+
+    before :each do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:ssa_h3).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:vlp_h92).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_errors).and_return(true)
+    end
+
+    context 'success payload' do
+      shared_examples_for 'IVL state machine transitions and verification_types validation_status' do |ssn, citizen, from_state, to_state, event, type_name, verification_type_validation_status|
+        before do
+          EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+          person.ssn = ssn
+          consumer.citizen_status = citizen
+        end
+
+        it "moves from #{from_state} to #{to_state} on #{event}" do
+          expect(consumer).to transition_from(from_state).to(to_state).on_event(event.to_sym, verification_attr)
+          expect(consumer.verification_types.where(:type_name.in => type_name).first.validation_status).to eq verification_type_validation_status
+        end
+      end
+
+      # DHS calls will not made for people who are 'us_citizen'
+      context 'coverage_purchased_no_residency with us_citizen' do
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '999001234', 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Social Security Number"],
+                        "negative_response_received"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '999001234', 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Citizenship"], "negative_response_received"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '111111111', 'us_citizen', :unverified, :ssa_pending, 'coverage_purchased_no_residency!', ["Social Security Number"], "pending"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '111111111', 'us_citizen', :unverified, :ssa_pending, 'coverage_purchased_no_residency!', ["Citizenship"], "unverified"
+      end
+
+      # DHS calls will be made for people who are 'naturalized_citizen'
+      context 'coverage_purchased_no_residency with naturalized_citizen' do
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '999001234', 'naturalized_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Social Security Number"],
+                        "negative_response_received"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '999001234', 'naturalized_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Citizenship"], "pending"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '111111111', 'naturalized_citizen', :unverified, :ssa_pending, 'coverage_purchased_no_residency!', ["Social Security Number"], "pending"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '111111111', 'naturalized_citizen', :unverified, :ssa_pending, 'coverage_purchased_no_residency!', ["Citizenship"], "pending"
+      end
+    end
+
+    context 'failure payload' do
+      let(:ssa_validator) { instance_double(Operations::Fdsh::Ssa::H3::RequestSsaVerification) }
+      let(:vlp_validator) { instance_double(Operations::Fdsh::Vlp::H92::RequestInitialVerification) }
+
+      shared_examples_for 'IVL state machine transitions and verification_types validation_status' do |ssn, citizen, from_state, to_state, event, type_name, verification_type_validation_status|
+        before do
+          allow(ssa_validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid payload'))
+          allow(Operations::Fdsh::Ssa::H3::RequestSsaVerification).to receive(:new).and_return(ssa_validator)
+          allow(vlp_validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid payload'))
+          allow(Operations::Fdsh::Vlp::H92::RequestInitialVerification).to receive(:new).and_return(vlp_validator)
+          EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+          person.ssn = ssn
+          consumer.citizen_status = citizen
+        end
+
+        it "moves from #{from_state} to #{to_state} on #{event}" do
+          expect(consumer).to transition_from(from_state).to(to_state).on_event(event.to_sym, verification_attr)
+          expect(consumer.verification_types.where(:type_name.in => type_name).first.validation_status).to eq verification_type_validation_status
+        end
+      end
+
+      context 'coverage_purchased_no_residency' do
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '999001234', 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Social Security Number"],
+                        "negative_response_received"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '999001234', 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Citizenship"], "negative_response_received"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '111111111', 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Social Security Number"],
+                        "negative_response_received"
+        it_behaves_like 'IVL state machine transitions and verification_types validation_status', '111111111', 'us_citizen', :unverified, :verification_outstanding, 'coverage_purchased_no_residency!', ["Citizenship"], "negative_response_received"
       end
     end
   end
@@ -587,6 +717,9 @@ context 'Verification process and notices' do
           consumer.verification_types.each do |verif|
             if verif.type_name == 'American Indian Status'
               expect(verif.validation_status).to eq('negative_response_received')
+            elsif verif.type_name == 'Citizenship'
+              # Validation Status stays same as we will not make DHS call for people who are 'us_citizen'
+              expect(verif.validation_status).to eq('unverified')
             else
               expect(verif.validation_status).to eq('pending')
             end
@@ -2036,6 +2169,19 @@ end
 describe '.create_or_term_eligibility' do
 
   context 'family members with consumer roles present' do
+    let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
+    let!(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+    let!(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+    let(:catalog_eligibility) do
+      Operations::Eligible::CreateCatalogEligibility.new.call(
+        {
+          subject: benefit_coverage_period.to_global_id,
+          eligibility_feature: "aca_ivl_osse_eligibility",
+          effective_date: benefit_coverage_period.start_on.to_date,
+          domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+        }
+      )
+    end
     let(:primary) { FactoryBot.create(:person, :with_consumer_role) }
     let(:spouse) { FactoryBot.create(:person, :with_consumer_role) }
     let(:child1) { FactoryBot.create(:person, :with_consumer_role) }
@@ -2049,15 +2195,18 @@ describe '.create_or_term_eligibility' do
     context 'it should create eligibility for active family members' do
       let(:valid_params) do
         {
-          evidence_key: :osse_subsidy,
+          evidence_key: :ivl_osse_evidence,
           evidence_value: 'true',
-          effective_date: TimeKeeper.date_of_record.next_year.beginning_of_year
+          effective_date: TimeKeeper.date_of_record.beginning_of_year
         }
       end
 
       before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+        catalog_eligibility
         osse_eligible_members.each do |person|
           person.consumer_role.create_or_term_eligibility(valid_params)
+          person.consumer_role.reload
         end
       end
 
@@ -2078,7 +2227,7 @@ describe '.create_or_term_eligibility' do
       it 'should create eligibility with given effective date' do
         verify_active_family_members do |consumer_role|
           expect(consumer_role.eligibilities.count).to eq 1
-          expect(consumer_role.eligibilities.first.start_on).to eq valid_params[:effective_date]
+          expect(consumer_role.eligibilities.first.effective_on).to eq valid_params[:effective_date]
         end
       end
 
@@ -2093,25 +2242,80 @@ describe '.create_or_term_eligibility' do
 
     context 'it should term eligibility' do
       let(:consumer_role) { primary.consumer_role }
-      let(:consumer_elig) { build(:eligibility, :with_subject, :with_evidences, start_on: TimeKeeper.date_of_record.prev_month) }
-      let!(:eligibility) do
-        consumer_role.eligibilities << consumer_elig
+      let!(:ivl_osse_eligibility) do
+        eligibility = build(:ivl_osse_eligibility,
+                            :with_admin_attested_evidence,
+                            :evidence_state => :approved,
+                            :is_eligible => false)
+        consumer_role.eligibilities << eligibility
         consumer_role.save!
-        consumer_role.eligibilities.first
+        eligibility
       end
 
       let(:valid_params) do
         {
-          evidence_key: :osse_subsidy,
+          evidence_key: :ivl_osse_evidence,
           evidence_value: 'false',
           effective_date: TimeKeeper.date_of_record
         }
       end
 
       before { consumer_role.create_or_term_eligibility(valid_params) }
-
-      it { expect(eligibility.reload.end_on).to eq(TimeKeeper.date_of_record) }
       it { expect(consumer_role.reload.osse_eligible?(TimeKeeper.date_of_record)).to be_falsey }
+    end
+  end
+end
+
+describe 'create default osse eligibility on create' do
+  let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
+  let!(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
+  let!(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+  let(:catalog_eligibility) do
+    Operations::Eligible::CreateCatalogEligibility.new.call(
+      {
+        subject: benefit_coverage_period.to_global_id,
+        eligibility_feature: "aca_ivl_osse_eligibility",
+        effective_date: benefit_coverage_period.start_on.to_date,
+        domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+      }
+    )
+  end
+  let(:consumer_role) { FactoryBot.build(:consumer_role) }
+  let(:current_year) { TimeKeeper.date_of_record.year }
+
+  context 'when osse feature for the given year is disabled' do
+    before do
+      EnrollRegistry["aca_ivl_osse_eligibility_#{current_year}"].feature.stub(:is_enabled).and_return(false)
+      catalog_eligibility
+    end
+
+    it 'should create osse eligibility in initial state' do
+      expect(consumer_role.eligibilities.count).to eq 0
+      consumer_role.save
+      expect(consumer_role.reload.eligibilities.count).to eq 0
+    end
+  end
+
+  context 'when osse feature for the given year is enabled' do
+    before do
+      allow(EnrollRegistry).to receive(:feature?).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+      catalog_eligibility
+    end
+
+    it 'should create osse eligibility in initial state' do
+      expect(consumer_role.eligibilities.count).to eq 0
+      consumer_role.save!
+      expect(consumer_role.reload.eligibilities.count).to eq 1
+      eligibility = consumer_role.eligibilities.first
+      expect(eligibility.key).to eq "aca_ivl_osse_eligibility_#{TimeKeeper.date_of_record.year}".to_sym
+      expect(eligibility.current_state).to eq :ineligible
+      expect(eligibility.state_histories.count).to eq 1
+      expect(eligibility.evidences.count).to eq 1
+      evidence = eligibility.evidences.first
+      expect(evidence.key).to eq :ivl_osse_evidence
+      expect(evidence.current_state).to eq :not_approved
+      expect(evidence.state_histories.count).to eq 1
     end
   end
 end

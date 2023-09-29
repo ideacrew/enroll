@@ -21,6 +21,10 @@ module Operations
         # **Do not pass in args(exclude_seps) elsewhere unless approved from Dan/leadership team**
         # !!!Important!!!
         def call(family, exclude_applications = false, *args)
+          options = args.first || {}
+          @transformed_family_members = yield transform_family_members(family.family_members)
+          @transformed_applications = yield transform_applications(family, exclude_applications)
+          @transformed_households = yield transform_households(family.households, options)
           request_payload = yield construct_payload(family, exclude_applications, args)
 
           Success(request_payload)
@@ -30,14 +34,14 @@ module Operations
         private
 
         def construct_payload(family, exclude_applications, args)
-          options = args.first || {}
+          @family_hbx_id = family.hbx_assigned_id.to_s
           payload = {
-            hbx_id: family.hbx_assigned_id.to_s,
-            family_members: transform_family_members(family.family_members),
+            hbx_id: @family_hbx_id,
+            family_members: @transformed_family_members,
             renewal_consent_through_year: family.renewal_consent_through_year,
             special_enrollment_periods: transform_special_enrollment_periods(family.special_enrollment_periods),
             payment_transactions: transform_payment_transactions(family.payment_transactions),
-            magi_medicaid_applications: transform_applications(family, exclude_applications),
+            magi_medicaid_applications: @transformed_applications,
             documents: transform_documents(family.documents),
             timestamp: {created_at: family.created_at.to_datetime, modified_at: family.updated_at.to_datetime} # ,
             # foreign_keys TO DO ??
@@ -47,23 +51,22 @@ module Operations
           }
           payload.merge!(min_verification_due_date: family.min_verification_due_date) if family.min_verification_due_date.present?
           payload.merge!(irs_groups: transform_irs_groups(family.irs_groups)) if family.irs_groups.present?
-          payload.merge!(households: transform_households(family.households, options)) if family.households.present?
+          payload.merge!(households: @transformed_households) if @transformed_households.present?
           payload.merge!(tax_household_groups: transform_tax_household_groups(family.tax_household_groups)) if family.tax_household_groups.present?
-          failed_payloads = payload.values.select { |value| value.is_a?(Dry::Monads::Result::Failure) }
-          return Failure("Unable to transform payload values: #{failed_payloads}") if failed_payloads.present?
+
           Success(payload)
         end
 
         def transform_applications(family, exclude_applications)
-          return unless EnrollRegistry.feature_enabled?(:financial_assistance)
-          return [] if exclude_applications
+          return Success(nil) unless EnrollRegistry.feature_enabled?(:financial_assistance)
+          return Success([]) if exclude_applications
 
           applications = ::FinancialAssistance::Application.where(family_id: family.id).determined
           transformed_applications = applications.collect do |application|
             ::FinancialAssistance::Operations::Applications::Transformers::ApplicationTo::Cv3Application.new.call(application)
           end.compact
           return Failure("Could not transform applications for family with hbx_id #{family.hbx_assigned_id}: #{transformed_applications.select(&:failure?).map(&:failure)}") unless transformed_applications.all?(&:success?)
-          transformed_applications.map(&:value!)
+          Success(transformed_applications.map(&:value!))
         end
 
         def transform_special_enrollment_periods(special_enrollment_periods)
@@ -192,7 +195,9 @@ module Operations
         end
 
         def transform_households(households, options)
-          households.collect do |household|
+          return Success([]) unless households.present?
+
+          transformed_households = households.collect do |household|
             enrollments = household.hbx_enrollments.where(:aasm_state.ne => "shopping", :product_id.ne => nil)
             household_data = {
               start_date: household.effective_starting_on,
@@ -202,9 +207,16 @@ module Operations
               tax_households: transform_tax_households(household.tax_households),
               coverage_households: transform_coverage_households(household.coverage_households)
             }
-            household_data.merge!(hbx_enrollments: transform_hbx_enrollments(enrollments, options)) if enrollments.present?
+            if enrollments.present?
+              transformed_enrollments = transform_hbx_enrollments(enrollments, options)
+              return transformed_enrollments if transformed_enrollments.failure?
+
+              household_data.merge!(hbx_enrollments: transformed_enrollments.value!)
+            end
             household_data
           end
+
+          Success(transformed_households)
         end
 
         def transform_tax_household_groups(tax_household_groups)
@@ -352,7 +364,10 @@ module Operations
         end
 
         def transform_family_members(family_members)
-          family_members.collect do |member|
+          transformed_family_members = family_members.collect do |member|
+            person = transform_person(member.person)
+            return person if person.failure?
+
             {
               hbx_id: member.hbx_id.to_s,
               is_primary_applicant: member.is_primary_applicant,
@@ -360,15 +375,20 @@ module Operations
               is_consent_applicant: member.is_consent_applicant,
               is_coverage_applicant: member.is_coverage_applicant,
               is_active: member.is_active,
-              # magi_medicaid_application_applicants: transform_applicants(member.magi_medicaid_application_applicants),
-              person: transform_person(member.person),
+              person: person.value!,
               timestamp: {created_at: member.created_at.to_datetime, modified_at: member.updated_at.to_datetime}
             }
           end
+          Success(transformed_family_members)
         end
 
         def transform_hbx_enrollments(enrollments, options)
-          enrollments.map { |enrollment| transform_hbx_enrollment(enrollment, options) }
+          transformed_enrollments = enrollments.collect do |enrollment|
+            transform_hbx_enrollment(enrollment, options)
+          end
+          return Failure("Could not transform enrollment for family with hbx_id #{@family_hbx_id}: #{transformed_enrollments.select(&:failure?).map(&:failure)}") unless transformed_enrollments.all?(&:success?)
+
+          Success(transformed_enrollments.map(&:value!))
         end
 
         def construct_updated_by(updated_by)
@@ -376,11 +396,11 @@ module Operations
         end
 
         def transform_hbx_enrollment(enrollment, options)
-          Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment.new.call(enrollment, options).value!
+          Operations::Transformers::HbxEnrollmentTo::Cv3HbxEnrollment.new.call(enrollment, options)
         end
 
         def transform_person(person)
-          Operations::Transformers::PersonTo::Cv3Person.new.call(person).value!
+          Operations::Transformers::PersonTo::Cv3Person.new.call(person)
         end
       end
     end

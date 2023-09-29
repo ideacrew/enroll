@@ -22,6 +22,7 @@ Feature: Cost Savings -  Start New Application
 
   Scenario: FAA is enabled - year selection enabled - and consumer has a no existing FAA applications
     Given the iap year selection feature is enabled
+    And the iap year selection form feature is enabled
     And current hbx is under open enrollment
     Given the date is within open enrollment
     Given a consumer exists
@@ -34,7 +35,7 @@ Feature: Cost Savings -  Start New Application
     And the consumer clicks on Cost Savings link
     Then consumer should see 'Start New Application' button
     When consumer click 'Start New Application' button
-    Then the user will navigate to the assistance year selection page
+    Then the user will navigate to the assistance year selection page with multiple options
 
   Scenario: FAA is enabled - year selection disabled - and consumer has a no existing FAA applications
     Given the iap year selection feature is disabled
@@ -79,4 +80,4 @@ Feature: Cost Savings -  Start New Application
     And the consumer clicks on Cost Savings link
     Then consumer should see 'Start New Application' button
     When consumer click 'Start New Application' button
-    Then the user will navigate to the assistance year selection page
+    Then the user will navigate to the non-OE assistance year selection page

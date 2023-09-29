@@ -37,23 +37,29 @@ module FinancialAssistance
             end
 
             def update_applicant(response_app_entity, application, applicant_identifier)
+              enrollments = HbxEnrollment.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES, family_id: application.family_id)
               response_applicant = response_app_entity.applicants.detect {|applicant| applicant.person_hbx_id == applicant_identifier}
               applicant = application.applicants.where(person_hbx_id: applicant_identifier).first
 
               return Failure("applicant not found with #{applicant_identifier} for pvc Medicare") unless applicant
               return Failure("applicant not found in response with #{applicant_identifier} for pvc Medicare") unless response_applicant
 
-              update_applicant_verifications(applicant, response_applicant)
+              update_applicant_verifications(applicant, response_applicant, enrollments)
               Success('Successfully updated Applicant with evidences and verifications')
             end
 
-            def update_applicant_verifications(applicant, response_applicant_entity)
+            def update_applicant_verifications(applicant, response_applicant_entity, enrollments)
               response_non_esi_evidence = response_applicant_entity.non_esi_evidence
               applicant_non_esi_evidence = applicant.non_esi_evidence
 
               if applicant_non_esi_evidence.present?
                 if response_non_esi_evidence.aasm_state == 'outstanding'
-                  applicant.set_evidence_outstanding(applicant_non_esi_evidence)
+                  if enrolled?(applicant, enrollments)
+                    due_date = fetch_evidence_due_date_for_bulk_actions(applicant_non_esi_evidence, response_non_esi_evidence)
+                    applicant.set_evidence_outstanding(applicant_non_esi_evidence, due_date)
+                  else
+                    applicant.set_evidence_to_negative_response(applicant_non_esi_evidence)
+                  end
                 else
                   applicant.set_evidence_attested(applicant_non_esi_evidence)
                 end
@@ -67,6 +73,23 @@ module FinancialAssistance
               end
 
               Success(applicant)
+            end
+
+            def fetch_evidence_due_date_for_bulk_actions(applicant_non_esi_evidence, response_evidence)
+              return if response_evidence.request_results.blank?
+              return applicant_non_esi_evidence.due_on if applicant_non_esi_evidence.due_on.present?
+              return unless response_evidence.request_results.any? do |result|
+                FinancialAssistance::Applicant::BULK_REDETERMINATION_ACTION_TYPES.include?(result.action)
+              end
+
+              TimeKeeper.date_of_record + EnrollRegistry[:bulk_call_verification_due_in_days].item.to_i
+            end
+
+            def enrolled?(applicant, enrollments)
+              return false if enrollments.blank?
+
+              family_member_ids = enrollments.flat_map(&:hbx_enrollment_members).flat_map(&:applicant_id).uniq
+              family_member_ids.map(&:to_s).include?(applicant.family_member_id.to_s)
             end
           end
         end

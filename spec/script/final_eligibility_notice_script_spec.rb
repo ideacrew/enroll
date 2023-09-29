@@ -109,6 +109,7 @@ RSpec.describe "FinalEligibilityNoticeScript", :dbclean => :after_each do
 
   after :all do
     FileUtils.rm_rf(Dir.glob(File.join(Rails.root, 'spec/test_data/notices/final_eligibility_notice_aqhp_report_*.csv')))
+    DatabaseCleaner.clean
   end
 end
 

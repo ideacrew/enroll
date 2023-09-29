@@ -106,7 +106,6 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
         end
 
         let(:renewal_application) do
-          # renewal_effective_date = current_effective_date.next_year
           r_application = initial_application.renew
           r_application.save
           r_application
@@ -118,18 +117,81 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
           renewal_application.benefit_packages[0]
         end
 
+        let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year }
+
+        let!(:catalog_eligibility) do
+          ::Operations::Eligible::CreateCatalogEligibility.new.call(
+            {
+              subject: current_benefit_market_catalog.to_global_id,
+              eligibility_feature: "aca_shop_osse_eligibility",
+              effective_date: current_benefit_market_catalog.application_period.begin.to_date,
+              domain_model:
+                "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+            }
+          )
+        end
+
+        let!(:renewal_catalog_eligibility) do
+          ::Operations::Eligible::CreateCatalogEligibility.new.call(
+            {
+              subject: renewal_benefit_market_catalog.to_global_id,
+              eligibility_feature: "aca_shop_osse_eligibility",
+              effective_date: renewal_benefit_market_catalog.application_period.begin.to_date,
+              domain_model: "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+            }
+          )
+        end
+
+        let!(:current_benefit_sponsorship_eligibility) do
+          BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(
+            {
+              subject: benefit_sponsorship.to_global_id,
+              effective_date: current_benefit_market_catalog.application_period.begin.to_date,
+              evidence_key: :shop_osse_evidence,
+              evidence_value: "true"
+            }
+          )
+        end
+
+        let!(:renewal_benefit_sponsorship_eligibility) do
+          BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(
+            {
+              subject: benefit_sponsorship.to_global_id,
+              effective_date: renewal_benefit_market_catalog.application_period.begin.to_date,
+              evidence_key: :shop_osse_evidence,
+              evidence_value: "true"
+            }
+          )
+        end
+
+        let!(:current_lcsp) do
+          create(
+            :benefit_markets_products_health_products_health_product,
+            application_period: current_benefit_market_catalog.application_period,
+            hios_id: EnrollRegistry["lowest_cost_silver_product_#{current_effective_date.year}"].item
+          )
+        end
+
+        let!(:current_lcsp) do
+          create(
+            :benefit_markets_products_health_products_health_product,
+            application_period: renewal_benefit_market_catalog.application_period,
+            hios_id: EnrollRegistry["lowest_cost_silver_product_#{current_effective_date.year + 1}"].item
+          )
+        end
+
         before do
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(100.0)
           renewal_benefit_package.update_attributes(title: initial_benefit_package.title + "(#{renewal_application.effective_period.min.year})")
           renewal_benefit_package.sponsored_benefits.each do |sponsored_benefit|
             allow(sponsored_benefit).to receive(:products).and_return(sponsored_benefit.product_package.products)
           end
-          renewal_application
         end
 
         context 'renewing employee A' do
-
           before(:each) do
+            EnrollRegistry["aca_shop_osse_eligibility_#{current_effective_date.year}".to_sym].feature.stub(:is_enabled).and_return(true)
+            EnrollRegistry["aca_shop_osse_eligibility_#{current_effective_date.year + 1}".to_sym].feature.stub(:is_enabled).and_return(true)
             renewal_benefit_package.renew_member_benefit(census_employees[0])
             family.reload
           end
@@ -143,6 +205,7 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
             expect(health_renewals[0].product).to eq enrollment_1.product.renewal_product
             expect(dental_renewals.size).to eq 1
             expect(dental_renewals[0].product).to eq enrollment_2.product.renewal_product
+            expect (health_renewals[0].eligible_child_care_subsidy).not_to eq nil
           end
         end
 
@@ -310,6 +373,7 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
           end
 
           before do
+            EnrollRegistry[:cancel_renewals_for_term].feature.stub(:is_enabled).and_return(true)
             allow(sep_enrollment).to receive(:parent_enrollment).and_return(enrollment_1)
           end
 

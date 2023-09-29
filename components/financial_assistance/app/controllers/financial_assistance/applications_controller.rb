@@ -112,7 +112,7 @@ module FinancialAssistance
 
         redirect_to redirect_path
       else
-        flash[:error] = copy_result.failure
+        flash[:error] = copy_result.failure[:simple_error_message]
         redirect_to applications_path
       end
     rescue StandardError => e

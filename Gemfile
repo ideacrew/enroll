@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.5.9'
+ruby '2.6.3'
 gem 'rails', '~> 5.2.4.3'
 gem 'sidekiq'
 gem 'globalid'
@@ -98,7 +98,7 @@ gem 'redcarpet',                '~> 3.4'
 gem 'redis',                    '~> 4.0'
 gem 'redis-rails',              '~> 5.0.2'
 gem 'resque',                   '~> 1.26.0'
-gem 'roo',                      '~> 2.1'
+gem 'roo',                      '~> 2.7.0'
 gem 'rubyzip', '>= 1.3.0'
 gem 'ruby-saml',                '~> 1.3'
 gem 'sassc',                    '~> 2.0'
@@ -170,11 +170,12 @@ group :test do
   gem 'rspec-benchmark'
   gem 'ruby-progressbar',             '~> 1'
   gem 'shoulda-matchers',             '~> 3'
-  gem 'simplecov',                    '~> 0.14',  :require => false
+  gem 'simplecov',                    '~> 0.22.0',  :require => false
+  gem 'simplecov-cobertura'
   gem 'test-prof'
   gem 'warden',                       '~> 1.2.7'
-  gem 'watir',                        '~> 6.10.3'
-  gem 'webdrivers', '~> 3.0'
+  gem 'watir',                        '~> 6.18.0'
+  gem 'webdrivers', '~> 5.3.1'
   gem 'webmock',                      '~> 3.0.1'
 end
 

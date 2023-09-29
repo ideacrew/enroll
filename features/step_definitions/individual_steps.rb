@@ -67,10 +67,35 @@ When(/the user registers as an individual$/) do
   fill_in IvlPersonalInformation.first_name, :with => (@u.first_name :first_name)
   fill_in IvlPersonalInformation.last_name, :with => (@u.last_name :last_name)
   fill_in IvlPersonalInformation.dob, :with => (@u.adult_dob :adult_dob)
-  fill_in IvlPersonalInformation.ssn, :with => (@u.ssn :ssn)
+  fill_in IvlPersonalInformation.ssn, :with => "262-61-3061"
   find(IvlPersonalInformation.male_radiobtn).click
   screenshot("register")
   find(IvlPersonalInformation.continue_btn).click
+end
+
+When(/the user registers as an individual with invalid SSN$/) do
+  fill_in IvlPersonalInformation.first_name, :with => (@u.first_name :first_name)
+  fill_in IvlPersonalInformation.last_name, :with => (@u.last_name :last_name)
+  fill_in IvlPersonalInformation.dob, :with => (@u.adult_dob :adult_dob)
+  fill_in IvlPersonalInformation.ssn, :with => "999-00-1234"
+  find(IvlPersonalInformation.male_radiobtn).click
+  find(IvlPersonalInformation.continue_btn).click
+end
+
+Then(/^Individual sees the error message (.*)$/) do |error_message|
+  page.should have_content(error_message)
+end
+
+Then(/^Individual should not see the error message (.*)$/) do |error_message|
+  expect(page).not_to have_content(error_message)
+end
+
+When(/^validate SSN feature is (.*)$/) do |feature|
+  if feature == "enabled"
+    stub_const('Forms::ConsumerCandidate::SSN_REGEX', /^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$/)
+  else
+    stub_const('Forms::ConsumerCandidate::SSN_REGEX', /\A\d{9}\z/)
+  end
 end
 
 And(/the user will have to accept alert pop up for missing field$/) do
@@ -1016,7 +1041,7 @@ end
 
 And(/consumer has osse eligibility/) do
   person = Person.all.first
-  person.consumer_role.eligibilities << FactoryBot.build(:eligibility, :with_evidences, :with_subject, start_on: TimeKeeper.date_of_record.beginning_of_year)
+  person.consumer_role.eligibilities << FactoryBot.build(:ivl_osse_eligibility, :with_admin_attested_evidence, evidence_state: :approved)
 end
 
 When(/consumer visits home page after successful ridp/) do
@@ -1250,9 +1275,9 @@ end
 
 Given(/plan filter feature is disabled and osse subsidy feature is enabled/) do
   year = TimeKeeper.date_of_record.year
-  EnrollRegistry[:aca_ivl_osse_subsidy].feature.stub(:is_enabled).and_return(true)
-  EnrollRegistry["aca_ivl_osse_subsidy_#{year}"].feature.stub(:is_enabled).and_return(true)
-  EnrollRegistry["aca_ivl_osse_subsidy_#{year - 1}"].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry[:aca_ivl_osse_eligibility].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry["aca_ivl_osse_eligibility_#{year}"].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry["aca_ivl_osse_eligibility_#{year - 1}"].feature.stub(:is_enabled).and_return(true)
   EnrollRegistry[:individual_osse_plan_filter].feature.stub(:is_enabled).and_return(false)
 end
 

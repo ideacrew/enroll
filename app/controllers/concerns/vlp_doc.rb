@@ -2,6 +2,7 @@
 
 module VlpDoc
   include ErrorBubble
+  include EventSource::Command
 
   def vlp_doc_params_list
     [
@@ -98,7 +99,54 @@ module VlpDoc
 
   def native_status_changed?(role)
     return unless role
-    params_hash = params.permit("tribal_id").to_h
-    role.person.send("tribal_id") != params_hash["tribal_id"]
+
+    if EnrollRegistry.feature_enabled?(:indian_alaskan_tribe_codes)
+      tribal_state = params.dig("person", "tribal_state")
+      tribe_codes =  params.dig("person", "tribe_codes")
+      tribal_name = params.dig("person", "tribal_name")
+      tribal_id = params.dig("person", "tribal_id")
+
+      if tribal_state == EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
+        role.person.tribe_codes != tribe_codes
+      elsif tribal_id.present?
+        role.person.tribal_id != tribal_id
+      else
+        role.person.tribal_name != tribal_name
+      end
+    else
+      params_hash = params.permit("tribal_id").to_h
+      role.person.tribal_id != params_hash["tribal_id"]
+    end
+  end
+
+  # These methods are a fix to make sure that any associated events are
+  # fired correctly.
+  # It's placed here because:
+  #   1. Embedded documents can frequently change the state of consumer
+  #      roles, but those writes/changes can happen after the consumer
+  #      role itself is updated.
+  #   2. If we place the event broadcast into the embedded document itself,
+  #      the result is a tremendous amount of thrashing when this update
+  #      should actually be considered atomic.
+  #   3. We have no desire right now to impact the behaviour of primary family
+  #      members during the entry process.
+  #
+  # All of this logic should be refactored into the correct single operation
+  # when this controller is corrected into the clean code pattern.
+
+  def fire_consumer_roles_create_for_vlp_docs(consumer_role)
+    return unless consumer_role && consumer_role.active_vlp_document.present?
+    event = event('events.individual.consumer_roles.created', attributes: { gid: consumer_role.to_global_id.uri })
+    event.success.publish if event.success?
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't generate consumer role create event due to #{e.backtrace}" }
+  end
+
+  def fire_consumer_roles_update_for_vlp_docs(consumer_role, original_applying_for_coverage)
+    return unless consumer_role && consumer_role.active_vlp_document.present?
+    event = event('events.individual.consumer_roles.updated', attributes: { gid: consumer_role.to_global_id.uri, previous: {is_applying_coverage: original_applying_for_coverage} })
+    event.success.publish if event.success?
+  rescue StandardError => e
+    Rails.logger.error { "Couldn't generate consumer role updated event due to #{e.backtrace}" }
   end
 end

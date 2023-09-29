@@ -213,15 +213,19 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   def total_childcare_subsidy_amount
     return hbx_enrollment.eligible_child_care_subsidy.to_f if hbx_enrollment.is_reinstated_enrollment?
 
-    if ivl_osse_eligible? && (is_hc4cc_plan || !EnrollRegistry.feature_enabled?("individual_osse_plan_filter"))
+    if is_eligible_for_osse_grant? && is_hc4cc_plan
       total_premium - total_aptc_amount
     else
       0.0
     end
   end
 
+  def is_eligible_for_osse_grant?
+    hbx_enrollment.is_eligible_for_osse_grant?("aca_individual_osse_plan_subsidy".to_sym)
+  end
+
   def ivl_osse_eligible?
-    hbx_enrollment.ivl_osse_eligible?(hbx_enrollment.effective_on)
+    hbx_enrollment.ivl_osse_eligible?
   end
 
   private

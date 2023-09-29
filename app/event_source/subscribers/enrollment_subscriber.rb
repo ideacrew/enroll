@@ -15,9 +15,9 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "EnrollmentSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.error "EnrollmentSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
     #   logger.info "EnrollmentSubscriber: errored & acked. Backtrace: #{e.backtrace}"
-      subscriber_logger.info "EnrollmentSubscriber, ack: #{payload}"
+      subscriber_logger.error "EnrollmentSubscriber, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
 
@@ -27,12 +27,12 @@ module Subscribers
       pre_process_message(subscriber_logger, payload)
 
       # Add subscriber operations below this line
-      create_grants(payload)
+      # create_grants(payload)
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "EnrollmentSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      subscriber_logger.info "EnrollmentSubscriber, ack: #{payload}"
+      subscriber_logger.error "EnrollmentSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.error "EnrollmentSubscriber, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
 
@@ -44,55 +44,54 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "EnrollmentSubscriber#on_enroll_individual_enrollments, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      subscriber_logger.info "EnrollmentSubscriber#on_enroll_individual_enrollments, ack: #{payload}"
+      subscriber_logger.error "EnrollmentSubscriber#on_enroll_individual_enrollments, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.error "EnrollmentSubscriber#on_enroll_individual_enrollments, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
 
-    def create_grants(payload)
-      enrollment = GlobalID::Locator.locate(payload[:enrollment_global_id])
+    # def create_grants(payload)
+    #   enrollment = GlobalID::Locator.locate(payload[:enrollment_global_id])
 
-      title = 'OSSE ChildCare Subsidy Premium'
-      key = :osse_subsidy
+    #   title = 'OSSE ChildCare Subsidy Premium'
+    #   key = :osse_subsidy
 
 
-      enrollment.hbx_enrollment_members.each do |hbx_enrollment_member|
-        next if enrollment.is_shop? && !hbx_enrollment_member.is_subscriber?
+    #   enrollment.hbx_enrollment_members.each do |hbx_enrollment_member|
+    #     next if enrollment.is_shop? && !hbx_enrollment_member.is_subscriber?
 
-        value = {
-          title: title,
-          key: key,
-          value: enrollment.osse_subsidy_for_member(hbx_enrollment_member)
-        }
+    #     value = {
+    #       title: title,
+    #       key: key,
+    #       value: enrollment.osse_subsidy_for_member(hbx_enrollment_member)
+    #     }
 
-        grant_values = {
-          title: title,
-          key: key,
-          start_on: enrollment.effective_on,
-          value: value
-        }
-        eligibility = eligibility(hbx_enrollment_member)
+    #     grant_values = {
+    #       title: title,
+    #       key: key,
+    #       start_on: enrollment.effective_on,
+    #       value: value
+    #     }
+    #     eligibility = eligibility(hbx_enrollment_member)
 
-        eligibility.persist_grants(grant_values)
+    #     eligibility.persist_grants(grant_values)
+    #   end
+    # end
 
-      end
-    end
+    # def eligibility(hbx_enrollment_member)
+    #   enrollment = hbx_enrollment_member.hbx_enrollment
+    #   person = hbx_enrollment_member.person
 
-    def eligibility(hbx_enrollment_member)
-      enrollment = hbx_enrollment_member.hbx_enrollment
-      person = hbx_enrollment_member.person
+    #   subject =
+    #     if enrollment.is_shop?
+    #       enrollment.employee_role
+    #     elsif enrollment.is_coverall?
+    #       person.resident_role
+    #     else
+    #       person.consumer_role
+    #     end
 
-      subject =
-        if enrollment.is_shop?
-          enrollment.employee_role
-        elsif enrollment.is_coverall?
-          person.resident_role
-        else
-          person.consumer_role
-        end
-
-      subject.eligibilities.max_by(&:created_at)
-    end
+    #   subject.eligibilities.max_by(&:created_at)
+    # end
 
     def redetermine_family_eligibility(subscriber_logger, payload)
       enrollment = GlobalID::Locator.locate(payload[:gid])
@@ -123,7 +122,7 @@ module Subscribers
 
       return application if application.present?
 
-      family.active_financial_assistance_application(enrollment.effective_on.year)
+      enrollment.family.active_financial_assistance_application(enrollment.effective_on.year)
     end
 
     def pre_process_message(subscriber_logger, payload)
