@@ -136,6 +136,9 @@ module VlpDoc
 
   def fire_consumer_roles_create_for_vlp_docs(consumer_role)
     return unless consumer_role && consumer_role.active_vlp_document.present?
+
+    clear_history_noise_if_present_from(consumer_role)
+
     event = event('events.individual.consumer_roles.created', attributes: { gid: consumer_role.to_global_id.uri })
     event.success.publish if event.success?
   rescue StandardError => e
@@ -144,9 +147,21 @@ module VlpDoc
 
   def fire_consumer_roles_update_for_vlp_docs(consumer_role, original_applying_for_coverage)
     return unless consumer_role && consumer_role.active_vlp_document.present?
+
+    clear_history_noise_if_present_from(consumer_role)
+
     event = event('events.individual.consumer_roles.updated', attributes: { gid: consumer_role.to_global_id.uri, previous: {is_applying_coverage: original_applying_for_coverage} })
     event.success.publish if event.success?
   rescue StandardError => e
     Rails.logger.error { "Couldn't generate consumer role updated event due to #{e.backtrace}" }
+  end
+
+  def clear_history_noise_if_present_from(consumer_role)
+    consumer_role.verification_types.active.where(:type_name.in => ["Citizenship", "Immigration status"]).each do |v_type|
+      type_history_ele = v_type.type_history_elements.max_by(&:created_at)
+      if type_history_ele.present? && type_history_ele.update_reason.match(/No VLP Documents/)
+        type_history_ele.destroy
+      end
+    end
   end
 end

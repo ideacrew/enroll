@@ -47,7 +47,8 @@ RSpec.describe Insured::FamilyMembersController do
         local_residency_validation: nil,
         residency_determined_at: nil,
         to_global_id: global_id,
-        active_vlp_document: vlp_document
+        active_vlp_document: vlp_document,
+        verification_types: []
       )
     end
 
