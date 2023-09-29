@@ -7,7 +7,6 @@ families_created_count = Family.where(created_at: range).count
 families_updated_count = Family.where(updated_at: range).count
 enrollment_created_count = HbxEnrollment.where(created_at: range, "effective_on" => {"$gte" => Date.new(2022,1,1)},
                                                :aasm_state.in => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES).count
-renewal_statuses = HbxEnrollment::RENEWAL_STATUSES.map(&:to_s)
 enrollments = HbxEnrollment.collection.aggregate([
  { "$match" => {
    "hbx_enrollment_members" => {"$ne" => nil},
@@ -16,10 +15,7 @@ enrollments = HbxEnrollment.collection.aggregate([
    "product_id" => { "$ne" => nil},
    "aasm_state" => {"$in" =>  HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
    "effective_on" => {"$gte" => Date.new(2022,1,1)},
-   "created_at" => { "$gte" => start_on, "$lte" => end_on},
-   "$nor" => [
-    { "workflow_state_transitions.from_state": { "$in": renewal_statuses } }
-  ]
+   "created_at" => { "$gte" => start_on, "$lte" => end_on}
  }},
 {"$group" => {
     "_id" => "$product_id",
