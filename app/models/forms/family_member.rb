@@ -144,7 +144,11 @@ module Forms
       return false unless try_create_person(person)
       family_member = family.relate_new_member(person, self.relationship)
       if self.is_consumer_role == "true"
-        family_member.family.build_consumer_role(family_member, extract_consumer_role_params.merge({skip_consumer_role_callbacks: @skip_consumer_role_callbacks}))
+
+        # DO NOT change the order of the key value pairs
+        additional_params = { skip_consumer_role_callbacks: @skip_consumer_role_callbacks }.merge(extract_consumer_role_params)
+
+        family_member.family.build_consumer_role(family_member, additional_params)
       elsif self.is_resident_role == "true"
         family_member.family.build_resident_role(family_member)
       end
