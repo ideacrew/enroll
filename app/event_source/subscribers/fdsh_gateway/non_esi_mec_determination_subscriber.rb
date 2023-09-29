@@ -23,7 +23,7 @@ module Subscribers
         ack(delivery_info.delivery_tag)
       rescue StandardError => e
         ack(delivery_info.delivery_tag)
-        logger.info "FdshGateway::NonESIMECDeterminationSubscriber: on_non_esi_mec_determination error: #{e.backtrace}"
+        logger.error "FdshGateway::NonESIMECDeterminationSubscriber: on_non_esi_mec_determination error_message: #{e.message}, backtrace: #{e.backtrace}"
       end
     end
   end

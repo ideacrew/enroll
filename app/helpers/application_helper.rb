@@ -986,8 +986,6 @@ module ApplicationHelper
   end
 
   def display_childcare_program_options(person)
-    return false unless EnrollRegistry.feature_enabled?(:aca_ivl_osse_subsidy)
-
     person.has_active_consumer_role? || person.has_active_resident_role?
   end
 
@@ -1011,8 +1009,21 @@ module ApplicationHelper
   end
 
   def plan_childcare_subsidy_eligible(plan)
-    return true unless EnrollRegistry.feature_enabled?("individual_osse_plan_filter")
+    plan.is_eligible_for_osse_grant? && plan.is_hc4cc_plan
+  end
 
-    plan.ivl_osse_eligible? && plan.is_hc4cc_plan
+  def current_osse_status_for_role(role)
+    date = TimeKeeper.date_of_record
+    active_eligibility = role.active_eligibility_on(date)
+
+    if active_eligibility.present?
+      "Active for (#{date.year})"
+    else
+      "Not Active for (#{date.year})"
+    end
+  end
+
+  def individual_osse_eligibility_years_for_display
+    ::BenefitCoveragePeriod.osse_eligibility_years_for_display.sort.reverse
   end
 end

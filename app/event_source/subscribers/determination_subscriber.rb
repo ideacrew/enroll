@@ -50,8 +50,8 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      logger.info "DeterminationSubscriber: error: #{e.backtrace}"
-      subscriber_logger.info "DeterminationSubscriber: error: #{e.backtrace}"
+      logger.error "DeterminationSubscriber: error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.error "DeterminationSubscriber: error message: #{e.message}, backtrace: #{e.backtrace}"
       ack(delivery_info.delivery_tag)
     end
   end

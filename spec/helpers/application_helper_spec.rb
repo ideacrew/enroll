@@ -894,6 +894,16 @@ describe "Enabled/Disabled IVL market" do
     it_behaves_like 'float_fix', (0.57 * 100), 57
   end
 
+  describe "#plan_childcare_subsidy_eligible" do
+    let(:plan) {double("Plan", :is_eligible_for_osse_grant? => false)}
+
+    context "when aca_ivl_osse_subsidy feature is disabled" do
+      it "returns false" do
+        expect(helper.plan_childcare_subsidy_eligible(plan)).to eq(false)
+      end
+    end
+  end
+
   describe 'round_down_float_two_decimals' do
 
     shared_examples_for 'rounding float number' do |input, output|

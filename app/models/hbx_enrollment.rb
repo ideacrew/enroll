@@ -127,7 +127,12 @@ class HbxEnrollment
   field :external_id, type: String
   field :external_group_identifiers, type: Array
   field :special_enrollment_period_id, type: BSON::ObjectId
+
+  # In Individual Market's context the predecessor_enrollment_id is:
+  #   1. The id of the enrollment that is renewed.
+  #   2. The id of the enrollment that is superseded.(Expand in the future)
   field :predecessor_enrollment_id, type: BSON::ObjectId
+
   field :enrollment_signature, type: String
 
   field :consumer_role_id, type: BSON::ObjectId
@@ -468,6 +473,7 @@ class HbxEnrollment
       effective_on: { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }
     )
   end
+  scope :effectuated, -> { where(:aasm_state.nin => ['coverage_canceled', 'shopping']) }
 
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -553,13 +559,17 @@ class HbxEnrollment
     @benefit_group = BenefitGroup.find(self.benefit_group_id)
   end
 
-  def record_transition
+  def record_transition(*args)
     generate_enrollment_saved_event
+
+    meta_args = {}
+    meta_args = args.last if !args.empty? && args.last.is_a?(Hash)
 
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
       to_state: aasm.to_state,
-      event: aasm.current_event
+      event: aasm.current_event,
+      metadata: meta_args
     )
   end
 
@@ -567,6 +577,7 @@ class HbxEnrollment
     begin
       enrollment = BenefitSponsors::Factories::EnrollmentRenewalFactory.call(self, new_benefit_package)
       if enrollment.save
+        enrollment.update_osse_childcare_subsidy
         assignment = self.employee_role.census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id, enrollment.effective_on)
         assignment.update_attributes(hbx_enrollment_id: enrollment.id)
       else
@@ -859,10 +870,18 @@ class HbxEnrollment
     # SHOP: Implement if we have requirement from buiness, event need to happen after cancel in shop.
     # IVL: cancel renewals on cancelling active coverage.
     return if is_shop?
+
+    return unless EnrollRegistry[:cancel_renewals_for_term].enabled?
     ::EnrollRegistry[:cancel_renewals_for_term] { {hbx_enrollment: self} }
   end
 
-  def propogate_terminate(term_date = TimeKeeper.date_of_record.end_of_month)
+  def propogate_terminate(*args)
+    term_date = if args.present? && args.first.respond_to?(:to_date)
+                  args.first
+                else
+                  TimeKeeper.date_of_record.end_of_month
+                end
+
     if terminated_on.present? && term_date < terminated_on
       self.terminated_on = term_date
     else
@@ -875,6 +894,7 @@ class HbxEnrollment
       notify(ENROLLMENT_UPDATED_EVENT_NAME, {policy_id: self.hbx_id})
     end
 
+    return unless EnrollRegistry[:cancel_renewals_for_term].enabled?
     ::EnrollRegistry[:cancel_renewals_for_term] { {hbx_enrollment: self} }
   end
 
@@ -2224,6 +2244,16 @@ class HbxEnrollment
                   guard: :prior_plan_year_coverage?
     end
 
+    # This event is used to cancel coverage for superseded terminated enrollments
+    # This is specific to Individual Market enrollments
+    # Example:
+    #   When enrollments are purchased with a retroactive effective date,
+    #   and there are terminated enrollments in the current year with the same enrollment signature,
+    #   then the terminated enrollments should be canceled.
+    event :cancel_coverage_for_superseded_term, after: :record_transition do
+      transitions from: :coverage_terminated, to: :coverage_canceled, guard: :is_ivl_by_kind?
+    end
+
     event :cancel_for_non_payment, :after => :record_transition do
       transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected,
                          :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected,
@@ -2338,7 +2368,8 @@ class HbxEnrollment
     current_bcp.contains?(effective_on)
   end
 
-  def can_select_coverage?(qle: false)
+  def can_select_coverage?(arg = {})
+    qle = arg[:qle] || false
     return true if is_cobra_status?
     if is_shop?
       if employee_role.can_enroll_as_new_hire?
@@ -2461,10 +2492,6 @@ class HbxEnrollment
 
   def is_health_enrollment?
     coverage_kind == "health"
-  end
-
-  def is_dental_enrollment?
-    coverage_kind == "dental"
   end
 
   def plan_year_check(employee_role)
@@ -2610,6 +2637,7 @@ class HbxEnrollment
       })
       group_enrollment_members << group_enrollment_member
     end
+
     group_enrollment = BenefitSponsors::Enrollments::GroupEnrollment.new(
       previous_product: previous_product,
       coverage_start_on: effective_on,
@@ -2817,23 +2845,33 @@ class HbxEnrollment
   end
 
   def latest_wfst
-    workflow_state_transitions.order(created_at: :desc).first
+    @latest_wfst ||= workflow_state_transitions.order(created_at: :desc).first
+  end
+
+  def is_eligible_for_osse_grant?(key)
+    return false if is_shop? || dental?
+    hbx_enrollment_members.any? do |member|
+      member.is_eligible_for_osse_grant?(key, effective_on)
+    end
   end
 
   def ivl_osse_eligible?(new_effective_date = nil)
     return false if is_shop? || dental?
 
+    new_effective_date ||= effective_on
     hbx_enrollment_members.any? do |member|
       member.osse_eligible_on_effective_date?(new_effective_date)
     end
   end
 
   def update_osse_childcare_subsidy
+    return if dental?
+
     if is_shop?
-      effective_year = sponsored_benefit_package.start_on.year
-      return if coverage_kind.to_s == 'dental'
-      return unless employee_role&.osse_eligible?(effective_on)
+      application = sponsored_benefit_package.benefit_application
+      effective_year = application.start_on.year
       return unless shop_osse_eligibility_is_enabled?(effective_year)
+      return unless application.osse_eligible?
 
       osse_childcare_subsidy = osse_subsidy_for_member(primary_hbx_enrollment_member)
     else
@@ -2842,7 +2880,7 @@ class HbxEnrollment
       cost_calculator = build_plan_premium(qhp_plan: product, elected_aptc: applied_aptc_amount, apply_aptc: applied_aptc_amount > 0)
       osse_childcare_subsidy = cost_calculator.total_childcare_subsidy_amount
     end
-
+    osse_childcare_subsidy ||= 0.0
     update(eligible_child_care_subsidy: osse_childcare_subsidy)
   end
 
@@ -2850,12 +2888,18 @@ class HbxEnrollment
     effective_year_for_lcsp = sponsored_benefit_package.start_on.year
     hios_id = EnrollRegistry["lowest_cost_silver_product_#{effective_year_for_lcsp}"].item
     lcsp = BenefitMarkets::Products::Product.by_year(effective_year_for_lcsp).where(hios_id: hios_id).first
-
     return if lcsp.nil?
 
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(self)
-    member_groups_lcsp = sponsored_cost_calculator.groups_for_products([lcsp])
+    previous_product = parent_enrollment&.product
 
+    sponsored_cost_calculator.action = if product && previous_product && product.id == previous_product.id
+                                         :calc_non_product_change_childcare_subsidy
+                                       else
+                                         :calc_childcare_subsidy
+                                       end
+
+    member_groups_lcsp = sponsored_cost_calculator.groups_for_products([lcsp])
     member_enrollment = member_groups_lcsp[0].group_enrollment.member_enrollments.detect{ |me| me.member_id.to_s == hbx_enrollment_member.id.to_s }
     return if member_enrollment.nil?
 
@@ -2864,6 +2908,7 @@ class HbxEnrollment
 
   def verify_and_reset_osse_subsidy_amount(member_group)
     return unless is_shop?
+
     hbx_enrollment_members.each do |member|
       next unless member.is_subscriber?
       product_price = member_group.group_enrollment.member_enrollments.find{|enrollment| enrollment.member_id == member.id }.product_price
@@ -2893,6 +2938,55 @@ class HbxEnrollment
         :family_member_id.in => thh_enr.tax_household.aptc_members.map(&:applicant_id)
       ).present?
     end
+  end
+
+  # Checks to see if the new enrollment superseded the previous enrollment and is eligible for cancellation.
+  #   - Checks if RR configuration is enabled
+  #   - Checks if the enrollment is of kind individual market
+  #   - Checks if the previous enrollment is in terminated state
+  #   - Checks if the new enrollment has an effective_on date
+  #   - Checks if the new enrollment's effective_on is same as the current enrollment's effective_on year
+  #   - Checks if the previous enrollment can be canceled via event 'cancel_coverage_for_superseded_term'
+  #   - The base/previous enrollment must have the same signature as the new enrollment, which is checked before calling this method
+  def enrollment_superseded_and_eligible_for_cancellation?(new_effective_on)
+    EnrollRegistry.feature_enabled?(:cancel_superseded_terminated_enrollments) &&
+      coverage_terminated? &&
+      new_effective_on.present? &&
+      new_effective_on.year == effective_on.year &&
+      may_cancel_coverage_for_superseded_term?
+  end
+
+  # Checks to see if the previous enrollment is ineligible for termination.
+  # Previous enrollment is ineligible for termination if all the below are true
+  #   - Checks if the enrollment is of kind individual market
+  #   - Checks if the enrollment is in terminated state
+  #   - Checks if the enrollment has a terminated_on date
+  #   - Checks if the new_effective_on date exists
+  #   - Checks if the previous day of the new effective on is greater or equal to the enrollment's terminated_on
+  #   - The base/previous enrollment must have the same signature as the new enrollment, which is 'given' before calling this method
+  def ineligible_for_termination?(new_effective_on)
+    is_ivl_by_kind? &&
+      coverage_terminated? &&
+      terminated_on.present? &&
+      new_effective_on.present? &&
+      (new_effective_on - 1.day) >= terminated_on
+  end
+
+  # Checks to see if a workflow state transition is 'superseded_silent'
+  def is_transition_superseded_silent?(wfts)
+    wfts.metadata_has?(
+      { 'reason' => Enrollments::TerminationReasons::SUPERSEDED_SILENT }
+    )
+  end
+
+  def predecessor_enrollment_hbx_id
+    predecessor_enrollment&.hbx_id
+  end
+
+  def predecessor_enrollment
+    return nil unless predecessor_enrollment_id
+
+    HbxEnrollment.where(id: predecessor_enrollment_id).first
   end
 
   private

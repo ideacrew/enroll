@@ -112,6 +112,8 @@ class ConsumerRole
   delegate :citizen_status, :citizenship_result,:vlp_verified_date, :vlp_authority, :vlp_document_id, to: :lawful_presence_determination_instance
   delegate :citizen_status=, :citizenship_result=,:vlp_verified_date=, :vlp_authority=, :vlp_document_id=, to: :lawful_presence_determination_instance
 
+  delegate :encrypted_ssn, to: :person
+
   field :is_applicant, type: Boolean  # Consumer is applying for benefits coverage
   field :birth_location, type: String
   field :marital_status, type: String
@@ -582,10 +584,14 @@ class ConsumerRole
       transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?], :after => [:move_types_to_pending]
     end
 
-    event :coverage_purchased_no_residency, :after => [:invoke_pending_verification!, :record_transition, :move_types_to_pending, :notify_of_eligibility_change]  do
-      transitions from: :unverified, to: :verification_outstanding, :guard => [:is_tribe_member_or_native_no_snn?], :after => [:handle_native_no_snn_or_indian_transition]
+    event :coverage_purchased_no_residency, :after => [:invoke_pending_verification!, :record_transition, :notify_of_eligibility_change]  do
+      transitions from: :unverified, to: :verification_outstanding, :guard => [:is_tribe_member_or_native_no_snn?]
       transitions from: :unverified, to: :dhs_pending, :guards => [:call_dhs?]
       transitions from: :unverified, to: :ssa_pending, :guards => [:call_ssa?]
+
+      success do
+        handle_native_no_snn_or_indian_transition if self.verification_outstanding?
+      end
     end
 
     event :ssn_invalid, :after => [:fail_ssn, :fail_lawful_presence, :record_transition, :notify_of_eligibility_change] do
@@ -635,7 +641,7 @@ class ConsumerRole
       transitions from: :fully_verified, to: :verification_outstanding
     end
 
-    event :trigger_residency, :after => [:mark_residency_pending, :record_transition, :start_residency_verification_process, :notify_of_eligibility_change] do
+    event :trigger_residency, :after => [:record_transition, :start_residency_verification_process, :mark_residency_pending, :notify_of_eligibility_change] do
       transitions from: :ssa_pending, to: :ssa_pending
       transitions from: :unverified, to: :unverified
       transitions from: :dhs_pending, to: :dhs_pending
@@ -699,10 +705,16 @@ class ConsumerRole
     invoke_verification! if [:dhs_pending, :ssa_pending].include?(aasm.current_state)
   end
 
+  def eligible_for_invoking_dhs?
+    is_applying_coverage && (
+      [NATURALIZED_CITIZEN_STATUS, ALIEN_LAWFULLY_PRESENT_STATUS] + INELIGIBLE_CITIZEN_VERIFICATION
+    ).include?(citizen_status)
+  end
+
   def invoke_verification!(*args)
     return if skip_residency_verification == true
     invoke_ssa if person.ssn.present? || is_native?
-    invoke_dhs
+    invoke_dhs if eligible_for_invoking_dhs?
   end
 
   def verify_ivl_by_admin(*args)
@@ -726,10 +738,10 @@ class ConsumerRole
       fail_indian_tribe
     elsif tribal_with_ssn?
       invoke_verification!(verification_attr)
-      move_types_to_pending
       fail_indian_tribe
     elsif native_no_ssn?
-      fail_lawful_presence(verification_attr)
+      invoke_ssa
+      fail_lawful_presence(verification_attr) unless EnrollRegistry.feature_enabled?(:validate_and_record_publish_errors)
     end
   end
 
@@ -772,7 +784,7 @@ class ConsumerRole
       live_types << LOCATION_RESIDENCY if EnrollRegistry.feature_enabled?(:location_residency_verification_type)
       live_types << 'Social Security Number' if ssn
       if EnrollRegistry.feature_enabled?(:indian_alaskan_tribe_details)
-        live_types << 'American Indian Status' if !(tribal_state.nil? || tribal_state.empty?) && !(tribal_name.nil? || tribal_name.empty?)
+        live_types << 'American Indian Status' if !(tribal_state.nil? || tribal_state.empty?) && !(check_tribal_name.nil? || check_tribal_name.empty?)
       else
         live_types << 'American Indian Status' unless tribal_id.nil? || tribal_id.empty?
       end
@@ -958,8 +970,7 @@ class ConsumerRole
   def check_native_status(family, native_status_changed)
     return unless native_status_changed
     return unless family&.person_has_an_active_enrollment?(person)
-
-    if (EnrollRegistry[:indian_alaskan_tribe_details].enabled? && person.tribal_state.present? && person.tribal_name.present?) || person.tribal_id.present?
+    if (EnrollRegistry[:indian_alaskan_tribe_details].enabled? && person.tribal_state.present? && check_tribal_name.present?) || person.tribal_id.present?
       fail_indian_tribe
       fail_native_status!
     elsif all_types_verified? && !fully_verified? && may_pass_native_status?
@@ -1265,13 +1276,18 @@ class ConsumerRole
   end
 
   def ensure_native_validation
-    self.native_validation = "na" if EnrollRegistry[:indian_alaskan_tribe_details].enabled? && (tribal_state.nil? || tribal_state.empty? || tribal_name.nil? || tribal_name.empty?)
+    self.native_validation = "na" if EnrollRegistry[:indian_alaskan_tribe_details].enabled? && (tribal_state.nil? || tribal_state.empty? || check_tribal_name.nil? || check_tribal_name.empty?)
 
     if tribal_id.nil? || tribal_id.empty?
       self.native_validation = "na"
     else
       self.native_validation = "outstanding" if native_validation == "na"
     end
+  end
+
+  def check_tribal_name
+    return tribal_name unless EnrollRegistry.feature_enabled?(:indian_alaskan_tribe_codes)
+    tribal_state.present? && tribal_state == EnrollRegistry[:enroll_app].setting(:state_abbreviation).item ? tribe_codes : tribal_name
   end
 
   def ensure_ssn_validation_status

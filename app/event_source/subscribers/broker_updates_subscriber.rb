@@ -13,8 +13,8 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "BrokerUpdatesSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      subscriber_logger.info "BrokerUpdatesSubscriber, ack: #{payload}"
+      subscriber_logger.error "BrokerUpdatesSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.error "BrokerUpdatesSubscriber, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
 
@@ -26,21 +26,21 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "BrokerUpdatesSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      subscriber_logger.info "BrokerUpdatesSubscriber, ack: #{payload}"
+      subscriber_logger.error "BrokerUpdatesSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.error "BrokerUpdatesSubscriber, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
 
     def hire_broker(payload, subscriber_logger)
       ::Operations::Families::HireBrokerAgency.new.call(payload)
     rescue StandardError => e
-      subscriber_logger.info "Error: BrokerUpdatesSubscriber, response: #{e}"
+      subscriber_logger.error "Error: BrokerUpdatesSubscriber, error message: #{e.message}, backtrace: #{e.backtrace}"
     end
 
     def fire_broker(payload, subscriber_logger)
       ::Operations::Families::TerminateBrokerAgency.new.call(payload)
     rescue StandardError => e
-      subscriber_logger.info "Error: BrokerUpdatesSubscriber, response: #{e}"
+      subscriber_logger.error "Error: BrokerUpdatesSubscriber, error message: #{e.message}, backtrace: #{e.backtrace}"
     end
 
     def subscriber_logger_for(event)

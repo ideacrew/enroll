@@ -406,12 +406,23 @@ module Insured::FamiliesHelper
     BenefitMarkets::Locations::CountyZip.where(zip: address.zip.slice(/\d{5}/)).pluck(:county_name).uniq
   end
 
-  def latest_transition(enrollment)
-    if enrollment.latest_wfst.present?
-      l10n('enrollment.latest_transition_data',
-           from_state: enrollment.latest_wfst.from_state,
-           to_state: enrollment.latest_wfst.to_state,
-           created_at: enrollment.latest_wfst.created_at.in_time_zone('Eastern Time (US & Canada)').strftime("%m/%d/%Y %-I:%M%p"))
+  def all_transitions(enrollment)
+    if enrollment.workflow_state_transitions.present?
+      all_transitions = []
+      enrollment.workflow_state_transitions.each do |transition|
+        all_transitions << if enrollment.is_transition_superseded_silent?(transition)
+                             l10n('enrollment.latest_transition_data_with_silent_reason',
+                                  from_state: transition.from_state,
+                                  to_state: transition.to_state,
+                                  created_at: transition.created_at.in_time_zone('Eastern Time (US & Canada)').strftime("%m/%d/%Y %-I:%M%p"))
+                           else
+                             l10n('enrollment.latest_transition_data',
+                                  from_state: transition.from_state,
+                                  to_state: transition.to_state,
+                                  created_at: transition.created_at.in_time_zone('Eastern Time (US & Canada)').strftime("%m/%d/%Y %-I:%M%p"))
+                           end
+      end
+      all_transitions.join("\n")
     else
       l10n('not_available')
     end
@@ -422,5 +433,36 @@ module Insured::FamiliesHelper
     reason_is_non_payment = enrollment.terminate_reason == 'non_payment' if EnrollRegistry.feature_enabled?(:show_non_pay_enrollments)
     external_enrollment = (enrollment.aasm_state != 'shopping' && enrollment.external_enrollment == true)
     (canceled_enrollment && !reason_is_non_payment) || external_enrollment
+  end
+
+  def is_broker_authorized?(current_user, family)
+    person = current_user.person
+    return false if person.blank?
+
+    logged_user_broker_role = person.broker_role
+    logged_user_staff_roles = person.broker_agency_staff_roles.where(aasm_state: 'active')
+    return false if logged_user_broker_role.blank? && logged_user_staff_roles.blank? # logged in user is not a broker
+
+    family_broker_agency_id = family.current_broker_agency&.benefit_sponsors_broker_agency_profile_id
+    return false if family_broker_agency_id.blank? # family has no broker
+
+    family_broker_agency_id == logged_user_broker_role.benefit_sponsors_broker_agency_profile_id || logged_user_staff_roles.map(&:benefit_sponsors_broker_agency_profile_id).include?(family_broker_agency_id)
+  end
+
+  def is_general_agency_authorized?(current_user, family)
+    logged_user_ga_roles = current_user.person&.active_general_agency_staff_roles
+    return false if logged_user_ga_roles.blank? # logged in user is not a ga
+
+    family_broker_profile_id = family.current_broker_agency&.benefit_sponsors_broker_agency_profile_id
+    return false if family_broker_profile_id.blank? # family has no broker, hence no ga
+
+    ::SponsoredBenefits::Organizations::PlanDesignOrganization.where(
+      :owner_profile_id => family_broker_profile_id,
+      :general_agency_accounts => {:"$elemMatch" => {aasm_state: :active, :benefit_sponsrship_general_agency_profile_id.in => logged_user_ga_roles.map(&:benefit_sponsors_general_agency_profile_id)}}
+    ).present?
+  end
+
+  def is_family_authorized?(current_user, family)
+    current_user.person&.primary_family == family
   end
 end

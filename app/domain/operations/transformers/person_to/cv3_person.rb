@@ -52,6 +52,8 @@ module Operations
             timestamp: {created_at: person.created_at.to_datetime, modified_at: person.updated_at.to_datetime}
           }
           Success(payload)
+        rescue StandardError => e
+          Failure("Cv3Person hbx id: #{person&.hbx_id} | exception: #{e.inspect} | backtrace: #{e.backtrace.inspect}")
         end
 
         def transform_person_health(person)
@@ -151,6 +153,7 @@ module Operations
             next if vlp_document.subject.nil?
             {
               subject: vlp_document.subject,
+              description: vlp_document.description,
               alien_number: vlp_document.alien_number,
               i94_number: vlp_document.i94_number,
               visa_number: vlp_document.visa_number,
@@ -231,7 +234,7 @@ module Operations
             identity_rejected: consumer_role.identity_rejected,
             application_rejected: consumer_role.application_rejected,
             documents: transform_documents(consumer_role.documents),
-            vlp_documents: transform_vlp_documents(consumer_role.vlp_documents),
+            vlp_documents: transform_vlp_documents([consumer_role.active_vlp_document].compact),
             ridp_documents: transform_ridp_documents(consumer_role.ridp_documents),
             verification_type_history_elements: transform_verification_type_history_elements(consumer_role.verification_type_history_elements),
             lawful_presence_determination: construct_lawful_presence_determination(consumer_role.lawful_presence_determination),

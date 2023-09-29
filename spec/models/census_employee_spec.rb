@@ -1302,6 +1302,80 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
           expect(assignment).to be_present
         end
       end
+
+
+      context "when cobra effective date is last month of PY and terminated previously with renewing cancelled enrollment", dbclean: :after_each do
+        let(:renewal_effective_date) {active_benefit_application.end_on + 1.day}
+        let(:renewal_effective_period) {renewal_effective_date..current_effective_date.next_year.prev_day}
+        let(:renewal_benefit_application) {expired_benefit_application_one.update_attributes(aasm_state: :canceled, effective_period: renewal_effective_period)}
+        let(:renewal_benefit_package) { expired_benefit_package_one }
+        let!(:active_enrollment) do
+          FactoryBot.create(:hbx_enrollment,
+                            household: shop_family.latest_household,
+                            coverage_kind: coverage_kind,
+                            effective_on: active_benefit_application.start_on,
+                            enrollment_kind: 'open_enrollment',
+                            family: shop_family,
+                            kind: "employer_sponsored",
+                            submitted_at: active_benefit_application.start_on - 20.days,
+                            benefit_sponsorship_id: benefit_sponsorship.id,
+                            sponsored_benefit_package_id: active_benefit_package.id,
+                            sponsored_benefit_id: active_sponsored_benefit.id,
+                            employee_role_id: employee_role.id,
+                            benefit_group_assignment_id: census_employee.benefit_package_assignment_on(active_benefit_package.start_on).id,
+                            product_id: active_sponsored_benefit.reference_product.id,
+                            aasm_state: 'coverage_selected')
+        end
+
+        let!(:renewing_cancelled_enrollment) do
+          FactoryBot.create(:hbx_enrollment,
+                            household: shop_family.latest_household,
+                            coverage_kind: coverage_kind,
+                            effective_on: renewal_effective_date,
+                            enrollment_kind: 'open_enrollment',
+                            family: shop_family,
+                            kind: "employer_sponsored",
+                            submitted_at: expired_benefit_application_one.start_on - 20.days,
+                            benefit_sponsorship_id: benefit_sponsorship.id,
+                            sponsored_benefit_package_id: renewal_benefit_package.id,
+                            sponsored_benefit_id: expired_sponsored_benefit_one.id,
+                            employee_role_id: employee_role.id,
+                            benefit_group_assignment_id: census_employee.benefit_package_assignment_on(renewal_benefit_package.start_on).id,
+                            product_id: expired_sponsored_benefit_one.reference_product.id,
+                            aasm_state: 'canceled')
+        end
+
+        let(:employment_termination_date) { active_benefit_application.end_on - 2.months }
+        let(:cobra_begin_date) { employment_termination_date.end_of_month + 1.day }
+
+        before do
+          TimeKeeper.set_date_of_record_unprotected!(active_benefit_application.end_on - 1.month)
+          employee_role.update(census_employee_id: census_employee.id)
+          allow(census_employee).to receive(:employee_record_claimed?).and_return(true)
+          assignment = census_employee.create_benefit_package_assignment(renewal_benefit_package, renewal_benefit_package.start_on)
+          assignment.save
+          census_employee.employee_role = (employee_role)
+          census_employee.terminate_employment(employment_termination_date)
+          census_employee.reload
+          census_employee.update_for_cobra(cobra_begin_date, user)
+          census_employee.reload
+        end
+
+        after do
+          TimeKeeper.set_date_of_record_unprotected!(Date.today)
+        end
+
+        it 'should reinstate employee cobra coverage' do
+          shop_family.reload
+          cobra_enrollment = shop_family.active_household.hbx_enrollments.where(:effective_on => cobra_begin_date).first
+          expect(cobra_enrollment).to be_present
+        end
+
+        it 'should create new valid benefit group assignment' do
+          assignment = census_employee.benefit_group_assignments.where(start_on: cobra_begin_date).first
+          expect(assignment).to be_present
+        end
+      end
     end
   end
 
