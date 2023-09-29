@@ -27,7 +27,7 @@ namespace :import do
           sheets =  if Rails.env.test?
                       result.sheets
                     else
-                      ["IVL", "SHOP Q1", "SHOP Dental", "IVL Dental"]
+                      ["IVL", "SHOP Q1", "Dental SHOP", "IVL Dental"]
                     end
 
           sheets.each do |sheet_name|
@@ -48,7 +48,7 @@ namespace :import do
                 plan.nationwide, plan.dc_in_network = [true, false] if NATIONWIDE_NETWORK.include?(row_info[@headers["network"]])
                 plan.dc_in_network, plan.nationwide = [true, false] if DC_IN_NETWORK.include?(row_info[@headers["network"]])
                 plan.provider_directory_url = provider_directory_url
-                if !["SHOP Dental", "IVL Dental"].include?(sheet_name)
+                if !["Dental SHOP", "IVL Dental"].include?(sheet_name)
                   rx_formulary_url = row_info[@headers["rx formulary url"]]
                   plan.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
                   if ["IVL", "SHOP Q1"].include?(sheet_name) && year > 2017
@@ -64,7 +64,7 @@ namespace :import do
                 product.nationwide, product.dc_in_network = [true, false] if NATIONWIDE_NETWORK.include?(row_info[@headers["network"]])
                 product.dc_in_network, product.nationwide = [true, false] if DC_IN_NETWORK.include?(row_info[@headers["network"]])
                 product.provider_directory_url = provider_directory_url
-                if !["SHOP Dental", "IVL Dental"].include?(sheet_name)
+                if !["Dental SHOP", "IVL Dental"].include?(sheet_name)
                   rx_formulary_url = row_info[@headers["rx formulary url"]]
                   product.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
                   if ["IVL", "SHOP Q1"].include?(sheet_name) && year > 2017
