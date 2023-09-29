@@ -163,7 +163,7 @@ module Operations
         entity =
           if financial_application&.determined? && financial_application.eligibility_response_payload.present?
             ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(
-              JSON.parse(financial_application.eligibility_response_payload, :symbolize_name => true)
+              JSON.parse(financial_application.eligibility_response_payload, :symbolize_names => true)
             )
           else
             build_family_payload(family)
