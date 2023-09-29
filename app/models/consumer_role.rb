@@ -706,7 +706,9 @@ class ConsumerRole
   end
 
   def eligible_for_invoking_dhs?
-    is_applying_coverage && [NATURALIZED_CITIZEN_STATUS, ALIEN_LAWFULLY_PRESENT_STATUS].include?(citizen_status)
+    is_applying_coverage && (
+      [NATURALIZED_CITIZEN_STATUS, ALIEN_LAWFULLY_PRESENT_STATUS] + INELIGIBLE_CITIZEN_VERIFICATION
+    ).include?(citizen_status)
   end
 
   def invoke_verification!(*args)
@@ -738,7 +740,8 @@ class ConsumerRole
       invoke_verification!(verification_attr)
       fail_indian_tribe
     elsif native_no_ssn?
-      fail_lawful_presence(verification_attr)
+      invoke_ssa
+      fail_lawful_presence(verification_attr) unless EnrollRegistry.feature_enabled?(:validate_and_record_publish_errors)
     end
   end
 

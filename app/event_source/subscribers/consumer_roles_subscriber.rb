@@ -13,8 +13,8 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "ConsumerRolesSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      subscriber_logger.info "ConsumerRolesSubscriber, ack: #{payload}"
+      subscriber_logger.error "ConsumerRolesSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.error "ConsumerRolesSubscriber, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
 
@@ -26,7 +26,7 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "ConsumerRolesSubscriber Update, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.error "ConsumerRolesSubscriber Update, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
       ack(delivery_info.delivery_tag)
     end
 
@@ -35,7 +35,7 @@ module Subscribers
     def determine_verifications(payload, subscriber_logger)
       ::Operations::Individual::DetermineVerifications.new.call({ id: GlobalID::Locator.locate(payload[:gid]).id })
     rescue StandardError => e
-      subscriber_logger.info "Error: ConsumerRolesSubscriber, response: #{e}"
+      subscriber_logger.error "Error: ConsumerRolesSubscriber, error message: #{e.message}, backtrace: #{e.backtrace}"
     end
 
     def determine_verifications_on_update(payload, subscriber_logger)
@@ -43,7 +43,7 @@ module Subscribers
         { payload: payload, subscriber_logger: subscriber_logger }
       )
     rescue StandardError => e
-      subscriber_logger.info "Error: ConsumerRolesSubscriber OnUpdate, response: #{e}, backtrace: #{e.backtrace}"
+      subscriber_logger.error "Error: ConsumerRolesSubscriber OnUpdate, error message: #{e.message}, backtrace: #{e.backtrace}"
     end
 
     def subscriber_logger_for(event)

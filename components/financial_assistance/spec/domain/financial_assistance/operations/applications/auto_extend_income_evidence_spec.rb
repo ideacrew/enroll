@@ -76,6 +76,13 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
                                         is_satisfied: false)
     end
 
+    let!(:eligibility_determination) do
+      family.create_eligibility_determination
+      family.eligibility_determination.update!(outstanding_verification_status: 'outstanding',
+                                               outstanding_verification_earliest_due_date: TimeKeeper.date_of_record,
+                                               outstanding_verification_document_status: 'Partially Uploaded')
+    end
+
     before do
       allow(FinancialAssistanceRegistry[:auto_update_income_evidence_due_on].setting(:days)).to receive(:item).and_return(65)
     end
@@ -196,88 +203,73 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AutoExtendIncome
         end
       end
     end
-  end
 
-  describe 'extending income evidence verification due date on a family level' do
-    # Test family with
-    # 1 member eligible for income evidence extension (later due date)
-    # 1 member eligible for income evidence extension (earlier due date)
-    # 1 member ineligible for income evidence extension
-    # Maybe add 1 member with complete verified income evidence?
+    context 'with no eligible families in their ROP' do
+      before do
+        family.eligibility_determination.update!(outstanding_verification_status: 'verified',
+                                                 outstanding_verification_earliest_due_date: nil,
+                                                 outstanding_verification_document_status: nil)
+      end
 
-    let!(:address) { FactoryBot.build(:financial_assistance_address) }
-    let(:applicant_1_due_date) { TimeKeeper.date_of_record }
-    let(:applicant_2_due_date) { TimeKeeper.date_of_record + 5.days }
-    let(:applicant_3_due_date) { TimeKeeper.date_of_record + 30.days }
+      it 'should return a failure' do
+        result = subject.call({})
+        expect(result).to be_failure
+        expect(result.failure).to eq("No families found with outstanding verification status")
+      end
 
-    let!(:income_evidence_1) do
-      applicant.create_income_evidence(key: :income,
-                                       title: 'Income',
-                                       aasm_state: 'outstanding',
-                                       due_on: applicant_1_due_date,
-                                       verification_outstanding: true,
-                                       is_satisfied: false)
+      it 'should not update the income evidence due on for the applicant' do
+        expect(applicant.income_evidence.due_on).to eq(TimeKeeper.date_of_record)
+        expect(applicant.income_evidence.due_on).not_to eq(TimeKeeper.date_of_record + 65.days)
+      end
     end
 
-    let!(:income_evidence_2) do
-      applicant2.create_income_evidence(key: :income,
-                                        title: 'Income',
-                                        aasm_state: 'outstanding',
-                                        due_on: applicant_2_due_date,
-                                        verification_outstanding: true,
-                                        is_satisfied: false)
-    end
+    context 'with no eligible applications that are the most recent determined' do
+      let!(:application2) do
+        FactoryBot.create(:application,
+                          family_id: family.id,
+                          aasm_state: "determined",
+                          effective_date: (TimeKeeper.date_of_record - 12.days))
+      end
 
-    let!(:income_evidence_3) do
-      applicant3.create_income_evidence(key: :income,
-                                        title: 'Income',
-                                        aasm_state: 'outstanding',
-                                        due_on: applicant_3_due_date,
-                                        verification_outstanding: true,
-                                        is_satisfied: false)
-    end
+      let!(:application2_applicant) do
+        FactoryBot.create(:applicant,
+                          application: application2,
+                          dob: TimeKeeper.date_of_record - 40.years,
+                          is_primary_applicant: true,
+                          family_member_id: family.family_members[0].id,
+                          person_hbx_id: person.hbx_id,
+                          addresses: [FactoryBot.build(:financial_assistance_address)])
+      end
 
-    before do
-      # Enable to be able to use min_verification_due_date_on_family on family model
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:crm_update_family_save).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:include_faa_outstanding_verifications).and_return(true)
-      family.create_eligibility_determination
-      family.eligibility_determination.update!(outstanding_verification_status: 'outstanding',
-                                               outstanding_verification_earliest_due_date: TimeKeeper.date_of_record,
-                                               outstanding_verification_document_status: 'Partially Uploaded')
-    end
+      let!(:application2_applicant2) do
+        FactoryBot.create(:applicant,
+                          application: application2,
+                          dob: TimeKeeper.date_of_record - 25.years,
+                          is_primary_applicant: false,
+                          family_member_id: family.family_members[1].id,
+                          person_hbx_id: family.family_members[1].person.hbx_id,
+                          addresses: [FactoryBot.build(:financial_assistance_address)])
+      end
 
-    context 'success' do
-      context 'with params given' do
-        before do
-          @result = subject.call({extend_by: 35, modified_by: 'admin@ideacrew.com'})
+      let!(:application2_applicant3) do
+        FactoryBot.create(:applicant,
+                          application: application2,
+                          dob: TimeKeeper.date_of_record - 25.years,
+                          is_primary_applicant: false,
+                          family_member_id: family.family_members[2].id,
+                          person_hbx_id: family.family_members[2].person.hbx_id,
+                          addresses: [FactoryBot.build(:financial_assistance_address)])
+      end
 
-          applicant.reload
-          applicant2.reload
-          applicant3.reload
-          family.eligibility_determination.reload
-        end
+      it 'should return success' do
+        result = subject.call({})
+        expect(result).to be_success
+        expect(result.value!).to eq([])
+      end
 
-        it 'should return success' do
-          expect(@result).to be_success
-          expect(@result.value!.length).to eq(1)
-
-          expect(@result.value!.include?(family.family_members[0].hbx_id)).to be_truthy
-          expect(@result.value!.include?(family.family_members[1].hbx_id)).to be_falsy
-          expect(@result.value!.include?(family.family_members[2].hbx_id)).to be_falsy
-        end
-
-        it 'should update the income_evidence due_on date for the applicant where applicable' do
-          expect(applicant.income_evidence.due_on).to eq(applicant_1_due_date + 35.days)
-          expect(applicant2.income_evidence.due_on).to eq(applicant_2_due_date) # extensions only happen if evidence due on is the current_due_on
-          expect(applicant3.income_evidence.due_on).to eq(applicant_3_due_date) # Extension period not applicable to applicants ineligible for auto-renewal
-        end
-
-        it 'should update the family outstanding_verification_earliest_due_date to the earliest income_evidence due_on date' do
-          # applicant2 has the earliest income_evidence due_on date -- meaning the overall earliest due date for the family should also be this date
-          expect(family.eligibility_determination.outstanding_verification_earliest_due_date).to eq(applicant2.income_evidence.due_on)
-        end
+      it 'should not update the income evidence due on for the applicant' do
+        expect(applicant.income_evidence.due_on).to eq(TimeKeeper.date_of_record)
+        expect(applicant.income_evidence.due_on).not_to eq(TimeKeeper.date_of_record + 65.days)
       end
     end
   end

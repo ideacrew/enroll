@@ -19,8 +19,8 @@ module Subscribers
 
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e
-        subscriber_logger.info "CensusEmployeeSubscriber, census_employee: #{census_employee.full_name}, employer: #{employer.legal_name}, error message: #{e.message}, backtrace: #{e.backtrace}"
-        logger.info "CensusEmployeeSubscriber: errored & acked. payload: #{payload} Backtrace: #{e.backtrace}"
+        subscriber_logger.error "CensusEmployeeSubscriber, census_employee: #{census_employee.full_name}, employer: #{employer.legal_name}, error message: #{e.message}, backtrace: #{e.backtrace}"
+        logger.error "CensusEmployeeSubscriber: errored & acked. payload: #{payload}, error message: #{e.message}, Backtrace: #{e.backtrace}"
         ack(delivery_info.delivery_tag)
       end
 
@@ -60,8 +60,8 @@ module Subscribers
         end
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e
-        subscriber_logger.info "CensusEmployeeSubscriber on_census_employee_terminated, census_employee: #{census_employee.full_name}, employer: #{employer.legal_name}, error message: #{e.message}, backtrace: #{e.backtrace}"
-        logger.info "CensusEmployeeSubscriber on_census_employee_terminated: errored & acked. payload: #{payload} Backtrace: #{e.backtrace}"
+        subscriber_logger.error "CensusEmployeeSubscriber on_census_employee_terminated, census_employee: #{census_employee.full_name}, employer: #{employer.legal_name}, error message: #{e.message}, backtrace: #{e.backtrace}"
+        logger.error "CensusEmployeeSubscriber on_census_employee_terminated: errored & acked. payload: #{payload} error message: #{e.message}, backtrace: #{e.backtrace}"
         ack(delivery_info.delivery_tag)
       end
 

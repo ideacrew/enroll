@@ -14,8 +14,8 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "PeopleSubscriber::Save, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      subscriber_logger.info "PeopleSubscriber::Save, ack: #{payload}"
+      subscriber_logger.error "PeopleSubscriber::Save, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.error "PeopleSubscriber::Save, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
 
@@ -28,8 +28,8 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "PeopleSubscriber::Update, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      subscriber_logger.info "PeopleSubscriber::Update,  ack: #{payload}"
+      subscriber_logger.error "PeopleSubscriber::Update, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.error "PeopleSubscriber::Update,  ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
 
@@ -51,16 +51,21 @@ module Subscribers
       identifying_information_attributes = EnrollRegistry[:consumer_role_hub_call].setting(:identifying_information_attributes).item.map(&:to_sym)
       tribe_status_attributes = EnrollRegistry[:consumer_role_hub_call].setting(:indian_tribe_attributes).item.map(&:to_sym)
       valid_attributes = identifying_information_attributes + tribe_status_attributes
-      if consumer_role.present? && (valid_attributes & params[:payload].keys).present?
+      if consumer_role.present? && ((valid_attributes & params[:payload].keys).present? || removed_ssn?(params))
         result = ::Operations::Individual::DetermineVerifications.new.call({id: consumer_role.id})
         result_str = result.success? ? "Success: #{result.success}" : "Failure: #{result.failure}"
         subscriber_logger.info "PeopleSubscriber::Update, determine_verifications result: #{result_str}"
       end
     rescue StandardError => e
-      subscriber_logger.info "Error: PeopleSubscriber::Update, response: #{e}"
+      subscriber_logger.error "Error: PeopleSubscriber::Update, error message: #{e.message}, backtrace: #{e.backtrace}"
     end
 
     private
+
+    def removed_ssn?(params)
+      # We get changed attributes here which are the old values of the attributes
+      params[:payload][:no_ssn] == '0'
+    end
 
     def pre_process_message(subscriber_logger, payload)
       subscriber_logger.info "PeopleSubscriber, response: #{payload}"
