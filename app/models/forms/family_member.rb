@@ -5,7 +5,8 @@ module Forms
     include Config::AcaModelConcern
 
     attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id, :gender, :relationship, :is_tobacco_user, :tribe_codes,
-                  :addresses, :is_homeless, :is_temporarily_out_of_state, :is_moving_to_state, :same_with_primary, :is_applying_coverage, :age_off_excluded, :immigration_doc_statuses
+                  :addresses, :is_homeless, :is_temporarily_out_of_state, :is_moving_to_state, :same_with_primary, :is_applying_coverage, :age_off_excluded, :immigration_doc_statuses,
+                  :skip_consumer_role_callbacks
     attr_writer :family
     include ::Forms::PeopleNames
     include ::Forms::ConsumerFields
@@ -115,7 +116,7 @@ module Forms
       if existing_person
         family_member = family.relate_new_member(existing_person, self.relationship)
         if self.is_consumer_role == "true"
-          family_member.family.build_consumer_role(family_member)
+          family_member.family.build_consumer_role(family_member, {skip_consumer_role_callbacks: @skip_consumer_role_callbacks})
         elsif self.is_resident_role == "true"
           family_member.build_resident_role(family_member)
         end
@@ -143,7 +144,7 @@ module Forms
       return false unless try_create_person(person)
       family_member = family.relate_new_member(person, self.relationship)
       if self.is_consumer_role == "true"
-        family_member.family.build_consumer_role(family_member, extract_consumer_role_params)
+        family_member.family.build_consumer_role(family_member, extract_consumer_role_params.merge({skip_consumer_role_callbacks: @skip_consumer_role_callbacks}))
       elsif self.is_resident_role == "true"
         family_member.family.build_resident_role(family_member)
       end
@@ -339,7 +340,7 @@ module Forms
       assign_person_address(family_member.person)
       return false unless try_update_person(family_member.person)
       if attr["is_consumer_role"] == "true"
-        family_member.family.build_consumer_role(family_member, attr["vlp_document_id"])
+        family_member.family.build_consumer_role(family_member, {skip_consumer_role_callbacks: @skip_consumer_role_callbacks})
       elsif attr["is_resident_role"] == "true"
         family_member.family.build_resident_role(family_member)
       end
