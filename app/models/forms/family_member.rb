@@ -340,7 +340,7 @@ module Forms
       assign_person_address(family_member.person)
       return false unless try_update_person(family_member.person)
       if attr["is_consumer_role"] == "true"
-        family_member.family.build_consumer_role(family_member, attr["vlp_document_id"].merge({skip_consumer_role_callbacks: @skip_consumer_role_callbacks}))
+        family_member.family.build_consumer_role(family_member, {skip_consumer_role_callbacks: @skip_consumer_role_callbacks})
       elsif attr["is_resident_role"] == "true"
         family_member.family.build_resident_role(family_member)
       end
