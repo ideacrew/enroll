@@ -41,6 +41,8 @@ module Operations
         person.ssn = params[:person][:ssn]
       end
       person.save!
+      # Updates the no_ssn field to indicate no_ssn and also to trigger the Hub Calls
+      person.update_attributes!({ no_ssn: '1' }) if person.encrypted_ssn.blank?
       CensusEmployee.update_census_employee_records(person, current_user)
       Success([nil, dont_update_ssn])
     rescue StandardError => e

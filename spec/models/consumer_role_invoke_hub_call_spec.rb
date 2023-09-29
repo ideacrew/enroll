@@ -30,8 +30,8 @@ describe ConsumerRole, dbclean: :around_each do
       it_behaves_like 'eligibility of invoking dhs call', 'alien_lawfully_present', true, true
       it_behaves_like 'eligibility of invoking dhs call', 'lawful_permanent_resident', true, false
       it_behaves_like 'eligibility of invoking dhs call', 'naturalized_citizen', true, true
-      it_behaves_like 'eligibility of invoking dhs call', 'non_native_not_lawfully_present_in_us', true, false
-      it_behaves_like 'eligibility of invoking dhs call', 'not_lawfully_present_in_us', true, false
+      it_behaves_like 'eligibility of invoking dhs call', 'non_native_not_lawfully_present_in_us', true, true
+      it_behaves_like 'eligibility of invoking dhs call', 'not_lawfully_present_in_us', true, true
       it_behaves_like 'eligibility of invoking dhs call', 'us_citizen', true, false
     end
 

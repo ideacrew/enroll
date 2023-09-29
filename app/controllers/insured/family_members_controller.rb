@@ -115,6 +115,8 @@ class Insured::FamilyMembersController < ApplicationController
       extended_family_members_count = household.extended_family_coverage_household.coverage_household_members.count
       Rails.logger.info("In FamilyMembersController create action #{params}, #{@family.inspect}") unless active_family_members_count == immediate_household_members_count + extended_family_members_count
       @created = true
+      consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
+      fire_consumer_roles_create_for_vlp_docs(consumer_role) if consumer_role
       respond_to do |format|
         format.html { render 'show' }
         format.js { render 'show' }
@@ -178,6 +180,7 @@ class Insured::FamilyMembersController < ApplicationController
       return
     end
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
+    original_applying_for_coverage = consumer_role.present? ? consumer_role.is_applying_coverage : nil
     if @address_errors.blank? && @dependent.update_attributes(dependent_person_params[:dependent]) && update_vlp_documents(consumer_role, 'dependent', @dependent)
       active_family_members_count = @family.active_family_members.count
       household = @family.active_household
@@ -191,6 +194,7 @@ class Insured::FamilyMembersController < ApplicationController
           params[:dependent][:is_applying_coverage]
         )
       end
+      fire_consumer_roles_update_for_vlp_docs(consumer_role, original_applying_for_coverage)
       respond_to do |format|
         format.html { render 'show' }
         format.js { render 'show' }

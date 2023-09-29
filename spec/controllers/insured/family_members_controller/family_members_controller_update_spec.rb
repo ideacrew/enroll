@@ -45,8 +45,18 @@ RSpec.describe Insured::FamilyMembersController do
         ConsumerRole,
         person: double(is_homeless: false, is_temporarily_out_of_state: false),
         local_residency_validation: nil,
-        residency_determined_at: nil
+        residency_determined_at: nil,
+        to_global_id: global_id,
+        active_vlp_document: vlp_document
       )
+    end
+
+    let(:vlp_document) do
+      instance_double(VlpDocument)
+    end
+
+    let(:global_id) do
+      ConsumerRole.new.to_global_id
     end
 
     let(:dependent_controller_parameters) do
@@ -64,6 +74,10 @@ RSpec.describe Insured::FamilyMembersController do
     end
 
     describe "when the value for 'is_applying_coverage' is provided" do
+      before :each do
+        allow(consumer_role).to receive(:is_applying_coverage).and_return(!is_applying_coverage_value)
+      end
+
       let(:is_applying_coverage_value) { "false" }
       let(:dependent_update_properties) do
         { "first_name" => "Dependent First Name", "same_with_primary" => "true", "is_applying_coverage" => is_applying_coverage_value }
@@ -77,6 +91,10 @@ RSpec.describe Insured::FamilyMembersController do
     end
 
     describe "when the value for 'is_applying_coverage' is NOT provided" do
+      before :each do
+        allow(consumer_role).to receive(:is_applying_coverage).and_return(true)
+      end
+
       let(:dependent_update_properties) do
         { "first_name" => "Dependent First Name", "same_with_primary" => "true" }
       end
