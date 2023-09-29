@@ -146,12 +146,12 @@ class BenefitGroupAssignment
   end
 
   def plan_year
-    # [Deprecated] Instead use benefit application
+    warn "[Deprecated] Instead use benefit application" unless Rails.env.test?
+    return benefit_group.plan_year if is_case_old?
     benefit_application
   end
 
   def benefit_application
-    return benefit_group.plan_year if is_case_old?
     benefit_package.benefit_application if benefit_package.present?
   end
 
