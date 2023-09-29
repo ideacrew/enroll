@@ -102,6 +102,9 @@ namespace :dry_run do
     task :notices_by_dates, [:start_date, :end_date] => :environment do |_t, args|
       start_date = args[:start_date] || TimeKeeper.date_of_record
       end_date = args[:end_date] || TimeKeeper.date_of_record
+      start_date = Date.parse(start_date) if start_date.is_a?(String)
+      end_date = Date.parse(end_date) if end_date.is_a?(String)
+
       log "Running notices report for #{start_date} to #{end_date}"
       documents = notices(start_date, end_date)
       to_csv("notices_by_dates_#{start_date.strftime('%Y_%m_%d')}_#{end_date.strftime('%Y_%m_%d')}") do |csv|
