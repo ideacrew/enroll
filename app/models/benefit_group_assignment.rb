@@ -147,12 +147,12 @@ class BenefitGroupAssignment
 
   def plan_year
     # [Deprecated] Instead use benefit application
-    benefit_application
+    benefit_application(dep_method_call: true)
   end
 
-  def benefit_application
+  def benefit_application(dep_method_call: false)
     # Logic pulled from deprecated method plan_year
-    return benefit_group.plan_year if is_case_old?
+    return benefit_group.plan_year if dep_method_call && is_case_old?
 
     benefit_package.benefit_application if benefit_package.present?
   end
@@ -168,7 +168,7 @@ class BenefitGroupAssignment
 
   def benefit_group=(new_benefit_group)
     # [Deprecated] Instead use benefit_package=
-    self.benefit_package = { new_benefit_group: new_benefit_group, dep_method_call: true }
+    self.benefit_package=({ new_benefit_group: new_benefit_group, dep_method_call: true })
   end
 
   def benefit_group
