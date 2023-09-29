@@ -68,10 +68,14 @@ class BenefitGroupAssignment
   end
 
   def plan_year
-    benefit_application
+    # [Deprecated] Instead use benefit application
+    benefit_application(dep_method_call: true)
   end
 
-  def benefit_application
+  def benefit_application(dep_method_call: false)
+    # Logic pulled from deprecated method plan_year
+    return benefit_group.plan_year if dep_method_call && is_case_old?
+
     benefit_package.benefit_application if benefit_package.present?
   end
 
