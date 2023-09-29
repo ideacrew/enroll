@@ -76,7 +76,10 @@ FactoryBot.define do
     trait :with_benefit_package do
       association :benefit_sponsor_catalog, factory: :benefit_markets_benefit_sponsor_catalog
       after(:build) do |benefit_application, evaluator|
-        product_package = benefit_application.benefit_sponsor_catalog.product_packages.by_package_kind(evaluator.package_kind).by_product_kind(:health).first
+        health_product_packages = benefit_application.benefit_sponsor_catalog.product_packages.by_product_kind(:health)
+        product_package = health_product_packages.by_package_kind(evaluator.package_kind).first
+        product_package ||= health_product_packages.first
+
         if evaluator.dental_sponsored_benefit
           dental_product_package = benefit_application.benefit_sponsor_catalog.product_packages.by_package_kind(evaluator.dental_package_kind).by_product_kind(:dental).first
           benefit_application.benefit_packages = [create(:benefit_sponsors_benefit_packages_benefit_package,

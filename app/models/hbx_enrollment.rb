@@ -127,7 +127,12 @@ class HbxEnrollment
   field :external_id, type: String
   field :external_group_identifiers, type: Array
   field :special_enrollment_period_id, type: BSON::ObjectId
+
+  # In Individual Market's context the predecessor_enrollment_id is:
+  #   1. The id of the enrollment that is renewed.
+  #   2. The id of the enrollment that is superseded.(Expand in the future)
   field :predecessor_enrollment_id, type: BSON::ObjectId
+
   field :enrollment_signature, type: String
 
   field :consumer_role_id, type: BSON::ObjectId
@@ -468,6 +473,7 @@ class HbxEnrollment
       effective_on: { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }
     )
   end
+  scope :effectuated, -> { where(:aasm_state.nin => ['coverage_canceled', 'shopping']) }
 
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -2631,6 +2637,7 @@ class HbxEnrollment
       })
       group_enrollment_members << group_enrollment_member
     end
+
     group_enrollment = BenefitSponsors::Enrollments::GroupEnrollment.new(
       previous_product: previous_product,
       coverage_start_on: effective_on,
@@ -2873,7 +2880,7 @@ class HbxEnrollment
       cost_calculator = build_plan_premium(qhp_plan: product, elected_aptc: applied_aptc_amount, apply_aptc: applied_aptc_amount > 0)
       osse_childcare_subsidy = cost_calculator.total_childcare_subsidy_amount
     end
-
+    osse_childcare_subsidy ||= 0.0
     update(eligible_child_care_subsidy: osse_childcare_subsidy)
   end
 
@@ -2881,13 +2888,18 @@ class HbxEnrollment
     effective_year_for_lcsp = sponsored_benefit_package.start_on.year
     hios_id = EnrollRegistry["lowest_cost_silver_product_#{effective_year_for_lcsp}"].item
     lcsp = BenefitMarkets::Products::Product.by_year(effective_year_for_lcsp).where(hios_id: hios_id).first
-
     return if lcsp.nil?
 
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(self)
-    sponsored_cost_calculator.action = :calc_childcare_subsidy
-    member_groups_lcsp = sponsored_cost_calculator.groups_for_products([lcsp])
+    previous_product = parent_enrollment&.product
 
+    sponsored_cost_calculator.action = if product && previous_product && product.id == previous_product.id
+                                         :calc_non_product_change_childcare_subsidy
+                                       else
+                                         :calc_childcare_subsidy
+                                       end
+
+    member_groups_lcsp = sponsored_cost_calculator.groups_for_products([lcsp])
     member_enrollment = member_groups_lcsp[0].group_enrollment.member_enrollments.detect{ |me| me.member_id.to_s == hbx_enrollment_member.id.to_s }
     return if member_enrollment.nil?
 
@@ -2965,6 +2977,16 @@ class HbxEnrollment
     wfts.metadata_has?(
       { 'reason' => Enrollments::TerminationReasons::SUPERSEDED_SILENT }
     )
+  end
+
+  def predecessor_enrollment_hbx_id
+    predecessor_enrollment&.hbx_id
+  end
+
+  def predecessor_enrollment
+    return nil unless predecessor_enrollment_id
+
+    HbxEnrollment.where(id: predecessor_enrollment_id).first
   end
 
   private

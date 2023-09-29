@@ -19,6 +19,7 @@ describe SetActiveVlpDocument, dbclean: :after_each do
       let(:vlp_doc) { FactoryBot.build(:vlp_document, subject: 'ajhssjah.png') }
 
       before do
+        consumer_role.active_vlp_document_id = nil
         consumer_role.vlp_documents = [vlp_doc]
         consumer_role.save!
         subject.migrate
