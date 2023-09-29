@@ -130,6 +130,13 @@ class DocumentsController < ApplicationController
     result = ::Operations::CallFedHub.new.call(request_hash)
     key, message = result.failure? ? result.failure : result.success
 
+    if result.failure?
+      @verification_type.fail_type
+      @verification_type.add_type_history_element(action: "Hub Request Failed",
+                                                  modifier: "System",
+                                                  update_reason: "#{@verification_type.type_name} Request Failed due to #{message}")
+    end
+
     respond_to do |format|
       format.html {
         flash[key] = message
