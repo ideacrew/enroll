@@ -276,6 +276,8 @@ class ConsumerRole
   # For use when generating consumers during rake tasks
   attr_accessor :skip_residency_verification
 
+  attr_accessor :skip_consumer_role_callbacks
+
   #list of the collections we want to track under consumer role model
   COLLECTIONS_TO_TRACK = %w- Person consumer_role vlp_documents lawful_presence_determination hbx_enrollments -
 
@@ -1327,6 +1329,7 @@ class ConsumerRole
   end
 
   def publish_created_event
+    return if skip_consumer_role_callbacks
     event = event('events.individual.consumer_roles.created', attributes: { gid: self.to_global_id.uri })
     event.success.publish if event.success?
   rescue StandardError => e
@@ -1334,6 +1337,7 @@ class ConsumerRole
   end
 
   def publish_updated_event
+    return if skip_consumer_role_callbacks
     event = event('events.individual.consumer_roles.updated', attributes: { gid: to_global_id.uri, previous: changed_attributes })
     event.success.publish if event.success?
   rescue StandardError => e
