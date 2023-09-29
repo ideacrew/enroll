@@ -49,7 +49,7 @@ module Subscribers
         renew_enrollments(family)
         @logger.info "Processed family with bson_id: #{id} for Enrollments Renewal"
       rescue StandardError => e
-        @logger.error "Error: OpenEnrollmentSubscriber, payload: #{payload}; response: #{e}, inspect: #{e.inspect}"
+        @logger.error "Error: OpenEnrollmentSubscriber, payload: #{payload}; error_message: #{e.message}, backtrace: #{e.backtrace}, inspect: #{e.inspect}"
       end
 
       def renew_osse_eligibility(person)

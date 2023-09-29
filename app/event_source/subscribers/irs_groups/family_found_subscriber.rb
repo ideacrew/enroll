@@ -17,7 +17,7 @@ module Subscribers
 
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e
-        logger.info "IrsGroups::FamilyFoundSubscriber:: errored & acked. Backtrace: #{e.backtrace}"
+        logger.error "IrsGroups::FamilyFoundSubscriber:: errored & acked. error_message: #{e.message}, backtrace: #{e.backtrace}"
         ack(delivery_info.delivery_tag)
       end
     end

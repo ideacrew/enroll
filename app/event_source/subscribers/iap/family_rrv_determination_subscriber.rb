@@ -24,9 +24,9 @@ module Subscribers
       ::FinancialAssistance::Operations::Applications::Rrv::CreateRrvRequest.new.call(families: families, assistance_year: payload[:assistance_year])
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "FamilyRrvDeterminationSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      logger.info "FamilyRrvDeterminationSubscriber: errored & acked. Backtrace: #{e.backtrace}"
-      subscriber_logger.info "FamilyRrvDeterminationSubscriber, ack: #{payload}"
+      subscriber_logger.error "FamilyRrvDeterminationSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      logger.error "FamilyRrvDeterminationSubscriber: errored & acked. error_message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.error "FamilyRrvDeterminationSubscriber, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
   end

@@ -164,9 +164,9 @@ module Eligibilities
       result
     end
 
-    def extend_due_on(period = 30.days, updated_by = nil)
+    def extend_due_on(period = 30.days, updated_by = nil, action = 'extend_due_date')
       self.due_on = verif_due_date + period
-      add_verification_history('extend_due_date', "Extended due date to #{due_on.strftime('%m/%d/%Y')}", updated_by)
+      add_verification_history(action, "Extended due date to #{due_on.strftime('%m/%d/%Y')}", updated_by)
     end
 
     def auto_extend_due_on(period = 30.days, updated_by = nil)
@@ -184,9 +184,14 @@ module Eligibilities
       self.due_on = new_date
     end
 
-    def can_be_extended?(date)
-      return false unless due_on == date && ['rejected', 'outstanding'].include?(self.aasm_state)
-      extensions = verification_histories&.where(action: "auto_extend_due_date")
+    def can_be_auto_extended?(date)
+      return false unless due_on == date
+      can_be_extended?('auto_extend_due_date')
+    end
+
+    def can_be_extended?(action)
+      return false unless ['rejected', 'outstanding'].include?(self.aasm_state)
+      extensions = verification_histories&.where(action: action)
       return true unless extensions&.any?
       #  want this limitation on due date extensions to reset anytime an evidence no longer requires a due date
       # (is moved to 'verified' or 'attested' state) so that an individual can benefit from the extension again in the future.

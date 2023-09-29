@@ -44,8 +44,8 @@ module Subscribers
 
             ack(delivery_info.delivery_tag)
           rescue StandardError, SystemStackError => e
-            subscriber_logger.info "on_enroll_applications_aptc_csr_credits_renewals_determination_submission, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-            logger.info "on_enroll_applications_aptc_csr_credits_renewals_determination_submission: errored & acked. Backtrace: #{e.backtrace}"
+            subscriber_logger.error "on_enroll_applications_aptc_csr_credits_renewals_determination_submission, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+            logger.error "on_enroll_applications_aptc_csr_credits_renewals_determination_submission: errored & acked. error message: #{e.message}, Backtrace: #{e.backtrace}"
             ack(delivery_info.delivery_tag)
           end
         end
