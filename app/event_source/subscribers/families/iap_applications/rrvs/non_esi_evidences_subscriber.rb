@@ -19,7 +19,7 @@ module Subscribers
 
           rescue StandardError, SystemStackError => e
             subscriber_logger.error "Rrvs::NonEsiEvidencesSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-            subscriber_logger.info "Rrvs::NonEsiEvidencesSubscriber, ack: #{payload}"
+            subscriber_logger.error "Rrvs::NonEsiEvidencesSubscriber, ack: #{payload}"
             ack(delivery_info.delivery_tag)
           end
 
@@ -30,7 +30,7 @@ module Subscribers
             result_str = result.success? ? "Success: #{result.success}" : "Failure: #{result.failure}"
             subscriber_logger.info "Rrvs::NonEsiEvidencesSubscriber, determine_verifications result: #{result_str}"
           rescue StandardError => e
-            subscriber_logger.error "Rrvs::NonEsiEvidencesSubscriber, response: #{e}"
+            subscriber_logger.error "Rrvs::NonEsiEvidencesSubscriber, error_message: #{e.message}, backtrace: #{e.backtrace}"
           end
 
           def subscriber_logger_for(event)

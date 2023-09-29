@@ -677,4 +677,31 @@ RSpec.describe HbxEnrollment, type: :model do
       end
     end
   end
+
+  describe '#predecessor_enrollment' do
+    let(:enrollment2) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        :individual_aptc,
+        :with_silver_health_product,
+        aasm_state: aasm_state,
+        family: family,
+        consumer_role_id: person.consumer_role.id
+      )
+    end
+
+    context 'with predecessor_enrollment_id' do
+      let(:predecessor_enrollment_id) { enrollment2.id }
+
+      it 'returns predecessor_enrollment_id' do
+        expect(hbx_enrollment.predecessor_enrollment).to eq(enrollment2)
+      end
+    end
+
+    context 'without predecessor_enrollment_id' do
+      it 'returns nil' do
+        expect(hbx_enrollment.predecessor_enrollment).to be_nil
+      end
+    end
+  end
 end

@@ -920,6 +920,10 @@ When(/^.+ selects? a plan on the plan shopping page$/) do
   find_all(EmployeeChoosePlan.select_plan_btn, wait: 5)[0].click
 end
 
+When(/^.+ selects? a last plan on the plan shopping page$/) do
+  find_all(EmployeeChoosePlan.select_plan_btn, wait: 5)[-1].click
+end
+
 Then(/^.+ should see the coverage summary page$/) do
   expect(page).to have_content('Confirm Your Plan Selection')
   # screenshot("summary_page")

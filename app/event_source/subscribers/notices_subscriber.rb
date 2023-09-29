@@ -30,9 +30,9 @@ module Subscribers
       subscriber_logger.info "Successfully processed NoticesSubscriber, response: #{payload}"
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "NoticesSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      logger.info "NoticesSubscriber: errored & acked. Backtrace: #{e.backtrace}"
-      subscriber_logger.info "NoticesSubscriber, ack: #{payload}"
+      subscriber_logger.error "NoticesSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      logger.error "NoticesSubscriber: errored & acked. error message: #{e.message}, Backtrace: #{e.backtrace}"
+      subscriber_logger.error "NoticesSubscriber, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
   end

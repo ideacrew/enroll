@@ -15,9 +15,9 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "EnrollmentSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.error "EnrollmentSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
     #   logger.info "EnrollmentSubscriber: errored & acked. Backtrace: #{e.backtrace}"
-      subscriber_logger.info "EnrollmentSubscriber, ack: #{payload}"
+      subscriber_logger.error "EnrollmentSubscriber, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
 
@@ -31,8 +31,8 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "EnrollmentSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      subscriber_logger.info "EnrollmentSubscriber, ack: #{payload}"
+      subscriber_logger.error "EnrollmentSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.error "EnrollmentSubscriber, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
 
@@ -44,8 +44,8 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "EnrollmentSubscriber#on_enroll_individual_enrollments, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-      subscriber_logger.info "EnrollmentSubscriber#on_enroll_individual_enrollments, ack: #{payload}"
+      subscriber_logger.error "EnrollmentSubscriber#on_enroll_individual_enrollments, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.error "EnrollmentSubscriber#on_enroll_individual_enrollments, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
 

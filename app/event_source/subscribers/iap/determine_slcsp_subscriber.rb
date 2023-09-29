@@ -16,7 +16,7 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      logger.info "on_determine_slcsp: error: #{e} backtrace: #{e.backtrace}"
+      logger.error "on_determine_slcsp: error_message: #{e.message}, backtrace: #{e.backtrace}"
       ack(delivery_info.delivery_tag)
     end
 
@@ -38,8 +38,8 @@ module Subscribers
       end
       subscriber_logger.info "process_determine_slcsp: ------- end"
     rescue StandardError => e
-      subscriber_logger.info "process_determine_slcsp: error: #{e} backtrace: #{e.backtrace}"
-      subscriber_logger.info "process_determine_slcsp: ------- end"
+      subscriber_logger.error "process_determine_slcsp: error_message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.error "process_determine_slcsp: ------- end"
     end
 
     def subscriber_logger_for(event)
