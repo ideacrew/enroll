@@ -156,15 +156,12 @@ module VlpDoc
     Rails.logger.error { "Couldn't generate consumer role updated event due to #{e.backtrace}" }
   end
 
-  # rubocop:disable Style/IfUnlessModifier
   def clear_history_noise_if_present_from(consumer_role)
     consumer_role.verification_types.active.where(:type_name.in => ["Citizenship", "Immigration status"]).each do |v_type|
-      type_history_ele = v_type.type_history_elements.max_by(:created_at)
+      type_history_ele = v_type.type_history_elements.max_by(&:created_at)
       if type_history_ele.present? && type_history_ele.update_reason.match(/No VLP Documents/)
         type_history_ele.destroy
       end
     end
-    consumer_role.save!
   end
-  # rubocop:enable Style/IfUnlessModifier
 end
