@@ -41,7 +41,7 @@ namespace :dry_run do
       Rake::Task['dry_run:data:create_service_areas'].invoke(year)
       Rake::Task['dry_run:data:create_rating_areas'].invoke(year)
       Rake::Task['dry_run:data:create_actuarial_factors'].invoke(year)
-      Rake::Task['dry_run:data:create_plans'].invoke(year)
+      # Rake::Task['dry_run:data:create_plans'].invoke(year) NOT USED SINCE 2019, PRODUCTS ARE USED INSTEAD
       Rake::Task['dry_run:data:create_products'].invoke(year)
       Rake::Task['dry_run:data:create_benefit_coverage_period'].invoke(year)
       Rake::Task['dry_run:data:create_benefit_packages'].invoke(year)

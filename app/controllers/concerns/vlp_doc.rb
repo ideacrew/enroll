@@ -136,6 +136,7 @@ module VlpDoc
 
   def fire_consumer_roles_create_for_vlp_docs(consumer_role)
     return unless consumer_role && consumer_role.active_vlp_document.present?
+
     event = event('events.individual.consumer_roles.created', attributes: { gid: consumer_role.to_global_id.uri })
     event.success.publish if event.success?
   rescue StandardError => e
@@ -144,9 +145,11 @@ module VlpDoc
 
   def fire_consumer_roles_update_for_vlp_docs(consumer_role, original_applying_for_coverage)
     return unless consumer_role && consumer_role.active_vlp_document.present?
+
     event = event('events.individual.consumer_roles.updated', attributes: { gid: consumer_role.to_global_id.uri, previous: {is_applying_coverage: original_applying_for_coverage} })
     event.success.publish if event.success?
   rescue StandardError => e
     Rails.logger.error { "Couldn't generate consumer role updated event due to #{e.backtrace}" }
   end
+
 end
