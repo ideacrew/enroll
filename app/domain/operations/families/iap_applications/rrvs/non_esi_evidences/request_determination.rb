@@ -107,12 +107,13 @@ module Operations
             def create_evidence_history(application, action, update_reason, update_by)
               application.active_applicants.each do |applicant|
                 evidence = applicant.non_esi_evidence
+                next unless evidence.present?
                 add_verification_history(evidence, action, update_reason, update_by)
               end
             end
 
             def add_verification_history(evidence, action, update_reason, update_by)
-              evidence.add_verification_history(action, update_reason, update_by)
+              evidence.add_verification_history(action, update_reason, update_by) if evidence.present?
             end
 
             def update_evidence_state_for_all_applicants(application)
