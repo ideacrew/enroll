@@ -114,7 +114,7 @@ module Operations
 
             # update income evidence state to default aasm state for applicant
             def update_income_evidence_to_default_state(income_evidence)
-              income_evidence.determine_income_evidence_aasm_status
+              income_evidence&.determine_income_evidence_aasm_status
             end
 
             def rrv_logger
