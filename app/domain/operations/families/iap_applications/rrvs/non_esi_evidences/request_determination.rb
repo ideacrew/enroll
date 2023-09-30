@@ -74,11 +74,14 @@ module Operations
             end
 
             def validate_applicants(payload_entity, application)
+              active_applicants = application.active_applicants
               payload_entity.value!.applicants.map do |applicant_entity|
+                applicant = active_applicants.select { |member| member.person_hbx_id == applicant_entity.person_hbx_id }.first
+                next unless applicant.non_esi_evidence.present?
+
                 result = Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules.new.call(applicant_entity, :non_esi_mec)
                 next [applicant_entity.person_hbx_id, true] unless result.failure?
 
-                applicant = application.active_applicants.select { |member| member.person_hbx_id == applicant_entity.person_hbx_id }.first
                 record_applicant_failure(applicant.non_esi_evidence, result)
                 [applicant_entity.person_hbx_id, false]
               end
@@ -124,7 +127,7 @@ module Operations
 
             # update income evidence state to default aasm state for applicant
             def update_evidence_to_default_state(evidence)
-              evidence.determine_mec_evidence_aasm_status
+              evidence&.determine_mec_evidence_aasm_status
             end
 
             def rrv_logger
