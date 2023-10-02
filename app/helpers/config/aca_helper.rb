@@ -433,14 +433,14 @@ module Config
     def ce_roster_bulk_upload_enabled?
       EnrollRegistry.feature?(:ce_roster_bulk_upload) && EnrollRegistry.feature_enabled?(:ce_roster_bulk_upload)
     end
-  end
 
-  def shop_osse_eligibility_years_for_display
-    BenefitMarkets::BenefitMarketCatalog.osse_eligibility_years_for_display.sort.reverse
-  end
+    def shop_osse_eligibility_years_for_display
+      BenefitMarkets::BenefitMarketCatalog.osse_eligibility_years_for_display.sort.reverse
+    end
 
-  def individual_osse_eligibility_years_for_display
-    ::BenefitCoveragePeriod.osse_eligibility_years_for_display.sort.reverse
+    def individual_osse_eligibility_years_for_display
+      ::BenefitCoveragePeriod.osse_eligibility_years_for_display.sort.reverse
+    end
   end
 end
 # rubocop:enable Metrics/ModuleLength
