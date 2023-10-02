@@ -223,6 +223,76 @@ module BenefitSponsors
           end
           expect(member_total).to eq(total_contribution)
         end
+
+        context 'when parent exists on enrollment' do
+          let(:family_roster_entry) do
+            ::BenefitSponsors::Members::MemberGroup.new(
+              [employee, spouse, child, parent],
+              group_enrollment: family_group_enrollment
+            )
+          end
+
+          let(:family_group_enrollment) do
+            BenefitSponsors::Enrollments::GroupEnrollment.new(
+              member_enrollments: [employee_enrollment, spouse_enrollment, child_enrollment, parent_enrollment],
+              rate_schedule_date: rate_schedule_date,
+              coverage_start_on: coverage_start_date,
+              previous_product: nil,
+              product: product,
+              rating_area: rating_area,
+              product_cost_total: family_price
+            )
+          end
+
+          let(:parent_member_id) { "some_child1_member_id" }
+          let(:parent_dob) { coverage_start_date - 50.years }
+          let(:parent) do
+            instance_double(
+              "::BenefitMarkets::SponsoredBenefits::RosterMember",
+              member_id: parent_member_id,
+              relationship: "parent",
+              is_disabled?: false,
+              dob: parent_dob,
+              is_primary_member?: false
+            )
+          end
+          let(:parent_enrollment) do
+            ::BenefitSponsors::Enrollments::MemberEnrollment.new(
+              member_id: parent_member_id,
+              product_price: dependent_price
+            )
+          end
+          let(:parent_age) { 50 }
+
+          before do
+            allow(employee_contribution_unit).to receive(:match?).with({"" => 1}).and_return false
+            allow(spouse_contribution_unit).to receive(:match?).with({"" => 1}).and_return(false)
+            allow(dependent_contribution_unit).to receive(:match?).with({"" => 1}).and_return(false)
+            allow(contribution_model).to receive(:map_relationship_for).with("parent", parent_age, false).and_return nil
+            allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(reference_product, rate_schedule_date, parent_age, rating_area).and_return(300.00)
+          end
+
+          it "calculates the total contribution" do
+            calculation_result = contribution_calculator.calculate_contribution_for(
+              contribution_model,
+              family_roster_entry,
+              sponsor_contribution
+            )
+            expect(calculation_result.group_enrollment.sponsor_contribution_total).to eq(total_contribution)
+          end
+
+          it "calculates the member contributions" do
+            calculation_result = contribution_calculator.calculate_contribution_for(
+              contribution_model,
+              family_roster_entry,
+              sponsor_contribution
+            )
+            member_total = calculation_result.group_enrollment.member_enrollments.inject(BigDecimal("0.00")) do |acc, m_en|
+              BigDecimal((acc + m_en.sponsor_contribution).to_s).round(2)
+            end
+            expect(member_total).to eq(total_contribution)
+          end
+        end
       end
 
       describe "with a pricing determination and one family that has:

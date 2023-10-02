@@ -24,7 +24,12 @@ module BenefitSponsors
 
         def add(member)
           if !@is_contribution_prohibited
-            c_factor = contribution_factor_for(member)
+            c_unit = get_contribution_unit(member)
+            if c_unit.blank?
+              @member_contributions[member.member_id] = 0.00
+              return self
+            end
+            c_factor = contribution_factor_for(c_unit)
             c_amount = calc_contribution_amount_for(member, c_factor)
             @member_contributions[member.member_id] = c_amount 
             @total_contribution = BigDecimal((@total_contribution + c_amount).to_s).round(2)
@@ -54,9 +59,8 @@ module BenefitSponsors
           )
         end
 
-        def contribution_factor_for(roster_entry_member)
-          cu = get_contribution_unit(roster_entry_member)
-          cl = @level_map[cu.id]
+        def contribution_factor_for(c_unit)
+          cl = @level_map[c_unit.id]
           cl.contribution_factor
         end
 
