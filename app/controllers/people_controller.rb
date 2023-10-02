@@ -343,6 +343,7 @@ private
     dep_address.city = @person_new_home_address.city
     dep_address.state = @person_new_home_address.state
     dep_address.zip = @person_new_home_address.zip
+    dep_address.county = @person_new_home_address.county if @person_new_home_address.county.present?
     dep_address.save!
   end
 
