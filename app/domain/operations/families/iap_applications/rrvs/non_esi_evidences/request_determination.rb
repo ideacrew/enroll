@@ -74,11 +74,14 @@ module Operations
             end
 
             def validate_applicants(payload_entity, application)
+              active_applicants = application.active_applicants
               payload_entity.value!.applicants.map do |applicant_entity|
+                applicant = active_applicants.detect { |member| member.person_hbx_id == applicant_entity.person_hbx_id }
+                next unless applicant.non_esi_evidence.present?
+
                 result = Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules.new.call(applicant_entity, :non_esi_mec)
                 next [applicant_entity.person_hbx_id, true] unless result.failure?
 
-                applicant = application.active_applicants.select { |member| member.person_hbx_id == applicant_entity.person_hbx_id }.first
                 record_applicant_failure(applicant.non_esi_evidence, result)
                 [applicant_entity.person_hbx_id, false]
               end
@@ -107,12 +110,13 @@ module Operations
             def create_evidence_history(application, action, update_reason, update_by)
               application.active_applicants.each do |applicant|
                 evidence = applicant.non_esi_evidence
+                next unless evidence.present?
                 add_verification_history(evidence, action, update_reason, update_by)
               end
             end
 
             def add_verification_history(evidence, action, update_reason, update_by)
-              evidence.add_verification_history(action, update_reason, update_by)
+              evidence.add_verification_history(action, update_reason, update_by) if evidence.present?
             end
 
             def update_evidence_state_for_all_applicants(application)
@@ -123,7 +127,7 @@ module Operations
 
             # update income evidence state to default aasm state for applicant
             def update_evidence_to_default_state(evidence)
-              evidence.determine_mec_evidence_aasm_status
+              evidence&.determine_mec_evidence_aasm_status
             end
 
             def rrv_logger

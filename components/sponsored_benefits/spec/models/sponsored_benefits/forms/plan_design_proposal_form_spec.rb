@@ -42,6 +42,26 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignProposal, type: :model, dbcle
       }
     end
 
+    let(:proposal_effective_date)  { plan_design_proposal.effective_date }
+    let(:renewal_benefit_market_catalog) do
+      create(:benefit_markets_benefit_market_catalog, :with_product_packages,
+             benefit_market: benefit_market,
+             title: "SHOP Benefits for #{proposal_effective_date.year}",
+             application_period: (proposal_effective_date.beginning_of_year..proposal_effective_date.end_of_year))
+    end
+
+    let(:renewal_catalog_eligibility) do
+      ::Operations::Eligible::CreateCatalogEligibility.new.call(
+        {
+          subject: renewal_benefit_market_catalog.to_global_id,
+          eligibility_feature: "aca_shop_osse_eligibility",
+          effective_date: renewal_benefit_market_catalog.application_period.begin.to_date,
+          domain_model:
+            "AcaEntities::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+        }
+      )
+    end
+
     let(:catalog_eligibility) do
       ::Operations::Eligible::CreateCatalogEligibility.new.call(
         {
@@ -57,6 +77,7 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignProposal, type: :model, dbcle
     before do
       allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
       catalog_eligibility
+      renewal_catalog_eligibility
       form = described_class.new(params.merge('proposal_id' => plan_design_proposal.id.to_s))
       form.save
     end
@@ -65,9 +86,9 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignProposal, type: :model, dbcle
       let(:osse_eligibility) { 'true' }
 
       it 'should store eligibility' do
-        osse_eligibility = benefit_sponsorship.reload.eligibility_on(plan_design_proposal.effective_date)
+        osse_eligibility = benefit_sponsorship.reload.eligibility_on(current_effective_date)
         expect(osse_eligibility).to be_present
-        expect(osse_eligibility.is_eligible_on?(plan_design_proposal.effective_date)).to be_truthy
+        expect(osse_eligibility.is_eligible_on?(current_effective_date)).to be_truthy
         expect(plan_design_proposal.osse_eligibility.present?).to eq true
       end
     end

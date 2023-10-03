@@ -308,7 +308,7 @@ class ConsumerRole
 
   def setup_lawful_determination_instance
     unless self.lawful_presence_determination.present?
-      self.lawful_presence_determination = LawfulPresenceDetermination.new
+      self.lawful_presence_determination = LawfulPresenceDetermination.new(skip_lawful_presence_determination_callbacks: skip_consumer_role_callbacks)
     end
   end
 
