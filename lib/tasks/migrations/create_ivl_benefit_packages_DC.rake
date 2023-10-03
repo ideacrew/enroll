@@ -1,5 +1,6 @@
 # This rake is not for mock plans
-
+# RAILS_ENV=production bundle exec rake import:create_ivl_benefit_packages_DC year=2023 slcsp_hios_id="94506DC0390006-01"
+# RAILS_ENV=production bundle exec rake import:create_ivl_benefit_packages_DC year=2024
 namespace :import do
   desc "Create current year benefit coverage period and packages with products"
   task :create_ivl_benefit_packages_DC  => :environment do
@@ -13,9 +14,7 @@ namespace :import do
     raise "please pass year" unless ENV['year'].present?
 
     year = ENV['year'].to_i
-
-    slcsp_hios_id = "94506DC0390006-01"
-    slcsp_hios_id = "94506DC0390005-01" if year == 2024
+    slcsp_hios_id = ENV['slcsp_hios_id'] || "94506DC0390005-01"
 
     # Second lowest cost silver plan
     slcs_products = BenefitMarkets::Products::Product.where(hios_id: slcsp_hios_id).by_year(year)
