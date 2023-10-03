@@ -222,8 +222,9 @@ RSpec.describe PeopleController, dbclean: :after_each do
       post :update, params: { id: person.id, person: person_attributes }
 
       person.reload
+      dependent.reload
       primary_address = person.addresses.select{|address| address.kind == 'home'}.first
-      dependent_address = person.primary_family.family_members.reject(&:is_primary_applicant?).first.person.addresses.first
+      dependent_address = dependent.addresses.first
       expect(primary_address.same_address?(dependent_address)).to eq true
       expect(primary_address.county).to eq dependent_address.county
     end
