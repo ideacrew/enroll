@@ -332,6 +332,22 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
       end
 
+      context "when consumer covered under catastrophic product" do
+        let!(:current_product) { FactoryBot.create(:active_individual_catastophic_product, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_product_id: renewal_product.id) }
+        it 'should return an empty apt hash' do
+          allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
+            double(
+              call: double(
+                success?: true,
+                value!: 100
+              )
+            )
+          )
+          subject.renew
+          expect(subject.aptc_values).to eq({})
+        end
+      end
+
       context 'when mthh enabled' do
         before do
           allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1390, total_premium: 1390))
@@ -568,6 +584,22 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                                                 })
               expect(subject.assisted).to eq true
             end
+          end
+        end
+
+        context "when consumer covered under catastrophic product" do
+          let!(:current_product) { FactoryBot.create(:active_individual_catastophic_product, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_product_id: renewal_product.id) }
+          it 'should return an empty apt hash' do
+            allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
+              double(
+                call: double(
+                  success?: true,
+                  value!: 100
+                )
+              )
+            )
+            subject.renew
+            expect(subject.aptc_values).to eq({})
           end
         end
       end
