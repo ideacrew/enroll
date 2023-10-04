@@ -12,5 +12,5 @@ module Types
 
   # Emails              = Array.of(Types::Email)
   PositiveInteger     = Coercible::Integer.constrained(gteq: 0)
-  Bson                = Types.Constructor(BSON::ObjectId) { |val| BSON::ObjectId val }
+  Bson                = Types.Constructor(BSON::ObjectId) { |val| BSON::ObjectId val } unless Types.const_defined?('Bson')
 end

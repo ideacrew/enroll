@@ -332,6 +332,29 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
       end
 
+      context "when consumer covered under catastrophic product" do
+        before do
+          primary.update(dob: renewal_benefit_coverage_period.start_on - 25.years)
+          spouse.person.update(dob: renewal_benefit_coverage_period.start_on - 25.years)
+          child1.person.update(dob: renewal_benefit_coverage_period.start_on - 1.years)
+          child2.person.update(dob: renewal_benefit_coverage_period.start_on - 1.years)
+          child3.person.update(dob: renewal_benefit_coverage_period.start_on - 1.years)
+        end
+
+        let!(:current_product) { FactoryBot.create(:active_individual_catastophic_product, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_product_id: renewal_product.id) }
+        it 'should return an empty apt hash' do
+          allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
+            double(
+              call: double(
+                success?: true,
+                value!: 100
+              )
+            )
+          )
+          expect(subject.renew.applied_aptc_amount).to be_zero
+        end
+      end
+
       context 'when mthh enabled' do
         before do
           allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1390, total_premium: 1390))
@@ -568,6 +591,32 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                                                 })
               expect(subject.assisted).to eq true
             end
+          end
+        end
+
+        context "when consumer covered under catastrophic product" do
+          before do
+            primary.update(dob: renewal_benefit_coverage_period.start_on - 25.years)
+            spouse.person.update(dob: renewal_benefit_coverage_period.start_on - 25.years)
+            child1.person.update(dob: renewal_benefit_coverage_period.start_on - 1.years)
+            child2.person.update(dob: renewal_benefit_coverage_period.start_on - 1.years)
+            child3.person.update(dob: renewal_benefit_coverage_period.start_on - 1.years)
+            renewal_product.update(metal_level_kind: :catastrophic)
+          end
+
+          # let!(:renewal_product) { FactoryBot.create(:active_individual_catastophic_product, hios_id: "11111111122302-01", csr_variant_id: "01") }
+          let!(:current_product) { FactoryBot.create(:active_individual_catastophic_product, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_product_id: renewal_product.id) }
+
+          it 'should return an empty apt hash' do
+            allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
+              double(
+                call: double(
+                  success?: true,
+                  value!: 100
+                )
+              )
+            )
+            expect(subject.renew.applied_aptc_amount).to be_zero
           end
         end
       end
