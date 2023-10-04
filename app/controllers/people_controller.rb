@@ -345,6 +345,7 @@ private
     dep_address.zip = @person_new_home_address.zip
     dep_address.county = @person_new_home_address.county if @person_new_home_address.county.present?
     dep_address.save!
+    dependent.person.save!
   end
 
   def sanitize_person_params
