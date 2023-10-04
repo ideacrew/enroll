@@ -245,7 +245,10 @@ previously_renewed = all_enrolled_people = HbxEnrollment.collection.aggregate([
       "product_id" => { "$ne" => nil},
       "aasm_state" => {"$in" => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
       "effective_on" => {"$gte" => Date.new(2023,1,1)},
-      'workflow_state_transitions.from_state': { '$in' => renewal_statuses }
+      '$or' => [
+        {'workflow_state_transitions.from_state': { '$in' => renewal_statuses }},
+        {'workflow_state_transitions.to_state': { '$in' => renewal_statuses }}
+      ]
   }
   },
   {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},

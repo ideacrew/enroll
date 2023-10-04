@@ -66,7 +66,9 @@ namespace :reports do
           enrollment.coverage_kind == enr.coverage_kind &&
           enrollment.effective_on >= enr.effective_on.beginning_of_year &&
           enrollment_member_hbx_ids.include?(person.hbx_id) &&
-          enrollment.was_in_renewal_status?
+          enrollment.workflow_state_transitions.any? do |wst|
+            HbxEnrollment::RENEWAL_STATUSES.include?(wst.from_state.to_s) || HbxEnrollment::RENEWAL_STATUSES.include?(wst.to_state.to_s)
+          end
       end
     end
 
