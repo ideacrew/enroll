@@ -45,10 +45,7 @@ class PersonRelationship
     "unrelated",
     'ward',
     'cousin'
-  ]
-  # rubocop:disable Naming/ConstantName
-  Relationships += ['domestic_partners_child', 'parents_domestic_partner'] if EnrollRegistry.feature_enabled?(:mitc_relationships)
-  Relationships.freeze
+  ] + (EnrollRegistry.feature_enabled?(:mitc_relationships) ? %w[domestic_partners_child parents_domestic_partner] : []).freeze
 
   Relationships_UI = [
     "spouse",
@@ -61,10 +58,7 @@ class PersonRelationship
     "nephew_or_niece",
     "grandchild",
     'grandparent'
-  ]
-  Relationships_UI += ['father_or_mother_in_law', 'daughter_or_son_in_law', 'brother_or_sister_in_law', 'cousin', 'domestic_partners_child', 'parents_domestic_partner'] if EnrollRegistry.feature_enabled?(:mitc_relationships)
-  # rubocop:enable Naming/ConstantName
-  Relationships_UI.freeze
+  ] + (EnrollRegistry.feature_enabled?(:mitc_relationships) ? %w[father_or_mother_in_law daughter_or_son_in_law brother_or_sister_in_law cousin domestic_partners_child parents_domestic_partner] : []).freeze
 
   InverseMap = {
     "child" => "parent",
