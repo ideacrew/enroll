@@ -236,7 +236,7 @@ end
 post_11_1_purchase_set = Set.new(post_11_1_ids)
 
 renewal_statuses = HbxEnrollment::RENEWAL_STATUSES.map(&:to_s)
-previously_renewed = all_enrolled_people = HbxEnrollment.collection.aggregate([
+has_been_renewed = all_enrolled_people = HbxEnrollment.collection.aggregate([
   {"$match" => {
       "hbx_enrollment_members" => {"$ne" => nil},
       "external_enrollment" => {"$ne" => true},
@@ -272,15 +272,15 @@ previously_renewed = all_enrolled_people = HbxEnrollment.collection.aggregate([
   {"$project" => {"_id" => "$person_id", "total" => {"$sum" => 1}}}
 ])
 
-previously_renewed_ids = previously_renewed.map do |rec|
+has_been_renewed_ids = has_been_renewed.map do |rec|
   rec["_id"]
 end
 
-previously_renewed_set = Set.new(post_11_1_ids)
+has_been_renewed_set = Set.new(post_11_1_ids)
 
-active_renewals_set = (re_enrolled_member_set & post_11_1_purchase_set) - previously_renewed_set
+active_renewals_set = (re_enrolled_member_set & post_11_1_purchase_set) - has_been_renewed_set
 
-passive_renewals_set = re_enrolled_member_set - (post_11_1_purchase_set - previously_renewed_set)
+passive_renewals_set = re_enrolled_member_set - (post_11_1_purchase_set - has_been_renewed_set)
 
 puts "Total Member Enrolled(2023) Count: #{all_enrolled_people_set.size}"
 puts "Total New Member/Consumer selected 2023 enrollments after 11/1/2022 : #{new_member_set.size}"
