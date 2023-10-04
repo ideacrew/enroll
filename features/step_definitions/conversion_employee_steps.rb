@@ -265,7 +265,7 @@ def summary_page_steps(named_person, &block)
   block.call(named_person) if block_given?
 end
 
-When(/(.+) clicks the confirm link/) do
+When(/(.+) clicks the confirm link/) do |_named_person|
   find('.interaction-click-control-confirm').click
 end
 
@@ -297,7 +297,7 @@ def receipt_page_steps(named_person, &block)
   end
 end
 
-When(/(.+) clicks the previous link/) do
+When(/(.+) clicks the previous link/) do |_named_person|
   find('.interaction-click-control-previous').click
 end
 
