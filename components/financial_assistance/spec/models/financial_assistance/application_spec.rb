@@ -712,6 +712,34 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 
+  describe '.create_evidences call
+  - for renewal application
+  - when renewal_eligibility_verification_using_rrv is enabled' do
+    let(:income) { FactoryBot.build(:financial_assistance_income, amount: 200, start_on: Date.new(2021,6,1), end_on: Date.new(2021, 6, 30), frequency_kind: "biweekly") }
+
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:renewal_eligibility_verification_using_rrv).and_return(true)
+      application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'renewal_draft', to_state: 'submitted')
+      application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'submitted', to_state: 'determined')
+      application.save!
+      application.send(:create_evidences)
+    end
+
+    it 'should not create MEC evidences and income evidence' do
+      application.reload.active_applicants.each do |applicant|
+        expect(applicant.income_evidence.present?).to be_falsey
+        expect(applicant.esi_evidence.present?).to be_falsey
+        expect(applicant.non_esi_evidence.present?).to be_falsey
+        expect(applicant.local_mec_evidence.present?).to be_falsey
+      end
+    end
+  end
+
   describe '.delete_verification_documents' do
 
     before do
