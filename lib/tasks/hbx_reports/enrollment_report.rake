@@ -58,7 +58,7 @@ namespace :reports do
       end
     end
 
-    def previously_renewed_enrollments(enr, all_enrollments, person)
+    def renewed_enrollments(enr, all_enrollments, person)
       states = HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES
       all_enrollments.select do |enrollment|
         enrollment_member_hbx_ids = enrollment.hbx_enrollment_members.flat_map(&:person).pluck(:hbx_id)
@@ -66,7 +66,9 @@ namespace :reports do
           enrollment.coverage_kind == enr.coverage_kind &&
           enrollment.effective_on >= enr.effective_on.beginning_of_year &&
           enrollment_member_hbx_ids.include?(person.hbx_id) &&
-          enrollment.was_in_renewal_status?
+          enrollment.workflow_state_transitions.any? do |wst|
+            HbxEnrollment::RENEWAL_STATUSES.include?(wst.from_state.to_s) || HbxEnrollment::RENEWAL_STATUSES.include?(wst.to_state.to_s)
+          end
       end
     end
 
@@ -109,8 +111,8 @@ namespace :reports do
     def member_status(enr)
       enrs_between_nov_and_dec_set = has_effectuated_coverage_in_prev_year_during_oe?(enr)
       re_enrolled_member_set = @enrollments&.map(&:hbx_id)
-      active_renewals_set = (re_enrolled_member_set & @post_11_1_purchases&.map(&:hbx_id)) - @previously_renewed_enrollments&.map(&:hbx_id)
-      passive_renewals_set = re_enrolled_member_set - (@post_11_1_purchases&.map(&:hbx_id) - @previously_renewed_enrollments&.map(&:hbx_id))
+      active_renewals_set = (re_enrolled_member_set & @post_11_1_purchases&.map(&:hbx_id)) - @renewed_enrollments&.map(&:hbx_id)
+      passive_renewals_set = re_enrolled_member_set - (@post_11_1_purchases&.map(&:hbx_id) - @renewed_enrollments&.map(&:hbx_id))
 
       if active_renewals_set.present? && enrs_between_nov_and_dec_set.present?
         "Active Re-enrollee"
@@ -178,7 +180,7 @@ namespace :reports do
                 @enrollments = all_enrollments_for_year(enr, all_enrollments_for_person, per)
                 @pre_11_1_purchases = pre_11_1_purchase_enrollments(enr, all_enrollments_for_person, per)
                 @post_11_1_purchases = post_11_1_purchase_enrollments(enr, all_enrollments_for_person, per)
-                @previously_renewed_enrollments = previously_renewed_enrollments(enr, all_enrollments_for_person, per)
+                @renewed_enrollments = renewed_enrollments(enr, all_enrollments_for_person, per)
                 @previous_enrollments = all_effectuated_enrollments_for_prev_year(enr, all_enrollments_for_person, per)
                 @all_expired_enrollments = all_expired_enrollments_for_prev_year(enr, all_enrollments_for_person, per)
                 csv << [
