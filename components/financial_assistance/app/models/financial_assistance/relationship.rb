@@ -124,5 +124,9 @@ module FinancialAssistance
       return unless application.draft?
       FinancialAssistance::Operations::Application::RelationshipHandler.new.call({relationship: self})
     end
+
+    def valid_relationship_kind?
+      ::AcaEntities::MagiMedicaid::Types::RelationshipKind.values.include?(kind)
+    end
   end
 end

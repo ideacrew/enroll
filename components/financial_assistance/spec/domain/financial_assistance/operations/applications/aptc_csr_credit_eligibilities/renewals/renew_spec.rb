@@ -316,7 +316,22 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
           expect(@result.failure).to match(/because: \(missing_relationships\)/)
         end
       end
+
+      context "Invalid relationships between applicants" do
+        before do
+          application_11.ensure_relationship_with_primary(applicant_12, 'life_partner')
+          person_11.ensure_relationship_with(person_12, 'life_partner')
+          @result = subject.call({ family_id: application_11.family_id, renewal_year: application_11.assistance_year.next })
+        end
+
+        it 'should return failure' do
+          expect(@result).to be_failure
+          expect(FinancialAssistance::Application.where(family_id: family_11.id).last.aasm_state).to eq 'applicants_update_required'
+          expect(@result.failure).to match(/because: \(atleast_one_invalid_relationship\)/)
+        end
+      end
     end
+
     context 'missing keys' do
       context 'missing family_id' do
         before do
