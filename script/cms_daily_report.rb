@@ -197,7 +197,7 @@ end
 post_11_1_purchase_set = Set.new(post_11_1_ids)
 
 renewal_statuses = HbxEnrollment::RENEWAL_STATUSES.map(&:to_s)
-has_been_renewed = all_enrolled_people = HbxEnrollment.collection.aggregate([
+has_been_renewed = HbxEnrollment.collection.aggregate([
   {"$match" => {
       "hbx_enrollment_members" => {"$ne" => nil},
       "external_enrollment" => {"$ne" => true},
