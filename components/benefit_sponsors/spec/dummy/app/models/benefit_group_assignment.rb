@@ -128,10 +128,10 @@
     self.benefit_package_id.blank?
   end
 
-  def plan_year
-    # [Deprecated] Instead use benefit application
-    benefit_application(dep_method_call: true)
-  end
+  # def plan_year
+  #   # [Deprecated] Instead use benefit application
+  #   benefit_application(dep_method_call: true)
+  # end
 
   def benefit_application(dep_method_call: false)
     # Logic pulled from deprecated method plan_year

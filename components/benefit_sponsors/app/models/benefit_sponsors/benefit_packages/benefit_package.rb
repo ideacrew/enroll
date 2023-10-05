@@ -690,10 +690,10 @@ module BenefitSponsors
 
       # Deprecate below methods in future
 
-      def plan_year
-        # [Deprecated] Instead use benefit_application
-        benefit_application
-      end
+      # def plan_year
+      #   # [Deprecated] Instead use benefit_application
+      #   benefit_application
+      # end
 
       private
 
