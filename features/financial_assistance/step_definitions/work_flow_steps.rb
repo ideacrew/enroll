@@ -76,6 +76,7 @@ Then(/^the user will navigate to the assistance year selection page with multipl
   expect(page).to have_content(l10n("faa.year_selection_header"))
   expect(page).to have_content(l10n("faa.assitance_year_option1", year: oe_year))
   expect(page).to have_content(l10n("faa.assitance_year_option2", year: current_year))
+  expect(find("#renewal_assistance_year")).to be_checked
 end
 
 Then(/the user will navigate to the non-OE assistance year selection page/) do
