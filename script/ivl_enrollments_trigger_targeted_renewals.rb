@@ -4,8 +4,8 @@
 
 require 'csv'
 year = 2023
-read_filename = "#{Rails.root}/pids/#{year}_eligible_renewal_failures.csv"
-write_filename = "#{Rails.root}/pids/#{year}_retriggered_renewal_failures.csv"
+read_filename = "#{Rails.root}/pids/#{year}_ivl_enrollments_eligible_renewal_failures.csv"
+write_filename = "#{Rails.root}/pids/#{year}_ivl_enrollments_retriggered_renewal_failures.csv"
 
 current_bs = HbxProfile.current_hbx.benefit_sponsorship
 renewal_bcp = current_bs.renewal_benefit_coverage_period

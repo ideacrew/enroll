@@ -4,7 +4,7 @@
 
 require "csv"
 year = 2023
-filename = "/pids/#{year}_eligible_renewal_failures.csv"
+filename = "/pids/#{year}_ivl_enrollments_eligible_renewal_failures.csv"
 
 current_bcp = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
 current_start_on = current_bcp.start_on.to_date
