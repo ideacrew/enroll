@@ -23,7 +23,7 @@
                 </div>
                 <div>
                   <h3>
-                    <%= FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value! %>
+                    <%= assistance_year %>
                     <%= l10n("faa.year_selection_oe_year") %>
                   </h3>
                 </div>
@@ -32,7 +32,7 @@
               <div class="faays-body">
                 <p>
                   <%= l10n("faa.see_if_you_qualify_1") %>
-                  <%= FinancialAssistanceRegistry[:enrollment_dates].settings(:application_year).item.constantize.new.call.value! %>
+                  <%= assistance_year %>
                   <%= l10n("faa.see_if_you_qualify_2", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item, medicaid_or_chip_program_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
                 </p>
                 <p>

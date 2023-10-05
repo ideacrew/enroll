@@ -65,7 +65,9 @@ Given(/IAP Assistance Year Display feature is disabled/) do
 end
 
 Then(/They should see the application assistance year above Info Needed/) do
-  assistance_year = FinancialAssistance::Application.all.first.assistance_year.to_s
+  application = FinancialAssistance::Application.all.first
+  assistance_year = assistance_year_display(application)
+
   expect(page).to have_content(assistance_year[0..1])
   expect(page).to have_content(assistance_year[2..3])
 end

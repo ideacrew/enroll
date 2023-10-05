@@ -364,5 +364,12 @@ module FinancialAssistance
     def display_esi_fields?(insurance_kind, kind)
       ['employer_sponsored_insurance', 'health_reimbursement_arrangement'].include?(insurance_kind) && (kind == "is_eligible" || !FinancialAssistanceRegistry.feature_enabled?(:short_enrolled_esi_forms))
     end
+
+    def assistance_year
+      return @assistance_year if defined? @assistance_year
+
+      year_selection_enabled = FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) && (HbxProfile.current_hbx.under_open_enrollment? || FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection_form))
+      @assistance_year = year_selection_enabled ? @application.assistance_year.to_s : FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s
+    end
   end
 end
