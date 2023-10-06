@@ -77,8 +77,25 @@ module Operations
         if renewed_enrollment.is_a?(HbxEnrollment)
           Success(renewed_enrollment)
         else
+          update_enrollment_with_error(enrollment, renewed_enrollment)
           Failure('Unable to renew the enrollment')
         end
+      end
+
+      # @param [ HbxEnrollment ] enrollment Enrollment that needs to be updated.
+      # @param [ String ] renewed_enrollment Error message.
+      # @return [ nil ]
+      # @note This method is used to update the enrollment with the error message.
+      #       This method is called when the enrollment renewal fails.
+      #       Failure raised in this method should not impact the renewal process.
+      def update_enrollment_with_error(enrollment, renewed_enrollment)
+        return unless renewed_enrollment.is_a?(String)
+
+        # Not adding to the exising array of reasons as we need to override the existing reasons if we attempt tp renew the enrollment again.
+        enrollment.successor_creation_failure_reasons = [renewed_enrollment]
+        enrollment.save!
+      rescue StandardError => e
+        Rails.logger.error "Unable to update the enrollment with #{renewed_enrollment} error: #{e.message}"
       end
     end
   end
