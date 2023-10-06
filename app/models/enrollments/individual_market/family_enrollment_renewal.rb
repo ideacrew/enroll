@@ -30,6 +30,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     save_renewal_enrollment(renewal_enrollment)
   rescue StandardError => e
     @logger.info "Enrollment renewal failed for #{enrollment.hbx_id} with error message: #{e} backtrace: #{e.backtrace.join('\n')}"
+    e.message
   end
 
   def clone_enrollment
@@ -354,7 +355,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   def clone_enrollment_members
     old_enrollment_members = eligible_enrollment_members
-    raise "unable to generate enrollment with hbx_id #{@enrollment.hbx_id} due to no enrollment members not present" if old_enrollment_members.blank?
+    raise "Unable to generate renewal for enrollment with hbx_id #{@enrollment.hbx_id} due to missing(eligible) enrollment members." if old_enrollment_members.blank?
 
     latest_enrollment = @enrollment.family.active_household.hbx_enrollments.where(:aasm_state.nin => ['shopping']).order_by(:created_at.desc).first
     old_enrollment_members.inject([]) do |members, hbx_enrollment_member|
