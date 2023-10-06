@@ -248,6 +248,59 @@ Then(/(.+) should see coverage summary page with qle effective date/) do |named_
   find('.interaction-click-control-confirm').click
 end
 
+Then(/(.+) should see summary page with qle effective date and same plan member premiums/) do |named_person|
+  summary_page_steps(named_person) do |name|
+    step "#{name} should see employee premium and subsidy based on plan year effective date"
+  end
+end
+
+Then(/(.+) should see summary page with qle effective date and new plan member premiums/) do |named_person|
+  summary_page_steps(named_person) do |name|
+    step "#{name} should see employee premium and subsidy based on qle effective date"
+  end
+end
+
+def summary_page_steps(named_person, &block)
+  step "#{named_person} should get qle effective date as coverage effective date"
+  block.call(named_person) if block_given?
+end
+
+When(/(.+) clicks the confirm link/) do |_named_person|
+  find('.interaction-click-control-confirm').click
+end
+
+Then(/(.*) should see the receipt page with qle effective date as effective date/) do |named_person|
+  receipt_page_steps(named_person)
+end
+
+Then(/(.*) should see receipt page with qle effective date and same plan member premiums/) do |named_person|
+  receipt_page_steps(named_person) do |name|
+    step "#{name} should see employee premium and subsidy based on plan year effective date"
+  end
+end
+
+Then(/(.*) should see receipt page with qle effective date and new plan member premiums/) do |named_person|
+  receipt_page_steps(named_person) do |name|
+    step "#{name} should see employee premium and subsidy based on qle effective date"
+  end
+end
+
+def receipt_page_steps(named_person, &block)
+  expect(page).to have_content('Enrollment Submitted')
+  step "#{named_person} should get qle effective date as coverage effective date"
+  block.call(named_person) if block_given?
+
+  if page.has_link?('CONTINUE')
+    click_link "CONTINUE"
+  else
+    click_link "GO TO MY ACCOUNT"
+  end
+end
+
+When(/(.+) clicks the previous link/) do |_named_person|
+  find('.interaction-click-control-previous').click
+end
+
 Then(/(.+) should see employee premium and subsidy based on (.+) effective date/) do |named_person, event|
   person = people[named_person]
   person_record = Person.where(first_name: /#{person[:first_name]}/i, last_name: /#{person[:last_name]}/i).first
@@ -262,27 +315,18 @@ Then(/(.+) should see employee premium and subsidy based on (.+) effective date/
   employee_age = person_record.age_on(employee_coverage_date)
   display_employee_age = person_record.age_on(TimeKeeper.date_of_record)
 
-  premium_amount = ::BenefitMarkets::Products::ProductRateCache.lookup_rate(new_enrollment.product, plan_year_start, employee_age, "R-DC001", 'N')
+  selected_plan = new_enrollment.product || @current_plan_selection
   subsidy_amount = ::BenefitMarkets::Products::ProductRateCache.lookup_rate(benchmark_product, plan_year_start, employee_age, "R-DC001", 'N')
+  premium_amount = ::BenefitMarkets::Products::ProductRateCache.lookup_rate(selected_plan, plan_year_start, employee_age, "R-DC001", 'N')
+  applied_subsidy = [premium_amount, subsidy_amount].min
 
   find('.coverage_effective_date', text: new_enrollment.effective_on.strftime("%m/%d/%Y"))
   find(:xpath, "//table/tbody[1]/tr[1]/td[1][contains(text(), '#{named_person}')]")
   find(:xpath, "//table/tbody[1]/tr[1]/td[2][contains(text(), 'self')]")
   find(:xpath, "//table/tbody[1]/tr[1]/td[3][contains(text(), '#{display_employee_age}')]")
-  find(:xpath, "//table/tbody[1]/tr[1]/td[4][contains(text(), '#{premium_amount}')]")
+  find(:xpath, "//table/tbody[1]/tr[1]/td[4][contains(text(), '$#{premium_amount}')]")
   find(:xpath, "//table/tbody[1]/tr[1]/td[5][contains(text(), 'HC4CC')]")
-  find(:xpath, "//table/tbody[1]/tr[1]/td[6][contains(text(), '#{subsidy_amount}')]")
-end
-
-Then(/(.*) should see the receipt page with qle effective date as effective date/) do |named_person|
-  expect(page).to have_content('Enrollment Submitted')
-  step "#{named_person} should get qle effective date as coverage effective date"
-
-  if page.has_link?('CONTINUE')
-    click_link "CONTINUE"
-  else
-    click_link "GO TO MY ACCOUNT"
-  end
+  find(:xpath, "//table/tbody[1]/tr[1]/td[6][contains(text(), '$#{applied_subsidy}')]")
 end
 
 Then(/.+ should see the enrollment submitted/) do
