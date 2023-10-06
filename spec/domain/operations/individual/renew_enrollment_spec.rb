@@ -340,6 +340,19 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
     end
   end
 
+  context 'enrollment renewal failure' do
+    before do
+      enrollment.hbx_enrollment_members.each { |mbr| mbr.person.update_attributes!(is_incarcerated: true) }
+      subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
+    end
+
+    it 'updates the enrollment successor_creation_failure_reasons' do
+      expect(enrollment.successor_creation_failure_reasons).to include(
+        "Unable to generate renewal for enrollment with hbx_id #{enrollment.hbx_id} due to missing(eligible) enrollment members."
+      )
+    end
+  end
+
   context 'for renewal failure' do
     context 'bad input object' do
       before :each do
