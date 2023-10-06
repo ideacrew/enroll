@@ -1,5 +1,9 @@
 require "set"
 
+# Add year argument in the following format: bundle exec rails r cms_daily_report.rb 2023 -e production
+year = ARGV[0].present? ?  ARGV[0].to_i: Date.today.year.to_i
+
+
 all_enrolled_people = HbxEnrollment.collection.aggregate([
   {"$match" => {
       "hbx_enrollment_members" => {"$ne" => nil},
@@ -8,7 +12,7 @@ all_enrolled_people = HbxEnrollment.collection.aggregate([
       "consumer_role_id" => {"$ne" => nil},
       "product_id" => { "$ne" => nil},
       "aasm_state" => {"$in" => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
-      "effective_on" => {"$gte" => Date.new(2023,1,1)}
+      "effective_on" => {"$gte" => Date.new(year+1,1,1)}
   }
   },
   {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
@@ -45,7 +49,7 @@ pre_term_renewal_candidates = HbxEnrollment.collection.aggregate([
       "consumer_role_id" => {"$ne" => nil},
       "product_id" => { "$ne" => nil},
       "aasm_state" => {"$in" =>  HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
-      "effective_on" => { "$gte" => Date.new(2022,1,1), "$lte" => Date.new(2022,12,31) }
+      "effective_on" => { "$gte" => Date.new(year,1,1), "$lte" => Date.new(year,12,31) }
   }
   },
   {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
@@ -80,7 +84,7 @@ post_term_renewal_candidates = HbxEnrollment.collection.aggregate([
       "consumer_role_id" => {"$ne" => nil},
       "product_id" => { "$ne" => nil},
       "aasm_state" => {"$in" =>  ["coverage_expired"]},
-      "effective_on" => { "$gte" => Date.new(2022,1,1), "$lte" => Date.new(2022,12,31) }
+      "effective_on" => { "$gte" => Date.new(year,1,1), "$lte" => Date.new(year,12,31) }
   }
   },
   {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
@@ -115,9 +119,9 @@ termed_people_between_nov_and_dec = HbxEnrollment.collection.aggregate([
      "coverage_kind" => "health",
      "consumer_role_id" => {"$ne" => nil},
      "product_id" => { "$ne" => nil},
-     "terminated_on" => { "$gte" => Date.new(2022,11,1), "$lte" => Date.new(2022,12,31) },
+     "terminated_on" => { "$gte" => Date.new(year,11,1), "$lte" => Date.new(year,12,31) },
      "aasm_state" => {"$in" => ["coverage_terminated"]},
-     "effective_on" => { "$gte" => Date.new(2022,1,1), "$lte" => Date.new(2022,12,31) }
+     "effective_on" => { "$gte" => Date.new(year,1,1), "$lte" => Date.new(year,12,31) }
    }
    },
    {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
@@ -155,7 +159,7 @@ new_member_set = (all_enrolled_people_set - termed_people_between_nov_and_dec_se
 
 re_enrolled_member_set = all_enrolled_people_set & (renewal_candidate_set | termed_people_between_nov_and_dec_set)
 
-time_period = Time.zone.parse("2022-11-01 10:00:00").utc
+time_period = Time.zone.parse("2022-11-01 10:00:00").utc.change(year: year)
 
 post_11_1_purchases = all_enrolled_people = HbxEnrollment.collection.aggregate([
   {"$match" => {
@@ -166,7 +170,7 @@ post_11_1_purchases = all_enrolled_people = HbxEnrollment.collection.aggregate([
       "product_id" => { "$ne" => nil},
       "created_at" => { "$gte" => time_period },
       "aasm_state" => {"$in" => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
-      "effective_on" => {"$gte" => Date.new(2023,1,1)}
+      "effective_on" => {"$gte" => Date.new(year+1,1,1)}
   }
   },
   {"$project" => {"family_id" => "$family_id", "hbx_enrollment_members" => "$hbx_enrollment_members"}},
@@ -205,7 +209,7 @@ has_been_renewed = HbxEnrollment.collection.aggregate([
       "consumer_role_id" => {"$ne" => nil},
       "product_id" => { "$ne" => nil},
       "aasm_state" => {"$in" => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES},
-      "effective_on" => {"$gte" => Date.new(2023,1,1)},
+      "effective_on" => {"$gte" => Date.new(year+1,1,1)},
       '$or' => [
         {'workflow_state_transitions.from_state': { '$in' => renewal_statuses }},
         {'workflow_state_transitions.to_state': { '$in' => renewal_statuses }}
@@ -243,11 +247,11 @@ active_renewals_set = (re_enrolled_member_set & post_11_1_purchase_set) - has_be
 
 passive_renewals_set = re_enrolled_member_set - (post_11_1_purchase_set - has_been_renewed_set)
 
-puts "Total Member Enrolled(2023) Count: #{all_enrolled_people_set.size}"
-puts "Total New Member/Consumer selected 2023 enrollments after 11/1/2022 : #{new_member_set.size}"
-puts "Total Re-Enrolled(2023) Member: #{re_enrolled_member_set.size}"
-puts "Total Active Renewed(2023) Member: #{active_renewals_set.size}"
-puts "Total Auto Renewed(2023) Member: #{passive_renewals_set.size}"
+puts "Total Member Enrolled(#{year+1}) Count: #{all_enrolled_people_set.size}"
+puts "Total New Member/Consumer selected #{year+1} enrollments after 11/1/#{year} : #{new_member_set.size}"
+puts "Total Re-Enrolled(#{year+1}) Member: #{re_enrolled_member_set.size}"
+puts "Total Active Renewed(#{year+1}) Member: #{active_renewals_set.size}"
+puts "Total Auto Renewed(#{year+1}) Member: #{passive_renewals_set.size}"
 
 def total_families(families, file_name, offset_count)
   field_names = ["PrimaryHbxID", "PrimaryFullName"]
@@ -268,10 +272,10 @@ auto_and_active_enrolled_families = HbxEnrollment.where(coverage_kind: "health",
                                                         :"external_enrollment".ne => true,
                                                         :"consumer_role_id".ne => nil,
                                                         :"aasm_state".in => HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES,
-                                                        :"effective_on".gte => Date.new(2023,1,1)).pluck(:family_id).uniq
+                                                        :"effective_on".gte => Date.new(year+1,1,1)).pluck(:family_id).uniq
 
-families_created_after_10_31_22 = Family.where(:"created_at".gte => Date.new(2022,11,1)).pluck(:_id).uniq
-families_with_2023_assistance = ::FinancialAssistance::Application.renewal_eligible.by_year(2023).pluck(:family_id).uniq
+families_created_after_10_31_22 = Family.where(:"created_at".gte => Date.new(year,11,1)).pluck(:_id).uniq
+families_with_2023_assistance = ::FinancialAssistance::Application.renewal_eligible.by_year(year+1).pluck(:family_id).uniq
 all_submitted_families = Set.new(auto_and_active_enrolled_families) | Set.new(families_created_after_10_31_22) | Set.new(families_with_2023_assistance)
 
 families = Family.where(:"_id".in => all_submitted_families.to_a)
@@ -466,10 +470,10 @@ def process_ivl_families_medicaid_or_chip(families, file_name, offset_count)
       primary = family.primary_person
 
       if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-        thhs = family.tax_household_groups.active.where(:"start_on".gte => Date.new(2023)).first&.tax_households
+        thhs = family.tax_household_groups.active.where(:"start_on".gte => Date.new(year+1)).first&.tax_households
         thhm_medicaid_members = thhs.map(&:tax_household_members).flatten.select {|th_member| th_member.is_medicaid_chip_eligible } if thhs.present?
       else
-        thhs = family.latest_household.tax_households.where(effective_ending_on: nil, :"effective_starting_on".gte => Date.new(2023)).first
+        thhs = family.latest_household.tax_households.where(effective_ending_on: nil, :"effective_starting_on".gte => Date.new(year+1)).first
         thhm_medicaid_members = thhs&.tax_household_members.where(is_medicaid_chip_eligible: true)
       end
 
@@ -489,9 +493,9 @@ def process_ivl_families_medicaid_or_chip(families, file_name, offset_count)
 end
 
 if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-  families = Family.where(:"tax_household_groups" => { "$elemMatch" => { :"end_on" => nil, :"start_on".gte => Date.new(2023) } })
+  families = Family.where(:"tax_household_groups" => { "$elemMatch" => { :"end_on" => nil, :"start_on".gte => Date.new(year+1) } })
 else
-  families = Family.where(:"households.tax_households" => { "$elemMatch" => { :"effective_ending_on" => nil, :"effective_starting_on".gte => Date.new(2023) } })
+  families = Family.where(:"households.tax_households" => { "$elemMatch" => { :"effective_ending_on" => nil, :"effective_starting_on".gte => Date.new(year+1) } })
 end
 
 total_count = families.count
@@ -518,9 +522,9 @@ def process_ivl_families_with_qhp(families, file_name, offset_count)
     families.no_timeout.limit(10_000).offset(offset_count).inject([]) do |_dummy, family|
       primary = family.primary_person
       if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-        thhs = family.tax_household_groups.active.where(:"start_on".gte => Date.new(2023)).first&.tax_households
+        thhs = family.tax_household_groups.active.where(:"start_on".gte => Date.new(year+1)).first&.tax_households
       else
-        thh = family.latest_household.latest_active_tax_household_with_year(2023)
+        thh = family.latest_household.latest_active_tax_household_with_year(year+1)
       end
 
       family.family_members.where(is_active: true).each do |f_member|
@@ -582,7 +586,7 @@ def process_ivl_families_with_qhp_assistance(families, file_name, offset_count)
       primary = family.primary_person
 
       if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-        thhs = family.tax_household_groups.active.where(:"start_on".gte => Date.new(2023)).first&.tax_households
+        thhs = family.tax_household_groups.active.where(:"start_on".gte => Date.new(year+1)).first&.tax_households
         thmm_members = thhs.map(&:tax_household_members).flatten if thhs.present?
         thhm_aptc_members = thmm_members.select {|th_member| th_member.is_ia_eligible } if thmm_members.present?
 
@@ -597,7 +601,7 @@ def process_ivl_families_with_qhp_assistance(families, file_name, offset_count)
           @total_member_counter_qhp_assistance += thhm_aptc_members.count
         end
       else
-        thh = family.latest_household.tax_households.where(effective_ending_on: nil, :"effective_starting_on".gte => Date.new(2023)).first
+        thh = family.latest_household.tax_households.where(effective_ending_on: nil, :"effective_starting_on".gte => Date.new(year+1)).first
         thhm_aptc_members = thh&.tax_household_members.where(is_ia_eligible: true)
         if thh.present? && thhm_aptc_members.present?
           thhm_aptc_members.each do |aptc_thhm|
@@ -616,9 +620,9 @@ def process_ivl_families_with_qhp_assistance(families, file_name, offset_count)
 end
 
 if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-  families = Family.where(:"tax_household_groups" => { "$elemMatch" => { :"end_on" => nil, :"start_on".gte => Date.new(2023) } })
+  families = Family.where(:"tax_household_groups" => { "$elemMatch" => { :"end_on" => nil, :"start_on".gte => Date.new(year+1) } })
 else
-  families = Family.where(:"households.tax_households" => { "$elemMatch" => { :"effective_ending_on" => nil, :"effective_starting_on".gte => Date.new(2023) } })
+  families = Family.where(:"households.tax_households" => { "$elemMatch" => { :"effective_ending_on" => nil, :"effective_starting_on".gte => Date.new(year+1) } })
 end
 
 total_count = families.count
