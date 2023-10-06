@@ -261,7 +261,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
 
         it "should raise an error" do
-          expect { subject.clone_enrollment_members }.to raise_error(RuntimeError, /unable to generate enrollment with hbx_id /)
+          expect { subject.clone_enrollment_members }.to raise_error(RuntimeError, /Unable to generate renewal for enrollment with hbx_id/)
         end
       end
     end
@@ -315,9 +315,11 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           renewal_rating_area.destroy!
         end
 
-        it 'should return nil and log an error' do
+        it 'returns error message and log the error' do
           expect_any_instance_of(Logger).to receive(:info).with(/Enrollment renewal failed for #{enrollment.hbx_id} with error message: /i)
-          expect(subject.renew).to eq nil
+          expect(subject.renew).to eq(
+            "Cannot renew enrollment #{enrollment.hbx_id}. Error: Rating Area Is Blank"
+          )
         end
       end
 
@@ -326,9 +328,11 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           renewal_service_area.destroy!
         end
 
-        it 'should return nil and log an error' do
+        it 'returns error message and log the error' do
           expect_any_instance_of(Logger).to receive(:info).with(/Enrollment renewal failed for #{enrollment.hbx_id} with error message: /i)
-          expect(subject.renew).to eq nil
+          expect(subject.renew).to eq(
+            "Cannot renew enrollment #{enrollment.hbx_id}. Error: Product is NOT offered in service area"
+          )
         end
       end
 
