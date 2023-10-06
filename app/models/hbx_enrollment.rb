@@ -2882,7 +2882,6 @@ class HbxEnrollment
       effective_year = application.start_on.year
       return unless shop_osse_eligibility_is_enabled?(effective_year)
       return unless application.osse_eligible?
-
       osse_childcare_subsidy = osse_subsidy_for_member(primary_hbx_enrollment_member)
     else
       return unless ivl_osse_eligible?
@@ -2919,6 +2918,7 @@ class HbxEnrollment
   def verify_and_reset_osse_subsidy_amount(member_group)
     return unless is_shop?
 
+    update_osse_childcare_subsidy
     hbx_enrollment_members.each do |member|
       next unless member.is_subscriber?
       product_price = member_group.group_enrollment.member_enrollments.find{|enrollment| enrollment.member_id == member.id }.product_price

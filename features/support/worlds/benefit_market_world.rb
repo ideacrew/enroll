@@ -113,11 +113,10 @@ module BenefitMarketWorld
     ['CareFirst', 'Kaiser Permanente']
   end
 
-  def health_products(premium_factor = nil)
-    premium_factor ||= 0
+  def health_products(premium_factor: 0, num_products: 3)
     health_issuers.each do |issuer_name|
       create_list(:benefit_markets_products_health_products_health_product,
-                  3,
+                  num_products,
                   benefit_market_kind: benefit_market.kind,
                   application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
                   product_package_kinds: [:single_issuer, :metal_level, :single_product],
@@ -129,7 +128,7 @@ module BenefitMarketWorld
 
       next unless current_effective_date.month == 1
       create_list(:benefit_markets_products_health_products_health_product,
-                  3,
+                  num_products,
                   benefit_market_kind: benefit_market.kind,
                   application_period: ((current_effective_date - 1.month).beginning_of_year..(current_effective_date - 1.month).end_of_year),
                   product_package_kinds: [:single_issuer, :metal_level, :single_product],
@@ -261,7 +260,9 @@ Given(/^osse benefit market catalog exists for (.*) initial employer with (.*) b
   coverage_kinds = coverage_kinds.split('&').map(&:strip).map(&:to_sym)
   initial_application_dates(status.to_sym)
   product_kinds(coverage_kinds)
-  health_products(5)
+  health_products(premium_factor: 2, num_products: 1)
+  health_products(premium_factor: 3, num_products: 1)
+  health_products(premium_factor: 4, num_products: 1)
   dental_products if coverage_kinds.include?(:dental)
   reset_product_cache
   create_benefit_market_catalog_for(current_effective_date - 1.month) if current_effective_date.month == 1

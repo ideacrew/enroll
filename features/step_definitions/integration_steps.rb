@@ -920,8 +920,14 @@ When(/^.+ selects? a plan on the plan shopping page$/) do
   find_all(EmployeeChoosePlan.select_plan_btn, wait: 5)[0].click
 end
 
+When(/^.+ selects? a second plan on the plan shopping page$/) do
+  find_all(EmployeeChoosePlan.select_plan_btn, wait: 5)[1].click
+  @current_plan_selection = BenefitMarkets::Products::HealthProducts::HealthProduct.all[1]
+end
+
 When(/^.+ selects? a last plan on the plan shopping page$/) do
   find_all(EmployeeChoosePlan.select_plan_btn, wait: 5)[-1].click
+  @current_plan_selection = BenefitMarkets::Products::HealthProducts::HealthProduct.all[-1]
 end
 
 Then(/^.+ should see the coverage summary page$/) do
