@@ -125,6 +125,9 @@ module FinancialAssistance
               elsif missing_relationships?(relationships_changed, renew_application)
                 @failure_reason = 'missing_relationships'
                 'applicants_update_required'
+              elsif !renew_application.valid_relationship_kinds?
+                @failure_reason = 'atleast_one_invalid_relationship'
+                'applicants_update_required'
               else
                 'renewal_draft'
               end
