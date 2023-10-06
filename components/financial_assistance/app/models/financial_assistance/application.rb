@@ -1195,6 +1195,10 @@ module FinancialAssistance
       is_valid.all?(true)
     end
 
+    def valid_relationship_kinds?
+      relationships.all?(&:valid_relationship_kind?)
+    end
+
     def valid_relations?
       matrix = build_relationship_matrix
       EnrollRegistry.feature_enabled?(:mitc_relationships) ? validate_relationships(matrix) : true
