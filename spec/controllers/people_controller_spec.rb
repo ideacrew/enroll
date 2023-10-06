@@ -188,4 +188,45 @@ RSpec.describe PeopleController, dbclean: :after_each do
       end
     end
   end
+
+  context 'populate county information on dependent address' do
+    let(:person) { FactoryBot.create(:person, first_name: 'test', addresses: [address]) }
+    let(:dependent) { FactoryBot.create(:person, addresses: [address]) }
+    let(:address) { FactoryBot.build(:address, kind: "home", address_1: "address1_a", address_2: "", city: "city1", state: "ME", zip: "22211", county: "test") }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let(:family_member) { FactoryBot.create(:family_member, family: family, person: dependent) }
+    let(:person_attributes) { person.attributes.to_hash}
+    let(:addresses_attributes3) do
+      {
+        "0" => { "kind" => "home",
+                 "address_1" => "address1_changed",
+                 "address_2" => "",
+                 "city" => "city1",
+                 "state" => "ME",
+                 "zip" => "22111",
+                 "county" => "test_3",
+                 "id" => person.addresses[0].id.to_s }
+      }
+    end
+
+    before do
+      family.save
+      family_member.save
+      person.primary_family.reload
+      allow(person).to receive(:primary_family).and_return(family)
+      person_attributes[:addresses_attributes] = addresses_attributes3
+    end
+
+    it "when primary address is updated with county information" do
+      sign_in(user)
+      post :update, params: { id: person.id, person: person_attributes }
+
+      person.reload
+      dependent.reload
+      primary_address = person.addresses.select{|address| address.kind == 'home'}.first
+      dependent_address = dependent.addresses.first
+      expect(primary_address.same_address?(dependent_address)).to eq true
+      expect(primary_address.county).to eq dependent_address.county
+    end
+  end
 end
