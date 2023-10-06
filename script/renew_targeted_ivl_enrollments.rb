@@ -5,13 +5,13 @@
 require 'csv'
 year = 2023
 read_filename = "#{Rails.root}/pids/#{year}_ivl_enrollments_eligible_renewal_failures.csv"
-write_filename = "#{Rails.root}/pids/#{year}_ivl_enrollments_retriggered_renewal_failures.csv"
+write_filename = "#{Rails.root}/pids/#{year}_ivl_enrollments_retriggered_renewals.csv"
 
 current_bs = HbxProfile.current_hbx.benefit_sponsorship
 renewal_bcp = current_bs.renewal_benefit_coverage_period
 
 CSV.open(write_filename, "wb") do |csv|
-  csv << ["enrollment_hbx_id", "primary_hbx_id"]
+  csv << ["primary_hbx_id", "enrollment_hbx_id", "renewal_enrollment_hbx_id", "renewal_failure_reasons"]
 
   CSV.foreach(read_filename) do |row|
     enrollment_hbx_id, primary_hbx_id = row
@@ -22,9 +22,10 @@ CSV.open(write_filename, "wb") do |csv|
     if result.success?
       renewal_enrollment = result.success
       puts "Successfully able to create renewal enrollment with HBX_ID #{renewal_enrollment.hbx_id}, effective on #{renewal_enrollment.effective_on}, aasm state #{renewal_enrollment.aasm_state}"
+      csv << [primary_hbx_id, enrollment_hbx_id, renewal_enrollment.hbx_id, "N/A"]
     else
       puts "Unable to create renewal enrollment for HBX_ID #{current_year_enrollment.hbx_id}"
-      csv << [enrollment_hbx_id, primary_hbx_id]
+      csv << [primary_hbx_id, enrollment_hbx_id, "N/A", current_year_enrollment.successor_creation_failure_reasons]
     end
   rescue StandardError => e
     puts "ERROR on row: #{row}, Backtrace: #{e.backtrace}"

@@ -11,7 +11,7 @@ current_start_on = current_bcp.start_on.to_date
 current_end_on = current_bcp.end_on.to_date
 
 CSV.open(filename, "w") do |csv|
-  csv << ["enrollment_hbx_id", "primary_hbx_id"]
+  csv << ["primary_hbx_id", "enrollment_hbx_id", "renewal_failure_reasons"]
 
   query = {
     :kind.in => ['individual', 'coverall'],
@@ -28,6 +28,6 @@ CSV.open(filename, "w") do |csv|
   "Total #{year} enrollments with missing renewal: #{enrollments_with_missing_renewal.count}"
 
   enrollments_with_missing_renewal.each do |enrollment|
-    csv << [enrollment.hbx_id, enrollment.primary_hbx_enrollment_member.hbx_id]
+    csv << [enrollment.primary_hbx_enrollment_member.hbx_id, enrollment.hbx_id, enrollment.successor_creation_failure_reasons]
   end
 end
