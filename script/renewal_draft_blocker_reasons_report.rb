@@ -14,7 +14,7 @@ applications = ::FinancialAssistance::Application.by_year(assistance_year).where
 
 file_name = "renewal_draft_blocker_reasons_report_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
 
-CSV.pen(file_name, 'w', force_quotes: true) do |csv|
+CSV.open(file_name, 'w', force_quotes: true) do |csv|
   csv << [
     'Application Hbx ID',
     'Application Assistance Year',
