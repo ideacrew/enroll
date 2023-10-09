@@ -82,8 +82,11 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
         expect(@renewal_draft_app).not_to be_a(::FinancialAssistance::Application)
       end
 
-      it 'should return application in income_verification_extension_required state' do
-        expect(@result.failure).to match(/Renewal Application:.*failed with aasm_state: \(income_verification_extension_required\)/)
+      let(:renewal_draft_blocker_reason) { 'years_to_renew is 0 or nil' }
+
+      it 'returns application in income_verification_extension_required state' do
+        expect(@result.failure).to match(renewal_draft_blocker_reason)
+        expect(subject.renewal_application.income_verification_extension_required?).to be_truthy
       end
     end
 
@@ -280,6 +283,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
           per
         end
         let!(:family_member_13) { FactoryBot.create(:family_member, person: person_13, family: family_11)}
+        let(:renewal_draft_blocker_reason) { 'family_members_changed' }
 
         before do
           @result = subject.call({ family_id: application_11.family_id, renewal_year: application_11.assistance_year.next })
@@ -287,7 +291,8 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
 
         it 'should return failure and set renewal application state to applicants_update_required' do
           expect(@result.failure?).to eq true
-          expect(FinancialAssistance::Application.where(family_id: family_11.id).last.aasm_state).to eq 'applicants_update_required'
+          expect(subject.renewal_application.renewal_draft_blocker_reasons).to include(renewal_draft_blocker_reason)
+          expect(subject.renewal_application.aasm_state).to eq 'applicants_update_required'
         end
       end
 
@@ -298,9 +303,12 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
           @result = subject.call({ family_id: application_11.family_id, renewal_year: application_11.assistance_year.next })
         end
 
+        let(:renewal_draft_blocker_reason) { 'family_members_changed' }
+
         it 'should return failure and set renewal application state to applicants_update_required' do
           expect(@result.failure?).to eq true
-          expect(FinancialAssistance::Application.where(family_id: family_11.id).last.aasm_state).to eq 'applicants_update_required'
+          expect(subject.renewal_application.renewal_draft_blocker_reasons).to include(renewal_draft_blocker_reason)
+          expect(subject.renewal_application.aasm_state).to eq 'applicants_update_required'
         end
       end
 
@@ -310,10 +318,13 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
           @result = subject.call({ family_id: application.family_id, renewal_year: application.assistance_year.next })
         end
 
+        let(:renewal_draft_blocker_reason) { 'missing_relationships' }
+
         it 'should return failure' do
           expect(@result).to be_failure
-          expect(FinancialAssistance::Application.where(family_id: application.family.id).last.aasm_state).to eq 'applicants_update_required'
-          expect(@result.failure).to match(/because: \(missing_relationships\)/)
+          expect(subject.renewal_application.aasm_state).to eq 'applicants_update_required'
+          expect(subject.renewal_application.renewal_draft_blocker_reasons).to include(renewal_draft_blocker_reason)
+          expect(@result.failure).to match(renewal_draft_blocker_reason)
         end
       end
 
@@ -324,10 +335,13 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
           @result = subject.call({ family_id: application_11.family_id, renewal_year: application_11.assistance_year.next })
         end
 
+        let(:renewal_draft_blocker_reason) { 'invalid_relationships' }
+
         it 'should return failure' do
           expect(@result).to be_failure
-          expect(FinancialAssistance::Application.where(family_id: family_11.id).last.aasm_state).to eq 'applicants_update_required'
-          expect(@result.failure).to match(/because: \(atleast_one_invalid_relationship\)/)
+          expect(subject.renewal_application.aasm_state).to eq 'applicants_update_required'
+          expect(subject.renewal_application.renewal_draft_blocker_reasons).to include(renewal_draft_blocker_reason)
+          expect(@result.failure).to match(renewal_draft_blocker_reason)
         end
       end
     end
