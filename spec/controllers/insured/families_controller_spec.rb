@@ -1040,7 +1040,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     context "delete delete_consumer_broker" do
       let(:family) {FactoryBot.build(:family)}
       before :each do
-        EnrollRegistry[:send_broker_fired_event_to_edi].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:send_broker_fired_event_to_edi].feature).to receive(:is_enabled).and_return(true)
         allow(person).to receive(:hbx_staff_role).and_return(double('hbx_staff_role', permission: double('permission',modify_family: true)))
         allow(person).to receive(:agent?).and_return(true)
         family.broker_agency_accounts = [

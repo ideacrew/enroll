@@ -33,7 +33,7 @@ describe ConsumerRole, dbclean: :after_each do
   end
 
   before :each do
-    EnrollRegistry[:aca_individual_market].feature.stub(:is_enabled).and_return(true)
+    allow(EnrollRegistry[:aca_individual_market].feature).to receive(:is_enabled).and_return(true)
   end
 
   describe '.new' do

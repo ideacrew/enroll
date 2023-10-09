@@ -8,7 +8,7 @@ RSpec.describe ::Operations::FinancialAssistance::CreateOrUpdateApplicant, type:
   let!(:family_member) { FactoryBot.create(:family_member, family: family, person: person2) }
 
   before do
-    EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
+    allow(EnrollRegistry[:financial_assistance].feature).to receive(:is_enabled).and_return(true)
     allow(EnrollRegistry[:validate_quadrant].feature).to receive(:is_enabled).and_return(true)
   end
 

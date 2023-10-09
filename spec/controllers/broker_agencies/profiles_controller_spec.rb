@@ -357,7 +357,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
 
     context "when general agency is disabled via resource registry",dbclean: :after_each do
       before :each do
-        EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:general_agency].feature).to receive(:is_enabled).and_return(false)
         sign_in user
         get :assign, params: {id: broker_agency_profile.id}, format: :js, xhr: true
       end
@@ -535,7 +535,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
 
     context "when general agency is disabled via resource registry",dbclean: :after_each do
       before do
-        EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:general_agency].feature).to receive(:is_enabled).and_return(false)
       end
       context "when we Assign agency",dbclean: :after_each do
         before :each do

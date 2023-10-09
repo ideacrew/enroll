@@ -636,7 +636,7 @@ describe HbxEnrollment, "reinstate and change end date", type: :model, :dbclean 
       end
 
       before do
-        EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:financial_assistance].feature).to receive(:is_enabled).and_return(false)
         allow(EnrollRegistry[:admin_ivl_end_date_changes].feature).to receive(:is_enabled).and_return(true)
         allow(EnrollRegistry[:admin_shop_end_date_changes].feature).to receive(:is_enabled).and_return(true)
         allow(EnrollRegistry[:validate_quadrant].feature).to receive(:is_enabled).and_return(true)
@@ -723,7 +723,7 @@ describe HbxEnrollment, "reinstate and change end date", type: :model, :dbclean 
       end
 
       before do
-        EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:financial_assistance].feature).to receive(:is_enabled).and_return(false)
         allow(EnrollRegistry[:admin_ivl_end_date_changes].feature).to receive(:is_enabled).and_return(true)
         allow(EnrollRegistry[:admin_shop_end_date_changes].feature).to receive(:is_enabled).and_return(true)
         allow(EnrollRegistry[:assign_contribution_model_aca_shop].feature).to receive(:is_enabled).and_return(true)
@@ -926,7 +926,7 @@ describe HbxEnrollment, "reinstate and change end date", type: :model, :dbclean 
 
     before do
       allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, 11,1) + 14.days)
-      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:financial_assistance].feature).to receive(:is_enabled).and_return(false)
       allow(EnrollRegistry[:admin_ivl_end_date_changes].feature).to receive(:is_enabled).and_return(true)
       allow(EnrollRegistry[:admin_shop_end_date_changes].feature).to receive(:is_enabled).and_return(true)
       allow(EnrollRegistry[:assign_contribution_model_aca_shop].feature).to receive(:is_enabled).and_return(true)
@@ -1055,7 +1055,7 @@ describe HbxEnrollment, "reinstate and change end date", type: :model, :dbclean 
         end
 
         before do
-          EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:financial_assistance].feature).to receive(:is_enabled).and_return(false)
           EnrollRegistry[:admin_ivl_end_date_changes].feature.stub(:is_enabled).and_return(false)
           EnrollRegistry[:admin_shop_end_date_changes].feature.stub(:is_enabled).and_return(false)
           EnrollRegistry[:prior_plan_year_shop_sep].feature.stub(:is_enabled).and_return(false)

@@ -490,7 +490,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
       let(:consumer_role) {FactoryBot.build(:consumer_role)}
       context "had a SSN" do
         before do
-          EnrollRegistry[:show_download_tax_documents].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:show_download_tax_documents].feature).to receive(:is_enabled).and_return(true)
           person.consumer_role = consumer_role
             person.ssn = '123456789'
         end
@@ -556,7 +556,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
 
     context "when termination reason config is enabled and enrollment is IVL" do
       before :each do
-        EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:display_ivl_termination_reason].feature).to receive(:is_enabled).and_return(true)
       end
 
       it "should return true" do
@@ -566,7 +566,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
 
     context "when termination reason config is disabled and enrollment is IVL" do
       before :each do
-        EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:display_ivl_termination_reason].feature).to receive(:is_enabled).and_return(false)
       end
 
       it "should return false" do
@@ -577,7 +577,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
     context "when termination reason config is enabled and enrollment is shop" do
       before :each do
         hbx_enrollment.update_attributes(kind: "shop")
-        EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:display_ivl_termination_reason].feature).to receive(:is_enabled).and_return(false)
       end
 
       it "should return false" do
@@ -729,7 +729,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
 
     shared_examples 'a label checker' do |aasm_state, terminate_reason, is_outstanding, expected_label|
       before do
-        EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:display_ivl_termination_reason].feature).to receive(:is_enabled).and_return(true)
         allow(enrollment).to receive(:aasm_state).and_return(aasm_state)
         allow(enrollment).to receive(:terminate_reason).and_return(terminate_reason)
         allow(enrollment).to receive(:is_any_enrollment_member_outstanding).and_return(is_outstanding)

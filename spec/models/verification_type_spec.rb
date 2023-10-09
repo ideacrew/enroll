@@ -79,7 +79,7 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
     context 'when setting verification_document_due_in_days is enabled' do
 
       before do
-        EnrollRegistry[:set_due_date_upon_response_from_hub].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:set_due_date_upon_response_from_hub].feature).to receive(:is_enabled).and_return(true)
         person.verification_types.each(&:fail_type)
       end
 

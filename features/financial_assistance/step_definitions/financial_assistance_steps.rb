@@ -489,7 +489,7 @@ Given(/the mec check feature is enabled/) do
 end
 
 Given(/the mec check feature is disabled/) do
-  EnrollRegistry[:mec_check].feature.stub(:is_enabled).and_return(false)
+  allow(EnrollRegistry[:mec_check].feature).to receive(:is_enabled).and_return(false)
 end
 
 Given(/the shop coverage check feature is enabled/) do
@@ -497,7 +497,7 @@ Given(/the shop coverage check feature is enabled/) do
 end
 
 Given(/the shop coverage check feature is disabled/) do
-  EnrollRegistry[:shop_coverage_check].feature.stub(:is_enabled).and_return(false)
+  allow(EnrollRegistry[:shop_coverage_check].feature).to receive(:is_enabled).and_return(false)
 end
 
 Given(/the coverage check banners feature is enabled/) do

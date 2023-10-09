@@ -33,7 +33,7 @@ RSpec.describe "broker_agencies/profiles/_employers.html.erb", :dbclean => :afte
       end
       context "when disabled" do
         before do
-          EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:general_agency].feature).to receive(:is_enabled).and_return(false)
           render template: "broker_agencies/profiles/_employers.html.erb"
         end
         it "should not have general agency" do

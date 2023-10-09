@@ -179,7 +179,7 @@ RSpec.describe ConsumerRolesHelper, :type => :helper do
     end
 
     it "should return next page url if identity verified" do
-      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:financial_assistance].feature).to receive(:is_enabled).and_return(false)
       allow(person.consumer_role).to receive(:identity_verified?).and_return true
       person.primary_family.update_attributes(application_type: 'Paper')
       consumer = person.consumer_role
@@ -189,7 +189,7 @@ RSpec.describe ConsumerRolesHelper, :type => :helper do
     end
 
     it "should return help paying for coverage path if identify is verified and FA feature on even with upload_ridp link" do
-      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:financial_assistance].feature).to receive(:is_enabled).and_return(true)
       allow(person.consumer_role).to receive(:identity_verified?).and_return true
       consumer = person.consumer_role
       consumer.admin_bookmark_url = "/insured/consumer_role/upload_ridp_document"

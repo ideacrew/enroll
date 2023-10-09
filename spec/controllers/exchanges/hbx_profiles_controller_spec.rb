@@ -1008,7 +1008,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context "when GA is disabled in settings" do
       before do
-        EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:general_agency].feature).to receive(:is_enabled).and_return(false)
         Enroll::Application.reload_routes!
       end
       it "should returns http success" do
@@ -1039,7 +1039,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
 
     before do
-      EnrollRegistry[:change_end_date].feature.settings.last.stub(:item).and_return(true)
+      allow(EnrollRegistry[:change_end_date].feature.settings.last).to receive(:item).and_return(true)
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       sign_in(user)
     end

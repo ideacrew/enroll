@@ -259,7 +259,7 @@ describe "#select_coverage event for shop", dbclean: :after_each do
     end
 
     before do
-      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:financial_assistance].feature).to receive(:is_enabled).and_return(false)
       EnrollRegistry[:prior_plan_year_ivl_sep].feature.stub(:is_enabled).and_return(true)
       allow(EnrollRegistry[:prior_plan_year_shop_sep].feature).to receive(:is_enabled).and_return(true)
       allow(EnrollRegistry[:validate_quadrant].feature).to receive(:is_enabled).and_return(true)

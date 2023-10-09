@@ -11,7 +11,7 @@ RSpec.describe "insured/plan_shoppings/_individual_agreement.html.erb" do
 
   context "normal message" do
     before :each do
-      EnrollRegistry[:aca_individual_market].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:aca_individual_market].feature).to receive(:is_enabled).and_return(true)
       assign(:person, person)
       assign(:hbx_enrollment, hbx_enrollment)
       render "insured/plan_shoppings/individual_agreement", locals: { coverage_year: TimeKeeper.date_of_record.year.to_s }
@@ -38,7 +38,7 @@ RSpec.describe "insured/plan_shoppings/_individual_agreement.html.erb" do
 
   context "extended message" do
     before :each do
-      EnrollRegistry[:aca_individual_market].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:aca_individual_market].feature).to receive(:is_enabled).and_return(true)
       assign(:person, person)
       assign(:hbx_enrollment, hbx_enrollment)
       allow(@plan).to receive(:total_aptc_amount).and_return(50)
