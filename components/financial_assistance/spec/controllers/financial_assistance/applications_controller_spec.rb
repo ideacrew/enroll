@@ -819,6 +819,8 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     describe 'Feature flagged endpoints', type: :request do
 
       describe "GET /applications" do
+        let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+        let!(:application) { FactoryBot.create :financial_assistance_application, :with_applicants, family_id: family.id, aasm_state: 'determined' }
         before(:each) do
           sign_in(user)
         end

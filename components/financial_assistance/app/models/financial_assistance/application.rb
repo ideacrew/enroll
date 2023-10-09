@@ -152,22 +152,26 @@ module FinancialAssistance
                                     message: "must fall within range: #{YEARS_TO_RENEW_RANGE}"
                                   }
 
-    index({"_id" => 1})
     index({"is_renewal_authorized" => 1})
     index({"family_id" => 1})
-    index({"years_to_renew" => 1})
     index({"benchmark_product_id" => 1})
     index({"has_eligibility_response" => 1})
-    index({"transfer_requested" => 1})
     index({"applicant_kind" => 1})
+# Below you will see a large number of ignored indexes.
+# This is required as MongoDB can only handle 64 indexes (63 really - _id
+# already takes one) per collection and we are far over the index limit.
+=begin
+    index({"years_to_renew" => 1})
+    index({"transfer_requested" => 1})
     index({"request_kind" => 1})
     index({"motivation_kind" => 1})
     index({"us_state" => 1})
     index({"is_ridp_verified" => 1})
     index({"renewal_base_year" => 1})
     index({"account_transferred" => 1})
-    index({"has_mec_check_response" => 1})
     index({"parent_living_out_of_home_terms" => 1})
+=end
+    index({"has_mec_check_response" => 1})
 
     index({ renewal_draft_blocker_reasons: 1 })
 
@@ -175,7 +179,6 @@ module FinancialAssistance
     index({ aasm_state: 1 })
     index({ created_at: 1 })
     index({ assistance_year: 1 })
-    index({ assistance_year: 1, aasm_state: 1, family_id: 1 })
     index({ "workflow_state_transitions.transition_at" => 1,
             "workflow_state_transitions.to_state" => 1 },
           { name: "workflow_to_state" })
@@ -189,8 +192,10 @@ module FinancialAssistance
     index({"eligibility_determinations.max_aptc" => 1})
     index({"eligibility_determinations.csr_percent_as_integer" => 1})
     index({"eligibility_determinations.source" => 1})
+=begin
     index({"eligibility_determinations.aptc_csr_annual_household_income" => 1})
     index({"eligibility_determinations.csr_annual_income_limit" => 1})
+=end
     index({"eligibility_determinations.effective_starting_on" => 1})
     index({"eligibility_determinations.effective_ending_on" => 1})
     index({"eligibility_determinations.is_eligibility_determined" => 1})
@@ -200,21 +205,23 @@ module FinancialAssistance
     # applicant index
     index({ "applicants._id" => 1 })
     index({"applicants.no_ssn" => 1})
-    index({"applicants.is_tobacco_user" => 1})
     index({"applicants.assisted_income_validation" => 1})
     index({"applicants.assisted_mec_validation" => 1})
     index({"applicants.aasm_state" => 1})
     index({"applicants.is_active" => 1})
+=begin
+    index({"applicants.is_tobacco_user" => 1})
     index({"applicants.has_fixed_address" => 1})
     index({"applicants.tax_filer_kind" => 1})
-
     index({"applicants.magi_as_percentage_of_fpl" => 1})
     index({"applicants.age_left_foster_care" => 1})
     index({"applicants.children_expected_count" => 1})
+=end
     index({"applicants.csr_percent_as_integer" => 1})
     index({"applicants.csr_eligibility_kind" => 1})
 
     index({"applicants.is_primary_applicant" => 1})
+=begin
     index({"applicants.no_dc_address" => 1})
     index({"applicants.is_homeless" => 1})
     index({"applicants.is_temporarily_out_of_state" => 1})
@@ -277,6 +284,7 @@ module FinancialAssistance
     index({"applicants.is_vets_spouse_or_child" => 1})
     index({"applicants.need_help_paying_bills" => 1})
     index({"applicants.eligibility_determination_id" => 1})
+=end
 
     # verification_types index
     index({"applicants.verification_types._id" => 1})
@@ -288,6 +296,7 @@ module FinancialAssistance
     index({"applicants.verification_types.due_date" => 1})
     index({"applicants.verification_types.due_date_type" => 1})
 
+=begin
     index({"applicants.addresses._id" => 1})
     index({"applicants.addresses.kind" => 1})
 
@@ -297,11 +306,12 @@ module FinancialAssistance
 
     index({"applicants.emails._id" => 1})
     index({"applicants.emails.kind" => 1})
-
+=end
     # incomes index
     index({"applicants.incomes._id" => 1})
-    index({"applicants.incomes.title" => 1})
     index({"applicants.incomes.kind" => 1})
+=begin
+    index({"applicants.incomes.title" => 1})
     index({"applicants.incomes.wage_type" => 1})
     index({"applicants.incomes.hours_per_week" => 1})
     index({"applicants.incomes.amount" => 1})
@@ -309,52 +319,56 @@ module FinancialAssistance
     index({"applicants.incomes.frequency_kind" => 1})
     index({"applicants.incomes.start_on" => 1})
     index({"applicants.incomes.end_on" => 1})
+    index({"applicants.incomes.submitted_at" => 1})
     index({"applicants.incomes.employer_name" => 1})
     index({"applicants.incomes.employer_id" => 1})
-    index({"applicants.incomes.submitted_at" => 1})
-
     index({"applicants.incomes.employer_address._id" => 1})
     index({"applicants.incomes.employer_address.kind" => 1})
 
     index({"applicants.incomes.employer_phone._id" => 1})
     index({"applicants.incomes.employer_phone.kind" => 1})
     index({"applicants.incomes.employer_phone.primary" => 1})
+=end
 
     # deduction index
     index({"applicants.deductions._id" => 1})
-    index({"applicants.deductions.title" => 1})
     index({"applicants.deductions.kind" => 1})
+=begin
+    index({"applicants.deductions.title" => 1})
     index({"applicants.deductions.amount" => 1})
     index({"applicants.deductions.frequency_kind" => 1})
     index({"applicants.deductions.start_on" => 1})
     index({"applicants.deductions.end_on" => 1})
     index({"applicants.deductions.submitted_at" => 1})
-
+=end
     # benefit index
     index({"applicants.benefits._id" => 1})
-    index({"applicants.benefits.title" => 1})
     index({"applicants.benefits.kind" => 1})
     index({"applicants.benefits.esi_covered" => 1})
     index({"applicants.benefits.insurance_kind" => 1})
-    index({"applicants.benefits.hra_type" => 1})
     index({"applicants.benefits.is_employer_sponsored" => 1})
+=begin
+    index({"applicants.benefits.title" => 1})
     index({"applicants.benefits.is_esi_waiting_period" => 1})
     index({"applicants.benefits.is_esi_mec_met" => 1})
+    index({"applicants.benefits.hra_type" => 1})
     index({"applicants.benefits.employee_cost" => 1})
     index({"applicants.benefits.employee_cost_frequency" => 1})
+    index({"applicants.benefits.employer_name" => 1})
+=end
     index({"applicants.benefits.start_on" => 1})
     index({"applicants.benefits.end_on" => 1})
     index({"applicants.benefits.submitted_at" => 1})
-    index({"applicants.benefits.employer_name" => 1})
     index({"applicants.benefits.employer_id" => 1})
 
+=begin
     index({"applicants.benefits.employer_address._id" => 1})
     index({"applicants.benefits.employer_address.kind" => 1})
 
     index({"applicants.benefits.employer_phone._id" => 1})
     index({"applicants.benefits.employer_phone.kind" => 1})
     index({"applicants.benefits.employer_phone.primary" => 1})
-
+=end
     index({"applicants.evidences.eligibility_status" => 1})
 
     # Applicant evidences
@@ -1404,6 +1418,9 @@ module FinancialAssistance
     def is_application_valid?
       required_attributes_valid? && relationships_complete? && applicants_have_valid_addresses?
     end
+
+    # Used for performance improvement cacheing.
+    attr_writer :family
 
     # rubocop:disable Lint/EmptyRescueClause
     def family
