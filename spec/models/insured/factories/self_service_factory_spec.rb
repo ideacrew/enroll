@@ -202,7 +202,7 @@ module Insured
       let!(:tax_household_member2) {tax_household10.tax_household_members.create(applicant_id: family.family_members[1].id, is_ia_eligible: true)}
 
       before :each do
-        EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:apply_aggregate_to_enrollment].feature).to receive(:is_enabled).and_return(true)
         @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
         @product.update_attributes(ehb: 0.9966)
         @product.save!

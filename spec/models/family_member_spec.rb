@@ -70,7 +70,7 @@ describe FamilyMember, dbclean: :after_each do
 
   let(:p0) {Person.create!(first_name: "Dan", last_name: "Aurbach")}
   let(:p1) {Person.create!(first_name: "Patrick", last_name: "Carney")}
-  let(:ag) {
+  let(:ag) do
     fam = Family.new
     fam.family_members.build(
       :person => p0,
@@ -78,7 +78,7 @@ describe FamilyMember, dbclean: :after_each do
     )
     fam.save!
     fam
-  }
+  end
   let(:family_member_params) {
     { person: p1,
       is_primary_applicant: true,
