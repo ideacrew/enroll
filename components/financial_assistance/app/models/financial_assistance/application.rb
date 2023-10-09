@@ -119,6 +119,11 @@ module FinancialAssistance
 
     field :has_mec_check_response, type: Boolean, default: false
 
+    # A field to store reasons why an application cannot be put into the "renewal_draft" state without a user input.
+    # This is only applicable in application renewals context.
+    # The value of this field is only valid if the application is either in 'applicants_update_required' or 'income_verification_extension_required' state.
+    field :renewal_draft_blocker_reasons, type: Array
+
     embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination', cascade_callbacks: true, validate: true
     embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship', cascade_callbacks: true, validate: true
     embeds_many :applicants, inverse_of: :application, class_name: '::FinancialAssistance::Applicant', cascade_callbacks: true, validate: true
@@ -163,6 +168,8 @@ module FinancialAssistance
     index({"account_transferred" => 1})
     index({"has_mec_check_response" => 1})
     index({"parent_living_out_of_home_terms" => 1})
+
+    index({ renewal_draft_blocker_reasons: 1 })
 
     index({ hbx_id: 1 }, { unique: true })
     index({ aasm_state: 1 })
@@ -381,6 +388,8 @@ module FinancialAssistance
     scope :renewal_eligible, -> { where(:aasm_state.in => RENEWAL_ELIGIBLE_STATES) }
 
     scope :has_outstanding_verifications, -> { where(:"applicants.evidences.eligibility_status".in => ["outstanding", "in_review"]) }
+
+    scope :with_renewal_blocker_reasons, -> { where(:renewal_draft_blocker_reasons.ne => nil, :aasm_state.in => ['applicants_update_required', 'income_verification_extension_required']) }
 
     alias is_joint_tax_filing? is_joint_tax_filing
     alias is_renewal_authorized? is_renewal_authorized
