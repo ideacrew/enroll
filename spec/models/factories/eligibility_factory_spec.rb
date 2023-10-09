@@ -15,7 +15,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
   end
 
   before do
-    EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
+    allow(EnrollRegistry[:calculate_monthly_aggregate].feature).to receive(:is_enabled).and_return(false)
     EnrollRegistry[:calculate_monthly_aggregate].feature.settings.last.stub(:item).and_return(false)
   end
 
@@ -606,7 +606,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
 
     describe 'cases for single tax household scenarios with calculate_monthly_aggregate feature enabled' do
       before do
-        EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:calculate_monthly_aggregate].feature).to receive(:is_enabled).and_return(false)
         allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, 8, 1))
         @product = FactoryBot.create(:benefit_markets_products_health_products_health_product, metal_level_kind: :silver, benefit_market_kind: :aca_individual)
         reset_premium_tuples

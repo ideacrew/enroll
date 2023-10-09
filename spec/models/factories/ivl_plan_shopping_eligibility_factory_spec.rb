@@ -18,7 +18,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
   end
 
   before :each do
-    EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
+    allow(EnrollRegistry[:calculate_monthly_aggregate].feature).to receive(:is_enabled).and_return(false)
   end
 
   unless Settings.site.faa_enabled

@@ -2078,7 +2078,7 @@ describe 'vlp documents' do
     context 'when admin verifies and consumer has ridp documents' do
 
       before do
-        EnrollRegistry[:show_people_with_no_evidence].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:show_people_with_no_evidence].feature).to receive(:is_enabled).and_return(false)
       end
 
       it "should delete the ridp documents" do
@@ -2098,7 +2098,7 @@ describe 'vlp documents' do
     context 'when admin rejects and consumer has ridp documents' do
 
       before do
-        EnrollRegistry[:show_people_with_no_evidence].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:show_people_with_no_evidence].feature).to receive(:is_enabled).and_return(false)
       end
 
       it "should delete the ridp documents" do

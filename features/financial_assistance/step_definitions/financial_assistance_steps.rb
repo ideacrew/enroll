@@ -55,13 +55,13 @@ Then(/^they should see a new finanical assistance application$/) do
 end
 
 Given(/IAP Assistance Year Display feature is enabled/) do
-  EnrollRegistry[:iap_assistance_year_display].feature.stub(:is_enabled).and_return(true)
-  FinancialAssistanceRegistry[:iap_assistance_year_display].feature.stub(:is_enabled).and_return(true)
+  allow(EnrollRegistry[:iap_assistance_year_display].feature).to receive(:is_enabled).and_return(true)
+  allow(FinancialAssistanceRegistry[:iap_assistance_year_display].feature).to receive(:is_enabled).and_return(true)
 end
 
 Given(/IAP Assistance Year Display feature is disabled/) do
-  EnrollRegistry[:iap_assistance_year_display].feature.stub(:is_enabled).and_return(false)
-  FinancialAssistanceRegistry[:iap_assistance_year_display].feature.stub(:is_enabled).and_return(false)
+  allow(EnrollRegistry[:iap_assistance_year_display].feature).to receive(:is_enabled).and_return(false)
+  allow(FinancialAssistanceRegistry[:iap_assistance_year_display].feature).to receive(:is_enabled).and_return(false)
 end
 
 Then(/They should see the application assistance year above Info Needed/) do
@@ -451,8 +451,8 @@ Given(/^the kaiser paynow feature configuration is disabled$/) do
 end
 
 When(/kaiser pay now feature is enabled/) do
-  EnrollRegistry[:kaiser_permanente_pay_now].feature.stub(:is_enabled).and_return(true)
-  EnrollRegistry[:kaiser_permanente_pay_now].setting(:plan_shopping).stub(:item).and_return(true)
+  allow(EnrollRegistry[:kaiser_permanente_pay_now].feature).to receive(:is_enabled).and_return(true)
+  allow(EnrollRegistry[:kaiser_permanente_pay_now].setting(:plan_shopping)).to receive(:item).and_return(true)
 end
 
 Given(/^the enrollment tile feature is enabled$/) do
@@ -460,11 +460,11 @@ Given(/^the enrollment tile feature is enabled$/) do
 end
 
 Given(/^the generic_redirect setting is enabled$/) do
-  EnrollRegistry[:generic_redirect].feature.stub(:is_enabled).and_return(true)
+  allow(EnrollRegistry[:generic_redirect].feature).to receive(:is_enabled).and_return(true)
 end
 
 Given(/^the generic_redirect setting is disabled$/) do
-  EnrollRegistry[:generic_redirect].feature.stub(:is_enabled).and_return(false)
+  allow(EnrollRegistry[:generic_redirect].feature).to receive(:is_enabled).and_return(false)
 end
 
 Given(/^the FAA feature configuration is enabled$/) do
@@ -485,7 +485,7 @@ Given(/an applicant has outstanding local mec evidence/) do
 end
 
 Given(/the mec check feature is enabled/) do
-  EnrollRegistry[:mec_check].feature.stub(:is_enabled).and_return(true)
+  allow(EnrollRegistry[:mec_check].feature).to receive(:is_enabled).and_return(true)
 end
 
 Given(/the mec check feature is disabled/) do
