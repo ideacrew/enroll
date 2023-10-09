@@ -540,7 +540,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
       context 'shop enabled?' do
         before do
-          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
           sign_in(current_user)
           get :sorting_sep_types
         end

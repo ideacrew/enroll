@@ -61,7 +61,7 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
 
 
     before :each do
-      EnrollRegistry[:drop_enrollment_members].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:drop_enrollment_members].feature).to receive(:is_enabled).and_return(true)
     end
 
     context 'invalid params', dbclean: :around_each do
@@ -468,8 +468,8 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
 
   describe 'when mthh is enabled' do
     before do
-      EnrollRegistry[:drop_enrollment_members].feature.stub(:is_enabled).and_return(true)
-      EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:drop_enrollment_members].feature).to receive(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
 
       allow(::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts).to receive(:new).and_return(
         double('IdentifySlcspWithPediatricDentalCosts',

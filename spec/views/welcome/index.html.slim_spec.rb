@@ -20,7 +20,7 @@ RSpec.describe "welcome/index.html.slim", :type => :view, dbclean: :after_each  
   describe "not signed in user" do
     xcontext "with general agency enabled" do
       before :each do
-        EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:general_agency].feature).to receive(:is_enabled).and_return(true)
         Enroll::Application.reload_routes!
         render
       end

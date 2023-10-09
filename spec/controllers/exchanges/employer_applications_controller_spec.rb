@@ -134,7 +134,7 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
 
     context 'Success' do
       before :each do
-        EnrollRegistry[:benefit_application_reinstate].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:benefit_application_reinstate].feature).to receive(:is_enabled).and_return(true)
         allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', can_modify_plan_year: true))
         sign_in(user)
         initial_application.update_attributes!(:aasm_state => :retroactive_canceled)
@@ -177,7 +177,7 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
 
     context 'Failure Application Not Valid For reinstate' do
       before :each do
-        EnrollRegistry[:benefit_application_reinstate].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:benefit_application_reinstate].feature).to receive(:is_enabled).and_return(true)
         allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', can_modify_plan_year: true))
         sign_in(user)
         initial_application.update_attributes!(:aasm_state => :enrollment_eligible)

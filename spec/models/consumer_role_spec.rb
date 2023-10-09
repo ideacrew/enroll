@@ -356,7 +356,7 @@ context 'Verification process and notices' do
 
   describe 'Native American verification' do
     before do
-      EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(false)
     end
     shared_examples_for 'ensures native american field value' do |action, state, consumer_kind, tribe, tribe_state|
       it "#{action} #{state} for #{consumer_kind}" do
@@ -372,8 +372,8 @@ context 'Verification process and notices' do
       let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, :with_enrollment_members, family: family, enrollment_members: family.family_members)}
 
       before do
-        EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(true)
-        EnrollRegistry[:indian_alaskan_tribe_codes].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:indian_alaskan_tribe_codes].feature).to receive(:is_enabled).and_return(true)
         allow(EnrollRegistry[:enroll_app].setting(:state_abbreviation)).to receive(:item).and_return('ME')
         person.update_attributes!(tribal_state: "ME", tribe_codes: ["", "PE"])
         v_type = VerificationType.new(type_name: "American Indian Status", validation_status: 'outstanding', inactive: false)
@@ -404,8 +404,8 @@ context 'Verification process and notices' do
   describe "#check_tribal_name" do
 
     before do
-      EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(true)
-      EnrollRegistry[:indian_alaskan_tribe_codes].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:indian_alaskan_tribe_codes].feature).to receive(:is_enabled).and_return(true)
       allow(EnrollRegistry[:enroll_app].setting(:state_abbreviation)).to receive(:item).and_return('ME')
 
     end
@@ -549,7 +549,7 @@ context 'Verification process and notices' do
     context 'success payload' do
       shared_examples_for 'IVL state machine transitions and verification_types validation_status' do |ssn, citizen, from_state, to_state, event, type_name, verification_type_validation_status|
         before do
-          EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(false)
           person.ssn = ssn
           consumer.citizen_status = citizen
         end
@@ -589,7 +589,7 @@ context 'Verification process and notices' do
           allow(Operations::Fdsh::Ssa::H3::RequestSsaVerification).to receive(:new).and_return(ssa_validator)
           allow(vlp_validator).to receive(:call).and_return(Dry::Monads::Failure('Invalid payload'))
           allow(Operations::Fdsh::Vlp::H92::RequestInitialVerification).to receive(:new).and_return(vlp_validator)
-          EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(false)
           person.ssn = ssn
           consumer.citizen_status = citizen
         end
@@ -618,7 +618,7 @@ context 'Verification process and notices' do
     all_states = [:unverified, :ssa_pending, :dhs_pending, :verification_outstanding, :fully_verified, :sci_verified, :verification_period_ended]
     shared_examples_for 'IVL state machine transitions and workflow' do |ssn, citizen, residency, residency_status, from_state, to_state, event, tribal_id = ''|
       before do
-        EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(false)
         person.ssn = ssn
         consumer.citizen_status = citizen
         consumer.is_state_resident = residency
@@ -987,7 +987,7 @@ context 'Verification process and notices' do
 
     shared_examples_for "collecting verification types for person" do |v_types, types_count, ssn, citizen, native, age|
       before do
-        EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(false)
         person.ssn = nil unless ssn
         person.us_citizen = citizen
         person.dob = TimeKeeper.date_of_record - age.to_i.years
@@ -1039,7 +1039,7 @@ context 'Verification process and notices' do
     let(:family) { double("Family", :person_has_an_active_enrollment? => true)}
 
     before do
-      EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(false)
     end
     it 'should fail indian tribe status if person updates native status field' do
       person.update_attributes(tribal_id: "1234567")
@@ -1168,7 +1168,7 @@ end
 
 describe "Indian tribe member" do
   before do
-    EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+    allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(false)
   end
   let(:person) { FactoryBot.create(:person, :with_consumer_role) }
   let(:consumer_role) { person.consumer_role }

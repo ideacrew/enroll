@@ -346,7 +346,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
     before do
       allow(TimeKeeper).to receive(:date_of_record).and_return(start_of_year)
-      EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
 
       allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
         double(
@@ -1022,7 +1022,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
           allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
           allow(hbx_enrollment).to receive(:is_coverall?).and_return(false)
           allow(hbx_enrollment).to receive(:decorated_elected_plans).and_return([])
-          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(false)
         end
 
         context "with tax_household" do

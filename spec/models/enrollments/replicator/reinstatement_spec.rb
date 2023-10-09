@@ -392,7 +392,7 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
 
       context "when temporary_configuration_enable_multi_tax_household_feature is disabled" do
         before do
-          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(false)
         end
 
         it "should return csr_87" do
@@ -403,7 +403,7 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
 
       context "when temporary_configuration_enable_multi_tax_household_feature is enabled" do
         before do
-          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
         end
 
         it 'should return csr_0 for this shopping group' do

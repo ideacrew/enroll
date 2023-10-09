@@ -25,7 +25,7 @@ describe ImportMissingPersonContactInfo, dbclean: :after_each do
     }
   }
   before do
-    EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+    allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
   end
 
   context "update person contact information from census employee" do

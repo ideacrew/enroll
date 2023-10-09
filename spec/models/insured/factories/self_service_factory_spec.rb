@@ -8,7 +8,7 @@ module Insured
     before :each do
       TimeKeeper.set_date_of_record_unprotected!(Date.today)
       DatabaseCleaner.clean
-      EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:apply_aggregate_to_enrollment].feature).to receive(:is_enabled).and_return(false)
     end
 
     let(:site_key) { EnrollRegistry[:enroll_app].setting(:site_key).item.upcase }
@@ -135,7 +135,7 @@ module Insured
 
 
       before :each do
-        EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:apply_aggregate_to_enrollment].feature).to receive(:is_enabled).and_return(false)
         @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
         @product.update_attributes(ehb: 0.9844, is_hc4cc_plan: true)
         premium_table = @product.premium_tables.first
@@ -306,7 +306,7 @@ module Insured
 
       describe 'when multi tax household enabled' do
         before do
-          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
 
           allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
             double(
@@ -531,7 +531,7 @@ module Insured
         let(:max_aptc) { 1700.0 }
 
         before do
-          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
 
           allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
             double(

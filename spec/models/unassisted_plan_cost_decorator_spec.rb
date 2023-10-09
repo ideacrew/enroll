@@ -227,7 +227,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
         end
 
         it "if multi taxhousehold feature is enabled" do
-          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
           total_premium = plan_cost_decorator.total_premium
           total_aptc_amount = plan_cost_decorator.total_aptc_amount
           expect(plan_cost_decorator.total_employee_cost).to eq(total_premium - total_aptc_amount)
@@ -469,7 +469,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
 
       context 'when mthh enabled' do
         before do
-          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
         end
 
         context 'when grants does not exist' do

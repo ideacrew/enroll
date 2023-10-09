@@ -19,8 +19,8 @@ describe "#cancel_coverage event for shop", dbclean: :after_each do
     include_context "setup expired, and active benefit applications"
 
     before do
-      EnrollRegistry[:prior_plan_year_shop_sep].feature.stub(:is_enabled).and_return(true)
-      EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:prior_plan_year_shop_sep].feature).to receive(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:validate_quadrant].feature).to receive(:is_enabled).and_return(true)
     end
 
     let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year.prev_year }
@@ -50,8 +50,8 @@ describe "#cancel_coverage event for shop", dbclean: :after_each do
     include_context "setup terminated and active benefit applications"
 
     before do
-      EnrollRegistry[:prior_plan_year_shop_sep].feature.stub(:is_enabled).and_return(true)
-      EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:prior_plan_year_shop_sep].feature).to receive(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:validate_quadrant].feature).to receive(:is_enabled).and_return(true)
     end
 
     let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year.prev_year }
@@ -261,8 +261,8 @@ describe "#select_coverage event for shop", dbclean: :after_each do
     before do
       EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
       EnrollRegistry[:prior_plan_year_ivl_sep].feature.stub(:is_enabled).and_return(true)
-      EnrollRegistry[:prior_plan_year_shop_sep].feature.stub(:is_enabled).and_return(true)
-      EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:prior_plan_year_shop_sep].feature).to receive(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:validate_quadrant].feature).to receive(:is_enabled).and_return(true)
       census_employee.benefit_group_assignments << terminated_bga
       census_employee.benefit_group_assignments << active_bga
       census_employee.save
@@ -626,7 +626,7 @@ describe '.update_reinstate_coverage', dbclean: :around_each do
       period = initial_application.effective_period.min..TimeKeeper.date_of_record.end_of_month
       initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
       initial_application.schedule_enrollment_termination!
-      EnrollRegistry[:benefit_application_reinstate].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:benefit_application_reinstate].feature).to receive(:is_enabled).and_return(true)
       EnrollRegistry[:benefit_application_reinstate]{ {params: {benefit_application: initial_application, options: {transmit_to_carrier: true} } } }
       family.hbx_enrollments.map(&:reload)
       census_employee.reload

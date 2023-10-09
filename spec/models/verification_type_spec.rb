@@ -14,7 +14,7 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
 
   describe "build certain type" do
     before do
-      EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(false)
     end
     context "SSN" do
       it "doesn't have ssn type" do

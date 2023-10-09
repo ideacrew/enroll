@@ -95,7 +95,7 @@ describe UpdateBenchmarkForContinuousCoverageAndChildMemberEnrs, dbclean: :after
 
     before do
       allow(TimeKeeper).to receive(:date_of_record).and_return(start_of_year)
-      EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
       allow(::Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCosts).to receive(:new).and_return(
         double('IdentifySlcspWithPediatricDentalCosts',
                call: double(success: slcsp_info, success?: true, failure?: false))

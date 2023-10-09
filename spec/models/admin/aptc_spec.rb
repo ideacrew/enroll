@@ -4,7 +4,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
   RSpec.describe Admin::Aptc, :type => :model, dbclean: :after_each do
     before :each do
       EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
-      EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:apply_aggregate_to_enrollment].feature).to receive(:is_enabled).and_return(false)
     end
     let(:months_array) {Date::ABBR_MONTHNAMES.compact}
 
