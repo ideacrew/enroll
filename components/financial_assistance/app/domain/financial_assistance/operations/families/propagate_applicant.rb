@@ -8,12 +8,13 @@ module FinancialAssistance
     module Families
       # Create of update a family member
       class PropagateApplicant
-        send(:include, Dry::Monads[:result, :do])
+        include Dry::Monads[:result, :do]
 
-        def call(params:)
-          values = yield validate(params[:applicant_params])
-          applicant_params = yield build(values)
-          result = yield propagate_applicant(applicant_params.to_h.merge(family_id: params[:family_id]))
+        def call(params)
+          contract = yield validate(params[:applicant_params])
+          entity = yield build(contract)
+          applicant_params = yield sanitize_params(entity.to_h, params)
+          result = yield propagate_applicant(applicant_params)
 
           Success(result)
         end
@@ -30,14 +31,20 @@ module FinancialAssistance
           end
         end
 
-        def build(values)
-          result = FinancialAssistance::Entities::Applicant.new(values)
+        def sanitize_params(applicant_params, params)
+          applicant_params.merge!({is_primary_applicant: params[:is_primary_applicant], family_id: params[:family_id]})
+          Success(applicant_params)
+        end
+
+        def build(contract)
+          result = FinancialAssistance::Entities::Applicant.new(contract)
 
           Success(result)
         end
 
         def propagate_applicant(applicant_params)
           begin
+            applicant_params.merge!(skip_consumer_role_callbacks: true)
             result = ::Operations::Families::CreateOrUpdateMember.new.call(applicant_params)
             return result if result.success?
           rescue StandardError => e

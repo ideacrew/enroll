@@ -6,9 +6,15 @@ require 'dry/monads/do'
 
 module Operations
   module People
+    # Class for initializing a new VLP document
     class InitializeVlpDocument
       include Dry::Monads[:result, :do]
 
+      # Initializes a new VLP document.
+      #
+      # @param params [Hash] The parameters for initializing the VLP document.
+      # @option params [String] :subject The subject of the VLP document required.
+      # @return [Dry::Monads::Result] The result of the operation.
       def call(params)
         contract = yield validate(params)
         entity = yield create_entity(contract)
@@ -25,7 +31,10 @@ module Operations
       end
 
       def validate(params)
-        contract = Validators::Families::VlpDocumentContract.new.call(sanitize_params(params))
+        hash = sanitize_params(params)
+        return Success({}) if hash[:subject].blank?
+
+        contract = Validators::Families::VlpDocumentContract.new.call(hash)
 
         if contract.success?
           Success(contract)

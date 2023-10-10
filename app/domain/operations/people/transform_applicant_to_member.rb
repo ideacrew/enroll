@@ -5,15 +5,21 @@ require 'dry/monads/do'
 
 module Operations
   module People
+    # Class for transforming applicant parameters to member parameters
     class TransformApplicantToMember
       include Dry::Monads[:result, :do]
 
+      # Transforms the applicant parameters to member parameters.
+      #
+      # @param params [Hash] The parameters for transforming the applicant to a member.
+      # @option params [Boolean] :skip_consumer_role_callbacks Additional param whether to skip consumer role callbacks.
+      # @return [Dry::Monads::Result] The result of the operation is member hash.
       def call(params)
         applicant_params = yield validate(params)
         person_hash = yield initialize_person(applicant_params)
         consumer_role_hash = yield initialize_consumer_role(applicant_params)
         vlp_document_hash = yield initialize_vlp_document(applicant_params)
-        member_hash = yield build_payload(person_hash.to_h, consumer_role_hash.to_h, vlp_document_hash.to_h)
+        member_hash = yield build_payload(person_hash.to_h, consumer_role_hash.to_h, vlp_document_hash.to_h, applicant_params)
 
         Success(member_hash)
       end
@@ -41,11 +47,11 @@ module Operations
         Operations::People::InitializeVlpDocument.new.call(params)
       end
 
-      def build_payload(person_hash, consumer_role_hash, vlp_document_hash)
-        person_hash[:addresses_attributes] = person_hash.delete :addresses
-        person_hash[:phones_attributes] = person_hash.delete :phones
-        person_hash[:emails_attributes] = person_hash.delete :emails
-        person_hash.merge!(consumer_role: { **consumer_role_hash, vlp_documents_attributes: [vlp_document_hash] })
+      def build_payload(person_hash, consumer_role_hash, vlp_document_hash, params)
+        person_hash[:person_addresses] = person_hash.delete :addresses
+        person_hash[:person_phones] = person_hash.delete :phones
+        person_hash[:person_emails] = person_hash.delete :emails
+        person_hash[:consumer_role] = { skip_consumer_role_callbacks: params[:skip_consumer_role_callbacks], **consumer_role_hash, vlp_documents_attributes: [vlp_document_hash] }
 
         Success(person_hash)
       end

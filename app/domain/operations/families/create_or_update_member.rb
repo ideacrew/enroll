@@ -7,11 +7,7 @@ module Operations
   module Families
     # Class for creating and updating family members in cooperation with Financial Assistance engine
     class CreateOrUpdateMember
-      send(:include, Dry::Monads[:result, :do])
-
-      # @param [ Bson::ID ] application_id Application ID
-      # @param [ Bson::ID ] family_id Family ID
-      # @return [ Family ] family Family
+      include Dry::Monads[:result, :do]
 
       def call(params)
         family_id, applicant_params = yield validate(params)
