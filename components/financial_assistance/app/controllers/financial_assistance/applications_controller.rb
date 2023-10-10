@@ -7,7 +7,7 @@ module FinancialAssistance
     before_action :set_current_person
     before_action :find_application, :except => [:index, :index_with_filter, :new, :copy, :uqhp_flow, :review, :raw_application, :checklist_pdf]
 
-    around_action :cache_current_hbx, :only => [:index, :index_with_filter]
+    around_action :cache_current_hbx, :only => [:index_with_filter]
 
     include ActionView::Helpers::SanitizeHelper
     include ::UIHelpers::WorkflowController
