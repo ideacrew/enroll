@@ -175,7 +175,7 @@ module FinancialAssistance
 
     index({ renewal_draft_blocker_reasons: 1 })
 
-    index({ hbx_id: 1 }, { unique: true })
+    index({ hbx_id: 1 })
     index({ aasm_state: 1 })
     index({ created_at: 1 })
     index({ assistance_year: 1 })
