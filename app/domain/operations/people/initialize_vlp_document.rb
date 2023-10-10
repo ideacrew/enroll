@@ -9,11 +9,11 @@ module Operations
     class InitializeVlpDocument
       include Dry::Monads[:result, :do]
 
-      def call(applicant_params)
-        contract = yield validate(applicant_params)
-        result = yield create_entity(contract)
+      def call(params)
+        contract = yield validate(params)
+        entity = yield create_entity(contract)
 
-        Success(result)
+        Success(entity)
       end
 
       private

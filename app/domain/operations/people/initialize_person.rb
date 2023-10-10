@@ -8,17 +8,17 @@ module Operations
     class InitializePerson
       include Dry::Monads[:result, :do]
 
-      def call(applicant_params)
-        contract = yield validate(applicant_params)
-        result = yield create_entity(contract)
+      def call(params)
+        contract = yield validate(params)
+        entity = yield create_entity(contract)
 
-        Success(result)
+        Success(entity)
       end
 
       private
 
       def sanitize_params(params)
-        params[:hbx_id] = params.delete :person_hbx_id
+        params[:hbx_id] = params.delete :person_hbx_id if params[:person_hbx_id]
         params
       end
 
