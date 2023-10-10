@@ -304,7 +304,7 @@ RSpec.describe TaxHousehold, type: :model do
       before do
         hbx_enrollment_aptc.update_attributes!(effective_on: TimeKeeper.date_of_record.beginning_of_year, applied_aptc_amount: 150.00)
         allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, 8, 1))
-        allow(EnrollRegistry[:calculate_monthly_aggregate].feature).to receive(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:calculate_monthly_aggregate].feature).to receive(:is_enabled).and_return(true)
         @result = tax_household.total_aptc_available_amount_for_enrollment(hbx_enrollment_aptc, TimeKeeper.date_of_record)
       end
 
