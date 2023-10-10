@@ -32,6 +32,6 @@ CSV.open(filename, "w") do |csv|
   "Total #{year} enrollments with missing renewal: #{enrollments_with_missing_renewal.count}"
 
   enrollments_with_missing_renewal.each do |enrollment|
-    csv << [enrollment.primary_hbx_enrollment_member.hbx_id, enrollment.hbx_id, enrollment.successor_creation_failure_reasons]
+    csv << [enrollment&.primary_hbx_enrollment_member&.hbx_id, enrollment&.hbx_id, enrollment&.successor_creation_failure_reasons]
   end
 end
