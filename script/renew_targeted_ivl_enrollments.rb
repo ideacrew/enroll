@@ -7,9 +7,9 @@ unless ARGV[0].present?
   exit
 end
 require 'csv'
-year = ARGV[0]
-read_filename = "#{Rails.root}/pids/#{year.to_i + 1}_ivl_enrollments_eligible_renewal_failures.csv"
-write_filename = "#{Rails.root}/pids/#{year.to_i + 1}_ivl_enrollments_retriggered_renewals.csv"
+year = ARGV[0].to_i
+read_filename = "#{Rails.root}/pids/#{year + 1}_ivl_enrollments_eligible_renewal_failures.csv"
+write_filename = "#{Rails.root}/pids/#{year + 1}_ivl_enrollments_retriggered_renewals.csv"
 
 current_bs = HbxProfile.current_hbx.benefit_sponsorship
 renewal_bcp = current_bs.renewal_benefit_coverage_period
