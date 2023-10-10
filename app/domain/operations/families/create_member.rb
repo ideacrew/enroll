@@ -38,7 +38,7 @@ module Operations
         result = Operations::People::TransformApplicantToMember.new.call(applicant_params)
         return result unless result.success?
 
-        Success(result.success["consumer_role"].merge!(:is_applicant => false))
+        Success(result.success)
       end
 
       def build_member(member_hash)

@@ -8,8 +8,8 @@ module Operations
     class InitializeConsumerRole
       include Dry::Monads[:result, :do]
 
-      def call(applicant_params)
-        contract = yield validate(applicant_params)
+      def call(params)
+        contract = yield validate(params)
         result = yield create_entity(contract)
 
         Success(result)
@@ -17,8 +17,13 @@ module Operations
 
       private
 
+      def sanitize_params(params)
+        params[:is_applicant] = params.delete :is_primary_applicant if params[:is_primary_applicant]
+        params
+      end
+
       def validate(params)
-        contract = Validators::Families::ConsumerRoleContract.new.call(params)
+        contract = Validators::Families::ConsumerRoleContract.new.call(sanitize_params(params))
 
         if contract.success?
           Success(contract)
