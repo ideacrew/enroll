@@ -1608,7 +1608,11 @@ module FinancialAssistance
       return unless application.draft?
       if is_active && !callback_update
         create_or_update_member_params = { applicant_params: self.attributes_for_export, family_id: application.family_id }
-        create_or_update_result = ::FinancialAssistance::Operations::Families::CreateOrUpdateMember.new.call(params: create_or_update_member_params)
+        create_or_update_result = if FinancialAssistanceRegistry[:propagate_applicant].enabled?
+                                    ::FinancialAssistance::Operations::Families::PropagateApplicant.new.call(params: create_or_update_member_params)
+                                  else
+                                    ::FinancialAssistance::Operations::Families::CreateOrUpdateMember.new.call(params: create_or_update_member_params)
+                                  end
         if create_or_update_result.success?
           response_family_member_id = create_or_update_result.success[:family_member_id]
           update_attributes!(family_member_id: response_family_member_id) if family_member_id.nil?

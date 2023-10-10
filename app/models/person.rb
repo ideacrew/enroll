@@ -1311,7 +1311,26 @@ class Person
     end
   end
 
+  def addresses_attributes=(array_attributes)
+    assign(array_attributes, :addresses)
+  end
+
+  def emails_attributes=(array_attributes)
+    assign(array_attributes, :emails)
+  end
+
+  def phones_attributes=(array_attributes)
+    assign(array_attributes, :phones)
+  end
+
   private
+
+  def assign(collection, association)
+    collection.each do |attributes|
+      record = send(association).find_or_initialize_by(kind: attributes[:kind])
+      record.assign_attributes(attributes)
+    end
+  end
 
   def is_only_one_individual_role_active?
     if self.is_consumer_role_active? && self.is_resident_role_active?

@@ -18,7 +18,6 @@ module Operations
       private
 
       def validate(params)
-        params.merge!(:is_applicant => false)
         contract = Validators::Families::ConsumerRoleContract.new.call(params)
 
         if contract.success?

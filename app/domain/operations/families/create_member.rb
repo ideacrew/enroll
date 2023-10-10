@@ -4,22 +4,22 @@ require 'dry/monads'
 require 'dry/monads/do'
 
 module Operations
-  module People
-    class BuildMember
-      include Dry::Monads[:result, :do]
+  module Families
+    # Class for creating and updating family members in cooperation with Financial Assistance engine
+    class CreateMember
+      send(:include, Dry::Monads[:result, :do])
 
       def call(params)
         applicant_params, family_id = yield validate(params)
-        family = yield find_family(family_id)
-        person_hash = yield initialize_person(applicant_params)
-        consumer_role_hash = yield initialize_consumer_role(applicant_params)
-        vlp_document_hash = yield initialize_vlp_document(applicant_params)
-        member_hash = yield build_payload(person_hash.to_h, consumer_role_hash.to_h, vlp_document_hash.to_h)
+        member_hash = yield transform_applicant_to_member(applicant_params)
         person = yield build_member(member_hash)
+        family = yield find_family(family_id)
         yield build_relationship(person, family, applicant_params[:relationship])
         yield build_family_member(person, family)
+        yield persist(person, family)
 
-        Success([person, family])
+        #send family member id
+        Success("Family member created successfully")
       end
 
       private
@@ -34,22 +34,11 @@ module Operations
         Operations::Families::Find.new.call(id: BSON::ObjectId(family_id))
       end
 
-      def initialize_person(params)
-        Operations::People::InitializePerson.new.call(params)
-      end
+      def transform_applicant_to_member(applicant_params)
+        result = Operations::People::TransformApplicantToMember.new.call(applicant_params)
+        return result unless result.success?
 
-      def initialize_consumer_role(params)
-        Operations::People::InitializeConsumerRole.new.call(params)
-      end
-
-      def initialize_vlp_document(params)
-        Operations::People::InitializeVlpDocument.new.call(params)
-      end
-
-      def build_payload(person_hash, consumer_role_hash, vlp_document_hash)
-        person_hash.merge!(consumer_role: { **consumer_role_hash, vlp_documents: [vlp_document_hash] })
-
-        Success(person_hash)
+        Success(result.success["consumer_role"].merge!(:is_applicant => false))
       end
 
       def build_member(member_hash)
@@ -71,6 +60,12 @@ module Operations
         Success()
       rescue StandardError => e
         Failure("Relationship creation failed: #{e}")
+      end
+
+      def persist(person, family)
+        person.save!
+        family.save!
+        Success({family_member_id: @family_member.id, person_hbx_id: @person.hbx_id})
       end
     end
   end
