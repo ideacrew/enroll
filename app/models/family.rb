@@ -836,11 +836,11 @@ class Family
     end
 
     family_member = family_members.build(
-        person: person,
-        is_primary_applicant: is_primary_applicant,
-        is_coverage_applicant: is_coverage_applicant,
-        is_consent_applicant: is_consent_applicant
-      )
+      person: person,
+      is_primary_applicant: is_primary_applicant,
+      is_coverage_applicant: is_coverage_applicant,
+      is_consent_applicant: is_consent_applicant
+    )
 
     active_household.build_household_coverage_member(family_member)
     family_member

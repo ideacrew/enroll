@@ -5,6 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   module People
+    # Class for initializing a new person
     class InitializePerson
       include Dry::Monads[:result, :do]
 
