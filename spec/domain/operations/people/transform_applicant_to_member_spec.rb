@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Operations::People::TransformApplicantToMember do
@@ -74,6 +76,24 @@ RSpec.describe Operations::People::TransformApplicantToMember do
           expect(member_hash[:consumer_role]).to have_key(:skip_consumer_role_callbacks)
           expect(member_hash[:consumer_role]).to have_key(:is_applicant)
           expect(member_hash[:consumer_role]).to have_key(:vlp_documents_attributes)
+        end
+      end
+
+      context 'failure' do
+        context 'when applicant params are not passed' do
+          let(:applicant_params) { {} }
+
+          before do
+            @result = described_class.new.call(applicant_params)
+          end
+
+          it 'returns a failure result' do
+            expect(@result.failure?).to be_truthy
+          end
+
+          it 'returns a failure message' do
+            expect(@result.failure).to eq('Provide applicant_params for transformation')
+          end
         end
       end
     end
