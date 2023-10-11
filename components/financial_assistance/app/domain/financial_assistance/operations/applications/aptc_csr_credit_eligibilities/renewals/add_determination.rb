@@ -50,11 +50,11 @@ module FinancialAssistance
                                               eligibility_response_payload: application_entity.to_h.to_json })
 
               add_eligibility_determination(application, application_entity)
-              application.save
+              return Failure("Failed to update application with Eligibility Determinations due to validation errors: #{application.errors.full_messages} ") unless application.valid?
+              application.save!
               application.determine_renewal
 
-              return Success('Successfully updated Application object with Full Eligibility Determination') if application.save
-
+              return Success('Successfully updated Application object with Full Eligibility Determination') if application.save!
               Failure('Failed to updated Application object with Full Eligibility Determination')
             end
 
@@ -84,7 +84,7 @@ module FinancialAssistance
                                               magi_medicaid_monthly_household_income: ped_entity.magi_medicaid_monthly_household_income,
                                               is_without_assistance: ped_entity.is_uqhp_eligible,
                                               csr_percent_as_integer: get_csr_value(ped_entity),
-                                              is_ia_eligible: ped_entity.is_ia_eligible,
+                                              is_ia_eligible: ped_entity.is_ia_eligible || false,
                                               is_medicaid_chip_eligible: ped_entity.is_medicaid_chip_eligible || ped_entity.is_magi_medicaid,
                                               is_totally_ineligible: ped_entity.is_totally_ineligible,
                                               is_eligible_for_non_magi_reasons: ped_entity.is_eligible_for_non_magi_reasons,
