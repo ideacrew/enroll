@@ -44,7 +44,7 @@ module FinancialAssistance
 
         def propagate_applicant(applicant_params)
           begin
-            applicant_params.merge!(skip_consumer_role_callbacks: true)
+            applicant_params.merge!(skip_consumer_role_callbacks: true, skip_person_updated_event_callback: true)
             result = ::Operations::Families::CreateOrUpdateMember.new.call(applicant_params)
             return result if result.success?
           rescue StandardError => e

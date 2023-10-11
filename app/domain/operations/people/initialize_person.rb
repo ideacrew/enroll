@@ -19,7 +19,7 @@ module Operations
       private
 
       def sanitize_params(params)
-        params[:hbx_id] = params.delete :person_hbx_id if params[:person_hbx_id]
+        params[:hbx_id] = params.delete :person_hbx_id
         params
       end
 

@@ -1311,15 +1311,15 @@ class Person
     end
   end
 
-  def addresses_attributes=(array_attributes)
+  def person_addresses=(array_attributes)
     assign(array_attributes, :addresses)
   end
 
-  def emails_attributes=(array_attributes)
+  def person_emails=(array_attributes)
     assign(array_attributes, :emails)
   end
 
-  def phones_attributes=(array_attributes)
+  def person_phones=(array_attributes)
     assign(array_attributes, :phones)
   end
 
