@@ -140,6 +140,9 @@ registry:
       - key: :totally_ineligible_notice
         item: :totally_ineligible_notice
         is_enabled: <%= ENV['TOTALLY_INELIGIBLE_NOTICE_IS_ENABLED'] || false %>
+      - key: :propagate_applicant
+        item: :propagate_applicant
+        is_enabled: <%= ENV['PROPAGATE_APPLICANT_IS_ENABLED'] || false %>
   - namespace:
     - :request_determination
     features:
