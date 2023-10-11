@@ -33,7 +33,7 @@ def redeterminations_catchup(renewal_year)
   logger = Logger.new("#{Rails.root}/log/redeterminations_catchup_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.log")
 
   report_file_name = "#{Rails.root}/redeterminations_catchup_report.csv"
-  csv_headers = %w[PrimaryHbxId FamilyID Index ApplicationHbxId RenewalApplicationHbxID Outcome OutcomeMessage]
+  csv_headers = %w[PrimaryHbxId FamilyID Index RenewalApplicationHbxID Outcome OutcomeMessage]
 
   family_ids = ::HbxEnrollment.individual_market.enrolled.current_year.distinct(:family_id)
 
