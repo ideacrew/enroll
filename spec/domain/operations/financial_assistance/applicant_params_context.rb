@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
-require 'bigdecimal'
-require 'bigdecimal/util'
-
 RSpec.shared_context 'export_applicant_attributes_context' do
-let(:current_date) { Date.today}
+  let(:current_date) { Date.today}
   let(:dob) { current_date - 20.years }
   let(:applicant_params) do
     {:_id => BSON::ObjectId('5f5ecf00d73697f046c926fe'),

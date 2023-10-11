@@ -1,50 +1,19 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'domain/operations/financial_assistance/applicant_params_context'
 
 RSpec.describe Operations::People::TransformApplicantToMember do
+  include_context 'export_applicant_attributes_context'
+
   describe '#call' do
-    let(:current_date) { Date.today}
-    let(:dob) { current_date - 20.years }
-    let(:applicant_params) do
-      {:first_name => "test",
-       :middle_name => nil,
-       :last_name => "test",
-       :ssn => "564654900",
-       :gender => "male",
-       :dob => dob.to_s,
-       :family_member_id => BSON::ObjectId('6525f616f78542bc66d12319'),
-       :person_hbx_id => "169698664415129",
-       :is_incarcerated => true,
-       :ethnicity => ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"],
-       :indian_tribe_member => false,
-       :tribal_id => nil,
-       :tribal_state => nil,
-       :tribal_name => nil,
-       :tribe_codes => [],
-       :no_dc_address => false,
-       :is_homeless => false,
-       :no_ssn => "0",
-       :citizen_status => "alien_lawfully_present",
-       :is_consumer_role => true,
-       :same_with_primary => false,
-       :is_applying_coverage => true,
-       :vlp_subject => "I-766 (Employment Authorization Card)",
-       :alien_number => "745896592",
-       :card_number => "4578451236592",
-       :expiration_date => current_date + 1.year,
-       :relationship => "child",
-       :addresses => [{:kind => "home", :address_1 => "test", :address_2 => "", :address_3 => "", :city => "test", :county => "Kennebec", :state => "ME", :zip => "04333", :country_name => ""}],
-       :emails => [],
-       :phones => [],
-       :is_primary_applicant => false,
-       :skip_consumer_role_callbacks => true,
-       :skip_person_updated_event_callback => true}
+    let(:params) do
+      applicant_params.merge(family_id: family.id, relationship: 'spouse')
     end
 
     context 'success' do
       before do
-        @result = described_class.new.call(applicant_params)
+        @result = described_class.new.call(params)
       end
 
       it 'returns a success result' do

@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
+require 'domain/operations/financial_assistance/applicant_params_context'
+
 RSpec.describe Operations::Families::CreateMember, type: :model, dbclean: :after_each do
-  let!(:person) do
+  include_context 'export_applicant_attributes_context'
+
+  let(:person) do
     FactoryBot.create(:person,
                       :with_consumer_role,
                       :with_active_consumer_role,
@@ -12,54 +16,10 @@ RSpec.describe Operations::Families::CreateMember, type: :model, dbclean: :after
                       dob: Date.new(1984, 3, 8))
   end
 
-  let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
+  let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
 
-  let!(:applicant_params) do
-    {:_id => BSON::ObjectId('5f5ecf00d73697f046c926fe'),
-     :family_id => BSON::ObjectId(family.id),
-     :person_hbx_id => '77a0be350dd1437ca5ba2259fdddb982',
-     :first_name => 'mem30',
-     :last_name => '30',
-     :gender => 'male',
-     :dob => '2000-09-17 00:00:00 UTC',
-     :is_incarcerated => true,
-     :ethnicity => ['White', 'Black or African American', 'Asian Indian', 'Chinese', 'Mexican', 'Mexican American'],
-     :tribal_id => '123213123',
-     :no_dc_address => false,
-     :is_homeless => false,
-     :is_temporarily_out_of_state => false,
-     :citizen_status => 'alien_lawfully_present',
-     :is_consumer_role => true,
-     :same_with_primary => true,
-     :is_applying_coverage => true,
-     :vlp_subject => 'I-94 (Arrival/Departure Record)',
-     :i94_number => '65436789098',
-     :sevis_id => '3456789876',
-     :expiration_date => '2020-09-30 00:00:00 UTC',
-     :ssn => '873672163',
-     :relationship => 'unrelated',
-     :is_primary_applicant => false,
-     :incomes => [
-      {
-        title: "Job Income",
-        wage_type: "wages_and_salaries",
-        amount: 10
-      }
-     ],
-     :addresses =>
-         [{'address_1' => '123 NE',
-           'address_2' => '',
-           'address_3' => '',
-           'county' => '',
-           'country_name' => '',
-           'kind' => 'home',
-           'city' => 'was',
-           'state' => 'DC',
-           'zip' => '12321'}],
-     :emails => [{'kind' => 'home', 'address' => 'mem30@dc.gov'}],
-     :phones =>
-         [{'kind' => 'home', 'country_code' => '', 'area_code' => '213', 'number' => '2131322', 'extension' => '', 'full_phone_number' => '2132131322'},
-          {'kind' => 'mobile', 'country_code' => '', 'area_code' => '213', 'number' => '2131322', 'extension' => '', 'full_phone_number' => '2132131322'}]}
+  let(:params) do
+    applicant_params.merge(family_id: family.id, relationship: 'spouse')
   end
 
   it 'should be a container-ready operation' do
@@ -68,9 +28,9 @@ RSpec.describe Operations::Families::CreateMember, type: :model, dbclean: :after
 
   context 'for success flow' do
     before do
-      @result = subject.call({applicant_params: applicant_params, family_id: family.id})
+      @result = subject.call({applicant_params: params, family_id: family.id})
       family.reload
-      @person = Person.by_hbx_id(applicant_params[:hbx_id]).first
+      @person = Person.by_hbx_id(params[:hbx_id]).first
     end
 
     context 'success' do
@@ -106,9 +66,9 @@ RSpec.describe Operations::Families::CreateMember, type: :model, dbclean: :after
 
   context 'failure' do
     before do
-      @result = subject.call(applicant_params.except(:family_id))
+      @result = subject.call(params.except(:family_id))
       family.reload
-      @person = Person.by_hbx_id(applicant_params[:hbx_id]).first
+      @person = Person.by_hbx_id(params[:hbx_id]).first
     end
 
     context 'failure' do
