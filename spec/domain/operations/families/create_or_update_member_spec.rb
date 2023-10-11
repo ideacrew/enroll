@@ -129,23 +129,23 @@ RSpec.describe Operations::Families::CreateOrUpdateMember, type: :model, dbclean
     end
 
     context 'failure' do
-        before do
-          @result = subject.call(params.except(:family_id))
-          family.reload
-          @person = Person.by_hbx_id(params[:person_hbx_id]).first
-        end
-  
-        it 'should return failure' do
-          expect(@result).to be_a Dry::Monads::Result::Failure
-        end
-  
-        it 'should not create person' do
-          expect(@person).not_to be_nil
-        end
-  
-        it 'should not create family member' do
-          expect(family.family_members.count).to eq 2
-        end
+      before do
+        @result = subject.call(params.except(:family_id))
+        family.reload
+        @person = Person.by_hbx_id(params[:person_hbx_id]).first
       end
+
+      it 'should return failure' do
+        expect(@result).to be_a Dry::Monads::Result::Failure
+      end
+
+      it 'should not create person' do
+        expect(@person).not_to be_nil
+      end
+
+      it 'should not create family member' do
+        expect(family.family_members.count).to eq 2
+      end
+    end
   end
 end
