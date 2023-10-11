@@ -76,7 +76,7 @@ module Operations
       def persist(person, _family, family_member, active_vlp_document)
         person.consumer_role.active_vlp_document_id = active_vlp_document&.id
 
-        if person.changes.present?
+        if person_changed?(person)
           person.save!
           family_member.save!
           return Success()
@@ -88,6 +88,10 @@ module Operations
         end
 
         Success({family_member_id: family_member.id})
+      end
+
+      def person_changed?(person)
+        person.changed? || person.addresses.any?(&:changed?) || person.emails.any?(&:changed?) || person.phones.any?(&:changed?)
       end
 
       def consumer_role_changed?(consumer_role)
