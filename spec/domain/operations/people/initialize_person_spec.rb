@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Operations::People::TransformApplicantToMember do
+RSpec.describe Operations::People::InitializePerson do
   describe '#call' do
     let(:current_date) { Date.today}
     let(:dob) { current_date - 20.years }
@@ -51,25 +51,22 @@ RSpec.describe Operations::People::TransformApplicantToMember do
         expect(@result.success?).to be_truthy
       end
 
-      it 'returns a member hash' do
-        expect(@result.success).to be_a(Hash)
+      it 'returns a person hash' do
+        expect(@result.success).to be_a(Entities::Person)
       end
 
-      it 'returns a member hash with person attributes' do
-        member_hash = @result.success
-        expect(member_hash).to have_key(:person_addresses)
-        expect(member_hash).to have_key(:person_phones)
-        expect(member_hash).to have_key(:person_emails)
-        expect(member_hash).to have_key(:hbx_id)
-        expect(member_hash).not_to have_key(:person_hbx_id)
+      it 'returns a hash with person attributes' do
+        hash = @result.success.to_h
+        expect(hash).to have_key(:addresses)
+        expect(hash).to have_key(:phones)
+        expect(hash).to have_key(:emails)
+        expect(hash).to have_key(:hbx_id)
+        expect(hash).not_to have_key(:person_hbx_id)
       end
 
-      it 'returns a member hash with consumer role attributes' do
-        member_hash = @result.success
-        expect(member_hash).to have_key(:consumer_role)
-        expect(member_hash[:consumer_role]).to have_key(:skip_consumer_role_callbacks)
-        expect(member_hash[:consumer_role]).to have_key(:is_applicant)
-        expect(member_hash[:consumer_role]).to have_key(:vlp_documents_attributes)
+      it 'returns a hash without consumer role attributes' do
+        hash = @result.success.to_h
+        expect(hash).not_to have_key(:consumer_role)
       end
     end
 
@@ -86,7 +83,7 @@ RSpec.describe Operations::People::TransformApplicantToMember do
         end
 
         it 'returns a failure message' do
-          expect(@result.failure).to eq('Provide applicant_params for transformation')
+          expect(@result.failure.errors.to_h).to eq({:dob=>["is missing", "must be a date"], :first_name=>["is missing", "must be a string"], :gender=>["is missing", "must be a string"], :last_name=>["is missing", "must be a string"]})
         end
       end
     end
