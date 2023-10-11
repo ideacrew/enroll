@@ -60,6 +60,12 @@ RSpec.describe "insured/families/home.html.erb" do
     expect(rendered).to have_selector('div#qle-details-for-existing-sep')
   end
 
+  it "should not display 'existing SEP - Eligible to enroll' partial if there is no active admin SEP" do
+    assign(:active_sep, [])
+    render file: "insured/families/home.html.erb"
+    expect(rendered).to_not have_selector('div#qle-details-for-existing-sep')
+  end
+
   context "Eligible to Enroll partial" do
     it "does not display 'existing SEP - Eligible to enroll' partial if the qualifying life event kind is inactive" do
       sep.qualifying_life_event_kind.update_attributes!(is_active: false)
