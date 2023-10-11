@@ -1311,16 +1311,10 @@ class Person
     end
   end
 
-  def person_addresses=(array_attributes)
-    assign(array_attributes, :addresses)
-  end
-
-  def person_emails=(array_attributes)
-    assign(array_attributes, :emails)
-  end
-
-  def person_phones=(array_attributes)
-    assign(array_attributes, :phones)
+  %w[addresses emails phones].each do |association|
+    define_method("person_#{association}=") do |array_attributes|
+      assign(array_attributes, association.to_sym)
+    end
   end
 
   private
