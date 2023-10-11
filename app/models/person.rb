@@ -1321,6 +1321,7 @@ class Person
 
   def assign(collection, association)
     collection.each do |attributes|
+      attributes.symbolize_keys!
       record = send(association).find_or_initialize_by(kind: attributes[:kind])
       record.assign_attributes(attributes)
     end
