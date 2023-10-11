@@ -25,6 +25,14 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
                       last_name: 'Rivers',
                       dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
                       application: application)
+    FactoryBot.create(:financial_assistance_applicant,
+                      eligibility_determination_id: ed.id,
+                      person_hbx_id: '96',
+                      is_primary_applicant: true,
+                      first_name: 'Bob',
+                      last_name: 'Rivers',
+                      dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                      application: application)
   end
 
   context 'success' do
@@ -102,6 +110,10 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
       context 'for Applicant' do
         it 'should update is_ia_eligible' do
           expect(@applicant.is_ia_eligible).to eq(true)
+        end
+
+        it 'should set is_ia_eligible to false if is_ia_eligible is nil' do
+          expect(@ed.applicants.last.is_ia_eligible).to eq(false)
         end
 
         it 'should update is_medicaid_chip_eligible' do

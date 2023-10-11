@@ -129,7 +129,30 @@ RSpec.shared_context 'cms ME simple_scenarios test_case_d', :shared_context => :
                                                         :last_name => "Rivers",
                                                         :dob => member_dob,
                                                         :person_hbx_id => "95" }
-                            }] }],
+                            },
+                            {
+                             :product_eligibility_determination => { :is_ia_eligible => nil,
+                                                                     :is_medicaid_chip_eligible => false,
+                                                                     :is_totally_ineligible => nil,
+                                                                     :is_magi_medicaid => false,
+                                                                     :is_uqhp_eligible => nil,
+                                                                     :is_csr_eligible => true,
+                                                                     is_eligible_for_non_magi_reasons: true,
+                                                                     :csr => "limited",
+                                                                     :is_non_magi_medicaid_eligible => false,
+                                                                     :is_without_assistance => false,
+                                                                     :member_determinations => [{
+                                                                                                  :kind => 'Insurance Assistance Determination',
+                                                                                                  :criteria_met => true,
+                                                                                                  :determination_reasons => [],
+                                                                                                  eligibility_overrides: []
+                                                                                                }]},
+                             :applicant_reference => { :first_name => "Bob",
+                                                       :last_name => "Rivers",
+                                                       :dob => member_dob,
+                                                       :person_hbx_id => "96" }
+                            }
+                            ] }],
       :relationships => [],
       :us_state => "DC",
       :hbx_id => "200000126",
