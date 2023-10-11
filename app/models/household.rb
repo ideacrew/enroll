@@ -74,7 +74,7 @@ class Household
 
   def build_household_coverage_member(family_member)
     primary_relationship = family_member.primary_relationship
-    primary_person = family_member.family.primary_applicant_person
+    primary_person = family_member.family.primary_person
 
     if Family::IMMEDIATE_FAMILY.include?(primary_relationship)
       immediate_family_coverage_household.add_coverage_household_member(family_member)
