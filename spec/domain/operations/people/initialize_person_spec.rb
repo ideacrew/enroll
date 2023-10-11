@@ -83,7 +83,7 @@ RSpec.describe Operations::People::InitializePerson do
         end
 
         it 'returns a failure message' do
-          expect(@result.failure.errors.to_h).to eq({:dob=>["is missing", "must be a date"], :first_name=>["is missing", "must be a string"], :gender=>["is missing", "must be a string"], :last_name=>["is missing", "must be a string"]})
+          expect(@result.failure.errors.to_h).to eq({:dob => ["is missing", "must be a date"], :first_name => ["is missing", "must be a string"], :gender => ["is missing", "must be a string"], :last_name => ["is missing", "must be a string"]})
         end
       end
     end
