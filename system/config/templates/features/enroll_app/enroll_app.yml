@@ -920,3 +920,6 @@ registry:
       - key: :oeg_notice_income_verification_only
         item: :oeg_notice_income_verification_only
         is_enabled: <%= ENV['OEG_NOTICE_INCOME_VERIFICATION_ONLY_IS_ENABLED'] || false %>
+      - key: :show_sep_message
+        item: :show_sep_message
+        is_enabled: <%= ENV['SHOW_SEP_MESSAGE_IS_ENABLED'] || false %>
