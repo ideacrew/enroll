@@ -25,14 +25,6 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
                       last_name: 'Rivers',
                       dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
                       application: application)
-    FactoryBot.create(:financial_assistance_applicant,
-                      eligibility_determination_id: ed.id,
-                      person_hbx_id: '96',
-                      is_primary_applicant: true,
-                      first_name: 'Bob',
-                      last_name: 'Rivers',
-                      dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
-                      application: application)
   end
 
   context 'success' do
@@ -113,7 +105,25 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
         end
 
         it 'should set is_ia_eligible to false if is_ia_eligible is nil' do
-          expect(@ed.applicants.last.is_ia_eligible).to eq(false)
+          # Without recreating the application were trying to resubmit a determined application and cannot transition from determined to submitted
+          application.destroy
+          application = FactoryBot.create(:financial_assistance_application, hbx_id: '200000126', aasm_state: "submitted")
+          ed = FactoryBot.create(:financial_assistance_eligibility_determination, application: application)
+          ed.update_attributes!(hbx_assigned_id: '12345')
+          FactoryBot.create(:financial_assistance_applicant,
+                            eligibility_determination_id: ed.id,
+                            person_hbx_id: '95',
+                            is_primary_applicant: true,
+                            first_name: 'Gerald',
+                            last_name: 'Rivers',
+                            dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                            application: application)
+          dup_response_payload = response_payload.dup
+          dup_response_payload[:tax_households].first[:tax_household_members].first[:product_eligibility_determination][:is_ia_eligible] = nil
+          subject.call(dup_response_payload)
+          application = ::FinancialAssistance::Application.by_hbx_id(dup_response_payload[:hbx_id]).first.reload
+          applicant = application.eligibility_determinations.first.applicants.first
+          expect(applicant.is_ia_eligible).to eq(false)
         end
 
         it 'should update is_medicaid_chip_eligible' do
