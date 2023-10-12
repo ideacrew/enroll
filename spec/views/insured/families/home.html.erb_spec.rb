@@ -68,12 +68,12 @@ RSpec.describe "insured/families/home.html.erb" do
 
   context "Eligible to Enroll partial" do
 
-    it "does not display 'existing SEP - Eligible to enroll' partial if the qualifying life event kind is inactive" do
+    it "does display 'existing SEP - Eligible to enroll' partial if the qualifying life event kind is inactive" do
       sep.qualifying_life_event_kind.update_attributes!(is_active: false)
       render file: "insured/families/home.html.erb"
       assign(:active_sep, sep)
       render file: "insured/families/home.html.erb"
-      expect(rendered).to_not have_selector('div#qle-details-for-existing-sep')
+      expect(rendered).to have_selector('div#qle-details-for-existing-sep')
     end
   end
 
