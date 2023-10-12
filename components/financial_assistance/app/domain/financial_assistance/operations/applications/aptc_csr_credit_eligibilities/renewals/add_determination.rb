@@ -55,7 +55,7 @@ module FinancialAssistance
               application.determine_renewal
 
               return Success('Successfully updated Application object with Full Eligibility Determination') if application.save!
-              Failure('Failed to updated Application object with Full Eligibility Determination')
+              Failure('Failed to transition application to a determined state')
             end
 
             def add_eligibility_determination(application, application_entity)
