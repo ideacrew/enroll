@@ -645,3 +645,10 @@ RSpec.describe Organization, dbclean: :after_each do
   end
 
 end
+
+RSpec.describe Organization, "with valid indexes" do
+  it "creates the indexes correctly" do
+    Organization.remove_indexes
+    Organization.create_indexes
+  end
+end
