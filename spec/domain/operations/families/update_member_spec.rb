@@ -27,45 +27,80 @@ RSpec.describe Operations::Families::CreateOrUpdateMember, type: :model, dbclean
   end
 
   context '#update member' do
-    let(:params) do
-      applicant_params.merge(family_id: family.id, gender: 'female', is_incarcerated: false, :ethnicity => ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"], i94_number: '45612378985', relationship: 'spouse')
-    end
-
     context 'success' do
-      before do
-        @result = subject.call(params)
-        family.reload
-        @person = Person.by_hbx_id(params[:person_hbx_id]).first
+
+      context '- when person attributes are changed
+               - when active vlp document attributes are changed' do
+        let(:params) do
+          applicant_params.merge(family_id: family.id, gender: 'female', is_incarcerated: false, :ethnicity => ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"], i94_number: '45612378985', relationship: 'child')
+        end
+
+        before do
+          @result = subject.call(params)
+          family.reload
+          @person = Person.by_hbx_id(params[:person_hbx_id]).first
+        end
+
+        it 'returns a success result' do
+          expect(@result).to be_a(Dry::Monads::Result::Success)
+        end
+
+        it 'persists the person' do
+          expect(@person.persisted?).to be_truthy
+        end
+
+        it 'no change in family member count' do
+          expect(family.family_members.count).to eq(2)
+        end
+
+        it 'update person attributes' do
+          expect(@person.is_incarcerated).to be_falsey
+          expect(@person.gender).to eq 'female'
+          expect(@person.ethnicity).to eq ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"]
+        end
+
+        it 'update VLP document attributes' do
+          expect(@person.consumer_role.active_vlp_document.i94_number).to eq '45612378985'
+        end
+
+        it 'update relationship' do
+          expect(family.primary_person.person_relationships.count).to eq 1
+          expect(family.primary_person.person_relationships.first.relative_id).to eq @person.id
+          expect(family.primary_person.person_relationships.first.kind).to eq 'child'
+        end
       end
 
-      it 'returns a success result' do
-        expect(@result).to be_a(Dry::Monads::Result::Success)
-      end
+      context '- when person attributes are changed
+               - when vlp document type is changed' do
+        let(:params) do
+          applicant_params.merge(family_id: family.id, vlp_subject: 'I-571 (Refugee Travel Document)', i94_number: '45612378985', relationship: 'spouse')
+        end
+        before do
+          @result = subject.call(params)
+          family.reload
+          @person = Person.by_hbx_id(params[:person_hbx_id]).first
+        end
 
-      it 'persists the person' do
-        expect(@person.persisted?).to be_truthy
-      end
+        it 'returns a success result' do
+          expect(@result).to be_a(Dry::Monads::Result::Success)
+        end
 
-      it 'update person' do
-        expect(@person).not_to be_nil
-      end
+        it 'new active vlp document' do
+          expect(@person.consumer_role.active_vlp_document.subject).to eq 'I-571 (Refugee Travel Document)'
+        end
 
-      it 'no change in family member count' do
-        expect(family.family_members.count).to eq(2)
-      end
-
-      it 'update person attributes' do
-        expect(@person.is_incarcerated).to be_falsey
-        expect(@person.gender).to eq 'female'
-        expect(@person.ethnicity).to eq ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"]
-      end
-
-      it 'update VLP document attributes' do
-        expect(@person.consumer_role.active_vlp_document.i94_number).to eq '45612378985'
+        it 'previous VLP document is inactive' do
+          inactive_vlp_document = @person.consumer_role.vlp_documents.where(subject: 'I-94 (Arrival/Departure Record)').first
+          expect(@person.consumer_role.active_vlp_document.id).not_to eq inactive_vlp_document.id
+          expect(@person.consumer_role.vlp_documents.count).to eq 2
+        end
       end
     end
 
     context 'failure' do
+      let(:params) do
+        applicant_params.merge(family_id: family.id, gender: 'female', is_incarcerated: false, :ethnicity => ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"], i94_number: '45612378985', relationship: 'spouse')
+      end
       before do
         @result = subject.call(params.except(:family_id))
         family.reload
