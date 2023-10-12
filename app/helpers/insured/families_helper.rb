@@ -419,7 +419,7 @@ module Insured::FamiliesHelper
                              l10n('enrollment.latest_transition_data',
                                   from_state: transition.from_state,
                                   to_state: transition.to_state,
-                                  created_at: transition.created_at.in_time_zone('Eastern Time (US & Canada)').strftime("%m/%d/%Y %-I:%M%p"))
+                                  created_at: transition.created_at&.in_time_zone('Eastern Time (US & Canada)')&.strftime("%m/%d/%Y %-I:%M%p"))
                            end
       end
       all_transitions.join("\n")

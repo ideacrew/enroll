@@ -714,6 +714,15 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
       end
     end
 
+    context 'created_at nil on workflowstate_transitions' do
+      before { hbx_enr.renew_enrollment }
+
+      it 'returns latest_transition_data' do
+        hbx_enr.workflow_state_transitions.first.update_attributes(created_at: nil)
+        expect(helper.all_transitions(hbx_enr)).to match(/From shopping to auto_renewing at/)
+      end
+    end
+
     context 'without state transitions' do
       it 'does not return latest_transition_data' do
         expect(helper.all_transitions(hbx_enr)).to eq(l10n('not_available'))
