@@ -9,7 +9,7 @@ module ActiveSupport
         result = yield
         set_callback(*args)
         result
-      rescue StandardError => e
+      rescue StandardError
         set_callback(*args)
         result
       end
@@ -19,7 +19,7 @@ module ActiveSupport
         result = yield
         callback_options.each { |args| set_callback(*args) }
         result
-      rescue StandardError => e
+      rescue StandardError
         callback_options.each { |args| set_callback(*args) }
         result
       end
