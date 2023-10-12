@@ -330,6 +330,12 @@ class HbxEnrollment
   index({ 'predecessor_enrollment_id' => 1 })
   index({ 'successor_creation_failure_reasons' => 1 })
 
+  # Index for IVl Enrollment Renewals
+  index({ kind: 1, aasm_state: 1, coverage_kind: 1, effective_on: 1 })
+
+  # Index for IVL Enrollments Expiration(1/1) and Effectuation(1/1)
+  index({ effective_on: 1, kind: 1, aasm_state: 1 })
+
   scope :active,              ->{ where(is_active: true).where(:created_at.ne => nil) } # Depricated scope
   scope :open_enrollments,    ->{ where(enrollment_kind: "open_enrollment") }
   scope :special_enrollments, ->{ where(enrollment_kind: "special_enrollment") }
