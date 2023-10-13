@@ -93,7 +93,12 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
     applied_percentage = enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_percentage
     ehb_premium = renewal_enrollment.total_ehb_premium
-    applied_aptc = float_fix([(max_aptc * applied_percentage), ehb_premium].min)
+    applied_aptc = if applied_percentage.infinite? || applied_percentage.nan?
+                     float_fix(ehb_premium)
+                   else
+                     float_fix([(max_aptc * applied_percentage), ehb_premium].min)
+                   end
+
     @assisted = true if max_aptc > 0.0
 
     @aptc_values.merge!({
