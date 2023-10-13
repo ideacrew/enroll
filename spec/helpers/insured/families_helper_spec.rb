@@ -776,6 +776,74 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
     end
   end
 
+  describe '#is_broker_authorized' do
+    context 'when current user is not a ga staff' do
+      let(:user) { FactoryBot.create(:user, :with_consumer_role) }
+      let(:family) { FactoryBot.create(:person, :with_family) }
+
+      it 'return false' do
+        expect(helper.is_broker_authorized?(user, family)).to eq false
+      end
+    end
+
+    context 'when family does not have an assigned broker' do
+      let(:user) { FactoryBot.create(:user, :with_consumer_role) }
+      let(:family) { FactoryBot.create(:person, :with_family).primary_family }
+
+      it 'return false' do
+        expect(helper.is_broker_authorized?(user, family)).to eq false
+      end
+    end
+
+    context 'when family an assigned broker' do
+      context 'when current user does not belong to family broker' do
+        let(:user) { FactoryBot.create(:user, person: person) }
+        let(:person) { FactoryBot.create(:person, :with_broker_role) }
+        let(:family) { FactoryBot.create(:person, :with_family).primary_family }
+
+        before do
+          allow(family).to receive(:current_broker_agency).and_return double('BrokerAgencyAccount', benefit_sponsors_broker_agency_profile_id: BSON::ObjectId.new)
+        end
+
+        it 'return false' do
+          expect(helper.is_broker_authorized?(user, family)).to eq false
+        end
+      end
+
+      context 'when current user belongs to family broker' do
+        let(:user) { FactoryBot.create(:user, person: person) }
+        let(:person) do
+          person = FactoryBot.create(:person, :with_broker_role)
+          person.broker_role.update_attributes(benefit_sponsors_broker_agency_profile_id: BSON::ObjectId.new)
+          person
+        end
+        let(:family) { FactoryBot.create(:person, :with_family).primary_family }
+
+        context 'ivl role' do
+          before do
+            allow(family).to receive(:current_broker_agency).and_return double('BrokerAgencyAccount', benefit_sponsors_broker_agency_profile_id: person.broker_role.benefit_sponsors_broker_agency_profile_id)
+          end
+
+          it 'return true' do
+            expect(helper.is_broker_authorized?(user, family)).to eq true
+          end
+        end
+
+        context 'shop role' do
+
+          before do
+            allow(family).to receive(:current_broker_agency).and_return nil
+            allow(helper).to receive(:shop_broker_agency_ids).with(family).and_return [person.broker_role.benefit_sponsors_broker_agency_profile_id]
+          end
+
+          it 'return true' do
+            expect(helper.is_broker_authorized?(user, family)).to eq true
+          end
+        end
+      end
+    end
+  end
+
   describe '#is_general_agency_authorized' do
     context 'when current user is not a ga staff' do
       let(:user) { FactoryBot.create(:user, :with_consumer_role) }
@@ -819,14 +887,30 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
         let(:user) { FactoryBot.create(:user, :with_consumer_role) }
         let(:family) { FactoryBot.create(:person, :with_family).primary_family }
 
-        before do
-          allow(user).to receive_message_chain(:person, :active_general_agency_staff_roles).and_return [double('GeneralAgencyStaffRole', benefit_sponsors_general_agency_profile_id: general_agency_profile.id)]
-          allow(family).to receive(:current_broker_agency).and_return double('BrokerAgencyAccount', benefit_sponsors_broker_agency_profile_id: owner_profile.id)
-          plan_design_organization_with_assigned_ga
+        context 'ivl role' do
+          before do
+            allow(user).to receive_message_chain(:person, :active_general_agency_staff_roles).and_return [double('GeneralAgencyStaffRole', benefit_sponsors_general_agency_profile_id: general_agency_profile.id)]
+            allow(family).to receive(:current_broker_agency).and_return double('BrokerAgencyAccount', benefit_sponsors_broker_agency_profile_id: owner_profile.id)
+            plan_design_organization_with_assigned_ga
+          end
+
+          it 'return true' do
+            expect(helper.is_general_agency_authorized?(user, family)).to eq true
+          end
         end
 
-        it 'return true' do
-          expect(helper.is_general_agency_authorized?(user, family)).to eq true
+        context 'shop role' do
+
+          before do
+            allow(user).to receive_message_chain(:person, :active_general_agency_staff_roles).and_return [double('GeneralAgencyStaffRole', benefit_sponsors_general_agency_profile_id: general_agency_profile.id)]
+            allow(family).to receive(:current_broker_agency).and_return nil
+            allow(helper).to receive(:shop_broker_agency_ids).with(family).and_return [owner_profile.id]
+            plan_design_organization_with_assigned_ga
+          end
+
+          it 'return true' do
+            expect(helper.is_general_agency_authorized?(user, family)).to eq true
+          end
         end
       end
     end
