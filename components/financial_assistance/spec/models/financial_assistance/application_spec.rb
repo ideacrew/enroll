@@ -2647,3 +2647,10 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 end
+
+RSpec.describe ::FinancialAssistance::Application, "with correct index definitions", type: :model, dbclean: :after_each do
+  it "has valid indexes" do
+    ::FinancialAssistance::Application.remove_indexes
+    ::FinancialAssistance::Application.create_indexes
+  end
+end
