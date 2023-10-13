@@ -241,7 +241,7 @@ has_been_renewed_ids = has_been_renewed.map do |rec|
   rec["_id"]
 end
 
-has_been_renewed_set = Set.new(post_11_1_ids)
+has_been_renewed_set = Set.new(has_been_renewed_ids)
 
 active_renewals_set = (re_enrolled_member_set & post_11_1_purchase_set) - has_been_renewed_set
 
