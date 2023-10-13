@@ -64,7 +64,7 @@ h1,h2,h3,h4,h5,h6 {
     }
     .navbar-collapse {
       .header-text {
-        color: $primary-gray;
+        color: #487ba2;  //changes header-text from light gray to darker blue
         font-size: 14px;
         text-transform: uppercase;
         font-weight: $primary-bold;
@@ -98,7 +98,14 @@ h1,h2,h3,h4,h5,h6 {
               font-size: 16px;
               color: $primary-black;
             }
+            span:hover {
+              color: black !important;
+            } //still trying to improve phone number hover color change, currently not working
           }
+          strong {
+            color: #757575 !important; //darkens gray color
+          }
+
         }
         .my-portal-links {
           min-height: 70px;
@@ -222,6 +229,7 @@ h1,h2,h3,h4,h5,h6 {
 
 .btn {
   margin: 3px 0;
+  background-color: #E72326;  //overwrites slightly lighter red background-color
 }
 .btn:focus,
 .btn:active:focus,
@@ -264,7 +272,7 @@ fieldset[disabled] .btn {
 }
 
 .btn-default {
-  color: $secondary-button-text;
+  color: #0071B3; //fixes button issue where color needs to be darker
   background-color: $secondary-button-background;
   border-color: $secondary-button-border;
   text-transform: $secondary-button-text-casing;
@@ -319,6 +327,14 @@ fieldset[disabled] .btn-default.active {
 .fa-trash:hover {
   cursor:pointer;
 }
+
+.label-danger {
+  background-color: #D4403A !important;
+} //fixes warnings by darkening label
+
+.alert-error {
+  color: #AA4241 !important;
+} //fixes alert text by darkening it from var(--error-shade)
 
 thead {
   background-color: $primary-white;
