@@ -64,7 +64,7 @@ h1,h2,h3,h4,h5,h6 {
     }
     .navbar-collapse {
       .header-text {
-        color: $primary-gray;
+        color: $secondary-gray;
         font-size: 14px;
         text-transform: uppercase;
         font-weight: $primary-bold;
@@ -76,7 +76,7 @@ h1,h2,h3,h4,h5,h6 {
           line-height: 50px;
           padding: 23px 15px;
           font-weight: 600;
-          color: #487ba2;
+          color: #447397;
           &:hover {
             background-color: $background-hover;
             text-decoration: none;
@@ -91,7 +91,7 @@ h1,h2,h3,h4,h5,h6 {
           span:first-of-type {}
           span:last-of-type {
             .fa {
-              color: $brand-primary;
+              color: $secondary-gray;
             }
             strong {
               line-height: 0;
@@ -136,7 +136,7 @@ h1,h2,h3,h4,h5,h6 {
     text-decoration:none;
     cursor:pointer;
     transition: all 0.3s ease 0s;
-    color: #e72b2d;
+    color: #e72326;
   }
 
   a:visited {
@@ -242,7 +242,7 @@ h1,h2,h3,h4,h5,h6 {
 .btn-min:hover,
 .btn-min:focus,
 .btn-min.focus {
-  color: #487ba2;
+  color: #447397;
   transform: scale(1.1);
 }
 .btn:active,
@@ -356,7 +356,7 @@ thead {
     padding-right: 6px;
   }
   ul.progress-wrapper li.complete .vertical-line-progress {
-    background-color: #487ba2;
+    background-color: #447397;
   }
   .vertical-line-progress {
     background-color: #cacaca;
@@ -379,17 +379,17 @@ thead {
     padding: 5px 0px;
     list-style: none;
     padding-left: 35px;
-    color: #487ba2;
+    color: #447397;
   }
   ul.progress-wrapper li.active {
     padding: 5px 0px;
     list-style: none;
     padding-left: 35px;
     font-weight: bold;
-    color: #487ba2;
+    color: #447397;
   }
   ul.progress-wrapper li.complete span.circle-progress {
-    background-color: #487ba2;
+    background-color: #447397;
     border: none;
     width: 14px;
     left: 9px;
@@ -506,7 +506,7 @@ thead {
         }
       }
       .fa {
-        color: $primary-gray;
+        color: $secondary-gray;
       }
       .fa-stack {
         position: relative;
