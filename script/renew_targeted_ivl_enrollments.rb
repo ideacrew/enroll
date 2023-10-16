@@ -8,8 +8,8 @@ unless ARGV[0].present?
 end
 require 'csv'
 year = ARGV[0].to_i
-read_filename = "#{Rails.root}/pids/#{year + 1}_ivl_enrollments_eligible_renewal_failures.csv"
-write_filename = "#{Rails.root}/pids/#{year + 1}_ivl_enrollments_retriggered_renewals.csv"
+read_filename = "#{Rails.root}/#{year + 1}_ivl_enrollments_eligible_renewal_failures.csv"
+write_filename = "#{Rails.root}/#{year + 1}_ivl_enrollments_retriggered_renewals.csv"
 
 current_bs = HbxProfile.current_hbx.benefit_sponsorship
 renewal_bcp = current_bs.renewal_benefit_coverage_period
@@ -18,7 +18,7 @@ CSV.open(write_filename, "wb") do |csv|
   csv << ["primary_hbx_id", "enrollment_hbx_id", "renewal_enrollment_hbx_id", "renewal_failure_reasons"]
 
   CSV.foreach(read_filename) do |row|
-    enrollment_hbx_id, primary_hbx_id = row
+    primary_hbx_id, enrollment_hbx_id = row
     current_year_enrollment = HbxEnrollment.by_hbx_id(enrollment_hbx_id).first
     next row if current_year_enrollment.blank?
 
@@ -26,10 +26,10 @@ CSV.open(write_filename, "wb") do |csv|
     if result.success?
       renewal_enrollment = result.success
       puts "Successfully able to create renewal enrollment with HBX_ID #{renewal_enrollment.hbx_id}, effective on #{renewal_enrollment.effective_on}, aasm state #{renewal_enrollment.aasm_state}"
-      csv << [primary_hbx_id, enrollment_hbx_id, renewal_enrollment.hbx_id, "N/A"]
+      csv << [primary_hbx_id, enrollment_hbx_id, renewal_enrollment&.hbx_id, "N/A"]
     else
       puts "Unable to create renewal enrollment for HBX_ID #{current_year_enrollment.hbx_id}"
-      csv << [primary_hbx_id, enrollment_hbx_id, "N/A", current_year_enrollment.successor_creation_failure_reasons]
+      csv << [primary_hbx_id, enrollment_hbx_id, "N/A", current_year_enrollment&.successor_creation_failure_reasons]
     end
   rescue StandardError => e
     puts "ERROR on row: #{row}, Backtrace: #{e.backtrace}"

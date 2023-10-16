@@ -2287,3 +2287,10 @@ describe '#deactivate_financial_assistance' do
     end
   end
 end
+
+describe Family, "with index definitions" do
+  it "creates the indexes" do
+    Family.remove_indexes
+    Family.create_indexes
+  end
+end

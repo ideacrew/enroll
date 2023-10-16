@@ -1800,3 +1800,10 @@ describe Person, :dbclean => :after_each do
     end
   end
 end
+
+describe Person, "with index definitions" do
+  it "creates the indexes" do
+    Person.remove_indexes
+    Person.create_indexes
+  end
+end

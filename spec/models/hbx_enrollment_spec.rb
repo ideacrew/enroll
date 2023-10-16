@@ -785,3 +785,10 @@ describe '#advance_day', dbclean: :after_each do
     end
   end
 end
+
+describe HbxEnrollment, "with index definitions" do
+  it "creates the indexes" do
+    HbxEnrollment.remove_indexes
+    HbxEnrollment.create_indexes
+  end
+end
