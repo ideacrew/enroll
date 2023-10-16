@@ -173,7 +173,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
           allow(mock_employee_candidate).to receive(:match_census_employees).and_return([])
           #allow(mock_resident_candidate).to receive(:dob).and_return()
           allow(Factories::EmploymentRelationshipFactory).to receive(:build).and_return(true)
-          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(false)
           post :match, params: { :person => person_parameters }
         end
 
@@ -432,7 +432,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         allow(person).to receive(:employee_roles).and_return [employee_role]
         allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
         allow(EnrollRegistry[:mec_check].feature).to receive(:is_enabled).and_return(false)
-        EnrollRegistry[:shop_coverage_check].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:shop_coverage_check].feature).to receive(:is_enabled).and_return(true)
         allow(person).to receive(:mec_check_eligible?).and_return(false)
       end
 

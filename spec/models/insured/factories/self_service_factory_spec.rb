@@ -429,7 +429,7 @@ module Insured
         before :each do
           coverage_start_on = enrollment.hbx_enrollment_members.first.coverage_start_on
           FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[2].id, eligibility_date: coverage_start_on, coverage_start_on: coverage_start_on, hbx_enrollment: enrollment, tobacco_use: 'N')
-          EnrollRegistry[:check_enrollment_member_eligibility].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:check_enrollment_member_eligibility].feature).to receive(:is_enabled).and_return(true)
         end
 
         context 'when one of the member is not applying for coverage' do
@@ -690,7 +690,7 @@ module Insured
 
       context "within OE last month and after monthly_enrollment_due_on day of the month of IndividualEnrollmentDueDayOfMonth effective date 1/1 and 15 day disabled" do
         before do
-          EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature).to receive(:is_enabled).and_return(true)
           system_date = Date.new(Date.today.year, 12, Settings.aca.individual_market.monthly_enrollment_due_on.next)
           allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
           @effective_date = described_class.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), Date.new(Date.today.year.next, 1, 1)).to_date
@@ -703,7 +703,7 @@ module Insured
 
       context "within OE last month and after monthly_enrollment_due_on day of the month of IndividualEnrollmentDueDayOfMonth effective date 3/1 with override" do
         before do
-          EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature).to receive(:is_enabled).and_return(true)
           current_year = Date.today.year
           system_date = rand(Date.new(current_year.next, 1, Settings.aca.individual_market.monthly_enrollment_due_on.next)..Date.new(current_year.next, 1, 31))
           allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
@@ -717,7 +717,7 @@ module Insured
 
       context "outside OE after monthly_enrollment_due_on day of the month of IndividualEnrollmentDueDayOfMonth with override enabled" do
         before do
-          EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature).to receive(:is_enabled).and_return(true)
           current_year = Date.today.year
           system_date = Date.new(current_year, 2, Settings.aca.individual_market.monthly_enrollment_due_on.next)
           allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
@@ -731,7 +731,7 @@ module Insured
 
       context "outside OE on monthly_enrollment_due_on day of the month of IndividualEnrollmentDueDayOfMonth with override enabled" do
         before do
-          EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature).to receive(:is_enabled).and_return(true)
           current_year = Date.today.year
           system_date = Date.new(current_year, 1, Settings.aca.individual_market.monthly_enrollment_due_on)
           allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)

@@ -199,7 +199,7 @@ RSpec.describe Exchanges::EmployerApplicationsController, dbclean: :after_each d
 
     context 'Feature disabled' do
       before :each do
-        EnrollRegistry[:benefit_application_reinstate].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:benefit_application_reinstate].feature).to receive(:is_enabled).and_return(false)
         allow(hbx_staff_role).to receive(:permission).and_return(double('Permission', can_modify_plan_year: true))
         sign_in(user)
         initial_application.update_attributes!(:aasm_state => :enrollment_eligible)

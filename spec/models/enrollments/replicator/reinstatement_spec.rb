@@ -369,7 +369,7 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
 
     context "native_american_csr feature enabled and all are indian tribes" do
       before do
-        EnrollRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:native_american_csr].feature).to receive(:is_enabled).and_return(true)
         tax_household_member1.family_member.person.update_attributes(indian_tribe_member: true)
         tax_household_member2.family_member.person.update_attributes(indian_tribe_member: true)
       end
@@ -382,7 +382,7 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
 
     context "native_american_csr feature disabled" do
       before do
-        EnrollRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:native_american_csr].feature).to receive(:is_enabled).and_return(false)
       end
 
       it "should not return csr_limited" do
@@ -471,7 +471,7 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
               family.family_members.map(&:person).each do |per|
                 per.update_attributes!(indian_tribe_member: true)
               end
-              EnrollRegistry[:native_american_csr].feature.stub(:is_enabled).and_return(true)
+              allow(EnrollRegistry[:native_american_csr].feature).to receive(:is_enabled).and_return(true)
             end
 
             let(:reinstatement_enrollment) { described_class.new(hbx_enrollment, hbx_enrollment.effective_on).build }

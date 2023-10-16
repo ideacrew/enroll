@@ -8,7 +8,7 @@ require File.join(Rails.root, 'spec/shared_contexts/dchbx_product_selection')
 
 RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
   before do
-    EnrollRegistry[:cancel_renewals_for_term].feature.stub(:is_enabled).and_return(true)
+    allow(EnrollRegistry[:cancel_renewals_for_term].feature).to receive(:is_enabled).and_return(true)
   end
 
   describe HbxEnrollment, dbclean: :around_each do

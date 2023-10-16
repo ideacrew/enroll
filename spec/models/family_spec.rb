@@ -475,7 +475,7 @@ describe Family, dbclean: :around_each do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
 
     before do
-      EnrollRegistry[:include_faa_outstanding_verifications].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:include_faa_outstanding_verifications].feature).to receive(:is_enabled).and_return(true)
     end
 
     it "should earliest duedate when family had two or more due dates" do

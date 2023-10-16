@@ -554,8 +554,8 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
       context 'shop and congress disabled?' do
         before do
-          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(false)
-          EnrollRegistry[:fehb_market].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:fehb_market].feature).to receive(:is_enabled).and_return(false)
           sign_in(current_user)
           get :sorting_sep_types
         end

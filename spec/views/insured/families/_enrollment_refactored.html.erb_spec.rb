@@ -180,7 +180,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
 
     context "Grouping is enabled" do
       before :each do
-        EnrollRegistry[:home_tiles_group_by_year].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:home_tiles_group_by_year].feature).to receive(:is_enabled).and_return(true)
       end
 
       it "should display the year of the plan as header" do

@@ -1132,14 +1132,14 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
 
       it "displays the upload_notice_form view" do
-        EnrollRegistry[:show_upload_notices].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:show_upload_notices].feature).to receive(:is_enabled).and_return(true)
         get :upload_notice_form
         expect(response).to have_http_status(:success)
         expect(response).to render_template(:upload_notice_form)
       end
 
       it "should redirect unless enabled" do
-        EnrollRegistry[:show_upload_notices].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:show_upload_notices].feature).to receive(:is_enabled).and_return(false)
         get :upload_notice_form
         expect(response).to redirect_to(root_path)
         expect(flash[:notice]).to eq("Upload Notice Form is Disabled")

@@ -67,7 +67,8 @@ RSpec.describe Operations::HbxEnrollments::DropEnrollmentMembers, :type => :mode
     context 'invalid params', dbclean: :around_each do
       context 'when feature is turned off' do
         before do
-          EnrollRegistry[:drop_enrollment_members].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:drop_enrollment_members].feature).to receive(:is_enabled).and_return(false)
+
           @result = subject.call({hbx_enrollment: enrollment,
                                   options: {"termination_date_#{enrollment.id}" => (TimeKeeper.date_of_record + 1.day).to_s,
                                             "terminate_member_#{hbx_enrollment_member3.id}" => hbx_enrollment_member3.id.to_s}})

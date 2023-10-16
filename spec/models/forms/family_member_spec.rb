@@ -476,7 +476,7 @@ describe "checking validations on family member object" do
 
     context "when user answered us citizen as false and immigration_status_question is required" do
       before do
-        EnrollRegistry[:immigration_status_question_required].stub(:item).and_return(true)
+        allow(EnrollRegistry[:immigration_status_question_required].feature).to receive(:item).and_return(true)
       end
 
       subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"false"})) }
@@ -489,7 +489,7 @@ describe "checking validations on family member object" do
 
     context "when user answered us citizen as false and immigration_status_question is not required" do
       before do
-        EnrollRegistry[:immigration_status_question_required].stub(:item).and_return(false)
+        allow(EnrollRegistry[:immigration_status_question_required].feature).to receive(:item).and_return(false)
       end
 
       subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen" => "false"})) }

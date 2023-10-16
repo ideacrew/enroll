@@ -97,7 +97,7 @@ describe ConsumerRole, dbclean: :after_each do
         let(:consumer_role) { saved_person.build_consumer_role(valid_params) }
 
         before do
-          EnrollRegistry[:location_residency_verification_type].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:location_residency_verification_type].feature).to receive(:is_enabled).and_return(false)
         end
 
         it "should not create a location_residency verification type when turned off" do
@@ -109,7 +109,7 @@ describe ConsumerRole, dbclean: :after_each do
     context 'location_residency_verification_type feature is disabled' do
       let(:consumer_role) { saved_person.build_consumer_role(valid_params) }
       before do
-        EnrollRegistry[:location_residency_verification_type].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:location_residency_verification_type].feature).to receive(:is_enabled).and_return(false)
       end
 
       it "should not create a location_residency verification type when turned off" do
@@ -194,7 +194,7 @@ describe "CRM update" do
     allow_any_instance_of(Person).to receive(:has_active_consumer_role?).and_return(true)
     allow_any_instance_of(Person).to receive(:primary_family).and_return(test_family)
     allow_any_instance_of(Family).to receive(:primary_person).and_return(test_person)
-    EnrollRegistry[:crm_publish_primary_subscriber].feature.stub(:is_enabled).and_return(true)
+    allow(EnrollRegistry[:crm_publish_primary_subscriber].feature).to receive(:is_enabled).and_return(true)
   end
 
   it "calls the PublishPrimarySubscriber operation" do

@@ -153,7 +153,7 @@ RSpec.describe Insured::ConsumerRolesController do
 
       context "iap year selection is disabled and IVL oe end date is in future" do
         before do
-          EnrollRegistry[:iap_year_selection].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:iap_year_selection].feature).to receive(:is_enabled).and_return(false)
           allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, 1, 1))
         end
 
