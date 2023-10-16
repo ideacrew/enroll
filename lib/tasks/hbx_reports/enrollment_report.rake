@@ -114,10 +114,10 @@ namespace :reports do
       active_renewals_set = (re_enrolled_member_set & @post_11_1_purchases&.map(&:hbx_id)) - @renewed_enrollments&.map(&:hbx_id)
       passive_renewals_set = re_enrolled_member_set - (@post_11_1_purchases&.map(&:hbx_id) - @renewed_enrollments&.map(&:hbx_id))
 
-      if active_renewals_set.present? && enrs_between_nov_and_dec_set.present?
-        "Active Re-enrollee"
-      elsif passive_renewals_set.present? && enrs_between_nov_and_dec_set.present?
+      if passive_renewals_set.present? && enrs_between_nov_and_dec_set.present?
         "Re-enrollee"
+      elsif active_renewals_set.present? && enrs_between_nov_and_dec_set.present?
+        "Active Re-enrollee"
       elsif enrs_between_nov_and_dec_set.empty? || @previous_enrollments.blank?
         "New Consumer"
       end
