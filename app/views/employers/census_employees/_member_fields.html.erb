@@ -48,7 +48,7 @@
           </label>
           <div class="vertically-aligned-row">
             <div class="n-radio-group">
-              <div class="n-radio-row">
+              <div tabindex="0" class="n-radio-row">
                 <%= f.label :gender, 'male', :value => 'Male', class: 'n-radio' do %>
                 <%= f.radio_button :gender, "male", class: "n-radio" %>
                 <span class="n-radio"></span>
@@ -57,7 +57,7 @@
               </div>
             </div>
             <div class="n-radio-group">
-              <div class="n-radio-row">
+              <div tabindex="0" class="n-radio-row">
                 <%= f.label :gender, 'female', :value => 'Female', class: 'n-radio' do %>
                 <%= f.radio_button :gender, "female", class: "n-radio" %>
                 <span class="n-radio"></span>

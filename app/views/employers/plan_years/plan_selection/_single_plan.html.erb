@@ -1,7 +1,7 @@
   <% @plans.each do |p| %>
     <div class="col-xs-3">
       <div clas="col-xs-12 reference-plan">
-        <div class="col-xs-3">
+        <div tabindex="0" class="col-xs-3">
   <%= radio_button :reference_plan_id, p.id %>
   <%= label_tag :reference_plan_id %>
 </div>
