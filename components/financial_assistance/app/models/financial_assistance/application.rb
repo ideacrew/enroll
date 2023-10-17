@@ -187,8 +187,6 @@ module FinancialAssistance
     # applicant index
     index({ "applicants._id" => 1 })
     index({"applicants.no_ssn" => 1})
-    index({"applicants.assisted_income_validation" => 1})
-    index({"applicants.assisted_mec_validation" => 1})
     index({"applicants.aasm_state" => 1})
     index({"applicants.is_active" => 1})
     index({"applicants.csr_percent_as_integer" => 1})
