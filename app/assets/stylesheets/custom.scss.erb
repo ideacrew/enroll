@@ -3934,8 +3934,9 @@ label.checkbox-custom-label {
     padding: 0;
     text-transform: uppercase;
 }
-.checkbox label {
+.checkbox-custom:focus + .checkbox-custom-label::before, .radio-custom:focus + .radio-custom-label::before{
     padding: 0;
+    outline: -webkit-focus-ring-color auto 1px;
 }
 .checkbox-filter-wrapper {
     border-bottom: 1px solid #cacaca;
