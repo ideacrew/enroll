@@ -207,7 +207,7 @@ class PeopleController < ApplicationController
     respond_to do |format|
       if @valid_vlp != false && @person.update_attributes(person_params.except(:is_applying_coverage))
         if @person.is_consumer_role_active? && person_params[:is_applying_coverage] == "true"
-          @person.consumer_role.check_native_status(@family, native_changed: @native_status_changed)
+          @person.consumer_role.check_native_status(@family, @native_status_changed)
         end
         @person.consumer_role.update_attribute(:is_applying_coverage, person_params[:is_applying_coverage]) if @person.consumer_role.present? && (!person_params[:is_applying_coverage].nil?)
         # if dual role, this will update both ivl and ee
