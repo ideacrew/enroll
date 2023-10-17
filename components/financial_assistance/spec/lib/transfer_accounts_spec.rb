@@ -98,6 +98,8 @@ RSpec.describe ::FinancialAssistance::TransferAccounts, dbclean: :after_each do
   let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
   let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
   let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+  let(:transfer_account_obj)  { FinancialAssistance::TransferAccounts.new }
+  let(:event_2) { Success(double(publish: true)) }
 
   before do
     allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
@@ -106,6 +108,9 @@ RSpec.describe ::FinancialAssistance::TransferAccounts, dbclean: :after_each do
     stub_const('::Operations::Products::Fetch', fetch_double)
     stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
     stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
+    allow(FinancialAssistance::TransferAccounts).to receive(:new).and_return(transfer_account_obj)
+    allow(transfer_account_obj).to receive(:build_event).and_return(event_2)
+    allow(event.success).to receive(:publish).and_return(true)
     allow(FinancialAssistance::Operations::Transfers::MedicaidGateway::TransferAccount).to receive(:new).and_return(obj)
     allow(obj).to receive(:build_event).and_return(event)
     allow(event.success).to receive(:publish).and_return(true)
