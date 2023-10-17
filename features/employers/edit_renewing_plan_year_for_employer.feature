@@ -26,3 +26,8 @@ Feature: As a renewing employer I should not be able to set contribution percent
       | 100                  | true                  |
       | 60                   | true                  |
       | 20                   | true                  |
+
+  Scenario: Meeting WCAG2.1 Guidelines
+    When ABC Widgets is logged in and on the home page
+    And staff role person clicked on benefits tab
+    Then the page should be axe clean according to: wcag21aa

@@ -17,6 +17,7 @@ require 'webdrivers'
 require 'cucumber/rails'
 require 'email_spec/cucumber'
 require 'rspec/expectations'
+require 'axe-cucumber-steps'
 # require 'capybara-screenshot/cucumber'
 require 'cucumber/rspec/doubles'
 

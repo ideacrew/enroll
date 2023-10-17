@@ -158,6 +158,8 @@ end
 
 group :test do
   gem 'action_mailer_cache_delivery', '~> 0.3'
+  gem 'axe-core-selenium'
+  gem 'axe-core-cucumber'
   gem 'capybara',                     '~> 3.12'
   gem 'capybara-screenshot',          '~> 1.0.18'
   gem 'cucumber-rails',               '2.0', :require => false
