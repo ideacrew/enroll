@@ -3,8 +3,21 @@
 require 'rails_helper'
 require 'domain/operations/financial_assistance/applicant_params_context'
 
-RSpec.describe Operations::People::TransformApplicantToMember do
+RSpec.describe Operations::People::TransformApplicantToMember, dbclean: :after_each do
   include_context 'export_applicant_attributes_context'
+
+  let(:person) do
+    FactoryBot.create(:person,
+                      :with_consumer_role,
+                      :with_active_consumer_role,
+                      hbx_id: '20944967',
+                      last_name: 'primary_last',
+                      first_name: 'primary_first',
+                      ssn: '243108282',
+                      dob: Date.new(1984, 3, 8))
+  end
+
+  let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
 
   describe '#call' do
     let(:params) do
@@ -38,7 +51,7 @@ RSpec.describe Operations::People::TransformApplicantToMember do
         expect(member_hash).to have_key(:consumer_role)
         expect(member_hash[:consumer_role]).to have_key(:skip_consumer_role_callbacks)
         expect(member_hash[:consumer_role]).to have_key(:is_applicant)
-        expect(member_hash[:consumer_role]).to have_key(:vlp_documents_attributes)
+        expect(member_hash[:consumer_role]).to have_key(:immigration_documents_attributes)
       end
     end
 

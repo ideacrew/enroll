@@ -115,7 +115,7 @@ describe ConsumerRole, dbclean: :around_each do
     end
   end
 
-  describe '#vlp_documents_attributes=' do
+  describe '#immigration_documents_attributes=' do
     let(:consumer_role) { FactoryBot.create(:consumer_role) }
 
     context 'when the VLP document already exists' do
@@ -125,7 +125,7 @@ describe ConsumerRole, dbclean: :around_each do
       it 'updates the existing VLP document' do
         vlp_document = consumer_role.vlp_documents.first
         expect do
-          consumer_role.vlp_documents_attributes = array_attributes
+          consumer_role.immigration_documents_attributes = array_attributes
         end.to change { vlp_document.alien_number }.to("111111111")
       end
     end
@@ -138,7 +138,7 @@ describe ConsumerRole, dbclean: :around_each do
         consumer_role.vlp_documents.delete_all
 
         expect do
-          consumer_role.vlp_documents_attributes = array_attributes
+          consumer_role.immigration_documents_attributes = array_attributes
         end.to change { consumer_role.vlp_documents.size }.by(1)
         expect(consumer_role.vlp_documents.last.subject).to eq('Test VLP Document')
         expect(consumer_role.vlp_documents.last.expiration_date).to eq(Date.new(2022, 12, 31))

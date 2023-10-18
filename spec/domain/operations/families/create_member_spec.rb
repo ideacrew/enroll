@@ -10,8 +10,8 @@ RSpec.describe Operations::Families::CreateMember, type: :model, dbclean: :after
                       :with_consumer_role,
                       :with_active_consumer_role,
                       hbx_id: '20944967',
-                      last_name: 'Test',
-                      first_name: 'Domtest34',
+                      last_name: 'primary_last',
+                      first_name: 'primary_first',
                       ssn: '243108282',
                       dob: Date.new(1984, 3, 8))
   end
