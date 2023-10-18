@@ -170,7 +170,7 @@ class Person
   embeds_many :documents, as: :documentable
   embeds_many :verification_types, cascade_callbacks: true, validate: true
 
-  attr_accessor :effective_date
+  attr_accessor :effective_date, :skip_person_updated_event_callback, :is_consumer_role, :is_resident_role
 
   accepts_nested_attributes_for :consumer_role, :resident_role, :broker_role, :hbx_staff_role,
     :person_relationships, :employee_roles, :phones, :employer_staff_roles
@@ -192,8 +192,6 @@ class Person
     inclusion: { in: Person::GENDER_KINDS, message: "%{value} is not a valid gender" }
 
   add_observer ::BenefitSponsors::Observers::EmployerStaffRoleObserver.new, :contact_changed?
-
-  attr_accessor :skip_person_updated_event_callback
 
   index({hbx_id: 1}, {sparse:true, unique: true})
   index({external_person_id: 1}, {sparse: true, unique: true})
@@ -1179,9 +1177,6 @@ class Person
   # FIXME
   # TODO: Move this out of here
   attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
-
-  attr_accessor :is_consumer_role
-  attr_accessor :is_resident_role
 
   before_save :assign_citizen_status_from_consumer_role
 
