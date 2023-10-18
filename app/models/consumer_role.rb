@@ -829,7 +829,7 @@ class ConsumerRole
     subject_doc || vlp_documents.build({subject:subject})
   end
 
-  def vlp_documents_attributes=(array_attributes)
+  def immigration_documents_attributes=(array_attributes)
     array_attributes.each do |vlp_document_attributes|
       vlp_document = vlp_documents.find_or_initialize_by(subject: vlp_document_attributes['subject'])
       vlp_document.assign_attributes(vlp_document_attributes)

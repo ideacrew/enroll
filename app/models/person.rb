@@ -193,6 +193,8 @@ class Person
 
   add_observer ::BenefitSponsors::Observers::EmployerStaffRoleObserver.new, :contact_changed?
 
+  attr_accessor :skip_person_updated_event_callback
+
   index({hbx_id: 1}, {sparse:true, unique: true})
   index({external_person_id: 1}, {sparse: true, unique: true})
   index({user_id: 1}, {sparse:true, unique: true})
@@ -475,6 +477,8 @@ class Person
   end
 
   def publish_updated_event
+    return if skip_person_updated_event_callback
+
     event = event('events.person_updated', attributes: { gid: self.to_global_id.uri, payload: self.changed_attributes })
     event.success.publish if event.success?
   rescue StandardError => e
