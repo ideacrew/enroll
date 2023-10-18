@@ -17,7 +17,7 @@ module FinancialAssistance
       start_on = ENV['start_on'].present? ? Date.strptime(ENV['start_on'].to_s, "%m/%d/%Y") : Date.yesterday
       end_on = ENV['end_on'].present? ? Date.strptime(ENV['end_on'].to_s, "%m/%d/%Y") : Date.yesterday
       range = start_on.beginning_of_day..end_on.end_of_day
-      eligible_family_ids = ::FinancialAssistance::Application.determined.where(submitted_at: range).distinct(:family_id)
+      eligible_family_ids = ::FinancialAssistance::Application.determined_and_submitted_within_range(range).distinct(:family_id)
       families = Family.where(:_id.in => eligible_family_ids)
       build_account_transfer_requests(families)
     end
@@ -28,7 +28,7 @@ module FinancialAssistance
       total_families_count = families.count
       account_transfer_logger.info("********************************* Total families with determined applications count #{total_families_count}  *********************************")
       families.no_timeout.each_with_index do |family, index|
-        application = FinancialAssistance::Application.where(family_id: family.id, aasm_state: 'determined').last
+        application = FinancialAssistance::Application.for_determined_family(family.id).last
         if application.present? && (application.transfer_requested || application.is_transferrable?) && !application.account_transferred
           publish_event(application, index)
           account_transfer_logger.info("********************************* processed application #{application.hbx_id}  *********************************") if count % 100 == 0
