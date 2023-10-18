@@ -243,10 +243,10 @@ module FinancialAssistance
     scope :created_asc,      -> { order(created_at: :asc) }
     scope :renewal_draft,    ->{ any_in(aasm_state: 'renewal_draft') }
     scope :income_verification_extension_required, ->{ any_in(aasm_state: 'income_verification_extension_required') }
-    scope :determined_and_submitted_within_range, ->(range) {
-      where(aas_state: 'determined', submitted_at: range)
+    scope :determined_and_submitted_within_range, lambda { |range|
+      where(aasm_state: 'determined', submitted_at: range)
     }
-    scope :for_determined_family, ->(family_id) {
+    scope :for_determined_family, lambda { |family_id|
       where(aasm_state: 'determined', family_id: family_id)
     }
 
