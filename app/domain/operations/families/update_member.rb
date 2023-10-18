@@ -10,6 +10,13 @@ module Operations
       include EventSource::Command
       include Dry::Monads[:result, :do]
 
+      # Creates or updates a family member and persists the changes to the database.
+      #
+      # @param params [Hash] The parameters for creating or updating the family member.
+      # @option params [Hash] :applicant_params The parameters for the applicant.
+      # @option params [String] :family_id The ID of the family to which the member belongs.
+      # @option params [Person] :person The person object to update.
+      # @return [Dry::Monads::Result] A monad indicating success or failure.
       def call(params)
         applicant_params, family_id, person = yield validate(params)
         member_hash = yield transform(applicant_params)
@@ -30,7 +37,7 @@ module Operations
       def validate(params)
         return Failure("Provide family_id to build member") if params[:family_id].blank?
         return Failure("Provide applicant_params to build member") if params[:applicant_params].blank?
-        return Failure("Provide person to build member") if params[:person].blank?
+        return Failure("Provide person id to build member") if params[:person].blank?
 
         Success([params[:applicant_params], params[:family_id].to_s, params[:person]])
       end
@@ -39,6 +46,13 @@ module Operations
         Operations::People::TransformApplicantToMember.new.call(applicant_params)
       end
 
+      # Person object is storing the values as empty string
+      # Applicant object is storing the values as nil
+      # Sanitizes the member parameters to ensure that the person object is not overwritten with no values again.
+      #
+      # @param member_hash [Hash] The member parameters to sanitize.
+      # @param person [Person] The person object to update.
+      # @return [Dry::Monads::Result] A monad indicating success or failure.
       def sanitize_person_params(member_hash, person)
         member_hash[:tribal_name] = person.tribal_name if person.tribal_name.to_s.empty? && member_hash[:tribal_name].to_s.empty?
         member_hash[:tribal_state] = person.tribal_state if person.tribal_state.to_s.empty? && member_hash[:tribal_state].to_s.empty?
@@ -58,6 +72,9 @@ module Operations
         Success(person)
       end
 
+      # Finds the active VLP document for the person.
+      #
+      # active vlp document from applicant params
       def find_active_vlp_document(person, member_hash)
         subject = member_hash.dig(:consumer_role, :immigration_documents_attributes, 0, :subject).to_s
         vlp_document = person.consumer_role.vlp_documents.detect { |doc| doc.subject.to_s == subject }
@@ -90,6 +107,13 @@ module Operations
         Failure("Relationship creation failed: #{e}")
       end
 
+      # Persists the changes to the person, consumer role, vlp documents, lawful presence determination and family member objects.
+      # pick the event according to the changes in person or consumer role
+      #
+      # @param person [Person] The person object to update.
+      # @param family_member [FamilyMember] The family member object to update.
+      # @param active_vlp_document [VlpDocument] The active VLP document for the person.
+      # @return [Dry::Monads::Result] A monad indicating success or failure with the event to publish.
       def persist(person, family_member, active_vlp_document)
         db_active_vlp_document_id = person.consumer_role.active_vlp_document_id
         person.consumer_role.active_vlp_document_id = active_vlp_document&.id if db_active_vlp_document_id != active_vlp_document&.id

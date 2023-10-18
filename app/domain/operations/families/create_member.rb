@@ -25,7 +25,7 @@ module Operations
         family_member = yield build_family_member(person, family)
         person = yield persist_person(person)
         family_member_id = yield persist_family(family_member, family)
-        fire_consumer_roles_create_for_vlp_docs(person.consumer_role) if person.consumer_role.present?
+        fire_created_event(person.consumer_role) if person.consumer_role.present?
 
         Success(family_member_id)
       end
@@ -89,11 +89,9 @@ module Operations
         Success(family_member.id)
       end
 
-      def fire_consumer_roles_create_for_vlp_docs(consumer_role)
+      def fire_created_event(consumer_role)
         event = event('events.individual.consumer_roles.created', attributes: { gid: consumer_role.to_global_id.uri })
         event.success.publish if event.success?
-      rescue StandardError => e
-        Rails.logger.error { "Couldn't generate consumer role create event due to #{e.backtrace}" }
       end
     end
   end
