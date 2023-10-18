@@ -6,7 +6,6 @@ class ConsumerRole
   include Mongoid::Timestamps
   include Acapi::Notifiers
   include AASM
-  include Mongoid::Attributes::Dynamic
   include StateTransitionPublisher
   include Mongoid::History::Trackable
   include DocumentsVerificationStatus

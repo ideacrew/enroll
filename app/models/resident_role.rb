@@ -4,7 +4,6 @@ class ResidentRole
   include AASM
   include Acapi::Notifiers
   include SetCurrentUser
-  include Mongoid::Attributes::Dynamic
   include Mongoid::History::Trackable
   include GlobalID::Identification
   include ChildcareSubsidyConcern
