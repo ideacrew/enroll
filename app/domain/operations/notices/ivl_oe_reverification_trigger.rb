@@ -93,7 +93,7 @@ module Operations
       end
 
       def build_family_member_hash(family)
-        family.family_members.collect do |fm|
+        family.active_family_members.collect do |fm|
           person = fm.person
           outstanding_verification_types = person.consumer_role.types_include_to_notices
           member_hash = {
@@ -144,7 +144,7 @@ module Operations
       end
 
       def documents_needed?(family)
-        family.family_members.any? { |member| member.person.consumer_role.types_include_to_notices.present? }
+        family.active_family_members.any? { |member| member.person.consumer_role.types_include_to_notices.present? }
       end
 
       def build_family_payload(family)

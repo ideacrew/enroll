@@ -8,7 +8,7 @@ unless ARGV[0].present?
 end
 require "csv"
 year = ARGV[0].to_i
-filename = "#{Rails.root}/pids/#{year + 1}_ivl_enrollments_eligible_renewal_failures.csv"
+filename = "#{Rails.root}/#{year + 1}_ivl_enrollments_eligible_renewal_failures.csv"
 
 current_bcp = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
 current_start_on = current_bcp.start_on.to_date
@@ -32,6 +32,6 @@ CSV.open(filename, "w") do |csv|
   "Total #{year} enrollments with missing renewal: #{enrollments_with_missing_renewal.count}"
 
   enrollments_with_missing_renewal.each do |enrollment|
-    csv << [enrollment.primary_hbx_enrollment_member.hbx_id, enrollment.hbx_id, enrollment.successor_creation_failure_reasons]
+    csv << [enrollment&.primary_hbx_enrollment_member&.hbx_id, enrollment&.hbx_id, enrollment&.successor_creation_failure_reasons]
   end
 end

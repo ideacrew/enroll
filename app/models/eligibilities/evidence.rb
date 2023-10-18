@@ -115,7 +115,8 @@ module Eligibilities
     def move_evidence_to_outstanding
       return unless may_move_to_outstanding?
 
-      update(verification_outstanding: true, is_satisfied: false)
+      due_date = due_on.blank? ? TimeKeeper.date_of_record + 95.days : due_on
+      update(verification_outstanding: true, is_satisfied: false, due_on: due_date)
       move_to_outstanding!
     end
 
