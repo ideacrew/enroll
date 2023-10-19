@@ -154,5 +154,16 @@ RSpec.describe ::Operations::Notices::IvlOeReverificationTrigger, dbclean: :afte
         expect(payload[:contact_method]).to eq(contact_method)
       end
     end
+
+    context 'build family member hash' do
+      let!(:inactive_person){ create(:person, hbx_id: "732021")}
+      let!(:family_member) { create(:family_member, family: family, person: inactive_person, is_active: false)}
+      let(:payload) { ::Operations::Notices::IvlOeReverificationTrigger.new.send('build_family_member_hash', family) }
+
+      it 'should include only active family members in the hash' do
+        expect(payload.any? {|members| members[:person][:hbx_id].eql?(person.hbx_id)}).to be_truthy
+        expect(payload.any? {|members| members[:person][:hbx_id].eql?(inactive_person.hbx_id)}).to be_falsey
+      end
+    end
   end
 end
