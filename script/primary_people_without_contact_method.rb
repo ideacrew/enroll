@@ -11,10 +11,10 @@ CSV.open("#{Rails.root}/primary_people_without_contact_method.csv", "w", force_q
     'Primary Person Name',
     'Primary Person Consumer Role Exists?',
     'Primary Person Contact Method',
-    '2023 Latest Determined App HBX ID',
-    '2023 Latest Determined App Aasm State',
-    '2024 Latest Determined App HBX ID',
-    '2024 Latest Determined App Aasm State'
+    'Current Year Latest Determined App HBX ID',
+    'Current Year Latest Determined App Aasm State',
+    'Prospective Year Latest Determined App HBX ID',
+    'Prospective Year Latest Determined App Aasm State'
   ]
 
   people_with_missing_contact_method = Person.all.where(:'consumer_role.contact_method' => nil)
