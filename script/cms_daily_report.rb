@@ -159,7 +159,7 @@ new_member_set = (all_enrolled_people_set - termed_people_between_nov_and_dec_se
 
 re_enrolled_member_set = all_enrolled_people_set & (renewal_candidate_set | termed_people_between_nov_and_dec_set)
 
-time_period = Time.zone.parse("#{year}-11-01 10:00:00")
+time_period = Time.zone.parse("#{year}-11-01 10:00:00").utc
 
 post_11_1_purchases = all_enrolled_people = HbxEnrollment.collection.aggregate([
   {"$match" => {
