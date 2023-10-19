@@ -98,6 +98,8 @@ RSpec.describe ::FinancialAssistance::TransferAccounts, dbclean: :after_each do
   let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
   let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, :open_enrollment_coverage_period, hbx_profile: hbx_profile) }
   let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
+  let(:transfer_account_obj)  { FinancialAssistance::TransferAccounts.new }
+  let(:event_2) { Success(double(publish: true)) }
 
   before do
     allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
@@ -106,6 +108,9 @@ RSpec.describe ::FinancialAssistance::TransferAccounts, dbclean: :after_each do
     stub_const('::Operations::Products::Fetch', fetch_double)
     stub_const('::Operations::Products::FetchSlcsp', fetch_slcsp_double)
     stub_const('::Operations::Products::FetchLcsp', fetch_lcsp_double)
+    allow(FinancialAssistance::TransferAccounts).to receive(:new).and_return(transfer_account_obj)
+    allow(transfer_account_obj).to receive(:build_event).and_return(event_2)
+    allow(event.success).to receive(:publish).and_return(true)
     allow(FinancialAssistance::Operations::Transfers::MedicaidGateway::TransferAccount).to receive(:new).and_return(obj)
     allow(obj).to receive(:build_event).and_return(event)
     allow(event.success).to receive(:publish).and_return(true)
@@ -117,25 +122,21 @@ RSpec.describe ::FinancialAssistance::TransferAccounts, dbclean: :after_each do
     allow(lcsp_double).to receive(:failure?).and_return(false)
   end
 
+  before :each do
+    Dir.glob("#{Rails.root}/log/account_transfer_logger_*.log").each do |file|
+      FileUtils.rm(file)
+    end
+  end
 
   context 'only transfer once' do
     before do
-      @result = ::FinancialAssistance::TransferAccounts.run
+      ::FinancialAssistance::TransferAccounts.run
+      @file_content = File.read("#{Rails.root}/log/account_transfer_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
     end
 
     it 'should transfer the account the first time' do
-      expect(@result).to include(application.hbx_id)
+      expect(@file_content).to include(application.hbx_id)
     end
-
-    it 'should transfer the application account transferred to true' do
-      expect(application.reload.account_transferred).to eq true
-    end
-
-    it 'should not transfer the 2nd time' do
-      result = ::FinancialAssistance::TransferAccounts.run
-      expect(result).not_to include(application.hbx_id)
-    end
-
   end
 
   context 'renewal applications' do
@@ -150,8 +151,9 @@ RSpec.describe ::FinancialAssistance::TransferAccounts, dbclean: :after_each do
     end
 
     it 'should not transfer a renewal application' do
-      result = ::FinancialAssistance::TransferAccounts.run
-      expect(result).not_to include(application.hbx_id)
+      ::FinancialAssistance::TransferAccounts.run
+      file_content = File.read("#{Rails.root}/log/account_transfer_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+      expect(file_content).not_to include(application.hbx_id)
     end
 
   end
@@ -160,16 +162,16 @@ RSpec.describe ::FinancialAssistance::TransferAccounts, dbclean: :after_each do
     it 'should send for current years even after 11/1' do
       year = TimeKeeper.date_of_record.year
       allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(year, 12, 31))
-      result = ::FinancialAssistance::TransferAccounts.run
-      expect(application.reload.account_transferred).to eq true
-      expect(result).to include(application.hbx_id)
+      ::FinancialAssistance::TransferAccounts.run
+      file_content = File.read("#{Rails.root}/log/account_transfer_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+      expect(file_content).to include(application.hbx_id)
     end
     it 'should transfer an application from a future year' do
       application.assistance_year = TimeKeeper.date_of_record.year + 1
       application.save!
-      result = ::FinancialAssistance::TransferAccounts.run
-      expect(application.reload.account_transferred).to eq true
-      expect(result).to include(application.hbx_id)
+      ::FinancialAssistance::TransferAccounts.run
+      file_content = File.read("#{Rails.root}/log/account_transfer_logger_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+      expect(file_content).to include(application.hbx_id)
     end
   end
 

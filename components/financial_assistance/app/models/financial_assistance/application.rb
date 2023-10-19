@@ -165,6 +165,8 @@ module FinancialAssistance
     index({ aasm_state: 1 })
     index({ created_at: 1 })
     index({ assistance_year: 1 })
+    index({ aasm_state: 1, submitted_at: 1 })
+    index({ aasm_state: 1, family_id: 1 })
     index({ "workflow_state_transitions.transition_at" => 1,
             "workflow_state_transitions.to_state" => 1 },
           { name: "workflow_to_state" })
@@ -187,8 +189,6 @@ module FinancialAssistance
     # applicant index
     index({ "applicants._id" => 1 })
     index({"applicants.no_ssn" => 1})
-    index({"applicants.assisted_income_validation" => 1})
-    index({"applicants.assisted_mec_validation" => 1})
     index({"applicants.aasm_state" => 1})
     index({"applicants.is_active" => 1})
     index({"applicants.csr_percent_as_integer" => 1})
@@ -243,6 +243,12 @@ module FinancialAssistance
     scope :created_asc,      -> { order(created_at: :asc) }
     scope :renewal_draft,    ->{ any_in(aasm_state: 'renewal_draft') }
     scope :income_verification_extension_required, ->{ any_in(aasm_state: 'income_verification_extension_required') }
+    scope :determined_and_submitted_within_range, lambda { |range|
+      where(aasm_state: 'determined', submitted_at: range)
+    }
+    scope :for_determined_family, lambda { |family_id|
+      where(aasm_state: 'determined', family_id: family_id)
+    }
 
     # Applications that are in submitted and after submission states. Non work in progress applications.
     scope :submitted_and_after, lambda {

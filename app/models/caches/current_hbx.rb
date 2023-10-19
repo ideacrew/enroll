@@ -6,7 +6,7 @@ module Caches
     end
 
     def self.cache!
-      Thread.current[:__current_hbx_lookup_cache] = HbxProfile.find_by_state_abbreviation(HbxProfile.aca_state_abbreviation)
+      Thread.current[:__current_hbx_lookup_cache] = HbxProfile.find_current_with_proxy_inbox
     end
 
     def self.purge!
