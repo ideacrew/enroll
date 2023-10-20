@@ -22,8 +22,12 @@ module Subscribers
 
       def process_account_transfer_requested_event(subscriber_logger, response)
         subscriber_logger.info "process_account_transfer_requested_event: ------- start"
-        ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferOut.new.call(application_id: response[:application_id])
-        subscriber_logger.info "process_account_transfer_requested_event: ------- end"
+        result = ::FinancialAssistance::Operations::Transfers::MedicaidGateway::AccountTransferOut.new.call(application_id: response[:application_id])
+        if result.success?
+          subscriber_logger.info "process_account_transfer_requested_event: success: #{result.value!}"
+        else
+          subscriber_logger.info "process_account_transfer_requested_event: Failure: #{result.failure}"
+        end
       rescue StandardError => e
         subscriber_logger.error "process_account_transfer_requested_event: error: #{e.message} backtrace: #{e.backtrace}"
         subscriber_logger.error "process_account_transfer_requested_event: ------- end"

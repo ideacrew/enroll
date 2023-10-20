@@ -138,8 +138,6 @@ group :development, :test do
   gem 'addressable',            '~> 2.3'
   # gem 'bundler-audit',          '~> 0.6'
   gem 'brakeman'
-  gem 'capistrano',             '~> 3.1'
-  gem 'capistrano-rails',       '1.4'
   gem 'climate_control',        '~> 0.2.0'
   gem 'email_spec',             '~> 2'
   gem 'factory_bot_rails',      '~> 4.11'
@@ -181,6 +179,5 @@ end
 
 group :production do
   gem 'newrelic_rpm', '~> 5.0'
-  gem 'unicorn',      '~> 4.8'
   gem 'puma',         '~> 3.12.4'
 end
