@@ -129,7 +129,7 @@ module FinancialAssistance
     embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship', cascade_callbacks: true, validate: true
     embeds_many :applicants, inverse_of: :application, class_name: '::FinancialAssistance::Applicant', cascade_callbacks: true, validate: true
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
-    has_many :transactions, as: :transactable, class_name: 'Transmittable::Transaction'
+    has_many :transactions, as: :transactable, class_name: '::Transmittable::Transaction'
 
     accepts_nested_attributes_for :applicants, :workflow_state_transitions
 
