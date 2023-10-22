@@ -6,7 +6,7 @@ module Transmittable
     extend ActiveSupport::Concern
 
     included do
-      has_many :transactions, as: :transactable, class_name: 'Transmittable::Transaction'
+      has_many :transactions, as: :transactable, class_name: '::Transmittable::Transaction'
     end
   end
 end
