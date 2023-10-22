@@ -55,12 +55,12 @@ module Operations
       end
 
       def create_process_status
-        ::Transmittable::CreateProcessStatusHash.new.call({ event: 'initial', state_key: :initial, started_at: DateTime.now,
-                                                            message: 'created job' }).value!
+        Operations::Transmittable::CreateProcessStatusHash.new.call({ event: 'initial', state_key: :initial, started_at: DateTime.now,
+                                                                      message: 'created job' }).value!
       end
 
       def create_job(job_entity)
-        job = Transmittable::Job.create(job_entity.to_h)
+        job = ::Transmittable::Job.create(job_entity.to_h)
         job.save ? Success(job) : Failure("Unable to save job due to invalid params")
       end
     end

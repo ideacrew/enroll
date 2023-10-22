@@ -20,7 +20,7 @@ module Operations
       def validate_params(params)
         return Failure('Transaction cannot be created without key symbol') unless params[:key].is_a?(Symbol)
         return Failure('Transaction cannot be created without started_at datetime') unless params[:started_at].is_a?(DateTime)
-        return Failure('Transaction cannot be created without a transmission') unless params[:transmission].is_a?(Transmittable::Transmission)
+        return Failure('Transaction cannot be created without a transmission') unless params[:transmission].is_a?(::Transmittable::Transmission)
         return Failure('Transaction cannot be created without a subject') unless params[:subject]
         return Failure('Transaction cannot be created without event string') unless params[:event].is_a?(String)
         return Failure('Transaction cannot be created without state_key symbol') unless params[:state_key].is_a?(Symbol)
@@ -44,8 +44,8 @@ module Operations
       end
 
       def create_process_status(event, state_key)
-        ::Transmittable::CreateProcessStatusHash.new.call({ event: event, state_key: state_key, started_at: DateTime.now,
-                                                            message: 'created transaction' }).value!
+        Operations::Transmittable::CreateProcessStatusHash.new.call({ event: event, state_key: state_key, started_at: DateTime.now,
+                                                                      message: 'created transaction' }).value!
       end
 
       def create_transaction_entity(transaction_hash)

@@ -27,12 +27,12 @@ module Operations
 
       def find_or_create_job(values)
         if values[:job_id]
-          job = Transmittable::Job.where(job_id: values[:job_id]).last
+          job = ::Transmittable::Job.where(job_id: values[:job_id]).last
 
           job ? Success(job) : create_job(values)
 
         elsif values[:message_id]
-          job = Transmittable::Job.where(message_id: values[:message_id]).last
+          job = ::Transmittable::Job.where(message_id: values[:message_id]).last
 
           job ? Success(job) : create_job(values)
         else
@@ -41,7 +41,7 @@ module Operations
       end
 
       def create_job(values)
-        result = ::Transmittable::CreateJob.new.call(values)
+        result = Operations::Transmittable::CreateJob.new.call(values)
 
         result.success? ? Success(result.value!) : result
       end

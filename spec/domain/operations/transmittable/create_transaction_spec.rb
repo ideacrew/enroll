@@ -8,13 +8,13 @@ RSpec.describe Operations::Transmittable::CreateTransaction, dbclean: :after_eac
   let(:title) { 'SSA Verification Request'}
   let(:description) { 'Request for SSA verification to CMS'}
   let(:transmission) { FactoryBot.create(:transmittable_transmission) }
-  let(:person) { FactoryBot.create(:person) }
+  let(:application) { FinancialAssistance::Application.create }
   let(:required_params) do
     {
       key: key,
       started_at: DateTime.now,
       transmission: transmission,
-      subject: person,
+      subject: application,
       event: 'initial',
       state_key: :initial
     }

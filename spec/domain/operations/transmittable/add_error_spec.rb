@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'shared_examples/ssa_transmittable'
+require 'shared_examples/transmittable'
 
 RSpec.describe Operations::Transmittable::AddError, dbclean: :after_each do
-  include_context "ssa transmittable job transmission transaction"
+  include_context "transmittable job transmission transaction"
   subject { described_class.new }
 
   context 'sending invalid params' do

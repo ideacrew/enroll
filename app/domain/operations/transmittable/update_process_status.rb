@@ -29,6 +29,7 @@ module Operations
           last_process_state.ended_at = DateTime.now if last_process_state
           transmittable_object.process_status.process_states.create(process_state.to_h)
           if [:failed, :completed, :succeeded].include?(values[:state])
+            last_process_state = transmittable_object&.process_status&.process_states&.last
             transmittable_object.ended_at = DateTime.now
             last_process_state.ended_at = DateTime.now
           end
@@ -37,8 +38,8 @@ module Operations
         end
         Success("Process status updated successfully")
       rescue StandardError => e
-        ::Transmittable::AddError.new.call({ transmittable_objects: values[:transmittable_objects], key: :update_process_status,
-                                             message: "Error updating process status: #{e.message}" })
+        Operations::Transmittable::AddError.new.call({ transmittable_objects: values[:transmittable_objects], key: :update_process_status,
+                                                       message: "Error updating process status: #{e.message}" })
         Failure("Error updating process status: #{e.message}")
       end
 

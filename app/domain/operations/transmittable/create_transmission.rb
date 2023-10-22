@@ -19,7 +19,7 @@ module Operations
       def validate_params(params)
         return Failure('Transmission cannot be created without key symbol') unless params[:key].is_a?(Symbol)
         return Failure('Transmission cannot be created without started_at datetime') unless params[:started_at].is_a?(DateTime)
-        return Failure('Transmission cannot be created without a job') unless params[:job].is_a?(Transmittable::Job)
+        return Failure('Transmission cannot be created without a job') unless params[:job].is_a?(::Transmittable::Job)
         return Failure('Transmission cannot be created without event string') unless params[:event].is_a?(String)
         return Failure('Transmission cannot be created without state_key symbol') unless params[:state_key].is_a?(Symbol)
         return Failure('Transmission cannot be created without correlation_id string') unless params[:correlation_id].is_a?(String)
@@ -41,8 +41,8 @@ module Operations
       end
 
       def create_process_status(event, state_key)
-        ::Transmittable::CreateProcessStatusHash.new.call({ event: event, state_key: state_key, started_at: DateTime.now,
-                                                            message: 'created transmission' }).value!
+        Operations::Transmittable::CreateProcessStatusHash.new.call({ event: event, state_key: state_key, started_at: DateTime.now,
+                                                                      message: 'created transmission' }).value!
       end
 
       def transmission_entity(transmission_hash)
