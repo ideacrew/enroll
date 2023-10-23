@@ -768,6 +768,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       let(:session_variables) { { elected_aptc: elected_aptc, max_aptc: max_aptc, aptc_grants: double } }
       before do
         EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:enroll_app].settings(:default_aptc_percentage).stub(:item).and_return(100)
         allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
           double(
             call: double(
