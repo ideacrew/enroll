@@ -732,7 +732,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
   end
 
-  context '#set_elected_aptc_by_params' do
+  context '#set_elected_aptc_by_params', :dbclean => :around_each  do
     context 'both elected_aptc and aptc in session are same' do
       let(:elected_aptc) { 637.0 }
       let(:max_aptc)   { 637.0 }
