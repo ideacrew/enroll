@@ -262,6 +262,7 @@ module Eligibilities
         transitions from: :unverified, to: :attested
         transitions from: :negative_response_received, to: :attested
         transitions from: :attested, to: :attested
+        transitions from: :verified, to: :attested
       end
 
       event :move_to_rejected, :after => [:record_transition] do
