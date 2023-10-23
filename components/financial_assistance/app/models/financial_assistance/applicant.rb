@@ -1323,7 +1323,7 @@ module FinancialAssistance
       evidence.verification_outstanding = false
       evidence.is_satisfied = true
       evidence.due_on = nil
-      evidence.attest
+      evidence.attest unless evidence.verified?
       save!
     end
 
