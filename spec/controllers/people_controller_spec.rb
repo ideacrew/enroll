@@ -61,6 +61,52 @@ RSpec.describe PeopleController, dbclean: :after_each do
       post :update, params: {id: person.id, person: person_attributes}
     end
 
+    describe "native status" do
+      let!(:ai_an_person) {FactoryBot.create(:person, :with_consumer_role, tribal_id: '123')}
+      let!(:ai_an_person_params) {ai_an_person.attributes.to_hash.merge(:is_applying_coverage => "true") }
+      let!(:ai_an_family) { FactoryBot.create(:family, :with_primary_family_member, person: ai_an_person) }
+      let!(:hbx_enrollment_member) do
+        FactoryBot.build(:hbx_enrollment_member,
+                         is_subscriber: true,
+                         applicant_id: ai_an_family.family_members.first.id,
+                         coverage_start_on: TimeKeeper.date_of_record.beginning_of_month,
+                         eligibility_date: TimeKeeper.date_of_record.beginning_of_month)
+      end
+      let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, hbx_enrollment_members: [hbx_enrollment_member], family: ai_an_family, household: ai_an_family.latest_household, is_active: true) }
+
+      before :each do
+        allow(Person).to receive(:find).and_return(ai_an_person)
+        ai_an_person.consumer_role.coverage_purchased
+        request.env['HTTP_REFERER'] = "insured/families/personal"
+        allow(ai_an_person).to receive(:is_consumer_role_active?).and_return(true)
+        sign_in user
+      end
+
+      context "when native status has changed" do
+
+        before do
+          allow_any_instance_of(VlpDoc).to receive(:native_status_changed?).and_return(true)
+          post :update, params: {id: ai_an_person.id, person: ai_an_person_params}
+        end
+
+        it "fails native status" do
+          ai_an_person.reload
+          expect(ai_an_person.consumer_role.workflow_state_transitions.first.event).to eql('fail_native_status!')
+        end
+      end
+
+      context "when native status has not changed" do
+        before do
+          allow_any_instance_of(VlpDoc).to receive(:native_status_changed?).and_return(false)
+          post :update, params: {id: ai_an_person.id, person: ai_an_person_params}
+        end
+
+        it "does not fail native status" do
+          ai_an_person.reload
+          expect(ai_an_person.consumer_role.workflow_state_transitions.first.event).to_not eql('fail_native_status!')
+        end
+      end
+    end
 
     context "to verify if addresses are updated?" do
 

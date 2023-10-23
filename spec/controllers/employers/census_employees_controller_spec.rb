@@ -76,6 +76,24 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
         expect(response).not_to render_template("new")
       end
     end
+
+    context 'with broker agency staff role' do
+      let(:user) { FactoryBot.create(:user) }
+      let!(:person) { FactoryBot.create(:person, user: user) }
+      let!(:site) { FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :dc) }
+      let!(:broker_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+      let!(:broker_agency_profile) { broker_organization.broker_agency_profile }
+      let!(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person) }
+      let!(:broker_agency_accounts) { FactoryBot.create(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, benefit_sponsorship: benefit_sponsorship) }
+
+      it "should not render the new template" do
+        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+        sign_in(user)
+        get :new, params: {:employer_profile_id => employer_profile_id}
+        expect(response).not_to be_redirect
+        expect(response).to render_template("new")
+      end
+    end
   end
 
   describe "POST create", dbclean: :around_each do
