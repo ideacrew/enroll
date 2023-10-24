@@ -13,7 +13,7 @@ describe ".propogate_cancel" do
 
   context "individual market" do
     before do
-      EnrollRegistry[:cancel_renewals_for_term].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:cancel_renewals_for_term].feature).to receive(:is_enabled).and_return(true)
       family.hbx_enrollments.where(effective_on: TimeKeeper.date_of_record.next_year.beginning_of_year).first.update_attributes(aasm_state: "auto_renewing")
       active_coverage.update_attributes(aasm_state: :coverage_selected)
       allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 1))
@@ -94,7 +94,7 @@ describe ".propogate_cancel" do
 
     context 'when disabled' do
       before do
-        EnrollRegistry[:exclude_child_only_offering].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:exclude_child_only_offering].feature).to receive(:is_enabled).and_return(false)
       end
 
       context 'when members greater than 18 exists' do
@@ -144,7 +144,7 @@ describe ".propogate_cancel" do
 
     context 'when enabled' do
       before do
-        EnrollRegistry[:exclude_child_only_offering].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:exclude_child_only_offering].feature).to receive(:is_enabled).and_return(true)
       end
 
       context 'when members greater than 18 exists' do
@@ -209,7 +209,7 @@ describe ".propogate_cancel" do
 
     context 'when disabled' do
       before do
-        EnrollRegistry[:exclude_adult_and_child_only_offering].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:exclude_adult_and_child_only_offering].feature).to receive(:is_enabled).and_return(false)
       end
 
       context 'when members greater than 18 exists' do
@@ -259,7 +259,7 @@ describe ".propogate_cancel" do
 
     context 'when enabled' do
       before do
-        EnrollRegistry[:exclude_adult_and_child_only_offering].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:exclude_adult_and_child_only_offering].feature).to receive(:is_enabled).and_return(true)
       end
 
       context 'when members greater than 18 exists' do

@@ -69,21 +69,24 @@ module Operations
 
               payload_entity
             rescue StandardError => e
-              rrv_logger.error("Failed to transform application with hbx_id #{application.hbx_id} due to #{e.inspect}")
-              Failure("Failed to transform application with hbx_id #{application.hbx_id}")
+              rrv_logger.error("RRV process failed to publish event for the application with hbx_id #{application.hbx_id} due to #{e.inspect}")
+              Failure("RRV process failed to publish event for the application with hbx_id #{application.hbx_id} due to #{e.inspect}")
             end
 
             def validate_applicants(payload_entity, application)
-              active_applicants = application.active_applicants
-              payload_entity.value!.applicants.map do |applicant_entity|
-                applicant = active_applicants.detect { |member| member.person_hbx_id == applicant_entity.person_hbx_id }
-                next unless applicant.non_esi_evidence.present?
+              eligible_applicants = application.active_applicants.select(&:non_esi_evidence)
+              applicants_entity = payload_entity.value!.applicants
 
+              eligible_applicants.map do |eligible_applicant|
+                applicant_entity = applicants_entity.detect { |appl_entity| eligible_applicant.person_hbx_id == appl_entity.person_hbx_id }
                 result = Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules.new.call(applicant_entity, :non_esi_mec)
-                next [applicant_entity.person_hbx_id, true] unless result.failure?
 
-                record_applicant_failure(applicant.non_esi_evidence, result)
-                [applicant_entity.person_hbx_id, false]
+                if result.success?
+                  [applicant_entity.person_hbx_id, true]
+                else
+                  record_applicant_failure(eligible_applicant.non_esi_evidence, result)
+                  [applicant_entity.person_hbx_id, false]
+                end
               end
             end
 

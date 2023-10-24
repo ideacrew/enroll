@@ -26,8 +26,8 @@ module ConsumerWorld
   end
 
   def create_prior_and_current_benefit_packages
-    EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).stub(:item).and_return('single')
-    EnrollRegistry[:service_area].setting(:service_area_model).stub(:item).and_return('single')
+    allow(EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model)).to receive(:item).and_return('single')
+    allow(EnrollRegistry[:service_area].setting(:service_area_model)).to receive(:item).and_return('single').and_return('single')
     prior_coverage_year = Date.today.year - 1
     current_coverage_year = Date.today.year
     prior_hbx_profile = FactoryBot.create(:hbx_profile,
@@ -47,8 +47,8 @@ module ConsumerWorld
   end
 
   def create_prior_current_and_future_benefit_packages
-    EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).stub(:item).and_return('single')
-    EnrollRegistry[:service_area].setting(:service_area_model).stub(:item).and_return('single')
+    allow(EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model)).to receive(:item).and_return('single')
+    allow(EnrollRegistry[:service_area].setting(:service_area_model)).to receive(:item).and_return('single').and_return('single')
     prior_coverage_year = Date.today.year - 1
     current_coverage_year = Date.today.year
     hbx_profile = FactoryBot.create(:hbx_profile,

@@ -8,7 +8,7 @@ RSpec.describe ExceptionsController, :type => :controller, :dbclean => :after_ea
     context "custom_exceptions_controller feature" do
       context "enabled" do
         before do
-          EnrollRegistry[:custom_exceptions_controller].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:custom_exceptions_controller].feature).to receive(:is_enabled).and_return(true)
           get :show, params: {id: 1}
         end
 
@@ -19,7 +19,7 @@ RSpec.describe ExceptionsController, :type => :controller, :dbclean => :after_ea
 
       context "disabled" do
         before do
-          EnrollRegistry[:custom_exceptions_controller].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:custom_exceptions_controller].feature).to receive(:is_enabled).and_return(false)
           get :show, params: {id: 1}
         end
 
