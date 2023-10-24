@@ -69,8 +69,8 @@ module Operations
 
               payload_entity
             rescue StandardError => e
-              rrv_logger.error("Failed to transform application with hbx_id #{application.hbx_id} due to #{e.inspect}")
-              Failure("Failed to transform application with hbx_id #{application.hbx_id}")
+              rrv_logger.error("RRV process failed to publish event for the application with hbx_id #{application.hbx_id} due to #{e.inspect}")
+              Failure("RRV process failed to publish event for the application with hbx_id #{application.hbx_id} due to #{e.inspect}")
             end
 
             def validate_applicants(payload_entity, application)
