@@ -3925,7 +3925,7 @@ ul.list-right-section li a img {
 }
 .checkbox-custom:checked + .checkbox-custom-label::before {
     background: #337ab7 none repeat scroll 0 0;
-    color: #fff;
+    color: #fff; 
 }
 label.checkbox-custom-label {
     color: #414141;
@@ -3936,7 +3936,8 @@ label.checkbox-custom-label {
 }
 .checkbox-custom:focus + .checkbox-custom-label::before, .radio-custom:focus + .radio-custom-label::before{
     padding: 0;
-    outline: -webkit-focus-ring-color auto 1px;
+    outline: -webkit-focus-ring-color auto 1px; 
+    //This was added to improve visual focus on our checkboxes. Since this ::before is cosmetic, it can be left as is.
 }
 .checkbox-filter-wrapper {
     border-bottom: 1px solid #cacaca;

@@ -64,7 +64,7 @@ h1,h2,h3,h4,h5,h6 {
     }
     .navbar-collapse {
       .header-text {
-        color: $secondary-gray;
+        color: $secondary-gray; //uses the newly made secondary-gray for darker navbar headers
         font-size: 14px;
         text-transform: uppercase;
         font-weight: $primary-bold;
@@ -76,7 +76,7 @@ h1,h2,h3,h4,h5,h6 {
           line-height: 50px;
           padding: 23px 15px;
           font-weight: 600;
-          color: #447397;
+          color: #447397; //lighter blue for portal text
           &:hover {
             background-color: $background-hover;
             text-decoration: none;
@@ -91,7 +91,7 @@ h1,h2,h3,h4,h5,h6 {
           span:first-of-type {}
           span:last-of-type {
             .fa {
-              color: $secondary-gray;
+              color: $secondary-gray; //also uses the new gray for the right navbar
             }
             strong {
               line-height: 0;
@@ -136,7 +136,7 @@ h1,h2,h3,h4,h5,h6 {
     text-decoration:none;
     cursor:pointer;
     transition: all 0.3s ease 0s;
-    color: #e72326;
+    color: #e72326; //slightly darker red on hover
   }
 
   a:visited {
