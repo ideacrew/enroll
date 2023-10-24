@@ -152,7 +152,7 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
 
   context 'success' do
     it 'should return success if assistance year is passed' do
-      result = subject.call({application_hbx_id: application.hbx_id, family_hbx_id: family.hbx_assigned_id})
+      result = subject.call({ application_hbx_id: application.hbx_id })
       expect(result).to be_success
     end
   end
@@ -164,7 +164,7 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
       allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
       applicant2.update_attributes!(ssn: "756841234")
-      @result = subject.call({application_hbx_id: application.hbx_id, family_hbx_id: family.hbx_assigned_id})
+      @result = subject.call({ application_hbx_id: application.hbx_id })
       application.reload
     end
 
@@ -201,7 +201,7 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
       allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
       applicant2.update_attributes!(ssn: "756841234", is_applying_coverage: false, is_ia_eligible: false)
-      @result = subject.call({application_hbx_id: application.hbx_id, family_hbx_id: family.hbx_assigned_id})
+      @result = subject.call({ application_hbx_id: application.hbx_id })
       application.reload
     end
 
@@ -230,7 +230,7 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
       before do
         allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
-        @result = subject.call({application_hbx_id: application.hbx_id, family_hbx_id: family.hbx_assigned_id})
+        @result = subject.call({ application_hbx_id: application.hbx_id })
         application.reload
       end
 
@@ -265,7 +265,7 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
         allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
         applicant2.update_attributes!(is_applying_coverage: false, is_ia_eligible: false)
-        @result = subject.call({application_hbx_id: application.hbx_id, family_hbx_id: family.hbx_assigned_id})
+        @result = subject.call({ application_hbx_id: application.hbx_id })
         application.reload
       end
 
@@ -297,7 +297,7 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
           applicant.unset(:encrypted_ssn)
         end
         application.save!
-        @result = subject.call({application_hbx_id: application.hbx_id, family_hbx_id: family.hbx_assigned_id})
+        @result = subject.call({ application_hbx_id: application.hbx_id })
         application.reload
       end
 
@@ -336,7 +336,7 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
         end
         applicant2.update_attributes!(is_applying_coverage: false, is_ia_eligible: false)
         application.save!
-        @result = subject.call({application_hbx_id: application.hbx_id, family_hbx_id: family.hbx_assigned_id})
+        @result = subject.call({ application_hbx_id: application.hbx_id })
         application.reload
       end
 
@@ -360,10 +360,9 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
     end
   end
 
-  context 'failure' do
-    it "should fail if application_hbx_id is not given" do
-      result = subject.call(family_hbx_id: family.hbx_assigned_id)
-      expect(result).not_to be_success
+  context 'without input params' do
+    it 'returns failure with error messages' do
+      expect(subject.call({})).to eq Failure(['application hbx_id is missing'])
     end
   end
 end

@@ -28,10 +28,7 @@ module Operations
             private
 
             def validate(params)
-              errors = []
-              errors << 'application hbx_id is missing' unless params[:application_hbx_id]
-              errors << 'family_hbx_id is missing' unless params[:family_hbx_id]
-
+              errors = params[:application_hbx_id] ? [] : ['application hbx_id is missing']
               errors.empty? ? Success(params) : Failure(errors)
             end
 
