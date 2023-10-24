@@ -1,7 +1,7 @@
 desc "Run a report for enrollment eligibility"
 task :enrollment_renewal_eligibility_report => :environment do
   file_name = "#{Rails.root}/enrollment_eligibility_report_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.csv"
-  field_names = %w[EnrollmentHbxId EnrollmentAASMState PrimaryHbxID MemberHbxID MemberFirstName MemberLastName MemberDOB member-is_applying_coverage member-citizen_status member-is_incarcerated member-state member_present_in_manage_family? applicant-is_applying_coverage applicant-citizen_status applicant-is_incarcerated applicant-state error_message]
+  field_names = %w[EnrollmentHbxId EnrollmentAASMState EnrollmentProductKind PrimaryHbxID MemberHbxID MemberFirstName MemberLastName MemberDOB member-is_applying_coverage member-citizen_status member-is_incarcerated member-state member-is_homeless? member-is_temporarily_out_of_state? member-active? member_present_in_manage_family? applicant-is_applying_coverage applicant-citizen_status applicant-is_incarcerated applicant-state error_message]
   CSV.open(file_name, 'w', force_quotes: true) do |csv|
     csv << field_names
     active_enrollments = HbxEnrollment.where(:kind.in => %w[individual coverall], :aasm_state.nin => %w[shopping coverage_canceled coverage_terminated coverage_expired])
@@ -25,6 +25,7 @@ task :enrollment_renewal_eligibility_report => :environment do
 
             csv << [enrollment.hbx_id,
                     enrollment.aasm_state,
+                    enrollment.product&.kind,
                     primary_person.hbx_id,
                     member_person.hbx_id,
                     member_person.first_name,
@@ -34,6 +35,9 @@ task :enrollment_renewal_eligibility_report => :environment do
                     member_person.citizen_status,
                     member_person.is_incarcerated,
                     member_person.rating_address&.state,
+                    member_person.is_homeless,
+                    member_person.is_temporarily_out_of_state,
+                    member_person.resident_role&.is_active? || member_person.consumer_role&.is_active?,
                     active_family_member_ids.include?(enrollment_member.applicant_id),
                     applicant&.is_applying_coverage,
                     applicant&.citizen_status,
