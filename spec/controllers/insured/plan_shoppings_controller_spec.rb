@@ -761,6 +761,35 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       end
     end
 
+    context 'when max_aptc is zero' do
+      let(:elected_aptc) { 500.0 }
+      let(:max_aptc)   { 0.0 }
+      let(:given_aptc) { 300.0 }
+      let(:session_variables) { { elected_aptc: elected_aptc, max_aptc: max_aptc, aptc_grants: double } }
+
+      before do
+        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+
+        allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
+          double(
+            call: double(
+              success?: true,
+              value!: max_aptc
+            )
+          )
+        )
+      end
+
+      it 'returns zero' do
+        subject = Insured::PlanShoppingsController.new
+        request = ActionDispatch::Request.new({})
+        request.session = session_variables
+        subject.request = request
+        subject.send(:set_elected_aptc_by_params, given_aptc)
+        expect(subject.request.session[:elected_aptc]).to eq(max_aptc)
+      end
+    end
+
     context 'elected_aptc is greater than the max_aptc and aptc in session' do
       let(:elected_aptc) { 605.0 }
       let(:max_aptc)   { 605.0 }
