@@ -362,7 +362,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       context 'when mthh enabled' do
         before do
           allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1390, total_premium: 1390))
-          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
           update_age_off_excluded(enrollment.family, false)
         end
 
@@ -679,7 +679,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           enrollment.coverage_kind = "dental"
           enrollment.product = dental_product
           enrollment.save!
-          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
         end
 
         context 'unassisted renewal' do

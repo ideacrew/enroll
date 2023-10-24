@@ -30,7 +30,7 @@ describe 'Pay Now Click Tracking Report', :dbclean => :after_each do
 
     context 'Configuration test for providing carriers' do
       before do
-        EnrollRegistry[:carrier_abbrev_list].feature.stub(:item).and_return(["AHI", "BLHI", "GHMSI", "DDPA", "DTGA", "DMND", "KFMASI", "META", "UHIC"])
+        allow(EnrollRegistry[:carrier_abbrev_list].feature).to receive(:item).and_return(["AHI", "BLHI", "GHMSI", "DDPA", "DTGA", "DMND", "KFMASI", "META", "UHIC"])
         payment_transaction1.reload
         payment_transaction2.reload
 
@@ -53,7 +53,7 @@ describe 'Pay Now Click Tracking Report', :dbclean => :after_each do
 
     context 'Configuration test new carrier addition' do
       before do
-        EnrollRegistry[:carrier_abbrev_list].feature.stub(:item).and_return(["CHO", "HPHC", "ANTHM", "NEDD"])
+        allow(EnrollRegistry[:carrier_abbrev_list].feature).to receive(:item).and_return(["CHO", "HPHC", "ANTHM", "NEDD"])
         issuer_profile.update_attributes(abbrev: "NEDD")
         payment_transaction1.reload
         payment_transaction2.reload

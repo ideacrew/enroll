@@ -775,7 +775,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       end
 
       it "should render create_eligibility if save successful" do
-        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
         sign_in(user)
         post :create_eligibility, params: params, xhr: true, format: :js
         eligibility_determination = family.reload.eligibility_determination
@@ -901,7 +901,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     before do
       allow(employee_role.census_employee).to receive(:employer_profile).and_return(abc_profile)
       allow(person).to receive(:employee_roles).and_return([employee_role])
-      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
     end
 
     it "should render back to edit_enrollment if there is a validation error on save" do
@@ -992,7 +992,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context "when GA is enabled in settings" do
       before do
-        EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:general_agency].feature).to receive(:is_enabled).and_return(true)
         Enroll::Application.reload_routes!
       end
       it "should returns http success" do
@@ -1008,7 +1008,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context "when GA is disabled in settings" do
       before do
-        EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:general_agency].feature).to receive(:is_enabled).and_return(false)
         Enroll::Application.reload_routes!
       end
       it "should returns http success" do
@@ -1039,7 +1039,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
 
     before do
-      EnrollRegistry[:change_end_date].feature.settings.last.stub(:item).and_return(true)
+      allow(EnrollRegistry[:change_end_date].feature.settings.last).to receive(:item).and_return(true)
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       sign_in(user)
     end
@@ -1285,7 +1285,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
 
     before :each do
-      EnrollRegistry[:drop_enrollment_members].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:drop_enrollment_members].feature).to receive(:is_enabled).and_return(true)
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       sign_in user
     end
