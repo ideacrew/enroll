@@ -77,7 +77,7 @@ module Operations
               active_applicants = application.active_applicants
               payload_entity.value!.applicants.map do |applicant_entity|
                 applicant = active_applicants.detect { |member| member.person_hbx_id == applicant_entity.person_hbx_id }
-                next unless applicant.non_esi_evidence.present?
+                next [] unless applicant.non_esi_evidence.present?
 
                 result = Operations::Fdsh::PayloadEligibility::CheckApplicantEligibilityRules.new.call(applicant_entity, :non_esi_mec)
                 next [applicant_entity.person_hbx_id, true] unless result.failure?
