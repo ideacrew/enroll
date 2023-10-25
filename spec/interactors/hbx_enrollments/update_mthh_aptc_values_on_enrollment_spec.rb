@@ -130,7 +130,7 @@ RSpec.describe ::HbxEnrollments::UpdateMthhAptcValuesOnEnrollment, :dbclean => :
     cr2 = FactoryBot.build(:consumer_role, :contact_method => "Paper Only")
     family.family_members[2].person.consumer_role = cr2
     family.save!
-    EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+    allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
     allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1500, total_premium: 1600))
   end
 

@@ -135,7 +135,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
       context "when kind is individual" do
 
         before :each do
-          EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:display_ivl_termination_reason].feature).to receive(:is_enabled).and_return(true)
           allow(hbx_enrollment).to receive(:kind).and_return('individual')
           allow(hbx_enrollment).to receive(:is_ivl_by_kind?).and_return(true)
           allow(hbx_enrollment).to receive(:is_enrolled_by_aasm_state?)
@@ -180,7 +180,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
 
     context "Grouping is enabled" do
       before :each do
-        EnrollRegistry[:home_tiles_group_by_year].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:home_tiles_group_by_year].feature).to receive(:is_enabled).and_return(true)
       end
 
       it "should display the year of the plan as header" do
@@ -410,7 +410,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
 
     context "when termination reason config is enabled and enrollment is IVL" do
       before :each do
-        EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:display_ivl_termination_reason].feature).to receive(:is_enabled).and_return(true)
       end
 
       it "should display Terminated by Insurance Company indicator on enrollment tile" do
@@ -428,7 +428,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
 
     context "when termination reason config is disabled and enrollment is IVL" do
       before :each do
-        EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:display_ivl_termination_reason].feature).to receive(:is_enabled).and_return(false)
       end
 
       it "should not display Terminated by health insure indicator on enrollment tile" do
@@ -448,7 +448,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
     context "when termination reason config is enabled and enrollment is Shop" do
       before :each do
         hbx_enrollment.update_attributes(kind: 'shop')
-        EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:display_ivl_termination_reason].feature).to receive(:is_enabled).and_return(false)
       end
 
       it "should not display Terminated by health insure indicator if enrollment has termination reason present" do
@@ -497,7 +497,7 @@ RSpec.describe "insured/families/_enrollment_refactored.html.erb" do
 
     context "when termination reason config is enabled and enrollment is IVL" do
       before :each do
-        EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:display_ivl_termination_reason].feature).to receive(:is_enabled).and_return(true)
       end
 
       it "should display Canceled by health insure indicator on enrollment tile" do

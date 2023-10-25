@@ -14,7 +14,7 @@ RSpec.describe "broker_agencies/profiles/_assign.html.erb", dbclean: :after_each
       context "when enabled" do
         let(:general_agency_profile) { FactoryBot.create(:general_agency_profile) }
         before do
-          EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:general_agency].feature).to receive(:is_enabled).and_return(true)
           assign :general_agency_profiles, [general_agency_profile]
           Enroll::Application.reload_routes!
           render template: "broker_agencies/profiles/_assign.html.erb"

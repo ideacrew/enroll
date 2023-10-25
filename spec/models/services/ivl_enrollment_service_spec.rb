@@ -29,7 +29,7 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
 
     context 'when include_faa_outstanding_verifications feature is turned off' do
       before :each do
-        EnrollRegistry[:legacy_enrollment_trigger].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:legacy_enrollment_trigger].feature).to receive(:is_enabled).and_return(true)
       end
 
       it 'should trigger first reminder notice for unassisted families after 10 days of ENR notice' do
@@ -53,7 +53,7 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
       context 'when consumer is assisted' do
         context 'when skip_aptc_families_from_document_reminder_notices feature is turned on' do
           before do
-            EnrollRegistry[:skip_aptc_families_from_document_reminder_notices].feature.stub(:is_enabled).and_return(true)
+            allow(EnrollRegistry[:skip_aptc_families_from_document_reminder_notices].feature).to receive(:is_enabled).and_return(true)
           end
 
           it 'should not trigger reminder notice for families from curam' do
@@ -69,8 +69,8 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
           let(:due_date) { TimeKeeper.date_of_record + 85.days }
 
           before do
-            EnrollRegistry[:legacy_enrollment_trigger].feature.stub(:is_enabled).and_return(true)
-            EnrollRegistry[:skip_aptc_families_from_document_reminder_notices].feature.stub(:is_enabled).and_return(false)
+            allow(EnrollRegistry[:legacy_enrollment_trigger].feature).to receive(:is_enabled).and_return(true)
+            allow(EnrollRegistry[:skip_aptc_families_from_document_reminder_notices].feature).to receive(:is_enabled).and_return(false)
           end
 
           it 'should trigger reminder notice for families from curam' do
@@ -93,8 +93,8 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
 
       context 'when document_reminder_notice_trigger is disabled' do
         before do
-          EnrollRegistry[:legacy_enrollment_trigger].feature.stub(:is_enabled).and_return(false)
-          EnrollRegistry[:document_reminder_notice_trigger].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:legacy_enrollment_trigger].feature).to receive(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:document_reminder_notice_trigger].feature).to receive(:is_enabled).and_return(false)
         end
 
         it 'should not trigger document reminder events to polypress' do
@@ -109,8 +109,8 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
 
       context 'when document_reminder_notice_trigger is enabled' do
         before do
-          EnrollRegistry[:legacy_enrollment_trigger].feature.stub(:is_enabled).and_return(false)
-          EnrollRegistry[:document_reminder_notice_trigger].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:legacy_enrollment_trigger].feature).to receive(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:document_reminder_notice_trigger].feature).to receive(:is_enabled).and_return(true)
         end
 
         it 'should trigger document reminder events to polypress' do
@@ -156,10 +156,10 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
       let(:evidence) { ::Eligibilities::Evidence.new(key: :non_esi_mec, title: "NON ESI MEC", aasm_state: "outstanding", due_on: due_on) }
 
       before do
-        EnrollRegistry[:legacy_enrollment_trigger].feature.stub(:is_enabled).and_return(false)
-        EnrollRegistry[:document_reminder_notice_trigger].feature.stub(:is_enabled).and_return(true)
-        EnrollRegistry[:include_faa_outstanding_verifications].feature.stub(:is_enabled).and_return(true)
-        EnrollRegistry[:skip_aptc_families_from_document_reminder_notices].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:legacy_enrollment_trigger].feature).to receive(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:document_reminder_notice_trigger].feature).to receive(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:include_faa_outstanding_verifications].feature).to receive(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:skip_aptc_families_from_document_reminder_notices].feature).to receive(:is_enabled).and_return(false)
         family.update_attributes(min_verification_due_date: due_on)
         person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
         hbx_enrollment.save!
@@ -331,8 +331,8 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
 
     context 'when document_reminder_notice_trigger is enabled' do
       before do
-        EnrollRegistry[:legacy_enrollment_trigger].feature.stub(:is_enabled).and_return(false)
-        EnrollRegistry[:document_reminder_notice_trigger].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:legacy_enrollment_trigger].feature).to receive(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:document_reminder_notice_trigger].feature).to receive(:is_enabled).and_return(true)
       end
 
       it 'should trigger document reminder notice' do
@@ -343,8 +343,8 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
 
     context 'when legacy_enrollment_trigger is enabled' do
       before do
-        EnrollRegistry[:legacy_enrollment_trigger].feature.stub(:is_enabled).and_return(true)
-        EnrollRegistry[:document_reminder_notice_trigger].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:legacy_enrollment_trigger].feature).to receive(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:document_reminder_notice_trigger].feature).to receive(:is_enabled).and_return(false)
       end
 
       it 'should trigger legacy enrollment notice' do

@@ -148,7 +148,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     let(:benefit_package_with_current_date_start_on) { FactoryBot.build(:benefit_package) }
 
     before do
-      EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(false)
     end
 
     it "should return true when csr_kind is blank" do
@@ -190,7 +190,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
 
     context 'mthh enabled' do
       before do
-        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
       end
 
       it 'should return false when cost_sharing is not equal to csr_kind or csr_0' do

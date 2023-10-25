@@ -44,7 +44,7 @@ describe Forms::HealthcareForChildcareProgramForm do
       let(:osse_eligibility) { build(:ivl_osse_eligibility, :with_admin_attested_evidence, evidence_state: :approved, is_eligible: false)}
 
       before do
-        EnrollRegistry[:aca_ivl_osse_effective_beginning_of_year].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:aca_ivl_osse_effective_beginning_of_year].feature).to receive(:is_enabled).and_return(true)
         primary.consumer_role.create_or_term_eligibility(eligibility_params)
         primary.reload
       end
@@ -72,7 +72,7 @@ describe Forms::HealthcareForChildcareProgramForm do
       let(:osse_eligibility) { build(:ivl_osse_eligibility, :with_admin_attested_evidence, evidence_state: :approved, is_eligible: false)}
 
       before do
-        EnrollRegistry[:aca_ivl_osse_effective_beginning_of_year].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:aca_ivl_osse_effective_beginning_of_year].feature).to receive(:is_enabled).and_return(true)
         primary.resident_role.create_or_term_eligibility(eligibility_params)
         primary.reload
       end
