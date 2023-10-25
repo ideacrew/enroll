@@ -513,6 +513,34 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:edit)
     end
+
+    context "person record already exists" do
+
+      let!(:person) {FactoryBot.create(:person, :with_consumer_role)}
+      let!(:person1) {FactoryBot.create(:person, :with_consumer_role)}
+      let!(:user) { FactoryBot.create(:user, person: person) }
+      let!(:user1) { FactoryBot.create(:user, person: person1) }
+
+      before do
+        person.unset(:encrypted_ssn)
+        put :update, params: { person: person_params.deep_symbolize_keys, id: person.consumer_role.id }
+      end
+    
+      let(:person_params) do
+        {"family" => {"application_type" => "Curam"}, us_citizen: "true", naturalized_citizen: "true",
+        "dob" => person.dob, "first_name" => person1.first_name,"gender" => 
+          "male","last_name" => person1.last_name,"middle_name" => "","name_sfx" => "","ssn" => 
+          person.ssn,"user_id" => "xyz"}
+      end
+
+      it "displays an error message" do
+        expect(flash[:error]).to eql(l10n("person_match_error_message", first_name: person1.first_name, last_name: person1.last_name))
+      end
+
+      it "redirects to edit page" do
+        expect(response).to redirect_to edit_insured_consumer_role_path(person.consumer_role.id)
+      end
+    end
   end
 
   context "PUT update as HBX Admin" do
