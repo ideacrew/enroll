@@ -52,8 +52,7 @@ module Operations
             end
 
             def publish_event(family, application)
-              payload = { application_hbx_id: application.hbx_id, family_hbx_id: family.hbx_assigned_id }
-              event = build_event(payload)
+              event = build_event({ application_hbx_id: application.hbx_id })
               event.success.publish
             end
 
