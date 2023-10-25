@@ -42,7 +42,7 @@ describe Forms::ConsumerCandidate, "asked to match a person", dbclean: :after_ea
       it "should add errors" do
         subject.uniq_ssn
         expect(subject.errors[:ssn_taken]).to eq ["The social security number you entered is affiliated with another account."]
-      end
+      end  
     end
 
     context 'when ssn matches with unclaimed user account' do
