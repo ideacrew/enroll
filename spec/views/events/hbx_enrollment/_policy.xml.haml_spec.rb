@@ -36,7 +36,7 @@ RSpec.describe 'events/hbx_enrollment/_policy.xml.haml', dbclean: :after_each do
   context 'for dependent enrollment only' do
 
     before do
-      EnrollRegistry[:enroll_app].setting(:send_rating_area_for_ivl_policy_to_edi).stub(:item).and_return(false)
+      allow(EnrollRegistry[:enroll_app].setting(:send_rating_area_for_ivl_policy_to_edi)).to receive(:item).and_return(false)
     end
 
     it 'should generate a policy cv with responsible_party' do
@@ -54,7 +54,7 @@ RSpec.describe 'events/hbx_enrollment/_policy.xml.haml', dbclean: :after_each do
     let!(:benefit_markets_location_rating_area) { FactoryBot.create_default(:benefit_markets_locations_rating_area) }
 
     before do
-      EnrollRegistry[:enroll_app].setting(:send_rating_area_for_ivl_policy_to_edi).stub(:item).and_return(true)
+      allow(EnrollRegistry[:enroll_app].setting(:send_rating_area_for_ivl_policy_to_edi)).to receive(:item).and_return(true)
       hbx_enrollment.update_attributes(rating_area_id: benefit_markets_location_rating_area.id)
       render :partial => "events/hbx_enrollment/policy", :locals => {hbx_enrollment: hbx_enrollment}
       @doc = Nokogiri::XML(rendered)
