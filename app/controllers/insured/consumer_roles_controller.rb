@@ -331,15 +331,12 @@ class Insured::ConsumerRolesController < ApplicationController
   def validate_person_match
     first_name = params[:person][:first_name]
     last_name = params[:person][:last_name]
-
-    if (first_name != @person.first_name) || (last_name != @person.last_name)
-      matched_person = match_person(first_name, last_name)
-      if matched_person.present? && matched_person.user.present? && (matched_person.user_id.to_s != @person.user_id.to_s)
-        flash[:error] = l10n("person_match_error_message", first_name: first_name, last_name: last_name)
-        respond_to do |format|
-          format.html { redirect_to edit_insured_consumer_role_path(@person.consumer_role.id) }
-        end
-      end
+    return unless (first_name != @person.first_name) || (last_name != @person.last_name)
+    matched_person = match_person(first_name, last_name)
+    return unless matched_person.present? && matched_person.user.present? && (matched_person.user_id.to_s != @person.user_id.to_s)
+    flash[:error] = l10n("person_match_error_message", first_name: first_name, last_name: last_name)
+    respond_to do |format|
+      format.html { redirect_to edit_insured_consumer_role_path(@person.consumer_role.id) }
     end
   end
 

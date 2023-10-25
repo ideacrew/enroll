@@ -525,12 +525,12 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         person.unset(:encrypted_ssn)
         put :update, params: { person: person_params.deep_symbolize_keys, id: person.consumer_role.id }
       end
-    
+
       let(:person_params) do
         {"family" => {"application_type" => "Curam"}, us_citizen: "true", naturalized_citizen: "true",
-        "dob" => person.dob, "first_name" => person1.first_name,"gender" => 
-          "male","last_name" => person1.last_name,"middle_name" => "","name_sfx" => "","ssn" => 
-          person.ssn,"user_id" => "xyz"}
+         "dob" => person.dob, "first_name" => person1.first_name,"gender" =>
+         "male","last_name" => person1.last_name,"middle_name" => "","name_sfx" => "","ssn" =>
+         person.ssn,"user_id" => "xyz"}
       end
 
       it "displays an error message" do
