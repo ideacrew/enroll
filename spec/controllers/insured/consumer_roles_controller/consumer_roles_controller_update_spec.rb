@@ -31,7 +31,7 @@ RSpec.describe Insured::ConsumerRolesController do
         first_name: "John",
         last_name: "Smith",
         ssn: "123",
-        dob: TimeKeeper.date_of_record - 30.years,
+        dob: TimeKeeper.date_of_record - 30.years
       )
     end
     let(:consumer_role) do
