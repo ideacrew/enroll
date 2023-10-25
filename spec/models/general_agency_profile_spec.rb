@@ -15,7 +15,7 @@ RSpec.describe GeneralAgencyProfile, dbclean: :after_each do
   let(:market_kind_error_message) {"#{bad_market_kind} is not a valid market kind"}
 
   before :each do
-    EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(true)
+    allow(EnrollRegistry[:general_agency].feature).to receive(:is_enabled).and_return(true)
     stub_const("GeneralAgencyProfile::MARKET_KINDS", ['shop', 'individual', 'both'])
   end
 

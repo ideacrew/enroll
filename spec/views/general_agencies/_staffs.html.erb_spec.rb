@@ -4,7 +4,7 @@ RSpec.describe "general_agencies/profiles/_staffs.html.erb" do
   let(:staff) { FactoryBot.create(:general_agency_staff_role) }
   before :each do
     assign :staffs, [staff]
-    EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(true)
+    allow(EnrollRegistry[:general_agency].feature).to receive(:is_enabled).and_return(true)
     Enroll::Application.reload_routes!
     render template: "general_agencies/profiles/_staffs.html.erb"
   end

@@ -163,7 +163,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   it "does creates a continuous enrollment for future coverage period after purchase" do
     subject
     %i[prior_plan_year_ivl_sep fehb_market indian_alaskan_tribe_details].each do |feature|
-      EnrollRegistry[feature].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[feature].feature).to receive(:is_enabled).and_return(true)
     end
 
     subject.call(product_selection)

@@ -110,7 +110,7 @@ Then(/^Individual should see cost saving documents for evidences$/) do
 end
 
 Then(/^validate_and_record_publish_application_errors feature is (.*)$/) do |config|
-  EnrollRegistry[:validate_and_record_publish_application_errors].feature.stub(:is_enabled).and_return(config == 'enabled')
+  allow(EnrollRegistry[:validate_and_record_publish_application_errors].feature).to receive(:is_enabled).and_return(config == 'enabled')
 end
 
 When(/^evidence determination payload is failed to publish$/) do

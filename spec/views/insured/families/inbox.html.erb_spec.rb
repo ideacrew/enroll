@@ -12,12 +12,12 @@ describe "insured/families/inbox.html.erb", dbclean: :after_each do
     assign(:current_user, user)
     assign(:provider, person)
     allow(person).to receive_message_chain("inbox.unread_messages.size").and_return(3)
-    EnrollRegistry[:medicaid_tax_credits_link].feature.stub(:is_enabled).and_return(true)
+    allow(EnrollRegistry[:medicaid_tax_credits_link].feature).to receive(:is_enabled).and_return(true)
   end
 
   context "as admin" do
     before :each do
-      EnrollRegistry[:show_download_tax_documents].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:show_download_tax_documents].feature).to receive(:is_enabled).and_return(true)
       allow(view).to receive_message_chain("current_user.has_hbx_staff_role?").and_return(true)
     end
 
@@ -74,10 +74,10 @@ describe "insured/families/inbox.html.erb", dbclean: :after_each do
 
   if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     let(:consumer_role) { double('consumer_role', :is_active? => true)}
-    
+
     context "as consumer" do
       before do
-        EnrollRegistry[:show_download_tax_documents].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:show_download_tax_documents].feature).to receive(:is_enabled).and_return(true)
         allow(view).to receive_message_chain("current_user.has_hbx_staff_role?").and_return(false)
         allow(view).to receive(:individual_market_is_enabled?).and_return(true)
         allow(person).to receive(:consumer_role).and_return consumer_role

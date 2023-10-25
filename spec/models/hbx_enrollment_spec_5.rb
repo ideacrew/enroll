@@ -96,7 +96,7 @@ RSpec.describe HbxEnrollment, type: :model do
 
   before do
     ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
-    EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+    allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
 
     allow(
       hbx_enrollment.ivl_decorated_hbx_enrollment
