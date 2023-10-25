@@ -181,7 +181,7 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
     context 'prior year expired enrollment where termination date is less than than enrollment expiration date' do
 
       before do
-        EnrollRegistry[:change_end_date].feature.settings.last.stub(:item).and_return(true)
+        allow(EnrollRegistry[:change_end_date].feature.settings.last).to receive(:item).and_return(true)
       end
 
       let(:prior_coverage_year) { Date.today.year - 1}
@@ -208,7 +208,7 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
       include_context 'prior, current and next year benefit coverage periods and products'
 
       before do
-        EnrollRegistry[:change_end_date].feature.settings.last.stub(:item).and_return(true)
+        allow(EnrollRegistry[:change_end_date].feature.settings.last).to receive(:item).and_return(true)
       end
 
       context 'prior year expired enrollment where termination date is less than than enrollment expiration date' do
@@ -357,7 +357,7 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
     context 'prior year SHOP expired enrollment where termination date is less than than enrollment expiration date' do
 
       before do
-        EnrollRegistry[:change_end_date].feature.settings.last.stub(:item).and_return(true)
+        allow(EnrollRegistry[:change_end_date].feature.settings.last).to receive(:item).and_return(true)
       end
 
       include_context "setup expired, and active benefit applications"
@@ -395,7 +395,7 @@ RSpec.describe ::Operations::HbxEnrollments::EndDateChange, dbclean: :after_each
       include_context 'setup expired, active and renewing benefit applications'
 
       before do
-        EnrollRegistry[:change_end_date].feature.settings.last.stub(:item).and_return(true)
+        allow(EnrollRegistry[:change_end_date].feature.settings.last).to receive(:item).and_return(true)
       end
 
       context 'prior year expired enrollment where termination date is less than than enrollment expiration date' do

@@ -601,9 +601,22 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def set_elected_aptc_by_params(elected_aptc)
-    if session[:elected_aptc].to_f != elected_aptc.to_f
-      session[:elected_aptc] = elected_aptc.to_f
-    end
+    return if session[:elected_aptc].to_d == elected_aptc.to_d
+    aptc = if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+             recalcuate_elected_aptc(elected_aptc)
+           else
+             elected_aptc.to_f
+           end
+    session[:elected_aptc] = aptc
+  end
+
+  def recalcuate_elected_aptc(elected_aptc)
+    return 0.0 if session[:max_aptc].to_f.zero?
+
+    default_aptc_percentage = EnrollRegistry[:enroll_app].setting(:default_aptc_percentage).item
+    percentage = [elected_aptc.to_f / session[:max_aptc], default_aptc_percentage.to_f / 100].min
+    max_aptc = ::Operations::PremiumCredits::FindAptc.new.call({ hbx_enrollment: @enrollment, effective_on: @enrollment.effective_on }).value!.to_f
+    percentage * max_aptc
   end
 
   def validate_rating_address

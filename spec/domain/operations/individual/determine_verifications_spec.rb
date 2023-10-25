@@ -46,7 +46,7 @@ RSpec.describe Operations::Individual::DetermineVerifications, dbclean: :after_e
 
       context "when trigger_verifications_before_enrollment_purchase is enabled" do
         before do
-          EnrollRegistry[:trigger_verifications_before_enrollment_purchase].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:trigger_verifications_before_enrollment_purchase].feature).to receive(:is_enabled).and_return(true)
         end
 
         it 'returns success' do
@@ -63,7 +63,7 @@ RSpec.describe Operations::Individual::DetermineVerifications, dbclean: :after_e
 
       context "when trigger_verifications_before_enrollment_purchase is disabled" do
         before do
-          EnrollRegistry[:trigger_verifications_before_enrollment_purchase].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:trigger_verifications_before_enrollment_purchase].feature).to receive(:is_enabled).and_return(false)
         end
 
         context "if person don't have an active enrollment" do

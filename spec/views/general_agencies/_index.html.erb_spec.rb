@@ -4,7 +4,7 @@ RSpec.describe "general_agencies/profiles/_families.html.erb", dbclean: :after_e
   let(:general_agency_profile) { FactoryBot.create(:general_agency_profile) }
   before :each do
     assign :general_agency_profiles, Kaminari.paginate_array([general_agency_profile]).page(0)
-    EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(false)
+    allow(EnrollRegistry[:general_agency].feature).to receive(:is_enabled).and_return(false)
     Enroll::Application.reload_routes!
     render template: "general_agencies/profiles/_index.html.erb"
   end

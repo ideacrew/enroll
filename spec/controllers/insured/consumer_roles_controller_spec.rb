@@ -6,8 +6,8 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
 
   context "When individual market is disabled" do
     before do
-      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
-      EnrollRegistry[:aca_individual_market].feature.stub(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:aca_individual_market].feature).to receive(:is_enabled).and_return(false)
       sign_in user
       get :search
     end
@@ -27,7 +27,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
   let(:bookmark_url) {'localhost:3000'}
 
   before do
-    EnrollRegistry[:aca_individual_market].feature.stub(:is_enabled).and_return(true)
+    allow(EnrollRegistry[:aca_individual_market].feature).to receive(:is_enabled).and_return(true)
   end
 
   context "GET privacy",dbclean: :after_each do
@@ -155,7 +155,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
           allow(mock_employee_candidate).to receive(:match_census_employees).and_return([])
           #allow(mock_resident_candidate).to receive(:dob).and_return()
           allow(Factories::EmploymentRelationshipFactory).to receive(:build).and_return(true)
-          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
           post :match, params: { :person => person_parameters }
         end
 
@@ -173,7 +173,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
           allow(mock_employee_candidate).to receive(:match_census_employees).and_return([])
           #allow(mock_resident_candidate).to receive(:dob).and_return()
           allow(Factories::EmploymentRelationshipFactory).to receive(:build).and_return(true)
-          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(false)
           post :match, params: { :person => person_parameters }
         end
 
@@ -293,12 +293,12 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     before(:each) do
       allow(ConsumerRole).to receive(:find).and_return(consumer_role)
       allow(consumer_role).to receive(:build_nested_models_for_person).and_return(true)
-      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:financial_assistance].feature).to receive(:is_enabled).and_return(true)
       allow(consumer_role).to receive(:person).and_return(person)
       allow(user).to receive(:person).and_return person
       allow(person).to receive(:consumer_role).and_return consumer_role
-      EnrollRegistry[:mec_check].feature.stub(:is_enabled).and_return(false)
-      EnrollRegistry[:shop_coverage_check].feature.stub(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:mec_check].feature).to receive(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:shop_coverage_check].feature).to receive(:is_enabled).and_return(false)
       allow(person).to receive(:mec_check_eligible?).and_return(false)
       person_params[:addresses_attributes] = addresses_attributes
       person_params[:consumer_role_attributes] = consumer_role_attributes
@@ -382,9 +382,9 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       before :each do
         allow(controller).to receive(:update_vlp_documents).and_return(true)
         allow(person).to receive(:employee_roles).and_return [employee_role]
-        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
-        EnrollRegistry[:mec_check].feature.stub(:is_enabled).and_return(false)
-        EnrollRegistry[:shop_coverage_check].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:mec_check].feature).to receive(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:shop_coverage_check].feature).to receive(:is_enabled).and_return(false)
         allow(person).to receive(:mec_check_eligible?).and_return(false)
         put :update, params: { person: person_params, id: "test" }
       end
@@ -430,9 +430,9 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       before :each do
         allow(controller).to receive(:update_vlp_documents).and_return(true)
         allow(person).to receive(:employee_roles).and_return [employee_role]
-        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
-        EnrollRegistry[:mec_check].feature.stub(:is_enabled).and_return(false)
-        EnrollRegistry[:shop_coverage_check].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:mec_check].feature).to receive(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:shop_coverage_check].feature).to receive(:is_enabled).and_return(true)
         allow(person).to receive(:mec_check_eligible?).and_return(false)
       end
 
@@ -474,7 +474,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     end
 
     it "should redirect to family members page when current user is admin & doing new paper app and faa is disabled" do
-      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:financial_assistance].feature).to receive(:is_enabled).and_return(false)
       allow(controller).to receive(:update_vlp_documents).and_return(true)
       allow(controller).to receive(:is_new_paper_application?).and_return true
       put :update, params: {person: person_params, id: 'test'}
@@ -526,7 +526,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     before(:each) do
       allow(ConsumerRole).to receive(:find).and_return(consumer_role)
       allow(consumer_role).to receive(:build_nested_models_for_person).and_return(true)
-      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:financial_assistance].feature).to receive(:is_enabled).and_return(true)
       allow(consumer_role).to receive(:person).and_return(person)
       allow(user).to receive(:person).and_return person
       allow(person).to receive(:consumer_role).and_return consumer_role
@@ -556,7 +556,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     end
 
     it "should update consumer identity and application fields to valid and redirect to family members page when current user has application type as Curam and faa is disabled" do
-      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:financial_assistance].feature).to receive(:is_enabled).and_return(false)
       person_params["family"]["application_type"] = "Curam"
       allow(controller).to receive(:update_vlp_documents).and_return(true)
       allow(controller).to receive(:is_new_paper_application?).and_return false

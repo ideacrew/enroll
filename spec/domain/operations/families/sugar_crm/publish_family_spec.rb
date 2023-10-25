@@ -20,7 +20,7 @@ RSpec.describe Operations::Families::SugarCrm::PublishFamily, type: :model, dbcl
   before do
     # Test the CRM update in isolation
     allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
-    EnrollRegistry[:crm_update_family_save].feature.stub(:is_enabled).and_return(false)
+    allow(EnrollRegistry[:crm_update_family_save].feature).to receive(:is_enabled).and_return(false)
     DatabaseCleaner.clean
     family.family_members << dependent_family_member
     person.person_relationships << PersonRelationship.new(relative: person, kind: "self")

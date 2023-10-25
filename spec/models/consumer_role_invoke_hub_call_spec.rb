@@ -63,7 +63,7 @@ describe ConsumerRole, dbclean: :around_each do
     context 'validate_and_record_publish_errors enabled' do
       shared_examples_for 'IVL state machine transitions and verification_types validation_status' do |from_state, to_state, event, type_name, verification_type_validation_status|
         before do
-          EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(false)
           allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:ssa_h3).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:vlp_h92).and_return(true)
@@ -90,7 +90,7 @@ describe ConsumerRole, dbclean: :around_each do
     context 'validate_and_record_publish_errors disabled' do
       shared_examples_for 'IVL state machine transitions and verification_types validation_status' do |from_state, to_state, event, type_name, verification_type_validation_status|
         before do
-          EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(false)
           allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:ssa_h3).and_return(true)
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:vlp_h92).and_return(true)

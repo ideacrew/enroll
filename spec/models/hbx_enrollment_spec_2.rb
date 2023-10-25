@@ -328,7 +328,7 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
 
         before do
           TimeKeeper.set_date_of_record_unprotected!(Date.new(current_year, 11, 5))
-          EnrollRegistry[:product_selection_effects].feature.stub(:settings).and_return([double(key: :operation, item: operation_setting)])
+          allow(EnrollRegistry[:product_selection_effects].feature).to receive(:settings).and_return([double(key: :operation, item: operation_setting)])
 
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(100.0)
           renewal_benefit_package.update_attributes(title: initial_benefit_package.title + "(#{renewal_application.effective_period.min.year})")
@@ -373,7 +373,7 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
           end
 
           before do
-            EnrollRegistry[:cancel_renewals_for_term].feature.stub(:is_enabled).and_return(true)
+            allow(EnrollRegistry[:cancel_renewals_for_term].feature).to receive(:is_enabled).and_return(true)
             allow(sep_enrollment).to receive(:parent_enrollment).and_return(enrollment_1)
           end
 

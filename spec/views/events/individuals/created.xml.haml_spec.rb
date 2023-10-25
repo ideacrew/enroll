@@ -31,7 +31,7 @@ RSpec.describe "events/individuals/created.haml.erb", dbclean: :after_each do
     let(:contact_address) { individual.contact_addresses.first }
     let!(:us_county) { BenefitMarkets::Locations::CountyFips.create({ state_postal_code: 'ME',  county_fips_code: '23003', county_name: 'Aroostook'}) }
     before do
-      EnrollRegistry[:enroll_app].setting(:county_fips_code_enabled).stub(:item).and_return(true)
+      allow(EnrollRegistry[:enroll_app].setting(:county_fips_code_enabled)).to receive(:item).and_return(true)
       render :template => "events/individuals/created", :locals => { :individual => individual}
     end
     it "should be schema valid" do

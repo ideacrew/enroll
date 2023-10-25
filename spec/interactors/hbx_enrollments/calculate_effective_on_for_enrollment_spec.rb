@@ -131,7 +131,7 @@ RSpec.describe ::HbxEnrollments::CalculateEffectiveOnForEnrollment, :dbclean => 
 
   context "within OE last month and after monthly_enrollment_due_on day of the month of IndividualEnrollmentDueDayOfMonth effective date 1/1 and 15 day disabled" do
     before do
-      EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature).to receive(:is_enabled).and_return(true)
       system_date = Date.new(Date.today.year, 12, Settings.aca.individual_market.monthly_enrollment_due_on.next)
       allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
       @context = described_class.call(system_date: TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'),base_enrollment_effective_on: Date.new(Date.today.year.next, 1, 1))
@@ -144,7 +144,7 @@ RSpec.describe ::HbxEnrollments::CalculateEffectiveOnForEnrollment, :dbclean => 
 
   context "within OE last month and after monthly_enrollment_due_on day of the month of IndividualEnrollmentDueDayOfMonth effective date 3/1 with override" do
     before do
-      EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature).to receive(:is_enabled).and_return(true)
       system_date = rand(Date.new(current_year.next, 1, Settings.aca.individual_market.monthly_enrollment_due_on.next)..Date.new(current_year.next, 1, 31))
       allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
       @context = described_class.call(system_date: TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'),base_enrollment_effective_on: Date.new(system_date.year, 3, 1))
@@ -157,7 +157,7 @@ RSpec.describe ::HbxEnrollments::CalculateEffectiveOnForEnrollment, :dbclean => 
 
   context "outside OE after monthly_enrollment_due_on day of the month of IndividualEnrollmentDueDayOfMonth with override enabled" do
     before do
-      EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature).to receive(:is_enabled).and_return(true)
       system_date = Date.new(current_year, 2, Settings.aca.individual_market.monthly_enrollment_due_on.next)
       allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
       @context = described_class.call(system_date: TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'),base_enrollment_effective_on: system_date)
@@ -170,7 +170,7 @@ RSpec.describe ::HbxEnrollments::CalculateEffectiveOnForEnrollment, :dbclean => 
 
   context "outside OE on monthly_enrollment_due_on day of the month of IndividualEnrollmentDueDayOfMonth with override enabled" do
     before do
-      EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature).to receive(:is_enabled).and_return(true)
       system_date = Date.new(current_year, 1, Settings.aca.individual_market.monthly_enrollment_due_on)
       allow(TimeKeeper).to receive(:date_of_record).and_return(system_date)
       @context = described_class.call(system_date: TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'),base_enrollment_effective_on: Date.new(system_date.year, 1, 31))
