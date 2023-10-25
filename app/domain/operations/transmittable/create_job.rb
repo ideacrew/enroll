@@ -42,6 +42,8 @@ module Operations
                   allow_list: [],
                   deny_list: []
                 })
+      rescue StandardError => e
+        Rails.logger.error { "Couldn't create job #{e.backtrace}" }
       end
 
       def create_job_entity(job_hash)
