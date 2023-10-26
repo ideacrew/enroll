@@ -4,5 +4,5 @@ require File.join(Rails.root, "app", "data_migrations", "remove_old_ifsv_cases")
 
 namespace :migrations do
   desc "remove hbx_enrollments and people records by HBX ID and SSN"
-  RemoveSsn.define_task :remove_old_ifsv_cases => :environment
+  RemoveOldIfsvCases.define_task :remove_old_ifsv_cases => :environment
 end
