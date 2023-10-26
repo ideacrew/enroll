@@ -1,5 +1,7 @@
-require File.join(Rails.root, "lib/mongoid_migration_task")
+# frozen_string_literal: true
 
+require File.join(Rails.root, "lib/mongoid_migration_task")
+# Task to remove specified hbx_enrollments and people records
 class RemoveOldIfsvCases < MongoidMigrationTask
   def migrate
     hbx_ids = ENV['hbx_ids'].split(',')
@@ -7,7 +9,6 @@ class RemoveOldIfsvCases < MongoidMigrationTask
 
     destroyed_hbx_enrollment_ids = []
     destroyed_ssns = []
-
 
     destroy_hbx_enrollments(hbx_ids, destroyed_hbx_enrollment_ids)
 
@@ -24,7 +25,6 @@ class RemoveOldIfsvCases < MongoidMigrationTask
     else
       puts "The following SSNs people were not destroyed: #{ssns - destroyed_ssns}"
     end
-
   end
 
   def destroy_hbx_enrollments(hbx_ids, destroyed_hbx_enrollment_ids)
@@ -37,9 +37,7 @@ class RemoveOldIfsvCases < MongoidMigrationTask
   def destroy_people(ssns, destroyed_ssns)
     ssns.each do |ssn|
       person = Person.find_by_ssn(ssn)
-      if person
-        destroyed_ssns.push(ssn) if person.destroy
-      end
+      destroyed_ssns.push(ssn) if person&.destroy
     end
   end
 end
