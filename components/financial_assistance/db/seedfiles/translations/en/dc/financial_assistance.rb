@@ -171,7 +171,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.non_oe_learn_more" => "Learn more about Special Enrollment Periods",
   "en.faa.year_selection_oe_range_from" => "Open enrollment is from ",
   "en.faa.year_selection_oe_range_through" => " through ",
-  "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a target='_blank' href='https://www.dchealthlink.com/contact-us-for-2022-coverage?utm_source=2022EnrollmentCoverage&utm_medium=ea_link&utm_campaign=WantsCoverage2022'>submit a webform</a> or call %{short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
+  "en.faa.year_selection_learn_more" => "If you need health insurance or lower premiums for %{year}, please call %{short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>. If you need to apply for or renew Medicaid, please go to <a target='_blank' href='https://districtdirect.dc.gov/ua/'>districtdirect.dc.gov</a> or call District Direct at (202) 727-5355 /TTD: (800) 877-8339.",
   'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.',
   "en.faa.eligibility_go_to_my_account_message" => "<b>If you’re already enrolled in DC Health Link’s Individual & Family plan</b>, you’re finished! To see your plan information, select <b>GO TO MY ACCOUNT</b>.",
   "en.faa.application_for_coverage" => "Application for Coverage",

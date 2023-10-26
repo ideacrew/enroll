@@ -2,7 +2,10 @@ require "set"
 
 # Add year argument in the following format: bundle exec rails r cms_daily_report.rb 2023 -e production
 year = ARGV[0].present? ?  ARGV[0].to_i: Date.today.year.to_i
-next_year = year + 1
+@current_year = year
+def next_year
+  @current_year + 1
+end
 
 all_enrolled_people = HbxEnrollment.collection.aggregate([
   {"$match" => {

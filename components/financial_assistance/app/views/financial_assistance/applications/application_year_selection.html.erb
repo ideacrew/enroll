@@ -36,8 +36,9 @@
                   <%= l10n("faa.see_if_you_qualify_2", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item, medicaid_or_chip_program_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %>
                 </p>
                 <p>
+                  <% oe_start_on = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.open_enrollment_start_on %>
                   <b><%= l10n("faa.year_selection_oe_range_from") %></b>
-                  <b><%= HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.open_enrollment_start_on %></b>
+                  <b><%= oe_start_on %></b>
                   <b><%= l10n("faa.year_selection_oe_range_through") %></b>
                   <b><%= HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.open_enrollment_end_on %></b>
                 </p>
@@ -48,7 +49,7 @@
                   <i class="fas fa-info-circle"></i>
                 </div>
                 <div>
-                  <p><%= l10n("faa.year_selection_learn_more", short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></p>
+                  <p><%= l10n("faa.year_selection_learn_more", year: oe_start_on.year, short_name: EnrollRegistry[:enroll_app].setting(:short_name).item) %></p>
                 </div>
               </div>
             </div>
