@@ -518,8 +518,6 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
 
       let!(:person) {FactoryBot.create(:person, :with_consumer_role)}
       let!(:person1) {FactoryBot.create(:person, :with_consumer_role)}
-      let!(:user) { FactoryBot.create(:user, person: person) }
-      let!(:user1) { FactoryBot.create(:user, person: person1) }
 
       before do
         person.unset(:encrypted_ssn)
