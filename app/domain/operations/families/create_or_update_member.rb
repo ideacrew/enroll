@@ -56,6 +56,9 @@ module Operations
         else
           Failure(result.failure)
         end
+      rescue StandardError => e
+        Rails.logger.error "Error while creating/updating family member: #{e.message}"
+        Failure("Person creation failed: #{e.message}")
       end
 
       def find_or_match_person(applicant_params)
