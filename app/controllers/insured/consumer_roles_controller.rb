@@ -11,8 +11,7 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :decrypt_params, only: [:create]
   before_action :set_cache_headers, only: [:edit, :help_paying_coverage, :privacy, :search]
   before_action :redirect_if_medicaid_tax_credits_link_is_disabled, only: [:privacy, :search]
-  before_action :sanitize_contact_method, only: [:update]
-  before_action :validate_person_match, only: [:update]
+  before_action :sanitize_contact_method, :validate_person_match, only: [:update]
 
   FIELDS_TO_ENCRYPT = [:ssn,:dob,:first_name,:middle_name,:last_name,:gender,:user_id].freeze
 
