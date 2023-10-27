@@ -300,7 +300,7 @@ class HbxEnrollment
                                                           :"effective_on".gte => effective_period.min,
                                                           :"effective_on".lte => effective_period.max
                                                         )}
-  scope :by_benefit_application_and_sponsored_benefit,  ->(benefit_application, sponsored_benefit, end_date) do 
+  scope :by_benefit_application_and_sponsored_benefit,  ->(benefit_application, sponsored_benefit, end_date) do
     where(
       :"sponsored_benefit_id" => sponsored_benefit._id,
       :"aasm_state".in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES),
@@ -823,7 +823,7 @@ class HbxEnrollment
 
   def renewal_enrollments(successor_application)
     family.active_household.hbx_enrollments.where({
-      :sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id), 
+      :sponsored_benefit_package_id.in => successor_application.benefit_packages.pluck(:_id),
       :coverage_kind => coverage_kind,
       :kind => kind,
       :effective_on => successor_application.start_on
@@ -999,13 +999,13 @@ class HbxEnrollment
 
   def sponsored_benefit
     return @sponsored_benefit if defined? @sponsored_benefit
-    @sponsored_benefit = sponsored_benefit_package.sponsored_benefits.detect{ |sb| sb.id == sponsored_benefit_id }    
+    @sponsored_benefit = sponsored_benefit_package.sponsored_benefits.detect{ |sb| sb.id == sponsored_benefit_id }
   end
 
   def sponsored_benefit=(sponsored_benefit)
     raise ArgumentError.new("expected BenefitSponsors::SponsoredBenefits::SponsoredBenefit") unless sponsored_benefit.is_a? ::BenefitSponsors::SponsoredBenefits::SponsoredBenefit
     self.sponsored_benefit_id = sponsored_benefit._id
-    @sponsored_benefit = sponsored_benefit    
+    @sponsored_benefit = sponsored_benefit
   end
 
   def rating_area
@@ -1303,21 +1303,21 @@ class HbxEnrollment
 
   def self.employee_current_benefit_group(employee_role, hbx_enrollment, qle)
     effective_date = effective_date_for_enrollment(employee_role, hbx_enrollment, qle)
-    plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(effective_date)
+    benefit_application = employee_role.employer_profile.find_plan_year_by_effective_date(effective_date)
 
-    if plan_year.blank?
+    if benefit_application.blank?
       raise "Unable to find employer-sponsored benefits for enrollment year #{effective_date.year}"
     end
 
-    if plan_year.open_enrollment_start_on > TimeKeeper.date_of_record
-      raise "Open enrollment for your employer-sponsored benefits not yet started. Please return on #{plan_year.open_enrollment_start_on.strftime("%m/%d/%Y")} to enroll for coverage."
+    if benefit_application.open_enrollment_start_on > TimeKeeper.date_of_record
+      raise "Open enrollment for your employer-sponsored benefits not yet started. Please return on #{benefit_application.open_enrollment_start_on.strftime("%m/%d/%Y")} to enroll for coverage."
     end
 
     census_employee = employee_role.census_employee
-    benefit_group_assignment = plan_year.is_renewing? ?
-        census_employee.renewal_benefit_group_assignment : (plan_year.aasm_state == "expired" && qle) ? census_employee.benefit_group_assignments.order_by(:'created_at'.desc).detect { |bga| bga.plan_year.aasm_state == "expired"} : census_employee.active_benefit_group_assignment
+    benefit_group_assignment = benefit_application.is_renewing? ?
+        census_employee.renewal_benefit_group_assignment : (benefit_application.aasm_state == "expired" && qle) ? census_employee.benefit_group_assignments.order_by(:'created_at'.desc).detect { |bga| bga.benefit_application.aasm_state == "expired"} : census_employee.active_benefit_group_assignment
 
-    if benefit_group_assignment.blank? || benefit_group_assignment.plan_year != plan_year
+    if benefit_group_assignment.blank? || benefit_group_assignment.benefit_application != benefit_application
       raise "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date.year}"
     end
 
@@ -1918,7 +1918,7 @@ class HbxEnrollment
     if previous_enrollment
       previous_product = previous_enrollment.product
     end
-    
+
     hbx_enrollment_members.each do |hem|
       person = hem.person
       roster_member = EnrollmentMemberAdapter.new(
@@ -2033,8 +2033,8 @@ class HbxEnrollment
   end
 
   def benefit_group_assignment_valid?(coverage_effective_date)
-    plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(coverage_effective_date)
-    if plan_year.present? && benefit_group_assignment.plan_year == plan_year
+    benefit_application = employee_role.employer_profile.find_plan_year_by_effective_date(coverage_effective_date)
+    if benefit_application.present? && benefit_group_assignment.benefit_application == benefit_application
       true
     else
       self.errors.add(:base, "You can not keep an existing plan which belongs to previous plan year")

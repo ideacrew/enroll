@@ -145,13 +145,8 @@ class BenefitGroupAssignment
     self.benefit_package_id.blank?
   end
 
-  def plan_year
-    warn "[Deprecated] Instead use benefit application" unless Rails.env.test?
-    return benefit_group.plan_year if is_case_old?
-    benefit_application
-  end
-
   def benefit_application
+    return benefit_group.plan_year if is_case_old?
     benefit_package.benefit_application if benefit_package.present?
   end
 
@@ -401,7 +396,7 @@ class BenefitGroupAssignment
     census_employee.benefit_group_assignments.where(:id.ne => self.id).inject([]) do |_dummy, benefit_group_assignment|
       end_on = benefit_group_assignment.end_on || (start_on - 1.day)
       if is_case_old?
-        end_on = benefit_group_assignment.plan_year.end_on unless benefit_group_assignment.plan_year.coverage_period_contains?(end_on)
+        end_on = benefit_group_assignment.benefit_application.end_on unless benefit_group_assignment.benefit_application.coverage_period_contains?(end_on)
       else
         end_on = benefit_group_assignment.benefit_application.end_on unless benefit_group_assignment.benefit_application.effective_period.cover?(end_on)
       end

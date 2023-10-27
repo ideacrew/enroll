@@ -128,13 +128,8 @@
     self.benefit_package_id.blank?
   end
 
-  def plan_year
-    warn "[Deprecated] Instead use benefit application" unless Rails.env.test?
-    return benefit_group.plan_year if is_case_old?
-    benefit_application
-  end
-
   def benefit_application
+    return benefit_group.plan_year if is_case_old?
     benefit_package.benefit_application if benefit_package.present?
   end
 
@@ -329,10 +324,10 @@
 
   def make_active
     census_employee.benefit_group_assignments.each do |benefit_group_assignment|
-      if benefit_group_assignment.is_active? && benefit_group_assignment.id != self.id  
+      if benefit_group_assignment.is_active? && benefit_group_assignment.id != self.id
         end_on = benefit_group_assignment.end_on || (start_on - 1.day)
         if is_case_old?
-          end_on = benefit_group_assignment.plan_year.end_on unless benefit_group_assignment.plan_year.coverage_period_contains?(end_on)
+          end_on = benefit_group_assignment.benefit_application.end_on unless benefit_group_assignment.benefit_application.coverage_period_contains?(end_on)
         else
           end_on = benefit_group_assignment.benefit_application.end_on unless benefit_group_assignment.benefit_application.effective_period.cover?(end_on)
         end
@@ -340,7 +335,7 @@
       end
     end
     # TODO: Hack to get census employee spec to pass
-    #bga_to_activate = census_employee.benefit_group_assignments.select { |bga| HbxEnrollment::ENROLLED_STATUSES.include?(bga.hbx_enrollment&.aasm_state) }.last 
+    #bga_to_activate = census_employee.benefit_group_assignments.select { |bga| HbxEnrollment::ENROLLED_STATUSES.include?(bga.hbx_enrollment&.aasm_state) }.last
     #if bga_to_activate.present?
     # bga_to_activate.update_attributes!(activated_at: TimeKeeper.datetime_of_record)
     #else
@@ -364,7 +359,7 @@
 
   def model_integrity
     self.errors.add(:benefit_group, "benefit_group required") unless benefit_group.present?
-    
+
     # TODO: Not sure if this can really exist if we depracate aasm_state from here. Previously the hbx_enrollment was checked if coverage_selected?
     # which references the aasm_state, but if thats depracated, not sure hbx_enrollment can be checked any longer. CensusEmployee model has an instance method
     # called create_benefit_package_assignment(new_benefit_package, start_on) which creates a BGA without hbx enrollment.
