@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'domain/operations/financial_assistance/applicant_params_context'
+require 'domain/operations/families/member_params_context'
 
-RSpec.describe Operations::Families::CreateOrUpdateMember, type: :model, dbclean: :after_each do
-  include_context 'export_applicant_attributes_context'
+RSpec.describe Operations::Families::UpdateMember, type: :model, dbclean: :after_each do
+  include_context 'member_attributes_context'
 
   let(:person) do
     FactoryBot.create(:person,
@@ -18,9 +18,11 @@ RSpec.describe Operations::Families::CreateOrUpdateMember, type: :model, dbclean
 
   let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:create_spouse) do
-    Operations::Families::CreateMember.new.call({applicant_params: applicant_params.merge(relationship: 'spouse'), family_id: family.id})
+    Operations::Families::CreateMember.new.call({member_params: member_hash, family_id: family.id})
     family.reload
   end
+
+  let(:dependent) { family.family_members.where(is_primary_applicant: false).last.person }
 
   it 'should be a container-ready operation' do
     expect(subject.respond_to?(:call)).to be_truthy
@@ -32,13 +34,15 @@ RSpec.describe Operations::Families::CreateOrUpdateMember, type: :model, dbclean
       context '- when person attributes are changed
                - when active vlp document attributes are changed' do
         let(:params) do
-          applicant_params.merge(family_id: family.id, gender: 'female', is_incarcerated: false, :ethnicity => ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"], i94_number: '45612378985', relationship: 'child')
+          member_hash.merge!(gender: 'female', is_incarcerated: false, :ethnicity => ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"], relationship: 'child')
+          member_hash[:consumer_role][:immigration_documents_attributes][0].merge!(i94_number: '45612378985')
+          member_hash
         end
 
         before do
-          @result = subject.call(params)
+          @result = subject.call({member_params: params, family_id: family.id, person_hbx_id: dependent.hbx_id})
           family.reload
-          @person = Person.by_hbx_id(params[:person_hbx_id]).first
+          @person = Person.by_hbx_id(member_hash[:hbx_id]).first
         end
 
         it 'returns a success result' do
@@ -73,12 +77,13 @@ RSpec.describe Operations::Families::CreateOrUpdateMember, type: :model, dbclean
       context '- when person attributes are changed
                - when vlp document type is changed' do
         let(:params) do
-          applicant_params.merge(family_id: family.id, vlp_subject: 'I-571 (Refugee Travel Document)', i94_number: '45612378985', relationship: 'spouse')
+          member_hash[:consumer_role][:immigration_documents_attributes][0].merge!(subject: 'I-571 (Refugee Travel Document)', i94_number: '45612378985')
+          member_hash
         end
         before do
-          @result = subject.call(params)
+          @result = subject.call({member_params: params, family_id: family.id, person_hbx_id: dependent.hbx_id})
           family.reload
-          @person = Person.by_hbx_id(params[:person_hbx_id]).first
+          @person = Person.by_hbx_id(member_hash[:hbx_id]).first
         end
 
         it 'returns a success result' do
@@ -99,12 +104,15 @@ RSpec.describe Operations::Families::CreateOrUpdateMember, type: :model, dbclean
 
     context 'failure' do
       let(:params) do
-        applicant_params.merge(family_id: family.id, gender: 'female', is_incarcerated: false, :ethnicity => ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"], i94_number: '45612378985', relationship: 'spouse')
+        member_hash.merge!(gender: 'female', is_incarcerated: false, :ethnicity => ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"])
+        member_hash[:consumer_role][:immigration_documents_attributes][0].merge!(i94_number: '45612378985')
+        member_hash
       end
+
       before do
-        @result = subject.call(params.except(:family_id))
+        @result = subject.call({member_params: params, person_hbx_id: dependent.hbx_id})
         family.reload
-        @person = Person.by_hbx_id(params[:person_hbx_id]).first
+        @person = Person.by_hbx_id(member_hash[:hbx_id]).first
       end
 
       it 'should return failure' do
