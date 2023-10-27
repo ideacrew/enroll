@@ -13,7 +13,8 @@ module Operations
         family_id, applicant_params = yield validate(params)
         applicant_params = yield sanitize_params(applicant_params)
         person = yield find_or_match_person(applicant_params)
-        family_member_id = yield create_or_update_member(applicant_params, family_id, person)
+        member_hash = yield transform(applicant_params)
+        family_member_id = yield create_or_update_member(member_hash, family_id, person)
 
         Success(family_member_id)
       end
@@ -32,12 +33,23 @@ module Operations
         Success(applicant_params)
       end
 
-      def create_or_update_member(params, family_id, person)
+      def transform(applicant_params)
+        result = Operations::People::TransformApplicantToMember.new.call(applicant_params)
+        return result if result.failure?
+
+        hash = result.success
+        hash.merge!(relationship: applicant_params[:relationship])
+
+        Success(hash)
+      end
+
+      def create_or_update_member(member_hash, family_id, person)
         result = if person.blank?
-                   Operations::Families::CreateMember.new.call({applicant_params: params, family_id: family_id})
+                   Operations::Families::CreateMember.new.call({member_params: member_hash, family_id: family_id})
                  else
-                   Operations::Families::UpdateMember.new.call({applicant_params: params, family_id: family_id, person: person})
+                   Operations::Families::UpdateMember.new.call({member_params: member_hash, family_id: family_id, person_hbx_id: person.hbx_id})
                  end
+
         if result.success?
           family_member_id = result.success
           Success(family_member_id)

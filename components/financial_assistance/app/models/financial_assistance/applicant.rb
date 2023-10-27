@@ -1616,7 +1616,8 @@ module FinancialAssistance
       if is_active && !callback_update
         create_or_update_member_params = { applicant_params: self.attributes_for_export, family_id: application.family_id }
         create_or_update_result = if FinancialAssistanceRegistry[:propagate_applicant].enabled?
-                                    ::FinancialAssistance::Operations::Families::PropagateApplicant.new.call(create_or_update_member_params.merge(is_primary_applicant: is_primary_applicant?))
+                                    create_or_update_member_params.merge!(is_primary_applicant: is_primary_applicant?, skip_consumer_role_callbacks: true, skip_person_updated_event_callback: true)
+                                    ::Operations::Families::CreateOrUpdateMember.new.call(create_or_update_member_params)
                                   else
                                     ::FinancialAssistance::Operations::Families::CreateOrUpdateMember.new.call(params: create_or_update_member_params)
                                   end
@@ -1627,6 +1628,7 @@ module FinancialAssistance
         application.update_dependents_home_address if is_primary_applicant? && address_info_changed?
       end
     rescue StandardError => e
+      Rails.logger.error {"Unable to propagate_applicant due to #{e}"} unless Rails.env.test?
       e.message
     end
 

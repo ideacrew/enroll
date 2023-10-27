@@ -13,21 +13,23 @@ module Operations
       # Creates or updates a family member and persists the changes to the database.
       #
       # @param params [Hash] The parameters for creating or updating the family member.
-      # @option params [Hash] :applicant_params The parameters for the applicant.
+      # @option params [Hash] :member_params The parameters to create member.
       # @option params [String] :family_id The ID of the family to which the member belongs.
       # @option params [Person] :person The person object to update.
       # @return [Dry::Monads::Result] A monad indicating success or failure.
       def call(params)
-        applicant_params, family_id, person = yield validate(params)
-        member_hash = yield transform(applicant_params)
-        member_hash = yield sanitize_person_params(member_hash, person)
-        person = yield assign_member_values(person, member_hash)
-        active_vlp_document = yield find_active_vlp_document(person, member_hash)
+        member_params, family_id, person_hbx_id = yield validate(params)
+        person = yield find_person(person_hbx_id)
+        member_params = yield sanitize_person_params(member_params, person)
+        person = yield assign_member_values(person, member_params)
+        active_vlp_document = yield find_active_vlp_document(person, member_params)
         family = yield find_family(family_id)
-        yield build_relationship(person, family, applicant_params[:relationship])
+        yield build_relationship(person, family, member_params[:relationship])
         family_member = yield build_family_member(person, family)
-        result = yield persist(person, family_member, active_vlp_document)
-        fire_update_event(result[:event]) if person.consumer_role.present? && result[:can_trigger_hub_call]
+        person_changes, consumer_role_changes = yield persist(person, family_member, active_vlp_document)
+        event = yield build_event(person_changes, consumer_role_changes, person)
+
+        fire_update_event(event) if event.present?
 
         Success(family_member.id)
       end
@@ -36,14 +38,14 @@ module Operations
 
       def validate(params)
         return Failure("Provide family_id to build member") if params[:family_id].blank?
-        return Failure("Provide applicant_params to build member") if params[:applicant_params].blank?
-        return Failure("Provide person id to build member") if params[:person].blank?
+        return Failure("Provide member_params to build member") if params[:member_params].blank?
+        return Failure("Provide person id to build member") if params[:person_hbx_id].blank?
 
-        Success([params[:applicant_params], params[:family_id].to_s, params[:person]])
+        Success([params[:member_params], params[:family_id].to_s, params[:person_hbx_id]])
       end
 
-      def transform(applicant_params)
-        Operations::People::TransformApplicantToMember.new.call(applicant_params)
+      def find_person(person_hbx_id)
+        Operations::People::Find.new.call({person_hbx_id: person_hbx_id})
       end
 
       # Person object is storing the values as empty string
@@ -115,48 +117,53 @@ module Operations
       # @param active_vlp_document [VlpDocument] The active VLP document for the person.
       # @return [Dry::Monads::Result] A monad indicating success or failure with the event to publish.
       def persist(person, family_member, active_vlp_document)
-        db_active_vlp_document_id = person.consumer_role.active_vlp_document_id
-        person.consumer_role.active_vlp_document_id = active_vlp_document&.id if db_active_vlp_document_id != active_vlp_document&.id
+        consumer_role = person.consumer_role
+        db_active_vlp_document_id = consumer_role.active_vlp_document_id
+        consumer_role.active_vlp_document_id = active_vlp_document&.id if db_active_vlp_document_id != active_vlp_document&.id
 
-        result = if person_changed?(person) && consumer_role_changed?(person.consumer_role)
-                   person.skip_person_updated_event_callback = true
-                   event = fetch_event_name(person)
-                   person.consumer_role.save!
-                   person.save!
-                   { can_trigger_hub_call: true, event: event }
-                 elsif person_changed?(person)
-                   person.skip_person_updated_event_callback = true
-                   event = fetch_event_name(person)
-                   person.save!
-                   { can_trigger_hub_call: true, event: event }
-                 elsif consumer_role_changed?(person.consumer_role)
-                   event = fetch_event_name(person)
-                   person.consumer_role.save!
-                   { can_trigger_hub_call: true, event: event }
-                 else
-                   { can_trigger_hub_call: false }
-                 end
+        consumer_role_changes, person_changes = if person_changed?(person) && consumer_role_changed?(consumer_role)
+                                                  [save_consumer_role(consumer_role), save_person(person)]
+                                                elsif person_changed?(person)
+                                                  [{}, save_person(person)]
+                                                elsif consumer_role_changed?(consumer_role)
+                                                  [save_consumer_role(consumer_role), {}]
+                                                end
 
         family_member.save!
-        Success(result)
+        Success([person_changes, consumer_role_changes])
       end
 
-      def fetch_person_event_name(person)
+      def save_person(person)
+        changes = person.changes
+        person.save!
+        changes
+      end
+
+      def save_consumer_role(consumer_role)
+        changes = consumer_role.changes
+        consumer_role.lawful_presence_determination.skip_lawful_presence_determination_callbacks = true
+        consumer_role.save!
+        changes
+      end
+
+      def build_person_event(person, person_changes)
         identifying_information_attributes = EnrollRegistry[:consumer_role_hub_call].setting(:identifying_information_attributes).item.map(&:to_sym)
         tribe_status_attributes = EnrollRegistry[:consumer_role_hub_call].setting(:indian_tribe_attributes).item.map(&:to_sym)
         valid_attributes = identifying_information_attributes + tribe_status_attributes
 
-        event('events.person_updated', attributes: { gid: person.to_global_id.uri, payload: person.changed_attributes }) if (valid_attributes & person.changes.symbolize_keys.keys).present?
+        event('events.person_updated', attributes: { gid: person.to_global_id.uri, payload: person_changes }) if (valid_attributes & person_changes.symbolize_keys.keys).present?
       end
 
-      def fetch_event_name(person)
-        event = fetch_person_event_name(person)
+      def build_event(person_changes, consumer_role_changes, person)
+        return Success(nil) if person_changes.blank? && consumer_role_changes.blank?
+
+        event = build_person_event(person, person_changes)
         return event if event.present?
 
-        fetch_consumer_role_event_name(person.consumer_role)
+        build_consumer_role_event(person.consumer_role)
       end
 
-      def fetch_consumer_role_event_name(consumer_role)
+      def build_consumer_role_event(consumer_role)
         event('events.individual.consumer_roles.updated', attributes: { gid: consumer_role.to_global_id.uri, previous: {is_applying_coverage: consumer_role.is_applying_coverage} })
       end
 
@@ -169,7 +176,7 @@ module Operations
       end
 
       def fire_update_event(event)
-        event.success.publish if event.success?
+        Success(event.publish)
       end
     end
   end

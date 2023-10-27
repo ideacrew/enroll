@@ -49,9 +49,11 @@ module Operations
 
       # if us_citizen, clear all vlp values
       def build_payload(person_hash, consumer_role_hash, vlp_document_hash, params)
+        person_hash[:relationship] = params[:relationship]
         person_hash[:person_addresses] = person_hash.delete :addresses
         person_hash[:person_phones] = person_hash.delete :phones
         person_hash[:person_emails] = person_hash.delete :emails
+        person_hash[:skip_person_updated_event_callback] = params[:skip_person_updated_event_callback]
         person_hash[:consumer_role] = {
           skip_consumer_role_callbacks: params[:skip_consumer_role_callbacks],
           **consumer_role_hash,

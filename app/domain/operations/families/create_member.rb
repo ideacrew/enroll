@@ -13,19 +13,19 @@ module Operations
       # Creates a new family member.
       #
       # @param params [Hash] The parameters for creating the family member.
-      # @option params [Hash] :applicant_params The parameters for the applicant.
+      # @option params [Hash] :member_params The parameters to create member.
       # @option params [String] :family_id The ID of the family.
       # @return [Dry::Monads::Result] The result of the operation is family_member_id.
       def call(params)
-        applicant_params, family_id = yield validate(params)
-        member_hash = yield transform(applicant_params)
-        person = yield build_member(member_hash)
+        member_params, family_id = yield validate(params)
+        person = yield build_member(member_params)
         family = yield find_family(family_id)
-        yield build_relationship(person, family, applicant_params[:relationship])
+        yield build_relationship(person, family, member_params[:relationship])
         family_member = yield build_family_member(person, family)
         person = yield persist_person(person)
         family_member_id = yield persist_family(family_member, family)
-        fire_created_event(person.consumer_role) if person.consumer_role.present?
+        event = yield build_event(person.consumer_role)
+        yield fire_created_event(event)
 
         Success(family_member_id)
       end
@@ -34,15 +34,9 @@ module Operations
 
       def validate(params)
         return Failure("Provide family_id to build member") if params[:family_id].blank?
-        return Failure("Provide applicant_params to build member") if params[:applicant_params].blank?
-        Success([params[:applicant_params], params[:family_id].to_s])
-      end
+        return Failure("Provide member_params to build member") if params[:member_params].blank?
 
-      def transform(applicant_params)
-        result = Operations::People::TransformApplicantToMember.new.call(applicant_params)
-        return result if result.failure?
-
-        Success(result.success)
+        Success([params[:member_params], params[:family_id].to_s])
       end
 
       def find_family(family_id)
@@ -89,9 +83,12 @@ module Operations
         Success(family_member.id)
       end
 
-      def fire_created_event(consumer_role)
-        event = event('events.individual.consumer_roles.created', attributes: { gid: consumer_role.to_global_id.uri })
-        event.success.publish if event.success?
+      def build_event(consumer_role)
+        event('events.individual.consumer_roles.created', attributes: { gid: consumer_role.to_global_id.uri })
+      end
+
+      def fire_created_event(event)
+        Success(event.publish)
       end
     end
   end
