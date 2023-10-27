@@ -1019,7 +1019,7 @@ And(/^consumer is an indian_tribe_member$/) do
 end
 
 Given(/^site is for (.*)$/) do |state|
-  EnrollRegistry[:enroll_app].setting(:state_abbreviation).stub(:item).and_return(state.upcase)
+  allow(EnrollRegistry[:enroll_app].setting(:state_abbreviation)).to receive(:item).and_return(state.upcase)
 end
 
 And(/^the consumer should see tribal name textbox without text$/) do
@@ -1235,7 +1235,7 @@ And(/^Dependent clicks on purchase button on confirmation page$/) do
 end
 
 Given(/^the warning duplicate enrollment feature configuration is enabled$/) do
-  EnrollRegistry[:existing_coverage_warning].feature.stub(:is_enabled).and_return(true)
+  allow(EnrollRegistry[:existing_coverage_warning].feature).to receive(:is_enabled).and_return(true)
 end
 
 And(/Dependent sees Your Information page$/) do
@@ -1275,10 +1275,10 @@ end
 
 Given(/plan filter feature is disabled and osse subsidy feature is enabled/) do
   year = TimeKeeper.date_of_record.year
-  EnrollRegistry[:aca_ivl_osse_eligibility].feature.stub(:is_enabled).and_return(true)
+  allow(EnrollRegistry[:aca_ivl_osse_eligibility].feature).to receive(:is_enabled).and_return(true)
   EnrollRegistry["aca_ivl_osse_eligibility_#{year}"].feature.stub(:is_enabled).and_return(true)
   EnrollRegistry["aca_ivl_osse_eligibility_#{year - 1}"].feature.stub(:is_enabled).and_return(true)
-  EnrollRegistry[:individual_osse_plan_filter].feature.stub(:is_enabled).and_return(false)
+  allow(EnrollRegistry[:individual_osse_plan_filter].feature).to receive(:is_enabled).and_return(false)
 end
 
 Then(/consumer should see 0 premiums for all plans/) do

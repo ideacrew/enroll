@@ -6,7 +6,7 @@ RSpec.describe Operations::Individual::OnNewDetermination, type: :model, dbclean
   before :each do
     TimeKeeper.set_date_of_record_unprotected!(Date.today)
     DatabaseCleaner.clean
-    EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(false)
+    allow(EnrollRegistry[:apply_aggregate_to_enrollment].feature).to receive(:is_enabled).and_return(false)
   end
 
   let(:site_key) { EnrollRegistry[:enroll_app].setting(:site_key).item.upcase }
@@ -83,8 +83,9 @@ RSpec.describe Operations::Individual::OnNewDetermination, type: :model, dbclean
     let(:renewal_individual_premium_table) { build(:benefit_markets_products_premium_table, effective_period: renewal_application_period, rating_area: renewal_rating_area) }
 
     before :each do
-      EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
-      EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).stub(:item).and_return(1.0)
+      allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage)).to receive(:item).and_return(1.0)
+
       TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 12, 15))
       effective_on = hbx_profile.benefit_sponsorship.current_benefit_period.start_on
       tax_household10 = FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil, effective_starting_on: hbx_profile.benefit_sponsorship.current_benefit_period.start_on)

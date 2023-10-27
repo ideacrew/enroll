@@ -41,7 +41,7 @@ RSpec.describe L10nHelper, :type => :helper do
 
   context "FAA database values" do
     before do
-      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:financial_assistance].feature).to receive(:is_enabled).and_return(true)
     end
 
     context "income" do

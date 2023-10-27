@@ -25,8 +25,8 @@ describe 'shared/_consumer_home_address_fields.html.erb' do
 
   context 'when features are enabled' do
     before do
-      EnrollRegistry[:moving_to_state].feature.stub(:is_enabled).and_return(true)
-      EnrollRegistry[:living_outside_state].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:moving_to_state].feature).to receive(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:living_outside_state].feature).to receive(:is_enabled).and_return(true)
 
       render 'shared/consumer_home_address_fields', f: @mock_form, no_dc_address: true
     end
@@ -42,8 +42,8 @@ describe 'shared/_consumer_home_address_fields.html.erb' do
 
   context 'when features are disabled' do
     before do
-      EnrollRegistry[:moving_to_state].feature.stub(:is_enabled).and_return(false)
-      EnrollRegistry[:living_outside_state].feature.stub(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:moving_to_state].feature).to receive(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:living_outside_state].feature).to receive(:is_enabled).and_return(false)
 
       render 'shared/consumer_home_address_fields', f: @mock_form, no_dc_address: true
     end

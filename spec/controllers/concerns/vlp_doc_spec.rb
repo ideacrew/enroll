@@ -329,7 +329,7 @@ describe FakesController do
     let(:consumer_role) { FactoryBot.build(:consumer_role, tribal_state: 'ME', tribe_codes: ["PR"], tribal_name: "Tribe1") }
 
     before :each do
-      EnrollRegistry[:indian_alaskan_tribe_codes].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:indian_alaskan_tribe_codes].feature).to receive(:is_enabled).and_return(true)
       allow(EnrollRegistry[:enroll_app].setting(:state_abbreviation)).to receive(:item).and_return('ME')
     end
 

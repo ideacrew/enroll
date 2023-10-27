@@ -45,8 +45,8 @@ RSpec.describe Insured::ConsumerRolesController do
       sign_in(user)
       allow(ConsumerRole).to receive(:find).with(consumer_role_id).and_return(consumer_role)
       allow(consumer_role).to receive(:update_by_person).with(person_controller_parameters).and_return(true)
-      EnrollRegistry[:mec_check].feature.stub(:is_enabled).and_return(false)
-      EnrollRegistry[:shop_coverage_check].feature.stub(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:mec_check].feature).to receive(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:shop_coverage_check].feature).to receive(:is_enabled).and_return(false)
       allow(person).to receive(:mec_check_eligible?).and_return(false)
     end
 
@@ -83,9 +83,9 @@ RSpec.describe Insured::ConsumerRolesController do
       let(:user) { FactoryBot.create :user, :with_consumer_role }
 
       before do
-        EnrollRegistry[:aca_individual_market].feature.stub(:is_enabled).and_return(true)
-        EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
-        EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:aca_individual_market].feature).to receive(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:financial_assistance].feature).to receive(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:validate_quadrant].feature).to receive(:is_enabled).and_return(true)
         # allow(EnrollRegistry).to receive(:feature_enabled?).with(:location_residency_verification_type).and_return(true)
         sign_in user
       end
@@ -101,9 +101,9 @@ RSpec.describe Insured::ConsumerRolesController do
       let(:user) { FactoryBot.create :user, :with_consumer_role }
 
       before do
-        EnrollRegistry[:aca_individual_market].feature.stub(:is_enabled).and_return(true)
-        EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
-        EnrollRegistry[:validate_quadrant].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:aca_individual_market].feature).to receive(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:financial_assistance].feature).to receive(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:validate_quadrant].feature).to receive(:is_enabled).and_return(true)
         # allow(EnrollRegistry).to receive(:feature_enabled?).with(:location_residency_verification_type).and_return(true)
         sign_in user
       end
@@ -138,7 +138,7 @@ RSpec.describe Insured::ConsumerRolesController do
       context "iap year selection is enabled and IVL oe end date is in future" do
         before do
           allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_profile)
-          EnrollRegistry[:iap_year_selection].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:iap_year_selection].feature).to receive(:is_enabled).and_return(true)
           allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, 1, 1))
         end
 
@@ -153,7 +153,7 @@ RSpec.describe Insured::ConsumerRolesController do
 
       context "iap year selection is disabled and IVL oe end date is in future" do
         before do
-          EnrollRegistry[:iap_year_selection].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:iap_year_selection].feature).to receive(:is_enabled).and_return(false)
           allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, 1, 1))
         end
 
