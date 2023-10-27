@@ -140,11 +140,11 @@ RSpec.describe Operations::Families::CreateOrUpdateMember, type: :model, dbclean
       end
 
       it 'should not create person' do
-        expect(@person).not_to be_nil
+        expect(@person).to be_nil
       end
 
       it 'should not create family member' do
-        expect(family.family_members.count).to eq 2
+        expect(family.family_members.count).to eq 1
       end
     end
   end

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'domain/operations/financial_assistance/applicant_params_context'
+require 'domain/operations/families/member_params_context'
 
 RSpec.describe Operations::Families::CreateMember, type: :model, dbclean: :after_each do
-  include_context 'export_applicant_attributes_context'
+  include_context 'member_attributes_context'
 
   let(:person) do
     FactoryBot.create(:person,
@@ -19,7 +19,8 @@ RSpec.describe Operations::Families::CreateMember, type: :model, dbclean: :after
   let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
 
   let(:params) do
-    applicant_params.merge(family_id: family.id, relationship: 'spouse')
+    member_hash.merge!(relationship: 'spouse')
+    member_hash
   end
 
   it 'should be a container-ready operation' do
@@ -28,9 +29,9 @@ RSpec.describe Operations::Families::CreateMember, type: :model, dbclean: :after
 
   context 'for success flow' do
     before do
-      @result = subject.call({applicant_params: params, family_id: family.id})
+      @result = subject.call({member_params: member_hash, family_id: family.id})
       family.reload
-      @person = Person.by_hbx_id(params[:hbx_id]).first
+      @person = Person.by_hbx_id(member_hash[:hbx_id]).first
     end
 
     context 'success' do
@@ -66,9 +67,9 @@ RSpec.describe Operations::Families::CreateMember, type: :model, dbclean: :after
 
   context 'failure' do
     before do
-      @result = subject.call(params.except(:family_id))
+      @result = subject.call(member_hash)
       family.reload
-      @person = Person.by_hbx_id(params[:hbx_id]).first
+      @person = Person.by_hbx_id(member_hash[:hbx_id]).first
     end
 
     context 'failure' do
