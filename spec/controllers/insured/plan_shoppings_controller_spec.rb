@@ -730,6 +730,20 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       get :thankyou, params: {id: hbx_enrollment.id, plan_id: product.id}
       expect(response).to render_template('insured/plan_shoppings/thankyou.html.erb')
     end
+
+    context 'set_elected_aptc_by_params' do
+      before do
+        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+      end
+
+      it 'does not raise error' do
+        sign_in(user)
+        session_variables = { elected_aptc: 630, max_aptc: 630, aptc_grants: double }
+        expect do
+          get :thankyou, params: { id: hbx_enrollment.id, plan_id: product.id, elected_aptc: 605 }, session: session_variables
+        end.not_to raise_error(NoMethodError)
+      end
+    end
   end
 
   context '#set_elected_aptc_by_params', :dbclean => :around_each  do
