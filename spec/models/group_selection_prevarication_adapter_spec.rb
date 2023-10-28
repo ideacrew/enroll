@@ -380,4 +380,58 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each, :if => 
       end
     end
   end
+
+  context '.create_action_market_kind' do
+    context 'when market_kind is shop' do
+      let(:options) do
+        {
+          market_kind: 'shop'
+        }
+      end
+
+      context 'when fehb employee' do
+
+        before do
+          allow(adapter).to receive(:is_fehb_market_enabled?).and_return(true)
+          allow(adapter).to receive(:is_fehb?).and_return(true)
+        end
+
+        it 'should return fehb' do
+          expect(adapter.create_action_market_kind(options)).to eq 'fehb'
+        end
+      end
+
+      context 'when not an fehb employee' do
+        it 'should return market_kind' do
+          expect(adapter.create_action_market_kind(options)).to eq 'shop'
+        end
+      end
+    end
+
+    context 'when market_kind is individual' do
+      let(:options) do
+        {
+          market_kind: 'individual'
+        }
+      end
+
+      context 'when fehb employee' do
+
+        before do
+          allow(adapter).to receive(:is_fehb_market_enabled?).and_return(true)
+          allow(adapter).to receive(:is_fehb?).and_return(true)
+        end
+
+        it 'should return market_kind' do
+          expect(adapter.create_action_market_kind(options)).to eq 'individual'
+        end
+      end
+
+      context 'when not an fehb employee' do
+        it 'should return market_kind' do
+          expect(adapter.create_action_market_kind(options)).to eq 'individual'
+        end
+      end
+    end
+  end
 end
