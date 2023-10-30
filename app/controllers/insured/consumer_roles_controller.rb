@@ -330,7 +330,7 @@ class Insured::ConsumerRolesController < ApplicationController
   def validate_person_match
     first_name = params[:person][:first_name]
     last_name = params[:person][:last_name]
-    return unless (first_name != @person.first_name) || (last_name != @person.last_name)
+    return if (first_name == @person.first_name) || (last_name == @person.last_name)
     matched_person = match_person(first_name, last_name)
     return unless matched_person.present? && (matched_person.hbx_id != @person.hbx_id)
     flash[:error] = l10n("person_match_error_message", first_name: first_name, last_name: last_name)
