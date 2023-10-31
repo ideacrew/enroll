@@ -48,7 +48,7 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
       primary_person = person.primary_family ? person : person.families.first.primary_applicant.person
       consumer_role = primary_person.consumer_role
       if primary_person.present? && consumer_role.present?
-        @notifier = Services::NoticeService.new
+        @notifier = BenefitSponsors::Services::NoticeService.new
         @notifier.deliver(
           recipient: consumer_role,
           event_object: consumer_role,
