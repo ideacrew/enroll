@@ -220,69 +220,6 @@ if Settings.aca.market_kinds.include? 'individual'
       ]
     },
     {
-      hbx_id: 'IVLR8',
-      title: '2017 Insurance Renewal Notice and Opportunity to Change Plans',
-      description: 'Notice to be sent out to individuals staying on UQHP',
-      resource_name: 'consumer_role',
-      event_name: 'ivl_renewal_notice_8',
-      notice_triggers: [
-        {
-          name: 'September Projected Renewal Notice - UQHP',
-          notice_template: 'notices/ivl/IVLR8_UQHP_to_UQHP',
-          notice_builder: 'IvlNotices::VariableIvlRenewalNotice',
-          mpi_indicator: 'MPI_IVLR8',
-          notice_trigger_element_group: {
-            market_places: ['individual'],
-            primary_recipients: ["consumer"],
-            primary_recipient_delivery_method: ["secure_message", "paper"],
-            secondary_recipients: []
-          }
-        }
-      ]
-    },
-    {
-      hbx_id: 'IVLR9',
-      title: 'Your 2017 Final Insurance Enrollment Notice',
-      description: 'Notice to be sent out to people enrolled in 2017 coverage who have enrolled by December',
-      resource_name: 'consumer_role',
-      event_name: 'ivl_renewal_notice_9',
-      notice_triggers: [
-        {
-          name: 'December Final Insurance Enrollment Notice',
-          notice_template: 'notices/ivl/IVLR9_UQHP_final_renewal_december',
-          notice_builder: 'IvlNotices::NoAppealVariableIvlRenewalNotice',
-          mpi_indicator: 'MPI_IVLR9',
-          notice_trigger_element_group: {
-            market_places: ['individual'],
-            primary_recipients: ["consumer"],
-            primary_recipient_delivery_method: ["secure_message", "paper"],
-            secondary_recipients: []
-          }
-        }
-      ]
-    },
-    {
-      hbx_id: 'IVLR10',
-      title: 'Your 2017 Final Insurance Enrollment Notice',
-      description: 'Notice to be sent out to people enrolled in 2017 assisted coverage who have enrolled by December',
-      resource_name: 'consumer_role',
-      event_name: 'ivl_renewal_notice_10',
-      notice_triggers: [
-        {
-          name: 'December Final Insurance Enrollment Notice',
-          notice_template: 'notices/ivl/IVLR10_AQHP_final_renewal',
-          notice_builder: 'IvlNotices::NoAppealVariableIvlRenewalNotice',
-          mpi_indicator: 'MPI_IVLR10',
-          notice_trigger_element_group: {
-            market_places: ['individual'],
-            primary_recipients: ["consumer"],
-            primary_recipient_delivery_method: ["secure_message", "paper"],
-            secondary_recipients: []
-          }
-        }
-      ]
-    },
-    {
       hbx_id: 'IVL_CAP',
       title: 'Important Tax Information about your Catastrophic Health Coverage',
       description: 'Notice to be sent out to all the people enrolled in Catastrophic plan in 2017 for at least a day',
