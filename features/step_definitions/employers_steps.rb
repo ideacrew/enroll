@@ -687,7 +687,7 @@ Then(/^employer should see create plan year button disabled if plan year start i
     expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql false
   else
     expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql true
-  end 
+  end
 end
 
 Then(/^employer should see your estimated montly cost$/) do
