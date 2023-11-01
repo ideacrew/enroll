@@ -1,6 +1,6 @@
 ### Next Steps:
 1. Finalize a template for documenting a false positive.
-2. Add previously identified false positives to the CODESWEEP_FALSE_POSITIVES.MD file.
+2. Add previously identified false positives to the CODESWEEP_FALSE_POSITIVES.MD file. (And share it with Desire)
 3. Add more information to [Real Security Issue](CODESWEEP_FALSE_POSITIVES_README.MD#real-security-issue) which could be helpful for developers to understand the process.
     1. Usually after the fix we will merge this into trunk after this PR passes 2 reviews before we QA this.
     2. In some cases, we might want to to QA this before we merge this into trunk.
@@ -9,12 +9,18 @@
 1.
     1. Vulnerability: `CrossSiteRequestForgery`
     2. Severity: `Medium`
-    3. Cause:
-    4. False positive reason:
-    5. Pull Request Link: https://github.com/ideacrew/enroll/pull/3126
+    3. Cause: Code includes an expression with the `match` keyword.  The AppScan heuristic for flagging default, insecure routing settings looks for expressions of the form `match =>`.
+    4. False positive reasons:
+        1. It seems to be unaware or not configured for the fact that the code of the form `$match =>` is frequently used in MongoDB queries.
+        2. It doesn't verify that the expression in question is in a file or code block that actually controls Rails routing settings, such as `config/routes.rb`. The code it is flagging isn't in a routing configuration file and has nothing to do with routing. 
+    5. Approved Cases:
+        1. PR: https://github.com/ideacrew/enroll/pull/3126, file: app/models/queries/ivl_sep_events.rb
+
 2.
     1. Vulnerability: `Injection.SQL`
     2. Severity: `High`
-    3. Cause:
-    4. False positive reason:
-    5. Pull Request Link: https://github.com/ideacrew/enroll/pull/3130
+    3. Cause: Code includes an expression with the `where` keyword.
+    4. False positive reasons:
+        1. Enroll utilizes MongoDB for data storage instead of SQL
+    5. Approved Cases:
+        1. PR: https://github.com/ideacrew/enroll/pull/3130, file: script/export_rrv_families.rb
