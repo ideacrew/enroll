@@ -680,6 +680,16 @@ Then(/^employer should see create plan year button disabled$/) do
   expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql true
 end
 
+Then(/^employer should see create plan year button disabled if plan year start is not the first of the year$/) do
+  benefit_application = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.all.first.benefit_applications.first
+  plan_year_start = benefit_application.effective_period.first.to_date
+  if plan_year_start == (TimeKeeper.date_of_record + 1.year).beginning_of_year
+    expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql false
+  else
+    expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql true
+  end
+end
+
 Then(/^employer should see your estimated montly cost$/) do
   expect(page).to have_content("Your Estimated Monthly Cost")
 end
