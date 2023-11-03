@@ -7,6 +7,7 @@ module BenefitSponsors
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
         include Config::AcaHelper
         include EventSource::Command
+        include ::L10nHelper
 
         before_action :find_employer, only: [
           :show, :inbox, :bulk_employee_upload, :export_census_employees, :show_invoice,
@@ -163,10 +164,10 @@ module BenefitSponsors
               event = event('events.benefit_sponsors.employer_profile.bulk_ce_upload', attributes: {s3_reference_key: filename, bucket_name: 'ce-roster-upload', employer_profile_id: @employer_profile.id, filename: filename})
               event.success.publish if event.success?
               # once we put file to s3 then redirecting user to the employees list page
-              flash[:notice] = 'File uploaded to S3'
+              flash[:notice] = l10n("employers.employer_profiles.ce_bulk_upload_success_message")
               redirect_to employees_upload_url(@employer_profile.id)
             else
-              flash[:notice] = 'File not uploaded to S3'
+              flash[:notice] = l10n("employers.employer_profiles.ce_bulk_upload_error_message")
               render @roster_upload_form.redirection_url || default_url
             end
           rescue StandardError => e
