@@ -150,7 +150,7 @@ describe BrokerRole, dbclean: :around_each do
 
       context 'allow_alphanumeric_npn enabled' do
         before do
-          EnrollRegistry[:allow_alphanumeric_npn].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:allow_alphanumeric_npn].feature).to receive(:is_enabled).and_return(true)
         end
 
         it 'saves allow_alphanumeric' do
@@ -161,7 +161,7 @@ describe BrokerRole, dbclean: :around_each do
 
       context 'allow_alphanumeric_npn disabled' do
         before do
-          EnrollRegistry[:allow_alphanumeric_npn].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:allow_alphanumeric_npn].feature).to receive(:is_enabled).and_return(false)
         end
 
         it 'saves allow_alphanumeric' do

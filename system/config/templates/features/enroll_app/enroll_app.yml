@@ -378,7 +378,7 @@ registry:
           - key: :current_effective_period
             item: <%= Date.new(2020,11,1)..Date.new(2021,10,31) %>
           - key: :upcoming_effective_period
-            item: <%= Date.new(2022,11,1)..Date.new(2023,01,31) %>
+            item: <%= Date.new(2023,11,1)..Date.new(2024,01,31) %>
           - key: :contact_center_number_for_display
             item: "(855) 532-5465"
           - key: :mailing_address_1
@@ -392,7 +392,7 @@ registry:
         is_enabled: true
         settings:
           - key: :ivl_enrollment_renewal_begin_effective_day
-            item: 1
+            item: <%= ENV['IVL_ENROLLMENT_RENEWAL_BEGIN_EFFECTIVE_DAY'] || 1 %>
           - key: :ivl_enrollment_renewal_begin_effective_month
             item: <%= ENV['IVL_ENROLLMENT_RENEWAL_BEGIN_EFFECTIVE_MONTH'] || 11 %>
       - key: :exclude_child_only_offering

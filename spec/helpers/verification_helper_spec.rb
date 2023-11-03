@@ -300,7 +300,7 @@ RSpec.describe VerificationHelper, :type => :helper do
 
       context "when include_faa_outstanding_verifications is enabled" do
         before do
-          EnrollRegistry[:include_faa_outstanding_verifications].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:include_faa_outstanding_verifications].feature).to receive(:is_enabled).and_return(true)
         end
 
         it 'returns false when family has no eligibility determination' do
@@ -474,7 +474,7 @@ RSpec.describe VerificationHelper, :type => :helper do
   #     expect(helper.review_button_class(family)).to eq('success')
   #   end
   # end
- 
+
   describe '#has_active_consumer_dependent?' do
     let(:person1) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
     let(:person2) { FactoryBot.create(:person, :with_consumer_role)}
@@ -729,7 +729,7 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
 
     before do
-      EnrollRegistry[:ssa_h3].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:ssa_h3].feature).to receive(:is_enabled).and_return(true)
     end
 
     it 'parses payload' do

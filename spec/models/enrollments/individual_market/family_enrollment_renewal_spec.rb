@@ -261,7 +261,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
 
         it "should raise an error" do
-          expect { subject.clone_enrollment_members }.to raise_error(RuntimeError, /unable to generate enrollment with hbx_id /)
+          expect { subject.clone_enrollment_members }.to raise_error(RuntimeError, /Unable to generate renewal for enrollment with hbx_id/)
         end
       end
     end
@@ -315,9 +315,11 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           renewal_rating_area.destroy!
         end
 
-        it 'should return nil and log an error' do
+        it 'returns error message and log the error' do
           expect_any_instance_of(Logger).to receive(:info).with(/Enrollment renewal failed for #{enrollment.hbx_id} with error message: /i)
-          expect(subject.renew).to eq nil
+          expect(subject.renew).to eq(
+            "Cannot renew enrollment #{enrollment.hbx_id}. Error: Rating Area Is Blank"
+          )
         end
       end
 
@@ -326,16 +328,41 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           renewal_service_area.destroy!
         end
 
-        it 'should return nil and log an error' do
+        it 'returns error message and log the error' do
           expect_any_instance_of(Logger).to receive(:info).with(/Enrollment renewal failed for #{enrollment.hbx_id} with error message: /i)
-          expect(subject.renew).to eq nil
+          expect(subject.renew).to eq(
+            "Cannot renew enrollment #{enrollment.hbx_id}. Error: Product is NOT offered in service area"
+          )
+        end
+      end
+
+      context "when consumer covered under catastrophic product" do
+        before do
+          primary.update(dob: renewal_benefit_coverage_period.start_on - 25.years)
+          spouse.person.update(dob: renewal_benefit_coverage_period.start_on - 25.years)
+          child1.person.update(dob: renewal_benefit_coverage_period.start_on - 1.years)
+          child2.person.update(dob: renewal_benefit_coverage_period.start_on - 1.years)
+          child3.person.update(dob: renewal_benefit_coverage_period.start_on - 1.years)
+        end
+
+        let!(:current_product) { FactoryBot.create(:active_individual_catastophic_product, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_product_id: renewal_product.id) }
+        it 'should return an empty apt hash' do
+          allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
+            double(
+              call: double(
+                success?: true,
+                value!: 100
+              )
+            )
+          )
+          expect(subject.renew.applied_aptc_amount).to be_zero
         end
       end
 
       context 'when mthh enabled' do
         before do
           allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1390, total_premium: 1390))
-          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
           update_age_off_excluded(enrollment.family, false)
         end
 
@@ -570,6 +597,32 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             end
           end
         end
+
+        context "when consumer covered under catastrophic product" do
+          before do
+            primary.update(dob: renewal_benefit_coverage_period.start_on - 25.years)
+            spouse.person.update(dob: renewal_benefit_coverage_period.start_on - 25.years)
+            child1.person.update(dob: renewal_benefit_coverage_period.start_on - 1.years)
+            child2.person.update(dob: renewal_benefit_coverage_period.start_on - 1.years)
+            child3.person.update(dob: renewal_benefit_coverage_period.start_on - 1.years)
+            renewal_product.update(metal_level_kind: :catastrophic)
+          end
+
+          # let!(:renewal_product) { FactoryBot.create(:active_individual_catastophic_product, hios_id: "11111111122302-01", csr_variant_id: "01") }
+          let!(:current_product) { FactoryBot.create(:active_individual_catastophic_product, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_product_id: renewal_product.id) }
+
+          it 'should return an empty apt hash' do
+            allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
+              double(
+                call: double(
+                  success?: true,
+                  value!: 100
+                )
+              )
+            )
+            expect(subject.renew.applied_aptc_amount).to be_zero
+          end
+        end
       end
 
       context 'when mthh enabled for dental enrollment' do
@@ -626,7 +679,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           enrollment.coverage_kind = "dental"
           enrollment.product = dental_product
           enrollment.save!
-          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
         end
 
         context 'unassisted renewal' do

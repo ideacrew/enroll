@@ -155,7 +155,7 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::IncomeEvidences::Req
 
   context 'success' do
     it 'should return success if assistance year is passed' do
-      result = subject.call({application_hbx_id: application.hbx_id, family_hbx_id: family.hbx_assigned_id})
+      result = subject.call({ application_hbx_id: application.hbx_id })
       expect(result).to be_success
     end
   end
@@ -164,7 +164,7 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::IncomeEvidences::Req
     before do
       allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
-      @result = subject.call({application_hbx_id: application.hbx_id, family_hbx_id: family.hbx_assigned_id})
+      @result = subject.call({ application_hbx_id: application.hbx_id })
       application.reload
     end
 
@@ -200,7 +200,7 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::IncomeEvidences::Req
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
         application.applicants.last.unset(:encrypted_ssn)
         application.save!
-        @result = subject.call({application_hbx_id: application.hbx_id, family_hbx_id: family.hbx_assigned_id})
+        @result = subject.call({ application_hbx_id: application.hbx_id })
         application.reload
       end
 
@@ -237,7 +237,7 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::IncomeEvidences::Req
           applicant.unset(:encrypted_ssn)
         end
         application.save!
-        @result = subject.call({application_hbx_id: application.hbx_id, family_hbx_id: family.hbx_assigned_id})
+        @result = subject.call({ application_hbx_id: application.hbx_id })
         application.reload
       end
 
@@ -267,10 +267,9 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::IncomeEvidences::Req
     end
   end
 
-  context 'failure' do
-    it "should fail if application_hbx_id is not given" do
-      result = subject.call(family_hbx_id: family.hbx_assigned_id)
-      expect(result).not_to be_success
+  context 'without params' do
+    it 'returns failure with error messages' do
+      expect(subject.call({})).to eq Failure(['application hbx_id is missing'])
     end
   end
 end

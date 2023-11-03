@@ -108,8 +108,8 @@ module BenefitApplicationWorld
   def reinstate_application(application)
     terminate_application(application, application.end_on - 4.months)
     application.reload
-    EnrollRegistry[:benefit_application_reinstate].feature.stub(:is_enabled).and_return(true)
-    EnrollRegistry[:benefit_application_reinstate].setting(:offset_months).stub(:item).and_return(12)
+    allow(EnrollRegistry[:benefit_application_reinstate].feature).to receive(:is_enabled).and_return(true)
+    allow(EnrollRegistry[:benefit_application_reinstate].setting(:offset_months)).to receive(:item).and_return(12)
     EnrollRegistry[:benefit_application_reinstate]{ {params: {benefit_application: application, options: {transmit_to_carrier: true} } } }
     application.benefit_sponsorship.benefit_applications.detect{|app| app.reinstated_id.present?}
   end

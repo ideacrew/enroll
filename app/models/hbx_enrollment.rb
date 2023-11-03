@@ -173,6 +173,15 @@ class HbxEnrollment
   # should not be transmitted to carriers nor reported in metrics.
   field :external_enrollment, type: Boolean, default: false
 
+  # In Individual Market's context the successor_creation_failure_reasons is:
+  #   1. Reasons why a renewal is not created.
+  #   2. Reasons why enrollment is not created during
+  #     i. FA application
+  #     ii. Reinstatment
+  #     iii. Self Service
+  # Currently, this is only used in IVL Renewals context.
+  field :successor_creation_failure_reasons, type: Array
+
   track_history   :modifier_field_optional => true,
                   :on => [:kind,
                           :enrollment_kind,
@@ -318,7 +327,14 @@ class HbxEnrollment
   index({"terminated_on" => 1}, { sparse: true })
   index({"applied_aptc_amount" => 1})
   index({"eligible_child_care_subsidy" => 1})
+  index({ 'predecessor_enrollment_id' => 1 })
+  index({ 'successor_creation_failure_reasons' => 1 })
 
+  # Index for IVl Enrollment Renewals
+  index({ kind: 1, aasm_state: 1, coverage_kind: 1, effective_on: 1 })
+
+  # Index for IVL Enrollments Expiration(1/1) and Effectuation(1/1)
+  index({ effective_on: 1, kind: 1, aasm_state: 1 })
 
   scope :active,              ->{ where(is_active: true).where(:created_at.ne => nil) } # Depricated scope
   scope :open_enrollments,    ->{ where(enrollment_kind: "open_enrollment") }
@@ -2872,7 +2888,6 @@ class HbxEnrollment
       effective_year = application.start_on.year
       return unless shop_osse_eligibility_is_enabled?(effective_year)
       return unless application.osse_eligible?
-
       osse_childcare_subsidy = osse_subsidy_for_member(primary_hbx_enrollment_member)
     else
       return unless ivl_osse_eligible?
@@ -2909,6 +2924,7 @@ class HbxEnrollment
   def verify_and_reset_osse_subsidy_amount(member_group)
     return unless is_shop?
 
+    update_osse_childcare_subsidy
     hbx_enrollment_members.each do |member|
       next unless member.is_subscriber?
       product_price = member_group.group_enrollment.member_enrollments.find{|enrollment| enrollment.member_id == member.id }.product_price

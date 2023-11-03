@@ -121,14 +121,14 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
     end
 
     before do
-      EnrollRegistry[:atleast_one_silver_plan_donot_cover_pediatric_dental_cost].feature.stub(:is_enabled).and_return(true)
-      EnrollRegistry[:atleast_one_silver_plan_donot_cover_pediatric_dental_cost].settings(start_of_year.year.to_s.to_sym).stub(:item).and_return(true)
+      allow(EnrollRegistry[:atleast_one_silver_plan_donot_cover_pediatric_dental_cost].feature).to receive(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:atleast_one_silver_plan_donot_cover_pediatric_dental_cost].settings(start_of_year.year.to_s.to_sym)).to receive(:item).and_return(true)
     end
 
     context 'geographic_rating_area_model: single' do
       before :each do
-        EnrollRegistry[:enroll_app].settings(:rating_areas).stub(:item).and_return('single')
-        EnrollRegistry[:service_area].settings(:service_area_model).stub(:item).and_return('single')
+        allow(EnrollRegistry[:enroll_app].settings(:rating_areas)).to receive(:item).and_return('single')
+        allow(EnrollRegistry[:service_area].settings(:service_area_model)).to receive(:item).and_return('single')
       end
 
       context 'household_type: child_only' do
@@ -170,8 +170,8 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcspWithPediatricDentalCo
 
     context 'geographic_rating_area_model: county' do
       before :each do
-        EnrollRegistry[:enroll_app].settings(:rating_areas).stub(:item).and_return('county')
-        EnrollRegistry[:service_area].settings(:service_area_model).stub(:item).and_return('county')
+        allow(EnrollRegistry[:enroll_app].settings(:rating_areas)).to receive(:item).and_return('county')
+        allow(EnrollRegistry[:service_area].settings(:service_area_model)).to receive(:item).and_return('county')
       end
 
       context 'household_type: child_only' do

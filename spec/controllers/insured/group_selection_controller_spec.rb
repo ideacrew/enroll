@@ -9,8 +9,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     #include_context "setup benefit market with market catalogs and product packages"
 
   before :each do
-    EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
-    EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(false)
+    allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
+    allow(EnrollRegistry[:apply_aggregate_to_enrollment].feature).to receive(:is_enabled).and_return(false)
   end
 
   let(:site) { BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
@@ -1146,7 +1146,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     let(:params) {{'applied_pct_1' => new_aptc_pct, 'aptc_applied_total' => new_aptc_amount, 'hbx_enrollment_id' => hbx_enrollment.id.to_s, max_aptc: max_tax_credit}}
 
     before :each do
-      EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
       sign_in user
       post :edit_aptc, params: params
     end

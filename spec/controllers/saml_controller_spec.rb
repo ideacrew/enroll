@@ -174,7 +174,7 @@ RSpec.describe SamlController do
 
   describe "GET navigate_to_assistance", db_clean: :after_each do
     before :each do
-      EnrollRegistry[:medicaid_tax_credits_link].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:medicaid_tax_credits_link].feature).to receive(:is_enabled).and_return(true)
     end
 
     context "logged on user" do
