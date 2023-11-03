@@ -58,8 +58,7 @@ module Operations
       end
 
       def update_and_build_verification_types(person)
-        date = TimeKeeper.date_of_record
-        person.consumer_role.types_include_to_notices.collect do |verification_type|
+        person_role(person)&.types_include_to_notices.collect do |verification_type|
           {
             type_name: verification_type.type_name,
             validation_status: verification_type.validation_status,
@@ -72,8 +71,10 @@ module Operations
         members = enrollment.family&.family_members&.where(is_active: true) || []
         family_members_hash = members.collect do |fm|
           person = fm.person
-          outstanding_verification_types = person.consumer_role.types_include_to_notices
+          outstanding_verification_types = person_role(person)&.types_include_to_notices
           is_incarcerated = person.is_incarcerated || false
+          consumer_role_ref = person.consumer_role.present? ? {consumer_role: build_consumer_role(person.consumer_role)} : nil
+          resident_role_ref = person.resident_role.present? ? {resident_role: build_resident_role(person.resident_role)} : nil
           member_hash = {
             is_primary_applicant: fm.is_primary_applicant,
             person: {
@@ -83,11 +84,11 @@ module Operations
               person_health: { is_tobacco_user: person.is_tobacco_user },
               is_active: person.is_active,
               is_disabled: person.is_disabled,
-              consumer_role: build_consumer_role(person.consumer_role),
               addresses: build_addresses(person, fm.is_primary_applicant)
             }
           }
           member_hash[:person].merge!(verification_types: update_and_build_verification_types(person)) if outstanding_verification_types.present?
+          member_hash[:person].merge!(consumer_role_ref || resident_role_ref)
           member_hash
         end
         Success(family_members_hash)
@@ -109,7 +110,8 @@ module Operations
         enrollments.collect do |enr|
           product = enr.product
           issuer = product.issuer_profile
-          consumer_role = enr.consumer_role
+          consumer_role_ref = enr.consumer_role.present? ? {consumer_role_reference: consumer_role_reference(enr.consumer_role)} : nil
+          resident_role_ref = enr.resident_role.present? ? {resident_role_reference: resident_role_reference(enr.resident_role)} : nil
           enrollment_hash = {
             effective_on: enr.effective_on,
             aasm_state: enr.aasm_state,
@@ -121,12 +123,11 @@ module Operations
             hbx_enrollment_members: enrollment_member_hash(enr),
             product_reference: product_reference(product, issuer),
             issuer_profile_reference: issuer_profile_reference(issuer),
-            consumer_role_reference: consumer_role_reference(consumer_role),
             is_receiving_assistance: (enr.applied_aptc_amount > 0 || (product.is_csr? ? true : false)),
             timestamp: timestamp(enr)
           }
           enrollment_hash.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment?
-          enrollment_hash
+          enrollment_hash.merge!(consumer_role_ref || resident_role_ref)
         end
       end
 
@@ -164,6 +165,7 @@ module Operations
       end
 
       def build_consumer_role(consumer_role)
+        return nil if consumer_role.blank?
         {
           is_applying_coverage: consumer_role.is_applying_coverage,
           contact_method: consumer_role.contact_method,
@@ -182,7 +184,23 @@ module Operations
         }
       end
 
+      def build_resident_role(resident_role)
+        return nil if resident_role.blank?
+        ref_hash = {
+          is_applicant: resident_role.is_applicant,
+          is_active: resident_role.is_active,
+          is_state_resident: resident_role.is_state_resident,
+          contact_method: resident_role.contact_method,
+          language_preference: resident_role.language_preference,
+          local_residency_responses: resident_role.local_residency_responses,
+          lawful_presence_determination: {}
+        }
+        ref_hash.merge!(residency_determined_at: resident_role.residency_determined_at) if resident_role.residency_determined_at.present?
+        ref_hash
+      end
+
       def consumer_role_reference(consumer_role)
+        return nil if consumer_role.blank?
         {
           is_active: consumer_role.is_active,
           is_applying_coverage: consumer_role.is_applying_coverage,
@@ -191,6 +209,17 @@ module Operations
           lawful_presence_determination: {},
           citizen_status: consumer_role.citizen_status
         }
+      end
+
+      def resident_role_reference(resident_role)
+        return nil if resident_role.blank?
+        ref_hash = {
+          is_applicant: resident_role.is_applicant,
+          is_active: resident_role.is_active,
+          is_state_resident: resident_role.is_state_resident
+        }
+        ref_hash.merge!(residency_determined_at: resident_role.residency_determined_at) if resident_role.residency_determined_at.present?
+        ref_hash
       end
 
       def issuer_profile_reference(issuer)
@@ -230,9 +259,13 @@ module Operations
         end
       end
 
+      def person_role(person)
+        person.consumer_role || person.resident_role
+      end
+
       def is_documents_needed(enrollment)
         members = enrollment.hbx_enrollment_members.map(&:family_member)
-        members.any? { |member| member.person.consumer_role.types_include_to_notices.present? }
+        members.any? { |member| person_role(member.person)&.types_include_to_notices.present? }
       end
 
       def build_payload(family_members_hash, households_hash, family, documents_needed)
