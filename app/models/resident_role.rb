@@ -187,8 +187,6 @@ class ResidentRole
   end
 
   def types_include_to_notices
-    verification_types.find_all do |type|
-      type.type_unverified?
-    end
+    verification_types.find_all(&:type_unverified?)
   end
 end

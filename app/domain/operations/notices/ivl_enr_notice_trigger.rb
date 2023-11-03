@@ -58,7 +58,7 @@ module Operations
       end
 
       def update_and_build_verification_types(person)
-        person_role(person)&.types_include_to_notices.collect do |verification_type|
+        person_role(person)&.types_include_to_notices&.collect do |verification_type|
           {
             type_name: verification_type.type_name,
             validation_status: verification_type.validation_status,
