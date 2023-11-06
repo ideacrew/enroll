@@ -1111,11 +1111,8 @@ And(/^employer should see that the create plan year is (.*)$/) do |plan_year_btn
   if plan_year_btn_enabled == 'true'
     expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql false
   else
-    if plan_year_start == (TimeKeeper.date_of_record + 1.year).beginning_of_year
-      expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql false
-    else
-      expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql true
-    end
+    expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql false if plan_year_start == (TimeKeeper.date_of_record + 1.year).beginning_of_year
+    expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql true
   end
 end
 
