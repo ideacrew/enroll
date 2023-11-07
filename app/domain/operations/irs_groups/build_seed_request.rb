@@ -34,7 +34,7 @@ module Operations
       end
 
       def validate_payload(value)
-        result = AcaEntities::Contracts::Families::FamilyContract.new.call(value)
+        result = AcaEntities::Contracts::Families::FamilyContract.new.call(cv3_family.value!)
         if result.success?
           Success(result)
         else
