@@ -73,8 +73,6 @@ module Operations
           person = fm.person
           outstanding_verification_types = person_role(person)&.types_include_to_notices
           is_incarcerated = person.is_incarcerated || false
-          consumer_role_ref = person.consumer_role.present? ? {consumer_role: build_consumer_role(person.consumer_role)} : nil
-          resident_role_ref = person.resident_role.present? ? {resident_role: build_resident_role(person.resident_role)} : nil
           member_hash = {
             is_primary_applicant: fm.is_primary_applicant,
             person: {
@@ -88,7 +86,8 @@ module Operations
             }
           }
           member_hash[:person].merge!(verification_types: update_and_build_verification_types(person)) if outstanding_verification_types.present?
-          member_hash[:person].merge!(consumer_role_ref || resident_role_ref)
+          member_hash[:person].merge!({consumer_role: build_consumer_role(person.consumer_role)}) if person.is_consumer_role_active?
+          member_hash[:person].merge!({resident_role: build_resident_role(person.resident_role)}) if person.is_resident_role_active?
           member_hash
         end
         Success(family_members_hash)
@@ -110,8 +109,6 @@ module Operations
         enrollments.collect do |enr|
           product = enr.product
           issuer = product.issuer_profile
-          consumer_role_ref = enr.consumer_role.present? ? {consumer_role_reference: consumer_role_reference(enr.consumer_role)} : nil
-          resident_role_ref = enr.resident_role.present? ? {resident_role_reference: resident_role_reference(enr.resident_role)} : nil
           enrollment_hash = {
             effective_on: enr.effective_on,
             aasm_state: enr.aasm_state,
@@ -127,7 +124,9 @@ module Operations
             timestamp: timestamp(enr)
           }
           enrollment_hash.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment?
-          enrollment_hash.merge!(consumer_role_ref || resident_role_ref)
+          enrollment_hash.merge!({consumer_role_reference: consumer_role_reference(enr.consumer_role)}) if enr.consumer_role.present?
+          enrollment_hash.merge!({resident_role_reference: resident_role_reference(enr.resident_role)}) if enr.resident_role.present?
+          enrollment_hash
         end
       end
 
@@ -260,7 +259,9 @@ module Operations
       end
 
       def person_role(person)
-        person.consumer_role || person.resident_role
+        return person.consumer_role if person.is_consumer_role_active?
+        return person.resident_role if person.is_resident_role_active?
+        nil
       end
 
       def is_documents_needed(enrollment)
