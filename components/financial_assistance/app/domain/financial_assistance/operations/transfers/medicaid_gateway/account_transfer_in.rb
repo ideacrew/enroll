@@ -517,7 +517,7 @@ module FinancialAssistance
           def fill_applicants_form(payload, application) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
             applications = payload["family"]['magi_medicaid_applications'].first
             applications[:applicants].each do |applicant|
-              persisted_applicant = application.applicants.where(first_name: /^#{applicant[:first_name]}$/i, last_name: /^#{applicant[:last_name]}$/i).first
+              persisted_applicant = application.applicants.where(first_name: /^#{applicant[:first_name]}$/i, last_name: /^#{applicant[:last_name]}$/i, dob: applicant[:dob]).first
               return Failure("No matching applicant") unless persisted_applicant.present?
               claimed_by = application.applicants.where(ext_app_id: applicant[:claimed_as_tax_dependent_by]).first
               persisted_applicant.is_physically_disabled = applicant[:is_physically_disabled]
