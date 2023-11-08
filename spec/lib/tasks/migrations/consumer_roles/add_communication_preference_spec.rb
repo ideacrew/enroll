@@ -91,15 +91,29 @@ RSpec.describe 'Adds missing communication preference', :type => :task, dbclean:
   let(:logger_file_name) { "#{Rails.root}/log/add_missing_communication_preference.log" }
   let(:logger_output) { File.read(logger_file_name) }
 
-  it 'adds contact method, logs info and adds updates to CSV' do
-    expect(consumer_role.contact_method).to be_nil
-    invoke_migration_task
-    expect(consumer_role.reload.contact_method).to eq(contact_method_mail_only)
-    expect(csv_output.count).not_to be_zero
-    expect(logger_output).to include("Total number of families to process:")
+  context 'when there is only one member per family' do
+    it 'adds contact method, logs info and adds updates to CSV' do
+      expect(consumer_role.contact_method).to be_nil
+      invoke_migration_task
+      expect(consumer_role.reload.contact_method).to eq(contact_method_mail_only)
+      expect(csv_output.count).not_to be_zero
+      expect(logger_output).to include("Total number of families to process:")
+    end
+  end
+
+  context 'when the dependent does not have contact preference' do
+    before do
+      consumer_role.update!(contact_method: 'Only Electronic communications')
+      invoke_migration_task
+    end
+
+    it 'skips the family' do
+      expect(consumer_role.reload.contact_method).to eq('Only Electronic communications')
+    end
   end
 end
 
 def invoke_migration_task
+  Rake::Task['migrations:add_communication_preference'].reenable
   Rake::Task['migrations:add_communication_preference'].invoke
 end
