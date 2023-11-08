@@ -94,15 +94,19 @@ module Operations
       end
 
       def build_household_hash(family, enrollment)
-        household_hash = family.households.collect do |household|
-          {
+        households = family.households.collect do |household|
+          household_hash = {
             start_date: household.effective_starting_on,
             is_active: household.is_active,
-            coverage_households: household.coverage_households.collect { |ch| {is_immediate_family: ch.is_immediate_family, coverage_household_members: ch.coverage_household_members.collect {|chm| {is_subscriber: chm.is_subscriber}}} },
-            hbx_enrollments: build_enrollments_hash([enrollment])
+            coverage_households: household.coverage_households.collect { |ch| {is_immediate_family: ch.is_immediate_family, coverage_household_members: ch.coverage_household_members.collect {|chm| {is_subscriber: chm.is_subscriber}}} }
           }
+          enrollments_result = build_enrollments_hash([enrollment])
+          return Failure(enrollments_result) if enrollments_result.is_a? String
+
+          household_hash.merge!({ hbx_enrollments: enrollments_result })
         end
-        Success(household_hash)
+
+        Success(households)
       end
 
       def build_enrollments_hash(enrollments)
@@ -125,7 +129,12 @@ module Operations
           }
           enrollment_hash.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment?
           enrollment_hash.merge!({consumer_role_reference: consumer_role_reference(enr.consumer_role)}) if enr.consumer_role.present?
-          enrollment_hash.merge!({resident_role_reference: resident_role_reference(fetch_enrollment_resident_role(enr))}) if resident_role_ref_required?(enr)
+          if resident_role_ref_required?(enr)
+            resident_role = fetch_enrollment_resident_role(enr)
+            return "Unable to find resident role for Coverall enrollment #{enr.hbx_id}" if resident_role.blank?
+
+            enrollment_hash.merge!({resident_role_reference: resident_role_reference(resident_role)})
+          end
           enrollment_hash
         end
       end
@@ -230,7 +239,7 @@ module Operations
       def fetch_enrollment_resident_role(enrollment)
         return enrollment.resident_role if enrollment.resident_role.present?
         # resident role should be present on enrollment, but use primary person resident role as a fallback if missing
-        enrollment.primary_hbx_enrollment_member.person.resident_role
+        enrollment&.primary_hbx_enrollment_member&.person&.resident_role
       end
 
       def issuer_profile_reference(issuer)
