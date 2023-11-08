@@ -18,10 +18,12 @@ class AddCommunicationPreference < MongoidMigrationTask
       eligible_families.each do |family|
         logger.info "Processing family #{family.id}"
         primary = family.primary_person
+        next family if primary.consumer_role.blank?
+        next family if primary.consumer_role.contact_method.present?
+
         current_application = latest_determined_application(family, system_year).first
         renewal_application = latest_determined_application(family, system_year.next).first
 
-        next family if primary.consumer_role.blank?
         csv << [
           primary.hbx_id,
           primary.full_name,
