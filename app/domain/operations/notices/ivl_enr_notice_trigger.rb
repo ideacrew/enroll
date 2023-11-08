@@ -125,7 +125,7 @@ module Operations
           }
           enrollment_hash.merge!(special_enrollment_period_reference: special_enrollment_period_reference(enr)) if enr.is_special_enrollment?
           enrollment_hash.merge!({consumer_role_reference: consumer_role_reference(enr.consumer_role)}) if enr.consumer_role.present?
-          enrollment_hash.merge!({resident_role_reference: resident_role_reference(enr.resident_role)}) if enr.resident_role.present?
+          enrollment_hash.merge!({resident_role_reference: resident_role_reference(fetch_enrollment_resident_role(enr))}) if resident_role_ref_required?(enr)
           enrollment_hash
         end
       end
@@ -219,6 +219,18 @@ module Operations
         }
         ref_hash.merge!(residency_determined_at: resident_role.residency_determined_at) if resident_role.residency_determined_at.present?
         ref_hash
+      end
+
+      # Family contracts require resident role reference to be present for coverall enrollments
+      # This method is used to determine if resident role reference should be populated
+      def resident_role_ref_required?(enrollment)
+        enrollment.kind == "coverall"
+      end
+
+      def fetch_enrollment_resident_role(enrollment)
+        return enrollment.resident_role if enrollment.resident_role.present?
+        # resident role should be present on enrollment, but use primary person resident role as a fallback if missing
+        enrollment.primary_hbx_enrollment_member.person.resident_role
       end
 
       def issuer_profile_reference(issuer)

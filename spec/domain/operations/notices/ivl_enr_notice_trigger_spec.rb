@@ -84,6 +84,18 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
         result = subject.call(params)
         expect(result.success?).to be_truthy
       end
+
+      context 'resident role id missing on enrollment' do
+        before do
+          enrollment_resident.update_attributes(resident_role_id: nil)
+        end
+
+        it 'should return success' do
+          result = subject.call(params)
+          binding.irb
+          expect(result.success?).to be_truthy
+        end
+      end
     end
 
     context 'person without address' do
