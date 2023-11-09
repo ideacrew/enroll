@@ -309,7 +309,8 @@ module FinancialAssistance
             applicants = iap_hash['applicants']
             applicants.each do |applicant_hash|
               family_member = @family.family_members.select do |fm|
-                fm.person.first_name.downcase == applicant_hash['name']['first_name'].downcase &&
+                fm.person.dob == applicant_hash['demographic']['dob'].to_date &&
+                  fm.person.first_name.downcase == applicant_hash['name']['first_name'].downcase &&
                   fm.person.last_name.downcase == applicant_hash['name']['last_name'].downcase
               end.first
               citizen_status_info = applicant_hash['citizenship_immigration_status_information']

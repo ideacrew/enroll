@@ -42,6 +42,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         before do
           record = serializer.parse(xml)
           @transformed = transformer.transform(record.to_hash(identifier: true))
+          @transformed[:family][:family_members][1][:person][:person_name][:first_name] = "Laura"
           @transformed[:family][:magi_medicaid_applications].first[:applicants][1][:name][:first_name] = "Laura"
           @result = subject.call(@transformed)
         end
@@ -50,6 +51,12 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
           app = FinancialAssistance::Application.find(@result.value!)
           @transformed.deep_symbolize_keys!
           expect(app.applicants.count).to eql(@transformed[:family][:magi_medicaid_applications].first[:applicants].count)
+        end
+
+        it "persists unique family member ids" do
+          app = FinancialAssistance::Application.find(@result.value!)
+          @transformed.deep_symbolize_keys!
+          expect(app.applicants.pluck(:family_member_id).uniq.count).to eql(@transformed[:family][:magi_medicaid_applications].first[:applicants].count)
         end
       end
 
