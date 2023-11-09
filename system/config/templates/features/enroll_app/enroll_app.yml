@@ -190,7 +190,7 @@ registry:
           - key: :contact_center_county
             item: 'District of Columbia'
           - key: :contact_center_zip_code
-            item: "20090" # For DC loading rating areas, the zip uses this zip code 20024
+            item: "20090" # For DC loading rating areas, the zip uses this zip code 20090
           - key: :contact_center_email_address
             item: "info@dchealthlink.com"
           - key: :contact_center_short_number
