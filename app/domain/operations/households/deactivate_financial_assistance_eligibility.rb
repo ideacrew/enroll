@@ -31,11 +31,16 @@ module Operations
       def execute(values)
         family = Operations::Families::Find.new.call(id: BSON::ObjectId(values[:family_id]))
         return family if family.failure?
+        tax_households = family.success.active_household.latest_active_tax_households
+        active_tax_households = case values[:deactivate_action_type]
+                                when 'current_and_prospective'
+                                  tax_households.current_and_prospective_by_year(values[:date].to_date.year)
+                                when 'current_only'
+                                  tax_households.tax_household_with_year(values[:date].to_date.year)
+                                end
+        return Success('No Active Tax Households to deactivate') unless active_tax_households.present?
 
-        tax_households = family.success.active_household.latest_active_tax_households.current_and_prospective_by_year(values[:date].to_date.year)
-        return Success('No Active Tax Households to deactivate') unless tax_households.present?
-
-        tax_households.each do |thh|
+        active_tax_households.each do |thh|
           end_on = (values[:date] > thh.effective_starting_on) ? values[:date] : thh.effective_starting_on
           thh.update_attributes!(effective_ending_on: end_on)
         end
