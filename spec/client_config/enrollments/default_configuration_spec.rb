@@ -23,4 +23,14 @@ RSpec.describe 'default enrollments namespace client specific configurations' do
       end
     end
   end
+
+  describe 'generate_initial_enrollment_on_subscriber_drop' do
+    context 'for default value' do
+      it 'returns default value false' do
+        expect(
+          EnrollRegistry.feature_enabled?(:generate_initial_enrollment_on_subscriber_drop)
+        ).to be_falsey
+      end
+    end
+  end
 end
