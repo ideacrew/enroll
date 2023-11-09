@@ -36,7 +36,47 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       TimeKeeper.set_date_of_record_unprotected!(Date.today)
     end
 
-    describe '.turned_19_during_renewal_with_pediatric_only_qdp?' do
+    describe '#transition_enrollment' do
+      let(:renewal_enrollment) { subject.renew }
+
+      before do
+        allow(subject).to receive(:subscriber_dropped?).with(anything).and_return(subscriber_dropped)
+      end
+
+      context 'when subscriber is dropped' do
+        let(:subscriber_dropped) { true }
+
+        it 'transitions renewal enrollment to coverage_selected' do
+          expect(renewal_enrollment.coverage_selected?).to be_truthy
+        end
+
+        it 'creates only one expected workflow state transition' do
+          expect(renewal_enrollment.workflow_state_transitions.count).to eq(1)
+
+          expect(
+            renewal_enrollment.workflow_state_transitions.pluck(:event, :from_state, :to_state)
+          ).to eq([['select_coverage!', 'shopping', 'coverage_selected']])
+        end
+      end
+
+      context 'when subscriber is not dropped' do
+        let(:subscriber_dropped) { false }
+
+        it 'transitions renewal enrollment to auto_renewing' do
+          expect(renewal_enrollment.auto_renewing?).to be_truthy
+        end
+
+        it 'creates only one expected workflow state transition' do
+          expect(renewal_enrollment.workflow_state_transitions.count).to eq(1)
+
+          expect(
+            renewal_enrollment.workflow_state_transitions.pluck(:event, :from_state, :to_state)
+          ).to eq([['renew_enrollment', 'shopping', 'auto_renewing']])
+        end
+      end
+    end
+
+    describe '#turned_19_during_renewal_with_pediatric_only_qdp?' do
       let(:renewal_coverage_start) { renewal_benefit_coverage_period.start_on }
       let(:person) { FactoryBot.create(:person, :with_consumer_role, dob: TimeKeeper.date_of_record - dependent_age.years) }
       let(:dependent) { double('HbxEnrollmentMember', person: person) }
@@ -139,7 +179,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
     end
 
-    describe ".clone_enrollment_members" do
+    describe "#clone_enrollment_members" do
 
       context "when dependent age off feature is turned off" do
         before do
@@ -266,7 +306,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
     end
 
-    describe ".renew" do
+    describe "#renew" do
 
       before do
         allow(child1).to receive(:relationship).and_return('child')
@@ -907,6 +947,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               allow(subject).to receive(:can_renew_assisted_product?).and_return(true)
               allow(subject).to receive(:eligible_to_get_covered?).and_return(true)
               allow(subject).to receive(:populate_aptc_hash).and_return(true)
+              allow(subject).to receive(:subscriber_dropped?).and_return(false)
             end
 
             it "should renew and apply child care subsidy" do
@@ -933,6 +974,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               allow(subject).to receive(:can_renew_assisted_product?).and_return(true)
               allow(subject).to receive(:eligible_to_get_covered?).and_return(true)
               allow(subject).to receive(:populate_aptc_hash).and_return(true)
+              allow(subject).to receive(:subscriber_dropped?).and_return(false)
             end
 
             it "should renew and apply child care subsidy" do
