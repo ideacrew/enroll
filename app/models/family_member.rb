@@ -203,7 +203,9 @@ class FamilyMember
     family.deactivate_financial_assistance(TimeKeeper.date_of_record)
     return if family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year).blank?
 
-    Operations::Households::DeactivateFinancialAssistanceEligibility.new.call(params: {family_id: family.id, date: TimeKeeper.date_of_record})
+    Operations::Households::DeactivateFinancialAssistanceEligibility.new.call(params: {
+                                                                                deactivate_action_type: 'current_and_prospective', family_id: family.id, date: TimeKeeper.date_of_record
+                                                                              })
   rescue StandardError => e
     Rails.logger.error {"Unable to do action Operations::Households::DeactivateFinancialAssistanceEligibility for family_member with object_id: #{self.id} due to #{e.message}"}
   end
