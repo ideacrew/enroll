@@ -126,11 +126,11 @@ module Etl::Csv
     end
 
     def parse_boolean(cell)
-      cell.blank? ? nil : cell.to_s.match(/(true|t|yes|y|1)$/i) != nil ? "1" : "0"
-    end
-
-    def parse_boolean(cell)
-      cell.blank? ? nil : cell.to_s.match(/(true|t|yes|y|1)$/i) != nil ? "1" : "0"
+      if cell.blank?
+        nil
+      else
+        cell.to_s.match(/(true|t|yes|y|1)$/i).nil? ? "0" : "1"
+      end
     end
 
     def parse_number(cell)
