@@ -331,11 +331,11 @@ class CensusEmployeeImport
   end
 
   def parse_boolean(cell)
-    cell.blank? ? nil : cell.match(/(true|t|yes|y|1)$/i) != nil ? "1" : "0"
+    cell.blank? ? nil : cell.to_s.match(/(true|t|yes|y|1)$/i) != nil ? "1" : "0"
   end
 
   def self.parse_boolean(cell)
-    cell.blank? ? nil : cell.match(/(true|t|yes|y|1)$/i) != nil ? "1" : "0"
+    cell.blank? ? nil : cell.to_s.match(/(true|t|yes|y|1)$/i) != nil ? "1" : "0"
   end
 
   def self.parse_number(cell)
