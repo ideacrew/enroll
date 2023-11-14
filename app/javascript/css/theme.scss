@@ -1,17 +1,17 @@
 .btn-outline-primary {
-  color: var(--theme-primary-100, #007bc4);
-  border-color: var(--theme-primary-100, #007bc4);
+  color: var(--theme-primary-100, #3B6B90);
+  border-color: var(--theme-primary-100, #3B6B90);
   font-weight: 600;
   text-transform: capitalize;
 
   &:hover {
     background-color: var(--grey-000);
-    color: var(--theme-primary-100, #007bc4);
+    color: var(--theme-primary-100, #3B6B90);
   }
 
   &:not(:disabled):not(:disabled):active {
     background-color: var(--grey-000);
-    color: var(--theme-primary-100, #007bc4);
+    color: var(--theme-primary-100, #3B6B90);
   }
 }
 
@@ -76,7 +76,7 @@
     font-size: 18px;
   }
   .header-text {
-    color: var(--grey-060);
+    color: var(--secondary-font-color, --grey-060);
     font-size: 14px;
     text-transform: uppercase;
     font-weight: 600;
