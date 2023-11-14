@@ -278,6 +278,20 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
       end
     end
 
+    context 'enrollment product is catastrophic' do
+      before do
+        product.update_attributes!(metal_level_kind: 'catastrophic')
+        @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
+      end
+
+      it 'should not apply aptc values to the renewal enrollment' do
+        expect(@result.success.applied_aptc_amount).to be_zero
+        expect(@result.success.elected_aptc_pct).to be_zero
+        # expect(@result.success.max_aptc).to be_zero
+        # expect(@result.success.csr_amt).to be_zero
+      end
+    end
+
     context 'with an expired enrollment by aasm state' do
       before :each do
         enrollment.expire_coverage!
