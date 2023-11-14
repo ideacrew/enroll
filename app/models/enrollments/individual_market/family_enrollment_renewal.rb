@@ -79,9 +79,11 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   end
 
   def populate_aptc_hash(renewal_enrollment)
-    # Prevents applying APTC to catastrophic enrollment plans irrespective of which tax model is used
-    return unless renewal_enrollment.product.can_use_aptc?
+    # APTC is only calculated here when the Multi Tax Household feature is enabled
+    # Legacy APTC calculation is done in Operations::Individual::RenewEnrollment
     return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+    # blocks aptc calculation if renewal has a catastrophic product
+    return unless renewal_enrollment.product.can_use_aptc?
 
     aptc_op = ::Operations::PremiumCredits::FindAptc.new.call({
                                                                 hbx_enrollment: renewal_enrollment,
