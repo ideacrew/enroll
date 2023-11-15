@@ -48,9 +48,7 @@ module Operations
       end
 
       def fetch_eligibility_values(enrollment, effective_on)
-        # APTC is calculated in Enrollments::IndividualMarket::FamilyEnrollmentRenewal when Multi Tax Household feature is enabled
-        mthh_enabled = EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-        return Success({}) if mthh_enabled || !enrollment.is_health_enrollment? || !enrollment.product.can_use_aptc?
+        return Success({}) if skip_eligibility_values?(enrollment)
 
         family = enrollment.family
         tax_household = family.active_household.latest_active_thh_with_year(effective_on.year)
@@ -66,6 +64,15 @@ module Operations
         end
 
         Success(data || {})
+      end
+
+      def skip_eligibility_values?(enrollment)
+        # APTC is calculated in Enrollments::IndividualMarket::FamilyEnrollmentRenewal when Multi Tax Household feature is enabled
+        mthh_enabled = EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+        # APTC should only be applied to health enrollments that are:
+        # - not catastrophic
+        # - not coverall
+        mthh_enabled || !enrollment.is_health_enrollment? || !enrollment.product.can_use_aptc? || enrollment.kind == 'coverall'
       end
 
       def renew_enrollment(enrollment, effective_on, eligibility_values)
