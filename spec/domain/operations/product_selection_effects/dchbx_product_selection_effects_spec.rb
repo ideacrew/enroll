@@ -214,6 +214,50 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
 end
 
 describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "when:
+- there is current coverage in active state
+- there is prior coverage in expired state
+- there is a renewal coverage
+- there is open enrollment
+- the selection is IVL and sep is added for prior coverage year
+- and prior_plan_year ivl sep feature is disabled
+", dbclean: :after_each do
+
+  include_context 'family has prior, current and renewal year coverage and in open enrollment and purchased new coverage in prior year via SEP'
+
+  let(:product_selection) do
+    Entities::ProductSelection.new({:enrollment => prior_ivl_enrollment, :product => prior_product, :family => family})
+  end
+
+  subject do
+    current_product
+    prior_ivl_enrollment_2
+    current_ivl_enrollment
+    renewal_ivl_enrollment
+    product_selection
+    allow(family).to receive(:current_sep).and_return sep
+    Operations::ProductSelectionEffects::DchbxProductSelectionEffects
+  end
+
+  it 'prior coverage gets terminated and new prior coverage gets created with no change in current and renewal coverage' do
+    sep.update_attributes(end_on: Date.new(current_coverage_year, 11, 15))
+    subject
+    prior_ivl_enrollment.generate_hbx_signature
+    allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_coverage_year, 11, 15))
+    %i[prior_plan_year_ivl_sep].each do |feature|
+      EnrollRegistry[feature].feature.stub(:is_enabled).and_return(false)
+    end
+    subject.call(product_selection)
+    family.reload
+    enrollments = family.hbx_enrollments
+    expect(enrollments.length).to eq 4
+    expect(enrollments.by_year(prior_coverage_year).count).to eq 2
+    expect(enrollments.by_year(current_coverage_year).count).to eq 1
+    expect(enrollments.by_year(current_coverage_year + 1).count).to eq 1
+
+  end
+end
+
+describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "when:
 - there is no current coverage
 - there is no prior coverage
 - there is no open enrollment

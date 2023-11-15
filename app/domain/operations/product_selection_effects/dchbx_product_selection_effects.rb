@@ -81,9 +81,7 @@ module Operations
       end
 
       def enrollment_effective_on_eligible_for_renewal?(enrollment, bcp)
-        return true if enrollment.effective_on.year == (bcp.start_on.year - 1)
-
-        false
+        enrollment.effective_on.year == (bcp.start_on.year - 1)
       end
 
       def fetch_renewal_enrollment_year(enrollment)
