@@ -1042,6 +1042,18 @@ end
 And(/consumer has osse eligibility/) do
   person = Person.all.first
   person.consumer_role.eligibilities << FactoryBot.build(:ivl_osse_eligibility, :with_admin_attested_evidence, evidence_state: :approved)
+  current_date = TimeKeeper.date_of_record
+  effective_on = ::Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(current_date.in_time_zone('Eastern Time (US & Canada)'), current_date).to_date
+  binding.pry
+  if effective_on.year != current_date.year
+
+    renewal_eligibility = FactoryBot.build(:ivl_osse_eligibility,
+                                           :with_admin_attested_evidence,
+                                           evidence_state: :approved,
+                                           key: :"aca_ivl_osse_eligibility_#{effective_on.year}".to_sym,
+                                           effective_on: effective_on)
+    person.consumer_role.eligibilities << renewal_eligibility
+  end
 end
 
 When(/consumer visits home page after successful ridp/) do
