@@ -490,6 +490,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.current_enrolled_or_termed_products_by_subscriber(@hbx_enrollment).map(&:id)
     Rails.logger.warn("**********************enrolled_hbx_enrollment_plan_ids #{@enrolled_hbx_enrollment_plan_ids.count}****************************")
     Rails.logger.warn("**********************enrolled_hbx_enrollment_plan_ids #{@enrolled_hbx_enrollment_plan_ids.first}****************************")
+    Rails.logger.warn("**********************enrolled_hbx_enrollment_plan_ids #{@hbx_enrollment.family.current_enrolled_or_termed_products_by_subscriber(@hbx_enrollment).flatten}****************************")
     if @hbx_enrollment.blank?
       @plans = []
     else
