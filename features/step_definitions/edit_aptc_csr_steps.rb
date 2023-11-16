@@ -65,8 +65,9 @@ end
 Given(/self service osse feature is enabled/) do
   year = TimeKeeper.date_of_record.year
   allow(EnrollRegistry[:aca_ivl_osse_eligibility].feature).to receive(:is_enabled).and_return(true)
-  EnrollRegistry["aca_ivl_osse_eligibility_#{year}"].feature.stub(:is_enabled).and_return(true)
   EnrollRegistry["aca_ivl_osse_eligibility_#{year - 1}"].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry["aca_ivl_osse_eligibility_#{year}"].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry["aca_ivl_osse_eligibility_#{year + 1}"].feature.stub(:is_enabled).and_return(true)
   allow(EnrollRegistry[:self_service_osse_subsidy].feature).to receive(:is_enabled).and_return(true)
   allow(EnrollRegistry[:individual_osse_plan_filter].feature).to receive(:is_enabled).and_return(true)
 end
