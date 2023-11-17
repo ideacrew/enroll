@@ -37,7 +37,9 @@ module Operations
 
       def end_current_taxhousehold_groups(family, application_entity)
         new_effective_date = application_entity.tax_households.first.effective_on
-        ::Operations::TaxHouseholdGroups::Deactivate.new.call({ family: family, new_effective_date: new_effective_date })
+        ::Operations::TaxHouseholdGroups::Deactivate.new.call({ deactivate_action_type: 'current_only',
+                                                                family: family,
+                                                                new_effective_date: new_effective_date })
       end
 
       def create_tax_household_groups(application_entity)

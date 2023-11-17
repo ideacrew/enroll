@@ -11,6 +11,8 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
   describe 'ivl enrollment notice trigger' do
     let(:person) { FactoryBot.create(:person, :with_consumer_role)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let(:person_resident) { FactoryBot.create(:person, :with_resident_role)}
+    let(:family_resident) { FactoryBot.create(:family, :with_primary_family_member, person: person_resident)}
     let(:issuer) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, abbrev: 'ANTHM') }
     let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :ivl_product, issuer_profile: issuer) }
     let(:aasm_state) { 'coverage_selected' }
@@ -25,6 +27,19 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
         applied_aptc_amount: Money.new(44_500),
         consumer_role_id: person.consumer_role.id,
         enrollment_members: family.family_members
+      )
+    end
+    let(:enrollment_resident) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        :with_enrollment_members,
+        :coverall_unassisted,
+        family: family_resident,
+        aasm_state: aasm_state,
+        product_id: product.id,
+        applied_aptc_amount: Money.new(44_500),
+        resident_role_id: person_resident.resident_role.id,
+        enrollment_members: family_resident.family_members
       )
     end
 
@@ -54,9 +69,42 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
       context 'when an auto renewing enrollment is present' do
         let(:aasm_state) { 'auto_renewing' }
 
-        it 'should return sucess' do
+        it 'should return success' do
           result = subject.call(params)
           expect(result.success?).to be_truthy
+        end
+      end
+    end
+
+    context 'with resident role' do
+
+      let(:params) {{enrollment: enrollment_resident}}
+
+      it 'should return success' do
+        result = subject.call(params)
+        expect(result.success?).to be_truthy
+      end
+
+      context 'resident role id missing on enrollment' do
+        before do
+          enrollment_resident.update_attributes(resident_role_id: nil)
+        end
+
+        it 'should return success' do
+          result = subject.call(params)
+          expect(result.success?).to be_truthy
+        end
+
+        context 'and resident role missing on person' do
+          before do
+            person_resident.update(resident_role: nil)
+          end
+
+          it 'should return a failure' do
+            result = subject.call(params)
+            expect(result.success?).to be_falsey
+            expect(result.failure).to eq("Unable to find resident role for Coverall enrollment #{enrollment_resident.hbx_id}")
+          end
         end
       end
     end

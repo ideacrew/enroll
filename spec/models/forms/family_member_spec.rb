@@ -17,7 +17,7 @@ describe Forms::FamilyMember do
 
   context 'indian alaskan tribe details' do
     before do
-      EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(false)
     end
     it "should require tribal_id when citizen_status=indian_tribe_member" do
       if individual_market_is_enabled?
@@ -32,7 +32,7 @@ describe Forms::FamilyMember do
   end
 
   it "should require tribal_state and tribal_name when citizen_status=indian_tribe_member and feature is enabled" do
-    EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(true)
+    allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(true)
     if individual_market_is_enabled?
       subject.is_consumer_role = true
       subject.is_applying_coverage = true
@@ -46,7 +46,7 @@ describe Forms::FamilyMember do
   end
 
   it "should not require validations on indian_tribe_member for state and name" do
-    EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(true)
+    allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(true)
     subject.is_consumer_role = true
     subject.is_applying_coverage = false
     subject.valid?
@@ -476,7 +476,7 @@ describe "checking validations on family member object" do
 
     context "when user answered us citizen as false and immigration_status_question is required" do
       before do
-        EnrollRegistry[:immigration_status_question_required].stub(:item).and_return(true)
+        allow(EnrollRegistry[:immigration_status_question_required].feature).to receive(:item).and_return(true)
       end
 
       subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen"=>"false"})) }
@@ -489,7 +489,7 @@ describe "checking validations on family member object" do
 
     context "when user answered us citizen as false and immigration_status_question is not required" do
       before do
-        EnrollRegistry[:immigration_status_question_required].stub(:item).and_return(false)
+        allow(EnrollRegistry[:immigration_status_question_required].feature).to receive(:item).and_return(false)
       end
 
       subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen" => "false"})) }

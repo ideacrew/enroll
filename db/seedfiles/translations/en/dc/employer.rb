@@ -49,4 +49,6 @@ EMPLOYER_TRANSLATIONS = {
   :'en.osse_multi_year_description' => "<strong>Note, </strong>When the eligibility calendar year is set to Active, any coverage year start(initial or renewal) within the active calendar will have HC4CC eligibility.",
   :'en.hc4cc_subsidy_with_pipe' => "HC4CC Subsidies |",
   :'en.select_eligibility_years' => "Select Eligibility Year(s)",
+  :'en.employers.employer_profiles.ce_bulk_upload_success_message' => "File uploaded in s3, will process it on the background",
+  :'en.employers.employer_profiles.ce_bulk_upload_error_message' => "There was an error on the file upload in S3, please try again"
 }.freeze

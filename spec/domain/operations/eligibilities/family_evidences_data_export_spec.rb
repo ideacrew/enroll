@@ -206,7 +206,7 @@ RSpec.describe ::Operations::Eligibilities::FamilyEvidencesDataExport,
   end
 
   context 'with financial_assistance determination' do
-    before { EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(false) }
+    before { allow(EnrollRegistry[:apply_aggregate_to_enrollment].feature).to receive(:is_enabled).and_return(false) }
 
     let!(:thhg) { FactoryBot.create(:tax_household_group, family: family) }
     let!(:new_thh) do
@@ -227,7 +227,7 @@ RSpec.describe ::Operations::Eligibilities::FamilyEvidencesDataExport,
 
     context 'when MTHHs feature is enabled' do
       before do
-        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
       end
 
       it 'returns max_aptc and CSR from new THHs' do
@@ -248,7 +248,7 @@ RSpec.describe ::Operations::Eligibilities::FamilyEvidencesDataExport,
 
     context 'when MTHHs feature is disabled' do
       before do
-        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(false)
       end
 
       it 'returns max_aptc and CSR from legacy THHs' do

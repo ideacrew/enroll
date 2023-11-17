@@ -145,4 +145,23 @@ RSpec.describe FinancialAssistance::Relationship, type: :model, dbclean: :after_
       expect(@second_application.relationships.first.relative).to be_a(::FinancialAssistance::Applicant)
     end
   end
+
+  describe '#valid_relationship_kind?' do
+    let(:relationship) { application.relationships.build(applicant_id: BSON::ObjectId.new, kind: relation_kind, relative_id: BSON::ObjectId.new)}
+    let(:relation_kind) { 'spouse' }
+
+    context 'valid relationship_kind' do
+      let(:relation_kind) { 'spouse' }
+      it 'should return true' do
+        expect(relationship.valid_relationship_kind?).to be_truthy
+      end
+    end
+
+    context 'relationship_kind is invalid' do
+      let(:relation_kind) { 'life_partner' }
+      it 'should return false' do
+        expect(relationship.valid_relationship_kind?).to be_falsey
+      end
+    end
+  end
 end

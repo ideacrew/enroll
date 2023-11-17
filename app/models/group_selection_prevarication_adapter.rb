@@ -296,6 +296,7 @@ class GroupSelectionPrevaricationAdapter
 
   def create_action_market_kind(params)
     if params[:market_kind].present?
+      return "fehb" if params[:market_kind] == "shop" && is_fehb?(person) && is_fehb_market_enabled?
       params[:market_kind]
     elsif is_shop_market_enabled?
       "shop"

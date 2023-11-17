@@ -11,7 +11,7 @@ RSpec.describe "general_agencies/profiles/edit.html.erb" do
     assign :organization, org_form
     assign :general_agency_profile, general_agency_profile
     assign :id, general_agency_profile.id
-    EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(false)
+    allow(EnrollRegistry[:general_agency].feature).to receive(:is_enabled).and_return(false)
     Enroll::Application.reload_routes!
     render template: "general_agencies/profiles/edit.html.erb"
   end

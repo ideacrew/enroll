@@ -19,7 +19,7 @@ RSpec.describe 'insured/plan_shoppings/_individual_coverage_information.html.erb
     end
 
     context 'display_you_pay feature disabled' do
-      before { EnrollRegistry[:display_you_pay].feature.stub(:is_enabled).and_return(false) }
+      before { allow(EnrollRegistry[:display_you_pay].feature).to receive(:is_enabled).and_return(false) }
 
       it 'has data-cuke no_you_pay' do
         render :template => 'insured/plan_shoppings/thankyou.html.erb'
@@ -28,7 +28,7 @@ RSpec.describe 'insured/plan_shoppings/_individual_coverage_information.html.erb
     end
 
     context 'display_you_pay feature enabled' do
-      before { EnrollRegistry[:display_you_pay].feature.stub(:is_enabled).and_return(true) }
+      before { allow(EnrollRegistry[:display_you_pay].feature).to receive(:is_enabled).and_return(true) }
 
       it 'doesnot have data-cuke no_you_pay' do
         render :template => 'insured/plan_shoppings/thankyou.html.erb'

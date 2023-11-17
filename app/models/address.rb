@@ -327,6 +327,7 @@ class Address
   def same_address?(another_address)
     return(false) if another_address.nil?
     attrs_to_match = [:address_1, :address_2, :address_3, :city, :state, :zip]
+    attrs_to_match << :county if EnrollRegistry.feature_enabled?(:display_county)
     attrs_to_match.all? { |attr| attribute_matches?(attr, another_address) }
   end
 

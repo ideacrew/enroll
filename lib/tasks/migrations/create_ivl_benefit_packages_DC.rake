@@ -1,5 +1,6 @@
 # This rake is not for mock plans
-
+# RAILS_ENV=production bundle exec rake import:create_ivl_benefit_packages_DC year=2023 slcsp_hios_id="94506DC0390006-01"
+# RAILS_ENV=production bundle exec rake import:create_ivl_benefit_packages_DC year=2024
 namespace :import do
   desc "Create current year benefit coverage period and packages with products"
   task :create_ivl_benefit_packages_DC  => :environment do
@@ -13,10 +14,11 @@ namespace :import do
     raise "please pass year" unless ENV['year'].present?
 
     year = ENV['year'].to_i
+    slcsp_hios_id = ENV['slcsp_hios_id'] || "94506DC0390005-01"
 
     # Second lowest cost silver plan
-    slcs_products = BenefitMarkets::Products::Product.where(hios_id: "94506DC0390006-01")
-    current_slcsp =  slcs_products.select{|a| a.active_year == year}.first
+    slcs_products = BenefitMarkets::Products::Product.where(hios_id: slcsp_hios_id).by_year(year)
+    current_slcsp =  slcs_products.first
     # check if benefit package is present for 2023
     current_period_bc = hbx.benefit_sponsorship.benefit_coverage_periods.select { |bcp| bcp.start_on.year == year }.first
 
@@ -324,6 +326,8 @@ namespace :import do
     current_period_bc.save!
 
     if EnrollRegistry.feature?("aca_ivl_osse_eligibility_#{year}") && EnrollRegistry.feature_enabled?("aca_ivl_osse_eligibility_#{year}")
+      abort if current_period_bc.eligibilities.any?(&:eligible?)
+
       puts "current benefit coverage period created. Creating eligibilities....."
       result = Operations::Eligible::CreateCatalogEligibility.new.call(
         {

@@ -14,7 +14,7 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
 
   describe "build certain type" do
     before do
-      EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(false)
     end
     context "SSN" do
       it "doesn't have ssn type" do
@@ -79,7 +79,7 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
     context 'when setting verification_document_due_in_days is enabled' do
 
       before do
-        EnrollRegistry[:set_due_date_upon_response_from_hub].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:set_due_date_upon_response_from_hub].feature).to receive(:is_enabled).and_return(true)
         person.verification_types.each(&:fail_type)
       end
 
@@ -95,7 +95,7 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
     context 'when setting verification_document_due_in_days is disabled' do
 
       before do
-        EnrollRegistry[:set_due_date_upon_response_from_hub].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:set_due_date_upon_response_from_hub].feature).to receive(:is_enabled).and_return(false)
         person.verification_types.each(&:fail_type)
       end
 

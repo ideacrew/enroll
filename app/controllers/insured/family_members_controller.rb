@@ -89,7 +89,7 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def create
-    @dependent = ::Forms::FamilyMember.new(params[:dependent])
+    @dependent = ::Forms::FamilyMember.new(params[:dependent].merge({skip_consumer_role_callbacks: true}))
     @address_errors = validate_address_params(params)
     @family = Family.find(@dependent.family_id)
     if @family.primary_applicant.person.resident_role?
@@ -108,7 +108,7 @@ class Insured::FamilyMembersController < ApplicationController
       end
       return
     end
-    if @address_errors.blank? && @dependent.save && update_vlp_documents(@dependent.family_member.try(:person).try(:consumer_role), 'dependent', @dependent)
+    if @address_errors.blank? && @dependent.save && update_vlp_documents(consumer_role_for_create(@dependent), 'dependent', @dependent)
       active_family_members_count = @family.active_family_members.count
       household = @family.active_household
       immediate_household_members_count = household.immediate_family_coverage_household.coverage_household_members.count
@@ -162,6 +162,7 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def update
+    @dependent.skip_consumer_role_callbacks = true
     @address_errors = validate_address_params(params)
 
     if @dependent.family_member.try(:person).present? && @dependent.family_member.try(:person).is_resident_role_active?
@@ -263,6 +264,12 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   private
+
+  def consumer_role_for_create(dependent)
+    consumer_role = dependent.family_member.try(:person).try(:consumer_role)
+    consumer_role.skip_consumer_role_callbacks = true if consumer_role.present?
+    consumer_role
+  end
 
   def dependent_person_params
     params.permit(:dependent => {})

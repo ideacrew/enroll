@@ -805,6 +805,44 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
       end
     end
   end
+
+  context 'move_evidence_to_outstanding' do
+    let(:income_evidence) do
+      applicant.create_income_evidence(
+        key: :income,
+        title: 'Income',
+        aasm_state: 'pending',
+        due_on: nil,
+        verification_outstanding: false,
+        is_satisfied: true
+      )
+    end
+
+    context "when evidence is not outstanding and due_on is nil" do
+      it "should move income evidence to outstanding and set due_on" do
+        verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+        income_evidence.move_evidence_to_outstanding
+        income_evidence.reload
+        expect(income_evidence.aasm_state).to eq "outstanding"
+        expect(income_evidence.due_on).to eq TimeKeeper.date_of_record + verification_document_due
+        expect(income_evidence.verification_outstanding).to eq true
+        expect(income_evidence.is_satisfied).to eq false
+      end
+    end
+
+    context "when evidence is outstanding and due_on already exists" do
+      before do
+        income_evidence.update_attributes(aasm_state: :outstanding, due_on: TimeKeeper.date_of_record)
+      end
+
+      it "should move income evidence to outstanding and set due_on" do
+        income_evidence.move_evidence_to_outstanding
+        income_evidence.reload
+        expect(income_evidence.aasm_state).to eq "outstanding"
+        expect(income_evidence.due_on).to eq TimeKeeper.date_of_record
+      end
+    end
+  end
 end
 
 def create_embedded_docs_for_evidence(evidence)
