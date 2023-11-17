@@ -115,7 +115,9 @@ module Eligibilities
     def move_evidence_to_outstanding
       return unless may_move_to_outstanding?
 
-      update(verification_outstanding: true, is_satisfied: false)
+      verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+      due_date = due_on.blank? ? TimeKeeper.date_of_record + verification_document_due : due_on
+      update(verification_outstanding: true, is_satisfied: false, due_on: due_date)
       move_to_outstanding!
     end
 
@@ -260,6 +262,7 @@ module Eligibilities
         transitions from: :unverified, to: :attested
         transitions from: :negative_response_received, to: :attested
         transitions from: :attested, to: :attested
+        transitions from: :verified, to: :attested
       end
 
       event :move_to_rejected, :after => [:record_transition] do

@@ -60,7 +60,7 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
       assign(:consumer_role, @person.consumer_role)
       assign(:person, @person)
-      EnrollRegistry[:in_person_application_enabled].feature.stub(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:in_person_application_enabled].feature).to receive(:is_enabled).and_return(false)
       render partial: "insured/consumer_roles/form", locals: {f: mock_form}
     end
 
@@ -96,7 +96,7 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
       allow(view).to receive(:policy_helper).and_return(double("FamilyPolicy", updateable?: true))
       assign(:consumer_role, @person.consumer_role)
       assign(:person, @person)
-      EnrollRegistry[:in_person_application_enabled].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:in_person_application_enabled].feature).to receive(:is_enabled).and_return(true)
       render partial: "insured/consumer_roles/form", locals: {f: mock_form}
     end
 
@@ -120,7 +120,7 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
       @person.build_consumer_role if @person.consumer_role.blank?
       @person.consumer_role.build_nested_models_for_person
       mock_form = ActionView::Helpers::FormBuilder.new(:person, @person, helper, {})
-      EnrollRegistry[:in_person_application_enabled].feature.stub(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:in_person_application_enabled].feature).to receive(:is_enabled).and_return(false)
       stub_template "shared/_consumer_fields.html.erb" => ''
       #returning false for everyone except hbx_staff
       allow(view).to receive(:policy_helper).and_return(double("ConsumerRole", can_view_application_types?: false), double("FamilyPolicy", updateable?: true))

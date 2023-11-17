@@ -4,13 +4,13 @@ require File.join(Rails.root, 'app', 'data_migrations', 'update_employee_role_id
 describe UpdateEmployeeRoleId, dbclean: :after_each do
   let(:given_task_name) { 'update_employee_role_id' }
   subject { UpdateEmployeeRoleId.new(given_task_name, double(:current_scope => nil)) }
-  
+
   describe 'given a task name' do
     it 'has the given task name' do
       expect(subject.name).to eql given_task_name
     end
   end
-  
+
   describe 'update employee role id on the enrollments/census_employee', dbclean: :after_each do
     let(:current_effective_date)  { TimeKeeper.date_of_record.next_month.beginning_of_month }
     let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
@@ -77,7 +77,7 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
 
     context 'update employee role id on the enrollments', dbclean: :after_each  do
       before :each do
-        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
         employee_role.person.save!
       end
 
@@ -105,7 +105,7 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
 
     context 'update employee role id on the census_employee', dbclean: :after_each  do
       before :each do
-        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
         employee_role.person.save!
         person.active_employee_roles.first.census_employee.update_attributes!(employee_role_id: employee_role.id )
       end

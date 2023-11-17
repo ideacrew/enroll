@@ -16,6 +16,8 @@ module FinancialAssistance
             include Dry::Monads[:result, :do, :try]
             include EventSource::Command
 
+            attr_reader :renewal_application
+
             # @param [Hash] opts The options to generate renewal_draft application
             # @option opts [BSON::ObjectId] :family_id (required)
             # @option opts [Integer] :renewal_year (required)
@@ -81,11 +83,11 @@ module FinancialAssistance
                 copied_result = renewal_application_factory.call(application_id: application.id)
                 return Failure(copied_result.failure[:detailed_error_message]) if copied_result.failure?
 
-                renewal_application = copied_result.success
+                @renewal_application = copied_result.success
                 family_members_changed = renewal_application_factory.family_members_changed
                 relationships_changed = renewal_application_factory.relationships_changed
                 calculated_renewal_base_year = calculate_renewal_base_year(application)
-                renewal_application.assign_attributes(
+                additional_attrs = {
                   aasm_state: find_aasm_state(
                     application,
                     family_members_changed,
@@ -97,15 +99,21 @@ module FinancialAssistance
                   renewal_base_year: calculated_renewal_base_year,
                   predecessor_id: application.id,
                   effective_date: Date.new(validated_params[:renewal_year])
-                )
-
+                }
+                additional_attrs[:renewal_draft_blocker_reasons] = [@failure_reason] if @failure_reason
+                renewal_application.assign_attributes(additional_attrs)
                 renewal_application.full_medicaid_determination = application.full_medicaid_determination if full_medicaid_determination_feature_enabled?
 
                 renewal_application.save
                 if renewal_application.renewal_draft?
                   Success(renewal_application)
                 else
-                  Failure("Renewal Application: (#{renewal_application.hbx_id}) failed with aasm_state: (#{renewal_application.aasm_state}), because: (#{@failure_reason || 'Unknown'})")
+                  Failure(
+                    "Renewal Application with hbx_id: #{
+                      renewal_application.hbx_id} is in #{
+                        renewal_application.aasm_state} state instead of renewal_draft because: #{
+                          @failure_reason || 'Unknown'}. Might require user input."
+                  )
                 end
               end.to_result
             end
@@ -124,6 +132,9 @@ module FinancialAssistance
                 'applicants_update_required'
               elsif missing_relationships?(relationships_changed, renew_application)
                 @failure_reason = 'missing_relationships'
+                'applicants_update_required'
+              elsif !renew_application.valid_relationship_kinds?
+                @failure_reason = 'invalid_relationships'
                 'applicants_update_required'
               else
                 'renewal_draft'

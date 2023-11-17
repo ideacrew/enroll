@@ -101,7 +101,7 @@ RSpec.describe Operations::Families::CreateOrUpdateFamilyMember, type: :model, d
       Person.by_hbx_id(applicant_params[:hbx_id]).first
     end
     before do
-      EnrollRegistry[:verification_type_income_verification].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:verification_type_income_verification].feature).to receive(:is_enabled).and_return(true)
     end
     it "should not create an income vlp document if incomes are present on applicant" do
       @result = subject.call(applicant_params)

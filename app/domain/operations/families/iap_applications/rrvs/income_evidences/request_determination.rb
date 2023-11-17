@@ -28,10 +28,7 @@ module Operations
             private
 
             def validate(params)
-              errors = []
-              errors << 'application hbx_id is missing' unless params[:application_hbx_id]
-              errors << 'family_hbx_id is missing' unless params[:family_hbx_id]
-
+              errors = params[:application_hbx_id].present? ? [] : ['application hbx_id is missing']
               errors.empty? ? Success(params) : Failure(errors)
             end
 
@@ -101,6 +98,7 @@ module Operations
             def create_evidence_history(application, action, update_reason, update_by)
               application.active_applicants.each do |applicant|
                 evidence = applicant.income_evidence
+                next unless evidence.present?
                 evidence.add_verification_history(action, update_reason, update_by)
               end
             end
@@ -113,7 +111,7 @@ module Operations
 
             # update income evidence state to default aasm state for applicant
             def update_income_evidence_to_default_state(income_evidence)
-              income_evidence.determine_income_evidence_aasm_status
+              income_evidence&.determine_income_evidence_aasm_status
             end
 
             def rrv_logger

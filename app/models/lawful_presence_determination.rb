@@ -27,6 +27,8 @@ class LawfulPresenceDetermination
   field :aasm_state, type: String
   embeds_many :workflow_state_transitions, as: :transitional
 
+  attr_accessor :skip_lawful_presence_determination_callbacks
+
   after_create :publish_created_event
   after_update :publish_updated_event
 
@@ -150,6 +152,7 @@ class LawfulPresenceDetermination
   end
 
   def publish_created_event
+    return if skip_lawful_presence_determination_callbacks
     attrs = { consumer_role_id: ivl_role.id }.merge!(self.changes)
     # TODO: This should be refactored to use created instead of updated.
     event = event('events.individual.consumer_roles.lawful_presence_determinations.updated', attributes: attrs)
@@ -159,6 +162,7 @@ class LawfulPresenceDetermination
   end
 
   def publish_updated_event
+    return if skip_lawful_presence_determination_callbacks
     attrs = { consumer_role_id: ivl_role.id }.merge!(self.changes)
     event = event('events.individual.consumer_roles.lawful_presence_determinations.updated', attributes: attrs)
     event.success.publish if event.success?

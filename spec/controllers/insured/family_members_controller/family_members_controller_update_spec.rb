@@ -72,6 +72,7 @@ RSpec.describe Insured::FamilyMembersController do
       allow(dependent).to receive(:update_attributes).with(dependent_controller_parameters).and_return(true)
       allow(consumer_role).to receive(:sensitive_information_changed?).with(dependent_update_properties).and_return(false)
       allow(consumer_role).to receive(:check_for_critical_changes).with(family, info_changed: false, is_homeless: nil, is_temporarily_out_of_state: nil, dc_status: false)
+      allow(dependent).to receive(:skip_consumer_role_callbacks=).with(true)
     end
 
     describe "when the value for 'is_applying_coverage' is provided" do

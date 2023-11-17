@@ -104,7 +104,7 @@ module Operations
     context "tax notices" do
 
       before do
-        EnrollRegistry[:ivl_tax_form_notice].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:ivl_tax_form_notice].feature).to receive(:is_enabled).and_return(true)
       end
 
       ["Void_1095-A_Tax_Form.pdf", "Your_1095-A_Health_Coverage_Tax_Form", "Corrected_1095-A_Tax_Form"].each do |notice_title|

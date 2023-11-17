@@ -186,7 +186,7 @@ RSpec.describe ::Operations::Eligibilities::BuildDetermination,
 
   context "enable residency verification" do
     before do
-      EnrollRegistry[:residency].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:residency].feature).to receive(:is_enabled).and_return(true)
     end
 
     let(:eligibility_items_requested) do

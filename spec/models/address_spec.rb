@@ -393,6 +393,65 @@ describe '#matches_addresses?' do
   end
 end
 
+describe '#same_address' do
+  let(:address_1) do
+    FactoryBot.build(:address,address_1: "An address line 1",
+                              address_2: "An address line 2",
+                              city: "A City",
+                              state: "ME",
+                              county: county_1,
+                              zip: "21222")
+  end
+  let(:address_2) do
+    FactoryBot.build(:address,address_1: "An address line 1",
+                              address_2: "An address line 2",
+                              city: "A City",
+                              state: "ME",
+                              county: county_2,
+                              zip: "21222")
+  end
+  let(:county_1) { 'test_1' }
+  let(:county_2) { 'test_2' }
+  let(:setting) { double }
+
+  before do
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(false)
+  end
+
+
+  context 'addresses with different counties and display county is flag is false' do
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
+    end
+
+    it 'should return true' do
+      expect(address_1.same_address?(address_2)).to eq(true)
+    end
+  end
+
+  context 'addresses with different counties and display county is flag is true' do
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
+    end
+    it 'should return true' do
+      expect(address_1.same_address?(address_2)).to eq(false)
+    end
+  end
+
+  context 'addresses with same counties and display county is flag is true' do
+    let(:county_1) { 'test_1' }
+    let(:county_2) { 'test_1' }
+
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
+    end
+
+    it 'should return true' do
+      expect(address_1.same_address?(address_2)).to eq(true)
+    end
+  end
+end
+
 describe "#kind" do
   let(:office_location) {FactoryBot.build(:office_location, :primary)}
   let(:address) {FactoryBot.build(:address)}
