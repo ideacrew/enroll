@@ -409,7 +409,6 @@ class Family
         (HbxEnrollment::TERMINATED_STATUSES.include?(en.aasm_state) && en.terminated_on >= enrollment.effective_on.prev_day) ||
         (en.aasm_state == 'coverage_expired' && en.effective_on >= enrollment.effective_on.beginning_of_year && en.effective_on <= enrollment.effective_on.end_of_year)
       end.sort_by { |object| object.effective_on }.reverse
-      Rails.logger.warn("**********************result #{enrollment_hbx_ids.count}****************************")
       Rails.logger.warn("**********************result #{result&.first&.hbx_id}****************************")
       Rails.logger.warn("**********************result_effective_on #{result&.first&.effective_on}****************************")
       result
