@@ -33,7 +33,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb",dbclean: :arou
         allow(current_user).to receive(:has_employee_role?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([employee_role])
         allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
-        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
         #allow(view).to receive(:has_active_sep?).and_return(false)
         render "insured/families/shop_for_plans_widget"
       end
@@ -115,7 +115,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb",dbclean: :arou
           allow(employee_role).to receive(:census_employee).and_return(census_employee)
           allow(employee_role).to receive(:is_under_open_enrollment?).and_return(true)
           allow(view).to receive(:is_under_open_enrollment?).and_return(false)
-          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
         end
 
         it 'should show text terminated by employer if census employee is terminated and has no active seps' do
@@ -152,7 +152,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb",dbclean: :arou
           allow(employee_role).to receive(:census_employee).and_return(census_employee)
           allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
           allow(view).to receive(:is_under_open_enrollment?).and_return(false)
-          EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
         end
 
         it 'should show text terminated by employer if census employee is terminated and has no active seps' do

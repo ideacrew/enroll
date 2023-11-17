@@ -259,6 +259,11 @@ module FinancialAssistance
       end
       application.update_attributes!(aasm_state: 'determined')
     end
+
+    def assistance_year_display(application)
+      year_selection_enabled = FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) && (HbxProfile.current_hbx.under_open_enrollment? || FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection_form))
+      year_selection_enabled ? application.assistance_year.to_s : FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s
+    end
   end
 end
 # rubocop:enable Metrics/ModuleLength

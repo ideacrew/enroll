@@ -73,12 +73,12 @@ Given(/^the user will navigate to the FAA Household Info page$/) do
 end
 
 Given(/the No SSN Dropdown feature is disabled/) do
-  EnrollRegistry[:no_ssn_reason_dropdown].feature.stub(:is_enabled).and_return(false)
+  allow(EnrollRegistry[:no_ssn_reason_dropdown].feature).to receive(:is_enabled).and_return(false)
   FinancialAssistanceRegistry[:no_ssn_reason_dropdown].feature.stub(:is_enabled).and_return(false)
 end
 
 Given(/the No SSN Dropdown feature is enabled/) do
-  EnrollRegistry[:no_ssn_reason_dropdown].feature.stub(:is_enabled).and_return(true)
+  allow(EnrollRegistry[:no_ssn_reason_dropdown].feature).to receive(:is_enabled).and_return(true)
   FinancialAssistanceRegistry[:no_ssn_reason_dropdown].feature.stub(:is_enabled).and_return(true)
 end
 

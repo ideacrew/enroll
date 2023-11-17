@@ -21,7 +21,11 @@ module Operations
 
         def deactivate_current_thhg(application)
           new_effective_date = application.eligibility_determinations.pluck(:effective_starting_on).compact.first
-          ::Operations::TaxHouseholdGroups::Deactivate.new.call({ family: application.family, new_effective_date: new_effective_date })
+          ::Operations::TaxHouseholdGroups::Deactivate.new.call({
+                                                                  deactivate_action_type: 'current_only',
+                                                                  family: application.family,
+                                                                  new_effective_date: new_effective_date
+                                                                })
         end
 
         def create_new_thhg(application)

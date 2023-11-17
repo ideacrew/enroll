@@ -8,7 +8,7 @@ RSpec.describe Employers::PeopleController do
     it "renders the 'search' template" do
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:agent?).and_return(false)
-      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
       sign_in(user)
       get :search
       expect(response).to have_http_status(:success)
@@ -28,7 +28,7 @@ RSpec.describe Employers::PeopleController do
     before(:each) do
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:agent?).and_return(false)
-      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
       sign_in(user)
       post :create, params: {person: person_parameters}
     end
@@ -65,7 +65,7 @@ RSpec.describe Employers::PeopleController do
       sign_in(user)
       allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters.merge({user_id: user_id})).and_return(mock_employee_candidate)
       allow(mock_employee_candidate).to receive(:match_person).and_return(found_person)
-      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
       post :match, params: more_params
     end
 
@@ -83,7 +83,7 @@ RSpec.describe Employers::PeopleController do
     let(:user) { double(id: user_id) }
     let(:person) { double("person")}
     let(:user_id) { "SOMDFINKETHING_ID" }
-    let!(:person_parameters) { ActionController::Parameters.new(:first_name => "SOMDFINKETHING").permit(:first_name,:user_id) } 
+    let!(:person_parameters) { ActionController::Parameters.new(:first_name => "SOMDFINKETHING").permit(:first_name,:user_id) }
     let(:found_person) { [] }
     let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => validation_result) }
 
@@ -93,7 +93,7 @@ RSpec.describe Employers::PeopleController do
       sign_in(user)
       allow(Forms::EmployeeCandidate).to receive(:new).with(person_parameters.merge({user_id: user_id})).and_return(mock_employee_candidate)
       allow(mock_employee_candidate).to receive(:match_person).and_return(found_person)
-      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
       post :match, params: {:person => person_parameters}
     end
 
@@ -156,7 +156,7 @@ RSpec.describe Employers::PeopleController do
       allow(person).to receive(:employer_contact).and_return("test")
       allow(person).to receive(:updated_by=).and_return("test")
       allow(person).to receive(:update_attributes).and_return(save_result)
-      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
       put :update, params: valid_params
     end
 

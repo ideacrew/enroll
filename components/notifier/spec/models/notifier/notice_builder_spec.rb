@@ -114,7 +114,7 @@ module Notifier
             let(:resource) { "BenefitSponsors::Organizations::AcaShop#{site_key}EmployerProfile".constantize.new }
 
             before :each do
-              NotifierRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+              allow(NotifierRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
             end
 
             if ::Settings.notices.shop.store_paper_notice

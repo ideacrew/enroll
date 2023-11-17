@@ -16,7 +16,7 @@ RSpec.describe "broker_agencies/profiles/_employers.html.erb", :dbclean => :afte
     context "General Agency can be enabled or disabled via resource registry" do
       context "when enabled" do
         before :each do
-          EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:general_agency].feature).to receive(:is_enabled).and_return(true)
           render template: "broker_agencies/profiles/_employers.html.erb"
         end
         it "should have general agency" do
@@ -33,7 +33,7 @@ RSpec.describe "broker_agencies/profiles/_employers.html.erb", :dbclean => :afte
       end
       context "when disabled" do
         before do
-          EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:general_agency].feature).to receive(:is_enabled).and_return(false)
           render template: "broker_agencies/profiles/_employers.html.erb"
         end
         it "should not have general agency" do

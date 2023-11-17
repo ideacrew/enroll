@@ -57,11 +57,18 @@ module FinancialAssistance
     MEC_VALIDATION_STATES = %w[na valid outstanding pending].freeze
     CSR_KINDS = ['csr_100', 'csr_94', 'csr_87', 'csr_73', 'csr_0', 'csr_limited'].freeze
 
-    DRIVER_QUESTION_ATTRIBUTES = [:has_job_income, :has_self_employment_income, :has_other_income,
-                                  :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage]
-    DRIVER_QUESTION_ATTRIBUTES += [:has_unemployment_income] if FinancialAssistanceRegistry[:unemployment_income].enabled?
-    DRIVER_QUESTION_ATTRIBUTES += [:has_american_indian_alaskan_native_income] if FinancialAssistanceRegistry[:american_indian_alaskan_native_income].enabled?
-    DRIVER_QUESTION_ATTRIBUTES.freeze
+    DRIVER_QUESTION_ATTRIBUTES = [
+      :has_job_income,
+      :has_self_employment_income,
+      :has_other_income,
+      :has_deductions,
+      :has_enrolled_health_coverage,
+      :has_eligible_health_coverage
+    ] + (
+      FinancialAssistanceRegistry[:unemployment_income].enabled? ? [:has_unemployment_income] : []
+    ) + (
+      FinancialAssistanceRegistry[:american_indian_alaskan_native_income].enabled? ? [:has_american_indian_alaskan_native_income] : []
+    ).freeze
 
     #list of the documents user can provide to verify Immigration status
     VLP_DOCUMENT_KINDS = FinancialAssistanceRegistry[:vlp_documents].setting(:vlp_document_kind_options).item
@@ -1316,7 +1323,7 @@ module FinancialAssistance
       evidence.verification_outstanding = false
       evidence.is_satisfied = true
       evidence.due_on = nil
-      evidence.attest
+      evidence.attest unless evidence.verified?
       save!
     end
 
