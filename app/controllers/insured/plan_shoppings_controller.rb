@@ -79,11 +79,11 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def thankyou
+    @enrollment = HbxEnrollment.find(params.require(:id))
     set_elected_aptc_by_params(params[:elected_aptc]) if params[:elected_aptc].present?
     set_consumer_bookmark_url(family_account_path)
     set_admin_bookmark_url(family_account_path)
     @plan = BenefitMarkets::Products::Product.find(params[:plan_id])
-    @enrollment = HbxEnrollment.find(params.require(:id))
     @enrollment.set_special_enrollment_period
 
     if @enrollment.is_shop?

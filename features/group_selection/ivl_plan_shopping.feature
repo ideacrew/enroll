@@ -134,6 +134,7 @@ Feature: IVL plan purchase
     And consumer has a dependent in child relationship with age less than 26
     And consumer has successful ridp
     And consumer has osse eligibility
+    And products are marked as hc4cc
     Given every individual is eligible for Plan shopping for CSR plans
     When consumer visits home page
     And consumer clicked on "Married" qle

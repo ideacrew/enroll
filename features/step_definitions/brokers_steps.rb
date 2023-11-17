@@ -477,8 +477,10 @@ Given(/the osse subsidy feature is enabled/) do
   allow(EnrollRegistry[:broker_quote_osse_eligibility].feature).to receive(:is_enabled).and_return(true)
   allow(EnrollRegistry["aca_shop_osse_eligibility_#{year}"].feature).to receive(:is_enabled).and_return(true)
   allow(EnrollRegistry["aca_shop_osse_eligibility_#{year - 1}"].feature).to receive(:is_enabled).and_return(true)
+  allow(EnrollRegistry["aca_shop_osse_eligibility_#{year + 1}"].feature).to receive(:is_enabled).and_return(true)
   allow(EnrollRegistry["aca_ivl_osse_eligibility_#{year}"].feature).to receive(:is_enabled).and_return(true)
   allow(EnrollRegistry["aca_ivl_osse_eligibility_#{year - 1}"].feature).to receive(:is_enabled).and_return(true)
+  allow(EnrollRegistry["aca_ivl_osse_eligibility_#{year + 1}"].feature).to receive(:is_enabled).and_return(true)
   allow(EnrollRegistry[:individual_osse_plan_filter].feature).to receive(:is_enabled).and_return(true)
 end
 
