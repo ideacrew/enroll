@@ -1,17 +1,17 @@
 .btn-outline-primary {
-  color: var(--theme-primary-100, #3B6B90);
-  border-color: var(--theme-primary-100, #3B6B90);
+  color: var(--theme-primary-100, #007bc4);
+  border-color: var(--theme-primary-100, #007bc4);
   font-weight: 600;
   text-transform: capitalize;
 
   &:hover {
     background-color: var(--grey-000);
-    color: var(--theme-primary-100, #3B6B90);
+    color: var(--theme-primary-100, #007bc4);
   }
 
   &:not(:disabled):not(:disabled):active {
     background-color: var(--grey-000);
-    color: var(--theme-primary-100, #3B6B90);
+    color: var(--theme-primary-100, #007bc4);
   }
 }
 
