@@ -394,11 +394,20 @@ class Family
   def current_enrolled_or_termed_coverages(enrollment, include_matching_effective_date = false)
     coverages = active_household.hbx_enrollments.by_coverage_kind(enrollment.coverage_kind)
     query_expr = existing_coverage_query_expr(enrollment, include_matching_effective_date)
-    coverages.where(query_expr).or(
+
+    Rails.logger.warn("**********************coverages #{coverages.count}****************************")
+    Rails.logger.warn("**********************coverages_query_expr #{coverages.where(query_expr).count}****************************")
+    Rails.logger.warn("**********************coverages_query_expr #{coverages.where(query_expr).map(&:hbx_id)}****************************")
+    result = coverages.where(query_expr).or(
       {:aasm_state.in => HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES},
       {:aasm_state.in => HbxEnrollment::TERMINATED_STATUSES, :terminated_on.gte => enrollment.effective_on.prev_day},
       {:aasm_state.in => ['coverage_expired'], effective_on: { "$gte" => enrollment.effective_on.beginning_of_year, "$lte" => enrollment.effective_on.end_of_year} }
     ).order('effective_on DESC')
+
+    Rails.logger.warn("**********************result #{result.count}****************************")
+    Rails.logger.warn("**********************result #{result&.first&.hbx_id}****************************")
+    Rails.logger.warn("**********************result_effective_on #{result&.first&.effective_on}****************************")
+    result
   end
   # rubocop:enable Style/OptionalBooleanParameter
 
