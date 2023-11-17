@@ -1142,11 +1142,13 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     let(:max_tax_credit) {'2000'}
     let(:new_aptc_amount_float) { new_aptc_amount.to_f }
     let(:max_tax_credit_float) { max_tax_credit.to_f }
+    let(:new_effective_date) { Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), hbx_enrollment.effective_on).to_date }
 
     let(:params) {{'applied_pct_1' => new_aptc_pct, 'aptc_applied_total' => new_aptc_amount, 'hbx_enrollment_id' => hbx_enrollment.id.to_s, max_aptc: max_tax_credit}}
 
     before :each do
       allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature).to receive(:is_enabled).and_return(true)
       sign_in user
       post :edit_aptc, params: params
     end
@@ -1154,7 +1156,13 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     it "should update APTC amount on the new enrollment based on the aggregate aptc amount" do
       family.reload
       new_enrollment = family.hbx_enrollments.last
-      expect(new_enrollment.elected_aptc_pct).to eq(new_aptc_amount_float / max_tax_credit_float)
+      new_enrollment.effective_on
+      if hbx_enrollment.effective_on.year == new_effective_date.year
+        expect(new_enrollment.elected_aptc_pct).to eq(new_aptc_amount_float / max_tax_credit_float)
+      else
+        # Can't create a corresponding enrollment during the end of the year due to overlapping plan year issue and hence disabling the change tax credit button
+        expect(new_enrollment.elected_aptc_pct).to eq(hbx_enrollment.elected_aptc_pct)
+      end
     end
   end
 
