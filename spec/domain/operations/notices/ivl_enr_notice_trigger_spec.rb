@@ -84,6 +84,29 @@ RSpec.describe ::Operations::Notices::IvlEnrNoticeTrigger, dbclean: :after_each 
         result = subject.call(params)
         expect(result.success?).to be_truthy
       end
+
+      context 'resident role id missing on enrollment' do
+        before do
+          enrollment_resident.update_attributes(resident_role_id: nil)
+        end
+
+        it 'should return success' do
+          result = subject.call(params)
+          expect(result.success?).to be_truthy
+        end
+
+        context 'and resident role missing on person' do
+          before do
+            person_resident.update(resident_role: nil)
+          end
+
+          it 'should return a failure' do
+            result = subject.call(params)
+            expect(result.success?).to be_falsey
+            expect(result.failure).to eq("Unable to find resident role for Coverall enrollment #{enrollment_resident.hbx_id}")
+          end
+        end
+      end
     end
 
     context 'person without address' do

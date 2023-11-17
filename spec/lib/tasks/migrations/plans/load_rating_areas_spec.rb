@@ -9,7 +9,7 @@ describe 'load_rate_reference:update_rating_areas' do
     Rake.application.rake_require "tasks/migrations/plans/load_rating_areas"
     Rake::Task.define_task(:environment)
 
-    create(:benefit_markets_locations_county_zip, county_name: EnrollRegistry[:enroll_app].setting(:contact_center_county).item)
+    create(:benefit_markets_locations_county_zip, county_name: EnrollRegistry[:enroll_app].setting(:contact_center_county).item, zip: '20024')
     unless EnrollRegistry[:enroll_app].settings(:rating_areas).item == 'single'
       glob_pattern = File.join(Rails.root, "db/seedfiles/cca/locations_seed.rb")
       load glob_pattern
