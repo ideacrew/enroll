@@ -204,6 +204,72 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
     end
 
+    describe '#subscriber_dropped?' do
+      before do
+        allow(
+          EnrollRegistry[:generate_initial_enrollment_on_subscriber_drop].feature
+        ).to receive(:is_enabled).and_return(feature_enabled)
+      end
+
+      let(:fer_instance) do
+        subject.enrollment = enrollment
+        subject
+      end
+
+      let(:renew_enrollment) do
+        double(
+          'HbxEnrollment',
+          hbx_enrollment_members: [
+            double('HbxEnrollmentMember', applicant_id: renewal_applicant_id)
+          ]
+        )
+      end
+
+      let(:enrollment) do
+        double(
+          'HbxEnrollment', subscriber: double(
+            'HbxEnrollmentMember', applicant_id: subscriber_applicant_id
+          )
+        )
+      end
+
+      context 'when feature is disabled' do
+        let(:feature_enabled) { false }
+        let(:renewal_applicant_id) { '11111' }
+        let(:subscriber_applicant_id) { '11111' }
+
+        it 'returns false' do
+          expect(
+            fer_instance.subscriber_dropped?(renew_enrollment)
+          ).to be_falsey
+        end
+      end
+
+      context 'when feature is enabled and subscriber is not dropped' do
+        let(:feature_enabled) { true }
+        let(:renewal_applicant_id) { '11111' }
+        let(:subscriber_applicant_id) { '11111' }
+
+        it 'returns false' do
+          expect(
+            fer_instance.subscriber_dropped?(renew_enrollment)
+          ).to be_falsey
+        end
+      end
+
+      context 'when feature is enabled and subscriber is dropped' do
+        let(:feature_enabled) { true }
+        let(:renewal_applicant_id) { '22222' }
+        let(:subscriber_applicant_id) { '11111' }
+
+        it 'returns true' do
+          expect(
+            fer_instance.subscriber_dropped?(renew_enrollment)
+          ).to be_truthy
+        end
+      end
+    end
+
     after :all do
       file_path = "#{Rails.root}/log/family_enrollment_renewal_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
       FileUtils.rm_rf(file_path) if File.file?(file_path)

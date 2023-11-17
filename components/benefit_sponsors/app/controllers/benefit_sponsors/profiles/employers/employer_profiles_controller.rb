@@ -7,6 +7,7 @@ module BenefitSponsors
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
         include Config::AcaHelper
         include EventSource::Command
+        include ::L10nHelper
 
         before_action :find_employer, only: [
           :show, :inbox, :bulk_employee_upload, :export_census_employees, :show_invoice,
@@ -156,17 +157,22 @@ module BenefitSponsors
           filename = file.original_filename
           # preparing the file upload to s3
           uri = Aws::S3Storage.save(file.path, 'ce-roster-upload')
-          if uri.present?
-            # making call to subscriber
-            event = event('events.benefit_sponsors.employer_profile.bulk_ce_upload', attributes: {s3_reference_key: filename, bucket_name: 'ce-roster-upload', employer_profile_id: @employer_profile.id, filename: filename})
-            event.success.publish if event.success?
-            # once we put file to s3 then redirecting user to the employees list page
-            redirect_to employees_upload_url(@employer_profile.id)
-          else
-            flash[:notice] = 'File not uploaded to S3'
-            respond_to do |format|
-              format.html {  render default_url}
+          @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, @employer_profile)
+          begin
+            if uri.present?
+              # making call to subscriber
+              event = event('events.benefit_sponsors.employer_profile.bulk_ce_upload', attributes: {s3_reference_key: filename, bucket_name: 'ce-roster-upload', employer_profile_id: @employer_profile.id, filename: filename})
+              event.success.publish if event.success?
+              # once we put file to s3 then redirecting user to the employees list page
+              flash[:notice] = l10n("employers.employer_profiles.ce_bulk_upload_success_message")
+              redirect_to employees_upload_url(@employer_profile.id)
+            else
+              flash[:notice] = l10n("employers.employer_profiles.ce_bulk_upload_error_message")
+              render @roster_upload_form.redirection_url || default_url
             end
+          rescue StandardError => e
+            @roster_upload_form.errors.add(:base, e.message)
+            render @roster_upload_form.redirection_url || default_url
           end
         end
 

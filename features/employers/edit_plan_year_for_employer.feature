@@ -33,7 +33,7 @@ Feature: Edit Plan Year For Initial Employer
     And employer clicked on edit plan year button
     Then employer should see form for benefit application and benefit package
     And employer updated <contribution_percent> contribution percent for the application
-    And employer should see create plan year button disabled
+    And employer should see create plan year button disabled if plan year start is not the first of the year
     And employer logs out
 
     Examples:
