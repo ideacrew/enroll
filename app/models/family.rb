@@ -402,8 +402,13 @@ class Family
       ).order('effective_on DESC')
     else
       Rails.logger.warn("**********************enrollment #{enrollment.hbx_id}****************************")
-      enrollment_hbx_ids = ivl_query_expr(enrollment).map { |enr| enr['hbx_id'] }
-      result = HbxEnrollment.where(:hbx_id.in => enrollment_hbx_ids).order('effective_on DESC')
+      coverages = active_household.hbx_enrollments.by_coverage_kind(enrollment.coverage_kind)
+      query_expr = existing_coverage_query_expr(enrollment, include_matching_effective_date)
+      result =  coverages.where(query_expr).select do |en|
+        HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(en.aasm_state) ||
+        (HbxEnrollment::TERMINATED_STATUSES.include?(en.aasm_state) && en.terminated_on >= enrollment.effective_on.prev_day) ||
+        (en.aasm_state == 'coverage_expired' && en.effective_on >= enrollment.effective_on.beginning_of_year && en.effective_on <= enrollment.effective_on.end_of_year)
+      end.sort_by { |object| object.effective_on }.reverse
       Rails.logger.warn("**********************result #{enrollment_hbx_ids.count}****************************")
       Rails.logger.warn("**********************result #{result&.first&.hbx_id}****************************")
       Rails.logger.warn("**********************result_effective_on #{result&.first&.effective_on}****************************")
