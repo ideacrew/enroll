@@ -27,7 +27,11 @@ RSpec.describe Insured::ConsumerRolesController do
         no_dc_address: false,
         has_multiple_roles?: false,
         id: person_id,
-        agent?: false
+        agent?: false,
+        first_name: "John",
+        last_name: "Smith",
+        ssn: "123",
+        dob: TimeKeeper.date_of_record - 30.years
       )
     end
     let(:consumer_role) do

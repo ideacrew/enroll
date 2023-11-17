@@ -234,6 +234,14 @@ And(/^the .+ is navigated to Application checklist page/) do
   expect(page).to have_content('Application Checklist')
 end
 
+And(/^the .+ is navigated to year selection page/) do
+  if EnrollRegistry[:enroll_app].setting(:site_key).item.to_s.downcase == 'dc'
+    expect(page).to have_content('districtdirect.dc.gov')
+  else
+    expect(page).to have_content(/submit a webform/)
+  end
+end
+
 And(/^the .+ should see a modal popup/) do
   expect(page).to have_content(l10n('faa.cost_savings.start_new_application').to_s)
 end

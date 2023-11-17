@@ -36,6 +36,7 @@ RSpec.describe ::Operations::HbxEnrollments::RelocateEnrollment, dbclean: :after
       person.home_address.update_attributes(zip: county_zip.zip, county: county_zip.county_name, state: county_zip.state)
       allow(EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model)).to receive(:item).and_return('county')
       allow(EnrollRegistry[:enroll_app].setting(:rating_areas)).to receive(:item).and_return('county')
+      allow(EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature).to receive(:is_enabled).and_return(true)
       BenefitMarkets::Locations::RatingArea.where(:exchange_provided_code.nin => ["R-ME004"]).first.update_attributes(covered_states: nil, active_year: start_date.year, county_zip_ids: [county_zip.id], exchange_provided_code: "R-ME001")
       BenefitMarkets::Locations::ServiceArea.update_all(covered_states: ['ME'])
       @rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(person.home_address)

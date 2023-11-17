@@ -2,7 +2,7 @@ Feature: Broker HC4CC quote creation
 
   Background: Broker Quoting Tool
     Given the shop market configuration is enabled
-    And Broker HC4CC feature enabled
+    Given the osse subsidy feature is enabled
     And a CCA site exists with a benefit market
     And benefit market catalog exists with eligibility
     And Health and Dental plans exist
