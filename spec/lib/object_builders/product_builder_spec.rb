@@ -80,7 +80,7 @@ describe "qhp builder" do
     context 'when feature is enabled' do
       before(:each) do
         ::BenefitMarkets::Products::Product.delete_all
-        EnrollRegistry[:import_network_data].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:import_network_data].feature).to receive(:is_enabled).and_return(true)
         xml = Nokogiri::XML(File.open(@files.first))
         product_parser = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
         product = ProductBuilder.new({})
@@ -96,7 +96,7 @@ describe "qhp builder" do
     context 'when feature is disabled' do
       before(:each) do
         ::BenefitMarkets::Products::Product.delete_all
-        EnrollRegistry[:import_network_data].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:import_network_data].feature).to receive(:is_enabled).and_return(false)
         xml = Nokogiri::XML(File.open(@files.first))
         product_parser = Parser::PlanBenefitTemplateParser.parse(xml.root.canonicalize, :single => true)
         product = ProductBuilder.new({})

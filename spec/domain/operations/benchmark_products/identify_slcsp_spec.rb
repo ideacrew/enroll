@@ -37,8 +37,8 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsp do
 
     before do
       allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) { |_id, _start, age| age * 1.0 }
-      EnrollRegistry[:enroll_app].settings(:rating_areas).stub(:item).and_return('county')
-      EnrollRegistry[:service_area].settings(:service_area_model).stub(:item).and_return('county')
+      allow(EnrollRegistry[:enroll_app].settings(:rating_areas)).to receive(:item).and_return('county')
+      allow(EnrollRegistry[:service_area].settings(:service_area_model)).to receive(:item).and_return('county')
       benchmark_product_model = ::Operations::BenchmarkProducts::Initialize.new.call(input_params).success
       family, benchmark_product_model = ::Operations::BenchmarkProducts::IdentifyTypeOfHousehold.new.call(benchmark_product_model).success
       @benchmark_product_model = Operations::BenchmarkProducts::IdentifyRatingAndServiceAreas.new.call(
@@ -168,8 +168,8 @@ RSpec.describe Operations::BenchmarkProducts::IdentifySlcsp do
 
     before do
       allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) { |_id, _start, age| age * 1.0 }
-      EnrollRegistry[:enroll_app].settings(:rating_areas).stub(:item).and_return('county')
-      EnrollRegistry[:service_area].settings(:service_area_model).stub(:item).and_return('county')
+      allow(EnrollRegistry[:enroll_app].settings(:rating_areas)).to receive(:item).and_return('county')
+      allow(EnrollRegistry[:service_area].settings(:service_area_model)).to receive(:item).and_return('county')
       benchmark_product_model = ::Operations::BenchmarkProducts::Initialize.new.call(input_params).success
       family, benchmark_product_model = ::Operations::BenchmarkProducts::IdentifyTypeOfHousehold.new.call(benchmark_product_model).success
       @benchmark_product_model = Operations::BenchmarkProducts::IdentifyRatingAndServiceAreas.new.call(

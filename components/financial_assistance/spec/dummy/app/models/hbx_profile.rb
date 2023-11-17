@@ -70,7 +70,37 @@ class HbxProfile
     BrokerRole.inactive
   end
 
+  def eigenclass
+    class << self
+      self
+    end
+  end
+
+  # Module for caching of the inbox
+  module InboxCache
+    def inbox
+      unless @inbox_reloaded
+        @inbox_reloaded = true
+        self.reload
+      end
+      super
+    end
+  end
+
+  # Since we use this optimization when we explicitly pull the record without
+  # the inbox, we'll patch the inbox method to trigger a reload.  We only do
+  # this in the instance itself, so other class instances aren't infected.
+  def extend_with_inbox_reload
+    eigenclass.prepend InboxCache
+    self
+  end
+
   class << self
+    def find_current_with_proxy_inbox
+      org = Organization.unscoped.where("hbx_profile.us_state_abbreviation": aca_state_abbreviation.to_s.upcase).without("hbx_profile.inbox").first
+      org.hbx_profile.extend_with_inbox_reload if org.present?
+    end
+
     def find(id)
       org = Organization.where("hbx_profile._id" => BSON::ObjectId.from_string(id)).first
       org.hbx_profile if org.present?
@@ -91,7 +121,9 @@ class HbxProfile
     end
 
     def current_hbx
-      find_by_state_abbreviation(aca_state_abbreviation)
+      Caches::CurrentHbx.fetch do
+        find_current_with_proxy_inbox
+      end
     end
 
     def transmit_group_xml(employer_profile_ids)

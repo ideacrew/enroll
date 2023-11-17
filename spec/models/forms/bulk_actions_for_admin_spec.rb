@@ -265,7 +265,7 @@ describe Forms::BulkActionsForAdmin do
     let(:subject) { Forms::BulkActionsForAdmin.new(drop_enrollment_members_arguments)}
 
     before do
-      EnrollRegistry[:drop_enrollment_members].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:drop_enrollment_members].feature).to receive(:is_enabled).and_return(true)
     end
 
     it "should not cancel enrollment include failure message" do

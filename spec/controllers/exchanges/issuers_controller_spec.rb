@@ -8,7 +8,7 @@ RSpec.describe Exchanges::IssuersController do
   let(:user)            { double("user", :has_hbx_staff_role? => true) }
 
   before(:each) do
-    EnrollRegistry[:issuers_tab].feature.stub(:is_enabled).and_return(true)
+    allow(EnrollRegistry[:issuers_tab].feature).to receive(:is_enabled).and_return(true)
     sign_in(user)
   end
 

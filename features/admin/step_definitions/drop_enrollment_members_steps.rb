@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Given(/drop_enrollment_members feature is enabled/) do
-  EnrollRegistry[:drop_enrollment_members].feature.stub(:is_enabled).and_return(true)
+  allow(EnrollRegistry[:drop_enrollment_members].feature).to receive(:is_enabled).and_return(true)
 end
 
 Given(/^User with multiple member enrollment exists$/) do

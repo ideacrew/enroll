@@ -97,8 +97,8 @@ RSpec.describe Operations::Subscribers::ProcessRequests::DetermineSlcsp, type: :
         mm_application[:assistance_year] = TimeKeeper.date_of_record.year
         mm_application[:aptc_effective_date] = TimeKeeper.date_of_record.beginning_of_year.to_date
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) { |_id, _start, age| age * 1.0 }
-        EnrollRegistry[:enroll_app].settings(:rating_areas).stub(:item).and_return('county')
-        EnrollRegistry[:service_area].settings(:service_area_model).stub(:item).and_return('county')
+        allow(EnrollRegistry[:enroll_app].settings(:rating_areas)).to receive(:item).and_return('county')
+        allow(EnrollRegistry[:service_area].settings(:service_area_model)).to receive(:item).and_return('county')
       end
 
       it 'should return entity' do
