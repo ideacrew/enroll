@@ -392,24 +392,54 @@ class Family
   # fetch the current active or terminated enrollments for continous coverage
   # rubocop:disable Style/OptionalBooleanParameter
   def current_enrolled_or_termed_coverages(enrollment, include_matching_effective_date = false)
-    coverages = active_household.hbx_enrollments.by_coverage_kind(enrollment.coverage_kind)
-    query_expr = existing_coverage_query_expr(enrollment, include_matching_effective_date)
-
-    Rails.logger.warn("**********************coverages #{coverages.count}****************************")
-    Rails.logger.warn("**********************coverages_query_expr #{coverages.where(query_expr).count}****************************")
-    Rails.logger.warn("**********************coverages_query_expr #{coverages.where(query_expr).map(&:hbx_id)}****************************")
-    result = coverages.where(query_expr).or(
-      {:aasm_state.in => HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES},
-      {:aasm_state.in => HbxEnrollment::TERMINATED_STATUSES, :terminated_on.gte => enrollment.effective_on.prev_day},
-      {:aasm_state.in => ['coverage_expired'], effective_on: { "$gte" => enrollment.effective_on.beginning_of_year, "$lte" => enrollment.effective_on.end_of_year} }
-    ).order('effective_on DESC')
-
-    Rails.logger.warn("**********************result #{result.count}****************************")
-    Rails.logger.warn("**********************result #{result&.first&.hbx_id}****************************")
-    Rails.logger.warn("**********************result_effective_on #{result&.first&.effective_on}****************************")
-    result
+    if enrollment.is_shop?
+      coverages = active_household.hbx_enrollments.by_coverage_kind(enrollment.coverage_kind)
+      query_expr = existing_coverage_query_expr(enrollment, include_matching_effective_date)
+      coverages.where(query_expr).or(
+        {:aasm_state.in => HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES},
+        {:aasm_state.in => HbxEnrollment::TERMINATED_STATUSES, :terminated_on.gte => enrollment.effective_on.prev_day},
+        {:aasm_state.in => ['coverage_expired'], effective_on: { "$gte" => enrollment.effective_on.beginning_of_year, "$lte" => enrollment.effective_on.end_of_year} }
+      ).order('effective_on DESC')
+    else
+      Rails.logger.warn("**********************enrollment #{enrollment.hbx_id}****************************")
+      enrollment_hbx_ids = ivl_query_expr(enrollment).map { |enr| enr['hbx_id'] }
+      result = HbxEnrollment.where(:hbx_id.in => enrollment_hbx_ids).order('effective_on DESC')
+      Rails.logger.warn("**********************result #{enrollment_hbx_ids.count}****************************")
+      Rails.logger.warn("**********************result #{result&.first&.hbx_id}****************************")
+      Rails.logger.warn("**********************result_effective_on #{result&.first&.effective_on}****************************")
+      result
+    end
   end
   # rubocop:enable Style/OptionalBooleanParameter
+
+  def ivl_query_expr(enrollment)
+    HbxEnrollment.collection.aggregate(
+      [{ "$match" => { "family_id" => enrollment.family_id,
+                       "coverage_kind" => enrollment.coverage_kind,
+                       "kind" => enrollment.kind,
+                       "_id" => { "$ne" => enrollment.id },
+                       "$expr": {
+                         "$and": [
+                           { "$lt": ["$effective_on", enrollment.effective_on] },
+                           { "$gte": ["$effective_on", enrollment.effective_on.beginning_of_year] },
+                           { "$or": [
+                             { "$in": ["$aasm_state", HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES] },
+                             { "$and": [
+                               { "$in": ["$aasm_state", HbxEnrollment::TERMINATED_STATUSES] },
+                               { "$gte": ["$terminated_on", enrollment.effective_on.prev_day] }
+                             ] },
+                             { "$and": [
+                               { "$in": ["$aasm_state", ["coverage_expired"]] },
+                               { "$gte": ["$effective_on", enrollment.effective_on.beginning_of_year] },
+                               { "$lte": ["$effective_on", enrollment.effective_on.end_of_year] }
+                             ] }
+                           ] }
+                         ]
+                       } } },
+       { "$sort" => { "effective_on" => -1 } },
+       {"$project" => {"_id" => 0, "hbx_id" => 1}}]
+    )
+  end
 
   def enrollments
     return [] if  latest_household.blank?
