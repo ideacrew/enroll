@@ -185,6 +185,39 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         expect(FinancialAssistance::Application.all.income_verification_extension_required.to_a).to eq []
       end
     end
+
+    context 'for_determined_family' do
+      it 'should return only determined applications' do
+        applications = FinancialAssistance::Application.for_determined_family(family_id)
+        expect(applications.map(&:aasm_state)).to include 'determined'
+      end
+
+      it 'should not return any determined applications' do
+        FinancialAssistance::Application.update_all(aasm_state: 'submitted')
+        expect(FinancialAssistance::Application.for_determined_family(family_id).to_a).to eq []
+      end
+    end
+
+    context 'determined_and_submitted_within_range' do
+      it 'should return only determined and submitted applications' do
+        FinancialAssistance::Application.update_all(submitted_at: TimeKeeper.date_of_record)
+        applications = FinancialAssistance::Application.determined_and_submitted_within_range(TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year)
+        expect(applications.map(&:aasm_state)).to include 'determined'
+        expect(applications.map(&:aasm_state)).not_to include 'submitted'
+      end
+
+      it 'should not return any determined and submitted applications' do
+        FinancialAssistance::Application.update_all(aasm_state: 'draft')
+        date_range = TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year
+        expect(FinancialAssistance::Application.determined_and_submitted_within_range(date_range).to_a).to eq []
+      end
+
+
+      it 'should not return any applications if no applications in date range' do
+        date_range = TimeKeeper.date_of_record.next_year.beginning_of_year..TimeKeeper.date_of_record.next_year.end_of_year
+        expect(FinancialAssistance::Application.determined_and_submitted_within_range(date_range).to_a).to eq []
+      end
+    end
   end
 
   describe '.compute_actual_days_worked' do
@@ -708,6 +741,34 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     it 'should have both income and mec in pending state' do
       application.active_applicants.each do |applicant|
         expect(applicant.income_evidence.aasm_state).to eq "pending"
+      end
+    end
+  end
+
+  describe '.create_evidences call
+  - for renewal application
+  - when renewal_eligibility_verification_using_rrv is enabled' do
+    let(:income) { FactoryBot.build(:financial_assistance_income, amount: 200, start_on: Date.new(2021,6,1), end_on: Date.new(2021, 6, 30), frequency_kind: "biweekly") }
+
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:renewal_eligibility_verification_using_rrv).and_return(true)
+      application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'renewal_draft', to_state: 'submitted')
+      application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'submitted', to_state: 'determined')
+      application.save!
+      application.send(:create_evidences)
+    end
+
+    it 'should not create MEC evidences and income evidence' do
+      application.reload.active_applicants.each do |applicant|
+        expect(applicant.income_evidence.present?).to be_falsey
+        expect(applicant.esi_evidence.present?).to be_falsey
+        expect(applicant.non_esi_evidence.present?).to be_falsey
+        expect(applicant.local_mec_evidence.present?).to be_falsey
       end
     end
   end
@@ -2617,5 +2678,12 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
       expect(application.all_applicants_medicaid_or_chip_eligible?).to eq(true)
     end
+  end
+end
+
+RSpec.describe ::FinancialAssistance::Application, "with correct index definitions", type: :model, dbclean: :after_each do
+  it "has valid indexes" do
+    ::FinancialAssistance::Application.remove_indexes
+    ::FinancialAssistance::Application.create_indexes
   end
 end

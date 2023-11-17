@@ -32,7 +32,11 @@ module Operations
         @family = values[:family]
         @effective_date = Date.strptime(values[:th_group_info][:effective_date], '%m/%d/%Y')
 
-        ::Operations::TaxHouseholdGroups::Deactivate.new.call({ family: @family, new_effective_date: @effective_date })
+        ::Operations::TaxHouseholdGroups::Deactivate.new.call({
+                                                                deactivate_action_type: 'current_only',
+                                                                family: @family,
+                                                                new_effective_date: @effective_date
+                                                              })
       end
 
       def create_taxhousehold_group(th_group_info)

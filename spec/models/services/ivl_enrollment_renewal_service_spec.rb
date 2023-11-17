@@ -89,7 +89,7 @@ RSpec.describe Services::IvlEnrollmentRenewalService, type: :model, :dbclean => 
 
       context 'mthh enabled' do
         before do
-          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
         end
 
         it "should return ehb_premium" do

@@ -14,10 +14,10 @@ p "found #{family_ids.count} families"  unless Rails.env.test?
 CSV.open("export_rrv_families_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv", "w") do |csv|
     csv << [
       'Primary HbxId',
-      "Most recent determined #{assistance_year} application ID", 
+      "Most recent determined #{assistance_year} application ID",
       "Most recent determined #{assistance_year} application determination date",
       "Latest active #{assistance_year} health plan HIOS-ID",
-      "Latest active #{assistance_year} health plan state (autorenewing, coverage_selected etc)", 
+      "Latest active #{assistance_year} health plan state (autorenewing, coverage_selected etc)",
       'APTC applied on latest active health plan',
       'Applicants person hbx_id with out SSN'
     ]
@@ -36,8 +36,7 @@ CSV.open("export_rrv_families_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.
       next if determined_application.blank? || applications.any?{|application| application.created_at > determined_application.created_at}
 
       determined_at = determined_application.eligibility_determinations.max_by(&:created_at)&.determined_at
-      health_coverage = family.active_household.hbx_enrollments.enrolled_and_renewing.individual_market.by_health.max_by(&:created_at)
-      
+      health_coverage = family.active_household.hbx_enrollments.enrolled_and_renewing.individual_market.by_health.by_year(assistance_year).max_by(&:created_at)
       counter += 1
 
       result = determined_application.applicants.each_with_object({}) do |applicant, hash|

@@ -309,7 +309,8 @@ module FinancialAssistance
             applicants = iap_hash['applicants']
             applicants.each do |applicant_hash|
               family_member = @family.family_members.select do |fm|
-                fm.person.first_name.downcase == applicant_hash['name']['first_name'].downcase &&
+                fm.person.dob == applicant_hash['demographic']['dob'].to_date &&
+                  fm.person.first_name.downcase == applicant_hash['name']['first_name'].downcase &&
                   fm.person.last_name.downcase == applicant_hash['name']['last_name'].downcase
               end.first
               citizen_status_info = applicant_hash['citizenship_immigration_status_information']
@@ -517,7 +518,7 @@ module FinancialAssistance
           def fill_applicants_form(payload, application) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
             applications = payload["family"]['magi_medicaid_applications'].first
             applications[:applicants].each do |applicant|
-              persisted_applicant = application.applicants.where(first_name: /^#{applicant[:first_name]}$/i, last_name: /^#{applicant[:last_name]}$/i).first
+              persisted_applicant = application.applicants.where(first_name: /^#{applicant[:first_name]}$/i, last_name: /^#{applicant[:last_name]}$/i, dob: applicant[:dob]).first
               return Failure("No matching applicant") unless persisted_applicant.present?
               claimed_by = application.applicants.where(ext_app_id: applicant[:claimed_as_tax_dependent_by]).first
               persisted_applicant.is_physically_disabled = applicant[:is_physically_disabled]

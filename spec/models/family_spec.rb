@@ -291,8 +291,8 @@ describe Family, type: :model, dbclean: :around_each do
 
     context "send broker events to edi if feature is enabled" do
       before do
-        EnrollRegistry[:send_broker_hired_event_to_edi].feature.stub(:is_enabled).and_return(true)
-        EnrollRegistry[:send_broker_fired_event_to_edi].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:send_broker_hired_event_to_edi].feature).to receive(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:send_broker_fired_event_to_edi].feature).to receive(:is_enabled).and_return(true)
       end
 
       it "should notify edi on impacted enrollments if feature is enabled" do
@@ -303,8 +303,8 @@ describe Family, type: :model, dbclean: :around_each do
 
     context "send broker events to edi if feature is disabled" do
       before do
-        EnrollRegistry[:send_broker_hired_event_to_edi].feature.stub(:is_enabled).and_return(false)
-        EnrollRegistry[:send_broker_fired_event_to_edi].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:send_broker_hired_event_to_edi].feature).to receive(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:send_broker_fired_event_to_edi].feature).to receive(:is_enabled).and_return(false)
       end
 
       it "should notify edi on impacted enrollments if feature is enabled" do
@@ -475,7 +475,7 @@ describe Family, dbclean: :around_each do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
 
     before do
-      EnrollRegistry[:include_faa_outstanding_verifications].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:include_faa_outstanding_verifications].feature).to receive(:is_enabled).and_return(true)
     end
 
     it "should earliest duedate when family had two or more due dates" do
@@ -913,7 +913,7 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
 
     before do
-      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
     end
 
     it "should be in open enrollment" do
@@ -963,7 +963,7 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     let!(:benefit_group_assignment2) { FactoryBot.create(:benefit_group_assignment, benefit_group: benefit_group2, census_employee: census_employee2)}
 
     before do
-      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
     end
 
     it "should be in open enrollment" do
@@ -1049,7 +1049,7 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
 
     before do
-      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
     end
 
     it "should be in open enrollment" do
@@ -1107,7 +1107,7 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     let!(:benefit_group_assignment2) { FactoryBot.create(:benefit_group_assignment, benefit_group: benefit_group2, census_employee: census_employee2)}
 
     before do
-      EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
     end
 
     it "should be in open enrollment" do
@@ -2239,7 +2239,7 @@ describe '#deactivate_financial_assistance' do
 
   context 'with valid params' do
     before do
-      EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
     end
 
     it 'deactivates active tax household group' do
@@ -2252,7 +2252,7 @@ describe '#deactivate_financial_assistance' do
   context 'with invalid params' do
     context 'bad date input and multi tax household feature is enabled' do
       before do
-        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
       end
 
       it 'does not deactivate active tax household group' do
@@ -2264,7 +2264,7 @@ describe '#deactivate_financial_assistance' do
 
     context 'bad date input and multi tax household feature is disabled' do
       before do
-        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(false)
       end
 
       it 'does not deactivate active tax household group' do
@@ -2276,7 +2276,7 @@ describe '#deactivate_financial_assistance' do
 
     context 'multi tax households feature is disabled' do
       before do
-        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(false)
       end
 
       it 'does not deactivate active tax household group' do
@@ -2285,5 +2285,12 @@ describe '#deactivate_financial_assistance' do
         expect(tax_household_group.reload.end_on).to be_nil
       end
     end
+  end
+end
+
+describe Family, "with index definitions" do
+  it "creates the indexes" do
+    Family.remove_indexes
+    Family.create_indexes
   end
 end
