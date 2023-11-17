@@ -3,7 +3,6 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.6.3'
 gem 'rails', '~> 5.2.4.3'
 gem 'sidekiq'
 gem 'globalid'
@@ -29,7 +28,7 @@ gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar.git
 #######################################################
 # Local components/engines
 #######################################################
-gem 'acapi',              git: "https://github.com/ideacrew/acapi.git", branch: 'amqp_proc_title'
+gem 'acapi',              git: "https://github.com/ideacrew/acapi.git", branch: 'trunk'
 gem 'aca_entities',       git: 'https://github.com/ideacrew/aca_entities.git', branch: 'trunk'
 gem 'event_source',       git:  'https://github.com/ideacrew/event_source.git', branch: 'trunk'
 gem "benefit_markets",    path: "components/benefit_markets"
@@ -71,7 +70,8 @@ gem 'combine_pdf',              '~> 1.0'
 gem 'config',                   '~> 2.0'
 gem 'curl',                     '~> 0.0.9'
 gem 'devise',                   '~> 4.5'
-gem 'devise-jwt', "~> 0.5.9"
+gem 'devise-jwt', "0.9.0"
+gem 'warden-jwt_auth', "0.6.0"
 gem 'jwt', "~> 2.2.1"
 gem 'haml',                     '~> 5.0'
 gem 'httparty',                 '~> 0.16'
@@ -89,7 +89,7 @@ gem 'mail',                     '~> 2.7'
 gem 'maskedinput-rails',        '~> 1.4'
 gem 'money-rails',              '~> 1.13'
 gem 'net-ssh',                  '= 4.2.0'
-gem 'nokogiri',                 '~> 1.10.8'
+gem 'nokogiri'
 gem 'nokogiri-happymapper',     '~> 0.8.0', :require => 'happymapper'
 gem 'non-stupid-digest-assets'
 gem 'pundit',                   '~> 2.0'
@@ -116,6 +116,9 @@ gem 'fast_jsonapi'
 gem 'loofah', '~> 2.3.1'
 gem 'stimulus_reflex', '3.4.1'
 gem 'rack-cors'
+
+gem 'dry-configurable', '0.13.0'
+gem 'dry-container', '0.9.0'
 
 group :development do
   gem "certified",              '~> 1'
