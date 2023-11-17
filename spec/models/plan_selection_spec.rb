@@ -1,3 +1,5 @@
+#frozen_string_literal: true
+
 require 'rails_helper'
 describe PlanSelection, dbclean: :after_each, :if => ExchangeTestingConfigurationHelper.individual_market_is_enabled? do
   subject {PlanSelection.new(hbx_enrollment, hbx_enrollment.product)}
@@ -16,6 +18,8 @@ describe PlanSelection, dbclean: :after_each, :if => ExchangeTestingConfiguratio
   let(:year) {TimeKeeper.date_of_record.year}
   let(:effective_on) {Date.new(year, 3, 1)}
   let(:previous_enrollment_status) {'coverage_selected'}
+  let(:max_aptc) {100.00}
+  let(:elected_aptc) {100.00}
   let(:terminated_on) {nil}
   let(:covered_individuals) {family.family_members}
   let(:newly_covered_individuals) {family.family_members}
@@ -83,6 +87,36 @@ describe PlanSelection, dbclean: :after_each, :if => ExchangeTestingConfiguratio
       it 'should not set predecessor_enrollment_id' do
         subject.verify_and_set_member_coverage_start_dates
         expect(hbx_enrollment.predecessor_enrollment_id).to eq nil
+      end
+    end
+  end
+
+  describe '.apply_aptc_if_needed' do
+    before do
+      allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(applied_aptc_amount: 100, total_ehb_premium: 1390, total_aptc_amount: 100, aptc_amount: 100))
+    end
+    context 'When max_aptc is less than 0.00' do
+      let(:max_aptc) {0.00}
+      let(:elected_aptc) {100.00}
+      it 'should return 0.00 for elected_aptc_pct' do
+        expect(subject.apply_aptc_if_needed(elected_aptc,max_aptc)).to eq true
+        expect(subject.hbx_enrollment.elected_aptc_pct).to eq 0.00
+      end
+    end
+    context 'When max_aptc is greater than 0.00' do
+      let(:max_aptc) {1000.00}
+      let(:elected_aptc) {100.00}
+      it 'should return calculated elected_aptc_pct' do
+        expect(subject.apply_aptc_if_needed(elected_aptc,max_aptc)).to eq true
+        expect(subject.hbx_enrollment.elected_aptc_pct).to eq 0.10
+      end
+    end
+    context 'When elected_aptc_pct is greater than 1.00' do
+      let(:max_aptc) {50.00}
+      let(:elected_aptc) {100.00}
+      it 'should return 1.00 for elected_aptc_pct' do
+        expect(subject.apply_aptc_if_needed(elected_aptc,max_aptc)).to eq true
+        expect(subject.hbx_enrollment.elected_aptc_pct).to eq 1.00
       end
     end
   end

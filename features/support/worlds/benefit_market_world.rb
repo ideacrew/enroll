@@ -223,7 +223,7 @@ module BenefitMarketWorld
     )
     result = create_catalog_eligibility(@benefit_market_catalog)
     if result.success?
-      health_product = BenefitMarkets::Products::Product.by_year(2023).by_kind(:health)[2]
+      health_product = BenefitMarkets::Products::Product.by_year(effective_date.year).by_kind(:health)[2]
       effective_year_for_lcsp = @benefit_market_catalog.application_period.begin.year
       feature_key = "lowest_cost_silver_product_#{effective_year_for_lcsp}"
       if EnrollRegistry.feature?(feature_key) && EnrollRegistry.feature_enabled?(feature_key)
@@ -253,7 +253,7 @@ Given(/^Qualifying life events are present$/) do
 end
 
 And(/^benefit market catalog exists with eligibility$/) do
-  create_benefit_market_catalog_for(TimeKeeper.date_of_record)
+  create_benefit_market_catalog_for(current_effective_date)
 end
 
 Given(/^osse benefit market catalog exists for (.*) initial employer with (.*) benefits$/) do |status, coverage_kinds|

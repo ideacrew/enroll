@@ -1039,9 +1039,24 @@ And(/consumer has successful ridp/) do
   benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(start_on)}.update_attributes!(slcsp_id: current_product.id)
 end
 
+And(/products are marked as hc4cc/) do
+  BenefitMarkets::Products::Product.all.each { |p| p.update!(is_hc4cc_plan: true) }
+end
+
 And(/consumer has osse eligibility/) do
   person = Person.all.first
   person.consumer_role.eligibilities << FactoryBot.build(:ivl_osse_eligibility, :with_admin_attested_evidence, evidence_state: :approved)
+  current_date = TimeKeeper.date_of_record
+  effective_on = ::Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(current_date.in_time_zone('Eastern Time (US & Canada)'), current_date).to_date
+  if effective_on.year != current_date.year
+
+    renewal_eligibility = FactoryBot.build(:ivl_osse_eligibility,
+                                           :with_admin_attested_evidence,
+                                           evidence_state: :approved,
+                                           key: :"aca_ivl_osse_eligibility_#{effective_on.year}".to_sym,
+                                           effective_on: effective_on)
+    person.consumer_role.eligibilities << renewal_eligibility
+  end
 end
 
 When(/consumer visits home page after successful ridp/) do
@@ -1276,8 +1291,9 @@ end
 Given(/plan filter feature is disabled and osse subsidy feature is enabled/) do
   year = TimeKeeper.date_of_record.year
   allow(EnrollRegistry[:aca_ivl_osse_eligibility].feature).to receive(:is_enabled).and_return(true)
-  EnrollRegistry["aca_ivl_osse_eligibility_#{year}"].feature.stub(:is_enabled).and_return(true)
-  EnrollRegistry["aca_ivl_osse_eligibility_#{year - 1}"].feature.stub(:is_enabled).and_return(true)
+  allow(EnrollRegistry["aca_ivl_osse_eligibility_#{year}".to_sym].feature).to receive(:is_enabled).and_return(true)
+  allow(EnrollRegistry["aca_ivl_osse_eligibility_#{year - 1}".to_sym].feature).to receive(:is_enabled).and_return(true)
+  allow(EnrollRegistry["aca_ivl_osse_eligibility_#{year + 1}".to_sym].feature).to receive(:is_enabled).and_return(true)
   allow(EnrollRegistry[:individual_osse_plan_filter].feature).to receive(:is_enabled).and_return(false)
 end
 
