@@ -9,8 +9,8 @@ FactoryBot.define do
     value do
       {
         title: 'childcare Subsidy',
-        key: :childcare_grant,
-        item: 'true'
+        key: :aca_individual_osse_plan_subsidy,
+        item: 'aca_individual_osse_plan_subsidy'
       }
     end
   end
