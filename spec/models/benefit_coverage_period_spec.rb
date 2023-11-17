@@ -1253,4 +1253,22 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       end
     end
   end
+
+  describe 'scopes' do
+    describe '.by_year' do
+      let(:hbx_profile) { FactoryBot.create(:hbx_profile) }
+      let(:benefit_sponsorship) { FactoryBot.create(:benefit_sponsorship, hbx_profile: hbx_profile) }
+      let(:prospective_year) { TimeKeeper.date_of_record.year.next }
+
+      let!(:renewal_benefit_coverage_period) do
+        FactoryBot.create(:benefit_coverage_period, benefit_sponsorship: benefit_sponsorship, coverage_year: prospective_year)
+      end
+
+      it 'return bcps of given year only' do
+        eligible_bcps = benefit_sponsorship.benefit_coverage_periods.by_year(prospective_year).to_a
+        expect(eligible_bcps).to include(renewal_benefit_coverage_period)
+        expect(eligible_bcps).not_to include(benefit_sponsorship)
+      end
+    end
+  end
 end

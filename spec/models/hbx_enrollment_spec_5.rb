@@ -13,11 +13,13 @@ RSpec.describe HbxEnrollment, type: :model do
   let(:person) { create(:person, :with_consumer_role, :with_active_consumer_role, first_name: 'test1') }
   let(:family) { create(:family, :with_primary_family_member, person: person) }
   let(:aasm_state) { 'coverage_selected' }
+  let(:predecessor_enrollment_id) { nil }
   let(:hbx_enrollment) do
     create(:hbx_enrollment, :individual_aptc, :with_silver_health_product, aasm_state: aasm_state,
                                                                            applied_aptc_amount: applied_aptc_amount,
                                                                            elected_aptc_pct: elected_aptc_pct,
                                                                            family: family,
+                                                                           predecessor_enrollment_id: predecessor_enrollment_id,
                                                                            consumer_role_id: person.consumer_role.id,
                                                                            ehb_premium: enrollment_ehb_premium)
   end
@@ -94,7 +96,7 @@ RSpec.describe HbxEnrollment, type: :model do
 
   before do
     ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
-    EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+    allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
 
     allow(
       hbx_enrollment.ivl_decorated_hbx_enrollment
@@ -313,6 +315,392 @@ RSpec.describe HbxEnrollment, type: :model do
         expect(hbx_enrollment.hbx_enrollment_members.pluck(:coverage_start_on)).to eq([enrollment_effective_on, enrollment_effective_on])
         hbx_enrollment.reset_member_coverage_start_dates
         expect(hbx_enrollment.hbx_enrollment_members.pluck(:coverage_start_on)).to eq([enrollment_effective_on, enrollment_effective_on])
+      end
+    end
+  end
+
+  describe '#cancel_coverage_for_superseded_term' do
+    context "when:
+      - enrollment is of kind 'individual'
+      - enrollment is in 'coverage_terminated' state
+      " do
+
+      let(:aasm_state) { 'coverage_terminated' }
+
+      it 'transitions enrollment to canceled' do
+        expect(hbx_enrollment.may_cancel_coverage_for_superseded_term?).to be_truthy
+        hbx_enrollment.cancel_coverage_for_superseded_term!
+        expect(hbx_enrollment.reload.coverage_canceled?).to be_truthy
+      end
+    end
+
+    context "when:
+      - enrollment is of kind 'individual'
+      - enrollment is not in 'coverage_terminated' state
+      " do
+
+      it 'returns false for transition check' do
+        expect(hbx_enrollment.may_cancel_coverage_for_superseded_term?).to be_falsey
+        expect do
+          hbx_enrollment.cancel_coverage_for_superseded_term!
+        end.to raise_error(AASM::InvalidTransition)
+      end
+    end
+
+    context "when:
+      - enrollment is not of kind 'individual'
+      - enrollment is in 'coverage_terminated' state
+      " do
+
+      let(:aasm_state) { 'coverage_terminated' }
+
+      it 'returns false for transition check' do
+        allow(hbx_enrollment).to receive(:is_ivl_by_kind?).and_return(false)
+        expect(hbx_enrollment.may_cancel_coverage_for_superseded_term?).to be_falsey
+        expect do
+          hbx_enrollment.cancel_coverage_for_superseded_term!
+        end.to raise_error(AASM::InvalidTransition)
+      end
+    end
+  end
+
+  describe '#enrollment_superseded_and_eligible_for_cancellation?' do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let(:new_effective_on) { TimeKeeper.date_of_record }
+    let(:aasm_state) { 'coverage_terminated' }
+    let(:kind) { 'individual' }
+
+    let(:prev_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        :with_silver_health_product,
+                        :with_enrollment_members,
+                        kind: kind,
+                        enrollment_members: family.family_members,
+                        aasm_state: aasm_state,
+                        household: family.active_household,
+                        effective_on: TimeKeeper.date_of_record,
+                        family: family)
+    end
+
+    let(:feature_enabled) { true }
+
+    before do
+      allow(
+        EnrollRegistry[:cancel_superseded_terminated_enrollments].feature
+      ).to receive(:is_enabled).and_return(feature_enabled)
+    end
+
+    context "when:
+      - RR configuration feature :cancel_superseded_terminated_enrollments is enabled
+      - enrollment is of kind individual market
+      - enrollment is terminated
+      - new effective exists
+      - new effective on's year is same as enrollment's effective_on's year
+      " do
+
+      it 'returns true' do
+        expect(
+          prev_enrollment.enrollment_superseded_and_eligible_for_cancellation?(new_effective_on)
+        ).to be_truthy
+      end
+    end
+
+    context "when:
+      - RR configuration feature :cancel_superseded_terminated_enrollments is disabled
+      - enrollment is of kind individual market
+      - enrollment is terminated
+      - new effective exists
+      - new effective on's year is same as enrollment's effective_on's year
+      " do
+
+      let(:feature_enabled) { false }
+
+      it 'returns false' do
+        expect(
+          prev_enrollment.enrollment_superseded_and_eligible_for_cancellation?(new_effective_on)
+        ).to be_falsey
+      end
+    end
+
+    context "when:
+      - RR configuration feature :cancel_superseded_terminated_enrollments is enabled
+      - enrollment is not of kind individual market
+      - enrollment is terminated
+      - new effective exists
+      - new effective on's year is same as enrollment's effective_on's year
+      " do
+
+      let(:kind) { 'employer_sponsored' }
+
+      it 'returns false' do
+        expect(
+          prev_enrollment.enrollment_superseded_and_eligible_for_cancellation?(new_effective_on)
+        ).to be_falsey
+      end
+    end
+
+    context "when:
+      - RR configuration feature :cancel_superseded_terminated_enrollments is enabled
+      - enrollment is of kind individual market
+      - enrollment is not terminated
+      - new effective exists
+      - new effective on's year is same as enrollment's effective_on's year
+      " do
+
+      let(:aasm_state) { 'coverage_selected' }
+
+      it 'returns false' do
+        expect(
+          prev_enrollment.enrollment_superseded_and_eligible_for_cancellation?(new_effective_on)
+        ).to be_falsey
+      end
+    end
+
+    context "when:
+      - RR configuration feature :cancel_superseded_terminated_enrollments is enabled
+      - enrollment is of kind individual market
+      - enrollment is terminated
+      - new effective does not exists
+      " do
+
+      let(:new_effective_on) { nil }
+
+      it 'returns false' do
+        expect(
+          prev_enrollment.enrollment_superseded_and_eligible_for_cancellation?(new_effective_on)
+        ).to be_falsey
+      end
+    end
+
+    context "when:
+      - RR configuration feature :cancel_superseded_terminated_enrollments is enabled
+      - enrollment is of kind individual market
+      - enrollment is not terminated
+      - new effective exists
+      - new effective on's year is not same as enrollment's effective_on's year
+      " do
+
+      let(:new_effective_on) { TimeKeeper.date_of_record.next_year }
+
+      it 'returns false' do
+        expect(
+          prev_enrollment.enrollment_superseded_and_eligible_for_cancellation?(new_effective_on)
+        ).to be_falsey
+      end
+    end
+  end
+
+  describe '#ineligible_for_termination?' do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let(:system_year) { TimeKeeper.date_of_record.year }
+    let(:new_effective_on) { Date.new(system_year, 2) }
+    let(:terminated_on) { Date.new(system_year, 2) - 1.day }
+    let(:aasm_state) { 'coverage_terminated' }
+    let(:kind) { 'individual' }
+
+    let(:prev_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        :with_silver_health_product,
+                        :with_enrollment_members,
+                        kind: kind,
+                        enrollment_members: family.family_members,
+                        aasm_state: aasm_state,
+                        terminated_on: terminated_on,
+                        household: family.active_household,
+                        effective_on: Date.new(system_year),
+                        family: family)
+    end
+
+    context "when:
+      - enrollment is of kind individual market
+      - enrollment is terminated
+      - enrollment has terminated_on
+      - new effective exists
+      - new effective on is one day after the enrollment's terminated_on
+      " do
+
+      it 'returns true' do
+        expect(prev_enrollment.ineligible_for_termination?(new_effective_on)).to be_truthy
+      end
+    end
+
+    context "when:
+      - enrollment is not of kind individual market
+      - enrollment is terminated
+      - enrollment has terminated_on
+      - new effective exists
+      - new effective on is one day after the enrollment's terminated_on
+      " do
+
+      let(:kind) { 'employer_sponsored' }
+
+      it 'returns false' do
+        expect(prev_enrollment.ineligible_for_termination?(new_effective_on)).to be_falsey
+      end
+    end
+
+    context "when:
+      - enrollment is of kind individual market
+      - enrollment is not terminated
+      - enrollment has terminated_on
+      - new effective exists
+      - new effective on is one day after the enrollment's terminated_on
+      " do
+
+      let(:aasm_state) { 'coverage_selected' }
+
+      it 'returns false' do
+        expect(prev_enrollment.ineligible_for_termination?(new_effective_on)).to be_falsey
+      end
+    end
+
+    context "when:
+      - enrollment is of kind individual market
+      - enrollment is terminated
+      - enrollment does not have terminated_on
+      - new effective exists
+      - new effective on is one day after the enrollment's terminated_on
+      " do
+
+      let(:terminated_on) { nil }
+
+      it 'returns false' do
+        expect(prev_enrollment.ineligible_for_termination?(new_effective_on)).to be_falsey
+      end
+    end
+
+    context "when:
+      - enrollment is of kind individual market
+      - enrollment is terminated
+      - enrollment has terminated_on
+      - new effective does not exist
+      - new effective on is one day after the enrollment's terminated_on
+      " do
+
+      let(:new_effective_on) { nil }
+
+      it 'returns false' do
+        expect(prev_enrollment.ineligible_for_termination?(new_effective_on)).to be_falsey
+      end
+    end
+
+    context "when:
+      - enrollment is of kind individual market
+      - enrollment is terminated
+      - enrollment has terminated_on
+      - new effective exists
+      - previous day of the new effective on is greater than the enrollment's terminated_on
+      " do
+
+      let(:new_effective_on) { Date.new(system_year, 5) }
+
+      it 'returns true' do
+        expect(prev_enrollment.ineligible_for_termination?(new_effective_on)).to be_truthy
+      end
+    end
+
+    context "when:
+      - enrollment is of kind individual market
+      - enrollment is terminated
+      - enrollment has terminated_on
+      - new effective exists
+      - previous day of the new effective on is less than the enrollment's terminated_on
+      " do
+
+      let(:new_effective_on) { Date.new(system_year, 1) }
+
+      it 'returns false' do
+        expect(prev_enrollment.ineligible_for_termination?(new_effective_on)).to be_falsey
+      end
+    end
+  end
+
+  describe '#propogate_terminate' do
+    let(:aasm_state) { 'coverage_terminated' }
+
+    context 'without arguments' do
+      it 'assigns terminated_on without raising any error' do
+        expect { hbx_enrollment.propogate_terminate }.not_to raise_error(StandardError)
+        expect(hbx_enrollment.terminated_on).to be_truthy
+      end
+    end
+
+    context 'with only terminated_on' do
+      let(:terminated_on_date) { hbx_enrollment.effective_on.end_of_month }
+
+      it 'assigns terminated_on without raising any error' do
+        expect do
+          hbx_enrollment.propogate_terminate(terminated_on_date)
+        end.not_to raise_error(StandardError)
+        expect(hbx_enrollment.terminated_on).to eq(terminated_on_date)
+      end
+    end
+
+    context 'with terminated_on and additional transition args' do
+      let(:terminated_on_date) { hbx_enrollment.effective_on.end_of_month }
+      let(:transition_args) { { reason: Enrollments::TerminationReasons::SUPERSEDED_SILENT } }
+
+      it 'assigns terminated_on without raising any error' do
+        expect do
+          hbx_enrollment.propogate_terminate(terminated_on_date, transition_args)
+        end.not_to raise_error(StandardError)
+        expect(hbx_enrollment.terminated_on).to eq(terminated_on_date)
+      end
+    end
+  end
+
+  describe '#predecessor_enrollment_hbx_id' do
+    let(:enrollment2) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        :individual_aptc,
+        :with_silver_health_product,
+        aasm_state: aasm_state,
+        family: family,
+        consumer_role_id: person.consumer_role.id
+      )
+    end
+
+    context 'with predecessor_enrollment_id' do
+      let(:predecessor_enrollment_id) { enrollment2.id }
+
+      it 'returns predecessor_enrollment_id' do
+        expect(hbx_enrollment.predecessor_enrollment_hbx_id).to eq(enrollment2.hbx_id)
+      end
+    end
+
+    context 'without predecessor_enrollment_id' do
+      it 'returns nil' do
+        expect(hbx_enrollment.predecessor_enrollment_hbx_id).to be_nil
+      end
+    end
+  end
+
+  describe '#predecessor_enrollment' do
+    let(:enrollment2) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        :individual_aptc,
+        :with_silver_health_product,
+        aasm_state: aasm_state,
+        family: family,
+        consumer_role_id: person.consumer_role.id
+      )
+    end
+
+    context 'with predecessor_enrollment_id' do
+      let(:predecessor_enrollment_id) { enrollment2.id }
+
+      it 'returns predecessor_enrollment_id' do
+        expect(hbx_enrollment.predecessor_enrollment).to eq(enrollment2)
+      end
+    end
+
+    context 'without predecessor_enrollment_id' do
+      it 'returns nil' do
+        expect(hbx_enrollment.predecessor_enrollment).to be_nil
       end
     end
   end

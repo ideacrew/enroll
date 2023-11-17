@@ -20,7 +20,7 @@ registry:
         is_enabled: <%= ENV['IAP_YEAR_SELECTION_FORM_IS_ENABLED'] || false %>
         settings:
           - key: :iap_year_sep_link
-            item: ""
+            item: "https://www.dchealthlink.com/individuals/life-changes"
       - key: :iap_assistance_year_display
         is_enabled: <%= ENV['IAP_ASSISTANCE_YEAR_DISPLAY_IS_ENABLED'] || false %>
       - key: :enrollment_dates
@@ -122,7 +122,7 @@ registry:
       - key: :non_applicant_citizen_status
         is_enabled: false
       - key: :out_of_state_primary
-        is_enabled: true
+        is_enabled: <%= ENV['OUT_OF_STATE_PRIMARY_IS_ENABLED'] || true %>
       - key: :temporary_configuration_enable_multi_tax_household_feature
         is_enabled: <%= ENV['TEMPORARY_CONFIGURATION_OF_MULTI_TAX_HOUSEHOLD_FEATURE_IS_ENABLED'] || false %>
       - key: :draft_application_after_ridp
@@ -137,6 +137,9 @@ registry:
       - key: :short_enrolled_esi_forms
         item: :short_enrolled_esi_forms
         is_enabled: <%= ENV['SHORT_ENROLLED_ESI_IS_ENABLED'] || false %>
+      - key: :totally_ineligible_notice
+        item: :totally_ineligible_notice
+        is_enabled: <%= ENV['TOTALLY_INELIGIBLE_NOTICE_IS_ENABLED'] || false %>
   - namespace:
     - :request_determination
     features:
@@ -163,7 +166,7 @@ registry:
     - key: :non_magi_transfer
       is_enabled: <%= ENV['NON_MAGI_TRANSFER_IS_ENABLED'] || false %>
     - key: :block_renewal_application_transfers
-      is_enabled: <%= ENV['ATP_ON_RENEWALS_IS_ENABLED'] || false %>
+      is_enabled: <%= ENV['ATP_ON_RENEWALS_IS_ENABLED'] || true %>
     - key: :load_county_on_inbound_transfer
       is_enabled: <%= ENV['LOAD_COUNTY_ON_INBOUND_TRANSFER_IS_ENABLED'] || false %>
     - key: :automatic_submission
@@ -264,6 +267,9 @@ registry:
           item: false
     - key: :full_medicaid_determination_step
       is_enabled: true
+      settings:
+        - key: :annual_eligibility_redetermination
+          item: <%= ENV['FULL_MEDICAID_DETERMINATION_FOR_ANNUAL_ELIGIBILITY_REDETERMINATION_IS_ENABLED'] || false %>
     - key: :native_american_csr
       is_enabled: true
     - key: :filing_as_head_of_household
@@ -317,6 +323,13 @@ registry:
           item: <%= ENV['RENEWALS_CREATION_MONTH'] || 10 %>
         - key: :renewals_creation_day
           item: <%= ENV['RENEWALS_CREATION_DAY'] || 16 %>
+    - key: :skip_eligibility_redetermination
+      is_enabled: <%= ENV['SKIP_ELIGIBILITY_REDETERMINATION_IS_ENABLED'] || false %>
+    - key: :auto_update_income_evidence_due_on
+      is_enabled: <%= ENV['AUTO_UPDATE_INCOME_EVIDENCE_DUE_ON_IS_ENABLED'] || false %>
+      settings:
+        - key: :days
+          item:  <%= ENV['AUTO_UPDATE_INCOME_EVIDENCE_DUE_ON_DAYS'] || 65 %>
     - key: :skip_employer_address_validation
       is_enabled: :false
     - key: :skip_employer_phone_validation
@@ -362,5 +375,9 @@ registry:
           item: 12_550
         - key: :unearned_income_filing_threshold_2023
           item: 1_100
+        - key: :earned_income_filing_threshold_2024
+          item: 12_950
+        - key: :unearned_income_filing_threshold_2024
+          item: 1_150
 # TODO eligibility engine connectivity(HAVEN) settings
 # TODO mec service connectivity settings

@@ -33,9 +33,31 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         @result = subject.call(@transformed)
       end
 
-      it 'should set the transferred_at field'  do
+      it 'should set the transferred_at field' do
         app = FinancialAssistance::Application.find(@result.value!)
         expect(app.transferred_at).not_to eq nil
+      end
+
+      context "two applicants share the same first and last name" do
+        before do
+          record = serializer.parse(xml)
+          @transformed = transformer.transform(record.to_hash(identifier: true))
+          @transformed[:family][:family_members][1][:person][:person_name][:first_name] = "Laura"
+          @transformed[:family][:magi_medicaid_applications].first[:applicants][1][:name][:first_name] = "Laura"
+          @result = subject.call(@transformed)
+        end
+
+        it "persists all applicants" do
+          app = FinancialAssistance::Application.find(@result.value!)
+          @transformed.deep_symbolize_keys!
+          expect(app.applicants.count).to eql(@transformed[:family][:magi_medicaid_applications].first[:applicants].count)
+        end
+
+        it "persists unique family member ids" do
+          app = FinancialAssistance::Application.find(@result.value!)
+          @transformed.deep_symbolize_keys!
+          expect(app.applicants.pluck(:family_member_id).uniq.count).to eql(@transformed[:family][:magi_medicaid_applications].first[:applicants].count)
+        end
       end
 
       context 'load_county_on_inbound_transfer feature is enabled' do
@@ -55,11 +77,44 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
         end
       end
 
+      context "vlp documents" do
+        before do
+          @category_code = @transformed["family"]["family_members"].first["person"]["consumer_role"]["vlp_documents"].first["subject"]
+          @naturalization_number = @transformed["family"]["family_members"].first["person"]["consumer_role"]["vlp_documents"].first["naturalization_number"]
+          @alien_number = @transformed["family"]["family_members"].first["person"]["consumer_role"]["vlp_documents"].first["alien_number"]
+        end
+
+        it "should populate vlp documents on the consumer role" do
+          person = Person.first
+          consumer_role = person.consumer_role
+          active_vlp_doc = consumer_role.vlp_documents.last
+          expect(consumer_role.active_vlp_document_id).to eq active_vlp_doc.id
+          expect(active_vlp_doc.subject).to eq(@category_code)
+          expect(active_vlp_doc.naturalization_number).to eq(@naturalization_number)
+          expect(active_vlp_doc.alien_number).to eq(@alien_number)
+        end
+
+        it "should populate vlp documents on the applicant" do
+          applicant = FinancialAssistance::Application.first.applicants.first
+          expect(applicant.vlp_subject).to eq(@category_code)
+          expect(applicant.alien_number).to eq(@alien_number)
+          expect(applicant.naturalization_number).to eq(@naturalization_number)
+        end
+      end
+
       context 'person ethnicity' do
         it 'should populate person ethnicity using cv3 person demographics ethnicity' do
           person_demographics = @transformed["family"]["family_members"].first["person"]["person_demographics"]
           person = Person.first
           expect(person.ethnicity).to eq person_demographics["ethnicity"]
+        end
+      end
+
+      context 'language preference' do
+        it 'should populate person language preference' do
+          person_demographics = @transformed["family"]["family_members"].first["person"]["consumer_role"]
+          person = Person.first
+          expect(person.consumer_role.language_preference).to match(/#{person_demographics["language_preference"]}/i)
         end
       end
 
@@ -148,6 +203,22 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
           end
         end
       end
+
+      context 'valid attestations' do
+        it 'should create valid attestations for the application' do
+          attributes = @transformed["family"]['magi_medicaid_applications'].first
+          application = FinancialAssistance::Application.find(@result.value!)
+          attestation_vals = { "submission_terms": attributes["submission_terms"],
+                               "medicaid_terms": attributes["medicaid_terms"],
+                               "medicaid_insurance_collection_terms": attributes["medicaid_insurance_collection_terms"],
+                               "parent_living_out_of_home_terms": attributes["parent_living_out_of_home_terms"],
+                               "report_change_terms": attributes["report_change_terms"],
+                               "attestation_terms": attributes["attestation_terms"] }
+
+          attributes = attestation_vals.keys.map { |name| [name, application.attributes[name]] }.to_h
+          expect(attributes).to eq attestation_vals
+        end
+      end
     end
   end
 
@@ -160,7 +231,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
             allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:automatic_submission).and_return(false)
             allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:load_county_on_inbound_transfer).and_return(true)
             missing_counties_xml = Nokogiri::XML(xml)
-            missing_counties_xml.xpath("//ns3:LocationCountyName", {"ns3" => "http://niem.gov/niem/niem-core/2.0"}).remove
+            missing_counties_xml.xpath("//ns3:LocationCountyName", { "ns3" => "http://niem.gov/niem/niem-core/2.0" }).remove
             record = serializer.parse(missing_counties_xml)
             transformed = transformer.transform(record.to_hash(identifier: true)).deep_stringify_keys!
             @result = subject.call(transformed)
@@ -178,7 +249,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
     before do
       ::BenefitMarkets::Locations::CountyZip.create(zip: "04330", state: "ME", county_name: "Kennebec")
       missing_counties_xml = Nokogiri::XML(xml)
-      missing_counties_xml.xpath("//ns3:LocationCountyName", {"ns3" => "http://niem.gov/niem/niem-core/2.0"}).remove
+      missing_counties_xml.xpath("//ns3:LocationCountyName", { "ns3" => "http://niem.gov/niem/niem-core/2.0" }).remove
       record = serializer.parse(missing_counties_xml)
       @transformed = transformer.transform(record.to_hash(identifier: true)).deep_stringify_keys!
     end

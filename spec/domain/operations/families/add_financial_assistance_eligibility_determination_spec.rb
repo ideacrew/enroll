@@ -43,7 +43,7 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
            "middle_name" => nil,
            "last_name" => "final",
            "name_sfx" => nil,
-           "encrypted_ssn" => "62gUZwpIFdWmZN4cmRxkTA==\n",
+           "encrypted_ssn" => "BNBMRqni1M95MDBg/kIb4g==\n",
            "gender" => "male",
            "dob" => "1988-09-01 00:00:00 UTC",
            "is_primary_applicant" => true,

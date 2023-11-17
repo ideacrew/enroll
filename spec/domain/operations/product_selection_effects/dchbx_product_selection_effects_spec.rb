@@ -163,7 +163,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   it "does creates a continuous enrollment for future coverage period after purchase" do
     subject
     %i[prior_plan_year_ivl_sep fehb_market indian_alaskan_tribe_details].each do |feature|
-      EnrollRegistry[feature].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[feature].feature).to receive(:is_enabled).and_return(true)
     end
 
     subject.call(product_selection)
@@ -496,8 +496,12 @@ RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects
     context 'new enrollment in prior plan year for dependent add with previous year active coverage' do
       include_context 'family with two members and one enrollment and one predecessor enrollment with two members with previous year active coverage'
 
+      let(:second_person) { family.family_members[1].person }
+      let!(:consumer_role) { FactoryBot.create(:consumer_role, person: second_person) }
+      let!(:ivl_transition) { FactoryBot.create(:individual_market_transition, person: second_person) }
+
       before do
-        family.family_members[1].person.update_attributes(dob: predecessor_enrollment.effective_on - 10.years)
+        second_person.update_attributes(dob: predecessor_enrollment.effective_on - 10.years)
         expired_enrollment.generate_hbx_signature
         predecessor_enrollment.update_attributes(enrollment_signature: expired_enrollment.enrollment_signature)
         product_selection = Entities::ProductSelection.new({:enrollment => predecessor_enrollment, :product => predecessor_product, :family => family})

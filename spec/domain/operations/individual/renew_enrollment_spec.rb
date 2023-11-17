@@ -190,6 +190,21 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
             expect(@result.success.product_id).to eq(renewal_product.id)
           end
         end
+
+        context 'current enrollment is Coverall kind' do
+          before do
+            enrollment.update_attributes!(kind: 'coverall')
+            enrollment.update_attributes!(elected_aptc_pct: 0.5, applied_aptc_amount: 50.0)
+            eligibilty_determination.update_attributes!(max_aptc: 100.00)
+            @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
+          end
+
+          context 'and APTC determination is present for prospective year coverage' do
+            it 'should not apply aptc values to the renewal enrollment' do
+              expect(@result.success.applied_aptc_amount).to be_zero
+            end
+          end
+        end
       end
 
       context 'renewal enrollment with csr product' do
@@ -278,6 +293,20 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
       end
     end
 
+    context 'enrollment product is catastrophic' do
+      before do
+        tax_household.update_attributes!(effective_starting_on: next_year_date.beginning_of_year)
+        tax_household.tax_household_members.first.update_attributes!(applicant_id: family_member.id)
+        product.update_attributes!(metal_level_kind: 'catastrophic')
+        @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
+      end
+
+      it 'should not apply aptc values to the renewal enrollment' do
+        expect(@result.success.applied_aptc_amount).to be_zero
+        expect(@result.success.elected_aptc_pct).to be_zero
+      end
+    end
+
     context 'with an expired enrollment by aasm state' do
       before :each do
         enrollment.expire_coverage!
@@ -307,12 +336,21 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
                           renewal_product_id: renewal_product.id)
       end
 
+      let(:dental_benefit_package) do
+        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each do |bcp|
+          bcp.benefit_packages.each do |bp|
+            bp.update_attributes!(benefit_categories: ['dental'], title: "individual_dental_benefits_#{effective_on.year}")
+          end
+        end
+      end
+
       before :each do
         enrollment.expire_coverage!
         enrollment.update_attributes!(coverage_kind: 'dental',
                                       elected_aptc_pct: 0.7,
                                       applied_aptc_amount: 100.00,
                                       product_id: product.id)
+        dental_benefit_package
         @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
       end
 
@@ -328,6 +366,19 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
         expect(@result.success.elected_aptc_pct).to be_zero
         expect(@result.success.applied_aptc_amount).to be_zero
       end
+    end
+  end
+
+  context 'enrollment renewal failure' do
+    before do
+      enrollment.hbx_enrollment_members.each { |mbr| mbr.person.update_attributes!(is_incarcerated: true) }
+      subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
+    end
+
+    it 'updates the enrollment successor_creation_failure_reasons' do
+      expect(enrollment.successor_creation_failure_reasons).to include(
+        "Unable to generate renewal for enrollment with hbx_id #{enrollment.hbx_id} due to missing(eligible) enrollment members."
+      )
     end
   end
 

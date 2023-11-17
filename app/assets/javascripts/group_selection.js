@@ -56,7 +56,6 @@ function setGroupSelectionHandlers(){
     }
 
     $('#market_kind_individual').on('change', function() {
-      //debugger;
       disableEmployerSelection();
 
       $('#dental-radio-button').slideDown();
@@ -66,10 +65,11 @@ function setGroupSelectionHandlers(){
       disableIvlIneligible();
       setPrimaryForIvl();
 
+      var ivl_effective_on = $('#ivl_effective_on').val();
+      $("#effective_date_for_display").text(ivl_effective_on);
     });
 
     $('#market_kind_coverall').on('change', function() {
-      //debugger;
       disableEmployerSelection();
 
       $('#dental-radio-button').slideDown();
@@ -80,6 +80,8 @@ function setGroupSelectionHandlers(){
       //setPrimaryForIvl();
       enableIvlEligibleForCoverall();
 
+      var ivl_effective_on = $('#ivl_effective_on').val();
+      $("#effective_date_for_display").text(ivl_effective_on);
     });
 
 
@@ -99,6 +101,9 @@ function setGroupSelectionHandlers(){
       disableShopHealthIneligible(employer_id)
       $(".health_errors_" + employer_id ).show();
       setPrimaryForShop();
+
+      var shop_effective_on = $('#shop_effective_on').val();
+      $("#effective_date_for_display").text(shop_effective_on);
     });
   }
 
@@ -129,11 +134,11 @@ function hideShopErrors() {
 }
 
 function hideIvlErrors() {
-  $('#coverage-household tr td.ivl_errors').hide();
+  $('#coverage-household tr td div.ivl_errors').hide();
 }
 
 function showIvlErrors() {
-  $('#coverage-household tr td.ivl_errors').show();
+  $('#coverage-household tr td div.ivl_errors').show();
 }
 
 

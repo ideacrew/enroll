@@ -2,11 +2,12 @@ class Insured::GroupSelectionController < ApplicationController
   include Insured::GroupSelectionHelper
   include Config::SiteConcern
   include L10nHelper
+  include Insured::FamiliesHelper
 
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   before_action :validate_rating_address, only: [:create]
   before_action :set_cache_headers, only: [:new, :edit_plan]
-  before_action :is_user_authorized?, only: [:edit_plan, :terminate_confirm, :term_or_cancel]
+  before_action :is_user_authorized?, only: [:new, :create, :edit_plan, :terminate_confirm, :term_or_cancel]
   # before_action :set_vars_for_market, only: [:new]
   # before_action :is_under_open_enrollment, only: [:new]
 
@@ -50,6 +51,7 @@ class Insured::GroupSelectionController < ApplicationController
     @shop_under_current = @adapter.shop_under_current
     @shop_under_future = @adapter.shop_under_future
     @new_effective_on = @adapter.calculate_new_effective_on(params)
+    fetch_effective_dates_for_dual_role
 
     @adapter.if_should_generate_coverage_family_members_for_cobra(params) do |cobra_members|
       @coverage_family_members_for_cobra = cobra_members
@@ -98,7 +100,6 @@ class Insured::GroupSelectionController < ApplicationController
     update_tobacco_field(hbx_enrollment.hbx_enrollment_members) if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
 
     if @market_kind == 'shop' || @market_kind == 'fehb'
-
       raise @adapter.no_employer_benefits_error_message(hbx_enrollment) unless hbx_enrollment.sponsored_benefit_package.shoppable?
 
       census_effective_on = @employee_role.census_employee.coverage_effective_on(hbx_enrollment.sponsored_benefit_package)
@@ -230,15 +231,31 @@ class Insured::GroupSelectionController < ApplicationController
 
   private
 
+  def person_has_dual_role?
+    (@person.has_consumer_role? && @person.has_active_employee_role?) || (@person.has_active_employee_role? && @person.has_resident_role?)
+  end
+
+  def fetch_effective_dates_for_dual_role
+    return unless person_has_dual_role?
+
+    @ivl_effective_on = if @person.has_consumer_role?
+                          @adapter.calculate_ivl_effective_on
+                        else
+                          @adapter.calculate_coverall_effective_on
+                        end
+
+    @shop_effective_on = @adapter.calculate_new_effective_on(params)
+  end
+
   def revise_aptc_applied_total(params, enrollment_id)
     aptc_applied = params[:aptc_applied_total].delete_prefix('$')
     hbx_enrollment = HbxEnrollment.find(enrollment_id)
     max_aptc = params[:max_aptc]&.to_f
-    osse_eligible = hbx_enrollment&.ivl_osse_eligible?(hbx_enrollment.effective_on) && ivl_osse_filtering_enabled?
+    osse_eligible = hbx_enrollment&.ivl_osse_eligible? && ivl_osse_filtering_enabled?
     return aptc_applied unless osse_eligible && max_aptc > 0.00
 
     aptc_pct = (aptc_applied.to_f / max_aptc).round(2)
-    aptc_pct < 0.85 ? (max_aptc * 0.85) : aptc_applied
+    aptc_pct < minimum_applied_aptc_pct_for_osse ? (max_aptc * minimum_applied_aptc_pct_for_osse) : aptc_applied
   end
 
   def calculate_elected_aptc_pct(aptc_applied_amount, aggregate_aptc_amount)
@@ -246,10 +263,23 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def is_user_authorized?
-    return true if current_user.has_hbx_staff_role?
-    hbx_enrollment_exists = current_user.person.primary_family.hbx_enrollments.where(id: params.require(:hbx_enrollment_id)).present?
-    raise "HBX enrollment ID does not belong to the user" unless hbx_enrollment_exists
-    true
+    redirect_to root_path if current_user.blank? || (params[:hbx_enrollment_id].blank? && @family.blank?)
+
+    family = params[:hbx_enrollment_id].present? ? HbxEnrollment.where(id: params[:hbx_enrollment_id]).first&.family : @family
+    redirect_to root_path if family.blank?
+
+    return if current_user.has_hbx_staff_role? || is_family_authorized?(current_user, family) || is_broker_authorized?(current_user, family) || is_general_agency_authorized?(current_user, family)
+
+    error_message = 'User not authorized to perform this operation'
+    flash[:error] = error_message
+    redirect_to root_path
+  rescue StandardError => e
+    # The code should robustly handle all authorization use cases, but it's important to understand that there may be exceptional scenarios where we encounter
+    # difficulties in identifying the user and their enrollment relationship.
+    # In such rare instances, we will diligently log these occurrences, take the necessary steps to rectify the issue,
+    # and ensure that the system continues to function without disruption.
+    logger.error "[GroupSelectionController] Failed to authorize user #{current_user.id},
+                  class #{e.class} with message #{e.message}\n#{e.backtrace&.join("\n")}"
   end
 
   def family_member_eligibility_check(family_member)
@@ -262,9 +292,7 @@ class Insured::GroupSelectionController < ApplicationController
            end
     family_member_ids = @family.family_members.active.map(&:id)
 
-    market_kind = @market_kind == "shop" ? "shop" : get_ivl_market_kind(@person)
-
-    rule = InsuredEligibleForBenefitRule.new(role, @benefit, {family: @family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: market_kind, shopping_family_members_ids: family_member_ids})
+    rule = InsuredEligibleForBenefitRule.new(role, @benefit, {family: @family, coverage_kind: @coverage_kind, new_effective_on: @new_effective_on, market_kind: get_ivl_market_kind(@person), shopping_family_members_ids: family_member_ids})
 
     is_ivl_coverage, errors = rule.satisfied?
     person = family_member.person

@@ -15,7 +15,7 @@
       <th>Applied APTC Ratio &nbsp;&nbsp;</th>
       <th>
        <span align= "center"><output id = "aptc_applied_pct_<%=hbx_id%>" name="aptc_applied_pct"><%=find_applied_aptc_percent(@current_aptc_applied_hash[hbx_id].to_f, max_for_hbx)%>%</output></span>
-       <% min_aptc = hbx_values['osse_eligible'] == true ? 0.85 : 0 %>
+       <% min_aptc = hbx_values['osse_eligible'] == true ? minimum_applied_aptc_pct_for_osse : 0 %>
        <input id = "applied_pct_<%=hbx_id%>" name='applied_pct_<%=hbx_id%>' type="range" min="<%= min_aptc %>" max="1" step="0.025" value="<%=(@current_aptc_applied_hash[hbx_id].to_f/max_for_hbx)%>" onchange="APTCModule.computeAppliedAPTC('<%=hbx_id%>', this.value, <%=@max_aptc.to_f%>, <%=max_for_hbx%>);APTCModule.calculateAvailableAPTC('<%=hbx_id%>')" style = "padding: 0px;" data-cuke="aptc_slider">
       </th>
     </tr>

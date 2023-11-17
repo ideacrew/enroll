@@ -23,7 +23,7 @@ module Subscribers
         ack(delivery_info.delivery_tag)
       rescue StandardError => e
         ack(delivery_info.delivery_tag)
-        logger.info "FdshGateway::RrvMdcrDeterminationSubscriber: invoked on_magi_medicaid_application_renewal_eligibilities_mdcr_determined error: #{e.backtrace}"
+        logger.error "FdshGateway::RrvMdcrDeterminationSubscriber: invoked on_magi_medicaid_application_renewal_eligibilities_mdcr_determined error_message: #{e.message}, backtrace: #{e.backtrace}"
       end
     end
   end

@@ -36,6 +36,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::Medicare::A
 
         @application = ::FinancialAssistance::Application.by_hbx_id(response_payload[:hbx_id]).first.reload
         @app_entity = ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(response_payload).success
+        @applicant.reload
       end
 
       it 'should return success' do
@@ -43,9 +44,12 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::Medicare::A
       end
 
       it 'should update applicant verification' do
-        @applicant.reload
         expect(@applicant.non_esi_evidence.aasm_state).to eq "outstanding"
         expect(@result.success).to eq('Successfully updated Applicant with evidences and verifications')
+      end
+
+      it "should record request results" do
+        expect(@applicant.non_esi_evidence.request_results.first.action).to eq "Hub Response"
       end
     end
 
@@ -60,6 +64,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::Medicare::A
 
         @application = ::FinancialAssistance::Application.by_hbx_id(response_payload[:hbx_id]).first.reload
         @app_entity = ::AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(response_payload).success
+        @applicant.reload
       end
 
       it 'should return success' do
@@ -67,9 +72,12 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Rrv::Medicare::A
       end
 
       it 'should update applicant verification' do
-        @applicant.reload
         expect(@applicant.non_esi_evidence.aasm_state).to eq "attested"
         expect(@result.success).to eq('Successfully updated Applicant with evidences and verifications')
+      end
+
+      it "should record request results" do
+        expect(@applicant.non_esi_evidence.request_results.first.action).to eq "Hub Response"
       end
     end
   end

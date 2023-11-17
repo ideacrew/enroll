@@ -3,6 +3,7 @@ class Insured::FamiliesController < FamiliesController
   include Acapi::Notifiers
   include ::ApplicationHelper
   include Config::SiteConcern
+  include Insured::FamiliesHelper
 
   before_action :updateable?, only: [:delete_consumer_broker, :record_sep, :purchase, :upload_notice]
   before_action :init_qualifying_life_events, only: [:home, :manage_family, :find_sep]
@@ -14,51 +15,58 @@ class Insured::FamiliesController < FamiliesController
   before_action :transition_family_members_update_params, only: [:transition_family_members_update]
   before_action :upload_notice_form_enabled?, only: [:upload_notice_form]
   before_action :set_cache_headers, only: [:home, :inbox]
+  before_action :ivl_osse_enabled?, only: [
+    :healthcare_for_childcare_program,
+    :healthcare_for_childcare_program_form,
+    :update_osse_eligibilities
+  ]
+
+  around_action :cache_hbx, only: [:home]
 
   def home
-    Caches::CurrentHbx.with_cache do
-      authorize @family, :show?
-      build_employee_role_by_census_employee_id
-      set_flash_by_announcement
-      set_bookmark_url
-      set_admin_bookmark_url(home_insured_families_path)
-      @active_sep = @family.latest_active_sep
+    authorize @family, :show?
+    build_employee_role_by_census_employee_id
+    set_flash_by_announcement
+    set_bookmark_url
+    set_admin_bookmark_url(home_insured_families_path)
+    @active_sep = @family.latest_active_sep
 
-      log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
+    # rubocop:disable Lint/RedundantStringCoercion
+    log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
+    # rubocop:enable Lint/RedundantStringCoercion
 
-      @hbx_enrollments = @family.enrollments.non_external.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
+    @hbx_enrollments = @family.enrollments.non_external.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
 
-      @all_hbx_enrollments_for_admin = if EnrollRegistry.feature_enabled?(:include_external_enrollment_in_display_all_enrollments)
-                                         @hbx_enrollments + HbxEnrollment.family_canceled_enrollments(@family) + HbxEnrollment.family_external_enrollments(@family)
-                                       else
-                                         @hbx_enrollments + HbxEnrollment.family_canceled_enrollments(@family)
-                                       end
-      # Sort by effective_on again. The latest enrollment will display at the top.
-      @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.sort_by(&:effective_on).reverse
-      @enrollment_filter = @family.enrollments_for_display
+    @all_hbx_enrollments_for_admin = if EnrollRegistry.feature_enabled?(:include_external_enrollment_in_display_all_enrollments)
+                                       @hbx_enrollments + HbxEnrollment.family_canceled_enrollments(@family) + HbxEnrollment.family_external_enrollments(@family)
+                                     else
+                                       @hbx_enrollments + HbxEnrollment.family_canceled_enrollments(@family)
+                                     end
+    # Sort by effective_on again. The latest enrollment will display at the top.
+    @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.sort_by(&:effective_on).reverse
+    @enrollment_filter = @family.enrollments_for_display
 
-      valid_display_enrollments = Array.new
-      @enrollment_filter.each  { |e| valid_display_enrollments.push e['_id'] }
+    valid_display_enrollments = []
+    @enrollment_filter.each  { |e| valid_display_enrollments.push e['_id'] }
 
-      log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| !hbx.is_coverage_waived? && hbx.product.blank?}
-      update_changing_hbxs(@hbx_enrollments)
+    log("#3860 person_id: #{@person.id}", {:severity => "error"}) if @hbx_enrollments.any?{|hbx| !hbx.is_coverage_waived? && hbx.product.blank?}
+    update_changing_hbxs(@hbx_enrollments)
 
-      @hbx_enrollments += HbxEnrollment.family_non_pay_enrollments(@family) if EnrollRegistry.feature_enabled?(:show_non_pay_enrollments)
-      @hbx_enrollments.sort_by!(&:effective_on).reverse!
+    @hbx_enrollments += HbxEnrollment.family_non_pay_enrollments(@family) if EnrollRegistry.feature_enabled?(:show_non_pay_enrollments)
+    @hbx_enrollments.sort_by!(&:effective_on).reverse!
 
-      @employee_role = @person.active_employee_roles.first if is_shop_or_fehb_market_enabled?
-      @tab = params['tab']
-      @family_members = @family.active_family_members
+    @employee_role = @person.active_employee_roles.first if is_shop_or_fehb_market_enabled?
+    @tab = params['tab']
+    @family_members = @family.active_family_members
 
-      if EnrollRegistry.feature_enabled?(:home_tiles_current_and_future_only)
-        @hbx_enrollments = @hbx_enrollments.select { |d| d["effective_on"] >= TimeKeeper.date_of_record.beginning_of_year }
-        @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.select { |d| d["effective_on"] >= TimeKeeper.date_of_record.beginning_of_year }
-      end
+    if EnrollRegistry.feature_enabled?(:home_tiles_current_and_future_only)
+      @hbx_enrollments = @hbx_enrollments.select { |d| d["effective_on"] >= TimeKeeper.date_of_record.beginning_of_year }
+      @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.select { |d| d["effective_on"] >= TimeKeeper.date_of_record.beginning_of_year }
+    end
 
-      respond_to do |format|
-        format.html
-        format.any { head :ok }
-      end
+    respond_to do |format|
+      format.html
+      format.any { head :ok }
     end
   end
 
@@ -169,13 +177,28 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def healthcare_for_childcare_program
+    authorize @family, :healthcare_for_childcare_program?
+
     @childcare_forms = ::Forms::HealthcareForChildcareProgramForm.build_forms_for(@person.primary_family)
   end
 
-  def update_healthcare_for_childcare_program_eligibility
-    ::Forms::HealthcareForChildcareProgramForm.submit_with(healthcare_for_childcare_program_params)
+  def healthcare_for_childcare_program_form
+    authorize @family, :healthcare_for_childcare_program?
 
-    redirect_to(healthcare_for_childcare_program_insured_families_path)
+    @service = ::Services::IvlOsseEligibilityService.new(params.permit(:person_id))
+    @osse_status_by_year = @service.osse_status_by_year
+  end
+
+  def update_osse_eligibilities
+    authorize @family, :healthcare_for_childcare_program?
+    args = params.require(:eligibilities).permit(:person_id, :osse => {})
+    @service = ::Services::IvlOsseEligibilityService.new(args)
+    result = @service.update_osse_eligibilities_by_year
+
+    flash[:notice] = "Sucessfully updated #{@service.person.full_name}'s HC4CC eligibility for years #{result['Success'].join(', ')}" if result["Success"]
+    flash[:error] = "Failed to updated #{@service.person.full_name}'s HC4CC eligibility for years #{result['Failure'].join(', ')}" if result["Failure"]
+
+    redirect_to(healthcare_for_childcare_program_form_insured_families_path(person_id: @service.person.id))
   end
 
   def verification
@@ -275,6 +298,13 @@ class Insured::FamiliesController < FamiliesController
       @enrollment = HbxEnrollment.find(params[:hbx_enrollment_id])
     else
       @enrollment = @family.active_household.hbx_enrollments.active.last if @family.present?
+    end
+
+    family = @enrollment.family
+    unless current_user.has_hbx_staff_role? || is_family_authorized?(current_user, family) || is_broker_authorized?(current_user, family) || is_general_agency_authorized?(current_user, family)
+      flash[:error] = 'User not authorized to perform this operation'
+      redirect_to root_path
+      return
     end
 
     if @enrollment.present?
@@ -457,6 +487,14 @@ class Insured::FamiliesController < FamiliesController
       Rails.logger.error { "Unable to deliver transition notice #{person.hbx_id} due to #{e.inspect}" }
     end
   end
+
+  # rubocop:disable Style/ExplicitBlockArgument
+  def cache_hbx
+    Caches::CurrentHbx.with_cache do
+      yield
+    end
+  end
+  # rubocop:enable Style/ExplicitBlockArgument
 
   def updateable?
     authorize Family, :updateable?

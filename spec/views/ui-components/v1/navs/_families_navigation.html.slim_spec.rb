@@ -15,7 +15,7 @@ RSpec.describe "_families_navigation.html.slim", :type => :view, dbclean: :after
       assign(:person, person)
       assign(:employee_role, nil)
       assign(:family_members, nil)
-      EnrollRegistry["aca_ivl_osse_subsidy"].feature.stub(:is_enabled).and_return(true)
+      EnrollRegistry["aca_ivl_osse_eligibility"].feature.stub(:is_enabled).and_return(true)
     end
 
     context "login as an admin" do

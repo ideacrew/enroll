@@ -40,10 +40,7 @@ module FinancialAssistance
       'stepson_or_stepdaughter',
       'cousin',
       'domestic_partner'
-    ]
-
-    RELATIONSHIPS += ['parents_domestic_partner', 'domestic_partners_child'] if EnrollRegistry.feature_enabled?(:mitc_relationships)
-    RELATIONSHIPS.freeze
+    ] + (EnrollRegistry.feature_enabled?(:mitc_relationships) ? %w[parents_domestic_partner domestic_partners_child] : []).freeze
 
     RELATIONSHIPS_UI = [
       "spouse",
@@ -56,11 +53,7 @@ module FinancialAssistance
       "nephew_or_niece",
       "grandchild",
       'grandparent'
-    ]
-
-    RELATIONSHIPS_UI += ['father_or_mother_in_law', 'daughter_or_son_in_law', 'brother_or_sister_in_law', 'cousin', 'domestic_partners_child', 'parents_domestic_partner'] if EnrollRegistry.feature_enabled?(:mitc_relationships)
-
-    RELATIONSHIPS_UI.freeze
+    ] + (EnrollRegistry.feature_enabled?(:mitc_relationships) ? %w[father_or_mother_in_law daughter_or_son_in_law brother_or_sister_in_law cousin domestic_partners_child parents_domestic_partner] : []).freeze
 
     INVERSE_MAP = {
       "child" => "parent",
@@ -123,6 +116,10 @@ module FinancialAssistance
     def propagate_applicant
       return unless application.draft?
       FinancialAssistance::Operations::Application::RelationshipHandler.new.call({relationship: self})
+    end
+
+    def valid_relationship_kind?
+      ::AcaEntities::MagiMedicaid::Types::RelationshipKind.values.include?(kind)
     end
   end
 end

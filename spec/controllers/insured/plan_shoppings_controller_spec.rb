@@ -40,7 +40,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   let(:cost_calculator) { HbxEnrollmentSponsoredCostCalculator.new(hbx_enrollment) }
 
   before do
-    EnrollRegistry[:extended_aptc_individual_agreement_message].feature.stub(:is_enabled).and_return(false)
+    allow(EnrollRegistry[:extended_aptc_individual_agreement_message].feature).to receive(:is_enabled).and_return(false)
   end
 
   context "POST checkout", :dbclean => :around_each do
@@ -153,7 +153,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
         context 'when send_secure_purchase_confirmation_email enabled' do
           it 'should send secure message' do
-            EnrollRegistry[:send_shop_secure_purchase_confirmation_email].feature.stub(:is_enabled).and_return(true)
+            allow(EnrollRegistry[:send_shop_secure_purchase_confirmation_email].feature).to receive(:is_enabled).and_return(true)
             expect(person.inbox.messages.count).to eq(1)
             get :receipt, params: {id: "id"}
             expect(person.inbox.messages.count).to eq(2)
@@ -163,7 +163,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
         context 'when send_secure_purchase_confirmation_email disabled' do
           it 'should not send secure message' do
-            EnrollRegistry[:send_shop_secure_purchase_confirmation_email].feature.stub(:is_enabled).and_return(false)
+            allow(EnrollRegistry[:send_shop_secure_purchase_confirmation_email].feature).to receive(:is_enabled).and_return(false)
             expect(person.inbox.messages.count).to eq(1)
             get :receipt, params: {id: "id"}
             expect(person.inbox.messages.count).to eq(1)
@@ -180,7 +180,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
         context 'when send_secure_purchase_confirmation_email enabled' do
           it 'should send secure message' do
-            EnrollRegistry[:send_ivl_secure_purchase_confirmation_email].feature.stub(:is_enabled).and_return(true)
+            allow(EnrollRegistry[:send_ivl_secure_purchase_confirmation_email].feature).to receive(:is_enabled).and_return(true)
             expect(person.inbox.messages.count).to eq(1)
             get :receipt, params: {id: "id"}
             expect(person.inbox.messages.count).to eq(2)
@@ -190,7 +190,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
         context 'when send_secure_purchase_confirmation_email disabled' do
           it 'should not send secure message' do
-            EnrollRegistry[:send_ivl_secure_purchase_confirmation_email].feature.stub(:is_enabled).and_return(false)
+            allow(EnrollRegistry[:send_ivl_secure_purchase_confirmation_email].feature).to receive(:is_enabled).and_return(false)
             expect(person.inbox.messages.count).to eq(1)
             get :receipt, params: {id: "id"}
             expect(person.inbox.messages.count).to eq(1)
@@ -240,8 +240,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         controller.instance_variable_set(:@elected_aptc, elected_aptc)
         controller.instance_variable_set(:@max_aptc, max_aptc)
         controller.instance_variable_set(:@aptc_grants, double)
-        EnrollRegistry[:aca_individual_osse_aptc_minimum].feature.stub(:is_enabled).and_return(true)
-        allow_any_instance_of(HbxEnrollment).to receive(:ivl_osse_eligible?).with(start_of_year).and_return(true)
+        allow(EnrollRegistry[:aca_ivl_osse_eligibility].feature).to receive(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:aca_individual_osse_aptc_minimum].feature).to receive(:is_enabled).and_return(true)
+        allow_any_instance_of(HbxEnrollment).to receive(:ivl_osse_eligible?).and_return(true)
         sign_in(user)
       end
 
@@ -265,7 +266,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         controller.instance_variable_set(:@elected_aptc, elected_aptc)
         controller.instance_variable_set(:@max_aptc, max_aptc)
         controller.instance_variable_set(:@aptc_grants, double)
-        EnrollRegistry[:aca_individual_osse_aptc_minimum].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:aca_individual_osse_aptc_minimum].feature).to receive(:is_enabled).and_return(false)
         sign_in(user)
         get :thankyou, params: input_params, session: session_variables
       end
@@ -281,9 +282,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         controller.instance_variable_set(:@elected_aptc, elected_aptc)
         controller.instance_variable_set(:@max_aptc, max_aptc)
         controller.instance_variable_set(:@aptc_grants, double)
-        EnrollRegistry[:aca_individual_osse_aptc_minimum].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:aca_individual_osse_aptc_minimum].feature).to receive(:is_enabled).and_return(false)
         plan.update!(is_hc4cc_plan: true)
-        allow_any_instance_of(HbxEnrollment).to receive(:ivl_osse_eligible?).with(start_of_year).and_return(true)
+        allow_any_instance_of(HbxEnrollment).to receive(:ivl_osse_eligible?).and_return(true)
         sign_in(user)
         get :thankyou, params: input_params, session: session_variables
       end
@@ -345,7 +346,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
     before do
       allow(TimeKeeper).to receive(:date_of_record).and_return(start_of_year)
-      EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
 
       allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
         double(
@@ -451,7 +452,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(sponsored_benefit).to receive(:rate_schedule_date).and_return(rate_schedule_date)
       allow(HbxEnrollmentSponsoredCostCalculator).to receive(:new).with(hbx_enrollment).and_return(cost_calculator)
       allow(cost_calculator).to receive(:groups_for_products).with([product]).and_return([member_group])
-      EnrollRegistry[:enrollment_product_date_match].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:enrollment_product_date_match].feature).to receive(:is_enabled).and_return(true)
     end
 
     it "returns http success" do
@@ -576,7 +577,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         end
 
         it "when existing_coverage_warning setting is on is true & market kind is shop" do
-          EnrollRegistry[:existing_coverage_warning].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:existing_coverage_warning].feature).to receive(:is_enabled).and_return(true)
           sign_in(user)
           get :thankyou, params: {id: "id", plan_id: "plan_id", market_kind: "shop"}
           expect(assigns(:dependent_members)).to eq nil
@@ -592,7 +593,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
       it "when existing_coverage_warning setting is on is false & market kind is shop" do
         allow_any_instance_of(PlanSelection).to receive(:existing_coverage).and_return(nil)
-        EnrollRegistry[:existing_coverage_warning].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:existing_coverage_warning].feature).to receive(:is_enabled).and_return(false)
         sign_in(user)
         get :thankyou, params: {id: "id", plan_id: "plan_id"}
         expect(assigns(:dependent_members)).to eq nil
@@ -707,7 +708,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
 
     it "should redirect to the group selection page if IVL enrollment effective date doesn't match product dates" do
-      EnrollRegistry[:enrollment_product_date_match].feature.stub(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:enrollment_product_date_match].feature).to receive(:is_enabled).and_return(false)
       hbx_enrollment.update_attributes!(effective_on: Date.new(year, 1, 1))
       product.update_attributes!(application_period: Date.new(year - 1, 1, 1)..Date.new(year - 1, 12, 31))
       sign_in(user)
@@ -716,7 +717,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
 
     it "should render thank you page if SHOP enrollment effective date doesn't match product dates" do
-      EnrollRegistry[:enrollment_product_date_match].feature.stub(:is_enabled).and_return(false)
+      allow(EnrollRegistry[:enrollment_product_date_match].feature).to receive(:is_enabled).and_return(false)
       hbx_enrollment.update_attributes!(effective_on: Date.new(year, 1, 1))
       product.update_attributes!(application_period: Date.new(year - 1, 1, 1)..Date.new(year - 1, 12, 31))
       sign_in(user)
@@ -728,6 +729,136 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       sign_in(user)
       get :thankyou, params: {id: hbx_enrollment.id, plan_id: product.id}
       expect(response).to render_template('insured/plan_shoppings/thankyou.html.erb')
+    end
+
+    context 'set_elected_aptc_by_params' do
+      before do
+        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+      end
+
+      it 'does not raise error' do
+        sign_in(user)
+        session_variables = { elected_aptc: 630, max_aptc: 630, aptc_grants: double }
+        expect do
+          get :thankyou, params: { id: hbx_enrollment.id, plan_id: product.id, elected_aptc: 605 }, session: session_variables
+        end.not_to raise_error(NoMethodError)
+      end
+    end
+  end
+
+  context '#set_elected_aptc_by_params', :dbclean => :around_each  do
+    context 'both elected_aptc and aptc in session are same' do
+      let(:elected_aptc) { 637.0 }
+      let(:max_aptc)   { 637.0 }
+      let(:session_variables) { { elected_aptc: elected_aptc, max_aptc: max_aptc, aptc_grants: double } }
+
+      before do
+        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+
+        allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
+          double(
+            call: double(
+              success?: true,
+              value!: max_aptc
+            )
+          )
+        )
+      end
+
+      it 'should not change the elected aptc amount in session' do
+        subject = Insured::PlanShoppingsController.new
+        request = ActionDispatch::Request.new({})
+        request.session = session_variables
+        subject.request = request
+        subject.send(:set_elected_aptc_by_params, elected_aptc)
+        expect(subject.request.session[:elected_aptc]).to eq(elected_aptc)
+      end
+    end
+
+    context 'when max_aptc is zero' do
+      let(:elected_aptc) { 500.0 }
+      let(:max_aptc)   { 0.0 }
+      let(:given_aptc) { 300.0 }
+      let(:session_variables) { { elected_aptc: elected_aptc, max_aptc: max_aptc, aptc_grants: double } }
+
+      before do
+        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+
+        allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
+          double(
+            call: double(
+              success?: true,
+              value!: max_aptc
+            )
+          )
+        )
+      end
+
+      it 'returns zero' do
+        subject = Insured::PlanShoppingsController.new
+        request = ActionDispatch::Request.new({})
+        request.session = session_variables
+        subject.request = request
+        subject.send(:set_elected_aptc_by_params, given_aptc)
+        expect(subject.request.session[:elected_aptc]).to eq(max_aptc)
+      end
+    end
+
+    context 'elected_aptc is greater than the max_aptc and aptc in session' do
+      let(:elected_aptc) { 605.0 }
+      let(:max_aptc)   { 605.0 }
+      let(:aptc_given) { 637.0 }
+      let(:session_variables) { { elected_aptc: elected_aptc, max_aptc: max_aptc, aptc_grants: double } }
+      before do
+        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+        EnrollRegistry[:enroll_app].settings(:default_aptc_percentage).stub(:item).and_return(100)
+        allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
+          double(
+            call: double(
+              success?: true,
+              value!: max_aptc
+            )
+          )
+        )
+      end
+
+      it 'should not change the elected aptc amount in session' do
+        subject = Insured::PlanShoppingsController.new
+        subject.instance_variable_set(:@enrollment, hbx_enrollment)
+        request = ActionDispatch::Request.new({})
+        request.session = session_variables
+        subject.request = request
+        subject.send(:set_elected_aptc_by_params, aptc_given)
+        expect(subject.request.session[:elected_aptc]).to eq(elected_aptc)
+      end
+    end
+
+    context 'elected_aptc is less than the max_aptc and aptc in session' do
+      let(:elected_aptc) { 605.0 }
+      let(:max_aptc)   { 605.0 }
+      let(:aptc_given) { 322.0 }
+      let(:session_variables) { { elected_aptc: elected_aptc, max_aptc: max_aptc, aptc_grants: double } }
+      before do
+        EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+        allow(::Operations::PremiumCredits::FindAptc).to receive(:new).and_return(
+          double(
+            call: double(
+              success?: true,
+              value!: max_aptc
+            )
+          )
+        )
+      end
+
+      it 'should change the elected aptc amount in session to aptc_given' do
+        subject = Insured::PlanShoppingsController.new
+        subject.instance_variable_set(:@enrollment, hbx_enrollment)
+        request = ActionDispatch::Request.new({})
+        request.session = session_variables
+        subject.request = request
+        subject.send(:set_elected_aptc_by_params, aptc_given)
+        expect(subject.request.session[:elected_aptc]).to eq(aptc_given)
+      end
     end
   end
 
@@ -1021,7 +1152,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
           allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
           allow(hbx_enrollment).to receive(:is_coverall?).and_return(false)
           allow(hbx_enrollment).to receive(:decorated_elected_plans).and_return([])
-          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(false)
         end
 
         context "with tax_household" do
@@ -1207,7 +1338,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     describe "plan_selection_callback" do
       let(:coverage_kind){"health"}
-      let(:market_kind){"individual"}
       let(:person) { FactoryBot.create(:person, :with_active_consumer_role, :with_consumer_role) }
       let(:user)  { FactoryBot.create(:user, person: person) }
       let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
@@ -1218,12 +1348,23 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       context "When a callback is received" do
         before do
           sign_in user
-          get :plan_selection_callback, params: { id: hbx_enrollment.id, hios_id: product.hios_id, year: year, market_kind: market_kind, coverage_kind: coverage_kind }
+          get :plan_selection_callback, params: { id: hbx_enrollment.id, hios_id: product.hios_id, year: year, market_kind: 'individual', coverage_kind: coverage_kind }
         end
 
         it "should assign market kind and coverage_kind" do
           expect(assigns(:market_kind)).to be_truthy
           expect(assigns(:coverage_kind)).to be_truthy
+        end
+      end
+
+      context "When a callback is received with no market kind" do
+        before do
+          sign_in user
+          get :plan_selection_callback, params: { id: hbx_enrollment.id, hios_id: product.hios_id, year: year, market_kind: nil, coverage_kind: coverage_kind }
+        end
+
+        it "should assign market kind to enrollment kind" do
+          expect(response).to redirect_to(thankyou_insured_plan_shopping_path(plan_id: product.id.to_s, id: hbx_enrollment.id,coverage_kind: coverage_kind, market_kind: hbx_enrollment.kind, change_plan: nil))
         end
       end
     end

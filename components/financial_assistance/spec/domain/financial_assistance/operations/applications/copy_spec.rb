@@ -42,6 +42,71 @@ RSpec.describe FinancialAssistance::Operations::Applications::Copy, type: :model
                       person_hbx_id: person2.hbx_id)
   end
 
+  describe 'failure results' do
+    context 'invalid aasm state' do
+      before do
+        application.update(aasm_state: 'draft')
+        @result = subject.call(application_id: application.id)
+      end
+
+      it 'should return a hash with simple error message key' do
+        expect(@result.failure.key?(:simple_error_message)).to eq true
+      end
+
+      it 'shoudld return correct message' do
+        valid_states = FinancialAssistance::Operations::Applications::Copy::VALID_APPLICATION_STATES
+        expect(@result.failure[:simple_error_message]).to eq I18n.t('faa.errors.given_application_is_not_submitted_error', valid_states: valid_states)
+      end
+    end
+
+    context 'application id missing in params' do
+      before do
+        @result = subject.call({})
+      end
+
+      it 'should return a hash with simple error message key' do
+        expect(@result.failure.key?(:simple_error_message)).to eq true
+      end
+
+      it 'shoudld return correct message' do
+        expect(@result.failure[:simple_error_message]).to eq I18n.t('faa.errors.key_application_id_missing_error')
+      end
+    end
+
+    context 'copied application is invalid' do
+      before do
+        application.years_to_renew = 100
+        application.save(validate: false)
+        @result = subject.call(application_id: application.id)
+      end
+
+      it 'should return a hash with simple error message and detailed error message keys' do
+        expect(@result.failure.key?(:simple_error_message)).to eq true
+        expect(@result.failure.key?(:detailed_error_message)).to eq true
+      end
+
+      it 'shoudld return correct simple message' do
+        expect(@result.failure[:simple_error_message]).to eq I18n.t('faa.errors.invalid_application')
+      end
+    end
+
+    context 'error in creating new application' do
+      before do
+        allow(FinancialAssistance::Application).to receive(:new).and_raise(StandardError)
+        @result = subject.call(application_id: application.id)
+      end
+
+      it 'should return a hash with simple error message and detailed error message keys' do
+        expect(@result.failure.key?(:simple_error_message)).to eq true
+        expect(@result.failure.key?(:detailed_error_message)).to eq true
+      end
+
+      it 'shoudld return correct simple message' do
+        expect(@result.failure[:simple_error_message]).to eq I18n.t('faa.errors.copy_application_error')
+      end
+    end
+  end
+
   context 'duplicate' do
     context 'Should create relationships if there are no relationship for application and relationships present to primary person' do
       before do

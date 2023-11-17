@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'aasm/rspec'
+
 RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::RequestDetermination, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
@@ -24,11 +26,47 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
                                   last_name: person.last_name,
                                   dob: person.dob,
                                   gender: person.gender,
-                                  ssn: person.ssn,
+                                  ssn: "123456789",
                                   application: application,
                                   ethnicity: [],
                                   is_primary_applicant: true,
                                   person_hbx_id: person.hbx_id,
+                                  is_self_attested_blind: false,
+                                  is_applying_coverage: true,
+                                  is_required_to_file_taxes: true,
+                                  is_filing_as_head_of_household: true,
+                                  is_pregnant: false,
+                                  has_job_income: false,
+                                  has_self_employment_income: false,
+                                  has_unemployment_income: false,
+                                  has_other_income: false,
+                                  has_deductions: false,
+                                  is_self_attested_disabled: true,
+                                  is_physically_disabled: false,
+                                  citizen_status: 'us_citizen',
+                                  has_enrolled_health_coverage: false,
+                                  has_eligible_health_coverage: false,
+                                  has_eligible_medicaid_cubcare: false,
+                                  is_claimed_as_tax_dependent: false,
+                                  is_incarcerated: false,
+                                  net_annual_income: 10_078.90,
+                                  is_post_partum_period: false,
+                                  is_ia_eligible: true)
+    applicant
+  end
+
+  let!(:applicant2) do
+    applicant = FactoryBot.create(:applicant,
+                                  :with_student_information,
+                                  first_name: person2.first_name,
+                                  last_name: person2.last_name,
+                                  dob: person2.dob,
+                                  gender: person2.gender,
+                                  ssn: nil,
+                                  application: application,
+                                  ethnicity: [],
+                                  is_primary_applicant: true,
+                                  person_hbx_id: person2.hbx_id,
                                   is_self_attested_blind: false,
                                   is_applying_coverage: true,
                                   is_required_to_file_taxes: true,
@@ -114,16 +152,249 @@ RSpec.describe Operations::Families::IapApplications::Rrvs::NonEsiEvidences::Req
 
   context 'success' do
     it 'should return success if assistance year is passed' do
-      result = subject.call({application_hbx_id: application.hbx_id, family_hbx_id: family.hbx_assigned_id})
+      result = subject.call({ application_hbx_id: application.hbx_id })
       expect(result).to be_success
     end
   end
 
-  context 'failure' do
-    it "should fail if application_hbx_id is not given" do
-      result = subject.call(family_hbx_id: family.hbx_assigned_id)
-      expect(result).not_to be_success
-     # expect(result.failure).to eq "application hbx_id is missing"
+  context 'success
+- when validate_and_record_publish_application_errors feature is enabled
+- when all applicants are valid' do
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
+      applicant2.update_attributes!(ssn: "756841234")
+      @result = subject.call({ application_hbx_id: application.hbx_id })
+      application.reload
+    end
+
+    it 'should return success' do
+      expect(@result).to be_success
+    end
+
+    it 'should record success for valid applicant1' do
+      non_esi_evidence = application.applicants[0].non_esi_evidence
+      expect(non_esi_evidence.verification_histories.last.action).to eq 'RRV_Submitted'
+    end
+
+    it 'non_esi_evidence state for valid applicant1 is pending' do
+      non_esi_evidence = application.applicants[0].non_esi_evidence
+      expect(non_esi_evidence).to have_state(:pending)
+    end
+
+    it 'should record success for invalid applicant' do
+      non_esi_evidence = application.applicants[1].non_esi_evidence
+      expect(non_esi_evidence.verification_histories.last.action).to eq 'RRV_Submitted'
+    end
+
+    it 'non_esi_evidence for invalid applicant is pending' do
+      non_esi_evidence = application.applicants[1].non_esi_evidence
+      expect(non_esi_evidence).to have_state(:pending)
+    end
+  end
+
+  context 'success
+  - when validate_and_record_publish_application_errors feature is enabled
+  - when all applicants are valid
+  - and one of the applicant does not have non esi evidence' do
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
+      applicant2.update_attributes!(ssn: "756841234", is_applying_coverage: false, is_ia_eligible: false)
+      @result = subject.call({ application_hbx_id: application.hbx_id })
+      application.reload
+    end
+
+    it 'should return success' do
+      expect(@result).to be_success
+    end
+
+    it 'should record success for valid applicant1' do
+      non_esi_evidence = application.applicants[0].non_esi_evidence
+      expect(non_esi_evidence.verification_histories.last.action).to eq 'RRV_Submitted'
+    end
+
+    it 'non_esi_evidence state for valid applicant1 is pending' do
+      non_esi_evidence = application.applicants[0].non_esi_evidence
+      expect(non_esi_evidence).to have_state(:pending)
+    end
+
+    it 'does not have non_esi_evidence for applicant2' do
+      expect(application.applicants[1].non_esi_evidence).to eq nil
+    end
+  end
+
+  context 'success
+  - when validate_and_record_publish_application_errors feature is enabled
+  - when all applicants are valid
+  - and first applicant does not have non esi evidence' do
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
+      applicant.update_attributes!(is_applying_coverage: false, is_ia_eligible: false)
+      applicant2.update_attributes!(ssn: "756841234")
+      @result = subject.call({application_hbx_id: application.hbx_id, family_hbx_id: family.hbx_assigned_id})
+      application.reload
+    end
+
+    it 'should return success' do
+      expect(@result).to be_success
+    end
+
+    it 'should record success for valid applicant2' do
+      non_esi_evidence = application.applicants[1].non_esi_evidence
+      expect(non_esi_evidence.verification_histories.last.action).to eq 'RRV_Submitted'
+    end
+
+    it 'non_esi_evidence state for valid applicant2 is pending' do
+      non_esi_evidence = application.applicants[1].non_esi_evidence
+      expect(non_esi_evidence).to have_state(:pending)
+    end
+
+    it 'does not have non_esi_evidence for applicant1' do
+      expect(application.applicants[0].non_esi_evidence).to eq nil
+    end
+  end
+
+  context 'when validate_and_record_publish_application_errors feature is enabled' do
+    context '- when applicant2 is invalid
+    - and all the applicants have non_esi_evidence' do
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
+        @result = subject.call({ application_hbx_id: application.hbx_id })
+        application.reload
+      end
+
+      it 'should return success' do
+        expect(@result).to be_success
+      end
+
+      it 'should record success for valid applicant1' do
+        non_esi_evidence = application.applicants[0].non_esi_evidence
+        expect(non_esi_evidence.verification_histories.last.action).to eq 'RRV_Submitted'
+      end
+
+      it 'non_esi_evidence for valid applicant1 is pending' do
+        non_esi_evidence = application.applicants[0].non_esi_evidence
+        expect(non_esi_evidence).to have_state(:pending)
+      end
+
+      it 'should record failure for invalid applicant' do
+        non_esi_evidence = application.applicants[1].non_esi_evidence
+        expect(non_esi_evidence.verification_histories.last.action).to eq 'RRV_Submission_Failed'
+      end
+
+      it 'non_esi_evidence for invalid applicant is attested' do
+        non_esi_evidence = application.applicants[1].non_esi_evidence
+        expect(non_esi_evidence).to have_state(:attested)
+      end
+    end
+
+    context '- when applicant2 is invalid
+    - and applicant2 does not have non_esi_evidence' do
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
+        applicant2.update_attributes!(is_applying_coverage: false, is_ia_eligible: false)
+        @result = subject.call({ application_hbx_id: application.hbx_id })
+        application.reload
+      end
+
+      it 'should return success' do
+        expect(@result).to be_success
+      end
+
+      it 'should record success for valid applicant1' do
+        non_esi_evidence = application.applicants[0].non_esi_evidence
+        expect(non_esi_evidence.verification_histories.last.action).to eq 'RRV_Submitted'
+      end
+
+      it 'non_esi_evidence for valid applicant1 is pending' do
+        non_esi_evidence = application.applicants[0].non_esi_evidence
+        expect(non_esi_evidence).to have_state(:pending)
+      end
+
+      it 'does not have non_esi_evidence for applicant2' do
+        expect(application.applicants[1].non_esi_evidence).to eq nil
+      end
+    end
+
+    context '- when all applicants are invalid
+    - and applicants have non_esi_evidence' do
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
+        application.applicants.each do |applicant|
+          applicant.unset(:encrypted_ssn)
+        end
+        application.save!
+        @result = subject.call({ application_hbx_id: application.hbx_id })
+        application.reload
+      end
+
+      it 'should return failure' do
+        expect(@result).to be_failure
+      end
+
+      it 'should record failure for invalid applicant1' do
+        non_esi_evidence = application.applicants[0].non_esi_evidence
+        expect(non_esi_evidence.verification_histories.last.action).to eq 'RRV_Submission_Failed'
+      end
+
+      it 'non_esi_evidence for invalid applicant1 is attested' do
+        non_esi_evidence = application.applicants[0].non_esi_evidence
+        expect(non_esi_evidence).to have_state(:attested)
+      end
+
+      it 'should record failure for invalid applicant1' do
+        non_esi_evidence = application.applicants[1].non_esi_evidence
+        expect(non_esi_evidence.verification_histories.last.action).to eq 'RRV_Submission_Failed'
+      end
+
+      it 'non_esi_evidence for invalid applicant1 is attested' do
+        non_esi_evidence = application.applicants[1].non_esi_evidence
+        expect(non_esi_evidence).to have_state(:attested)
+      end
+    end
+
+    context '- when all applicants are invalid
+    - and applicant2 does not have non_esi_evidence' do
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_and_record_publish_application_errors).and_return(true)
+        application.applicants.each do |applicant|
+          applicant.unset(:encrypted_ssn)
+        end
+        applicant2.update_attributes!(is_applying_coverage: false, is_ia_eligible: false)
+        application.save!
+        @result = subject.call({ application_hbx_id: application.hbx_id })
+        application.reload
+      end
+
+      it 'should return failure' do
+        expect(@result).to be_failure
+      end
+
+      it 'should record failure for invalid applicant1' do
+        non_esi_evidence = application.applicants[0].non_esi_evidence
+        expect(non_esi_evidence.verification_histories.last.action).to eq 'RRV_Submission_Failed'
+      end
+
+      it 'non_esi_evidence for invalid applicant1 is attested' do
+        non_esi_evidence = application.applicants[0].non_esi_evidence
+        expect(non_esi_evidence).to have_state(:attested)
+      end
+
+      it 'does not have non_esi_evidence for applicant2' do
+        expect(application.applicants[1].non_esi_evidence).to eq nil
+      end
+    end
+  end
+
+  context 'without input params' do
+    it 'returns failure with error messages' do
+      expect(subject.call({})).to eq Failure(['application hbx_id is missing'])
     end
   end
 end

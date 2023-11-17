@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class LawfulPresenceDetermination
   SSA_VERIFICATION_REQUEST_EVENT_NAME = "local.enroll.lawful_presence.ssa_verification_request"
   VLP_VERIFICATION_REQUEST_EVENT_NAME = "local.enroll.lawful_presence.vlp_verification_request"
@@ -24,6 +26,8 @@ class LawfulPresenceDetermination
   field :qualified_non_citizenship_result, type:  String
   field :aasm_state, type: String
   embeds_many :workflow_state_transitions, as: :transitional
+
+  attr_accessor :skip_lawful_presence_determination_callbacks
 
   after_create :publish_created_event
   after_update :publish_updated_event
@@ -75,7 +79,14 @@ class LawfulPresenceDetermination
 
   def start_ssa_process
     if EnrollRegistry.feature_enabled?(:ssa_h3)
-      Operations::Fdsh::Ssa::H3::RequestSsaVerification.new.call(self.ivl_role.person)
+      result = Operations::Fdsh::Ssa::H3::RequestSsaVerification.new.call(ivl_role.person)
+      ssa_verification_type = ivl_role.verification_types.ssn_type.first
+
+      if result.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_errors)
+        process_ssa_request_failure(result, ssa_verification_type)
+      else
+        ssa_verification_type&.pending_type
+      end
     else
       notify(SSA_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.ivl_role.person})
     end
@@ -83,7 +94,21 @@ class LawfulPresenceDetermination
 
   def start_vlp_process(requested_start_date)
     if EnrollRegistry.feature_enabled?(:vlp_h92)
-      Operations::Fdsh::Vlp::H92::RequestInitialVerification.new.call(self.ivl_role.person)
+      result = Operations::Fdsh::Vlp::H92::RequestInitialVerification.new.call(ivl_role.person)
+      verification_type = ivl_role.verification_types.active.where(:type_name.in => ["Citizenship", "Immigration status"]).first
+
+      if result.failure? && EnrollRegistry.feature_enabled?(:validate_and_record_publish_errors)
+        verification_type.add_type_history_element(action: "Hub Request Failed", modifier: "System", update_reason: "#{verification_type.type_name} Request Failed due to #{result.failure}")
+        args = OpenStruct.new(determined_at: Time.now, vlp_authority: 'dhs')
+
+        if ivl_role.may_fail_dhs?
+          ivl_role.fail_dhs!(args)
+        else
+          ivl_role.fail_lawful_presence(args)
+        end
+      else
+        verification_type.pending_type
+      end
     else
       notify(VLP_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.ivl_role.person, :coverage_start_date => requested_start_date})
     end
@@ -127,6 +152,7 @@ class LawfulPresenceDetermination
   end
 
   def publish_created_event
+    return if skip_lawful_presence_determination_callbacks
     attrs = { consumer_role_id: ivl_role.id }.merge!(self.changes)
     # TODO: This should be refactored to use created instead of updated.
     event = event('events.individual.consumer_roles.lawful_presence_determinations.updated', attributes: attrs)
@@ -136,6 +162,7 @@ class LawfulPresenceDetermination
   end
 
   def publish_updated_event
+    return if skip_lawful_presence_determination_callbacks
     attrs = { consumer_role_id: ivl_role.id }.merge!(self.changes)
     event = event('events.individual.consumer_roles.lawful_presence_determinations.updated', attributes: attrs)
     event.success.publish if event.success?
@@ -150,5 +177,27 @@ class LawfulPresenceDetermination
       event: aasm.current_event,
       transition_at: Time.now
     )
+  end
+
+  # Method to process the Failure Response from SSA Verification Request when feature :validate_and_record_publish_errors is enabled
+  def process_ssa_request_failure(failure_request_result, ssa_v_type)
+    args = OpenStruct.new(determined_at: Time.now, vlp_authority: 'ssa')
+
+    type_history_params = {
+      action: 'Hub Request Failed',
+      modifier: 'System',
+      update_reason: "SSA Verification Request Failed due to #{failure_request_result.failure}"
+    }
+
+    citizenship_v_type = ivl_role.verification_types.citizenship_type.first
+    # Only handles case where SSN is blank and member is US Citizen
+    if ivl_role.encrypted_ssn.blank? && ivl_role.is_native?
+      citizenship_v_type.add_type_history_element(type_history_params)
+      ivl_role.fail_lawful_presence(args)
+    else
+      ssa_v_type.add_type_history_element(type_history_params)
+      citizenship_v_type.add_type_history_element(type_history_params) if ivl_role.is_native?
+      ivl_role.ssn_invalid!(args)
+    end
   end
 end

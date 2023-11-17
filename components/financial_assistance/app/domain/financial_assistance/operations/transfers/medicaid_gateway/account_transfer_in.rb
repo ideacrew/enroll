@@ -10,6 +10,7 @@ module FinancialAssistance
       module MedicaidGateway
         # This Operation creates a new family and application draft
         # Operation receives ATP payload from medicaid gateway
+        # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/ClassLength
         class AccountTransferIn
           include ::FinancialAssistance::MeCountyHelper
           include Dry::Monads[:result, :do, :try]
@@ -184,7 +185,9 @@ module FinancialAssistance
           end
 
           def build_application(payload, family)
-            app_params = payload["family"]['magi_medicaid_applications'].first.merge!(family_id: family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5)
+            app = payload["family"]['magi_medicaid_applications'].first
+            # years_to_renew needs to be merged with a hash rocket to properly merge with the existing years_to_renew key
+            app_params = app.merge!(family_id: family.id, benchmark_product_id: BSON::ObjectId.new, "years_to_renew" => 5)
             app_params["assistance_year"] = FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s
             ::FinancialAssistance::Operations::Application::Create.new.call(params: app_params.except('applicants').merge(applicants: []))
           rescue StandardError => e
@@ -203,6 +206,8 @@ module FinancialAssistance
               @family_member = fam_result.value!
               consumer_role_params = family_member_hash['person']['consumer_role']
               create_or_update_consumer_role(consumer_role_params.merge(is_consumer_role: true), @family_member)
+              create_or_update_vlp_documents(consumer_role_params['vlp_documents'], @person) if consumer_role_params['vlp_documents']
+              Success(@person.consumer_role)
             else
               first_name = family_member_hash['person']['person_name']['first_name']
               last_name = family_member_hash['person']['person_name']['last_name']
@@ -253,10 +258,14 @@ module FinancialAssistance
             Failure("create_or_update_family_member: #{e}")
           end
 
-          def create_or_update_vlp_document(applicant_params, person)
-            ::Operations::People::CreateOrUpdateVlpDocument.new.call(params: { applicant_params: applicant_params, person: person })
+          def create_or_update_vlp_documents(vlp_documents, person)
+            failed_results = vlp_documents.each_with_object([]) do |vlp_document, failures|
+              result = ::Operations::People::CreateOrUpdateVlpDocument.new.call(params: { applicant_params: vlp_document, person: person })
+              failures << result.failure unless result.success?
+            end
+            Failure("Failed to create or update VLP document(s): #{failures}") if failed_results.present?
           rescue StandardError => e
-            Failure("create_or_update_vlp_document: #{e}")
+            Failure("create_or_update_vlp_documents: #{e}")
           end
 
           def create_or_update_relationship(person, family, relationship_kind)
@@ -295,12 +304,13 @@ module FinancialAssistance
             Failure("same_address_with_primary: #{e}")
           end
 
-          def sanitize_applicant_params(iap_hash, primary) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity
+          def sanitize_applicant_params(iap_hash, primary)
             sanitize_params = []
             applicants = iap_hash['applicants']
             applicants.each do |applicant_hash|
               family_member = @family.family_members.select do |fm|
-                fm.person.first_name.downcase == applicant_hash['name']['first_name'].downcase &&
+                fm.person.dob == applicant_hash['demographic']['dob'].to_date &&
+                  fm.person.first_name.downcase == applicant_hash['name']['first_name'].downcase &&
                   fm.person.last_name.downcase == applicant_hash['name']['last_name'].downcase
               end.first
               citizen_status_info = applicant_hash['citizenship_immigration_status_information']
@@ -345,7 +355,21 @@ module FinancialAssistance
                 is_resident_role: applicant_hash['is_resident_role'],
                 is_applying_coverage: applicant_hash['is_applying_coverage'],
                 is_consent_applicant: applicant_hash['is_consent_applicant'],
-                vlp_document: applicant_hash['vlp_document'],
+
+                vlp_subject: applicant_hash['vlp_subject'],
+                alien_number: applicant_hash['alien_number'],
+                i94_number: applicant_hash['i94_number'],
+                visa_number: applicant_hash['visa_number'],
+                passport_number: applicant_hash['passport_number'],
+                sevis_id: applicant_hash['sevis_id'],
+                naturalization_number: applicant_hash['naturalization_number'],
+                receipt_number: applicant_hash['receipt_number'],
+                citizenship_number: applicant_hash['citizenship_number'],
+                card_number: applicant_hash['card_number'],
+                country_of_citizenship: applicant_hash['country_of_citizenship'],
+                vlp_description: applicant_hash['vlp_description'],
+                expiration_date: applicant_hash['expiration_date'],
+                issuing_country: applicant_hash['issuing_country'],
 
                 person_hbx_id: family_member.person.hbx_id,
                 ext_app_id: applicant_hash['person_hbx_id'],
@@ -494,7 +518,7 @@ module FinancialAssistance
           def fill_applicants_form(payload, application) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
             applications = payload["family"]['magi_medicaid_applications'].first
             applications[:applicants].each do |applicant|
-              persisted_applicant = application.applicants.where(first_name: /^#{applicant[:first_name]}$/i, last_name: /^#{applicant[:last_name]}$/i).first
+              persisted_applicant = application.applicants.where(first_name: /^#{applicant[:first_name]}$/i, last_name: /^#{applicant[:last_name]}$/i, dob: applicant[:dob]).first
               return Failure("No matching applicant") unless persisted_applicant.present?
               claimed_by = application.applicants.where(ext_app_id: applicant[:claimed_as_tax_dependent_by]).first
               persisted_applicant.is_physically_disabled = applicant[:is_physically_disabled]
@@ -569,6 +593,7 @@ module FinancialAssistance
             end
             result.success? ? Success("recorded transferred_at") : Failure("could not set transferred_at")
           end
+           # rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/CyclomaticComplexity, Metrics/ClassLength
 
         end
       end

@@ -53,6 +53,22 @@ end
 
 World(EmployerWorld)
 
+And(/^there is employer (.*?) with a OSSE eligibility$/) do |legal_name|
+  step "there is an employer #{legal_name}"
+
+  organization = @organization[legal_name]
+  employer_profile = organization.employer_profile
+
+  ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(
+    {
+      subject: employer_profile.active_benefit_sponsorship.to_global_id,
+      evidence_key: :shop_osse_evidence,
+      evidence_value: 'true',
+      effective_date: TimeKeeper.date_of_record.beginning_of_year
+    }
+  )
+end
+
 And(/^there is an employer (.*?)$/) do |legal_name|
   employer legal_name, legal_name: legal_name, dba: legal_name
   benefit_sponsorship(employer(legal_name))
@@ -121,6 +137,13 @@ end
 Given(/a consumer role person with family/) do
   person = people['Patrick Doe']
   @person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, first_name: 'Employee', last_name: person[:last_name], ssn: person[:ssn], dob: person[:dob])
+  FactoryBot.create :family, :with_primary_family_member, person: @person
+  FactoryBot.create(:user, person: @person, email: person[:email], password: person[:password], password_confirmation: person[:password])
+end
+
+Given(/a resident role person with family/) do
+  person = people['Patrick Doe']
+  @person = FactoryBot.create(:person, :with_resident_role, first_name: 'Employee', last_name: person[:last_name], dob: person[:dob])
   FactoryBot.create :family, :with_primary_family_member, person: @person
   FactoryBot.create(:user, person: @person, email: person[:email], password: person[:password], password_confirmation: person[:password])
 end

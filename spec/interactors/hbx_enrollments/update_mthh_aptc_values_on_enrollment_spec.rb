@@ -7,6 +7,10 @@ RSpec.describe ::HbxEnrollments::UpdateMthhAptcValuesOnEnrollment, :dbclean => :
     TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 6, 1))
   end
 
+  after :all do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+  end
+
   let!(:site_key) { EnrollRegistry[:enroll_app].setting(:site_key).item.upcase }
   let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
   let!(:family)        { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person) }
@@ -126,7 +130,7 @@ RSpec.describe ::HbxEnrollments::UpdateMthhAptcValuesOnEnrollment, :dbclean => :
     cr2 = FactoryBot.build(:consumer_role, :contact_method => "Paper Only")
     family.family_members[2].person.consumer_role = cr2
     family.save!
-    EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+    allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
     allow(UnassistedPlanCostDecorator).to receive(:new).and_return(double(total_ehb_premium: 1500, total_premium: 1600))
   end
 

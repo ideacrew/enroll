@@ -8,7 +8,7 @@ RSpec.describe "events/addresses/_address.haml.erb", dbclean: :after_each do
   let!(:us_county) { BenefitMarkets::Locations::CountyFips.create({ state_postal_code: 'ME',  county_fips_code: '23003', county_name: 'Aroostook'}) }
   context 'county fips code is enabled' do
     before do
-      EnrollRegistry[:enroll_app].setting(:county_fips_code_enabled).stub(:item).and_return(true)
+      allow(EnrollRegistry[:enroll_app].setting(:county_fips_code_enabled)).to receive(:item).and_return(true)
       render :partial => "events/addresses/address", :collection => individual.contact_addresses
       @doc = Nokogiri::XML(rendered)
     end
@@ -19,7 +19,7 @@ RSpec.describe "events/addresses/_address.haml.erb", dbclean: :after_each do
   end
   context 'county fips code is disabled' do
     before do
-      EnrollRegistry[:enroll_app].setting(:county_fips_code_enabled).stub(:item).and_return(false)
+      allow(EnrollRegistry[:enroll_app].setting(:county_fips_code_enabled)).to receive(:item).and_return(false)
       render :partial => "events/addresses/address", :collection => individual.contact_addresses
       @doc = Nokogiri::XML(rendered)
     end

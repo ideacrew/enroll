@@ -64,6 +64,7 @@ module SponsoredBenefits
           @plan_design_organization.plan_design_proposals.detect do |proposal|
             proposal.id.to_s == val
           end
+
         if @proposal.present?
           @profile = @proposal.profile
           prepopulate_attributes
@@ -81,8 +82,7 @@ module SponsoredBenefits
           .strftime('%Y-%m-%d')
         @quote_date = @proposal.updated_at.strftime('%m/%d/%Y')
         sponsorship = @proposal.profile.benefit_sponsorships.first
-        @osse_eligibility ||= 'true' if sponsorship &&
-                                        osse_eligibility_with(sponsorship).present?
+        @osse_eligibility ||= 'true' if osse_eligibility_with(sponsorship)&.is_eligible_on?(TimeKeeper.date_of_record)
       end
 
       def ensure_proposal
@@ -166,11 +166,14 @@ module SponsoredBenefits
             enrollment_dates[:effective_period]
           benefit_application.open_enrollment_period =
             enrollment_dates[:open_enrollment_period]
-
-          create_or_term_osse_eligibility(sponsorship)
         end
 
-        @proposal.save!
+        if @proposal.save
+          create_or_term_osse_eligibility(sponsorship) if sponsorship
+          true
+        else
+          false
+        end
       end
 
       def has_reference_plan_assigned?
@@ -232,16 +235,14 @@ module SponsoredBenefits
       end
 
       def osse_eligibility_with(benefit_sponsorship)
-        benefit_sponsorship.eligibility_for(:osse_subsidy, effective_date)
+        benefit_sponsorship&.eligibility_on(effective_date)
       end
 
       def create_or_term_osse_eligibility(benefit_sponsorship)
         return unless osse_eligibility.present?
 
-        osse_eligibility_present =
-          osse_eligibility_with(benefit_sponsorship).present?
-
-        if osse_eligibility_present
+        eligibility_record = benefit_sponsorship.eligibility_on(effective_date)
+        if eligibility_record&.is_eligible_on?(TimeKeeper.date_of_record)
           terminate_eligibility(benefit_sponsorship) if osse_eligibility.to_s == 'false'
           return
         end
@@ -254,36 +255,25 @@ module SponsoredBenefits
         end
       end
 
-      def create_eligibility(benefit_sponsorship)
-        result =
-          ::Operations::Eligibilities::Osse::BuildEligibility.new.call(
-            osse_eligibility_params(benefit_sponsorship)
-          )
-        return unless result.success?
-
-        eligibility =
-          benefit_sponsorship.eligibilities.build(result.success.to_h)
-        eligibility.save!
+      def osse_eligibility_params(benefit_sponsorship)
+        {
+          subject: benefit_sponsorship.to_global_id,
+          evidence_key: :bqt_osse_evidence,
+          evidence_value: osse_eligibility.to_s,
+          effective_date: @effective_date
+        }
       end
 
-      # do we need to term eligibilities for roster employees??
-      def terminate_eligibility(benefit_sponsorship)
-        ::Operations::Eligibilities::Osse::TerminateEligibility.new.call(
-          {
-            subject_gid: benefit_sponsorship.to_global_id.to_s,
-            evidence_key: :osse_subsidy,
-            termination_date: [TimeKeeper.date_of_record, effective_date].max
-          }
+      def create_eligibility(benefit_sponsorship)
+        ::SponsoredBenefits::Operations::BenefitSponsorships::BqtOsseEligibilities::CreateBqtOsseEligibility.new.call(
+          osse_eligibility_params(benefit_sponsorship)
         )
       end
 
-      def osse_eligibility_params(benefit_sponsorship)
-        {
-          subject_gid: benefit_sponsorship.to_global_id,
-          evidence_key: :osse_subsidy,
-          evidence_value: osse_eligibility,
-          effective_date: effective_date
-        }
+      def terminate_eligibility(benefit_sponsorship)
+        ::SponsoredBenefits::Operations::BenefitSponsorships::BqtOsseEligibilities::CreateBqtOsseEligibility.new.call(
+          osse_eligibility_params(benefit_sponsorship)
+        )
       end
 
       def osse_eligibile?

@@ -7,6 +7,8 @@ module FinancialAssistance
     before_action :set_current_person
     before_action :find_application, :except => [:index, :index_with_filter, :new, :copy, :uqhp_flow, :review, :raw_application, :checklist_pdf]
 
+    around_action :cache_current_hbx, :only => [:index_with_filter]
+
     include ActionView::Helpers::SanitizeHelper
     include ::UIHelpers::WorkflowController
     include Acapi::Notifiers
@@ -26,12 +28,20 @@ module FinancialAssistance
     end
 
     def index_with_filter
-      @applications = FinancialAssistance::Application.where("family_id" => get_current_person.financial_assistance_identifier)
-      @filtered_applications = params.dig(:filter, :year).present? && !params.dig(:filter, :year).nil? ? @applications.where(:assistance_year => params[:filter][:year]) : @applications
-      @filtered_applications = @filtered_applications.desc(:created_at)
-
-      determined_apps = @filtered_applications.where(:aasm_state => "determined")
-      @recent_determined_hbx_id = determined_apps.where(:assistance_year => determined_apps.map(&:assistance_year).max).desc(:submitted_at).first&.hbx_id
+      result = FinancialAssistance::Operations::Applications::QueryFilteredApplications.new.call(
+        {
+          family_id: get_current_person.financial_assistance_identifier,
+          filter_year: params.dig(:filter, :year)
+        }
+      )
+      if result.success?
+        value = result.value!
+        @applications = value[:applications]
+        @filtered_applications = value[:filtered_applications]
+        @recent_determined_hbx_id = value[:recent_determined_hbx_id]
+      else
+        render json: result.failure.to_h, status: 422
+      end
     end
 
     def new
@@ -112,7 +122,7 @@ module FinancialAssistance
 
         redirect_to redirect_path
       else
-        flash[:error] = copy_result.failure
+        flash[:error] = copy_result.failure[:simple_error_message]
         redirect_to applications_path
       end
     rescue StandardError => e
@@ -312,6 +322,14 @@ module FinancialAssistance
 
       redirect_to application_checklist_application_path(@application)
     end
+
+    # rubocop:disable Style/ExplicitBlockArgument
+    def cache_current_hbx
+      ::Caches::CurrentHbx.with_cache do
+        yield
+      end
+    end
+    # rubocop:enable Style/ExplicitBlockArgument
 
     private
 

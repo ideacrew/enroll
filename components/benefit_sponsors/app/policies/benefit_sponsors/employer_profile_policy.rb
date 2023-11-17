@@ -59,8 +59,18 @@ module BenefitSponsors
 
     def updateable?
       return false if (user.blank? || user.person.blank?)
-      return true if  (user.has_hbx_staff_role? && can_modify_employer?) || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record)
+      return true if  (user.has_hbx_staff_role? && can_modify_employer?) || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record) || is_broker_staff_role_for_employer?(record)
       is_staff_role_for_employer?(record)
+    end
+
+    def osse_eligibilities?
+      return false if user.blank? || user.person.blank?
+
+      user.has_hbx_staff_role? && user.person.hbx_staff_role.permission.can_edit_osse_eligibility
+    end
+
+    def update_osse_eligibilities?
+      osse_eligibilities?
     end
 
     def can_read_inbox?

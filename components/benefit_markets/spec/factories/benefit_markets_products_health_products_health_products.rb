@@ -17,6 +17,7 @@ FactoryBot.define do
     deductible           { "$500 per person" }
     family_deductible    { "$500 per person | $1000 per group" }
     is_hc4cc_plan        { false }
+    csr_variant_id       { "04" }
 
     product_package_kinds { [:single_product, :single_issuer, :metal_level] }
     sequence(:hios_id, (10..99).cycle)  { |n| "41842DC04000#{n}-01" }
@@ -26,6 +27,7 @@ FactoryBot.define do
 
     transient do
       build_premium_tables true
+      premium_factor { 0 } # multiplier for premium increments
       issuer_name { 'BlueChoice' }
     end
 
@@ -116,7 +118,7 @@ FactoryBot.define do
 
     after(:build) do |product, evaluator|
       if evaluator.build_premium_tables
-        product.premium_tables << build_list(:benefit_markets_products_premium_table, 1, effective_period: product.application_period,
+        product.premium_tables << build_list(:benefit_markets_products_premium_table, 1, effective_period: product.application_period, premium_factor: evaluator.premium_factor,
                                                                                          rating_area: FactoryBot.create(:benefit_markets_locations_rating_area, active_year: product.application_period.min.year))
       end
     end
