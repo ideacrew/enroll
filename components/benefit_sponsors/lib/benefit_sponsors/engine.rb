@@ -8,6 +8,7 @@ require 'language_list'
 require 'interactor'
 require 'dry-container'
 require 'dry-auto_inject'
+require 'dry-configurable'
 
 module BenefitSponsors
   class Engine < ::Rails::Engine
