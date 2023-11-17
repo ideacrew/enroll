@@ -3,6 +3,7 @@
 class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   include FloatHelper
   include Config::AcaHelper
+
   attr_accessor :enrollment, :renewal_coverage_start, :assisted, :aptc_values
 
   CAT_AGE_OFF_HIOS_IDS = ["94506DC0390008", "86052DC0400004"]
@@ -24,7 +25,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
     # elected aptc should be the minimun between applied_aptc and EHB premium.
     renewal_enrollment = assisted_enrollment(renewal_enrollment) if @assisted.present? && renewal_enrollment.is_health_enrollment?
-    renewal_enrollment.renew_enrollment
+    transition_enrollment(renewal_enrollment)
     verify_and_set_osse_minimum_aptc(renewal_enrollment) if @assisted
     renewal_enrollment.update_osse_childcare_subsidy
     save_renewal_enrollment(renewal_enrollment)
@@ -79,9 +80,11 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   end
 
   def populate_aptc_hash(renewal_enrollment)
-    # Prevents applying APTC to catastrophic enrollment plans irrespective of which tax model is used
-    return unless renewal_enrollment.product.can_use_aptc?
+    # APTC is only calculated here when the Multi Tax Household feature is enabled
+    # Legacy APTC calculation is done in Operations::Individual::RenewEnrollment
     return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
+    # blocks aptc calculation if renewal has a catastrophic product
+    return unless renewal_enrollment.product.can_use_aptc?
 
     aptc_op = ::Operations::PremiumCredits::FindAptc.new.call({
                                                                 hbx_enrollment: renewal_enrollment,
@@ -378,6 +381,19 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
       message = "Enrollment: #{@enrollment.hbx_id}, \n" \
       "Error(s): \n #{renewal_enrollment.errors.map{|k,v| "#{k} = #{v}"}.join(" & \n")} \n"
       @logger.info message
+    end
+  end
+
+  def subscriber_dropped?(renewal_enrollment)
+    EnrollRegistry.feature_enabled?(:generate_initial_enrollment_on_subscriber_drop) &&
+      renewal_enrollment.hbx_enrollment_members.map(&:applicant_id).exclude?(enrollment.subscriber.applicant_id)
+  end
+
+  def transition_enrollment(renewal_enrollment)
+    if subscriber_dropped?(renewal_enrollment)
+      renewal_enrollment.select_coverage!
+    else
+      renewal_enrollment.renew_enrollment
     end
   end
 end

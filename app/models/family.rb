@@ -1416,7 +1416,11 @@ class Family
     return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
     return if !effective_date.is_a?(Date) || active_thhg(effective_date.year).blank?
 
-    deactivated = ::Operations::TaxHouseholdGroups::Deactivate.new.call({ family: self, new_effective_date: effective_date })
+    deactivated = ::Operations::TaxHouseholdGroups::Deactivate.new.call({
+                                                                          deactivate_action_type: 'current_and_prospective',
+                                                                          family: self,
+                                                                          new_effective_date: effective_date
+                                                                        })
 
     if deactivated.failure?
       Rails.logger.error { "Failed to deactivate tax household groups for family with hbx_id: #{hbx_assigned_id}, Failure: #{deactivated.failure}" }
