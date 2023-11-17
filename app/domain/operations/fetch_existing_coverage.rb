@@ -41,7 +41,8 @@ module Operations
       family_ids = []
       enrollment_members.each do |enr_member|
         person = enr_member&.person
-        family_ids << Family.find_all_by_person(person).pluck(:id) if person.present?
+        # family_ids << Family.find_all_by_person(person).pluck(:id) if person.present?
+        family_ids << Family.find_primary_applicant_by_person(person).pluck(:id) if person.present?
       end
       family_ids.count > 0 ? Success(family_ids.uniq.flatten) : Failure('No families found for members')
     end
