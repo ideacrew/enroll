@@ -203,7 +203,7 @@ jobs:
           path: vendor/bundle
           key: benefit_sponsors-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
-            benefit_sponsors-
+            benefit_sponsors-${{ hashFiles('**/Gemfile.lock') }}
       - name: bundle install
         run: |
           gem update --system --quiet --silent
