@@ -103,7 +103,7 @@ jobs:
           path: vendor/bundle
           key: v5-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
-            v5-${{ matrix.engine-name }}-
+            v5-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
       - name: bundle install
         run: |
           gem update --system --quiet --silent
