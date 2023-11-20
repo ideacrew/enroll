@@ -89,9 +89,7 @@ resetIcons() {
 validateLength(value) {
   if (value.length >= 8 && value.length < 20) {
     document.querySelector('.length').classList.add('fa-check');
-    document.getElementById('length').style.color = '#bef470';
     document.querySelector('.longer').classList.add('fa-check');
-    document.getElementById('longer').style.color = '#bef470';
   } else if (value.length < 8 && this.usernameFieldTarget.value.length > 0) {
     this.resetIcons();
   }
@@ -100,7 +98,6 @@ validateLength(value) {
 validateUpCase(value) {
   if (value.match(/[A-Z]/)) {
     document.querySelector('.upper').classList.add('fa-check');
-    document.getElementById('upper').style.color = '#bef470';
   } else {
     document.querySelector('.upper').classList.remove('fa-check');
     document.querySelector('.upper').classList.add('fa-times');
@@ -111,7 +108,6 @@ validateUpCase(value) {
 validateNumber(value) {
   if (value.match(/[0-9]/)) {
     document.querySelector('.number').classList.add('fa-check');
-    document.getElementById('number').style.color = '#bef470';
   } else {
     document.querySelector('.number').classList.remove('fa-check');
     document.querySelector('.number').classList.add('fa-times');
@@ -122,7 +118,6 @@ validateNumber(value) {
 validateSpecialCharacters(value) {
   if (value.match(/.[!,@,#,$,%,^,&,*,?,_,~,-,(,)]/)) {
     document.querySelector('.spec_char').classList.add('fa-check');
-    document.getElementById('spec_char').style.color = '#bef470';
   } else {
     document.querySelector('.spec_char').classList.remove('fa-check');
     document.querySelector('.spec_char').classList.add('fa-times');
@@ -133,7 +128,6 @@ validateSpecialCharacters(value) {
 validateLowerCase(value) {
   if (value.match(/[a-z]/)) {
     document.querySelector('.lower').classList.add('fa-check');
-    document.getElementById('lower').style.color = '#bef470';
   } else {
     document.querySelector('.lower').classList.remove('fa-check');
     document.querySelector('.lower').classList.add('fa-times');
@@ -163,7 +157,6 @@ validateRepeatedChar(value) {
       document.getElementById('mtt').style.color = '';
     } else {
       document.querySelector('.mtt').classList.add('fa-check');
-      document.getElementById('mtt').style.color = '#bef470';
     }
   }
 }
@@ -174,7 +167,6 @@ validateWhiteSpace(value) {
     document.getElementById('wh_space').style.color = '';
   } else {
     document.querySelector('.wh_space').classList.add('fa-check');
-    document.getElementById('wh_space').style.color = '#bef470';
   }
 }
 
@@ -184,7 +176,6 @@ validateUserIdMatch(value) {
     document.getElementById('nm_uid').style.color = '';
   } else {
     document.querySelector('.nm_uid').classList.add('fa-check');
-    document.getElementById('nm_uid').style.color = '#bef470';
   }
 }
 
