@@ -408,11 +408,12 @@ class Family
         Rails.logger.warn("**********************en.aasm_state #{en.aasm_state}****************************")
         Rails.logger.warn("**********************terminated_on #{en.terminated_on}****************************")
         Rails.logger.warn("**********************enrollment.effective_on.prev_day #{enrollment.effective_on.prev_day}****************************")
+        Rails.logger.warn("**********************result0 #{HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES}****************************")
         Rails.logger.warn("**********************result1 #{HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(en.aasm_state)}****************************")
         Rails.logger.warn("**********************result2 #{(en.aasm_state == 'coverage_expired' && en.effective_on >= enrollment.effective_on.beginning_of_year && en.effective_on <= enrollment.effective_on.end_of_year)}****************************")
         Rails.logger.warn("**********************result3 #{(HbxEnrollment::TERMINATED_STATUSES.include?(en.aasm_state) && en.terminated_on >= enrollment.effective_on.prev_day) }****************************")
         
-        HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(en.aasm_state) ||
+        ["coverage_selected", "transmitted_to_carrier", "coverage_enrolled", "coverage_termination_pending", "unverified", "coverage_reinstated", "auto_renewing", "renewing_coverage_selected", "renewing_transmitted_to_carrier", "renewing_coverage_enrolled", "auto_renewing_contingent", "renewing_contingent_selected", "renewing_contingent_transmitted_to_carrier", "renewing_contingent_enrolled"].include?(en.aasm_state) ||
         (HbxEnrollment::TERMINATED_STATUSES.include?(en.aasm_state) && en.terminated_on >= enrollment.effective_on.prev_day) ||
         (en.aasm_state == 'coverage_expired' && en.effective_on >= enrollment.effective_on.beginning_of_year && en.effective_on <= enrollment.effective_on.end_of_year)
       end.sort_by { |object| object.effective_on }.reverse
