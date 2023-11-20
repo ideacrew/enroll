@@ -19,7 +19,7 @@ module Services
       if EnrollRegistry.feature_enabled?(:async_expire_and_begin_coverages)
         Rails.logger.error "async_expire_and_begin_coverages feature flag is enabled but async expire_individual_market_enrollments still needs to be implemented!"
       else
-        @logger.info "Started expire_individual_market_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
+        @logger.info "Started expire_individual_market_enrollments process at #{TimeKeeper.datetime_of_record}"
         current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
         batch_size = 500
         offset = 0
@@ -30,9 +30,6 @@ module Services
         )
         @logger.info "Total enrollments to expire count: #{individual_market_enrollments.count}"
         while offset <= individual_market_enrollments.count
-  
-          # insert new async code here
-          # use each with index and log with index
           individual_market_enrollments.offset(offset).limit(batch_size).no_timeout.each do |enrollment|
             enrollment.expire_coverage! if enrollment.may_expire_coverage?
             @logger.info "Processed enrollment: #{enrollment.hbx_id}"
@@ -50,7 +47,7 @@ module Services
       if EnrollRegistry.feature_enabled?(:async_expire_and_begin_coverages)
         Rails.logger.error "async_expire_and_begin_coverages feature flag is enabled but async begin_coverage_for_ivl_enrollments still needs to be implemented!"
       else
-        @logger.info "Started begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
+        @logger.info "Started begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record}"
         current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
         batch_size = 500
         offset = 0
@@ -74,7 +71,7 @@ module Services
           offset += batch_size
         end
         @logger.info "Total IVL auto renewing enrollment processed count: #{count}"
-        @logger.info "Ended begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
+        @logger.info "Ended begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record}"
       end
     end
 
