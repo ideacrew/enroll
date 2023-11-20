@@ -792,3 +792,36 @@ describe HbxEnrollment, "with index definitions" do
     HbxEnrollment.create_indexes
   end
 end
+
+describe '#can_make_changes_for_ivl_enrollment?' do
+  let(:hbx_enrollment) { HbxEnrollment.new }
+  context 'when enrollment_plan_tile_update feature is disabled' do
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:enrollment_plan_tile_update).and_return(false)
+      hbx_enrollment.can_make_changes_for_ivl_enrollment?
+    end
+
+    it 'returns original count' do
+      expect(HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.count).to be 14
+    end
+
+    it 'should not have coverage_terminated' do
+      expect(HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES).not_to include('coverage_terminated')
+    end
+  end
+
+  context 'when enrollment_plan_tile_update feature is enabled' do
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:enrollment_plan_tile_update).and_return(true)
+      hbx_enrollment.can_make_changes_for_ivl_enrollment?
+    end
+
+    it 'returns original count' do
+      expect(HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.count).to be 14
+    end
+
+    it 'should not have coverage_terminated' do
+      expect(HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES).not_to include('coverage_terminated')
+    end
+  end
+end
