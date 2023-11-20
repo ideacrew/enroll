@@ -55,8 +55,7 @@ class HbxEnrollment
   CANCELED_STATUSES   = %w[coverage_canceled void].freeze # Void state enrollments are invalid enrollments. will be treated same as canceled.
   RENEWAL_STATUSES    = %w(auto_renewing renewing_coverage_selected renewing_transmitted_to_carrier renewing_coverage_enrolled
                               auto_renewing_contingent renewing_contingent_selected renewing_contingent_transmitted_to_carrier
-                              renewing_contingent_enrolled
-                            )
+                              renewing_contingent_enrolled).freeze
   WAIVED_STATUSES     = %w(inactive renewing_waived)
 
   ENROLLED_AND_RENEWAL_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES
