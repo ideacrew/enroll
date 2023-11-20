@@ -53,12 +53,12 @@ class HbxEnrollment
   SELECTED_AND_WAIVED = %w(coverage_selected inactive)
   TERMINATED_STATUSES = %w[coverage_terminated unverified coverage_expired].freeze
   CANCELED_STATUSES   = %w[coverage_canceled void].freeze # Void state enrollments are invalid enrollments. will be treated same as canceled.
-  RENEWAL_STATUSES    = %w(auto_renewing renewing_coverage_selected renewing_transmitted_to_carrier renewing_coverage_enrolled
-                              auto_renewing_contingent renewing_contingent_selected renewing_contingent_transmitted_to_carrier
-                              renewing_contingent_enrolled).freeze
+  RENEWAL_STATUSES    = %w[auto_renewing renewing_coverage_selected renewing_transmitted_to_carrier renewing_coverage_enrolled
+                          auto_renewing_contingent renewing_contingent_selected renewing_contingent_transmitted_to_carrier
+                          renewing_contingent_enrolled].freeze
   WAIVED_STATUSES     = %w(inactive renewing_waived)
 
-  ENROLLED_AND_RENEWAL_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES
+  ENROLLED_AND_RENEWAL_STATUSES = (ENROLLED_STATUSES + RENEWAL_STATUSES).freeze
 
   ENROLLED_RENEWAL_WAIVED_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES + WAIVED_STATUSES
   TERM_REASONS = %w[non_payment voluntary_withdrawl retroactive_canceled].freeze

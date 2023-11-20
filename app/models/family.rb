@@ -409,6 +409,8 @@ class Family
         Rails.logger.warn("**********************terminated_on #{en.terminated_on}****************************")
         Rails.logger.warn("**********************enrollment.effective_on.prev_day #{enrollment.effective_on.prev_day}****************************")
         Rails.logger.warn("**********************result0 #{HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES}****************************")
+        Rails.logger.warn("**********************result01 #{HbxEnrollment::ENROLLED_STATUSES}****************************")
+        Rails.logger.warn("**********************result02 #{HbxEnrollment::RENEWAL_STATUSES}****************************")
         Rails.logger.warn("**********************result1 #{HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(en.aasm_state)}****************************")
         Rails.logger.warn("**********************result2 #{(en.aasm_state == 'coverage_expired' && en.effective_on >= enrollment.effective_on.beginning_of_year && en.effective_on <= enrollment.effective_on.end_of_year)}****************************")
         Rails.logger.warn("**********************result3 #{(HbxEnrollment::TERMINATED_STATUSES.include?(en.aasm_state) && en.terminated_on >= enrollment.effective_on.prev_day) }****************************")
