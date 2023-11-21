@@ -141,6 +141,123 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
 end
 
 describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "when:
+ - there is no current coverage
+ - there is no prior coverage
+ - there is open enrollment
+ - the selection is IVL and sep is added for prior coverage year
+  ", dbclean: :after_each do
+
+  let(:consumer_role) { FactoryBot.create(:consumer_role) }
+  let(:family) do
+    FactoryBot.create(:family,
+                      :with_primary_family_member,
+                      person: consumer_role.person)
+  end
+  let(:prior_coverage_year) { Date.today.year - 1 }
+
+  let(:product) do
+    FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual,
+                                                                                application_period: Date.new(prior_coverage_year,1,1)..Date.new(prior_coverage_year,12,31),
+                                                                                kind: :health, csr_variant_id: '01')
+  end
+  let(:qle) { FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual") }
+  let(:sep) {  FactoryBot.create(:special_enrollment_period, effective_on: Date.new(prior_coverage_year, 11, 1), family: family, coverage_renewal_flag: false, qualifying_life_event_kind_id: qle.id)}
+
+
+  let(:prior_ivl_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      :individual_unassisted,
+                      :with_enrollment_members,
+                      enrollment_members: family.family_members,
+                      special_enrollment_period_id: sep.id,
+                      household: family.active_household,
+                      effective_on: Date.new(prior_coverage_year, 11, 1),
+                      family: family,
+                      consumer_role_id: consumer_role.id,
+                      product: product)
+  end
+
+  let(:product_selection) do
+    Entities::ProductSelection.new({:enrollment => prior_ivl_enrollment, :product => product, :family => family})
+  end
+
+  let(:current_coverage_year) { Date.today.year }
+
+  let!(:hbx_profile) do
+    FactoryBot.create(:hbx_profile,
+                      :current_oe_period_with_past_coverage_periods,
+                      coverage_year: current_coverage_year)
+  end
+
+  subject do
+    hbx_profile.benefit_sponsorship.benefit_coverage_periods.last.update(open_enrollment_start_on: Date.new(current_coverage_year, 11, 1),
+                                                                         open_enrollment_end_on: Date.new(current_coverage_year, 12, 31))
+
+    product_selection
+    allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_coverage_year, 11, 15))
+    allow(family).to receive(:current_sep).and_return sep
+    Operations::ProductSelectionEffects::DchbxProductSelectionEffects
+  end
+
+  it "does not creates a continuous enrollment for future coverage period after purchase" do
+    subject
+    %i[prior_plan_year_ivl_sep fehb_market indian_alaskan_tribe_details].each do |feature|
+      allow(EnrollRegistry[feature].feature).to receive(:is_enabled).and_return(false)
+    end
+
+    subject.call(product_selection)
+    family.reload
+    enrollments = family.hbx_enrollments.sort_by(&:effective_on)
+    expect(enrollments.length).to eq 1
+    expect(enrollments.last.effective_on.year).to eq prior_coverage_year
+  end
+end
+
+describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "when:
+- there is current coverage in active state
+- there is prior coverage in expired state
+- there is a renewal coverage
+- there is open enrollment
+- the selection is IVL and sep is added for prior coverage year
+- and prior_plan_year ivl sep feature is disabled
+", dbclean: :after_each do
+
+  include_context 'family has prior, current and renewal year coverage and in open enrollment and purchased new coverage in prior year via SEP'
+
+  let(:product_selection) do
+    Entities::ProductSelection.new({:enrollment => prior_ivl_enrollment, :product => prior_product, :family => family})
+  end
+
+  subject do
+    current_product
+    prior_ivl_enrollment_2
+    current_ivl_enrollment
+    renewal_ivl_enrollment
+    product_selection
+    allow(family).to receive(:current_sep).and_return sep
+    Operations::ProductSelectionEffects::DchbxProductSelectionEffects
+  end
+
+  it 'prior coverage gets terminated and new prior coverage gets created with no change in current and renewal coverage' do
+    sep.update_attributes(end_on: Date.new(current_coverage_year, 11, 15))
+    subject
+    prior_ivl_enrollment.generate_hbx_signature
+    allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_coverage_year, 11, 15))
+    %i[prior_plan_year_ivl_sep].each do |feature|
+      EnrollRegistry[feature].feature.stub(:is_enabled).and_return(false)
+    end
+    subject.call(product_selection)
+    family.reload
+    enrollments = family.hbx_enrollments
+    expect(enrollments.length).to eq 4
+    expect(enrollments.by_year(prior_coverage_year).count).to eq 2
+    expect(enrollments.by_year(current_coverage_year).count).to eq 1
+    expect(enrollments.by_year(current_coverage_year + 1).count).to eq 1
+
+  end
+end
+
+describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "when:
 - there is no current coverage
 - there is no prior coverage
 - there is no open enrollment
