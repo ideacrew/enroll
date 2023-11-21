@@ -283,16 +283,20 @@ validateEmail() {
 
 validateEmailFormat() {
   let email = this.optionalEmailTarget.value;
-  if (!this.isEmail(email)) {
-    Swal.fire({
-      title: 'Invalid Email Entered',
-      type: 'error',
-      text: 'The email entered is not in a valid format, please check your entry and submit the information again.',
-      onClose: () => {
-        this.usernameFieldTarget.value = '';
-      }
-    });
-    this.optionalEmailTarget.value = '';
+  let username = this.usernameFieldTarget.value;
+  // if email field is blank or username field is blank, allow user to keyboard navigate through to sign in link or live chat widget
+  if(email != '' || username != '') {
+    if (!this.isEmail(email)) {
+      Swal.fire({
+        title: 'Invalid Email Entered',
+        type: 'error',
+        text: 'The email entered is not in a valid format, please check your entry and submit the information again.',
+        onClose: () => {
+          this.usernameFieldTarget.value = '';
+        }
+      });
+      this.optionalEmailTarget.value = '';
+    }
   }
 }
 
@@ -316,9 +320,12 @@ passwordsMatch() {
 }
 
 preventEnterSubmission(event) {
-  if (event.keyCode === 13 || event.code === "Enter") {
-    event.preventDefault();
-    event.stopPropagation();
+  let submitButton = document.getElementById('submit-button');
+  if(submitButton._focusedElement) {
+    if (event.keyCode === 13 || event.code === "Enter") {
+      event.preventDefault();
+      event.stopPropagation();
+    }
   }
 }
 
