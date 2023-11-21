@@ -1,8 +1,8 @@
 require 'tempfile'
 
-AUDIT_START_DATE = Date.new(2022,1,1)
-AUDIT_END_DATE = Date.new(2023,1,1)
-PASSIVE_RENEWAL_DATE = Time.mktime(2021,10,24,0,0,0)
+AUDIT_START_DATE = Date.new(2022,11,1)
+AUDIT_END_DATE = Date.new(2023,7,1)
+PASSIVE_RENEWAL_DATE = Time.mktime(2022,11,1,0,0,0)
 
 class PersonAuditListener
   include AmqpClientHelpers
@@ -37,7 +37,7 @@ class PersonAuditListener
   end
 
   def subscribe
-    @benefit_packages = IvlEligibilityAudits::AuditQueryCache.benefit_packages_for(2022)
+    @benefit_packages = IvlEligibilityAudits::AuditQueryCache.benefit_packages_for(2023)
     @queue.subscribe(:block => true, :manual_ack => true) do |delivery_info, properties, payload|
       headers = properties.headers || {}
       person_id = headers["person_id"]
@@ -73,7 +73,7 @@ class PersonAuditListener
   end
   
   def calc_eligibility_for(cr, family, benefit_packages, ed)
-    effective_date = (ed < Date.new(2022,1,1)) ? Date.new(2022,1,1) : ed.to_date
+    effective_date = (ed < Date.new(2023,1,1)) ? Date.new(2023,1,1) : ed.to_date
     all_eligibilities = benefit_packages.map do |hbp|
       [
         hbp,

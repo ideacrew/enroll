@@ -1,5 +1,5 @@
-AUDIT_START_DATE = Date.new(2022,1,1)
-AUDIT_END_DATE = Date.new(2023,1,1)
+AUDIT_START_DATE = Date.new(2022,11,1)
+AUDIT_END_DATE = Date.new(2023,7,1)
 STDOUT.puts "Standard caching complete."
 STDOUT.flush
 
