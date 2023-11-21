@@ -22,14 +22,14 @@ RSpec.describe ::Operations::HbxEnrollments::Expire, dbclean: :after_each do
     let(:result) { described_class.new.call(params) }
 
     describe 'where enrollment is not an ivl enrollment' do
-        before do
-            enrollment.update(kind: 'employer_sponsored')
-        end
+      before do
+        enrollment.update(kind: 'employer_sponsored')
+      end
 
-        it 'fails due to invalid enrollment kind' do
-            expect(result.success?).to be_falsey
-            expect(result.failure).to eq("Unable to expire enrollment hbx id #{enrollment.hbx_id} - employer_sponsored is not a valid IVL enrollment kind")
-        end
+      it 'fails due to invalid enrollment kind' do
+        expect(result.success?).to be_falsey
+        expect(result.failure).to eq("Unable to expire enrollment hbx id #{enrollment.hbx_id} - employer_sponsored is not a valid IVL enrollment kind")
+      end
     end
   end
 

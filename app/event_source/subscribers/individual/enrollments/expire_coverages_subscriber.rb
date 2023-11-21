@@ -10,10 +10,17 @@ module Subscribers
         @logger = subscriber_logger_for(:on_enroll_individual_enrollments_expire_coverages_request)
         payload = JSON.parse(response, symbolize_names: true)
         enrollment_hbx_id = payload[:enrollment_hbx_id]
+
         @logger.info "ExpireCoveragesSubscriber, response: #{payload}"
         @logger.info "------------ Processing enrollment: #{enrollment_hbx_id}, index_id: #{payload[:index_id]} ------------"
+        result = Operations::HbxEnrollments::Expire.new.call(payload)
         @logger.info "Processed enrollment: #{enrollment_hbx_id}"
 
+        if result.success?
+          @logger.info result.value!
+        else
+          @logger.error result.failure
+        end
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e
         @logger.error "ExpireCoveragesSubscriber, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
