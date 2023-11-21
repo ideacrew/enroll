@@ -173,7 +173,8 @@ module Services
     end
 
     def send_reminder_notices_for_ivl(date)
-      return if families_for_ivl_reminder_notices.blank?
+      families = families_for_ivl_reminder_notices
+      return if families.blank?
 
       @logger.info '*' * 50
       @logger.info "Started send_reminder_notices_for_ivl process at #{TimeKeeper.datetime_of_record}"
