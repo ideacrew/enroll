@@ -40,7 +40,7 @@
 - if step == 1 && search_page == true
   = link_to "Continue", insured_consumer_role_index_path(person: @person_params), method: :post, class: 'btn btn-lg btn-primary  btn-block'
 - elsif step == 1
-  %span{class: 'btn btn-lg btn-primary btn-br btn-block', onclick: 'PersonValidations.manageRequiredValidations($(this));'} CONTINUE
+  %span{tabindex: '0', id: 'continue_button', class: 'btn btn-lg btn-primary btn-br btn-block', onkeydown: 'handleButtonKeyDown(event, "continue_button");', onclick: 'PersonValidations.manageRequiredValidations($(this));'} CONTINUE
   %button.btn.btn-lg.btn-primary.btn-br.btn-block.interaction-click-control-continue.hidden{type: 'submit'}
     CONTINUE
 - elsif ridp == true && step == 2
@@ -77,3 +77,12 @@
   show_account_button: step > 2 && EnrollRegistry.feature_enabled?(:back_to_account_all_shop),
   is_complete: step == 6,
   show_help_button: step != 1 && step < 6}
+
+:javascript
+  function handleButtonKeyDown(event, buttonId) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const button = document.getElementById(buttonId);
+      button.click();
+    }
+  }
