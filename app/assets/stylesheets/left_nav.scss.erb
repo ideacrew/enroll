@@ -138,7 +138,7 @@
   }
   .cna {
     cursor: not-allowed !important;
-    color:#909090 !important;
+    color: var(--secondary-font-color, #909090);
   }
 
   .cna {
@@ -211,7 +211,7 @@
   font-weight: 600;
 }
 .activer > a {
-  background: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+  background: var(--theme-primary-100, <%= EnrollRegistry[:qle_carousel].settings(:color).item %>);
   font-weight: 600;
 }
 
