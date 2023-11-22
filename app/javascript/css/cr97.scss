@@ -1,11 +1,12 @@
 :root {
-    --secondary-font-color: #676C72; //This should be used for secondary text throughout the page
-    --theme-primary-100: #3B6B90; //This should always be used as the primary blue
-    --theme-secondary: #3D5D6F; //This should be used as a secondary darker blue
-    --error-color: #D42537;
+    --secondary-font-color: #676C72; //used for secondary text
+    --bold-font-color: #323130;
+    --theme-primary-100: #3B6B90; //used as the primary blue
+    --theme-secondary: #3D5D6F; //used as a secondary darker blue
+    --error-color: #D42537; //used for error messages and buttons
     --primary-white: #ffffff;
     --primary-black: #000000;
-    --alert-notice-green: #62703E;
+    --alert-notice-green: #62703E; //used for success messages
 
     --font: Barlow, sans-serif;
     --default-font-color: #323130;

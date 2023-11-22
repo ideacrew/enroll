@@ -52,24 +52,30 @@
       <%= f.label :no_ssn, :value => true do %>
         <span class='no_ssn'>&nbsp;<%= l10n("do_not_have_ssn") %></span>
       <% end %>
-      <span><i class='fa fa-question-circle' id="no_ssn_tooltip" data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.no_ssn_tooltip")%>"></i></span>
+      <span>
+        <i tabindex="0" class='fa fa-question-circle' id="no_ssn_tooltip" data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.no_ssn_tooltip")%>">
+          <span class="hide"> "<%=l10n("insured.consumer_roles.search.no_ssn_tooltip")%>"</span>
+        </i>
+      </span>
     </div>
 
     <div class="col-lg-1 col-md-2 col-sm-2 col-xs-2 form-group form-group-lg no-pd border_bottom_zero">
       <div class="radio">
-        <%= f.radio_button :gender, "male", class: "required floatlabel", id: 'radio_male', required: true %>
-        <label for="radio_male"><span>MALE</span></label>
+        <%= f.radio_button :gender, "male", class: "required floatlabel", id: "radio_male", checked: true %>
+        <label for="radio_male" tabindex="0" role="button" aria-pressed="true" onkeydown="handleRadioKeyDown(event, 'radio_male', 'radio_female')"><span>MALE</span></label>
       </div>
     </div>
     <div class="col-lg-1 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
       <div class="radio">
-        <%= f.radio_button :gender, "female", class: "required floatlabel", id: 'radio_female', required: true %>
-        <label class="female" for="radio_female"><span>FEMALE</span></label>
+        <%= f.radio_button :gender, "female", class: "required floatlabel", id: "radio_female", checked: false %>
+        <label for="radio_female" tabindex="0" role="button" aria-pressed="false" onkeydown="handleRadioKeyDown(event, 'radio_female', 'radio_male')"><span>FEMALE</span></label>
       </div>
     </div>
-    <span>
-      <i class='fa fa-question-circle no-pd pull-right' id="gender-tooltip" data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.gender_tooltip")%>"></i>
-    </span>
+  <span>
+    <i tabindex="0" class='fa fa-question-circle no-pd pull-right' id="gender-tooltip" data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.gender_tooltip")%>">
+      <span class="hide"> "<%=l10n("insured.consumer_roles.search.gender_tooltip")%>"</span>
+    </i>
+  </span>
   </div>
 </div>
 
@@ -82,3 +88,42 @@
     Freebies.floatlabels();
   });
 </script>
+
+<script type="text/javascript">
+  function handleRadioKeyDown(event, radioId, otherRadioId) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const radio = document.getElementById(radioId);
+      const otherRadio = document.getElementById(otherRadioId);
+      radio.checked = true;
+      otherRadio.checked = false;
+      radio.setAttribute("aria-pressed", "true");
+      otherRadio.setAttribute("aria-pressed", "false");
+      if (radio.id === 'is_applying_coverage_false') {
+        document.querySelector('.tribal-container').classList.remove('hide');
+      } else if (radio.id === 'indian-tribe-member-no') {
+        document.querySelector('.tribal-container').classList.add('hide');
+      }
+    }
+  }
+</script>
+
+<script type="text/javascript">
+  function handleRadioKeyDown(event, radioId, otherRadioId) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const radio = document.getElementById(radioId);
+      const otherRadio = document.getElementById(otherRadioId);
+      radio.checked = true;
+      otherRadio.checked = false;
+      radio.setAttribute("aria-pressed", "true");
+      otherRadio.setAttribute("aria-pressed", "false");
+      if (radio.id === 'is_applying_coverage_false') {
+        document.getElementById('ssn-coverage-msg').style.display = 'block';
+      } else if (radio.id === 'is_applying_coverage_true') {
+        document.getElementById('ssn-coverage-msg').style.display = 'none';
+      }
+    }
+  }
+</script>
+
