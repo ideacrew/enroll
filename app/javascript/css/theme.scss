@@ -16,16 +16,16 @@
 }
 
 .invalid-feedback {
-  color: var(--error-text-color, #dc3545)
+  color: var(--error-color, #dc3545)
 }
 
 .btn-primary {
   text-transform: uppercase;
   font-weight: 600;
-  border-color: var(--error-color);
+  border-color: var(--error-color, #e72b2d);
   border-bottom-width: medium;
   color: var(--grey-000);
-  background-color: var(--error-color);
+  background-color: var(--error-color, #e72b2d);
 
   &:hover:not(:disabled) {
     background-color: var(--error-shade);
