@@ -136,6 +136,7 @@ group :development, :test do
   gem 'dotenv-rails'
   gem 'action-cable-testing'
   gem 'addressable',            '~> 2.3'
+  gem 'axe-core-cucumber'
   # gem 'bundler-audit',          '~> 0.6'
   gem 'brakeman'
   gem 'climate_control',        '~> 0.2.0'
