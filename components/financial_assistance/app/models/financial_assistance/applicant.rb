@@ -1284,12 +1284,12 @@ module FinancialAssistance
       TimeKeeper.date_of_record + verification_document_due.days
     end
 
-    def enrolled_with(enrollment)
+    def enrolled_with(enrollment, subscriber_logger = nil)
       EVIDENCES.each do |evidence_type|
         evidence = self.send(evidence_type)
         next unless evidence.present?
         aptc_or_csr_used = enrollment.applied_aptc_amount > 0 || ['02', '04', '05', '06'].include?(enrollment.product.csr_variant_id)
-        Rails.logger.info "************************EnrollmentSubscriber, redetermine_family_eligibility for enrolled_with #{enrollment.aasm_state} | #{aptc_or_csr_used} | #{evidence.aasm_state}************************"
+        subscriber_logger.info "************************EnrollmentSubscriber, redetermine_family_eligibility for enrolled_with #{enrollment.aasm_state} | #{aptc_or_csr_used} | #{evidence.aasm_state}************************"
         if aptc_or_csr_used && ['pending', 'negative_response_received'].include?(evidence.aasm_state)
           set_evidence_outstanding(evidence)
         elsif !aptc_or_csr_used
