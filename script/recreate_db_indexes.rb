@@ -6,8 +6,9 @@
 
 start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 (Dir["#{Rails.root}/app/models/**/*.rb"] + Dir["#{Rails.root}/components/*/app/models/**/*.rb"]).each { |model_path| require model_path }
-all_collection_names = Mongoid.default_client.database.collection_names.sort
-all_mongoid_models = Mongoid.models.sort_by(&:name)
+
+# All models that include Mongoid::Document, including inherited models
+all_mongoid_models = ObjectSpace.each_object(Class).select { |klass| klass < Mongoid::Document }.sort_by(&:name)
 
 def time_elapsed(start_time)
   end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -19,7 +20,7 @@ end
 
 all_mongoid_models.each do |model|
   p "Checking if #{model.name} is an eligible model to process"
-  if all_collection_names.exclude?(model.collection_name.to_s) || model.index_specifications.empty?
+  if model.embedded? || model.index_specifications.empty?
     p "----- Ineligible model #{model.name}, skipping. -----"
     next
   else
@@ -34,3 +35,21 @@ rescue Mongo::Error::OperationFailure => e
 end
 
 time_elapsed(start_time)
+
+__END__
+
+all_collection_models = []
+all_non_embedded_models = []
+all_cyclic_models = []
+all_models_without_indexes = []
+
+all_mongoid_models.each do |model|
+  if model.index_specifications.empty?
+    all_models_without_indexes << model
+    next
+  end
+
+  all_collection_models << model if all_collection_names.include?(model.collection_name.to_s)
+  all_non_embedded_models << model unless model.embedded?
+  all_cyclic_models << model if model.cyclic?
+end

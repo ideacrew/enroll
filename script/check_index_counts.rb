@@ -14,11 +14,11 @@ correction_list = []
 
 (Dir["#{Rails.root}/app/models/**/*.rb"] + Dir["#{Rails.root}/components/*/app/models/**/*.rb"]).each { |model_path| require model_path }
 
-all_collection_names = Mongoid.default_client.database.collection_names
-all_mongoid_models = Mongoid.models.sort_by(&:name)
+# All models that include Mongoid::Document, including inherited models
+all_mongoid_models = ObjectSpace.each_object(Class).select { |klass| klass < Mongoid::Document }.sort_by(&:name)
 
 all_mongoid_models.each do |model|
-  next if all_collection_names.exclude?(model.collection_name.to_s) || model.index_specifications.empty?
+  next if model.embedded? || model.index_specifications.empty?
 
   actual_indexes = model.collection.indexes.count - 1
   specified_indexes = model.index_specifications.count
