@@ -48,15 +48,11 @@ module Services
     def process_async_expiration_requests
       @logger.info "Started generating IVL coverage expiration requests at #{TimeKeeper.datetime_of_record}"
       current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
-      # individual_market_enrollments = HbxEnrollment.where(
-      #   :effective_on.lt => current_benefit_period.start_on,
-      #   :kind.in => ["individual", "coverall"],
-      #   :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ["coverage_termination_pending"]
-      # )
-
-      # testing appscan codesweep false positive behavior
-      individual_market_enrollments = HbxEnrollment.where(effective_on: Date.today, kind: 'individual')
-
+      individual_market_enrollments = HbxEnrollment.where(
+        :effective_on.lt => current_benefit_period.start_on,
+        :kind.in => ["individual", "coverall"],
+        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ["coverage_termination_pending"]
+      )
       @logger.info "Total enrollments to expire count: #{individual_market_enrollments.count}"
       individual_market_enrollments.no_timeout.each_with_index do |enrollment, index|
         trigger_expiration_request_event(enrollment, index)
