@@ -1379,7 +1379,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
     end
 
-    context "cobra with auto renewal enrollments" , dbclean: :after_each do
+    context "cobra with auto renewal enrollments", dbclean: :after_each do
       include_context "setup expired, active and renewing benefit applications"
 
       let!(:current_benefit_market_catalog) do
@@ -1404,7 +1404,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
       let!(:census_employee) do
         census_employee = create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: active_benefit_package, hired_on: hired_on,
-                                 employee_role_id: employee_role.id)
+                                                                            employee_role_id: employee_role.id)
         assignment = census_employee.create_benefit_package_assignment(expired_benefit_package, expired_benefit_package.start_on)
         assignment.is_active = true
         assignment.save
