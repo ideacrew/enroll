@@ -21,6 +21,8 @@
     2. Severity: `High`
     3. Cause: Code includes an expression with the `where` keyword.
     4. False positive reasons:
-        1. Enroll utilizes MongoDB for data storage instead of SQL
+        1. There is no user input being sent to the `.where` query: `.where(:"applicants.is_ia_eligible" => true)`
+        2. The only parameter based on user input is already cast to an integer: `assistance_year = ENV['assistance_year'].to_i`
+        3. The query is called in a script that is run manually and internally.
     5. Approved Cases:
         1. PR: https://github.com/ideacrew/enroll/pull/3130, file: script/export_rrv_families.rb
