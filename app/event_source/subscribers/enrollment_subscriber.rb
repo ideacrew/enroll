@@ -95,15 +95,16 @@ module Subscribers
 
     def redetermine_family_eligibility(subscriber_logger, payload)
       enrollment = GlobalID::Locator.locate(payload[:gid])
+      Rails.logger.info "************************EnrollmentSubscriber, redetermine_family_eligibility for enrollment #{enrollment.hbx_id} | #{enrollment.aasm_state} | #{enrollment.shopping?}************************"
       return if enrollment.shopping? || Rails.env.test?
 
       family = enrollment.family
       assistance_year = enrollment.effective_on.year
-
+      Rails.logger.info "************************EnrollmentSubscriber, redetermine_family_eligibility for ENROLLED_AND_RENEWAL_STATUSES #{HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(enrollment.aasm_state)}************************"
       if HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(enrollment.aasm_state)
         family.fail_negative_and_pending_verifications
         application = fetch_application(enrollment)
-        subscriber_logger.info "EnrollmentSubscriber, redetermine_family_eligibility for enrollment #{enrollment.hbx_id} with the application #{application&.hbx_id}"
+        subscriber_logger.info "************************EnrollmentSubscriber, redetermine_family_eligibility for enrollment #{enrollment.hbx_id} with the application #{application&.hbx_id}************************"
         application&.enrolled_with(enrollment)
       end
 
@@ -119,9 +120,9 @@ module Subscribers
                       application_hbx_id = thhe&.tax_household&.tax_household_group&.application_id
                       ::FinancialAssistance::Application.where(hbx_id: application_hbx_id).first
                     end
-
+                    Rails.logger.info "************************EnrollmentSubscriber, redetermine_family_eligibility for fetch_application #{application.hbx_id}************************"
       return application if application.present?
-
+      Rails.logger.info "************************EnrollmentSubscriber, redetermine_family_eligibility for fetch_application #{enrollment.family.active_financial_assistance_application(enrollment.effective_on.year).hbx_id}************************"
       enrollment.family.active_financial_assistance_application(enrollment.effective_on.year)
     end
 
