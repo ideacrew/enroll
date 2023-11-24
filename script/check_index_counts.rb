@@ -6,7 +6,7 @@
 
 # Checks if the number of indexes specified in the model matches the number of indexes in the database for each model which is eligible to have indexes.
 # Prints outputs as: (Model): (actually exists)/(should exist)
-# Generates a correction script to fix the discrepencies
+# Generates a correction script to fix the discrepancies
 
 no_collection_list = []
 mismatched_list = []
