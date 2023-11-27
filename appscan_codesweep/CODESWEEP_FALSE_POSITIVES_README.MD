@@ -2,12 +2,12 @@
 IdeaCrew currently uses the AppScan CodeSweep technology to run a security check on each PR that is raised against trunk. See [CodeSweep GitHub Workflow](/.github/workflows/codesweep.yml) for implementation details.
 
 ## False Positives
-Multiple examples have been encountered where commonly used patterns in our Rails applications are triggering false positives, which results in a red build and blocks the peer review process.  These false positives can incentivize messy code, antipatterns, etc. when developers alter implementation details just to work around the security check.
+Multiple examples have been encountered where commonly used patterns in our Rails applications are triggering false positives, which results in a red build and blocks the peer review process. These false positives can incentivize messy code, antipatterns, etc. when developers alter implementation details just to work around the security check.
 
 Currently, AppScan CodeSweep does not have an ignore list. This means that false positives that are found by AppScan CodeSweep need to be handled by us (IC staff) as part of our code release process.
 
 ## Protocol for Handling an AppScan CodeSweep Failure
-The protocol below is now in place to handle false positives.  It is subject to change as we learn more about the AppScan CodeSweep technology and as we gain more experience with it.
+The protocol below is now in place to handle false positives. It is subject to change as we learn more about the AppScan CodeSweep technology and as we gain more experience with it.
 
 ### Known False Positive
 To determine if the CodeSweep failure is a known false positive, the author should check the [list of codesweep false positives](CODESWEEP_FALSE_POSITIVES.MD).
@@ -17,7 +17,7 @@ If the author believes they have reproduced a known false positive, then they mu
 2. Tag a [Merge Shepherd](https://github.com/orgs/ideacrew/teams/merge-shepherds) on the PR for review.
 3. Add a Security Review to the Pivotal ticket and assign it to the Merge Shepherd.
 
-The Merge Shepherd is responsible for reviewing the PR  and approving if it is a known false positive. This includes updating the Pivotal ticket's Security Review status to "Pass".  
+The Merge Shepherd is responsible for reviewing the PR and approving if it is a known false positive. This includes updating the Pivotal ticket's Security Review status to "Pass".
 
 If the Merge Shepherd believes the failure does NOT match a known false positive, then the author must follow the protocol below for adding a new false positive. (format as bullet list)
 
