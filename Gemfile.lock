@@ -1031,7 +1031,7 @@ DEPENDENCIES
   action_mailer_cache_delivery (~> 0.3)
   addressable (~> 2.3)
   aws-sdk (~> 2.2.4)
-  axe-core-cucumber
+  axe-core-cucumber (~> 4.8.0)
   bcrypt (~> 3.1)
   benefit_markets!
   benefit_sponsors!
