@@ -53,35 +53,4 @@ module EventLog
             )
           }
   end
-
-  class_methods do
-    def store(data)
-      mutex = Mutex.new
-
-      mutex.synchronize do
-        set_collection_name(collection_name(data))
-        record = self.new(data)
-        record.save
-      end
-    end
-
-    def find(query)
-      mutex = Mutex.new
-
-      mutex.synchronize do
-        set_collection_name(collection_name(query))
-        where(query)
-      end
-    end
-
-    def set_collection_name(collection_name)
-      store_in collection: collection_name
-    end
-
-    def collection_name(options)
-      raise "subject_gid must be passed" unless options[:subject_gid]
-      subject = GlobalID::Locator.locate(options[:subject_gid])
-      subject.class.collection_name.to_s + "_audit_log_events"
-    end
-  end
 end
