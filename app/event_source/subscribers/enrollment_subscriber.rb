@@ -6,12 +6,15 @@ module Subscribers
     include ::EventSource::Subscriber[amqp: 'enroll.individual.enrollments']
 
     subscribe(:on_enrollment_saved) do |delivery_info, _metadata, response|
+      @logger = Logger.new("#{Rails.root}/on_enrollment_saved_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
       subscriber_logger = subscriber_logger_for(:on_enrollment_saved)
       payload = JSON.parse(response, symbolize_names: true)
+      enrollment = GlobalID::Locator.locate(payload[:gid])
+      @logger.error "************************EnrollmentSubscriber, payload: #{payload}, enrollment: #{enrollment}************************"
       pre_process_message(subscriber_logger, payload)
 
       # Add subscriber operations below this line
-      redetermine_family_eligibility(subscriber_logger, payload)
+      redetermine_family_eligibility(subscriber_logger, payload, @logger)
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
@@ -93,21 +96,25 @@ module Subscribers
     #   subject.eligibilities.max_by(&:created_at)
     # end
 
-    def redetermine_family_eligibility(subscriber_logger, payload)
+    def redetermine_family_eligibility(subscriber_logger, payload, _logger)
       enrollment = GlobalID::Locator.locate(payload[:gid])
+      @logger.error "************************EnrollmentSubscriber, redetermine_family_eligibility for enrollment #{enrollment.hbx_id} | #{enrollment.aasm_state} | #{enrollment.shopping?}************************"
       subscriber_logger.info "************************EnrollmentSubscriber, redetermine_family_eligibility for enrollment #{enrollment.hbx_id} | #{enrollment.aasm_state} | #{enrollment.shopping?}************************"
       return if enrollment.shopping? || Rails.env.test?
 
       family = enrollment.family
       assistance_year = enrollment.effective_on.year
+      @logger.error "************************EnrollmentSubscriber, redetermine_family_eligibility for ENROLLED_AND_RENEWAL_STATUSES #{HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(enrollment.aasm_state)}************************"
       subscriber_logger.info "************************EnrollmentSubscriber, redetermine_family_eligibility for ENROLLED_AND_RENEWAL_STATUSES #{HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(enrollment.aasm_state)}************************"
       if HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.include?(enrollment.aasm_state)
         family.fail_negative_and_pending_verifications
         application = fetch_application(enrollment)
-        subscriber_logger.info "************************EnrollmentSubscriber, redetermine_family_eligibility for enrollment #{enrollment.hbx_id} with the application #{application&.hbx_id}************************"
-        application&.enrolled_with(enrollment, subscriber_logger)
-      end
+        @logger.error "************************EnrollmentSubscriber, redetermine_family_eligibility for enrollment #{enrollment.hbx_id} with the application #{application&.hbx_id}************************"
 
+        subscriber_logger.info "************************EnrollmentSubscriber, redetermine_family_eligibility for enrollment #{enrollment.hbx_id} with the application #{application&.hbx_id}************************"
+        application&.enrolled_with(enrollment, @logger)
+      end
+      subscriber_logger.info "************************EnrollmentSubscriber, redetermine_family_eligibility for enrollment #{enrollment.hbx_id} -- #{enrollment.aasm_state}************************"
       family.update_due_dates_on_vlp_docs_and_evidences(assistance_year)
       ::Operations::Eligibilities::BuildFamilyDetermination.new.call(family: family, effective_date: enrollment.effective_on.to_date)
     end
@@ -120,7 +127,7 @@ module Subscribers
                       application_hbx_id = thhe&.tax_household&.tax_household_group&.application_id
                       ::FinancialAssistance::Application.where(hbx_id: application_hbx_id).first
                     end
-                    subscriber_logger.info "************************EnrollmentSubscriber, redetermine_family_eligibility for fetch_application #{application.hbx_id}************************"
+      subscriber_logger.info "************************EnrollmentSubscriber, redetermine_family_eligibility for fetch_application #{application.hbx_id}************************"
       return application if application.present?
       subscriber_logger.info "************************EnrollmentSubscriber, redetermine_family_eligibility for fetch_application #{enrollment.family.active_financial_assistance_application(enrollment.effective_on.year).hbx_id}************************"
       enrollment.family.active_financial_assistance_application(enrollment.effective_on.year)
