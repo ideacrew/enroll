@@ -79,9 +79,9 @@
         </div>
         <div class="row justify-content-md-center pt-3">
           <% if site_uses_default_devise_path? %>
-            <%= link_to "Sign In", new_user_session_path, class:'btn btn-link' %>
+            <%= sanitize "<a class='btn btn-link' href='#{new_user_session_path}'>Sign In</a>" %>
           <% else %>
-            <%= link_to "Sign In", new_user_session_path, class: 'btn btn-link' unless Rails.env.production? %>
+            <%= sanitize "<a class='btn btn-link' href='#{new_user_session_path}'>Sign In</a>" unless Rails.env.production? %>
           <% end %>
         </div>
       <% end %>
