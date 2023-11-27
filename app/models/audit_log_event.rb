@@ -1,10 +1,16 @@
 # frozen_string_literal: true
 
-# model to persist all audit log events for EA
+# Audit log events are dynamically stored in various collections through the
+# utilization of store_in collection: collection_name
 class AuditLogEvent
   include Mongoid::Document
   include Mongoid::Timestamps
   include GlobalID::Identification
+  include Mongoid::Attributes::Dynamic
+
+  # Utilizing a dynamic collection for this model with the disabled default collection behavior,
+  # this configuration is dynamically established within the AuditLogQuery class.
+  store_in collection: nil
 
   SEVERITY = %i[debug info notice warn error critical alert emerg].freeze
   LOG_LEVELS = %i[debug info warn error fatal unknown].freeze
@@ -13,9 +19,11 @@ class AuditLogEvent
   field :subject_gid, type: String
   field :correlation_id, type: String
   field :event_category, type: Symbol
+  field :session_id, type: String # belongs_to :session or embed document?
 
-  field :session_id, type: String
-  field :account_id, type: String # covert this to belongs_to association once account model introduced
+  # convert this to association
+  # belongs_to :account, class_name: "User", optional: false
+  field :account_id, type: String # TODO: we should seed system account
   field :host_id, type: String
 
   field :trigger, type: String
@@ -25,7 +33,7 @@ class AuditLogEvent
   field :event_time, type: DateTime
   field :tags, type: Array
 
-  index({ subject_id: 1 })
+  index({ subject_gid: 1 })
   index({ event_category: 1 })
   index({ session_id: 1 })
   index({ account_id: 1 })
@@ -43,7 +51,6 @@ class AuditLogEvent
   scope :by_severity, ->(severity) { where(severity: severity) }
   scope :by_host, ->(host_id) { where(host_id: host_id) }
   scope :by_trigger, ->(trigger) { where(trigger: trigger) }
-
   scope :events_during,
         lambda { |time_period|
           where(
@@ -52,4 +59,34 @@ class AuditLogEvent
           )
         }
 
+  class << self
+    def store(data)
+      mutex = Mutex.new
+
+      mutex.synchronize do
+        set_collection_name(collection_name(data))
+        record = self.new(data)
+        record.save
+      end
+    end
+
+    def find(query)
+      mutex = Mutex.new
+
+      mutex.synchronize do
+        set_collection_name(collection_name(query))
+        where(query)
+      end
+    end
+
+    def set_collection_name(collection_name)
+      store_in collection: collection_name
+    end
+
+    def collection_name(options)
+      raise "subject_gid must be passed" unless options[:subject_gid]
+      subject = GlobalID::Locator.locate(options[:subject_gid])
+      subject.class.collection_name.to_s + "_audit_log_events"
+    end
+  end
 end
