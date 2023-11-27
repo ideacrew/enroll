@@ -112,6 +112,9 @@ module Operations
         ConsumerRole.set_callback(:update, :after, :publish_updated_event) if subject.is_a?(ConsumerRole)
 
         output
+      rescue StandardError => e
+        ConsumerRole.set_callback(:update, :after, :publish_updated_event) if subject.is_a?(ConsumerRole)
+        Failure(e.inspect)
       end
 
       def callbacks_to_skip
