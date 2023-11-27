@@ -15,6 +15,10 @@
   }
 }
 
+.invalid-feedback {
+  color: var(--error-text-color, #dc3545)
+}
+
 .btn-primary {
   text-transform: uppercase;
   font-weight: 600;
@@ -45,6 +49,18 @@
     background-color: var(--error-shade);
     border-color: var(--error-shade);
   }
+}
+
+.text-muted {
+  color: var(--secondary-font-color, #6c757d) !important;
+}
+
+.btn-link {
+  color: var(--theme-primary-100, #007bc4) !important;
+}
+
+.swal2-styled.swal2-confirm {
+  background-color: var(--theme-primary-100, #3085D6) !important;
 }
 
 .heading-text {
