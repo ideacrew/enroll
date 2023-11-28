@@ -63,7 +63,7 @@ module Operations
                       results[:failures].push({ family_hbx_id: family.hbx_assigned_id, error: result.failure })
                     end
                   rescue StandardError => e
-                    results[:failures].push({ family_hbx_id: family.hbx_assigned_id, error: "Failed due to unknow exception - #{e.inspect}" })
+                    results[:failures].push({ family_hbx_id: family.hbx_assigned_id, error: "Failed due to unknown exception - #{e.inspect}" })
                   end
 
                   results
