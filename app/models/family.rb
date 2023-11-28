@@ -27,7 +27,7 @@ class Family
   include GlobalID::Identification
   include EventSource::Command
 
-  IMMEDIATE_FAMILY = %w[spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner].freeze
+  IMMEDIATE_FAMILY = %w[self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner].freeze
 
   field :version, type: Integer, default: 1
   embeds_many :versions, class_name: self.name, validate: false, cyclic: true, inverse_of: nil
