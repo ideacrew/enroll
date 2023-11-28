@@ -28,7 +28,10 @@ RSpec.describe Operations::TaxHouseholdGroups::Deactivate, type: :model, dbclean
 
     context 'invalid input params' do
       context 'invalid family' do
-        let(:input_params) { { family: nil, new_effective_date: system_date } }
+        let(:input_params) do
+          { deactivate_action_type: 'current_and_prospective',
+            family: nil, new_effective_date: system_date }
+        end
 
         it 'returns a failure with a message' do
           expect(subject.failure).to eq(invalid_params_failure_message)
@@ -36,7 +39,10 @@ RSpec.describe Operations::TaxHouseholdGroups::Deactivate, type: :model, dbclean
       end
 
       context 'invalid new_effective_date' do
-        let(:input_params) { { family: family, new_effective_date: nil } }
+        let(:input_params) do
+          { deactivate_action_type: 'current_and_prospective',
+            family: family, new_effective_date: nil }
+        end
 
         it 'returns a failure with a message' do
           expect(subject.failure).to eq(invalid_params_failure_message)
@@ -44,7 +50,10 @@ RSpec.describe Operations::TaxHouseholdGroups::Deactivate, type: :model, dbclean
       end
 
       context 'invalid family, new_effective_date' do
-        let(:input_params) { { family: nil, new_effective_date: nil } }
+        let(:input_params) do
+          { deactivate_action_type: 'current_and_prospective',
+            family: nil, new_effective_date: nil }
+        end
 
         it 'returns a failure with a message' do
           expect(subject.failure).to eq(invalid_params_failure_message)
@@ -53,7 +62,10 @@ RSpec.describe Operations::TaxHouseholdGroups::Deactivate, type: :model, dbclean
     end
 
     context 'without tax household groups' do
-      let(:input_params) { { family: family, new_effective_date: system_date } }
+      let(:input_params) do
+        { deactivate_action_type: 'current_and_prospective',
+          family: family, new_effective_date: system_date }
+      end
 
       it 'returns a success with a message' do
         expect(subject.success).to eq(no_active_thhgs_message)
@@ -61,7 +73,10 @@ RSpec.describe Operations::TaxHouseholdGroups::Deactivate, type: :model, dbclean
     end
 
     context 'without active tax household groups' do
-      let(:input_params) { { family: family, new_effective_date: system_date } }
+      let(:input_params) do
+        { deactivate_action_type: 'current_and_prospective',
+          family: family, new_effective_date: system_date }
+      end
 
       before do
         inactive_retro_thhg
@@ -75,7 +90,10 @@ RSpec.describe Operations::TaxHouseholdGroups::Deactivate, type: :model, dbclean
     end
 
     context 'with active tax household groups' do
-      let(:input_params) { { family: family, new_effective_date: system_date } }
+      let(:input_params) do
+        { deactivate_action_type: 'current_and_prospective',
+          family: family, new_effective_date: system_date }
+      end
 
       before do
         retro_tax_household_group
@@ -105,6 +123,44 @@ RSpec.describe Operations::TaxHouseholdGroups::Deactivate, type: :model, dbclean
           current_tax_household_group.id,
           prospective_tax_household_group.id
         )
+      end
+    end
+
+    context 'with current_year deactivate_action_type' do
+      context 'with active tax household groups' do
+        let(:input_params) do
+          { deactivate_action_type: 'current_only',
+            family: family, new_effective_date: system_date }
+        end
+
+        before do
+          retro_tax_household_group
+          current_tax_household_group
+          prospective_tax_household_group
+
+          inactive_retro_thhg
+          inactive_current_thhg
+          inactive_prospective_thhg
+        end
+
+        it 'returns a success with a message' do
+          expect(subject.success).to eq(deactivated_thhgs_message)
+        end
+
+        it 'deactivates current year active thhgs' do
+          expect(family.reload.tax_household_groups.active.pluck(:id)).to include(
+            current_tax_household_group.id,
+            prospective_tax_household_group.id
+          )
+
+          subject
+
+          expect(family.reload.tax_household_groups.active.pluck(:id)).to include(retro_tax_household_group.id)
+
+          expect(family.reload.tax_household_groups.inactive.pluck(:id)).to include(
+            current_tax_household_group.id
+          )
+        end
       end
     end
   end

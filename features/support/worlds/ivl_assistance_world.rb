@@ -148,7 +148,7 @@ module IvlAssistanceWorld
   def enable_change_tax_credit_button
     current_year = TimeKeeper.date_of_record.year
     is_tax_credit_btn_enabled = TimeKeeper.date_of_record < Date.new(current_year, 11, HbxProfile::IndividualEnrollmentDueDayOfMonth + 1)
-    allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 10, 5)) unless is_tax_credit_btn_enabled
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(current_year,10,5)) unless is_tax_credit_btn_enabled
   end
 
   def create_family_faa_application(state)

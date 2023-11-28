@@ -65,8 +65,9 @@ end
 Given(/self service osse feature is enabled/) do
   year = TimeKeeper.date_of_record.year
   allow(EnrollRegistry[:aca_ivl_osse_eligibility].feature).to receive(:is_enabled).and_return(true)
-  EnrollRegistry["aca_ivl_osse_eligibility_#{year}"].feature.stub(:is_enabled).and_return(true)
   EnrollRegistry["aca_ivl_osse_eligibility_#{year - 1}"].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry["aca_ivl_osse_eligibility_#{year}"].feature.stub(:is_enabled).and_return(true)
+  EnrollRegistry["aca_ivl_osse_eligibility_#{year + 1}"].feature.stub(:is_enabled).and_return(true)
   allow(EnrollRegistry[:self_service_osse_subsidy].feature).to receive(:is_enabled).and_return(true)
   allow(EnrollRegistry[:individual_osse_plan_filter].feature).to receive(:is_enabled).and_return(true)
 end
@@ -92,5 +93,11 @@ end
 
 Then(/Hbx Admin should see the OSSE APTC error message/) do
   wait_for_ajax
-  expect(page).to have_content(Settings.aptc_errors.below_85_for_osse)
+  hbx = HbxEnrollment.all.first
+  effective_on = ::Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), hbx.effective_on).to_date
+  if hbx.effective_on == effective_on.year
+    expect(page).to have_content(Settings.aptc_errors.below_85_for_osse)
+  else
+    expect(page).to have_content(Settings.aptc_errors.effective_date_overflow)
+  end
 end
