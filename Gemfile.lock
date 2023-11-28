@@ -7,8 +7,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: f6600a2aaeb229a0dbf6f89a197d0eaabb4d641d
-  branch: 184806765_audit_logs
+  revision: 438f819c1bb682dbaddafad9b8c125bec260da43
+  branch: trunk
   specs:
     aca_entities (0.10.0)
       deep_merge
@@ -329,6 +329,13 @@ GEM
       jmespath (~> 1.0)
     aws-sdk-resources (2.2.37)
       aws-sdk-core (= 2.2.37)
+    axe-core-api (4.8.0)
+      dumb_delegator
+      virtus
+    axe-core-cucumber (4.8.0)
+      axe-core-api
+      dumb_delegator
+      virtus
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
@@ -484,6 +491,7 @@ GEM
       dry-equalizer (~> 0.2)
       dry-initializer (~> 3.0)
       dry-schema (~> 1.5, >= 1.5.2)
+    dumb_delegator (1.0.0)
     easy_diff (1.0.0)
     email_spec (2.2.0)
       htmlentities (~> 4.3.3)
@@ -1023,6 +1031,7 @@ DEPENDENCIES
   action_mailer_cache_delivery (~> 0.3)
   addressable (~> 2.3)
   aws-sdk (~> 2.2.4)
+  axe-core-cucumber (~> 4.8.0)
   bcrypt (~> 3.1)
   benefit_markets!
   benefit_sponsors!
