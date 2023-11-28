@@ -74,7 +74,7 @@
   font-size: 1.5em;
 }
 .fa, .knowmore h4 {
-  color: #007BC4;
+  color: var(--theme-primary-100, #007bc4);
 }
 .fa-2x {
   font-size: 2em;

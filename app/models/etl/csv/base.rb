@@ -30,9 +30,9 @@ module Etl::Csv
       excel_file = Roo::Spreadsheet.open(@file)
 
       @sheet = excel_file.sheet(0)
-      # raise "Error: invalid header format." unless ((@header_row > 0) && header_valid?) 
+      # raise "Error: invalid header format." unless ((@header_row > 0) && header_valid?)
 
-      # To match spreadsheet convention, Roo gem uses 1-based (rather than 0-based) references 
+      # To match spreadsheet convention, Roo gem uses 1-based (rather than 0-based) references
       records = []
       documents = []
       @data_start_row = 2
@@ -76,7 +76,7 @@ module Etl::Csv
     def parse_ssn(cell)
       return nil unless cell.present?
       ssn = cell.to_s.gsub(/\D/, '')
-      
+
       raise ImportErrorValue, "invalid SSN length: #{ssn.size}" unless ssn.size == 9
       raise ImportErrorValue, "invalid SSN composition #{ssn}" unless is_ssn_composition_valid?(ssn)
     end
@@ -92,7 +92,7 @@ module Etl::Csv
     end
 
     def parse_employee_relationship(cell)
-      # defined? @last_employer_assigned_family_id ? 
+      # defined? @last_employer_assigned_family_id ?
       return nil if cell.blank?
       field_map = case parse_text(cell).downcase
         when "employee"
@@ -126,11 +126,11 @@ module Etl::Csv
     end
 
     def parse_boolean(cell)
-      cell.blank? ? nil : cell.match(/(true|t|yes|y|1)$/i) != nil ? "1" : "0"
-    end
-
-    def parse_boolean(cell)
-      cell.blank? ? nil : cell.match(/(true|t|yes|y|1)$/i) != nil ? "1" : "0"
+      if cell.blank?
+        nil
+      else
+        cell.to_s.match(/(true|t|yes|y|1)$/i).nil? ? "0" : "1"
+      end
     end
 
     def parse_number(cell)
