@@ -281,12 +281,13 @@ class Family
   }
 
   scope :outstanding_verifications_expiring_on, lambda {|date|
-    where({"$and" =>
-            [
-              {"eligibility_determination.subjects.eligibility_states.evidence_states.due_on" => date.beginning_of_day},
-              {"eligibility_determination.subjects.eligibility_states.evidence_states.status" => :outstanding},
-              {"eligibility_determination.subjects.eligibility_states.eligibility_item_key" => {"$in": %w[aptc_csr_credit aca_individual_market_eligibility] }}
-            ]
+    where({
+            "$and" =>
+              [
+                {"eligibility_determination.subjects.eligibility_states.evidence_states.due_on" => date.beginning_of_day},
+                {"eligibility_determination.subjects.eligibility_states.evidence_states.status" => :outstanding},
+                {"eligibility_determination.subjects.eligibility_states.eligibility_item_key" => {"$in": %w[aptc_csr_credit aca_individual_market_eligibility] }}
+              ]
           })
   }
 
