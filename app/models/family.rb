@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A model for grouping and organizing a {Person} with their related {FamilyMember FamilyMember(s)},
 # benefit enrollment eligibility, financial assistance eligibility and availability, benefit enrollments,
 # broker agents, and documents.
@@ -8,6 +10,7 @@
 #
 # Family is a top level physical MongoDB Collection.
 
+#rubocop:disable Metrics/ClassLength
 class Family
   require 'autoinc'
   require "#{Rails.root}/app/models/concerns/crm_gateway/family_concern.rb"
@@ -24,7 +27,7 @@ class Family
   include GlobalID::Identification
   include EventSource::Command
 
-  IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner)
+  IMMEDIATE_FAMILY = %w[spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner].freeze
 
   field :version, type: Integer, default: 1
   embeds_many :versions, class_name: self.name, validate: false, cyclic: true, inverse_of: nil
@@ -49,7 +52,7 @@ class Family
   field :cv3_payload, type: Hash, default: {}
   field :crm_notifiction_needed, type: Boolean
 
-  belongs_to  :person, optional: true
+  belongs_to :person, optional: true
   has_many :hbx_enrollments
 
   # Collection of insured:  employees, consumers, residents
@@ -143,8 +146,8 @@ class Family
 
   after_initialize :build_household
 
- # after_save :update_family_search_collection
- # after_destroy :remove_family_search_record
+# after_save :update_family_search_collection
+# after_destroy :remove_family_search_record
 
   scope :with_enrollment_hbx_id, ->(enrollment_hbx_id) { where(
     :"_id".in => HbxEnrollment.where(hbx_id: enrollment_hbx_id).distinct(:family_id)
@@ -278,7 +281,11 @@ class Family
   }
 
   scope :outstanding_verifications_expiring_on, lambda {|date|
-    where(:"eligibility_determination.outstanding_verification_earliest_due_date" => date.beginning_of_day)
+    where({
+            "eligibility_determination.subjects.eligibility_states.evidence_states.due_on" => date.beginning_of_day,
+            "eligibility_determination.subjects.eligibility_states.evidence_states.status" => :outstanding,
+            "eligibility_determination.subjects.eligibility_states.eligibility_item_key" => {"$in": %w[aptc_csr_credit aca_individual_market_eligibility] }
+          })
   }
 
   # Replaced scopes for moving HbxEnrollment to top level
@@ -1523,3 +1530,4 @@ private
     ::Operations::People::UpdateDueDateOnVlpDocuments.new.call(family: self, due_date: new_due_date)
   end
 end
+#rubocop:enable Metrics/ClassLength
