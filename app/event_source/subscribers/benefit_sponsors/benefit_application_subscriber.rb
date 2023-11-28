@@ -16,49 +16,14 @@ module Subscribers
         subscriber_logger.info "BenefitApplicationsSubscriber on_open_enrollment_began payload: #{payload}"
         logger.info "BenefitApplicationsSubscriber on_open_enrollment_began payload: #{payload}"
 
-        create_employee_osse_eligibilies(benefit_application)
-
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e
-        subscriber_logger.info "BenefitApplicationsSubscriber, employer fein: #{benefit_sponsorship.fein}, error message: #{e.message}, backtrace: #{e.backtrace}"
-        logger.info "BenefitApplicationsSubscriber: errored & acked. payload: #{payload} Backtrace: #{e.backtrace}"
+        subscriber_logger.error "BenefitApplicationsSubscriber, employer fein: #{benefit_sponsorship.fein}, error message: #{e.message}, backtrace: #{e.backtrace}"
+        logger.error "BenefitApplicationsSubscriber: errored & acked. payload: #{payload} error message: #{e.message}, backtrace: #{e.backtrace}"
         ack(delivery_info.delivery_tag)
       end
 
       private
-
-      def create_employee_osse_eligibilies(benefit_application)
-        return unless benefit_application.osse_eligible?
-
-        benefit_sponsorship = benefit_application.benefit_sponsorship
-        benefit_sponsorship.census_employees.without_cobra.non_terminated.each do |census_employee|
-          employee_role = census_employee.employee_role
-          next unless employee_role
-          result = ::Operations::Eligibilities::Osse::CreateEligibility.new.call(
-            {
-              subject_gid: employee_role.to_global_id,
-              evidence_key: :osse_subsidy,
-              evidence_value: 'true',
-              effective_date: benefit_application.start_on.to_date
-            }
-          )
-
-          if result.success?
-            subscriber_logger.info "on_open_enrollment_began employer fein: #{benefit_sponsorship.fein}, census_employee: #{census_employee.id} processed successfully"
-            logger.info "on_open_enrollment_began BenefitApplicationsSubscriber: acked, SuccessResult: #{result.success}"
-          else
-            errors =
-              case result.failure
-              when Array
-                result.failure
-              when Dry::Validation::Result
-                result.failure.errors.to_h
-              end
-            subscriber_logger.info "on_open_enrollment_began employer fein: #{benefit_sponsorship.fein}, failed!!, FailureResult: #{errors}, census_employee: #{census_employee.id}"
-            logger.info "BenefitApplicationsSubscriber: acked, FailureResult: #{errors} for census_employee: #{census_employee.id}"
-          end
-        end
-      end
 
       def subscriber_logger
         return @subscriber_logger if defined? @subscriber_logger

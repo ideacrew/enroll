@@ -199,6 +199,70 @@ module Insured::FamiliesHelper
     enrollment_states_hash.stringify_keys[enrollment.aasm_state.to_s]
   end
 
+  # Generates an HTML label for the given hbx enrollment object based on its aasm state and other attributes.
+  # The label provides a visual representation of the enrollment state with text and color.
+  #
+  # @param enrollment [Object] The hbx enrollment object for which the label is generated.
+  # @return [String, nil] An HTML string representing the label or nil if the enrollment is blank.
+  def enrollment_state_label(enrollment)
+    return if enrollment.blank?
+
+    # The colors correspond to those set in enrollment.scss as label-{color}. We use color as an indicator of the
+    # enrollment status. For example, green indicates that the enrollment is active, red indicates that the enrollment
+    # is terminated, yellow indicates that the enrollment requires action, etc.
+    state_groups = {
+      auto_renewing: {
+        has_outstanding_verification: { text: 'Action Needed', color: 'yellow' },
+        default: { text: 'Auto Renewing', color: 'green' }
+      },
+      coverage_canceled: {
+        non_payment: { text: 'Canceled by Insurance Company', color: 'red' },
+        default: { text: 'Coverage Canceled', color: 'grey' }
+      },
+      coverage_expired: {
+        default: { text: 'Coverage Year Ended', color: 'blue' }
+      },
+      coverage_reinstated: {
+        default: { text: 'Coverage Reinstated', color: 'green' }
+      },
+      coverage_selected: {
+        has_outstanding_verification: { text: 'Action Needed', color: 'yellow' },
+        default: { text: 'Coverage Selected', color: 'green' }
+      },
+      coverage_terminated: {
+        non_payment: { text: 'Terminated by Insurance Company', color: 'red' },
+        default: { text: 'Terminated', color: 'blue' }
+      },
+      renewing_coverage_selected: {
+        has_outstanding_verification: { text: 'Action Needed', color: 'yellow' },
+        default: { text: 'Renewing Coverage Selected', color: 'green' }
+      },
+      unverified: {
+        has_outstanding_verification: { text: 'Action Needed', color: 'yellow' }
+      },
+      default: {
+        has_outstanding_verification: { text: 'Action Needed', color: 'yellow' }
+      }
+    }
+
+    group = state_groups[enrollment.aasm_state.to_sym] || state_groups[:default]
+    condition = determine_condition(enrollment, group)
+    label = group[condition] || { text: enrollment.aasm_state.to_s.titleize, color: 'grey' }
+    # Coverage reinstated is a special case where the aasm state is something else but we want to show it as reinstated in "green" (active) scenarios
+    label = state_groups[:coverage_reinstated][:default] if enrollment.is_reinstated_enrollment? && label[:color] == 'green'
+    content_tag(:span, label[:text], class: "label label-#{label[:color]}")
+  end
+
+  def determine_condition(enrollment, enrollment_state)
+    if display_termination_reason?(enrollment) && enrollment_state.key?(:non_payment)
+      :non_payment
+    elsif enrollment.is_any_enrollment_member_outstanding && enrollment_state.key?(:has_outstanding_verification)
+      :has_outstanding_verification
+    else
+      :default
+    end
+  end
+
   def display_termination_reason?(enrollment)
     return false if enrollment.is_shop?
     enrollment.terminate_reason && EnrollRegistry.feature_enabled?(:display_ivl_termination_reason) &&
@@ -241,7 +305,7 @@ module Insured::FamiliesHelper
       # Use turbolinks: false, to avoid calling controller action twice.
       # TODO: Refactor Shop For Planss as a translation at some point
       link_path = family_id.present? ? insured_family_members_path(sep_id: sep.id, qle_id: qle.id, family_id: family_id) : insured_family_members_path(sep_id: sep.id, qle_id: qle.id)
-      link_to link_title.presence || 'Shop for Plans', link_path, class: 'btn btn-default', data: {turbolinks: false}
+      link_to link_title.presence || l10n("insured.shop_for_plans"), link_path, data: {turbolinks: false}
     end
   end
 
@@ -342,12 +406,23 @@ module Insured::FamiliesHelper
     BenefitMarkets::Locations::CountyZip.where(zip: address.zip.slice(/\d{5}/)).pluck(:county_name).uniq
   end
 
-  def latest_transition(enrollment)
-    if enrollment.latest_wfst.present?
-      l10n('enrollment.latest_transition_data',
-           from_state: enrollment.latest_wfst.from_state,
-           to_state: enrollment.latest_wfst.to_state,
-           created_at: enrollment.latest_wfst.created_at.in_time_zone('Eastern Time (US & Canada)').strftime("%m/%d/%Y %-I:%M%p"))
+  def all_transitions(enrollment)
+    if enrollment.workflow_state_transitions.present?
+      all_transitions = []
+      enrollment.workflow_state_transitions.each do |transition|
+        all_transitions << if enrollment.is_transition_superseded_silent?(transition)
+                             l10n('enrollment.latest_transition_data_with_silent_reason',
+                                  from_state: transition.from_state,
+                                  to_state: transition.to_state,
+                                  created_at: transition.created_at.in_time_zone('Eastern Time (US & Canada)').strftime("%m/%d/%Y %-I:%M%p"))
+                           else
+                             l10n('enrollment.latest_transition_data',
+                                  from_state: transition.from_state,
+                                  to_state: transition.to_state,
+                                  created_at: transition.created_at&.in_time_zone('Eastern Time (US & Canada)')&.strftime("%m/%d/%Y %-I:%M%p"))
+                           end
+      end
+      all_transitions.join("\n")
     else
       l10n('not_available')
     end
@@ -358,5 +433,46 @@ module Insured::FamiliesHelper
     reason_is_non_payment = enrollment.terminate_reason == 'non_payment' if EnrollRegistry.feature_enabled?(:show_non_pay_enrollments)
     external_enrollment = (enrollment.aasm_state != 'shopping' && enrollment.external_enrollment == true)
     (canceled_enrollment && !reason_is_non_payment) || external_enrollment
+  end
+
+  def is_broker_authorized?(current_user, family)
+    person = current_user.person
+    return false if person.blank?
+
+    logged_user_broker_role = person.broker_role
+    logged_user_staff_roles = person.broker_agency_staff_roles.where(aasm_state: 'active')
+    return false if logged_user_broker_role.blank? && logged_user_staff_roles.blank? # logged in user is not a broker
+    return false if broker_profile_ids(family).blank? # family has no broker
+
+    broker_profile_ids(family).include?(logged_user_broker_role.benefit_sponsors_broker_agency_profile_id) || logged_user_staff_roles.map(&:benefit_sponsors_broker_agency_profile_id).include?(ivl_broker_agency_id(family))
+  end
+
+  def is_general_agency_authorized?(current_user, family)
+    logged_user_ga_roles = current_user.person&.active_general_agency_staff_roles
+    return false if logged_user_ga_roles.blank? # logged in user is not a ga
+    return false if broker_profile_ids(family).blank? # family has no broker, hence no ga
+
+    ::SponsoredBenefits::Organizations::PlanDesignOrganization.where(
+      :owner_profile_id.in => broker_profile_ids(family),
+      :general_agency_accounts => {:"$elemMatch" => {aasm_state: :active, :benefit_sponsrship_general_agency_profile_id.in => logged_user_ga_roles.map(&:benefit_sponsors_general_agency_profile_id)}}
+    ).present?
+  end
+
+  def is_family_authorized?(current_user, family)
+    current_user.person&.primary_family == family
+  end
+
+  def broker_profile_ids(family)
+    @broker_profile_ids ||= ([ivl_broker_agency_id(family)] + shop_broker_agency_ids(family)).compact
+  end
+
+  def ivl_broker_agency_id(family)
+    @ivl_broker_agency_id ||= family.current_broker_agency&.benefit_sponsors_broker_agency_profile_id
+  end
+
+  def shop_broker_agency_ids(family)
+    @shop_broker_agency_ids ||= family.primary_person.active_employee_roles.map do |er|
+      er.employer_profile&.active_broker_agency_account&.benefit_sponsors_broker_agency_profile_id
+    end.compact
   end
 end

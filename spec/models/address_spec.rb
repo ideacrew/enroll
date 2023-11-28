@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'sidekiq/testing'
 
 describe Address, "with proper validations" do
   let(:address_kind) { "home" }
@@ -173,27 +172,6 @@ describe Address, "with proper validations" do
             expect(address.valid?).to eq false
           end
         end
-      end
-    end
-  end
-
-  context "#notify_address_changed" do
-    let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
-    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-    let!(:delete_address) do
-      person.addresses.first.delete
-    end
-
-    before do
-      EnrollRegistry[:notify_address_changed].feature.stub(:is_enabled).and_return(true)
-    end
-
-    context "when address is updated" do
-      it "should notify_address_changed callback and queue the job" do
-        AddressWorker.clear
-        person.home_address.update_attributes(state: "OT")
-        expect(AddressWorker.jobs.size).to eq 1
-        AddressWorker.clear
       end
     end
   end
@@ -411,6 +389,65 @@ describe '#matches_addresses?' do
     end
     it 'returns false' do
       expect(address.matches_addresses?(second_address)).to be_falsey
+    end
+  end
+end
+
+describe '#same_address' do
+  let(:address_1) do
+    FactoryBot.build(:address,address_1: "An address line 1",
+                              address_2: "An address line 2",
+                              city: "A City",
+                              state: "ME",
+                              county: county_1,
+                              zip: "21222")
+  end
+  let(:address_2) do
+    FactoryBot.build(:address,address_1: "An address line 1",
+                              address_2: "An address line 2",
+                              city: "A City",
+                              state: "ME",
+                              county: county_2,
+                              zip: "21222")
+  end
+  let(:county_1) { 'test_1' }
+  let(:county_2) { 'test_2' }
+  let(:setting) { double }
+
+  before do
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return(false)
+  end
+
+
+  context 'addresses with different counties and display county is flag is false' do
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(false)
+    end
+
+    it 'should return true' do
+      expect(address_1.same_address?(address_2)).to eq(true)
+    end
+  end
+
+  context 'addresses with different counties and display county is flag is true' do
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
+    end
+    it 'should return true' do
+      expect(address_1.same_address?(address_2)).to eq(false)
+    end
+  end
+
+  context 'addresses with same counties and display county is flag is true' do
+    let(:county_1) { 'test_1' }
+    let(:county_2) { 'test_1' }
+
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return(true)
+    end
+
+    it 'should return true' do
+      expect(address_1.same_address?(address_2)).to eq(true)
     end
   end
 end

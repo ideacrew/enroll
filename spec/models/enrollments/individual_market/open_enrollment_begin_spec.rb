@@ -4,12 +4,14 @@ require 'rails_helper'
 require "#{Rails.root}/spec/shared_contexts/enrollment.rb"
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
-  RSpec.describe "Enrollments::IndividualMarket::OpenEnrollmentBegin", type: :model do
+  RSpec.describe Enrollments::IndividualMarket::OpenEnrollmentBegin, type: :model do
     include FloatHelper
 
     before do
       DatabaseCleaner.clean
     end
+
+    let(:hbx_profile) { FactoryBot.create(:hbx_profile, :current_oe_period_with_past_coverage_periods) }
 
     context "Given a database of Families" do
 
@@ -211,6 +213,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     describe "To test passive renewals with only ivl health products" do
       include_context "setup families enrollments"
 
+      before :each do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+      end
+
       context "Given a database of Families" do
         it "at least one Family with an active 'Individual Market Health product Enrollment only'" do
           expect(family_unassisted.active_household.hbx_enrollments.first.kind).to eq "individual"
@@ -218,56 +224,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
         it "at least one Family with an active 'Assisted Individual Market Health product Enrollment only'" do
           expect(family_assisted.active_household.hbx_enrollments.first.applied_aptc_amount).not_to eq 0
-        end
-
-        context "when OE script is executed" do
-
-          before do
-            hbx_profile.benefit_sponsorship.benefit_coverage_periods.each do |bcp|
-              slcsp_id = if bcp.start_on.year == renewal_csr_87_product.application_period.min.year
-                           renewal_csr_87_product.id
-                         else
-                           active_csr_87_product.id
-                         end
-              bcp.update_attributes!(slcsp_id: slcsp_id)
-            end
-            hbx_profile.reload
-
-            renewal_individual_health_product.reload
-            active_individual_health_product.reload
-            family_assisted.active_household.reload
-            allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
-          end
-
-          context 'assisted renewal' do
-            before :each do
-              invoke_oe_script
-              family_assisted.active_household.reload
-              @enrollments = family_assisted.active_household.hbx_enrollments
-              family_assisted.family_members.map(&:person).each do |per|
-                per.update_attributes!(age_off_excluded: true)
-              end
-            end
-
-            it 'should generate renewal enrollment' do
-              expect(@enrollments.count).to eq 2
-            end
-
-            it 'should generate assisted renewal enrollment' do
-              expect(@enrollments[1].applied_aptc_amount.to_f).to eq(BigDecimal((@enrollments[1].total_premium * @enrollments[1].product.ehb).to_s).round(2, BigDecimal::ROUND_DOWN).round(2))
-            end
-          end
-
-          context 'unassisted renewal' do
-            before :each do
-              invoke_oe_script
-              family_unassisted.active_household.reload
-            end
-
-            it 'should generate renewal enrollment for unassisted family' do
-              expect(family_unassisted.active_household.hbx_enrollments.count).to eq 3
-            end
-          end
         end
       end
 
@@ -297,9 +253,65 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
     end
 
+    describe 'when async processing is enabled' do
+      include_context "setup families enrollments"
+
+      before :each do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+      end
+
+      let(:subject) { Enrollments::IndividualMarket::OpenEnrollmentBegin.new }
+
+      it 'should invoke an event' do
+        expect(subject).to receive(:event).exactly(2).times.and_call_original
+        subject.process_renewals
+      end
+
+      context '#records' do
+        context 'when osse disabled' do
+          before do
+            allow_any_instance_of(BenefitCoveragePeriod).to receive(:eligibility_on).and_return false
+          end
+
+          it 'should return family collection' do
+            expect(subject.records.first.class).to eq Family
+          end
+        end
+
+        context 'when osse enabled' do
+          before do
+            allow_any_instance_of(BenefitCoveragePeriod).to receive(:eligibility_on).and_return true
+          end
+
+          it 'should return family collection' do
+            expect(subject.records.first.class).to eq Family
+          end
+        end
+      end
+    end
+
+    describe '#osse_enabled' do
+      it 'returns boolean for osse_enabled' do
+        hbx_profile
+        expect(subject.osse_enabled).to be_a(FalseClass)
+      end
+    end
+
+    describe '.new' do
+      it 'creates logger' do
+        subject
+
+        expect(
+          File.exist?(
+            "#{Rails.root}/log/ivl_open_enrollment_begin_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+          )
+        ).to be_truthy
+      end
+    end
+
     after :all do
-      path = "#{Rails.root}/pids/"
-      FileUtils.rm_rf(path) if Dir.exist?(path)
+      file_path = "#{Rails.root}/log/ivl_open_enrollment_begin_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+      FileUtils.rm_rf(file_path) if File.file?(file_path)
     end
   end
 end

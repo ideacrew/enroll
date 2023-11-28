@@ -87,7 +87,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
       context 'when total_minimum_responsibility is enabled' do
         before do
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 0.0}
-          EnrollRegistry[:total_minimum_responsibility].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:total_minimum_responsibility].feature).to receive(:is_enabled).and_return(true)
         end
 
         it "should have the correct member ehb premium" do
@@ -227,7 +227,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
         end
 
         it "if multi taxhousehold feature is enabled" do
-          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
           total_premium = plan_cost_decorator.total_premium
           total_aptc_amount = plan_cost_decorator.total_aptc_amount
           expect(plan_cost_decorator.total_employee_cost).to eq(total_premium - total_aptc_amount)
@@ -284,6 +284,25 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
 
           it 'should return 0.0' do
             expect(@upcd_2.employee_cost_for(hbx_enrollment_member1)).to eq 0.0
+          end
+        end
+      end
+
+      context 'should have correct total_childcare_subsidy_amount' do
+        let(:plan_cost_decorator) { UnassistedPlanCostDecorator.new(@product, hbx_enrollment10, 1500.00, tax_household10) }
+
+        it 'for non hc4cc plan subsidy amount should be 0' do
+          expect(plan_cost_decorator.total_childcare_subsidy_amount).to eq 0.0
+        end
+
+        context "for hc4cc plan" do
+          before do
+            allow(plan_cost_decorator).to receive(:is_eligible_for_osse_grant?).and_return true
+            allow(plan_cost_decorator).to receive(:is_hc4cc_plan).and_return true
+          end
+
+          it 'for hc4cc plan subsidy amount should not be 0' do
+            expect(plan_cost_decorator.total_childcare_subsidy_amount).not_to eq 0.0
           end
         end
       end
@@ -450,7 +469,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
 
       context 'when mthh enabled' do
         before do
-          EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
         end
 
         context 'when grants does not exist' do
@@ -534,7 +553,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
     context 'total_minimum_responsibility' do
       context 'feature is turned on' do
         before do
-          EnrollRegistry[:total_minimum_responsibility].feature.stub(:is_enabled).and_return(true)
+          allow(EnrollRegistry[:total_minimum_responsibility].feature).to receive(:is_enabled).and_return(true)
           @upcd_1.update_attributes(ehb: 0.999)
         end
 
@@ -545,7 +564,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
 
       context 'feature is turned off' do
         before do
-          EnrollRegistry[:total_minimum_responsibility].feature.stub(:is_enabled).and_return(false)
+          allow(EnrollRegistry[:total_minimum_responsibility].feature).to receive(:is_enabled).and_return(false)
           @upcd_1.update_attributes(ehb: 0.999)
         end
 

@@ -9,7 +9,7 @@ class TaxHouseholdMember
 
   embedded_in :tax_household
   embeds_many :financial_statements
-  embeds_many :member_determinations # stores eligibility determinations with determination reasons
+  embeds_many :member_determinations, cascade_callbacks: true # stores eligibility determinations with determination reasons
   accepts_nested_attributes_for :member_determinations
 
   field :applicant_id, type: BSON::ObjectId

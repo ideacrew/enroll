@@ -185,8 +185,6 @@ class Person
 
   validates :encrypted_ssn, uniqueness: true, allow_blank: true
 
-  validate :is_ssn_composition_correct?
-
   validate :is_only_one_individual_role_active?
 
   validates :gender,
@@ -270,6 +268,9 @@ class Person
   )
 
   index({ "verification_types.validation_status" => 1 })
+
+  index({ "consumer_role.eligibilities.key" => 1 })
+  index({ "resident_role.eligibilities.key" => 1 })
 
   scope :all_consumer_roles,          -> { exists(consumer_role: true) }
   scope :all_resident_roles,          -> { exists(resident_role: true) }
@@ -1311,27 +1312,6 @@ class Person
   end
 
   private
-  def is_ssn_composition_correct?
-    # Invalid compositions:
-    #   All zeros or 000, 666, 900-999 in the area numbers (first three digits);
-    #   00 in the group number (fourth and fifth digit); or
-    #   0000 in the serial number (last four digits)
-
-    if ssn.present?
-      invalid_area_numbers = %w(000 666)
-      invalid_area_range = 900..999
-      invalid_group_numbers = %w(00)
-      invalid_serial_numbers = %w(0000)
-
-      return false if ssn.to_s.blank?
-      return false if invalid_area_numbers.include?(ssn.to_s[0,3])
-      return false if invalid_area_range.include?(ssn.to_s[0,3].to_i)
-      return false if invalid_group_numbers.include?(ssn.to_s[3,2])
-      return false if invalid_serial_numbers.include?(ssn.to_s[5,4])
-    end
-
-    true
-  end
 
   def is_only_one_individual_role_active?
     if self.is_consumer_role_active? && self.is_resident_role_active?

@@ -192,7 +192,7 @@
                 </div>
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6"><%= l10n('faa.incomes.from_employer', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) %>
+                  <div class="col-md-6"><%= l10n('faa.incomes.from_employer', assistance_year: assistance_year) %>
                   </div>
                   <div class="col-md-6"><%= human_boolean applicant.has_job_income %></div>
                 </div>
@@ -243,13 +243,13 @@
                 <% end %>
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6"><%= l10n('faa.incomes.from_self_employment', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) %></div>
+                  <div class="col-md-6"><%= l10n('faa.incomes.from_self_employment', assistance_year: assistance_year) %></div>
                   <div class="col-md-6"><%= human_boolean applicant.has_self_employment_income %></div>
                 </div>
 
                 <% if FinancialAssistanceRegistry.feature_enabled?(:unemployment_income) %>
                   <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                    <div class="col-md-6"><%= l10n('faa.other_incomes.unemployment', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) %>
+                    <div class="col-md-6"><%= l10n('faa.other_incomes.unemployment', assistance_year: assistance_year) %>
                     </div>
                     <div class="col-md-6"><%= human_boolean applicant.has_unemployment_income %></div>
                   </div>
@@ -264,7 +264,7 @@
                 <% end %>
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6"><%= l10n('faa.other_incomes.other_sources', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) %>
+                  <div class="col-md-6"><%= l10n('faa.other_incomes.other_sources', assistance_year: assistance_year) %>
                   </div>
                   <div class="col-md-6"><%= human_boolean applicant.has_other_income %></div>
                 </div>
@@ -281,7 +281,7 @@
                 </div>
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6"><%= l10n('faa.deductions.income_adjustments', assistance_year: FinancialAssistanceRegistry[:enrollment_dates].setting(:application_year).item.constantize.new.call.value!.to_s) %>
+                  <div class="col-md-6"><%= l10n('faa.deductions.income_adjustments', assistance_year: assistance_year) %>
                   </div>
                   <div class="col-md-6"><%= human_boolean applicant.has_deductions %></div>
                 </div>
@@ -510,11 +510,19 @@
                 <div class="col-md-6"><%= human_boolean applicant.is_self_attested_blind %></div>
               </div>
 
-              <% if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) %>
-                <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6"><%= l10n("faa.primary_caretaker_question_text") %></div>
-                  <div class="col-md-6"><%= human_boolean applicant.is_primary_caregiver %></div>
-                </div>
+              <% if applicant.age_of_the_applicant >= 19 && applicant.is_applying_coverage %>
+                <% if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_other_question) %>
+                  <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                    <div class="col-md-6"><%= l10n("faa.primary_caretaker_question_text") %></div>
+                    <div class="col-md-6"><%= human_boolean applicant.is_primary_caregiver %></div>
+                  </div>
+                <% end %>
+                <% if FinancialAssistanceRegistry.feature_enabled?(:primary_caregiver_relationship_other_question) %>
+                  <div class="row row-form-wrapper ptb no-buffer row-height form-content">
+                    <div class="col-md-6"><%= l10n("faa.primary_caretaker_for_text_review_page") %></div>
+                    <div class="col-md-6"><%= applicant.is_primary_caregiver_for&.collect{|hbx_id| @applicants_name_by_hbx_id_hash[hbx_id]}&.compact %></div>
+                  </div>
+                <% end %>
               <% end %>
 
               <div class="row row-form-wrapper ptb no-buffer row-height form-content">

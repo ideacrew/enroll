@@ -170,6 +170,10 @@ class GroupSelectionPrevaricationAdapter
     calculate_effective_on(market_kind: 'individual', employee_role: nil, benefit_group: nil)
   end
 
+  def calculate_coverall_effective_on
+    calculate_effective_on(market_kind: 'coverall', employee_role: nil, benefit_group: nil)
+  end
+
   def calculate_new_effective_on(params)
     benefit_group = select_benefit_group(params)
     calculate_effective_on(market_kind: select_market(params), employee_role: possible_employee_role, benefit_group: benefit_group)
@@ -292,6 +296,7 @@ class GroupSelectionPrevaricationAdapter
 
   def create_action_market_kind(params)
     if params[:market_kind].present?
+      return "fehb" if params[:market_kind] == "shop" && is_fehb?(person) && is_fehb_market_enabled?
       params[:market_kind]
     elsif is_shop_market_enabled?
       "shop"

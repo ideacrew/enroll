@@ -680,6 +680,16 @@ Then(/^employer should see create plan year button disabled$/) do
   expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql true
 end
 
+Then(/^employer should see create plan year button disabled if plan year start is not the first of the year$/) do
+  benefit_application = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.all.first.benefit_applications.first
+  plan_year_start = benefit_application.effective_period.first.to_date
+  if plan_year_start == (TimeKeeper.date_of_record + 1.year).beginning_of_year
+    expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql false
+  else
+    expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql true
+  end
+end
+
 Then(/^employer should see your estimated montly cost$/) do
   expect(page).to have_content("Your Estimated Monthly Cost")
 end
@@ -710,7 +720,7 @@ end
 Then(/^employer clicks on terminated filter$/) do
   expect(page).to have_content "Select 'Add New Employee' to continue building your roster, or select 'Upload Employee Roster' if you're ready to download or upload the roster template"
   find_by_id('Tab:terminated').click
-  wait_for_ajax
+  sleep(2)
 end
 
 Then(/^employer should not see the Get Help from Broker$/) do
@@ -834,11 +844,11 @@ And(/^employer clicks on all employees$/) do
   expect(page).to have_content "Select 'Add New Employee' to continue building your roster, or select 'Upload Employee Roster' if you're ready to download or upload the roster template"
   find_by_id('Tab:all').click
 
-  wait_for_ajax
+  sleep(2)
 end
 
 Then(/^employer should not see termination date column$/) do
-  wait_for_ajax
+  sleep(2)
   expect(page).not_to have_content "Terminated On"
 end
 
@@ -847,7 +857,7 @@ And(/^employer clicked on save plan year button$/) do
 end
 
 Then(/^they should see that employee's details$/) do
-  wait_for_ajax
+  sleep(2)
   expect(page).to have_selector("input[value='#{employees.first.dob.strftime('%m/%d/%Y')}']")
 end
 
@@ -1096,10 +1106,17 @@ Then(/^employer should see Enter effective date for (.*?) Action/) do |action_na
 end
 
 And(/^employer should see that the create plan year is (.*)$/) do |plan_year_btn_enabled|
+  benefit_application = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.all.first.benefit_applications.first
+  plan_year_start = benefit_application.effective_period.first.to_date
+
   if plan_year_btn_enabled == 'true'
     expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql false
-  else
-    expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql true
+  elsif plan_year_btn_enabled == 'false'
+    if plan_year_start == (TimeKeeper.date_of_record + 1.year).beginning_of_year
+      expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql false
+    else
+      expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql true
+    end
   end
 end
 

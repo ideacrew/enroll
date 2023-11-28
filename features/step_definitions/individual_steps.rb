@@ -67,10 +67,35 @@ When(/the user registers as an individual$/) do
   fill_in IvlPersonalInformation.first_name, :with => (@u.first_name :first_name)
   fill_in IvlPersonalInformation.last_name, :with => (@u.last_name :last_name)
   fill_in IvlPersonalInformation.dob, :with => (@u.adult_dob :adult_dob)
-  fill_in IvlPersonalInformation.ssn, :with => (@u.ssn :ssn)
+  fill_in IvlPersonalInformation.ssn, :with => "262-61-3061"
   find(IvlPersonalInformation.male_radiobtn).click
   screenshot("register")
   find(IvlPersonalInformation.continue_btn).click
+end
+
+When(/the user registers as an individual with invalid SSN$/) do
+  fill_in IvlPersonalInformation.first_name, :with => (@u.first_name :first_name)
+  fill_in IvlPersonalInformation.last_name, :with => (@u.last_name :last_name)
+  fill_in IvlPersonalInformation.dob, :with => (@u.adult_dob :adult_dob)
+  fill_in IvlPersonalInformation.ssn, :with => "999-00-1234"
+  find(IvlPersonalInformation.male_radiobtn).click
+  find(IvlPersonalInformation.continue_btn).click
+end
+
+Then(/^Individual sees the error message (.*)$/) do |error_message|
+  page.should have_content(error_message)
+end
+
+Then(/^Individual should not see the error message (.*)$/) do |error_message|
+  expect(page).not_to have_content(error_message)
+end
+
+When(/^validate SSN feature is (.*)$/) do |feature|
+  if feature == "enabled"
+    stub_const('Forms::ConsumerCandidate::SSN_REGEX', /^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$/)
+  else
+    stub_const('Forms::ConsumerCandidate::SSN_REGEX', /\A\d{9}\z/)
+  end
 end
 
 And(/the user will have to accept alert pop up for missing field$/) do
@@ -174,6 +199,26 @@ And(/^.+ selects (.*) for coverage$/) do |coverage|
   else
     find(:xpath, '//label[@for="is_applying_coverage_false"]').click
   end
+end
+
+Then(/^the question "(.*)" is displayed$/) do |question|
+  expect(page).to have_content(question)
+end
+
+Then(/^the question "(.*)" is not displayed$/) do |question|
+  expect(page).not_to have_content(question)
+end
+
+Then(/^tribal state dropdown box is clicked$/) do
+  find_all(IvlPersonalInformation.tribe_state_dropdown).first.click
+end
+
+When(/^AI AN question is answered yes$/) do
+  find_all(IvlPersonalInformation.american_or_alaskan_native_yes_radiobtn).first.click
+end
+
+Then(/^states dropdown should popup$/) do
+  expect(page.find("#tribal-state-container .selectric-items").present?).to be_truthy
 end
 
 Then(/^.+ should see error message (.*)$/) do |text|
@@ -974,7 +1019,7 @@ And(/^consumer is an indian_tribe_member$/) do
 end
 
 Given(/^site is for (.*)$/) do |state|
-  EnrollRegistry[:enroll_app].setting(:state_abbreviation).stub(:item).and_return(state.upcase)
+  allow(EnrollRegistry[:enroll_app].setting(:state_abbreviation)).to receive(:item).and_return(state.upcase)
 end
 
 And(/^the consumer should see tribal name textbox without text$/) do
@@ -994,9 +1039,24 @@ And(/consumer has successful ridp/) do
   benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(start_on)}.update_attributes!(slcsp_id: current_product.id)
 end
 
+And(/products are marked as hc4cc/) do
+  BenefitMarkets::Products::Product.all.each { |p| p.update!(is_hc4cc_plan: true) }
+end
+
 And(/consumer has osse eligibility/) do
   person = Person.all.first
-  person.consumer_role.eligibilities << FactoryBot.build(:eligibility, :with_evidences, :with_subject, start_on: TimeKeeper.date_of_record.beginning_of_year)
+  person.consumer_role.eligibilities << FactoryBot.build(:ivl_osse_eligibility, :with_admin_attested_evidence, evidence_state: :approved)
+  current_date = TimeKeeper.date_of_record
+  effective_on = ::Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(current_date.in_time_zone('Eastern Time (US & Canada)'), current_date).to_date
+  if effective_on.year != current_date.year
+
+    renewal_eligibility = FactoryBot.build(:ivl_osse_eligibility,
+                                           :with_admin_attested_evidence,
+                                           evidence_state: :approved,
+                                           key: :"aca_ivl_osse_eligibility_#{effective_on.year}".to_sym,
+                                           effective_on: effective_on)
+    person.consumer_role.eligibilities << renewal_eligibility
+  end
 end
 
 When(/consumer visits home page after successful ridp/) do
@@ -1190,7 +1250,7 @@ And(/^Dependent clicks on purchase button on confirmation page$/) do
 end
 
 Given(/^the warning duplicate enrollment feature configuration is enabled$/) do
-  EnrollRegistry[:existing_coverage_warning].feature.stub(:is_enabled).and_return(true)
+  allow(EnrollRegistry[:existing_coverage_warning].feature).to receive(:is_enabled).and_return(true)
 end
 
 And(/Dependent sees Your Information page$/) do
@@ -1226,4 +1286,19 @@ end
 
 And(/the extended_aptc_individual_agreement_message configuration is enabled/) do
   enable_feature :extended_aptc_individual_agreement_message
+end
+
+Given(/plan filter feature is disabled and osse subsidy feature is enabled/) do
+  year = TimeKeeper.date_of_record.year
+  allow(EnrollRegistry[:aca_ivl_osse_eligibility].feature).to receive(:is_enabled).and_return(true)
+  allow(EnrollRegistry["aca_ivl_osse_eligibility_#{year}".to_sym].feature).to receive(:is_enabled).and_return(true)
+  allow(EnrollRegistry["aca_ivl_osse_eligibility_#{year - 1}".to_sym].feature).to receive(:is_enabled).and_return(true)
+  allow(EnrollRegistry["aca_ivl_osse_eligibility_#{year + 1}".to_sym].feature).to receive(:is_enabled).and_return(true)
+  allow(EnrollRegistry[:individual_osse_plan_filter].feature).to receive(:is_enabled).and_return(false)
+end
+
+Then(/consumer should see 0 premiums for all plans/) do
+  page.all("h2.plan-premium").each do |premium|
+    expect(premium).to have_content("$0.00")
+  end
 end

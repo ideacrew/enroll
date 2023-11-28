@@ -349,7 +349,7 @@ module BenefitSponsors
         if cell.blank?
           nil
         else
-          cell.match(/(true|t|yes|y|1)$/i).nil? ? "0" : "1"
+          cell.to_s.match(/(true|t|yes|y|1)$/i).nil? ? "0" : "1"
         end
       end
 

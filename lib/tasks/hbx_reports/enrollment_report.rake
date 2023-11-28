@@ -36,7 +36,7 @@ namespace :reports do
 
     def pre_11_1_purchase_enrollments(enr, all_enrollments, person)
       time_period = Time.zone.parse("2022-11-01 10:00:00").utc
-      states = HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES
+      states = HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES
       all_enrollments.select do |enrollment|
         enrollment_member_hbx_ids = enrollment.hbx_enrollment_members.flat_map(&:person).pluck(:hbx_id)
         enrollment.created_at < time_period && states.include?(enrollment.aasm_state) &&
@@ -48,13 +48,27 @@ namespace :reports do
 
     def post_11_1_purchase_enrollments(enr, all_enrollments, person)
       time_period = Time.zone.parse("2022-11-01 10:00:00").utc
-      states = HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES
+      states = HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES
       all_enrollments.select do |enrollment|
         enrollment_member_hbx_ids = enrollment.hbx_enrollment_members.flat_map(&:person).pluck(:hbx_id)
         enrollment.created_at >= time_period && states.include?(enrollment.aasm_state) &&
           enrollment.coverage_kind == enr.coverage_kind &&
           enrollment.effective_on >= enr.effective_on.beginning_of_year &&
           enrollment_member_hbx_ids.include?(person.hbx_id)
+      end
+    end
+
+    def renewed_enrollments(enr, all_enrollments, person)
+      states = HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES
+      all_enrollments.select do |enrollment|
+        enrollment_member_hbx_ids = enrollment.hbx_enrollment_members.flat_map(&:person).pluck(:hbx_id)
+          states.include?(enrollment.aasm_state) &&
+          enrollment.coverage_kind == enr.coverage_kind &&
+          enrollment.effective_on >= enr.effective_on.beginning_of_year &&
+          enrollment_member_hbx_ids.include?(person.hbx_id) &&
+          enrollment.workflow_state_transitions.any? do |wst|
+            HbxEnrollment::RENEWAL_STATUSES.include?(wst.from_state.to_s) || HbxEnrollment::RENEWAL_STATUSES.include?(wst.to_state.to_s)
+          end
       end
     end
 
@@ -97,10 +111,13 @@ namespace :reports do
     def member_status(enr)
       enrs_between_nov_and_dec_set = has_effectuated_coverage_in_prev_year_during_oe?(enr)
       re_enrolled_member_set = @enrollments&.map(&:hbx_id)
-      active_renewals_set = re_enrolled_member_set & @post_11_1_purchases&.map(&:hbx_id)
-      passive_renewals_set = re_enrolled_member_set - @post_11_1_purchases&.map(&:hbx_id)
+      active_renewals_set = (re_enrolled_member_set & @post_11_1_purchases&.map(&:hbx_id)) - @renewed_enrollments&.map(&:hbx_id)
+      passive_renewals_set = re_enrolled_member_set - (@post_11_1_purchases&.map(&:hbx_id) - @renewed_enrollments&.map(&:hbx_id))
 
-      if active_renewals_set.present? && enrs_between_nov_and_dec_set.present?
+      # if dually enrolled, passive
+      if active_renewals_set.present? && passive_renewals_set.present? && enrs_between_nov_and_dec_set.present?
+        "Re-enrollee"
+      elsif active_renewals_set.present? && enrs_between_nov_and_dec_set.present?
         "Active Re-enrollee"
       elsif passive_renewals_set.present? && enrs_between_nov_and_dec_set.present?
         "Re-enrollee"
@@ -144,7 +161,7 @@ namespace :reports do
               "Purchase Date", "Coverage Start", "Coverage End", "SEP Reason", "Term Reason",
               "Home Address", "Mailing Address","Work Email", "Home Email", "Phone Number","Broker", "Broker NPN",
               "Broker Assignment Date","Race", "Ethnicity", "Citizen Status",
-              "Broker Assisted"]
+              "Broker Assisted", "Predecessor Enrollment HbxID"]
       while offset <= total_count
         enrollments.offset(offset).limit(batch_size).no_timeout.each do |enr|
           count += 1
@@ -166,6 +183,7 @@ namespace :reports do
                 @enrollments = all_enrollments_for_year(enr, all_enrollments_for_person, per)
                 @pre_11_1_purchases = pre_11_1_purchase_enrollments(enr, all_enrollments_for_person, per)
                 @post_11_1_purchases = post_11_1_purchase_enrollments(enr, all_enrollments_for_person, per)
+                @renewed_enrollments = renewed_enrollments(enr, all_enrollments_for_person, per)
                 @previous_enrollments = all_effectuated_enrollments_for_prev_year(enr, all_enrollments_for_person, per)
                 @all_expired_enrollments = all_expired_enrollments_for_prev_year(enr, all_enrollments_for_person, per)
                 csv << [
@@ -201,7 +219,8 @@ namespace :reports do
                   per.ethnicity,
                   ethnicity_status(per.ethnicity),
                   per.citizen_status,
-                  broker_assisted(enr, primary_person)
+                  broker_assisted(enr, primary_person),
+                  enr.predecessor_enrollment_hbx_id
                 ]
               end
             end

@@ -346,6 +346,9 @@ registry:
         settings:
           - key: :effective_period
             item: <%= Date.new(2020,9,18)..Date.new(2021,12,31) %>
+      - key: :verbose_sep_message
+        item: :verbose_sep_message
+        is_enabled: <%= ENV['VERBOSE_SEP_MESSAGE_IS_ENABLED'] || false %>
       - key: :special_cover_header
         item: :special_cover_header
         is_enabled: true
@@ -361,6 +364,9 @@ registry:
       - key: :adtl_contact_required_for_text
         item: :adtl_contact_required_for_text
         is_enabled: <%= ENV['ADTL_CONTACT_REQUIRED_FOR_TEXT_IS_ENABLED'] || false %>
+      - key: :ssn_ui_validation
+        item: :ssn_ui_validation
+        is_enabled: <%= ENV['SSN_UI_VALIDATION_IS_ENABLED'] || false %>
       - key: :counties_import
         is_enabled: true
         item: 'SHOP_ZipCode_CY2021_FINAL_ME.xlsx'
@@ -377,7 +383,7 @@ registry:
           - key: :current_effective_period
             item: <%= Date.new(2020,11,1)..Date.new(2021,10,31) %>
           - key: :upcoming_effective_period
-            item: <%= Date.new(2022,11,1)..Date.new(2023,01,31) %>
+            item: <%= Date.new(2023,11,1)..Date.new(2024,01,31) %>
           - key: :contact_center_number_for_display
             item: '(855) 532-5465'
           - key: :mailing_address_1
@@ -391,9 +397,9 @@ registry:
         is_enabled: true
         settings:
           - key: :ivl_enrollment_renewal_begin_effective_day
-            item: 1
+            item: <%= ENV['IVL_ENROLLMENT_RENEWAL_BEGIN_EFFECTIVE_DAY'] || 1 %>
           - key: :ivl_enrollment_renewal_begin_effective_month
-            item: 11
+            item: <%= ENV['IVL_ENROLLMENT_RENEWAL_BEGIN_EFFECTIVE_MONTH'] || 11 %>
       - key: :exclude_child_only_offering
         item: :exclude_child_only_offering
         is_enabled: true
@@ -420,6 +426,9 @@ registry:
         is_enabled: <%= ENV['ELIGIBILITY_AUDIT_LOG_IS_ENABLED'] || false %>
       - key: :notify_address_changed
         is_enabled: <%= ENV['NOTIFY_ADDRESS_CHANGED_IS_ENABLED'] || false %>
+      - key: :ce_roster_bulk_upload
+        item: :ce_roster_bulk_upload
+        is_enabled: <%= ENV['CE_ROSTER_BULK_UPLOAD_ENABLED'] || false %>
   - namespace:
       - :pay_now_feature
     features:
@@ -704,7 +713,7 @@ registry:
         is_enabled: false
       - key: :show_download_tax_documents
         item: :show_download_tax_documents
-        is_enabled: false
+        is_enabled: <%= ENV['SHOW_DOWNLOAD_TAX_DOCUMENTS_IS_ENABLED'] || false %>
       - key: :show_upload_notices
         item: :show_upload_notices
         is_enabled: false
@@ -840,6 +849,10 @@ registry:
     features:
       - key: :display_enr_summary
         is_enabled: <%= ENV['DISPLAY_ENR_SUMMARY_IS_ENABLED'] || true %>
+      - key: :silent_transition_enrollment
+        is_enabled: <%= ENV['SILENT_TRANSITION_ENROLLMENT_IS_ENABLED'] || false %>
+      - key: :cancel_superseded_terminated_enrollments
+        is_enabled: <%= ENV['CANCEL_SUPERSEDED_TERMINATED_ENROLLMENTS_IS_ENABLED'] || false %>
       - key: :domestic_partner_rating
         is_enabled: <%= ENV['DOMESTIC_PARTNER_RATING_IS_ENABLED'] || false %>
       - key: issuer_provided_code
@@ -870,6 +883,30 @@ registry:
       - key: :ivl_tax_form_notice
         item: :ivl_tax_form_notice
         is_enabled: <%= ENV['IVL_TAX_FORM_NOTICE_IS_ENABLED'] || false %>
-      - key: :registration_recaptcha
-        item: :registration_recaptcha
-        is_enabled: <%= ENV['REGISTRATION_RECAPTCHA_IS_ENABLED'] || false %>
+      - key: :forgot_password_recaptcha
+        item: :forgot_password_recaptcha
+        is_enabled: <%= ENV['FORGOT_PASSWORD_RECAPTCHA'] || false %>
+      - key: :registration_broker_recaptcha
+        item: :registration_broker_recaptcha
+        is_enabled: <%= ENV['REGISTRATION_BROKER_RECAPTCHA_IS_ENABLED'] || false %>
+      - key: :registration_ga_recaptcha
+        item: :registration_ga_recaptcha
+        is_enabled: <%= ENV['REGISTRATION_GA_RECAPTCHA_IS_ENABLED'] || false %>
+      - key: :registration_user_account_recaptcha
+        item: :registration_user_account_recaptcha
+        is_enabled: <%= ENV['REGISTRATION_USERACCOUNT_RECAPTCHA_IS_ENABLED'] || false %>
+      - key: :registration_sponsor_recaptcha
+        item: :registration_sponsor_recaptcha
+        is_enabled: <%= ENV['REGISTRATION_SPONSOR_RECAPTCHA_IS_ENABLED'] || false %>
+      - key: :back_to_account_all_shop
+        item: :back_to_account_all_shop
+        is_enabled: <%= ENV['BACK_TO_ACCOUNT_ALL_SHOP_IS_ENABLED'] || false %>
+      - key: :indian_alaskan_tribe_codes
+        item: :indian_alaskan_tribe_codes
+        is_enabled: <%= ENV['INDIAN_ALASKAN_TRIBE_CODES_IS_ENABLED'] || false %>
+      - key: :oeg_notice_income_verification_only
+        item: :oeg_notice_income_verification_only
+        is_enabled: <%= ENV['OEG_NOTICE_INCOME_VERIFICATION_ONLY_IS_ENABLED'] || false %>
+      - key: :async_expire_and_begin_coverages
+        item: :async_expire_and_begin_coverages
+        is_enabled: <%= ENV['ASYNC_EXPIRE_AND_BEGIN_COVERAGES_IS_ENABLED'] || false %>

@@ -14,6 +14,7 @@ module SponsoredBenefits
     before_action :published_plans_are_view_only, only: [:edit]
     before_action :claimed_quotes_are_view_only, only: [:edit]
     before_action :load_profile, only: [:new, :edit, :index]
+    skip_before_action :set_broker_agency_profile_from_user, only: [:claim]
 
     def index
       @datatable = effective_datatable
@@ -29,9 +30,9 @@ module SponsoredBenefits
       claim_code_status, quote = SponsoredBenefits::Organizations::PlanDesignProposal.claim_code_status?(quote_claim_code)
 
       unless claim_code_status == "invalid"
-        osse_quote = quote.osse_eligibility&.present? && EnrollRegistry.feature_enabled?(:broker_quote_hc4cc_subsidy)
+        osse_quote = quote.osse_eligibility&.present? && EnrollRegistry.feature_enabled?(:broker_quote_osse_eligibility)
         effective_on = quote.profile.benefit_application.effective_period.min
-        employer_osse_eligible = employer_profile.active_benefit_sponsorship&.eligibility_for(:osse_subsidy, effective_on).present?
+        employer_osse_eligible = employer_profile.active_benefit_sponsorship&.active_eligibility_on(effective_on).present?
 
         error_message = quote.present? && aca_state_abbreviation == "MA" ? check_if_county_zip_are_same(quote, employer_profile) : " "
       end
@@ -194,7 +195,9 @@ module SponsoredBenefits
     end
 
     def employee_datatable(sponsorship)
-      Effective::Datatables::PlanDesignEmployeeDatatable.new({id: sponsorship.id, scopes: params[:scopes]})
+      Effective::Datatables::PlanDesignEmployeeDatatable.new(
+        { id: sponsorship.id, profile_id: params[:profile_id], scopes: params[:scopes] }
+      )
     end
 
     def init_employee_datatable

@@ -32,7 +32,7 @@
           }, :sortable => false, :filter => false
           table_column :state, :label => 'State', :proc => Proc.new { |row| row.aasm_state.capitalize }, :sortable => false, :filter => false
 
-          if EnrollRegistry.feature_enabled?(:aca_shop_osse_subsidy) && EnrollRegistry.feature_enabled?(:broker_quote_hc4cc_subsidy)
+          if EnrollRegistry.feature_enabled?(:aca_shop_osse_eligibility) && EnrollRegistry.feature_enabled?(:broker_quote_osse_eligibility)
             table_column :hc4cc, :label => "HC4CC", :proc => proc { |row|
               if row.osse_eligibility.present?
                 l10n("yes")
@@ -135,7 +135,12 @@
           }
         end
 
+        def authorized?(current_user, _controller, _action, _resource)
+          return false unless current_user
 
+          proposal_organization = SponsoredBenefits::Organizations::PlanDesignOrganization.find(attributes[:organization_id])
+          SponsoredBenefits::PlanDesignOrganizationPolicy.new(current_user, proposal_organization).view_proposals?
+        end
       end
     end
   end

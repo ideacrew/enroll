@@ -2,8 +2,8 @@
 
 require 'rails_helper'
 
-describe 'daily_faa_submission_report' do
-  before do
+describe 'daily_faa_submission_report', :dbclean => :after_each do
+  before :all do
     DatabaseCleaner.clean
   end
 

@@ -28,7 +28,7 @@ module Subscribers
       end
     rescue StandardError => e
       nack(delivery_info.delivery_tag)
-      logger.info "MecCheckSubscriber: error: #{e.backtrace}"
+      logger.info "MecCheckSubscriber: error message: #{e.message}, backtrace: #{e.backtrace}"
     end
   end
 end

@@ -21,7 +21,11 @@ module Operations
 
         def deactivate_current_thhg(application)
           new_effective_date = application.eligibility_determinations.pluck(:effective_starting_on).compact.first
-          ::Operations::TaxHouseholdGroups::Deactivate.new.call({ family: application.family, new_effective_date: new_effective_date })
+          ::Operations::TaxHouseholdGroups::Deactivate.new.call({
+                                                                  deactivate_action_type: 'current_only',
+                                                                  family: application.family,
+                                                                  new_effective_date: new_effective_date
+                                                                })
         end
 
         def create_new_thhg(application)
@@ -75,7 +79,19 @@ module Operations
             is_non_magi_medicaid_eligible: applicant.is_non_magi_medicaid_eligible,
             is_totally_ineligible: applicant.is_totally_ineligible,
             csr_percent_as_integer: applicant.is_ia_eligible ? applicant.csr_percent_as_integer : 0,
-            member_determinations: applicant.member_determinations}
+            member_determinations: member_determinations(applicant)}
+        end
+
+        def member_determinations(applicant)
+          applicant.member_determinations&.map do |member_determination|
+            md_attributes = member_determination.attributes
+            md_attributes.except!('_id', 'created_at', 'updated_at')
+            eo_attributes = member_determination.eligibility_overrides&.map do |eo|
+              eo.attributes.except!('_id', 'created_at', 'updated_at')
+            end
+            md_attributes['eligibility_overrides'] = eo_attributes
+            md_attributes
+          end
         end
       end
     end

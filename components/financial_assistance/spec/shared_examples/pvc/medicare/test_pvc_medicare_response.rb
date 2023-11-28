@@ -248,7 +248,7 @@ RSpec.shared_context 'FDSH PVC Medicare sample response', :shared_context => :me
             :tution_and_fees => 0,
             :other_magi_eligible_income => 0
           },
-          :non_esi_evidence => {:key => :non_esi_mec, :title => "NON ESI MEC", :aasm_state => "outstanding"},
+          :non_esi_evidence => non_esi_mec_evidence_1,
           :mitc_relationships => [],
           :mitc_is_required_to_file_taxes => false
         }
@@ -557,7 +557,7 @@ RSpec.shared_context 'FDSH PVC Medicare sample response', :shared_context => :me
             :tution_and_fees => 0,
             :other_magi_eligible_income => 0
           },
-          :non_esi_evidence => {:key => :non_esi_mec, :title => "NON ESI MEC", aasm_state: "attested"},
+          :non_esi_evidence => non_esi_mec_evidence_2,
           :mitc_relationships => [],
           :mitc_is_required_to_file_taxes => false
         }
@@ -619,6 +619,39 @@ RSpec.shared_context 'FDSH PVC Medicare sample response', :shared_context => :me
           :dependents => []
         }
     ]
+    }
+  end
+
+  let(:non_esi_mec_evidence_1) do
+    {
+      :key => :non_esi_mec,
+      :title => 'Non ESI MEC',
+      :description => nil,
+      :aasm_state => 'outstanding',
+      :due_on => nil,
+      :updated_by => nil,
+      :request_results => [request_result_hash]
+    }
+  end
+
+  let(:non_esi_mec_evidence_2) do
+    {
+      :key => :non_esi_mec,
+      :title => 'Non ESI MEC',
+      :description => nil,
+      :aasm_state => 'attested',
+      :due_on => nil,
+      :updated_by => nil,
+      :request_results => [request_result_hash]
+    }
+  end
+
+  let(:request_result_hash) do
+    {
+      :result => 'eligible',
+      :source => 'MEDC',
+      :code => '7313',
+      :code_description => 'Applicant Not Found'
     }
   end
 end

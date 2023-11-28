@@ -2,8 +2,9 @@ Feature: Broker HC4CC quote creation
 
   Background: Broker Quoting Tool
     Given the shop market configuration is enabled
-    And Broker HC4CC feature enabled
+    Given the osse subsidy feature is enabled
     And a CCA site exists with a benefit market
+    And benefit market catalog exists with eligibility
     And Health and Dental plans exist
     And there is a Broker Agency exists for District Brokers Inc
     And the broker Max Planck is primary broker for District Brokers Inc
@@ -49,4 +50,6 @@ Feature: Broker HC4CC quote creation
     Then Primary Broker clicks Back to All Quotes
     And the broker clicks Actions dropdown
     And the broker clicks copy quote
-    Then the broker should see Yes for HC4CC
+    And the broker should see Yes for HC4CC
+    And Primary broker clicks on Select Health Benefits button
+    Then Primary broker should see metal level non bronze options

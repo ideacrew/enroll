@@ -8,8 +8,8 @@ module Operations
     class AddFinancialAssistanceEligibilityDetermination
       send(:include, Dry::Monads[:result, :do])
 
-      def call(params:)
-        values = yield validate(params) #application_contract
+      def call(application)
+        values = yield validate(application) #application_contract
         family = yield find_family(values[:family_id])
         result = yield add_determination(family, values)
 
@@ -18,7 +18,9 @@ module Operations
 
       private
 
-      def validate(params)
+      def validate(application)
+        @application = application
+        params = @application.attributes
         contract_result = Validators::Families::EligibilityDeterminationContract.new.call(params)
         contract_result.success? ? Success(contract_result.to_h) : Failure(contract_result.errors)
       end
@@ -89,8 +91,21 @@ module Operations
           is_non_magi_medicaid_eligible: applicant["is_non_magi_medicaid_eligible"],
           is_totally_ineligible: applicant["is_totally_ineligible"],
           csr_percent_as_integer: is_ia_eligible ? applicant["csr_percent_as_integer"] : 0,
-          member_determinations: applicant["member_determinations"]
+          member_determinations: member_determinations(applicant)
         )
+      end
+
+      def member_determinations(applicant)
+        member_determinations = @application.applicants.detect {|a| a.person_hbx_id == applicant["person_hbx_id"]}.member_determinations
+        member_determinations.map do |md|
+          md_attributes = md.attributes
+          md_attributes.except!('_id', 'created_at', 'updated_at')
+          eo_attributes = md.eligibility_overrides&.map do |eo|
+            eo.attributes.except!('_id', 'created_at', 'updated_at')
+          end
+          md_attributes['eligibility_overrides'] = eo_attributes
+          md_attributes
+        end
       end
 
       def fetch_family_member_from_applicant(family, applicant)
@@ -101,7 +116,7 @@ module Operations
       def deactivate_latest_tax_households(values)
         primary_applicant = values[:applicants].select{|app| app["is_primary_applicant"]}.first
         ed = values[:eligibility_determinations].select{|ed| ed["_id"] == primary_applicant["eligibility_determination_id"]}.first
-        Operations::Households::DeactivateFinancialAssistanceEligibility.new.call(params: {family_id: values[:family_id], date: ed["effective_starting_on"]})
+        Operations::Households::DeactivateFinancialAssistanceEligibility.new.call(params: { deactivate_action_type: 'current_only', family_id: values[:family_id], date: ed["effective_starting_on"]})
       end
 
       def update_family_attributes(family, case_id)

@@ -6,6 +6,7 @@ ENV_LIST = ['qa', 'prod', 'preprod', 'cte', 'cpr', 'uat']
 
 namespace :sbc do
   #USAGE rake sbc:upload['MASTER 2016 QHP_QDP IVAL & SHOP Plan and Rate Matrix v.9.xlsx','v.2 SBCs 9.22.2015']
+  desc "sbc upload"
   task :upload, [:matrix_path, :dir_path] => :environment do |task, args|
     sbc_processor = SbcProcessor.new(args.matrix_path, args.dir_path)
     sbc_processor.run
@@ -14,6 +15,7 @@ namespace :sbc do
   # USAGE rake sbc:export
   # This will export a map of plan and sbc pdfs in S3 to plans-sbcs.csv
   # A CSV with plan.id, plan.hios_id, plan.active_year, plan.sbc_document.identifier, plan.sbc_document.title
+  desc "sbc export"
   task :export => :environment do
     counter = 0
     file_path = "plans-sbcs.csv"
@@ -93,7 +95,8 @@ namespace :sbc do
 
   namespace :'2015' do
     #USAGE rake sbc:2015:upload['2015.csv','2015pdfs']
-    task :upload, [:csv_path, :dir_path] => :environment do |task, args|
+    desc "sbc 2015 upload"
+    task :upload, [:csv_path, :dir_path] => [:environment] do |task, args|
       sbc_processor = SbcProcessor2015.new(args.csv_path, args.dir_path)
       sbc_processor.run
     end

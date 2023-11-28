@@ -1,6 +1,8 @@
 require "rails_helper"
+require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
 
 RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  do
+  include_context "set up broker agency profile for BQT, by using configuration settings"
 
   describe "#plan_shopping_dependent_text", dbclean: :after_each  do
     let(:person) { FactoryBot.build_stubbed(:person)}
@@ -488,6 +490,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
       let(:consumer_role) {FactoryBot.build(:consumer_role)}
       context "had a SSN" do
         before do
+          allow(EnrollRegistry[:show_download_tax_documents].feature).to receive(:is_enabled).and_return(true)
           person.consumer_role = consumer_role
             person.ssn = '123456789'
         end
@@ -553,7 +556,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
 
     context "when termination reason config is enabled and enrollment is IVL" do
       before :each do
-        EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:display_ivl_termination_reason].feature).to receive(:is_enabled).and_return(true)
       end
 
       it "should return true" do
@@ -563,7 +566,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
 
     context "when termination reason config is disabled and enrollment is IVL" do
       before :each do
-        EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:display_ivl_termination_reason].feature).to receive(:is_enabled).and_return(false)
       end
 
       it "should return false" do
@@ -574,7 +577,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
     context "when termination reason config is enabled and enrollment is shop" do
       before :each do
         hbx_enrollment.update_attributes(kind: "shop")
-        EnrollRegistry[:display_ivl_termination_reason].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:display_ivl_termination_reason].feature).to receive(:is_enabled).and_return(false)
       end
 
       it "should return false" do
@@ -681,22 +684,245 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
     end
   end
 
-  describe '#fetch_counties_by_zip', dbclean: :after_each do
-    let!(:family) { FactoryBot.create(:family, :with_primary_family_member) }
-    let!(:hbx_enr) { FactoryBot.create(:hbx_enrollment, aasm_state: 'shopping', kind: 'individual', family: family) }
+  describe '#latest_transition', dbclean: :after_each do
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+    let(:hbx_enr) { FactoryBot.create(:hbx_enrollment, aasm_state: 'shopping', kind: 'individual', family: family) }
 
-    context 'with workflow_state_transition' do
+    context 'with state transitions including transition args' do
+      let(:transition_reason) { { reason: Enrollments::TerminationReasons::SUPERSEDED_SILENT } }
+
+      before { hbx_enr.renew_enrollment!(transition_reason) }
+
+      it 'returns latest_transition_data' do
+        expect(helper.all_transitions(hbx_enr)).to match(/From shopping to auto_renewing at/)
+      end
+
+      it 'returns transition reason' do
+        expect(helper.all_transitions(hbx_enr)).to match(/Silent/)
+      end
+    end
+
+    context 'with state transitions' do
       before { hbx_enr.renew_enrollment! }
 
-      it 'should return latest_transition_data' do
-        expect(helper.latest_transition(hbx_enr)).to match(/From shopping to auto_renewing at/)
+      it 'returns latest_transition_data' do
+        expect(helper.all_transitions(hbx_enr)).to match(/From shopping to auto_renewing at/)
+      end
+
+      it 'does not return transition reason' do
+        expect(helper.all_transitions(hbx_enr)).not_to match(/Silent/)
       end
     end
 
-    context 'without workflow_state_transition' do
-      it 'should return latest_transition_data' do
-        expect(helper.latest_transition(hbx_enr)).to eq(l10n('not_available'))
+    context 'created_at nil on workflowstate_transitions' do
+      before { hbx_enr.renew_enrollment }
+
+      it 'returns latest_transition_data' do
+        hbx_enr.workflow_state_transitions.first.update_attributes(created_at: nil)
+        expect(helper.all_transitions(hbx_enr)).to match(/From shopping to auto_renewing at/)
       end
     end
+
+    context 'without state transitions' do
+      it 'does not return latest_transition_data' do
+        expect(helper.all_transitions(hbx_enr)).to eq(l10n('not_available'))
+      end
+    end
+  end
+
+  # Though we primarily care to test the functionality of the method and not the exact html we use the existence of
+  # expected html elements as a positive indicator. If the related state_groups hash fields are updated, this test will
+  # need to be updated as well.
+  describe 'enrollment_state_label' do
+    let(:enrollment) { instance_double(HbxEnrollment, is_shop?: false, is_reinstated_enrollment?: false) }
+
+    shared_examples 'a label checker' do |aasm_state, terminate_reason, is_outstanding, expected_label|
+      before do
+        allow(EnrollRegistry[:display_ivl_termination_reason].feature).to receive(:is_enabled).and_return(true)
+        allow(enrollment).to receive(:aasm_state).and_return(aasm_state)
+        allow(enrollment).to receive(:terminate_reason).and_return(terminate_reason)
+        allow(enrollment).to receive(:is_any_enrollment_member_outstanding).and_return(is_outstanding)
+      end
+
+      it "returns the #{expected_label} label" do
+        expect(enrollment_state_label(enrollment)).to include(*expected_label)
+      end
+    end
+
+    context 'when enrollment is blank' do
+      before do
+        allow(enrollment).to receive(:blank?).and_return(true)
+      end
+
+      it 'returns nil' do
+        expect(enrollment_state_label(enrollment)).to be_nil
+      end
+    end
+
+    context 'when enrollment is not blank' do
+
+      context 'when condition is present in state group' do
+        it_behaves_like 'a label checker', 'coverage_canceled', HbxEnrollment::TermReason::NON_PAYMENT, false, ['red', 'Canceled by Insurance Company']
+        it_behaves_like 'a label checker', 'auto_renewing', nil, true, ['yellow', 'Action Needed']
+      end
+
+      context 'when is reinstated' do
+        before do
+          allow(enrollment).to receive(:is_reinstated_enrollment?).and_return(true)
+        end
+        # should return Coverage Reinstated only if the color is green (active)
+        it_behaves_like 'a label checker', 'coverage_selected', nil, true, ['yellow', 'Action Needed']
+        it_behaves_like 'a label checker', 'coverage_selected', nil, false, ['green', 'Coverage Reinstated']
+      end
+
+      context 'when condition is not present in state group' do
+        it_behaves_like 'a label checker', 'auto_renewing', nil, false, ['green', 'Auto Renewing']
+      end
+
+      context 'when aasm_state is not found in state_groups' do
+        it_behaves_like 'a label checker', 'unknown_state', nil, false, ['grey', 'Unknown State']
+      end
+    end
+  end
+
+  describe '#is_broker_authorized' do
+    context 'when current user is not a ga staff' do
+      let(:user) { FactoryBot.create(:user, :with_consumer_role) }
+      let(:family) { FactoryBot.create(:person, :with_family) }
+
+      it 'return false' do
+        expect(helper.is_broker_authorized?(user, family)).to eq false
+      end
+    end
+
+    context 'when family does not have an assigned broker' do
+      let(:user) { FactoryBot.create(:user, :with_consumer_role) }
+      let(:family) { FactoryBot.create(:person, :with_family).primary_family }
+
+      it 'return false' do
+        expect(helper.is_broker_authorized?(user, family)).to eq false
+      end
+    end
+
+    context 'when family an assigned broker' do
+      context 'when current user does not belong to family broker' do
+        let(:user) { FactoryBot.create(:user, person: person) }
+        let(:person) { FactoryBot.create(:person, :with_broker_role) }
+        let(:family) { FactoryBot.create(:person, :with_family).primary_family }
+
+        before do
+          allow(family).to receive(:current_broker_agency).and_return double('BrokerAgencyAccount', benefit_sponsors_broker_agency_profile_id: BSON::ObjectId.new)
+        end
+
+        it 'return false' do
+          expect(helper.is_broker_authorized?(user, family)).to eq false
+        end
+      end
+
+      context 'when current user belongs to family broker' do
+        let(:user) { FactoryBot.create(:user, person: person) }
+        let(:person) do
+          person = FactoryBot.create(:person, :with_broker_role)
+          person.broker_role.update_attributes(benefit_sponsors_broker_agency_profile_id: BSON::ObjectId.new)
+          person
+        end
+        let(:family) { FactoryBot.create(:person, :with_family).primary_family }
+
+        context 'ivl role' do
+          before do
+            allow(family).to receive(:current_broker_agency).and_return double('BrokerAgencyAccount', benefit_sponsors_broker_agency_profile_id: person.broker_role.benefit_sponsors_broker_agency_profile_id)
+          end
+
+          it 'return true' do
+            expect(helper.is_broker_authorized?(user, family)).to eq true
+          end
+        end
+
+        context 'shop role' do
+
+          before do
+            allow(family).to receive(:current_broker_agency).and_return nil
+            allow(helper).to receive(:shop_broker_agency_ids).with(family).and_return [person.broker_role.benefit_sponsors_broker_agency_profile_id]
+          end
+
+          it 'return true' do
+            expect(helper.is_broker_authorized?(user, family)).to eq true
+          end
+        end
+      end
+    end
+  end
+
+  describe '#is_general_agency_authorized' do
+    context 'when current user is not a ga staff' do
+      let(:user) { FactoryBot.create(:user, :with_consumer_role) }
+      let(:family) { FactoryBot.create(:person, :with_family) }
+
+      it 'return false' do
+        expect(helper.is_general_agency_authorized?(user, family)).to eq false
+      end
+    end
+
+    context 'when family does not have an assigned broker' do
+      let(:user) { FactoryBot.create(:user, :with_consumer_role) }
+      let(:family) { FactoryBot.create(:person, :with_family).primary_family }
+
+      before do
+        allow(user).to receive_message_chain(:person, :active_general_agency_staff_roles).and_return [double('GeneralAgencyStaffRole')]
+      end
+
+      it 'return false' do
+        expect(helper.is_general_agency_authorized?(user, family)).to eq false
+      end
+    end
+
+    context 'when family an assigned broker & current user has ga staff role' do
+      context 'when current user ga does not belong to family broker' do
+        let(:user) { FactoryBot.create(:user, :with_consumer_role) }
+        let(:family) { FactoryBot.create(:person, :with_family).primary_family }
+
+        before do
+          allow(user).to receive_message_chain(:person, :active_general_agency_staff_roles).and_return [double('GeneralAgencyStaffRole', benefit_sponsors_general_agency_profile_id: general_agency_profile.id)]
+          allow(family).to receive(:current_broker_agency).and_return double('BrokerAgencyAccount', benefit_sponsors_broker_agency_profile_id: BSON::ObjectId.new)
+          plan_design_organization_with_assigned_ga
+        end
+
+        it 'return false' do
+          expect(helper.is_general_agency_authorized?(user, family)).to eq false
+        end
+      end
+
+      context 'when current user ga belongs to family broker' do
+        let(:user) { FactoryBot.create(:user, :with_consumer_role) }
+        let(:family) { FactoryBot.create(:person, :with_family).primary_family }
+
+        context 'ivl role' do
+          before do
+            allow(user).to receive_message_chain(:person, :active_general_agency_staff_roles).and_return [double('GeneralAgencyStaffRole', benefit_sponsors_general_agency_profile_id: general_agency_profile.id)]
+            allow(family).to receive(:current_broker_agency).and_return double('BrokerAgencyAccount', benefit_sponsors_broker_agency_profile_id: owner_profile.id)
+            plan_design_organization_with_assigned_ga
+          end
+
+          it 'return true' do
+            expect(helper.is_general_agency_authorized?(user, family)).to eq true
+          end
+        end
+
+        context 'shop role' do
+
+          before do
+            allow(user).to receive_message_chain(:person, :active_general_agency_staff_roles).and_return [double('GeneralAgencyStaffRole', benefit_sponsors_general_agency_profile_id: general_agency_profile.id)]
+            allow(family).to receive(:current_broker_agency).and_return nil
+            allow(helper).to receive(:shop_broker_agency_ids).with(family).and_return [owner_profile.id]
+            plan_design_organization_with_assigned_ga
+          end
+
+          it 'return true' do
+            expect(helper.is_general_agency_authorized?(user, family)).to eq true
+          end
+        end
+      end
+    end
+
   end
 end

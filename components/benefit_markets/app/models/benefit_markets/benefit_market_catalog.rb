@@ -2,6 +2,7 @@ module BenefitMarkets
   class BenefitMarketCatalog
     include Mongoid::Document
     include Mongoid::Timestamps
+    include GlobalID::Identification
 
     # Frequency at which sponsors may submit an initial or renewal application
     # Example application interval kinds:
@@ -41,6 +42,8 @@ module BenefitMarkets
                 class_name: "::BenefitMarkets::MarketPolicies::MemberMarketPolicy"
     embeds_many :product_packages, as: :packagable,
                 class_name: "::BenefitMarkets::Products::ProductPackage"
+
+    embeds_many :eligibilities, class_name: '::Eligible::Eligibility', as: :eligible, cascade_callbacks: true
 
     # Entire geography covered by under this catalog
     has_and_belongs_to_many  :service_areas,
@@ -135,6 +138,26 @@ module BenefitMarkets
 
       open_enrollment_end_on_day = Settings.aca.shop_market.open_enrollment.monthly_end_on
       open_enrollment_end_on_day - minimum_length
+    end
+
+    #TODO: update the logic once settings moved to benefit market catalog
+    def self.osse_eligibility_years_for_display
+      all.collect do |market_catalog|
+        year = market_catalog.product_active_year
+        eligibility = market_catalog.eligibilities.by_key("aca_shop_osse_eligibility_#{year}".to_sym).first
+        next unless eligibility&.eligible?
+        year
+      end.compact
+    end
+
+    def eligibilities_on(date)
+      eligibility_key = "aca_shop_osse_eligibility_#{date.year}".to_sym
+
+      eligibilities.by_key(eligibility_key)
+    end
+
+    def eligibility_on(effective_date)
+      eligibilities_on(effective_date).last
     end
 
     private

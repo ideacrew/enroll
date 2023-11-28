@@ -2,9 +2,11 @@
 
 require 'rails_helper'
 require 'aasm/rspec'
+require "#{FinancialAssistance::Engine.root}/spec/shared_examples/medicaid_gateway/test_case_d_response"
 
 RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after_each do
   include Dry::Monads[:result, :do]
+  include_context 'cms ME simple_scenarios test_case_d'
 
   let(:family_id) { BSON::ObjectId.new }
   let!(:year) { TimeKeeper.date_of_record.year }
@@ -167,6 +169,54 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     it 'should not return draft applications' do
       expect(FinancialAssistance::Application.all.for_verifications.map(&:aasm_state)).not_to include 'draft'
       expect(FinancialAssistance::Application.all.for_verifications.map(&:aasm_state)).to include 'determined'
+    end
+
+    context 'income_verification_required' do
+      it 'should return only income_verification_required applications' do
+        state = 'income_verification_extension_required'
+        application.update_attributes!(aasm_state: state)
+        applications = FinancialAssistance::Application.all.income_verification_extension_required
+        expect(applications.map(&:aasm_state)).to include state
+      end
+
+      it 'should not return any income_verification_required applications' do
+        state = 'submitted'
+        application.update_attributes!(aasm_state: state)
+        expect(FinancialAssistance::Application.all.income_verification_extension_required.to_a).to eq []
+      end
+    end
+
+    context 'for_determined_family' do
+      it 'should return only determined applications' do
+        applications = FinancialAssistance::Application.for_determined_family(family_id)
+        expect(applications.map(&:aasm_state)).to include 'determined'
+      end
+
+      it 'should not return any determined applications' do
+        FinancialAssistance::Application.update_all(aasm_state: 'submitted')
+        expect(FinancialAssistance::Application.for_determined_family(family_id).to_a).to eq []
+      end
+    end
+
+    context 'determined_and_submitted_within_range' do
+      it 'should return only determined and submitted applications' do
+        FinancialAssistance::Application.update_all(submitted_at: TimeKeeper.date_of_record)
+        applications = FinancialAssistance::Application.determined_and_submitted_within_range(TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year)
+        expect(applications.map(&:aasm_state)).to include 'determined'
+        expect(applications.map(&:aasm_state)).not_to include 'submitted'
+      end
+
+      it 'should not return any determined and submitted applications' do
+        FinancialAssistance::Application.update_all(aasm_state: 'draft')
+        date_range = TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year
+        expect(FinancialAssistance::Application.determined_and_submitted_within_range(date_range).to_a).to eq []
+      end
+
+
+      it 'should not return any applications if no applications in date range' do
+        date_range = TimeKeeper.date_of_record.next_year.beginning_of_year..TimeKeeper.date_of_record.next_year.end_of_year
+        expect(FinancialAssistance::Application.determined_and_submitted_within_range(date_range).to_a).to eq []
+      end
     end
   end
 
@@ -691,6 +741,34 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     it 'should have both income and mec in pending state' do
       application.active_applicants.each do |applicant|
         expect(applicant.income_evidence.aasm_state).to eq "pending"
+      end
+    end
+  end
+
+  describe '.create_evidences call
+  - for renewal application
+  - when renewal_eligibility_verification_using_rrv is enabled' do
+    let(:income) { FactoryBot.build(:financial_assistance_income, amount: 200, start_on: Date.new(2021,6,1), end_on: Date.new(2021, 6, 30), frequency_kind: "biweekly") }
+
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:esi_mec_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:non_esi_mec_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:ifsv_determination).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:verification_type_income_verification).and_return(true)
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:renewal_eligibility_verification_using_rrv).and_return(true)
+      application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'renewal_draft', to_state: 'submitted')
+      application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'submitted', to_state: 'determined')
+      application.save!
+      application.send(:create_evidences)
+    end
+
+    it 'should not create MEC evidences and income evidence' do
+      application.reload.active_applicants.each do |applicant|
+        expect(applicant.income_evidence.present?).to be_falsey
+        expect(applicant.esi_evidence.present?).to be_falsey
+        expect(applicant.non_esi_evidence.present?).to be_falsey
+        expect(applicant.local_mec_evidence.present?).to be_falsey
       end
     end
   end
@@ -1255,6 +1333,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   describe 'build_relationship_matrix' do
     before do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
     end
 
     let!(:application10) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
@@ -1406,6 +1485,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   describe 'fetch_relationship_matrix' do
     before do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
     end
 
     let!(:application10) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
@@ -1711,8 +1791,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   end
 
   describe 'publish_application_determined' do
-    let(:publish_operation_class) { FinancialAssistance::Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined }
-    let(:publish_operation_result) { Success(double) }
+    let(:publish_operation_class) { FinancialAssistance::Operations::Applications::Verifications::RequestEvidenceDetermination }
 
     before do
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:mec_check).and_return(true)
@@ -1749,38 +1828,30 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
         end
       end
     end
+  end
 
-    # verification histories creation moved to subscriber as part of code optimization work (sbm_183622458)
-    # context "when rrv feature is disabled" do
+  describe 'notify_totally_ineligible_members' do
+    before do
+      allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:totally_ineligible_notice).and_return(true)
 
-    #   before do
-    #     allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:renewal_eligibility_verification_using_rrv).and_return(false)
-    #     allow(publish_operation_class).to receive_message_chain(:new, :call).with(anything).and_return(publish_operation_result)
-    #   end
+      application.update_attributes!(eligibility_response_payload: response_payload.to_json)
+      application.active_applicants.each{|applicant| applicant.update_attributes!(is_ia_eligible: true) }
+      application.send(:create_evidences)
+      application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'renewal_draft', to_state: 'submitted')
+      application.save!
+    end
 
-    #   it 'should not trigger fdsh calls on renewal application determinations' do
-    #     application.active_applicants.each do |applicant|
-    #       expect(applicant.esi_evidence).to be_present
-    #       %w[esi_evidence non_esi_evidence local_mec_evidence income_evidence].each do |evidence_name|
-    #         evidence = applicant.send(evidence_name)
-    #         expect(evidence.verification_histories).to be_empty
-    #       end
-    #     end
+    it "should not notify members when no applicants are totally ineligible" do
+      result = application.notify_totally_ineligible_members
+      expect(result).to eq nil
+    end
 
-    #     application.publish_application_determined
+    it "should notify members when any applicants are totally_ineligible" do
+      application.active_applicants.first.update_attributes!(is_totally_ineligible: true)
 
-    #     application.active_applicants.each do |applicant|
-    #       %w[esi_evidence non_esi_evidence local_mec_evidence income_evidence].each do |evidence_name|
-    #         evidence = applicant.send(evidence_name)
-    #         expect(evidence.verification_histories).to be_present
-    #         history = evidence.verification_histories.first
-    #         expect(history.action).to eq "application_determined"
-    #         expect(history.update_reason).to eq "Requested Hub for verification"
-    #         expect(history.updated_by).to eq "system"
-    #       end
-    #     end
-    #   end
-    # end
+      result = application.notify_totally_ineligible_members
+      expect(result).to_not eq nil
+    end
   end
 
   describe 'apply_aggregate_to_enrollment' do
@@ -1867,6 +1938,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     before :each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
       relationship_application.applicants.each do |appl|
         appl.addresses = [FactoryBot.build(:financial_assistance_address,
                                            :address_1 => '1111 Awesome Street NE',
@@ -1885,6 +1957,74 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     context "when there is only one applicant" do
       it "should return true" do
         expect(relationship_application.valid_relations?).to eq(true)
+      end
+    end
+
+    context "when an applicant has more than one spouse relationship" do
+      let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let(:set_up_relationships) do
+        relationship_application.ensure_relationship_with_primary(applicant1, 'spouse')
+        relationship_application.ensure_relationship_with_primary(applicant2, 'spouse')
+        relationship_application.add_or_update_relationships(applicant1, applicant2, 'parent')
+        relationship_application.build_relationship_matrix
+        relationship_application.save(validate: false)
+      end
+
+      before do
+        set_up_relationships
+      end
+
+      it "returns false" do
+        expect(relationship_application.valid_relations?).to eq(false)
+      end
+    end
+
+    context "when an applicant is unrelated to the domestic partner of their parent" do
+      let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let(:set_up_relationships) do
+        relationship_application.ensure_relationship_with_primary(applicant1, 'child')
+        relationship_application.ensure_relationship_with_primary(applicant2, 'domestic_partner')
+        relationship_application.add_or_update_relationships(applicant1, applicant2, 'unrelated')
+      end
+
+      before do
+        set_up_relationships
+      end
+
+      it "should return false" do
+        expect(relationship_application.valid_relations?).to eq(false)
+      end
+    end
+
+    context "when there is an invalid in-law relationship" do
+      let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let!(:applicant3) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let!(:applicant4) { FactoryBot.create(:financial_assistance_applicant, application: relationship_application, family_member_id: BSON::ObjectId.new) }
+      let(:set_up_relationships) do
+        relationship_application.ensure_relationship_with_primary(applicant1, 'child')
+        relationship_application.ensure_relationship_with_primary(applicant2, 'spouse')
+        relationship_application.ensure_relationship_with_primary(applicant3, 'sibling')
+        relationship_application.ensure_relationship_with_primary(applicant4, 'unrelated')
+        relationship_application.add_or_update_relationships(applicant1, applicant2, 'child')
+        relationship_application.add_or_update_relationships(applicant1, applicant3, 'nephew_or_niece')
+        relationship_application.add_or_update_relationships(applicant1, applicant4, 'nephew_or_niece')
+        relationship_application.add_or_update_relationships(applicant2, applicant3, 'brother_or_sister_in_law')
+        relationship_application.add_or_update_relationships(applicant2, applicant4, 'unrelated')
+        relationship_application.add_or_update_relationships(applicant3, applicant4, 'spouse')
+
+        relationship_application.build_relationship_matrix
+        relationship_application.save(validate: false)
+      end
+
+      before do
+        set_up_relationships
+      end
+
+      it "returns false" do
+        expect(relationship_application.valid_relations?).to eq(false)
       end
     end
 
@@ -2169,6 +2309,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     before :each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:mitc_relationships).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
       relationship_application.applicants.each do |appl|
         appl.addresses = [FactoryBot.build(:financial_assistance_address,
                                            :address_1 => '1111 Awesome Street NE',
@@ -2226,5 +2367,323 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       application.reload
       expect(application.aasm_state).to eq "determined"
     end
+  end
+
+  describe 'application eligible for renewal?' do
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: '100095')}
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let!(:application) do
+      FactoryBot.create(:financial_assistance_application,
+                        hbx_id: '111000222',
+                        family_id: family.id,
+                        is_renewal_authorized: false,
+                        is_requesting_voter_registration_application_in_mail: true,
+                        years_to_renew: 5,
+                        medicaid_terms: true,
+                        report_change_terms: true,
+                        medicaid_insurance_collection_terms: true,
+                        parent_living_out_of_home_terms: true,
+                        attestation_terms: true,
+                        submission_terms: true,
+                        assistance_year: TimeKeeper.date_of_record.year,
+                        full_medicaid_determination: true)
+    end
+
+    let!(:applicant_1) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        person_hbx_id: '100095',
+                        is_primary_applicant: true,
+                        family_member_id: family.primary_applicant.id,
+                        first_name: 'Gerald',
+                        last_name: 'Rivers',
+                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                        application: application)
+    end
+
+    let!(:applicant_2) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        person_hbx_id: '100096',
+                        is_primary_applicant: true,
+                        family_member_id: family.primary_applicant.id,
+                        first_name: 'Diana',
+                        last_name: 'Rivers',
+                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                        application: application)
+    end
+
+    context 'skip renewals feature disabled' do
+      before do
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(false)
+      end
+
+      it 'should return false' do
+        expect(application.eligible_for_renewal?).to eq(true)
+      end
+    end
+
+    context 'skip renewals feature enabled and application has all ineligible applicants' do
+      before do
+        application.applicants.each do |appl|
+          appl.update_attributes!(is_applying_coverage: false)
+        end
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(true)
+      end
+
+      it 'should return false' do
+        expect(application.eligible_for_renewal?).to eq(false)
+      end
+    end
+
+    context 'skip renewals feature enabled and application has all non applying coverage applicants' do
+      before do
+        application.applicants.each do |appl|
+          appl.update_attributes!(is_totally_ineligible: true)
+        end
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(true)
+      end
+
+      it 'should return false' do
+        expect(application.eligible_for_renewal?).to eq(false)
+      end
+    end
+
+    context 'skip renewals feature enabled and application has all medicaid chip applicants' do
+      before do
+        application.applicants.each do |appl|
+          appl.update_attributes!(is_medicaid_chip_eligible: true)
+        end
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(true)
+      end
+
+      it 'should return false' do
+        expect(application.eligible_for_renewal?).to eq(false)
+      end
+    end
+
+    context 'skip renewals feature enabled and application has medicaid chip applicant and ia_eligible applicant' do
+      before do
+        application.applicants[0].update_attributes!(is_medicaid_chip_eligible: true)
+        application.applicants[1].update_attributes!(is_without_assistance: true)
+        allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:skip_eligibility_redetermination).and_return(true)
+      end
+
+      it 'should return false' do
+        expect(application.eligible_for_renewal?).to eq(true)
+      end
+    end
+  end
+
+  context 'has_eligible_applicants_for_assistance?' do
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: '100095')}
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let!(:application) do
+      FactoryBot.create(:financial_assistance_application,
+                        hbx_id: '111000222',
+                        family_id: family.id,
+                        is_renewal_authorized: false,
+                        is_requesting_voter_registration_application_in_mail: true,
+                        years_to_renew: 5,
+                        medicaid_terms: true,
+                        report_change_terms: true,
+                        medicaid_insurance_collection_terms: true,
+                        parent_living_out_of_home_terms: true,
+                        attestation_terms: true,
+                        submission_terms: true,
+                        assistance_year: TimeKeeper.date_of_record.year,
+                        full_medicaid_determination: true)
+    end
+
+    let!(:applicant_1) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        person_hbx_id: '100095',
+                        is_primary_applicant: true,
+                        family_member_id: family.primary_applicant.id,
+                        first_name: 'Gerald',
+                        last_name: 'Rivers',
+                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                        application: application)
+    end
+
+    let!(:applicant_2) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        person_hbx_id: '100096',
+                        is_primary_applicant: true,
+                        family_member_id: family.primary_applicant.id,
+                        first_name: 'Diana',
+                        last_name: 'Rivers',
+                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                        application: application)
+    end
+
+    it 'should return true if application has eligible applicants' do
+      application.applicants.each do |appl|
+        appl.update_attributes!(is_ia_eligible: true)
+      end
+      expect(application.has_eligible_applicants_for_assistance?).to eq(true)
+    end
+
+    it 'should return false if application has no eligible applicants' do
+      application.applicants.each do |appl|
+        appl.update_attributes!(is_totally_ineligible: true)
+      end
+      expect(application.has_eligible_applicants_for_assistance?).to eq(false)
+    end
+  end
+
+  context 'all_applicants_totally_ineligible?' do
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: '100095')}
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let!(:application) do
+      FactoryBot.create(:financial_assistance_application,
+                        hbx_id: '111000222',
+                        family_id: family.id,
+                        is_renewal_authorized: false,
+                        is_requesting_voter_registration_application_in_mail: true,
+                        years_to_renew: 5,
+                        medicaid_terms: true,
+                        report_change_terms: true,
+                        medicaid_insurance_collection_terms: true,
+                        parent_living_out_of_home_terms: true,
+                        attestation_terms: true,
+                        submission_terms: true,
+                        assistance_year: TimeKeeper.date_of_record.year,
+                        full_medicaid_determination: true)
+    end
+
+    let!(:applicant_1) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        person_hbx_id: '100095',
+                        is_primary_applicant: true,
+                        family_member_id: family.primary_applicant.id,
+                        first_name: 'Gerald',
+                        last_name: 'Rivers',
+                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                        application: application)
+    end
+
+    let!(:applicant_2) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        person_hbx_id: '100096',
+                        is_primary_applicant: true,
+                        family_member_id: family.primary_applicant.id,
+                        first_name: 'Diana',
+                        last_name: 'Rivers',
+                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                        application: application)
+    end
+
+    it 'should return true if all applicants are totally ineligible' do
+      application.applicants.each do |appl|
+        appl.update_attributes!(is_totally_ineligible: true)
+      end
+      expect(application.all_applicants_totally_ineligible?).to eq(true)
+    end
+  end
+
+  context 'all_applicants_without_applying_for_coverage?' do
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: '100095')}
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let!(:application) do
+      FactoryBot.create(:financial_assistance_application,
+                        hbx_id: '111000222',
+                        family_id: family.id,
+                        is_renewal_authorized: false,
+                        is_requesting_voter_registration_application_in_mail: true,
+                        years_to_renew: 5,
+                        medicaid_terms: true,
+                        report_change_terms: true,
+                        medicaid_insurance_collection_terms: true,
+                        parent_living_out_of_home_terms: true,
+                        attestation_terms: true,
+                        submission_terms: true,
+                        assistance_year: TimeKeeper.date_of_record.year,
+                        full_medicaid_determination: true)
+    end
+
+    let!(:applicant_1) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        person_hbx_id: '100095',
+                        is_primary_applicant: true,
+                        family_member_id: family.primary_applicant.id,
+                        first_name: 'Gerald',
+                        last_name: 'Rivers',
+                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                        application: application)
+    end
+
+    let!(:applicant_2) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        person_hbx_id: '100096',
+                        is_primary_applicant: true,
+                        family_member_id: family.primary_applicant.id,
+                        first_name: 'Diana',
+                        last_name: 'Rivers',
+                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                        application: application)
+    end
+
+    it 'should return true if all applicants are not applyling for coverage' do
+      application.applicants.each do |appl|
+        appl.update_attributes!(is_applying_coverage: false)
+      end
+      expect(application.all_applicants_without_applying_for_coverage?).to eq(true)
+    end
+  end
+
+  context 'all_applicants_medicaid_or_chip_eligible?' do
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role, hbx_id: '100095')}
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let!(:application) do
+      FactoryBot.create(:financial_assistance_application,
+                        hbx_id: '111000222',
+                        family_id: family.id,
+                        is_renewal_authorized: false,
+                        is_requesting_voter_registration_application_in_mail: true,
+                        years_to_renew: 5,
+                        medicaid_terms: true,
+                        report_change_terms: true,
+                        medicaid_insurance_collection_terms: true,
+                        parent_living_out_of_home_terms: true,
+                        attestation_terms: true,
+                        submission_terms: true,
+                        assistance_year: TimeKeeper.date_of_record.year,
+                        full_medicaid_determination: true)
+    end
+
+    let!(:applicant_1) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        person_hbx_id: '100095',
+                        is_primary_applicant: true,
+                        family_member_id: family.primary_applicant.id,
+                        first_name: 'Gerald',
+                        last_name: 'Rivers',
+                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                        application: application)
+    end
+
+    let!(:applicant_2) do
+      FactoryBot.create(:financial_assistance_applicant,
+                        person_hbx_id: '100096',
+                        is_primary_applicant: true,
+                        family_member_id: family.primary_applicant.id,
+                        first_name: 'Diana',
+                        last_name: 'Rivers',
+                        dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                        application: application)
+    end
+
+    it 'should return true if all applicants are not applyling for coverage' do
+      application.applicants.each do |appl|
+        appl.update_attributes!(is_medicaid_chip_eligible: true)
+      end
+      expect(application.all_applicants_medicaid_or_chip_eligible?).to eq(true)
+    end
+  end
+end
+
+RSpec.describe ::FinancialAssistance::Application, "with correct index definitions", type: :model, dbclean: :after_each do
+  it "has valid indexes" do
+    ::FinancialAssistance::Application.remove_indexes
+    ::FinancialAssistance::Application.create_indexes
   end
 end

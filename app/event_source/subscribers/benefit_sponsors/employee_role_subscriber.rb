@@ -18,52 +18,15 @@ module Subscribers
         subscriber_logger.info "on_employee_role_created, employee_role: #{person&.full_name} employer: #{employer&.legal_name} fein: #{employer.fein}"
         subscriber_logger.info "EmployeeRoleSubscriber on_employee_role_created payload: #{payload}"
         logger.info "EmployeeRoleSubscriber on_employee_role_created payload: #{payload}"
-        create_employee_osse_eligibility(employee_role)
 
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e
-        subscriber_logger.info "EmployeeRoleSubscriber, employee_role: #{person&.full_name}, employer: #{employer&.legal_name}, error message: #{e.message}, backtrace: #{e.backtrace}"
-        logger.info "EmployeeRoleSubscriber: errored & acked. payload: #{payload} Backtrace: #{e.backtrace}"
+        subscriber_logger.error "EmployeeRoleSubscriber, employee_role: #{person&.full_name}, employer: #{employer&.legal_name}, error message: #{e.message}, backtrace: #{e.backtrace}"
+        logger.error "EmployeeRoleSubscriber: errored & acked. payload: #{payload} error message: #{e.message}, backtrace: #{e.backtrace}"
         ack(delivery_info.delivery_tag)
       end
 
       private
-
-      def create_employee_osse_eligibility(employee_role)
-        person = employee_role.person
-        census_employee = employee_role.census_employee
-
-        return unless census_employee
-        return if census_employee.is_cobra_status?
-
-        census_employee.osse_eligible_applications.each do |benefit_application|
-          employer = benefit_application.employer_profile
-
-          result = ::Operations::Eligibilities::Osse::CreateEligibility.new.call(
-            {
-              subject_gid: employee_role.to_global_id,
-              evidence_key: :osse_subsidy,
-              evidence_value: 'true',
-              effective_date: benefit_application.start_on.to_date
-            }
-          )
-
-          if result.success?
-            subscriber_logger.info "on_employee_role_created employer fein: #{employer.fein}, employee: #{person&.full_name} processed successfully"
-            logger.info "on_employee_role_created CensusEmployeeSubscriber: acked, SuccessResult: #{result.success}"
-          else
-            errors =
-              case result.failure
-              when Array
-                result.failure
-              when Dry::Validation::Result
-                result.failure.errors.to_h
-              end
-            subscriber_logger.info "on_employee_role_created employer fein: #{employer.fein}, failed!!, FailureResult: #{errors}, employee: #{person&.full_name}"
-            logger.info "CensusEmployeeSubscriber: acked, FailureResult: #{errors} for employee: #{person&.full_name}, employer fein: #{employer.fein}"
-          end
-        end
-      end
 
       def subscriber_logger
         return @subscriber_logger if defined? @subscriber_logger

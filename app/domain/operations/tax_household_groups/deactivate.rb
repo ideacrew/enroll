@@ -8,6 +8,7 @@ module Operations
     # this operation is to end current taxhouseholdgroups
     class Deactivate
       send(:include, Dry::Monads[:result, :do])
+      DEACTIVATE_ACTION_TYPES = ['current_only', 'current_and_prospective'].freeze
 
       def call(params)
         values = yield validate(params)
@@ -19,7 +20,7 @@ module Operations
       private
 
       def validate(params)
-        if params[:family].is_a?(Family) && params[:new_effective_date].is_a?(Date)
+        if params[:family].is_a?(Family) && params[:new_effective_date].is_a?(Date) && DEACTIVATE_ACTION_TYPES.include?(params[:deactivate_action_type])
           Success(params)
         else
           Failure('Invalid params. family should be an instance of Family and new_effective_date should be an instance of Date')
@@ -33,7 +34,13 @@ module Operations
       end
 
       def deactivate(values)
-        tax_household_groups = values[:family].tax_household_groups.active.by_year(values[:new_effective_date].year)
+        active_thh_groups = values[:family].tax_household_groups.active
+        tax_household_groups = case values[:deactivate_action_type]
+                               when 'current_only'
+                                 active_thh_groups.by_year(values[:new_effective_date].year)
+                               when 'current_and_prospective'
+                                 active_thh_groups.current_and_prospective_by_year(values[:new_effective_date].year)
+                               end
         return Success('No Active Tax Household Groups to deactivate') if tax_household_groups.blank?
 
         tax_household_groups.each do |th_group|

@@ -40,60 +40,28 @@ end
 # end
 
 def can_transmit?(enrollment)
-  offered_in_service_area = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: enrollment})
-  offered_in_service_area.success?
+  # We need to replace this.
+  # It currently checks if we offer the plan attached to the enrollment.
+  # However, it uses the **current** address of the covered individuals.
+  # This means that when you move, resulting in a termination, the termination
+  # event will no longer flow, because all of a sudden, the plan isn't offered -
+  # which is correct.  What we need to check for instead is an **actual**
+  # $0 premium.  I'm leaving the operation intact as I'm not sure where
+  # else it might be used.
+
+  # offered_in_service_area = ::Operations::Products::ProductOfferedInServiceArea.new.call({enrollment: enrollment})
+  # offered_in_service_area.success?
+
+  enrollment.total_premium > 0.0
 end
 
 enrollment_kinds = %w(employer_sponsored employer_sponsored_cobra)
 active_statuses = %w[coverage_selected auto_renewing renewing_coverage_selected]
 
-purchases = HbxEnrollment.collection.aggregate([
-  {"$match" => {
-    "workflow_state_transitions" => {
-      "$elemMatch" => {
-        "to_state" => {"$in" => active_statuses},
-        "transition_at" => {
-           "$gte" => start_time,
-           "$lt" => end_time
-        }
-      }
-    },
-    "rating_area_id" => {"$ne" => nil},
-    "kind" => {"$nin" => enrollment_kinds}
-  }},
-  {"$group" => {
-    "_id" => "$hbx_id",
-    "created_at" => { "$last" =>  "$created_at" },
-    "enrollment_state" => {"$last" => "$aasm_state"}
-  }},
-  {"$project" => {
-    "_id" => 1,
-    "created_at" => 1,
-    "enrollment_state" => "$enrollment_state"
-  }},
-  { "$sort" => { "created_at" => 1 } }
-])
+query = Queries::IvlSepEvents.new(start_time, end_time)
 
-terms = HbxEnrollment.collection.aggregate([
-  {"$match" => {
-    "workflow_state_transitions" => {
-      "$elemMatch" => {
-        "to_state" => {"$in" => ["coverage_terminated","coverage_canceled"]},
-        "transition_at" => {
-           "$gte" => start_time,
-           "$lt" => end_time
-        }
-      }
-    },
-    "rating_area_id" => {"$ne" => nil},
-    "kind" => {"$nin" => enrollment_kinds},
-  }},
-  {"$group" => {
-      "_id" => "$hbx_id",
-      "created_at" => { "$last" =>  "$created_at" },
-  }},
-  { "$sort" => { "created_at" => 1 } }
-])
+purchases = query.selections_during_window
+terms = query.terminations_during_window
 
 puts purchases.count
 puts terms.count
@@ -106,6 +74,10 @@ purchases.to_a.each do |rec|
 
   unless can_transmit?(enrollment)
     Rails.logger.info "0$ premium issue - cannot transmit purchase #{pol_id}"
+    next
+  end
+  if query.purchase_and_cancel_in_same_window?(enrollment)
+    Rails.logger.info "Purchase and cancel in same window, ignoring initial event for #{pol_id}"
     next
   end
 
@@ -135,6 +107,14 @@ terms.to_a.each do |rec|
 
   unless can_transmit?(enrollment)
     Rails.logger.info "0$ premium issue - cannot trasmit term #{pol_id}"
+    next
+  end
+  if query.purchase_and_cancel_in_same_window?(enrollment)
+    Rails.logger.info "Purchase and cancel in same window, ignoring term event for #{pol_id}"
+    next
+  end
+  if query.has_silent_cancel?(enrollment)
+    Rails.logger.info "Silent cancel, ignoring term event for #{pol_id}"
     next
   end
   if ::EnrollRegistry.feature_enabled?(:gate_enrollments_to_edidb_for_year)

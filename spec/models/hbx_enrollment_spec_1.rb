@@ -7,6 +7,9 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 require File.join(Rails.root, 'spec/shared_contexts/dchbx_product_selection')
 
 RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
+  before do
+    allow(EnrollRegistry[:cancel_renewals_for_term].feature).to receive(:is_enabled).and_return(true)
+  end
 
   describe HbxEnrollment, dbclean: :around_each do
     include_context "setup benefit market with market catalogs and product packages"
@@ -403,7 +406,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       let(:active_year)               {TimeKeeper.date_of_record.year}
 
       before :each do
-        EnrollRegistry[:location_residency_verification_type].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:location_residency_verification_type].feature).to receive(:is_enabled).and_return(true)
         allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
         allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
       end
@@ -1086,7 +1089,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         allow(::EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_quadrant).and_return true
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:display_county).and_return false
-        EnrollRegistry[:crm_update_family_save].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:crm_update_family_save].feature).to receive(:is_enabled).and_return(false)
 
       end
 

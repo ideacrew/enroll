@@ -6,14 +6,20 @@
 # instead of editing this one. Cucumber will automatically load all features/**/*.rb
 # files.
 
-ENV["RAILS_ENV"] ||= 'test'
+ENV['RAILS_ENV'] ||= 'test'
 $LOADING_CUCUMBER_ENV = true
+if ENV["COVERAGE"]
+  require 'simplecov'
+  SimpleCov.command_name "specs_#{Process.pid}_#{ENV['TEST_ENV_NUMBER'] || '1'}"
+  SimpleCov.start 'rails'
+end
 require 'webdrivers'
 require 'cucumber/rails'
 require 'email_spec/cucumber'
 require 'rspec/expectations'
 # require 'capybara-screenshot/cucumber'
 require 'cucumber/rspec/doubles'
+require 'axe-cucumber-steps'
 
 Dir[File.expand_path("#{Rails.root}/lib/test/**/*.rb")].each { |f| load f }
 require File.expand_path("#{File.dirname(__FILE__)}/../../config/environment")

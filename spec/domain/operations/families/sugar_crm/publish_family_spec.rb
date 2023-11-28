@@ -20,7 +20,7 @@ RSpec.describe Operations::Families::SugarCrm::PublishFamily, type: :model, dbcl
   before do
     # Test the CRM update in isolation
     allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
-    EnrollRegistry[:crm_update_family_save].feature.stub(:is_enabled).and_return(false)
+    allow(EnrollRegistry[:crm_update_family_save].feature).to receive(:is_enabled).and_return(false)
     DatabaseCleaner.clean
     family.family_members << dependent_family_member
     person.person_relationships << PersonRelationship.new(relative: person, kind: "self")
@@ -82,7 +82,7 @@ RSpec.describe Operations::Families::SugarCrm::PublishFamily, type: :model, dbcl
     end
 
     it "should return failure if no family members critical attributes have been changed" do
-      expect(subject.call(family)).to eq(Failure("No critical changes made to family, no update needed to CRM gateway."))
+      expect(subject.call(family)).to eq(Failure("No critical changes made to family: #{family.id}, no update needed to CRM gateway."))
     end
   end
 

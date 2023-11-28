@@ -17,6 +17,9 @@ registry:
       - key: :verification_document_due_in_days
         item: 96
         is_enabled: true
+      - key: :bulk_call_verification_due_in_days
+        item: <%= ENV['BULK_CALL_VERIFICATION_DUE_IN_DAYS'] || 36 %>
+        is_enabled: true
       - key: :ivl_eligibility_notices
         is_enabled: true
         settings:
@@ -176,7 +179,7 @@ registry:
         is_enabled: true
         settings:
           - key: :offset_prior_to_due_date
-            item: 70
+            item: <%= ENV['DR2_DUE_DATE_OFFSET'] || 70 %>
           - key: :units
             item: :days
           - key: :event_name
@@ -185,7 +188,7 @@ registry:
         is_enabled: true
         settings:
           - key: :offset_prior_to_due_date
-            item: 45
+            item: 35
           - key: :units
             item: :days
           - key: :event_name
@@ -194,7 +197,7 @@ registry:
         is_enabled: true
         settings:
           - key: :offset_prior_to_due_date
-            item: 30
+            item: 20
           - key: :units
             item: :days
           - key: :event_name

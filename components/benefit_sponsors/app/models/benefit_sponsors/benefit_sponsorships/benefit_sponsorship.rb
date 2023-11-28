@@ -102,8 +102,7 @@ module BenefitSponsors
       class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication",
       inverse_of: :benefit_sponsorship
 
-    has_many :eligibilities, class_name: "::Eligibilities::Osse::Eligibility",
-                             as: :eligibility
+    embeds_many :eligibilities, class_name: '::Eligible::Eligibility', as: :eligible, cascade_callbacks: true
 
     has_many    :census_employees,
       class_name: "::CensusEmployee"
@@ -144,6 +143,8 @@ module BenefitSponsors
     validates :source_kind,
       inclusion: { in: SOURCE_KINDS, message: "%{value} is not a valid source kind" },
       allow_blank: false
+
+    scope :shop_osse_eligibilities, -> { where(:"eligibilities._type" => /.*ShopOsseEligibility$/) }
 
     # Workflow attributes
     scope :active,                      ->{ any_in(aasm_state: ACTIVE_STATES) }
@@ -291,6 +292,7 @@ module BenefitSponsors
 
     after_save :notify_on_save
     before_create :generate_hbx_id
+    after_create :create_default_osse_eligibility
     before_validation :pull_profile_attributes, :pull_organization_attributes, :validate_profile_organization
 
     def application_may_renew_effective_on(new_date)
@@ -355,21 +357,6 @@ module BenefitSponsors
 
     def has_primary_office_address?
       primary_office_location.present? && primary_office_location.address.present?
-    end
-
-    def eligibility_for(evidence_key, start_on)
-      eligibilities.by_date(start_on).select do |eligibility|
-        el = eligibility.evidences.by_key(evidence_key).max_by(&:created_at)
-        el&.is_satisfied == true
-      end.last
-    end
-
-    def current_eligibility(evidence_key)
-      # returns latest eligibility without an end date
-      eligibilities.select do |eligibility|
-        el = eligibility.evidences.by_key(evidence_key).max_by(&:created_at)
-        eligibility.end_on.nil? && el&.is_satisfied == true
-      end.last
     end
 
     # Inverse of Profile#benefit_sponsorship
@@ -440,6 +427,28 @@ module BenefitSponsors
 
     def benefit_market_catalog_for(effective_date)
       benefit_market.benefit_market_catalog_effective_on(effective_date)
+    end
+
+    def eligibilities_on(date)
+      eligibility_key = "aca_shop_osse_eligibility_#{date.year}".to_sym
+
+      eligibilities.by_key(eligibility_key)
+    end
+
+    def eligibility_on(effective_date)
+      eligibilities_on(effective_date).last
+    end
+
+    def active_eligibilities_on(date)
+      eligibilities_on(date).select{|e| e.is_eligible_on?(date) }
+    end
+
+    def active_eligibility_on(effective_date)
+      active_eligibilities_on(effective_date).last
+    end
+
+    def is_grant_eligible_on?(grant_value, effective_date)
+      active_eligibilities_on(effective_date).any?{|e| e.grant_for(grant_value)}
     end
 
     def benefit_sponsor_catalog_for(effective_date)
@@ -909,6 +918,39 @@ module BenefitSponsors
 
     def generate_hbx_id
       write_attribute(:hbx_id, BenefitSponsors::Organizations::HbxIdGenerator.generate_benefit_sponsorship_id) if hbx_id.blank?
+    end
+
+    def initial_osse_eligibility_params(effective_date)
+      effective_date ||= TimeKeeper.date_of_record.beginning_of_year
+      {
+        subject: self.to_global_id,
+        evidence_key: :shop_osse_evidence,
+        evidence_value: 'false',
+        effective_date: effective_date
+      }
+    end
+
+    def shop_osse_eligibility_is_enabled?(year = TimeKeeper.date_of_record.year)
+      EnrollRegistry.feature?("aca_shop_osse_eligibility_#{year}") && EnrollRegistry.feature_enabled?("aca_shop_osse_eligibility_#{year}")
+    end
+
+    def create_default_osse_eligibility
+      return unless shop_osse_eligibility_is_enabled?
+
+      ::BenefitMarkets::BenefitMarketCatalog.osse_eligibility_years_for_display.each do |year|
+        next unless year >= TimeKeeper.date_of_record.year
+
+        begin
+          effective_date = Date.new(year, 1, 1)
+          next if eligibility_on(effective_date)
+
+          ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(
+            initial_osse_eligibility_params(effective_date)
+          )
+        rescue StandardError => e
+          Rails.logger.error { "Default Osse Eligibility not created for #{self.to_global_id} due to #{e.backtrace}" }
+        end
+      end
     end
 
     def employer_profile_to_benefit_sponsor_states_map

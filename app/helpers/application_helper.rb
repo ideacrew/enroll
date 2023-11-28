@@ -342,16 +342,29 @@ module ApplicationHelper
   def render_flash
     rendered = []
     flash.each do |type, messages|
-      next if messages.respond_to?(:include?) && messages&.include?("nil is not a symbol nor a string")
+      next if messages.blank? || (messages.respond_to?(:include?) && messages.include?("nil is not a symbol nor a string"))
+
       if messages.respond_to?(:each)
         messages.each do |m|
-          rendered << render(:partial => 'layouts/flash', :locals => {:type => type, :message => m}) unless m.blank?
+          rendered << get_flash(type, m) if m.present?
         end
       else
-        rendered << render(:partial => 'layouts/flash', :locals => {:type => type, :message => messages}) unless messages.blank?
+        rendered << get_flash(type, messages)
       end
     end
     rendered.join.html_safe
+  end
+
+  def get_flash(type, msg)
+    if is_announcement?(msg)
+      render(:partial => 'layouts/announcement_flash', :locals => {:type => type, :message => msg[:announcement]})
+    else
+      render(:partial => 'layouts/flash', :locals => {:type => type, :message => msg})
+    end
+  end
+
+  def is_announcement?(item)
+    item.respond_to?(:keys) && item[:is_announcement]
   end
 
   def dd_value(val)
@@ -973,12 +986,44 @@ module ApplicationHelper
   end
 
   def display_childcare_program_options(person)
-    return false unless EnrollRegistry.feature_enabled?(:aca_ivl_osse_subsidy)
-
     person.has_active_consumer_role? || person.has_active_resident_role?
   end
 
-  def display_registration_recaptcha
-    EnrollRegistry.feature_enabled?(:registration_recaptcha)
+  def registration_recaptcha_enabled?(profile_type)
+    case profile_type
+    when "broker_agency"
+      EnrollRegistry.feature_enabled?(:registration_broker_recaptcha)
+    when "general_agency"
+      EnrollRegistry.feature_enabled?(:registration_ga_recaptcha)
+    when "user_account"
+      EnrollRegistry.feature_enabled?(:registration_user_account_recaptcha)
+    when "benefit_sponsor"
+      EnrollRegistry.feature_enabled?(:registration_sponsor_recaptcha)
+    else
+      false
+    end
+  end
+
+  def forgot_password_recaptcha_enabled?
+    EnrollRegistry.feature_enabled?(:forgot_password_recaptcha)
+  end
+
+  def plan_childcare_subsidy_eligible(plan)
+    plan.is_eligible_for_osse_grant? && plan.is_hc4cc_plan
+  end
+
+  def current_osse_status_for_role(role)
+    date = TimeKeeper.date_of_record
+    active_eligibility = role.active_eligibility_on(date)
+
+    if active_eligibility.present?
+      "Active for (#{date.year})"
+    else
+      "Not Active for (#{date.year})"
+    end
+  end
+
+  def individual_osse_eligibility_years_for_display
+    ::BenefitCoveragePeriod.osse_eligibility_years_for_display.sort.reverse
   end
 end

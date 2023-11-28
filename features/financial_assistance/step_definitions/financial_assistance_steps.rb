@@ -55,17 +55,19 @@ Then(/^they should see a new finanical assistance application$/) do
 end
 
 Given(/IAP Assistance Year Display feature is enabled/) do
-  EnrollRegistry[:iap_assistance_year_display].feature.stub(:is_enabled).and_return(true)
-  FinancialAssistanceRegistry[:iap_assistance_year_display].feature.stub(:is_enabled).and_return(true)
+  allow(EnrollRegistry[:iap_assistance_year_display].feature).to receive(:is_enabled).and_return(true)
+  allow(FinancialAssistanceRegistry[:iap_assistance_year_display].feature).to receive(:is_enabled).and_return(true)
 end
 
 Given(/IAP Assistance Year Display feature is disabled/) do
-  EnrollRegistry[:iap_assistance_year_display].feature.stub(:is_enabled).and_return(false)
-  FinancialAssistanceRegistry[:iap_assistance_year_display].feature.stub(:is_enabled).and_return(false)
+  allow(EnrollRegistry[:iap_assistance_year_display].feature).to receive(:is_enabled).and_return(false)
+  allow(FinancialAssistanceRegistry[:iap_assistance_year_display].feature).to receive(:is_enabled).and_return(false)
 end
 
 Then(/They should see the application assistance year above Info Needed/) do
-  assistance_year = FinancialAssistance::Application.all.first.assistance_year.to_s
+  application = FinancialAssistance::Application.all.first
+  assistance_year = assistance_year_display(application)
+
   expect(page).to have_content(assistance_year[0..1])
   expect(page).to have_content(assistance_year[2..3])
 end
@@ -449,8 +451,8 @@ Given(/^the kaiser paynow feature configuration is disabled$/) do
 end
 
 When(/kaiser pay now feature is enabled/) do
-  EnrollRegistry[:kaiser_permanente_pay_now].feature.stub(:is_enabled).and_return(true)
-  EnrollRegistry[:kaiser_permanente_pay_now].setting(:plan_shopping).stub(:item).and_return(true)
+  allow(EnrollRegistry[:kaiser_permanente_pay_now].feature).to receive(:is_enabled).and_return(true)
+  allow(EnrollRegistry[:kaiser_permanente_pay_now].setting(:plan_shopping)).to receive(:item).and_return(true)
 end
 
 Given(/^the enrollment tile feature is enabled$/) do
@@ -458,11 +460,11 @@ Given(/^the enrollment tile feature is enabled$/) do
 end
 
 Given(/^the generic_redirect setting is enabled$/) do
-  EnrollRegistry[:generic_redirect].feature.stub(:is_enabled).and_return(true)
+  allow(EnrollRegistry[:generic_redirect].feature).to receive(:is_enabled).and_return(true)
 end
 
 Given(/^the generic_redirect setting is disabled$/) do
-  EnrollRegistry[:generic_redirect].feature.stub(:is_enabled).and_return(false)
+  allow(EnrollRegistry[:generic_redirect].feature).to receive(:is_enabled).and_return(false)
 end
 
 Given(/^the FAA feature configuration is enabled$/) do
@@ -483,27 +485,27 @@ Given(/an applicant has outstanding local mec evidence/) do
 end
 
 Given(/the mec check feature is enabled/) do
-  EnrollRegistry[:mec_check].feature.stub(:is_enabled).and_return(true)
+  allow(EnrollRegistry[:mec_check].feature).to receive(:is_enabled).and_return(true)
 end
 
 Given(/the mec check feature is disabled/) do
-  EnrollRegistry[:mec_check].feature.stub(:is_enabled).and_return(false)
+  allow(EnrollRegistry[:mec_check].feature).to receive(:is_enabled).and_return(false)
 end
 
 Given(/the shop coverage check feature is enabled/) do
-  EnrollRegistry[:shop_coverage_check].feature.stub(:is_enabled).and_return(true)
+  allow(EnrollRegistry[:shop_coverage_check].feature).to receive(:is_enabled).and_return(true)
 end
 
 Given(/the shop coverage check feature is disabled/) do
-  EnrollRegistry[:shop_coverage_check].feature.stub(:is_enabled).and_return(false)
+  allow(EnrollRegistry[:shop_coverage_check].feature).to receive(:is_enabled).and_return(false)
 end
 
 Given(/the coverage check banners feature is enabled/) do
-  EnrollRegistry[:coverage_check_banners].feature.stub(:is_enabled).and_return(true)
+  allow(EnrollRegistry[:coverage_check_banners].feature).to receive(:is_enabled).and_return(true)
 end
 
 Given(/the coverage check banners feature is disabled/) do
-  EnrollRegistry[:coverage_check_banners].feature.stub(:is_enabled).and_return(false)
+  allow(EnrollRegistry[:coverage_check_banners].feature).to receive(:is_enabled).and_return(false)
 end
 
 Given(/an applicant has shop coverage/) do
@@ -676,8 +678,12 @@ Then(/^a family with financial application and applicants in (.*) state exists w
   create_family_faa_application_with_applicants_and_evidences(state)
 end
 
+Then(/^a family with financial application and applicants in (.*) state exists with unverified evidences$/) do |state|
+  create_family_faa_application_with_applicants_and_unverified_evidences(state)
+end
+
 When(/^an applicant with other income exists for a (.*) financial application$/) do |state|
-  create_application_applicant_with_other_income(state)
+  create_application_applicant_with_incomes(state)
 end
 
 Then(/^the user with (.*) role is logged in$/) do |role|
@@ -711,6 +717,10 @@ end
 
 Then(/^the social security type - (.*) benefits should show$/) do |ssi_type|
   expect(page).to have_content(l10n("faa.income.social_security_benefit.#{ssi_type}"))
+end
+
+Then(/^the (.*) type should display$/) do |income_type|
+  expect(page).to have_content(l10n("faa.income.#{income_type.parameterize.underscore}"))
 end
 
 Then(/^the caretaker questions should show$/) do

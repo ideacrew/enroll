@@ -101,8 +101,9 @@
         = @hbx_enrollment&.effective_on
         br/
         span.ttu.lg.twelve.font-weight-bold
-          = l10n('enrollment.latest_transition')
-        = latest_transition(@hbx_enrollment)
+          = l10n('enrollment.transitions')
+        div style='white-space: pre-line;'
+          = all_transitions(@hbx_enrollment)
         br/
         span.ttu.lg.twelve.font-weight-bold
           = l10n('product_hios_id')
@@ -111,6 +112,11 @@
         span.ttu.lg.twelve.font-weight-bold
           = l10n('rating_area.exchange_provided_code')
         = @hbx_enrollment&.rating_area&.exchange_provided_code || l10n('not_available')
+        br/
+        span.ttu.lg.twelve.font-weight-bold
+          = l10n('service_area')
+          | :
+        =< @hbx_enrollment&.product&.service_area&.issuer_provided_code || l10n('not_available')
         br/
         br/
         span.h3 data-cuke='enrollment_member_detail'

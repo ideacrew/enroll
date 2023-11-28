@@ -6,8 +6,14 @@ module BenefitSponsors
       # EmployerProfilesController
       class EmployerProfilesController < ::BenefitSponsors::ApplicationController
         include Config::AcaHelper
+        include EventSource::Command
+        include ::L10nHelper
 
-        before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :export_census_employees, :show_invoice, :coverage_reports, :download_invoice, :terminate_employee_roster_enrollments]
+        before_action :find_employer, only: [
+          :show, :inbox, :bulk_employee_upload, :export_census_employees, :show_invoice,
+          :coverage_reports, :download_invoice, :terminate_employee_roster_enrollments,
+          :osse_eligibilities, :update_osse_eligibilities
+        ]
         before_action :load_group_enrollments, only: [:coverage_reports], if: :is_format_csv?
         before_action :check_and_download_invoice, only: [:download_invoice, :show_invoice]
         before_action :wells_fargo_sso, only: [:show]
@@ -108,10 +114,31 @@ module BenefitSponsors
           end
         end
 
+        def osse_eligibilities
+          authorize @employer_profile, :osse_eligibilities?
+          service = BenefitSponsors::Services::OsseEligibilityService.new(@employer_profile)
+          @osse_status_by_year = service.osse_status_by_year
+          respond_to do |format|
+            format.html
+          end
+        end
+
+        def update_osse_eligibilities
+          authorize @employer_profile, :update_osse_eligibilities?
+
+          eligibilities = params.require(:eligibilities).permit(:osse => {})
+          service = BenefitSponsors::Services::OsseEligibilityService.new(@employer_profile, eligibilities)
+          result = service.update_osse_eligibilities_by_year
+          flash[:notice] = "Sucessfully updated HC4CC eligibility for years #{result['Success'].join(', ')}" if result["Success"]
+          flash[:error] = "Failed to updated HC4CC eligibility for years #{result['Failure'].join(', ')}" if result["Failure"]
+
+          redirect_to profiles_employers_employer_profile_osse_eligibilities_path(employer_profile_id: @employer_profile.id)
+        end
+
         def export_census_employees
           authorize @employer_profile
           respond_to do |format|
-            format.csv { send_data @employer_profile.census_employees.sorted.to_csv, filename: "#{@employer_profile.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
+            format.csv { send_data CensusEmployee.download_census_employees_roster(@employer_profile.id), filename: "#{@employer_profile.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
           end
         end
 
@@ -126,22 +153,53 @@ module BenefitSponsors
           send_data(Aws::S3Storage.find(@invoice.identifier), options) if @invoice&.identifier
         end
 
+        def bulk_upload_with_async_process(file)
+          filename = file.original_filename
+          # preparing the file upload to s3
+          uri = Aws::S3Storage.save(file.path, 'ce-roster-upload')
+          @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, @employer_profile)
+          begin
+            if uri.present?
+              # making call to subscriber
+              event = event('events.benefit_sponsors.employer_profile.bulk_ce_upload', attributes: {s3_reference_key: filename, bucket_name: 'ce-roster-upload', employer_profile_id: @employer_profile.id, filename: filename})
+              event.success.publish if event.success?
+              # once we put file to s3 then redirecting user to the employees list page
+              flash[:notice] = l10n("employers.employer_profiles.ce_bulk_upload_success_message")
+              redirect_to employees_upload_url(@employer_profile.id)
+            else
+              flash[:notice] = l10n("employers.employer_profiles.ce_bulk_upload_error_message")
+              render @roster_upload_form.redirection_url || default_url
+            end
+          rescue StandardError => e
+            @roster_upload_form.errors.add(:base, e.message)
+            render @roster_upload_form.redirection_url || default_url
+          end
+        end
+
+        def bulk_upload_with_sync_process(file)
+          @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, @employer_profile)
+          roaster_upload_count = @roster_upload_form.census_records.length
+          begin
+            if @roster_upload_form.save
+              flash[:notice] = "#{roaster_upload_count} records uploaded from CSV"
+              redirect_to URI.parse(@roster_upload_form.redirection_url).to_s
+            else
+              render @roster_upload_form.redirection_url || default_url
+            end
+          rescue StandardError => e
+            @roster_upload_form.errors.add(:base, e.message)
+            render @roster_upload_form.redirection_url || default_url
+          end
+        end
+
         def bulk_employee_upload
           authorize @employer_profile, :show?
           if roster_upload_file_type.include?(file_content_type)
             file = params.require(:file)
-            @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, @employer_profile)
-            roaster_upload_count = @roster_upload_form.census_records.length
-            begin
-              if @roster_upload_form.save
-                flash[:notice] = "#{roaster_upload_count} records uploaded from CSV"
-                redirect_to URI.parse(@roster_upload_form.redirection_url).to_s
-              else
-                render @roster_upload_form.redirection_url || default_url
-              end
-            rescue StandardError => e
-              @roster_upload_form.errors.add(:base, e.message)
-              render @roster_upload_form.redirection_url || default_url
+            if ce_roster_bulk_upload_enabled?
+              bulk_upload_with_async_process(file)
+            else
+              bulk_upload_with_sync_process(file)
             end
           else
             @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.new

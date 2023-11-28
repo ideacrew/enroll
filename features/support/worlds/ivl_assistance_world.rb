@@ -148,7 +148,7 @@ module IvlAssistanceWorld
   def enable_change_tax_credit_button
     current_year = TimeKeeper.date_of_record.year
     is_tax_credit_btn_enabled = TimeKeeper.date_of_record < Date.new(current_year, 11, HbxProfile::IndividualEnrollmentDueDayOfMonth + 1)
-    allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 10, 5)) unless is_tax_credit_btn_enabled
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(current_year,10,5)) unless is_tax_credit_btn_enabled
   end
 
   def create_family_faa_application(state)
@@ -181,7 +181,7 @@ module IvlAssistanceWorld
     @application.save!
   end
 
-  def create_application_applicant_with_other_income(state)
+  def create_application_applicant_with_incomes(state)
     create_family_faa_application(state)
     eligibility_determination1 = FactoryBot.create(:financial_assistance_eligibility_determination, application: @application)
     @applicant = FactoryBot.create(:financial_assistance_applicant, eligibility_determination_id: eligibility_determination1.id, is_primary_applicant: true, gender: "male", application: @application, family_member_id: BSON::ObjectId.new)
@@ -210,6 +210,18 @@ module IvlAssistanceWorld
                                          county: 'Cumberland')]
       appl.save!
     end
+
+    wages_and_salaries_params = {kind: "wages_and_salaries",
+                                 amount: 3400.0,
+                                 amount_tax_exempt: 0,
+                                 frequency_kind: "quarterly",
+                                 start_on: Date.new(TimeKeeper.date_of_record.year,0o1,0o1),
+                                 end_on: nil,
+                                 is_projected: false,
+                                 submitted_at: TimeKeeper.date_of_record}
+
+    @application.applicants.first.incomes << FinancialAssistance::Income.new(wages_and_salaries_params)
+
     @application.save!
   end
 
@@ -221,6 +233,18 @@ module IvlAssistanceWorld
       applicant.esi_evidence = FactoryBot.build(:evidence, :with_request_results, :with_verification_histories, key: :esi_mec, title: 'ESI MEC')
       applicant.non_esi_evidence = FactoryBot.build(:evidence, :with_request_results, :with_verification_histories, key: :non_esi_mec, title: 'Non ESI MEC')
       applicant.local_mec_evidence = FactoryBot.build(:evidence, :with_request_results, :with_verification_histories, key: :local_mec, title: 'Local MEC')
+      applicant.save
+    end
+  end
+
+  def create_family_faa_application_with_applicants_and_unverified_evidences(state)
+    create_family_faa_application_with_applicants(state)
+
+    @application.applicants.each do |applicant|
+      applicant.income_evidence = FactoryBot.build(:evidence, :with_request_results, :with_verification_histories, key: :income, title: 'Income', aasm_state: 'unverified', is_satisfied: false)
+      applicant.esi_evidence = FactoryBot.build(:evidence, :with_request_results, :with_verification_histories, key: :esi_mec, title: 'ESI MEC', aasm_state: 'unverified', is_satisfied: false)
+      applicant.non_esi_evidence = FactoryBot.build(:evidence, :with_request_results, :with_verification_histories, key: :non_esi_mec, title: 'Non ESI MEC', aasm_state: 'unverified', is_satisfied: false)
+      applicant.local_mec_evidence = FactoryBot.build(:evidence, :with_request_results, :with_verification_histories, key: :local_mec, title: 'Local MEC', aasm_state: 'unverified', is_satisfied: false)
       applicant.save
     end
   end

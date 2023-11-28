@@ -11,7 +11,7 @@ RSpec.describe GeneralAgencyAccount, type: :model do
   end
 
   before do
-    EnrollRegistry[:general_agency].feature.stub(:is_enabled).and_return(true)
+    allow(EnrollRegistry[:general_agency].feature).to receive(:is_enabled).and_return(true)
   end
 
   context ".new" do

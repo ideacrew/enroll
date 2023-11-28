@@ -19,23 +19,7 @@ describe Products::QhpCostShareVariance, :type => :model do
     expect(product_qhp.qhp_cost_share_variances.first.product_for('fehb')).to eq fehb_product
   end
 
-  context 'when qhp_product_for_include_aca_individual enabled' do
-    before do
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:qhp_product_for_include_aca_individual).and_return(true)
-    end
-
-    it "should return aca_individual product for individual market kind" do
-      expect(product_qhp.qhp_cost_share_variances.first.product_for('individual')).to eq aca_individual_product
-    end
-  end
-
-  context 'when qhp_product_for_include_aca_individual disabled' do
-    before do
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:qhp_product_for_include_aca_individual).and_return(false)
-    end
-
-    it "should return aca_individual product for individual market kind" do
-      expect(product_qhp.qhp_cost_share_variances.first.product_for('individual')).to eq nil
-    end
+  it "should return aca individual product" do
+    expect(product_qhp.qhp_cost_share_variances.first.product_for('individual')).to eq aca_individual_product
   end
 end

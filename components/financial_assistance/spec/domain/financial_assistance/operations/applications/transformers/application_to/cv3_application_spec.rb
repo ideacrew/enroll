@@ -2206,6 +2206,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     context 'when use_defaults_for_qnc_and_five_year_bar_data is disabled' do
       before do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:use_defaults_for_qnc_and_five_year_bar_data).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
       end
 
       context 'when qnc is false on applicant' do
@@ -2264,6 +2265,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
     context 'when use_defaults_for_qnc_and_five_year_bar_data is disabled' do
       before do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:use_defaults_for_qnc_and_five_year_bar_data).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
         applicant.update!(qualified_non_citizen: false)
         result = subject.call(application.reload)
         entity_init = AcaEntities::MagiMedicaid::Operations::InitializeApplication.new.call(result.success)
@@ -2322,6 +2324,18 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       it 'returns success' do
         expect(operation_result).to be_success
         expect(result_code_description).to be_nil
+      end
+    end
+    context 'with blank due date' do
+      before do
+        applicant.local_mec_evidence.update_attributes!(due_on: nil)
+      end
+
+      let(:code_description) { nil }
+      let(:local_mec_evidence_result) { operation_result.value![:applicants].first[:local_mec_evidence][:due_on] }
+
+      it 'should return a populated due on' do
+        expect(local_mec_evidence_result).to eql(applicant.local_mec_evidence.verif_due_date)
       end
     end
   end
