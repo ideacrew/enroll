@@ -20,7 +20,7 @@
     <%= javascript_pack_tag ENV['CLIENT'] %>
     <%= stylesheet_pack_tag ENV['CLIENT'] %>
 
-    <% if ENV['CR97_ENABLED'] %>
+    <% if ENV['CR97_IS_ENABLED'] %>
       <%= javascript_pack_tag 'cr97' %>
       <%= stylesheet_pack_tag 'cr97' %>
     <% end %>
