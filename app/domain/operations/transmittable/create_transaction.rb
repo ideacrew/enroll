@@ -8,7 +8,8 @@ module Operations
 
       def call(params)
         values = yield validate_params(params)
-        transaction_hash = yield build_transaction_hash(values)
+        process_status = yield create_process_status(values[:event], values[:state_key])
+        transaction_hash = yield build_transaction_hash(values, process_status)
         transaction_entity = yield create_transaction_entity(transaction_hash)
         transaction = yield create_transaction(transaction_entity, values[:subject])
         _transaction_transmission = yield create_transaction_transmission(transaction, values[:transmission])
@@ -28,12 +29,12 @@ module Operations
         Success(params)
       end
 
-      def build_transaction_hash(values)
+      def build_transaction_hash(values, process_status)
         Success({
                   key: values[:key],
                   title: values[:title],
                   description: values[:description],
-                  process_status: create_process_status(values[:event], values[:state_key]),
+                  process_status: process_status,
                   started_at: values[:started_at],
                   transaction_id: values[:correlation_id],
                   ended_at: values[:ended_at],
@@ -44,14 +45,15 @@ module Operations
       end
 
       def create_process_status(event, state_key)
-        Operations::Transmittable::CreateProcessStatusHash.new.call({ event: event, state_key: state_key, started_at: DateTime.now,
-                                                                      message: 'created transaction' }).value!
+        result = Operations::Transmittable::CreateProcessStatusHash.new.call({ event: event, state_key: state_key, started_at: DateTime.now,
+                                                                               message: 'created transaction' })
+        result.success? ? Success(result.value!) : result
       end
 
       def create_transaction_entity(transaction_hash)
         validation_result = AcaEntities::Protocols::Transmittable::Operations::Transactions::Create.new.call(transaction_hash)
 
-        validation_result.success? ? Success(validation_result.value!) : Failure("Unable to create Transaction due to invalid params")
+        validation_result.success? ? Success(validation_result.value!) : validation_result
       end
 
       def create_transaction(transaction_entity, subject)

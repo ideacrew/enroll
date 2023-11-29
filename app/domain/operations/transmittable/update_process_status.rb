@@ -49,7 +49,7 @@ module Operations
                                                                                                                 started_at: DateTime.now,
                                                                                                                 state_key: values[:state] })
 
-        validation_result.success? ? Success(validation_result.value!) : Failure("Unable to create process state due to invalid params")
+        validation_result.success? ? Success(validation_result.value!) : validation_result
       end
     end
   end

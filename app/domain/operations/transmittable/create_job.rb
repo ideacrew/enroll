@@ -8,7 +8,8 @@ module Operations
 
       def call(params)
         values = yield validate_params(params)
-        job_hash = yield create_job_hash(values)
+        process_status = yield create_process_status
+        job_hash = yield create_job_hash(values, process_status)
         job_entity = yield create_job_entity(job_hash)
         job = yield create_job(job_entity)
         Success(job)
@@ -24,7 +25,7 @@ module Operations
         Success(params)
       end
 
-      def create_job_hash(values)
+      def create_job_hash(values, process_status)
         Success({
                   job_id: generate_job_id(values[:key]),
                   saga_id: values[:saga_id],
@@ -37,7 +38,7 @@ module Operations
                   ended_at: values[:ended_at],
                   time_to_live: values[:time_to_live],
                   message_id: values[:message_id],
-                  process_status: create_process_status,
+                  process_status: process_status,
                   transmittable_errors: [],
                   allow_list: [],
                   deny_list: []
@@ -49,7 +50,7 @@ module Operations
       def create_job_entity(job_hash)
         validation_result = AcaEntities::Protocols::Transmittable::Operations::Jobs::Create.new.call(job_hash)
 
-        validation_result.success? ? Success(validation_result.value!) : Failure("Unable to create job due to invalid params")
+        validation_result.success? ? Success(validation_result.value!) : validation_result
       end
 
       def generate_job_id(key)
@@ -57,8 +58,9 @@ module Operations
       end
 
       def create_process_status
-        Operations::Transmittable::CreateProcessStatusHash.new.call({ event: 'initial', state_key: :initial, started_at: DateTime.now,
-                                                                      message: 'created job' }).value!
+        result = Operations::Transmittable::CreateProcessStatusHash.new.call({ event: 'initial', state_key: :initial, started_at: DateTime.now,
+                                                                               message: 'created job' })
+        result.success? ? Success(result.value!) : result
       end
 
       def create_job(job_entity)

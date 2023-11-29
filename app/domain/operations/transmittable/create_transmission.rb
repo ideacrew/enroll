@@ -8,7 +8,8 @@ module Operations
 
       def call(params)
         values = yield validate_params(params)
-        transmission_hash = yield build_transmission_hash(values)
+        process_status = yield create_process_status(values[:event], values[:state_key])
+        transmission_hash = yield build_transmission_hash(values, process_status)
         transmission_entity = yield transmission_entity(transmission_hash)
         transmission = yield create_transmission(params[:job], transmission_entity)
         Success(transmission)
@@ -27,28 +28,29 @@ module Operations
         Success(params)
       end
 
-      def build_transmission_hash(values)
+      def build_transmission_hash(values, process_status)
         Success({
                   key: values[:key],
                   title: values[:title],
                   description: values[:description],
                   started_at: values[:started_at],
                   ended_at: values[:ended_at],
-                  process_status: create_process_status(values[:event], values[:state_key]),
+                  process_status: process_status,
                   transmission_id: values[:correlation_id],
                   transmittable_errors: []
                 })
       end
 
       def create_process_status(event, state_key)
-        Operations::Transmittable::CreateProcessStatusHash.new.call({ event: event, state_key: state_key, started_at: DateTime.now,
-                                                                      message: 'created transmission' }).value!
+        result = Operations::Transmittable::CreateProcessStatusHash.new.call({ event: event, state_key: state_key, started_at: DateTime.now,
+                                                                               message: 'created transmission' })
+        result.success? ? Success(result.value!) : result
       end
 
       def transmission_entity(transmission_hash)
         validation_result = AcaEntities::Protocols::Transmittable::Operations::Transmissions::Create.new.call(transmission_hash)
 
-        validation_result.success? ? Success(validation_result.value!) : Failure("Unable to create Transmission due to invalid params")
+        validation_result.success? ? Success(validation_result.value!) : validation_result
       end
 
       def create_transmission(job, tranmission_entity)

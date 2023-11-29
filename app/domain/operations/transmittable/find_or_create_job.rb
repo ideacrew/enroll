@@ -41,9 +41,7 @@ module Operations
       end
 
       def create_job(values)
-        result = Operations::Transmittable::CreateJob.new.call(values)
-
-        result.success? ? Success(result.value!) : result
+        Operations::Transmittable::CreateJob.new.call(values)
       end
     end
   end
