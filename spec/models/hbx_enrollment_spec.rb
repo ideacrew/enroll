@@ -575,6 +575,7 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
   let(:employee_role) { census_employee.employee_role.reload }
   let(:effective_on) { initial_application.start_on.to_date }
   let(:coverage_kind) { "health" }
+  let(:kind) { 'employer_sponsored' }
 
   let(:shop_enrollment) do
     FactoryBot.create(
@@ -583,6 +584,7 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
       :with_enrollment_members,
       :with_product,
       coverage_kind: coverage_kind,
+      kind: kind,
       family: person.primary_family,
       employee_role: employee_role,
       effective_on: (effective_on + 3.months),
@@ -646,6 +648,14 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
         expect(shop_enrollment.reload.eligible_child_care_subsidy.to_f).to eq(0.00)
       end
     end
+
+    context 'when enrollment is cobra' do
+      let(:kind) { 'employer_sponsored_cobra' }
+
+      it 'should not update OSSE subsidy' do
+        expect(shop_enrollment.reload.eligible_child_care_subsidy.to_f).to eq(0.00)
+      end
+    end
   end
 
   context 'when employee is not eligible for OSSE' do
@@ -702,6 +712,26 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
         expect(shop_enrollment.eligible_child_care_subsidy.to_f).to eq excess_subsidy_amount
         shop_enrollment.verify_and_reset_osse_subsidy_amount(member_group)
         expect(shop_enrollment.eligible_child_care_subsidy.to_f).to eq subscriber_premium
+      end
+    end
+
+    context 'when subscriber is cobra eligible, it should not reset the osse value ' do
+      let(:member_group)  { HbxEnrollmentSponsoredCostCalculator.new(shop_enrollment).groups_for_products([shop_enrollment.product]).first }
+      let(:subscriber_premium) do
+        member = shop_enrollment.hbx_enrollment_members.detect(&:is_subscriber?)
+        member_group.group_enrollment.member_enrollments.find{|enrollment| enrollment.member_id == member.id }.product_price
+      end
+      let(:kind) { 'employer_sponsored_cobra' }
+
+
+      before do
+        shop_enrollment.update(eligible_child_care_subsidy: 0.00)
+      end
+
+      it 'should max subsidy at subscriber premium' do
+        expect(shop_enrollment.eligible_child_care_subsidy.to_f).to eq 0.00
+        shop_enrollment.verify_and_reset_osse_subsidy_amount(member_group)
+        expect(shop_enrollment.eligible_child_care_subsidy.to_f).to eq 0.00
       end
     end
   end
