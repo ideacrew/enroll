@@ -136,7 +136,11 @@ class Family
          'eligibility_determination.subjects.encrypted_ssn': 1 },
         { name: 'outstanding_verification_subjects_encrypted_ssn' })
 
-  # index("households.tax_households_id")
+  index({ 'eligibility_determination.subjects.eligibility_states.evidence_states.status': 1,
+          'eligibility_determination.subjects.eligibility_states.eligibility_item_key': 1,
+          'eligibility_determination.subjects.eligibility_states.evidence_states.due_on': 1},
+        { name: 'subjects_evidence_states_status_due_on'})
+
 
   validates :renewal_consent_through_year,
             numericality: {only_integer: true, inclusion: 2014..2025},
@@ -284,9 +288,9 @@ class Family
     where({
             "$and" =>
               [
-                {"eligibility_determination.subjects.eligibility_states.evidence_states.due_on" => date.beginning_of_day},
                 {"eligibility_determination.subjects.eligibility_states.evidence_states.status" => :outstanding},
-                {"eligibility_determination.subjects.eligibility_states.eligibility_item_key" => {"$in": %w[aptc_csr_credit aca_individual_market_eligibility] }}
+                {"eligibility_determination.subjects.eligibility_states.eligibility_item_key" => {"$in": %w[aptc_csr_credit aca_individual_market_eligibility] }},
+                {"eligibility_determination.subjects.eligibility_states.evidence_states.due_on" => date.beginning_of_day}
               ]
           })
   }
