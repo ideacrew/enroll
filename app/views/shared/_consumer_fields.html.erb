@@ -12,15 +12,13 @@
           <label>Is this person a US citizen or US national? *</label>
         </div>
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
-          <div tabindex="0", class="radio skinned-form-controls skinned-form-controls-mac">
-            <%= f.radio_button :us_citizen, true, required: true, class: "required floatlabel" %>
-            <%= f.label :us_citizen, :value => true do %>
-              <span class="yes_no_pair">Yes</span>
-            <% end %>
+          <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'person_us_citizen_yes', 'person_us_citizen_no')" class="radio skinned-form-controls skinned-form-controls-mac">
+            <input type="radio" name="us_citizen" value="true" required class="required floatlabel">
+            <label for="us_citizen_true">True</label>
           </div>
         </div>
         <div class="col-lg-1 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
-          <div tabindex="0", class="radio skinned-form-controls skinned-form-controls-mac">
+          <div tabindex="0", onkeydown="handleRadioKeyDown(event, 'person_us_citizen_no', 'person_us_citizen_yes')", class="radio skinned-form-controls skinned-form-controls-mac">
             <%= f.radio_button :us_citizen, false, required: true, class: "required floatlabel" %>
             <%= f.label :us_citizen, :value => false do %>
               <span class="yes_no_pair">No</span>
@@ -38,10 +36,10 @@
           <label> <%= l10n("insured.consumer_roles.naturalized_question") %> *</label>
         </div>
         <div class="col-lg-3 col-md-2 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
-          <div tabindex="0", onkeydown="handleRadioKeyDown(event, 'naturalized_citizen_yes', 'naturalized_citizen_no')", class="radio skinned-form-controls skinned-form-controls-mac">
+          <div class="radio skinned-form-controls skinned-form-controls-mac">
             <%= f.radio_button :naturalized_citizen, true, required: true, class: "required floatlabel" %>
             <%= f.label :naturalized_citizen, :value => true do %>
-              <span class="yes_no_pair">Yes</span>
+              <span tabindex="0", onkeydown="handleRadioKeyDown(event, 'naturalized_citizen_yes', 'naturalized_citizen_no')", class="yes_no_pair">Yes</span>
             <% end %>
           </div>
         </div>
