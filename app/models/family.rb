@@ -124,7 +124,7 @@ class Family
 
   index({ 'eligibility_determination.effective_date': 1 })
 
-  index({'eligibility_determination.outstanding_verificationstatus': 1,
+  index({'eligibility_determination.outstanding_verification_status': 1,
          'eligibility_determination.subjects.full_name': 1},
         { name: 'outstanding_verification_subjects_full_name' })
 
@@ -284,11 +284,11 @@ class Family
     ).distinct(:family_id))
   }
 
-  scope :outstanding_verifications_subjects_enrolled, lambda do
+  scope :outstanding_verifications_subjects_enrolled, lambda {
     where({"eligibility_determination.subjects.eligibility_states.evidence_states.is_eligble" => true})
-  end
+  }
 
-  scope :outstanding_verifications_expiring_on, lambda do |date|
+  scope :outstanding_verifications_expiring_on, lambda { |date|
     where({
             "$and" =>
               [
@@ -297,7 +297,7 @@ class Family
                 {"eligibility_determination.subjects.eligibility_states.evidence_states.due_on" => date.beginning_of_day}
               ]
           })
-  end
+  }
 
   # Replaced scopes for moving HbxEnrollment to top level
   # The following methods are rewrites of scopes that were being called before HbxEnrollment was a top level document.
