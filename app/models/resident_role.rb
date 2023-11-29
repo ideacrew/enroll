@@ -181,4 +181,12 @@ class ResidentRole
   def residency_verified?
     is_state_resident?
   end
+
+  def verification_types
+    person&.verification_types&.active&.where(applied_roles: "resident_role")
+  end
+
+  def types_include_to_notices
+    verification_types.find_all(&:type_unverified?)
+  end
 end

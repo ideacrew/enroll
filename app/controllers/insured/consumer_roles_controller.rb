@@ -11,7 +11,7 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :decrypt_params, only: [:create]
   before_action :set_cache_headers, only: [:edit, :help_paying_coverage, :privacy, :search]
   before_action :redirect_if_medicaid_tax_credits_link_is_disabled, only: [:privacy, :search]
-  before_action :sanitize_contact_method, only: [:update]
+  before_action :sanitize_contact_method, :validate_person_match, only: [:update]
 
   FIELDS_TO_ENCRYPT = [:ssn,:dob,:first_name,:middle_name,:last_name,:gender,:user_id].freeze
 
@@ -326,6 +326,33 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   private
+
+  def validate_person_match
+    first_name = params[:person][:first_name]
+    last_name = params[:person][:last_name]
+    return if (first_name == @person.first_name) && (last_name == @person.last_name)
+    matched_person = match_person(first_name, last_name)
+    return unless matched_person.present? && (matched_person.hbx_id != @person.hbx_id)
+    flash[:error] = l10n("person_match_error_message", first_name: first_name, last_name: last_name)
+    respond_to do |format|
+      format.html { redirect_to edit_insured_consumer_role_path(@person.consumer_role.id) }
+    end
+  end
+
+  def match_person(first_name, last_name)
+    ssn = @person.ssn
+    match_criteria, records = Operations::People::Match.new.call({:dob => @person.dob,
+                                                                  :last_name => last_name,
+                                                                  :first_name => first_name,
+                                                                  :ssn => ssn})
+
+    return nil if records.blank?
+    if (match_criteria == :dob_present && ssn.present? && records.first.employer_staff_roles?) ||
+       (match_criteria == :dob_present && ssn.blank?) ||
+       match_criteria == :ssn_present
+      records.first
+    end
+  end
 
   def mec_check(person_id)
     ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecCheck.new.call(person_id)

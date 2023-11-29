@@ -115,8 +115,10 @@ module Eligibilities
     def move_evidence_to_outstanding
       return unless may_move_to_outstanding?
 
-      update(verification_outstanding: true, is_satisfied: false)
-      move_to_outstanding
+      verification_document_due = EnrollRegistry[:verification_document_due_in_days].item
+      due_date = due_on.blank? ? TimeKeeper.date_of_record + verification_document_due : due_on
+      update(verification_outstanding: true, is_satisfied: false, due_on: due_date)
+      move_to_outstanding!
     end
 
     def move_evidence_to_negative_response_received
@@ -127,7 +129,7 @@ module Eligibilities
 
     def move_evidence_to_attested
       update(verification_outstanding: false, is_satisfied: true, due_on: nil)
-      attest
+      attest!
     end
 
     # Checks if the applicant is enrolled in any APTC or CSR enrollments.
@@ -164,9 +166,9 @@ module Eligibilities
       result
     end
 
-    def extend_due_on(period = 30.days, updated_by = nil)
+    def extend_due_on(period = 30.days, updated_by = nil, action = 'extend_due_date')
       self.due_on = verif_due_date + period
-      add_verification_history('extend_due_date', "Extended due date to #{due_on.strftime('%m/%d/%Y')}", updated_by)
+      add_verification_history(action, "Extended due date to #{due_on.strftime('%m/%d/%Y')}", updated_by)
     end
 
     def auto_extend_due_on(period = 30.days, updated_by = nil)
@@ -184,10 +186,15 @@ module Eligibilities
       self.due_on = new_date
     end
 
-    def can_be_extended?
-      return false unless type_unverified?
-      extensions = verification_histories.where(action: "auto_extend_due_date")
-      return true unless extensions.any?
+    def can_be_auto_extended?(date)
+      return false unless due_on == date
+      can_be_extended?('auto_extend_due_date')
+    end
+
+    def can_be_extended?(action)
+      return false unless ['rejected', 'outstanding'].include?(self.aasm_state)
+      extensions = verification_histories&.where(action: action)
+      return true unless extensions&.any?
       #  want this limitation on due date extensions to reset anytime an evidence no longer requires a due date
       # (is moved to 'verified' or 'attested' state) so that an individual can benefit from the extension again in the future.
       auto_extend_time = extensions.last&.created_at
@@ -255,6 +262,7 @@ module Eligibilities
         transitions from: :unverified, to: :attested
         transitions from: :negative_response_received, to: :attested
         transitions from: :attested, to: :attested
+        transitions from: :verified, to: :attested
       end
 
       event :move_to_rejected, :after => [:record_transition] do
@@ -372,7 +380,8 @@ module Eligibilities
     def record_transition
       self.workflow_state_transitions << WorkflowStateTransition.new(
         from_state: aasm.from_state,
-        to_state: aasm.to_state
+        to_state: aasm.to_state,
+        event: aasm.current_event
       )
     end
 

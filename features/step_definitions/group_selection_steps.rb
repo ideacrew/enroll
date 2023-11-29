@@ -55,7 +55,6 @@ Given (/a matched Employee exists with consumer role/) do
   FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)
 end
 
-
 And(/(.*) has a dependent in (.*) relationship with age (.*) than 26/) do |role, kind, var|
   dob = (var == "greater" ? TimeKeeper.date_of_record - 35.years : TimeKeeper.date_of_record - 5.years)
   family = Family.all.first
@@ -73,6 +72,23 @@ And(/(.*) has a dependent in (.*) relationship with age (.*) than 26/) do |role,
   ch.coverage_household_members << CoverageHouseholdMember.new(family_member_id: fm.id)
   ch.save
   final_person.save
+end
+
+Given(/a matched Employee exists with resident role/) do
+  FactoryBot.create(:employee_role, person: @person, employer_profile: @profile, benefit_sponsors_employer_profile_id: @profile.id)
+  ce = FactoryBot.build(
+    :benefit_sponsors_census_employee_with_active_assignment,
+    first_name: @person.first_name,
+    last_name: @person.last_name,
+    dob: @person.dob,
+    ssn: @person.ssn,
+    employer_profile: @profile,
+    employee_role_id: @person.employee_roles.first.id,
+    benefit_sponsorship: @sponsorship
+  )
+  ce.save!
+  @person.employee_roles.first.update_attributes(census_employee_id: ce.id)
+  FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)
 end
 
 And(/(.*) also has a health enrollment with primary person covered/) do |role|
@@ -482,10 +498,29 @@ When(/employee clicked on shop for plans/) do
 end
 
 When(/employee switched for (.*) benefits/) do |market_kind|
-  if market_kind == "individual"
+  case market_kind
+  when "individual"
     find(EmployeeChooseCoverage.individual_benefits_radiobtn).click
+  when "coverall"
+    find(EmployeeChooseCoverage.coverall_benefits_radiobtn).click
   else
     find(EmployeeChooseCoverage.employer_sponsored_benefits_radio_btn).click
+  end
+end
+
+And(/system date is (.*) date/) do |period|
+  if period == "open enrollment"
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year,11,1))
+  else
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+  end
+end
+
+Then(/user should see the effective date of (.*) coverage/) do |market|
+  if market == "employer-sponsored"
+    expect(page).to have_content @person.employee_roles.first.census_employee.coverage_effective_on
+  else
+    expect(page).to have_content HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period.start_on
   end
 end
 

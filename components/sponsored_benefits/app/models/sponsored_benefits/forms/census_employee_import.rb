@@ -340,11 +340,19 @@ module SponsoredBenefits
       end
 
       def parse_boolean(cell)
-        cell.blank? ? nil : cell.match(/(true|t|yes|y|1)$/i) != nil ? "1" : "0"
+        if cell.blank?
+          nil
+        else
+          cell.to_s.match(/(true|t|yes|y|1)$/i).nil? ? "0" : "1"
+        end
       end
 
       def self.parse_boolean(cell)
-        cell.blank? ? nil : cell.match(/(true|t|yes|y|1)$/i) != nil ? "1" : "0"
+        if cell.blank?
+          nil
+        else
+          cell.to_s.match(/(true|t|yes|y|1)$/i).nil? ? "0" : "1"
+        end
       end
 
       def self.parse_number(cell)
@@ -423,7 +431,7 @@ module SponsoredBenefits
 
       private
       def sanitize_value(value)
-        value = value.to_s.split('.')[0] if value.is_a? Float
+        value = value.to_s.split('.')[0] if value.is_a? Numeric
         value.gsub(/[[:cntrl:]]|^[\p{Space}]+|[\p{Space}]+$/, '')
       end
 

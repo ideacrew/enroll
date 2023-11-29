@@ -56,3 +56,14 @@ Feature: EE with consumer role plan purchase
     Then employee should see all the family members names
     When employee switched for employer-sponsored benefits
     Then user should not see the ivl error message
+
+Scenario: when user switches market place, effective date should be switched
+    Given a matched Employee exists with consumer role
+    And system date is open enrollment date
+    Then Employee sign in to portal
+    When employee clicked on shop for plans
+    When employee switched for employer-sponsored benefits
+    Then user should see the effective date of employer-sponsored coverage
+    When employee switched for individual benefits
+    Then user should see the effective date of individual coverage
+    And system date is today's date

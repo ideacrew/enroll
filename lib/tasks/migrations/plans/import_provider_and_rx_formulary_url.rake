@@ -52,7 +52,7 @@ namespace :import do
                   rx_formulary_url = row_info[@headers["rx formulary url"]]
                   plan.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
                   if ["IVL", "SHOP Q1"].include?(sheet_name) && year > 2017
-                    plan.is_standard_plan = row_info[@headers["standard plan?"]] == 'Y'
+                    plan.is_standard_plan = ["Yes", "Y"].include?(row_info[@headers["standard plan?"]])
                   end
                 end
                 plan.save
@@ -68,7 +68,7 @@ namespace :import do
                   rx_formulary_url = row_info[@headers["rx formulary url"]]
                   product.rx_formulary_url =  rx_formulary_url.include?("http") ? rx_formulary_url : "http://#{rx_formulary_url}"
                   if ["IVL", "SHOP Q1"].include?(sheet_name) && year > 2017
-                    product.is_standard_plan = row_info[@headers["standard plan?"]] == 'Y'
+                    product.is_standard_plan = ["Yes", "Y"].include?(row_info[@headers["standard plan?"]])
                   end
                 end
                 product.save

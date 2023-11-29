@@ -15,9 +15,23 @@ module Operations
         end
 
         def validate_ssn(payload)
-          encrypted_ssn = payload.person_demographics.encrypted_ssn || payload.person_identifying_information.encrypted_ssn
-          return Failure('No SSN for member') if encrypted_ssn.nil? || encrypted_ssn.empty?
+          encrypted_ssn = payload.person_demographics.encrypted_ssn
+          return Failure('No SSN') if encrypted_ssn.nil? || encrypted_ssn.empty?
           Operations::Fdsh::EncryptedSsnValidator.new.call(encrypted_ssn)
+        end
+
+        def validate_vlp_documents(person_entity)
+          vlp_documents = person_entity.consumer_role.vlp_documents
+          return Failure("No VLP Documents") if vlp_documents.empty?
+
+          errors = vlp_documents.collect do |vlp_document_entity|
+            next if vlp_document_entity.subject.nil?
+            vlp_errors = AcaEntities::Fdsh::Vlp::H92::VlpV37Contract.new.call(JSON.parse(vlp_document_entity.to_json).compact).errors.to_h
+            vlp_errors if vlp_errors.present?
+          end.compact
+
+          return Failure("Missing/Invalid information on vlp document") if errors.present?
+          Success()
         end
       end
     end

@@ -23,6 +23,10 @@ class EmployeeChooseCoverage
     'label[for="market_kind_individual"] span'
   end
 
+  def self.coverall_benefits_radiobtn
+    'label[for="market_kind_coverall"] span'
+  end
+
   def self.health_radio_btn
     'label[for="coverage_kind_health"] span'
   end

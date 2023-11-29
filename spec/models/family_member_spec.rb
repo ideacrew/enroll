@@ -36,7 +36,7 @@ describe FamilyMember, "given a person", dbclean: :after_each do
   let(:person) { create :person ,:with_family }
 
   it "should error when trying to save duplicate family member" do
-    family_member = FamilyMember.new(:person => person) 
+    family_member = FamilyMember.new(:person => person)
     person.families.first.family_members << family_member
     person.families.first.family_members << family_member
     expect(family_member.errors.full_messages.join(",")).to match(/Family members Duplicate family_members for person/)
@@ -70,7 +70,7 @@ describe FamilyMember, dbclean: :after_each do
 
   let(:p0) {Person.create!(first_name: "Dan", last_name: "Aurbach")}
   let(:p1) {Person.create!(first_name: "Patrick", last_name: "Carney")}
-  let(:ag) { 
+  let(:ag) do
     fam = Family.new
     fam.family_members.build(
       :person => p0,
@@ -78,7 +78,7 @@ describe FamilyMember, dbclean: :after_each do
     )
     fam.save!
     fam
-  }
+  end
   let(:family_member_params) {
     { person: p1,
       is_primary_applicant: true,
@@ -231,7 +231,7 @@ describe '#deactivate_tax_households' do
     let(:tax_household_group) { FactoryBot.create(:tax_household_group, family: family) }
 
     before do
-      EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
     end
 
     context 'family member is deleted' do

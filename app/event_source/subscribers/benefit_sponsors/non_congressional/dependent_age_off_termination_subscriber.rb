@@ -37,8 +37,8 @@ module Subscribers
 
           ack(delivery_info.delivery_tag)
         rescue StandardError, SystemStackError => e
-          subscriber_logger.info "on_enroll_benefit_sponsors_non_congressional_dependent_age_off_termination, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-          logger.info "on_enroll_benefit_sponsors_non_congressional_dependent_age_off_termination: errored & acked. Backtrace: #{e.backtrace}"
+          subscriber_logger.error "on_enroll_benefit_sponsors_non_congressional_dependent_age_off_termination, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+          logger.error "on_enroll_benefit_sponsors_non_congressional_dependent_age_off_termination: errored & acked. error_message: #{e.message}, backtrace: #{e.backtrace}"
           ack(delivery_info.delivery_tag)
         end
       end

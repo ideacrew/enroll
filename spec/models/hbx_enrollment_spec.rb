@@ -13,7 +13,7 @@ describe ".propogate_cancel" do
 
   context "individual market" do
     before do
-      EnrollRegistry[:cancel_renewals_for_term].feature.stub(:is_enabled).and_return(true)
+      allow(EnrollRegistry[:cancel_renewals_for_term].feature).to receive(:is_enabled).and_return(true)
       family.hbx_enrollments.where(effective_on: TimeKeeper.date_of_record.next_year.beginning_of_year).first.update_attributes(aasm_state: "auto_renewing")
       active_coverage.update_attributes(aasm_state: :coverage_selected)
       allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 1))
@@ -94,7 +94,7 @@ describe ".propogate_cancel" do
 
     context 'when disabled' do
       before do
-        EnrollRegistry[:exclude_child_only_offering].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:exclude_child_only_offering].feature).to receive(:is_enabled).and_return(false)
       end
 
       context 'when members greater than 18 exists' do
@@ -144,7 +144,7 @@ describe ".propogate_cancel" do
 
     context 'when enabled' do
       before do
-        EnrollRegistry[:exclude_child_only_offering].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:exclude_child_only_offering].feature).to receive(:is_enabled).and_return(true)
       end
 
       context 'when members greater than 18 exists' do
@@ -209,7 +209,7 @@ describe ".propogate_cancel" do
 
     context 'when disabled' do
       before do
-        EnrollRegistry[:exclude_adult_and_child_only_offering].feature.stub(:is_enabled).and_return(false)
+        allow(EnrollRegistry[:exclude_adult_and_child_only_offering].feature).to receive(:is_enabled).and_return(false)
       end
 
       context 'when members greater than 18 exists' do
@@ -259,7 +259,7 @@ describe ".propogate_cancel" do
 
     context 'when enabled' do
       before do
-        EnrollRegistry[:exclude_adult_and_child_only_offering].feature.stub(:is_enabled).and_return(true)
+        allow(EnrollRegistry[:exclude_adult_and_child_only_offering].feature).to receive(:is_enabled).and_return(true)
       end
 
       context 'when members greater than 18 exists' do
@@ -575,6 +575,7 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
   let(:employee_role) { census_employee.employee_role.reload }
   let(:effective_on) { initial_application.start_on.to_date }
   let(:coverage_kind) { "health" }
+  let(:kind) { 'employer_sponsored' }
 
   let(:shop_enrollment) do
     FactoryBot.create(
@@ -583,6 +584,7 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
       :with_enrollment_members,
       :with_product,
       coverage_kind: coverage_kind,
+      kind: kind,
       family: person.primary_family,
       employee_role: employee_role,
       effective_on: (effective_on + 3.months),
@@ -646,6 +648,14 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
         expect(shop_enrollment.reload.eligible_child_care_subsidy.to_f).to eq(0.00)
       end
     end
+
+    context 'when enrollment is cobra' do
+      let(:kind) { 'employer_sponsored_cobra' }
+
+      it 'should not update OSSE subsidy' do
+        expect(shop_enrollment.reload.eligible_child_care_subsidy.to_f).to eq(0.00)
+      end
+    end
   end
 
   context 'when employee is not eligible for OSSE' do
@@ -702,6 +712,26 @@ describe 'update_osse_childcare_subsidy', dbclean: :around_each do
         expect(shop_enrollment.eligible_child_care_subsidy.to_f).to eq excess_subsidy_amount
         shop_enrollment.verify_and_reset_osse_subsidy_amount(member_group)
         expect(shop_enrollment.eligible_child_care_subsidy.to_f).to eq subscriber_premium
+      end
+    end
+
+    context 'when subscriber is cobra eligible, it should not reset the osse value ' do
+      let(:member_group)  { HbxEnrollmentSponsoredCostCalculator.new(shop_enrollment).groups_for_products([shop_enrollment.product]).first }
+      let(:subscriber_premium) do
+        member = shop_enrollment.hbx_enrollment_members.detect(&:is_subscriber?)
+        member_group.group_enrollment.member_enrollments.find{|enrollment| enrollment.member_id == member.id }.product_price
+      end
+      let(:kind) { 'employer_sponsored_cobra' }
+
+
+      before do
+        shop_enrollment.update(eligible_child_care_subsidy: 0.00)
+      end
+
+      it 'should max subsidy at subscriber premium' do
+        expect(shop_enrollment.eligible_child_care_subsidy.to_f).to eq 0.00
+        shop_enrollment.verify_and_reset_osse_subsidy_amount(member_group)
+        expect(shop_enrollment.eligible_child_care_subsidy.to_f).to eq 0.00
       end
     end
   end
@@ -782,6 +812,46 @@ describe '#advance_day', dbclean: :after_each do
       HbxEnrollment.advance_day(TimeKeeper.date_of_record)
       expect(HbxEnrollment.all.size).to eq 2
       expect(HbxEnrollment.all.last.hbx_enrollment_members.size).to eq 1
+    end
+  end
+end
+
+describe HbxEnrollment, "with index definitions" do
+  it "creates the indexes" do
+    HbxEnrollment.remove_indexes
+    HbxEnrollment.create_indexes
+  end
+end
+
+describe '#can_make_changes_for_ivl_enrollment?' do
+  let(:hbx_enrollment) { HbxEnrollment.new }
+  context 'when enrollment_plan_tile_update feature is disabled' do
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:enrollment_plan_tile_update).and_return(false)
+      hbx_enrollment.can_make_changes_for_ivl_enrollment?
+    end
+
+    it 'returns original count' do
+      expect(HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.count).to be 14
+    end
+
+    it 'should not have coverage_terminated' do
+      expect(HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES).not_to include('coverage_terminated')
+    end
+  end
+
+  context 'when enrollment_plan_tile_update feature is enabled' do
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:enrollment_plan_tile_update).and_return(true)
+      hbx_enrollment.can_make_changes_for_ivl_enrollment?
+    end
+
+    it 'returns original count' do
+      expect(HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.count).to be 14
+    end
+
+    it 'should not have coverage_terminated' do
+      expect(HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES).not_to include('coverage_terminated')
     end
   end
 end

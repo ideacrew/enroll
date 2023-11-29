@@ -564,7 +564,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.enrollment.details.header' => 'Enrollment Detail',
   :'en.enrollment.members.header' => 'Enrollment Member Detail',
   :'en.enrollment.effective_on' => 'Effective Date: ',
-  :'en.enrollment.latest_transition' => 'Latest Transition: ',
+  :'en.enrollment.transitions' => 'Status Transition History: ',
   :'en.enrollment.latest_transition_data' => "From %{from_state} to %{to_state} at %{created_at}",
   :'en.enrollment.latest_transition_data_with_silent_reason' => "From %{from_state} to %{to_state} at %{created_at} (Silent)",
   :'en.product_hios_id' => 'Product HIOS ID: ',
@@ -579,5 +579,6 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.eligible' => "Eligible",
   :'en.ineligible' => "Ineligible",
   :'en.your_tax_credit' => "Your Tax Credit",
-  :'en.your_tax_credit_for_hc4cc' => "Your Tax Credit: HC4CC eligible households must use at least 85 percent of the credit."
+  :'en.your_tax_credit_for_hc4cc' => "Your Tax Credit: HC4CC eligible households must use at least 85 percent of the credit.",
+  :'en.person_match_error_message' => "%{first_name} %{last_name} is already affiliated with another account."
 }.freeze

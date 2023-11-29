@@ -59,7 +59,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
 
   let!(:prospective_determined_application) do
     FactoryBot.create(:financial_assistance_application,
-                      hbx_id: '111222333',
+                      hbx_id: '11122233344',
                       family_id: family.id,
                       is_renewal_authorized: false,
                       is_requesting_voter_registration_application_in_mail: true,

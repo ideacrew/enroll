@@ -35,7 +35,6 @@ EMPLOYER_TRANSLATIONS = {
   :'en.osse_eligibility_question' => 'Does this business qualify for HC4CC subsidies?',
   :'en.osse_bqt_eligibility_question' => 'Are you creating a quote for a business participating in HC4CC?',
   :'en.osse_eligibility_ivl_question' => 'Does this consumer qualify for HC4CC?',
-  :'en.eligibility_history' => 'View eligibility history',
   :'en.osse_subsidy_title' => 'HealthCare4ChildCare (HC4CC) Program',
   :'en.ivl_osse_subsidy_title_line_1' => 'HealthCare4ChildCare Through DC Health Link:',
   :'en.ivl_osse_subsidy_title_line_2' => 'Affordable health coverage for early childhood providers and their teams',
@@ -50,4 +49,6 @@ EMPLOYER_TRANSLATIONS = {
   :'en.osse_multi_year_description' => "<strong>Note, </strong>When the eligibility calendar year is set to Active, any coverage year start(initial or renewal) within the active calendar will have HC4CC eligibility.",
   :'en.hc4cc_subsidy_with_pipe' => "HC4CC Subsidies |",
   :'en.select_eligibility_years' => "Select Eligibility Year(s)",
+  :'en.employers.employer_profiles.ce_bulk_upload_success_message' => "File uploaded in s3, will process it on the background",
+  :'en.employers.employer_profiles.ce_bulk_upload_error_message' => "There was an error on the file upload in S3, please try again"
 }.freeze

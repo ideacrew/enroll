@@ -22,7 +22,7 @@ module Subscribers
         ack(delivery_info.delivery_tag)
       rescue StandardError => e
         ack(delivery_info.delivery_tag)
-        logger.info "FdshGateway::PvcMdcrDeterminationSubscriber: invoked on_periodic_verification_confirmation_determined error: #{e.message} // backtrace #{e.backtrace}"
+        logger.error "FdshGateway::PvcMdcrDeterminationSubscriber: invoked on_periodic_verification_confirmation_determined error: #{e.message} // backtrace #{e.backtrace}"
       end
     end
   end

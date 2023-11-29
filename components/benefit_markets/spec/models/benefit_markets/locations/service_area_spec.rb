@@ -248,4 +248,11 @@ module BenefitMarkets
       end
     end
   end
+
+  RSpec.describe Locations::ServiceArea, "with correct index definitions" do
+    it "creates indexes" do
+      Locations::ServiceArea.remove_indexes
+      Locations::ServiceArea.create_indexes
+    end
+  end
 end

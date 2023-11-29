@@ -17,7 +17,7 @@ RSpec.describe DocumentsController, :type => :controller do
 
   before :each do
     # Needed for the American indian status type
-    EnrollRegistry[:indian_alaskan_tribe_details].feature.stub(:is_enabled).and_return(false)
+    allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(false)
     sign_in user
     person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
   end
@@ -130,6 +130,24 @@ RSpec.describe DocumentsController, :type => :controller do
         it 'should redirect if verification type is Immigration status' do
           post :fed_hub_request, params: { verification_type: @immigration_type.id, person_id: person.id, id: bad_document.id }
           expect(flash[:danger]).to eq('Please fill in your information for Document Description.')
+        end
+      end
+
+      context 'no vlp document type' do
+        before do
+          person.consumer_role.vlp_documents = []
+          person.save!
+          @immigration_type.update_attributes!(inactive: false)
+        end
+
+        it 'should redirect if verification type is Immigration status' do
+          post :fed_hub_request, params: { verification_type: @immigration_type.id, person_id: person.id }
+
+          person.reload
+          @immigration_type.reload
+          expect(@immigration_type.validation_status).to eq 'negative_response_received'
+          error_message = @immigration_type.type_history_elements.last.update_reason
+          expect(error_message).to match(/Failed due to VLP Document not found/)
         end
       end
     end

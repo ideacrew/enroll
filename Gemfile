@@ -98,7 +98,7 @@ gem 'redcarpet',                '~> 3.4'
 gem 'redis',                    '~> 4.0'
 gem 'redis-rails',              '~> 5.0.2'
 gem 'resque',                   '~> 1.26.0'
-gem 'roo',                      '~> 2.1'
+gem 'roo',                      '~> 2.7.0'
 gem 'rubyzip', '>= 1.3.0'
 gem 'ruby-saml',                '~> 1.3'
 gem 'sassc',                    '~> 2.0'
@@ -136,10 +136,9 @@ group :development, :test do
   gem 'dotenv-rails'
   gem 'action-cable-testing'
   gem 'addressable',            '~> 2.3'
+  gem 'axe-core-cucumber',      '~> 4.8.0'
   # gem 'bundler-audit',          '~> 0.6'
   gem 'brakeman'
-  gem 'capistrano',             '~> 3.1'
-  gem 'capistrano-rails',       '1.4'
   gem 'climate_control',        '~> 0.2.0'
   gem 'email_spec',             '~> 2'
   gem 'factory_bot_rails',      '~> 4.11'
@@ -181,6 +180,5 @@ end
 
 group :production do
   gem 'newrelic_rpm', '~> 5.0'
-  gem 'unicorn',      '~> 4.8'
   gem 'puma',         '~> 3.12.4'
 end

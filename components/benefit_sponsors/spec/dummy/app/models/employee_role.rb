@@ -11,9 +11,6 @@ class EmployeeRole
 
   embedded_in :person
 
-  has_many :eligibilities, class_name: "::Eligibilities::Osse::Eligibility",
-                           as: :eligibility
-
   field :employer_profile_id, type: BSON::ObjectId
   field :benefit_sponsors_employer_profile_id, type: BSON::ObjectId
   field :census_employee_id, type: BSON::ObjectId

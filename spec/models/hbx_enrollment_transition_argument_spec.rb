@@ -53,7 +53,8 @@ RSpec.describe HbxEnrollment, "created in the shopping mode, then transitioned w
       let(:transition_args) { {} }
 
       it 'returns false' do
-        expect(enrollment.latest_wfst_is_superseded_silent?).to be_falsey
+        wfst = enrollment.workflow_state_transitions.last
+        expect(enrollment.is_transition_superseded_silent?(wfst)).to be_falsey
       end
     end
 
@@ -61,7 +62,8 @@ RSpec.describe HbxEnrollment, "created in the shopping mode, then transitioned w
       let(:transition_args) { { reason: 'Other than superseded silent' } }
 
       it 'returns false' do
-        expect(enrollment.latest_wfst_is_superseded_silent?).to be_falsey
+        wfst = enrollment.workflow_state_transitions.last
+        expect(enrollment.is_transition_superseded_silent?(wfst)).to be_falsey
       end
     end
 
@@ -70,7 +72,8 @@ RSpec.describe HbxEnrollment, "created in the shopping mode, then transitioned w
         let(:transition_args) { { reason: Enrollments::TerminationReasons::SUPERSEDED_SILENT } }
 
         it 'returns true' do
-          expect(enrollment.latest_wfst_is_superseded_silent?).to be_truthy
+          wfst = enrollment.workflow_state_transitions.last
+          expect(enrollment.is_transition_superseded_silent?(wfst)).to be_truthy
         end
       end
 
@@ -78,7 +81,8 @@ RSpec.describe HbxEnrollment, "created in the shopping mode, then transitioned w
         let(:transition_args) { { 'reason' => Enrollments::TerminationReasons::SUPERSEDED_SILENT } }
 
         it 'returns true' do
-          expect(enrollment.latest_wfst_is_superseded_silent?).to be_truthy
+          wfst = enrollment.workflow_state_transitions.last
+          expect(enrollment.is_transition_superseded_silent?(wfst)).to be_truthy
         end
       end
     end

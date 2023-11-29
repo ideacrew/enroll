@@ -1446,6 +1446,26 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
           expect(current_evidence.due_on).to be_blank
         end
       end
+
+      context "if evidence is verified" do
+        let(:current_evidence) { applicant.esi_evidence }
+
+        before do
+          applicant.create_esi_evidence(key: :esi_mec, title: "Esi", aasm_state: 'verified', due_on: Date.today, verification_outstanding: true, is_satisfied: false)
+        end
+
+        it 'should set due_on, is_satisfied and leave evidence in verified state' do
+          expect(current_evidence.verified?).to be_truthy
+          expect(current_evidence.is_satisfied).to be_falsey
+          expect(current_evidence.due_on).to be_present
+          applicant.set_evidence_attested(current_evidence)
+          current_evidence.reload
+          expect(current_evidence.verification_outstanding).to be_falsey
+          expect(current_evidence.is_satisfied).to be_truthy
+          expect(current_evidence.attested?).to be_falsy
+          expect(current_evidence.verified?).to be_truthy
+        end
+      end
     end
 
     context 'set evidence to outstanding' do
@@ -1464,11 +1484,13 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
 
         let(:current_evidence) { applicant.income_evidence }
 
-        it 'should set evidence verified' do
+        it 'should move evidence to outstanding and set due date' do
           expect(current_evidence.pending?).to be_truthy
+          expect(current_evidence.due_on).to eq nil
           applicant.set_evidence_outstanding(current_evidence)
           current_evidence.reload
           expect(current_evidence.verification_outstanding).to be_truthy
+          expect(current_evidence.due_on).not_to eq nil
         end
 
         it 'should set is_satisfied and verification_outstanding' do

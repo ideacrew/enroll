@@ -31,7 +31,7 @@ module Subscribers
 
           ack(delivery_info.delivery_tag)
         rescue StandardError, SystemStackError => e
-          subscriber_logger.info(subscriber_key(key, enrollment_hbx_id)) { {failure: {payload: payload, error_message: e.message, backtrace: e.backtrace}} }
+          subscriber_logger.error(subscriber_key(key, enrollment_hbx_id)) { {failure: {payload: payload, error_message: e.message, backtrace: e.backtrace}} }
           ack(delivery_info.delivery_tag)
         end
 

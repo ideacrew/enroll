@@ -90,10 +90,11 @@ class Products::QhpCostShareVariance
 
   def product_for(market_kind = 'aca_shop')
     qhp_product = product
-
-    return qhp_product if qhp_product.benefit_market_kind == market_kind.to_sym || dental?
     market_kinds = [market_kind.to_sym]
-    market_kinds << :aca_individual if market_kind == 'individual' && EnrollRegistry.feature_enabled?(:qhp_product_for_include_aca_individual)
+    market_kinds << :aca_individual if market_kind == 'individual'
+
+    return qhp_product if market_kinds.include?(qhp_product.benefit_market_kind) || dental?
+
     Rails.cache.fetch("qcsv--#{market_kind}-product-#{qhp.active_year}-hios-id-#{hios_plan_and_variant_id}", expires_in: 5.hours) do
       BenefitMarkets::Products::Product.where(
         :hios_base_id => /#{qhp_product.hios_base_id}/,

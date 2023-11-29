@@ -15,7 +15,7 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "Subscribers::EdiGatewayCv3FamilyRequestedSubscriber:: errored & acked. Backtrace: #{e.backtrace}"
+      subscriber_logger.error "Subscribers::EdiGatewayCv3FamilyRequestedSubscriber:: errored & acked. error message: #{e.message}, Backtrace: #{e.backtrace}"
       ack(delivery_info.delivery_tag)
     end
 

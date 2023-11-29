@@ -41,6 +41,67 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
     end
   end
 
+  describe '#construct_consumer_role with active and inactive vlp documents' do
+    let!(:vlp_document) {person.consumer_role.vlp_documents.first}
+
+    subject do
+      person.consumer_role.update_attributes!(active_vlp_document_id: vlp_document.id)
+      person.consumer_role.vlp_documents.create!(subject: "I-551 (Permanent Resident Card)")
+      ::Operations::Transformers::PersonTo::Cv3Person.new.construct_consumer_role(person.consumer_role)
+    end
+
+    it 'should have one active vlp_document' do
+      expect(subject[:vlp_documents].count).to eq 1
+    end
+
+    it 'retuns valid vlp document' do
+      expect(subject[:vlp_documents][0][:subject]).to eq vlp_document.subject
+    end
+  end
+
+  describe '#construct_consumer_role with only inactive vlp documents' do
+    let!(:vlp_document) {person.consumer_role.vlp_documents.first}
+
+    subject do
+      person.consumer_role.update_attributes!(active_vlp_document_id: nil)
+      ::Operations::Transformers::PersonTo::Cv3Person.new.construct_consumer_role(person.consumer_role)
+    end
+
+    it 'should not return vlp_documents' do
+      expect(subject[:vlp_documents].count).to eq 0
+    end
+  end
+
+  describe '#construct_consumer_role with no vlp documents' do
+    subject do
+      person.consumer_role.vlp_documents.destroy_all
+      ::Operations::Transformers::PersonTo::Cv3Person.new.construct_consumer_role(person.consumer_role)
+    end
+
+    it 'should not return vlp_documents' do
+      expect(subject[:vlp_documents].count).to eq 0
+    end
+  end
+
+  describe 'consumer_role with active and inactive vlp documents should pass payload validation' do
+    let!(:vlp_document) {person.consumer_role.vlp_documents.first}
+    let(:consumer_role) { FactoryBot.create(:consumer_role) }
+    let(:person) { FactoryBot.create(:person, consumer_role: consumer_role) }
+
+    before do
+      person.consumer_role.update_attributes!(active_vlp_document_id: vlp_document.id)
+      person.consumer_role.vlp_documents.create!(subject: "I-551 (Permanent Resident Card)")
+      person_payload = ::Operations::Transformers::PersonTo::Cv3Person.new.call(person).success
+      person_contract = AcaEntities::Contracts::People::PersonContract.new.call(person_payload)
+      person_entity = AcaEntities::People::Person.new(person_contract.to_h)
+      @result = Operations::Fdsh::PayloadEligibility::CheckPersonEligibilityRules.new.call(person_entity, :dhs)
+    end
+
+    it 'should return success' do
+      expect(@result).to be_success
+    end
+  end
+
   describe '#construct_person_demographics' do
 
     subject { ::Operations::Transformers::PersonTo::Cv3Person.new.construct_person_demographics(person) }
@@ -101,6 +162,25 @@ RSpec.describe ::Operations::Transformers::PersonTo::Cv3Person, dbclean: :after_
 
       it 'should populate the due date field' do
         expect(subject.first[:due_date]).to eq person.verification_types.first.verif_due_date
+      end
+    end
+  end
+
+  describe '#transform_vlp_documents' do
+    let(:consumer_role) { FactoryBot.create(:consumer_role, vlp_documents: vlp_documents, active_vlp_document_id: vlp_document.id) }
+    let(:person) { FactoryBot.create(:person, consumer_role: consumer_role) }
+    let(:vlp_documents) { [vlp_document] }
+    let(:vlp_document) { FactoryBot.build(:vlp_document, :other_with_i94_number) }
+
+    context 'with vlp document of type Other (With I-94 Number)' do
+      it 'returns success without raising errors' do
+        person_hash = subject.call(person).success
+        contract_person_hash = AcaEntities::Contracts::People::PersonContract.new.call(person_hash).to_h
+        person_entity = AcaEntities::People::Person.new(contract_person_hash)
+        contract_validation_result = AcaEntities::Fdsh::Vlp::H92::VlpV37Contract.new.call(
+          JSON.parse(person_entity.consumer_role.vlp_documents.first.to_json).compact
+        )
+        expect(contract_validation_result.errors.to_h).to be_empty
       end
     end
   end

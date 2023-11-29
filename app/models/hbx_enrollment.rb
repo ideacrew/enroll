@@ -127,7 +127,12 @@ class HbxEnrollment
   field :external_id, type: String
   field :external_group_identifiers, type: Array
   field :special_enrollment_period_id, type: BSON::ObjectId
+
+  # In Individual Market's context the predecessor_enrollment_id is:
+  #   1. The id of the enrollment that is renewed.
+  #   2. The id of the enrollment that is superseded.(Expand in the future)
   field :predecessor_enrollment_id, type: BSON::ObjectId
+
   field :enrollment_signature, type: String
 
   field :consumer_role_id, type: BSON::ObjectId
@@ -167,6 +172,15 @@ class HbxEnrollment
   # but did not originate with the exchange.  'External' enrollments
   # should not be transmitted to carriers nor reported in metrics.
   field :external_enrollment, type: Boolean, default: false
+
+  # In Individual Market's context the successor_creation_failure_reasons is:
+  #   1. Reasons why a renewal is not created.
+  #   2. Reasons why enrollment is not created during
+  #     i. FA application
+  #     ii. Reinstatment
+  #     iii. Self Service
+  # Currently, this is only used in IVL Renewals context.
+  field :successor_creation_failure_reasons, type: Array
 
   track_history   :modifier_field_optional => true,
                   :on => [:kind,
@@ -313,7 +327,14 @@ class HbxEnrollment
   index({"terminated_on" => 1}, { sparse: true })
   index({"applied_aptc_amount" => 1})
   index({"eligible_child_care_subsidy" => 1})
+  index({ 'predecessor_enrollment_id' => 1 })
+  index({ 'successor_creation_failure_reasons' => 1 })
 
+  # Index for IVl Enrollment Renewals
+  index({ kind: 1, aasm_state: 1, coverage_kind: 1, effective_on: 1 })
+
+  # Index for IVL Enrollments Expiration(1/1) and Effectuation(1/1)
+  index({ effective_on: 1, kind: 1, aasm_state: 1 })
 
   scope :active,              ->{ where(is_active: true).where(:created_at.ne => nil) } # Depricated scope
   scope :open_enrollments,    ->{ where(enrollment_kind: "open_enrollment") }
@@ -468,6 +489,7 @@ class HbxEnrollment
       effective_on: { :"$gte" => TimeKeeper.date_of_record.beginning_of_year, :"$lte" =>  TimeKeeper.date_of_record.end_of_year }
     )
   end
+  scope :effectuated, -> { where(:aasm_state.nin => ['coverage_canceled', 'shopping']) }
 
   embeds_many :workflow_state_transitions, as: :transitional
 
@@ -1475,7 +1497,7 @@ class HbxEnrollment
 
   def can_make_changes_for_ivl_enrollment?
     allowed_statuses = ENROLLED_AND_RENEWAL_STATUSES
-    allowed_statuses << 'coverage_terminated' if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update)
+    allowed_statuses += ["coverage_terminated"] if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update)
     return true if allowed_statuses.include?(aasm_state)
     false
   end
@@ -2631,6 +2653,7 @@ class HbxEnrollment
       })
       group_enrollment_members << group_enrollment_member
     end
+
     group_enrollment = BenefitSponsors::Enrollments::GroupEnrollment.new(
       previous_product: previous_product,
       coverage_start_on: effective_on,
@@ -2842,7 +2865,7 @@ class HbxEnrollment
   end
 
   def is_eligible_for_osse_grant?(key)
-    return false if is_shop? || dental?
+    return false if is_shop? || dental? || is_cobra_status?
     hbx_enrollment_members.any? do |member|
       member.is_eligible_for_osse_grant?(key, effective_on)
     end
@@ -2858,14 +2881,13 @@ class HbxEnrollment
   end
 
   def update_osse_childcare_subsidy
-    return if dental?
+    return if dental? || is_cobra_status?
 
     if is_shop?
       application = sponsored_benefit_package.benefit_application
       effective_year = application.start_on.year
       return unless shop_osse_eligibility_is_enabled?(effective_year)
       return unless application.osse_eligible?
-
       osse_childcare_subsidy = osse_subsidy_for_member(primary_hbx_enrollment_member)
     else
       return unless ivl_osse_eligible?
@@ -2873,7 +2895,7 @@ class HbxEnrollment
       cost_calculator = build_plan_premium(qhp_plan: product, elected_aptc: applied_aptc_amount, apply_aptc: applied_aptc_amount > 0)
       osse_childcare_subsidy = cost_calculator.total_childcare_subsidy_amount
     end
-
+    osse_childcare_subsidy ||= 0.0
     update(eligible_child_care_subsidy: osse_childcare_subsidy)
   end
 
@@ -2881,13 +2903,18 @@ class HbxEnrollment
     effective_year_for_lcsp = sponsored_benefit_package.start_on.year
     hios_id = EnrollRegistry["lowest_cost_silver_product_#{effective_year_for_lcsp}"].item
     lcsp = BenefitMarkets::Products::Product.by_year(effective_year_for_lcsp).where(hios_id: hios_id).first
-
     return if lcsp.nil?
 
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(self)
-    sponsored_cost_calculator.action = :calc_childcare_subsidy
-    member_groups_lcsp = sponsored_cost_calculator.groups_for_products([lcsp])
+    previous_product = parent_enrollment&.product
 
+    sponsored_cost_calculator.action = if product && previous_product && product.id == previous_product.id
+                                         :calc_non_product_change_childcare_subsidy
+                                       else
+                                         :calc_childcare_subsidy
+                                       end
+
+    member_groups_lcsp = sponsored_cost_calculator.groups_for_products([lcsp])
     member_enrollment = member_groups_lcsp[0].group_enrollment.member_enrollments.detect{ |me| me.member_id.to_s == hbx_enrollment_member.id.to_s }
     return if member_enrollment.nil?
 
@@ -2895,8 +2922,9 @@ class HbxEnrollment
   end
 
   def verify_and_reset_osse_subsidy_amount(member_group)
-    return unless is_shop?
+    return unless is_shop? && !is_cobra_status?
 
+    update_osse_childcare_subsidy
     hbx_enrollment_members.each do |member|
       next unless member.is_subscriber?
       product_price = member_group.group_enrollment.member_enrollments.find{|enrollment| enrollment.member_id == member.id }.product_price
@@ -2960,11 +2988,21 @@ class HbxEnrollment
       (new_effective_on - 1.day) >= terminated_on
   end
 
-  # Checks to see if the latest workflow state transition is 'superseded_silent'
-  def latest_wfst_is_superseded_silent?
-    latest_wfst.metadata_has?(
+  # Checks to see if a workflow state transition is 'superseded_silent'
+  def is_transition_superseded_silent?(wfts)
+    wfts.metadata_has?(
       { 'reason' => Enrollments::TerminationReasons::SUPERSEDED_SILENT }
     )
+  end
+
+  def predecessor_enrollment_hbx_id
+    predecessor_enrollment&.hbx_id
+  end
+
+  def predecessor_enrollment
+    return nil unless predecessor_enrollment_id
+
+    HbxEnrollment.where(id: predecessor_enrollment_id).first
   end
 
   private

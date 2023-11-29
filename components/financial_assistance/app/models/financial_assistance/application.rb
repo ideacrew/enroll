@@ -119,6 +119,11 @@ module FinancialAssistance
 
     field :has_mec_check_response, type: Boolean, default: false
 
+    # A field to store reasons why an application cannot be put into the "renewal_draft" state without a user input.
+    # This is only applicable in application renewals context.
+    # The value of this field is only valid if the application is either in 'applicants_update_required' or 'income_verification_extension_required' state.
+    field :renewal_draft_blocker_reasons, type: Array
+
     embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination', cascade_callbacks: true, validate: true
     embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship', cascade_callbacks: true, validate: true
     embeds_many :applicants, inverse_of: :application, class_name: '::FinancialAssistance::Applicant', cascade_callbacks: true, validate: true
@@ -147,28 +152,21 @@ module FinancialAssistance
                                     message: "must fall within range: #{YEARS_TO_RENEW_RANGE}"
                                   }
 
-    index({"_id" => 1})
     index({"is_renewal_authorized" => 1})
     index({"family_id" => 1})
-    index({"years_to_renew" => 1})
     index({"benchmark_product_id" => 1})
     index({"has_eligibility_response" => 1})
-    index({"transfer_requested" => 1})
     index({"applicant_kind" => 1})
-    index({"request_kind" => 1})
-    index({"motivation_kind" => 1})
-    index({"us_state" => 1})
-    index({"is_ridp_verified" => 1})
-    index({"renewal_base_year" => 1})
-    index({"account_transferred" => 1})
     index({"has_mec_check_response" => 1})
-    index({"parent_living_out_of_home_terms" => 1})
 
-    index({ hbx_id: 1 }, { unique: true })
+    index({ renewal_draft_blocker_reasons: 1 })
+
+    index({ hbx_id: 1 })
     index({ aasm_state: 1 })
     index({ created_at: 1 })
     index({ assistance_year: 1 })
-    index({ assistance_year: 1, aasm_state: 1, family_id: 1 })
+    index({ aasm_state: 1, submitted_at: 1 })
+    index({ aasm_state: 1, family_id: 1 })
     index({ "workflow_state_transitions.transition_at" => 1,
             "workflow_state_transitions.to_state" => 1 },
           { name: "workflow_to_state" })
@@ -182,8 +180,6 @@ module FinancialAssistance
     index({"eligibility_determinations.max_aptc" => 1})
     index({"eligibility_determinations.csr_percent_as_integer" => 1})
     index({"eligibility_determinations.source" => 1})
-    index({"eligibility_determinations.aptc_csr_annual_household_income" => 1})
-    index({"eligibility_determinations.csr_annual_income_limit" => 1})
     index({"eligibility_determinations.effective_starting_on" => 1})
     index({"eligibility_determinations.effective_ending_on" => 1})
     index({"eligibility_determinations.is_eligibility_determined" => 1})
@@ -193,83 +189,12 @@ module FinancialAssistance
     # applicant index
     index({ "applicants._id" => 1 })
     index({"applicants.no_ssn" => 1})
-    index({"applicants.is_tobacco_user" => 1})
-    index({"applicants.assisted_income_validation" => 1})
-    index({"applicants.assisted_mec_validation" => 1})
     index({"applicants.aasm_state" => 1})
     index({"applicants.is_active" => 1})
-    index({"applicants.has_fixed_address" => 1})
-    index({"applicants.tax_filer_kind" => 1})
-
-    index({"applicants.magi_as_percentage_of_fpl" => 1})
-    index({"applicants.age_left_foster_care" => 1})
-    index({"applicants.children_expected_count" => 1})
     index({"applicants.csr_percent_as_integer" => 1})
     index({"applicants.csr_eligibility_kind" => 1})
 
     index({"applicants.is_primary_applicant" => 1})
-    index({"applicants.no_dc_address" => 1})
-    index({"applicants.is_homeless" => 1})
-    index({"applicants.is_temporarily_out_of_state" => 1})
-    index({"applicants.same_with_primary" => 1})
-    index({"applicants.is_consent_applicant" => 1})
-    index({"applicants.is_living_in_state" => 1})
-    index({"applicants.is_ia_eligible" => 1})
-    index({"applicants.is_medicaid_chip_eligible" => 1})
-    index({"applicants.is_non_magi_medicaid_eligible" => 1})
-    index({"applicants.is_totally_ineligible" => 1})
-    index({"applicants.is_without_assistance" => 1})
-    index({"applicants.has_income_verification_response" => 1})
-    index({"applicants.has_mec_verification_response" => 1})
-    index({"applicants.is_magi_medicaid" => 1})
-    index({"applicants.is_medicare_eligible" => 1})
-    index({"applicants.is_self_attested_disabled" => 1})
-    index({"applicants.is_self_attested_long_term_care" => 1})
-    index({"applicants.is_veteran" => 1})
-    index({"applicants.is_refugee" => 1})
-    index({"applicants.is_trafficking_victim" => 1})
-    index({"applicants.is_primary_caregiver" => 1})
-    index({"applicants.is_subject_to_five_year_bar" => 1})
-    index({"applicants.is_five_year_bar_met" => 1})
-    index({"applicants.is_forty_quarters" => 1})
-    index({"applicants.encrypted_ssn" => 1})
-    index({"applicants.family_member_id" => 1})
-    index({"applicants.person_hbx_id" => 1})
-    index({"applicants.is_incarcerated" => 1})
-    index({"applicants.indian_tribe_member" => 1})
-    index({"applicants.tribal_id" => 1})
-    index({"applicants.tribal_state" => 1})
-    index({"applicants.tribal_name" => 1})
-    index({"applicants.health_service_eligible" => 1})
-    index({"applicants.health_service_through_referral" => 1})
-    index({"applicants.citizen_status" => 1})
-    index({"applicants.is_consumer_role" => 1})
-    index({"applicants.is_applying_coverage" => 1})
-    index({"applicants.had_medicaid_during_foster_care" => 1})
-    index({"applicants.has_daily_living_help" => 1})
-    index({"applicants.has_deductions" => 1})
-    index({"applicants.has_eligibility_changed" => 1})
-    index({"applicants.has_eligible_health_coverage" => 1})
-    index({"applicants.has_eligible_medicaid_cubcare" => 1})
-    index({"applicants.has_enrolled_health_coverage" => 1})
-    index({"applicants.has_job_income" => 1})
-    index({"applicants.has_other_income" => 1})
-    index({"applicants.has_self_employment_income" => 1})
-    index({"applicants.has_unemployment_income" => 1})
-    index({"applicants.is_claimed_as_tax_dependent" => 1})
-    index({"applicants.is_filing_as_head_of_household" => 1})
-    index({"applicants.is_former_foster_care" => 1})
-    index({"applicants.is_joint_tax_filing" => 1})
-    index({"applicants.is_physically_disabled" => 1})
-    index({"applicants.is_post_partum_period" => 1})
-    index({"applicants.is_pregnant" => 1})
-    index({"applicants.is_required_to_file_taxes" => 1})
-    index({"applicants.is_self_attested_blind" => 1})
-    index({"applicants.is_student" => 1})
-    index({"applicants.is_veteran_or_active_military" => 1})
-    index({"applicants.is_vets_spouse_or_child" => 1})
-    index({"applicants.need_help_paying_bills" => 1})
-    index({"applicants.eligibility_determination_id" => 1})
 
     # verification_types index
     index({"applicants.verification_types._id" => 1})
@@ -281,72 +206,25 @@ module FinancialAssistance
     index({"applicants.verification_types.due_date" => 1})
     index({"applicants.verification_types.due_date_type" => 1})
 
-    index({"applicants.addresses._id" => 1})
-    index({"applicants.addresses.kind" => 1})
-
-    index({"applicants.phones._id" => 1})
-    index({"applicants.phones.kind" => 1})
-    index({"applicants.phones.primary" => 1})
-
-    index({"applicants.emails._id" => 1})
-    index({"applicants.emails.kind" => 1})
-
     # incomes index
     index({"applicants.incomes._id" => 1})
-    index({"applicants.incomes.title" => 1})
     index({"applicants.incomes.kind" => 1})
-    index({"applicants.incomes.wage_type" => 1})
-    index({"applicants.incomes.hours_per_week" => 1})
-    index({"applicants.incomes.amount" => 1})
-    index({"applicants.incomes.amount_tax_exempt" => 1})
-    index({"applicants.incomes.frequency_kind" => 1})
-    index({"applicants.incomes.start_on" => 1})
-    index({"applicants.incomes.end_on" => 1})
-    index({"applicants.incomes.employer_name" => 1})
-    index({"applicants.incomes.employer_id" => 1})
-    index({"applicants.incomes.submitted_at" => 1})
-
-    index({"applicants.incomes.employer_address._id" => 1})
-    index({"applicants.incomes.employer_address.kind" => 1})
-
-    index({"applicants.incomes.employer_phone._id" => 1})
-    index({"applicants.incomes.employer_phone.kind" => 1})
-    index({"applicants.incomes.employer_phone.primary" => 1})
 
     # deduction index
     index({"applicants.deductions._id" => 1})
-    index({"applicants.deductions.title" => 1})
     index({"applicants.deductions.kind" => 1})
-    index({"applicants.deductions.amount" => 1})
-    index({"applicants.deductions.frequency_kind" => 1})
-    index({"applicants.deductions.start_on" => 1})
-    index({"applicants.deductions.end_on" => 1})
-    index({"applicants.deductions.submitted_at" => 1})
 
     # benefit index
     index({"applicants.benefits._id" => 1})
-    index({"applicants.benefits.title" => 1})
     index({"applicants.benefits.kind" => 1})
     index({"applicants.benefits.esi_covered" => 1})
     index({"applicants.benefits.insurance_kind" => 1})
-    index({"applicants.benefits.hra_type" => 1})
     index({"applicants.benefits.is_employer_sponsored" => 1})
-    index({"applicants.benefits.is_esi_waiting_period" => 1})
-    index({"applicants.benefits.is_esi_mec_met" => 1})
-    index({"applicants.benefits.employee_cost" => 1})
-    index({"applicants.benefits.employee_cost_frequency" => 1})
+
     index({"applicants.benefits.start_on" => 1})
     index({"applicants.benefits.end_on" => 1})
     index({"applicants.benefits.submitted_at" => 1})
-    index({"applicants.benefits.employer_name" => 1})
     index({"applicants.benefits.employer_id" => 1})
-
-    index({"applicants.benefits.employer_address._id" => 1})
-    index({"applicants.benefits.employer_address.kind" => 1})
-
-    index({"applicants.benefits.employer_phone._id" => 1})
-    index({"applicants.benefits.employer_phone.kind" => 1})
-    index({"applicants.benefits.employer_phone.primary" => 1})
 
     index({"applicants.evidences.eligibility_status" => 1})
 
@@ -364,6 +242,13 @@ module FinancialAssistance
     scope :by_year, ->(year) { where(:assistance_year => year) }
     scope :created_asc,      -> { order(created_at: :asc) }
     scope :renewal_draft,    ->{ any_in(aasm_state: 'renewal_draft') }
+    scope :income_verification_extension_required, ->{ any_in(aasm_state: 'income_verification_extension_required') }
+    scope :determined_and_submitted_within_range, lambda { |range|
+      where(aasm_state: 'determined', submitted_at: range)
+    }
+    scope :for_determined_family, lambda { |family_id|
+      where(aasm_state: 'determined', family_id: family_id)
+    }
 
     # Applications that are in submitted and after submission states. Non work in progress applications.
     scope :submitted_and_after, lambda {
@@ -380,6 +265,8 @@ module FinancialAssistance
     scope :renewal_eligible, -> { where(:aasm_state.in => RENEWAL_ELIGIBLE_STATES) }
 
     scope :has_outstanding_verifications, -> { where(:"applicants.evidences.eligibility_status".in => ["outstanding", "in_review"]) }
+
+    scope :with_renewal_blocker_reasons, -> { where(:renewal_draft_blocker_reasons.ne => nil, :aasm_state.in => ['applicants_update_required', 'income_verification_extension_required']) }
 
     alias is_joint_tax_filing? is_joint_tax_filing
     alias is_renewal_authorized? is_renewal_authorized
@@ -1021,7 +908,7 @@ module FinancialAssistance
       return unless can_trigger_fdsh_calls? || is_local_mec_checkable?
       return if previously_renewal_draft? && FinancialAssistanceRegistry.feature_enabled?(:renewal_eligibility_verification_using_rrv)
 
-      ::FinancialAssistance::Operations::Applications::Verifications::PublishMagiMedicaidApplicationDetermined.new.call(self)
+      ::FinancialAssistance::Operations::Applications::Verifications::RequestEvidenceDetermination.new.call(self)
     rescue StandardError => e
       Rails.logger.error { "FAA trigger_fdsh_calls error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
@@ -1192,6 +1079,10 @@ module FinancialAssistance
       is_valid = [find_missing_relationships(matrix).blank?]
       is_valid << applicant_relative_exists_for_relations
       is_valid.all?(true)
+    end
+
+    def valid_relationship_kinds?
+      relationships.all?(&:valid_relationship_kind?)
     end
 
     def valid_relations?
@@ -1390,6 +1281,9 @@ module FinancialAssistance
     def is_application_valid?
       required_attributes_valid? && relationships_complete? && applicants_have_valid_addresses?
     end
+
+    # Used for performance improvement cacheing.
+    attr_writer :family
 
     # rubocop:disable Lint/EmptyRescueClause
     def family
@@ -1783,6 +1677,8 @@ module FinancialAssistance
     end
 
     def create_evidences
+      return if previously_renewal_draft? && FinancialAssistanceRegistry.feature_enabled?(:renewal_eligibility_verification_using_rrv)
+
       active_applicants.each do |applicant|
         applicant.create_evidences
         applicant.create_eligibility_income_evidence if active_applicants.any?(&:is_ia_eligible?) || active_applicants.any?(&:is_applying_coverage)
