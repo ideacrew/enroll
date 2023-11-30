@@ -15,13 +15,13 @@
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
       <div class="radio">
         <%= f.radio_button :indian_tribe_member, true, class: "required floatlabel", id: 'indian-tribe-member-yes' %>
-        <label tabindex="0" onkeydown="handleRadioKeyDown(event, 'indian-tribe-member-yes', 'indian-tribe-member-no')" for="indian-tribe-member-yes"><span class="yes_no_pair"><%= l10n("Yes") %></span></label>
+        <label tabindex="0" onkeydown="handleTribeRadioKeyDown(event, 'indian-tribe-member-yes', 'indian-tribe-member-no')" for="indian-tribe-member-yes"><span class="yes_no_pair"><%= l10n("Yes") %></span></label>
       </div>
     </div>
     <div class="col-lg-1 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
       <div class="radio">
         <%= f.radio_button :indian_tribe_member, false, class: "required floatlabel", id: 'indian-tribe-member-no' %>
-        <label tabindex="0" onkeydown="handleRadioKeyDown(event, 'indian-tribe-member-no', 'indian-tribe-member-yes')" for="indian-tribe-member-no"><span class="yes_no_pair"><%= l10n("no") %></span></label>
+        <label tabindex="0" onkeydown="handleTribeRadioKeyDown(event, 'indian-tribe-member-no', 'indian-tribe-member-yes')" for="indian-tribe-member-no"><span class="yes_no_pair"><%= l10n("no") %></span></label>
       </div>
     </div>
     <div class="col-md-2 not-sure-margin left-seprator">
@@ -30,7 +30,7 @@
       </div>
   </div>
 
-  <div class="tribal-container <%= 'hide' unless f.object.indian_tribe_member %>">
+  <div id="tribal_container_test" class="tribal-container <%= 'hide' unless f.object.indian_tribe_member %>">
     <% if EnrollRegistry[:indian_alaskan_tribe_details].enabled? %>
       <input type="hidden" id="is_featured_tribes_selection_enabled" value="<%= FinancialAssistanceRegistry[:featured_tribes_selection].enabled? %>">
       <input type="hidden" id="enroll_state_abbr" value="<%= EnrollRegistry[:enroll_app].setting(:state_abbreviation).item %>">
@@ -113,24 +113,6 @@
           $('.tribe_codes:checked').removeAttr('checked');
           $('.tribal-name-container').removeClass('hide');
           $('.featured-tribe-container').addClass('hide');
-      }
-    }
-</script>
-
-
-<script type="text/javascript">
-  function handleRadioKeyDown(event, radioId, otherRadioId) {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      const radio = document.getElementById(radioId);
-      const otherRadio = document.getElementById(otherRadioId);
-      radio.checked = true;
-      otherRadio.checked = false;
-
-      if (radio.id === 'indian-tribe-member-yes') {
-        document.querySelector('.tribal-container').classList.remove('hide');
-      } elsif (radio.id === 'indian_tribe_member_no') 
-        document.querySelector('tribal-container').classList.add('hide');
       }
     }
 </script>
