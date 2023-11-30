@@ -1,3 +1,4 @@
+<script src="<%= asset_path('/../javascript/controllers/keyboard_navigation.js') %>"></script>
 <% vlp_doc_subject = (defined? @vlp_doc_subject) ? @vlp_doc_subject : nil %>
 
 <% if individual_market_is_enabled? %>
@@ -121,30 +122,3 @@
 
 <%= hidden_field_tag :form_for_consumer_role, f.object.is_a?(Person) %>
 <%= f.hidden_field :is_consumer_role, value: 'true' %>
-
-<script type="text/javascript">
-  function handleRadioKeyDown(event, radioId, otherRadioId) {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      const radio = document.getElementById(radioId);
-      const otherRadio = document.getElementById(otherRadioId);
-      radio.checked = true;
-      otherRadio.checked = false;
-      radio.setAttribute("aria-pressed", "true");
-      otherRadio.setAttribute("aria-pressed", "false");
-    }
-  }
-</script>
-
-<script type="text/javascript">
-  function handleTribeRadioKeyDown(event, radioId, otherRadioId) {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      const radio = document.getElementById(radioId);
-      const otherRadio = document.getElementById(otherRadioId);
-      radio.checked = true;
-      otherRadio.checked = false;
-      document.getElementById('tribal_container_test').classList.remove('hide');
-    }
-  }
-</script>
