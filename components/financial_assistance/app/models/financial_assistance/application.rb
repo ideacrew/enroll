@@ -11,6 +11,7 @@ module FinancialAssistance
     include Eligibilities::Visitors::Visitable
     include GlobalID::Identification
     include I18n
+    include Transmittable::Subject
 
     # belongs_to :family, class_name: "Family"
 
