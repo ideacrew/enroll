@@ -355,10 +355,25 @@ module FinancialAssistance
     end
 
     def enrolled_with(enrollment)
+      active_enrollments = enrollment.family.hbx_enrollments.enrolled_and_renewing
+
       enrollment.hbx_enrollment_members.each do |enrollment_member|
-        applicant = applicants.where(family_member_id: enrollment_member.applicant_id).first
+        family_member_id =  enrollment_member.applicant_id
+        applicant = applicants.where(family_member_id: family_member_id).first
+        next if ineligible_for_evidence_update?(enrollment, active_enrollments, family_member_id)
+
         applicant&.enrolled_with(enrollment)
       end
+    end
+
+    def ineligible_for_evidence_update?(enrollment, active_enrollments, family_member_id)
+      return false if enrollment.health?
+      family_member_enrollments = active_enrollments
+                                  .by_year(enrollment.effective_on.year)
+                                  .by_health
+                                  .map { |en| en.hbx_enrollment_members.any? { |member| member.applicant_id == family_member_id } }
+
+      family_member_enrollments.any?
     end
 
     # fetch existing relationships matrix
@@ -939,7 +954,6 @@ module FinancialAssistance
       self.effective_date.year < TimeKeeper.date_of_record.year
     end
 
-    # rubocop:disable Metrics/AbcSize
     def create_tax_household_groups
       return unless EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
 
@@ -962,7 +976,6 @@ module FinancialAssistance
     rescue StandardError => e
       Rails.logger.error { "FAA create_tax_household_groups error for application with hbx_id: #{hbx_id} message: #{e.message}, backtrace: #{e.backtrace.join('\n')}" }
     end
-    # rubocop:enable Metrics/AbcSize
 
     def trigger_local_mec
       ::FinancialAssistance::Operations::Applications::MedicaidGateway::RequestMecChecks.new.call(application_id: id) if is_local_mec_checkable?
