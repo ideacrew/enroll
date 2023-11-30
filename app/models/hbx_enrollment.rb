@@ -2530,6 +2530,10 @@ class HbxEnrollment
     coverage_kind == "dental"
   end
 
+  def health?
+    coverage_kind == "health"
+  end
+
   # TODO: Implement behaviour by 16219.
   def composite_rating_tier
     @composite_rating_tier ||= cached_composite_rating_tier
