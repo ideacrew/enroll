@@ -23,7 +23,7 @@ RSpec.describe BenefitSponsors::SanitizeHelper, type: :helper, dbclean: :after_e
     end
 
     it 'returns value unless it is a string' do
-      expect(sanitize(123456)).to eq 123456
+      expect(sanitize(123_456)).to eq 123_456
     end
   end
 end
