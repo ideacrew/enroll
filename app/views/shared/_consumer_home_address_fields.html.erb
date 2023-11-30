@@ -161,11 +161,21 @@
 </div>
 
 <% if f.object.addresses[1].present? %>
-<button index="0", class="form-action btn btn-default <%= pundit_class Family, :updateable?%>" data-cuke="remove_mailing_address">Remove Mailing Address</button>
+<span type="button" tabindex="0" onkeydown="handleButtonKeyDown(event, 'remove_mailing_address')" class="form-action btn btn-default <%= pundit_class Family, :updateable?%>" data-cuke="remove_mailing_address" id="remove_mailing_address">Remove Mailing Address</span>
 <% else %>
-<button index="0", class="form-action btn btn-default <%= pundit_class Family, :updateable?%>">Add Mailing Address</button>
+<span type="button" tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_mailing_address')" class="form-action btn btn-default <%= pundit_class Family, :updateable?%>" id="add_mailing_address">Add Mailing Address</span>
 <% end %>
 
+<script type="text/javascript">
+  function handleButtonKeyDown(event, buttonId) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const button = document.getElementById(buttonId);
+      button.click();
+    }
+  }
+
+</script>
 
 <% if EnrollRegistry.feature_enabled?(:address_verification) %>
 <script>
