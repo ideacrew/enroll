@@ -98,7 +98,6 @@ RSpec.describe SponsoredBenefits::Services::PlanDesignProposalService, type: :mo
       }
     end
     let(:health_plan_option_kind) { "single_issuer" }
-
     let(:benefit_group) { application.benefit_groups.first }
 
     context "#save_health_benefits" do
@@ -142,9 +141,13 @@ RSpec.describe SponsoredBenefits::Services::PlanDesignProposalService, type: :mo
           end
 
           it 'benefit group should be invalid' do
-            expect(benefit_group.valid?).to be_falsey
-            expect(benefit_group.errors.to_h[:relationship_benefits]).to eq "Employer contribution must be ≥ 50% for employee"
-
+            if application.effective_period.min.month == 1
+              expect(benefit_group.valid?).to be_falsey
+              expect(benefit_group.errors.to_h[:relationship_benefits]).to eq "single_issuer is not a valid plan option kind"
+            else
+              expect(benefit_group.valid?).to be_falsey
+              expect(benefit_group.errors.to_h[:relationship_benefits]).to eq "Employer contribution must be ≥ 50% for employee"
+            end
           end
         end
 
