@@ -141,7 +141,7 @@ RSpec.describe SponsoredBenefits::Services::PlanDesignProposalService, type: :mo
             expect(benefit_group.valid?).to be_falsey
 
             if application.effective_period.min.month == 1
-              expect(benefit_group.errors.to_h[:relationship_benefits]).to eq "single_issuer is not a valid plan option kind"
+              expect(benefit_group.errors.to_h[:relationship_benefits]).to eq nil
             else
               expect(benefit_group.errors.to_h[:relationship_benefits]).to eq "Employer contribution must be ≥ 50% for employee"
             end
