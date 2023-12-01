@@ -58,9 +58,6 @@ RSpec.describe SponsoredBenefits::Services::PlanDesignProposalService, type: :mo
       # Build these only when benefit_group plan_option_kind is solesource
       expect(@benefit_group.composite_tier_contributions.present?).to eq true if @benefit_group.sole_source?
     end
-
-    it "should not build composite tier contributions if it is not sole source" do
-    end
   end
 
   describe "#ensure_dental_benefits" do
@@ -141,11 +138,11 @@ RSpec.describe SponsoredBenefits::Services::PlanDesignProposalService, type: :mo
           end
 
           it 'benefit group should be invalid' do
+            expect(benefit_group.valid?).to be_falsey
+
             if application.effective_period.min.month == 1
-              expect(benefit_group.valid?).to be_falsey
               expect(benefit_group.errors.to_h[:relationship_benefits]).to eq "single_issuer is not a valid plan option kind"
             else
-              expect(benefit_group.valid?).to be_falsey
               expect(benefit_group.errors.to_h[:relationship_benefits]).to eq "Employer contribution must be ≥ 50% for employee"
             end
           end
