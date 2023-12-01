@@ -12,8 +12,8 @@
           <label>Is this person a US citizen or US national? *</label>
         </div>
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
-          <div class="radio skinned-form-controls skinned-form-controls-mac">
-            <%= f.radio_button :us_citizen, true, required: true, class: "required floatlabel" %>
+          <div tabindex="0" class="radio skinned-form-controls skinned-form-controls-mac">
+            <%= f.radio_button :us_citizen, true, required: true, class: "required floatlabel"%>
             <%= f.label :us_citizen, :value => true do %>
               <span class="yes_no_pair">Yes</span>
             <% end %>
@@ -21,7 +21,7 @@
         </div>
         <div class="col-lg-1 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
           <div class="radio skinned-form-controls skinned-form-controls-mac">
-            <%= f.radio_button :us_citizen, false, required: true, class: "required floatlabel" %>
+            <%= f.radio_button :us_citizen, false, tabindex: "0", required: true, class: "required floatlabel" %>
             <%= f.label :us_citizen, :value => false do %>
               <span class="yes_no_pair">No</span>
             <% end %>

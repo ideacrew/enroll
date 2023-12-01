@@ -12,7 +12,11 @@ function isApplyingCoverage(target) {
         $('#ssn-coverage-msg').show();
       }
     }
-    $(fields).change(function () {
+    $(fields).on("change keypress", function(event) {
+      if (event.type === "keypress" && event.keyCode !== 13) {
+        return; // Ignore keypress events other than Enter key
+      }
+      
       if ($(fields).not(':checked').val() == 'true') {
         $('.consumer_fields_for_applying_coverage').hide();
         $('#employer-coverage-msg').show();
@@ -53,24 +57,24 @@ function addEventOnSsn(target) {
   });
 }
 
-function applyListenersFor(target) {
+function applyListenersFor(event, target) {
   // target is person or dependent
-  $("input[name='" + target + "[us_citizen]']").change(function () {
+  $("input[name='" + target + "[us_citizen]']").on("change keypress", function(event) {
+    console.log("hello");
+    if (event.type === "keypress" && event.keyCode !== 13) {
+      return; // Ignore keypress events other than Enter key
+    }
+    
     $('#vlp_documents_container').hide();
     $('#vlp_documents_container .vlp_doc_area').html('');
-    $("input[name='" + target + "[naturalized_citizen]']").attr(
-      'checked',
-      false
-    );
-    $("input[name='" + target + "[eligible_immigration_status]']").attr(
-      'checked',
-      false
-    );
+    $("input[name='" + target + "[naturalized_citizen]']").attr('checked', false);
+    $("input[name='" + target + "[eligible_immigration_status]']").attr('checked', false);
+    
     if ($(this).val() == 'true') {
       $('#naturalized_citizen_container').show();
       $('#immigration_status_container').hide();
-      $('#' + target + '_naturalized_citizen_true').attr('required');
-      $('#' + target + '_naturalized_citizen_false').attr('required');
+      $('#' + target + '_naturalized_citizen_true').attr('required', true);
+      $('#' + target + '_naturalized_citizen_false').attr('required', true);
     } else {
       $('#naturalized_citizen_container').hide();
       $('#immigration_status_container').show();
@@ -79,7 +83,11 @@ function applyListenersFor(target) {
     }
   });
 
-  $("input[name='" + target + "[naturalized_citizen]']").change(function () {
+  $("input[name='" + target + "[naturalized_citizen]']").on("change keypress", function(event) {
+    if (event.type === "keypress" && event.keyCode !== 13) {
+      return; // Ignore keypress events other than Enter key
+    }
+    
     var selected_doc_type = $('#naturalization_doc_type').val();
     if ($(this).val() == 'true') {
       $('#vlp_documents_container').show();
@@ -94,22 +102,24 @@ function applyListenersFor(target) {
     }
   });
 
-  $("input[name='" + target + "[eligible_immigration_status]']").change(
-    function () {
-      var selected_doc_type = $('#immigration_doc_type').val();
-      if ($(this).val() == 'true' && this.checked) {
-        $('#vlp_documents_container').show();
-        $('#naturalization_doc_type_select').hide();
-        $('#immigration_doc_type_select').show();
-        showOnly(selected_doc_type);
-      } else {
-        $('#vlp_documents_container').hide();
-        $('#naturalization_doc_type_select').hide();
-        $('#immigration_doc_type_select').hide();
-        $('#vlp_documents_container .vlp_doc_area').html('');
-      }
+  $("input[name='" + target + "[eligible_immigration_status]']").on("change keypress", function(event) {
+    if (event.type === "keypress" && event.keyCode !== 13) {
+      return; // Ignore keypress events other than Enter key
     }
-  );
+    
+    var selected_doc_type = $('#immigration_doc_type').val();
+    if ($(this).val() == 'true' && this.checked) {
+      $('#vlp_documents_container').show();
+      $('#naturalization_doc_type_select').hide();
+      $('#immigration_doc_type_select').show();
+      showOnly(selected_doc_type);
+    } else {
+      $('#vlp_documents_container').hide();
+      $('#naturalization_doc_type_select').hide();
+      $('#immigration_doc_type_select').hide();
+      $('#vlp_documents_container .vlp_doc_area').html('');
+    }
+  });
 
   //start tribe option controls
   $("input[name='" + target + "[indian_tribe_member]']").change(function() {
@@ -121,7 +131,10 @@ function applyListenersFor(target) {
   });
 
   // tribal-state change - select from options
-  $('select#tribal-state').on("change", function() {
+  $('select#tribal-state').on("change keypress", function(event) {
+    if (event.type === "keypress" && event.keyCode !== 13) {
+      return; // Ignore keypress events other than Enter key
+    }
     var enroll_state_abbr = $('#enroll_state_abbr').val();
     var is_indian_alaskan_tribe_details_enabled = ($('#is_indian_alaskan_tribe_details_enabled').val() === 'true');
 
