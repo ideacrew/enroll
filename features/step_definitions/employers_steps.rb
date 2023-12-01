@@ -1108,6 +1108,21 @@ end
 And(/^employer should see that the create plan year is (.*)$/) do |plan_year_btn_enabled|
   benefit_application = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.all.first.benefit_applications.first
   plan_year_start = benefit_application.effective_period.first.to_date
+
+  if plan_year_btn_enabled == 'true'
+    expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql false
+  elsif plan_year_btn_enabled == 'false'
+    if plan_year_start == (TimeKeeper.date_of_record + 1.year).beginning_of_year
+      expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql false
+    else
+      expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql true
+    end
+  end
+end
+
+And(/^employer should see that the save plan year button is (.*)$/) do |plan_year_btn_enabled|
+  benefit_application = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.all.first.benefit_applications.first
+  plan_year_start = benefit_application.effective_period.first.to_date
   contribution_percent = find(:xpath, "/html/body/div[3]/div/div/div[2]/form/div[3]/div/div[5]/div/div[2]/div[1]/div[2]/div[1]/input").value.to_i
   case plan_year_btn_enabled
   when 'true'
