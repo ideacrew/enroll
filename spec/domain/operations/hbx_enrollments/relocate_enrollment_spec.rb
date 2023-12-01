@@ -64,7 +64,6 @@ RSpec.describe ::Operations::HbxEnrollments::RelocateEnrollment, dbclean: :after
     it "should generate new enrollment with different rating area" do
       subject.call(@params)
       family.reload
-      enrollments = family.enrollments
       if family.enrollments.first.effective_on.month == 1
         expect(family.active_household.hbx_enrollments.map(&:rating_area_id)).to eq([@rating_area.id, nil])
       else
