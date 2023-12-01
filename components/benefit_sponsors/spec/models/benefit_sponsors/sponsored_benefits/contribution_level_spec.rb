@@ -36,10 +36,12 @@ module BenefitSponsors
       end
 
       before :each do
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 11, 1))
         allow(initial_sponsor_setting).to receive(:item).and_return(:fifty_percent_sponsor_fixed_percent_contribution_model)
         allow(renewal_sponsor_setting).to receive(:item).and_return(:zero_percent_sponsor_fixed_percent_contribution_model)
       end
 
+      after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
       include_context 'setup benefit market with market catalogs and product packages'
       let(:aasm_state) { :active }
       include_context "setup initial benefit application"
