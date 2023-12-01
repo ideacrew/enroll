@@ -65,7 +65,6 @@ RSpec.describe ::Operations::HbxEnrollments::RelocateEnrollment, dbclean: :after
       subject.call(@params)
       family.reload
       enrollments = family.enrollments
-        binding.pry
       if family.enrollments.first.effective_on.month == 1
         expect(family.active_household.hbx_enrollments.map(&:rating_area_id)).to eq([@rating_area.id, nil])
       else
