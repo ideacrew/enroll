@@ -5,7 +5,8 @@
       <h2 class="text-center heading-text">Create Account</h2>
       <div id="pwError" class="d-none">
         <div class="alert alert-danger">
-          Your password confirmation didn’t match. Try again.
+          <span id="pwErrorMatch" class="d-none"><%= l10n("devise.errors.password_match") %></span>
+          <span id="pwErrorStrength" class="d-none"><%= l10n("devise.errors.password_strength") %></span>
         </div>
       </div>
       <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: {class: 'needs-validation', data: {controller:'signup', action: "keyup->signup#validateInput keydown->signup#preventEnterSubmission"}, novalidate: true, rel: 'noopener noreferrer' }) do |f| %>
@@ -55,7 +56,7 @@
               </div>
             </div>
           </div>
-          <%= f.password_field :password_confirmation, autocomplete: "off", class: "form-control", minlength:"8", required: true, data: {action: "focus->signup#hideTooltips click->signup#hideTooltips keyup->signup#checkMatch blur->signup#passwordsMatch", target: 'signup.passwordConfirmationField'} %>
+          <%= f.password_field :password_confirmation, autocomplete: "off", class: "form-control", minlength:"8", required: true, data: {action: "focus->signup#hideTooltips click->signup#hideTooltips keyup->signup#checkMatch blur->signup#validatePassword", target: 'signup.passwordConfirmationField'} %>
           <div class="invalid-feedback">
             Must be at least 8 characters and cannot contain username
           </div>
