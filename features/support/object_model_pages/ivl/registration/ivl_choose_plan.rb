@@ -95,6 +95,10 @@ class IvlChoosePlan
     '[data-cuke="compare_plan_checkbox"]'
   end
 
+  def self.contribution_amount
+    '[data-cuke="contribution-amount"]'
+  end
+
   def self.compare_plans_btn
     '[data-cuke="ivl-compare-selected-plans-link"]'
   end

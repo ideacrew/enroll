@@ -21,4 +21,4 @@
           .col-xs-3
             = f.number_field :contribution_factor, {value: "#{(f.object.contribution_factor * 100).to_i}", id: "#{f.object.id}", min: 0, max: 100, onblur: "setSliderValue(this)", "data-contribution-input" => 'true', "data-displayname" => f.object.display_name}
           .col-xs-9
-            input type="range" min="0" max="100" value="#{(f.object.contribution_factor * 100).to_i}" step="1" class="slider" id="#{f.object.id}" oninput="setInputValue(this)" data-id="#{f.object.id}"
+            input type="range" min="0" max="100" value="#{(f.object.contribution_factor * 100).to_i}" step="1" class="slider" data-cuke="contribution-amount" id="#{f.object.id}" oninput="setInputValue(this)" data-id="#{f.object.id}"
