@@ -57,10 +57,11 @@ function addEventOnSsn(target) {
   });
 }
 
-function applyListenersFor(event, target) {
+function applyListenersFor(target) {
   // target is person or dependent
   $("input[name='" + target + "[us_citizen]']").on("change keypress", function(event) {
     console.log("hello");
+    console.log(event.type + ' ' + event.keyCode);
     if (event.type === "keypress" && event.keyCode !== 13) {
       return; // Ignore keypress events other than Enter key
     }
