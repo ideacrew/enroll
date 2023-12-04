@@ -15,13 +15,13 @@
         </div>
       </div>
       <div class="row row-form-wrapper no-buffer" style="border-top: solid 1px #b7b7b7;">
-        <div class="col-lg-2 radio skinned-form-controls skinned-form-controls-mac">
+        <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'agreement_agree')" class="col-lg-2 radio skinned-form-controls skinned-form-controls-mac">
           <%= radio_button_tag :agreement, "agree", true, class: "required floatlabel"  %>
           <label for="agreement_agree"><span style="white-space: nowrap;">I agree</span></label>
         </div>
       </div>
       <div class="row row-form-wrapper no-buffer">
-        <div class="col-lg-10 radio skinned-form-controls skinned-form-controls-mac">
+        <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'agreement_disagree')" class="col-lg-10 radio skinned-form-controls skinned-form-controls-mac">
           <%= radio_button_tag :agreement, "disagree", false, class: "required floatlabel"  %>
           <label for="agreement_disagree"><span style="white-space: nowrap;">I disagree</span></label>
         </div>
