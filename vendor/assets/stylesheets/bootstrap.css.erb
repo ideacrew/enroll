@@ -3107,8 +3107,8 @@ fieldset[disabled] .btn-default.focus {
 }
 .btn-primary {
   color: #ffffff;
-  background-color: var(--error-color, #e72b2d);
-  border-color: #b7191b;
+  background-color: var(--primary-green, var(--error-color, #e72b2d));
+  border-color: var(--secondary-green, #b7191b);
   text-transform: uppercase;
   font-weight: 600;
   border-top: none;
@@ -3128,7 +3128,7 @@ fieldset[disabled] .btn-default.focus {
 }
 .btn-primary:hover {
   color: #fff;
-  background-color: #e72b2d;
+  background-color: var(--primary-green, #e72b2d);
   -webkit-filter: brightness(70%);
   -webkit-transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
