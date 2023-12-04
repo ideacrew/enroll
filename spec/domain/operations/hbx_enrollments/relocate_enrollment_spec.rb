@@ -3,6 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe ::Operations::HbxEnrollments::RelocateEnrollment, dbclean: :after_each do
+
+  before :all do
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 10, 1))
+  end
   let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:start_date) { TimeKeeper.date_of_record.beginning_of_year }
@@ -64,11 +68,7 @@ RSpec.describe ::Operations::HbxEnrollments::RelocateEnrollment, dbclean: :after
     it "should generate new enrollment with different rating area" do
       subject.call(@params)
       family.reload
-      if family.enrollments.first.effective_on.month == 1
-        expect(family.active_household.hbx_enrollments.map(&:rating_area_id)).to eq([@rating_area.id, nil])
-      else
-        expect(family.active_household.hbx_enrollments.map(&:rating_area_id)).to eq([@rating_area.id, rating_area2.id])
-      end
+      expect(family.active_household.hbx_enrollments.map(&:rating_area_id)).to eq([@rating_area.id, rating_area2.id])
     end
 
     it "should generate new enrollment with different rating area" do
@@ -104,5 +104,9 @@ RSpec.describe ::Operations::HbxEnrollments::RelocateEnrollment, dbclean: :after
       enrollment.reload
       expect(enrollment.aasm_state).to eq "coverage_terminated"
     end
+  end
+
+  after :all do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
   end
 end

@@ -2,6 +2,10 @@
 
 RSpec.describe SponsoredBenefits::Services::PlanDesignProposalService, type: :model, dbclean: :after_each do
 
+  before :all do
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 10, 1))
+  end
+
   let(:subject) do
     SponsoredBenefits::Services::PlanDesignProposalService.new(
       kind: benefit_kind,
@@ -139,12 +143,7 @@ RSpec.describe SponsoredBenefits::Services::PlanDesignProposalService, type: :mo
 
           it 'benefit group should be invalid' do
             expect(benefit_group.valid?).to be_falsey
-
-            if application.effective_period.min.month == 1
-              expect(benefit_group.errors.to_h[:relationship_benefits]).to eq nil
-            else
-              expect(benefit_group.errors.to_h[:relationship_benefits]).to eq "Employer contribution must be ≥ 50% for employee"
-            end
+            expect(benefit_group.errors.to_h[:relationship_benefits]).to eq "Employer contribution must be ≥ 50% for employee"
           end
         end
 
@@ -191,5 +190,9 @@ RSpec.describe SponsoredBenefits::Services::PlanDesignProposalService, type: :mo
         expect(employee_dental_benefits.premium_pct).to eq 65.0
       end
     end
+  end
+
+  after :all do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
   end
 end
