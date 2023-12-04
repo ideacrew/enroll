@@ -8,7 +8,10 @@
       .col-lg-8.col-md-8.col-sm-8.col-xs-12
         .ct-1
           h1.heading-text = l10n("insured.plan_shoppings.show.title")
-          h4.switch-header = l10n("insured.plan_shoppings.show.title.content")
+          - if @coverage_kind == "health"
+            h4.switch-header = l10n("insured.plan_shoppings.show.health_title.content")
+          - else
+            h4.switch-header = l10n("insured.plan_shoppings.show.dental_title.content")
           h4.swtich-header
           - if @market_kind == "shop" && EnrollRegistry.feature_enabled?(:display_cost_warning_message)
             - if @hbx_enrollment.sponsored_benefit.single_plan_type?

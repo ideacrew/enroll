@@ -26,6 +26,14 @@ Then(/^\w+ should see Go To Plan Compare button$/) do
   expect(page).to have_content("CHECKBOOK")
 end
 
+Then(/^\w+ should see (.*) title content$/) do |coverage_kind|
+  if coverage_kind == "health"
+    expect(page).to have_content(l10n("insured.plan_shoppings.show.health_title.content"))
+  else
+    expect(page).to have_content(l10n("insured.plan_shoppings.show.dental_title.content"))
+  end
+end
+
 When(/^\w+ visits? the Insured portal outside of open enrollment$/) do
   FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
   FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
