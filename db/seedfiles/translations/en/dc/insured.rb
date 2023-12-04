@@ -508,6 +508,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.print' => "Print",
   :'en.insured.plan_shoppings.show.title' => "Choose Plan",
   :'en.insured.plan_shoppings.show.title.content' => "Find a quality, affordable health insurance plan that's right for you, or for you and your family. Use 'Filter Results', 'Compare' and 'Details' features to narrow your choices. When you find the plan you want, 'Select Plan'.",
+  :'en.insured.plan_shoppings.show.dental_title.content' => "Find a quality, affordable health insurance plan that's right for you, or for you and your family. Use 'Filter Results', 'Compare' and 'Details' features to narrow your choices. When you find the plan you want, 'Select Plan'.",
   :'en.compare_plans' => "Compare Plans",
   :'en.insured.plan_shoppings.final_cost_change' => "Please note your final cost may change based on the final enrollment of all employees.",
   :'en.sort_by' => "Sort By",
