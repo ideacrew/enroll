@@ -28,7 +28,7 @@ end
 
 Then(/^\w+ should see (.*) title content$/) do |coverage_kind|
   if coverage_kind == "health"
-    expect(page).to have_content(l10n("insured.plan_shoppings.show.title.content"))
+    expect(page).to have_content(l10n("insured.plan_shoppings.show.health_title.content"))
   else
     expect(page).to have_content(l10n("insured.plan_shoppings.show.dental_title.content"))
   end
