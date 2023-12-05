@@ -64,7 +64,7 @@ h1,h2,h3,h4,h5,h6 {
     }
     .navbar-collapse {
       .header-text {
-        color: $primary-gray;
+        color: var(--secondary-font-color, #b7b7b7);
         font-size: 14px;
         text-transform: uppercase;
         font-weight: $primary-bold;
@@ -136,7 +136,7 @@ h1,h2,h3,h4,h5,h6 {
     text-decoration:none;
     cursor:pointer;
     transition: all 0.3s ease 0s;
-    color: #e72b2d;
+    color: var(--error-color, #e72b2d);
   }
 
   a:visited {

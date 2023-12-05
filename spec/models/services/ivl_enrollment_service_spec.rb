@@ -25,6 +25,11 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
     Services::IvlEnrollmentService.new
   end
 
+  before do
+    allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:async_expire_and_begin_coverages).and_return(false)
+  end
+
   context "send_reminder_notices_for_ivl" do
 
     context 'when include_faa_outstanding_verifications feature is turned off' do
@@ -209,6 +214,17 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
       expect(cover_coverage_enrolled_enrollment1.reload.aasm_state).to eq "coverage_expired"
       expect(cover_coverage_enrolled_enrollment1.workflow_state_transitions.first.event).to eq "expire_coverage!"
     end
+
+    context 'when async_expire_and_begin_coverages feature is enabled' do
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:async_expire_and_begin_coverages).and_return(true)
+      end
+
+      it "should not raise error" do
+        expect{subject.expire_individual_market_enrollments}.not_to raise_error
+      end
+    end
   end
 
   context ".begin_coverage_for_ivl_enrollments" do
@@ -323,6 +339,17 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
       expect(auto_renewing_enrollment.workflow_state_transitions.first.event).to eq "begin_coverage!"
       expect(cover_auto_renewing_enrollment.reload.aasm_state).to eq "coverage_selected"
       expect(cover_auto_renewing_enrollment.workflow_state_transitions.first.event).to eq "begin_coverage!"
+    end
+
+    context 'when async_expire_and_begin_coverages feature is enabled' do
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:async_expire_and_begin_coverages).and_return(true)
+      end
+
+      it "should not raise error" do
+        expect{subject.begin_coverage_for_ivl_enrollments}.not_to raise_error
+      end
     end
   end
 
