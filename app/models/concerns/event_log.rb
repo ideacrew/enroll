@@ -8,9 +8,10 @@ module EventLog
   included do
     EVENT_CATEGORIES = %i[osse_eligibility password_change].freeze
 
-    belongs_to :account, class_name: "User"
+    belongs_to :account, class_name: "User", inverse_of: :nil
     embeds_one :session_detail, class_name: "EventLog::SessionDetail", as: :sessionable
 
+    # field :account_id, type: String
     field :subject_gid, type: String
     field :event_category, type: Symbol
     field :correlation_id, type: String

@@ -9,20 +9,17 @@ RSpec.describe EventLogs::BenefitSponsorshipEventLog, type: :model, dbclean: :ar
     context "when sponsorship passed as subject" do
 
       let(:benefit_sponsorship)  { FactoryBot.create(:benefit_sponsors_benefit_sponsorship, :with_full_package) }
-      
+      let(:user) { FactoryBot.create(:user, identity_verified_date: nil) }
+  
       context ".save" do
         let(:params) do
           {
+            account_id: user.id,
             subject_gid: benefit_sponsorship.to_global_id,
             correlation_id: "a156ad4c031",
-            session_id: "222_222_220",
-            account_id: "d156ad4c031g32324tf0",
             host_id: :enroll,
             event_category: :osse_eligibility,
             trigger: "determine_eligibility",
-            response: "success",
-            log_level: :debug,
-            severity: :debug,
             event_time: DateTime.new
           }
         end
@@ -35,8 +32,8 @@ RSpec.describe EventLogs::BenefitSponsorshipEventLog, type: :model, dbclean: :ar
 
         it "should find events from collection" do
           expect(
-            described_class.find(
-              params.slice(:subject_gid, :event_category)
+            described_class.where(
+              params.slice(:account_id, :event_category)
             ).first
           ).to eq described_class.first
         end
