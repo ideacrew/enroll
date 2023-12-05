@@ -77,12 +77,3 @@
   show_account_button: step > 2 && EnrollRegistry.feature_enabled?(:back_to_account_all_shop),
   is_complete: step == 6,
   show_help_button: step != 1 && step < 6}
-
-:javascript
-  function handleButtonKeyDown(event, buttonId) {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      const button = document.getElementById(buttonId);
-      button.click();
-    }
-  }
