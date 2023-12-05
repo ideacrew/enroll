@@ -229,7 +229,7 @@ Then(/^.+ should not see error message (.*)$/) do |text|
   page.should have_no_content(text)
 end
 
-Then (/^.+ should see the weak password error message$/) do
+Then(/^.+ should see the weak password error message$/) do
   page.should have_content(l10n("devise.errors.password_strength"))
 end
 
