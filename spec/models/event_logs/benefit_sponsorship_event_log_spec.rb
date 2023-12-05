@@ -10,7 +10,7 @@ RSpec.describe EventLogs::BenefitSponsorshipEventLog, type: :model, dbclean: :ar
 
       let(:benefit_sponsorship)  { FactoryBot.create(:benefit_sponsors_benefit_sponsorship, :with_full_package) }
       let(:user) { FactoryBot.create(:user, identity_verified_date: nil) }
-  
+
       context ".save" do
         let(:params) do
           {
