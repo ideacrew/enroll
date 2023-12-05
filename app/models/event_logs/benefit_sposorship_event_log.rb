@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EventLogs
   class BenefitSponsorshipEventLog
     include Mongoid::Document

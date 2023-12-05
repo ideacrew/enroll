@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EventLogs
   class PersonEventLog
     include Mongoid::Document

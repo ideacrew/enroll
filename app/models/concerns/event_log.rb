@@ -6,7 +6,7 @@ module EventLog
   include GlobalID::Identification
 
   included do
-    EVENT_CATEGORIES = %i[osse_eligibility password_change].freeze
+    # EVENT_CATEGORIES = %i[osse_eligibility password_change].freeze
 
     belongs_to :account, class_name: "User", inverse_of: :nil
     embeds_one :session_detail, class_name: "EventLog::SessionDetail", as: :sessionable
