@@ -320,6 +320,7 @@ class ForcePublishBenAppReports < MongoidMigrationTask
     end
   end
 
+  # rubocop:disable Metrics/CyclomaticComplexity
   def osse_subsidy_report(start_on_date)
     today_time = TimeKeeper.date_of_record.strftime("%Y%m%d%H%M%S")
     file_name = "#{Rails.root}/osse_subsidy_report_#{today_time}_#{today_time}.csv"
@@ -334,9 +335,9 @@ class ForcePublishBenAppReports < MongoidMigrationTask
           renewal_bg_ids = ben_spon.renewal_benefit_application.benefit_packages&.pluck(:id) if ben_spon&.renewal_benefit_application&.present?
 
           renewal_enrollments = HbxEnrollment.where({
-                                            :sponsored_benefit_package_id.in => renewal_bg_ids,
-                                            :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + ['auto_renewing']
-                                          })
+                                                      :sponsored_benefit_package_id.in => renewal_bg_ids,
+                                                      :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + ['auto_renewing']
+                                                    })
 
           renewal_enrollments.each do |enr|
             osse_subsidy = enr.eligible_child_care_subsidy.to_s
@@ -348,4 +349,5 @@ class ForcePublishBenAppReports < MongoidMigrationTask
       end
     end
   end
+  # rubocop:enable Metrics/CyclomaticComplexity
 end
