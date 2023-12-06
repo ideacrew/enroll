@@ -138,4 +138,3 @@ class Insured::VerificationDocumentsController < ApplicationController
     end
 
   end
-end
