@@ -118,23 +118,23 @@ class Insured::VerificationDocumentsController < ApplicationController
     person_consumer_role.save
   end
 
-    def validate_file_type
-      return unless params[:file]
+  def validate_file_type
+    return unless params[:file]
 
-      max_file_size_in_bytes = VlpDocument::ID_FILE_SIZE_MB * 1024 * 1024
-      params[:file].each do |file|
-        file_path = file.path
-        command = "file --mime-type -b #{file_path}"
-        # https://docs.ruby-lang.org/en/2.4.0/Open3.html
-        # prevent users from uploading files with deceptive extensions, Ex - attempting to upload a '.mp4' that has been changed to '.mp4.jpeg'
-        mime_type, = Open3.capture3(command)
-        mime_type = mime_type.strip
+    max_file_size_in_bytes = VlpDocument::ID_FILE_SIZE_MB * 1024 * 1024
+    params[:file].each do |file|
+      file_path = file.path
+      command = "file --mime-type -b #{file_path}"
+      # https://docs.ruby-lang.org/en/2.4.0/Open3.html
+      # prevent users from uploading files with deceptive extensions, Ex - attempting to upload a '.mp4' that has been changed to '.mp4.jpeg'
+      mime_type, = Open3.capture3(command)
+      mime_type = mime_type.strip
 
-        next if VlpDocument::ALLOWED_MIME_TYPES.include?(mime_type) && file.size < max_file_size_in_bytes
-        File.delete(file_path) if File.exist?(file_path)
-        flash[:error] = "Unable to upload file. Please upload a file in PNG, JPEG, or PDF format and ensure it's under #{VlpDocument::ID_FILE_SIZE_MB}MB."
-        redirect_to verification_insured_families_path
-      end
+      next if VlpDocument::ALLOWED_MIME_TYPES.include?(mime_type) && file.size < max_file_size_in_bytes
+      File.delete(file_path) if File.exist?(file_path)
+      flash[:error] = "Unable to upload file. Please upload a file in PNG, JPEG, or PDF format and ensure it's under #{VlpDocument::ID_FILE_SIZE_MB}MB."
+      redirect_to verification_insured_families_path
     end
-
   end
+
+end
