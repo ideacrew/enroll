@@ -124,7 +124,9 @@ class Insured::VerificationDocumentsController < ApplicationController
     max_file_size_in_bytes = VlpDocument::ID_FILE_SIZE_MB * 1024 * 1024
     params[:file].each do |file|
       file_path = file.path
-      command = "file --mime-type -b #{file_path}"
+      # Sanitize the file path using Shellwords.escape to prevent command injection
+      escaped_file_path = Shellwords.escape(file_path)
+      command = "file --mime-type -b #{escaped_file_path}"
       # https://docs.ruby-lang.org/en/2.4.0/Open3.html
       # prevent users from uploading files with deceptive extensions, Ex - attempting to upload a '.mp4' that has been changed to '.mp4.jpeg'
       mime_type, = Open3.capture3(command)
