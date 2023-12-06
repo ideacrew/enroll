@@ -8,6 +8,7 @@ function setupExternalRedirectedListener() {
     var redirUrl = changeElement.getAttribute("data-redirect-url");
 
     if (redirUrl != null) {
+      window.localStorage.setItem("jwt", jwtVal);
       var headers = new Headers();
       headers.append('Authorization', 'Bearer ' + jwtVal);
       
