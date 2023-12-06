@@ -340,6 +340,17 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
       expect(cover_auto_renewing_enrollment.reload.aasm_state).to eq "coverage_selected"
       expect(cover_auto_renewing_enrollment.workflow_state_transitions.first.event).to eq "begin_coverage!"
     end
+
+    context 'when async_expire_and_begin_coverages feature is enabled' do
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:async_expire_and_begin_coverages).and_return(true)
+      end
+
+      it "should not raise error" do
+        expect{subject.begin_coverage_for_ivl_enrollments}.not_to raise_error
+      end
+    end
   end
 
   context '#send_enr_or_dr_notice_to_ivl' do
