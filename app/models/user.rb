@@ -61,6 +61,9 @@ class User
   ## Seed: https://github.com/plataformatec/devise/wiki/How-To%3a-Require-admin-to-activate-account-before-sign_in
   field :approved, type: Boolean, default: true
 
+  # Session token for Devise to prevent concurrent user sessions
+  field :current_login_token
+
   ##RIDP
   field :identity_verified_date, type: Date
   field :identity_final_decision_code, type: String

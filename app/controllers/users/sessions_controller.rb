@@ -4,11 +4,23 @@ class Users::SessionsController < Devise::SessionsController
   respond_to :html, :js
   after_action :log_failed_login, :only => :new
   before_action :set_ie_flash_by_announcement, only: [:new]
+  skip_before_action :check_concurrent_sessions
+
+  def new
+    # Persist flash error message when signing out user
+    flash.keep(:error) if flash[:error].present? && flash[:error] == l10n('devise.sessions.signed_out_concurrent_session')
+
+    self.resource = resource_class.new(sign_in_params)
+    clean_up_passwords(resource)
+    yield resource if block_given?
+    respond_with(resource, serialize_options(resource))
+  end
 
   def create
     self.resource = warden.authenticate!(auth_options)
     set_flash_message(:notice, :signed_in) if is_flashing_format?
     sign_in(resource_name, resource)
+    set_login_token
     yield resource if block_given?
     location = after_sign_in_path_for(resource)
     flash[:warning] = current_user.get_announcements_by_roles_and_portal(location) if current_user.present?
@@ -21,6 +33,13 @@ class Users::SessionsController < Devise::SessionsController
   end
 
   private
+
+  def set_login_token
+    # Set devise session token to prevent concurrent user logins.
+    token = Devise.friendly_token
+    session[:login_token] = token
+    current_user.update_attributes!(current_login_token: token)
+  end
 
   def log_failed_login
     return unless failed_login?
