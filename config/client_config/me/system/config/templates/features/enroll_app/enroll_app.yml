@@ -14,7 +14,7 @@ registry:
           is_visible: true
         settings:
           - key: :application_name
-            item: 'enroll_me'
+            item: 'enroll_na'
           - key: :copyright_period_start
             item: ''
           - key: :policies_url
@@ -30,17 +30,17 @@ registry:
           - key: :submit_docs_url
             item: 'https://www.CoverME.gov/forms'
           - key: :state_residency
-            item: 'ME Residency'
+            item: 'Residency'
           - key: :site_key
             item: :me
           - key: :state_abbreviation
-            item: 'ME'
+            item: 'N/A'
           - key: :subdomain
             item: 'cme'
           - key: :domain_name
             item: 'cme.enroll.openhbx.org'
           - key: :site_title
-            item: 'CoverME.gov'
+            item: 'Enroll App'
           - key: :home_url
             item: 'https://cme.enroll.openhbx.org/'
           - key: :home_business_url
@@ -56,23 +56,23 @@ registry:
           - key: :user_sign_in_url
             item: 'https://www.coverme.gov'
           - key: :website_name
-            item: https://www.coverme.gov"
+            item: "https://www.coverme.gov"
           - key: :main_web_address
             item: 'https://www.coverme.gov'
           - key: :main_web_address
             item: 'https://www.coverme.gov'
           - key: :state_name
-            item: 'Maine'
+            item: 'N/A'
           - key: :short_name
-            item: 'CoverME.gov'
+            item: 'Enroll App'
           - key: :byline
-            item: "Maine's Official Health Insurance Marketplace"
+            item: "The Official Health Insurance Marketplace"
           - key: :long_name
-            item: 'CoverME.gov'
+            item: 'Enroll App'
           - key: :header_message
-            item: "Maine's Official Health Insurance Marketplace"
+            item: "The Official Health Insurance Marketplace"
           - key: :byline
-            item: "Welcome to Maine's Health Insurance Marketplace"
+            item: "Welcome to the Health Insurance Marketplace"
           - key: :logo_file_name
             item: 'logo_me.svg'
           - key: :make_their_premium_payments_online
@@ -147,9 +147,9 @@ registry:
           - key: :mail_address
             item: 'info@coverme.gov'
           - key: :no_reply_email
-            item: 'noreply@coverme.gov'
+            item: 'noreply@sb.gov'
           - key: :mail_address
-            item: 'info@coverme.gov'
+            item: 'info@sbm.gov'
           - key: :producer_email_address
             item: 'mehl.producer@coverme.gov'
           - key: :privacy_policy
