@@ -116,8 +116,9 @@ class ApplicationController < ActionController::Base
   def concurrent_sessions?
     # If the session token differs from the token stored in the db
     # a new login for this user is detected.
+    # Checking for User class prevents spec breaking for Doubles.
     # Currently only enabled for admin users.
-    current_user && (session[:login_token] != current_user.current_login_token)
+    current_user && current_user.class == User && (session[:login_token] != current_user&.current_login_token)
   end
 
   def redirect_if_prod
