@@ -6,8 +6,4 @@ FactoryBot.define do
     started_at {DateTime.now}
     message {"initial"}
   end
-
-  before(:create) do |instance|
-    instance.event = "initial"
-  end
 end
