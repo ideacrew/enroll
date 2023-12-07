@@ -108,8 +108,6 @@ class ApplicationController < ActionController::Base
   private
 
   def check_concurrent_sessions
-    persist_flash_on_sign_out
-
     return unless concurrent_sessions? && current_user.has_hbx_staff_role?
     flash[:error] = l10n('devise.sessions.signed_out_concurrent_session')
     sign_out current_user
@@ -120,11 +118,6 @@ class ApplicationController < ActionController::Base
     # a new login for this user is detected.
     # Currently only enabled for admin users.
     current_user && (session[:login_token] != current_user.current_login_token)
-  end
-
-  def persist_flash_on_sign_out
-    # Persist flash error message when signing out user
-    flash.keep(:error) if flash[:error].present? && flash[:error] == l10n('devise.sessions.signed_out_concurrent_session')
   end
 
   def redirect_if_prod
