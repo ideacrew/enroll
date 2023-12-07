@@ -9,7 +9,7 @@ module Subscribers
 
         subscribe(:on_request) do |delivery_info, _metadata, response|
           @logger = subscriber_logger_for(:on_enroll_individual_enrollments_expire_coverages_request)
-          payload = JSON.parse(response)
+          payload = JSON.parse(response, symbolize_names: true)
 
           @logger.info "ExpireCoveragesSubscriber on_request, response: #{payload}"
           result = Operations::HbxEnrollments::ExpirationHandler.new.call(payload)
@@ -24,7 +24,7 @@ module Subscribers
 
         subscribe(:on_expire) do |delivery_info, _metadata, response|
           @logger = subscriber_logger_for(:on_enroll_individual_enrollments_expire_coverages_expire)
-          payload = JSON.parse(response)
+          payload = JSON.parse(response, symbolize_names: true)
           enrollment_hbx_id = payload[:enrollment_hbx_id]
 
           @logger.info "ExpireCoveragesSubscriber on_expire, response: #{payload}"
