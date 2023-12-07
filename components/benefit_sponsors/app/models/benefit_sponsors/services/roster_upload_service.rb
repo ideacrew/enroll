@@ -2,6 +2,7 @@ module BenefitSponsors
   module Services
     class RosterUploadService
       include ActiveModel::Validations
+      include BenefitSponsors::SanitizeHelper
 
       attr_accessor :file, :profile, :sheet
 
@@ -346,16 +347,15 @@ module BenefitSponsors
       end
 
       def parse_boolean(cell)
-        if cell.blank?
-          nil
-        else
-          cell.to_s.match(/(true|t|yes|y|1)$/i).nil? ? "0" : "1"
-        end
+        return nil if cell.blank?
+
+        cell.to_s.match(/(true|t|yes|y|1)$/i).nil? ? "0" : "1"
       end
 
       def sanitize_value(value)
         value = value.to_s.split('.')[0] if value.is_a? Float
         value.to_s.gsub(/[[:cntrl:]]|^\p{Space}+|\p{Space}+$/, '')
+        sanitize(value)
       end
     end
   end
