@@ -11,24 +11,32 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
     let(:params) { {} }
     let(:result) { described_class.new.call(params) }
 
-    it 'fails due to missing enrollment hbx id' do
-      expect(result.success?).to be_falsey
-      expect(result.failure).to eq('Missing query_criteria')
+    context 'missing query criteria' do
+      it 'fails due to missing query criteria' do
+        expect(result.success?).to be_falsey
+        expect(result.failure).to eq('Missing query_criteria')
+      end
     end
-  end
 
-  describe 'with invalid query criteria' do
-    let(:params) { { query_criteria: { 'bad query'} } }
-    let(:result) { described_class.new.call(params) }
+    context 'with invalid query criteria' do
+      let(:params) { { query_criteria: { 'bad' => 'query'} } }
+      let(:result) { described_class.new.call(params) }
 
-    it 'fails due to invalid enrollment kind' do
-      expect(result.success?).to be_falsey
-      expect(result.failure).to eq(/Error generating enrollments_to_expire query/)
+      it 'fails due to invalid enrollment kind' do
+        expect(result.success?).to be_falsey
+        expect(result.failure).to eq(/Error generating enrollments_to_expire query/)
+      end
     end
   end
 
   describe 'with valid params' do
-    let(:params) { { query_criteria: enrollment.hbx_id } }
+    let(:query_criteria) do
+      {
+        :kind.in => ["individual", "coverall"],
+        :aasm_state.in => ["auto_renewing", "renewing_coverage_selected"]
+      }
+    end
+    let(:params) { { query_criteria: {} } }
     let(:result) { described_class.new.call(params) }
 
     it 'succeeds with message' do
