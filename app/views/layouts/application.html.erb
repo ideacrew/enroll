@@ -20,6 +20,11 @@
     <%= javascript_pack_tag ENV['CLIENT'] %>
     <%= stylesheet_pack_tag ENV['CLIENT'] %>
 
+    <% if ENV['CR97_IS_ENABLED'] %>
+      <%= javascript_pack_tag 'cr97' %>
+      <%= stylesheet_pack_tag 'cr97' %>
+    <% end %>
+
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
       <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
