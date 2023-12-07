@@ -1426,14 +1426,14 @@ a.close-1, a.close-2{
     &.form-action {
       margin: 8px 0 20px;
       display: inline-block;
-      color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+      color: var(--theme-primary-100, #007bc4);
       font-size: 14px;
       font-weight: bold;
       border-radius: 4px;
       border: solid 1px #b2b2b2;
       background-color: transparent;
       &:hover {
-        border: solid 1px <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+        border: solid 1px var(--theme-primary-100, #007bc4);
         background-color: #ffffff;
       }
     }
