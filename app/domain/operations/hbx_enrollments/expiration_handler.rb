@@ -32,9 +32,12 @@ module Operations
 
       def enrollments_to_expire_query(query_criteria)
         enrollments_to_expire = HbxEnrollment.where(query_criteria)
+        # evaluating the criteria here to ensure the query is valid
+        enrollments_to_expire.count
+
         Success(enrollments_to_expire)
       rescue StandardError => e
-        Failure("Error generating enrollments_to_expire query: #{e.message}")
+        Failure("Error generating enrollments_to_expire query: #{e.message}; with query criteria: #{query_criteria}")
       end
 
       def publish_enrollment_expirations(enrollments_to_expire)

@@ -19,12 +19,12 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
     end
 
     context 'with invalid query criteria' do
-      let(:params) { { query_criteria: { 'bad' => 'query'} } }
+      let(:params) { { query_criteria: 'bad query' } }
       let(:result) { described_class.new.call(params) }
 
-      it 'fails due to invalid enrollment kind' do
+      it 'fails due to invalid query' do
         expect(result.success?).to be_falsey
-        expect(result.failure).to eq(/Error generating enrollments_to_expire query/)
+        expect(result.failure).to match(/Error generating enrollments_to_expire query/)
       end
     end
   end
@@ -36,7 +36,7 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
         :aasm_state.in => ["auto_renewing", "renewing_coverage_selected"]
       }
     end
-    let(:params) { { query_criteria: {} } }
+    let(:params) { { query_criteria: query_criteria } }
     let(:result) { described_class.new.call(params) }
 
     it 'succeeds with message' do
