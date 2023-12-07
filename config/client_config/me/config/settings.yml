@@ -13,7 +13,7 @@ site:
   faa_enabled: false # TODO: Remove this after configuring the settings.
   plan_options_title_for_ma: true
   support_for_ie_browser: false
-  tab_icon: 'data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII='
+  tab_icon: 'favicon.ico'
   use_default_devise_path: true
 
 contact_center:
