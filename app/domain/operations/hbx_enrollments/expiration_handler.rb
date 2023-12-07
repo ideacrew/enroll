@@ -43,6 +43,7 @@ module Operations
               event = event("events.individual.enrollments.expire_coverages.expire", attributes: { enrollment_hbx_id: enrollment_hbx_id, index_id: index})
               publish_event(event)
             end
+            Success("Done publishing enrollment expiration events.  See hbx_enrollments_expiration_handler log for results.")
         end
 
         def publish_event(event)
