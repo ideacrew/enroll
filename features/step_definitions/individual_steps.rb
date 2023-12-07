@@ -229,6 +229,10 @@ Then(/^.+ should not see error message (.*)$/) do |text|
   page.should have_no_content(text)
 end
 
+Then(/^.+ should see the weak password error message$/) do
+  page.should have_content(l10n("devise.errors.password_strength"))
+end
+
 And(/(.*) selects eligible immigration status$/) do |text|
   if text == "Dependent"
     find(:xpath, '//label[@for="dependent_us_citizen_false"]').click
@@ -463,6 +467,13 @@ Then(/Individual creates a new HBX account$/) do
   fill_in CreateAccount.email_or_username, :with => "testflow@test.com"
   fill_in CreateAccount.password, :with => "aA1!aA1!aA1!"
   fill_in CreateAccount.password_confirmation, :with => "aA1!aA1!aA1!"
+  find(CreateAccount.create_account_btn).click
+end
+
+Then(/Individual creates a new HBX account with a weak password$/) do
+  fill_in CreateAccount.email_or_username, :with => "testflow@test.com"
+  fill_in CreateAccount.password, :with => "WeakPass1!"
+  fill_in CreateAccount.password_confirmation, :with => "WeakPass1!"
   find(CreateAccount.create_account_btn).click
 end
 
