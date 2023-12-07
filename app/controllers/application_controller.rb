@@ -118,7 +118,7 @@ class ApplicationController < ActionController::Base
     # a new login for this user is detected.
     # Checking for User class prevents spec breaking for Doubles.
     # Currently only enabled for admin users.
-    current_user && current_user.class == User && (session[:login_token] != current_user&.current_login_token)
+    current_user.instance_of?(User) && (session[:login_token] != current_user&.current_login_token)
   end
 
   def redirect_if_prod
