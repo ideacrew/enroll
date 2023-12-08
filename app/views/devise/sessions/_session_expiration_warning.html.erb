@@ -15,7 +15,7 @@
         <ul class="application-warnings"></ul>
       </div>
       <div class="modal-footer">
-        <%= link_to l10n(".logout"), destroy_user_session_path, method: "delete", class: "btn btn-default btn-small", tabindex: "0" %>
+        <%= sanitize link_to l10n(".logout"), destroy_user_session_path, method: "delete", class: "btn btn-default btn-small", tabindex: "0" %>
         <span tabindex="0", onkeydown="handleButtonKeyDown(event, 'stay-logged-in')", id="stay-logged-in" class="btn btn-primary  mtz btn-small" data-dismiss="modal"><%= l10n("faa.stay_logged_in") %></span>
       </div>
     </div>
