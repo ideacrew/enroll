@@ -12,7 +12,7 @@ RSpec.describe ::Operations::HbxEnrollments::BeginCoverageHandler, dbclean: :aft
 
     context 'params is not a hash' do
       let(:params) { 'bad params' }
-  
+
       it 'fails due to missing query criteria' do
         expect(result.success?).to be_falsey
         expect(result.failure).to eq('Missing query_criteria.')
