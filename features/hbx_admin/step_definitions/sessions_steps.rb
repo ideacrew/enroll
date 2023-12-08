@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+Given(/^the prevent_concurrent_sessions feature is (.*)?/) do |is_enabled|
+  is_enabled == "enabled" ? enable_feature(:prevent_concurrent_sessions) : disable_feature(:prevent_concurrent_sessions)
+end
+
 # rubocop:disable Style/GlobalVars
 Given(/^admin logs in on browser (.*)?/) do |session_id|
   in_session(session_id) do
@@ -22,10 +26,14 @@ And(/^admin attempts to navigate on browser (.*)?/) do |session_id|
   end
 end
 
-Then(/^admin on browser (.*) should see the logged out due to concurrent session message?/) do |session_id|
+Then(/^admin on browser (.*) should (.*) the logged out due to concurrent session message?/) do |session_id, visibility|
   in_session(session_id) do
     session = $sessions[session_id]
-    expect(session).to have_content(l10n('devise.sessions.signed_out_concurrent_session'))
+    if visibility == "see"
+      expect(session).to have_content(l10n('devise.sessions.signed_out_concurrent_session'))
+    else
+      expect(session).not_to have_content(l10n('devise.sessions.signed_out_concurrent_session'))
+    end
   end
 end
 # rubocop:enable Style/GlobalVars
