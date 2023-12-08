@@ -22,7 +22,7 @@
           = l10n("previous_step")
     - if show_help_button && back_to_account_flag
       %li
-        %a{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal", style: link_style}
+        %a{"data-target" => "#help_with_plan_shopping", "data-toggle" => "modal", style: link_style, id: "help_me_sign_up", tabindex: "0", onkeydown: "handleButtonKeyDown(event, 'help_me_sign_up')"}
           = l10n("help_sign_up")
     - if show_exit_button
       %li
