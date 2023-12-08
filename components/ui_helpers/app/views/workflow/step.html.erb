@@ -92,7 +92,7 @@
         </ul>
       </p>
 
-      <div class="btn btn-default btn-block help-me-sign-up" data-target="#help_with_plan_shopping" data-toggle="modal">
+      <div id="help_me_sign_up" tabindex="0" onkeydown="handleButtonKeyDown(event, 'help_me_sign_up')" class="btn btn-default btn-block help-me-sign-up" data-target="#help_with_plan_shopping" data-toggle="modal">
         Help me sign up
       </div>
       <%= render partial: './ui-components/v1/modals/help_with_plan'  %>
