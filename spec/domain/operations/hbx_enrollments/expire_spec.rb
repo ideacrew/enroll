@@ -28,11 +28,26 @@ RSpec.describe ::Operations::HbxEnrollments::Expire, dbclean: :after_each do
 
       it 'fails due to invalid enrollment kind' do
         expect(result.success?).to be_falsey
-        expect(result.failure).to eq("Unable to expire enrollment hbx id #{enrollment.hbx_id} - employer_sponsored is not a valid IVL enrollment kind")
+        expect(result.failure).to eq("Failed to expire enrollment hbx id #{enrollment.hbx_id} - #{enrollment.kind} is not a valid IVL enrollment kind")
+      end
+    end
+
+    describe 'where enrollment fails the expiration guard clause' do
+      let(:benefit_group) { FactoryBot.create(:benefit_group) }
+
+      before do
+        benefit_group.plan_year.update_attributes(end_on: Date.today - 1.day)
+        enrollment.update_attributes(benefit_group_id: benefit_group.id)
+      end
+
+      it 'fails due to invalid state transition to coverage_expired' do
+        expect(result.success?).to be_falsey
+        expect(result.failure).to eq("Failed to expire enrollment hbx id #{enrollment.hbx_id} - Event 'expire_coverage' cannot transition from 'coverage_selected'. Failed callback(s): [:can_be_expired?].")
       end
     end
   end
 
+  # add example for coverall enrollment
   describe 'with valid params' do
     let(:params) { { enrollment_hbx_id: enrollment.hbx_id } }
     let(:result) { described_class.new.call(params) }
@@ -40,6 +55,17 @@ RSpec.describe ::Operations::HbxEnrollments::Expire, dbclean: :after_each do
     it 'succeeds with message' do
       expect(result.success?).to be_truthy
       expect(result.value!).to eq("Successfully expired enrollment hbx id #{enrollment.hbx_id}")
+    end
+
+    describe 'where enrollment is a coverall enrollment' do
+      before do
+        enrollment.update_attributes(kind: 'coverall')
+      end
+
+      it 'succeeds with message' do
+        expect(result.success?).to be_truthy
+        expect(result.value!).to eq("Successfully expired enrollment hbx id #{enrollment.hbx_id}")
+      end
     end
   end
 end

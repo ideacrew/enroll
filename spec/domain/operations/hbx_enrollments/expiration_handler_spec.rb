@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_each do
 
   let(:family)      { FactoryBot.create(:family, :with_primary_family_member) }
-  let!(:enrollment) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family) }
+  let!(:enrollment) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, aasm_state: "auto_renewing") }
 
   describe 'with invalid params' do
     let(:params) { {} }
@@ -14,7 +14,7 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
     context 'missing query criteria' do
       it 'fails due to missing query criteria' do
         expect(result.success?).to be_falsey
-        expect(result.failure).to eq('Missing query_criteria')
+        expect(result.failure).to eq('Missing query_criteria.')
       end
     end
 
@@ -24,7 +24,7 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
 
       it 'fails due to invalid query' do
         expect(result.success?).to be_falsey
-        expect(result.failure).to match(/Error generating enrollments_to_expire query/)
+        expect(result.failure).to eq("Missing query_criteria.")
       end
     end
   end
@@ -42,6 +42,10 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
     it 'succeeds with message' do
       expect(result.success?).to be_truthy
       expect(result.value!).to eq("Done publishing enrollment expiration events.  See hbx_enrollments_expiration_handler log for results.")
+    end
+
+    context 'with no enrollments found to expire' do
+        # TODO
     end
   end
 end

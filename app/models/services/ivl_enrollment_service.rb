@@ -7,6 +7,7 @@ module Services
 
     def initialize
       @logger = Logger.new("#{Rails.root}/log/family_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+      @current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
     end
 
     def process_enrollments(new_date)
@@ -46,9 +47,8 @@ module Services
     end
 
     def process_async_expirations_request
-      current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
       query_criteria = {
-        :effective_on.lt => current_benefit_period.start_on,
+        :effective_on.lt => @current_benefit_period.start_on,
         :kind.in => ["individual", "coverall"],
         :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ["coverage_termination_pending"]
       }
@@ -98,9 +98,8 @@ module Services
     end
 
     def process_async_begin_coverages_request
-      current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
       query_criteria = {
-        :effective_on => { "$gte" => current_benefit_period.start_on, "$lt" => current_benefit_period.end_on },
+        :effective_on => { "$gte" => @current_benefit_period.start_on, "$lt" => @current_benefit_period.end_on },
         :kind.in => ["individual", "coverall"],
         :aasm_state.in => ["auto_renewing", "renewing_coverage_selected"]
       }
