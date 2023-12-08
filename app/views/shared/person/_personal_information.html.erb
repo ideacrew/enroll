@@ -40,22 +40,26 @@
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd top-buffer" >
       <%= f.check_box :no_ssn,  :value => false, :onclick=>"$('#person_ssn').prop('disabled', !$('#person_ssn').prop('disabled')); $('#person_ssn').prop('required', !$('#person_ssn').prop('required'))" %>
       <label for="person_no_ssn"><span class='no_ssn'>&nbsp;<%= l10n("do_not_have_ssn") %></span></label>
-      <span><i tabindex="0" class='fa fa-question-circle' id="no_ssn_tooltip" data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.no_ssn_tooltip")%>"></i></span>
+      <span>
+        <i tabindex="0" class='fa fa-question-circle' id="no_ssn_tooltip" data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.no_ssn_tooltip")%>"></i>
+        <span class="hide"> "<%=l10n("insured.consumer_roles.search.no_ssn_tooltip")%>"</span>
+      </span>    
     </div>
     <div class="col-lg-1 col-md-1 col-sm-1 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
       <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_male')" class="radio">
         <%= f.radio_button :gender, "male", class: "required floatlabel", id: 'radio_male', required: true %>
-        <label for="radio_male"><span><%=l10n("male").to_s.upcase%></span></label>
+        <label for="radio_male"><span><%= l10n("male").to_s.upcase %></span></label>
       </div>
     </div>
     <div class="col-lg-1 col-md-1 col-sm-1 col-xs-6 form-group form-group-lg no-pd">
       <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_female')" class="radio">
         <%= f.radio_button :gender, "female", class: "required floatlabel", id: 'radio_female', required: true %>
-        <label class="female" for="radio_female"><span>l10n("female").to_s.upcase</span></label>
+        <label class="female" for="radio_female"><span><%= l10n("female").to_s.upcase %></span></label>
       </div>
     </div>
     <span>
       <i tabindex="0" id="gender-tooltip" class='fa fa-question-circle no-pd pull-right'  data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.gender_tooltip")%>"></i>
+      <span class="hide"> "<%=l10n("insured.consumer_roles.search.gender_tooltip")%>"</span>
     </span>
   </div>
 </div>
