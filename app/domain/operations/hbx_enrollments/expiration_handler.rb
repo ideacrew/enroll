@@ -7,10 +7,6 @@ module Operations
       include EventSource::Command
       include Dry::Monads[:result, :do]
 
-      def initialize
-        @logger = Logger.new("#{Rails.root}/log/hbx_enrollments_expiration_handler_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
-      end
-
       # @param [Hash] params
       # @option params [Hash] :query_criteria
       # @return [Dry::Monads::Result]
@@ -54,11 +50,15 @@ module Operations
 
       def publish_event(event, enrollment_hbx_id)
         if event.success?
-          @logger.info "Publishing expiration event for enrollment hbx id: #{enrollment_hbx_id}"
+          handler_logger.info "Publishing expiration event for enrollment hbx id: #{enrollment_hbx_id}"
           event.success.publish
         else
-          @logger.error "ERROR - Publishing expiration event failed for enrollment hbx id: #{enrollment_hbx_id}"
+          handler_logger.error "ERROR - Publishing expiration event failed for enrollment hbx id: #{enrollment_hbx_id}"
         end
+      end
+
+      def handler_logger
+        @handler_logger ||= Logger.new("#{Rails.root}/log/hbx_enrollments_expiration_handler_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
       end
     end
   end

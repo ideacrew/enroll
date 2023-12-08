@@ -17,8 +17,8 @@ module Subscribers
           result.success? ? @logger.info(result.value!) : @logger.error(result.failure)
           ack(delivery_info.delivery_tag)
         rescue StandardError, SystemStackError => e
-          @logger.error "ExpireCoveragesSubscriber on_request, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-          @logger.error "ExpireCoveragesSubscriber on_request, ack: #{payload}"
+          @logger.error "ExpireCoveragesSubscriber on_request, response: #{response}, error message: #{e.message}, backtrace: #{e.backtrace}"
+          @logger.error "ExpireCoveragesSubscriber on_request, ack: #{response}"
           ack(delivery_info.delivery_tag)
         end
 
@@ -35,8 +35,8 @@ module Subscribers
           result.success? ? @logger.info(result.value!) : @logger.error(result.failure)
           ack(delivery_info.delivery_tag)
         rescue StandardError, SystemStackError => e
-          @logger.error "ExpireCoveragesSubscriber on_expire, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
-          @logger.error "ExpireCoveragesSubscriber on_expire, ack: #{payload}"
+          @logger.error "ExpireCoveragesSubscriber on_expire, response: #{response}, error message: #{e.message}, backtrace: #{e.backtrace}"
+          @logger.error "ExpireCoveragesSubscriber on_expire, ack: #{response}"
           ack(delivery_info.delivery_tag)
         end
 

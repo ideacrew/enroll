@@ -7,7 +7,6 @@ module Services
 
     def initialize
       @logger = Logger.new("#{Rails.root}/log/family_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
-      @current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
     end
 
     def process_enrollments(new_date)
@@ -23,7 +22,7 @@ module Services
       if EnrollRegistry.feature_enabled?(:async_expire_and_begin_coverages)
         process_async_expirations_request
       else
-        current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+        # current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
         batch_size = 500
         offset = 0
         individual_market_enrollments = HbxEnrollment.where(
@@ -48,7 +47,7 @@ module Services
 
     def process_async_expirations_request
       query_criteria = {
-        :effective_on.lt => @current_benefit_period.start_on,
+        :effective_on.lt => current_benefit_period.start_on,
         :kind.in => ["individual", "coverall"],
         :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ["coverage_termination_pending"]
       }
@@ -60,7 +59,7 @@ module Services
         process_async_begin_coverages_request
       else
         @logger.info "Started begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record}"
-        current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+        # current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
         batch_size = 500
         offset = 0
         ivl_enrollments = HbxEnrollment.where(
@@ -99,7 +98,7 @@ module Services
 
     def process_async_begin_coverages_request
       query_criteria = {
-        :effective_on => { "$gte" => @current_benefit_period.start_on, "$lt" => @current_benefit_period.end_on },
+        :effective_on => { "$gte" => current_benefit_period.start_on, "$lt" => current_benefit_period.end_on },
         :kind.in => ["individual", "coverall"],
         :aasm_state.in => ["auto_renewing", "renewing_coverage_selected"]
       }
@@ -114,6 +113,10 @@ module Services
       else
         @logger.error "ERROR - Publishing begin coverages request failed: #{event.failure}"
       end
+    end
+
+    def current_benefit_period
+      @current_benefit_period ||= HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
     end
 
     def enrollment_notice_for_ivl_families(new_date)

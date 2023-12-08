@@ -45,7 +45,14 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
     end
 
     context 'with no enrollments found to expire' do
-        # TODO
+      before do
+        enrollment.update_attributes(aasm_state: "coverage_expired")
+      end
+
+      it 'fails due to no enrollments found' do
+        expect(result.success?).to be_falsey
+        expect(result.failure).to eq("No enrollments found for query criteria: #{query_criteria}")
+      end
     end
   end
 end
