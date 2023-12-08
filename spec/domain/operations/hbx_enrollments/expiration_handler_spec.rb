@@ -41,7 +41,7 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
 
     it 'succeeds with message' do
       expect(result.success?).to be_truthy
-      expect(result.value!).to eq("Done publishing enrollment expiration events.  See hbx_enrollments_expiration_handler log for results.")
+      expect(result.value!).to eq("Done publishing enrollment expiration events. See hbx_enrollments_expiration_handler log for results.")
     end
 
     context 'with no enrollments found to expire' do

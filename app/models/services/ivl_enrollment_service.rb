@@ -47,9 +47,9 @@ module Services
 
     def process_async_expirations_request
       query_criteria = {
-        :effective_on.lt => current_benefit_period.start_on,
-        :kind.in => ["individual", "coverall"],
-        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ["coverage_termination_pending"]
+        "effective_on": { "$lt": current_benefit_period.start_on },
+        "kind": { "$in": ["individual", "coverall"] },
+        "aasm_state": { "$in": HbxEnrollment::ENROLLED_STATUSES - ["coverage_termination_pending"] }
       }
       publish_expirations_request_event(query_criteria)
     end
@@ -98,9 +98,9 @@ module Services
 
     def process_async_begin_coverages_request
       query_criteria = {
-        :effective_on => { "$gte" => current_benefit_period.start_on, "$lt" => current_benefit_period.end_on },
-        :kind.in => ["individual", "coverall"],
-        :aasm_state.in => ["auto_renewing", "renewing_coverage_selected"]
+        "effective_on": { "$gte": current_benefit_period.start_on, "$lt": current_benefit_period.end_on },
+        "kind": { "$in": ["individual", "coverall"] },
+        "aasm_state": { "$in": ["auto_renewing", "renewing_coverage_selected"] }
       }
       publish_begin_coverage_request_event(query_criteria)
     end
