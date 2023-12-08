@@ -7,13 +7,10 @@ class Users::SessionsController < Devise::SessionsController
   skip_before_action :check_concurrent_sessions
 
   def new
-    # Persist flash error message when signing out user
-    flash.keep(:error) if flash[:error].present? && flash[:error] == l10n('devise.sessions.signed_out_concurrent_session')
-
-    self.resource = resource_class.new(sign_in_params)
-    clean_up_passwords(resource)
-    yield resource if block_given?
-    respond_with(resource, serialize_options(resource))
+    super do
+      # Persist flash error message when signing out user
+      flash.keep(:error) if flash[:error].present? && flash[:error] == l10n('devise.sessions.signed_out_concurrent_session')
+    end
   end
 
   def create
