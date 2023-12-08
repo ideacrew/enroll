@@ -47,7 +47,6 @@ RSpec.describe ::Operations::HbxEnrollments::Expire, dbclean: :after_each do
     end
   end
 
-  # add example for coverall enrollment
   describe 'with valid params' do
     let(:params) { { enrollment_hbx_id: enrollment.hbx_id } }
     let(:result) { described_class.new.call(params) }
