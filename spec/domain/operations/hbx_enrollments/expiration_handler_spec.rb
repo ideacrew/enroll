@@ -8,10 +8,20 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
   let!(:enrollment) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, aasm_state: "auto_renewing") }
 
   describe 'with invalid params' do
-    let(:params) { {} }
     let(:result) { described_class.new.call(params) }
 
+    context 'params is not a hash' do
+      let(:params) { 'bad params' }
+
+      it 'fails due to missing query criteria' do
+        expect(result.success?).to be_falsey
+        expect(result.failure).to eq('Missing query_criteria.')
+      end
+    end
+
     context 'missing query criteria' do
+      let(:params) { {} }
+
       it 'fails due to missing query criteria' do
         expect(result.success?).to be_falsey
         expect(result.failure).to eq('Missing query_criteria.')
