@@ -108,7 +108,7 @@ class ApplicationController < ActionController::Base
   private
 
   def check_concurrent_sessions
-    return unless concurrent_sessions? && current_user.has_hbx_staff_role?
+    return unless EnrollRegistry.feature_enabled?(:prevent_concurrent_sessions) && concurrent_sessions? && current_user.has_hbx_staff_role?
     flash[:error] = l10n('devise.sessions.signed_out_concurrent_session')
     sign_out current_user
   end
