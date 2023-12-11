@@ -12,7 +12,7 @@ module Subscribers
           payload = JSON.parse(response).deep_symbolize_keys
 
           @logger.info "BeginCoveragesSubscriber on_request, response: #{payload}"
-          result = Operations::HbxEnrollments::BeginCoverage.new.call(payload)
+          result = Operations::HbxEnrollments::BeginCoverageHandler.new.call(payload)
 
           result.success? ? @logger.info(result.value!) : @logger.error(result.failure)
           ack(delivery_info.delivery_tag)
@@ -23,7 +23,7 @@ module Subscribers
         end
 
         subscribe(:on_begin) do |delivery_info, _metadata, response|
-          @logger = subscriber_logger_for(:on_enroll_individual_enrollments_begin_coverages_request)
+          @logger = subscriber_logger_for(:on_enroll_individual_enrollments_begin_coverages_begin)
           payload = JSON.parse(response, symbolize_names: true)
           enrollment_hbx_id = payload[:enrollment_hbx_id]
 

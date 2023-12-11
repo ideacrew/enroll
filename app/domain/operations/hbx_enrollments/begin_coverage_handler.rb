@@ -8,12 +8,12 @@ module Operations
       include Dry::Monads[:result, :do]
 
       # @param [Hash] params
-      # @option params [String] :query_criteria
+      # @option params [Hash] :query_criteria
       # @return [Dry::Monads::Result]
       def call(params)
         query_criteria       = yield validate(params)
         enrollments_to_begin = yield enrollments_to_begin_query(query_criteria)
-        result               = yield publish_enrollment_expirations(enrollments_to_begin)
+        result               = yield publish_enrollment_initiations(enrollments_to_begin)
 
         Success(result)
       end
@@ -38,8 +38,8 @@ module Operations
         Failure("Error generating enrollments_to_begin query: #{e.message}; with query criteria: #{query_criteria}")
       end
 
-      def publish_enrollment_expirations(enrollments_to_expire)
-        enrollments_to_expire.no_timeout.each do |enrollment|
+      def publish_enrollment_initiations(enrollments_to_begin)
+        enrollments_to_begin.no_timeout.each do |enrollment|
           # TODO: use global id instead of hbx_id
           enrollment_hbx_id = enrollment.hbx_id
           event = event("events.individual.enrollments.begin_coverages.begin", attributes: { enrollment_hbx_id: enrollment_hbx_id })
@@ -48,7 +48,7 @@ module Operations
         Success("Done publishing enrollment expiration events. See hbx_enrollments_expiration_handler log for results.")
       end
 
-      def publish_event(event)
+      def publish_event(event, enrollment_hbx_id)
         if event.success?
           handler_logger.info "Publishing begin coverage event for enrollment hbx id: #{enrollment_hbx_id}"
           event.success.publish
