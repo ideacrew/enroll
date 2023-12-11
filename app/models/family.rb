@@ -1075,7 +1075,9 @@ class Family
     end
 
     def expire_individual_market_enrollments
-      initialize_ivl_enrollment_service.expire_individual_market_enrollments
+      initialize_ivl_enrollment_service.expire_individual_market_enrollments(
+        HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+      )
     end
 
     def begin_coverage_for_ivl_enrollments
