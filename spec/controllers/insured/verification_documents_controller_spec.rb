@@ -1,4 +1,5 @@
 require 'rails_helper'
+require "#{Rails.root}/spec/shared_examples/upload_verification_document_spec.rb"
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
@@ -58,17 +59,14 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
       end
     end
 
-    context "Successful Save family documnent status" do
+    context "verification document upload" do
 
     describe "file upload" do
-      let(:file) { [:temp_file] }
       let(:person) { FactoryBot.create(:person, :with_consumer_role) }
       let(:temp_file) { double }
       let(:consumer_role_params) {}
-      let(:params) { {person: {consumer_role: person.consumer_role}, file: file} }
       let(:bucket_name) { 'id-verification' }
       let(:doc_uri) { "doc_uri" }
-      let(:file_path) { 'temp_file' } # a sample file path
       let(:family) { double("Family", :update_family_document_status! => true)}
 
       before do
@@ -77,22 +75,38 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:add_type_history_element)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:set_current_person).and_return(person)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:person_consumer_role)
-        allow(Aws::S3Storage).to receive(:save).with(file_path, bucket_name).and_return(doc_uri)
-
-        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:file_path).with('temp_file').and_return(file_path)
-        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:file_name).with('temp_file').and_return("sample-filename")
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:file_name).and_return("sample-filename")
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:update_vlp_documents).with("sample-filename", doc_uri).and_return(true)
 
         controller.instance_variable_set(:"@family", family)
         sign_in user
-        post :upload, params: params
-
       end
 
-      it "updates the family doc status" do
+      it "uploads file successfully and updates the family doc status" do
+        file = fixture_file_upload("#{Rails.root}/test/uhic.jpg")
+        allow(Aws::S3Storage).to receive(:save).and_return(doc_uri)
+        params = { person: {consumer_role: person.consumer_role}, file: [file] }
+        post :upload, params: params
+
         expect(flash[:notice]).to eq("File Saved")
       end
 
+      # does not allow macro enabled documents like docx/ppt to be uploaded
+      it_behaves_like 'restrictions on verification document upload' do
+        let(:upload_file_path) { "#{Rails.root}/test/sample.docx" }
+      end
+
+      # does not allow huge files to be uploaded
+      it_behaves_like 'restrictions on verification document upload' do
+        let(:upload_file_path) { "#{Rails.root}/test/uhic.jpg" }
+        doc_limit_in_mb = EnrollRegistry[:verification_doc_size_limit_in_mb].item
+        before { allow_any_instance_of(ActionDispatch::Http::UploadedFile).to receive(:size).and_return(doc_limit_in_mb * doc_limit_in_mb * 1024 * 1024) }
+      end
+
+      # does not allow document to be uploaded when extension is hacked
+      it_behaves_like 'restrictions on verification document upload' do
+        let(:upload_file_path) { "#{Rails.root}/test/fake_sample.docx.jpg" }
+      end
      end
     end
 
