@@ -121,7 +121,8 @@ class Insured::VerificationDocumentsController < ApplicationController
   def validate_file_type
     return unless params[:file]
 
-    max_file_size_in_bytes = VlpDocument::ID_FILE_SIZE_MB * 1024 * 1024
+    doc_limit_mb = EnrollRegistry[:verification_doc_size_limit_in_mb].item.to_i || 100
+    max_file_size_in_bytes = doc_limit_mb * 1024 * 1024
     params[:file].each do |file|
       file_path = file.path
       # Sanitize the file path using Shellwords.escape to prevent command injection
@@ -134,7 +135,7 @@ class Insured::VerificationDocumentsController < ApplicationController
 
       next if VlpDocument::ALLOWED_MIME_TYPES.include?(mime_type) && file.size < max_file_size_in_bytes
       File.delete(file_path) if File.exist?(file_path)
-      flash[:error] = "Unable to upload file. Please upload a file in PNG, JPEG, or PDF format and ensure it's under #{VlpDocument::ID_FILE_SIZE_MB}MB."
+      flash[:error] = "Unable to upload file. Please upload a file in PNG, JPEG, or PDF format and ensure it's under #{doc_limit_mb}MB."
       redirect_to verification_insured_families_path
     end
   end
