@@ -140,6 +140,9 @@ registry:
       - key: :totally_ineligible_notice
         item: :totally_ineligible_notice
         is_enabled: <%= ENV['TOTALLY_INELIGIBLE_NOTICE_IS_ENABLED'] || false %>
+      - key: :avoid_dup_hub_calls_on_applicant_create_or_update
+        item: :avoid_dup_hub_calls_on_applicant_create_or_update
+        is_enabled: <%= ENV['AVOID_DUP_HUB_CALLS_ON_APPLICANT_CREATE_OR_UPDATE_IS_ENABLED'] || false %>
   - namespace:
     - :request_determination
     features:
