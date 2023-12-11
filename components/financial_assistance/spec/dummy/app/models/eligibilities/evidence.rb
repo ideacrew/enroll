@@ -153,6 +153,8 @@ module Eligibilities
         { non_esi_payload_format: EnrollRegistry[:non_esi_h31].setting(:payload_format).item }
       when :esi_mec
         { esi_mec_payload_format: EnrollRegistry[:esi_mec].setting(:payload_format).item }
+      when :income
+        { ifsv_payload_format: EnrollRegistry[:ifsv].setting(:payload_format).item }
       else
         {}
       end

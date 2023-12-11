@@ -21,4 +21,13 @@ RSpec.describe 'default fdsh service namespace client specific configurations' d
       end
     end
   end
+
+  describe 'ifsv' do
+    context 'for default value' do
+      it 'returns default value xml' do
+        expect(EnrollRegistry.feature_enabled?(:ifsv)).to be_truthy
+        expect(EnrollRegistry[:ifsv].setting(:payload_format).item).to eq('xml')
+      end
+    end
+  end
 end
