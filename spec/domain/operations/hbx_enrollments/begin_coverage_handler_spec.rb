@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe ::Operations::HbxEnrollments::BeginCoverageHandler, dbclean: :after_each do
 
   let(:family)      { FactoryBot.create(:family, :with_primary_family_member) }
-  let!(:enrollment) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family) }
+  let!(:enrollment) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, aasm_state: "auto_renewing") }
 
   describe 'with invalid params' do
     let(:result) { described_class.new.call(params) }
@@ -51,7 +51,7 @@ RSpec.describe ::Operations::HbxEnrollments::BeginCoverageHandler, dbclean: :aft
 
     it 'succeeds with message' do
       expect(result.success?).to be_truthy
-      expect(result.value!).to eq("Done publishing begin coverage enrollment events.  See hbx_enrollments_begin_coverage_handler log for results.")
+      expect(result.value!).to eq("Done publishing begin coverage enrollment events. See hbx_enrollments_begin_coverage_handler log for results.")
     end
 
     context 'with no enrollments found to begin coverage' do

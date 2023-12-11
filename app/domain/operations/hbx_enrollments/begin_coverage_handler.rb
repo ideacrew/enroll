@@ -41,20 +41,14 @@ module Operations
       def publish_enrollment_initiations(enrollments_to_begin)
         enrollments_to_begin.no_timeout.each do |enrollment|
           # TODO: use global id instead of hbx_id
-          enrollment_hbx_id = enrollment.hbx_id
-          event = event("events.individual.enrollments.begin_coverages.begin", attributes: { enrollment_hbx_id: enrollment_hbx_id })
-          publish_event(event, enrollment_hbx_id)
+          result = Operations::HbxEnrollments::PublishBeginCoverageEvent.new.call({enrollment_hbx_id: enrollment.hbx_id})
+          if result.success?
+            handler_logger.info "Enrollment hbx id: #{enrollment.hbx_id} - #{result.success}"
+          else
+            handler_logger.error "Enrollment hbx id: #{enrollment.hbx_id} - #{result.failure}"
+          end
         end
-        Success("Done publishing enrollment expiration events. See hbx_enrollments_expiration_handler log for results.")
-      end
-
-      def publish_event(event, enrollment_hbx_id)
-        if event.success?
-          handler_logger.info "Publishing begin coverage event for enrollment hbx id: #{enrollment_hbx_id}"
-          event.success.publish
-        else
-          handler_logger.error "ERROR - Publishing begin coverage event failed for enrollment hbx id: #{enrollment_hbx_id}"
-        end
+        Success("Done publishing begin coverage enrollment events. See hbx_enrollments_begin_coverage_handler log for results.")
       end
 
       def handler_logger
