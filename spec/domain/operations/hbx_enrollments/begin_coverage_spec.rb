@@ -33,16 +33,13 @@ RSpec.describe ::Operations::HbxEnrollments::BeginCoverage, dbclean: :after_each
     end
 
     describe 'where enrollment fails the expiration guard clause' do
-      let(:benefit_group) { FactoryBot.create(:benefit_group) }
-
       before do
-        benefit_group.plan_year.update_attributes(end_on: Date.today - 1.day)
-        enrollment.update_attributes(benefit_group_id: benefit_group.id)
+        enrollment.update_attributes(kind: "employer_sponsored")
       end
 
       it 'fails due to invalid state transition to coverage_expired' do
         expect(result.success?).to be_falsey
-        expect(result.failure).to eq("Failed to expire enrollment hbx id #{enrollment.hbx_id} - Event 'expire_coverage' cannot transition from 'coverage_selected'. Failed callback(s): [:can_be_expired?].")
+        expect(result.failure).to eq("Failed to begin coverage for enrollment hbx id #{enrollment.hbx_id} - #{enrollment.kind} is not a valid IVL enrollment kind")
       end
     end
   end
@@ -63,7 +60,7 @@ RSpec.describe ::Operations::HbxEnrollments::BeginCoverage, dbclean: :after_each
 
       it 'succeeds with message' do
         expect(result.success?).to be_truthy
-        expect(result.value!).to eq("Successfully expired enrollment hbx id #{enrollment.hbx_id}")
+        expect(result.value!).to eq("Successfully began coverage for enrollment hbx id #{enrollment.hbx_id}")
       end
     end
   end
