@@ -28,7 +28,7 @@ module Subscribers
           enrollment_hbx_id = payload[:enrollment_hbx_id]
 
           @logger.info "ExpireCoveragesSubscriber on_expire, response: #{payload}"
-          @logger.info "------------ Processing enrollment: #{enrollment_hbx_id}, index_id: #{payload[:index_id]} ------------"
+          @logger.info "------------ Processing enrollment: #{enrollment_hbx_id} ------------"
           result = Operations::HbxEnrollments::Expire.new.call(payload)
           @logger.info "Processed enrollment: #{enrollment_hbx_id}"
 
