@@ -89,9 +89,7 @@ resetIcons() {
 validateLength(value) {
   if (value.length >= 8 && value.length < 20) {
     document.querySelector('.length').classList.add('fa-check');
-    document.getElementById('length').style.color = '#bef470';
     document.querySelector('.longer').classList.add('fa-check');
-    document.getElementById('longer').style.color = '#bef470';
   } else if (value.length < 8 && this.usernameFieldTarget.value.length > 0) {
     this.resetIcons();
   }
@@ -100,7 +98,6 @@ validateLength(value) {
 validateUpCase(value) {
   if (value.match(/[A-Z]/)) {
     document.querySelector('.upper').classList.add('fa-check');
-    document.getElementById('upper').style.color = '#bef470';
   } else {
     document.querySelector('.upper').classList.remove('fa-check');
     document.querySelector('.upper').classList.add('fa-times');
@@ -111,7 +108,6 @@ validateUpCase(value) {
 validateNumber(value) {
   if (value.match(/[0-9]/)) {
     document.querySelector('.number').classList.add('fa-check');
-    document.getElementById('number').style.color = '#bef470';
   } else {
     document.querySelector('.number').classList.remove('fa-check');
     document.querySelector('.number').classList.add('fa-times');
@@ -122,7 +118,6 @@ validateNumber(value) {
 validateSpecialCharacters(value) {
   if (value.match(/.[!,@,#,$,%,^,&,*,?,_,~,-,(,)]/)) {
     document.querySelector('.spec_char').classList.add('fa-check');
-    document.getElementById('spec_char').style.color = '#bef470';
   } else {
     document.querySelector('.spec_char').classList.remove('fa-check');
     document.querySelector('.spec_char').classList.add('fa-times');
@@ -133,7 +128,6 @@ validateSpecialCharacters(value) {
 validateLowerCase(value) {
   if (value.match(/[a-z]/)) {
     document.querySelector('.lower').classList.add('fa-check');
-    document.getElementById('lower').style.color = '#bef470';
   } else {
     document.querySelector('.lower').classList.remove('fa-check');
     document.querySelector('.lower').classList.add('fa-times');
@@ -163,7 +157,6 @@ validateRepeatedChar(value) {
       document.getElementById('mtt').style.color = '';
     } else {
       document.querySelector('.mtt').classList.add('fa-check');
-      document.getElementById('mtt').style.color = '#bef470';
     }
   }
 }
@@ -174,7 +167,6 @@ validateWhiteSpace(value) {
     document.getElementById('wh_space').style.color = '';
   } else {
     document.querySelector('.wh_space').classList.add('fa-check');
-    document.getElementById('wh_space').style.color = '#bef470';
   }
 }
 
@@ -184,7 +176,6 @@ validateUserIdMatch(value) {
     document.getElementById('nm_uid').style.color = '';
   } else {
     document.querySelector('.nm_uid').classList.add('fa-check');
-    document.getElementById('nm_uid').style.color = '#bef470';
   }
 }
 
@@ -292,16 +283,20 @@ validateEmail() {
 
 validateEmailFormat() {
   let email = this.optionalEmailTarget.value;
-  if (!this.isEmail(email)) {
-    Swal.fire({
-      title: 'Invalid Email Entered',
-      type: 'error',
-      text: 'The email entered is not in a valid format, please check your entry and submit the information again.',
-      onClose: () => {
-        this.usernameFieldTarget.value = '';
-      }
-    });
-    this.optionalEmailTarget.value = '';
+  let username = this.usernameFieldTarget.value;
+  // if email field is blank or username field is blank, allow user to keyboard navigate through to sign in link or live chat widget
+  if(email != '' || username != '') {
+    if (!this.isEmail(email)) {
+      Swal.fire({
+        title: 'Invalid Email Entered',
+        type: 'error',
+        text: 'The email entered is not in a valid format, please check your entry and submit the information again.',
+        onClose: () => {
+          this.usernameFieldTarget.value = '';
+        }
+      });
+      this.optionalEmailTarget.value = '';
+    }
   }
 }
 
@@ -309,14 +304,21 @@ isEmail(email) {
   return /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i.test(email);
 }
 
-passwordsMatch() {
-  let password = this.passwordFieldTarget.value;
-  let password_confirmation = this.passwordConfirmationFieldTarget.value;
+validatePassword() {
   let createButton = document.querySelector('.create-account-btn');
   let pwError = document.getElementById('pwError');
+  let pwErrorMatch = document.getElementById('pwErrorMatch');
+  let pwErrorStrength = document.getElementById('pwErrorStrength');
 
-  if (password !== password_confirmation) {
+  if (!this.passwordsMatch()) {
     createButton.setAttribute('disabled', true);
+    pwErrorMatch.classList.remove('d-none');
+    pwErrorStrength.classList.add('d-none');
+    pwError.classList.remove('d-none');
+  } else if (!this.passwordIsStrong()) {
+    createButton.setAttribute('disabled', true);
+    pwErrorMatch.classList.add('d-none');
+    pwErrorStrength.classList.remove('d-none');
     pwError.classList.remove('d-none');
   } else {
     createButton.removeAttribute('disabled');
@@ -324,10 +326,24 @@ passwordsMatch() {
   }
 }
 
+passwordsMatch() {
+  let password = this.passwordFieldTarget.value;
+  let password_confirmation = this.passwordConfirmationFieldTarget.value;
+  return password == password_confirmation;
+}
+
+passwordIsStrong() {
+  const complexity = document.getElementById('complexity');
+  return complexity.className != "weak";
+}
+
 preventEnterSubmission(event) {
-  if (event.keyCode === 13 || event.code === "Enter") {
-    event.preventDefault();
-    event.stopPropagation();
+  let submitButton = document.getElementById('submit-button');
+  if(submitButton._focusedElement) {
+    if (event.keyCode === 13 || event.code === "Enter") {
+      event.preventDefault();
+      event.stopPropagation();
+    }
   }
 }
 

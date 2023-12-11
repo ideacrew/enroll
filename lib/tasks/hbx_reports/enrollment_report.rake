@@ -36,7 +36,7 @@ namespace :reports do
 
     def pre_11_1_purchase_enrollments(enr, all_enrollments, person)
       time_period = Time.zone.parse("2022-11-01 10:00:00").utc
-      states = HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES
+      states = HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES
       all_enrollments.select do |enrollment|
         enrollment_member_hbx_ids = enrollment.hbx_enrollment_members.flat_map(&:person).pluck(:hbx_id)
         enrollment.created_at < time_period && states.include?(enrollment.aasm_state) &&
@@ -48,7 +48,7 @@ namespace :reports do
 
     def post_11_1_purchase_enrollments(enr, all_enrollments, person)
       time_period = Time.zone.parse("2022-11-01 10:00:00").utc
-      states = HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES
+      states = HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES
       all_enrollments.select do |enrollment|
         enrollment_member_hbx_ids = enrollment.hbx_enrollment_members.flat_map(&:person).pluck(:hbx_id)
         enrollment.created_at >= time_period && states.include?(enrollment.aasm_state) &&
@@ -59,7 +59,7 @@ namespace :reports do
     end
 
     def renewed_enrollments(enr, all_enrollments, person)
-      states = HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES
+      states = HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES
       all_enrollments.select do |enrollment|
         enrollment_member_hbx_ids = enrollment.hbx_enrollment_members.flat_map(&:person).pluck(:hbx_id)
           states.include?(enrollment.aasm_state) &&
@@ -114,10 +114,7 @@ namespace :reports do
       active_renewals_set = (re_enrolled_member_set & @post_11_1_purchases&.map(&:hbx_id)) - @renewed_enrollments&.map(&:hbx_id)
       passive_renewals_set = re_enrolled_member_set - (@post_11_1_purchases&.map(&:hbx_id) - @renewed_enrollments&.map(&:hbx_id))
 
-      # if dually enrolled, passive
-      if active_renewals_set.present? && passive_renewals_set.present? && enrs_between_nov_and_dec_set.present?
-        "Re-enrollee"
-      elsif active_renewals_set.present? && enrs_between_nov_and_dec_set.present?
+      if active_renewals_set.present? && enrs_between_nov_and_dec_set.present?
         "Active Re-enrollee"
       elsif passive_renewals_set.present? && enrs_between_nov_and_dec_set.present?
         "Re-enrollee"

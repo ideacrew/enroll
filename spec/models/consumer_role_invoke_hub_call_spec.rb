@@ -114,4 +114,35 @@ describe ConsumerRole, dbclean: :around_each do
       end
     end
   end
+
+  describe '#immigration_documents_attributes=' do
+    let(:consumer_role) { FactoryBot.create(:consumer_role) }
+
+    context 'when the VLP document already exists' do
+      let(:vlp_document_attributes) { { 'subject' => 'I-327 (Reentry Permit)', 'alien_number' => '111111111' } }
+      let(:array_attributes) { [vlp_document_attributes] }
+
+      it 'updates the existing VLP document' do
+        vlp_document = consumer_role.vlp_documents.first
+        expect do
+          consumer_role.immigration_documents_attributes = array_attributes
+        end.to change { vlp_document.alien_number }.to("111111111")
+      end
+    end
+
+    context 'when the VLP document does not exist' do
+      let(:vlp_document_attributes) { { 'subject' => 'Test VLP Document', 'expiration_date' => Date.new(2022, 12, 31) } }
+      let(:array_attributes) { [vlp_document_attributes] }
+
+      it 'creates a new VLP document' do
+        consumer_role.vlp_documents.delete_all
+
+        expect do
+          consumer_role.immigration_documents_attributes = array_attributes
+        end.to change { consumer_role.vlp_documents.size }.by(1)
+        expect(consumer_role.vlp_documents.last.subject).to eq('Test VLP Document')
+        expect(consumer_role.vlp_documents.last.expiration_date).to eq(Date.new(2022, 12, 31))
+      end
+    end
+  end
 end

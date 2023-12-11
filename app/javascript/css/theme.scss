@@ -15,13 +15,17 @@
   }
 }
 
+.invalid-feedback {
+  color: var(--error-color, #dc3545)
+}
+
 .btn-primary {
   text-transform: uppercase;
   font-weight: 600;
-  border-color: var(--error-color);
+  border-color: var(--error-color, #e72b2d);
   border-bottom-width: medium;
   color: var(--grey-000);
-  background-color: var(--error-color);
+  background-color: var(--error-color, #e72b2d);
 
   &:hover:not(:disabled) {
     background-color: var(--error-shade);
@@ -45,6 +49,18 @@
     background-color: var(--error-shade);
     border-color: var(--error-shade);
   }
+}
+
+.text-muted {
+  color: var(--secondary-font-color, #6c757d) !important;
+}
+
+.btn-link {
+  color: var(--theme-primary-100, #007bc4) !important;
+}
+
+.swal2-styled.swal2-confirm {
+  background-color: var(--theme-primary-100, #3085D6) !important;
 }
 
 .heading-text {

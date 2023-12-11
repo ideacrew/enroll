@@ -3,6 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe ::Operations::HbxEnrollments::RelocateEnrollment, dbclean: :after_each do
+
+  before :all do
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 10, 1))
+  end
   let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:start_date) { TimeKeeper.date_of_record.beginning_of_year }
@@ -100,5 +104,9 @@ RSpec.describe ::Operations::HbxEnrollments::RelocateEnrollment, dbclean: :after
       enrollment.reload
       expect(enrollment.aasm_state).to eq "coverage_terminated"
     end
+  end
+
+  after :all do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
   end
 end

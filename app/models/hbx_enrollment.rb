@@ -2530,6 +2530,10 @@ class HbxEnrollment
     coverage_kind == "dental"
   end
 
+  def health?
+    coverage_kind == "health"
+  end
+
   # TODO: Implement behaviour by 16219.
   def composite_rating_tier
     @composite_rating_tier ||= cached_composite_rating_tier
@@ -2865,7 +2869,7 @@ class HbxEnrollment
   end
 
   def is_eligible_for_osse_grant?(key)
-    return false if is_shop? || dental?
+    return false if is_shop? || dental? || is_cobra_status?
     hbx_enrollment_members.any? do |member|
       member.is_eligible_for_osse_grant?(key, effective_on)
     end
@@ -2881,7 +2885,7 @@ class HbxEnrollment
   end
 
   def update_osse_childcare_subsidy
-    return if dental?
+    return if dental? || is_cobra_status?
 
     if is_shop?
       application = sponsored_benefit_package.benefit_application
@@ -2922,7 +2926,7 @@ class HbxEnrollment
   end
 
   def verify_and_reset_osse_subsidy_amount(member_group)
-    return unless is_shop?
+    return unless is_shop? && !is_cobra_status?
 
     update_osse_childcare_subsidy
     hbx_enrollment_members.each do |member|

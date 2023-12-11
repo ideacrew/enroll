@@ -37,7 +37,7 @@
 }
 
 .was-validated .form-control:invalid {
-    border-color: #dc3545;
+    border-color: var(--error-color, #dc3545);
 }
 
 .was-validated .form-control:valid {
@@ -65,5 +65,5 @@
   width: 100%;
   margin-top: .25rem;
   font-size: 80%;
-  color: #dc3545;
+  color: var(--error-text-color, #dc3545);
 }
