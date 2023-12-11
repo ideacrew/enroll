@@ -8,11 +8,11 @@ module Operations
       include Dry::Monads[:result, :do]
 
       # @param [Hash] params
-      # @option params [Hash] :
+      # @option params [Hash] :enrollment
       # @return [Dry::Monads::Result]
       def call(params)
-        enrollment_hbx_id = yield validate(params)
-        event             = yield build_event(enrollment_hbx_id)
+        values            = yield validate(params)
+        event             = yield build_event(values[:enrollment])
         result            = yield publish_event(event)
         Success(result)
       end
@@ -20,14 +20,13 @@ module Operations
       private
 
       def validate(params)
-        return Failure('Missing enrollment_hbx_id.') unless params.is_a?(Hash) && params[:enrollment_hbx_id].is_a?(String)
+        return Failure("Invalid input params: #{params}.") unless params.is_a?(Hash) && params[:enrollment].is_a?(::HbxEnrollment)
 
-        Success(params[:enrollment_hbx_id])
+        Success(params)
       end
 
-      def build_event(enrollment_hbx_id)
-        # TODO: use global id instead of hbx_id
-        event = event("events.individual.enrollments.begin_coverages.begin", attributes: { enrollment_hbx_id: enrollment_hbx_id })
+      def build_event(enrollment)
+        event = event("events.individual.enrollments.begin_coverages.begin", attributes: { enrollment_hbx_id: enrollment.hbx_id })
         if event.success?
           event
         else

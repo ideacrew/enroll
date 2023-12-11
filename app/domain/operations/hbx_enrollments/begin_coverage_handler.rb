@@ -40,8 +40,7 @@ module Operations
 
       def publish_enrollment_initiations(enrollments_to_begin)
         enrollments_to_begin.no_timeout.each do |enrollment|
-          # TODO: use global id instead of hbx_id
-          result = Operations::HbxEnrollments::PublishBeginCoverageEvent.new.call({enrollment_hbx_id: enrollment.hbx_id})
+          result = Operations::HbxEnrollments::PublishBeginCoverageEvent.new.call({enrollment: enrollment})
           if result.success?
             handler_logger.info "Enrollment hbx id: #{enrollment.hbx_id} - #{result.success}"
           else
