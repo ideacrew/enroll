@@ -10,17 +10,17 @@ module Services
     end
 
     def process_enrollments(new_date)
-      expire_individual_market_enrollments
+      expire_individual_market_enrollments(new_date)
       begin_coverage_for_ivl_enrollments if new_date == new_date.beginning_of_year
       # Deprecate following methods when DC moved to new eligibilities model
       send_enr_or_dr_notice_to_ivl(new_date)
       send_reminder_notices_for_ivl(new_date)
     end
 
-    def expire_individual_market_enrollments
+    def expire_individual_market_enrollments(new_date)
       @logger.info "Started expire_individual_market_enrollments process at #{TimeKeeper.datetime_of_record}"
       if EnrollRegistry.feature_enabled?(:async_expire_and_begin_coverages)
-        process_async_expirations_request
+        process_async_expirations_request(new_date)
       else
         batch_size = 500
         offset = 0
@@ -44,13 +44,20 @@ module Services
       @logger.info "Ended expire_individual_market_enrollments process at #{TimeKeeper.datetime_of_record}"
     end
 
-    def process_async_expirations_request
-      query_criteria = {
-        "effective_on": { "$lt": current_benefit_period.start_on },
-        "kind": { "$in": ["individual", "coverall"] },
-        "aasm_state": { "$in": HbxEnrollment::ENROLLED_STATUSES - ["coverage_termination_pending"] }
-      }
-      publish_expirations_request_event(query_criteria)
+    def process_async_expirations_request(new_date)
+      if new_date != new_date.beginning_of_year
+        @logger.info "Skipping expire coverages request for #{new_date} as it is not the beginning of the year."
+        return
+      end
+
+      @logger.info "Started process_async_expirations_request process at #{Time.now.strftime('%H:%M:%S.%L')}"
+      result = ::Operations::HbxEnrollments::RequestExpirations.new.call({})
+      if result.success?
+        @logger.info 'Successfully published expire coverages request.'
+      else
+        @logger.error "Publishing expire coverages request failed: #{result.failure}"
+      end
+      @logger.info "Ended process_async_expirations_request process at #{Time.now.strftime('%H:%M:%S.%L')}"
     end
 
     def begin_coverage_for_ivl_enrollments
@@ -81,16 +88,6 @@ module Services
         end
         @logger.info "Total IVL auto renewing enrollment processed count: #{count}"
         @logger.info "Ended begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record}"
-      end
-    end
-
-    def publish_expirations_request_event(query_criteria)
-      event = event("events.individual.enrollments.expire_coverages.request", attributes: { query_criteria: query_criteria })
-      if event.success?
-        @logger.info "Publishing expire coverages request with query criteria: #{query_criteria}"
-        event.success.publish
-      else
-        @logger.error "ERROR - Publishing expire coverages request failed: #{event.failure}"
       end
     end
 

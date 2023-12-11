@@ -6,6 +6,11 @@ module Transmittable
     include Mongoid::Document
     include Mongoid::Timestamps
 
+    # A Global ID is an app wide URI that uniquely identifies a model instance:
+    #   gid://YourApp/Some::Model/id
+    #   Example: 'gid://enroll/Transmittable::Job/65739e355b4dc03a97f26c3b'
+    include GlobalID::Identification
+
     has_many :transmissions, class_name: 'Transmittable::Transmission'
     has_one :process_status, as: :statusable, class_name: 'Transmittable::ProcessStatus'
     accepts_nested_attributes_for :process_status

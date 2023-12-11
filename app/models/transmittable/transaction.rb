@@ -6,6 +6,8 @@ module Transmittable
     include Mongoid::Document
     include Mongoid::Timestamps
 
+    include GlobalID::Identification
+
     belongs_to :transactable, polymorphic: true, index: true
     has_many :transactions_transmissions, class_name: 'Transmittable::TransactionsTransmissions'
     has_one :process_status, as: :statusable, class_name: 'Transmittable::ProcessStatus'

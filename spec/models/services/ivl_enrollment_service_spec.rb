@@ -202,7 +202,7 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
     end
 
     it "should expire the cover all coverage_selected enrollment" do
-      subject.expire_individual_market_enrollments
+      subject.expire_individual_market_enrollments(TimeKeeper.date_of_record)
       expect(cover_coverage_enrolled_enrollment.reload.aasm_state).to eq "coverage_expired"
       expect(cover_coverage_enrolled_enrollment.workflow_state_transitions.first.event).to eq "expire_coverage!"
     end
@@ -210,7 +210,7 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
     it "should not break when there is an error with one of the enrollments." do
       cover_coverage_enrolled_enrollment.unset(:family_id)
       cover_coverage_enrolled_enrollment.reload
-      subject.expire_individual_market_enrollments
+      subject.expire_individual_market_enrollments(TimeKeeper.date_of_record)
       expect(cover_coverage_enrolled_enrollment1.reload.aasm_state).to eq "coverage_expired"
       expect(cover_coverage_enrolled_enrollment1.workflow_state_transitions.first.event).to eq "expire_coverage!"
     end
@@ -221,8 +221,20 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:async_expire_and_begin_coverages).and_return(true)
       end
 
-      it "should not raise error" do
-        expect{subject.expire_individual_market_enrollments}.not_to raise_error
+      context 'when input date is not beginning of the year' do
+        let(:input_date) { Date.new(TimeKeeper.date_of_record.year, 2, 1) }
+
+        it 'executes without raising any errors' do
+          expect{ subject.expire_individual_market_enrollments(input_date) }.not_to raise_error
+        end
+      end
+
+      context 'when input date is beginning of the year' do
+        let(:input_date) { Date.new(TimeKeeper.date_of_record.year) }
+
+        it 'executes without raising any errors' do
+          expect{ subject.expire_individual_market_enrollments(input_date) }.not_to raise_error
+        end
       end
     end
   end

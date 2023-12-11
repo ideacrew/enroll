@@ -6,6 +6,8 @@ module Transmittable
     include Mongoid::Document
     include Mongoid::Timestamps
 
+    include GlobalID::Identification
+
     belongs_to :job, class_name: 'Transmittable::Job', optional: true
     has_many :transactions_transmissions, class_name: 'Transmittable::TransactionsTransmissions'
     has_one :process_status, as: :statusable, class_name: 'Transmittable::ProcessStatus'
