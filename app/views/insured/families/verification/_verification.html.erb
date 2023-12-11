@@ -135,7 +135,7 @@
   });
 
   function validateFileSize(input) {
-    const idVerificationFileSizeInMB = <%= VlpDocument::ID_FILE_SIZE_MB %>;
+    const idVerificationFileSizeInMB = <%= EnrollRegistry[:verification_doc_size_limit_in_mb].item.to_i %>;
     const maxFileSizeBytes = idVerificationFileSizeInMB * 1024 * 1024;
 
     for (let i = 0; i < input.files.length; i++) {
