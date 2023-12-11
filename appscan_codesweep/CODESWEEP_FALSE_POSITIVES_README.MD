@@ -19,7 +19,9 @@ If the author believes they have reproduced a known false positive, then they mu
 
 The Merge Shepherd is responsible for reviewing the PR and approving if it is a known false positive. This includes updating the Pivotal ticket's Security Review status to "Pass".
 
-If the Merge Shepherd believes the failure does NOT match a known false positive, then the author must follow the protocol below for adding a new false positive. (format as bullet list)
+**Note:** a Merge Shepherd can act as both regular peer reviewer and security reviewer for a PR, however, these are distinct steps that need to be tracked separately. **The false positives protocol is in addition to the regular peer review process, NOT in place of it.**
+
+If the Merge Shepherd believes the failure does not match a known false positive, then the author must follow the protocol below for adding a new false positive. (format as bullet list)
 
 ### New False Positive
 When the author believes they have encountered a new false positive that is not present on the false positives list, then they must:
@@ -27,10 +29,10 @@ When the author believes they have encountered a new false positive that is not 
 2. Tag the Security Manager([Desire Banse](https://github.com/desireB)) for security review.
 3. Flag the PR to their Tech Lead to coordinate approvals from the Security Manager, Lead Product Engineer and Leadership (Angus Irvine).
 
-The Lead Product Engineer (Sai K for IVL, Marco for Group) is responsible for:
+The Lead Product Engineer (Sai K for IVL, Marco for Group, Kristin for DBH) is responsible for:
 1. Getting approval from Desire for security review.
 2. Getting approval from Angus to merge the PR with a red build into trunk.
-3. Add a comment on the ticket indicating the approval from Angus to merge the PR with a red build into trunk.
+3. Adding a comment on the ticket indicating the approval from Angus to merge the PR with a red build into trunk.
 
 **IMPORTANT**: The build cannot be red for any reason other than the AppScan CodeSweep check.
 
