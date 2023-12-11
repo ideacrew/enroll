@@ -10,11 +10,11 @@ module Operations
       # @param [Hash] opts The options to request expiration all active IVL enrollments for the previous years
       # @option opts [Hash] :params
       # @return [Dry::Monads::Result]
-      def call(params)
+      def call(_params)
         logger         = yield initialize_logger
         job            = yield create_job
         query_criteria = yield fetch_query_critiria
-        event          = yield build_event(fetch_query_critiria, job)
+        event          = yield build_event(query_criteria, job)
         result         = yield publish(event, logger)
 
         Success(result)
@@ -41,7 +41,7 @@ module Operations
             title: "Request expiration of all active IVL enrollments before #{start_on}.",
             description: "Job that requests expiration of all active IVL enrollments before #{start_on}.",
             publish_on: DateTime.now,
-            started_at: DateTime.now,
+            started_at: DateTime.now
           }
         )
       end
