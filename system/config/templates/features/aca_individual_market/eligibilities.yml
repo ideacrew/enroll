@@ -210,3 +210,11 @@ registry:
     features:
       - key: :set_due_date_upon_response_from_hub
         is_enabled: true
+  - namespace:
+    - :enroll_app
+    - :aca_individual_market
+    - :eligibilities
+    - :reminder_notices
+    features:
+      - key: :trigger_document_reminder_notices_at_individual_level
+        is_enabled: <%= ENV['TRIGGER_DOCUMENT_REMINDER_NOTICES_AT_INDIVIDUAL_LEVEL_IS_ENABLED'] || false %>

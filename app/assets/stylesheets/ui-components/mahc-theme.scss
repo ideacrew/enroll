@@ -264,9 +264,9 @@ fieldset[disabled] .btn {
 }
 
 .btn-default {
-  color: $secondary-button-text;
+  color: var(--theme-primary-100, $secondary-button-text);
   background-color: $secondary-button-background;
-  border-color: $secondary-button-border;
+  border-color: var(--theme-primary-100, $secondary-button-border);
   text-transform: $secondary-button-text-casing;
   font-weight: $primary-bold;
   box-sizing: border-box;
