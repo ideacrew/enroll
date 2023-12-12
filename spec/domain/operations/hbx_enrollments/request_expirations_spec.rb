@@ -4,13 +4,9 @@ require 'rails_helper'
 
 RSpec.describe ::Operations::HbxEnrollments::RequestExpirations, dbclean: :after_each do
   describe '#call' do
-    let(:logger) do
-      "#{Rails.root}/log/request_expirations_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
-    end
-
-    let(:logger_content) { File.read(logger) }
-
     let(:result) { subject.call({}) }
+
+    let(:logger_content) { File.read(subject.logger.filename) }
 
     let(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
 

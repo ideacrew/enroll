@@ -7,16 +7,18 @@ module Operations
       include EventSource::Command
       include Dry::Monads[:result, :do]
 
+      attr_reader :transaction, :transmission
+
       # @param [Hash] params
       # @option params [Hash] :enrollment, :job
       # @return [Dry::Monads::Result]
       # @example params: { enrollment: HbxEnrollment.new, job: Transmittable::Job.new }
       def call(params)
-        values       = yield validate(params)
-        transmission = yield create_transmission(values[:enrollment], values[:job])
-        transaction  = yield create_transaction(values[:enrollment], transmission)
-        event        = yield build_event(values, transmission, transaction)
-        result       = yield publish_event(values[:enrollment], event)
+        values        = yield validate(params)
+        @transmission = yield create_transmission(values[:enrollment], values[:job])
+        @transaction  = yield create_transaction(values[:enrollment])
+        event         = yield build_event(values)
+        result        = yield publish_event(values[:enrollment], event)
 
         Success(result)
       end
@@ -48,7 +50,7 @@ module Operations
         )
       end
 
-      def create_transaction(enrollment, transmission)
+      def create_transaction(enrollment)
         ::Operations::Transmittable::CreateTransaction.new.call(
           {
             transmission: transmission,
@@ -64,7 +66,7 @@ module Operations
         )
       end
 
-      def build_event(values, transmission, transaction)
+      def build_event(values)
         event(
           'events.individual.enrollments.expire_coverages.expire',
           attributes: {
@@ -81,7 +83,7 @@ module Operations
 
       def publish_event(enrollment, event)
         event.publish
-        Success("Published expiration event: #{event.name} for enrollment with gid: #{enrollment.to_global_id.uri}.")
+        Success("Successfully published expiration event: #{event.name} for enrollment with hbx_id: #{enrollment.hbx_id}.")
       end
     end
   end

@@ -48,10 +48,34 @@ RSpec.describe ::Operations::HbxEnrollments::PublishExpirationEvent, dbclean: :a
     end
 
     context 'with valid params' do
+      before :each { result }
+
       it 'returns success' do
         expect(result.success).to eq(
           "Published expiration event: events.individual.enrollments.expire_coverages.expire for enrollment with gid: #{enrollment.to_global_id.uri}."
         )
+      end
+
+      it 'creates transmission with correct association' do
+        expect(subject.transmission).to be_a(::Transmittable::Transmission)
+        expect(subject.transmission.job).to eq(transmittable_job)
+      end
+
+      it 'creates transaction with correct associations' do
+        expect(subject.transaction).to be_a(::Transmittable::Transaction)
+        expect(subject.transaction.job).to eq(subject.transmission)
+        expect(
+          ::Transmittable::TransactionsTransmissions.where(
+            transaction_id: subject.transaction.id,
+            transmission_id: subject.transmission.id
+          ).count
+        ).to eq(1)
+        expect(subject.transaction.transactable).to eq(enrollment)
+      end
+
+      it 'creates transaction for enrollment' do
+        expect(enrollment.transactions.count).to eq(1)
+        expect(enrollment.transactions.first).to eq(subject.transaction)
       end
     end
   end

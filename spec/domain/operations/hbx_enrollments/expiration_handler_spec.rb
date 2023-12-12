@@ -38,7 +38,7 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
   end
 
   let(:result) { subject.call(params) }
-  let(:logger_content) { File.read(subject.logger) }
+  let(:logger_content) { File.read(subject.logger.filename) }
 
   describe 'with invalid params' do
     context 'params is not a hash' do
@@ -108,7 +108,7 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
     end
 
     let(:enr_success_msg) do
-      "Successfully published expiration event for enrollment hbx id: #{enrollment.hbx_id}"
+      "Successfully published expiration event: #{event.name} for enrollment with hbx_id: #{enrollment.hbx_id}."
     end
 
     it 'succeeds with message' do

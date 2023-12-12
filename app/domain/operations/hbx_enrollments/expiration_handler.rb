@@ -102,7 +102,7 @@ module Operations
           )
 
           if result.success?
-            logger.info "Successfully published expiration event for enrollment hbx id: #{enrollment.hbx_id}"
+            logger.info result.success
           else
             logger.error "Failed to publish expiration event for enrollment hbx id: #{enrollment.hbx_id}"
           end
