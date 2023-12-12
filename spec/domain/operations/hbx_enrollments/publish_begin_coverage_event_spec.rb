@@ -15,7 +15,7 @@ RSpec.describe ::Operations::HbxEnrollments::PublishBeginCoverageEvent, dbclean:
 
       it 'fails due to missing query criteria' do
         expect(result.success?).to be_falsey
-        expect(result.failure).to eq('Missing enrollment_hbx_id.')
+        expect(result.failure).to eq("Invalid input params: #{params}.")
       end
     end
 
@@ -24,13 +24,13 @@ RSpec.describe ::Operations::HbxEnrollments::PublishBeginCoverageEvent, dbclean:
 
       it 'fails due to missing query criteria' do
         expect(result.success?).to be_falsey
-        expect(result.failure).to eq('Missing enrollment_hbx_id.')
+        expect(result.failure).to eq("Invalid input params: #{params}.")
       end
     end
   end
 
   describe 'with valid params' do
-    let(:params) { { enrollment_hbx_id: enrollment.hbx_id } }
+    let(:params) { { enrollment: enrollment } }
     let(:result) { described_class.new.call(params) }
 
     it 'succeeds with message' do
