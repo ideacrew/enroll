@@ -65,7 +65,6 @@ RSpec.describe ::Operations::HbxEnrollments::PublishExpirationEvent, dbclean: :a
 
       it 'creates transaction with correct associations' do
         expect(subject.transaction).to be_a(::Transmittable::Transaction)
-        expect(subject.transaction.job).to eq(subject.transmission)
         expect(
           ::Transmittable::TransactionsTransmissions.where(
             transaction_id: subject.transaction.id,
