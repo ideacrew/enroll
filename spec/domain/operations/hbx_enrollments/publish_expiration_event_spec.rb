@@ -54,7 +54,7 @@ RSpec.describe ::Operations::HbxEnrollments::PublishExpirationEvent, dbclean: :a
 
       it 'returns success' do
         expect(result.success).to eq(
-          "Published expiration event: events.individual.enrollments.expire_coverages.expire for enrollment with gid: #{enrollment.to_global_id.uri}."
+          "Successfully published expiration event: events.individual.enrollments.expire_coverages.expire for enrollment with hbx_id: #{enrollment.hbx_id}."
         )
       end
 

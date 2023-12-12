@@ -51,7 +51,7 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
 
       it 'returns failure monad due to invalid params type' do
         expect(result.failure).to eq(failure_msg)
-        expect(logger_content).to include(failure_msg)
+        expect(logger_content).to match(failure_msg)
       end
     end
 
@@ -61,7 +61,7 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
 
       it 'fails due to missing query criteria' do
         expect(result.failure).to eq(failure_msg)
-        expect(logger_content).to include(failure_msg)
+        expect(logger_content).to match(failure_msg)
       end
     end
 
@@ -71,7 +71,7 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
 
       it 'returns failure monad with error message' do
         expect(result.failure).to eq(failure_msg)
-        expect(logger_content).to include(failure_msg)
+        expect(logger_content).to match(failure_msg)
       end
     end
 
@@ -81,7 +81,7 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
 
       it 'returns failure monad with error message' do
         expect(result.failure).to eq(failure_msg)
-        expect(logger_content).to include(failure_msg)
+        expect(logger_content).to match(failure_msg)
       end
     end
 
@@ -91,7 +91,7 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
 
       it 'returns a failure moand with error message' do
         expect(result.failure).to eq(failure_msg)
-        expect(logger_content).to include(failure_msg)
+        expect(logger_content).to match(failure_msg)
       end
     end
 
@@ -101,7 +101,7 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
 
       it 'returns a failure moand with error message' do
         expect(result.failure).to eq(failure_msg)
-        expect(logger_content).to include(failure_msg)
+        expect(logger_content).to match(failure_msg)
       end
     end
   end
@@ -112,13 +112,13 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
     end
 
     let(:enr_success_msg) do
-      "Successfully published expiration event: #{event.name} for enrollment with hbx_id: #{enrollment.hbx_id}."
+      "Successfully published expiration event: events.individual.enrollments.expire_coverages.expire for enrollment with hbx_id: #{enrollment.hbx_id}."
     end
 
     it 'succeeds with message' do
       expect(result.success).to eq(success_msg)
-      expect(logger_content).to include(enr_success_msg)
-      expect(logger_content).to include(success_msg)
+      expect(logger_content).to match(enr_success_msg)
+      expect(logger_content).to match(success_msg)
     end
   end
 
