@@ -55,7 +55,7 @@ module Services
 
     def begin_coverage_for_ivl_enrollments
       if EnrollRegistry.feature_enabled?(:async_expire_and_begin_coverages)
-        process_async_begin_coverage_requests
+        process_async_begin_coverages_request
       else
         @logger.info "Started begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record}"
         batch_size = 500
@@ -94,30 +94,15 @@ module Services
       end
     end
 
-    def process_async_begin_coverage_requests
-      @logger.info "Started generating IVL begin coverage requests at #{TimeKeeper.datetime_of_record}"
-      ivl_enrollments = HbxEnrollment.where(
-        :effective_on => { "$gte" => current_benefit_period.start_on, "$lt" => current_benefit_period.end_on },
-        :kind.in => ["individual", "coverall"],
-        :aasm_state.in => ["auto_renewing", "renewing_coverage_selected"]
-      )
-      @logger.info "Total IVL auto renewing enrollment count: #{ivl_enrollments.count}"
-      ivl_enrollments.no_timeout.each_with_index do |enrollment, index|
-        trigger_begin_coverage_request_event(enrollment, index)
-      rescue StandardError => e
-        @logger.error "ERROR - Failed begin coverage request for enrollment hbx_id: #{enrollment.hbx_id}; Exception: #{e.inspect}"
-      end
-      @logger.info "Ended generating IVL begin coverage requests at #{TimeKeeper.datetime_of_record}"
-    end
-
-    def trigger_begin_coverage_request_event(enrollment, index)
-      event = event("events.individual.enrollments.begin_coverages.request", attributes: { enrollment_hbx_id: enrollment.hbx_id, index_id: index})
-      if event.success?
-        @logger.info "Publishing begin coverage request for enrollment hbx_id: #{enrollment.hbx_id}"
-        event.success.publish
+    def process_async_begin_coverages_request
+      @logger.info "Started process_async_begin_coverages_request process at #{Time.now.strftime('%H:%M:%S.%L')}"
+      result = Operations::HbxEnrollments::RequestBeginCoverages.new.call({})
+      if result.success?
+        @logger.info 'Successfully published begin coverages request.'
       else
-        @logger.error "ERROR - Begin coverage request failed: enrollment hbx_id: #{enrollment.hbx_id}"
+        @logger.error "Publishing begin coverages request failed: #{result.failure}"
       end
+      @logger.info "Ended process_async_begin_coverages_request process at #{Time.now.strftime('%H:%M:%S.%L')}"
     end
 
     def current_benefit_period
