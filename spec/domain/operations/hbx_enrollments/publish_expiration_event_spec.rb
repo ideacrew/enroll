@@ -18,7 +18,9 @@ RSpec.describe ::Operations::HbxEnrollments::PublishExpirationEvent, dbclean: :a
 
   let(:transmittable_job) { FactoryBot.create(:transmittable_job, :hbx_enrollments_expiration) }
   let(:params) { { enrollment: enrollment, job: transmittable_job } }
-  let(:result) { described_class.new.call(params) }
+
+  let(:operation_instance) { described_class.new }
+  let(:result) { operation_instance.call(params) }
 
   describe '#call' do
     context 'with invalid params' do
@@ -59,24 +61,32 @@ RSpec.describe ::Operations::HbxEnrollments::PublishExpirationEvent, dbclean: :a
       end
 
       it 'creates transmission with correct association' do
-        expect(subject.transmission).to be_a(::Transmittable::Transmission)
-        expect(subject.transmission.job).to eq(transmittable_job)
+        expect(operation_instance.transmission).to be_a(::Transmittable::Transmission)
+        expect(operation_instance.transmission.job).to eq(transmittable_job)
+      end
+
+      it 'associates newly created transmission to job' do
+        expect(transmittable_job.transmissions.count).to eq(1)
+        expect(transmittable_job.transmissions.first).to eq(operation_instance.transmission)
       end
 
       it 'creates transaction with correct associations' do
-        expect(subject.transaction).to be_a(::Transmittable::Transaction)
-        expect(
-          ::Transmittable::TransactionsTransmissions.where(
-            transaction_id: subject.transaction.id,
-            transmission_id: subject.transmission.id
-          ).count
-        ).to eq(1)
-        expect(subject.transaction.transactable).to eq(enrollment)
+        expect(operation_instance.transaction).to be_a(::Transmittable::Transaction)
+        expect(operation_instance.transaction.transactable).to eq(enrollment)
       end
 
-      it 'creates transaction for enrollment' do
+      it 'creates join table record between transmission and transaction' do
+        expect(
+          ::Transmittable::TransactionsTransmissions.where(
+            transaction_id: operation_instance.transaction.id,
+            transmission_id: operation_instance.transmission.id
+          ).count
+        ).to eq(1)
+      end
+
+      it 'associates newly created transaction to enrollment' do
         expect(enrollment.transactions.count).to eq(1)
-        expect(enrollment.transactions.first).to eq(subject.transaction)
+        expect(enrollment.transactions.first).to eq(operation_instance.transaction)
       end
     end
   end

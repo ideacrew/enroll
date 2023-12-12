@@ -87,21 +87,19 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
 
     context 'with no enrollments in previous year' do
       let(:effective_on) { TimeKeeper.date_of_record.beginning_of_year }
-      let(:failure_msg) { "No enrollments found for query criteria: #{query_criteria}" }
 
       it 'returns a failure moand with error message' do
-        expect(result.failure).to eq(failure_msg)
-        expect(logger_content).to match(failure_msg)
+        expect(result.failure).to eq("No enrollments found for query criteria: #{query_criteria}")
+        expect(logger_content).to match(/No enrollments found for query criteria:/)
       end
     end
 
     context 'with no active enrollments in previous year' do
       let(:aasm_state) { 'coverage_canceled' }
-      let(:failure_msg) { "No enrollments found for query criteria: #{query_criteria}" }
 
       it 'returns a failure moand with error message' do
-        expect(result.failure).to eq(failure_msg)
-        expect(logger_content).to match(failure_msg)
+        expect(result.failure).to eq("No enrollments found for query criteria: #{query_criteria}")
+        expect(logger_content).to match(/No enrollments found for query criteria:/)
       end
     end
   end
