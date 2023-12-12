@@ -44,27 +44,9 @@ RSpec.describe ::Operations::HbxEnrollments::RequestExpirations, dbclean: :after
     end
 
     context 'with invalid params' do
-      context 'when params is not a hash' do
-        let(:params) { nil }
-
-        it 'returns a failure' do
-          expect(result.failure).to eq("Invalid input params: #{params}. Expected a hash.")
-        end
-      end
-
-      context 'when enrollment is not a valid object' do
-        let(:params) { { enrollment: 'enrollment' } }
-
-        it 'returns a failure' do
-          expect(result.failure).to eq("Invalid input params: #{params}. Expected a hash.")
-        end
-      end
-
-      context 'when job is not a valid object' do
-        let(:params) { { enrollment: enrollment, job: 'transmittable_job' } }
-
-        it 'returns a failure' do
-          expect(result.failure).to eq("Invalid input params: #{params}. Expected a hash.")
+      context 'without hbx profile' do
+        it 'returns a failure moand with error message' do
+          expect(result.failure).to eq('Unable to find the start_on date for current benefit coverage period.')
         end
       end
     end

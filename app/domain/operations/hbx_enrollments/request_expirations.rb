@@ -18,7 +18,7 @@ module Operations
         @job           = yield create_job(bcp_start_on)
         query_criteria = yield fetch_query_critiria(bcp_start_on)
         event          = yield build_event(query_criteria)
-        result         = yield publish(event)
+        result         = yield publish(bcp_start_on, event)
 
         Success(result)
       end
@@ -77,9 +77,9 @@ module Operations
         )
       end
 
-      def publish(event)
+      def publish(bcp_start_on, event)
         event.publish
-        msg = "Successfully published event: #{event.name} to request expiration of all active IVL enrollments effective before #{start_on}."
+        msg = "Successfully published event: #{event.name} to request expiration of all active IVL enrollments effective before #{bcp_start_on}."
         logger.info(msg)
         Success(msg)
       end

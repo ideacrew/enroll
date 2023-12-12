@@ -37,7 +37,7 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
     }
   end
 
-  let(:result) { described_class.new.call(params) }
+  let(:result) { subject.call(params) }
 
   describe 'with invalid params' do
     context 'params is not a hash' do
@@ -50,9 +50,11 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
 
     context 'missing query criteria' do
       let(:params) { {} }
+      let(:failure_msg) { "Invalid query_criteria in params: #{params}. Expected a hash." }
 
       it 'fails due to missing query criteria' do
-        expect(result.failure).to eq("Invalid query_criteria in params: #{params}. Expected a hash.")
+        expect(result.failure).to eq(failure_msg)
+        expect(subject.logger)
       end
     end
 

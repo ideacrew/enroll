@@ -56,14 +56,3 @@ RSpec.describe ::Operations::HbxEnrollments::PublishExpirationEvent, dbclean: :a
     end
   end
 end
-
-__END__
-
-TODO:
-  1. Add specs to verify the creation of Transmittable::Job.
-  2. Add specs to verify the creation of Transmittable::Transmission.
-  3. Add specs to verify the creation of Transmittable::Transaction.
-  4. Add specs to verify the association of Subject to Transmittable::Transaction.
-  5. What is the use of ":transmission_id" on Transmittable::Transmission?
-  6. Why is ":transmission_id" a mandatory field on Transmittable::Transmission?
-  7. What is the use of ":correlation_id" on Transmittable::Transmission?
