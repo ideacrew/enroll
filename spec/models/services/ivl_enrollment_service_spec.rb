@@ -227,6 +227,11 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
         it 'executes without raising any errors' do
           expect{ subject.expire_individual_market_enrollments(input_date) }.not_to raise_error
         end
+
+        it 'returns without requesting expirations' do
+          expect(::Operations::HbxEnrollments::RequestExpirations).not_to receive(:new)
+          subject.expire_individual_market_enrollments(input_date)
+        end
       end
 
       context 'when input date is beginning of the year' do
