@@ -108,6 +108,8 @@ module Operations
           end
         end
 
+        success_msg = 'Done publishing enrollment expiration events. See hbx_enrollments_expiration_handler log for results.'
+        logger.info success_msg
         Success('Done publishing enrollment expiration events. See hbx_enrollments_expiration_handler log for results.')
       end
     end

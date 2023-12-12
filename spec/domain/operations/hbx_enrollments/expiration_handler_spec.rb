@@ -38,13 +38,16 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
   end
 
   let(:result) { subject.call(params) }
+  let(:logger_content) { File.read(subject.logger) }
 
   describe 'with invalid params' do
     context 'params is not a hash' do
       let(:params) { 'bad params' }
+      let(:failure_msg) { "Invalid input params: #{params}. Expected a hash." }
 
       it 'returns failure monad due to invalid params type' do
-        expect(result.failure).to eq("Invalid input params: #{params}. Expected a hash.")
+        expect(result.failure).to eq(failure_msg)
+        expect(logger_content).to include(failure_msg)
       end
     end
 
@@ -54,48 +57,64 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
 
       it 'fails due to missing query criteria' do
         expect(result.failure).to eq(failure_msg)
-        expect(subject.logger)
+        expect(logger_content).to include(failure_msg)
       end
     end
 
     context 'with invalid transmittable_identifiers' do
       let(:params) { { query_criteria: {}, transmittable_identifiers: nil } }
+      let(:failure_msg) { "Invalid transmittable_identifiers in params: #{params}. Expected a hash." }
 
       it 'returns failure monad with error message' do
-        expect(result.failure).to eq("Invalid transmittable_identifiers in params: #{params}. Expected a hash.")
+        expect(result.failure).to eq(failure_msg)
+        expect(logger_content).to include(failure_msg)
       end
     end
 
     context 'with missing job_gid' do
       let(:params) { { query_criteria: {}, transmittable_identifiers: {} } }
+      let(:failure_msg) { "Missing job_gid in transmittable_identifiers of params: #{params}." }
 
       it 'returns failure monad with error message' do
-        expect(result.failure).to eq("Missing job_gid in transmittable_identifiers of params: #{params}.")
+        expect(result.failure).to eq(failure_msg)
+        expect(logger_content).to include(failure_msg)
       end
     end
 
     context 'with no enrollments in previous year' do
       let(:effective_on) { TimeKeeper.date_of_record.beginning_of_year }
+      let(:failure_msg) { "No enrollments found for query criteria: #{query_criteria}" }
 
       it 'returns a failure moand with error message' do
-        expect(result.failure).to eq("No enrollments found for query criteria: #{query_criteria}")
+        expect(result.failure).to eq(failure_msg)
+        expect(logger_content).to include(failure_msg)
       end
     end
 
     context 'with no active enrollments in previous year' do
       let(:aasm_state) { 'coverage_canceled' }
+      let(:failure_msg) { "No enrollments found for query criteria: #{query_criteria}" }
 
       it 'returns a failure moand with error message' do
-        expect(result.failure).to eq("No enrollments found for query criteria: #{query_criteria}")
+        expect(result.failure).to eq(failure_msg)
+        expect(logger_content).to include(failure_msg)
       end
     end
   end
 
   describe 'with valid params' do
+    let(:success_msg) do
+      "Done publishing enrollment expiration events. See hbx_enrollments_expiration_handler log for results."
+    end
+
+    let(:enr_success_msg) do
+      "Successfully published expiration event for enrollment hbx id: #{enrollment.hbx_id}"
+    end
+
     it 'succeeds with message' do
-      expect(result.success).to eq(
-        "Done publishing enrollment expiration events. See hbx_enrollments_expiration_handler log for results."
-      )
+      expect(result.success).to eq(success_msg)
+      expect(logger_content).to include(enr_success_msg)
+      expect(logger_content).to include(success_msg)
     end
   end
 end
