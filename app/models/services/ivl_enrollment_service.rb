@@ -95,12 +95,6 @@ module Services
     end
 
     def process_async_begin_coverages_request
-      # query_criteria = {
-      #   "effective_on": { "$gte": current_benefit_period.start_on, "$lt": current_benefit_period.end_on },
-      #   "kind": { "$in": ["individual", "coverall"] },
-      #   "aasm_state": { "$in": ["auto_renewing", "renewing_coverage_selected"] }
-      # }
-      # publish_begin_coverage_request_event(query_criteria)
       @logger.info "Started process_async_begin_coverages_request process at #{Time.now.strftime('%H:%M:%S.%L')}"
       result = Operations::HbxEnrollments::RequestBeginCoverages.new.call({})
       if result.success?
@@ -110,16 +104,6 @@ module Services
       end
       @logger.info "Ended process_async_begin_coverages_request process at #{Time.now.strftime('%H:%M:%S.%L')}"
     end
-
-    # def publish_begin_coverage_request_event(query_criteria)
-    #   event = event("events.individual.enrollments.begin_coverages.request", attributes: { query_criteria: query_criteria })
-    #   if event.success?
-    #     @logger.info "Publishing begin coverages request with query criteria: #{query_criteria}"
-    #     event.success.publish
-    #   else
-    #     @logger.error "ERROR - Publishing begin coverages request failed: #{event.failure}"
-    #   end
-    # end
 
     def current_benefit_period
       @current_benefit_period ||= HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
