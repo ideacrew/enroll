@@ -121,7 +121,7 @@ class Insured::VerificationDocumentsController < ApplicationController
   def validate_file_type
     return unless params[:file]
 
-    doc_limit_mb = EnrollRegistry[:verification_doc_size_limit_in_mb].item.to_i || 100
+    doc_limit_mb = EnrollRegistry[:verification_doc_size_limit_in_mb].item.to_i
     max_file_size_in_bytes = doc_limit_mb * 1024 * 1024
     params[:file].each do |file|
       file_path = file.path

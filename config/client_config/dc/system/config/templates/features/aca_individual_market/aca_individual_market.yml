@@ -117,7 +117,7 @@ registry:
         item: ^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$
         is_enabled: <%= ENV['VALIDATE_SSN_IS_ENABLED'] || false %>
       - key: :verification_doc_size_limit_in_mb
-        item: 100
+        item: <%= ENV['VERIFICATION_DOC_SIZE_LIMIT_IN_MB'] || 100 %>
         is_enabled: true
   - namespace:
     - :enroll_app
