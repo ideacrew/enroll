@@ -923,3 +923,6 @@ registry:
       - key: :async_expire_and_begin_coverages
         item: :async_expire_and_begin_coverages
         is_enabled: <%= ENV['ASYNC_EXPIRE_AND_BEGIN_COVERAGES_IS_ENABLED'] || false %>
+      - key: :employee_search_recaptcha
+        item: :employee_search_recaptcha
+        is_enabled: <%= ENV['EMPLOYEE_SEARCH_RECAPTCHA_IS_ENABLED'] || false %>

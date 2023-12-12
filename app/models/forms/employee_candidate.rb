@@ -74,6 +74,7 @@ module Forms
       if matched_person.present?
         if matched_person.user.present?
           if matched_person.user.id.to_s != self.user_id.to_s
+            Rails.logger.warn("EmployeeCandidate::does_not_match_a_different_users_person #{self.user_id.to_s} is already affiliated with another account - #{matched_person.user.id.to_s}")
             errors.add(
                 :base,
                 "#{first_name} #{last_name} is already affiliated with another account"

@@ -26,6 +26,8 @@ class Insured::EmployeeRolesController < ApplicationController
     @person_params = params.require(:person).permit(person_parameters_list).merge({:user_id => current_user.id})
     @person_params.merge(no_ssn: params.dig(:person, :no_ssn)) if params.dig(:person, :no_ssn)
     @person_params.merge(:dob => params.dig(:jq_datepicker_ignore_person, :dob)) if params.dig(:jq_datepicker_ignore_person, :dob)
+    session[:failed_match_attempts] ||= 0
+    @captcha_required = false
     @employee_candidate = ::Forms::EmployeeCandidate.new(@person_params)
     @person = @employee_candidate
     if @employee_candidate.valid?
@@ -46,6 +48,12 @@ class Insured::EmployeeRolesController < ApplicationController
         end
       end
     else
+      session[:failed_match_attempts] += 1
+      if session[:failed_match_attempts] > 3
+        @captcha_required = true
+        @employee_candidate.errors.add(:base, "reCAPTCHA verification failed") unless verify_recaptcha_if_needed
+        flash.delete(:recaptcha_error)
+      end
       respond_to do |format|
         format.html { render 'search' }
       end
@@ -229,5 +237,10 @@ class Insured::EmployeeRolesController < ApplicationController
   def employment_relationship_params
     params.require(:employment_relationship).permit(:first_name, :last_name, :middle_name,
       :name_pfx, :name_sfx, :gender, :hired_on, :eligible_for_coverage_on, :census_employee_id, :employer_name, :no_ssn)
+  end
+
+  def verify_recaptcha_if_needed
+    return true unless EnrollRegistry.feature_enabled?(:employee_search_recaptcha)
+    verify_recaptcha
   end
 end
