@@ -38,7 +38,11 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
   end
 
   let(:result) { subject.call(params) }
-  let(:logger_content) { File.read(subject.logger.filename) }
+
+  # TODO: Refactor to get the logger content from subject.logger instead of hardcoding the path
+  let(:logger_content) do
+    File.read("#{Rails.root}/log/expiration_handler_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+  end
 
   describe 'with invalid params' do
     context 'params is not a hash' do
@@ -116,5 +120,10 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
       expect(logger_content).to include(enr_success_msg)
       expect(logger_content).to include(success_msg)
     end
+  end
+
+  after :all do
+    file_path = "#{Rails.root}/log/expiration_handler_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+    File.delete(file_path) if File.file?(file_path)
   end
 end

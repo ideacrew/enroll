@@ -6,7 +6,10 @@ RSpec.describe ::Operations::HbxEnrollments::RequestExpirations, dbclean: :after
   describe '#call' do
     let(:result) { subject.call({}) }
 
-    let(:logger_content) { File.read(subject.logger.filename) }
+    # TODO: Refactor to get the logger content from subject.logger instead of hardcoding the path
+    let(:logger_content) do
+      File.read("#{Rails.root}/log/request_expirations_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+    end
 
     let(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
 

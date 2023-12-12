@@ -48,7 +48,9 @@ RSpec.describe ::Operations::HbxEnrollments::PublishExpirationEvent, dbclean: :a
     end
 
     context 'with valid params' do
-      before :each { result }
+      before :each do
+        result
+      end
 
       it 'returns success' do
         expect(result.success).to eq(
