@@ -89,7 +89,9 @@ module Operations
         if enrollments_to_expire.present?
           Success(enrollments_to_expire)
         else
-          Failure("No enrollments found for query criteria: #{query_criteria}")
+          failure_msg = "No enrollments found for query criteria: #{query_criteria}"
+          logger.error failure_msg
+          Failure(failure_msg)
         end
       rescue StandardError => e
         Failure("Error generating enrollments_to_expire query: #{e.message}; with query criteria: #{query_criteria}")

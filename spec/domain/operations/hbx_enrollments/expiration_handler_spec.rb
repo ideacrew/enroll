@@ -19,11 +19,13 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
   end
 
   let(:query_criteria) do
-    {
-      'aasm_state': { '$in': HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending'] },
-      'effective_on': { '$lt': start_on },
-      'kind': { '$in': ['individual', 'coverall'] }
-    }
+    JSON.parse(
+      {
+        'aasm_state': { '$in': HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending'] },
+        'effective_on': { '$lt': start_on },
+        'kind': { '$in': ['individual', 'coverall'] }
+      }.to_json
+    ).deep_symbolize_keys
   end
 
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_year }
