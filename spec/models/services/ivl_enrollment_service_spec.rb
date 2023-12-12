@@ -397,4 +397,9 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
       end
     end
   end
+
+  after :all do
+    file_path = "#{Rails.root}/log/family_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+    File.delete(file_path) if File.file?(file_path)
+  end
 end
