@@ -28,7 +28,18 @@ RSpec.describe ::Operations::HbxEnrollments::BeginCoverage, dbclean: :after_each
 
       it 'fails due to invalid enrollment kind' do
         expect(result.success?).to be_falsey
-        expect(result.failure).to eq("Unable to begin coverage for enrollment hbx id #{enrollment.hbx_id} - employer_sponsored is not a valid IVL enrollment kind")
+        expect(result.failure).to eq("Failed to begin coverage for enrollment hbx id #{enrollment.hbx_id} - #{enrollment.kind} is not a valid IVL enrollment kind")
+      end
+    end
+
+    describe 'where enrollment fails the expiration guard clause' do
+      before do
+        enrollment.update_attributes(kind: "employer_sponsored")
+      end
+
+      it 'fails due to invalid state transition to coverage_expired' do
+        expect(result.success?).to be_falsey
+        expect(result.failure).to eq("Failed to begin coverage for enrollment hbx id #{enrollment.hbx_id} - #{enrollment.kind} is not a valid IVL enrollment kind")
       end
     end
   end
@@ -40,6 +51,17 @@ RSpec.describe ::Operations::HbxEnrollments::BeginCoverage, dbclean: :after_each
     it 'succeeds with message' do
       expect(result.success?).to be_truthy
       expect(result.value!).to eq("Successfully began coverage for enrollment hbx id #{enrollment.hbx_id}")
+    end
+
+    describe 'where enrollment is a coverall enrollment' do
+      before do
+        enrollment.update_attributes(kind: 'coverall')
+      end
+
+      it 'succeeds with message' do
+        expect(result.success?).to be_truthy
+        expect(result.value!).to eq("Successfully began coverage for enrollment hbx id #{enrollment.hbx_id}")
+      end
     end
   end
 end

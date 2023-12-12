@@ -12,7 +12,6 @@ module Operations
       def call(params)
         enrollment_hbx_id = yield validate(params)
         hbx_enrollment    = yield find_enrollment(enrollment_hbx_id)
-        _valid_expiration = yield validate_coverage(hbx_enrollment)
         result            = yield begin_coverage(hbx_enrollment)
 
         Success(result)
@@ -22,7 +21,6 @@ module Operations
 
       def validate(params)
         return Failure('Missing enrollment_hbx_id') unless params.key?(:enrollment_hbx_id)
-
         Success(params[:enrollment_hbx_id])
       end
 
@@ -30,22 +28,13 @@ module Operations
         Operations::HbxEnrollments::Find.new.call({hbx_id: enrollment_hbx_id})
       end
 
-      def validate_coverage(enrollment)
-        failures = []
-        failures << "#{enrollment.kind} is not a valid IVL enrollment kind" unless enrollment.market_name == 'Individual'
-        failures << "enrollment does not meet the coverage initiation criteria" unless enrollment.may_begin_coverage?
-        if failures.empty?
-          Success(enrollment)
-        else
-          Failure("Unable to begin coverage for enrollment hbx id #{enrollment.hbx_id} - #{failures.join(', ')}")
-        end
-      end
-
       def begin_coverage(enrollment)
-        result = enrollment.begin_coverage!
-        return Failure("Failed to begin coverage for enrollment hbx id #{enrollment.hbx_id}.") unless result
+        return Failure("Failed to begin coverage for enrollment hbx id #{enrollment.hbx_id} - #{enrollment.kind} is not a valid IVL enrollment kind") unless enrollment.is_ivl_by_kind?
+        enrollment.begin_coverage!
 
         Success("Successfully began coverage for enrollment hbx id #{enrollment.hbx_id}")
+      rescue StandardError => e
+        Failure("Failed to begin coverage for enrollment hbx id #{enrollment.hbx_id} - #{e.message}")
       end
     end
   end

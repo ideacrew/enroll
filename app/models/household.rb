@@ -72,6 +72,21 @@ class Household
     self.save
   end
 
+  def build_household_coverage_member(family_member)
+    primary_relationship = family_member.primary_relationship
+    primary_person = family_member.family.primary_person
+
+    if Family::IMMEDIATE_FAMILY.include?(primary_relationship)
+      immediate_family_coverage_household.add_coverage_household_member(family_member)
+      extended_family_coverage_household.remove_family_member(family_member)
+    else
+      immediate_family_coverage_household.remove_family_member(family_member)
+      extended_family_coverage_household.add_coverage_household_member(family_member)
+    end
+
+    return if primary_person&.employee_roles.present? # prevent mongo conflict when dependent is added in SHOP context
+  end
+
   def immediate_family_coverage_household
     ch = coverage_households.detect { |hh| hh.is_immediate_family? }
     ch ||= coverage_households.build(is_immediate_family: true)

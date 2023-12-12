@@ -73,7 +73,8 @@ module FinancialAssistance
           def payload_format
             {
               non_esi_payload_format: EnrollRegistry[:non_esi_h31].setting(:payload_format).item,
-              esi_mec_payload_format: EnrollRegistry[:esi_mec].setting(:payload_format).item
+              esi_mec_payload_format: EnrollRegistry[:esi_mec].setting(:payload_format).item,
+              ifsv_payload_format: EnrollRegistry[:ifsv].setting(:payload_format).item
             }
           end
 
