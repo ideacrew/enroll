@@ -9,7 +9,7 @@ module Operations
     class Create
       send(:include, Dry::Monads[:result, :do])
 
-      attr_reader :resource_class
+      attr_accessor :resource_class
 
       # @param [Hash] opts Options to build audit log event
       # @option opts [<GlobalID>] :subject_gid required
@@ -35,14 +35,14 @@ module Operations
       private
 
       def validate(params)
-        resource_class = params.delete(:resource_class)
+        @resource_class = params.delete(:resource_class)
         return Failure("resource class name missing") unless resource_class
 
         result =
           "AcaEntities::EventLogs::#{resource_class}EventLogContract"
-            .constantize
-            .new
-            .call(params)
+          .constantize
+          .new
+          .call(params)
         result.success? ? Success(result) : Failure(result)
       end
 

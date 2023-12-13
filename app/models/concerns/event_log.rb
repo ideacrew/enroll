@@ -9,15 +9,15 @@ module EventLog
     # EVENT_CATEGORIES = %i[osse_eligibility password_change].freeze
 
     belongs_to :account, class_name: "User", inverse_of: :nil
-    embeds_one :session_detail, class_name: "EventLog::SessionDetail", as: :sessionable
+    embeds_one :session_detail, class_name: "EventLogs::SessionDetail", as: :sessionable
 
     # field :account_id, type: String
     field :subject_gid, type: String
-    field :event_category, type: Symbol
     field :correlation_id, type: String
+    field :message_id, type: String
     field :host_id, type: String
     field :trigger, type: String
-    field :message_id, type: String
+    field :event_category, type: Symbol
     field :event_time, type: DateTime
     field :tags, type: Array
 
