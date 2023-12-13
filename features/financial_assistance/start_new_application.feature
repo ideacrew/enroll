@@ -49,6 +49,8 @@ Feature: Cost Savings -  Start New Application
     Then consumer should see 'Start New Application' button
     When consumer click 'Start New Application' button
     Then the consumer is navigated to Application checklist page
+    And contrast_level_aa feature is enabled
+    Then the page should be axe clean according to: wcag2a; checking only: color-contrast
 
   Scenario: FAA is enabled - year selection disabled - OE ended - and consumer has a no existing FAA applications
     Given the iap year selection feature is enabled
@@ -65,6 +67,8 @@ Feature: Cost Savings -  Start New Application
     Then consumer should see 'Start New Application' button
     When consumer click 'Start New Application' button
     Then the consumer is navigated to Application checklist page
+    And contrast_level_aa feature is enabled
+    Then the page should be axe clean according to: wcag2a; checking only: color-contrast
 
   Scenario: FAA is enabled - year selection disabled - in OE - and consumer has a no existing FAA applications
     Given the iap year selection feature is enabled

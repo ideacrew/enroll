@@ -148,3 +148,10 @@ end
 And(/^the user clicks the Admin tab$/) do
   page.find('.dropdown-toggle', text: 'Admin').click
 end
+
+And(/contrast_level_aa feature is enabled?/) do
+  # Assets are compiled for DC environment. Because of this, we need to reload the page
+  # in order to test our AA compliant styling changes for ME.
+  ENV["CONTRAST_LEVEL_AA_IS_ENABLED"] = "true"
+  page.reset!
+end
