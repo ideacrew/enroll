@@ -9,7 +9,7 @@ site:
   broker_claim_quoting_enabled: true
   use_default_devise_path: true
   plan_options_title_for_ma: true
-  exchange_hbx_id: 'DC0'
+  exchange_hbx_id: 'ME0'
   faa_enabled: false # TODO: Remove this after configuring the settings.
   curam_enabled?: true
   support_for_ie_browser: true
@@ -27,7 +27,7 @@ contact_center:
   ivl_number: '1-123-111-2222'
   ivl_phone_number: '1-123-111-2222'
   email_address: 'info@ideacrew.com'
-  state: 'DC'
+  state: 'ME'
   non_discrimination_email: 'info@ideacrew.com'
 
   appeals: 'info@ideacrew.com'
@@ -84,7 +84,7 @@ invoices:
 aca:
   state_key: 'ic'
   state_name: 'Test State'
-  state_abbreviation: 'TS'
+  state_abbreviation: 'ME'
   market_kinds: ['shop', 'individual', 'fehb']
   nationwide_markets: true
   general_agency_enabled: true
