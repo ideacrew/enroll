@@ -22,9 +22,9 @@ module Subscribers
 
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
-      subscriber_logger.info "EventLogEventsSubscriber#on_enroll_event_log_events, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
+      subscriber_logger.error "EventLogEventsSubscriber#on_enroll_event_log_events, payload: #{payload}, error message: #{e.message}, backtrace: #{e.backtrace}"
       logger.info "EventLogEventsSubscriber#on_enroll_event_log_events: errored & acked. Backtrace: #{e.backtrace}"
-      subscriber_logger.info "EventLogEventsSubscriber#on_enroll_event_log_events, ack: #{payload}"
+      subscriber_logger.error "EventLogEventsSubscriber#on_enroll_event_log_events, ack: #{payload}"
       ack(delivery_info.delivery_tag)
     end
   end
