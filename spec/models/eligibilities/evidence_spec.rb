@@ -244,6 +244,17 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
         )
       end
 
+      let(:income_evidence) do
+        applicant.create_income_evidence(
+          key: :income,
+          title: 'Income',
+          aasm_state: 'pending',
+          due_on: nil,
+          verification_outstanding: false,
+          is_satisfied: true
+        )
+      end
+
       context 'non_esi_mec' do
         it 'should return payload format as json when it is set' do
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:non_esi_h31).and_return(true)
@@ -269,6 +280,20 @@ RSpec.describe ::Eligibilities::Evidence, type: :model, dbclean: :after_each do
           allow(EnrollRegistry).to receive(:feature_enabled?).with(:esi_mec).and_return(true)
           allow(EnrollRegistry[:esi_mec].setting(:payload_format)).to receive(:item).and_return('xml')
           expect(esi_evidence.payload_format).to eq({:esi_mec_payload_format => 'xml'})
+        end
+      end
+
+      context 'ifsv' do
+        it 'should return payload format as json when it is set' do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:ifsv).and_return(true)
+          allow(EnrollRegistry[:ifsv].setting(:payload_format)).to receive(:item).and_return('json')
+          expect(income_evidence.payload_format).to eq({:ifsv_payload_format => 'json'})
+        end
+
+        it 'should return payload format as xml when it is set' do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:ifsv).and_return(true)
+          allow(EnrollRegistry[:ifsv].setting(:payload_format)).to receive(:item).and_return('xml')
+          expect(income_evidence.payload_format).to eq({:ifsv_payload_format => 'xml'})
         end
       end
     end

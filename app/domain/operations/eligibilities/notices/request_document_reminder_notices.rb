@@ -48,7 +48,7 @@ module Operations
             notices.reduce({}) do |notices_output, document_reminder_key|
               offset_prior_due_date = offset_prior_to_due_date(document_reminder_key)
               families =
-                Family.outstanding_verifications_expiring_on(
+                Family.outstanding_verifications_subjects_enrolled.outstanding_verifications_expiring_on(
                   values[:date_of_record] + offset_prior_due_date
                 )
 
@@ -63,7 +63,7 @@ module Operations
                       results[:failures].push({ family_hbx_id: family.hbx_assigned_id, error: result.failure })
                     end
                   rescue StandardError => e
-                    results[:failures].push({ family_hbx_id: family.hbx_assigned_id, error: "Failed due to unknow exception - #{e.inspect}" })
+                    results[:failures].push({ family_hbx_id: family.hbx_assigned_id, error: "Failed due to unknown exception - #{e.inspect}" })
                   end
 
                   results
