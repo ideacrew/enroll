@@ -38,10 +38,10 @@
     box-shadow: 0 0 0 0.2rem var(--secondary-green, var(--error-tint));
   }
 
-  &:focus {
+  &:focus, &:hover {
     background-color: var(--primary-green, var(--error-color));
-    box-shadow: 0 0 0 0.2rem var(--secondary-green, var(--error-tint));
-    border-color: var(--primary-green, var(--error-color));
+    box-shadow: 0 0 0 0.1rem var(--secondary-green, var(--error-tint));
+    border-color: var(--secondary-green, var(--error-color));
   }
 
   &:disabled {
