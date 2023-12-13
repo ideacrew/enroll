@@ -17,6 +17,8 @@ Feature: A dedicated page that gives the user prior notice that that application
     Given that the user is on the Application Checklist page
     When the user clicks the PREVIOUS link
     Then the user will navigate to the assistance year selection page
+    And contrast_level_aa feature is enabled
+    Then the page should be axe clean according to: wcag2aa; checking only: color-contrast
 
   Scenario: User clicks previous or the back browser button with year selection disabled.
     Given the iap year selection feature is disabled
