@@ -136,7 +136,7 @@ h1,h2,h3,h4,h5,h6 {
     text-decoration:none;
     cursor:pointer;
     transition: all 0.3s ease 0s;
-    color: var(--error-color, #e72b2d);
+    color: var(--primary-red, var(--error-color, #e72b2d));
   }
 
   a:visited {
