@@ -920,3 +920,9 @@ registry:
       - key: :oeg_notice_income_verification_only
         item: :oeg_notice_income_verification_only
         is_enabled: <%= ENV['OEG_NOTICE_INCOME_VERIFICATION_ONLY_IS_ENABLED'] || false %>
+      - key: :async_expire_and_begin_coverages
+        item: :async_expire_and_begin_coverages
+        is_enabled: <%= ENV['ASYNC_EXPIRE_AND_BEGIN_COVERAGES_IS_ENABLED'] || false %>
+      - key: :prevent_concurrent_sessions
+        item: :prevent_concurrent_sessions
+        is_enabled: <%= ENV['PREVENT_CONCURRENT_SESSIONS_IS_ENABLED'] || false %>
