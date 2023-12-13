@@ -56,7 +56,7 @@ jobs:
     needs: [prep]
     strategy:
       matrix:
-        client: ['dc', 'me']
+        client: ['ic']
     runs-on: ubuntu-latest
     services:
       rabbitmq:
@@ -223,7 +223,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        client: ['dc', 'me']
+        client: ['ic']
         registry: ['public.ecr.aws', 'ghcr.io']
     steps:
       - run: |
