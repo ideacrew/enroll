@@ -1,0 +1,383 @@
+---
+registry:
+  - namespace:
+    - :enroll_app
+    - :aca_individual_market
+    - :financial_assistance
+    features:
+      - key: :aceds_curam
+        item: :aceds_curam
+        is_enabled: false
+      - key: :ivl_application_checklist
+        is_enabled: false
+        item: :ivl_application_checklist
+        settings:
+          - key: :file_location
+            item: 'db/documents/ivl_checklist.pdf'
+      - key: :iap_year_selection
+        is_enabled: <%= ENV['IAP_YEAR_SELECTION_IS_ENABLED'] || false %>
+      - key: :iap_year_selection_form
+        is_enabled: <%= ENV['IAP_YEAR_SELECTION_FORM_IS_ENABLED'] || false %>
+        settings:
+          - key: :iap_year_sep_link
+            item: "https://www.dchealthlink.com/individuals/life-changes"
+      - key: :iap_assistance_year_display
+        is_enabled: <%= ENV['IAP_ASSISTANCE_YEAR_DISPLAY_IS_ENABLED'] || false %>
+      - key: :enrollment_dates
+        item: :enrollment_dates
+        is_enabled: <%= ENV['ENROLLMENT_DATES_IS_ENABLED'] || true %>
+        settings:
+          - key: :application_new_year_effective_date_day_of_month
+            item: <%= ENV['APPLICATION_NEW_YEAR_EFFECTIVE_DATE_DAY_OF_MONTH'] || 1 %>
+          - key: :application_new_year_effective_date_month_of_year
+            item: <%= ENV['APPLICATION_NEW_YEAR_EFFECTIVE_DATE_MONTH_OF_YEAR'] || 11 %>
+          - key: :enrollment_due_day_of_month
+            is_enabled: true
+            item: 15
+          - key: :earliest_effective_date
+            item: FinancialAssistance::Operations::EnrollmentDates::EarliestEffectiveDate
+            is_enabled: true
+          - key: :application_year
+            item: FinancialAssistance::Operations::EnrollmentDates::ApplicationYear
+            is_enabled: true
+      - key: :faa_fifteenth_of_the_month_rule_overridden
+        item: :faa_fifteenth_of_the_month_rule_overridden
+        is_enabled: false
+      - key: :benchmark_plans
+        item: :benchmark_plans
+        is_enabled: true
+        settings:
+          - key: :benchmark_plan_2020
+            item: true
+            settings:
+              - key: :name
+                item: 'Plan Name'
+              - key: :hios_id
+                item: 'HIOS-ID'
+              - key: :is_dental_only
+                item: false
+              - key: :metal_level
+                item: :silver
+              - key: :coverage_kind
+                item: :health
+              - key: :ehb
+                item: 0.80
+              - key: :carrier_name
+                item: "Carrier Name"
+      - key: :unemployment_income
+        item: :unemployment_income
+        is_enabled: true
+      - key: :ssi_income_types
+        item: :ssi_income_types
+        is_enabled: <%= ENV['SSI_INCOME_TYPES_IS_ENABLED'] || false %>
+      - key: :transfer_history_page
+        item: :transfer_history_page
+        is_enabled: <%= ENV['TRANSFER_HISTORY_PAGE_IS_ENABLED'] || false %>
+      - key: :divorce_agreement_year
+        item: :divorce_agreement_year
+        is_enabled: <%= ENV['DIVORCE_AGREEMENT_YEAR_TOOLTIP_IS_ENABLED'] || false %>
+      - key: :medicaid_tax_credits_link
+        item: :medicaid_tax_credits_link
+        is_enabled: true
+      - key: :application_submission_error_status
+        item: :application_submission_error_status
+        is_enabled: <%= ENV['APPLICATION_SUBMISSION_ERROR_STATUS_IS_ENABLED'] || false %>
+      - key: :filtered_application_list
+        item: :filtered_application_list
+        is_enabled: <%= ENV['FILTERED_APPLICATION_LIST_IS_ENABLED'] || false %>
+      - key: :featured_tribes_selection
+        item: :featured_tribes_selection
+        is_enabled: <%= ENV['FEATURED_TRIBES_IS_ENABLED'] || false %>
+        settings:
+        - key: :featured_tribes
+          item: []
+      - key: :tribes_information_raw_review
+        item: :tribes_information_raw_review
+        is_enabled: <%= ENV['TRIBES_INFORMATION_RAW_REVIEW_IS_ENABLED'] || false %>
+      - key: :american_indian_alaskan_native_income
+        item: :american_indian_alaskan_native_income
+        is_enabled: false
+      - key: :indian_health_service_question
+        is_enabled: false
+      - key: :mainecare_healthcare_questions
+        is_enabled: true
+      - key: :immigration_status_question_required
+        is_enabled: true
+      - key: :primary_caregiver_other_question
+        item: :primary_caregiver_other_question
+        is_enabled: false
+      - key: :primary_caregiver_relationship_other_question
+        item: :primary_caregiver_relationship_other_question
+        is_enabled: false
+      - key: :mec_check
+        is_enabled: <%= ENV['MEC_CHECK_IS_ENABLED'] || false %>
+      - key: :shop_coverage_check
+        is_enabled: <%= ENV['SHOP_COVERAGE_CHECK_IS_ENABLED'] || false %>
+      - key: :coverage_check_banners
+        is_enabled: <%= ENV['COVERAGE_CHECK_BANNERS_IS_ENABLED'] || true %>
+      - key: :include_faa_outstanding_verifications
+        is_enabled: true
+      - key: :skip_aptc_families_from_document_reminder_notices
+        is_enabled: true
+      - key: :non_applicant_citizen_status
+        is_enabled: false
+      - key: :out_of_state_primary
+        is_enabled: <%= ENV['OUT_OF_STATE_PRIMARY_IS_ENABLED'] || true %>
+      - key: :temporary_configuration_enable_multi_tax_household_feature
+        is_enabled: <%= ENV['TEMPORARY_CONFIGURATION_OF_MULTI_TAX_HOUSEHOLD_FEATURE_IS_ENABLED'] || false %>
+      - key: :draft_application_after_ridp
+        item: :draft_application_after_ridp
+        is_enabled: <%= ENV['DRAFT_APPLICATION_AFTER_RIDP_IS_ENABLED'] || false %>
+      - key: :minimum_value_standard_question
+        item: :minimum_value_standard_question
+        is_enabled: <%= ENV['ESI_MVS_QUESTION_IS_ENABLED'] || false %>
+      - key: :oe_application_warning_display
+        item: :oe_application_warning_display
+        is_enabled: <%= ENV['OE_APPLICATION_WARNING_DISPLAY_IS_ENABLED'] || false %>
+      - key: :short_enrolled_esi_forms
+        item: :short_enrolled_esi_forms
+        is_enabled: <%= ENV['SHORT_ENROLLED_ESI_IS_ENABLED'] || false %>
+      - key: :totally_ineligible_notice
+        item: :totally_ineligible_notice
+        is_enabled: <%= ENV['TOTALLY_INELIGIBLE_NOTICE_IS_ENABLED'] || false %>
+  - namespace:
+    - :request_determination
+    features:
+    - key: :haven_determination
+      is_enabled: false
+    - key: :medicaid_gateway_determination
+      is_enabled: true
+    - key: :esi_mec_determination
+      is_enabled: true
+    - key: :non_esi_mec_determination
+      is_enabled: true
+    - key: :ifsv_determination
+      is_enabled: true
+  - namespace:
+    - :account_transfer
+    features:
+    - key: :real_time_transfer
+      is_enabled: <%= ENV['REAL_TIME_TRANSFER_IS_ENABLED'] || false %>
+    - key: :batch_transfer
+      is_enabled: <%= ENV['BATCH_TRANSFER_IS_ENABLED'] || false %>
+    - key: :transfer_service
+      is_enabled: <%= ENV['TRANSFER_SERVICE_IS_ENABLED'] || false %>
+      item: "curam"
+    - key: :non_magi_transfer
+      is_enabled: <%= ENV['NON_MAGI_TRANSFER_IS_ENABLED'] || false %>
+    - key: :block_renewal_application_transfers
+      is_enabled: <%= ENV['ATP_ON_RENEWALS_IS_ENABLED'] || true %>
+    - key: :load_county_on_inbound_transfer
+      is_enabled: <%= ENV['LOAD_COUNTY_ON_INBOUND_TRANSFER_IS_ENABLED'] || false %>
+    - key: :automatic_submission
+      is_enabled: <%= ENV['AUTOMATIC_SUBMISSION_IS_ENABLED'] || false %>
+  - namespace:
+    - :documents
+    features:
+      - key: :consumer_validations
+        is_enabled: false
+      - key: :non_magi_referral_display
+        is_enabled: false
+  - namespace:
+    - :questions
+    features:
+    - key: :has_enrolled_health_coverage
+      is_enabled: true
+      settings:
+        - key: :currently_enrolled
+          item: true
+        - key: :currently_enrolled_with_hra
+          item: false
+    - key: :has_eligible_health_coverage
+      is_enabled: true
+      settings:
+        - key: :currently_eligible
+          item: true
+        - key: :currently_eligible_with_hra
+          item: false
+    - key: :has_medicare_cubcare_eligible
+      is_enabled: false
+    - key: :medicaid_chip_driver_questions
+      is_enabled: false
+      settings:
+        - key: :medicaid_chip
+          item: "Medicaid"
+    - key: :net_annual_income_display
+      is_enabled: false
+    - key: :has_dependent_with_coverage
+      is_enabled: false
+    - key: :private_individual_and_family_coverage
+      is_enabled: true
+    - key: :acf_refugee_medical_assistance
+      is_enabled: true
+    - key: :americorps_health_benefits
+      is_enabled: true
+    - key: :child_health_insurance_plan
+      is_enabled: true
+    - key: :medicaid
+      is_enabled: true
+    - key: :medicare
+      is_enabled: true
+    - key: :medicare_advantage
+      is_enabled: true
+    - key: :medicare_part_b
+      is_enabled: true
+    - key: :state_supplementary_payment
+      is_enabled: true
+    - key: :tricare
+      is_enabled: true
+    - key: :veterans_benefits
+      is_enabled: true
+    - key: :naf_health_benefit_program
+      is_enabled: true
+    - key: :health_care_for_peace_corp_volunteers
+      is_enabled: true
+    - key: :department_of_defense_non_appropriated_health_benefits
+      is_enabled: true
+    - key: :cobra_benefit_fa
+      is_enabled: true
+    - key: :employer_sponsored_insurance
+      is_enabled: true
+    - key: :self_funded_student_health_coverage
+      is_enabled: true
+    - key: :foreign_government_health_coverage
+      is_enabled: true
+    - key: :private_health_insurance_plan
+      is_enabled: true
+    - key: :coverage_obtained_through_another_exchange
+      is_enabled: true
+    - key: :coverage_under_the_state_health_benefits_risk_pool
+      is_enabled: true
+    - key: :veterans_administration_health_benefits
+      is_enabled: true
+    - key: :peace_corps_health_benefits
+      is_enabled: true
+    - key: :health_reimbursement_arrangement # new
+      is_enabled: false
+    - key: :retiree_health_benefits # new
+      is_enabled: false
+    - key: :other_full_benefit_coverage # new
+      is_enabled: false
+    - key: :other_limited_benefit_coverage # new
+      is_enabled: false
+    - key: :prize_and_awards
+      is_enabled: true
+      settings:
+        - key: :gamble_prize
+          item: false
+    - key: :full_medicaid_determination_step
+      is_enabled: true
+      settings:
+        - key: :annual_eligibility_redetermination
+          item: <%= ENV['FULL_MEDICAID_DETERMINATION_FOR_ANNUAL_ELIGIBILITY_REDETERMINATION_IS_ENABLED'] || false %>
+    - key: :native_american_csr
+      is_enabled: true
+    - key: :filing_as_head_of_household
+      is_enabled: false
+    - key: :no_coverage_tribe_details
+      is_enabled: false
+    - key: :display_medicaid_question
+      item: :display_medicaid_question
+      is_enabled: false
+    - key: :optional_document_fields
+      item: :optional_document_fields
+      is_enabled: false
+    - key: :disable_employer_address_fields
+      item: :disable_employer_address_fields
+      is_enabled: false
+    - key: :fa_send_to_external_verification
+      is_enabled: false
+    - key: :medicaid_or_chip_program_short_name
+      is_enabled: true
+      settings:
+        - key: :name
+          item: 'Medicaid'
+    - key: :medicaid_or_chip_agency_long_name
+      is_enabled: true
+      settings:
+        - key: :name
+          item: 'DHS'
+    - key: :student_follow_up_questions
+      is_enabled: true
+    - key: :pregnancy_due_on_required
+      is_enabled: true
+    - key: :post_partum_period_one_year
+      is_enabled:  <%= ENV['POST_PARTUM_PERIOD_ONE_YEAR_IS_ENABLED'] || false %>
+    - key: :voter_registration_through_ext_url
+      is_enabled: false
+    - key: :voter_registration_through_hbx
+      is_enabled: true
+    - key: :question_required
+      is_enabled: true
+    - key: :is_enrolled_on_medicaid
+      is_enabled: true
+    - key: :no_ssn_reason_dropdown
+      is_enabled: <%= ENV['NO_SSN_DROPDOWN_IS_ENABLED'] || false %>
+  - namespace:
+    - :renewals
+    features:
+    - key: :create_renewals_on_date_change
+      is_enabled: <%= ENV['CREATE_RENEWALS_ON_DATE_CHANGE_IS_ENABLED'] || false %>
+      settings:
+        - key: :renewals_creation_month
+          item: <%= ENV['RENEWALS_CREATION_MONTH'] || 10 %>
+        - key: :renewals_creation_day
+          item: <%= ENV['RENEWALS_CREATION_DAY'] || 16 %>
+    - key: :skip_eligibility_redetermination
+      is_enabled: <%= ENV['SKIP_ELIGIBILITY_REDETERMINATION_IS_ENABLED'] || false %>
+    - key: :auto_update_income_evidence_due_on
+      is_enabled: <%= ENV['AUTO_UPDATE_INCOME_EVIDENCE_DUE_ON_IS_ENABLED'] || false %>
+      settings:
+        - key: :days
+          item:  <%= ENV['AUTO_UPDATE_INCOME_EVIDENCE_DUE_ON_DAYS'] || 65 %>
+    - key: :skip_employer_address_validation
+      is_enabled: :false
+    - key: :skip_employer_phone_validation
+      is_enabled: :false
+    - key: :skip_employer_id_validation
+      is_enabled: :false
+    - key: :negative_amount_income_types
+      is_enabled: true
+      settings:
+        - key: :income_types
+          item: ["net_self_employment", "capital_gains", "farming_and_fishing"]
+    - key: :skip_zero_income_amount_validation
+      is_enabled: :false
+    - key: :income_and_deduction_date_warning
+      item: :income_and_deduction_date_warning
+      is_enabled: <%= ENV['INCOME_AND_DEDUCTION_DATE_WARNING_IS_ENABLED'] || false %>
+  - namespace:
+    - :premium_credit_results
+    features:
+    - key: :display_eligibility_results_per_tax_household
+      is_enabled: <%= ENV['DISPLAY_ELIGIBILITY_RESULTS_PER_THH_IS_ENABLED'] || false %>
+  - namespace:
+    - :applications_index_page
+    features:
+    - key: :block_prospective_year_application_copy_before_oe
+      is_enabled: <%= ENV['BLOCK_PROSPECTIVE_YEAR_APPLICATION_COPY_BEFORE_OE_IS_ENABLED'] || false %>
+  - namespace:
+    - :income
+    features:
+      - key: :dependent_income_filing_thresholds
+        item: :dependent_income_filing_thresholds
+        is_enabled: <%= ENV['DEPENDENT_INCOME_FILING_THRESHOLDS_IS_ENABLED'] || false %>
+        settings:
+        - key: :earned_income_filing_threshold_2021
+          item: 12_200
+        - key: :unearned_income_filing_threshold_2021
+          item: 1_100
+        - key: :earned_income_filing_threshold_2022
+          item: 12_400
+        - key: :unearned_income_filing_threshold_2022
+          item: 1_100
+        - key: :earned_income_filing_threshold_2023
+          item: 12_550
+        - key: :unearned_income_filing_threshold_2023
+          item: 1_100
+        - key: :earned_income_filing_threshold_2024
+          item: 12_950
+        - key: :unearned_income_filing_threshold_2024
+          item: 1_150
+# TODO eligibility engine connectivity(HAVEN) settings
+# TODO mec service connectivity settings

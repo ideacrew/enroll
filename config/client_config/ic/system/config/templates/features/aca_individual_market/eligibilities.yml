@@ -1,0 +1,212 @@
+---
+registry:
+  - namespace:
+      - :enroll_app
+      - :aca_individual_market
+      - :eligibilities
+    features:
+      - key: :'gid://enroll_app/Family'
+        is_enabled: true
+        settings:
+          - key: :eligibility_items
+            item:
+              - :aptc_csr_credit
+              - :aca_individual_market_eligibility
+              - :health_product_enrollment_status
+              - :dental_product_enrollment_status
+      - key: :verification_document_due_in_days
+        item: 96
+        is_enabled: true
+      - key: :bulk_call_verification_due_in_days
+        item: <%= ENV['BULK_CALL_VERIFICATION_DUE_IN_DAYS'] || 35 %>
+        is_enabled: true
+      - key: :ivl_eligibility_notices
+        is_enabled: true
+        settings:
+          - key: :document_reminders
+            item:
+              - :document_reminder_0
+              - :document_reminder_1
+              - :document_reminder_2
+              - :document_reminder_3
+              - :document_reminder_4
+  - namespace:
+      - :enroll_app
+      - :aca_individual_market
+      - :eligibilities
+      - :eligibility_items
+    features:
+      - key: :aptc_csr_credit
+        is_enabled: true
+        settings:
+          - key: :evidence_items
+            item:
+              - :income_evidence
+              - :esi_evidence
+              - :non_esi_evidence
+              - :local_mec_evidence
+      - key: :aca_individual_market_eligibility
+        is_enabled: true
+        settings:
+          - key: :evidence_items
+            item:
+              - :immigration_status
+              - :citizenship
+              - :american_indian_status
+              - :social_security_number
+              - :residency
+      - key: :health_product_enrollment_status
+        is_enabled: true
+        settings:
+          - key: :evidence_items
+            item:
+              - :health_product_enrollment_evidence
+      - key: :dental_product_enrollment_status
+        is_enabled: true
+        settings:
+          - key: :evidence_items
+            item:
+              - :dental_product_enrollment_evidence
+  - namespace:
+      - :enroll_app
+      - :aca_individual_market
+      - :eligibilities
+      - :eligibility_items
+      - :evidence_items
+    features:
+      - key: :income_evidence
+        is_enabled: true
+        settings:
+          - key: :subject_ref
+            item: 'gid://enroll_app/Family::FamilyMember'
+          - key: :evidence_ref
+            item: 'gid://enroll_app/FinancialAssitance::Application'
+      - key: :esi_evidence
+        is_enabled: true
+        settings:
+          - key: :subject_ref
+            item: 'gid://enroll_app/Family::FamilyMember'
+          - key: :evidence_ref
+            item: 'gid://enroll_app/FinancialAssitance::Application'
+      - key: :non_esi_evidence
+        is_enabled: true
+        settings:
+          - key: :subject_ref
+            item: 'gid://enroll_app/Family::FamilyMember'
+          - key: :evidence_ref
+            item: 'gid://enroll_app/FinancialAssitance::Application'
+      - key: :local_mec_evidence
+        is_enabled: <%= ENV['LOCAL_MEC_EVIDENCE_IS_ENABLED'] || false %>
+        settings:
+          - key: :subject_ref
+            item: 'gid://enroll_app/Family::FamilyMember'
+          - key: :evidence_ref
+            item: 'gid://enroll_app/FinancialAssitance::Application'
+      - key: :immigration_status
+        is_enabled: true
+        settings:
+          - key: :subject_ref
+            item: 'gid://enroll_app/Family::FamilyMember'
+          - key: :evidence_ref
+            item: 'gid://enroll_app/Person'
+      - key: :citizenship
+        is_enabled: true
+        settings:
+          - key: :subject_ref
+            item: 'gid://enroll_app/Family::FamilyMember'
+          - key: :evidence_ref
+            item: 'gid://enroll_app/Person'
+      - key: :american_indian_status
+        is_enabled: true
+        settings:
+          - key: :subject_ref
+            item: 'gid://enroll_app/Family::FamilyMember'
+          - key: :evidence_ref
+            item: 'gid://enroll_app/Person'
+      - key: :social_security_number
+        is_enabled: true
+        settings:
+          - key: :subject_ref
+            item: 'gid://enroll_app/Family::FamilyMember'
+          - key: :evidence_ref
+            item: 'gid://enroll_app/Person'
+      - key: :residency
+        is_enabled: true
+        settings:
+          - key: :subject_ref
+            item: 'gid://enroll_app/Family::FamilyMember'
+          - key: :evidence_ref
+            item: 'gid://enroll_app/Person'
+      - key: :health_product_enrollment_evidence
+        is_enabled: true
+        settings:
+          - key: :subject_ref
+            item: 'gid://enroll_app/Family::FamilyMember'
+          - key: :evidence_ref
+            item: 'gid://enroll_app/HbxEnrollment'
+      - key: :dental_product_enrollment_evidence
+        is_enabled: true
+        settings:
+          - key: :subject_ref
+            item: 'gid://enroll_app/Family::FamilyMember'
+          - key: :evidence_ref
+            item: 'gid://enroll_app/HbxEnrollment'
+  - namespace:
+      - :enroll_app
+      - :aca_individual_market
+      - :eligibilities
+      - :notices
+    features:
+      - key: :document_reminder_0
+        is_enabled: true
+        settings:
+          - key: :offset_prior_to_due_date
+            item: 95
+          - key: :units
+            item: :days
+          - key: :event_name
+            item: :verifications_reminder
+      - key: :document_reminder_1
+        is_enabled: true
+        settings:
+          - key: :offset_prior_to_due_date
+            item: 85
+          - key: :units
+            item: :days
+          - key: :event_name
+            item: :first_verifications_reminder
+      - key: :document_reminder_2
+        is_enabled: true
+        settings:
+          - key: :offset_prior_to_due_date
+            item: <%= ENV['DR2_DUE_DATE_OFFSET'] || 70 %>
+          - key: :units
+            item: :days
+          - key: :event_name
+            item: :second_verifications_reminder
+      - key: :document_reminder_3
+        is_enabled: true
+        settings:
+          - key: :offset_prior_to_due_date
+            item: 45
+          - key: :units
+            item: :days
+          - key: :event_name
+            item: :third_verifications_reminder
+      - key: :document_reminder_4
+        is_enabled: true
+        settings:
+          - key: :offset_prior_to_due_date
+            item: 30
+          - key: :units
+            item: :days
+          - key: :event_name
+            item: :fourth_verifications_reminder
+  - namespace:
+      - :enroll_app
+      - :aca_individual_market
+      - :eligibilities
+      - :responses
+    features:
+      - key: :set_due_date_upon_response_from_hub
+        is_enabled: true

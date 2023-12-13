@@ -1,0 +1,15 @@
+---
+registry:
+  - namespace:
+    - :enroll_app
+    - :individual_market_products
+    features:
+      - key: :atleast_one_silver_plan_donot_cover_pediatric_dental_cost
+        is_enabled: false
+        settings:
+          - key: :"2022"
+            item: <%= ENV['ATLEAST_ONE_SILVER_PLAN_DONOT_COVER_PEDIATRIC_DENTAL_COST_2022_IS_ENABLED'] || false %>
+          - key: :"2023"
+            item: <%= ENV['ATLEAST_ONE_SILVER_PLAN_DONOT_COVER_PEDIATRIC_DENTAL_COST_2023_IS_ENABLED'] || false %>
+          - key: :"2024"
+            item: <%= ENV['ATLEAST_ONE_SILVER_PLAN_DONOT_COVER_PEDIATRIC_DENTAL_COST_2024_IS_ENABLED'] || false %>

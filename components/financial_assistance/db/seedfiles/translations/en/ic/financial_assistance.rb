@@ -5,11 +5,11 @@
 # rubocop:disable Layout/LineLength
 
 FINANCIAL_ASSISTANCE_TRANSLATIONS = {
-  "en.faa.curam_lookup" => "It looks like you've already completed an application for Medicaid and cost savings on DC Health Link.
-     Please call DC Health Link at (855) 532-5465 to make updates to that application.
-      If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on DC Health Link, but won't be able to tell you if you qualify for Medicaid or cost savings.",
-  "en.faa.acdes_lookup" => "It looks like you're already covered by Medicaid. Please call DC Health Link at (855) 532-5465 to make updates to your case.
-     If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on DC Health Link, but won't be able to tell you if you qualify for Medicaid or cost savings.",
+  "en.faa.curam_lookup" => "It looks like you've already completed an application for Medicaid and cost savings on IdeaCrew Demo.
+     Please call IdeaCrew Demo at (111) 222-3333 to make updates to that application.
+      If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on IdeaCrew Demo, but won't be able to tell you if you qualify for Medicaid or cost savings.",
+  "en.faa.acdes_lookup" => "It looks like you're already covered by Medicaid. Please call IdeaCrew Demo at (111) 222-3333 to make updates to your case.
+     If you keep going, we'll check to see if you qualify to enroll in a private health insurance plan on IdeaCrew Demo, but won't be able to tell you if you qualify for Medicaid or cost savings.",
   "en.faa.review_eligibility_header" => "Your Application for Lower Premiums",
   "en.faa.other_ques.title" => "Other Questions for",
   "en.faa.other_ques.answer_request" => "Answer these questions for this person. When you're finished, select CONTINUE.",
@@ -55,7 +55,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.eligible_for_medicaid" => "These people <span>likely qualify</span> for ",
   "en.faa.eligible_for_medicaid2" => "",
   "en.faa.dhs_decision" => "<span>NOTE: The Department of Human Services (DHS) will make a final decision on whether those listed qualify for <span class='run-glossary'>Medicaid</span>.</span>",
-  "en.faa.dhs_contact" => "They will send you a letter, and may ask you to provide documents. If you haven’t heard from DHS within 45 days, you may want to ask for an update by calling DC Health link at ",
+  "en.faa.dhs_contact" => "They will send you a letter, and may ask you to provide documents. If you haven’t heard from DHS within 45 days, you may want to ask for an update by calling IdeaCrew Demo at ",
   "en.faa.primary_caretaker_question_text" => "Is this person the main person taking care of any children age 18 or younger? *",
   "en.faa.primary_caretaker_for_text" => "Which member(s) of the household is this person the caretaker for? (choose all that apply)",
   "en.faa.primary_caretaker_for_text_review_page" => "Which member(s) of the household is this person the caretaker for?",
@@ -69,14 +69,14 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.does_not_qualify" => "Does Not Qualify",
   "en.faa.does_not_qualify_text" => "These people likely don't qualify for Medicaid , and don't qualify for private health insurance through CoverME.gov.",
   "en.faa.likely_does_not_qualify" => "These people <span> likely don't qualify for ",
-  "en.faa.likely_does_not_qualify2" => "</span>, and don't qualify for private health insurance through DC Health Link:",
+  "en.faa.likely_does_not_qualify2" => "</span>, and don't qualify for private health insurance through IdeaCrew Demo:",
   "en.faa.private_health_insurance" => "Private Health Insurance",
   "en.faa.private_health_insurance_text" => "These people qualify to enroll in a private health insurance plan.",
   "en.faa.qualified_to_enroll" => "These people are not eligible for lower monthly premiums. They <span> qualify to enroll </span> in a private health insurance plan.",
   "en.faa.do_not_agree" => "If you do not agree with the determination, you have the right to appeal. <a href= %{appeal_link} target='_blank'>Find out more about the appeal process</a> or <a href= %{find_expert_link}  target='_blank'>get help</a> by contacting us directly.",
   "en.faa.your_application_reference" => "Your application reference number is ",
   "en.faa.next_step_without_aggregate" => "<b>NEXT STEP:</b> Pick a health insurance plan.",
-  "en.faa.next_step_with_aggregate_1" => "<b>NEXT STEP:</b><ul><li><b>If you’re already enrolled in DC Health Link’s Individual & Family plan</b>, we’ve automatically changed your premium. You don’t have to do anything else.</li>",
+  "en.faa.next_step_with_aggregate_1" => "<b>NEXT STEP:</b><ul><li><b>If you’re already enrolled in IdeaCrew Demo’s Individual & Family plan</b>, we’ve automatically changed your premium. You don’t have to do anything else.</li>",
   "en.faa.next_step_with_aggregate_2" => "<br><li><b>If you’re not enrolled or need to make changes to your plan</b>, select CONTINUE to pick a health insurance plan or change who is covered by your plan.</li></ul>",
   "en.faa.next_step_medicaid_eligible" => "<b>Medicaid coverage is free. If you would like to enroll and pay full price for private health insurance instead, select CONTINUE to:</b><ul><li>pick a plan, or</li><li>add or remove someone from your plan.</li>",
   "en.faa.next_step_medicaid_eligible_at_least_one_other_eligible" => "<b>Select CONTINUE to:</b><ul><li>add or remove someone from your plan, or</li><li> pick a plan because you do not have coverage.</li>",
@@ -158,15 +158,15 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   # Year Selection page
   "en.faa.year_selection_header" => "You’re About to Sign Up for Health Insurance that Starts January 1 or Later",
   "en.faa.year_selection_subheader" => "Select CONTINUE to start a new application for lower premiums or Medicaid.",
-  "en.faa.assitance_year_option1" => "%{year} Open Enrollment"
+  "en.faa.assitance_year_option1" => "%{year} Open Enrollment",
   "en.faa.year_selection_oe_year" => " Open Enrollment",
   "en.faa.see_if_you_qualify_1" => "See if you qualify for lower monthly premiums for ",
   "en.faa.see_if_you_qualify_2" => " %{short_name} health insurance or free Medicaid coverage.",
   "en.faa.year_selection_oe_range_from" => "Open enrollment is from ",
   "en.faa.year_selection_oe_range_through" => " through ",
-  "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a target='_blank' href='https://www.dchealthlink.com/contact-us-for-2022-coverage?utm_source=2022EnrollmentCoverage&utm_medium=ea_link&utm_campaign=WantsCoverage2022'>submit a webform</a> or call %{short_name} at (855) 532-5465 / TTY: 711. <a target='_blank' href='https://www.dchealthlink.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
+  "en.faa.year_selection_learn_more" => "If you need health insurance, lower premiums, or Medicaid now, you can <a target='_blank' href='https://www.ideacrew.com/contact-us-for-2022-coverage?utm_source=2022EnrollmentCoverage&utm_medium=ea_link&utm_campaign=WantsCoverage2022'>submit a webform</a> or call %{short_name} at (111) 222-3333 / TTY: 711. <a target='_blank' href='https://www.ideacrew.com/individuals/life-changes'>Learn more about Life Changes</a>.", # TODO: Update URL and phones
   'en.faa.publish_error.second_error_message' => 'There is an error while submitting the application for assistance determination.',
-  "en.faa.eligibility_go_to_my_account_message" => "<b>If you’re already enrolled in DC Health Link’s Individual & Family plan</b>, you’re finished! To see your plan information, select <b>GO TO MY ACCOUNT</b>.",
+  "en.faa.eligibility_go_to_my_account_message" => "<b>If you’re already enrolled in IdeaCrew Demo’s Individual & Family plan</b>, you’re finished! To see your plan information, select <b>GO TO MY ACCOUNT</b>.",
   "en.faa.application_for_coverage" => "Application for Coverage",
   "en.faa.update_reminder" => "If you make changes to your %{year} coverage that should apply to your %{year2} coverage too, you will need to come back and update your %{year2} application. You can do this by copying your latest %{year} application and submitting it for %{year2}.",
   # Mec check

@@ -1,0 +1,150 @@
+---
+registry:
+  - namespace:
+    - :enroll_app
+    - :aca_individual_market
+    features:
+      - key: :residency_self_attestation
+        item: :residency_attestation
+        is_enabled: true
+        settings:
+          - key: :effective_period_start_day
+            item: <%= ENV['RESIDENCY_SELF_ATTESTATION_EFFECTIVE_PERIOD_START_DAY'] || "6" %>
+          - key: :effective_period_start_month
+            item: <%= ENV['RESIDENCY_SELF_ATTESTATION_EFFECTIVE_PERIOD_START_MONTH'] || "6" %>
+          - key: :effective_period_start_year
+            item: <%= ENV['RESIDENCY_SELF_ATTESTATION_EFFECTIVE_PERIOD_START_YEAR'] || "2020" %>
+          - key: :effective_period_end_day
+            item: <%= ENV['RESIDENCY_SELF_ATTESTATION_EFFECTIVE_PERIOD_END_DAY'] || "11" %>
+          - key: :effective_period_end_month
+            item: <%= ENV['RESIDENCY_SELF_ATTESTATION_EFFECTIVE_PERIOD_END_MONTH'] || "1" %>
+          - key: :effective_period_end_year
+            item: <%= ENV['RESIDENCY_SELF_ATTESTATION_EFFECTIVE_PERIOD_END_YEAR'] || "2023" %>
+      - key: :consumer_role_hub_call
+        item: :consumer_role_hub_call
+        is_enabled: true
+        settings:
+          - key: :identifying_information_attributes
+            item: ['first_name', 'last_name', 'encrypted_ssn', 'dob']
+          - key: :indian_tribe_attributes
+            item: ['tribal_state', 'tribal_name', 'tribal_id']
+          - key: :citizen_statuses
+            item: ['us_citizen', 'naturalized_citizen', 'indian_tribe_member', 'alien_lawfully_present']
+      - key: :special_enrollment_period
+        is_enabled: true
+        settings:
+          - key: :individual_market_monthly_enrollment_due_on
+            item: 20
+          - key: :fifteenth_of_the_month
+            item: 15
+      - key: :fifteenth_of_the_month_rule_overridden
+        is_enabled: false
+      - key: :aca_individual_assistance_benefits
+        is_enabled: true
+        settings:
+          - key: :default_applied_aptc_percentage
+            item: 0.85
+          - key: :minimum_applied_aptc_percentage_for_osse
+            item: 0.85
+      - key: :cancel_renewals_for_term
+        item: Operations::Individual::CancelRenewalEnrollment.new
+        is_enabled: <%= ENV['CANCEL_RENEWALS_FOR_TERM_IS_ENABLED'] || false %>
+      - key: :calculate_monthly_aggregate
+        item: Operations::Individual::CalculateMonthlyAggregate.new
+        is_enabled: <%= ENV['CALCULATE_MONTHLY_AGGREGATE_IS_ENABLED'] || true %>
+        settings:
+          - key: :termination_date
+            item: :end_of_month
+          - key: :eligible_months
+            item: true
+      - key: :apply_aggregate_to_enrollment
+        item: Operations::Individual::ApplyAggregateToEnrollment.new
+        is_enabled: true
+      - key: :check_enrollment_member_eligibility
+        is_enabled: <%= ENV['CHECK_ENROLLMENT_MEMBER_ELIGIBILITY_IS_ENABLED'] || false %>
+      - key: :vlp_documents
+        is_enabled: true
+        settings:
+          - key: :vlp_document_kind_options
+            item: [ "I-327 (Reentry Permit)", "I-551 (Permanent Resident Card)", "I-571 (Refugee Travel Document)", "I-766 (Employment Authorization Card)",
+                    "Certificate of Citizenship","Naturalization Certificate","Machine Readable Immigrant Visa (with Temporary I-551 Language)", "Temporary I-551 Stamp (on passport or I-94)", "I-94 (Arrival/Departure Record)",
+                    "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport", "Unexpired Foreign Passport",
+                    "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)", "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)",
+                    "Other (With Alien Number)", "Other (With I-94 Number)" ]
+      - key: :indian_alaskan_tribe_details
+        is_enabled: false
+      - key: :check_for_crm_updates
+        is_enabled: <%= ENV['CHECK_FOR_CRM_UPDATES_IS_ENABLED'] || false %>
+      - key: :prior_plan_year_ivl_sep
+        is_enabled: <%= ENV['PRIOR_PLAN_YEAR_SEP_IS_ENABLED'] || false %>
+      - key: :admin_ivl_end_date_changes
+        is_enabled: <%= ENV['ADMIN_IVL_END_DATE_CHANGES_IS_ENABLED'] || false %>
+      - key: :display_external_id_in_family_datatable
+        is_enabled: :false
+      - key: :contact_method_via_dropdown
+        is_enabled: :true
+      - key: :state_based_language_preferences
+        item: ["English", "Amharic", "Spanish"]
+        is_enabled: true
+      - key: :gate_enrollments_to_edidb_for_year
+        is_enabled: false
+        settings:
+          - key: :year
+            item: 2021
+      - key: :include_external_enrollment_in_display_all_enrollments
+        is_enabled: :false
+      - key: :extended_aptc_individual_agreement_message
+        item: :extended_aptc_individual_agreement_message
+        is_enabled: false
+      - key: :application_type_options
+        item: ["Phone", "Paper", "Curam", "Mobile"]
+        is_enabled: true
+      - key: :curam_application_type
+        item: "Curam"
+        is_enabled: true
+      - key: :verification_reasons
+        item: ["Document in EnrollApp", "Document in DIMS", "SAVE system", "E-Verified in Curam", "Salesforce", "Self-Attestation"]
+        is_enabled: true
+      - key: :total_minimum_responsibility
+        is_enabled: false
+      - key: :display_ivl_termination_reason
+        is_enabled: false
+      - key: :reinstate_nonpayment_ivl_enrollment
+        is_enabled: true
+      - key: :display_you_pay
+        is_enabled: <%= ENV['DISPLAY_YOU_PAY_IS_ENABLED'] || false %>
+      - key: :validate_ssn
+        item: ^(?!666|000|9\d{2})\d{3}[- ]{0,1}(?!00)\d{2}[- ]{0,1}(?!0{4})\d{4}$
+        is_enabled: <%= ENV['VALIDATE_SSN_IS_ENABLED'] || false %>
+  - namespace:
+    - :enroll_app
+    - :aca_individual_market
+    - :benefit_coverage_period
+    features:
+      - key: :default_open_enrollment_begin
+        item: :default_open_enrollment_begin
+        is_enabled: true
+        settings:
+          - key: :month
+            item: 11
+          - key: :day
+            item: 1
+          - key: :year_offset
+            item: -1
+      - key: :default_open_enrollment_end
+        item: :default_open_enrollment_end
+        is_enabled: true
+        settings:
+          - key: :month
+            item: 1
+          - key: :day
+            item: 31
+          - key: :year_offset
+            item: 0
+      - key: :create_bcp_on_date_change
+        is_enabled: <%= ENV['CREATE_BCP_ON_DATE_CHANGE_IS_ENABLED'] || false %>
+        settings:
+          - key: :bcp_creation_month
+            item: <%= ENV['BCP_CREATION_MONTH'] || 7 %>
+          - key: :bcp_creation_day
+            item: <%= ENV['BCP_CREATION_DAY'] || 10 %>

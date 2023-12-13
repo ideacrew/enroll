@@ -1,0 +1,25 @@
+---
+registry:
+  - namespace:
+    - :enroll_app
+    - :aca_shop_market
+    features:
+      - key: :add_external_links
+        is_enabled: false
+        settings:
+          - key: :employee_display
+            item: true
+          - key: :employer_display
+            item: true
+          - key: :plan_shopping_display
+            item: true
+          - key: :benefit_application_display
+            item: true
+          - key: :employer_advertisement_url
+            item: ""
+          - key: :employer_advertisement_text
+            item: ""
+          - key: :employee_advertisement_url
+            item: ""
+          - key: :employee_advertisement_text
+            item: ""

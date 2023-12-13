@@ -14,21 +14,21 @@ registry:
           is_visible: true
         settings:
           - key: :application_name
-            item: "enroll_dc"
+            item: "enroll_ic"
           - key: :copyright_period_start
             item: "2013"
           - key: :policies_url
-            item: "https://dchealthlink.com/"
+            item: "https://ideacrew.com/"
           - key: :faqs_url
-            item: "https://dchealthlink.com/help"
+            item: "https://ideacrew.com/help"
           - key: :help_url
-            item: "https://www.dchealthlink.com/help"
+            item: "https://www.ideacrew.com/help"
           - key: :business_resource_center_url
             item: "https://dchealthxlink.com/smallbusiness/"
           - key: :nondiscrimination_notice_url
-            item: "https://www.dchealthlink.com/nondiscrimination"
+            item: "https://www.ideacrew.com/nondiscrimination"
           - key: :submit_docs_url
-            item: "https://www.dchealthlink.com/submit-docs"
+            item: "https://www.ideacrew.com/submit-docs"
           - key: :site_key
             item: :dc
           - key: :state_abbreviation
@@ -38,49 +38,49 @@ registry:
           - key: :subdomain
             item: "dchbx"
           - key: :domain_name
-            item: "dchealthlink.com"
+            item: "ideacrew.com"
           - key: :site_title
             item: "DC's Online Health Insurance Marketplace"
           - key: :home_url
-            item: "https://www.dchealthlink.com/"
+            item: "https://www.ideacrew.com/"
           - key: :home_business_url
-            item: "https://www.dchealthlink.com/smallbusiness/overview"
+            item: "https://www.ideacrew.com/smallbusiness/overview"
           - key: :help_url
-            item: "https://www.dchealthlink.com/help"
+            item: "https://www.ideacrew.com/help"
           - key: :main_web_address_url
-            item: "https://www.dchealthlink.com/"
+            item: "https://www.ideacrew.com/"
           - key: :invoice_bill_url
-            item: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
+            item: "https://www.ideacrew.com/"
           - key: :payment_pdf_url
             item: "pdf/employers_paying_your_premiums_online.pdf"
           - key: :user_sign_in_url
-            item: "https://www.dchealthlink.com/"
+            item: "https://www.ideacrew.com/"
           - key: :website_name
-            item: "www.DCHealthLink.com"
+            item: "www.ideacrew.com"
           - key: :main_web_address
-            item: "www.DCHealthLink.com"
+            item: "www.ideacrew.com"
           - key: :health_care_website
             item: "www.healthcare.gov"
           - key: :health_care_website_url
             item: "https://www.healthcare.gov"
           - key: :short_name
-            item: "DC Health Link"
+            item: "IdeaCrew Demo"
           - key: :byline
-            item: "Welcome to the District's Health Insurance Marketplace"
+            item: "Welcome to IdeaCrew Demo Health Insurance Marketplace"
           - key: :long_name
-            item: "District of Columbia Health Link"
+            item: "IdeaCrew Enroll App Demo"
           - key: :header_message
-            item: "Welcome to the District's Health Insurance Marketplace"
+            item: "Welcome to IdeaCrew Demo Health Insurance Marketplace"
           - key: :logo_file_name
             item: "logo.png"
           - key: :make_their_premium_payments_online
-            item: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
+            item: "https://www.ideacrew.com/"
           - key: :tab_icon
             item: "favicon.ico"
           - key: :mailer_logo_file_name
             item: "dchealthlink.jpg"
           - key: :employer_application_deadline_link
-            item: "https://dchealthlink.com/smallbusiness/employer-coverage-deadlines"
+            item: "https://ideacrew.com/smallbusiness/employer-coverage-deadlines"
           - key: :s3_prefix
             item: "dchbx"
           - key: :broker_quoting_enabled
@@ -88,7 +88,7 @@ registry:
           - key: :broker_claim_quoting_enabled
             item: true
           - key: :guidance_for_business_owners_url
-            item: "https://dchealthlink.com/sites/default/files/v2/forms/Guidance_for_Business_Owners.pdf"
+            item: "https://ideacrew.com/sites/default/files/v2/forms/Guidance_for_Business_Owners.pdf"
           - key: :use_default_devise_path
             item: true
           - key: :plan_options_title_for_ma
@@ -98,27 +98,27 @@ registry:
           - key: :sign_in_routes
             item: ["/families/home"]
           - key: :shop_find_your_doctor_url
-            item: "https://dc.checkbookhealth.org/dc/"
+            item: "https://ideacrew.com/dc/"
           - key: :document_verification_checklist_url
             item: "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist"
           - key: :terms_and_conditions_url
-            item: "https://www.dchealthlink.com/terms"
+            item: "https://www.ideacrew.com/terms"
           - key: :certification_url
-            item: "https://www.dchealthlink.com/brokers/overview"
+            item: "https://www.ideacrew.com/brokers/overview"
           - key: :registration_path
-            item: "https://www.dchealthlink.com/smallbusiness"
+            item: "https://www.ideacrew.com/smallbusiness"
           - key: :broker_registration_path
-            item: "https://enroll.dchealthlink.com/broker_registration"
+            item: "https://enroll.ideacrew.com/broker_registration"
           - key: :broker_registration_guide
-            item: "https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf"
+            item: "https://ideacrew.com/sites/default/files/v2/forms/new_broker_registration.pdf"
           - key: :home_forms_url
-            item: "https://dchealthlink.com/forms"
+            item: "https://ideacrew.com/forms"
           - key: :forms_name
-            item: "DCHealthLink.com/forms"
+            item: "ideacrew.com/forms"
           - key: :short_url
-            item: "dchealthlink.com"
+            item: "ideacrew.com"
           - key: :forms
-            item: "https://dchealthlink.com/forms#en"
+            item: "https://ideacrew.com/forms#en"
           - key: :website_url
             item: "https://www.healthcare.gov"
           - key: :healthcare_name
@@ -130,13 +130,13 @@ registry:
           - key: :exchange_hbx_id
             item: "DC0"
           - key: :no_reply_email
-            item: "noreply@dchealthlink.com"
+            item: "noreply@ideacrew.com"
           - key: :mail_address
-            item: "info@dchealthlink.com"
+            item: "info@ideacrew.com"
           - key: :producer_email_address
-            item: 'dchl.producer@dc.gov'
+            item: 'dchl.producer@ideacrew.com'
           - key: :privacy_policy
-            item: "https://dchealthlink.com/"
+            item: "https://ideacrew.com/"
           - key: :late_rates_message
             item: "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
           - key: :faa_enabled
@@ -144,7 +144,7 @@ registry:
           - key: :county_fips_code_enabled
             item: false
           - key: :ivl_responsibility_url
-            item: "https://dchealthlink.com/individual-responsibility-requirement"
+            item: "https://ideacrew.com/individual-responsibility-requirement"
           - key: :curam_enabled?
             item: true
           - key: :support_for_ie_browser
@@ -156,9 +156,9 @@ registry:
           - key: :publisher
             item: "dchl"
           - key: :prod_tax_info
-            item: "https://dchealthlink.com/individuals/tax-documents"
+            item: "https://ideacrew.com/individuals/tax-documents"
           - key: :staging_tax_info_url
-            item: "https://staging.dchealthlink.com/individuals/tax-documents"
+            item: "https://staging.ideacrew.com/individuals/tax-documents"
           - key: :statewide_area
             item: "DC-Metro"
           - key: :nationwide_area
@@ -166,33 +166,33 @@ registry:
           - key: :standard_plan_label
             item: "STANDARD PLAN"
           - key: :exchange_name
-            item: "Washington DC Health Benefit Exchange"
+            item: "IdeaCrew Demo Health Benefit Exchange"
           - key: :social_media
             item: ''
           - key: :state_name
-            item: "District of Columbia"
+            item: "Test State"
           - key: :state_long_title
-            item: "the District of Columbia"
+            item: "Test State"
           - key: :state_dmv_link
             item: "https://dmv.dc.gov/page/proof-dc-residency-certifications"
           - key: :health_benefit_exchange_authority_phone_number
-            item: '(855) 532-5465 TTY: 711'
+            item: '(855) 123-4567 TTY: 711'
           - key: :contact_center_name
-            item: "DC Health Link's Customer Care Center"
+            item: "IdeaCrew Demo's Customer Care Center"
           - key: :contact_center_po_box
-            item: "PO Box 97022"
+            item: "PO Box 12345"
           - key: :contact_center_state_and_city
-            item: "Washington, DC"
+            item: "Test City, Test State"
           - key: :area_code
-            item: "202"
+            item: "111"
           - key: :contact_center_city
-            item: "Washington"
+            item: "Test City"
           - key: :contact_center_county
             item: 'District of Columbia'
           - key: :contact_center_zip_code
             item: "20090" # For DC loading rating areas, the zip uses this zip code 20090
           - key: :contact_center_email_address
-            item: "info@dchealthlink.com"
+            item: "info@ideacrew.com"
           - key: :contact_center_short_number
             item: "1-855-532-5465"
           - key: :contact_center_tty_number
@@ -208,9 +208,9 @@ registry:
           - key: :broker_course_administering_organization_link
             item: 'https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e'
           - key: :privacy_url
-            item: "https://www.dchealthlink.com/privacy"
+            item: "https://www.ideacrew.com/privacy"
           - key: :privacy_act_statement
-            item: "https://www.dchealthlink.com/privacy-act-statement"
+            item: "https://www.ideacrew.com/privacy-act-statement"
           - key: :site_broker_attestation_link
             item: "https://hbx.dc.gov/page/dc-health-link-broker-attestations"
           - key: :rating_areas
@@ -218,13 +218,13 @@ registry:
           - key: :favicon_tab_icon
             item: 'image/vnd.microsoft.icon'
           - key: :eligibile_immigration_statuses_url
-            item: "https://dchealthlink.com/sites/default/files/v2/forms/Eligible%20Immigration%20Status%20List_0.pdf"
+            item: "https://ideacrew.com/sites/default/files/v2/forms/Eligible%20Immigration%20Status%20List_0.pdf"
           - key: :geographic_rating_area_model
             item: 'single'
           - key: :benchmark_product_model
             item: :health_only
           - key: :assistance_estimate_url
-            item: "https://dc.checkbookhealth.org/hie/dc/2021/index.cfm?page"
+            item: "https://ideacrew.com/hie/dc/2021/index.cfm?page"
           - key: :dental_plan_years_available
             item: [""]
           - key: :sole_source_carriers_available
@@ -240,13 +240,13 @@ registry:
           - key: :send_rating_area_for_ivl_policy_to_edi
             item: false
           - key: :medicaid_agency_phone
-            item: "(202) 727-5355"
+            item: "(111) 111-2222"
           - key: :verifiable_immigration_statuses
             item: false
           - key: :appeal_link
-            item: "https://www.dchealthlink.com/sites/default/files/v2/forms/Appeals_Rights_IVL.pdf"
+            item: "https://www.ideacrew.com/sites/default/files/v2/forms/Appeals_Rights_IVL.pdf"
           - key: :find_expert_link
-            item: "https://www.dchealthlink.com/find-expert"
+            item: "https://www.ideacrew.com/find-expert"
           - key: :binder_payment_dates
             item: [
                     {"2019-01-01": '2018,12,12'},
@@ -380,13 +380,13 @@ registry:
           - key: :upcoming_effective_period
             item: <%= Date.new(2023,11,1)..Date.new(2024,01,31) %>
           - key: :contact_center_number_for_display
-            item: "(855) 532-5465"
+            item: "(111) 222-1111"
           - key: :mailing_address_1
-            item: "1225 I Street NW, Suite 400"
+            item: "1225 Test Street"
           - key: :mailing_address_city
-            item: "Washington"
+            item: "Test City"
           - key: :mailing_address_zip
-            item: "20005"
+            item: "12345"
       - key: :ivl_enrollment_renewal_begin_date
         item: :enrollment_renewal_date
         is_enabled: true

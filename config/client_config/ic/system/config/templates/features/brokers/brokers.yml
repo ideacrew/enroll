@@ -1,0 +1,34 @@
+---
+registry:
+  - namespace:
+      - :brokers
+    features:
+      - key: :brokers
+        is_enabled: true
+        meta:
+          label: Brokers
+          content_type: :boolean
+          default: true
+          description: The Enroll Application provides a dashboard for brokers where they may access and manage client employers and their employees. A broker’s account allows the broker to see all of his or her small group and individual clients. The broker is able to access employer, employee, and individual accounts from the dashboard.
+          is_required: true
+          is_visible: true
+        settings:
+          - key: :carrier_appointments
+            item: {"Aetna Health Inc": => nil, "Aetna Life Insurance Company": => nil, "Carefirst Bluechoice Inc": => nil, "Group Hospitalization and Medical Services Inc": => nil, "Kaiser Foundation": => nil, "Optimum Choice": => nil, "United Health Care Insurance": => nil, "United Health Care Mid Atlantic": => nil}
+      - key: :broker_attestation_fields
+        item: :broker_attestation_fields
+        is_enabled: false
+      - key: :allow_alphanumeric_npn
+        item: :allow_alphanumeric_npn
+        is_enabled: false
+      - key: :broker_training_link
+        is_enabled: true
+        item: ""
+      - key: :allow_edit_broker_email
+        is_enabled: <%= ENV['ALLOW_EDIT_BROKER_EMAIL_IS_ENABLED'] || false %>
+      - key: :allow_edit_broker_npn
+        is_enabled: <%= ENV['ALLOW_EDIT_BROKER_NPN_IS_ENABLED'] || false %>
+      - key: :send_broker_hired_event_to_edi
+        is_enabled: <%= ENV['BROKER_HIRED_EVENT_TO_EDI_IS_ENABLED'] || false %>
+      - key: :send_broker_fired_event_to_edi
+        is_enabled: <%= ENV['BROKER_FIRED_EVENT_TO_EDI_IS_ENABLED'] || false %>
