@@ -1491,6 +1491,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:tobacco_cost).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prevent_concurrent_sessions).and_return(false)
         sign_in user
       end
 
