@@ -12,7 +12,7 @@ module Subscribers
           payload = JSON.parse(response).deep_symbolize_keys
 
           @logger.info "BeginCoveragesSubscriber on_request, response: #{payload}"
-          result = Operations::HbxEnrollments::BeginCoverageHandler.new.call(payload)
+          result = ::Operations::HbxEnrollments::BeginCoverageHandler.new.call(payload)
 
           result.success? ? @logger.info(result.value!) : @logger.error(result.failure)
           ack(delivery_info.delivery_tag)

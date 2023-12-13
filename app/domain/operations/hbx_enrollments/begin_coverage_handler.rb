@@ -7,11 +7,24 @@ module Operations
       include EventSource::Command
       include Dry::Monads[:result, :do]
 
+      attr_reader :job
+
       # @param [Hash] params
-      # @option params [Hash] :query_criteria
+      # @option params [Hash] :query_criteria, :transmittable_identifiers
       # @return [Dry::Monads::Result]
+      # @example params: {
+      #   query_criteria: {
+      #     "effective_on": { "$gte": start_on, "$lt": end_on },
+      #      "kind": { "$in": ["individual", "coverall"] },
+      #      "aasm_state": { "$in": HbxEnrollment::RENEWAL_STATUSES - ["renewing_coverage_enrolled"] }
+      #    }
+      #   transmittable_identifiers: {
+      #     job_gid: 'gid://enroll/Transmittable::Job/65739e355b4dc03a97f26c3b'
+      #   }
+      # }
       def call(params)
         query_criteria       = yield validate(params)
+        @job                 = yield find_job(values[:transmittable_identifiers][:job_gid])
         enrollments_to_begin = yield enrollments_to_begin_query(query_criteria)
         result               = yield publish_enrollment_initiations(enrollments_to_begin)
 
@@ -21,9 +34,38 @@ module Operations
       private
 
       def validate(params)
-        return Failure('Missing query_criteria.') unless params.is_a?(Hash) && params[:query_criteria].is_a?(Hash)
+        unless params.is_a?(Hash)
+          msg = "Invalid input params: #{params}. Expected a hash."
+          return Failure(msg)
+        end
 
-        Success(params[:query_criteria])
+        unless params[:query_criteria].is_a?(Hash)
+          msg = "Invalid query_criteria in params: #{params}. Expected a hash."
+          return Failure(msg)
+        end
+
+        unless params[:transmittable_identifiers].is_a?(Hash)
+          msg = "Invalid transmittable_identifiers in params: #{params}. Expected a hash."
+          return Failure(msg)
+        end
+
+        if params[:transmittable_identifiers][:job_gid].blank?
+          msg = "Missing job_gid in transmittable_identifiers of params: #{params}."
+          return Failure(msg)
+        end
+
+        Success(params)
+      end
+
+      def find_job(job_gid)
+        job = GlobalID::Locator.locate(job_gid)
+
+        if job.present?
+          Success(job)
+        else
+          msg = "No Transmittable::Job found with given id: #{job_gid}"
+          Failure(msg)
+        end
       end
 
       def enrollments_to_begin_query(query_criteria)

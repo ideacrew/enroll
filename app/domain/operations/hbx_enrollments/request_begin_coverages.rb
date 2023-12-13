@@ -7,11 +7,14 @@ module Operations
       include EventSource::Command
       include Dry::Monads[:result, :do]
 
+      attr_reader :job
+
     # @param [Hash] opts The options to request initiation of all IVL renewal enrollments for the new year
     # @option opts [Hash] :params
     # @return [Dry::Monads::Result]
       def call(_params)
         logger         = yield initialize_logger
+        @job           = yield create_job
         query_criteria = yield fetch_query_critiria
         event          = yield build_event(query_criteria)
         result         = yield publish(event, logger)
@@ -29,6 +32,18 @@ module Operations
         )
       end
 
+      def create_job
+        ::Operations::Transmittable::CreateJob.new.call(
+          {
+            key: :hbx_enrollments_begin_coverage,
+            title: "Request begin coverage of all renewal IVL enrollments on #{TimeKeeper.date_of_record}.",
+            description: "Job that requests begin coverage for all renewal IVL enrollments on #{TimeKeeper.date_of_record}.",
+            publish_on: DateTime.now,
+            started_at: DateTime.now
+          }
+        )
+      end
+
       def start_on
         @start_on ||= HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.start_on
       end
@@ -37,14 +52,12 @@ module Operations
         @end_on ||= HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.end_on
       end
 
-    # TODO: Remove hard coded aaasm_state and kind values.
-    #       Define constants for them in HbxEnrollment class and use them.
       def fetch_query_critiria
         Success(
           {
             "effective_on": { "$gte": start_on, "$lt": end_on },
             "kind": { "$in": ["individual", "coverall"] },
-            "aasm_state": { "$in": ["auto_renewing", "renewing_coverage_selected"] }
+            "aasm_state": { "$in": HbxEnrollment::RENEWAL_STATUSES - ["renewing_coverage_enrolled"] }
           }
         )
       end
@@ -53,7 +66,8 @@ module Operations
         event(
           'events.individual.enrollments.begin_coverages.request',
           attributes: {
-            query_criteria: query_criteria
+            query_criteria: query_criteria,
+            transmittable_identifiers: { job_gid: job.to_global_id.uri }
           }
         )
       end
