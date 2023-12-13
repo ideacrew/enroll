@@ -32,8 +32,8 @@
                 <strong><br /><%= l10n('faa.edit.remove_warning') %></strong>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-primary btn-confirmation" onclick='confirmDestoyApplicant(event, "<%=application_applicant_path(@application, @applicant)%>"); return false;'>Confirm</button>
                 <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary btn-confirmation" onclick='confirmDestoyApplicant(event, "<%=application_applicant_path(@application, @applicant)%>"); return false;'>Confirm</button>
               </div>
             </div>
           </div>
@@ -86,13 +86,13 @@
 
           <div class="col-md-3 col-sm-3 no-pd">
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
-              <div class="radio">
+              <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_male')" class="radio">
                 <%= f.radio_button :gender, "male", class: "required floatlabel", id: 'radio_male' %>
                 <label for="radio_male"><span><%= l10n("male").to_s.upcase %></span></label>
               </div>
             </div>
             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
-              <div class="radio">
+              <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_female')" class="radio">
                 <%= f.radio_button :gender, "female", class: "required floatlabel", id: 'radio_female'  %>
                 <label for="radio_female"><span><%= l10n("female").to_s.upcase %></span></label>
               </div>
@@ -196,7 +196,7 @@
   <div class="row no-buffer <%= pundit_class Family, :updateable? %> ">
     <button type="submit" class="btn btn-primary btn-br hidden"><i class="fa fa-user-plus"></i> Save</button>
     <button type="button" class="btn btn-default close_member_form hide cancel_<%=@applicant.id%>_edit"> Cancel</button>
-    <span class='btn btn-primary btn-br save_member' onclick='PersonValidations.manageRequiredValidations($(this));'> Confirm member</span>
+    <span tabindex="0" tabindex="0" onkeydown="handleButtonKeyDown(event, 'confirm_member')" id="confirm_member" class='btn btn-primary btn-br save_member' onclick='PersonValidations.manageRequiredValidations($(this));'> Confirm member</span>
   </div>
 <% end %>
 <br>
