@@ -32,6 +32,6 @@
     color: var(--bright-green);
   }
   .fa-times {
-    color: var(--error-color);
+    color: var(--primary-red, var(--error-color));
   }
 }
