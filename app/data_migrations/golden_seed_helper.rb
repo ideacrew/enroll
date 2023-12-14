@@ -224,7 +224,7 @@ module GoldenSeedHelper
     user = User.new
     user.email = email
     user.oim_id = email
-    user.password = "P@ssw0rd!"
+    user.password = "P@ssw0rd!123"
     user.person = person_record
 
     user.person.consumer_role.skip_residency_verification = true if user.person.consumer_role
