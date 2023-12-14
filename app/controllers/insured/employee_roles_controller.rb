@@ -239,7 +239,7 @@ class Insured::EmployeeRolesController < ApplicationController
 
   def render_recaptcha_if_needed
     return unless EnrollRegistry.feature_enabled?(:employee_match_recaptcha)
-    max_emp_attempts = EnrollRegistry[:max_employee_match_recaptcha_attempts].item.to_i
+    max_emp_attempts = EnrollRegistry[:employee_match_max_recaptcha_attempts].item.to_i
     return unless session[:failed_match_attempts] > max_emp_attempts
     @captcha_required = true
     @employee_candidate.errors.add(:base, "reCAPTCHA verification failed") unless verify_recaptcha

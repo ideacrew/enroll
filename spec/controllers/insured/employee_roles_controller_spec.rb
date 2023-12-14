@@ -343,7 +343,9 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
             let(:found_census_employees) { [census_employee] }
 
             it "renders the 'match' template" do
-              expect(session[:failed_match_attempts]).to eq(nil)
+              post :match, params: {person: person_parameters}
+
+              expect(session[:failed_match_attempts]).to eq(0)
               expect(response).to have_http_status(:success)
               expect(response).to render_template("match")
               expect(assigns[:employee_candidate]).to eq mock_employee_candidate
