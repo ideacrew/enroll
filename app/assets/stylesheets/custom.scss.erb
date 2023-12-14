@@ -120,16 +120,17 @@ a {
 /* Flash Messages */
 
 .alert-error {
-    background-color: #f2dede;
+    background-color: var(--background-light-red, #f2dede);
+    border-bottom: .4mm solid var(--primary-red, transparent) !important;
     border-color: #eed3d7;
-    color: var(--error-color, #b94a48);
+    color: var(--primary-red, var(--error-color, #b94a48));
     text-align: left;
  }
 
 .alert-alert {
     background-color: #f2dede;
     border-color: #eed3d7;
-    color: var(--error-color, #b94a48);
+    color: var(--primary-red, var(--error-color, #b94a48));
     text-align: left;
  }
 
@@ -1426,14 +1427,14 @@ a.close-1, a.close-2{
     &.form-action {
       margin: 8px 0 20px;
       display: inline-block;
-      color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+      color: var(--theme-primary-100, #007bc4);
       font-size: 14px;
       font-weight: bold;
       border-radius: 4px;
       border: solid 1px #b2b2b2;
       background-color: transparent;
       &:hover {
-        border: solid 1px <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+        border: solid 1px var(--theme-primary-100, #007bc4);
         background-color: #ffffff;
       }
     }
@@ -3492,17 +3493,17 @@ table.table-list-wp tbody tr.brd td {
       display: inline-block;
       width: 100%;
       padding: 20px 0;
-      color: var(--error-color, #b94a48);
+      color: var(--primary-red, var(--error-color, #b94a48));
       .fa {
         margin: 0 10px 0 0;
-        color: var(--error-color, #b94a48);
+        color: var(--primary-red, var(--error-color, #b94a48));
 
       }
 
       h5 {
         padding-left: 20px;
         display: inline-block;
-        color: var(--error-color, #b94a48);
+        color: var(--primary-red, var(--error-color, #b94a48));
 
       }
 
@@ -3536,15 +3537,15 @@ table.table-list-wp tbody tr.brd td {
 }
 
 .confirm-terminate-wrapper a.terminate {
-    color: var(--error-color, #b94a48);
+    color: var(--primary-red, var(--error-color, #b94a48));
     border-radius: 4px;
     padding: 10px 10px;
-    border: solid 1px var(--error-color, #b94a48);
+    border: solid 1px var(--primary-red, var(--error-color, #b94a48));
     font-size: 14px;
     margin-right: 5px;
     cursor: pointer;
     &:hover {
-      background-color: var(--error-color, #b94a48);
+      background-color: var(--primary-red, var(--error-color, #b94a48));
       color: #fff;
     }
 }
@@ -3563,8 +3564,8 @@ table.table-wrapper tbody tr.unbrd td {
     border-radius: 4px;
     margin-bottom: 5px;
     background-color: transparent;
-    border: solid 1px var(--error-color, #b94a48);
-    color: var(--error-color, #b94a48);
+    border: solid 1px var(--primary-red, var(--error-color, #b94a48));
+    color: var(--primary-red, var(--error-color, #b94a48));
 }
 .confirm-terminate a strong {
     font-weight: bold;
