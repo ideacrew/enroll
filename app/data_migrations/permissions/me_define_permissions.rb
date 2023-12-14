@@ -144,14 +144,14 @@ class MeDefinePermissions < MigrationTask
     User.where(email: /themanda.*dc.gov/).delete_all
     Person.where(last_name: /^amanda\d+$/).delete_all
     a = 10_000_000
-    user1 = User.create(email: 'themanda.staff@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5_999_999) + a}")
-    user2 = User.create(email: 'themanda.readonly@dc.gov', password: 'P@55word', password_confirmation: 'P@55word',  oim_id: "ex#{rand(5_999_999) + a}")
-    user3 = User.create(email: 'themanda.csr_supervisor@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5_999_999) + a}")
-    user4 = User.create(email: 'themanda.csr_tier1@dc.gov', password: 'P@55word', password_confirmation: 'P@55word',  oim_id: "ex#{rand(5_999_999) + a}")
-    user5 = User.create(email: 'themanda.csr_tier2@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5_999_999) + a}")
-    user6 = User.create(email: 'developer@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5_999_999) + a}")
-    user7 = User.create(email: 'themanda.csr_tier3@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5_999_999) + a}")
-    user8 = User.create(email: 'themanda.super_admin@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5_999_999) + a}")
+    user1 = User.create(email: 'themanda.staff@dc.gov', password: 'P@55word1234', password_confirmation: 'P@55word1234', oim_id: "ex#{rand(5_999_999) + a}")
+    user2 = User.create(email: 'themanda.readonly@dc.gov', password: 'P@55word1234', password_confirmation: 'P@55word1234',  oim_id: "ex#{rand(5_999_999) + a}")
+    user3 = User.create(email: 'themanda.csr_supervisor@dc.gov', password: 'P@55word1234', password_confirmation: 'P@55word1234', oim_id: "ex#{rand(5_999_999) + a}")
+    user4 = User.create(email: 'themanda.csr_tier1@dc.gov', password: 'P@55word1234', password_confirmation: 'P@55word1234',  oim_id: "ex#{rand(5_999_999) + a}")
+    user5 = User.create(email: 'themanda.csr_tier2@dc.gov', password: 'P@55word1234', password_confirmation: 'P@55word1234', oim_id: "ex#{rand(5_999_999) + a}")
+    user6 = User.create(email: 'developer@dc.gov', password: 'P@55word1234', password_confirmation: 'P@55word1234', oim_id: "ex#{rand(5_999_999) + a}")
+    user7 = User.create(email: 'themanda.csr_tier3@dc.gov', password: 'P@55word1234', password_confirmation: 'P@55word1234', oim_id: "ex#{rand(5_999_999) + a}")
+    user8 = User.create(email: 'themanda.super_admin@dc.gov', password: 'P@55word1234', password_confirmation: 'P@55word1234', oim_id: "ex#{rand(5_999_999) + a}")
     state_abbreviation = EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
     hbx_profile_id = HbxProfile.all.detect { |profile| profile&.us_state_abbreviation == state_abbreviation }&.id&.to_s || HbxProfile.all&.last&.id&.to_s
     build_test_person_hbxstaff_set1(user1, user2, user3, user4, hbx_profile_id)
