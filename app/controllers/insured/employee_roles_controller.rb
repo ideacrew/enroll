@@ -33,6 +33,8 @@ class Insured::EmployeeRolesController < ApplicationController
     if @employee_candidate.valid?
       @found_census_employees = @employee_candidate.match_census_employees.select{|census_employee| census_employee.is_active? }
       if @found_census_employees.empty?
+        session[:failed_match_attempts] += 1
+        render_recaptcha_if_needed
         full_name = @person_params[:first_name] + " " + @person_params[:last_name]
         # @person = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, current_user)
 
@@ -49,11 +51,7 @@ class Insured::EmployeeRolesController < ApplicationController
       end
     else
       session[:failed_match_attempts] += 1
-      if session[:failed_match_attempts] > 3
-        @captcha_required = true
-        @employee_candidate.errors.add(:base, "reCAPTCHA verification failed") unless verify_recaptcha_if_needed
-        flash.delete(:recaptcha_error)
-      end
+      render_recaptcha_if_needed
       respond_to do |format|
         format.html { render 'search' }
       end
@@ -239,8 +237,13 @@ class Insured::EmployeeRolesController < ApplicationController
       :name_pfx, :name_sfx, :gender, :hired_on, :eligible_for_coverage_on, :census_employee_id, :employer_name, :no_ssn)
   end
 
-  def verify_recaptcha_if_needed
-    return true unless EnrollRegistry.feature_enabled?(:employee_search_recaptcha)
-    verify_recaptcha
+  def render_recaptcha_if_needed
+    return unless EnrollRegistry.feature_enabled?(:employee_match_recaptcha)
+    max_emp_attempts = EnrollRegistry[:max_employee_match_recaptcha_attempts].item.to_i
+    return unless session[:failed_match_attempts] > max_emp_attempts
+    @captcha_required = true
+    @employee_candidate.errors.add(:base, "reCAPTCHA verification failed") unless verify_recaptcha
+    flash.delete(:recaptcha_error)
   end
+
 end

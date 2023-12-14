@@ -261,6 +261,7 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
     describe "POST match" do
       let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
       let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => validation_result, ssn: "333224444", dob: "08/15/1975") }
+      let(:invalid_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => false, ssn: "33322", dob: "") }
       let(:census_employee) { instance_double("CensusEmployee")}
       let(:hired_on) { double }
       let(:employment_relationships) { double }
@@ -274,7 +275,6 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
         allow(census_employee).to receive(:is_active?).and_return(true)
         allow(Forms::EmployeeCandidate).to receive(:new).and_return(mock_employee_candidate)
         allow(Factories::EmploymentRelationshipFactory).to receive(:build).with(mock_employee_candidate, [census_employee]).and_return(employment_relationships)
-        post :match, params: {person: person_parameters}
       end
 
       context "given invalid parameters" do
@@ -282,6 +282,8 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
         let(:found_census_employees) { [] }
 
         it "renders the 'search' template" do
+          post :match, params: {person: person_parameters}
+
           expect(response).to have_http_status(:success)
           expect(response).to render_template("search")
           expect(assigns[:employee_candidate]).to eq mock_employee_candidate
@@ -298,20 +300,91 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
           let(:person_parameters){{"dob" => "1985-10-01", "first_name" => "martin","gender" => "male","last_name" => "york","middle_name" => "","name_sfx" => "","ssn" => "000000111"}}
 
           it "renders the 'no_match' template" do
+            post :match, params: {person: person_parameters}
+
             expect(response).to have_http_status(:success)
             expect(response).to render_template("no_match")
             expect(assigns[:employee_candidate]).to eq mock_employee_candidate
             expect(response).to render_template("employee_ineligibility_notice")
           end
 
+          it "renders reCaptcha when bruteforce attempted" do
+            allow(EnrollRegistry[:employee_match_recaptcha].feature).to receive(:is_enabled).and_return(true)
+            20.times do
+              post :match, params: {person: person_parameters}
+            end
+
+            expect(assigns(:captcha_required)).to eq(true)
+            expect(session[:failed_match_attempts]).to eq(20)
+          end
+
+          it "does not render reCaptcha with very few attempts" do
+            allow(EnrollRegistry[:employee_match_recaptcha].feature).to receive(:is_enabled).and_return(true)
+            2.times do
+              post :match, params: {person: person_parameters}
+            end
+
+            expect(assigns(:captcha_required)).to eq(false)
+            expect(session[:failed_match_attempts]).to eq(2)
+            expect(response).to render_template("no_match")
+          end
+
+          it "does not render reCaptcha with many attempts but FF is disabled" do
+            allow(EnrollRegistry[:employee_match_recaptcha].feature).to receive(:is_enabled).and_return(false)
+            20.times do
+              post :match, params: {person: person_parameters}
+            end
+
+            expect(assigns(:captcha_required)).to eq(false)
+            expect(response).to render_template("no_match")
+          end
+
           context "that find a matching employee" do
             let(:found_census_employees) { [census_employee] }
 
             it "renders the 'match' template" do
+              expect(session[:failed_match_attempts]).to eq(nil)
               expect(response).to have_http_status(:success)
               expect(response).to render_template("match")
               expect(assigns[:employee_candidate]).to eq mock_employee_candidate
               expect(assigns[:employment_relationships]).to eq employment_relationships
+            end
+          end
+
+          context "when employee_candidate is invalid" do
+            before do
+              allow(EnrollRegistry[:employee_match_recaptcha].feature).to receive(:is_enabled).and_return(true)
+              allow(Forms::EmployeeCandidate).to receive(:new).and_return(invalid_employee_candidate)
+            end
+
+            it "renders the match template with recaptcha when bruteforce is attempted" do
+              20.times do
+                post :match, params: {person: person_parameters}
+              end
+
+              expect(assigns(:captcha_required)).to eq(true)
+              expect(session[:failed_match_attempts]).to eq(20)
+              expect(response).to render_template("search")
+            end
+
+            it "renders the match template with no recaptcha when bruteforce is not attempted" do
+              2.times do
+                post :match, params: {person: person_parameters}
+              end
+
+              expect(assigns(:captcha_required)).to eq(false)
+              expect(session[:failed_match_attempts]).to eq(2)
+              expect(response).to render_template("search")
+            end
+
+            it "renders the match template with no recaptcha when FF is disabled" do
+              allow(EnrollRegistry[:employee_match_recaptcha].feature).to receive(:is_enabled).and_return(false)
+              20.times do
+                post :match, params: {person: person_parameters}
+              end
+
+              expect(assigns(:captcha_required)).to eq(false)
+              expect(response).to render_template("search")
             end
           end
         end
