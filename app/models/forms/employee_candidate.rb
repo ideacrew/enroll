@@ -86,7 +86,6 @@ module Forms
     end
 
     def dob_not_in_future
-      binding.irb
       if self.dob && self.dob > ::TimeKeeper.date_of_record
         errors.add(
             :dob,
