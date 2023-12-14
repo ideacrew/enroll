@@ -20,9 +20,9 @@
     <%= javascript_pack_tag ENV['CLIENT'] %>
     <%= stylesheet_pack_tag ENV['CLIENT'] %>
 
-    <% if ENV['CR97_IS_ENABLED'] %>
-      <%= javascript_pack_tag 'cr97' %>
-      <%= stylesheet_pack_tag 'cr97' %>
+    <% if ENV['CONTRAST_LEVEL_AA_IS_ENABLED'] %>
+      <%= javascript_pack_tag 'contrast_level_aa' %>
+      <%= stylesheet_pack_tag 'contrast_level_aa' %>
     <% end %>
 
 
