@@ -916,3 +916,6 @@ registry:
       - key: :employee_match_max_recaptcha_attempts
         item: <%= ENV['EMPLOYEE_MATCH_MAX_RECAPTCHA_ATTEMPTS'] || 3 %>
         is_enabled: true
+      - key: :prevent_concurrent_sessions
+        item: :prevent_concurrent_sessions
+        is_enabled: <%= ENV['PREVENT_CONCURRENT_SESSIONS_IS_ENABLED'] || false %>
