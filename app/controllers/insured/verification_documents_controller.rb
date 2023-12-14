@@ -135,7 +135,7 @@ class Insured::VerificationDocumentsController < ApplicationController
 
       next if VlpDocument::ALLOWED_MIME_TYPES.include?(mime_type) && file.size < max_file_size_in_bytes
       File.delete(file_path) if File.exist?(file_path)
-      flash[:error] = "Unable to upload file. Please upload a file in PNG, JPEG, or PDF format and ensure it's under #{doc_limit_mb}MB."
+      flash[:error] = "Unable to upload file. Acceptable file types - PDF, JPEG, PNG, and GIF and ensure it does not exceed #{doc_limit_mb} MB."
       redirect_to verification_insured_families_path
     end
   end
