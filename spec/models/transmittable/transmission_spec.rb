@@ -28,7 +28,7 @@ RSpec.describe Transmittable::Transmission, type: :model, dbclean: :after_each d
       let(:enrollment) do
         FactoryBot.create(:hbx_enrollment, family: FactoryBot.create(:family, :with_primary_family_member))
       end
-    
+
       let!(:transaction) do
         ::Operations::Transmittable::CreateTransaction.new.call(
           {
