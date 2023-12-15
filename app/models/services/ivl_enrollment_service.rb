@@ -45,12 +45,14 @@ module Services
     end
 
     def process_async_expirations_request
-      query_criteria = {
-        "effective_on": { "$lt": current_benefit_period.start_on },
-        "kind": { "$in": ["individual", "coverall"] },
-        "aasm_state": { "$in": HbxEnrollment::ENROLLED_STATUSES - ["coverage_termination_pending"] }
-      }
-      publish_expirations_request_event(query_criteria)
+      @logger.info "Started process_async_expirations_request process at #{Time.now.strftime('%H:%M:%S.%L')}"
+      result = ::Operations::HbxEnrollments::RequestExpirations.new.call({})
+      if result.success?
+        @logger.info 'Successfully published expire coverages request.'
+      else
+        @logger.error "Publishing expire coverages request failed: #{result.failure}"
+      end
+      @logger.info "Ended process_async_expirations_request process at #{Time.now.strftime('%H:%M:%S.%L')}"
     end
 
     def begin_coverage_for_ivl_enrollments
@@ -81,16 +83,6 @@ module Services
         end
         @logger.info "Total IVL auto renewing enrollment processed count: #{count}"
         @logger.info "Ended begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record}"
-      end
-    end
-
-    def publish_expirations_request_event(query_criteria)
-      event = event("events.individual.enrollments.expire_coverages.request", attributes: { query_criteria: query_criteria })
-      if event.success?
-        @logger.info "Publishing expire coverages request with query criteria: #{query_criteria}"
-        event.success.publish
-      else
-        @logger.error "ERROR - Publishing expire coverages request failed: #{event.failure}"
       end
     end
 
