@@ -6,6 +6,11 @@ module Transmittable
     include Mongoid::Document
     include Mongoid::Timestamps
 
+    # A Global ID is an app wide URI that uniquely identifies a model instance:
+    #   gid://YourApp/Some::Model/id
+    #   Example: 'gid://enroll/Transmittable::Job/65739e355b4dc03a97f26c3b'
+    include GlobalID::Identification
+
     has_many :transmissions, class_name: 'Transmittable::Transmission'
     has_one :process_status, as: :statusable, class_name: 'Transmittable::ProcessStatus'
     accepts_nested_attributes_for :process_status
@@ -30,19 +35,25 @@ module Transmittable
 
     scope :latest, -> { order(created_at: :desc) }
 
-    def generate_message_id
-      loop do
-        self.message_id = SecureRandom.uuid
-
-        break unless Transmittable::Job.where(message_id: message_id).exists?
-      end
-      self.save
-    end
+    before_create :generate_message_id
 
     def error_messages
       return [] unless errors
 
-      transmittable_errors&.map {|error| "#{error.key}: #{error.message}"}&.join(";")
+      transmittable_errors&.map { |error| "#{error.key}: #{error.message}" }&.join(';')
+    end
+
+    private
+
+    def generate_message_id
+      return if message_id.present?
+
+      loop do
+        @generated_message_id = SecureRandom.uuid
+        break unless Transmittable::Job.where(message_id: @generated_message_id).exists?
+      end
+
+      write_attribute(:message_id, @generated_message_id)
     end
   end
 end
