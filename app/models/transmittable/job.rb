@@ -35,19 +35,25 @@ module Transmittable
 
     scope :latest, -> { order(created_at: :desc) }
 
-    def generate_message_id
-      loop do
-        self.message_id = SecureRandom.uuid
-
-        break unless Transmittable::Job.where(message_id: message_id).exists?
-      end
-      self.save
-    end
+    before_create :generate_message_id
 
     def error_messages
       return [] unless errors
 
-      transmittable_errors&.map {|error| "#{error.key}: #{error.message}"}&.join(";")
+      transmittable_errors&.map { |error| "#{error.key}: #{error.message}" }&.join(';')
+    end
+
+    private
+
+    def generate_message_id
+      return if message_id.present?
+
+      loop do
+        @generated_message_id = SecureRandom.uuid
+        break unless Transmittable::Job.where(message_id: @generated_message_id).exists?
+      end
+
+      write_attribute(:message_id, @generated_message_id)
     end
   end
 end

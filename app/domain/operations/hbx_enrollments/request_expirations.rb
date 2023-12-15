@@ -6,6 +6,7 @@ module Operations
     class RequestExpirations
       include EventSource::Command
       include Dry::Monads[:result, :do]
+      include ::Domain::Operations::TransmittableConcern
 
       attr_reader :job, :logger
 
@@ -15,7 +16,8 @@ module Operations
       def call(_params)
         @logger        = yield initialize_logger
         bcp_start_on   = yield fetch_bcp_start_on
-        @job           = yield create_job(bcp_start_on)
+        job_params     = yield construct_job_params(bcp_start_on)
+        @job           = yield create_job(job_params)
         query_criteria = yield fetch_query_critiria(bcp_start_on)
         event          = yield build_event(query_criteria)
         result         = yield publish(bcp_start_on, event)
@@ -43,8 +45,8 @@ module Operations
         end
       end
 
-      def create_job(bcp_start_on)
-        ::Operations::Transmittable::CreateJob.new.call(
+      def construct_job_params(bcp_start_on)
+        Success(
           {
             key: :hbx_enrollments_expiration,
             title: "Request expiration of all active IVL enrollments before #{bcp_start_on}.",

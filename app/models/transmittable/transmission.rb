@@ -30,5 +30,11 @@ module Transmittable
 
       transmittable_errors&.map {|error| "#{error.key}: #{error.message}"}&.join(";")
     end
+
+    def transactions
+      ::Transmittable::Transaction.where(
+        :id.in => transactions_transmissions.pluck(:transaction_id)
+      )
+    end
   end
 end

@@ -10,17 +10,17 @@ module Services
     end
 
     def process_enrollments(new_date)
-      expire_individual_market_enrollments(new_date)
+      expire_individual_market_enrollments
       begin_coverage_for_ivl_enrollments if new_date == new_date.beginning_of_year
       # Deprecate following methods when DC moved to new eligibilities model
       send_enr_or_dr_notice_to_ivl(new_date)
       send_reminder_notices_for_ivl(new_date)
     end
 
-    def expire_individual_market_enrollments(new_date)
+    def expire_individual_market_enrollments
       @logger.info "Started expire_individual_market_enrollments process at #{TimeKeeper.datetime_of_record}"
       if EnrollRegistry.feature_enabled?(:async_expire_and_begin_coverages)
-        process_async_expirations_request(new_date)
+        process_async_expirations_request
       else
         batch_size = 500
         offset = 0
@@ -44,12 +44,7 @@ module Services
       @logger.info "Ended expire_individual_market_enrollments process at #{TimeKeeper.datetime_of_record}"
     end
 
-    def process_async_expirations_request(new_date)
-      if new_date != new_date.beginning_of_year
-        @logger.info "Skipping expire coverages request for #{new_date} as it is not the beginning of the year."
-        return
-      end
-
+    def process_async_expirations_request
       @logger.info "Started process_async_expirations_request process at #{Time.now.strftime('%H:%M:%S.%L')}"
       result = ::Operations::HbxEnrollments::RequestExpirations.new.call({})
       if result.success?

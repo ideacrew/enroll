@@ -6,6 +6,7 @@ module Operations
     class PublishExpirationEvent
       include EventSource::Command
       include Dry::Monads[:result, :do]
+      include ::Domain::Operations::TransmittableConcern
 
       attr_reader :transaction, :transmission
 
@@ -14,11 +15,13 @@ module Operations
       # @return [Dry::Monads::Result]
       # @example params: { enrollment: HbxEnrollment.new, job: Transmittable::Job.new }
       def call(params)
-        values        = yield validate(params)
-        @transmission = yield create_transmission(values[:enrollment], values[:job])
-        @transaction  = yield create_transaction(values[:enrollment])
-        event         = yield build_event(values)
-        result        = yield publish_event(values[:enrollment], event)
+        values              = yield validate(params)
+        transmission_params = yield construct_transmission_params(values[:enrollment], values[:job])
+        @transmission       = yield create_transmission(transmission_params, values[:job])
+        transaction_params  = yield construct_transaction_params(values[:enrollment])
+        @transaction        = yield create_transaction(transaction_params, values[:job])
+        event               = yield build_event(values)
+        result              = yield publish_event(values[:enrollment], event)
 
         Success(result)
       end
@@ -33,8 +36,8 @@ module Operations
         end
       end
 
-      def create_transmission(enrollment, job)
-        ::Operations::Transmittable::CreateTransmission.new.call(
+      def construct_transmission_params(enrollment, job)
+        Success(
           {
             job: job,
             key: :hbx_enrollments_expiration_request,
@@ -50,8 +53,8 @@ module Operations
         )
       end
 
-      def create_transaction(enrollment)
-        ::Operations::Transmittable::CreateTransaction.new.call(
+      def construct_transaction_params(enrollment)
+        Success(
           {
             transmission: transmission,
             subject: enrollment,
