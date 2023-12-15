@@ -16,7 +16,7 @@ RSpec.describe Transmittable::Job, type: :model, dbclean: :after_each do
       expect(job.respond_to?(:to_global_id)).to be_truthy
     end
 
-    it 'returns a GlobalID URI' do
+    it 'returns the GlobalID URI' do
       expect(
         job.to_global_id.uri.to_s
       ).to eq("gid://enroll/Transmittable::Job/#{job.id}")
