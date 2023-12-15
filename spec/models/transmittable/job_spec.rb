@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Transmittable::Job, type: :model, dbclean: :after_each do
-  let(:job) { create(:transmittable_job) }
+  let(:job) { FactoryBot.create(:transmittable_job) }
 
   describe '#before_create' do
     it 'populates message_id for the job' do
@@ -19,7 +19,7 @@ RSpec.describe Transmittable::Job, type: :model, dbclean: :after_each do
     it 'returns the GlobalID URI' do
       expect(
         job.to_global_id.uri.to_s
-      ).to eq("gid://enroll/Transmittable::Job/#{job.id}")
+      ).to eq("gid://enroll/#{described_class}/#{job.id}")
     end
   end
 end
