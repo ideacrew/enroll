@@ -74,6 +74,7 @@ module Operations
           'events.individual.enrollments.expire_coverages.expire',
           attributes: {
             enrollment_gid: values[:enrollment].to_global_id.uri,
+            enrollment_hbx_id: values[:enrollment].hbx_id,
             transmittable_identifiers: {
               job_gid: values[:job].to_global_id.uri,
               transmission_gid: transmission.to_global_id.uri,
