@@ -1202,7 +1202,7 @@ a.bg-warning:hover {
   background-color: #f7ecb5;
 }
 .bg-danger {
-  background-color: #f2dede;
+  background-color: var(--background-light-red, #f2dede);
 }
 a.bg-danger:hover {
   background-color: #e4b9b9;
@@ -2230,7 +2230,7 @@ table th[class*="col-"] {
 .table > thead > tr.danger > th,
 .table > tbody > tr.danger > th,
 .table > tfoot > tr.danger > th {
-  background-color: #f2dede;
+  background-color: var(--background-light-red, #f2dede);
 }
 .table-hover > tbody > tr > td.danger:hover,
 .table-hover > tbody > tr > th.danger:hover,
@@ -2638,7 +2638,7 @@ select[multiple].form-group-lg .form-control {
 }
 .has-error .input-group-addon {
   color: #a94442;
-  background-color: #f2dede;
+  background-color: var(--background-light-red, #f2dede);
   border-color: #a94442;
 }
 .has-error .form-control-feedback {
@@ -2889,7 +2889,7 @@ fieldset[disabled] .btn-primary.active {
 .btn-success {
   color: #fff;
   background-color: var(--primary-green, #5cb85c);
-  border-color: var(--secondary-green,#4cae4c);
+  border-color: var(--secondary-green, #4cae4c);
 }
 .btn-success:hover,
 .btn-success:focus,
@@ -2925,7 +2925,7 @@ fieldset[disabled] .btn-success:active,
 .btn-success[disabled].active,
 fieldset[disabled] .btn-success.active {
   background-color: var(--primary-green, #5cb85c);
-  border-color: var(--secondary-green,#4cae4c);
+  border-color: var(--secondary-green, #4cae4c);
 }
 .btn-success .badge {
   color: var(--primary-green, #5cb85c);
@@ -2977,8 +2977,8 @@ fieldset[disabled] .btn-info.active {
   background-color: #fff;
 }
 .btn-warning {
-  color: #fff;
-  background-color: #f0ad4e;
+  color: var(--primary-black, #fff);
+  background-color: var(--primary-orange, #f0ad4e);
   border-color: #eea236;
 }
 .btn-warning:hover,
@@ -3014,11 +3014,11 @@ fieldset[disabled] .btn-warning:active,
 .btn-warning.disabled.active,
 .btn-warning[disabled].active,
 fieldset[disabled] .btn-warning.active {
-  background-color: #f0ad4e;
+  background-color: var(--primary-orange, #f0ad4e);
   border-color: #eea236;
 }
 .btn-warning .badge {
-  color: #f0ad4e;
+  color: var(--primary-orange, #f0ad4e);
   background-color: #fff;
 }
 .btn-danger {
@@ -4541,21 +4541,22 @@ a.label:focus {
   background-color: #286090;
 }
 .label-success {
-  background-color: var(--primary-green, #5cb85c);
+  background-color: var(--success-green, #5cb85c);
 }
 .label-success[href]:hover,
 .label-success[href]:focus {
   background-color: #449d44;
 }
 .label-info {
-  background-color: #5bc0de;
+  background-color: var(--info-blue, #5bc0de);
 }
 .label-info[href]:hover,
 .label-info[href]:focus {
   background-color: #31b0d5;
 }
 .label-warning {
-  background-color: #f0ad4e;
+  background-color: var(--primary-orange, #f0ad4e);
+  text-color: var(--primary-black, #ffffff);
 }
 .label-warning[href]:hover,
 .label-warning[href]:focus {
@@ -4743,7 +4744,7 @@ a.thumbnail.active {
 }
 .alert-danger {
   color: #a94442;
-  background-color: #f2dede;
+  background-color: var(--background-light-red, #f2dede);
   border-color: #ebccd1;
 }
 .alert-danger hr {
@@ -4831,7 +4832,7 @@ a.thumbnail.active {
   background-image:         linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);
 }
 .progress-bar-warning {
-  background-color: #f0ad4e;
+  background-color: var(--primary-orange, #f0ad4e);
 }
 .progress-striped .progress-bar-warning {
   background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, .15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .15) 50%, rgba(255, 255, 255, .15) 75%, transparent 75%, transparent);
@@ -5022,7 +5023,7 @@ a.list-group-item-warning.active:focus {
 }
 .list-group-item-danger {
   color: #a94442;
-  background-color: #f2dede;
+  background-color: var(--background-light-red, #f2dede);
 }
 a.list-group-item-danger {
   color: #a94442;
@@ -5372,14 +5373,14 @@ a.list-group-item-danger.active:focus {
 }
 .panel-danger > .panel-heading {
   color: #a94442;
-  background-color: #f2dede;
+  background-color: var(--background-light-red, #f2dede);
   border-color: #ebccd1;
 }
 .panel-danger > .panel-heading + .panel-collapse > .panel-body {
   border-top-color: #ebccd1;
 }
 .panel-danger > .panel-heading .badge {
-  color: #f2dede;
+  color: var(--background-light-red, #f2dede);
   background-color: #a94442;
 }
 .panel-danger > .panel-footer + .panel-collapse > .panel-body {
