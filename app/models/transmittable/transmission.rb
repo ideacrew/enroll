@@ -8,7 +8,7 @@ module Transmittable
 
     include GlobalID::Identification
 
-    belongs_to :job, class_name: 'Transmittable::Job', optional: true
+    belongs_to :job, class_name: 'Transmittable::Job', optional: true, index: true
     has_many :transactions_transmissions, class_name: 'Transmittable::TransactionsTransmissions'
     has_one :process_status, as: :statusable, class_name: 'Transmittable::ProcessStatus'
     accepts_nested_attributes_for :process_status

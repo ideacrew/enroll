@@ -35,4 +35,10 @@ RSpec.describe Transmittable::Transaction, type: :model, dbclean: :after_each do
       ).to eq("gid://enroll/#{described_class}/#{transaction.id}")
     end
   end
+
+  describe '#transmissions' do
+    it 'returns the transmissions' do
+      expect(transaction.transmissions.to_a).to eq([transmission])
+    end
+  end
 end
