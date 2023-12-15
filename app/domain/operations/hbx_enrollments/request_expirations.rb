@@ -57,7 +57,7 @@ module Operations
         )
       end
 
-      # TODO: Remove hard coded aaasm_state and kind values.
+      # TODO: Remove hard coded aasm_state and kind values.
       #       Define constants for them in HbxEnrollment class and use them.
       def fetch_query_critiria(bcp_start_on)
         Success(
