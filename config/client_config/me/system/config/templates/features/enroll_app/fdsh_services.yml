@@ -24,6 +24,11 @@ registry:
         settings:
           - key: :payload_format
             item: <%= ENV['ESI_MEC_PAYLOAD_FORMAT'] || "xml" %>
+      - key: :ifsv
+        is_enabled: true
+        settings:
+          - key: :payload_format
+            item: <%= ENV['IFSV_PAYLOAD_FORMAT'] || "xml" %>
       - key: :renewal_eligibility_verification_using_rrv
         item: :renewal_eligibility_verification_using_rrv
         is_enabled: <%= ENV['RENEWAL_ELIGIBILITY_VERIFICATION_USING_RRV_IS_ENABLED'] || true %>
