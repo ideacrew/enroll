@@ -6,7 +6,9 @@ module Transmittable
     include Mongoid::Document
     include Mongoid::Timestamps
 
-    belongs_to :job, class_name: 'Transmittable::Job', optional: true
+    include GlobalID::Identification
+
+    belongs_to :job, class_name: 'Transmittable::Job', optional: true, index: true
     has_many :transactions_transmissions, class_name: 'Transmittable::TransactionsTransmissions'
     has_one :process_status, as: :statusable, class_name: 'Transmittable::ProcessStatus'
     accepts_nested_attributes_for :process_status
@@ -27,6 +29,12 @@ module Transmittable
       return [] unless errors
 
       transmittable_errors&.map {|error| "#{error.key}: #{error.message}"}&.join(";")
+    end
+
+    def transactions
+      ::Transmittable::Transaction.where(
+        :id.in => transactions_transmissions.pluck(:transaction_id)
+      )
     end
   end
 end

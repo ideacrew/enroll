@@ -844,6 +844,30 @@ class Family
     family_member
   end
 
+  def build_family_member(person, **opts)
+    is_primary_applicant  = opts[:is_primary_applicant]  || false
+    is_coverage_applicant = opts[:is_coverage_applicant] || true
+    is_consent_applicant  = opts[:is_consent_applicant]  || false
+
+    existing_family_member = family_members.detect { |fm| fm.person_id.to_s == person.id.to_s }
+
+    if existing_family_member
+      active_household.build_household_coverage_member(existing_family_member)
+      existing_family_member.is_active = true
+      return existing_family_member
+    end
+
+    family_member = family_members.build(
+      person: person,
+      is_primary_applicant: is_primary_applicant,
+      is_coverage_applicant: is_coverage_applicant,
+      is_consent_applicant: is_consent_applicant
+    )
+
+    active_household.build_household_coverage_member(family_member)
+    family_member
+  end
+
   # Remove {FamilyMember} referenced by this {Person}
   #
   # @param [ Person ] person The {Person} to remove from the family.

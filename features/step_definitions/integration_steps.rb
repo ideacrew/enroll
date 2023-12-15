@@ -81,7 +81,7 @@ def people
     },
     "Hbx Admin Tier 3" => {
       email: 'themanda.tier3@dc.gov',
-      password: 'P@55word'
+      password: 'aA1!aA1!aA1!'
     },
     "Primary Broker" => {
       email: 'ricky.martin@example.com',
