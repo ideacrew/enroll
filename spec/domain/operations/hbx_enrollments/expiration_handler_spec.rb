@@ -43,7 +43,7 @@ RSpec.describe ::Operations::HbxEnrollments::ExpirationHandler, dbclean: :after_
 
   # TODO: Refactor to get the logger content from subject.logger instead of hardcoding the path
   let(:logger_content) do
-    File.read("#{Rails.root}/log/expiration_handler_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
+    File.read("#{Rails.root}/log/hbx_enrollments_expiration_handler_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log")
   end
 
   describe 'with invalid params' do

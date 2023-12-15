@@ -37,7 +37,7 @@ module Operations
       def initialize_logger
         Success(
           Logger.new(
-            "#{Rails.root}/log/expiration_handler_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+            "#{Rails.root}/log/hbx_enrollments_expiration_handler_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
           )
         )
       end
