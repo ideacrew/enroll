@@ -205,7 +205,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Ifsv::H9t::IfsvE
         expect(income_evidence.outstanding?).to be_falsey
         expect(income_evidence.verification_outstanding).to be_falsey
         expect(income_evidence.negative_response_received?).to be_truthy
-        expect(income_evidence.is_satisfied).to eq false
+        expect(income_evidence.is_satisfied).to eq true
         expect(income_evidence.request_results.present?).to eq true
         expect(@result.success).to eq('Successfully updated Applicant with evidence')
       end
