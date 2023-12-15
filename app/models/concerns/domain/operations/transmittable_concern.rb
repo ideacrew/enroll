@@ -9,6 +9,12 @@ module Domain
       extend ActiveSupport::Concern
 
       included do
+        # @param [Hash] opts The options to add errors
+        # @option opts [Symbol, String, Hash]
+        #   :error_key The key to identify the transmittable object
+        #   :message The error message
+        #   :transmittable_objects The transmittable objects to add errors to
+        # @return [Dry::Monads::Result]
         def add_errors(error_key, message, transmittable_objects)
           ::Operations::Transmittable::AddError.new.call(
             {
@@ -19,11 +25,19 @@ module Domain
           )
         end
 
+        # @param [Hash] opts The options to create a transmittable job
+        # @option opts [Hash] :job_params The params to create a job
+        # @return [Dry::Monads::Result]
         def create_job(job_params)
           ::Operations::Transmittable::CreateJob.new.call(job_params)
         end
 
-        def create_transaction(transaction_params, job)
+        # @param [Hash] opts The options to create a request transmittable transaction
+        # @option opts [Hash, Transmittable::Job]
+        #   :transaction_params The params to create a transaction
+        #   :job The job to create a transaction for
+        # @return [Dry::Monads::Result]
+        def create_request_transaction(transaction_params, job)
           result = ::Operations::Transmittable::CreateTransaction.new.call(transaction_params)
           return result if result.success?
 
@@ -36,7 +50,12 @@ module Domain
           status_result.failure? ? status_result : result
         end
 
-        def create_transmission(transmission_params, job)
+        # @param [Hash] opts The options to create a request transmittable transmission
+        # @option opts [Hash, Transmittable::Job]
+        #   :transmission_params The params to create a transmission
+        #   :job The job to create a transmission for
+        # @return [Dry::Monads::Result]
+        def create_request_transmission(transmission_params, job)
           result = ::Operations::Transmittable::CreateTransmission.new.call(transmission_params)
           return result if result.success?
 
@@ -49,6 +68,12 @@ module Domain
           status_result.failure? ? status_result : result
         end
 
+        # @param [Hash] opts The options to update the transmittable process status
+        # @option opts [String, Symbol, Hash]
+        #   :message The message to update the process status with
+        #   :state The state to update the process status with
+        #   :transmittable_objects The transmittable objects to update the process status for
+        # @return [Dry::Monads::Result]
         def update_status(message, state, transmittable_objects)
           ::Operations::Transmittable::UpdateProcessStatus.new.call(
             {

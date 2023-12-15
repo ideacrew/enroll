@@ -17,9 +17,9 @@ module Operations
       def call(params)
         values              = yield validate(params)
         transmission_params = yield construct_transmission_params(values[:enrollment], values[:job])
-        @transmission       = yield create_transmission(transmission_params, values[:job])
+        @transmission       = yield create_request_transmission(transmission_params, values[:job])
         transaction_params  = yield construct_transaction_params(values[:enrollment])
-        @transaction        = yield create_transaction(transaction_params, values[:job])
+        @transaction        = yield create_request_transaction(transaction_params, values[:job])
         event               = yield build_event(values)
         result              = yield publish_event(values[:enrollment], event)
 
