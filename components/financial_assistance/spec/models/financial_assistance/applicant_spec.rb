@@ -1552,6 +1552,38 @@ RSpec.describe ::FinancialAssistance::Applicant, type: :model, dbclean: :after_e
         end
       end
 
+      context 'for outstanding income evidence with due on' do
+        before do
+          applicant.create_income_evidence(key: :income, title: "Income", aasm_state: 'outstanding', verification_outstanding: true, is_satisfied: false, due_on: Date.today + 2.months)
+        end
+
+        let(:current_evidence) { applicant.income_evidence }
+
+        it 'should transition evidence tonegative_response_received and due on to nil' do
+          expect(current_evidence.outstanding?).to be_truthy
+          expect(current_evidence.due_on.present?).to be_truthy
+          applicant.set_evidence_to_negative_response(current_evidence)
+          expect(current_evidence.reload.negative_response_received?).to be_truthy
+          expect(current_evidence.due_on.present?).to be_falsey
+        end
+      end
+
+      context 'for outstanding esi evidence with due on' do
+        before do
+          applicant.create_esi_evidence(key: :esi_mec, title: "Esi", aasm_state: 'outstanding', verification_outstanding: true, is_satisfied: false, due_on: Date.today + 2.months)
+        end
+
+        let(:current_evidence) { applicant.esi_evidence }
+
+        it 'should transition evidence to negative_response_received and due on to nil' do
+          expect(current_evidence.outstanding?).to be_truthy
+          expect(current_evidence.due_on.present?).to be_truthy
+          applicant.set_evidence_to_negative_response(current_evidence)
+          expect(current_evidence.reload.negative_response_received?).to be_truthy
+          expect(current_evidence.due_on.present?).to be_falsey
+        end
+      end
+
       context 'for esi mec evidence' do
         before do
           applicant.create_esi_evidence(key: :esi_mec, title: "Esi", aasm_state: 'pending', verification_outstanding: false, is_satisfied: true)
