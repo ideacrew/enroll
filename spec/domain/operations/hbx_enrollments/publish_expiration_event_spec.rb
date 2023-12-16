@@ -159,6 +159,7 @@ RSpec.describe ::Operations::HbxEnrollments::PublishExpirationEvent, dbclean: :a
 
       it 'creates transmission with correct association' do
         expect(operation_instance.transmission).to be_a(::Transmittable::Transmission)
+        expect(operation_instance.transmission.transmission_id).to eq(enrollment.hbx_id)
         expect(operation_instance.transmission.job).to eq(transmittable_job)
       end
 
@@ -169,6 +170,7 @@ RSpec.describe ::Operations::HbxEnrollments::PublishExpirationEvent, dbclean: :a
 
       it 'creates transaction with correct associations' do
         expect(operation_instance.transaction).to be_a(::Transmittable::Transaction)
+        expect(operation_instance.transaction.transaction_id).to eq(enrollment.hbx_id)
         expect(operation_instance.transaction.transactable).to eq(enrollment)
       end
 

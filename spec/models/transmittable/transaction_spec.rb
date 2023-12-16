@@ -13,7 +13,7 @@ RSpec.describe Transmittable::Transaction, type: :model, dbclean: :after_each do
       {
         transmission: transmission,
         subject: enrollment,
-        key: :hbx_enrollments_expiration_request,
+        key: :hbx_enrollment_expiration_request,
         title: "Enrollment expiration request transaction for #{enrollment.hbx_id}.",
         description: "Transaction request to expire enrollment with hbx id: #{enrollment.hbx_id}.",
         publish_on: Date.today,
