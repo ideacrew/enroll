@@ -23,14 +23,13 @@ RSpec.describe ::Operations::HbxEnrollments::Expire, dbclean: :after_each do
     ::Operations::Transmittable::CreateTransmission.new.call(
       {
         job: transmittable_job,
-        key: :hbx_enrollments_expiration_request,
+        key: :hbx_enrollment_expiration_request,
         title: "Transmission request to expire enrollment with hbx id: #{enrollment.hbx_id}.",
         description: "Transmission request to expire enrollment with hbx id: #{enrollment.hbx_id}.",
         publish_on: Date.today,
         started_at: DateTime.now,
         event: 'initial',
         state_key: :initial,
-        transmission_id: enrollment.hbx_id,
         correlation_id: enrollment.hbx_id
       }
     ).success
@@ -47,7 +46,8 @@ RSpec.describe ::Operations::HbxEnrollments::Expire, dbclean: :after_each do
         publish_on: Date.today,
         started_at: DateTime.now,
         event: 'initial',
-        state_key: :initial
+        state_key: :initial,
+        correlation_id: enrollment.hbx_id
       }
     ).success
   end
@@ -180,13 +180,6 @@ RSpec.describe ::Operations::HbxEnrollments::Expire, dbclean: :after_each do
             expect(result.success?).to be_falsey
             expect(result.failure).to eq("No Transmittable::Transmission found with given global ID: test")
           end
-
-          it 'should record errors and update status on job' do
-            result
-            transmittable_job.reload
-            expect(transmittable_job.process_status.latest_state.to_s).to eq("failed")
-            expect(transmittable_job.transmittable_errors).to be_present
-          end
         end
       end
 
@@ -203,16 +196,6 @@ RSpec.describe ::Operations::HbxEnrollments::Expire, dbclean: :after_each do
           it 'returns a failure' do
             expect(result.success?).to be_falsey
             expect(result.failure).to eq("No Transmittable::Transaction found with given global ID: test")
-          end
-
-          it 'should record errors and update status on both job and request transmission' do
-            result
-            transmittable_job.reload
-            transmission.reload
-            expect(transmittable_job.process_status.latest_state.to_s).to eq("failed")
-            expect(transmittable_job.transmittable_errors).to be_present
-            expect(transmission.process_status.latest_state.to_s).to eq("failed")
-            expect(transmission.transmittable_errors).to be_present
           end
         end
       end
@@ -297,6 +280,13 @@ RSpec.describe ::Operations::HbxEnrollments::Expire, dbclean: :after_each do
           transmission_id: operation_instance.response_transmission.id
         ).count
       ).to eq(1)
+    end
+
+    it 'associates both request/response transmission and transaction to enrollment' do
+      request_transmission = transmittable_job.transmissions.detect { |transmission| transmission.key == :hbx_enrollment_expiration_request }
+      expect(request_transmission.transmission_id).to eq(enrollment.hbx_id)
+      expect(operation_instance.response_transmission.transmission_id).to eq(enrollment.hbx_id)
+      expect(operation_instance.response_transaction.transaction_id).to eq(enrollment.hbx_id)
     end
 
     describe 'where enrollment is a coverall enrollment' do

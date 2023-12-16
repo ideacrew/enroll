@@ -26,10 +26,14 @@ module Operations
         values                  = yield validate(params)
         @hbx_enrollment         = yield find_enrollment(values[:enrollment_gid])
         job                     = yield find_job_by_global_id(values[:transmittable_identifiers][:job_gid])
-        request_transmission    = yield find_and_update_request_transmission(values[:transmittable_identifiers][:transmission_gid],
-                                                                             job)
-        request_transaction     = yield find_and_update_request_transaction(values[:transmittable_identifiers][:transaction_gid],
-                                                                            job, request_transmission)
+        request_transmission    = yield find_transmission_by_global_id(values[:transmittable_identifiers][:transmission_gid])
+        _transmission_result    = yield update_status("Transmittable::Transmission found with given global ID: #{values[:transmittable_identifiers][:transmission_gid]}",
+                                                      :succeeded,
+                                                      { transmission: request_transmission})
+        request_transaction     = yield find_transaction_by_global_id(values[:transmittable_identifiers][:transaction_gid])
+        _transaction_result     = yield update_status("Transmittable::Transaction found with given global ID: #{values[:transmittable_identifiers][:transaction_gid]}",
+                                                      :succeeded,
+                                                      { transaction: request_transaction})
         transmission_params     = yield construct_response_transmission_params(job)
         @response_transmission  = yield create_response_transmission(transmission_params,
                                                                      { job: job,
@@ -40,7 +44,10 @@ module Operations
                                                                     { job: job,
                                                                       transmission: request_transmission,
                                                                       transaction: request_transaction})
-        result                   = yield expire_enrollment
+        result                  = yield expire_enrollment
+        _expiration_result      = yield update_status("Successfully expired enrollment hbx id #{hbx_enrollment.hbx_id}",
+                                                      :succeeded,
+                                                      { transaction: response_transaction, transmission: response_transmission })
 
         Success(result)
       end
@@ -100,51 +107,6 @@ module Operations
         end
       end
 
-      def find_and_update_request_transmission(transmission_gid, job)
-        transmission = find_transmission_by_global_id(transmission_gid)
-
-        if transmission.success?
-          status_result = update_status("Transmittable::Transmission found with given global ID: #{transmission_gid}",
-                                        :succeeded,
-                                        { transmission: transmission.value! })
-
-          return status_result if status_result.failure?
-          Success(transmission.value!)
-        else
-          add_errors(:invalid_transmission_on_enrollment_expire,
-                     "No Transmittable::Transmission found with given global ID: #{transmission_gid}",
-                     { job: job })
-          status_result = update_status("No Transmittable::Transmission found with given global ID",
-                                        :failed,
-                                        { job: job })
-          return status_result if status_result.failure?
-          msg = "No Transmittable::Transmission found with given global ID: #{transmission_gid}"
-          Failure(msg)
-        end
-      end
-
-      def find_and_update_request_transaction(transaction_gid, job, request_transmission)
-        transaction = find_transaction_by_global_id(transaction_gid)
-
-        if transaction.success?
-          status_result = update_status("Transmittable::Transaction found with given global ID: #{transaction_gid}",
-                                        :succeeded,
-                                        { transaction: transaction.value! })
-          return status_result if status_result.failure?
-          Success(transaction.value!)
-        else
-          add_errors(:invalid_transaction_on_enrollment_expire,
-                     "No Transmittable::Transaction found with given global ID: #{transaction_gid}",
-                     { transmission: request_transmission, job: job })
-          status_result = update_status("No Transmittable::Transaction found with given global ID: #{transaction_gid}",
-                                        :failed,
-                                        { transmission: request_transmission, job: job })
-          return status_result if status_result.failure?
-          msg = "No Transmittable::Transaction found with given global ID: #{transaction_gid}"
-          Failure(msg)
-        end
-      end
-
       def construct_response_transmission_params(job)
         Success({
                   job: job,
@@ -155,7 +117,6 @@ module Operations
                   started_at: DateTime.now,
                   event: 'received',
                   state_key: :received,
-                  transmission_id: hbx_enrollment.hbx_id,
                   correlation_id: hbx_enrollment.hbx_id
                 })
       end
@@ -170,17 +131,13 @@ module Operations
                   publish_on: Date.today,
                   started_at: DateTime.now,
                   event: 'received',
-                  transaction_id: hbx_enrollment.hbx_id,
+                  correlation_id: hbx_enrollment.hbx_id,
                   state_key: :received
                 })
       end
 
       def expire_enrollment
         hbx_enrollment.expire_coverage!
-        status_result = update_status("Successfully expired enrollment hbx id #{hbx_enrollment.hbx_id}",
-                                      :succeeded,
-                                      { transaction: response_transaction, transmission: response_transmission })
-        return status_result if status_result.failure?
         Success("Successfully expired enrollment hbx id #{hbx_enrollment.hbx_id}")
       rescue StandardError => e
         add_errors(:expire_enrollment,
