@@ -4,7 +4,7 @@ module Operations
   module Transmittable
     # This module is designed for code reuse within domain operations that include Transmittable related objects.
     # It provides a set of generic methods or steps specifically tailored for Transmittable 2.0 functionality.
-    # The methods within this module are focused on the creation of Job, Transmission, Transaction, Error, and ProcessStatus objects,
+    # The methods within this module are focused on the finding and creation of Job, Transmission, Transaction, Error, and ProcessStatus objects,
     # offering a modular and reusable solution for related operations within the domain.
     # Operations are the classes that include EventSource::Command and Dry::Monads[:result, :do].
     module TransmittableUtils
@@ -45,7 +45,7 @@ module Operations
 
         add_errors(
           :create_request_transaction,
-          "Failed to create transaction due to #{result.failure}",
+          "Failed to create transaction due to #{result.failure} for params: #{transaction_params}",
           { job: job, transmission: transmission }
         )
         status_result = update_status(result.failure, :failed, { job: job, transmission: transmission })
@@ -63,10 +63,48 @@ module Operations
 
         add_errors(
           :create_request_transmission,
-          "Failed to create transmission due to #{result.failure}",
+          "Failed to create transmission due to #{result.failure} for params: #{transmission_params}",
           { job: job }
         )
         status_result = update_status(result.failure, :failed, { job: job })
+        status_result.failure? ? status_result : result
+      end
+
+      # @param [Hash] transmission_params The parameters for creating the response transmission.
+      # @param [Hash] transmittable_objects A hash containing transmittable objects.
+      # @option transmittable_objects [Object] :job The Transmittable::Job.
+      # @option transmittable_objects [Object] :transmission The request Transmittable::Transmission.
+      # @option transmittable_objects [Object] :transaction The request Transmittable::Transaction.
+      # @return [Dry::Monads::Result]
+      def create_response_transmission(transmission_params, transmittable_objects)
+        result = ::Operations::Transmittable::CreateTransmission.new.call(transmission_params)
+        return result if result.success?
+
+        add_errors(
+          :create_response_transmission,
+          "Failed to create transmission due to #{result.failure} for params: #{transmission_params}",
+          transmittable_objects
+        )
+        status_result = update_status(result.failure, :failed, transmittable_objects)
+        status_result.failure? ? status_result : result
+      end
+
+      # @param [Hash] transaction_params The parameters for creating the response transaction.
+      # @param [Hash] transmittable_objects A hash containing transmittable objects.
+      # @option transmittable_objects [Object] :job The Transmittable::Job.
+      # @option transmittable_objects [Object] :transmission The request Transmittable::Transmission.
+      # @option transmittable_objects [Object] :transaction The request Transmittable::Transaction.
+      # @return [Dry::Monads::Result]
+      def create_response_transaction(transaction_params, transmittable_objects)
+        result = ::Operations::Transmittable::CreateTransaction.new.call(transaction_params)
+        return result if result.success?
+
+        add_errors(
+          :create_response_transaction,
+          "Failed to create transaction due to #{result.failure} for params: #{transaction_params}",
+          { job: job, transmission: transmission }
+        )
+        status_result = update_status(result.failure, :failed, transmittable_objects)
         status_result.failure? ? status_result : result
       end
 
@@ -84,6 +122,48 @@ module Operations
             transmittable_objects: transmittable_objects
           }
         )
+      end
+
+      # Finds a Transmittable::Job based on its global identifier.
+      #
+      # @param [String] job_gid The global identifier of the Transmittable::Job.
+      # @return [Dry::Monads::Result]
+      def find_job_by_global_id(job_gid)
+        job = GlobalID::Locator.locate(job_gid)
+
+        if job.present?
+          Success(job)
+        else
+          Failure("No Transmittable::Job found with given global ID: #{job_gid}")
+        end
+      end
+
+      # Finds a Transmittable::Transmission based on its global identifier.
+      #
+      # @param [String] transmission_gid The global identifier of the Transmittable::Transmission.
+      # @return [Dry::Monads::Result]
+      def find_transmission_by_global_id(transmission_gid)
+        transmission = GlobalID::Locator.locate(transmission_gid)
+
+        if transmission.present?
+          Success(transmission)
+        else
+          Failure("No Transmittable::Transmission found with given global ID: #{transmission_gid}")
+        end
+      end
+
+      # Finds a Transmittable::Transaction based on its global identifier.
+      #
+      # @param [String] transaction_gid The global identifier of the Transmittable::Transaction.
+      # @return [Dry::Monads::Result]
+      def find_transaction_by_global_id(transaction_gid)
+        transaction = GlobalID::Locator.locate(transaction_gid)
+
+        if transaction.present?
+          Success(transaction)
+        else
+          Failure("No Transmittable::Transaction found with given global ID: #{transaction_gid}")
+        end
       end
     end
   end
