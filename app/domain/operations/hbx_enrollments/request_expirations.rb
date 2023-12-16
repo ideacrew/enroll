@@ -4,9 +4,7 @@ module Operations
   module HbxEnrollments
     # Publish event to request expiration of all active IVL enrollments for the previous years
     class RequestExpirations
-      include EventSource::Command
-      include Dry::Monads[:result, :do]
-      include ::Domain::Operations::TransmittableConcern
+      include ::Operations::Transmittable::TransmittableUtils
 
       attr_reader :job, :logger
 
@@ -18,7 +16,7 @@ module Operations
         bcp_start_on   = yield fetch_bcp_start_on
         job_params     = yield construct_job_params(bcp_start_on)
         @job           = yield create_job(job_params)
-        query_criteria = yield fetch_query_critiria(bcp_start_on)
+        query_criteria = yield fetch_query_criteria(bcp_start_on)
         event          = yield build_event(query_criteria)
         result         = yield publish(bcp_start_on, event)
 
@@ -59,7 +57,7 @@ module Operations
 
       # TODO: Remove hard coded aasm_state and kind values.
       #       Define constants for them in HbxEnrollment class and use them.
-      def fetch_query_critiria(bcp_start_on)
+      def fetch_query_criteria(bcp_start_on)
         Success(
           {
             'aasm_state': { '$in': HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending'] },
