@@ -35,15 +35,9 @@ module Operations
                                                       :succeeded,
                                                       { transaction: request_transaction})
         transmission_params     = yield construct_response_transmission_params(job)
-        @response_transmission  = yield create_response_transmission(transmission_params,
-                                                                     { job: job,
-                                                                       transmission: request_transmission,
-                                                                       transaction: request_transaction})
+        @response_transmission  = yield create_response_transmission(transmission_params, { job: job })
         transaction_params      = yield construct_response_transaction_params
-        @response_transaction   = yield create_response_transaction(transaction_params,
-                                                                    { job: job,
-                                                                      transmission: request_transmission,
-                                                                      transaction: request_transaction})
+        @response_transaction   = yield create_response_transaction(transaction_params, { job: job })
         result                  = yield expire_enrollment
         _expiration_result      = yield update_status("Successfully expired enrollment hbx id #{hbx_enrollment.hbx_id}",
                                                       :succeeded,
