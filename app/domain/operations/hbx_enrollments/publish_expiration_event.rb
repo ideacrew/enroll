@@ -45,7 +45,6 @@ module Operations
             started_at: DateTime.now,
             event: 'initial',
             state_key: :initial,
-            transmission_id: enrollment.hbx_id,
             correlation_id: enrollment.hbx_id
           }
         )
@@ -62,7 +61,8 @@ module Operations
             publish_on: Date.today,
             started_at: DateTime.now,
             event: 'initial',
-            state_key: :initial
+            state_key: :initial,
+            correlation_id: enrollment.hbx_id
           }
         )
       end
