@@ -14,7 +14,6 @@ module Operations
       # @return [Dry::Monads::Result]
       # @example params: {
       #   enrollment_gid: 'gid://enroll/HbxEnrollment/65739e355b4dc03a97f26c3b',
-      #   enrollment_hbx_id: '123456',
       #   transmittable_identifiers: {
       #    job_gid: 'gid://enroll/Transmittable::Job/65739e355b4dc03a97f26c3b',
       #    transmission_gid: 'gid://enroll/Transmittable::Transmission/65739e355b4dc03a97f26c3b',
