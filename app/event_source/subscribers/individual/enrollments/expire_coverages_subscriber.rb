@@ -23,11 +23,11 @@ module Subscribers
         subscribe(:on_expire) do |delivery_info, _metadata, response|
           @logger = subscriber_logger_for(:on_enroll_individual_enrollments_expire_coverages_expire)
           payload = JSON.parse(response, symbolize_names: true)
-          enrollment_hbx_id = payload[:enrollment_hbx_id]
+          enrollment_gid = payload[:enrollment_gid]
           @logger.info "ExpireCoveragesSubscriber on_expire, response: #{payload}"
-          @logger.info "------------ Processing enrollment: #{enrollment_hbx_id} ------------"
+          @logger.info "------------ Processing enrollment: #{enrollment_gid} ------------"
           result = Operations::HbxEnrollments::Expire.new.call(payload)
-          @logger.info "Processed enrollment: #{enrollment_hbx_id}"
+          @logger.info "Processed enrollment: #{enrollment_gid}"
           result.success? ? @logger.info(result.value!) : @logger.error(result.failure)
           ack(delivery_info.delivery_tag)
         rescue StandardError, SystemStackError => e
