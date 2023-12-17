@@ -168,6 +168,10 @@ RSpec.describe ::Operations::HbxEnrollments::BeginCoverage, dbclean: :after_each
   end
 
   describe 'with valid params' do
+    before :each do
+      result
+    end
+
     it 'returns success message' do
       msg = "Successfully began coverage for enrollment hbx id #{enrollment.hbx_id}."
       expect(result.success).to eq(msg)
@@ -176,12 +180,12 @@ RSpec.describe ::Operations::HbxEnrollments::BeginCoverage, dbclean: :after_each
 
     it 'creates transmission with correct association' do
       expect(operation_instance.response_transmission).to be_a(::Transmittable::Transmission)
-      expect(operation_instance.response_transmission.job).to eq(transmittable_job)
+      expect(operation_instance.response_transmission.job).to eq(job)
     end
 
     it 'associates newly created response transmission to job' do
-      expect(transmittable_job.transmissions.count).to eq(2)
-      expect(transmittable_job.transmissions.pluck(:key)).to include(:hbx_enrollment_begin_coverage_response)
+      expect(job.transmissions.count).to eq(2)
+      expect(job.transmissions.pluck(:key)).to include(:hbx_enrollment_begin_coverage_response)
     end
 
     it 'creates response transaction with correct associations' do
@@ -190,12 +194,10 @@ RSpec.describe ::Operations::HbxEnrollments::BeginCoverage, dbclean: :after_each
     end
 
     it 'creates join table record between transmission and transaction' do
+      expect(operation_instance.response_transaction.transmissions).to be_one
       expect(
-        ::Transmittable::TransactionsTransmissions.where(
-          transaction_id: operation_instance.response_transaction.id,
-          transmission_id: operation_instance.response_transmission.id
-        ).count
-      ).to eq(1)
+        operation_instance.response_transaction.transmissions.first
+      ).to eq(operation_instance.response_transmission)
     end
 
     it 'associates both request/response transmission and transaction to enrollment' do
