@@ -7,7 +7,17 @@ RSpec.describe ::Operations::HbxEnrollments::BeginCoverage, dbclean: :after_each
   let(:family)      { FactoryBot.create(:family, :with_primary_family_member) }
   let(:effective_on) { TimeKeeper.date_of_record.beginning_of_year }
   let(:aasm_state) { 'auto_renewing' }
-  let(:enrollment) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, aasm_state: aasm_state, effective_on: effective_on) }
+  let(:kind) { 'individual' }
+
+  let(:enrollment) do
+    FactoryBot.create(
+      :hbx_enrollment,
+      kind: kind,
+      family: family,
+      aasm_state: aasm_state,
+      effective_on: effective_on
+    )
+  end
 
   let(:enrollment_hbx_id) { enrollment.hbx_id }
 
@@ -73,6 +83,10 @@ RSpec.describe ::Operations::HbxEnrollments::BeginCoverage, dbclean: :after_each
         subject_gid: enrollment.to_global_id.uri.to_s
       }
     }
+  end
+
+  before :each do
+    result
   end
 
   describe 'with invalid params' do
@@ -165,13 +179,79 @@ RSpec.describe ::Operations::HbxEnrollments::BeginCoverage, dbclean: :after_each
         expect(result.failure).to eq("Missing subject_gid in transmittable_identifiers of params: #{params}.")
       end
     end
+
+    context 'invalid input enrollment gid' do
+      let(:params) do
+        {
+          enrollment_gid: 'invalid-enrollment-gid',
+          transmittable_identifiers: {
+            job_gid: job.to_global_id.uri.to_s,
+            transmission_gid: request_transmission.to_global_id.uri.to_s,
+            transaction_gid: request_transaction.to_global_id.uri.to_s,
+            subject_gid: enrollment.to_global_id.uri.to_s
+          }
+        }
+      end
+
+      it 'returns failure monad' do
+        expect(result.failure).to eq("No HbxEnrollment found with given global ID: #{params[:enrollment_gid]}")
+      end
+    end
+
+    context 'with shop enrollment' do
+      let(:kind) { 'employer_sponsored' }
+
+      it 'returns failure monad' do
+        expect(result.failure).to eq("Invalid Enrollment kind: #{kind}. Expected an IVL enrollment kinds.")
+      end
+    end
+
+    context 'with invalid aasm_state' do
+      let(:aasm_state) do
+        ['actively_renewing', 'coverage_canceled', 'coverage_enrolled', 'coverage_expired', 'coverage_terminated', 'coverage_termination_pending', 'inactive', 'renewing_contingent_enrolled', 'shopping', 'void'].sample
+      end
+
+      it 'returns failure monad and also logs the error msg' do
+        msg = "Invalid Transition request. Failed to begin coverage for enrollment hbx id #{enrollment.hbx_id}."
+        expect(result.failure).to eq(msg)
+        expect(logger).to include(msg)
+      end
+
+      it 'updates status on response transmission' do
+        response_transmission = operation_instance.response_transmission
+        process_status = response_transmission.process_status
+        expect(process_status.latest_state).to eq(:failed)
+        process_state = process_status.process_states.last
+        expect(process_state.event).to eq('failed')
+        expect(process_state.state_key).to eq(:failed)
+      end
+
+      it 'adds errors on response transmission' do
+        response_transmission = operation_instance.response_transmission
+        expect(
+          response_transmission.transmittable_errors.last.key
+        ).to eq(:enrollment_begin_coverage)
+      end
+
+      it 'updates status on response transaction' do
+        response_transaction = operation_instance.response_transaction
+        process_status = response_transaction.process_status
+        expect(process_status.latest_state).to eq(:failed)
+        process_state = process_status.process_states.last
+        expect(process_state.event).to eq('failed')
+        expect(process_state.state_key).to eq(:failed)
+      end
+
+      it 'adds errors on response transaction' do
+        response_transaction = operation_instance.response_transaction
+        expect(
+          response_transaction.transmittable_errors.last.key
+        ).to eq(:enrollment_begin_coverage)
+      end
+    end
   end
 
   describe 'with valid params' do
-    before :each do
-      result
-    end
-
     it 'returns success message' do
       msg = "Successfully began coverage for enrollment hbx id #{enrollment.hbx_id}."
       expect(result.success).to eq(msg)

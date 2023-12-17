@@ -112,9 +112,7 @@ module Operations
             "No HbxEnrollment found with given global ID: #{@hbx_enrollment_gid}"
           )
         elsif !hbx_enrollment.is_ivl_by_kind?
-          Failure(
-            "Failed to expire enrollment hbx id #{hbx_enrollment.hbx_id} - #{hbx_enrollment.kind} is not a valid IVL enrollment kind"
-          )
+          Failure("Invalid Enrollment kind: #{hbx_enrollment.kind}. Expected an IVL enrollment kinds.")
         else
           Success(hbx_enrollment)
         end
@@ -161,6 +159,9 @@ module Operations
           Success(msg)
         else
           msg = "Invalid Transition request. Failed to begin coverage for enrollment hbx id #{hbx_enrollment.hbx_id}."
+          add_errors(:enrollment_begin_coverage, msg, { transaction: response_transaction, transmission: response_transmission })
+          status_result = update_status(msg, :failed, { transaction: response_transaction, transmission: response_transmission })
+          return status_result if status_result.failure?
           logger.error msg
           Failure(msg)
         end
