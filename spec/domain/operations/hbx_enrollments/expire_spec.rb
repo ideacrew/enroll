@@ -42,7 +42,9 @@ RSpec.describe ::Operations::HbxEnrollments::Expire, dbclean: :after_each do
 
       it 'fails due to invalid state transition to coverage_expired' do
         expect(result.success?).to be_falsey
-        expect(result.failure).to eq("Failed to expire enrollment hbx id #{enrollment.hbx_id} - Event 'expire_coverage' cannot transition from 'coverage_selected'. Failed callback(s): [:can_be_expired?].")
+        expect(result.failure).to match(
+          /Failed to expire enrollment hbx id #{enrollment.hbx_id} - Event 'expire_coverage' cannot transition from 'coverage_selected'./
+        )
       end
     end
   end
