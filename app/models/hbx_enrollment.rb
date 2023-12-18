@@ -19,6 +19,8 @@ class HbxEnrollment
 
   include FloatHelper
 
+  include Transmittable::Subject
+
   belongs_to :household
   # Override attribute accessor as well
   # Migrate all the family ids to that
@@ -2528,6 +2530,10 @@ class HbxEnrollment
 
   def dental?
     coverage_kind == "dental"
+  end
+
+  def health?
+    coverage_kind == "health"
   end
 
   # TODO: Implement behaviour by 16219.

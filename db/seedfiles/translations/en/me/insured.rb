@@ -509,7 +509,8 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.plan_shoppings.print_waiver.print_waiver_html' => "<h3>Waiver confirmation</h3><p>You have successfully waived the coverage at %{updated_at}. </p><p>Waiver Reason : %{waiver_reason}. </p><p>Please print this page for your records. </p>",
   :'en.print' => "Print",
   :'en.insured.plan_shoppings.show.title' => "Choose Plan",
-  :'en.insured.plan_shoppings.show.title.content' => "If you already know what plan you want, use 'Select Plan' below to choose it.",
+  :'en.insured.plan_shoppings.show.health_title.content' => "If you already know what plan you want, use 'Select Plan' below to choose it. If you want to see which plans include your providers, hospital, prescriptions and an estimate of your total out-of-pocket costs, use Plan Compare.",
+  :'en.insured.plan_shoppings.show.dental_title.content' => "If you already know what plan you want, use 'Select Plan' below to choose it.",
   :'en.compare_plans' => "Compare Plans",
   :'en.insured.plan_shoppings.final_cost_change' => "Please note your final cost may change based on the final enrollment of all employees.",
   :'en.sort_by' => "Sort By",
@@ -582,5 +583,6 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.ineligible' => "Ineligible",
   :'en.your_tax_credit' => "Your Tax Credit",
   :'en.your_tax_credit_for_hc4cc' => "Your Tax Credit: HC4CC eligible households must use at least 85 percent of the credit.",
-  :'en.person_match_error_message' => "%{first_name} %{last_name} is already affiliated with another account."
+  :'en.person_match_error_message' => "%{first_name} %{last_name} is already affiliated with another account.",
+  :'en.upload_documents' => "Upload Documents"
 }.freeze

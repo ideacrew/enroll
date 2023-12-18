@@ -9,7 +9,7 @@
           <%= l10n("insured.families.click_help_me_sign_up") %>
         </small>
         <br/>
-        <span class="btn btn-default btn-block" data-target="#help_with_plan_shopping" data-toggle="modal">
+        <span id="help_me_sign_up" tabindex="0" onkeydown="handleButtonKeyDown(event, 'help_me_sign_up')" class="btn btn-default btn-block" data-target="#help_with_plan_shopping" data-toggle="modal">
           <%= l10n("help_me_sign_up") %>          
         </span>
         <br/>

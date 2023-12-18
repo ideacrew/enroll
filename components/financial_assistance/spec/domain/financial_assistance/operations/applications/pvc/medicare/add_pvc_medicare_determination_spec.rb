@@ -84,7 +84,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Pvc::Medicare::A
 
         it 'should not update due_on on local mec evidence' do
           @applicant.reload
-          expect(@applicant.non_esi_evidence.due_on).to eq TimeKeeper.date_of_record
+          expect(@applicant.non_esi_evidence.due_on).to eq nil
         end
       end
     end

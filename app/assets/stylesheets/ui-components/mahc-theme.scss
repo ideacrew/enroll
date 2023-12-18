@@ -136,7 +136,7 @@ h1,h2,h3,h4,h5,h6 {
     text-decoration:none;
     cursor:pointer;
     transition: all 0.3s ease 0s;
-    color: var(--error-color, #e72b2d);
+    color: var(--primary-red, var(--error-color, #e72b2d));
   }
 
   a:visited {
@@ -264,9 +264,9 @@ fieldset[disabled] .btn {
 }
 
 .btn-default {
-  color: $secondary-button-text;
+  color: var(--theme-primary-100, $secondary-button-text);
   background-color: $secondary-button-background;
-  border-color: $secondary-button-border;
+  border-color: var(--theme-primary-100, $secondary-button-border);
   text-transform: $secondary-button-text-casing;
   font-weight: $primary-bold;
   box-sizing: border-box;
