@@ -24,6 +24,12 @@ RSpec.describe ::Operations::HbxEnrollments::RequestExpirations, dbclean: :after
     end
 
     context 'with valid params' do
+      let(:family)      { FactoryBot.create(:family, :with_primary_family_member) }
+      let!(:enrollment) do
+        FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family,
+                                                                   effective_on: start_on - 1.month)
+      end
+
       before do
         start_on
         result
@@ -42,9 +48,25 @@ RSpec.describe ::Operations::HbxEnrollments::RequestExpirations, dbclean: :after
       end
     end
 
+    context 'no enrollments to expire' do
+      before do
+        start_on
+        result
+      end
+
+      it 'returns failure' do
+        expect(result.failure?).to eq true
+        expect(result.failure).to match(/No enrollments found for query criteria/)
+      end
+
+      it 'not creates a job' do
+        expect(subject.job).to eq nil
+      end
+    end
+
     context 'with invalid params' do
       context 'without hbx profile' do
-        it 'returns a failure moand with error message' do
+        it 'returns a failure monad with error message' do
           expect(result.failure).to eq('Unable to find the start_on date for current benefit coverage period.')
         end
       end
