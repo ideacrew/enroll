@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe ::Operations::HbxEnrollments::PublishBeginCoverageEvent, dbclean: :after_each do
+RSpec.describe ::Operations::HbxEnrollments::PublishExpirationEvent, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
   before :each do
@@ -10,8 +10,8 @@ RSpec.describe ::Operations::HbxEnrollments::PublishBeginCoverageEvent, dbclean:
   end
 
   let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
-  let(:effective_on) { TimeKeeper.date_of_record.beginning_of_year }
-  let(:aasm_state) { 'auto_renewing' }
+  let(:effective_on) { TimeKeeper.date_of_record.prev_year.beginning_of_year }
+  let(:aasm_state) { 'coverage_selected' }
   let!(:enrollment) do
     FactoryBot.create(
       :hbx_enrollment,
@@ -25,9 +25,9 @@ RSpec.describe ::Operations::HbxEnrollments::PublishBeginCoverageEvent, dbclean:
   let(:transmittable_job) do
     ::Operations::Transmittable::CreateJob.new.call(
       {
-        key: :hbx_enrollments_begin_coverage,
-        title: "Request begin coverage of all renewal IVL enrollments.",
-        description: "Job that requests begin coverage of all renewal IVL enrollments.",
+        key: :hbx_enrollments_expiration,
+        title: "Request expiration of all active IVL enrollments.",
+        description: "Job that requests expiration of all active IVL enrollments.",
         publish_on: DateTime.now,
         started_at: DateTime.now
       }
@@ -153,7 +153,7 @@ RSpec.describe ::Operations::HbxEnrollments::PublishBeginCoverageEvent, dbclean:
 
       it 'returns success' do
         expect(result.success).to eq(
-          "Successfully published begin coverage event: events.individual.enrollments.begin_coverages.begin for enrollment with hbx_id: #{enrollment.hbx_id}."
+          "Successfully published expiration event: events.individual.enrollments.expire_coverages.expire for enrollment with hbx_id: #{enrollment.hbx_id}."
         )
       end
 
