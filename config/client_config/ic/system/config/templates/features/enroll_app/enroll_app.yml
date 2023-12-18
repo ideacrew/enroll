@@ -30,17 +30,17 @@ registry:
           - key: :submit_docs_url
             item: "https://www.ideacrew.com/submit-docs"
           - key: :site_key
-            item: :dc
+            item: :me
           - key: :state_abbreviation
-            item: "DC"
+            item: "ME"
           - key: :state_residency
-            item: "DC Residency"
+            item: "ME Residency"
           - key: :subdomain
             item: "dchbx"
           - key: :domain_name
             item: "ideacrew.com"
           - key: :site_title
-            item: "DC's Online Health Insurance Marketplace"
+            item: "IdeaCrew Demo's Online Health Insurance Marketplace"
           - key: :home_url
             item: "https://www.ideacrew.com/"
           - key: :home_business_url
@@ -160,7 +160,7 @@ registry:
           - key: :staging_tax_info_url
             item: "https://staging.ideacrew.com/individuals/tax-documents"
           - key: :statewide_area
-            item: "DC-Metro"
+            item: "ME"
           - key: :nationwide_area
             item: "Nationwide"
           - key: :standard_plan_label
