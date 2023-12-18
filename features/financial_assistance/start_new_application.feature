@@ -49,8 +49,6 @@ Feature: Cost Savings -  Start New Application
     Then consumer should see 'Start New Application' button
     When consumer click 'Start New Application' button
     Then the consumer is navigated to Application checklist page
-    And contrast_level_aa feature is enabled
-    Then the page should be axe clean according to: wcag2a; checking only: color-contrast
 
   Scenario: FAA is enabled - year selection disabled - OE ended - and consumer has a no existing FAA applications
     Given the iap year selection feature is enabled
@@ -67,8 +65,6 @@ Feature: Cost Savings -  Start New Application
     Then consumer should see 'Start New Application' button
     When consumer click 'Start New Application' button
     Then the consumer is navigated to Application checklist page
-    And contrast_level_aa feature is enabled
-    Then the page should be axe clean according to: wcag2a; checking only: color-contrast
 
   Scenario: FAA is enabled - year selection disabled - in OE - and consumer has a no existing FAA applications
     Given the iap year selection feature is enabled
@@ -101,3 +97,18 @@ Feature: Cost Savings -  Start New Application
     Then consumer should see 'Start New Application' button
     When consumer click 'Start New Application' button
     Then the user will navigate to the non-OE assistance year selection page
+
+  Scenario: FAA is enabled - year selection disabled - contrast level aa is enabled - and consumer has a no existing FAA applications
+    Given the iap year selection feature is disabled
+    Given a consumer exists
+    And the consumer is logged in
+    And consumer has successful ridp
+    And the FAA feature configuration is enabled
+    When consumer visits home page
+    And the Cost Savings link is visible
+    And the consumer clicks on Cost Savings link
+    Then consumer should see 'Start New Application' button
+    When consumer click 'Start New Application' button
+    Then the consumer is navigated to Application checklist page
+    And contrast_level_aa feature is enabled
+    Then the page should be axe clean according to: wcag2a; checking only: color-contrast
