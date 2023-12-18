@@ -7,7 +7,7 @@ RSpec.shared_examples 'restrictions on verification document upload' do
     params = { person: { consumer_role: person.consumer_role }, file: [file] }
     post :upload, params: params
 
-    expect(flash[:error]).to eq("Unable to upload file. Please upload a file in PNG, JPEG, or PDF format and ensure it's under #{EnrollRegistry[:verification_doc_size_limit_in_mb].item}MB.")
+    expect(flash[:error]).to include(I18n.t("insured.verification_doc_file_error"))
     expect(response).to have_http_status(:redirect)
   end
 end
