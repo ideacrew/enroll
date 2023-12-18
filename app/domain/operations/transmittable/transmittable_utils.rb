@@ -4,7 +4,7 @@ module Operations
   module Transmittable
     # This module is designed for code reuse within domain operations that include Transmittable related objects.
     # It provides a set of generic methods or steps specifically tailored for Transmittable 2.0 functionality.
-    # The methods within this module are focused on the creation of Job, Transmission, Transaction, Error, and ProcessStatus objects,
+    # The methods within this module are focused on the finding and creation of Job, Transmission, Transaction, Error, and ProcessStatus objects,
     # offering a modular and reusable solution for related operations within the domain.
     # Operations are the classes that include EventSource::Command and Dry::Monads[:result, :do].
     module TransmittableUtils
@@ -45,7 +45,7 @@ module Operations
 
         add_errors(
           :create_request_transaction,
-          "Failed to create transaction due to #{result.failure}",
+          "Failed to create transaction due to #{result.failure} for params: #{transaction_params}",
           { job: job, transmission: transmission }
         )
         status_result = update_status(result.failure, :failed, { job: job, transmission: transmission })
@@ -63,7 +63,7 @@ module Operations
 
         add_errors(
           :create_request_transmission,
-          "Failed to create transmission due to #{result.failure}",
+          "Failed to create transmission due to #{result.failure} for params: #{transmission_params}",
           { job: job }
         )
         status_result = update_status(result.failure, :failed, { job: job })
@@ -82,7 +82,7 @@ module Operations
 
         add_errors(
           :create_response_transmission,
-          "Failed to create transmission due to #{result.failure}",
+          "Failed to create transmission due to #{result.failure} for params: #{transmission_params}",
           transmittable_objects
         )
         status_result = update_status(result.failure, :failed, transmittable_objects)
@@ -101,7 +101,7 @@ module Operations
 
         add_errors(
           :create_response_transaction,
-          "Failed to create transaction due to #{result.failure}",
+          "Failed to create transaction due to #{result.failure} for params: #{transaction_params}",
           { job: job, transmission: transmission }
         )
         status_result = update_status(result.failure, :failed, transmittable_objects)
@@ -134,8 +134,7 @@ module Operations
         if job.present?
           Success(job)
         else
-          msg = "No Transmittable::Job found with given global ID: #{job_gid}"
-          Failure(msg)
+          Failure("No Transmittable::Job found with given global ID: #{job_gid}")
         end
       end
 
@@ -149,8 +148,7 @@ module Operations
         if transmission.present?
           Success(transmission)
         else
-          msg = "No Transmittable::Transmission found with given global ID: #{transmission_gid}"
-          Failure(msg)
+          Failure("No Transmittable::Transmission found with given global ID: #{transmission_gid}")
         end
       end
 
@@ -164,8 +162,7 @@ module Operations
         if transaction.present?
           Success(transaction)
         else
-          msg = "No Transmittable::Transaction found with given global ID: #{transaction_gid}"
-          Failure(msg)
+          Failure("No Transmittable::Transaction found with given global ID: #{transaction_gid}")
         end
       end
     end
