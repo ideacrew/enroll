@@ -14,8 +14,6 @@ Feature: Start a new Financial Assistance Application
     And selects yes they would like help paying for coverage
     Then they should see a new finanical assistance application
     Then They should see the application assistance year above Info Needed
-    And contrast_level_aa feature is enabled
-    Then the page should be axe clean according to: wcag2aa; checking only: color-contrast
 
   Scenario: A consumer should NOT see the applications assistance year when feature disabled
     Given IAP Assistance Year Display feature is disabled
@@ -31,3 +29,12 @@ Feature: Start a new Financial Assistance Application
     And they should see each of their dependents listed
     And consumer clicks on pencil symbol next to primary person
     Then consumer should see today date and clicks continue
+
+  Scenario: contrast level aa is enabled - A consumer should see the applications assistance year when feature enabled
+    Given IAP Assistance Year Display feature is enabled
+    When a consumer visits the Get Help Paying for coverage page
+    And selects yes they would like help paying for coverage
+    Then they should see a new finanical assistance application
+    Then They should see the application assistance year above Info Needed
+    When the contrast_level_aa feature is enabled
+    Then the page should be axe clean according to: wcag2aa; checking only: color-contrast
