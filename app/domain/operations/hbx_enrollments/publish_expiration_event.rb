@@ -2,8 +2,8 @@
 
 module Operations
   module HbxEnrollments
-    # Publish event to begin IVL enrollment coverage
-    class PublishBeginCoverageEvent
+    # Publish expiration event for each enrollment
+    class PublishExpirationEvent
       include ::Operations::Transmittable::TransmittableUtils
 
       attr_reader :transaction, :transmission
@@ -38,9 +38,9 @@ module Operations
         Success(
           {
             job: job,
-            key: :hbx_enrollment_begin_coverage_request,
-            title: "Transmission request to begin coverage enrollment with hbx id: #{enrollment.hbx_id}.",
-            description: "Transmission request to begin coverage enrollment with hbx id: #{enrollment.hbx_id}.",
+            key: :hbx_enrollment_expiration_request,
+            title: "Transmission request to expire enrollment with hbx id: #{enrollment.hbx_id}.",
+            description: "Transmission request to expire enrollment with hbx id: #{enrollment.hbx_id}.",
             publish_on: Date.today,
             started_at: DateTime.now,
             event: 'initial',
@@ -55,9 +55,9 @@ module Operations
           {
             transmission: transmission,
             subject: enrollment,
-            key: :hbx_enrollment_begin_coverage_request,
-            title: "Enrollment begin coverage request transaction for #{enrollment.hbx_id}.",
-            description: "Transaction request to begin coverage of enrollment with hbx id: #{enrollment.hbx_id}.",
+            key: :hbx_enrollment_expiration_request,
+            title: "Enrollment expiration request transaction for #{enrollment.hbx_id}.",
+            description: "Transaction request to expire enrollment with hbx id: #{enrollment.hbx_id}.",
             publish_on: Date.today,
             started_at: DateTime.now,
             event: 'initial',
@@ -69,9 +69,10 @@ module Operations
 
       def build_event(values)
         event(
-          'events.individual.enrollments.begin_coverages.begin',
+          'events.individual.enrollments.expire_coverages.expire',
           attributes: {
             enrollment_gid: values[:enrollment].to_global_id.uri,
+            enrollment_hbx_id: values[:enrollment].hbx_id,
             transmittable_identifiers: {
               job_gid: values[:job].to_global_id.uri,
               transmission_gid: transmission.to_global_id.uri,
@@ -84,7 +85,7 @@ module Operations
 
       def publish_event(enrollment, event)
         event.publish
-        Success("Successfully published begin coverage event: #{event.name} for enrollment with hbx_id: #{enrollment.hbx_id}.")
+        Success("Successfully published expiration event: #{event.name} for enrollment with hbx_id: #{enrollment.hbx_id}.")
       end
     end
   end
