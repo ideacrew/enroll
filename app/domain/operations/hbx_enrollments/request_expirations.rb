@@ -14,9 +14,10 @@ module Operations
       def call(_params)
         @logger        = yield initialize_logger
         bcp_start_on   = yield fetch_bcp_start_on
+        query_criteria = yield fetch_query_criteria(bcp_start_on)
+        _result        = yield find_enrollments_to_expire(query_criteria)
         job_params     = yield construct_job_params(bcp_start_on)
         @job           = yield create_job(job_params)
-        query_criteria = yield fetch_query_criteria(bcp_start_on)
         event          = yield build_event(query_criteria)
         result         = yield publish(bcp_start_on, event)
 
@@ -40,6 +41,16 @@ module Operations
           Success(start_on)
         else
           Failure('Unable to find the start_on date for current benefit coverage period.')
+        end
+      end
+
+      def find_enrollments_to_expire(query_criteria)
+        enrollments_to_expire = HbxEnrollment.where(query_criteria)
+
+        if enrollments_to_expire.present?
+          Success("Found #{enrollments_to_expire.count} enrollments to expire.")
+        else
+          Failure("No enrollments found for query criteria: #{query_criteria}.")
         end
       end
 
