@@ -4,9 +4,7 @@ module Operations
   module HbxEnrollments
     # Publish expiration event for each enrollment
     class PublishExpirationEvent
-      include EventSource::Command
-      include Dry::Monads[:result, :do]
-      include ::Domain::Operations::TransmittableConcern
+      include ::Operations::Transmittable::TransmittableUtils
 
       attr_reader :transaction, :transmission
 
@@ -40,14 +38,13 @@ module Operations
         Success(
           {
             job: job,
-            key: :hbx_enrollments_expiration_request,
+            key: :hbx_enrollment_expiration_request,
             title: "Transmission request to expire enrollment with hbx id: #{enrollment.hbx_id}.",
             description: "Transmission request to expire enrollment with hbx id: #{enrollment.hbx_id}.",
             publish_on: Date.today,
             started_at: DateTime.now,
             event: 'initial',
             state_key: :initial,
-            transmission_id: enrollment.hbx_id,
             correlation_id: enrollment.hbx_id
           }
         )
@@ -58,13 +55,14 @@ module Operations
           {
             transmission: transmission,
             subject: enrollment,
-            key: :hbx_enrollments_expiration_request,
+            key: :hbx_enrollment_expiration_request,
             title: "Enrollment expiration request transaction for #{enrollment.hbx_id}.",
             description: "Transaction request to expire enrollment with hbx id: #{enrollment.hbx_id}.",
             publish_on: Date.today,
             started_at: DateTime.now,
             event: 'initial',
-            state_key: :initial
+            state_key: :initial,
+            correlation_id: enrollment.hbx_id
           }
         )
       end

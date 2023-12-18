@@ -1338,7 +1338,12 @@ module FinancialAssistance
     end
 
     def set_evidence_to_negative_response(evidence)
-      evidence.negative_response_received! if evidence.may_negative_response_received?
+      return unless evidence.may_negative_response_received?
+
+      evidence.verification_outstanding = false
+      evidence.is_satisfied = true
+      evidence.due_on = nil
+      evidence.negative_response_received!
       save!
     end
 
