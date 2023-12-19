@@ -1,31 +1,41 @@
 module BenefitSponsors
   module Organizations
     class BrokerAgencyProfilePolicy < ApplicationPolicy
+      def redirect_signup?
+        access_to_broker_agency_profile?
+      end
+
       def access_to_broker_agency_profile?
+        return false unless user
         return false unless user.person
         return true if user.person.hbx_staff_role
-        bap_id = record.id
-        broker_role = user.person.broker_role
-        if broker_role
-          return true if broker_role.benefit_sponsors_broker_agency_profile_id == bap_id && broker_role.active?
-        end
-        staff_roles = user.person.broker_agency_staff_roles || []
-        staff_roles.any?{|r| r.benefit_sponsors_broker_agency_profile_id == bap_id && r.active?}
+        return true if has_matching_broker_role?
+
+        has_matching_broker_agency_staff_role?
       end
 
       def set_default_ga?
-        return false unless user.person
-        return true if user.person.hbx_staff_role
+        access_to_broker_agency_profile?
+      end
 
-        bap_id = record.id
-        broker_role = user.person.broker_role
-        if broker_role
-          return true if broker_role.benefit_sponsors_broker_agency_profile_id == bap_id && broker_role.active?
+      protected
 
-        end
-
+      def has_matching_broker_agency_staff_role?
         staff_roles = user.person.broker_agency_staff_roles || []
-        staff_roles.any?{|r| r.broker_agency_profile_id == bap_id && r.active?}
+        staff_roles.any? do |sr|
+          sr.active? &&
+            (
+              sr.broker_agency_profile_id == record.id ||
+                sr.benefit_sponsors_broker_agency_profile_id == record.id
+            )
+        end
+      end
+
+      def has_matching_broker_role?
+        broker_role = user.person.broker_role
+        return false unless broker_role
+
+        broker_role.benefit_sponsors_broker_agency_profile_id == record.id && broker_role.active?
       end
     end
   end

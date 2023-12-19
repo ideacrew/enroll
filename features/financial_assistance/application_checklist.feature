@@ -33,3 +33,11 @@ Feature: A dedicated page that gives the user prior notice that that application
     Given that the user is on the Application Checklist page
     When the user clicks the SAVE & EXIT link
     Then the next time the user logs in the user will see Application checklist page
+
+  Scenario: contrast level aa is enabled - User clicks previous or the back browser button with year selection enabled.
+    Given the iap year selection feature is enabled
+    Given that the user is on the Application Checklist page
+    When the user clicks the PREVIOUS link
+    Then the user will navigate to the assistance year selection page
+    When the contrast_level_aa feature is enabled
+    Then the page should be axe clean according to: wcag2aa; checking only: color-contrast
