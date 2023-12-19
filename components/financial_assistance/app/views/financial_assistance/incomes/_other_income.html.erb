@@ -28,8 +28,8 @@
         <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= other_income.end_on %></span>
       </div>
       <div class="col-md-1 form-group-lg class-fa-household no-pd fa-adjustment">
-        <a class="other-income-edit edit-pr"><i class="fa fa-pencil fa-lg" aria-hidden="true"></i></a>
-        <a class="other-income-delete"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'other-income-edit-<%= dom_id other_income %>')" id="other-income-edit-<%= dom_id other_income %>" class="other-income-edit edit-pr"><i class="fa fa-pencil fa-lg" aria-hidden="true"></i><span class="hide"><%=l10n(".edit")%></span></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'other-income-delete')" id="other-income-delete" class="other-income-delete"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i><span class="hide"><%=l10n(".delete")%></span></a>
       </div>
     </div>
   </div>

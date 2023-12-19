@@ -62,6 +62,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.family_member' => "Family Member",
   :'en.family_members' => "Family Members",
   :'en.complete' => "Complete",
+  :'en.completed' => "Completed",
   :'en.view_documents' => "View Documents",
   :'en.download' => "Download",
   :'en.name' => "Name",
