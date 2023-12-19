@@ -153,8 +153,6 @@ module BenefitSponsors
         [open_enrollment_start_on, open_enrollment_end_on]
       end
 
-      #TODO: Implement the binder payment due dates using BankHolidaysHelper
-      #TODO: Logic around binder payment due dates is not clear at this point. Hence hard-coding the due dates for now.
       def map_binder_payment_due_date_by_start_on(is_renewing, start_on)
         prior_month = start_on - 1.month
         binder_payment_due_on = Date.new(prior_month.year, prior_month.month, EnrollRegistry[:enroll_app].setting(:binder_payment_default_date).item)
