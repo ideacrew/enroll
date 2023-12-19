@@ -552,6 +552,7 @@ GEM
     hashdiff (1.0.1)
     hashery (2.1.2)
     highline (2.0.3)
+    holidays (8.6.0)
     html2haml (2.2.0)
       erubis (~> 2.7.0)
       haml (>= 4.0, < 6)
@@ -1064,6 +1065,7 @@ DEPENDENCIES
   forgery (~> 0.7.0)
   globalid
   haml (~> 5.0)
+  holidays (~> 8.6)
   httparty (~> 0.16)
   i18n (~> 1.5)
   i18n-tasks (~> 0.9.33)
