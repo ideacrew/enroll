@@ -49,15 +49,11 @@ module Operations
       end
 
       def domain_contract_class
-        if defined?("AcaEntities::EventLogs::#{resource_class}EventLogContract")
-          Object.const_get("AcaEntities::EventLogs::#{resource_class}EventLogContract")
-        end
+        Object.const_get("AcaEntities::EventLogs::#{resource_class}EventLogContract") if defined?("AcaEntities::EventLogs::#{resource_class}EventLogContract")
       end
 
       def domain_entity_class
-        if defined?("AcaEntities::EventLogs::#{resource_class}EventLog")
-          Object.const_get("AcaEntities::EventLogs::#{resource_class}EventLog")
-        end
+        Object.const_get("AcaEntities::EventLogs::#{resource_class}EventLog") if defined?("AcaEntities::EventLogs::#{resource_class}EventLog")
       end
     end
   end

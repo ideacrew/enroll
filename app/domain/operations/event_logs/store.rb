@@ -60,12 +60,10 @@ module Operations
 
         errors =
           entities
-            .map do |entity_class|
-              unless domain_entity_defined?(entity_class)
-                "#{entity_class} not defined"
-              end
-            end
-            .compact
+          .map do |entity_class|
+            "#{entity_class} not defined" unless domain_entity_defined?(entity_class)
+          end
+          .compact
 
         errors.empty? ? Success(resource_class) : Failure(errors)
       end
@@ -97,9 +95,7 @@ module Operations
       end
 
       def persistance_model(resource_class)
-        if defined?("EventLogs::#{resource_class}EventLog")
-          Object.const_get("EventLogs::#{resource_class}EventLog")
-        end
+        Object.const_get("EventLogs::#{resource_class}EventLog") if defined?("EventLogs::#{resource_class}EventLog")
       end
     end
   end
