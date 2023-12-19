@@ -434,5 +434,9 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.insured.rejected' => "%{ridp_type} successfully rejected.",
   :'en.your_tax_credit' => "Your Tax Credit",
   :'en.your_tax_credit_for_hc4cc' => "Your Tax Credit: HC4CC eligible households must use at least 85 percent of the credit.",
-  :'en.upload_documents' => "Upload Documents"
+  :'en.upload_documents' => "Upload Documents",
+  :'en.insured.verification_doc_file_error' => "Unable to upload file. Acceptable file types - PDF, JPEG, PNG, and GIF and ensure it does not exceed 100 MB.",
+  :'en.insured.verification_acceptable_file_types_text' => "Acceptable file types:",
+  :'en.insured.verification_acceptable_file_types' => "PDF, JPEG, PNG, and GIF",
+  :'en.insured.verification_max_file_size' => "File should not exceed 100 MB"
 }.freeze

@@ -221,8 +221,8 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:async_expire_and_begin_coverages).and_return(true)
       end
 
-      it "should not raise error" do
-        expect{subject.expire_individual_market_enrollments}.not_to raise_error
+      it 'executes without raising any errors' do
+        expect{ subject.expire_individual_market_enrollments }.not_to raise_error
       end
     end
   end
@@ -379,5 +379,10 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
         subject.send_enr_or_dr_notice_to_ivl(TimeKeeper.date_of_record)
       end
     end
+  end
+
+  after :all do
+    file_path = "#{Rails.root}/log/family_advance_day_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
+    File.delete(file_path) if File.file?(file_path)
   end
 end

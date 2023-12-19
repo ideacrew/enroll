@@ -29,7 +29,8 @@ module Operations
           end
 
           def build_event(payload)
-            event('events.fdsh.vlp.h92.initial_verification_requested', attributes: payload, headers: { correlation_id: payload[:hbx_id] })
+            payload_type = EnrollRegistry[:vlp_h92].setting(:payload_type).item
+            event('events.fdsh.vlp.h92.initial_verification_requested', attributes: payload, headers: { correlation_id: payload[:hbx_id], payload_type: payload_type })
           end
 
           def publish(event)

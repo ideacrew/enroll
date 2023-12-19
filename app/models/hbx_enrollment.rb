@@ -19,6 +19,8 @@ class HbxEnrollment
 
   include FloatHelper
 
+  include Transmittable::Subject
+
   belongs_to :household
   # Override attribute accessor as well
   # Migrate all the family ids to that
