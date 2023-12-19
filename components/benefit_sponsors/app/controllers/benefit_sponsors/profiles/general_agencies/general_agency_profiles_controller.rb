@@ -70,6 +70,7 @@ module BenefitSponsors
         def messages
           @sent_box = true
           @general_agency_profile = ::BenefitSponsors::Organizations::GeneralAgencyProfile.find(params[:id])
+          authorize @general_agency_profile, :can_read_inbox?
           @provider = @general_agency_profile
         end
 
