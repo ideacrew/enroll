@@ -210,6 +210,7 @@ PATH
       dry-types
       dry-validation (~> 1.0)
       ffi (~> 1.9)
+      holidays (~> 8.6)
       kaminari (~> 0.17.0)
       mongoid (~> 7.0.2)
       pundit (~> 2.0)
