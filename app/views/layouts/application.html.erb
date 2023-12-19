@@ -20,7 +20,7 @@
     <%= javascript_pack_tag ENV['CLIENT'] %>
     <%= stylesheet_pack_tag ENV['CLIENT'] %>
 
-    <% if ENV['CONTRAST_LEVEL_AA_IS_ENABLED'] %>
+    <% if EnrollRegistry.feature_enabled?(:contrast_level_aa) %>
       <%= javascript_pack_tag 'contrast_level_aa' %>
       <%= stylesheet_pack_tag 'contrast_level_aa' %>
     <% end %>
