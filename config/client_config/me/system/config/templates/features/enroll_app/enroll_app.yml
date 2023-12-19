@@ -429,6 +429,9 @@ registry:
       - key: :ce_roster_bulk_upload
         item: :ce_roster_bulk_upload
         is_enabled: <%= ENV['CE_ROSTER_BULK_UPLOAD_ENABLED'] || false %>
+      - key: :contrast_level_aa
+        item: :contrast_level_aa
+        is_enabled: <%= ENV['CONTRAST_LEVEL_AA_IS_ENABLED'] || false %>
   - namespace:
       - :pay_now_feature
     features:
@@ -910,3 +913,6 @@ registry:
       - key: :async_expire_and_begin_coverages
         item: :async_expire_and_begin_coverages
         is_enabled: <%= ENV['ASYNC_EXPIRE_AND_BEGIN_COVERAGES_IS_ENABLED'] || false %>
+      - key: :prevent_concurrent_sessions
+        item: :prevent_concurrent_sessions
+        is_enabled: <%= ENV['PREVENT_CONCURRENT_SESSIONS_IS_ENABLED'] || false %>

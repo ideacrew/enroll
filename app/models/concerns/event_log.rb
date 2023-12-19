@@ -18,6 +18,7 @@ module EventLog
     field :host_id, type: String
     field :trigger, type: String
     field :event_category, type: Symbol
+
     field :event_time, type: DateTime
     field :tags, type: Array
 

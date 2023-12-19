@@ -44,7 +44,8 @@ module Operations
             host_id: headers[:host_id],
             trigger: payload[:trigger],
             event_category: payload[:event_category],
-            event_time: DateTime.strptime(payload[:event_time], "%m/%d/%Y %H:%M"),
+            event_time:
+              DateTime.strptime(payload[:event_time], "%m/%d/%Y %H:%M"),
             session_detail: payload[:session_detail]
           }
         )
@@ -68,16 +69,16 @@ module Operations
       end
 
       def create(params, resource_class)
-        result = Operations::EventLogs::Create.new.call(
-          params.merge(resource_class: resource_class)
-        )
+        result =
+          Operations::EventLogs::Create.new.call(
+            params.merge(resource_class: resource_class)
+          )
 
         result.success? ? result : Failure(result.failure.errors)
       end
 
       def store(values, resource_class)
-        log_event =
-          "EventLogs::#{resource_class}EventLog".constantize.new(values.to_h)
+        log_event = persistance_model(resource_class).new(values.to_h)
 
         log_event.save ? Success(log_event) : Failure(log_event)
       end
@@ -91,6 +92,10 @@ module Operations
         Success(Object.const_get(class_name))
       rescue NameError
         Failure(false)
+      end
+
+      def persistance_model(resource_class)
+        Object.const_get("EventLogs::#{resource_class}EventLog") if defined?("EventLogs::#{resource_class}EventLog")
       end
     end
   end

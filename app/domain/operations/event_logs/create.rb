@@ -38,20 +38,22 @@ module Operations
         @resource_class = params.delete(:resource_class)
         return Failure("resource class name missing") unless resource_class
 
-        result =
-          "AcaEntities::EventLogs::#{resource_class}EventLogContract"
-          .constantize
-          .new
-          .call(params)
+        result = domain_contract_class.new.call(params)
         result.success? ? Success(result) : Failure(result)
       end
 
       def create(values)
         Success(
-          "AcaEntities::EventLogs::#{resource_class}EventLog".constantize.new(
-            values.to_h
-          )
+          domain_entity_class.new(values.to_h)
         )
+      end
+
+      def domain_contract_class
+        Object.const_get("AcaEntities::EventLogs::#{resource_class}EventLogContract") if defined?("AcaEntities::EventLogs::#{resource_class}EventLogContract")
+      end
+
+      def domain_entity_class
+        Object.const_get("AcaEntities::EventLogs::#{resource_class}EventLog") if defined?("AcaEntities::EventLogs::#{resource_class}EventLog")
       end
     end
   end
