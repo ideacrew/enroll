@@ -54,12 +54,15 @@
   margin-right: 5px !important;
 }
 .warning-icon {
-    background-image: url('../../assets/images/warning-icon.svg');
-    background-repeat: no-repeat;
-    background-position: center;
-    color: transparent !important;
-    font-size: 27px !important;
-  }
+  background-image: url('../../assets/images/warning-icon.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  color: transparent !important;
+  font-size: 27px !important;
+}
+
+// These classes overwrite the .in-progress and .fa-refresh icons used for faa. We hide them
+// and use the warning icons added above in their place to help AA contrast standards.
 .in-progress-icon {
   color: transparent;
 }
