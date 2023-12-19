@@ -45,9 +45,9 @@ module BenefitSponsors
         end
 
         def show
-          authorize self, :redirect_signup?
-          set_flash_by_announcement
           @broker_agency_profile = ::BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id])
+          authorize @broker_agency_profile, :redirect_signup?
+          set_flash_by_announcement
           @provider = current_user.person
           @id = params[:id]
         end
@@ -74,8 +74,8 @@ module BenefitSponsors
 
         # TODO: need to refactor for cases around SHOP broker agencies
         def family_datatable
-          authorize self
           find_broker_agency_profile(BSON::ObjectId.from_string(params.permit(:id)[:id]))
+          authorize @broker_agency_profile, :access_to_broker_agency_profile?
           @display_family_link = if ::EnrollRegistry.feature_enabled?(:disable_family_link_in_broker_agency)
                                    current_user.has_hbx_staff_role? || !::EnrollRegistry[:disable_family_link_in_broker_agency].setting(:enable_after_time_period).item.cover?(TimeKeeper.date_of_record)
                                  else
@@ -99,8 +99,8 @@ module BenefitSponsors
         end
 
         def family_index
-          authorize self
           find_broker_agency_profile(BSON::ObjectId.from_string(params.permit(:id)[:id]))
+          authorize @broker_agency_profile, :access_to_broker_agency_profile?
           @q = params.permit(:q)[:q]
 
           respond_to do |format|
@@ -120,6 +120,7 @@ module BenefitSponsors
             redirect_to new_profiles_registration_path
             return
           end
+          authorize @broker_agency_profile, :access_to_broker_agency_profile?
           documents = @broker_agency_profile.documents
           @statements = get_commission_statements(documents) if documents
           collect_and_sort_commission_statements
@@ -147,6 +148,7 @@ module BenefitSponsors
           @broker_agency_profile = BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id])
           @broker_role = current_user.person.broker_role || nil
           @general_agency_profiles = BenefitSponsors::Organizations::GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
+          authorize @broker_agency_profile, :access_to_broker_agency_profile?
         end
 
         def messages
@@ -155,6 +157,7 @@ module BenefitSponsors
           # messages are different for current_user is admin and broker account login
           @broker_agency_profile = ::BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id])
           @broker_provider = @broker_agency_profile.primary_broker_role.person
+          authorize @broker_agency_profile, :access_to_broker_agency_profile?
 
           respond_to do |format|
             format.js {}
