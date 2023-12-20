@@ -35,7 +35,7 @@ passwordTooltip() {
   const passwordHelper =
     `<p>Your password must:</p>
      <ul class="list-group pwHelper">
-      <li id="length" class="invalid"><i class="fa fa-times mr-3 length"></i>Be at least 12 characters</li>
+      <li id="length" class="invalid"><i class="fa fa-times mr-3 length"></i>Be at least 8 characters</li>
       <li id="longer" class="invalid"><i class="fa fa-times mr-3 longer"></i>Not be longer than 20 characters</li>
       <li id="lower" class="invalid"><i class="fa fa-times mr-3 lower"></i>Include at least one lowercase letter</li>
       <li id="upper" class="invalid"><i class="fa fa-times mr-3 upper"></i>Include at least one uppercase letter</li>
@@ -87,10 +87,10 @@ resetIcons() {
 }
 
 validateLength(value) {
-  if (value.length >= 12 && value.length < 20) {
+  if (value.length >= 8 && value.length < 20) {
     document.querySelector('.length').classList.add('fa-check');
     document.querySelector('.longer').classList.add('fa-check');
-  } else if (value.length < 12 && this.usernameFieldTarget.value.length > 0) {
+  } else if (value.length < 8 && this.usernameFieldTarget.value.length > 0) {
     this.resetIcons();
   }
 }
@@ -180,7 +180,7 @@ validateUserIdMatch(value) {
 }
 
 passwordComplexity(value) {
-  const minPasswordLength = 12;
+  const minPasswordLength = 8;
   const num = {};
   num.Excess = 0;
   num.Upper = 0;
@@ -223,7 +223,7 @@ passwordComplexity(value) {
   //   To keep the same scoring logic, strongPasswordBonus accounts for the
   //   4 characters' worth of "bonus.Excess" points (3 each) that would be
   //   added to the final score of a 12 character password with minPasswordLength set to 8.
-  let strongPasswordBonus = 12;
+  let strongPasswordBonus = 0;
 
   score = baseScore + (num.Excess*bonus.Excess) + (num.Upper*bonus.Upper) + (num.Numbers*bonus.Numbers) + (num.Symbols*bonus.Symbols) + bonus.Combo + bonus.FlatLower + bonus.FlatNumber + strongPasswordBonus;
 
