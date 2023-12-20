@@ -99,7 +99,8 @@ Feature: Cost Savings -  Start New Application
     Then the user will navigate to the non-OE assistance year selection page
 
   Scenario: FAA is enabled - year selection enabled - contrast level aa is enabled - and consumer has a no existing FAA applications
-    Given the iap year selection feature is enabled
+    Given the contrast level aa feature is enabled
+    And the iap year selection feature is enabled
     And the iap year selection form feature is enabled
     And current hbx is under open enrollment
     Given the date is within open enrollment
@@ -114,10 +115,10 @@ Feature: Cost Savings -  Start New Application
     Then consumer should see 'Start New Application' button
     When consumer click 'Start New Application' button
     Then the user will navigate to the assistance year selection page with multiple options
-    When the contrast_level_aa feature is enabled
     Then the page should be axe clean according to: wcag2aa; checking only: color-contrast
 
   Scenario: FAA is enabled - year selection disabled - OE ended - contrast level aa is enabled - and consumer has a no existing FAA applications
+    Given the contrast level aa feature is enabled
     Given the iap year selection feature is enabled
     And the iap year selection form feature is disabled
     And current hbx is not under open enrollment
@@ -132,5 +133,4 @@ Feature: Cost Savings -  Start New Application
     Then consumer should see 'Start New Application' button
     When consumer click 'Start New Application' button
     Then the consumer is navigated to Application checklist page
-    When the contrast_level_aa feature is enabled
     Then the page should be axe clean according to: wcag2aa; checking only: color-contrast
