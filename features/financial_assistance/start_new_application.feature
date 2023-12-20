@@ -119,7 +119,7 @@ Feature: Cost Savings -  Start New Application
 
   Scenario: FAA is enabled - year selection disabled - OE ended - contrast level aa is enabled - and consumer has a no existing FAA applications
     Given the contrast level aa feature is enabled
-    Given the iap year selection feature is enabled
+    And the iap year selection feature is enabled
     And the iap year selection form feature is disabled
     And current hbx is not under open enrollment
     Given the date is after open enrollment
