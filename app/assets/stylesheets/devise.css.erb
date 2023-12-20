@@ -2,16 +2,18 @@
 /* Devise flash message coloring. Must be changed as per design.*/
 
 .alert-error {
-  background-color: #f2dede;
-  border-color: #eed3d7;
-  color: #b94a48;
+  background-color: var(--background-light-red, #f2dede);
+  border-bottom: .4mm solid var(--primary-red, transparent) !important;
+  border-color: var(--primary-red, #eed3d7);
+  color: var(--primary-red, var(--error-color, #b94a48));
   text-align: left;
 }
 
 .alert-alert {
-  background-color: #f2dede;
-  border-color: #eed3d7;
-  color: #b94a48;
+  background-color: var(--background-light-red, #f2dede);
+  border-bottom: .4mm solid var(--primary-red, transparent) !important;
+  border-color: var(--primary-red, #eed3d7);
+  color: var(--primary-red, var(--error-color, #b94a48));
   text-align: left;
 }
 

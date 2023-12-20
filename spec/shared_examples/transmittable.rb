@@ -7,7 +7,6 @@ RSpec.shared_context 'transmittable job transmission transaction', shared_contex
     job = FactoryBot.create(:transmittable_job)
     job.process_status = FactoryBot.create(:transmittable_process_status, statusable: job)
     job.process_status.process_states << FactoryBot.create(:transmittable_process_state, process_status: job.process_status)
-    job.generate_message_id
     job.save
     job
   end
