@@ -90,5 +90,11 @@ module Queries
 
       matching_cancel && matching_selection
     end
+
+    def skip_termination?(enrollment)
+      return true unless EnrollRegistry.feature_enabled?(:silent_transition_enrollment)
+
+      enrollment.purchase_event_published_at.blank?
+    end
   end
 end
