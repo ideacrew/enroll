@@ -325,8 +325,6 @@ class ForcePublishBenAppReports < MongoidMigrationTask
     today_time = TimeKeeper.date_of_record.strftime("%Y%m%d%H%M%S")
     file_name = "#{Rails.root}/osse_subsidy_report_#{today_time}_#{today_time}.csv"
 
-    system("rm -rf #{file_name}")
-
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:'benefit_applications.effective_period.min' => start_on_date).each do |ben_spon|
         ben_spon.benefit_applications.each do |ben_app|
