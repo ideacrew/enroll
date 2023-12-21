@@ -14,11 +14,13 @@ RSpec.describe HbxEnrollment, type: :model do
   let(:family) { create(:family, :with_primary_family_member, person: person) }
   let(:aasm_state) { 'coverage_selected' }
   let(:predecessor_enrollment_id) { nil }
+  let(:purchase_event_published_at) { nil }
   let(:hbx_enrollment) do
     create(:hbx_enrollment, :individual_aptc, :with_silver_health_product, aasm_state: aasm_state,
                                                                            applied_aptc_amount: applied_aptc_amount,
                                                                            elected_aptc_pct: elected_aptc_pct,
                                                                            family: family,
+                                                                           purchase_event_published_at: purchase_event_published_at,
                                                                            predecessor_enrollment_id: predecessor_enrollment_id,
                                                                            consumer_role_id: person.consumer_role.id,
                                                                            ehb_premium: enrollment_ehb_premium)
@@ -701,6 +703,27 @@ RSpec.describe HbxEnrollment, type: :model do
     context 'without predecessor_enrollment_id' do
       it 'returns nil' do
         expect(hbx_enrollment.predecessor_enrollment).to be_nil
+      end
+    end
+  end
+
+  describe '#mark_purchase_event_as_published!' do
+    context 'with purchase_event_published_at' do
+      let(:purchase_event_published_at) { DateTime.now }
+
+      it 'returns without modifying the published at' do
+        expect(hbx_enrollment.purchase_event_published_at).to eq(purchase_event_published_at)
+        hbx_enrollment.mark_purchase_event_as_published!
+        expect(hbx_enrollment.purchase_event_published_at).to eq(purchase_event_published_at)
+      end
+    end
+
+    context 'without purchase_event_published_at' do
+
+      it 'populates published at' do
+        expect(hbx_enrollment.purchase_event_published_at).to be_nil
+        hbx_enrollment.mark_purchase_event_as_published!
+        expect(hbx_enrollment.purchase_event_published_at).not_to be_nil
       end
     end
   end
