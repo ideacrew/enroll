@@ -10,7 +10,7 @@ class User
 
   attr_accessor :login
   include PermissionsConcern
-  # include AuthorizationConcern
+  include AuthorizationConcern
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
