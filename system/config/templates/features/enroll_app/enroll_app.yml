@@ -923,11 +923,11 @@ registry:
       - key: :async_expire_and_begin_coverages
         item: :async_expire_and_begin_coverages
         is_enabled: <%= ENV['ASYNC_EXPIRE_AND_BEGIN_COVERAGES_IS_ENABLED'] || false %>
-      - key: :employee_match_recaptcha
-        item: :employee_match_recaptcha
-        is_enabled: <%= ENV['EMPLOYEE_MATCH_RECAPTCHA_IS_ENABLED'] || false %>
-      - key: :employee_match_max_recaptcha_attempts
-        item: <%= ENV['EMPLOYEE_MATCH_MAX_RECAPTCHA_ATTEMPTS'] || 3 %>
+      - key: :lock_account_for_unsuccessful_match_attempts
+        item: :lock_account_for_unsuccessful_match_attempts
+        is_enabled: <%= ENV['LOCK_ACCOUNT_FOR_UNSUCCESSFUL_MATCH_ATTEMPTS_IS_ENABLED'] || false %>
+      - key: :employee_match_max_attempts
+        item: <%= ENV['EMPLOYEE_MATCH_MAX_ATTEMPTS'] || 3 %>
         is_enabled: true
       - key: :prevent_concurrent_sessions
         item: :prevent_concurrent_sessions

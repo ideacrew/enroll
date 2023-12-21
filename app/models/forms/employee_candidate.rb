@@ -2,6 +2,8 @@ module Forms
   class EmployeeCandidate
     include ActiveModel::Model
     include ActiveModel::Validations
+    include L10nHelper
+    include Config::ContactCenterModelConcern
 
     include PeopleNames
     include SsnField
@@ -10,6 +12,7 @@ module Forms
     attr_accessor :user_id
     attr_accessor :dob_check
     attr_accessor :is_applying_coverage
+    attr_accessor :invalid_match_attempts
 
     validates_presence_of :first_name, :allow_blank => nil
     validates_presence_of :last_name, :allow_blank => nil
@@ -76,15 +79,39 @@ module Forms
           current_user_id = self.user_id.to_s
           matched_person_user_id = matched_person.user.id.to_s
           if matched_person_user_id != current_user_id
-            Rails.logger.warn("EmployeeCandidate::does_not_match_a_different_users_person #{current_user_id} is already affiliated with another account - #{matched_person_user_id}")
-            errors.add(
+            unless EnrollRegistry.feature_enabled?(:lock_account_for_unsuccessful_match_attempts)
+              errors.add(
                 :base,
                 "#{first_name} #{last_name} is already affiliated with another account"
-            )
+              )
+            end
           end
         end
       end
       true
+    end
+
+    def validate_and_lock_account
+      return unless EnrollRegistry.feature_enabled?(:lock_account_for_unsuccessful_match_attempts)
+      max_match_attempts = EnrollRegistry[:employee_match_max_attempts].item.to_i
+
+      if invalid_match_attempts >= max_match_attempts
+        message = l10n("insured.employee_roles.unsuccessful_match_attempts_exceeded", contact_center_name: contact_center_name, contact_center_phone_number: contact_center_phone_number)
+        errors.add(
+          :base,
+          message
+        )
+        current_user.lock!
+      else
+        message = l10n("insured.employee_roles.unsuccessful_match_attempts")
+        errors.add(
+          :base, message
+        )
+      end
+    end
+
+    def current_user
+      User.find(user_id) if user_id.present?
     end
 
     def dob_not_in_future

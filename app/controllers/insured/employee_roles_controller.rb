@@ -23,21 +23,20 @@ class Insured::EmployeeRolesController < ApplicationController
 
   def match
     @no_save_button = true
-    @person_params = params.require(:person).permit(person_parameters_list).merge({:user_id => current_user.id})
+    session[:invalid_match_attempts] ||= 0
+    @person_params = params.require(:person).permit(person_parameters_list).merge({:user_id => current_user.id, :invalid_match_attempts => session[:invalid_match_attempts]})
     @person_params.merge(no_ssn: params.dig(:person, :no_ssn)) if params.dig(:person, :no_ssn)
     @person_params.merge(:dob => params.dig(:jq_datepicker_ignore_person, :dob)) if params.dig(:jq_datepicker_ignore_person, :dob)
-    session[:failed_match_attempts] ||= 0
     @captcha_required = false
     @employee_candidate = ::Forms::EmployeeCandidate.new(@person_params)
     @person = @employee_candidate
     if @employee_candidate.valid?
       @found_census_employees = @employee_candidate.match_census_employees.select{|census_employee| census_employee.is_active? }
       if @found_census_employees.empty?
-        session[:failed_match_attempts] += 1
-        render_recaptcha_if_needed
         full_name = @person_params[:first_name] + " " + @person_params[:last_name]
         # @person = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, current_user)
-
+        @employee_candidate.validate_and_lock_account
+        session[:invalid_match_attempts] += 1
         respond_to do |format|
           format.html { render 'no_match' }
         end
@@ -50,8 +49,8 @@ class Insured::EmployeeRolesController < ApplicationController
         end
       end
     else
-      session[:failed_match_attempts] += 1
-      render_recaptcha_if_needed
+      @employee_candidate.validate_and_lock_account
+      session[:invalid_match_attempts] += 1
       respond_to do |format|
         format.html { render 'search' }
       end
@@ -235,15 +234,6 @@ class Insured::EmployeeRolesController < ApplicationController
   def employment_relationship_params
     params.require(:employment_relationship).permit(:first_name, :last_name, :middle_name,
       :name_pfx, :name_sfx, :gender, :hired_on, :eligible_for_coverage_on, :census_employee_id, :employer_name, :no_ssn)
-  end
-
-  def render_recaptcha_if_needed
-    return unless EnrollRegistry.feature_enabled?(:employee_match_recaptcha)
-    max_emp_attempts = EnrollRegistry[:employee_match_max_recaptcha_attempts].item.to_i
-    return unless session[:failed_match_attempts] > max_emp_attempts
-    @captcha_required = true
-    @employee_candidate.errors.add(:base, "reCAPTCHA verification failed") unless verify_recaptcha
-    flash.delete(:recaptcha_error)
   end
 
 end
