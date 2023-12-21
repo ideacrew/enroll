@@ -12,6 +12,11 @@ module BenefitSponsors
       end
 
       def create
+        if @inbox_provider.instance_of?(Person)
+          authorize @inbox_provider, :can_read_inbox?, policy_class: BenefitSponsors::PersonPolicy
+        else
+          authorize @inbox_provider, :can_read_inbox?
+        end
       end
 
       def show
@@ -30,6 +35,11 @@ module BenefitSponsors
       end
 
       def destroy
+        if @inbox_provider.instance_of?(Person)
+          authorize @inbox_provider, :can_read_inbox?, policy_class: BenefitSponsors::PersonPolicy
+        else
+          authorize @inbox_provider, :can_read_inbox?
+        end
         BenefitSponsors::Services::MessageService.for_destroy(@message)
         flash[:notice] = "Successfully deleted inbox message."
         if params[:url].present?
