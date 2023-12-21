@@ -20,7 +20,7 @@ class User
   validates_uniqueness_of :email,:case_sensitive => false
   validates_presence_of     :password, if: :password_required?
   validates_confirmation_of :password, if: :password_required?
-  validates_length_of       :password, within: Devise.password_length, allow_blank: true
+  validates_length_of       :password, within: self.configured_password_length, allow_blank: true
   validates_format_of :email, with: Devise::email_regexp , allow_blank: true, :message => "(optional) is invalid"
 
   def oim_id_rules
@@ -169,5 +169,11 @@ class User
   end
   def get_announcements_by_roles_and_portal(portal_path="")
     []
+  end
+
+  def self.configured_password_length
+    default_min, default_max = EnrollRegistry[:enroll_app].setting(:default_password_length_range).item.split("..").map(&:to_i)
+    return Range.new(default_min, default_max) unless EnrollRegistry.feature_enabled?(:strong_password_length)
+    Devise.password_length
   end
 end
