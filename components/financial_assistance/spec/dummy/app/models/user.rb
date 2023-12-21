@@ -10,7 +10,7 @@ class User
 
   attr_accessor :login
   include PermissionsConcern
-  include AuthorizationConcern
+  # include AuthorizationConcern
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
@@ -23,7 +23,7 @@ class User
   validates_uniqueness_of :email,:case_sensitive => false
   validates_presence_of     :password, if: :password_required?
   validates_confirmation_of :password, if: :password_required?
-  validates_length_of       :password, within: self.configured_password_length, allow_blank: true
+  validates_length_of       :password, within: 8..20, allow_blank: true
   validates_format_of :email, with: Devise.email_regexp, allow_blank: true, :message => "(optional) is invalid"
 
   def oim_id_rules
