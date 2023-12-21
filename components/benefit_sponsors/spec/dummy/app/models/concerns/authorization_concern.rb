@@ -108,23 +108,6 @@ module AuthorizationConcern
       Devise.password_length
     end
 
-    def password_invalid?(password)
-      ## TODO: oim_id is an explicit dependency to the User class
-      resource = self.new(oim_id: 'example1', password: password)
-      !resource.valid_attribute?('password')
-    end
-
-    def generate_valid_password
-      password = Devise.friendly_token.first(16)
-      password = password + "aA1!"
-      password = password.squeeze
-      if password_invalid?(password)
-        password = generate_valid_password
-      else
-        password
-      end
-    end
-
     def find_by_authentication_token(token)
       where(authentication_token: token).first
     end
