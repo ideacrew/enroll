@@ -168,7 +168,7 @@ class User
     end
   end
 
-  def self.configured_password_length
+  def configured_password_length
     default_min, default_max = EnrollRegistry[:enroll_app].setting(:default_password_length_range).item.split("..").map(&:to_i)
     return Range.new(default_min, default_max) unless EnrollRegistry.feature_enabled?(:strong_password_length)
     Devise.password_length
