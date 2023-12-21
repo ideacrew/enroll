@@ -3,8 +3,6 @@
 # Concern to fetch session and user
 module SessionConcern
   extend ActiveSupport::Concern
-  #   thread_mattr_accessor :user #, :session
-  #   include Devise::Controllers::Helpers
 
   included do
     def current_user

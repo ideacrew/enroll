@@ -7,6 +7,10 @@ RSpec.describe ApplicationController do
     end
   end
 
+  DummyClass = Class.new do
+    include SessionConcern
+  end
+
   context '#set_ie_flash_by_announcement' do
     let(:ie_user_agent) { 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)' }
     let(:browser) { Browser.new(ie_user_agent) }
@@ -86,6 +90,13 @@ RSpec.describe ApplicationController do
       allow(@request).to receive(:referrer) {'http://localhost:3000/'}
       allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
       expect(controller.send(:confirm_last_portal, @request, user)).to eq root_path
+    end
+
+    it 'should set current user and session' do
+      dummy = DummyClass.new
+
+      expect(dummy.current_user).to eq user
+      expect(dummy.session).to include('session_id')
     end
   end
 
