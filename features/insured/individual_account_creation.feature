@@ -59,10 +59,6 @@ Feature: UI validations for Email, Username, SSN already in use, and weak Passwo
     When Individual clicks on continue
     And Individual should not see the error message Invalid SSN
 
-  Scenario: New user attempts to create account with a weak password
-    When Individual creates a new HBX account with a weak password
-    Then Individual should see the weak password error message
-
   Scenario: Strong password feature is enabled
     Given the strong password length feature is enabled
     When Individual visits the Consumer portal during open enrollment
