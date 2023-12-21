@@ -116,6 +116,7 @@ gem 'fast_jsonapi'
 gem 'loofah', '~> 2.3.1'
 gem 'stimulus_reflex', '3.4.1'
 gem 'rack-cors'
+gem 'holidays', '~> 8.6'
 
 group :development do
   gem "certified",              '~> 1'
