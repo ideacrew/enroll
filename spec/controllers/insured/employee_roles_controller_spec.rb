@@ -260,18 +260,22 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
 
     describe "POST match" do
       let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
-      let(:mock_employee_candidate) {  Forms::EmployeeCandidate.new({
-                                     :dob => "2012-10-12",
-                                     :ssn => "123-45-6789",
-                                     :first_name => "Tom",
-                                     :last_name => "Baker",
-                                     :gender => "male",
-                                     :is_applying_coverage => false
-                                   }) }
-      let(:invalid_employee_candidate) { Forms::EmployeeCandidate.new({
-                                                                        :dob => "",
-                                                                        :ssn => "33322"
-                                                                      }) }
+      let(:mock_employee_candidate) do
+        Forms::EmployeeCandidate.new({
+                                       :dob => "2012-10-12",
+                                       :ssn => "123-45-6789",
+                                       :first_name => "Tom",
+                                       :last_name => "Baker",
+                                       :gender => "male",
+                                       :is_applying_coverage => false
+                                     })
+      end
+      let(:invalid_employee_candidate) do
+        Forms::EmployeeCandidate.new({
+                                       :dob => "",
+                                       :ssn => "33322"
+                                     })
+      end
       let(:census_employee) { instance_double("CensusEmployee")}
       let(:hired_on) { double }
       let(:employment_relationships) { double }

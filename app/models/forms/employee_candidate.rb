@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Forms
   class EmployeeCandidate
     include ActiveModel::Model
@@ -7,12 +9,7 @@ module Forms
 
     include PeopleNames
     include SsnField
-    attr_accessor :gender
-
-    attr_accessor :user_id
-    attr_accessor :dob_check
-    attr_accessor :is_applying_coverage
-    attr_accessor :invalid_match_attempts
+    attr_accessor :gender, :user_id, :dob_check, :is_applying_coverage, :invalid_match_attempts
 
     validates_presence_of :first_name, :allow_blank => nil
     validates_presence_of :last_name, :allow_blank => nil
@@ -74,18 +71,14 @@ module Forms
 
     def does_not_match_a_different_users_person
       matched_person = match_person
-      if matched_person.present?
-        if matched_person.user.present?
-          current_user_id = self.user_id.to_s
-          matched_person_user_id = matched_person.user.id.to_s
-          if matched_person_user_id != current_user_id
-            unless EnrollRegistry.feature_enabled?(:lock_account_for_unsuccessful_match_attempts)
-              errors.add(
-                :base,
-                "#{first_name} #{last_name} is already affiliated with another account"
-              )
-            end
-          end
+      if matched_person.present? && matched_person.user.present?
+        current_user_id = self.user_id.to_s
+        matched_person_user_id = matched_person.user.id.to_s
+        if matched_person_user_id != current_user_id && !EnrollRegistry.feature_enabled?(:lock_account_for_unsuccessful_match_attempts)
+          errors.add(
+            :base,
+            "#{first_name} #{last_name} is already affiliated with another account"
+          )
         end
       end
       true
