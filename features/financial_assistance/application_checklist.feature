@@ -40,4 +40,5 @@ Feature: A dedicated page that gives the user prior notice that that application
     And that the user is on the Application Checklist page
     When the user clicks the PREVIOUS link
     Then the user will navigate to the assistance year selection page
-    And the page should be axe clean excluding "a[disabled]" according to: wcag2aa; checking only: color-contrast
+    And the browser has finished rendering the page
+    Then the page should be axe clean excluding "a[disabled]" according to: wcag2aa; checking only: color-contrast
