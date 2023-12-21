@@ -28,6 +28,10 @@ Given(/notices feature is disabled?/) do
   disable_feature(:notices_tab)
 end
 
+Given(/^the contrast level aa feature is enabled$/) do
+  enable_feature :contrast_level_aa
+end
+
 Then(/^they should see the Notices tab$/) do
   expect(page).to have_content("Notices")
 end
@@ -147,11 +151,4 @@ end
 
 And(/^the user clicks the Admin tab$/) do
   page.find('.dropdown-toggle', text: 'Admin').click
-end
-
-When(/the contrast_level_aa feature is enabled?/) do
-  # Assets are compiled after the page is loaded for cucumber tests. Because of this, we need to reload the page
-  # in order to test our AA compliant styling changes.
-  ENV["CONTRAST_LEVEL_AA_IS_ENABLED"] = "true"
-  page.reset!
 end
