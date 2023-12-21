@@ -83,7 +83,7 @@ div.disabled {
   font-weight: bold;
 }
 .back-link span {
-  color: #909090;
+  color: var(--secondary-font-color, #909090);
 }
 
 .faa-amount {

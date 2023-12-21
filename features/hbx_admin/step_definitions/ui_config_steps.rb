@@ -152,3 +152,9 @@ end
 And(/^the user clicks the Admin tab$/) do
   page.find('.dropdown-toggle', text: 'Admin').click
 end
+
+And(/^the browser has finished rendering the page$/) do
+  # Ensures the axecore contrast tests are not run immediately after the DOM is available but prior to the page
+  # fully rendering in the browser.
+  sleep(1)
+end
