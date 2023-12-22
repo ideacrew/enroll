@@ -8,6 +8,8 @@ module Operations
     # Operation to support IVL osse eligibility creation
     class CreateIvlOsseEligibility
       send(:include, Dry::Monads[:result, :do])
+      include EventSource::Command
+      include EventSource::Logging
 
       attr_accessor :subject, :default_eligibility
 
@@ -24,9 +26,11 @@ module Operations
         eligibility_options =
           yield build_eligibility_options(values, eligibility_record)
         eligibility = yield create_eligibility(values, eligibility_options)
-        persisted_eligibility = yield store(values, eligibility)
+        eligibility_record = yield store(values, eligibility)
+        event = yield create_event(eligibility_record)
+        _result = yield publish_event(event)
 
-        Success(persisted_eligibility)
+        Success(eligibility_record)
       end
 
       private
@@ -37,9 +41,13 @@ module Operations
         errors = []
         errors << "evidence key missing" unless params[:evidence_key]
         errors << "evidence value missing" unless params[:evidence_value]
-        errors << "effective date missing or it should be a date" unless params[:effective_date].is_a?(::Date)
+        unless params[:effective_date].is_a?(::Date)
+          errors << "effective date missing or it should be a date"
+        end
         @subject = GlobalID::Locator.locate(params[:subject])
-        errors << "subject missing or not found for #{params[:subject]}" unless subject.present?
+        unless subject.present?
+          errors << "subject missing or not found for #{params[:subject]}"
+        end
 
         errors.empty? ? Success(params) : Failure(errors)
       end
@@ -49,11 +57,11 @@ module Operations
       def find_eligibility(values)
         eligibility =
           subject
-          .eligibilities
-          .by_key(
-            "aca_ivl_osse_eligibility_#{values[:effective_date].year}".to_sym
-          )
-          .last
+            .eligibilities
+            .by_key(
+              "aca_ivl_osse_eligibility_#{values[:effective_date].year}".to_sym
+            )
+            .last
 
         Success(eligibility)
       end
@@ -102,19 +110,20 @@ module Operations
             end
           end
 
-        ConsumerRole.skip_callback(:update, :after, :publish_updated_event) if subject.is_a?(ConsumerRole)
+        if subject.is_a?(ConsumerRole)
+          ConsumerRole.skip_callback(:update, :after, :publish_updated_event)
+        end
         output =
           if default_eligibility
             Person.without_callbacks(callbacks_to_skip, &save_proc)
           else
             save_proc.call
           end
-        ConsumerRole.set_callback(:update, :after, :publish_updated_event) if subject.is_a?(ConsumerRole)
+        if subject.is_a?(ConsumerRole)
+          ConsumerRole.set_callback(:update, :after, :publish_updated_event)
+        end
 
         output
-      rescue StandardError => e
-        ConsumerRole.set_callback(:update, :after, :publish_updated_event) if subject.is_a?(ConsumerRole)
-        Failure(e.inspect)
       end
 
       def callbacks_to_skip
@@ -161,6 +170,83 @@ module Operations
 
         eligibility_record
       end
+
+      def create_event(eligibility)
+        event_name = eligibility_event_for(eligibility.current_state)
+        result =
+          event(
+            event_name,
+            attributes: eligibility.attributes.to_h,
+            headers: event_log_options(eligibility)
+          )
+
+        binding.irb
+        unless Rails.env.test?
+          logger.info("-" * 100)
+          logger.info(
+            "Enroll Reponse Publisher to external systems,
+            event_key: #{event_name}, attributes: #{eligibility.attributes.to_h}, result: #{result}"
+          )
+          logger.info("-" * 100)
+        end
+
+        result
+      end
+
+      def publish_event(event)
+        Success(event.publish)
+      end
+
+      def eligibility_event_for(current_state)
+        if current_state == :eligible
+          "events.hc4cc.eligibility_created"
+        elsif current_state == :ineligible
+          "events.hc4cc.eligibility_terminated"
+        end
+      end
+
+      def event_log_options(eligibility)
+        {
+          event_time: DateTime.now,
+          event_category: "hc4cc_eligibility",
+          event_outcome: "eligibility created",
+          subject_id: eligibility.eligible.person.to_global_id.to_s,
+          resource_id: eligibility.to_global_id.to_s,
+          market_kind: "individual",
+          build_message: true
+        }
+      end
     end
   end
 end
+
+# subject = Person.exists(:consumer_role => true).first.consumer_role
+
+# options = {
+#   subject_gid: subject.person.to_global_id,
+#   record_gid: subject.to_global_id,
+#   event_category: "hc4cc_eligibility",
+#   correlation_id: SecureRandom.uuid,
+#   message_id: SecureRandom.uuid,
+#   event_name: 'events.hc4cc.eligibility_created',
+#   event_outcome: 'eligibility_created',
+#   account_id: subject.person.user.id,
+#   event_time: DateTime.now,
+#   aggregated_event_log: {
+#     event_category: "hc4cc_eligibility",
+#     market_kind: "individual",
+#     subject_hbx_id: subject.person.hbx_id,
+#     event_category: "hc4cc_eligibility",
+#     event_time: DateTime.now,
+#     login_session_id: "1234"
+#   }
+# }
+
+# person_log = EventLogs::PersonEventLog.new(options)
+# person_log.event_loggable.build(options[:event_loggable])
+# person_log.save
+
+# # comments_with_posts = EventLogs::AggregatedEventLog.includes(:aggregatable).where(:created_at.gte => 1.hour.ago)
+
+# write specs and operatios
+# write operations that perists data into db
