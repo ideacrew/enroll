@@ -75,9 +75,10 @@ module Forms
         current_user_id = self.user_id.to_s
         matched_person_user_id = matched_person.user.id.to_s
         if matched_person_user_id != current_user_id && !EnrollRegistry.feature_enabled?(:lock_account_for_unsuccessful_match_attempts)
+          message = l10n("insured.employee_roles.matched_other_account", first_name: first_name, last_name: last_name)
           errors.add(
             :base,
-            "#{first_name} #{last_name} is already affiliated with another account"
+            message
           )
         end
       end
