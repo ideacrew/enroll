@@ -1620,7 +1620,7 @@ module FinancialAssistance
       return unless application.draft?
       if is_active && !callback_update
         create_or_update_member_params = { applicant_params: self.attributes_for_export, family_id: application.family_id }
-        create_or_update_result = if FinancialAssistanceRegistry[:avoid_dup_hub_calls_on_applicant_create_or_update].enabled?
+        create_or_update_result = if FinancialAssistanceRegistry[:avoid_dup_hub_calls_on_applicant_create_or_update].disabled?
                                     create_or_update_member_params.merge!(is_primary_applicant: is_primary_applicant?, skip_consumer_role_callbacks: true, skip_person_updated_event_callback: true)
                                     ::Operations::Families::CreateOrUpdateMember.new.call(create_or_update_member_params)
                                   else
