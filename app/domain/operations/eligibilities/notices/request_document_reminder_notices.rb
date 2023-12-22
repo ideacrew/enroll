@@ -48,7 +48,7 @@ module Operations
             notices.reduce({}) do |notices_output, document_reminder_key|
               offset_prior_due_date = offset_prior_to_due_date(document_reminder_key)
               families =
-                Family.outstanding_verifications_subjects_enrolled.outstanding_verifications_expiring_on(
+                Family.outstanding_verifications_expiring_on(
                   values[:date_of_record] + offset_prior_due_date
                 )
 
