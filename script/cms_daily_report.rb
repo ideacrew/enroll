@@ -474,7 +474,7 @@ def process_ivl_families_medicaid_or_chip(families, file_name, offset_count)
 
       if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
         # grab all tax households for any tax household groups starting in the next year
-        thhs = family.tax_household_groups.where(start_on: { :$gte => Date.new(next_year) }).map(&:tax_households).flatten
+        thhs = family.tax_household_groups.where(:"start_on".gte => Date.new(next_year)).map(&:tax_households).flatten
         # grab all instances of tax household members that are determined medicaid eligible
         all_medicaid_eligible_determinations = thhs.flat_map(&:tax_household_members).select(&:is_medicaid_chip_eligible)
         
@@ -531,7 +531,7 @@ def process_ivl_families_with_qhp(families, file_name, offset_count)
       primary = family.primary_person
       if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
         # grab all tax households for any tax household groups starting in the next year
-        thhs = family.tax_household_groups.where(start_on: { :$gte => Date.new(next_year) }).map(&:tax_households).flatten
+        thhs = family.tax_household_groups.where(:"start_on".gte => Date.new(next_year)).map(&:tax_households).flatten
         # grab all instances of tax household members that are determined medicaid eligible
         all_medicaid_eligible_determinations = thhs.flat_map(&:tax_household_members).select(&:is_medicaid_chip_eligible)
         # remove duplicate members (those determined medicaid eligible in multiple determinations)
@@ -601,7 +601,7 @@ def process_ivl_families_with_qhp_assistance(families, file_name, offset_count)
 
       if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
         # grab all tax households for any tax household groups starting in the next year
-        thhs = family.tax_household_groups.where(start_on: { :$gte => Date.new(next_year) }).map(&:tax_households).flatten
+        thhs = family.tax_household_groups.where(:"start_on".gte => Date.new(next_year)).map(&:tax_households).flatten
         # grab all instances of tax household members that are determined ia eligible
         all_ia_eligible_determinations = thhs.flat_map(&:tax_household_members).select(&:is_ia_eligible)
         
