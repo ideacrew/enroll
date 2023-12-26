@@ -34,6 +34,14 @@ Feature: Review your application page functionality 1
     And the user has signed their name
     Then the submit button will be disabled
 
+  Scenario: Parent Living Outside Home Button is Selected
+    Given the user has a parent living outside the home
+    Given the user clicks CONTINUE
+    Then the user is on the Your Preferences page
+    When the user clicks CONTINUE
+    Then the user is on the Submit Your Application page
+    Then the Parent Living Outside Home Attestation Checkbox is present
+
   Scenario: Editing Income Adjustments
     Given the pencil icon displays for each instance of income adjustments
     And the user clicks the pencil icon for INCOME ADJUSTMENTS
