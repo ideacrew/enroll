@@ -367,3 +367,43 @@ describe Queries::IvlSepEvents, "searching for purchases, with :silent_transitio
     expect(subject).to include(same_window_enrollment.hbx_id)
   end
 end
+
+RSpec.describe Queries::IvlSepEvents, dbclean: :after_each do
+  describe '#terminations_during_window' do
+    let(:purchase_event_published_at) { nil }
+    let(:enrollment) { double('HbxEnrollment', purchase_event_published_at: purchase_event_published_at) }
+    let(:ivl_sep_event) { described_class.new(Time.now, Time.now) }
+
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:silent_transition_enrollment).and_return(enabled_or_disabled)
+    end
+
+    context 'feature :silent_transition_enrollment is disabled' do
+      let(:enabled_or_disabled) { false }
+
+      it 'returns true as feature is disabled' do
+        expect(ivl_sep_event.skip_termination?(enrollment)).to be_truthy
+      end
+    end
+
+    context 'feature :silent_transition_enrollment is enabled' do
+      let(:enabled_or_disabled) { true }
+
+      context 'enrollment has no purchase_event_published_at' do
+
+        it 'returns true as purchase_event_published_at is nil' do
+          expect(ivl_sep_event.skip_termination?(enrollment)).to be_truthy
+        end
+      end
+
+      context 'enrollment has a purchase_event_published_at' do
+        let(:purchase_event_published_at) { DateTime.now }
+
+        it 'returns true as purchase_event_published_at is populated' do
+          expect(ivl_sep_event.skip_termination?(enrollment)).to be_falsey
+        end
+      end
+    end
+  end
+end

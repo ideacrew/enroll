@@ -16,10 +16,12 @@ RSpec.describe Operations::EventLogs::Store,
     }
   end
 
+  let(:subject_gid) { person.to_global_id.uri.to_s }
+
   let(:payload) do
     {
       account_id: user.id.to_s,
-      subject_gid: person.to_global_id.uri.to_s,
+      subject_gid: subject_gid,
       message_id: SecureRandom.uuid,
       trigger: "eligibility_create",
       event_category: :osse_eligibility,
@@ -33,6 +35,18 @@ RSpec.describe Operations::EventLogs::Store,
       correlation_id: SecureRandom.uuid,
       host_id: "https://demo.dceligibility.assit.org"
     }
+  end
+
+  context "when not able to locate subject resource" do
+
+    let(:subject_gid) { "#{person.to_global_id.uri}9" }
+
+    it "should fail" do
+      result = described_class.new.call(payload: payload, headers: headers)
+
+      expect(result).to be_failure
+      expect(result.failure).to eq "Unable to find resource for subject_gid: #{subject_gid}"
+    end
   end
 
   context "with input params" do

@@ -26,6 +26,7 @@ module Operations
       # @option opts [<Array>]    :tags optional
       # @return [Dry::Monad] result
       def call(params)
+        _resource_handler = yield init_resource_handler(params)
         values = yield validate(params)
         entity = yield create(values)
 
@@ -34,26 +35,42 @@ module Operations
 
       private
 
+      delegate :domain_contract_class,
+               :domain_entity_class,
+               to: :resource_handler
+
+      def init_resource_handler(options)
+        resource_handler.subject_gid = options[:subject_gid]
+
+        if resource_handler.associated_resource
+          Success(resource_handler)
+        else
+          Failure(
+            "Unable to find resource for subject_gid: #{options[:subject_gid]}"
+          )
+        end
+      end
+
       def validate(params)
-        @resource_class = params.delete(:resource_class)
-        return Failure("resource class name missing") unless resource_class
+        return Failure("domain contract not defined") unless domain_contract_class
 
         result = domain_contract_class.new.call(params)
         result.success? ? Success(result) : Failure(result)
       end
 
       def create(values)
-        Success(
-          domain_entity_class.new(values.to_h)
-        )
+        return Failure("domain entity not defined") unless domain_entity_class
+
+        Success(domain_entity_class.new(values.to_h))
       end
 
-      def domain_contract_class
-        Object.const_get("AcaEntities::EventLogs::#{resource_class}EventLogContract") if defined?("AcaEntities::EventLogs::#{resource_class}EventLogContract")
-      end
+      def resource_handler
+        return @resource_handler if @resource_handler
 
-      def domain_entity_class
-        Object.const_get("AcaEntities::EventLogs::#{resource_class}EventLog") if defined?("AcaEntities::EventLogs::#{resource_class}EventLog")
+        @resource_handler = Class.new do
+          include Mongoid::Document
+          include EventLog
+        end.new
       end
     end
   end
