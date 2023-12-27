@@ -57,6 +57,8 @@ module BenefitSponsors
             @employees = EmployeeRole.find_by_employer_profile(@employer_profile).compact.select { |ee| CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include?(ee.census_employee.aasm_state)}
           when 'inbox'
               # do something
+          when 'audit_log'
+            # do something
           else
             else_block
           end
