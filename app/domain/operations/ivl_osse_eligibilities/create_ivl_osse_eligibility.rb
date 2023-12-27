@@ -173,14 +173,12 @@ module Operations
 
       def create_event(eligibility)
         event_name = eligibility_event_for(eligibility.current_state)
-        result =
-          event(
-            event_name,
-            attributes: eligibility.attributes.to_h,
-            headers: event_log_options(eligibility)
-          )
+        trackable_event = Operations::EventLogs::TrackableEvent.new(event_name, payload: eligibility.attributes.to_h)
+        trackable_event.market_kind = 'individual'
+        trackable_event.subject = eligibility.eligible.person
+        trackable_event.resource = eligibility
+        result = trackable_event.build
 
-        binding.irb
         unless Rails.env.test?
           logger.info("-" * 100)
           logger.info(
@@ -204,21 +202,10 @@ module Operations
           "events.hc4cc.eligibility_terminated"
         end
       end
-
-      def event_log_options(eligibility)
-        {
-          event_time: DateTime.now,
-          event_category: "hc4cc_eligibility",
-          event_outcome: "eligibility created",
-          subject_id: eligibility.eligible.person.to_global_id.to_s,
-          resource_id: eligibility.to_global_id.to_s,
-          market_kind: "individual",
-          build_message: true
-        }
-      end
     end
   end
 end
+
 
 # subject = Person.exists(:consumer_role => true).first.consumer_role
 

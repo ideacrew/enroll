@@ -3,6 +3,7 @@
 # Event Log concern for storing events
 module EventLog
   extend ActiveSupport::Concern
+  include Mongoid::Document
   include GlobalID::Identification
 
   included do
