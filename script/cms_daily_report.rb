@@ -546,7 +546,7 @@ def process_ivl_families_with_qhp(families, file_name, offset_count)
           medicaid_eligible =
             if thhs.present?
               # check list of medicaid eligible members for the current person
-              thhm_medicaid_members&.any? { |th_member| th_member.applicant_id.to_s == f_member.id.to_s }
+              thhm_medicaid_members.any? { |th_member| th_member.applicant_id.to_s == f_member.id.to_s }
             else
               false
             end
