@@ -38,4 +38,3 @@ Feature: Start a new Financial Assistance Application and answers questions on O
   Scenario: User gives no answer to blind, daily help, help with bills, and physically disabled
     Given the user fills out the required other questions and submits it
     Then the user should see text that the info is complete
- 
