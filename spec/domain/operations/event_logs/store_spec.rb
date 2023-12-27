@@ -37,12 +37,18 @@ RSpec.describe Operations::EventLogs::Store,
     }
   end
 
+  before do
+    allow(subject).to receive(:event_logging_enabled?).and_return(true)
+  end
+
+  subject { described_class.new }
+
   context "when not able to locate subject resource" do
 
     let(:subject_gid) { "#{person.to_global_id.uri}9" }
 
     it "should fail" do
-      result = described_class.new.call(payload: payload, headers: headers)
+      result = subject.call(payload: payload, headers: headers)
 
       expect(result).to be_failure
       expect(result.failure).to eq "Unable to find resource for subject_gid: #{subject_gid}"
@@ -51,13 +57,13 @@ RSpec.describe Operations::EventLogs::Store,
 
   context "with input params" do
     it "should return success" do
-      result = described_class.new.call(payload: payload, headers: headers)
+      result = subject.call(payload: payload, headers: headers)
 
       expect(result).to be_success
     end
 
     it "should persist event log" do
-      described_class.new.call(payload: payload, headers: headers)
+      subject.call(payload: payload, headers: headers)
 
       expect(EventLogs::PersonEventLog.count).to eq 1
       event_log = EventLogs::PersonEventLog.first
@@ -70,6 +76,19 @@ RSpec.describe Operations::EventLogs::Store,
            :login_session_id
          ]
       expect(session_detail.portal).to eq session_details[:portal]
+    end
+  end
+
+  context "when event logging is disabled" do
+    before do
+      allow(subject).to receive(:event_logging_enabled?).and_return(false)
+    end
+
+    it "should fail" do
+      result = subject.call(payload: payload, headers: headers)
+
+      expect(result).to be_failure
+      expect(result.failure).to eq "Event logging is not enabled"
     end
   end
 end

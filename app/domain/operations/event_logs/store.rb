@@ -8,6 +8,7 @@ module Operations
     # Persist Audit Log Event
     class Store
       include Dry::Monads[:result, :do]
+      include Config::AcaModelConcern
 
       # @param [Hash] opts Options to persist event log event
       # @option opts [<GlobalID>] :account_gid required
@@ -20,6 +21,7 @@ module Operations
       # @option opts [<Hash>] :session_detail required
       # @return [Dry::Monad] result
       def call(payload: {}, headers: {})
+        yield is_event_log_feature_enabled?
         options = yield construct_params(payload, headers)
         _resource_handler = yield init_resource_handler(options)
         entity = yield create(options)
@@ -31,6 +33,12 @@ module Operations
       private
 
       delegate :persistence_model_class, to: :resource_handler
+
+      def is_event_log_feature_enabled?
+        return Success(true) if event_logging_enabled?
+
+        Failure("Event logging is not enabled")
+      end
 
       def construct_params(payload, headers)
         payload.symbolize_keys!

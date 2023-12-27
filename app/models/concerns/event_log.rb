@@ -6,22 +6,23 @@ module EventLog
   include GlobalID::Identification
 
   included do
-    EVENT_CATEGORIES = %i[
-      hc4cc_eligibility
-      sign_in
-      sign_out
-      password_change
-    ].freeze
+    # EVENT_CATEGORIES = %i[
+    #   hc4cc_eligibility
+    #   sign_in
+    #   sign_out
+    #   password_change
+    # ].freeze
+
+    belongs_to :account, class_name: "User", inverse_of: :nil
+
+    embeds_one :session_detail,
+               class_name: "EventLogs::SessionDetail",
+               as: :sessionable
 
     has_one :monitored_event,
             class_name: "EventLogs::MonitoredEvent",
             as: :monitorable,
             autosave: true
-
-    belongs_to :account, class_name: "User", inverse_of: :nil
-    embeds_one :session_detail,
-               class_name: "EventLogs::SessionDetail",
-               as: :sessionable
 
     field :subject_gid, type: String
     field :record_gid, type: String
