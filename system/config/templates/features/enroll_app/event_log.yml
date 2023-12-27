@@ -1,0 +1,7 @@
+---
+registry:
+  - namespace:
+      - :enroll_app
+    features:
+      - key: :aca_event_logging
+        is_enabled: true
