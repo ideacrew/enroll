@@ -23,7 +23,6 @@ module EventLog
                class_name: "EventLogs::SessionDetail",
                as: :sessionable
 
-    # field :account_id, type: String
     field :subject_gid, type: String
     field :record_gid, type: String
     field :correlation_id, type: String
@@ -36,24 +35,53 @@ module EventLog
     field :event_time, type: DateTime
     field :tags, type: Array
 
-    index({ subject_gid: 1 })
-    index({ event_category: 1 })
-    index({ account_id: 1 })
-    index({ host_id: 1 })
-    index({ trigger: 1 })
-    index({ event_time: 1 })
+    index(subject_gid: 1)
+    index(event_category: 1)
+    index(account_id: 1)
+    index(host_id: 1)
+    index(trigger: 1)
+    index(event_time: 1)
 
     scope :by_subject, ->(subject_id) { where(subject_gid: /#{subject_id}/i) }
     scope :by_event_category, ->(category) { where(event_category: category) }
     scope :by_account, ->(account_id) { where(account_id: account_id) }
     scope :by_host, ->(host_id) { where(host_id: host_id) }
     scope :by_trigger, ->(trigger) { where(trigger: trigger) }
-    scope :events_during,
-          lambda { |time_period|
-            where(
-              :event_time.gte => time_period.min,
-              :event_time.lte => time_period.max
-            )
-          }
+    scope :events_during, lambda { |time_period|
+      where(
+        :event_time.gte => time_period.min,
+        :event_time.lte => time_period.max
+      )
+    }
+
+    def associated_resource
+      return unless subject_gid
+
+      @associated_resource ||= GlobalID::Locator.locate(subject_gid)
+    rescue Mongoid::Errors::DocumentNotFound
+      @associated_resource = nil
+    end
+
+    def persistence_model_class
+      return unless associated_resource
+
+      resolve_class_for("EventLogs::#{associated_resource.class}EventLog")
+    end
+
+    def domain_entity_class
+      return unless associated_resource
+
+      resolve_class_for("AcaEntities::EventLogs::#{associated_resource.class}EventLog")
+    end
+
+    def domain_contract_class
+      return unless associated_resource
+
+      resolve_class_for("AcaEntities::EventLogs::#{associated_resource.class}EventLogContract")
+    end
+
+    def resolve_class_for(class_name)
+      Object.const_get(class_name) if defined?(class_name)
+    end
   end
 end
