@@ -18,40 +18,40 @@ RSpec.describe Operations::EventLogs::Store,
 
   let(:subject_gid) { person.to_global_id.uri.to_s }
 
-  let(:payload) do
-    {
-      account_id: user.id.to_s,
-      subject_gid: subject_gid,
-      message_id: SecureRandom.uuid,
-      trigger: "eligibility_create",
-      event_category: :osse_eligibility,
-      event_time: DateTime.now.to_s,
-      session_detail: session_details
-    }
-  end
+  let(:payload) { { sample: true } }
 
   let(:headers) do
     {
       correlation_id: SecureRandom.uuid,
-      host_id: "https://demo.dceligibility.assit.org"
+      host_id: "https://demo.dceligibility.assit.org",
+      account_id: user.id.to_s,
+      subject_gid: subject_gid,
+      resource_gid: subject_gid,
+      message_id: SecureRandom.uuid,
+      event_category: :hc4cc,
+      trigger: "eligibility_created",
+      event_outcome: "eligibility created",
+      event_time: DateTime.now.to_s,
+      market_kind: "individual",
+      event_name: "events.hc4cc.eligibility_created",
+      session: session_details
     }
   end
 
-  before do
-    allow(subject).to receive(:event_logging_enabled?).and_return(true)
-  end
+  before { allow(subject).to receive(:event_logging_enabled?).and_return(true) }
 
   subject { described_class.new }
 
   context "when not able to locate subject resource" do
-
     let(:subject_gid) { "#{person.to_global_id.uri}9" }
 
     it "should fail" do
       result = subject.call(payload: payload, headers: headers)
 
       expect(result).to be_failure
-      expect(result.failure).to eq "Unable to find resource for subject_gid: #{subject_gid}"
+      expect(
+        result.failure
+      ).to eq "Unable to find resource for subject_gid: #{subject_gid}"
     end
   end
 

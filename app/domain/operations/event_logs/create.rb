@@ -52,10 +52,12 @@ module Operations
       end
 
       def validate(params)
-        return Failure("domain contract not defined") unless domain_contract_class
+        unless domain_contract_class
+          return Failure("domain contract not defined")
+        end
 
         result = domain_contract_class.new.call(params)
-        result.success? ? Success(result) : Failure(result)
+        result.success? ? result : Failure(result.failure.errors)
       end
 
       def create(values)
@@ -67,10 +69,7 @@ module Operations
       def resource_handler
         return @resource_handler if @resource_handler
 
-        @resource_handler = Class.new do
-          include Mongoid::Document
-          include EventLog
-        end.new
+        @resource_handler = Class.new { include EventLog }.new
       end
     end
   end
