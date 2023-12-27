@@ -29,6 +29,8 @@
 
 <%- elsif @tab == 'families' %>
 <%= render partial:  "benefit_sponsors/profiles/employers/employer_profiles/my_account/families" %>
+<%- elsif @tab == 'audit_log' %>
+  <%= render partial:  "benefit_sponsors/profiles/employers/employer_profiles/my_account/audit_log" %>
 <%- end %>
 
 <%- if @tab == 'home' %>
