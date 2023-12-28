@@ -174,10 +174,11 @@ module Operations
       def create_event(eligibility)
         event_name = eligibility_event_for(eligibility.current_state)
         trackable_event = Operations::EventLogs::TrackableEvent.new(event_name, payload: eligibility.attributes.to_h)
-        trackable_event.market_kind = 'individual'
-        trackable_event.subject = eligibility.eligible.person
-        trackable_event.resource = eligibility
-        result = trackable_event.build
+        result = trackable_event.tap do |event|
+          event.market_kind = 'individual'
+          event.subject = eligibility.eligible
+          event.resource = eligibility
+        end.build
 
         unless Rails.env.test?
           logger.info("-" * 100)
