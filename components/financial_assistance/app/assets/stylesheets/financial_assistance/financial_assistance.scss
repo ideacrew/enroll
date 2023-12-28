@@ -178,8 +178,12 @@ span.span-text {
   color: #69A30D;
   font-weight: bold;
 }
+.in-progress{
+  color: var(--primary-black, #EAAA00);
+  font-weight: 600;
+}
 .in-progress-icon{
-  color: #eaaa00;
+  color: var(--soft-yellow, #EAAA00);
 }
 .app-status{
   padding: 10px;

@@ -266,49 +266,8 @@ registry:
             item: ''
           - key: :find_expert_link
             item: ''
-          - key: :binder_payment_dates
-            item:
-              [
-                { '2019-01-01': '2018,12,12' },
-                { '2019-02-01': '2019,1,14' },
-                { '2019-03-01': '2019,2,12' },
-                { '2019-04-01': '2019,3,12' },
-                { '2019-05-01': '2019,4,12' },
-                { '2019-06-01': '2019,5,14' },
-                { '2019-07-01': '2019,6,12' },
-                { '2019-08-01': '2019,7,12' },
-                { '2019-09-01': '2019,8,13' },
-                { '2019-10-01': '2019,9,12' },
-                { '2019-11-01': '2019,10,15' },
-                { '2019-12-01': '2019,11,13' },
-                { '2020-01-01': '2019,12,13' },
-                { '2020-02-01': '2020,1,14' },
-                { '2020-03-01': '2020,2,12' },
-                { '2020-04-01': '2020,3,12' },
-                { '2020-05-01': '2020,4,14' },
-                { '2020-06-01': '2020,5,12' },
-                { '2020-07-01': '2020,6,12' },
-                { '2020-08-01': '2020,7,14' },
-                { '2020-09-01': '2020,8,12' },
-                { '2020-10-01': '2020,9,14' },
-                { '2020-11-01': '2020,10,14' },
-                { '2020-12-01': '2020,11,13' },
-                { '2021-01-01': '2020,12,14' },
-                { '2021-02-01': '2021,1,12' },
-                { '2021-03-01': '2021,2,12' },
-                { '2021-04-01': '2021,3,12' },
-                { '2021-05-01': '2021,4,13' },
-                { '2021-06-01': '2021,5,12' },
-                { '2021-07-01': '2021,6,14' },
-                { '2021-08-01': '2021,7,13' },
-                { '2021-09-01': '2021,8,12' },
-                { '2021-10-01': '2021,9,14' },
-                { '2021-11-01': '2021,10,12' },
-                { '2021-12-01': '2021,11,15' },
-                { '2022-01-01': '2021,12,14' },
-                { '2022-02-01': '2022,1,12' },
-                { '2022-03-01': '2022,2,14' },
-              ]
+          - key: :binder_payment_default_date
+            item: 12
           - key: :default_aptc_percentage
             item: 100
           - key: :child_age_limit
@@ -913,6 +872,12 @@ registry:
       - key: :async_expire_and_begin_coverages
         item: :async_expire_and_begin_coverages
         is_enabled: <%= ENV['ASYNC_EXPIRE_AND_BEGIN_COVERAGES_IS_ENABLED'] || false %>
+      - key: :lock_account_for_unsuccessful_match_attempts
+        item: :lock_account_for_unsuccessful_match_attempts
+        is_enabled: <%= ENV['LOCK_ACCOUNT_FOR_UNSUCCESSFUL_MATCH_ATTEMPTS_IS_ENABLED'] || false %>
+      - key: :employee_match_max_attempts
+        item: <%= ENV['EMPLOYEE_MATCH_MAX_ATTEMPTS'] || 3 %>
+        is_enabled: true
       - key: :prevent_concurrent_sessions
         item: :prevent_concurrent_sessions
         is_enabled: <%= ENV['PREVENT_CONCURRENT_SESSIONS_IS_ENABLED'] || false %>
