@@ -31,7 +31,7 @@ RSpec.describe Operations::EventLogs::Store,
       event_category: :hc4cc,
       trigger: "eligibility_created",
       event_outcome: "eligibility created",
-      event_time: DateTime.now.to_s,
+      event_time: DateTime.now,
       market_kind: "individual",
       event_name: "events.hc4cc.eligibility_created",
       session: session_details

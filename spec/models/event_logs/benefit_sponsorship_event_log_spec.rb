@@ -19,7 +19,7 @@ RSpec.describe EventLogs::BenefitSponsorshipEventLog, type: :model, dbclean: :ar
             correlation_id: "a156ad4c031",
             host_id: :enroll,
             event_category: :osse_eligibility,
-            trigger: "determine_eligibility",
+            event_name: "events.determine_eligibility",
             event_time: DateTime.new
           }
         end
