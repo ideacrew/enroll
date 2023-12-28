@@ -32,14 +32,16 @@ class AuditLogsController < ApplicationController
                      id: 4,
                      eligibility: "OSSE1",
                      outcome: "Granted",
-                     performed_by: "test@test.com",
+                     performed_by: "test1@test.com",
                      reason: "This is testing",
                      approved: "Yes",
                      created_at: Time.now.utc
                    }]
 
-    if params[:eligibility].present?
-      @audit_logs = @audit_logs.select{|e| e[:eligibility] == params[:eligibility]}
+    if params[:user_id].present?
+      @audit_logs = [@audit_logs.last]
     end
+
+
   end
 end
