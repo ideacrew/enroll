@@ -98,7 +98,7 @@ input[type="radio"]:checked + label span {
 }
 
 .md-text {
-  color: #858585;
+  color: var(--primary-black, #858585);
 }
 
 .incomes-table, .deductions-table, .benefits-table {
