@@ -52,6 +52,7 @@ module Operations
             :message_id,
             :host_id,
             :trigger,
+            :event_name,
             :event_category
           )
 
