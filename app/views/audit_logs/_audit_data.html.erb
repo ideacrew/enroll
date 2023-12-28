@@ -1,0 +1,32 @@
+<table id="audit-log-table" class="table">
+  <thead>
+  <tr>
+    <th></th>
+    <th>Eligibility</th>
+    <th>Outcome</th>
+    <th>Performed By</th>
+    <th>Time</th>
+  </tr>
+  </thead>
+  <tbody>
+
+  <% @audit_logs.each do |audit_log| %>
+    <tr >
+      <td id="<%= "audit-#{audit_log[:id]}" %>" data-attr-id="<%= audit_log[:id] %>" class="audit-with-arrow"><span class="glyphicon glyphicon-chevron-right" id="log-expansion-icon"></span></td>
+      <td class="audit-col-2"><%= audit_log[:eligibility] %></td>
+      <td class="audit-col-3"><%= audit_log[:eligibility] %></td>
+      <td class="audit-col-4"><%= audit_log[:eligibility] %></td>
+      <td class="audit-col-5"><%= audit_log[:eligibility] %></td>
+    </tr>
+
+    <tr id="<%= "audit-expansion-#{audit_log[:id]}" %>" class="display-none">
+      <td></td>
+      <td colspan="3" class="expansion-details-col">There have been no adjustments since the last invoice.</td>
+      <td></td>
+    </tr>
+  <% end %>
+
+
+  <!-- Additional rows as needed -->
+  </tbody>
+</table>
