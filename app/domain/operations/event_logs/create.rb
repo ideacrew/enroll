@@ -57,13 +57,13 @@ module Operations
         end
 
         result = domain_contract_class.new.call(params)
-        result.success? ? result : Failure(result.failure.errors)
+        result.success? ? Success(result.to_h) : Failure(result.errors)
       end
 
       def create(values)
         return Failure("domain entity not defined") unless domain_entity_class
 
-        Success(domain_entity_class.new(values.to_h))
+        Success(domain_entity_class.new(values))
       end
 
       def resource_handler

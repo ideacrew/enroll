@@ -67,7 +67,6 @@ module Operations
         options =
           headers.slice(
             :account_id,
-            :subject_gid,
             :event_category,
             :market_kind
           )
@@ -75,9 +74,16 @@ module Operations
         options.merge(
           {
             event_time: formated_time(headers[:event_time]),
-            login_session_id: headers[:session][:login_session_id]
+            login_session_id: headers[:session][:login_session_id],
+            subject_hbx_id: subject_for(headers[:subject_gid])&.hbx_id
           }
         )
+      end
+
+      def subject_for(subject_gid)
+        @subject ||= GlobalID::Locator.locate(subject_gid)
+      rescue Mongoid::Errors::DocumentNotFound
+        @subject = nil
       end
 
       def init_resource_handler(options)
@@ -93,9 +99,7 @@ module Operations
       end
 
       def create(params)
-        result = Operations::EventLogs::Create.new.call(params)
-
-        result.success? ? result : Failure(result.failure.errors)
+        Operations::EventLogs::Create.new.call(params)
       end
 
       def store(values)

@@ -23,7 +23,8 @@ module EventLog
     has_one :monitored_event,
             class_name: "EventLogs::MonitoredEvent",
             as: :monitorable,
-            autosave: true
+            autosave: true,
+            dependent: :destroy
 
     field :subject_gid, type: String
     field :record_gid, type: String
