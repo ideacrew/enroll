@@ -2,7 +2,6 @@
 
 require 'dry/monads'
 require 'dry/monads/do'
-# require 'rails_helper'
 
 module FinancialAssistance
   module Operations

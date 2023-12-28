@@ -34,10 +34,7 @@ RSpec.describe FinancialAssistance::Operations::Applicants::Destroy, dbclean: :a
                       first_name: 'child',
                       last_name: 'bond')
   end
-
   let(:person_2) { FactoryBot.create(:person, hbx_id: '1001') }
-
- 
   let!(:family) {person.primary_family}
   let!(:family_member1) {FactoryBot.create(:family_member, family: person.primary_family)}
   let!(:family_member2) {FactoryBot.create(:family_member, family: person.primary_family, person_id: person_2.id)}
