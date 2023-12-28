@@ -17,6 +17,14 @@
     margin-bottom: 10px;
   }
 
+  .filters-text {
+    color: #323130;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 27px;
+  }
+
   .filters {
     display: none;
     flex-wrap: wrap;
@@ -52,7 +60,18 @@
     background: #FFF;
   }
 
-  #run-query,
+
+  #run-query {
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: block; /* Ensure the button is a block element to start on a new line */
+    margin-top: 10px; /* Adjust the margin as needed */
+  }
+
+
   #export-table {
     padding: 10px;
     background-color: #007bff;
@@ -61,8 +80,18 @@
     cursor: pointer;
   }
 
-  #run-query {
-    width: 20%;
+  #run-query,
+  #export-table {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .event-log-header.h3 {
+    color: #323130;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 36px;
   }
 
   table {
@@ -72,7 +101,6 @@
   }
 
   th, td {
-    border: 1px solid #ddd;
     padding: 8px;
     text-align: left;
   }
@@ -80,6 +108,30 @@
   th.sortable:hover {
     cursor: pointer;
     text-decoration: underline;
+  }
+
+  .display-none {
+    display: none;
+  }
+
+  .audit-with-arrow {
+    width: 5%;
+  }
+
+  .audit-col-2, .audit-col-3 {
+    width: 20%;
+  }
+
+  .audit-col-4 {
+    width: 35%;
+  }
+
+  .audit-col-4 {
+    width: 20%;
+  }
+
+  .audit-col-5 {
+    width: 15%;
   }
 </style>
 
@@ -92,13 +144,14 @@
 
     <div class="filters-container">
       <div id="filters-toggle" class="filters-toggle">
-        <span class="glyphicon glyphicon-chevron-right" id="filters-arrow"></span>Filters
+        <span class="glyphicon glyphicon-chevron-right" id="filters-arrow"></span>
+        <span class="filters-text">Filters</span>
       </div>
       <div class="filters" id="filters">
         <div class="filter-row">
           <label for="eligibility">Eligibility</label>
           <select id="eligibility">
-            <option value="osse">OSSE Eligibility</option>
+            <option value="OSSE">OSSE Eligibility</option>
           </select>
         </div>
         <div class="filter-row">
@@ -120,55 +173,75 @@
     </div>
 
     <div class="event-log-header">
-      <h3>Event Log for 105609</h3>
+      <h3><b>Event Log for 105609</b></h3>
       <button id="export-table">Export Table</button>
     </div>
-    <table>
-      <thead>
-      <tr>
-        <th>Eligibility</th>
-        <th>Outcome</th>
-        <th>Performed By</th>
-        <th class="sortable" onclick="sortTable(3)">Time &#x25B2;&#x25BC;</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr onclick="toggleDetails(this)">
-        <td>OSSE</td>
-        <td>Granted</td>
-        <td>system@dc.gov (100012)</td>
-        <td>12/14/2023 00:00 UTC</td>
-      </tr>
-      <!-- Additional rows as needed -->
-      </tbody>
-    </table>
+    <div id="audit-table-data">
+
+    </div>
+
   </div>
 </div>
 
+
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const filtersToggle = document.getElementById('filters-toggle');
-    const filters = document.getElementById('filters');
-    const arrow = document.getElementById('filters-arrow');
-    const runQueryButton = document.getElementById('run-query');
+  // Make an AJAX call on page load
+  $(document).ready(function() {
 
-    filtersToggle.addEventListener('click', function(e) {
-      e.preventDefault();
+    const filtersToggle = $('#filters-toggle');
+    const filters = $('#filters');
+    const arrow = $('#filters-arrow');
+    const runQueryButton = $('#run-query');
+    const eligibilityFilter = $('#eligibility');
+    const userIdFilter = $('#user-id');
+    const startDateFilter = $('#start-date');
+    const endDateFilter = $('#end-date');
 
-      if (filters.style.display === 'none') {
-        filters.style.display = 'flex';
-        arrow.classList.remove('glyphicon-chevron-right');
-        arrow.classList.add('glyphicon-chevron-down');
-        runQueryButton.style.display = 'block';
+    filtersToggle.on('click', function(e) {
+      if (filters.css('display') === 'none') {
+        filters.css('display', 'flex');
+        arrow.removeClass('glyphicon-chevron-right').addClass('glyphicon-chevron-down');
+        runQueryButton.show();
       } else {
-        filters.style.display = 'none';
-        arrow.classList.remove('glyphicon-chevron-down');
-        arrow.classList.add('glyphicon-chevron-right');
-        runQueryButton.style.display = 'none';
+        filters.css('display', 'none');
+        arrow.removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-right');
+        runQueryButton.hide();
       }
     });
 
     // Initially hide the "Run Query" button
-    runQueryButton.style.display = 'none';
+    runQueryButton.hide();
+
+    runQueryButton.on('click', function() {
+      $.ajax({
+        type: "POST",
+        url: '/audit_logs',
+        dataType: 'script',
+        data: {
+          eligibility: eligibilityFilter.val(),
+          user_id: userIdFilter.val(),
+          start_date: startDateFilter.val(),
+          end_date: endDateFilter.val(),
+          // Add more filters as needed
+        },
+        success: function(response) {
+          // Handle success
+          // console.log('AJAX call successful:', response);
+        },
+        error: function(error) {
+          // Handle error
+          console.error('AJAX call error:', error);
+        }
+      });
+    });
+
+    $.ajax({
+      type: "POST",
+      url: '/audit_logs',
+      dataType: 'script',
+      data: {
+      },
+    });
+
   });
 </script>
