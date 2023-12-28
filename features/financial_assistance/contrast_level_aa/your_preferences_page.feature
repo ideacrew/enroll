@@ -1,4 +1,4 @@
-Feature: Contrast level aa is enabled - User data usage preferences and voter registration
+Feature: Contrast level AA is enabled - User data usage preferences and voter registration
 
   Background: Your Preferences Page
     Given the contrast level aa feature is enabled
