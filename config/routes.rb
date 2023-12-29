@@ -626,6 +626,9 @@ Rails.application.routes.draw do
 
   resources :translations
 
+  get 'event_logs', to: 'event_logs#index'
+  post 'event_logs', to: 'event_logs#index'
+
   ############################# TO DELETE BELOW ##############################
 
   # FIXME: Do this properly later

@@ -1,12 +1,4 @@
-<style>
-  .audit-container {
-    width: 80%;
-    margin: 20px auto;
-    background-color: #f5f5f5;
-    padding: 20px;
-    border: 1px solid #ddd;
-  }
-
+<style lang="scss">
   .filters-container {
     margin-bottom: 10px;
   }
@@ -121,32 +113,32 @@
     display: none;
   }
 
-  .audit-with-arrow {
+  .event-with-arrow {
     width: 5%;
   }
 
-  .audit-col-2, .audit-col-3 {
+  .event-col-2, .event-col-3 {
     width: 20%;
   }
 
-  .audit-col-4 {
+  .event-col-4 {
     width: 35%;
   }
 
-  .audit-col-4 {
+  .event-col-4 {
     width: 20%;
   }
 
-  .audit-col-5 {
+  .event-col-5 {
     width: 15%;
   }
 </style>
 
-<div class="audit-log-tab">
+<div class="event-log-tab">
   <div>
     <h1>Audit Log</h1>
-    <h2>Sunland Cookie Co.</h2>
-    <p>HBX ID: 105609</p>
+    <h2><%= organization.legal_name %></h2>
+    <p>HBX ID: <%= @employer_profile.hbx_id %></p>
     <p>Please use the filters below to see specific actions taken on this organization.</p>
 
     <div class="filters-container">
@@ -183,18 +175,12 @@
       <h3><b>Event Log for 105609</b></h3>
       <button id="export-table">Export Table</button>
     </div>
-    <div id="audit-table-data">
-
-    </div>
-
+    <div id="event-table-data"></div>
   </div>
 </div>
 
-
 <script>
-  // Make an AJAX call on page load
   $(document).ready(function() {
-
     const filtersToggle = $('#filters-toggle');
     const filters = $('#filters');
     const arrow = $('#filters-arrow');
@@ -206,10 +192,8 @@
 
     startDateFilter.on('change', function () {
       const startDate = new Date(startDateFilter.val());
-      startDate.setDate(startDate.getDate() + 1); // Add one day
+      startDate.setDate(startDate.getDate() + 1);
       endDateFilter.prop('disabled', false);
-
-      // Ensure "End Date Range" is after or equal to "Start Date Range"
       endDateFilter.attr('min', formatDate(startDate));
     });
 
@@ -221,35 +205,27 @@
     }
 
     filtersToggle.on('click', function(e) {
-      if (filters.css('display') === 'none') {
-        filters.css('display', 'flex');
-        arrow.removeClass('glyphicon-chevron-right').addClass('glyphicon-chevron-down');
-        runQueryButton.show();
-      } else {
-        filters.css('display', 'none');
-        arrow.removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-right');
-        runQueryButton.hide();
-      }
+      const isFiltersHidden = filters.css('display') === 'none';
+      filters.css('display', isFiltersHidden ? 'flex' : 'none');
+      arrow.toggleClass('glyphicon-chevron-right glyphicon-chevron-down');
+      runQueryButton.toggle(isFiltersHidden);
     });
 
-    // Initially hide the "Run Query" button
     runQueryButton.hide();
 
     runQueryButton.on('click', function() {
       $.ajax({
-        type: "POST",
-        url: '/audit_logs',
+        type: 'POST',
+        url: '/event_logs',
         dataType: 'script',
         data: {
           eligibility: eligibilityFilter.val(),
           user_id: userIdFilter.val(),
           start_date: startDateFilter.val(),
           end_date: endDateFilter.val(),
-          // Add more filters as needed
         },
         success: function(response) {
           // Handle success
-          // console.log('AJAX call successful:', response);
         },
         error: function(error) {
           // Handle error
@@ -258,13 +234,15 @@
       });
     });
 
-    $.ajax({
-      type: "POST",
-      url: '/audit_logs',
-      dataType: 'script',
-      data: {
-      },
+    $('#export-table').on('click', function() {
+      window.location.href = '/event_logs.csv';
     });
 
+    $.ajax({
+      type: 'POST',
+      url: '/event_logs',
+      dataType: 'script',
+      data: {},
+    });
   });
 </script>
