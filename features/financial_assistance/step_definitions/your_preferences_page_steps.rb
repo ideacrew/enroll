@@ -5,6 +5,10 @@ Then(/^the user is on the Your Preferences page$/) do
   expect(page).to have_content('Your Preferences')
 end
 
+Given(/^the user has a parent living outside the home$/) do
+  FinancialAssistance::Application.first.update_attributes!(attestation_terms: true, parent_living_out_of_home_terms: true)
+end
+
 Then(/^the answer to "([^"]*)" is defaulted to "([^"]*)"$/) do |_arg1, _arg2|
   find('#eligibility_easier_yes').should be_checked
 end
@@ -22,5 +26,5 @@ Then(/^the "([^"]*)" question displays$/) do |question|
 end
 
 Given(/^the user selects I DISAGREE$/) do
-  find(:xpath, '//*[@id="eligibility_easier_no"]').set(true)
+  choose('eligibility_easier_no')
 end
