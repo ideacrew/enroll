@@ -1,4 +1,4 @@
-Feature: Start a new Financial Assistance Application and answers questions on Other Questions page - contrast level aa is enabled
+Feature: Contrast level AA is enabled - Start a new Financial Assistance Application and answers questions on Other Questions page
 
   Background: User logs in and visits applicant's other questions page
     Given the contrast level aa feature is enabled
