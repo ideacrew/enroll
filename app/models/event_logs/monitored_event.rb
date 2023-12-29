@@ -7,7 +7,6 @@ module EventLogs
 
     belongs_to :monitorable, polymorphic: true
 
-    field :market_kind, type: String
     field :account_id, type: String
     field :subject_hbx_id, type: String
     field :event_category, type: Symbol

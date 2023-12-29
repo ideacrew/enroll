@@ -51,7 +51,6 @@ module Operations
             :correlation_id,
             :message_id,
             :host_id,
-            :trigger,
             :event_name,
             :event_category
           )

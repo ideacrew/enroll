@@ -31,6 +31,7 @@ module EventLog
     field :correlation_id, type: String
     field :message_id, type: String
     field :host_id, type: String
+    field :payload, type: String
     field :event_category, type: Symbol
     field :event_name, type: String
     field :event_outcome, type: String
