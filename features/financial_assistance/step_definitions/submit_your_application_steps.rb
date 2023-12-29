@@ -150,6 +150,10 @@ Then(/^the user is on the Submit Your Application page$/) do
   expect(page).to have_content('Submit Your Application')
 end
 
+Then(/^the Parent Living Outside Home Attestation Checkbox is present$/) do
+  expect(page).to have_css("#application_attestation_terms")
+end
+
 Given(/^a required question is not answered$/) do
   expect(find_all("input[type='checkbox']").any? {|checkbox| !checkbox.checked?}).to be(true)
   expect(false).to eq(find('#living_outside_no').checked?).and eq(find('#living_outside_yes').checked?)
