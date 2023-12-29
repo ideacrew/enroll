@@ -1,0 +1,32 @@
+<table id="event-log-table" class="table">
+  <thead>
+  <tr>
+    <th></th>
+    <th>Eligibility</th>
+    <th>Outcome</th>
+    <th>Performed By</th>
+    <th>Time</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @event_logs.each do |event_log| %>
+    <tr>
+      <td id="<%= "event-#{event_log[:id]}" %>" data-attr-id="<%= event_log[:id] %>" class="event-with-arrow">
+        <span class="glyphicon glyphicon-chevron-right" id="log-expansion-icon"></span>
+      </td>
+      <td class="event-col-2"><%= event_log[:eligibility] %></td>
+      <td class="event-col-3"><%= event_log[:outcome] %></td>
+      <td class="event-col-4"><%= event_log[:performed_by] %></td>
+      <td class="event-col-5"><%= event_log[:created_at] %></td>
+    </tr>
+
+    <tr id="<%= "event-expansion-#{event_log[:id]}" %>" class="display-none">
+      <td></td>
+      <td colspan="3" class="expansion-details-col">There have been no adjustments since the last invoice.</td>
+      <td></td>
+    </tr>
+  <% end %>
+
+  <!-- Additional rows as needed -->
+  </tbody>
+</table>

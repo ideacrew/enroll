@@ -1,7 +1,7 @@
-class AuditLogsController < ApplicationController
+class EventLogsController < ApplicationController
 
   def index
-    @audit_logs = [{
+    @event_logs = [{
                      id: 1,
                      eligibility: "OSSE",
                      outcome: "Granted",
@@ -39,10 +39,16 @@ class AuditLogsController < ApplicationController
                    }]
 
     if params[:user_id].present?
-      @audit_logs = [@audit_logs.last]
-      puts "test"
+      @event_logs = [@event_logs.last]
     end
 
-
+    respond_to do |format|
+      format.js
+      format.csv do
+        csv_data = render_to_string(partial: 'event_logs/export_csv', locals: { event_logs: @event_logs })
+        send_data csv_data, filename: 'event_logs.csv', type: 'text/csv', disposition: 'attachment'
+      end
+    end
   end
+
 end
