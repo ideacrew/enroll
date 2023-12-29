@@ -358,7 +358,7 @@ document.addEventListener("turbolinks:load", function () {
       if (newIncomeForm.find('select').data('selectric')) newIncomeForm.find('select').selectric('destroy');
       var clonedForm = newIncomeForm.clone(true, true)
         .removeClass('hidden')
-        .appendTo(incomeListEl)
+        .appendTo(incomeListEl);
       if (incomeListEl.children().length > 1 && incomeListEl.children().first().attr('id') === 'hidden-income-form') {
         incomeListEl.children().first().remove();
       }
