@@ -188,7 +188,6 @@ Given(/^the user has signed their name$/) do
 end
 
 Then(/^the submit button will be enabled$/) do
-  binding.irb
   expect(find('.interaction-click-control-submit-application')[:class].include?('disabled')).to be(false)
 end
 
