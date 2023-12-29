@@ -1,25 +1,24 @@
-Feature: This gives the user access to application level navigation for applicants
+Feature: User data usage preferences and voter registration
 
   Background: Your Preferences Page
-    Given the FAA feature configuration is enabled
-    Given the date is within open enrollment
-    And the user is on FAA Household Info: Family Members page
+    Given a consumer exists
+    And is logged in
+    And the FAA feature configuration is enabled
+    And the user will navigate to the FAA Household Info page
     And all applicants are in Info Completed state with all types of income
     And the user clicks CONTINUE
-    Then the user is on the Review Your Application page
-    Given the user clicks CONTINUE
+    And the user is on the Review Your Application page
+    And the user clicks CONTINUE
     Then the user is on the Your Preferences page
 
   Scenario: Defaulted to "I AGREE"
-    Given the user is on the Your Preferences page
-    Then the answer to "To make it easier to determine my eligibility..." is defaulted to "I AGREE"
+    And the answer to "To make it easier to determine my eligibility..." is defaulted to "I AGREE"
     When the user clicks CONTINUE
     Then the user is on the Submit Your Application page
 
-  @broken
   Scenario: User selects "I DISAGREE"
     Given the user selects I DISAGREE
-    Then the "How long would you like your eligibility for help paying for coverage to be renewed? *" question displays
+    Then the "How long would you like your eligibility for premium reductions to be renewed? *" question displays
     When the user selects 3 years for eligibility length question
     And the user clicks CONTINUE
     Then the user is on the Submit Your Application page
