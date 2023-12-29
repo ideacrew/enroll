@@ -1,52 +1,83 @@
 # frozen_string_literal: true
 
+require "dry/monads"
+require "dry/monads/do"
+
 module Operations
   module EventLogs
-    # Create Event Log entity
+    # Publish trackable event
     class TrackableEvent
+      send(:include, Dry::Monads[:result, :do])
       include EventSource::Command
+      include EventSource::Logging
 
-      attr_accessor :event_name,
-                    :market_kind,
-                    :payload,
-                    :headers,
-                    :subject,
-                    :resource
+      attr_accessor :event_name
 
-      def initialize(event_name, options = {})
-        @event_name = event_name
-        @payload = options[:payload] || {}
-        @headers = options[:headers] || {}
-        @market_kind = "all"
+      # @param [Hash] opts Options to build trackable event
+      # @option opts [<Object>] :subject required
+      # @option opts [<Object>] :resource required
+      # @option opts [<String>] :market_kind required
+      # @option opts [<String>] :event_name required
+      # @option opts [<Hash>] :payload optional
+      # @return [Dry::Monad] result
+      def call(params)
+        values = yield validate(options)
+        headers, payload = yield build_options(values)
+        event = yield create(headers, payload)
+        result = yield publish(event)
+
+        Success(event)
       end
 
-      def build_headers
-        @headers[:subject_gid] ||= subject&.to_global_id&.to_s
-        @headers[:resource_gid] ||= resource&.to_global_id&.to_s
-        @headers[:market_kind] ||= market_kind
+      private
+
+      def validate(params)
+        errors = []
+        errors << "subject is required" unless params[:subject]
+        errors << "resource is required" unless params[:subject]
+        errors << "market kind is required" unless params[:market_kind]
+        errors << "event name is required" unless params[:event_name]
+
+        errors.empty? ? Success(params) : Failure(errors)
       end
 
-      def validate
-        raise "Subject is required" if headers[:subject_gid].blank?
-        raise "Resource is required" if headers[:resource_gid].blank?
-        raise "Market kind is required" if headers[:market_kind].blank?
+      def build_options(params)
+        @event_name = params[:event_name]
+
+        headers[:subject_gid] = params[:subject].to_global_id.to_s
+        headers[:resource_gid] = params[:resource].to_global_id.to_s
+        headers[:market_kind] = params[:market_kind]
+        payload = params[:payload] || {}
+
+        Success([headers, payload])
       end
 
-      def build
-        build_headers
-        validate
+      def create(headers, payload)
         event(
           event_name,
           attributes: payload,
           headers:
-            headers.merge(
+            options.merge(
               event_category: category,
               event_outcome: action.titleize,
               trigger: action,
-              event_time: DateTime.now,
+              event_time: DateTime.now.utc,
               build_message: true
             )
         )
+      end
+
+      def publish(event)
+        unless Rails.env.test?
+          logger.info("-" * 100)
+          logger.info(
+            "Enroll Trackable Event Publish to external systems,
+              event_name: #{event_name}, message: #{event.message.to_h}"
+          )
+          logger.info("-" * 100)
+        end
+
+        Success(event.publish)
       end
 
       def category

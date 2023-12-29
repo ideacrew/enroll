@@ -173,27 +173,14 @@ module Operations
 
       def create_event(eligibility)
         event_name = eligibility_event_for(eligibility.current_state)
-        trackable_event = Operations::EventLogs::TrackableEvent.new(event_name, payload: eligibility.attributes.to_h)
-        result = trackable_event.tap do |event|
-          event.market_kind = 'individual'
-          event.subject = eligibility.eligible
-          event.resource = eligibility
-        end.build
 
-        unless Rails.env.test?
-          logger.info("-" * 100)
-          logger.info(
-            "Enroll Reponse Publisher to external systems,
-            event_key: #{event_name}, attributes: #{eligibility.attributes.to_h}, result: #{result}"
-          )
-          logger.info("-" * 100)
-        end
-
-        result
-      end
-
-      def publish_event(event)
-        Success(event.publish)
+        Operations::EventLogs::TrackableEvent.new.call({
+          event_name: event_name,
+          payload: eligibility.attributes.to_h,
+          subject: eligibility.eligible,
+          resource: eligibility,
+          market_kind: 'individual'
+        })
       end
 
       def eligibility_event_for(current_state)
@@ -206,35 +193,3 @@ module Operations
     end
   end
 end
-
-
-# subject = Person.exists(:consumer_role => true).first.consumer_role
-
-# options = {
-#   subject_gid: subject.person.to_global_id,
-#   record_gid: subject.to_global_id,
-#   event_category: "hc4cc_eligibility",
-#   correlation_id: SecureRandom.uuid,
-#   message_id: SecureRandom.uuid,
-#   event_name: 'events.hc4cc.eligibility_created',
-#   event_outcome: 'eligibility_created',
-#   account_id: subject.person.user.id,
-#   event_time: DateTime.now,
-#   aggregated_event_log: {
-#     event_category: "hc4cc_eligibility",
-#     market_kind: "individual",
-#     subject_hbx_id: subject.person.hbx_id,
-#     event_category: "hc4cc_eligibility",
-#     event_time: DateTime.now,
-#     login_session_id: "1234"
-#   }
-# }
-
-# person_log = EventLogs::PersonEventLog.new(options)
-# person_log.event_loggable.build(options[:event_loggable])
-# person_log.save
-
-# # comments_with_posts = EventLogs::AggregatedEventLog.includes(:aggregatable).where(:created_at.gte => 1.hour.ago)
-
-# write specs and operatios
-# write operations that perists data into db
