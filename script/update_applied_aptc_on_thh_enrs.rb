@@ -63,7 +63,7 @@ def process_enrollments
 
       primary = enrollment.family.primary_person
 
-      current_thh_enrs_info.keys.each do |thh_enr|
+      current_thh_enrs_info.keys.each do |thh_enr_id|
         csv << [
           primary.hbx_id,
           primary.full_name,
@@ -71,11 +71,11 @@ def process_enrollments
           enrollment.effective_on,
           enrollment.aasm_state,
           enrollment.applied_aptc_amount,
-          thh_enr.id,
-          current_thh_enrs_info[thh_enr.id][:current_applied_aptc],
-          new_thh_enrs_info[thh_enr.id][:current_applied_aptc],
-          current_thh_enrs_info[thh_enr.id][:current_group_ehb_premium],
-          new_thh_enrs_info[thh_enr.id][:current_group_ehb_premium]
+          thh_enr_id,
+          current_thh_enrs_info[thh_enr_id][:current_applied_aptc],
+          new_thh_enrs_info[thh_enr_id][:current_applied_aptc],
+          current_thh_enrs_info[thh_enr_id][:current_group_ehb_premium],
+          new_thh_enrs_info[thh_enr_id][:current_group_ehb_premium]
         ]
       end
     end
