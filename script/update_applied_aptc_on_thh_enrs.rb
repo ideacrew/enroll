@@ -63,7 +63,7 @@ def process_enrollments
 
       primary = enrollment.family.primary_person
 
-      enrollment.aptc_tax_household_enrollments.each do |thh_enr|
+      current_thh_enrs_info.keys.each do |thh_enr|
         csv << [
           primary.hbx_id,
           primary.full_name,
