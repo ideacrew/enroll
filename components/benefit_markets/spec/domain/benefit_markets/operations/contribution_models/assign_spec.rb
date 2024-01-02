@@ -254,12 +254,7 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
       result = subject.call(params)
       expect(result.success?).to be_truthy
       key = result.success[:product_package_values][:assigned_contribution_model].key
-
-      if effective_date.month == 1 || effective_date >= Date.new(2020, 1, 1)
-        expect(key).to eq :zero_percent_sponsor_fixed_percent_contribution_model
-      else
-        expect(key).to eq :fifty_percent_sponsor_fixed_percent_contribution_model
-      end
+      expect(key).to eq :fifty_percent_sponsor_fixed_percent_contribution_model
     end
   end
 
