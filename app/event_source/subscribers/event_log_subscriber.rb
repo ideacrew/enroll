@@ -14,9 +14,7 @@ module Subscribers
       payload = JSON.parse(response, symbolize_names: true)
 
       subscriber_logger.info "EventLogEventsSubscriber#on_enroll_event_log_events, response: #{payload}"
-      unless Rails.env.test?
-        logger.info "EventLogEventsSubscriber#on_enroll_event_log_events payload: #{payload}"
-      end
+      logger.info "EventLogEventsSubscriber#on_enroll_event_log_events payload: #{payload}" unless Rails.env.test?
 
       store_event_log(payload, metadata)
       ack(delivery_info.delivery_tag)
@@ -29,7 +27,7 @@ module Subscribers
     private
 
     def store_event_log(payload, metadata)
-      headers = metadata.headers 
+      headers = metadata.headers
       headers[:message_id] = metadata.message_id
       headers[:correlation_id] = metadata.correlation_id
       headers[:host_id] = metadata.app_id
@@ -59,7 +57,7 @@ module Subscribers
     def subscriber_logger
       @subscriber_logger ||=
         Logger.new(
-          "#{Rails.root}/log/on_enroll_event_log_events_#{TimeKeeper.date_of_record.strftime("%Y_%m_%d")}.log"
+          "#{Rails.root}/log/on_enroll_event_log_events_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
         )
     end
   end

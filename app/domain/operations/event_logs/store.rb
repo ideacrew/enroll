@@ -64,7 +64,7 @@ module Operations
         Success(options)
       end
 
-      def construct_monitored_event(payload, headers)
+      def construct_monitored_event(_payload, headers)
         options = headers.slice(:event_category, :market_kind)
 
         account = headers[:account]
@@ -104,9 +104,7 @@ module Operations
       end
 
       def store(values)
-        unless persistence_model_class
-          return Failure("persistence model class not defined")
-        end
+        return Failure("persistence model class not defined") unless persistence_model_class
 
         log_event = persistence_model_class.new(values.to_h)
         log_event.save ? Success(log_event) : Failure(log_event)

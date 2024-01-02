@@ -40,15 +40,11 @@ module BenefitSponsors
             errors = []
             errors << "evidence key missing" unless params[:evidence_key]
             errors << "evidence value missing" unless params[:evidence_value]
-            unless params[:effective_date].is_a?(::Date)
-              errors << "effective date missing"
-            end
+            errors << "effective date missing" unless params[:effective_date].is_a?(::Date)
             @subject = GlobalID::Locator.locate(params[:subject])
-            unless @subject.present?
-              errors << "subject missing or not found for #{params[:subject]}"
-            end
+            errors << "subject missing or not found for #{params[:subject]}" unless @subject.present?
             if subject.respond_to?(:market_kind) &&
-                 subject.market_kind != :aca_shop
+               subject.market_kind != :aca_shop
               errors << "subject should belong to shop market"
             end
 
@@ -60,11 +56,11 @@ module BenefitSponsors
           def find_eligibility(values)
             eligibility =
               subject
-                .eligibilities
-                .by_key(
-                  "aca_shop_osse_eligibility_#{values[:effective_date].year}".to_sym
-                )
-                .last
+              .eligibilities
+              .by_key(
+                "aca_shop_osse_eligibility_#{values[:effective_date].year}".to_sym
+              )
+              .last
 
             Success(eligibility)
           end
@@ -156,17 +152,18 @@ module BenefitSponsors
             event_name = eligibility_event_for(eligibility.current_state)
 
             ::Operations::EventLogs::TrackableEvent.new.call({
-              event_name: event_name,
-              payload: eligibility.attributes.to_h,
-              subject: eligibility.eligible.organization,
-              resource: eligibility
-            })
+                                                               event_name: event_name,
+                                                               payload: eligibility.attributes.to_h,
+                                                               subject: eligibility.eligible.organization,
+                                                               resource: eligibility
+                                                             })
           end
 
           def eligibility_event_for(current_state)
-            if current_state == :eligible
+            case current_state
+            when :eligible
               'events.benefit_sponsors.benefit_sponsorships.eligibilities.shop_osse_eligibility.eligibility_created'
-            elsif current_state == :ineligible
+            when :ineligible
               'events.benefit_sponsors.benefit_sponsorships.eligibilities.shop_osse_eligibility.eligibility_terminated'
             end
           end

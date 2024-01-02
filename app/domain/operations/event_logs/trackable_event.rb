@@ -23,7 +23,7 @@ module Operations
         values = yield validate(params)
         headers, payload = yield build_options(values)
         event = yield create(headers, payload)
-        result = yield publish(event)
+        _result = yield publish(event)
 
         Success(event)
       end

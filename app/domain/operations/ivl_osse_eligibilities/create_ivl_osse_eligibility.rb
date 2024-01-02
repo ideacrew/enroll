@@ -40,13 +40,9 @@ module Operations
         errors = []
         errors << "evidence key missing" unless params[:evidence_key]
         errors << "evidence value missing" unless params[:evidence_value]
-        unless params[:effective_date].is_a?(::Date)
-          errors << "effective date missing or it should be a date"
-        end
+        errors << "effective date missing or it should be a date" unless params[:effective_date].is_a?(::Date)
         @subject = GlobalID::Locator.locate(params[:subject])
-        unless subject.present?
-          errors << "subject missing or not found for #{params[:subject]}"
-        end
+        errors << "subject missing or not found for #{params[:subject]}" unless subject.present?
 
         errors.empty? ? Success(params) : Failure(errors)
       end
@@ -56,11 +52,11 @@ module Operations
       def find_eligibility(values)
         eligibility =
           subject
-            .eligibilities
-            .by_key(
-              "aca_ivl_osse_eligibility_#{values[:effective_date].year}".to_sym
-            )
-            .last
+          .eligibilities
+          .by_key(
+            "aca_ivl_osse_eligibility_#{values[:effective_date].year}".to_sym
+          )
+          .last
 
         Success(eligibility)
       end
@@ -109,18 +105,14 @@ module Operations
             end
           end
 
-        if subject.is_a?(ConsumerRole)
-          ConsumerRole.skip_callback(:update, :after, :publish_updated_event)
-        end
+        ConsumerRole.skip_callback(:update, :after, :publish_updated_event) if subject.is_a?(ConsumerRole)
         output =
           if default_eligibility
             Person.without_callbacks(callbacks_to_skip, &save_proc)
           else
             save_proc.call
           end
-        if subject.is_a?(ConsumerRole)
-          ConsumerRole.set_callback(:update, :after, :publish_updated_event)
-        end
+        ConsumerRole.set_callback(:update, :after, :publish_updated_event) if subject.is_a?(ConsumerRole)
 
         output
       end
@@ -174,17 +166,18 @@ module Operations
         event_name = eligibility_event_for(eligibility.current_state)
 
         Operations::EventLogs::TrackableEvent.new.call({
-          event_name: event_name,
-          payload: eligibility.attributes.to_h,
-          subject: eligibility.eligible.person,
-          resource: eligibility
-        })
+                                                         event_name: event_name,
+                                                         payload: eligibility.attributes.to_h,
+                                                         subject: eligibility.eligible.person,
+                                                         resource: eligibility
+                                                       })
       end
 
       def eligibility_event_for(current_state)
-        if current_state == :eligible
+        case current_state
+        when :eligible
           'events.people.eligibilities.ivl_osse_eligibility.eligibility_created'
-        elsif current_state == :ineligible
+        when :ineligible
           'events.people.eligibilities.ivl_osse_eligibility.eligibility_terminated'
         end
       end
