@@ -27,8 +27,7 @@ module Operations
           yield build_eligibility_options(values, eligibility_record)
         eligibility = yield create_eligibility(values, eligibility_options)
         eligibility_record = yield store(values, eligibility)
-        event = yield create_event(eligibility_record)
-        _result = yield publish_event(event)
+        _event = yield publish_event(eligibility_record)
 
         Success(eligibility_record)
       end
@@ -171,23 +170,22 @@ module Operations
         eligibility_record
       end
 
-      def create_event(eligibility)
+      def publish_event(eligibility)
         event_name = eligibility_event_for(eligibility.current_state)
 
         Operations::EventLogs::TrackableEvent.new.call({
           event_name: event_name,
           payload: eligibility.attributes.to_h,
-          subject: eligibility.eligible,
-          resource: eligibility,
-          market_kind: 'individual'
+          subject: eligibility.eligible.person,
+          resource: eligibility
         })
       end
 
       def eligibility_event_for(current_state)
         if current_state == :eligible
-          "events.hc4cc.eligibility_created"
+          'events.people.eligibilities.ivl_osse_eligibility.eligibility_created'
         elsif current_state == :ineligible
-          "events.hc4cc.eligibility_terminated"
+          'events.people.eligibilities.ivl_osse_eligibility.eligibility_terminated'
         end
       end
     end

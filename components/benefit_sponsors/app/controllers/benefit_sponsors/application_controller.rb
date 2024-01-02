@@ -5,11 +5,13 @@ module BenefitSponsors
     include Pundit
     include ::L10nHelper
 
-
     helper BenefitSponsors::Engine.helpers
 
     rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
     rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
+
+    # for current_user
+    before_action :set_current_user
 
     def self.current_site
       site_key = EnrollRegistry[:enroll_app].settings(:site_key).item
@@ -20,6 +22,24 @@ module BenefitSponsors
       response.headers["Cache-Control"] = "no-cache, no-store, private"
       response.headers["Pragma"] = "no-cache"
     end
+
+    def set_current_user
+      User.current_user = current_user
+      User.current_session_values = session
+      SAVEUSER[:current_user_id] = current_user.try(:id)
+      session_id = SessionTaggedLogger.extract_session_id_from_request(request)
+      unless SessionIdHistory.where(session_id: session_id).present?
+        SessionIdHistory.create(session_id: session_id, session_user_id: current_user.try(:id), sign_in_outcome: "Successful", ip_address: request.remote_ip)
+      end
+    end
+
+    def clear_current_user
+      User.current_user = nil
+      User.current_session_values = nil
+      SAVEUSER[:current_user_id] = nil
+    end
+
+    append_after_action :clear_current_user
 
     protected
 

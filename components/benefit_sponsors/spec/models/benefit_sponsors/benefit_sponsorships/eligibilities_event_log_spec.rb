@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe EventLogs::BenefitSponsorshipEventLog, type: :model, dbclean: :around_each do
+RSpec.describe BenefitSponsors::BenefitSponsorships::EligibilitiesEventLog, type: :model, dbclean: :around_each do
   before { DatabaseCleaner.clean }
 
   describe "benefit sponsorship event log" do

@@ -26,9 +26,10 @@ module BenefitSponsors
             eligibility_options =
               yield build_eligibility_options(values, eligibility_record)
             eligibility = yield create_eligibility(eligibility_options)
-            persisted_eligibility = yield store(values, eligibility)
+            eligibility_record = yield store(values, eligibility)
+            _event = yield publish_event(eligibility_record)
 
-            Success(persisted_eligibility)
+            Success(eligibility_record)
           end
 
           private
@@ -39,11 +40,15 @@ module BenefitSponsors
             errors = []
             errors << "evidence key missing" unless params[:evidence_key]
             errors << "evidence value missing" unless params[:evidence_value]
-            errors << "effective date missing" unless params[:effective_date].is_a?(::Date)
+            unless params[:effective_date].is_a?(::Date)
+              errors << "effective date missing"
+            end
             @subject = GlobalID::Locator.locate(params[:subject])
-            errors << "subject missing or not found for #{params[:subject]}" unless @subject.present?
+            unless @subject.present?
+              errors << "subject missing or not found for #{params[:subject]}"
+            end
             if subject.respond_to?(:market_kind) &&
-               subject.market_kind != :aca_shop
+                 subject.market_kind != :aca_shop
               errors << "subject should belong to shop market"
             end
 
@@ -55,11 +60,11 @@ module BenefitSponsors
           def find_eligibility(values)
             eligibility =
               subject
-              .eligibilities
-              .by_key(
-                "aca_shop_osse_eligibility_#{values[:effective_date].year}".to_sym
-              )
-              .last
+                .eligibilities
+                .by_key(
+                  "aca_shop_osse_eligibility_#{values[:effective_date].year}".to_sym
+                )
+                .last
 
             Success(eligibility)
           end
@@ -145,6 +150,25 @@ module BenefitSponsors
             end
 
             eligibility_record
+          end
+
+          def publish_event(eligibility)
+            event_name = eligibility_event_for(eligibility.current_state)
+
+            ::Operations::EventLogs::TrackableEvent.new.call({
+              event_name: event_name,
+              payload: eligibility.attributes.to_h,
+              subject: eligibility.eligible.organization,
+              resource: eligibility
+            })
+          end
+
+          def eligibility_event_for(current_state)
+            if current_state == :eligible
+              'events.benefit_sponsors.benefit_sponsorships.eligibilities.shop_osse_eligibility.eligibility_created'
+            elsif current_state == :ineligible
+              'events.benefit_sponsors.benefit_sponsorships.eligibilities.shop_osse_eligibility.eligibility_terminated'
+            end
           end
         end
       end

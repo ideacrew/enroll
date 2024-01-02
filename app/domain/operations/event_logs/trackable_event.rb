@@ -20,7 +20,7 @@ module Operations
       # @option opts [<Hash>] :payload optional
       # @return [Dry::Monad] result
       def call(params)
-        values = yield validate(options)
+        values = yield validate(params)
         headers, payload = yield build_options(values)
         event = yield create(headers, payload)
         result = yield publish(event)
@@ -42,6 +42,7 @@ module Operations
       def build_options(params)
         @event_name = params[:event_name]
 
+        headers = {}
         headers[:subject_gid] = params[:subject].to_global_id.to_s
         headers[:resource_gid] = params[:resource].to_global_id.to_s
         payload = params[:payload] || {}
@@ -54,10 +55,7 @@ module Operations
           event_name,
           attributes: payload,
           headers:
-            options.merge(
-              event_time: DateTime.now.utc,
-              build_message: true
-            )
+            headers.merge(event_time: DateTime.now.utc, build_message: true)
         )
       end
 
@@ -66,7 +64,7 @@ module Operations
           logger.info("-" * 100)
           logger.info(
             "Enroll Trackable Event Publish to external systems,
-              event_name: #{event_name}, message: #{event.message.to_h}"
+              event_name: #{event_name} payload: #{event.message.payload} headers: #{event.message.headers}"
           )
           logger.info("-" * 100)
         end

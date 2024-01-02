@@ -40,14 +40,12 @@ module Operations
                to: :resource_handler
 
       def init_resource_handler(options)
-        resource_handler.subject_gid = options[:subject_gid]
+        resource_handler.event_name = options[:event_name]
 
-        if resource_handler.associated_resource
+        if resource_handler.resource_class_reference
           Success(resource_handler)
         else
-          Failure(
-            "Unable to find resource for subject_gid: #{options[:subject_gid]}"
-          )
+          Failure("Invalid event name: #{options[:event_name]}")
         end
       end
 

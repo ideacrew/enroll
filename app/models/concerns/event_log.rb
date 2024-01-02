@@ -57,30 +57,28 @@ module EventLog
       )
     }
 
-    def associated_resource
-      return unless subject_gid
+    def resource_class_reference
+      return if event_name.blank?
 
-      @associated_resource ||= GlobalID::Locator.locate(subject_gid)
-    rescue Mongoid::Errors::DocumentNotFound
-      @associated_resource = nil
+      event_name.split('.')[1..-3].collect{|elem| elem.titleize.gsub(" ", "") }.join('::')
     end
 
     def persistence_model_class
-      return unless associated_resource
+      return unless resource_class_reference
 
-      resolve_class_for("EventLogs::#{associated_resource.class}EventLog")
+      resolve_class_for("#{resource_class_reference}EventLog")
     end
 
     def domain_entity_class
-      return unless associated_resource
+      return unless resource_class_reference
 
-      resolve_class_for("AcaEntities::EventLogs::#{associated_resource.class}EventLog")
+      resolve_class_for("AcaEntities::#{resource_class_reference}EventLog")
     end
 
     def domain_contract_class
-      return unless associated_resource
+      return unless resource_class_reference
 
-      resolve_class_for("AcaEntities::EventLogs::#{associated_resource.class}EventLogContract")
+      resolve_class_for("AcaEntities::#{resource_class_reference}EventLogContract")
     end
 
     def resolve_class_for(class_name)

@@ -4,10 +4,10 @@ module Subscribers
   # Subscriber will receive Audit Log events
   class EventLogSubscriber
     include EventSource::Logging
-    include ::EventSource::Subscriber[amqp: "enroll.audit_log.events"]
+    include ::EventSource::Subscriber[amqp: "enroll.event_log.events"]
 
     subscribe(
-      :on_enroll_audit_log_events
+      :on_enroll_event_log_events
     ) do |delivery_info, metadata, response|
       logger.info "-" * 100 unless Rails.env.test?
 

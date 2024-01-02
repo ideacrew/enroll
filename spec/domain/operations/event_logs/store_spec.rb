@@ -23,20 +23,40 @@ RSpec.describe Operations::EventLogs::Store,
   let(:headers) do
     {
       correlation_id: SecureRandom.uuid,
+      message_id: SecureRandom.uuid,
       host_id: "https://demo.dceligibility.assit.org",
-      account_id: user.id.to_s,
       subject_gid: subject_gid,
       resource_gid: subject_gid,
-      message_id: SecureRandom.uuid,
-      event_category: :hc4cc,
-      trigger: "eligibility_created",
-      event_outcome: "eligibility created",
       event_time: DateTime.now,
-      market_kind: "individual",
-      event_name: "events.hc4cc.eligibility_created",
-      session: session_details
+      event_name: "events.people.eligibilities.ivl_osse_eligibility.eligibility_terminated",
+      account: {
+        id: user.id.to_s,
+        session: session_details
+      }
     }
   end
+
+  #   {
+  #        :subject_gid => "gid://enroll/Person/5d8501a31bdce254e7715bb7",
+  #       :resource_gid => "gid://enroll/IvlOsseEligibilities::IvlOsseEligibility/650425e688d2415d2b9130df",
+  #         :event_time => 2024-01-01 12:50:31 -0500,
+  #         :event_name => "events.people.eligibilities.ivl_osse_eligibility.eligibility_terminated",
+  #            :account => {
+  #         :session => {
+  #                                 :portal => "http://localhost:3000/exchanges/hbx_profiles",
+  #             :"warden.user.user.session" => {
+  #                 :last_request_at => 1704131431
+  #             },
+  #                            :login_token => "mewKXYvzF5aHZ6r-BAXa",
+  #                              :person_id => "5d8501a31bdce254e7715bb7",
+  #                             :session_id => "845b30bbb6f0b791d0753f36d93a731d"
+  #         },
+  #              :id => "5d680e26d7b2f7110f31170d"
+  #     },
+  #         :message_id => "a564a184-f64b-49e1-b735-4ac63058e409",
+  #     :correlation_id => "157aa53f-98ef-4a02-b658-3a1b05d7c2dc",
+  #            :host_id => "enroll"
+  # }
 
   before { allow(subject).to receive(:event_logging_enabled?).and_return(true) }
 
