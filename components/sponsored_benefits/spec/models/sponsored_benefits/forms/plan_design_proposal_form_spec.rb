@@ -42,7 +42,7 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignProposal, type: :model, dbcle
       }
     end
 
-    let(:proposal_effective_date)  { plan_design_proposal.effective_date + 1.year }
+    let(:proposal_effective_date)  { current_effective_date + 1.year }
     let(:renewal_benefit_market_catalog) do
       create(:benefit_markets_benefit_market_catalog, :with_product_packages,
              benefit_market: benefit_market,
