@@ -130,8 +130,7 @@ registry:
       - key: :lowest_cost_silver_product_2024
         item: '94506DC0350032-01'
         is_enabled: true
-
-    - namespace:
+  - namespace:
     - :enroll_app
     - :aca_shop_market
     - :benefit_market_catalog
