@@ -51,6 +51,16 @@ registry:
             - :all_contribution_levels_min_met_relaxed_2024
             - :benefit_application_fte_count_relaxed_2024
             - :employer_metal_level_products_restricted_2024
+      - key: :aca_shop_osse_eligibility_2025
+        item: :osse_eligibility_criterion
+        is_enabled: <%= ENV['SHOP_OSSE_ELIGIBILITY_2025_IS_ENABLED'] || false %>
+        settings:
+        - key: :grants_offered
+          item:
+            - :minimum_participation_rule_relaxed_2025
+            - :all_contribution_levels_min_met_relaxed_2025
+            - :benefit_application_fte_count_relaxed_2025
+            - :employer_metal_level_products_restricted_2025
   
   - namespace:
     - :enroll_app
@@ -118,5 +128,28 @@ registry:
         item: 'employer_metal_level_products'
         is_enabled: true
       - key: :lowest_cost_silver_product_2024
+        item: '94506DC0350032-01'
+        is_enabled: true
+
+    - namespace:
+    - :enroll_app
+    - :aca_shop_market
+    - :benefit_market_catalog
+    - :aca_shop_osse_eligibility
+    - :aca_shop_osse_eligibility_2025
+    features:
+      - key: :minimum_participation_rule_relaxed_2025
+        item: minimum_participation_rule
+        is_enabled: true
+      - key: :all_contribution_levels_min_met_relaxed_2025
+        item: 'all_contribution_levels_min_met'
+        is_enabled: true
+      - key: :benefit_application_fte_count_relaxed_2025
+        item: 'benefit_application_fte_count'
+        is_enabled: true
+      - key: :employer_metal_level_products_restricted_2025
+        item: 'employer_metal_level_products'
+        is_enabled: true
+      - key: :lowest_cost_silver_product_2025
         item: '94506DC0350032-01'
         is_enabled: true
