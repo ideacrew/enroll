@@ -136,14 +136,14 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CalculateAndPersistNe
         end
       end
 
-    it "should calculate net_annual_income correctly in a leap year" do
-      if Date.gregorian_leap?(application.assistance_year)
-        result = subject.call(params)
-        expect(result.success).to eq applicant
-        expect(applicant.net_annual_income.to_f.ceil).to eq 7_017
+      it "should calculate net_annual_income correctly in a leap year" do
+        if Date.gregorian_leap?(application.assistance_year)
+          result = subject.call(params)
+          expect(result.success).to eq applicant
+          expect(applicant.net_annual_income.to_f.ceil).to eq 7_017
+        end
       end
     end
-  end
 
     context 'Income and deductions have start date in future year and end date in future year and frequency kind is daily' do
       let(:params) do
