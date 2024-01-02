@@ -97,6 +97,9 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first }
 
   before do
+
+    allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(2023,12,31))
+
     allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
     allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
     allow(benefit_sponsorship).to receive(:current_benefit_period).and_return(benefit_coverage_period)
@@ -1439,6 +1442,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
   end
 
   describe 'magi deduction calculations' do
+    let!(:application_1) { FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'submitted', hbx_id: "830293", effective_date: Date.new(2023,1,1)) }
     let!(:deduction) do
       deduction = ::FinancialAssistance::Deduction.new({ kind: 'moving_expenses',
                                                          amount: 100.00,
@@ -1450,7 +1454,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
 
     context 'deduction with end_on in previous year than assistance year' do
       before do
-        applicant.deductions.first.update_attributes!(start_on: (Date.new(application.assistance_year) - 1).beginning_of_year, end_on: (Date.new(application.assistance_year) - 1).end_of_year)
+        application.applicants.first.deductions.first.update_attributes!(start_on: (Date.new(application.assistance_year) - 1).beginning_of_year, end_on: (Date.new(application.assistance_year) - 1).end_of_year)
       end
 
       it 'should have magi deductions be zero' do
@@ -1471,14 +1475,29 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
     end
 
-    context 'deduction with end_on in same year as assistance year' do
+    context 'deduction with end_on in same year as assistance year in non-leap year' do
       before do
         applicant.deductions.first.update_attributes!(end_on: Date.new(application.assistance_year,3,1))
       end
 
       it "should return deduction amount until the end date within the assistance year" do
-        result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
-        expect(result.to_i).to eql(854)
+        unless Date.gregorian_leap?(application.assistance_year)
+          result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
+          expect(result.to_i).to eql(854)
+        end
+      end
+    end
+
+    context 'deduction with end_on in same year as assistance year in leap year' do
+      before do
+        applicant.deductions.first.update_attributes!(end_on: Date.new(application.assistance_year,3,1))
+      end
+
+      it "should return deduction amount until the end date within the assistance year" do
+        if Date.gregorian_leap?(application.assistance_year)
+          result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
+          expect(result.to_i).to eql(866)
+        end
       end
     end
 
