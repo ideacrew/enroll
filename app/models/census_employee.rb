@@ -1729,7 +1729,7 @@ class CensusEmployee < CensusMember
     end
     return false if assignment_by_application.blank?
 
-    health_enrollment = assignment_by_application.hbx_enrollments.detect{|a|a.coverage_kind == 'health'}
+    health_enrollment = assignment_by_application.hbx_enrollments.detect{|a| a.coverage_kind == 'health'}
     health_enrollment&.is_coverage_waived?
   end
 
