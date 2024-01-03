@@ -5,6 +5,9 @@ registry:
     features:
       - key: :ridp_h139
         is_enabled: true
+        settings:
+          - key: :payload_format
+            item: <%= ENV['RIDP_H139_PAYLOAD_FORMAT'] || "xml" %>
       - key: :paper_application_verification
         is_enabled: false
       - key: :vlp_h92
