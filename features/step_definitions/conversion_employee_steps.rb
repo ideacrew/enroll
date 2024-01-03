@@ -308,7 +308,7 @@ Then(/(.+) should see employee premium and subsidy based on (.+) effective date/
   new_enrollment = HbxEnrollment.where(family_id: person_record.primary_family.id, effective_on: qle_effective_on).last
   plan_year_start = new_enrollment.sponsored_benefit_package.start_on
 
-  feature_key = "lowest_cost_silver_product_#{new_enrollment.effective_on.year}"
+  feature_key = "lowest_cost_silver_product_#{plan_year_start.year}"
   benchmark_product = BenefitMarkets::Products::Product.where(hios_id: EnrollRegistry[feature_key].item).first
   employee_coverage_date = qle_effective_on
   employee_coverage_date = plan_year_start if event == 'plan year'

@@ -881,14 +881,28 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
     end
 
-    context "No deductions and only incomes" do
+    context "No deductions and only incomes in non-leap year" do
+      before do
+        applicant.incomes << income
+      end
+      unless TimeKeeper.date_of_record.leap?
+        it 'should calculate and persist net annual income on applicant' do
+          application.calculate_total_net_income_for_applicants
+          expect(applicant.net_annual_income.to_f.ceil).to eq 428
+        end
+      end
+    end
+
+    context "No deductions and only incomes in a leap year" do
       before do
         applicant.incomes << income
       end
 
       it 'should calculate and persist net annual income on applicant' do
-        application.calculate_total_net_income_for_applicants
-        expect(applicant.net_annual_income.to_f.ceil).to eq 428
+        if TimeKeeper.date_of_record.leap?
+          application.calculate_total_net_income_for_applicants
+          expect(applicant.net_annual_income.to_f.ceil).to eq 427
+        end
       end
     end
 
