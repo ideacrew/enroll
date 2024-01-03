@@ -1,5 +1,9 @@
 require 'rails_helper'
 
+class DummySessionClass
+  include SessionConcern
+end
+
 RSpec.describe ApplicationController do
   controller(Employers::EmployerProfilesController) do
     def index
@@ -86,6 +90,13 @@ RSpec.describe ApplicationController do
       allow(@request).to receive(:referrer) {'http://localhost:3000/'}
       EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
       expect(controller.send(:confirm_last_portal, @request, user)).to eq root_path
+    end
+
+    it 'should set current user and session' do
+      dummy = DummySessionClass.new
+
+      expect(dummy.current_user).to eq user
+      expect(dummy.session).to include('session_id')
     end
   end
 
