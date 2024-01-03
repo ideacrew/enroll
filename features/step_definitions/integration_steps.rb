@@ -927,7 +927,8 @@ end
 
 When(/^.+ selects? a last plan on the plan shopping page$/) do
   find_all(EmployeeChoosePlan.select_plan_btn, wait: 5)[-1].click
-  @current_plan_selection = BenefitMarkets::Products::HealthProducts::HealthProduct.all[-1]
+  effective_year = benefit_sponsorship.benefit_applications.active.first.effective_period.min.year
+  @current_plan_selection = BenefitMarkets::Products::HealthProducts::HealthProduct.by_year(effective_year)[-1]
 end
 
 Then(/^.+ should see the coverage summary page$/) do
