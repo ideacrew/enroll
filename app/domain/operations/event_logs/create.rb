@@ -50,16 +50,21 @@ module Operations
       end
 
       def validate(params)
-        return Failure("domain contract not defined") unless domain_contract_class
-
+        unless domain_contract_class
+          return Failure("domain contract not defined")
+        end
         result = domain_contract_class.new.call(params)
         result.success? ? Success(result.to_h) : Failure(result.errors)
+      rescue NameError => e
+        Failure(e.message)
       end
 
       def create(values)
         return Failure("domain entity not defined") unless domain_entity_class
 
         Success(domain_entity_class.new(values))
+      rescue NameError => e
+        Failure(e.message)
       end
 
       def resource_handler

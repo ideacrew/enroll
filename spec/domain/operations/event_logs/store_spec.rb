@@ -28,7 +28,7 @@ RSpec.describe Operations::EventLogs::Store,
       subject_gid: subject_gid,
       resource_gid: subject_gid,
       event_time: DateTime.now,
-      event_name: "events.people.eligibilities.ivl_osse_eligibility.eligibility_terminated",
+      event_name: event_name,
       account: {
         id: user.id.to_s,
         session: session_details
@@ -36,34 +36,16 @@ RSpec.describe Operations::EventLogs::Store,
     }
   end
 
-  #   {
-  #        :subject_gid => "gid://enroll/Person/5d8501a31bdce254e7715bb7",
-  #       :resource_gid => "gid://enroll/IvlOsseEligibilities::IvlOsseEligibility/650425e688d2415d2b9130df",
-  #         :event_time => 2024-01-01 12:50:31 -0500,
-  #         :event_name => "events.people.eligibilities.ivl_osse_eligibility.eligibility_terminated",
-  #            :account => {
-  #         :session => {
-  #                                 :portal => "http://localhost:3000/exchanges/hbx_profiles",
-  #             :"warden.user.user.session" => {
-  #                 :last_request_at => 1704131431
-  #             },
-  #                            :login_token => "mewKXYvzF5aHZ6r-BAXa",
-  #                              :person_id => "5d8501a31bdce254e7715bb7",
-  #                             :session_id => "845b30bbb6f0b791d0753f36d93a731d"
-  #         },
-  #              :id => "5d680e26d7b2f7110f31170d"
-  #     },
-  #         :message_id => "a564a184-f64b-49e1-b735-4ac63058e409",
-  #     :correlation_id => "157aa53f-98ef-4a02-b658-3a1b05d7c2dc",
-  #            :host_id => "enroll"
-  # }
+  let(:event_name) do
+    "events.people.eligibilities.ivl_osse_eligibility.eligibility_created"
+  end
 
   before { allow(subject).to receive(:event_logging_enabled?).and_return(true) }
 
   subject { described_class.new }
 
   context "when not able to locate subject resource" do
-    let(:subject_gid) { "#{person.to_global_id.uri}9" }
+    let(:event_name) { "events.people.eligibilities.eligibility_created" }
 
     it "should fail" do
       result = subject.call(payload: payload, headers: headers)
@@ -71,7 +53,7 @@ RSpec.describe Operations::EventLogs::Store,
       expect(result).to be_failure
       expect(
         result.failure
-      ).to eq "Unable to find resource for subject_gid: #{subject_gid}"
+      ).to match(/uninitialized constant AcaEntities::PeopleEventLogContract/)
     end
   end
 
@@ -85,8 +67,8 @@ RSpec.describe Operations::EventLogs::Store,
     it "should persist event log" do
       subject.call(payload: payload, headers: headers)
 
-      expect(EventLogs::PersonEventLog.count).to eq 1
-      event_log = EventLogs::PersonEventLog.first
+      expect(People::EligibilitiesEventLog.count).to eq 1
+      event_log = People::EligibilitiesEventLog.first
       expect(event_log.account_id.to_s).to eq user.id.to_s
       expect(event_log.subject_gid).to eq person.to_global_id.uri.to_s
 
