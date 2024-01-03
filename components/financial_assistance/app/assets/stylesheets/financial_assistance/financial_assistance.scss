@@ -53,7 +53,7 @@ input[type="radio"]:checked + label span {
 }
 
 .fa, .knowmore h4 {
-  color: #007BC4;
+  color: var(--theme-primary-100, #007BC4);
 }
 
 #backModal {
@@ -98,7 +98,7 @@ input[type="radio"]:checked + label span {
 }
 
 .md-text {
-  color: #858585;
+  color: var(--primary-black, #858585);
 }
 
 .incomes-table, .deductions-table, .benefits-table {

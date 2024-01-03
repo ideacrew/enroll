@@ -26,5 +26,5 @@ Then(/^the "([^"]*)" question displays$/) do |question|
 end
 
 Given(/^the user selects I DISAGREE$/) do
-  find(:xpath, '//*[@id="eligibility_easier_no"]').set(true)
+  choose('eligibility_easier_no')
 end

@@ -10,3 +10,10 @@ function handleButtonKeyDown(event, buttonId) {
     document.getElementById(buttonId).click(); 
   }
 }
+
+function handleCancelButtonKeyDown(event, buttonId, hideForm) {
+  if (event.key === 'Enter') { 
+    document.getElementById(buttonId).click(); 
+    document.getElementById(hideForm).classList.add('hidden');
+  }
+}
