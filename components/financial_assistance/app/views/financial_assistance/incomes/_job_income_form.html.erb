@@ -67,8 +67,8 @@
 
   <div class="row">
     <div class="col-md-3 pull-right mt-1 mb-1">
-      <a class="btn btn-default income-cancel">Cancel</a>
-      <%= f.submit 'Save', class: 'btn btn-danger', :data => { :cuke => "job-income-save-button" }, onclick: "checkDate('#{income_id}')" %>
+      <a tabindex="0" onkeydown="handleCancelButtonKeyDown(event, 'income-cancel-<%= income_id %>', 'hidden-income-form')" id="income-cancel-<%= income_id %>" class="btn btn-default income-cancel">Cancel</a>
+      <%= f.submit 'Save', class: 'btn btn-save', :data => { :cuke => "job-income-save-button" }, onclick: "checkDate('#{income_id}')" %>
     </div>
   </div>
 
