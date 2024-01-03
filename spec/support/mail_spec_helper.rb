@@ -31,7 +31,7 @@ module MailSpecHelper
     def user_mailer_initial_employee_invitation_body(census_employee)
       short_name = EnrollRegistry[:enroll_app].setting(:short_name).item
       legal_name = census_employee.employer_profile.legal_name.titleize
-      oe_date = census_employee.published_benefit_group_assignment.plan_year.open_enrollment_start_on.to_date.to_formatted_s
+      oe_date = census_employee.published_benefit_group_assignment.benefit_application.open_enrollment_start_on.to_date.to_formatted_s
       fname = census_employee.full_name
       fname.slice! census_employee.last_name
       # rubocop:disable Layout/LineLength

@@ -1810,7 +1810,7 @@ class HbxEnrollment
     effective_date = effective_date_for_enrollment(employee_role, hbx_enrollment, qle)
     valid_effective_on_classes = [Time, Date, DateTime]
     if valid_effective_on_classes.include?(effective_date.class)
-      plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(effective_date)
+      benefit_application = employee_role.employer_profile.find_plan_year_by_effective_date(effective_date)
       enrollment_errors = {}
     else
       # In the #effective_date_for_enrollment method signature
@@ -1818,30 +1818,28 @@ class HbxEnrollment
       # was used) to avoid exceptions for the end user
       enrollment_errors = effective_date.errors
       effective_date = nil
-      plan_year = nil
+      benefit_application = nil
     end
 
-    if plan_year.blank?
-      enrollment_errors[:base] << " Unable to find employer-sponsored benefits for enrollment year #{effective_date&.year}"
-    end
 
-    if plan_year && plan_year.open_enrollment_start_on > TimeKeeper.date_of_record
-      enrollment_errors[:base] << "Open enrollment for your employer-sponsored benefits not yet started. Please return on #{plan_year&.open_enrollment_start_on&.strftime('%m/%d/%Y')} to enroll for coverage."
+    enrollment_errors[:base] << " Unable to find employer-sponsored benefits for enrollment year #{effective_date&.year}" if benefit_application.blank?
+
+    if benefit_application && benefit_application.open_enrollment_start_on > TimeKeeper.date_of_record
+      enrollment_errors[:base] << "Open enrollment for your employer-sponsored benefits not yet started. Please return on #{benefit_application&.open_enrollment_start_on&.strftime('%m/%d/%Y')} to enroll for coverage."
     end
 
     census_employee = employee_role.census_employee
     benefit_group_assignment =
-      if plan_year&.is_renewing? && census_employee.renewal_benefit_group_assignment
+      if benefit_application&.is_renewing? && census_employee.renewal_benefit_group_assignment
         census_employee.renewal_benefit_group_assignment
-      elsif plan_year&.aasm_state == "expired" && qle
-        census_employee.benefit_group_assignments.order_by(:created_at.desc).detect { |bga| bga.plan_year.aasm_state == "expired"}
+      elsif benefit_application&.aasm_state == "expired" && qle
+        census_employee.benefit_group_assignments.order_by(:created_at.desc).detect { |bga| bga.benefit_application.aasm_state == "expired"}
       else
         census_employee.active_benefit_group_assignment
       end
 
-    if benefit_group_assignment.blank? || benefit_group_assignment.plan_year != plan_year
-      enrollment_errors[:base] << "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date&.year}"
-    end
+    invalid_bga = benefit_group_assignment.blank? || benefit_group_assignment.benefit_application != benefit_application
+    enrollment_errors[:base] << "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date&.year}" if invalid_bga
 
     return benefit_group_assignment.benefit_group, benefit_group_assignment
   end
@@ -3120,8 +3118,8 @@ class HbxEnrollment
   end
 
   def benefit_group_assignment_valid?(coverage_effective_date)
-    plan_year = employee_role.employer_profile.find_plan_year_by_effective_date(coverage_effective_date)
-    if plan_year.present? && benefit_group_assignment.plan_year == plan_year
+    benefit_application = employee_role.employer_profile.find_plan_year_by_effective_date(coverage_effective_date)
+    if benefit_application.present? && benefit_group_assignment.benefit_application == benefit_application
       true
     else
       self.errors.add(:base, "You can not keep an existing plan which belongs to previous plan year")

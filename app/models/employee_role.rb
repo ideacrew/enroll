@@ -287,7 +287,7 @@ class EmployeeRole
     plan_year = employer_profile.find_plan_year_by_effective_date(coverage_effective_on(current_benefit_group: benefit_group))
 
     benefit_group_assignments = [census_employee.renewal_benefit_group_assignment, census_employee.active_benefit_group_assignment].compact
-    benefit_group_assignment  = benefit_group_assignments.detect{|bpkg| bpkg.plan_year == plan_year}
+    benefit_group_assignment  = benefit_group_assignments.detect{|bpkg| bpkg.benefit_application == plan_year}
     benefit_group_assignment.present? && benefit_group_assignment.benefit_group.is_offering_dental? ? true : false
   end
 

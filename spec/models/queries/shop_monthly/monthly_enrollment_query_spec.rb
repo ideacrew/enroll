@@ -39,7 +39,7 @@ describe "a monthly shop enrollment query", dbclean: :after_each do
           family: employee_A.person.primary_family,
           benefit_group_assignment: employee_A.census_employee.active_benefit_group_assignment(effective_on),
           employee_role: employee_A,
-          submitted_at: employee_A.census_employee.active_benefit_group_assignment(effective_on).plan_year.open_enrollment_end_on - 10.day
+          submitted_at: employee_A.census_employee.active_benefit_group_assignment(effective_on).benefit_application.open_enrollment_end_on - 10.day
         )
       }
 
@@ -107,7 +107,7 @@ describe "a monthly shop enrollment query", dbclean: :after_each do
           family: employee_C.person.primary_family,
           benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment(effective_on),
           employee_role: employee_C,
-          submitted_at: employee_A.census_employee.active_benefit_group_assignment(effective_on).plan_year.open_enrollment_end_on - 1.day
+          submitted_at: employee_A.census_employee.active_benefit_group_assignment(effective_on).benefit_application.open_enrollment_end_on - 1.day
         )
       end
 

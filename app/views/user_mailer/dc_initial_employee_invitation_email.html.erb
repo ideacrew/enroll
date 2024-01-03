@@ -8,7 +8,7 @@ Dear <%= census_employee.full_name.humanize.titleize %>,
 </div>
 <br/>
 <div>
-  In order to enroll into employer-sponsored coverage through <%= EnrollRegistry[:enroll_app].setting(:short_name).item %>, you must complete an application for enrollment by <%= census_employee.published_benefit_group_assignment.plan_year.open_enrollment_end_on.to_date.to_formatted_s %>, for coverage to be effective on <%= census_employee.published_benefit_group_assignment.plan_year.start_on.to_date.to_formatted_s %>. If you have other coverage, you will still want to “waive” coverage to preserve your special enrollment period rights for the plan year.
+  In order to enroll into employer-sponsored coverage through <%= EnrollRegistry[:enroll_app].setting(:short_name).item %>, you must complete an application for enrollment by <%= census_employee.published_benefit_group_assignment.benefit_application.open_enrollment_end_on.to_date.to_formatted_s %>, for coverage to be effective on <%= census_employee.published_benefit_group_assignment.benefit_application.start_on.to_date.to_formatted_s %>. If you have other coverage, you will still want to “waive” coverage to preserve your special enrollment period rights for the plan year.
 </div>
 <br/>
 <div>
