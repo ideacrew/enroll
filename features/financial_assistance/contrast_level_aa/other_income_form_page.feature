@@ -32,9 +32,9 @@ Feature: Contrast level AA is enabled - unemployment and other income form page
 
   Scenario: User enters negative Income amount for valid income type
     Given the user answers yes to having other income
-    And the browser has finished rendering the page
     And the user checks capital gains checkbox
     And the user fills out the other income information with negative income
     Then the save button should be enabled
     And the user saves the other income information
+    And the browser has finished rendering the page
     And the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
