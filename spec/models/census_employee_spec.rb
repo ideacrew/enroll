@@ -993,9 +993,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
   context ".is_waived_under?" do
     let(:census_employee) {CensusEmployee.new(**valid_params)}
     let!(:benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_group, census_employee: census_employee)}
+    let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
 
     before do
-      family = FactoryBot.create(:family, :with_primary_family_member)
       allow(census_employee).to receive(:family).and_return(family)
       enrollment = FactoryBot.create(
         :hbx_enrollment, family: family,
@@ -1033,6 +1033,17 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         benefit_group_assignment.hbx_enrollment.aasm_state = "renewing_waived"
         benefit_group_assignment.hbx_enrollment.save
         expect(census_employee.is_waived_under?(benefit_group_assignment.benefit_application)).to be_truthy
+      end
+    end
+
+    context "when bga default hbx_enrollment has coverage_kind dental" do
+      before do
+        dental_enrollment = FactoryBot.create(:hbx_enrollment, :with_dental_coverage_kind, family: family, household: family.active_household, benefit_group_assignment_id: benefit_group_assignment.id)
+        allow(benefit_group_assignment).to receive(:hbx_enrollment).and_return(dental_enrollment)
+      end
+
+      it "should return false if employee has not waived health coverage" do
+        expect(census_employee.is_waived_under?(benefit_group_assignment.benefit_application)).to be_falsey
       end
     end
   end
