@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Handles Audit Log requests
 class EventLogsController < ApplicationController
 
   def index

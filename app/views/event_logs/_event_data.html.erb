@@ -14,9 +14,10 @@
       <td id="<%= "event-#{event_log[:id]}" %>" data-attr-id="<%= event_log[:id] %>" class="event-with-arrow">
         <span class="glyphicon glyphicon-chevron-right" id="log-expansion-icon"></span>
       </td>
+      <% performed_by = event_log[:account_username] + " (" + event_log[:account_hbx_id] + ")" %>
       <td class="event-col-2"><%= event_log[:event_category].to_s.titleize %></td>
       <td class="event-col-3"><%= event_log.monitorable.event_name.match(/[^.]+\z/).to_s.titleize %></td>
-      <td class="event-col-4"><%= event_log[:account_username] %></td>
+      <td class="event-col-4"><%= performed_by %></td>
       <td class="event-col-5"><%= event_log[:event_time] %></td>
     </tr>
 

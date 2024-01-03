@@ -52,7 +52,7 @@ module EventLogs
         query[:event_time] ||= {}
         query[:event_time].merge!({ "$lte" => end_date.end_of_day })
       end
-      query.present? ? EventLogs::MonitoredEvent.where(query) : EventLogs::MonitoredEvent.all
+      query.present? ? EventLogs::MonitoredEvent.where(query).order(:event_time.desc) : EventLogs::MonitoredEvent.all.order(:event_time.desc)
     end
   end
 end

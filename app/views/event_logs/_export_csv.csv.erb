@@ -1,5 +1,6 @@
 "Eligibility","Outcome","Performed By","Time"
 <% @event_logs.each do |event_log| %>
-  <%= event_log[:event_category].to_s.titleize %>,<%= event_log.monitorable.event_name.match(/[^.]+\z/).to_s.titleize %>,<%= event_log[:account_username] %>,<%= event_log[:event_time] %>
+   <% performed_by = event_log[:account_username] + " (" + event_log[:account_hbx_id] + ")" %>
+  <%= event_log[:event_category].to_s.titleize %>,<%= event_log.monitorable.event_name.match(/[^.]+\z/).to_s.titleize %>,<%= performed_by %>,<%= event_log[:event_time] %>
 <% end %>
 
