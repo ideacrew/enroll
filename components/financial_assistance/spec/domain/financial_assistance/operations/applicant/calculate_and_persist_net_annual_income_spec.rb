@@ -128,10 +128,20 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CalculateAndPersistNe
         applicant.incomes << income
       end
 
-      it "should calculate net_annual_income correctly" do
-        result = subject.call(params)
-        expect(result.success).to eq applicant
-        expect(applicant.net_annual_income.to_f.ceil).to eq 7_003
+      it "should calculate net_annual_income correctly in non-leap year" do
+        unless Date.gregorian_leap?(application.assistance_year)
+          result = subject.call(params)
+          expect(result.success).to eq applicant
+          expect(applicant.net_annual_income.to_f.ceil).to eq 7_003
+        end
+      end
+
+      it "should calculate net_annual_income correctly in a leap year" do
+        if Date.gregorian_leap?(application.assistance_year)
+          result = subject.call(params)
+          expect(result.success).to eq applicant
+          expect(applicant.net_annual_income.to_f.ceil).to eq 7_017
+        end
       end
     end
 

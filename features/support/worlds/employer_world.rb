@@ -64,7 +64,7 @@ And(/^there is employer (.*?) with a OSSE eligibility$/) do |legal_name|
       subject: employer_profile.active_benefit_sponsorship.to_global_id,
       evidence_key: :shop_osse_evidence,
       evidence_value: 'true',
-      effective_date: TimeKeeper.date_of_record.beginning_of_year
+      effective_date: (current_effective_date || TimeKeeper.date_of_record).beginning_of_year
     }
   )
 end
