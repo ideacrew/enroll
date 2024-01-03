@@ -312,6 +312,8 @@ Rails.application.routes.draw do
         get 'personal'
         get 'inbox', format: false
         get 'healthcare_for_childcare_program'
+        get 'event_logs'
+        post 'event_logs'
         get 'healthcare_for_childcare_program_form'
         put 'update_osse_eligibilities'
         get 'brokers'

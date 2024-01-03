@@ -1,23 +1,7 @@
 class EventLogsController < ApplicationController
 
   def index
-    query = {}
-    %w(subject_hbx_id category).each do |param|
-      query[param.to_sym] = params[param.to_sym] if params[param.to_sym].present?
-    end
-
-    if params[:account].present?
-      query["$or"] = [{ account_hbx_id: params[:account] }, { account_username: params[:account] }]
-    end
-
-    %w(event_start_date event_end_date).each do |param|
-      if params[param.to_sym].present?
-        query[:event_time] ||= {}
-        query[:event_time].merge!({ "$#{param == 'event_start_date' ? 'gte' : 'lte'}" => params[param.to_sym] })
-      end
-    end
-
-    @event_logs = query.present? ? EventLogs::MonitoredEvent.where(query) : EventLogs::MonitoredEvent.all
+    @event_logs = EventLogs::MonitoredEvent.fetch_event_logs(event_log_params)
     respond_to do |format|
       format.js
       format.csv do
@@ -25,6 +9,12 @@ class EventLogsController < ApplicationController
         send_data csv_data, filename: 'event_logs.csv', type: 'text/csv', disposition: 'attachment'
       end
     end
+  end
+
+  private
+
+  def event_log_params
+    params.permit(:subject_hbx_id, :category, :account, :event_start_date, :event_end_date)
   end
 
 end

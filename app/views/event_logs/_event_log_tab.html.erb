@@ -1,9 +1,13 @@
 <div class="event-log-tab">
   <div>
-    <h1>Audit Log</h1>
-    <h2><%= organization.legal_name %></h2>
-    <p>HBX ID: <%= @employer_profile.hbx_id %></p>
-    <p>Please use the filters below to see specific actions taken on this organization.</p>
+    <h1><b>Audit Log</b></h1>
+    <h3><b><%= name %></b></h3>
+    <p><b>HBX ID:</b> <%= hbx_id %></p>
+    <% if active_tab == 'event_log_ivl' %>
+      <p>Please use the filters below to see specific actions taken on this individual.</p>
+    <% else %>
+      <p>Please use the filters below to see specific actions taken on this organization.</p>
+    <% end %>
 
     <div class="filters-container">
       <div id="filters-toggle" class="filters-toggle">
@@ -14,8 +18,9 @@
         <div class="filter-row">
           <label for="eligibility">Eligibility</label>
           <select id="eligibility">
-            <% EventLogs::MonitoredEvent.get_category_options(@employer_profile.hbx_id).each do |category| %>
-              <option value="<%= category %>"><%= category %></option>
+            <option value="">Select Eligibility</option>
+            <% EventLogs::MonitoredEvent.get_category_options(hbx_id).each do |category| %>
+              <option value="<%= category %>"><%= category.to_s.titleize %></option>
             <% end %>
           </select>
         </div>
@@ -25,7 +30,7 @@
         </div>
         <div class="filter-row">
           <label for="start-date">Start Date</label>
-          <input type="date" id="start-date">
+          <input placeholder="MM/DD/YYYY" type="date" id="start-date">
         </div>
         <div class="filter-row">
           <label for="end-date">End Date</label>
@@ -38,7 +43,7 @@
     </div>
 
     <div class="event-log-header">
-      <h3><b>Event Log for <%= @employer_profile.hbx_id %></b></h3>
+      <h3><b>Event Log for <%= hbx_id %></b></h3>
       <button id="export-table">Export Table</button>
     </div>
     <div id="event-table-data"></div>

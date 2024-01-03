@@ -30,5 +30,29 @@ module EventLogs
         pluck(:event_category).uniq
       end
     end
+
+    def self.fetch_event_logs(params)
+      query = {}
+      %w(subject_hbx_id category).each do |param|
+        query[param.to_sym] = params[param.to_sym] if params[param.to_sym].present?
+      end
+
+      if params[:account].present?
+        query["$or"] = [{ account_hbx_id: params[:account] }, { account_username: params[:account] }]
+      end
+
+      if params[:event_start_date].present?
+        start_date = params[:event_start_date].to_date
+        query[:event_time] ||= {}
+        query[:event_time].merge!({ "$gte" => start_date.beginning_of_day })
+      end
+
+      if params[:event_end_date].present?
+        end_date = params[:event_end_date].to_date
+        query[:event_time] ||= {}
+        query[:event_time].merge!({ "$lte" => end_date.end_of_day })
+      end
+      query.present? ? EventLogs::MonitoredEvent.where(query) : EventLogs::MonitoredEvent.all
+    end
   end
 end
