@@ -26,17 +26,11 @@ module BenefitSponsors
     def set_current_user
       User.current_user = current_user
       User.current_session_values = session
-      SAVEUSER[:current_user_id] = current_user.try(:id)
-      session_id = SessionTaggedLogger.extract_session_id_from_request(request)
-
-      return if SessionIdHistory.where(session_id: session_id).present?
-      SessionIdHistory.create(session_id: session_id, session_user_id: current_user.try(:id), sign_in_outcome: "Successful", ip_address: request.remote_ip)
     end
 
     def clear_current_user
       User.current_user = nil
       User.current_session_values = nil
-      SAVEUSER[:current_user_id] = nil
     end
 
     append_after_action :clear_current_user
