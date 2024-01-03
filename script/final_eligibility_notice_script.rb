@@ -139,7 +139,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
           family.set_due_date_on_verification_types
           family.update_attributes!(min_verification_due_date: (family.min_verification_due_date_on_family || (TimeKeeper.date_of_record + 95.days)))
         end
-        @notifier = Services::NoticeService.new
+        @notifier = BenefitSponsors::Services::NoticeService.new
         @notifier.deliver(
           recipient: consumer_role,
           event_object: consumer_role,

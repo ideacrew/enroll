@@ -39,12 +39,10 @@ class ShopNoticesNotifierJob < ActiveJob::Base
                     'IvlNotices::IvlTaxNotice',
                     'IvlNotices::IvlToCoverallTransitionNoticeBuilder',
                     'IvlNotices::IvlVtaNotice',
-                    'IvlNotices::NoAppealVariableIvlRenewalNotice',
                     'IvlNotices::NoticeBuilder',
                     'IvlNotices::ReminderNotice',
                     'RenewalNotice',
-                    'IvlNotices::SecondIvlRenewalNotice',
-                    'IvlNotices::VariableIvlRenewalNotice'].find { |x| x == notice_type.classify }
+                    'IvlNotices::SecondIvlRenewalNotice'].find { |x| x == notice_type.classify }
     raise "Unable to find the notice_class" if notice_class.nil?
     notice_class.camelize.constantize
   end
