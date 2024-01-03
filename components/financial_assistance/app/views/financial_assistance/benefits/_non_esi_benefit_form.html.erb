@@ -12,8 +12,8 @@
       </div>
     <div class="row">
       <div class="col-md-3 pull-right">
-        <a class="btn btn-default benefit-cancel">Cancel</a>
-        <%= f.submit 'Save', class: 'btn btn-danger' %>
+        <a tabindex="0" id="non_esi_cancel" class="btn btn-default benefit-cancel"><%=l10n(".cancel")%></a>
+        <%= f.submit 'Save', class: 'btn btn-save' %>
       </div>
     </div>
   </div>
