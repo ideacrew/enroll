@@ -1,5 +1,5 @@
-"ID","Eligibility","Outcome","Performed By","Reason","Approved","Time"
+"Eligibility","Outcome","Performed By","Time"
 <% @event_logs.each do |event_log| %>
-  "<%= event_log[:id] %>","<%= event_log[:eligibility] %>","<%= event_log[:outcome] %>","<%= event_log[:performed_by] %>","<%= event_log[:reason] %>","<%= event_log[:approved] %>","<%= event_log[:created_at] %>"
+  <%= event_log[:event_category] %>,<%= event_log.monitorable.event_name.match(/[^.]+\z/).to_s %>,<%= event_log[:account_username] %>,<%= event_log[:event_time] %>
 <% end %>
 

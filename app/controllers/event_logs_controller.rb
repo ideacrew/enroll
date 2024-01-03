@@ -1,47 +1,23 @@
 class EventLogsController < ApplicationController
 
   def index
-    @event_logs = [{
-                     id: 1,
-                     eligibility: "OSSE",
-                     outcome: "Granted",
-                     performed_by: "test@test.com",
-                     reason: "This is testing",
-                     approved: "Yes",
-                     created_at: Time.now.utc - 2.days
-                   },
-                   {
-                     id: 2,
-                     eligibility: "OSSE",
-                     outcome: "Renewed",
-                     performed_by: "test@test.com",
-                     reason: "This is testing",
-                     approved: "Yes",
-                     created_at: Time.now.utc - 1.day
-                   },
-                   {
-                     id: 3,
-                     eligibility: "OSSE",
-                     outcome: "Granted",
-                     performed_by: "test@test.com",
-                     reason: "This is testing",
-                     approved: "Yes",
-                     created_at: Time.now.utc
-                   },
-                   {
-                     id: 4,
-                     eligibility: "OSSE1",
-                     outcome: "Granted",
-                     performed_by: "test1@test.com",
-                     reason: "This is testing",
-                     approved: "Yes",
-                     created_at: Time.now.utc
-                   }]
-
-    if params[:user_id].present?
-      @event_logs = [@event_logs.last]
+    query = {}
+    %w(subject_hbx_id category).each do |param|
+      query[param.to_sym] = params[param.to_sym] if params[param.to_sym].present?
     end
 
+    if params[:account].present?
+      query["$or"] = [{ account_hbx_id: params[:account] }, { account_username: params[:account] }]
+    end
+
+    %w(event_start_date event_end_date).each do |param|
+      if params[param.to_sym].present?
+        query[:event_time] ||= {}
+        query[:event_time].merge!({ "$#{param == 'event_start_date' ? 'gte' : 'lte'}" => params[param.to_sym] })
+      end
+    end
+
+    @event_logs = query.present? ? EventLogs::MonitoredEvent.where(query) : EventLogs::MonitoredEvent.all
     respond_to do |format|
       format.js
       format.csv do
