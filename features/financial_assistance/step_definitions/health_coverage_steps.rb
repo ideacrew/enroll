@@ -126,6 +126,11 @@ Given(/^the user fills out the required health coverage information$/) do
   fill_in 'benefit[start_on]', with: "02/01/2018"
 end
 
+Given(/^the user fills out the required health coverage information with end date less than start date$/) do
+  fill_in 'benefit[start_on]', with: "02/01/2018"
+  fill_in 'benefit[end_on]', with: "02/01/2017"
+end
+
 And(/^the user fills out the required hra form$/) do
   fill_in 'benefit_employer_name', with: "Test Employer"
   fill_in 'benefit_employer_address_address_1', with: "Address line1"
