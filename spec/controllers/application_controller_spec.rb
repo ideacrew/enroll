@@ -1,14 +1,14 @@
 require 'rails_helper'
 
+class DummySessionClass
+  include SessionConcern
+end
+
 RSpec.describe ApplicationController do
   controller(Employers::EmployerProfilesController) do
     def index
       render text: "Anonymous Index"
     end
-  end
-
-  DummyClass = Class.new do
-    include SessionConcern
   end
 
   context '#set_ie_flash_by_announcement' do
@@ -93,7 +93,7 @@ RSpec.describe ApplicationController do
     end
 
     it 'should set current user and session' do
-      dummy = DummyClass.new
+      dummy = DummySessionClass.new
 
       expect(dummy.current_user).to eq user
       expect(dummy.session).to include('session_id')

@@ -4,4 +4,4 @@ registry:
       - :enroll_app
     features:
       - key: :aca_event_logging
-        is_enabled: true
+        is_enabled: <%= ENV['ACA_EVENT_LOGGING_IS_ENABLED'] || false %>

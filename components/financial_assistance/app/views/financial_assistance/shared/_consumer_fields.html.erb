@@ -8,7 +8,7 @@
       <label>Are you a US Citizen or US National? *</label>
     </div>
     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
-      <div class="radio skinned-form-controls skinned-form-controls-mac">
+      <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'applicant_us_citizen_true')" class="radio skinned-form-controls skinned-form-controls-mac">
         <%= f.radio_button :us_citizen, true, required: true, class: "required floatlabel" %>
         <%= f.label :us_citizen, :value => true do %>
           <span class="yes_no_pair">Yes</span>
@@ -16,7 +16,7 @@
       </div>
     </div>
     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
-      <div class="radio skinned-form-controls skinned-form-controls-mac">
+      <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'applicant_us_citizen_false')" class="radio skinned-form-controls skinned-form-controls-mac">
         <%= f.radio_button :us_citizen, false, required: true, class: "required floatlabel" %>
         <%= f.label :us_citizen, :value => false do %>
           <span class="yes_no_pair">No</span>
@@ -34,7 +34,7 @@
       <label><%= l10n("insured.consumer_roles.naturalized_question") %> *</label>
     </div>
     <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
-      <div class="radio skinned-form-controls skinned-form-controls-mac">
+      <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'applicant_naturalized_citizen_true')" class="radio skinned-form-controls skinned-form-controls-mac">
         <%= f.radio_button :naturalized_citizen, true, required: true, class: "required floatlabel" %>
         <%= f.label :naturalized_citizen, :value => true do %>
           <span class="yes_no_pair">Yes</span>
@@ -42,7 +42,7 @@
       </div>
     </div>
     <div class="col-lg-2 col-md-3 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
-      <div class="radio skinned-form-controls skinned-form-controls-mac">
+      <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'applicant_naturalized_citizen_false')" class="radio skinned-form-controls skinned-form-controls-mac">
         <%= f.radio_button :naturalized_citizen, false, required: true, class: "required floatlabel" %>
         <%= f.label :naturalized_citizen, :value => false do %>
           <span class="yes_no_pair">No</span>
@@ -72,7 +72,7 @@
       </div>
     <% else %>
       <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-        <div class="radio skinned-form-controls skinned-form-controls-mac">
+        <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'applicant_eligible_immigration_status_true')" class="radio skinned-form-controls skinned-form-controls-mac">
           <%= f.radio_button :eligible_immigration_status, true, class: "required floatlabel" %>
           <%= f.label :eligible_immigration_status, :value => true do %>
             <span class="yes_no_pair">Yes</span>
@@ -80,7 +80,7 @@
         </div>
       </div>
       <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
-        <div class="radio skinned-form-controls skinned-form-controls-mac">
+        <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'applicant_eligible_immigration_status_false')" class="radio skinned-form-controls skinned-form-controls-mac">
           <%= f.radio_button :eligible_immigration_status, false, class: "required floatlabel" %>
           <%= f.label :eligible_immigration_status, :value => false do %>
             <span class="yes_no_pair">No</span>
@@ -103,13 +103,13 @@
       <label class="required no-pd">Are you currently incarcerated? *</label>
     </div>
     <div class="col-lg-2 col-md-2 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
-      <div class="radio">
+      <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_incarcerated_yes')" class="radio">
         <%= f.radio_button :is_incarcerated, true, class: "required floatlabel", id: 'radio_incarcerated_yes', required: true %>
         <label for="radio_incarcerated_yes"><span class="yes_no_pair">Yes</span></label>
       </div>
     </div>
     <div class="col-lg-2 col-md-2 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
-      <div class="radio">
+      <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_incarcerated_no')" class="radio">
         <%= f.radio_button :is_incarcerated, false, class: "required floatlabel", id: 'radio_incarcerated_no', required: true %>
         <label for="radio_incarcerated_no"><span class="yes_no_pair">No</span></label>
       </div>

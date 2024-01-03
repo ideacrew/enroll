@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: f67daf70d350caf66a867fe51904b51d7718c0c2
+  revision: 2ac1634c55bef3214a51854e925a3456f457eab2
   branch: trunk
   specs:
     aca_entities (0.10.0)
@@ -35,10 +35,10 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/event_source.git
-  revision: 29393ebb04df8f57ccb536da4635087c8c8bde0b
+  revision: e368d614f37c5cf4e4a17a81ae71c49376d96ff6
   branch: trunk
   specs:
-    event_source (0.5.5)
+    event_source (0.5.8)
       bunny (>= 2.14)
       deep_merge (~> 1.2.0)
       dry-events (~> 0.3)
@@ -138,6 +138,7 @@ PATH
       dry-struct
       dry-types
       dry-validation (~> 1.0)
+      holidays (~> 8.6)
       interactor (~> 3.0)
       interactor-rails (~> 2.2)
       language_list (~> 1)
@@ -209,6 +210,7 @@ PATH
       dry-types
       dry-validation (~> 1.0)
       ffi (~> 1.9)
+      holidays (~> 8.6)
       kaminari (~> 0.17.0)
       mongoid (~> 7.0.2)
       pundit (~> 2.0)
@@ -552,6 +554,7 @@ GEM
     hashdiff (1.0.1)
     hashery (2.1.2)
     highline (2.0.3)
+    holidays (8.6.0)
     html2haml (2.2.0)
       erubis (~> 2.7.0)
       haml (>= 4.0, < 6)
@@ -1064,6 +1067,7 @@ DEPENDENCIES
   forgery (~> 0.7.0)
   globalid
   haml (~> 5.0)
+  holidays (~> 8.6)
   httparty (~> 0.16)
   i18n (~> 1.5)
   i18n-tasks (~> 0.9.33)

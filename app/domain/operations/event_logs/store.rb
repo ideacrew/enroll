@@ -114,6 +114,8 @@ module Operations
 
         log_event = persistence_model_class.new(values.to_h)
         log_event.save ? Success(log_event) : Failure(log_event)
+      rescue NameError => e
+        Failure(e.message)
       end
 
       def resource_handler

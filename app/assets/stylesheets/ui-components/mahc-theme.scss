@@ -559,6 +559,13 @@ thead {
   padding-left: 0.5em;
 }
 
+.fa-arrow-down:before {
+  color: var(--theme-primary-100, #007bc4);
+}
+
+.fa-info-circle:before {
+  color: var(--theme-primary-100, #007bc4);
+}
 
 #datatable_filter_source_kind {
     width: 75px;

@@ -37,6 +37,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'dry-container'
   s.add_dependency 'dry-struct'
   s.add_dependency 'dry-monads'
+  s.add_dependency 'holidays', '~> 8.6'
 
   s.test_files = Dir["spec/**/*"]
 
