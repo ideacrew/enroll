@@ -33,7 +33,7 @@ module EventLogs
 
     def self.fetch_event_logs(params)
       query = {}
-      %w(subject_hbx_id category).each do |param|
+      %w(subject_hbx_id event_category).each do |param|
         query[param.to_sym] = params[param.to_sym] if params[param.to_sym].present?
       end
 

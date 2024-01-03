@@ -17,7 +17,7 @@ class EventLogsController < ApplicationController
   private
 
   def event_log_params
-    params.permit(:subject_hbx_id, :category, :account, :event_start_date, :event_end_date)
+    params.permit(:subject_hbx_id, :event_category, :account, :event_start_date, :event_end_date)
   end
 
 end
