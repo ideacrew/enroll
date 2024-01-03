@@ -6,6 +6,5 @@ module Publishers
     include ::EventSource::Publisher[amqp: 'fdsh.verification_requests.vlp']
 
     register_event 'initial_verification_requested'
-    register_event 'close_case_request'
   end
 end
