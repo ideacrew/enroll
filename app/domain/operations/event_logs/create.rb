@@ -50,9 +50,7 @@ module Operations
       end
 
       def validate(params)
-        unless domain_contract_class
-          return Failure("domain contract not defined")
-        end
+        return Failure("domain contract not defined") unless domain_contract_class
         result = domain_contract_class.new.call(params)
         result.success? ? Success(result.to_h) : Failure(result.errors)
       rescue NameError => e
