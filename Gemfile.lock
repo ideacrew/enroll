@@ -7,8 +7,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: 0a0ffe5fab9771548c2822d18234b4f78208a2eb
-  branch: 186506126_create_monitored_event
+  revision: 2ac1634c55bef3214a51854e925a3456f457eab2
+  branch: trunk
   specs:
     aca_entities (0.10.0)
       deep_merge
@@ -35,8 +35,8 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/event_source.git
-  revision: 817b07ed289f7905dcc6ab25d7c394adb7b10fcd
-  branch: 186506126_message_dsl_changes
+  revision: e368d614f37c5cf4e4a17a81ae71c49376d96ff6
+  branch: trunk
   specs:
     event_source (0.5.8)
       bunny (>= 2.14)
