@@ -6,8 +6,9 @@
           %h1.darkblue
             = l10n("personal_information")
           = render 'remote_search_form', f: f
-          #person_search_results
-            = render 'no_match'
+          - unless EnrollRegistry.feature_enabled?(:lock_account_for_unsuccessful_match_attempts)
+            #person_search_results
+              = render 'no_match'
           %br
         .col-lg-3.col-md-3.col-sm-3.col-xs-12.col-md-offset-2.col-sm-offset-1.right-section
           = render  partial: 'shared/signup_progress', locals: {step: '1'}

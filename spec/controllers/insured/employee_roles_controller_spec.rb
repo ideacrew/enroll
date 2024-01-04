@@ -260,21 +260,33 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
 
     describe "POST match" do
       let(:person_parameters) { { :first_name => "SOMDFINKETHING" } }
-      let(:mock_employee_candidate) { instance_double("Forms::EmployeeCandidate", :valid? => validation_result, ssn: "333224444", dob: "08/15/1975") }
+      let(:mock_employee_candidate) do
+        Forms::EmployeeCandidate.new({
+                                       :dob => "2012-10-12",
+                                       :ssn => "123-45-6789",
+                                       :first_name => "Tom",
+                                       :last_name => "Baker",
+                                       :gender => "male",
+                                       :is_applying_coverage => false
+                                     })
+      end
+      let(:invalid_employee_candidate) do
+        Forms::EmployeeCandidate.new({
+                                       :dob => "",
+                                       :ssn => "33322"
+                                     })
+      end
       let(:census_employee) { instance_double("CensusEmployee")}
       let(:hired_on) { double }
       let(:employment_relationships) { double }
-      let(:user_id) { "SOMDFINKETHING_ID"}
-      let(:user) { double("User",id: user_id, email: "somdfinkething@gmail.com") }
+      let(:user) { FactoryBot.create(:user) }
 
       before(:each) do
         allow(user).to receive(:person).and_return(nil)
         sign_in(user)
         allow(mock_employee_candidate).to receive(:match_census_employees).and_return(found_census_employees)
         allow(census_employee).to receive(:is_active?).and_return(true)
-        allow(Forms::EmployeeCandidate).to receive(:new).and_return(mock_employee_candidate)
         allow(Factories::EmploymentRelationshipFactory).to receive(:build).with(mock_employee_candidate, [census_employee]).and_return(employment_relationships)
-        post :match, params: {person: person_parameters}
       end
 
       context "given invalid parameters" do
@@ -282,9 +294,10 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
         let(:found_census_employees) { [] }
 
         it "renders the 'search' template" do
+          post :match, params: {person: person_parameters}
+
           expect(response).to have_http_status(:success)
           expect(response).to render_template("search")
-          expect(assigns[:employee_candidate]).to eq mock_employee_candidate
         end
       end
 
@@ -296,22 +309,98 @@ if ::EnrollRegistry[:aca_shop_market].enabled?
           let(:person){ double("Person") }
           let(:consumer_role){ double("ConsumerRole", id: "test") }
           let(:person_parameters){{"dob" => "1985-10-01", "first_name" => "martin","gender" => "male","last_name" => "york","middle_name" => "","name_sfx" => "","ssn" => "000000111"}}
+          let(:invalid_person_parameters){{"dob" => "", "ssn" => "111"}}
 
           it "renders the 'no_match' template" do
+            post :match, params: {person: person_parameters}
+
             expect(response).to have_http_status(:success)
             expect(response).to render_template("no_match")
-            expect(assigns[:employee_candidate]).to eq mock_employee_candidate
             expect(response).to render_template("employee_ineligibility_notice")
+          end
+
+          it "locks account when bruteforce attempted and FF enabled" do
+            allow(EnrollRegistry[:lock_account_for_unsuccessful_match_attempts].feature).to receive(:is_enabled).and_return(true)
+            expect(user.reload.locked_at).to eq(nil)
+            max_attempts_to_try = EnrollRegistry[:employee_match_max_attempts].item.to_i + 1
+
+            max_attempts_to_try.times do
+              post :match, params: {person: person_parameters}
+            end
+
+            expect(session[:invalid_match_attempts]).to eq(max_attempts_to_try)
+            expect(assigns(:employee_candidate).errors.first[1]).to include("Maximum number of attempts")
+            expect(user.reload.locked_at).to_not eq(nil)
+          end
+
+          it "does not lock account with very few attempts when FF enabled" do
+            allow(EnrollRegistry[:lock_account_for_unsuccessful_match_attempts].feature).to receive(:is_enabled).and_return(true)
+            2.times do
+              post :match, params: {person: person_parameters}
+            end
+
+            expect(session[:invalid_match_attempts]).to eq(2)
+            expect(assigns(:employee_candidate).errors.first[1]).to eq(I18n.t("insured.employee_roles.unsuccessful_match_attempts"))
+            expect(response).to render_template("no_match")
+            expect(user.reload.locked_at).to eq(nil)
+          end
+
+          it "does not lock user account with many attempts when FF is disabled" do
+            allow(EnrollRegistry[:lock_account_for_unsuccessful_match_attempts].feature).to receive(:is_enabled).and_return(false)
+            20.times do
+              post :match, params: {person: person_parameters}
+            end
+
+            expect(user.reload.locked_at).to eq(nil)
+            expect(response).to render_template("no_match")
           end
 
           context "that find a matching employee" do
             let(:found_census_employees) { [census_employee] }
 
             it "renders the 'match' template" do
+              post :match, params: {person: person_parameters}
+
+              expect(session[:invalid_match_attempts]).to eq(1)
               expect(response).to have_http_status(:success)
-              expect(response).to render_template("match")
-              expect(assigns[:employee_candidate]).to eq mock_employee_candidate
-              expect(assigns[:employment_relationships]).to eq employment_relationships
+              expect(response).to render_template("no_match")
+            end
+          end
+
+          context "when employee_candidate is invalid" do
+            before do
+              allow(EnrollRegistry[:lock_account_for_unsuccessful_match_attempts].feature).to receive(:is_enabled).and_return(true)
+            end
+
+            it "renders the match template and locks account when bruteforce is attempted" do
+              expect(user.reload.locked_at).to eq(nil)
+
+              20.times do
+                post :match, params: {person: invalid_person_parameters}
+              end
+
+              expect(user.reload.locked_at).to_not eq(nil)
+              expect(session[:invalid_match_attempts]).to eq(20)
+              expect(response).to render_template("search")
+            end
+
+            it "renders the match template and does not lock account when bruteforce is not attempted" do
+              2.times do
+                post :match, params: {person: invalid_person_parameters}
+              end
+
+              expect(user.reload.locked_at).to eq(nil)
+              expect(session[:invalid_match_attempts]).to eq(2)
+              expect(response).to render_template("search")
+            end
+
+            it "renders the match template when FF is disabled" do
+              allow(EnrollRegistry[:lock_account_for_unsuccessful_match_attempts].feature).to receive(:is_enabled).and_return(false)
+              20.times do
+                post :match, params: {person: invalid_person_parameters}
+              end
+
+              expect(response).to render_template("search")
             end
           end
         end
