@@ -154,7 +154,9 @@
       type: 'POST',
       url: '/event_logs',
       dataType: 'script',
-      data: {},
+      data: {
+        subject_hbx_id: <%= raw hbx_id.to_json %>
+      },
       complete: function() {
         // Call the callback function when the initial request is complete
         callback();
