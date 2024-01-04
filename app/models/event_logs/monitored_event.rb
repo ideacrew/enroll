@@ -7,8 +7,6 @@ module EventLogs
 
     belongs_to :monitorable, polymorphic: true
 
-    attr_accessor :outcome
-
     field :account_hbx_id, type: String
     field :account_username, type: String
     field :subject_hbx_id, type: String
@@ -54,5 +52,6 @@ module EventLogs
       end
       query.present? ? EventLogs::MonitoredEvent.where(query).order(:event_time.desc) : EventLogs::MonitoredEvent.all.order(:event_time.desc)
     end
+
   end
 end
