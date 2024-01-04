@@ -2,7 +2,7 @@
 
 # Handles Audit Log requests
 class EventLogsController < ApplicationController
-
+  before_action :check_hbx_staff_role
   def index
     @event_logs = EventLogs::MonitoredEvent.fetch_event_logs(event_log_params)
     respond_to do |format|
@@ -18,6 +18,12 @@ class EventLogsController < ApplicationController
 
   def event_log_params
     params.permit(:subject_hbx_id, :event_category, :account, :event_start_date, :event_end_date)
+  end
+
+  def check_hbx_staff_role
+    unless current_user.has_hbx_staff_role?
+      redirect_to root_path, :flash => { :error => "You must be an HBX staff member" }
+    end
   end
 
 end

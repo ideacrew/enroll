@@ -2,10 +2,10 @@
   <thead>
   <tr>
     <th></th>
-    <th>Eligibility</th>
-    <th>Outcome</th>
-    <th>Performed By</th>
-    <th>Time</th>
+    <th><%= l10n("event_log.eligibility") %></th>
+    <th><%= l10n("event_log.outcome") %></th>
+    <th><%= l10n("event_log.performed_by") %></th>
+    <th><%= l10n("event_log.time") %></th>
   </tr>
   </thead>
   <tbody>
@@ -23,7 +23,7 @@
 
     <tr id="<%= "event-expansion-#{event_log[:id]}" %>" class="display-none">
       <td></td>
-      <td colspan="3" class="expansion-details-col">Additional Event Details.</td>
+      <td colspan="3" class="expansion-details-col"><%= l10n("event_log.additional_details") %></td>
       <td></td>
     </tr>
   <% end %>

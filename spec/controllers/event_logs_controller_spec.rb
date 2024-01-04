@@ -4,8 +4,11 @@ require 'rails_helper'
 
 RSpec.describe EventLogsController, :type => :controller do
   let(:user) { FactoryBot.create(:user) }
+  let(:person) { FactoryBot.create(:person, user: user) }
+  let(:hbx_staff_role) { FactoryBot.create(:hbx_staff_role, person: person) }
 
   before :each do
+    allow(user).to receive(:has_hbx_staff_role?).and_return true
     sign_in user
   end
 
