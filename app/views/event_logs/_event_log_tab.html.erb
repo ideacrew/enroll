@@ -64,7 +64,7 @@
     const accountFilter = $('#user-id');
     const startDateFilter = $('#start-date');
     const endDateFilter = $('#end-date');
-    const hbx_id = <%= raw escape_javascript(hbx_id).to_json %>;
+    const hbx_id = <%= sanitize hbx_id.to_json %>;
     // Event handler for start date change
     startDateFilter.on('change', function() {
       const startDate = new Date(startDateFilter.val());
@@ -155,7 +155,7 @@
       url: '/event_logs',
       dataType: 'script',
       data: {
-        subject_hbx_id: <%= raw escape_javascript(hbx_id).to_json %>
+        subject_hbx_id: <%= sanitize hbx_id.to_json %>
       },
       complete: function() {
         // Call the callback function when the initial request is complete
