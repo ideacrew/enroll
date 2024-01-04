@@ -17,13 +17,16 @@ RSpec.describe Operations::EventLogs::Create,
   end
 
   let(:subject_gid) { person.to_global_id.uri.to_s }
+  let(:event_name) do
+    "events.people.eligibilities.ivl_osse_eligibility.eligibility_created"
+  end
 
   let(:params) do
     {
       account_id: user.id.to_s,
       subject_gid: subject_gid,
       message_id: SecureRandom.uuid,
-      trigger: "eligibility_create",
+      event_name: event_name,
       correlation_id: SecureRandom.uuid,
       host_id: "https://demo.dceligibility.assit.org",
       event_category: :osse_eligibility,
@@ -33,14 +36,15 @@ RSpec.describe Operations::EventLogs::Create,
   end
 
   context "when not able to locate subject resource" do
-
-    let(:subject_gid) { "#{person.to_global_id.uri}9" }
+    let(:event_name) { "events.people.eligibilities.eligibility_created" }
 
     it "should fail" do
       result = described_class.new.call(params)
 
       expect(result).to be_failure
-      expect(result.failure).to eq "Unable to find resource for subject_gid: #{subject_gid}"
+      expect(result.failure).to match(
+        /uninitialized constant AcaEntities::PeopleEventLogContract/
+      )
     end
   end
 
@@ -49,7 +53,7 @@ RSpec.describe Operations::EventLogs::Create,
       result = described_class.new.call(params)
 
       expect(result).to be_success
-      expect(result.success).to be_a(AcaEntities::EventLogs::PersonEventLog)
+      expect(result.success).to be_a(AcaEntities::People::EligibilitiesEventLog)
     end
   end
 end
