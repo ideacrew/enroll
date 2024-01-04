@@ -218,7 +218,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.my_broker' => "My Broker",
   :'en.action_needed' => "Action Needed",
   :'en.upload_paper_application' => "Upload Paper Application",
-  :'en.audit_log' => "Audit-Log",
+  :'en.audit_log' => "Audit Log",
   :'en.messages' => "Messages",
   :'en.my_account' => "My Account",
   :'en.manage_family' => "Manage Family",

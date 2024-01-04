@@ -1,6 +1,6 @@
 Feature: Admin access to OSSE Audit-Log
   Scenario: Admin has access to OSSE Audit-Log under families home page
-    Given EnrollRegistry eligibility_audit_log feature is enabled
+    Given EnrollRegistry aca_event_logging feature is enabled
     Given the shop market configuration is enabled
     Given all market kinds are enabled for user to select
     Given all permissions are present
@@ -19,7 +19,7 @@ Feature: Admin access to OSSE Audit-Log
     And user logs out
 
   Scenario: Admin has access to OSSE Audit-Log under employer home page
-  Given EnrollRegistry eligibility_audit_log feature is enabled
+  Given EnrollRegistry aca_event_logging feature is enabled
     Given the shop market configuration is enabled
     Given all market kinds are enabled for user to select
     Given all permissions are present
