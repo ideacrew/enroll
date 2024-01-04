@@ -109,8 +109,13 @@ module BenefitSponsors
     end
 
     describe "#store_osse_eligibility" do
+      let(:create_shop_eligibility_service) do
+        ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new
+      end
+
       it "creates or terms osse eligibility" do
-        allow(::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new).to receive(:call).and_return(double("Result", success?: true))
+        allow(::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility).to receive(:new).and_return(create_shop_eligibility_service)
+        allow(create_shop_eligibility_service).to receive(:call).and_return(Dry::Monads::Success())
         result = subject.store_osse_eligibility("true", TimeKeeper.date_of_record)
         expect(result.success?).to be_truthy
       end

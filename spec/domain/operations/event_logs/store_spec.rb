@@ -18,49 +18,57 @@ RSpec.describe Operations::EventLogs::Store,
 
   let(:subject_gid) { person.to_global_id.uri.to_s }
 
-  let(:payload) do
-    {
-      account_id: user.id.to_s,
-      subject_gid: subject_gid,
-      message_id: SecureRandom.uuid,
-      trigger: "eligibility_create",
-      event_category: :osse_eligibility,
-      event_time: DateTime.now.to_s,
-      session_detail: session_details
-    }
-  end
+  let(:payload) { { sample: true } }
 
   let(:headers) do
     {
       correlation_id: SecureRandom.uuid,
-      host_id: "https://demo.dceligibility.assit.org"
+      message_id: SecureRandom.uuid,
+      host_id: "https://demo.dceligibility.assit.org",
+      subject_gid: subject_gid,
+      resource_gid: subject_gid,
+      event_time: DateTime.now,
+      event_name: event_name,
+      account: {
+        id: user.id.to_s,
+        session: session_details
+      }
     }
   end
 
-  context "when not able to locate subject resource" do
+  let(:event_name) do
+    "events.people.eligibilities.ivl_osse_eligibility.eligibility_created"
+  end
 
-    let(:subject_gid) { "#{person.to_global_id.uri}9" }
+  before { allow(subject).to receive(:event_logging_enabled?).and_return(true) }
+
+  subject { described_class.new }
+
+  context "when not able to locate subject resource" do
+    let(:event_name) { "events.people.eligibilities.eligibility_created" }
 
     it "should fail" do
-      result = described_class.new.call(payload: payload, headers: headers)
+      result = subject.call(payload: payload, headers: headers)
 
       expect(result).to be_failure
-      expect(result.failure).to eq "Unable to find resource for subject_gid: #{subject_gid}"
+      expect(
+        result.failure
+      ).to match(/uninitialized constant AcaEntities::PeopleEventLogContract/)
     end
   end
 
   context "with input params" do
     it "should return success" do
-      result = described_class.new.call(payload: payload, headers: headers)
+      result = subject.call(payload: payload, headers: headers)
 
       expect(result).to be_success
     end
 
     it "should persist event log" do
-      described_class.new.call(payload: payload, headers: headers)
+      subject.call(payload: payload, headers: headers)
 
-      expect(EventLogs::PersonEventLog.count).to eq 1
-      event_log = EventLogs::PersonEventLog.first
+      expect(People::EligibilitiesEventLog.count).to eq 1
+      event_log = People::EligibilitiesEventLog.first
       expect(event_log.account_id.to_s).to eq user.id.to_s
       expect(event_log.subject_gid).to eq person.to_global_id.uri.to_s
 
@@ -70,6 +78,19 @@ RSpec.describe Operations::EventLogs::Store,
            :login_session_id
          ]
       expect(session_detail.portal).to eq session_details[:portal]
+    end
+  end
+
+  context "when event logging is disabled" do
+    before do
+      allow(subject).to receive(:event_logging_enabled?).and_return(false)
+    end
+
+    it "should fail" do
+      result = subject.call(payload: payload, headers: headers)
+
+      expect(result).to be_failure
+      expect(result.failure).to eq "Event logging is not enabled"
     end
   end
 end

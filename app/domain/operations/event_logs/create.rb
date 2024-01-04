@@ -40,37 +40,35 @@ module Operations
                to: :resource_handler
 
       def init_resource_handler(options)
-        resource_handler.subject_gid = options[:subject_gid]
+        resource_handler.event_name = options[:event_name]
 
-        if resource_handler.associated_resource
+        if resource_handler.resource_class_reference
           Success(resource_handler)
         else
-          Failure(
-            "Unable to find resource for subject_gid: #{options[:subject_gid]}"
-          )
+          Failure("Invalid event name: #{options[:event_name]}")
         end
       end
 
       def validate(params)
         return Failure("domain contract not defined") unless domain_contract_class
-
         result = domain_contract_class.new.call(params)
-        result.success? ? Success(result) : Failure(result)
+        result.success? ? Success(result.to_h) : Failure(result.errors)
+      rescue NameError => e
+        Failure(e.message)
       end
 
       def create(values)
         return Failure("domain entity not defined") unless domain_entity_class
 
-        Success(domain_entity_class.new(values.to_h))
+        Success(domain_entity_class.new(values))
+      rescue NameError => e
+        Failure(e.message)
       end
 
       def resource_handler
         return @resource_handler if @resource_handler
 
-        @resource_handler = Class.new do
-          include Mongoid::Document
-          include EventLog
-        end.new
+        @resource_handler = Class.new { include EventLog }.new
       end
     end
   end

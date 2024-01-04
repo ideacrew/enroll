@@ -96,7 +96,7 @@ RSpec.describe "insured/families/home.html.erb" do
     end
 
     it "does not display 'sep message' partial if there is no active SEP" do
-      sep.update_attributes!(end_on: TimeKeeper.date_of_record - 1.day)
+      allow(family).to receive(:active_seps).and_return(false)
       render file: "insured/families/home.html.erb"
       expect(rendered).to_not have_selector('div#sep_message')
     end
