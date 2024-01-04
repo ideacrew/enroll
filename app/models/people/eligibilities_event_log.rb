@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module EventLogs
-  class PersonEventLog
+module People
+  class EligibilitiesEventLog
     include Mongoid::Document
     include Mongoid::Timestamps
     include ::EventLog
