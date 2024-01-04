@@ -1,4 +1,4 @@
-Feature: Functionality for the Family Relationships page - contrast level aa is enabled
+Feature: Contrast level AA is enabled - Functionality for the Family Relationships page
 
   Background: Family Relationships page
     Given the contrast level aa feature is enabled
