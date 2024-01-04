@@ -11,6 +11,8 @@ module BenefitSponsors
 
         attr_accessor :profile_id, :profile_type, :organization, :profile, :current_user, :claimed, :pending, :first_name, :last_name, :email, :dob, :npn, :fein, :legal_name, :person, :market_kind, :area_code, :number, :extension, :handler
 
+        attr_reader :matched_person
+
         cattr_accessor :profile_type
 
         delegate :is_employer_profile?, :is_broker_profile?, :is_general_agency_profile?, to: :class
@@ -147,6 +149,7 @@ module BenefitSponsors
           handler.factory = self
           handler.person = person
           handler.current_user = current_user
+          handler.matched_person = matched_person
           handler.persist_representative!
         end
 
@@ -223,7 +226,7 @@ module BenefitSponsors
           end
 
           if matched_people.count == 1
-            mp = matched_people.first
+            @matched_person = mp = matched_people.first
             if is_employer_profile? && mp.user.present? && (mp.user.id.to_s != current_user.id.to_s)
               errors.add(:staff_role, "a person matching the provided personal information has already been claimed by another user.  Please contact HBX.")
               return false
@@ -275,7 +278,7 @@ module BenefitSponsors
           self.profile = BenefitSponsors::Organizations::Profile.find(profile_id)
         end
 
-        BenefitSponsor = Struct.new(:factory, :organization, :profile, :person, :profile_id, :current_user, :is_saved) do
+        BenefitSponsor = Struct.new(:factory, :organization, :profile, :person, :profile_id, :current_user, :is_saved, :matched_person) do
 
           def persist_representative!
             profile = organization.employer_profile
@@ -349,7 +352,7 @@ module BenefitSponsors
           end
         end
 
-        GeneralAgency = Struct.new(:factory, :organization, :profile, :person, :profile_id, :current_user, :is_saved) do
+        GeneralAgency = Struct.new(:factory, :organization, :profile, :person, :profile_id, :current_user, :is_saved, :matched_person) do
 
           def persist_representative!
             profile = organization.general_agency_profile
@@ -402,7 +405,7 @@ module BenefitSponsors
           end
         end
 
-        BrokerAgency = Struct.new(:factory, :organization, :profile, :person, :profile_id, :current_user, :is_saved) do
+        BrokerAgency = Struct.new(:factory, :organization, :profile, :person, :profile_id, :current_user, :is_saved, :matched_person) do
 
           def persist_representative!
             profile = organization.broker_agency_profile
@@ -418,7 +421,29 @@ module BenefitSponsors
             end
             person.save!
             profile.update_attributes!(primary_broker_role_id: person.broker_role.id)
+            create_broker_agency_staff_role(profile.id)
             trigger_broker_application_confirmation_email(person)
+          end
+
+          # Calls method to create Broker Agency Staff Role for the person.
+          #
+          # @note This method may raise an exception if the Broker Agency Staff Role is not created successfully.
+          #   Broker Agency Staff Role is created only if the Resource Registry feature :broker_role_consumer_enhancement is enabled.
+          #   Broker Agency Staff Role should be created only if the person already exists in the system and NOT for a new person.
+          #
+          # @param [Person] An instance of Person.
+          # @param [BenefitSponsors::Organizations::BrokerAgencyProfile] An instance of BrokerAgencyProfile.
+          # @return [Boolean] true if the Broker Agency Staff Role is created successfully.
+          def create_broker_agency_staff_role(bap_id)
+            return if matched_person.blank?
+            return unless EnrollRegistry.feature_enabled?(:broker_role_consumer_enhancement)
+
+            matched_person.create_broker_agency_staff_role(
+              {
+                aasm_state: 'active',
+                benefit_sponsors_broker_agency_profile_id: bap_id
+              }
+            )
           end
 
           def fetch_organization(attributes)
