@@ -243,6 +243,12 @@ class User
       Thread.current[:current_user] = user
     end
 
+    def current_session_values=(session = nil)
+      session_values = (session&.to_hash || {}).except("warden.user.user.key", "_csrf_token")
+      session_values.merge!({"session_id" => session.id}) if session
+      Thread.current[:current_session_values] = session_values
+    end
+
     def get_saml_settings
       settings = OneLogin::RubySaml::Settings.new
 
