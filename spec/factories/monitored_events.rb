@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :monitored_event, class: 'EventLogs::MonitoredEvent' do
     account_hbx_id { "100001"}

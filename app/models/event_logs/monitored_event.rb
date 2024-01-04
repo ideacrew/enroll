@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+# Model for Event Logs
 module EventLogs
   class MonitoredEvent
     include Mongoid::Document

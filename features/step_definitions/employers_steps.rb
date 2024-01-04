@@ -1064,6 +1064,31 @@ And(/^employer clicks on submit button by entering todays date$/) do
   find(:xpath, "//*[@id='rehire_#{terminated_id}']/strong").click
 end
 
+Given(/^the employer clicks on audit-log tab$/) do
+  find('.interaction-click-control-audit-log', wait: 30).click
+end
+
+Then(/^the employer should see export table button$/) do
+  expect(page).to have_content(number_to_currency(@benefit_sponsorship_account.financial_transactions[0].amount))
+  expect(page).to have_content('Event Log for')
+end
+
+Then("the (.*) button should be disabled") do |button_id|
+  button = @browser.button(id: button_id)
+  expect(button).to be_present
+end
+
+Then("the (.*) section should be hidden") do |section_name|
+  binding.irb
+  section = find("div.#{section_name.downcase}#filters")
+  expect(section).to have_css('display: none;')
+end
+
+And("Audit Log Feature is enabled") do
+  allow(EnrollRegistry[:aca_event_logging].feature).to receive(:is_enabled).and_return(true)
+end
+
+
 When(/^employer selects one of their employees on Employee Roster$/) do
   census_employee = @census_employees.first
   expect(page).to have_content "Eddie Vedder"

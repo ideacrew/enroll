@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 RSpec.describe EventLogs::MonitoredEvent, :type => :model, dbclean: :around_each do
 
@@ -36,56 +38,55 @@ RSpec.describe EventLogs::MonitoredEvent, :type => :model, dbclean: :around_each
     end
 
     context ".fetch_event_logs" do
-    let(:params) { { account: @user.email, event_category: :login } }
-    it "should return event logs" do
-      expect(EventLogs::MonitoredEvent.fetch_event_logs(params).first).to eq @monitored_event
-    end
+      let(:params) { { account: @user.email, event_category: :login } }
+      it "should return event logs" do
+        expect(EventLogs::MonitoredEvent.fetch_event_logs(params).first).to eq @monitored_event
+      end
 
-    it "should return event logs for given subject" do
-      params[:subject_hbx_id] = @monitored_event.subject_hbx_id
-      expect(EventLogs::MonitoredEvent.fetch_event_logs(params).first).to eq @monitored_event
-    end
+      it "should return event logs for given subject" do
+        params[:subject_hbx_id] = @monitored_event.subject_hbx_id
+        expect(EventLogs::MonitoredEvent.fetch_event_logs(params).first).to eq @monitored_event
+      end
 
-    it "should return event logs for given account" do
-      params[:account] = @monitored_event.account_hbx_id
-      expect(EventLogs::MonitoredEvent.fetch_event_logs(params).first).to eq @monitored_event
-    end
+      it "should return event logs for given account" do
+        params[:account] = @monitored_event.account_hbx_id
+        expect(EventLogs::MonitoredEvent.fetch_event_logs(params).first).to eq @monitored_event
+      end
 
-    it "should return event logs for given account username" do
-      params[:account] = @monitored_event.account_username
-      expect(EventLogs::MonitoredEvent.fetch_event_logs(params).size).to eq(1)
-      expect(EventLogs::MonitoredEvent.fetch_event_logs(params).first).to eq @monitored_event
-    end
+      it "should return event logs for given account username" do
+        params[:account] = @monitored_event.account_username
+        expect(EventLogs::MonitoredEvent.fetch_event_logs(params).size).to eq(1)
+        expect(EventLogs::MonitoredEvent.fetch_event_logs(params).first).to eq @monitored_event
+      end
 
-    it "should return event logs for given event start date" do
-      params[:event_start_date] = @monitored_event.event_time.to_date
-      expect(EventLogs::MonitoredEvent.fetch_event_logs(params).size).to eq(1)
-      expect(EventLogs::MonitoredEvent.fetch_event_logs(params).first).to eq @monitored_event
-    end
+      it "should return event logs for given event start date" do
+        params[:event_start_date] = @monitored_event.event_time.to_date
+        expect(EventLogs::MonitoredEvent.fetch_event_logs(params).size).to eq(1)
+        expect(EventLogs::MonitoredEvent.fetch_event_logs(params).first).to eq @monitored_event
+      end
 
-    it "should return event logs for given event end date" do
-      params[:event_end_date] = @monitored_event.event_time.to_date
-      expect(EventLogs::MonitoredEvent.fetch_event_logs(params).first).to eq @monitored_event
-    end
+      it "should return event logs for given event end date" do
+        params[:event_end_date] = @monitored_event.event_time.to_date
+        expect(EventLogs::MonitoredEvent.fetch_event_logs(params).first).to eq @monitored_event
+      end
 
-    it "should return event logs for given event start and end date" do
-      params[:event_start_date] = @monitored_event.event_time.to_date
-      params[:event_end_date] = @monitored_event.event_time.to_date
-      expect(EventLogs::MonitoredEvent.fetch_event_logs(params).first).to eq @monitored_event
-    end
+      it "should return event logs for given event start and end date" do
+        params[:event_start_date] = @monitored_event.event_time.to_date
+        params[:event_end_date] = @monitored_event.event_time.to_date
+        expect(EventLogs::MonitoredEvent.fetch_event_logs(params).first).to eq @monitored_event
+      end
 
-    it "should return event logs for given account and event start date" do
-      params[:account] = @monitored_event.account_hbx_id
-      params[:event_start_date] = @monitored_event.event_time.to_date
-      expect(EventLogs::MonitoredEvent.fetch_event_logs(params).size).to eq(1)
-      expect(EventLogs::MonitoredEvent.fetch_event_logs(params).first).to eq @monitored_event
-    end
+      it "should return event logs for given account and event start date" do
+        params[:account] = @monitored_event.account_hbx_id
+        params[:event_start_date] = @monitored_event.event_time.to_date
+        expect(EventLogs::MonitoredEvent.fetch_event_logs(params).size).to eq(1)
+        expect(EventLogs::MonitoredEvent.fetch_event_logs(params).first).to eq @monitored_event
+      end
 
-    it "should return all event logs if no params are passed" do
-      expect(EventLogs::MonitoredEvent.fetch_event_logs({}).count).to eq(2)
+      it "should return all event logs if no params are passed" do
+        expect(EventLogs::MonitoredEvent.fetch_event_logs({}).count).to eq(2)
+      end
     end
-
-  end
 
   end
 

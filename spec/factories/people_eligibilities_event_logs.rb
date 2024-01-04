@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :people_eligibilities_event_log, class: 'People::EligibilitiesEventLog' do
     subject_gid { "some_subject_gid" }
