@@ -68,9 +68,9 @@ module Operations
         options = headers.slice(:event_category, :market_kind)
 
         account = headers[:account]
-        user_account = account_with(account[:id])
-        options[:account_hbx_id] = user_account.person.hbx_id
-        options[:account_username] = user_account.oim_id || user_account.email
+        user_account = account_with(account_id)
+        options[:account_hbx_id] = user_account.person.hbx_id 
+        options[:account_username] = user_account.username
         options[:login_session_id] = account[:session][:login_session_id]
         options[:event_category] = event_category_for(headers[:event_name])
         options.merge(
@@ -114,8 +114,6 @@ module Operations
 
         log_event = persistence_model_class.new(values.to_h)
         log_event.save ? Success(log_event) : Failure(log_event)
-      rescue NameError => e
-        Failure(e.message)
       end
 
       def resource_handler

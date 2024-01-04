@@ -7,7 +7,7 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 
 RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility,
                type: :model,
-               dbclean: :after_each do
+               dbclean: :around_each do
   include_context "setup benefit market with market catalogs and product packages"
 
   let(:site) do
@@ -60,6 +60,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
   before do
     TimeKeeper.set_date_of_record_unprotected!(current_effective_date)
     allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+    allow(subject).to receive(:publish_event).and_return(Dry::Monads::Success())
     catalog_eligibility
   end
 
@@ -67,13 +68,13 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
 
   context "with input params" do
     it "should build admin attested evidence options" do
-      result = described_class.new.call(required_params)
+      result = subject.call(required_params)
 
       expect(result).to be_success
     end
 
     it "should create eligibility with :initial state evidence" do
-      eligibility = described_class.new.call(required_params).success
+      eligibility = subject.call(required_params).success
 
       evidence = eligibility.evidences.last
       eligibility_state_history = eligibility.state_histories.last
@@ -96,7 +97,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
     let(:evidence_value) { "true" }
 
     it "should create eligibility with :approved state evidence" do
-      eligibility = described_class.new.call(required_params).success
+      eligibility = subject.call(required_params).success
 
       evidence = eligibility.evidences.last
       eligibility_state_history = eligibility.state_histories.last
@@ -119,7 +120,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
     let(:evidence_value) { "false" }
 
     it "should create eligibility with :approved state evidence" do
-      eligibility = described_class.new.call(required_params).success
+      eligibility = subject.call(required_params).success
 
       evidence = eligibility.evidences.last
       eligibility_state_history = eligibility.state_histories.last
@@ -155,7 +156,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
     end
 
     it "should create state history in tandem with existing evidence" do
-      eligibility = described_class.new.call(required_params).success
+      eligibility = subject.call(required_params).success
 
       evidence = eligibility.evidences.last
       eligibility_state_history = eligibility.state_histories.last
