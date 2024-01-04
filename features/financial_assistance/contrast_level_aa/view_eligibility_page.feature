@@ -15,4 +15,5 @@ Feature: Contrast level AA is enabled - A dedicated page that visit the eligibil
     And clicks the "Action" dropdown corresponding to the "determined" application
     And all applicants are not medicaid chip eligible and are non magi medicaid eligible
     And clicks the "View Eligibility Determination" link
+    And the browser has finished rendering the page
     And the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
