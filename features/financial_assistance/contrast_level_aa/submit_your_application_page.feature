@@ -19,7 +19,7 @@ Feature: Contrast level AA is enabled - This is the final review page before sub
     Given all required questions are answered
     And the user has not signed their name
     Then the submit button will be disabled
-    Then the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
+    And the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
 
   Scenario: Submit button is enabled when required checkboxes are checked and name is signed
     Given all required questions are answered
