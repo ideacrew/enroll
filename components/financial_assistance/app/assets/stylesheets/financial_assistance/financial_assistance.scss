@@ -32,7 +32,7 @@ input[type="radio"]:checked + label span {
     background:url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/210284/check_radio_sheet.png) -57px top no-repeat;
 }
 
-.deductions, .job_income, .new-other-income-form, .new-income-form, .new-unemployment-income-form, .edit-unemployment-income-form,
+.deductions, .job_income, .new-other-income-form, .new-unemployment-income-form, .edit-unemployment-income-form,
 .new-ai-an-income-form, .edit-ai-an-income-form {
   .col-md-3, input {
     padding-left: 0px !important;
@@ -53,7 +53,7 @@ input[type="radio"]:checked + label span {
 }
 
 .fa, .knowmore h4 {
-  color: #007BC4;
+  color: var(--theme-primary-100, #007BC4);
 }
 
 #backModal {
@@ -98,7 +98,7 @@ input[type="radio"]:checked + label span {
 }
 
 .md-text {
-  color: #858585;
+  color: var(--primary-black, #858585);
 }
 
 .incomes-table, .deductions-table, .benefits-table {

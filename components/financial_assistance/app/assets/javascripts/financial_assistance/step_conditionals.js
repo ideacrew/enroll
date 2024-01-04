@@ -196,6 +196,7 @@ document.addEventListener("turbolinks:load", function() {
 
   if($('#living_outside_yes').is(':checked')) {
     $('#living_outside_yes').parents(".row").next().removeClass('hide');
+    $('#living_outside_yes').parents(".row").next().next().removeClass('hide');
   }
   /* Submit Application Form Related */
 
