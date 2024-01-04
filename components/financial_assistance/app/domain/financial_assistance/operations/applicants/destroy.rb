@@ -33,6 +33,11 @@ module FinancialAssistance
 
         def destroy_applicant(applicant)
           person_hbx_id = applicant.person_hbx_id
+          person = Person.where(hbx_id: person_hbx_id).first
+
+          applicant.application.family.family_members.where(person_id: person.id).first.destroy!
+          applicant.application.family.reload
+
           @application.relationships.where(applicant_id: applicant.id).destroy_all
           @application.relationships.where(relative_id: applicant.id).destroy_all
           applicant.destroy!
