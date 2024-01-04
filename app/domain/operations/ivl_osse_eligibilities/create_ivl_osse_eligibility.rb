@@ -8,6 +8,8 @@ module Operations
     # Operation to support IVL osse eligibility creation
     class CreateIvlOsseEligibility
       send(:include, Dry::Monads[:result, :do])
+      include EventSource::Command
+      include EventSource::Logging
 
       attr_accessor :subject, :default_eligibility
 
@@ -24,9 +26,10 @@ module Operations
         eligibility_options =
           yield build_eligibility_options(values, eligibility_record)
         eligibility = yield create_eligibility(values, eligibility_options)
-        persisted_eligibility = yield store(values, eligibility)
+        eligibility_record = yield store(values, eligibility)
+        _event = yield publish_event(eligibility_record)
 
-        Success(persisted_eligibility)
+        Success(eligibility_record)
       end
 
       private
@@ -157,6 +160,26 @@ module Operations
         end
 
         eligibility_record
+      end
+
+      def publish_event(eligibility)
+        event_name = eligibility_event_for(eligibility.current_state)
+
+        Operations::EventLogs::TrackableEvent.new.call({
+                                                         event_name: event_name,
+                                                         payload: eligibility.attributes.to_h,
+                                                         subject: eligibility.eligible.person,
+                                                         resource: eligibility
+                                                       })
+      end
+
+      def eligibility_event_for(current_state)
+        case current_state
+        when :eligible
+          'events.people.eligibilities.ivl_osse_eligibility.eligibility_created'
+        when :ineligible
+          'events.people.eligibilities.ivl_osse_eligibility.eligibility_terminated'
+        end
       end
     end
   end
