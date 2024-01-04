@@ -182,6 +182,11 @@ class Insured::FamiliesController < FamiliesController
     @childcare_forms = ::Forms::HealthcareForChildcareProgramForm.build_forms_for(@person.primary_family)
   end
 
+  def event_logs
+    authorize @family, :can_view_audit_log?
+    @tab = params['tab']
+  end
+
   def healthcare_for_childcare_program_form
     authorize @family, :healthcare_for_childcare_program?
 
