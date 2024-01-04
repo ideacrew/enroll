@@ -18,8 +18,8 @@
         <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= deduction.end_on %></span>
       </div>
       <div class="col-md-1 no-pd form-group-lg class-fa-household fa-adjustment">
-          <a class="deduction-edit edit-pr"><i class="fa fa-pencil fa-lg" aria-hidden="true"></i></a>
-          <a class="deduction-delete"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></a>
+          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-edit-<%= dom_id deduction %>')" id="income-deduction-edit-<%= dom_id deduction %>" class="deduction-edit edit-pr"><i class="fa fa-pencil fa-lg" aria-hidden="true"></i><span class="hide"><%=l10n(".edit")%></span></a>
+          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-delete-<%= dom_id deduction %>')" id="income-deduction-delete-<%= dom_id deduction %>" class="deduction-delete"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i><span class="hide"><%=l10n(".delete")%></span></a>
       </div>
     </div>
   </div>
