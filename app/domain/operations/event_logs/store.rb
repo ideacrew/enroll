@@ -46,6 +46,7 @@ module Operations
         options =
           headers.slice(
             :subject_gid,
+            :resource_gid,
             :correlation_id,
             :message_id,
             :host_id,
