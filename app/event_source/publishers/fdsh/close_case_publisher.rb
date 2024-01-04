@@ -6,8 +6,7 @@ module Publishers
     class CloseCasePublisher
       include ::EventSource::Publisher[amqp: 'fdsh.close_case_request']
 
-      register_event 'close_case_request'
-
+      register_event 'close_case_requested'
     end
   end
 end

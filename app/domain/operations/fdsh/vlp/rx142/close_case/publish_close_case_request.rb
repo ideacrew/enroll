@@ -14,8 +14,8 @@ module Operations
             include Dry::Monads[:result, :do, :try]
             include EventSource::Command
 
-            def call(payload)
-              event  = yield build_event(payload)
+            def call(payload, correlation_id)
+              event  = yield build_event(payload, correlation_id)
               result = yield publish(event)
 
               Success(result)
@@ -23,10 +23,14 @@ module Operations
 
             private
 
-            def build_event(payload)
+            def build_event(payload, correlation_id)
               verification_response = payload.dig(:InitialVerificationResponseSet, :InitialVerificationIndividualResponses).first
               case_number = verification_response.dig(:InitialVerificationIndividualResponseSet, :CaseNumber)
-              event('events.fdsh.close_case_request', headers: { case_number: case_number })
+
+              person = Person.where(hbx_id: correlation_id).first
+              cv3_person = Operations::Fdsh::BuildAndValidatePersonPayload.new.call(person, :dhs)
+
+              event('events.fdsh.close_case_request.close_case_requested', attributes: cv3_person, headers: { case_number: case_number, correlation_id: correlation_id })
             end
 
             def publish(event)
