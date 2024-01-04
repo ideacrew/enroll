@@ -16,38 +16,32 @@ Feature: Start a new Financial Assistance Application and answers questions on h
 
   Scenario: User answers no to currently having health coverage
     Given the user answers no to currently having health coverage
-    And the browser has finished rendering the page
     Then the health coverage choices should not show
     And the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
 
   Scenario: User answers no to currently having access to other health coverage
     Given the user answers no to currently having access to other health coverage
-    And the browser has finished rendering the page
     Then the other health coverage choices should not show
     And the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
 
   Scenario: User answers yes to currently having health coverage
     Given the user answers yes to currently having health coverage
-    And the browser has finished rendering the page
     Then the health coverage choices should show
     And the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
 
   Scenario: User answers yes to currently having access to other health coverage
     Given the user answers yes to currently having access to other health coverage
-    And the browser has finished rendering the page
     Then the other health coverage choices should show
     And the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
 
   Scenario: Health coverage form shows after checking an option (currently have coverage)
     Given the user answers yes to currently having health coverage
-    And the browser has finished rendering the page
     And the user checks a health coverage checkbox
     Then the health coverage form should show
     And the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
 
   Scenario: Health coverage form shows after checking an option (currently have access to coverage)
     Given the user answers yes to currently having access to other health coverage
-    And the browser has finished rendering the page
     And the user checks a health coverage checkbox
     Then the other health coverage form should show
     And the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
