@@ -20,10 +20,9 @@ nav
         | Messages
         span.badge.message-unread #{profile_unread_messages_count(profile)}
 
-    - if current_user.try(:has_hbx_staff_role?) && eligibility_audit_log_is_enabled?
+    - if current_user.try(:has_hbx_staff_role?) && event_logging_enabled?
       li
-        = link_to "" do
-          = l10n("audit_log")
+        = link_to 'Audit Log', benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab => 'event_log_shop'), "aria-expanded" => "true"
   .my-account-widget.panel.panel-default
     .panel-heading
       h4 #{organization.legal_name}
