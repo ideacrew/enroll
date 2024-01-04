@@ -5,11 +5,11 @@ on:
   push:
     branches:
       - 'trunk'
-      - 'event_log_ui_latest'
+      - '185545425_shop_end_to_end'
   pull_request:
     branches:
       - 'trunk'
-      - 'event_log_ui_latest'
+      - '185545425_shop_end_to_end'
 
 concurrency:
   group: docker-${{ github.ref }}

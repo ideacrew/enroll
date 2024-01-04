@@ -1,6 +1,7 @@
 # frozen_string_literal: true
-# Model for Event Logs
+
 module EventLogs
+  # Model for Event Logs
   class MonitoredEvent
     include Mongoid::Document
     include Mongoid::Timestamps
@@ -31,13 +32,11 @@ module EventLogs
 
     def self.fetch_event_logs(params)
       query = {}
-      %w(subject_hbx_id event_category).each do |param|
+      %w[subject_hbx_id event_category].each do |param|
         query[param.to_sym] = params[param.to_sym] if params[param.to_sym].present?
       end
 
-      if params[:account].present?
-        query["$or"] = [{ account_hbx_id: params[:account] }, { account_username: params[:account] }]
-      end
+      query["$or"] = [{ account_hbx_id: params[:account] }, { account_username: params[:account] }] if params[:account].present?
 
       if params[:event_start_date].present?
         start_date = params[:event_start_date].to_date
