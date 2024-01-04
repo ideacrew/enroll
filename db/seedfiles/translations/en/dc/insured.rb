@@ -87,8 +87,11 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.name' => "Name",
   :'en.relation' => "Relation",
   :'en.self' => "Self",
+  :'en.insured.employee_roles.unsuccessful_match_attempts' => "Incorrect information entered, please check your entry for errors",
+  :'en.insured.employee_roles.unsuccessful_match_attempts_exceeded' => "Maximum number of attempts have been made, for additional assistance, please contact %{contact_center_name}: %{contact_center_phone_number}.",
   :'en.insured.families.financial_assistance_add_or_remove_family_member' => "You have added/removed/edited a family member on your profile. <br>Please update your financial assistance application.",
   :'en.insured.families.add_or_remove_family_html' => "You have added/removed a family member to your profile. <br>You may qualify for a special enrollment period.",
+  :'en.insured.employee_roles.matched_other_account' => "%{first_name} %{last_name} is already affiliated with another account",
   :'en.add_member' => "Add Member",
   :'en.choose_files' => "Choose Files",
   :'en.upload' => "Upload",
@@ -581,5 +584,10 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.ineligible' => "Ineligible",
   :'en.your_tax_credit' => "Your Tax Credit",
   :'en.your_tax_credit_for_hc4cc' => "Your Tax Credit: HC4CC eligible households must use at least 85 percent of the credit.",
-  :'en.person_match_error_message' => "%{first_name} %{last_name} is already affiliated with another account."
+  :'en.person_match_error_message' => "%{first_name} %{last_name} is already affiliated with another account.",
+  :'en.upload_documents' => "Upload Documents",
+  :'en.insured.verification_doc_file_error' => "Unable to upload file. Acceptable file types - PDF, JPEG, PNG, and GIF and ensure it does not exceed 100 MB.",
+  :'en.insured.verification_acceptable_file_types_text' => "Acceptable file types:",
+  :'en.insured.verification_acceptable_file_types' => "PDF, JPEG, PNG, and GIF",
+  :'en.insured.verification_max_file_size' => "File should not exceed 100 MB"
 }.freeze

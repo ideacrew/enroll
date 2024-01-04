@@ -19,6 +19,8 @@ class HbxEnrollment
 
   include FloatHelper
 
+  include Transmittable::Subject
+
   belongs_to :household
   # Override attribute accessor as well
   # Migrate all the family ids to that
@@ -181,6 +183,13 @@ class HbxEnrollment
   #     iii. Self Service
   # Currently, this is only used in IVL Renewals context.
   field :successor_creation_failure_reasons, type: Array
+
+  # @!attribute purchase_event_published_at
+  #   @note This field is currently only used in Individual Market's context.
+  #     This field gets populated when the purchase event is published to the bus via acapi in IVlSepQuery.
+  #     This field is used in IVlSepQuery to determine if the purchase event is published to the bus or not.
+  #   @return [DateTime] the date and time when the purchase event was published.
+  field :purchase_event_published_at, type: DateTime
 
   track_history   :modifier_field_optional => true,
                   :on => [:kind,
@@ -3007,6 +3016,13 @@ class HbxEnrollment
     return nil unless predecessor_enrollment_id
 
     HbxEnrollment.where(id: predecessor_enrollment_id).first
+  end
+
+  def mark_purchase_event_as_published!
+    return if purchase_event_published_at.present?
+
+    self.purchase_event_published_at = DateTime.now
+    save!
   end
 
   private

@@ -23,6 +23,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception, prepend: true
 
   ## Devise filters
+  before_action :check_concurrent_sessions
   before_action :require_login, unless: :authentication_not_required?
   before_action :authenticate_user_from_token!
   before_action :authenticate_me!
@@ -105,6 +106,20 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def check_concurrent_sessions
+    return unless EnrollRegistry.feature_enabled?(:prevent_concurrent_sessions) && concurrent_sessions? && current_user.has_hbx_staff_role?
+    flash[:error] = l10n('devise.sessions.signed_out_concurrent_session')
+    sign_out current_user
+  end
+
+  def concurrent_sessions?
+    # If the session token differs from the token stored in the db
+    # a new login for this user is detected.
+    # Checking for User class prevents spec breaking for Doubles.
+    # Currently only enabled for admin users.
+    current_user.instance_of?(User) && (session[:login_token] != current_user&.current_login_token)
+  end
 
   def redirect_if_prod
     redirect_to root_path, :flash => { :error => "Unable to run seeds on prod environment." } unless ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true' || !Rails.env.production?
@@ -286,6 +301,7 @@ class ApplicationController < ActionController::Base
 
     def set_current_user
       User.current_user = current_user
+      User.current_session_values = session
       SAVEUSER[:current_user_id] = current_user.try(:id)
       session_id = SessionTaggedLogger.extract_session_id_from_request(request)
       unless SessionIdHistory.where(session_id: session_id).present?
@@ -295,6 +311,7 @@ class ApplicationController < ActionController::Base
 
     def clear_current_user
       User.current_user = nil
+      User.current_session_values = nil
       SAVEUSER[:current_user_id] = nil
     end
 
