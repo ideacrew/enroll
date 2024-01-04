@@ -5,6 +5,7 @@ module Eligible
   class Eligibility
     include Mongoid::Document
     include Mongoid::Timestamps
+    include GlobalID::Identification
 
     STATUSES = %i[initial eligible ineligible].freeze
 
