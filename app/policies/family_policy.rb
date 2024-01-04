@@ -125,4 +125,10 @@ class FamilyPolicy < ApplicationPolicy
 
     user.has_hbx_staff_role? && user.person.hbx_staff_role.permission.can_edit_osse_eligibility
   end
+
+  def can_view_audit_log?
+    return false if user.blank? || user.person.blank?
+
+    user.has_hbx_staff_role?
+  end
 end
