@@ -1,0 +1,183 @@
+<div class="event-log-tab">
+  <div>
+    <h1><b><%= l10n("audit_log") %></b></h1>
+    <h3><b><%= name %></b></h3>
+    <p><b><%= l10n("event_log.hbx_id_text") %></b> <%= hbx_id %></p>
+    <% if active_tab == 'event_log_ivl' %>
+      <p><%= l10n("event_log.ivl_action") %></p>
+    <% else %>
+      <p><%= l10n("event_log.shop_action") %></p>
+    <% end %>
+
+    <div class="filters-container">
+      <div id="filters-toggle" class="filters-toggle">
+        <span class="glyphicon glyphicon-chevron-right" id="filters-arrow"></span>
+        <span class="filters-text"><%= l10n("event_log.filters") %></span>
+      </div>
+      <div class="filters" id="filters">
+        <div class="filter-row">
+          <label for="eligibility"><%= l10n("event_log.eligibility") %></label>
+          <select id="eligibility">
+            <option value=""><%= l10n("event_log.select_eligibility") %></option>
+            <% EventLogs::MonitoredEvent.get_category_options(hbx_id).each do |category| %>
+              <option value="<%= category %>"><%= category.to_s.titleize %></option>
+            <% end %>
+          </select>
+        </div>
+        <div class="filter-row">
+          <label for="user-id"><%= l10n("event_log.hbx_id_email") %></label>
+          <input type="text" id="user-id">
+        </div>
+        <div class="filter-row">
+          <label for="start-date"><%= l10n("event_log.start_date") %></label>
+          <input placeholder="MM/DD/YYYY" type="date" id="start-date">
+        </div>
+        <div class="filter-row">
+          <label for="end-date"><%= l10n("event_log.end_date") %></label>
+          <input type="date" id="end-date" disabled>
+        </div>
+      </div>
+      <div class="run-query">
+        <button id="run-query"><%= l10n("event_log.run_query") %></button>
+      </div>
+    </div>
+
+    <div class="event-log-header">
+      <div class="event-log-export-text">
+        <h3><b>Event Log for <%= hbx_id %></b></h3>
+        <button id="export-table"><%= l10n("event_log.export_table") %></button>
+      </div>
+    </div>
+    <div id="event-table-data"></div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function() {
+    // DOM elements
+    const filtersToggle = $('#filters-toggle');
+    const filters = $('#filters');
+    const arrow = $('#filters-arrow');
+    const runQueryButton = $('#run-query');
+    const exportTableButton = $('#export-table');
+    const categoryFilter = $('#eligibility');
+    const accountFilter = $('#user-id');
+    const startDateFilter = $('#start-date');
+    const endDateFilter = $('#end-date');
+    const hbx_id = <%= sanitize hbx_id.to_json %>;
+    // Event handler for start date change
+    startDateFilter.on('change', function() {
+      const startDate = new Date(startDateFilter.val());
+      startDate.setDate(startDate.getDate() + 1);
+      endDateFilter.prop('disabled', false);
+      endDateFilter.attr('min', formatDate(startDate));
+    });
+
+    // Function to format date
+    function formatDate(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    // Event handler for filters toggle
+    filtersToggle.on('click', function() {
+      const isFiltersHidden = filters.css('display') === 'none';
+      filters.css('display', isFiltersHidden ? 'flex' : 'none');
+      arrow.toggleClass('glyphicon-chevron-right glyphicon-chevron-down');
+
+      // Explicitly show/hide the button
+      runQueryButton.css('visibility', isFiltersHidden ? 'visible' : 'hidden');
+    });
+
+    // Initially hide the runQueryButton
+    runQueryButton.css('visibility', 'hidden');
+
+    // Event handler for runQueryButton click
+    runQueryButton.on('click', function() {
+      // Disable the buttons during the Ajax call
+      disableButtons();
+
+      // Perform an Ajax request
+      $.ajax({
+        type: 'POST',
+        url: '/event_logs',
+        dataType: 'script',
+        data: {
+          event_category: categoryFilter.val(),
+          account: accountFilter.val(),
+          event_start_date: startDateFilter.val(),
+          event_end_date: endDateFilter.val(),
+          subject_hbx_id: hbx_id
+        },
+        success: function(response) {
+          // Handle success
+        },
+        error: function(error) {
+          // Handle error
+          console.error('AJAX call error:', error);
+        },
+        complete: function() {
+          // Re-enable the buttons after the Ajax call is complete
+          enableButtons();
+        }
+      });
+    });
+
+    exportTableButton.on('click', function() {
+      window.location.href = '/event_logs.csv';
+    });
+
+    disableExportButton();
+    hideFilters();
+
+    // Initial Ajax request
+    initialAjaxRequest(function() {
+      // Callback: Enable the exportTableButton when the initial request is complete
+      enableExportButton();
+      showFilters();
+    });
+  });
+
+  function disableButtons() {
+    $('#run-query, #export-table').prop('disabled', true);
+  }
+
+  function enableButtons() {
+    $('#run-query, #export-table').prop('disabled', false);
+  }
+
+  // Function for initial Ajax request with a callback
+  function initialAjaxRequest(callback) {
+    $.ajax({
+      type: 'POST',
+      url: '/event_logs',
+      dataType: 'script',
+      data: {
+        subject_hbx_id: <%= sanitize hbx_id.to_json %>
+      },
+      complete: function() {
+        // Call the callback function when the initial request is complete
+        callback();
+      }
+    });
+  }
+
+  function enableExportButton() {
+    $('#export-table').prop('disabled', false);
+  }
+
+  function disableExportButton() {
+    $('#export-table').prop('disabled', true);
+  }
+
+  function showFilters() {
+    $('.filters-container').css('visibility', 'visible');
+  }
+
+  function hideFilters() {
+    $('.filters-container').css('visibility', 'hidden');
+  }
+
+</script>
