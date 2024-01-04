@@ -1,4 +1,4 @@
-Feature: Start a new Financial Assistance Application and fills out Income Adjustments form
+Feature: Contrast level AA is enabled - Start a new Financial Assistance Application and fills out Income Adjustments form
 
   Background: User logs in and visits applicant's income adjustments page
     Given the contrast level aa feature is enabled
@@ -18,19 +18,16 @@ Feature: Start a new Financial Assistance Application and fills out Income Adjus
   Scenario: User answers no to having income adjustments
     Given the user answers no to having income adjustments
     Then the income adjustments choices should not show
-    And the browser has finished rendering the page
     And the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
 
   Scenario: User answers yes to having other income
     Given the user answers yes to having income adjustments
     Then the income adjustments choices should show
     Then the divorce agreement copy should not show
-    And the browser has finished rendering the page
     And the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
 
   Scenario: Income adjustments form shows after checking an option
     Given the user answers yes to having income adjustments
     And the user checks a income adjustments checkbox
     Then the income adjustments form should show
-    And the browser has finished rendering the page
     And the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
