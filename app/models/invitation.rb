@@ -290,29 +290,29 @@ class Invitation
   end
 
   def self.invite_broker!(broker_role)
-    if !broker_role.email_address.blank?
-      invitation = self.create(
-        :role => "broker_role",
-        :source_kind => "broker_role",
-        :source_id => broker_role.id,
-        :invitation_email => broker_role.email_address
-      )
-      invitation.send_broker_invitation!(broker_role.parent.full_name)
-      invitation
-    end
+    return nil unless should_invite_broker_or_broker_staff_role?(broker_role)
+
+    invitation = self.create(
+      :role => "broker_role",
+      :source_kind => "broker_role",
+      :source_id => broker_role.id,
+      :invitation_email => broker_role.email_address
+    )
+    invitation.send_broker_invitation!(broker_role.parent.full_name)
+    invitation
   end
 
   def self.invite_broker_agency_staff!(broker_role)
-    if !broker_role.email_address.blank?
-      invitation = self.create(
-        :role => "broker_agency_staff_role",
-        :source_kind => "broker_agency_staff_role",
-        :source_id => broker_role.id,
-        :invitation_email => broker_role.email_address
-      )
-      invitation.send_broker_staff_invitation!(broker_role.parent.full_name, broker_role.parent.id)
-      invitation
-    end
+    return nil unless should_invite_broker_or_broker_staff_role?(broker_role)
+
+    invitation = self.create(
+      :role => "broker_agency_staff_role",
+      :source_kind => "broker_agency_staff_role",
+      :source_id => broker_role.id,
+      :invitation_email => broker_role.email_address
+    )
+    invitation.send_broker_staff_invitation!(broker_role.parent.full_name, broker_role.parent.id)
+    invitation
   end
 
   def self.invite_general_agency_staff!(staff_role)
@@ -376,5 +376,13 @@ class Invitation
       )
       return true if matching_invitation.present?
     end
+  end
+
+  def self.should_invite_broker_or_broker_staff_role?(role)
+    has_email = !role.email_address.blank?
+    return has_email unless EnrollRegistry.feature_enabled?(:broker_role_consumer_enhancement)
+    person = role.person
+    claimed_consumer_role_with_login = person.user.present? && person.consumer_role.present?
+    has_email && !claimed_consumer_role_with_login
   end
 end

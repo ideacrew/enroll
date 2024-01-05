@@ -25,8 +25,8 @@
     </div>
     <div class="row">
       <div class="col-md-3 pull-right">
-        <a class="btn btn-default deduction-cancel">Cancel</a>
-        <%= f.submit 'Save', class: 'btn btn-danger', :data => { :cuke => "income-adjustments-save-button" } %>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'income-deduction-cancel-<%= deduction_id %>')" id="income-deduction-cancel-<%= deduction_id %>" class="btn btn-default deduction-cancel">Cancel</a>
+        <%= f.submit 'Save', class: 'btn btn-save', :data => { :cuke => "income-adjustments-save-button" } %>
       </div>
     </div>
   </div>
