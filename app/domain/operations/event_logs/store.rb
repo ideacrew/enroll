@@ -57,7 +57,6 @@ module Operations
         options[:event_time] = formated_time(headers[:event_time])
         options[:session_detail] = account[:session]
         options[:account_id] = account[:id]
-        options[:session_detail][:login_session_id] = SecureRandom.uuid
         options[:monitored_event] = construct_monitored_event(payload, headers)
         options[:payload] = payload.to_json
         options[:event_category] = event_category_for(options[:event_name])
