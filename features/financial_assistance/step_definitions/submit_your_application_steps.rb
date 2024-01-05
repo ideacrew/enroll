@@ -16,7 +16,7 @@ Given(/^the user is on FAA Household Info: Family Members page$/) do
   # should be on application year select page
   # TODO: Will need to be updated when year select logic implemented
   if EnrollRegistry.feature_enabled?(:iap_year_selection)
-    find('a.interaction-click-control-continue').click
+    find('.interaction-click-control-continue').click
     sleep 2
   end
 
@@ -58,6 +58,35 @@ And(/^the user is on the FAA Household Info page$/) do
   # should be on checklist page now
   #find('a.interaction-click-control-continue').click
 
+end
+
+Given(/^all applicants are in Info Completed state%/) do
+  until find_all('.btn', text: 'ADD INCOME & COVERAGE INFO').empty?
+    find_all('.btn', text: 'ADD INCOME & COVERAGE INFO')[0].click
+    choose(IvlIapTaxInformationPage.file_taxes_no_radiobtn, wait: 5)
+    choose(IvlIapTaxInformationPage.claimed_as_tax_dependent_no_radiobtn)
+    find(IvlIapTaxInformationPage.continue_btn).click
+    choose(IvlIapJobIncomeInformationPage.has_job_income_no_radiobtn)
+    find(IvlIapJobIncomeInformationPage.continue_btn).click
+    
+    choose(IvlIapOtherIncomePage.has_unemployment_income_no_radiobtn)
+    choose(IvlIapOtherIncomePage.has_other_income_no_radiobtn)
+    find(IvlIapOtherIncomePage.continue_btn).click
+
+    choose(IvlIapIncomeAdjustmentsPage.income_adjustments_no_radiobtn)
+    find(IvlIapIncomeAdjustmentsPage.continue_btn).click
+
+    choose(IvlIapHealthCoveragePage.has_enrolled_health_coverage_no_radiobtn)
+    choose(IvlIapHealthCoveragePage.has_eligible_health_coverage_no_radiobtn)
+    find(IvlIapHealthCoveragePage.continue).click
+    choose(IvlIapOtherQuestions.is_pregnant_no_radiobtn)
+    choose(IvlIapOtherQuestions.is_post_partum_period_no_radiobtn)
+    choose(IvlIapOtherQuestions.person_blind_no_radiobtn)
+    choose(IvlIapOtherQuestions.has_daily_living_help_no_radiobtn)
+    choose(IvlIapOtherQuestions.need_help_paying_bills_no_radiobtn)
+    choose(IvlIapOtherQuestions.physically_disabled_no_radiobtn)
+    find(IvlIapOtherQuestions.continue_btn).click
+  end
 end
 
 Given(/^all applicants are in Info Completed state with all types of income$/) do
@@ -173,6 +202,7 @@ Given(/^all required questions are answered$/) do
   check_box_ids.each { |id| find("##{id}").check }
   # sets radio button to no
   find('#living_outside_no').set(true)
+  find('#medicaid_determination_no').set(true)
 end
 
 And(/^the user should be able to see medicaid determination question$/) do
