@@ -389,7 +389,6 @@ document.addEventListener("turbolinks:load", function () {
         .removeClass('hidden')
         .appendTo(incomeListEl);
       if (incomeListEl.children().length > 1 && incomeListEl.children().first().attr('id') === 'hidden-income-form') {
-        console.log("removed by otherindex check??");
         incomeListEl.children().first().remove();
       }
       if (unemploymentIndex != 0) {
