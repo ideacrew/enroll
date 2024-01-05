@@ -13,7 +13,7 @@
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:tax_info) %> applicant-nav">
           <% if @applicant.tax_info_complete?%>
-            <span class="fa fa-check applicant-check"></span>
+            <span class="fa fa-check applicant-check"><span class="hide"><%=l10n("completed")%></span></span>
             <%= link_to financial_assistance.go_to_step_application_applicant_path(@application, @applicant, 1), class: "" do %>
               Tax Info
             <% end %>
@@ -26,7 +26,7 @@
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:income) %> applicant-nav">
           <% if @applicant.embedded_document_section_entry_complete?(:income)%>
-            <span class="fa fa-check applicant-check"></span>
+            <span class="fa fa-check applicant-check"><span class="hide"><%=l10n("completed")%></span></span>
             <%= link_to financial_assistance.application_applicant_incomes_path(@application, @applicant), class: "" do %>
               Job Income
             <% end %>
@@ -39,7 +39,7 @@
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:other_income) %> applicant-nav">
           <% if @applicant.embedded_document_section_entry_complete?(:other_income)%>
-            <span class="fa fa-check applicant-check"></span>
+            <span class="fa fa-check applicant-check"><span class="hide"><%=l10n("completed")%></span></span>
             <%= link_to financial_assistance.other_application_applicant_incomes_path(@application, @applicant), class: "" do %>
               Other Income
             <% end %>
@@ -76,7 +76,7 @@
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:other_questions) %> applicant-nav">
           <% if @applicant.other_questions_complete?%>
-            <span class="fa fa-check applicant-check"></span>
+            <span class="fa fa-check applicant-check"><span class="hide"><%=l10n("completed")%></span></span>
             <%= link_to financial_assistance.other_questions_application_applicant_path(@application, @applicant), class: "" do %>
               Other Questions
             <% end %>
