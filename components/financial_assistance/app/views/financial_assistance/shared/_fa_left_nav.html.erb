@@ -52,7 +52,7 @@
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:income_adjustments) %> applicant-nav">
           <% if @applicant.embedded_document_section_entry_complete?(:income_adjustment)%>
-            <span class="fa fa-check applicant-check"></span>
+            <span class="fa fa-check applicant-check"><span class="hide"><%=l10n(".completed")%></span></span>
             <%= link_to financial_assistance.application_applicant_deductions_path(@application, @applicant), class: "" do %>
               Income Adjustments
             <% end %>
