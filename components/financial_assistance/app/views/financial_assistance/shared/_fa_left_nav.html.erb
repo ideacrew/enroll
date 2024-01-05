@@ -13,7 +13,7 @@
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:tax_info) %> applicant-nav">
           <% if @applicant.tax_info_complete?%>
-            <span class="fa fa-check applicant-check"><span class="hide"><%=l10n(".completed")%></span></span>
+            <span class="fa fa-check applicant-check"><span class="hide"><%=l10n("completed")%></span></span>
             <%= link_to financial_assistance.go_to_step_application_applicant_path(@application, @applicant, 1), class: "" do %>
               Tax Info
             <% end %>
@@ -26,7 +26,7 @@
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:income) %> applicant-nav">
           <% if @applicant.embedded_document_section_entry_complete?(:income)%>
-            <span class="fa fa-check applicant-check"><span class="hide"><%=l10n(".completed")%></span></span>
+            <span class="fa fa-check applicant-check"><span class="hide"><%=l10n("completed")%></span></span>
             <%= link_to financial_assistance.application_applicant_incomes_path(@application, @applicant), class: "" do %>
               Job Income
             <% end %>
@@ -39,7 +39,7 @@
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:other_income) %> applicant-nav">
           <% if @applicant.embedded_document_section_entry_complete?(:other_income)%>
-            <span class="fa fa-check applicant-check"><span class="hide"><%=l10n(".completed")%></span></span>
+            <span class="fa fa-check applicant-check"><span class="hide"><%=l10n("completed")%></span></span>
             <%= link_to financial_assistance.other_application_applicant_incomes_path(@application, @applicant), class: "" do %>
               Other Income
             <% end %>
@@ -52,7 +52,7 @@
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:income_adjustments) %> applicant-nav">
           <% if @applicant.embedded_document_section_entry_complete?(:income_adjustment)%>
-            <span class="fa fa-check applicant-check"><span class="hide"><%=l10n(".completed")%></span></span>
+            <span class="fa fa-check applicant-check"><span class="hide"><%=l10n("completed")%></span></span>
             <%= link_to financial_assistance.application_applicant_deductions_path(@application, @applicant), class: "" do %>
               Income Adjustments
             <% end %>
@@ -66,7 +66,7 @@
         <% if @applicant.is_applying_coverage %>
           <li class="list-box step-tabs <%= li_nav_classes_for(:health_coverage) %> applicant-nav">
             <% if @applicant.embedded_document_section_entry_complete?(:health_coverage)%>
-              <span class="fa fa-check applicant-check"><span class="hide"><%=l10n(".completed")%></span></span>
+              <span class="fa fa-check applicant-check"><span class="hide"><%=l10n("completed")%></span></span>
               <%= link_to_with_noopener_noreferrer('Health Coverage', financial_assistance.application_applicant_benefits_path(@application, @applicant), class: "") %>
             <% else %>
               <%= link_to_with_noopener_noreferrer('Health Coverage', financial_assistance.application_applicant_benefits_path(@application, @applicant), class: "no-check") %>
@@ -76,7 +76,7 @@
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:other_questions) %> applicant-nav">
           <% if @applicant.other_questions_complete?%>
-            <span class="fa fa-check applicant-check"><span class="hide"><%=l10n(".completed")%></span></span>
+            <span class="fa fa-check applicant-check"><span class="hide"><%=l10n("completed")%></span></span>
             <%= link_to financial_assistance.other_questions_application_applicant_path(@application, @applicant), class: "" do %>
               Other Questions
             <% end %>
