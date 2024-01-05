@@ -68,7 +68,7 @@ Given(/^all applicants are in Info Completed state%/) do
     find(IvlIapTaxInformationPage.continue_btn).click
     choose(IvlIapJobIncomeInformationPage.has_job_income_no_radiobtn)
     find(IvlIapJobIncomeInformationPage.continue_btn).click
-    
+
     choose(IvlIapOtherIncomePage.has_unemployment_income_no_radiobtn)
     choose(IvlIapOtherIncomePage.has_other_income_no_radiobtn)
     find(IvlIapOtherIncomePage.continue_btn).click
