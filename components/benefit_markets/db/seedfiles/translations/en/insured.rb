@@ -106,6 +106,7 @@ INSURED_TRANSLATIONS = {
   "en.active" => "Active",
   "en.enrollments" => "Enrollment(s)",
   "en.edit" => "Edit",
+  "en.open" => "Open",
   "en.insured.aptc_or_csr" => "APTC/CSR",
   "en.members" => "Members",
   "en.plan_contact_info" => "Plan Contact Info",
