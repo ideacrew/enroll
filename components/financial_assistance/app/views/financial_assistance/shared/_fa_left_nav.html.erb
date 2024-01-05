@@ -52,7 +52,7 @@
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:income_adjustments) %> applicant-nav">
           <% if @applicant.embedded_document_section_entry_complete?(:income_adjustment)%>
-            <span class="fa fa-check applicant-check"><span class="hide"><%=l10n(".completed")%></span></span>
+            <span class="fa fa-check applicant-check"><span class="hide"><%=l10n("completed")%></span></span>
             <%= link_to financial_assistance.application_applicant_deductions_path(@application, @applicant), class: "" do %>
               Income Adjustments
             <% end %>
@@ -66,7 +66,7 @@
         <% if @applicant.is_applying_coverage %>
           <li class="list-box step-tabs <%= li_nav_classes_for(:health_coverage) %> applicant-nav">
             <% if @applicant.embedded_document_section_entry_complete?(:health_coverage)%>
-              <span class="fa fa-check applicant-check"><span class="hide"><%=l10n(".completed")%></span></span>
+              <span class="fa fa-check applicant-check"><span class="hide"><%=l10n("completed")%></span></span>
               <%= link_to_with_noopener_noreferrer('Health Coverage', financial_assistance.application_applicant_benefits_path(@application, @applicant), class: "") %>
             <% else %>
               <%= link_to_with_noopener_noreferrer('Health Coverage', financial_assistance.application_applicant_benefits_path(@application, @applicant), class: "no-check") %>
