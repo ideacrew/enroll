@@ -32,8 +32,7 @@ input[type="radio"]:checked + label span {
     background:url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/210284/check_radio_sheet.png) -57px top no-repeat;
 }
 
-.deductions, .job_income, .new-other-income-form, .new-unemployment-income-form, .edit-unemployment-income-form,
-.new-ai-an-income-form, .edit-ai-an-income-form {
+.job_income, .new-other-income-form, .new-unemployment-income-form, .edit-unemployment-income-form {
   .col-md-3, input {
     padding-left: 0px !important;
     padding-right: 0px !important;
