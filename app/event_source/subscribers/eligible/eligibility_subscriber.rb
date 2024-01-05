@@ -96,7 +96,7 @@ module Subscribers
       def create_eligibility(options)
         operation = eligibility_operation_for(options[:subject]).new
         operation.default_eligibility = true if options[:evidence_value] == "false"
-
+        operation.prospective_eligibility = true
         operation.call(
           {
             subject: options[:subject].to_global_id,
