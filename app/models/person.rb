@@ -170,7 +170,7 @@ class Person
   embeds_many :documents, as: :documentable
   embeds_many :verification_types, cascade_callbacks: true, validate: true
 
-  attr_accessor :effective_date
+  attr_accessor :effective_date, :skip_person_updated_event_callback, :is_consumer_role, :is_resident_role
 
   accepts_nested_attributes_for :consumer_role, :resident_role, :broker_role, :hbx_staff_role,
     :person_relationships, :employee_roles, :phones, :employer_staff_roles
@@ -475,6 +475,8 @@ class Person
   end
 
   def publish_updated_event
+    return if skip_person_updated_event_callback
+
     event = event('events.person_updated', attributes: { gid: self.to_global_id.uri, payload: self.changed_attributes })
     event.success.publish if event.success?
   rescue StandardError => e
@@ -1176,9 +1178,6 @@ class Person
   # TODO: Move this out of here
   attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
 
-  attr_accessor :is_consumer_role
-  attr_accessor :is_resident_role
-
   before_save :assign_citizen_status_from_consumer_role
 
   def assign_citizen_status_from_consumer_role
@@ -1311,7 +1310,21 @@ class Person
     end
   end
 
+  %w[addresses emails phones].each do |association|
+    define_method("person_#{association}=") do |array_attributes|
+      assign(array_attributes, association.to_sym)
+    end
+  end
+
   private
+
+  def assign(collection, association)
+    collection.each do |attributes|
+      attributes.symbolize_keys!
+      record = send(association).find_or_initialize_by(kind: attributes[:kind])
+      record.assign_attributes(attributes)
+    end
+  end
 
   def is_only_one_individual_role_active?
     if self.is_consumer_role_active? && self.is_resident_role_active?

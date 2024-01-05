@@ -5,6 +5,10 @@ require "rails_helper"
 RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: :after_each do
   include Dry::Monads[:result, :do]
 
+  before :all do
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 10, 1))
+  end
+
   let!(:site) do
     FactoryBot.create(
       :benefit_sponsors_site, :with_benefit_market, :with_benefit_market_catalog_and_product_packages,
@@ -208,7 +212,7 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
   end
   let(:params)                 {{ product_package_values: product_package_params, enrollment_eligibility: enrollment_eligibility }}
 
-  before do
+  before :each do
     allow(enrollment_eligibility).to receive(:metal_level_products_restricted?).and_return(false)
     allow(enrollment_eligibility).to receive(:employer_contribution_minimum_relaxed?).and_return(osse_min_employer_contribution)
   end
@@ -250,12 +254,15 @@ RSpec.describe BenefitMarkets::Operations::ContributionModels::Assign, dbclean: 
       result = subject.call(params)
       expect(result.success?).to be_truthy
       key = result.success[:product_package_values][:assigned_contribution_model].key
-
-      if effective_date.month == 1 || effective_date >= Date.new(2020, 1, 1)
+      if effective_date.month == 1
         expect(key).to eq :zero_percent_sponsor_fixed_percent_contribution_model
       else
         expect(key).to eq :fifty_percent_sponsor_fixed_percent_contribution_model
       end
     end
+  end
+
+  after :all do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
   end
 end

@@ -10,6 +10,7 @@ module BenefitSponsors
       include Config::AcaModelConcern
       include BenefitSponsors::Concerns::Observable
       include BenefitSponsors::ModelEvents::Organization
+      include GlobalID::Identification
 
       ENTITY_KINDS = [
         :tax_exempt_organization,

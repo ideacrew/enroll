@@ -40,7 +40,7 @@
   background:#fff;
   overflow:hidden;
   background-clip:padding-box;
-  border: 1px solid #EAAA00;
+  border: 1px solid var(--primary-orange, #EAAA00);
 }
 
 .note.purple {
@@ -50,13 +50,13 @@
   border: 0px;
 }
 .note.purple:before {
-  border-color:#fff #eee #EAAA00 #EAAA00; background:transparent;
+  border-color:#fff #eee var(--primary-orange, #EAAA00) var(--primary-orange, #EAAA00); background:transparent;
 }
 .note.white {
   background:#ffffff; color: #414141; border: 1px solid red;
 }
 .note.white:before {
-  border-color:#fff #fff #EAAA00 #EAAA00; background: #EAAA00;
+  border-color:#fff #fff var(--primary-orange, #EAAA00) var(--primary-orange, #EAAA00); background: var(--primary-orange, #EAAA00);
 }
 
 .note p {
@@ -77,10 +77,11 @@
   padding: 0;
 }
 .whitebox .info-needed {
-  border-top: 1px solid #EAAA00;
-  border-bottom: 1px solid #EAAA00;
-  color: #ffffff;
-  background-color: #EAAA00;
+  border-top: 1px solid var(--primary-orange, #EAAA00);
+  border-bottom: 1px solid var(--primary-orange, #EAAA00);
+  color: var(--primary-black, #ffffff);
+  font-size: 16px;
+  background-color: var(--primary-orange, #EAAA00);
 }
 .whitebox .info-needed .fa {
   font-size: 22px;
@@ -89,6 +90,7 @@
 }
 .whitebox .info-needed span {
   font-weight: 600;
+  color: var(--primary-black, #ffffff);
 }
 .whitebox .sub-desc {
   font-size: 12px;

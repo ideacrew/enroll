@@ -34,7 +34,11 @@ module SponsoredBenefits
 
       add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_ga_account_events]
 
-        # belongs_to general_agency_profile
+      # belongs_to general_agency_profile
+
+      def has_general_agency_profile?
+        !(benefit_sponsrship_general_agency_profile_id.blank? && general_agency_profile_id.blank?)
+      end
 
         def general_agency_profile=(profile)
           raise ArgumentError.new("expected GeneralAgencyProfile") unless profile.class.to_s.match(/GeneralAgencyProfile/)
@@ -94,13 +98,13 @@ module SponsoredBenefits
 
         def for_broker_agency_account?(ba_account)
           return false unless (broker_role_id == ba_account.writing_agent_id)
-          return false unless general_agency_profile.present?
+          return false unless has_general_agency_profile?
+
           if !ba_account.end_on.blank?
             return((start_on >= ba_account.start_on) && (start_on <= ba_account.end_on))
           end
           (start_on >= ba_account.start_on)
         end
-
 
         aasm do
           state :active, initial: true

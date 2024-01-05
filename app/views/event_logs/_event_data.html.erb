@@ -1,0 +1,33 @@
+<table id="event-log-table" class="table">
+  <thead>
+  <tr>
+    <th></th>
+    <th><%= l10n("event_log.eligibility") %></th>
+    <th><%= l10n("event_log.outcome") %></th>
+    <th><%= l10n("event_log.performed_by") %></th>
+    <th><%= l10n("event_log.time") %></th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @event_logs.each do |event_log| %>
+    <tr>
+      <td id="<%= "event-#{event_log[:id]}" %>" data-attr-id="<%= event_log[:id] %>" class="event-with-arrow">
+        <span class="glyphicon glyphicon-chevron-right" id="log-expansion-icon"></span>
+      </td>
+      <% performed_by = event_log[:account_username] + " (" + event_log[:account_hbx_id] + ")" %>
+      <td class="event-col-2"><%= event_log[:event_category].to_s.titleize %></td>
+      <td class="event-col-3"><%= event_log.monitorable.event_name.match(/[^.]+\z/).to_s.titleize %></td>
+      <td class="event-col-4"><%= performed_by %></td>
+      <td class="event-col-5"><%= event_log[:event_time] %></td>
+    </tr>
+
+    <tr id="<%= "event-expansion-#{event_log[:id]}" %>" class="display-none">
+      <td></td>
+      <td colspan="3" class="expansion-details-col"><%= l10n("event_log.additional_details") %></td>
+      <td></td>
+    </tr>
+  <% end %>
+
+  <!-- Additional rows as needed -->
+  </tbody>
+</table>

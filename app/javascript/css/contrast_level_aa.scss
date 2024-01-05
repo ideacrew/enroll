@@ -1,0 +1,68 @@
+:root {
+    --secondary-font-color: #676C72; //secondary text gray
+    --bold-font-color: #323130; //bold text
+    --theme-primary-100: #3B6B90; //primary blue
+    --theme-secondary: #425C6E; //secondary dark blue
+    --primary-red: #D42537; //primary red
+    --unfocused-red: #D4403A; //soft red color
+    --background-light-red: #F9F1F1; //error notice background color
+    --primary-green: #5A7334; //green continue buttons
+    --secondary-green: #738C4A; //green for continue button hover
+    --success-green: #027314; //green for success notices
+
+    --primary-orange: #E5A900;
+    --primary-yellow: #FFD600;
+    --soft-yellow: #FFFADF;
+    --primary-white: #ffffff;
+    --primary-black: #000000;
+    --alert-notice-green: #62703E; //success notice green
+    --info-blue: #003260;
+
+    --font: Barlow, sans-serif;
+    --default-font-color: #323130;
+  
+    --placeholder-color: #676767;
+    --placeholder-font-weight: 400;
+    --floatlabel-color: #767676;
+    --floatlabel-onclick-color:#676767;
+    --input-text-color: #454545;
+    --form-element-text-color: #454545;
+  
+    --button-default-color: #4A7EA6;
+    --button-default-hover-color: #345F80;
+    --button-default-active-color: #274760;
+  
+    --enrollment-status-red: #A21E1F;
+    --enrollment-status-green: #027314;
+    --enrollment-status-yellow: #E5A900;
+    --enrollment-status-blue: #003260;
+    --enrollment-status-grey: #3B3A39;
+}
+
+.warning-notice {
+  padding: 8px 14px 8px 14px;
+  border-radius: 18px;
+  border: 1px;
+  background-color: var(--primary-orange);
+}
+
+.warning-status-hide {
+  display: none !important;
+}
+
+// use these in case we want to improve the icons used for "info needed" statuses on the FAA application workflow
+.warning-icon-small {
+  background-image: url('../../assets/images/warning-icon-small.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  color: transparent !important;
+  padding: 1px;
+  margin-right: 5px !important;
+}
+.warning-icon {
+  background-image: url('../../assets/images/warning-icon.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  color: transparent !important;
+  font-size: 27px !important;
+}

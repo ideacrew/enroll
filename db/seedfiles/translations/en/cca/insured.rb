@@ -62,6 +62,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.family_member' => "Family Member",
   :'en.family_members' => "Family Members",
   :'en.complete' => "Complete",
+  :'en.completed' => "Completed",
   :'en.view_documents' => "View Documents",
   :'en.download' => "Download",
   :'en.name' => "Name",
@@ -107,6 +108,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.active' => "Active",
   :'en.enrollments' => "Enrollment(s)",
   :'en.edit' => "Edit",
+  :'en.open' => "Open",
   :'en.insured.aptc_or_csr' => "APTC/CSR",
   :'en.members' => "Members",
   :'en.plan_contact_info' => "Plan Contact Info",
@@ -218,7 +220,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.my_broker' => "My Broker",
   :'en.action_needed' => "Action Needed",
   :'en.upload_paper_application' => "Upload Paper Application",
-  :'en.audit_log' => "Audit-Log",
+  :'en.audit_log' => "Audit Log",
   :'en.messages' => "Messages",
   :'en.my_account' => "My Account",
   :'en.manage_family' => "Manage Family",
@@ -433,5 +435,10 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.not_available' => 'NA',
   :'en.insured.rejected' => "%{ridp_type} successfully rejected.",
   :'en.your_tax_credit' => "Your Tax Credit",
-  :'en.your_tax_credit_for_hc4cc' => "Your Tax Credit: HC4CC eligible households must use at least 85 percent of the credit."
+  :'en.your_tax_credit_for_hc4cc' => "Your Tax Credit: HC4CC eligible households must use at least 85 percent of the credit.",
+  :'en.upload_documents' => "Upload Documents",
+  :'en.insured.verification_doc_file_error' => "Unable to upload file. Acceptable file types - PDF, JPEG, PNG, and GIF and ensure it does not exceed 100 MB.",
+  :'en.insured.verification_acceptable_file_types_text' => "Acceptable file types:",
+  :'en.insured.verification_acceptable_file_types' => "PDF, JPEG, PNG, and GIF",
+  :'en.insured.verification_max_file_size' => "File should not exceed 100 MB"
 }.freeze

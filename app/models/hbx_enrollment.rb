@@ -19,6 +19,8 @@ class HbxEnrollment
 
   include FloatHelper
 
+  include Transmittable::Subject
+
   belongs_to :household
   # Override attribute accessor as well
   # Migrate all the family ids to that
@@ -181,6 +183,13 @@ class HbxEnrollment
   #     iii. Self Service
   # Currently, this is only used in IVL Renewals context.
   field :successor_creation_failure_reasons, type: Array
+
+  # @!attribute purchase_event_published_at
+  #   @note This field is currently only used in Individual Market's context.
+  #     This field gets populated when the purchase event is published to the bus via acapi in IVlSepQuery.
+  #     This field is used in IVlSepQuery to determine if the purchase event is published to the bus or not.
+  #   @return [DateTime] the date and time when the purchase event was published.
+  field :purchase_event_published_at, type: DateTime
 
   track_history   :modifier_field_optional => true,
                   :on => [:kind,
@@ -1497,7 +1506,7 @@ class HbxEnrollment
 
   def can_make_changes_for_ivl_enrollment?
     allowed_statuses = ENROLLED_AND_RENEWAL_STATUSES
-    allowed_statuses << 'coverage_terminated' if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update)
+    allowed_statuses += ["coverage_terminated"] if EnrollRegistry.feature_enabled?(:enrollment_plan_tile_update)
     return true if allowed_statuses.include?(aasm_state)
     false
   end
@@ -2530,6 +2539,10 @@ class HbxEnrollment
     coverage_kind == "dental"
   end
 
+  def health?
+    coverage_kind == "health"
+  end
+
   # TODO: Implement behaviour by 16219.
   def composite_rating_tier
     @composite_rating_tier ||= cached_composite_rating_tier
@@ -2865,7 +2878,7 @@ class HbxEnrollment
   end
 
   def is_eligible_for_osse_grant?(key)
-    return false if is_shop? || dental?
+    return false if is_shop? || dental? || is_cobra_status?
     hbx_enrollment_members.any? do |member|
       member.is_eligible_for_osse_grant?(key, effective_on)
     end
@@ -2881,7 +2894,7 @@ class HbxEnrollment
   end
 
   def update_osse_childcare_subsidy
-    return if dental?
+    return if dental? || is_cobra_status?
 
     if is_shop?
       application = sponsored_benefit_package.benefit_application
@@ -2922,7 +2935,7 @@ class HbxEnrollment
   end
 
   def verify_and_reset_osse_subsidy_amount(member_group)
-    return unless is_shop?
+    return unless is_shop? && !is_cobra_status?
 
     update_osse_childcare_subsidy
     hbx_enrollment_members.each do |member|
@@ -3003,6 +3016,13 @@ class HbxEnrollment
     return nil unless predecessor_enrollment_id
 
     HbxEnrollment.where(id: predecessor_enrollment_id).first
+  end
+
+  def mark_purchase_event_as_published!
+    return if purchase_event_published_at.present?
+
+    self.purchase_event_published_at = DateTime.now
+    save!
   end
 
   private

@@ -1,15 +1,15 @@
+# frozen_string_literal: true
+
 module Forms
   class EmployeeCandidate
     include ActiveModel::Model
     include ActiveModel::Validations
+    include L10nHelper
+    include Config::ContactCenterModelConcern
 
     include PeopleNames
     include SsnField
-    attr_accessor :gender
-
-    attr_accessor :user_id
-    attr_accessor :dob_check
-    attr_accessor :is_applying_coverage
+    attr_accessor :gender, :user_id, :dob_check, :is_applying_coverage, :invalid_match_attempts
 
     validates_presence_of :first_name, :allow_blank => nil
     validates_presence_of :last_name, :allow_blank => nil
@@ -71,17 +71,41 @@ module Forms
 
     def does_not_match_a_different_users_person
       matched_person = match_person
-      if matched_person.present?
-        if matched_person.user.present?
-          if matched_person.user.id.to_s != self.user_id.to_s
-            errors.add(
-                :base,
-                "#{first_name} #{last_name} is already affiliated with another account"
-            )
-          end
+      if matched_person.present? && matched_person.user.present?
+        current_user_id = self.user_id.to_s
+        matched_person_user_id = matched_person.user.id.to_s
+        if matched_person_user_id != current_user_id && !EnrollRegistry.feature_enabled?(:lock_account_for_unsuccessful_match_attempts)
+          message = l10n("insured.employee_roles.matched_other_account", first_name: first_name, last_name: last_name)
+          errors.add(
+            :base,
+            message
+          )
         end
       end
       true
+    end
+
+    def validate_and_lock_account
+      return unless EnrollRegistry.feature_enabled?(:lock_account_for_unsuccessful_match_attempts)
+      max_match_attempts = EnrollRegistry[:employee_match_max_attempts].item.to_i
+
+      if invalid_match_attempts >= max_match_attempts
+        message = l10n("insured.employee_roles.unsuccessful_match_attempts_exceeded", contact_center_name: contact_center_name, contact_center_phone_number: contact_center_phone_number)
+        errors.add(
+          :base,
+          message
+        )
+        current_user.lock!
+      else
+        message = l10n("insured.employee_roles.unsuccessful_match_attempts")
+        errors.add(
+          :base, message
+        )
+      end
+    end
+
+    def current_user
+      User.find(user_id) if user_id.present?
     end
 
     def dob_not_in_future

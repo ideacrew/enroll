@@ -14,4 +14,7 @@ DEVISE_TRANSLATIONS = {
   "en.devise.registrations.new.optional" => "optional",
   "en.devise.registrations.new.password_confirmation" => "Password confirmation",
   "en.devise.errors.message" => " You need to correct the following errors to create an account:",
+  "en.devise.errors.password_match" => "Your password confirmation didn’t match. Try again.",
+  "en.devise.errors.password_strength" => "Your password is not strong enough. Try again.",
+  "en.devise.sessions.signed_out_concurrent_session" => "New user login detected - you have been signed out of this session."
 }

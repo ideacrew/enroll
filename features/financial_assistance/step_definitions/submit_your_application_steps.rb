@@ -150,13 +150,17 @@ Then(/^the user is on the Submit Your Application page$/) do
   expect(page).to have_content('Submit Your Application')
 end
 
+Then(/^the Parent Living Outside Home Attestation Checkbox is present$/) do
+  expect(page).to have_css("#application_attestation_terms")
+end
+
 Given(/^a required question is not answered$/) do
-  expect(find_all("input[type='checkbox']").any? {|checkbox| !checkbox.checked?}).to be(true)
-  expect(false).to eq(find('#living_outside_no').checked?).and eq(find('#living_outside_yes').checked?)
+  expect(find("#application_medicaid_terms").checked?).to be(false)
 end
 
 Given(/^the user has not signed their name$/) do
-  expect(true).to eq(find('#first_name_thank_you').text.empty?).or eq(find('#last_name_thank_you').text.empty?)
+  expect(find('#first_name_thank_you').text.empty?).to eq(true)
+  expect(find('#last_name_thank_you').text.empty?).to eq(true)
 end
 
 Then(/^the submit button will be disabled$/) do
@@ -164,9 +168,11 @@ Then(/^the submit button will be disabled$/) do
 end
 
 Given(/^all required questions are answered$/) do
-  find_all("input[type='checkbox']").each {|checkbox| checkbox.set(true)}
+  # getting and looping through each checkbox id looks unnecessary but using find_all directly does not work as expected
+  check_box_ids = find_all("input[type='checkbox']").map { |checkbox| checkbox[:id] }
+  check_box_ids.each { |id| find("##{id}").check }
+  # sets radio button to no
   find('#living_outside_no').set(true)
-  find('#application_report_change_terms').click
 end
 
 And(/^the user should be able to see medicaid determination question$/) do
@@ -176,14 +182,11 @@ And(/^the user should be able to see medicaid determination question$/) do
   end
 end
 
-Given(/^all required questions are answered including report change terms field$/) do
-  find_all("input[type='checkbox']").each {|checkbox| checkbox.set(true)}
-  find('#living_outside_no').set(true)
-end
-
 Given(/^the user has signed their name$/) do
   fill_in IvlConfirmYourPlanSelection.first_name, with: application.primary_applicant.first_name
   fill_in IvlConfirmYourPlanSelection.last_name, with: application.primary_applicant.last_name
+  # Remove focus from the last name field by clicking on header text
+  find('.fa-darkblue').click
 end
 
 Then(/^the submit button will be enabled$/) do

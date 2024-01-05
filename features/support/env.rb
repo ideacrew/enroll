@@ -19,6 +19,7 @@ require 'email_spec/cucumber'
 require 'rspec/expectations'
 # require 'capybara-screenshot/cucumber'
 require 'cucumber/rspec/doubles'
+require 'axe-cucumber-steps'
 
 Dir[File.expand_path("#{Rails.root}/lib/test/**/*.rb")].each { |f| load f }
 require File.expand_path("#{File.dirname(__FILE__)}/../../config/environment")

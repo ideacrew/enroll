@@ -32,7 +32,7 @@ input[type="radio"]:checked + label span {
     background:url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/210284/check_radio_sheet.png) -57px top no-repeat;
 }
 
-.deductions, .job_income, .new-other-income-form, .new-income-form, .new-unemployment-income-form, .edit-unemployment-income-form {
+.job_income, .new-other-income-form, .new-income-form, .new-unemployment-income-form, .edit-unemployment-income-form {
   .col-md-3, input {
     padding-left: 0px !important;
     padding-right: 0px !important;
@@ -52,7 +52,7 @@ input[type="radio"]:checked + label span {
 }
 
 .fa, .knowmore h4 {
-  color: #007BC4;
+  color: var(--theme-primary-100, #007bc4);
 }
 
 #backModal {
@@ -173,8 +173,12 @@ span.span-text {
   color: #69A30D;
   font-weight: bold;
 }
+.in-progress{
+  color: var(--primary-black, #EAAA00);
+  font-weight: bold;
+}
 .in-progress-icon{
-  color: #eaaa00;
+  color: var(--primary-orange, #EAAA00);
 }
 .app-status{
   padding: 10px;
@@ -188,7 +192,7 @@ input.radio-yml {
 .title-text {
   margin-bottom: 0px;
   margin-top: 20px;
-  color: #007BC4;
+  color: var(--theme-primary-100, #007bc4);
 }
 .fa-text-color {
   font-weight: lighter;
@@ -256,7 +260,7 @@ div#add-more-link {
 }
 .help-to-decide {
   display: inline-block;
-  border-left: 1px solid #007bc4;
+  border-left: 1px solid var(--theme-primary-100, #007bc4);
   padding-left: 12px;
   margin-left: 10px;
 }

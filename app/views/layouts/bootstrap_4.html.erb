@@ -13,6 +13,12 @@
     <%= stylesheet_pack_tag 'application' %>
     <%= javascript_pack_tag ENV['CLIENT'] %>
     <%= stylesheet_pack_tag ENV['CLIENT'] %>
+
+    <% if EnrollRegistry.feature_enabled?(:contrast_level_aa) %>
+      <%= javascript_pack_tag 'contrast_level_aa' %>
+      <%= stylesheet_pack_tag 'contrast_level_aa' %>
+    <% end %>
+
     <%= action_cable_meta_tag %>
     <%= csrf_meta_tags %>
     <% if EnrollRegistry.feature_enabled?(:live_chat_widget) %>

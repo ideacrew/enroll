@@ -32,7 +32,7 @@ If we ask for changes via code reviews then:
 2. Re-run the test suites to ensure tests are still passing
 3. Push additional commit(s)
 
-## <a name="commit"></a> Commit Message Guidelines
+## <a name="commit"></a> Commit Message & PR Title Guidelines
 
 At IdeaCrew, we squash all PRs into a single commit that uses the PR title as the commit message. Because of this, individual commit messages are less important than the PR title. All PR titles must follow a few simple rules:
 

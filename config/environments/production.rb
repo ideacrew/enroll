@@ -111,4 +111,11 @@ Rails.application.configure do
   Mongo::Logger.logger.level = Logger::ERROR
 
   # Full exceptions in non-prod environments
+
+  unless ENV["CLOUDFLARE_PROXY_IPS"].blank?
+    proxy_ip_env = ENV["CLOUDFLARE_PROXY_IPS"]
+    proxy_ips = proxy_ip_env.split(",").map(&:strip).map { |proxy| IPAddr.new(proxy) }
+    all_proxies = proxy_ips + ActionDispatch::RemoteIp::TRUSTED_PROXIES
+    config.middleware.swap ActionDispatch::RemoteIp, ActionDispatch::RemoteIp, false, all_proxies
+  end
 end

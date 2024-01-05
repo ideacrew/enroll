@@ -81,11 +81,7 @@ module Operations
       end
 
       def enrollment_effective_on_eligible_for_renewal?(enrollment, bcp)
-        return false if enrollment.effective_on.year == bcp.start_on.year
-        return true if enrollment.effective_on.year == (bcp.start_on.year - 1)
-
-        prior_bcp = HbxProfile.current_hbx&.benefit_sponsorship&.previous_benefit_coverage_period
-        prior_bcp.present? && prior_bcp.contains?(enrollment.effective_on)
+        enrollment.effective_on.year == (bcp.start_on.year - 1)
       end
 
       def fetch_renewal_enrollment_year(enrollment)
