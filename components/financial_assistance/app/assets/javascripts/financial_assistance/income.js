@@ -394,7 +394,6 @@ document.addEventListener("turbolinks:load", function () {
       }
       if (unemploymentIndex != 0) {
         var previousForm = clonedForm.prev('.new-unemployment-income-form');
-        console.log("removed by otherindex check??");
         previousForm.remove();
       }
       var length = incomeListEl.find(".unemployment-income").length;
