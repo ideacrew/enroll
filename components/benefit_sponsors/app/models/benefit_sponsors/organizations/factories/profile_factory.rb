@@ -436,6 +436,7 @@ module BenefitSponsors
           # @return [Boolean] true if the Broker Agency Staff Role is created successfully.
           def create_broker_agency_staff_role(bap_id)
             return if matched_person.blank?
+            return if matched_person.user.blank?
             return unless EnrollRegistry.feature_enabled?(:broker_role_consumer_enhancement)
 
             matched_person.create_broker_agency_staff_role(

@@ -683,11 +683,12 @@ module BenefitSponsors
 
     context 'BrokerAgency persist_representative!' do
       context 'when matching person exists' do
-        let(:person) { FactoryBot.create(:person) }
-        let(:first_name) { person.first_name }
-        let(:last_name) { person.last_name }
-        let(:person_date_of_birth) { person.dob }
-        let(:profile_factory) { profile_factory_class.call(valid_broker_params) }
+        let(:person)                { FactoryBot.create(:person) }
+        let(:user)                  { FactoryBot.create(:user, person: person) }
+        let(:first_name)            { user.person.first_name }
+        let(:last_name)             { user.person.last_name }
+        let(:person_date_of_birth)  { user.person.dob }
+        let(:profile_factory)       { profile_factory_class.call(valid_broker_params) }
 
         before do
           allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
@@ -702,8 +703,20 @@ module BenefitSponsors
             expect(profile_factory.matched_person).to eq(person)
           end
 
-          it 'creates broker agency staff role for the person' do
-            expect(person.reload.broker_agency_staff_roles.count).to eq(1)
+          context 'person with user' do
+            it 'creates broker agency staff role for the person' do
+              expect(person.reload.broker_agency_staff_roles.count).to eq(1)
+            end
+          end
+
+          context 'person without user' do
+            let(:first_name)            { person.first_name }
+            let(:last_name)             { person.last_name }
+            let(:person_date_of_birth)  { person.dob }
+
+            it 'does not create broker agency staff role for the person' do
+              expect(person.reload.broker_agency_staff_roles.count).not_to eq(1)
+            end
           end
         end
 
