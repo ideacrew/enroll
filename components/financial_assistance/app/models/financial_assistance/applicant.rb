@@ -1310,7 +1310,7 @@ module FinancialAssistance
       save!
     end
 
-    # rubocop:disable Metrics/Naming/AccessorMethodName
+    # rubocop:disable Naming/AccessorMethodName
     def set_evidence_verified(evidence)
       evidence.verification_outstanding = false
       evidence.is_satisfied = true
@@ -1363,7 +1363,7 @@ module FinancialAssistance
       evidence.move_to_rejected
       save!
     end
-    # rubocop:enable Metrics/Naming/AccessorMethodName
+    # rubocop:enable Naming/AccessorMethodName
 
     class << self
       def find(id)
