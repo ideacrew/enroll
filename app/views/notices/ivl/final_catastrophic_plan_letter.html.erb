@@ -32,18 +32,14 @@ content: "You will not receive any tax forms from #{EnrollRegistry[:enroll_app].
 <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "You may receive a tax form from your health insurance company.  Health insurance companies are encouraged (but not required) to provide a tax form for those enrolled in catastrophic coverage.  Contact your insurance company directly for more information on this tax form."} %>
 
-<div style="page-break-after: always;">
-  <%= render partial: 'notices/shared/paragraph', :locals => {
-  content: "If you have questions or concerns, we’re here to help."} %>
+<p>If you have questions or concerns, we're here to help.</p>
 
-  <br>
+<p style="margin-top: 2em;"><%= "The #{EnrollRegistry[:enroll_app].setting(:short_name).item} Team" %></p>
 
+<div style="page-break-before: always;">
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
-  content: "The #{EnrollRegistry[:enroll_app].setting(:short_name).item} Team"} %>
-</div>
-
-<%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
   content: "_____________________________________________________________________________________________________________"} %>
+</div>
 
 <%= render partial: 'notices/shared/reference_paragraph', :locals => {
 contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:",
