@@ -21,8 +21,10 @@
 <script type="text/javascript">
   var conf_id = '#payOnlineConfirmation_' + '<%= @employer_profile.id %>';
   $('.pay_online_confirmation.btn').click(function() {
+    console.log('<%= @wells_fargo_sso&.url %>');
     let _ = '<% @wells_fargo_sso&.token(override_token: true) %>';
     let newUrl = '<%= @wells_fargo_sso&.url %>'
+    console.log(newUrl);
     window.open(newUrl, '_blank');
 
     // Hide the modal
