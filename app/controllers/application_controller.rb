@@ -262,6 +262,7 @@ class ApplicationController < ActionController::Base
     end
 
     def after_sign_in_path_for(resource)
+      User.current_login_session = resource
       if request.referrer =~ /sign_in/
         redirect_path = confirm_last_portal(request, resource)
         session[:portal] || redirect_path
@@ -271,6 +272,7 @@ class ApplicationController < ActionController::Base
     end
 
     def after_sign_out_path_for(resource_or_scope)
+      User.current_login_session = nil
       logout_saml_index_path
     end
 

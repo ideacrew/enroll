@@ -1,14 +1,20 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require "rails_helper"
 
-RSpec.describe BenefitSponsors::BenefitSponsorships::EligibilitiesEventLog, type: :model, dbclean: :around_each do
+RSpec.describe BenefitSponsors::BenefitSponsorships::EligibilitiesEventLog,
+               type: :model,
+               dbclean: :around_each do
   before { DatabaseCleaner.clean }
 
   describe "benefit sponsorship event log" do
     context "when sponsorship passed as subject" do
-
-      let(:benefit_sponsorship)  { FactoryBot.create(:benefit_sponsors_benefit_sponsorship, :with_full_package) }
+      let(:benefit_sponsorship) do
+        FactoryBot.create(
+          :benefit_sponsors_benefit_sponsorship,
+          :with_full_package
+        )
+      end
       let(:user) { FactoryBot.create(:user, identity_verified_date: nil) }
 
       context ".save" do
@@ -16,6 +22,7 @@ RSpec.describe BenefitSponsors::BenefitSponsorships::EligibilitiesEventLog, type
           {
             account_id: user.id,
             subject_gid: benefit_sponsorship.to_global_id,
+            resource_gid: benefit_sponsorship.to_global_id,
             correlation_id: "a156ad4c031",
             host_id: :enroll,
             event_category: :osse_eligibility,
@@ -36,6 +43,14 @@ RSpec.describe BenefitSponsors::BenefitSponsorships::EligibilitiesEventLog, type
               params.slice(:account_id, :event_category)
             ).first
           ).to eq described_class.first
+        end
+
+        it "should persist resource gid" do
+          described_class.create(params)
+
+          expect(
+            described_class.first.resource_gid
+          ).to eq benefit_sponsorship.to_global_id.to_s
         end
       end
     end
