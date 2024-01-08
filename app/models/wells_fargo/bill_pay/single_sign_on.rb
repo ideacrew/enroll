@@ -27,8 +27,8 @@ module WellsFargo
         @email = email
       end
 
-      def token(override_token: nil)
-        return @token if defined? @token && !override_token
+      def token(override_token: false)
+        return @token if !override_token && defined? @token
 
         begin
           @creation_date = Time.zone.now.strftime(DATE_FORMAT)
