@@ -10,16 +10,22 @@
         </p>
       </div>
       <div class="modal-footer">
-        <% @wells_fargo_sso&.token %>
-        <%= link_to '<button class="btn btn-default pay_online_confirmation pull-right left-margin">Pay Online</button>'.html_safe, @wells_fargo_sso&.url, target: :_blank %> <span class="btn btn-default btn-small" data-dismiss="modal">Cancel</span>
+        <button class="btn btn-default pay_online_confirmation pull-right left-margin">Pay Online</button>
+        <span class="btn btn-default btn-small" data-dismiss="modal">Cancel</span>
       </div>
     </div>
   </div>
 </div>
 
+
 <script type="text/javascript">
   var conf_id = '#payOnlineConfirmation_' + '<%= @employer_profile.id %>';
   $('.pay_online_confirmation.btn').click(function() {
+    let _ = '<% @wells_fargo_sso&.token(override_token: true) %>';
+    let newUrl = '<%= @wells_fargo_sso&.url %>'
+    window.open(newUrl, '_blank');
+
+    // Hide the modal
     $(conf_id).modal('hide');
   });
 </script>
