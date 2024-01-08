@@ -1,5 +1,5 @@
 .tooltip > .tooltip-inner {
-  background-color: var( --primary-white, var(--theme-primary-100, #007bc4));
+  background-color: var( --primary-white, var(--theme-primary-blue, #007bc4));
   color: var( --primary-black, var(--grey-000));
 }
 
@@ -11,17 +11,17 @@
 }
 
 .tooltip.bs-tooltip-right .arrow:before {
-  border-right-color: var(--theme-primary-100, #007bc4);
+  border-right-color: var(--theme-primary-blue, #007bc4);
 }
 
 .tooltip.bs-tooltip-left .arrow:before {
-  border-left-color: var(--theme-primary-100, #007bc4);
+  border-left-color: var(--theme-primary-blue, #007bc4);
 }
 
 .tooltip .tooltip-inner {
   border-style: solid;
   border-width: 2px;
-  border-color: var(--theme-primary-100, #007bc4);
+  border-color: var(--theme-primary-blue, #007bc4);
 }
 
 .pwHelper {
