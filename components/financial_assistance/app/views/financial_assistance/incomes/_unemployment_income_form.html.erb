@@ -25,8 +25,8 @@
     </div>
     <div class="row">
       <div class="col-md-3 pull-right">
-        <a class="btn btn-default unemployment-income-cancel">Cancel</a>
-        <%= f.submit 'Save', class: "btn btn-danger #{'disabled' if disabled }", :data => { :cuke => "unemployment-income-save-button" }, onclick: "checkDate('#{income_id}')" %>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'unemployment-cancel-<%= income_id %>')" id="unemployment-cancel-<%= income_id %>" class="btn btn-default unemployment-income-cancel">Cancel</a>
+        <%= f.submit 'Save', class: "btn btn-save #{'disabled' if disabled }", :data => { :cuke => "unemployment-income-save-button" }, onclick: "checkDate('#{income_id}')" %>
       </div>
     </div>
   </div>

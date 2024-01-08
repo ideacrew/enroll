@@ -6,8 +6,8 @@
         <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_name %></span>
       </div>
        <div class="col-md-2 no-pd form-group-lg class-fa-household fa-adjustment">
-        <a class="benefit-edit edit-pr"><i class="fa fa-pencil fa-lg" aria-hidden="true"></i></a>
-        <a class="benefit-delete"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'esi-edit-<%= dom_id benefit %>')" id="esi-edit-<%= dom_id benefit %>"class="benefit-edit edit-pr"><i class="fa fa-pencil fa-lg" aria-hidden="true"></i><span class="hide"><%=l10n("edit")%></span></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'esi-delete-<%= dom_id benefit %>')" id="esi-delete-<%= dom_id benefit %>"class="benefit-delete"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i><span class="hide"><%=l10n("delete")%></span></a>
       </div>
     </div>
     <% if !FinancialAssistanceRegistry.feature_enabled?(:disable_employer_address_fields) %>

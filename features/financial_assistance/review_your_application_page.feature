@@ -15,7 +15,7 @@ Feature: Review your application page functionality 1
     When the user clicks CONTINUE
     Then the user is on the Submit Your Application page
     And the user has signed their name
-    And all required questions are answered including report change terms field
+    And all required questions are answered
     And the user should be able to see medicaid determination question
     Then the submit button will be enabled
 
