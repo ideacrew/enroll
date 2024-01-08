@@ -1225,7 +1225,6 @@ class Person
   def create_broker_agency_staff_role(basr_params)
     basr = broker_agency_staff_roles.build(
       {
-        aasm_state: basr_params[:aasm_state],
         benefit_sponsors_broker_agency_profile_id: basr_params[:benefit_sponsors_broker_agency_profile_id]
       }
     )
