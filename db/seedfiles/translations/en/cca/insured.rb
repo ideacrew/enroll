@@ -93,6 +93,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.insured.families.verification.documents_FAQ' => "Documents We Accept",
   :'en.delete' => "Delete",
   :'en.deleted' => "Deleted",
+  :'en.info' => "Info",
   :'en.insured.families.medicaid_and_tax_credits' => "Medicaid & Tax Credits",
   :'en.insured.families.apply_for_medicaid_widget' => "Apply, renew, read notices or find out what documents are needed for Medicaid or tax credit assisted coverage",
   :'en.insured.families.aptc_or_csr_enrollments' => "APTC / CSR Enrollments",
