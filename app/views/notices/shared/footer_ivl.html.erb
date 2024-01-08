@@ -52,7 +52,7 @@
     </tr>
     <tr>
       <td style="padding:3px 10px; font-size:8px;" align="center">Questions?
-        Call <%= site_short_name %> at <%= notice.is_a?(Notifier::NoticeKind) ?  contact_center_number_for_display : notice.hbe.phone %>, or go to <%= site_policies_url %>.
+        Call <%= site_short_name %> at <%= notice.is_a?(Notifier::NoticeKind) ?  contact_center_number_for_display : notice.hbe.phone %>, or go to <%= site_website_name.downcase %>.
       </td>
     </tr>
   </table>
