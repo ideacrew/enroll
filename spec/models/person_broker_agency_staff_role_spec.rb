@@ -7,12 +7,18 @@ RSpec.describe Person, type: :model, dbclean: :after_each do
 
   describe '#create_broker_agency_staff_role' do
     context 'with valid params' do
-      let(:basr_params) { { aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: BSON::ObjectId.new } }
+      let(:basr_params) { { benefit_sponsors_broker_agency_profile_id: BSON::ObjectId.new } }
 
       it 'creates a broker agency staff role' do
         expect(
           person.create_broker_agency_staff_role(basr_params)
         ).to be_a(BrokerAgencyStaffRole)
+      end
+
+      it 'creates a broker agency staff role in initial aasm_state' do
+        expect(
+          person.create_broker_agency_staff_role(basr_params).aasm_state
+        ).to eq('broker_agency_pending')
       end
     end
 

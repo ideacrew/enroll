@@ -707,6 +707,12 @@ module BenefitSponsors
             it 'creates broker agency staff role for the person' do
               expect(person.reload.broker_agency_staff_roles.count).to eq(1)
             end
+
+            it 'creates broker agency staff role in the initial aasm_state' do
+              expect(
+                person.reload.broker_agency_staff_roles.first.aasm_state
+              ).to eq('broker_agency_pending')
+            end
           end
 
           context 'person without user' do
