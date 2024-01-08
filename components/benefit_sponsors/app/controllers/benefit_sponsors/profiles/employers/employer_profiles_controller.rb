@@ -270,7 +270,7 @@ module BenefitSponsors
           email = @employer_profile.staff_roles.first&.work_email_or_best
 
           if email.present?
-            wells_fargo_sso =
+            @wells_fargo_sso =
               ::WellsFargo::BillPay::SingleSignOn.new(
                 @employer_profile.hbx_id,
                 @employer_profile.hbx_id,
@@ -278,7 +278,7 @@ module BenefitSponsors
                 email
               )
           end
-          @wf_url = wells_fargo_sso.url if wells_fargo_sso&.token.present?
+          @wf_url = @wells_fargo_sso.url if @wells_fargo_sso&.token.present?
         end
 
         def retrieve_payments_for_page(page_no)

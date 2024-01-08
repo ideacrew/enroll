@@ -10,7 +10,8 @@
         </p>
       </div>
       <div class="modal-footer">
-        <%= link_to '<button class="btn btn-default pay_online_confirmation pull-right left-margin">Pay Online</button>'.html_safe, @wf_url, target: :_blank %> <span class="btn btn-default btn-small" data-dismiss="modal">Cancel</span>
+        <% @wells_fargo_sso&.token %>
+        <%= link_to '<button class="btn btn-default pay_online_confirmation pull-right left-margin">Pay Online</button>'.html_safe, @wells_fargo_sso&.url, target: :_blank %> <span class="btn btn-default btn-small" data-dismiss="modal">Cancel</span>
       </div>
     </div>
   </div>
