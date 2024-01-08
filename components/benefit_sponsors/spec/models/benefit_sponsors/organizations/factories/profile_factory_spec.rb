@@ -85,6 +85,11 @@ module BenefitSponsors
         }
       }
     end
+
+    let(:first_name) { 'Tyrion' }
+    let(:last_name) { 'Lannister' }
+    let(:person_date_of_birth) { dob }
+
     let(:valid_broker_params) do
       site
       {
@@ -96,12 +101,12 @@ module BenefitSponsors
           0 =>
           {
             :npn => "3458947593",
-            :first_name => "Tyrion",
-            :last_name => "Lannister",
+            first_name: first_name,
+            last_name: last_name,
             :email => "tyrion@lannister.com",
             :phone => nil,
             :status => nil,
-            :dob => dob,
+            :dob => person_date_of_birth,
             :person_id => nil,
             :area_code => nil,
             :number => nil,
@@ -672,6 +677,59 @@ module BenefitSponsors
 
         it 'should update address' do
           expect(general_agency.general_agency_profile.primary_office_location.address.city).to eq city
+        end
+      end
+    end
+
+    context 'BrokerAgency persist_representative!' do
+      context 'when matching person exists' do
+        let(:person)                { FactoryBot.create(:person) }
+        let(:user)                  { FactoryBot.create(:user, person: person) }
+        let(:first_name)            { user.person.first_name }
+        let(:last_name)             { user.person.last_name }
+        let(:person_date_of_birth)  { user.person.dob }
+        let(:profile_factory)       { profile_factory_class.call(valid_broker_params) }
+
+        before do
+          allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_role_consumer_enhancement).and_return(enabled_or_disabled)
+          profile_factory
+        end
+
+        context 'when the feature is enabled' do
+          let(:enabled_or_disabled) { true }
+
+          it 'sets the attribute reader with matched person record' do
+            expect(profile_factory.matched_person).to eq(person)
+          end
+
+          context 'person with user' do
+            it 'creates broker agency staff role for the person' do
+              expect(person.reload.broker_agency_staff_roles.count).to eq(1)
+            end
+          end
+
+          context 'person without user' do
+            let(:first_name)            { person.first_name }
+            let(:last_name)             { person.last_name }
+            let(:person_date_of_birth)  { person.dob }
+
+            it 'does not create broker agency staff role for the person' do
+              expect(person.reload.broker_agency_staff_roles.count).not_to eq(1)
+            end
+          end
+        end
+
+        context 'when the feature is disabled' do
+          let(:enabled_or_disabled) { false }
+
+          it 'sets the attribute reader with matched person record' do
+            expect(profile_factory.matched_person).to eq(person)
+          end
+
+          it 'creates broker agency staff role for the person' do
+            expect(person.reload.broker_agency_staff_roles.count).to eq(0)
+          end
         end
       end
     end
