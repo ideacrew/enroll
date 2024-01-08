@@ -386,7 +386,7 @@ Then(/^Individual should be on verification page/) do
 end
 
 When(/^.+ clicks on the Continue button of the Family Information page$/) do
-  find(IvlFamilyInformation.continue_btn).click
+  find('.interaction-click-control-continue').click
   sleep 10
 end
 
