@@ -28,8 +28,6 @@ module WellsFargo
       end
 
       def token
-        return @token if defined? @token
-
         begin
           @creation_date = Time.zone.now.strftime(DATE_FORMAT)
           private_key = OpenSSL::PKey::RSA.new(File.read(Rails.root.join('config','ssl').to_s + PRIVATE_KEY_LOCATION))
