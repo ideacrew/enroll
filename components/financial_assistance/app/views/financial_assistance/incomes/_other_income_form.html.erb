@@ -33,8 +33,8 @@
     </div>
     <div class="row">
       <div class="col-md-3 pull-right">
-        <a onkeydown="handleButtonKeyDown(event, 'other-income-cancel')" id="other-income-cancel" class="btn btn-default other-income-cancel">Cancel</a>
-        <%= f.submit 'Save', class: "btn btn-danger #{'disabled' if disabled }", :data => { :cuke => "other-income-save-button" } %>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'other-income-cancel-<%= income_id %>', 'new-other-income-form')" id="other-income-cancel-<%= income_id %>" class="btn btn-default other-income-cancel">Cancel</a>
+        <%= f.submit 'Save', class: "btn btn-save #{'disabled' if disabled }", :data => { :cuke => "other-income-save-button" } %>
       </div>
     </div>
   </div>

@@ -32,7 +32,7 @@ input[type="radio"]:checked + label span {
     background:url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/210284/check_radio_sheet.png) -57px top no-repeat;
 }
 
-.job_income, .new-other-income-form, .new-unemployment-income-form, .edit-unemployment-income-form {
+.job_income {
   .col-md-3, input {
     padding-left: 0px !important;
     padding-right: 0px !important;
@@ -139,7 +139,7 @@ span.span-text {
 .form-heading
 {
   font-weight: bold;
-  color: #909090;
+  color: var(--secondary-font-color, #909090);
 }
 .form-content
 {
@@ -366,10 +366,10 @@ div#add-more-link {
 
 .verti-line {
   background: linear-gradient(to right,
-    rgba(206, 184, 136, 0.25) calc(50% - 0.4px),
+    rgba(245, 236, 213, 0.5) calc(50% - 0.4px),
     #ddd calc(50% - 0.4px),
     #ddd calc(50% + 0.4px),
-    rgba(206, 184, 136, 0.25) calc(50% + 0.4px));
+    rgba(245, 236, 213, 0.5) calc(50% + 0.4px));
 }
 
 .margin-tb-10{
