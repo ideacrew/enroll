@@ -86,7 +86,7 @@ RSpec.describe Operations::Families::CreateOrUpdateMember, type: :model, dbclean
 
   context '#update member' do
     let(:params) do
-      {applicant_params: applicant_params.merge( gender: 'female', is_incarcerated: false, :ethnicity => ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"], i94_number: '45612378985', relationship: 'spouse'), family_id: family.id}
+      {applicant_params: applicant_params.merge(gender: 'female', is_incarcerated: false, :ethnicity => ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"], i94_number: '45612378985', relationship: 'spouse'), family_id: family.id}
     end
 
     let!(:create_spouse) do
