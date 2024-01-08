@@ -440,10 +440,7 @@ module BenefitSponsors
             return unless EnrollRegistry.feature_enabled?(:broker_role_consumer_enhancement)
 
             matched_person.create_broker_agency_staff_role(
-              {
-                aasm_state: 'active',
-                benefit_sponsors_broker_agency_profile_id: bap_id
-              }
+              benefit_sponsors_broker_agency_profile_id: bap_id
             )
           end
 
