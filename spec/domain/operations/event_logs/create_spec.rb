@@ -25,6 +25,7 @@ RSpec.describe Operations::EventLogs::Create,
     {
       account_id: user.id.to_s,
       subject_gid: subject_gid,
+      resource_gid: subject_gid,
       message_id: SecureRandom.uuid,
       event_name: event_name,
       correlation_id: SecureRandom.uuid,

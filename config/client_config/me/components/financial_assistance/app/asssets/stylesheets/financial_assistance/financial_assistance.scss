@@ -52,7 +52,7 @@ input[type="radio"]:checked + label span {
 }
 
 .fa, .knowmore h4 {
-  color: var(--theme-primary-100, #007bc4);
+  color: var(--theme-primary-blue, #007bc4);
 }
 
 #backModal {
@@ -192,7 +192,7 @@ input.radio-yml {
 .title-text {
   margin-bottom: 0px;
   margin-top: 20px;
-  color: var(--theme-primary-100, #007bc4);
+  color: var(--theme-primary-blue, #007bc4);
 }
 .fa-text-color {
   font-weight: lighter;
@@ -260,7 +260,7 @@ div#add-more-link {
 }
 .help-to-decide {
   display: inline-block;
-  border-left: 1px solid var(--theme-primary-100, #007bc4);
+  border-left: 1px solid var(--theme-primary-blue, #007bc4);
   padding-left: 12px;
   margin-left: 10px;
 }

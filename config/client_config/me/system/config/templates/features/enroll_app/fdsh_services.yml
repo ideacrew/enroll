@@ -42,3 +42,6 @@ registry:
         is_enabled: <%= ENV['VALIDATE_AND_RECORD_PUBLISH_ERRORS_IS_ENABLED'] || false %>
       - key: :validate_and_record_publish_application_errors
         is_enabled: <%= ENV['VALIDATE_AND_RECORD_PUBLISH_APPLICATION_ERRORS_IS_ENABLED'] || false %>
+      - key: :send_close_case_request
+        item: :send_close_case_request
+        is_enabled: <%= ENV['SEND_CLOSE_CASE_REQUEST_IS_ENABLED'] || false %>
