@@ -27,7 +27,7 @@ module EventLog
             dependent: :destroy
 
     field :subject_gid, type: String
-    field :record_gid, type: String
+    field :resource_gid, type: String
     field :correlation_id, type: String
     field :message_id, type: String
     field :host_id, type: String

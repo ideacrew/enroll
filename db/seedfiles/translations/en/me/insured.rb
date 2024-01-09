@@ -117,6 +117,9 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.families.verification.documents_FAQ' => "Documents We Accept",
   :'en.delete' => "Delete",
   :'en.deleted' => "Deleted",
+  :'en.info' => "Info",
+  :'en.next' => "Next Page",
+  :'en.previous' => "Previous Page",
   :'en.insured.families.medicaid_and_tax_credits' => "Medicaid & Tax Credits",
   :'en.insured.families.apply_for_medicaid_widget' => "Apply, renew, read notices or find out what documents are needed for Medicaid or tax credit assisted coverage",
   :'en.insured.families.aptc_or_csr_enrollments' => "APTC / CSR Enrollments",
@@ -590,5 +593,6 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.verification_doc_file_error' => "Unable to upload file. Acceptable file types - PDF, JPEG, PNG, and GIF and ensure it does not exceed 100 MB.",
   :'en.insured.verification_acceptable_file_types_text' => "Acceptable file types:",
   :'en.insured.verification_acceptable_file_types' => "PDF, JPEG, PNG, and GIF",
-  :'en.insured.verification_max_file_size' => "File should not exceed 100 MB"
+  :'en.insured.verification_max_file_size' => "File should not exceed 100 MB",
+  :'en.waiting_for_eligibility' => "Waiting for your eligibility results..."
 }.freeze
