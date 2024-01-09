@@ -10,7 +10,9 @@ module SessionConcern
     end
 
     def session
-      Thread.current[:current_session_values]
+      session_values = Thread.current[:current_session_values] || {}
+      session_values[:login_session_id] = Thread.current[:login_session_id] if Thread.current[:login_session_id].present?
+      session_values
     end
 
     def system_account
