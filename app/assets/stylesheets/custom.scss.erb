@@ -3652,10 +3652,10 @@ ul.progress-wrapper li.complete {
     list-style: none;
     /*border-left: 2px solid #007bc4;*/
     padding-left: 35px;
-    color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+    color: var(--theme-primary-blue, <%= EnrollRegistry[:qle_carousel].settings(:color).item %>);
 }
 ul.progress-wrapper li.complete span.circle-progress {
-    background-color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+    background-color: var(--theme-primary-blue, <%= EnrollRegistry[:qle_carousel].settings(:color).item %>);
     border: none;
     width: 14px;
     left: 9px;
@@ -3667,11 +3667,11 @@ ul.progress-wrapper li.active {
     /*border-left: 2px solid #007bc4;*/
     padding-left: 35px;
     font-weight: bold;
-    color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+    color: var(--theme-primary-blue, <%= EnrollRegistry[:qle_carousel].settings(:color).item %>);
 }
 ul.progress-wrapper li.active span.circle-progress {
     background-color: #ffffff;
-    border: 2px solid <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+    border: 2px solid var(--theme-primary-blue, <%= EnrollRegistry[:qle_carousel].settings(:color).item %>);
     width: 14px;
     left: 9px;
     height: 14px;
@@ -3686,7 +3686,7 @@ ul.progress-wrapper li.active span.circle-progress {
     margin-top: 5px;
 }
 ul.progress-wrapper li.complete .vertical-line-progress {
-    background-color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+    background-color: var(--theme-primary-blue, <%= EnrollRegistry[:qle_carousel].settings(:color).item %>);
 }
 ul.progress-wrapper li.active .vertical-line-progress {
     background-color: #cacaca;
