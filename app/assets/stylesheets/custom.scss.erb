@@ -3652,7 +3652,7 @@ ul.progress-wrapper li.complete {
     list-style: none;
     /*border-left: 2px solid #007bc4;*/
     padding-left: 35px;
-    color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+    color: var(--theme-primary-blue, <%= EnrollRegistry[:qle_carousel].settings(:color).item %>);
 }
 ul.progress-wrapper li.complete span.circle-progress {
     background-color: var(--theme-primary-blue, <%= EnrollRegistry[:qle_carousel].settings(:color).item %>);
