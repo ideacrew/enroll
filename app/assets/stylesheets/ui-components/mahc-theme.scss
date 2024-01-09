@@ -578,3 +578,7 @@ thead {
 .white {
   color: #ffffff !important;
 }
+
+.black {
+  color: var(--primary-black, #ffffff) !important;
+}
