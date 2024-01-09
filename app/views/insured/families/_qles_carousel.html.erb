@@ -54,10 +54,11 @@
     <!-- Controls -->
     <% color = EnrollRegistry[:qle_carousel].settings(:color).item %>
     <a class="left carousel-control" href="#carousel-qles" role="button" data-slide="prev" style="background-image: none;color:<%= color %>">
-      <i class="fa fa-angle-left left fa-2x" aria-hidden="true"></i>
+      <i class="fa fa-angle-left left fa-2x" aria-hidden="true"><span class="hide"><%=l10n("previous")%></span></i>
     </a>
+    &nbsp
     <a class="right carousel-control" href="#carousel-qles" role="button" data-slide="next" style="background-image: none;color:<%= color %>">
-      <i class="fa fa-angle-right right fa-2x" aria-hidden="true"></i>
+      <i class="fa fa-angle-right right fa-2x" aria-hidden="true"><span class="hide"><%=l10n("next")%></span></i>
     </a>
   <% end %>
 </div>
