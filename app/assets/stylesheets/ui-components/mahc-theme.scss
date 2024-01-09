@@ -574,3 +574,11 @@ thead {
 #fteEmployee, #pteEmployee, #medSecPayers {
   padding:0;
 }
+
+.white {
+  color: #ffffff !important;
+}
+
+.black {
+  color: var(--primary-black, #ffffff) !important;
+}
