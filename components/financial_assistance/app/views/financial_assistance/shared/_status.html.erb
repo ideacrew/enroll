@@ -1,7 +1,7 @@
 <% if (application.present? && application.ready_for_attestation?) %>
   <div class="household-status ready-4-review">
   	<span class="note purple"> </span>
-    <div class="whitebox white">
+    <div class="whitebox">
       <% if FinancialAssistanceRegistry.feature_enabled?(:iap_assistance_year_display) %>
         <%= render partial: 'financial_assistance/shared/status_header', locals: {application: application} %>
       <% else %>
@@ -14,13 +14,13 @@
 <% else %>
 	<div class="household-status">
     <span class="note purple"> </span>
-    <div class="whitebox white">
+    <div class="whitebox">
       <% if FinancialAssistanceRegistry.feature_enabled?(:iap_assistance_year_display) %>
         <%= render partial: 'financial_assistance/shared/status_header', locals: {application: application} %>
       <% else %>
         <p>Your Application for Premium Reductions</p>
       <% end %>
-      <p class="info-needed"><i class="fa fa-refresh fa-refresh-faa fa-lg warning-status-hide" alt="warning" aria-hidden="true"></i><span>Info Needed</span></p>
+      <p class="info-needed"><i class="fa fa-refresh fa-refresh-faa fa-lg warning-status-hide" alt="warning" aria-hidden="true"></i><span class="black">Info Needed</span></p>
       <p class="sub-desc">You must enter all required information for everyone in your household.</p>
     </div>
   </div>
