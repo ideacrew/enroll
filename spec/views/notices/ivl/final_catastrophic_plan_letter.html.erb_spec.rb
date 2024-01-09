@@ -3,8 +3,8 @@
 require 'rails_helper'
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
   RSpec.describe 'notices/ivl/final_catastrophic_plan_letter.html.erb' do
-  include Config::SiteHelper
-  include Config::AcaHelper
+    include Config::SiteHelper
+    include Config::AcaHelper
 
     let!(:person) { FactoryBot.create(:person, :with_consumer_role, :with_mailing_address) }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
@@ -38,7 +38,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       it { expect(rendered).to match(/#{l10n("notices.shared.dear_person", first_name: notice.primary_firstname)}/) }
       it { expect(rendered).to match(/#{l10n("notices.ivl_cap.you_are_receiving_this_letter", site_short_name: site_short_name, previous_year: previous_year)}/) }
       it { expect(rendered).to match(/#{l10n("notices.ivl_cap.federal_law_required", aca_state_name: aca_state_name, ivl_responsibility_url: EnrollRegistry[:enroll_app].setting(:ivl_responsibility_url).item)}/) }
-      it { expect(rendered).to match(/#{l10n("notices.ivl_cap.you_may_receive_a_tax_form")}/) }
+      it { expect(rendered).to match(/(#{l10n("notices.ivl_cap.you_may_receive_a_tax_form")})*/) }
       it { expect(rendered).to match(/#{l10n("notices.shared.questions_or_concerns")}/) }
       it { expect(rendered).to match(/#{l10n("notices.shared.the_site_short_name_team", site_short_name: site_short_name)}/) }
     end

@@ -1,5 +1,9 @@
 # DC Notices Translations
 NOTICES_TRANSLATIONS = {
+  :'en.notices.shared.your_id_is' => "Your %{site_short_name} ID is: %{hbx_id}",
+  :'en.notices.shared.page' => "Page ",
+  :'en.notices.shared.of' => " of ",
+  :'en.notices.shared.questions_call' => "Questions? Call %{site_short_name} at %{phone}, or go to %{website}.",
   :'en.notices.shared.dear_person' => "Dear %{first_name}:",
   :'en.notices.shared.questions_or_concerns' => "If you have questions or concerns, we're here to help.",
   :'en.notices.shared.the_site_short_name_team' => "The %{site_short_name} Team",

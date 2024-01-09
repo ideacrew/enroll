@@ -51,8 +51,9 @@
       <td align="center">_____________________________________________________________________________________________________________________</td>
     </tr>
     <tr>
-      <td style="padding:3px 10px; font-size:8px;" align="center">Questions?
-        Call <%= site_short_name %> at <%= notice.is_a?(Notifier::NoticeKind) ?  contact_center_number_for_display : notice.hbe.phone %>, or go to <%= site_website_name.downcase %>.
+      <td style="padding:3px 10px; font-size:8px;" align="center">
+      <% phone = notice.is_a?(Notifier::NoticeKind) ?  contact_center_number_for_display : notice.hbe.phone %>
+      <%= l10n("notices.shared.questions_call", site_short_name: site_short_name, phone: phone, website: site_website_name.downcase) %>
       </td>
     </tr>
   </table>
