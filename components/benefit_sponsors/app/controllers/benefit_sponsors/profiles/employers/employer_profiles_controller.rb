@@ -12,7 +12,7 @@ module BenefitSponsors
         before_action :find_employer, only: [
           :show, :inbox, :bulk_employee_upload, :export_census_employees, :show_invoice,
           :coverage_reports, :download_invoice, :terminate_employee_roster_enrollments,
-          :osse_eligibilities, :update_osse_eligibilities
+          :osse_eligibilities, :update_osse_eligibilities, :wells_fargo_sso
         ]
         before_action :load_group_enrollments, only: [:coverage_reports], if: :is_format_csv?
         before_action :check_and_download_invoice, only: [:download_invoice, :show_invoice]
@@ -263,9 +263,8 @@ module BenefitSponsors
           redirect_to "#{profiles_employers_employer_profile_path(@employer_profile)}?tab=employees"
         end
 
-        private
-
         def wells_fargo_sso
+          authorize @employer_profile, :show?
           #grab url for WellsFargoSSO and store in insance variable
           email = @employer_profile.staff_roles.first&.work_email_or_best
 
@@ -279,7 +278,13 @@ module BenefitSponsors
               )
           end
           @wf_url = @wells_fargo_sso.url if @wells_fargo_sso&.token.present?
+          respond_to do |format|
+            format.html
+            format.json { render json: {wf_url: @wf_url} }
+          end
         end
+
+        private
 
         def retrieve_payments_for_page(page_no)
           return unless (financial_transactions = @benefit_sponsorship.financial_transactions)
