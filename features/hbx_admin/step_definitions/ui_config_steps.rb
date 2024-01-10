@@ -159,3 +159,11 @@ And(/^the browser has finished rendering the page$/) do
   # USE THIS ONLY AFTER CONFIRMING THAT IT IS ABSOLUTELY NECESSARY
   sleep(1)
 end
+
+Then(/^the page is axe clean$/) do
+  # Ensures the axecore contrast tests are not run immediately after the DOM is available but prior to the page
+  # fully rendering in the browser.
+  # USE THIS ONLY AFTER CONFIRMING THAT IT IS ABSOLUTELY NECESSARY
+  sleep(1)
+  steps %(the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast)
+end

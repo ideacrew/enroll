@@ -4660,7 +4660,7 @@ table.table.table-no-sytle td {
 #qle-header .info-wrapper h4{
   margin: 0;
   line-height: 1.4em;
-  color: $qle-header-color;
+  color: var(--theme-primary-blue, $qle-header-color);
 }
 
 #qle-menu h5 {
@@ -4724,7 +4724,7 @@ position: absolute;
   margin-right: 20px;
 }
 #shop-for-plans-widget .btn, .employer-panel .btn {
-  color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+  color: var(--theme-primary-blue, #007bc4);
   font-weight: 600;
 }
 
