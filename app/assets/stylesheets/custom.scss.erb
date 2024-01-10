@@ -3934,6 +3934,10 @@ label.checkbox-custom-label {
     padding: 0;
     text-transform: uppercase;
 }
+.checkbox-custom:focus + .checkbox-custom-label::before, .radio-custom:focus + .radio-custom-label::before{
+    padding: 0;
+    outline: -webkit-focus-ring-color auto 1px; 
+}
 .checkbox label {
     padding: 0;
 }
