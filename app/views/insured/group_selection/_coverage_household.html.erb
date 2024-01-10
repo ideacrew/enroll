@@ -75,11 +75,11 @@
                     <label class="required no-pd"><%= l10n("insured.group_selection.is_tobacco_user") %> *</label>
                   </div>
                   <% member = @latest_enrollment.hbx_enrollment_members.where(applicant_id: family_member.id).first if @latest_enrollment %>
-                  <div class="col-xs-2 top-buffer pb-1">
+                  <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'is_tobacco_user_Y_<%= index %>')" class="col-xs-2 top-buffer pb-1">
                     <input id="is_tobacco_user_Y_<%= index %>" type="radio" value="Y" name="is_tobacco_user_<%= family_member.id %>" <%='checked' if member&.tobacco_use == 'Y' %>>
                     <label class="radio-label" for="is_tobacco_user_Y_<%= index %>"><span>Yes</span></label>
                   </div>
-                  <div class="col-md-2 col-xs-1 top-buffer pb-1">
+                  <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'is_tobacco_user_N_<%= index %>')" class="col-md-2 col-xs-1 top-buffer pb-1">
                     <input id="is_tobacco_user_N_<%= index %>" type="radio" value="N" name="is_tobacco_user_<%= family_member.id %>" <%='checked' if member&.tobacco_use != 'Y' %>>
                     <label class="radio-label" for="is_tobacco_user_N_<%= index %>"><span>No</span></label>
                   </div>
