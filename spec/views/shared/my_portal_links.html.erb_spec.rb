@@ -1,6 +1,15 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-describe "shared/_my_portal_links.html.haml", dbclean: :after_each do
+describe 'shared/_my_portal_links.html.erb', dbclean: :after_each do
+  let(:brce_enabled_or_disabled) { false }
+  let(:families_home_url) { '/families/home?tab=home' }
+
+  before :each do
+    allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
+    allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_role_consumer_enhancement).and_return(brce_enabled_or_disabled)
+  end
 
   context "with employee role" do
     let(:user) { FactoryBot.create(:user, person: person, roles: ["employee"]) }
@@ -17,10 +26,9 @@ describe "shared/_my_portal_links.html.haml", dbclean: :after_each do
       person.employee_roles.first.save!
       sign_in(user)
       render 'shared/my_portal_links'
-      expect(rendered).to have_content('My Insured Portal')
+      expect(rendered).to have_link('My Insured Portal', href: families_home_url)
       expect(rendered).to_not have_selector('dropdownMenu1')
     end
-
   end
 
   context "with employer role & employee role" do
@@ -44,7 +52,7 @@ describe "shared/_my_portal_links.html.haml", dbclean: :after_each do
       allow(user).to receive(:has_employee_role?).and_return(true)
       sign_in(user)
       render 'shared/my_portal_links'
-      expect(rendered).to have_content('My Insured Portal')
+      expect(rendered).to have_link('My Insured Portal', href: families_home_url)
       expect(rendered).to have_content(census_employee.employer_profile.legal_name)
       expect(rendered).to have_selector('.dropdown-menu')
       expect(rendered).to have_selector('.dropdown-menu')
@@ -77,7 +85,7 @@ describe "shared/_my_portal_links.html.haml", dbclean: :after_each do
       person.employee_roles.first.save!
       sign_in(user)
       render 'shared/my_portal_links'
-      expect(rendered).to have_content('My Insured Portal')
+      expect(rendered).to have_link('My Insured Portal', href: families_home_url)
       expect(rendered).to have_content(all_er_profile.legal_name)
       expect(rendered).to have_content('Second Company')
       expect(rendered).to have_selector('.dropdown-menu')
@@ -130,4 +138,93 @@ describe "shared/_my_portal_links.html.haml", dbclean: :after_each do
     end
   end
 
+  describe 'with dual roles when one of the roles is consumer_role' do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:user) { FactoryBot.create(:user, person: person) }
+    let(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, site_key: ::EnrollRegistry[:enroll_app].settings(:site_key).item) }
+    let(:broker_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+    let(:broker_agency_id) { broker_agency_organization.broker_agency_profile.id }
+
+    let(:auth_and_consent_url) { '/insured/consumer_role/ridp_agreement' }
+    let(:broker_agency_registration_url) { '/benefit_sponsors/profiles/registrations/new?profile_type=broker_agency' }
+    let(:broker_agency_portal_url) { "/benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/#{broker_agency_id}?tab=home" }
+
+    before do
+      person.broker_agency_staff_roles.create!(
+        {
+          aasm_state: 'active',
+          benefit_sponsors_broker_agency_profile_id: broker_agency_id
+        }
+      )
+
+      allow(user).to receive(:consumer_identity_verified?).and_return(identity_verified)
+
+      sign_in(user)
+      render 'shared/my_portal_links'
+    end
+
+    context 'consumer role without RIPD' do
+      let(:identity_verified) { false }
+
+      context 'when the feature is disabled' do
+        it 'does not have families home link' do
+          expect(rendered).not_to have_link('My Insured Portal', href: families_home_url)
+        end
+
+        it 'has broker agency portal link' do
+          expect(rendered).to have_link(
+            'My Broker Agency Portal', href: broker_agency_registration_url
+          )
+        end
+      end
+
+      context 'when the feature is enabled' do
+        let(:brce_enabled_or_disabled) { true }
+
+        it 'does not have families home link' do
+          expect(rendered).not_to have_link('My Insured Portal', href: families_home_url)
+        end
+
+        it 'has RIDP failed validation page' do
+          expect(rendered).to have_link('My Insured Portal', href: auth_and_consent_url)
+        end
+
+        it 'has broker agency portal link' do
+          expect(rendered).to have_link(
+            broker_agency_organization.legal_name, href: broker_agency_portal_url
+          )
+        end
+      end
+    end
+
+    context 'consumer role with RIPD' do
+      let(:identity_verified) { true }
+
+      context 'when the feature is disabled' do
+        it 'does not have families home link' do
+          expect(rendered).not_to have_link('My Insured Portal', href: families_home_url)
+        end
+
+        it 'has broker agency portal link' do
+          expect(rendered).to have_link(
+            'My Broker Agency Portal', href: broker_agency_registration_url
+          )
+        end
+      end
+
+      context 'when the feature is enabled' do
+        let(:brce_enabled_or_disabled) { true }
+
+        it 'has families home link' do
+          expect(rendered).to have_link('My Insured Portal', href: auth_and_consent_url)
+        end
+
+        it 'has broker agency portal link' do
+          expect(rendered).to have_link(
+            broker_agency_organization.legal_name, href: broker_agency_portal_url
+          )
+        end
+      end
+    end
+  end
 end

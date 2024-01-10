@@ -1322,7 +1322,8 @@ class Person
   #
   # @param [Hash] basr_params.
   #   The acceptable keys: :aasm_state, :benefit_sponsors_broker_agency_profile_id, :reason
-  # @return [Boolean] true if the Broker Agency Staff Role is created successfully.
+  #   Currently, we only create Broker Agency Staff Role with benefit_sponsors_broker_agency_profile_id
+  # @return [BrokerAgencyStaffRole] broker_agency_staff_role if the Broker Agency Staff Role is created successfully.
   def create_broker_agency_staff_role(basr_params)
     basr = broker_agency_staff_roles.build(
       {
