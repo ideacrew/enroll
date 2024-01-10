@@ -38,6 +38,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       it { expect(rendered).to match(/#{l10n("notices.shared.dear_person", first_name: notice.primary_firstname)}/) }
       it { expect(rendered).to match(/#{l10n("notices.ivl_cap.you_are_receiving_this_letter", site_short_name: site_short_name, previous_year: previous_year)}/) }
       it { expect(rendered).to match(/#{l10n("notices.ivl_cap.federal_law_required", aca_state_name: aca_state_name, ivl_responsibility_url: EnrollRegistry[:enroll_app].setting(:ivl_responsibility_url).item)}/) }
+      it { expect(rendered).to match(/#{EnrollRegistry[:enroll_app].setting(:ivl_responsibility_url).item}/) }
       it { expect(rendered).to match(/(#{l10n("notices.ivl_cap.you_may_receive_a_tax_form")})*/) }
       it { expect(rendered).to match(/#{l10n("notices.shared.questions_or_concerns")}/) }
       it { expect(rendered).to match(/#{l10n("notices.shared.the_site_short_name_team", site_short_name: site_short_name)}/) }
