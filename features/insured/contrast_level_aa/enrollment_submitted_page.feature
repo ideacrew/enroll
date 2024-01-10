@@ -24,4 +24,5 @@ Feature: Contrast level AA is enabled - Insured Plan Shopping on Individual mark
     And Individual should not see any plan which premium is 0
     And Individual selects a plan on plan shopping page
     And Individual clicks on purchase button on confirmation page
+    And the browser has finished rendering the page
     Then the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
