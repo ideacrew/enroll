@@ -1,7 +1,7 @@
-Feature: Contrast level AA is enabled - Insured Plan Shopping on Individual market
+Feature: Contrast level AA is enabled - Insured Plan Shopping with SEP
   Background:
     Given the contrast level aa feature is enabled
-    And the FAA feature configuration is enabled
+    Given the FAA feature configuration is enabled
     Given individual Qualifying life events are present
     Given Individual has not signed up as an HBX user
     When Individual visits the Insured portal outside of open enrollment
@@ -21,5 +21,6 @@ Feature: Contrast level AA is enabled - Insured Plan Shopping on Individual mark
     And Individual clicks on the Continue button of the Family Information page
     When Individual click the "Had a baby" in qle carousel
     And Individual selects a current qle date
+    Then Individual should see confirmation and continue
     And the browser has finished rendering the page
     Then the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
