@@ -947,4 +947,167 @@ describe "Enabled/Disabled IVL market" do
       end
     end
   end
+
+  describe '#eligible_to_redirect_to_home_page?' do
+    let(:user) { FactoryBot.create(:user, person: person) }
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:brce_enabled_or_disabled) { false }
+
+    before :each do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_role_consumer_enhancement).and_return(brce_enabled_or_disabled)
+    end
+
+    context 'when user has an employee role' do
+      let(:person) { FactoryBot.create(:person, :with_employee_role) }
+      let(:employee_role) { person.employee_roles.first }
+
+      before do
+        allow(person).to receive(:active_employee_roles).and_return([employee_role])
+      end
+
+      it 'returns true' do
+        expect(helper.eligible_to_redirect_to_home_page?(user)).to eq(true)
+      end
+    end
+
+    context 'resource registry feature is disabled' do
+      it 'returns true' do
+        expect(helper.eligible_to_redirect_to_home_page?(user)).to eq(true)
+      end
+    end
+
+    context 'resource registry feature is enabled' do
+      let(:brce_enabled_or_disabled) { true }
+
+      context 'without consumer role or employee role' do
+        it 'returns false' do
+          expect(helper.eligible_to_redirect_to_home_page?(user)).to eq(false)
+        end
+      end
+
+      context 'with consumer role' do
+        let(:ridp_verified) { false }
+
+        before do
+          expect(user).to receive(:consumer_identity_verified?).and_return(ridp_verified)
+        end
+
+        context 'with RIDP' do
+          let(:ridp_verified) { true }
+
+          it 'returns true' do
+            expect(helper.eligible_to_redirect_to_home_page?(user)).to eq(true)
+          end
+        end
+
+        context 'without RIDP' do
+          it 'returns false' do
+            expect(helper.eligible_to_redirect_to_home_page?(user)).to eq(false)
+          end
+        end
+      end
+    end
+
+    context 'when user has an consumer role without RIDP' do
+      let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+
+      before do
+        allow(user).to receive(:consumer_identity_verified?).and_return(false)
+      end
+
+      context 'feature is disabled' do
+        it 'returns true' do
+          expect(helper.eligible_to_redirect_to_home_page?(user)).to eq(true)
+        end
+      end
+
+      context 'feature is enabled' do
+        let(:brce_enabled_or_disabled) { true }
+
+        it 'returns false' do
+          expect(helper.eligible_to_redirect_to_home_page?(user)).to eq(false)
+        end
+      end
+    end
+
+    context 'when user has an consumer role with RIDP' do
+      let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+
+      before do
+        allow(user).to receive(:consumer_identity_verified?).and_return(true)
+      end
+
+      context 'feature is disabled' do
+        it 'returns true' do
+          expect(helper.eligible_to_redirect_to_home_page?(user)).to eq(true)
+        end
+      end
+
+      context 'feature is enabled' do
+        let(:brce_enabled_or_disabled) { true }
+
+        it 'returns true' do
+          expect(helper.eligible_to_redirect_to_home_page?(user)).to eq(true)
+        end
+      end
+    end
+  end
+
+  describe '#insured_role_exists?' do
+    let(:brce_enabled_or_disabled) { false }
+    let(:user) { FactoryBot.create(:user, person: person) }
+
+    before :each do
+      allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_role_consumer_enhancement).and_return(brce_enabled_or_disabled)
+    end
+
+    context 'employee role exists' do
+      let(:person) { FactoryBot.create(:person, :with_employee_role) }
+      let(:employee_role) { person.employee_roles.first }
+
+      before do
+        allow(person).to receive(:active_employee_roles).and_return([employee_role])
+      end
+
+      it 'returns true' do
+        expect(helper.insured_role_exists?(user)).to eq(true)
+      end
+    end
+
+    context 'consumer role exists' do
+      let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+
+      context 'resource registry feature is enabled' do
+        let(:brce_enabled_or_disabled) { true }
+
+        it 'returns true' do
+          expect(helper.insured_role_exists?(user)).to be_truthy
+        end
+      end
+
+      context 'resource registry feature is disabled' do
+        context 'with RIDP verified' do
+          before do
+            allow(user).to receive(:consumer_identity_verified?).and_return(true)
+          end
+
+          it 'returns true' do
+            expect(helper.insured_role_exists?(user)).to eq(true)
+          end
+        end
+
+        context 'without RIDP verified' do
+          before do
+            allow(user).to receive(:consumer_identity_verified?).and_return(false)
+          end
+
+          it 'returns false' do
+            expect(helper.insured_role_exists?(user)).to eq(false)
+          end
+        end
+      end
+    end
+  end
 end
