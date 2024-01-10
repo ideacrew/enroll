@@ -1,17 +1,17 @@
 .btn-outline-primary {
-  color: var(--theme-primary-100, #007bc4);
-  border-color: var(--theme-primary-100, #007bc4);
+  color: var(--theme-primary-blue, #007bc4);
+  border-color: var(--theme-primary-blue, #007bc4);
   font-weight: 600;
   text-transform: capitalize;
 
   &:hover {
     background-color: var(--grey-000);
-    color: var(--theme-primary-100, #007bc4);
+    color: var(--theme-primary-blue, #007bc4);
   }
 
   &:not(:disabled):not(:disabled):active {
     background-color: var(--grey-000);
-    color: var(--theme-primary-100, #007bc4);
+    color: var(--theme-primary-blue, #007bc4);
   }
 }
 
@@ -56,16 +56,16 @@
 }
 
 .btn-link {
-  color: var(--theme-primary-100, #007bc4) !important;
+  color: var(--theme-primary-blue, #007bc4) !important;
 }
 
 .swal2-styled.swal2-confirm {
-  background-color: var(--theme-primary-100, #3085D6) !important;
+  background-color: var(--theme-primary-blue, #3085D6) !important;
 }
 
 .heading-text {
   font-weight: 400;
-  color: var(--theme-primary-100, #007bc4);
+  color: var(--theme-primary-blue, #007bc4);
 }
 
 .invalid-feedback {
@@ -79,7 +79,7 @@
 
 .navbar-main {
   background-color: var(--grey-000);
-  border-bottom: solid 3px var(--theme-primary-100, #007bc4);
+  border-bottom: solid 3px var(--theme-primary-blue, #007bc4);
   .navbar-brand {
     border-right: solid 1px var(--grey-050);
     img {
@@ -101,7 +101,7 @@
     border: none;
   }
   .fa-phone {
-    color: var(--theme-primary-100, #007bc4);
+    color: var(--theme-primary-blue, #007bc4);
   }
   .cc-number {
     color: var(--grey-120);
@@ -110,7 +110,7 @@
 
 .sub-text {
   font-weight: 200;
-  color: var(--theme-primary-100, #007bc4);
+  color: var(--theme-primary-blue, #007bc4);
 }
 
 // This is for conditional styles used only in

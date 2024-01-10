@@ -1310,7 +1310,7 @@ module FinancialAssistance
       save!
     end
 
-    # rubocop:disable Metrics/Naming/AccessorMethodName
+    # rubocop:disable Naming/AccessorMethodName
     def set_evidence_verified(evidence)
       evidence.verification_outstanding = false
       evidence.is_satisfied = true
@@ -1363,7 +1363,7 @@ module FinancialAssistance
       evidence.move_to_rejected
       save!
     end
-    # rubocop:enable Metrics/Naming/AccessorMethodName
+    # rubocop:enable Naming/AccessorMethodName
 
     class << self
       def find(id)
@@ -1621,7 +1621,7 @@ module FinancialAssistance
       if is_active && !callback_update
         create_or_update_member_params = { applicant_params: self.attributes_for_export, family_id: application.family_id }
         create_or_update_result = if FinancialAssistanceRegistry[:avoid_dup_hub_calls_on_applicant_create_or_update].enabled?
-                                    create_or_update_member_params.merge!(is_primary_applicant: is_primary_applicant?, skip_consumer_role_callbacks: true, skip_person_updated_event_callback: true)
+                                    create_or_update_member_params[:applicant_params].merge!(is_primary_applicant: is_primary_applicant?, skip_consumer_role_callbacks: true, skip_person_updated_event_callback: true)
                                     ::Operations::Families::CreateOrUpdateMember.new.call(create_or_update_member_params)
                                   else
                                     ::FinancialAssistance::Operations::Families::CreateOrUpdateMember.new.call(params: create_or_update_member_params)

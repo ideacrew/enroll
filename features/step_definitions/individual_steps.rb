@@ -386,7 +386,7 @@ Then(/^Individual should be on verification page/) do
 end
 
 When(/^.+ clicks on the Continue button of the Family Information page$/) do
-  find(IvlFamilyInformation.continue_btn).click
+  find('.interaction-click-control-continue').click
   sleep 10
 end
 
@@ -464,7 +464,7 @@ end
 And(/^.+ clicks on the Continue button of the Household Info page/) do
   screenshot("line 161")
   sleep 2
-  find(IvlIapFamilyInformation.continue_btn).click
+  find('.interaction-click-control-continue').click
 end
 
 Then(/consumer clicked on Go To My Account/) do
@@ -519,6 +519,9 @@ And(/I signed in$/) do
   find(SignIn.sign_in_btn).click
 end
 
+When(/^the individual continues to the Choose Coverage page$/) do
+  expect(page).to have_content IvlChooseCoverage.choose_coverage_for_your_household_text
+end
 
 When(/^the individual clicks the Continue button of the Group Selection page$/) do
   expect(page).to have_content IvlChooseCoverage.choose_coverage_for_your_household_text

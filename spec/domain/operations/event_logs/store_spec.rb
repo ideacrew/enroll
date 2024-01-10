@@ -71,6 +71,7 @@ RSpec.describe Operations::EventLogs::Store,
       event_log = People::EligibilitiesEventLog.first
       expect(event_log.account_id.to_s).to eq user.id.to_s
       expect(event_log.subject_gid).to eq person.to_global_id.uri.to_s
+      expect(event_log.resource_gid).to eq person.to_global_id.uri.to_s
 
       session_detail = event_log.session_detail
       expect(session_detail.session_id).to eq session_details[:session_id]
