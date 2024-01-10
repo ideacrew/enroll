@@ -1026,4 +1026,52 @@ module ApplicationHelper
   def individual_osse_eligibility_years_for_display
     ::BenefitCoveragePeriod.osse_eligibility_years_for_display.sort.reverse
   end
+
+  # => START: Broker Role Consumer Role(Dual Roles) Enhancement.
+
+  # Method: eligible_to_redirect_to_home_page?
+  #
+  # This method checks if a user is eligible to be redirected to the family home page.
+  #
+  # @param [User] user The user to check for eligibility.
+  #
+  # @return [Boolean]
+  #   returns true if the user has an employee role
+  #   returns true if the 'broker_role_consumer_enhancement' feature is not enabled
+  #   returns true if the user has a consumer role and their identity is verified.
+  #   Otherwise, it returns false.
+  #
+  # @example
+  #   eligible_to_redirect_to_home_page?(user) #=> true/false
+  def eligible_to_redirect_to_home_page?(user)
+    return true if user.has_employee_role?
+    return true unless EnrollRegistry.feature_enabled?(:broker_role_consumer_enhancement)
+
+    user.has_consumer_role? && user.consumer_identity_verified?
+  end
+
+  # @method insured_role_exists?(user)
+  # Checks if the user has an insured role.
+  #
+  # @param [User] user The user to check for insured roles.
+  #
+  # @return [Boolean]
+  #   returns true if the user has an employee role.
+  #   returns true if the user has a consumer role and the 'broker_role_consumer_enhancement' feature is enabled.
+  #   returns true if the user has a consumer role and their identity is verified when the 'broker_role_consumer_enhancement' feature is disabled enabled.
+  #   Otherwise, it returns false.
+  #
+  # @example Check if a user has an insured role
+  #   insured_role_exists?(user) #=> true/false
+  def insured_role_exists?(user)
+    return true if user.has_employee_role?
+
+    if EnrollRegistry.feature_enabled?(:broker_role_consumer_enhancement)
+      user.has_consumer_role?
+    else
+      user.has_consumer_role? && user.consumer_identity_verified?
+    end
+  end
+
+  # => END: Broker Role Consumer Role(Dual Roles) Enhancement
 end
