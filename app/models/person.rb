@@ -1316,6 +1316,24 @@ class Person
     end
   end
 
+  # Creates a new Broker Agency Staff Role with given input params.
+  #
+  # @note This method may raise an exception if the Broker Agency Staff Role is not created successfully.
+  #
+  # @param [Hash] basr_params.
+  #   The acceptable keys: :aasm_state, :benefit_sponsors_broker_agency_profile_id, :reason
+  #   Currently, we only create Broker Agency Staff Role with benefit_sponsors_broker_agency_profile_id
+  # @return [BrokerAgencyStaffRole] broker_agency_staff_role if the Broker Agency Staff Role is created successfully.
+  def create_broker_agency_staff_role(basr_params)
+    basr = broker_agency_staff_roles.build(
+      {
+        benefit_sponsors_broker_agency_profile_id: basr_params[:benefit_sponsors_broker_agency_profile_id]
+      }
+    )
+    save!
+    basr
+  end
+
   private
 
   def assign(collection, association)

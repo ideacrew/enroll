@@ -50,7 +50,7 @@
 <div id="dependent_buttons" class="focus_effect personal-info-row <%= pundit_class Family, :updateable?%>">
   <div class="col-md-12 no-pd col-sm-12 col-xs-12" id="add-member-btn">
     <%= link_to new_resident_dependent_insured_family_members_path(:family_id => @family.id), :remote => true, :class => "btn btn-primary " do
-      "<i class='fa fa-user-plus'></i> #{l10n('add_member')}".html_safe
+      "<i class='fa fa-user-plus white'></i> #{l10n('add_member')}".html_safe
     end
     %>
   </div>
