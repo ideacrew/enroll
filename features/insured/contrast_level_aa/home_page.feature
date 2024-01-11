@@ -13,4 +13,4 @@ Feature: Contrast level AA is enabled - Consumer shops for plan
     Then Patrick Doe should see family members page and clicks continue
     And Patrick Doe should see the group selection page
     When Patrick Doe clicks Back to my account button
-    Then the page is axe clean
+    Then the page passes minimum level aa contrast guidelines
