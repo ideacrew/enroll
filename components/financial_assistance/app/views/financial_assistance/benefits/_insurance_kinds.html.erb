@@ -1,7 +1,6 @@
 <div class="instruction-row row row-form-wrapper no-buffer row-height">
 	<div class="col-md-10 checklist-title">
-		<span> <b class="run-glossary"> <%= sanitize(text1) %> <%= render partial:"shared/glossary", locals: { key: "coverage", title: "coverage", term: "coverage" } %> <%= sanitize(text2) %> </b></span>
-	</div>
+<span> <b class="run-glossary"> <%= ERB::Util.html_escape(text1) %> <%= render partial: "shared/glossary", locals: { key: "coverage", title: "coverage", term: "coverage" } %> <%= ERB::Util.html_escape(text2) %> </b></span>	</div>
 </div>
 <div class="instruction-row row row-form-wrapper lightgray no-buffer row-height">
  	<div class="col-md-12 checklist-title-header">
