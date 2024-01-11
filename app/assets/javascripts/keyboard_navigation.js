@@ -18,6 +18,19 @@ function handleCitizenKeyDown(event, radioIdBase) {
   }
 }
 
+function handleContactInfoKeyDown(event, radioId, modifyDiv) {
+  if (event.key === 'Enter') { 
+    document.getElementById(radioId).click(); 
+    hidden_div = document.getElementById(modifyDiv);
+    if (hidden_div.style.display === "block") {
+      hidden_div.style.display = "none";
+    } else {
+      hidden_div.style.opacity = "1";
+      hidden_div.style.display = "block";
+    }
+  }
+}
+
 function handleButtonKeyDown(event, buttonId) {
   if (event.key === 'Enter') { 
     document.getElementById(buttonId).click(); 

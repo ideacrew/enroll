@@ -150,7 +150,7 @@
                 <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: product } %>
             </button>
 
-            <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'plan_contact_info')" class="btn btn-default">
+            <button tabindex="0" onkeydown="handleContactInfoKeyDown(event, 'plan_contact_info', '<%= product.kind.to_s %>-<%= product.id %>-<%= hbx_enrollment.hbx_id%>')" class="btn btn-default">
                 <a class="vertically-aligned-row" id="plan_contact_info" data-toggle="modal" data-target="#<%= product.kind.to_s %>-<%= product.id %>-<%= hbx_enrollment.hbx_id%>">
                     <i class="fa fa-phone"></i>
                     <span class="col-xs-11 enrollment-tile-summary"><%= l10n("plan_contact_info") %></span>
