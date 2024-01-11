@@ -6,7 +6,8 @@ RSpec.describe Operations::BenefitSponsors::EmployerProfile::BulkCeUpload, type:
 
   describe '#call' do
     let(:bucket_name) { 'ce-roster-upload' }
-    let(:s3_uri) { "f55679fe-34ca-426c-b68b-d5d92f16255c" }    let(:filename) { "test.xlsx" }
+    let(:s3_uri) { "f55679fe-34ca-426c-b68b-d5d92f16255c" }
+    let(:filename) { "test.xlsx" }
     let(:bucket_name) { 'ce-roster-upload' }
     let(:person) { FactoryBot.create(:person) }
     let!(:site)                  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
