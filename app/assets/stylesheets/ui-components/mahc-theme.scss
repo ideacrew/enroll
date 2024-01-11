@@ -176,7 +176,7 @@ h1,h2,h3,h4,h5,h6 {
     padding-right: 15px;
   }
   li a {
-    color: #cbe6ff;
+    color: var(--soft-blue, #cbe6ff);;
     text-align: left;
     padding-left: 15px;
     font-weight: 600;

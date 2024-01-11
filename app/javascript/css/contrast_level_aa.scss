@@ -17,6 +17,8 @@
     --primary-black: #000000;
     --alert-notice-green: #62703E; //success notice green
     --info-blue: #003260;
+    --soft-blue: #D6EBFF; //home page right nav text color
+    --light-gray: #A19F9D;
 
     --font: Barlow, sans-serif;
     --default-font-color: #323130;
@@ -65,4 +67,16 @@
   background-position: center;
   color: transparent !important;
   font-size: 27px !important;
+}
+
+.ready-4-review .note.purple::before {
+  display: none;
+}
+
+.note.purple {
+  display: none;
+}
+
+.complete-icon-text{
+  font-weight: normal !important;
 }

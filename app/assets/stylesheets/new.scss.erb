@@ -3,7 +3,7 @@
 #home, .plan_design_proposals {
   nav {
     ul {
-      background-color: $brand-primary;
+      background-color: var(--theme-primary-blue, $brand-primary);
       padding: 20px 0;
       list-style-type: none;
       img {
@@ -16,11 +16,11 @@
         &.active {
           a {
             color: #ffffff;
-            border-left: solid 4px #cbe6ff;
+            border-left: solid 4px var(--soft-blue, #cbe6ff);
           }
         }
         a {
-          color: #cbe6ff;
+          color: var(--soft-blue, #cbe6ff);
           text-align: left;
           padding-left: 15px;
           font-weight: 600;
@@ -32,7 +32,7 @@
           }
         }
         span {
-          background-color: $primary-red !important;
+          background-color: var(--primary-red, $primary-red) !important;
         }
       }
     }
