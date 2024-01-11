@@ -300,7 +300,7 @@ class Invitation
       invitation.send_broker_invitation!(broker_role.parent.full_name)
       invitation
     elsif should_notify_linked_broker_or_broker_staff_role?(broker_role)
-      UserMailer.broker_or_broker_staff_linked_invitation_email(broker_role.email_address, broker_role.parent.full_name)
+      UserMailer.broker_or_broker_staff_linked_invitation_email(broker_role.email_address, broker_role.parent.full_name).deliver_now
     end
   end
 
@@ -315,7 +315,7 @@ class Invitation
       invitation.send_broker_staff_invitation!(broker_role.parent.full_name, broker_role.parent.id)
       invitation
     elsif should_notify_linked_broker_or_broker_staff_role?(broker_role)
-      UserMailer.broker_or_broker_staff_linked_invitation_email(broker_role.email_address, broker_role.parent.full_name)
+      UserMailer.broker_or_broker_staff_linked_invitation_email(broker_role.email_address, broker_role.parent.full_name).deliver_now
     end
   end
 
