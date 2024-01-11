@@ -225,6 +225,10 @@ describe "A Broker Invitation" do
     it "should not invite the broker" do
       expect(Invitation.should_invite_broker_or_broker_staff_role?(broker)).to be_falsey
     end
+
+    it "should not notify the broker of being approved" do
+      expect(Invitation.should_notify_linked_broker_or_broker_staff_role?(broker)).to be_falsey
+    end
   end
 
   describe "when:
@@ -237,6 +241,10 @@ describe "A Broker Invitation" do
 
     it "should invite the broker" do
       expect(Invitation.should_invite_broker_or_broker_staff_role?(broker)).to be_truthy
+    end
+
+    it "should not notify the broker of being approved" do
+      expect(Invitation.should_notify_linked_broker_or_broker_staff_role?(broker)).to be_falsey
     end
   end
 
@@ -251,6 +259,10 @@ describe "A Broker Invitation" do
     it "should not invite the broker" do
       expect(Invitation.should_invite_broker_or_broker_staff_role?(broker)).to be_falsey
     end
+
+    it "should not notify the broker of being approved" do
+      expect(Invitation.should_notify_linked_broker_or_broker_staff_role?(broker)).to be_falsey
+    end
   end
 
   describe "when:
@@ -265,6 +277,10 @@ describe "A Broker Invitation" do
 
     it "should invite the broker" do
       expect(Invitation.should_invite_broker_or_broker_staff_role?(broker)).to be_truthy
+    end
+
+    it "should not notify the broker of being approved" do
+      expect(Invitation.should_notify_linked_broker_or_broker_staff_role?(broker)).to be_falsey
     end
   end
 
@@ -281,6 +297,10 @@ describe "A Broker Invitation" do
     it "should invite the broker" do
       expect(Invitation.should_invite_broker_or_broker_staff_role?(broker)).to be_truthy
     end
+
+    it "should not notify the broker of being approved" do
+      expect(Invitation.should_notify_linked_broker_or_broker_staff_role?(broker)).to be_falsey
+    end
   end
 
   describe "when:
@@ -295,6 +315,10 @@ describe "A Broker Invitation" do
 
     it "should invite the broker" do
       expect(Invitation.should_invite_broker_or_broker_staff_role?(broker)).to be_truthy
+    end
+
+    it "should not notify the broker of being approved" do
+      expect(Invitation.should_notify_linked_broker_or_broker_staff_role?(broker)).to be_falsey
     end
   end
 
@@ -310,6 +334,10 @@ describe "A Broker Invitation" do
 
     it "should not invite the broker" do
       expect(Invitation.should_invite_broker_or_broker_staff_role?(broker)).to be_falsey
+    end
+
+    it "should notify the broker of being approved" do
+      expect(Invitation.should_notify_linked_broker_or_broker_staff_role?(broker)).to be_truthy
     end
   end
 end
@@ -337,6 +365,10 @@ describe "A Broker Staff Invitation" do
     it "should not invite the broker" do
       expect(Invitation.should_invite_broker_or_broker_staff_role?(broker_staff)).to be_falsey
     end
+
+    it "should not notify the broker staff of being approved" do
+      expect(Invitation.should_notify_linked_broker_or_broker_staff_role?(broker_staff)).to be_falsey
+    end
   end
 
   describe "when:
@@ -349,6 +381,10 @@ describe "A Broker Staff Invitation" do
 
     it "should invite the broker" do
       expect(Invitation.should_invite_broker_or_broker_staff_role?(broker_staff)).to be_truthy
+    end
+
+    it "should not notify the broker staff of being approved" do
+      expect(Invitation.should_notify_linked_broker_or_broker_staff_role?(broker_staff)).to be_falsey
     end
   end
 
@@ -363,6 +399,10 @@ describe "A Broker Staff Invitation" do
     it "should not invite the broker" do
       expect(Invitation.should_invite_broker_or_broker_staff_role?(broker_staff)).to be_falsey
     end
+
+    it "should not notify the broker staff of being approved" do
+      expect(Invitation.should_notify_linked_broker_or_broker_staff_role?(broker_staff)).to be_falsey
+    end
   end
 
   describe "when:
@@ -377,6 +417,10 @@ describe "A Broker Staff Invitation" do
 
     it "should invite the broker" do
       expect(Invitation.should_invite_broker_or_broker_staff_role?(broker_staff)).to be_truthy
+    end
+
+    it "should not notify the broker staff of being approved" do
+      expect(Invitation.should_notify_linked_broker_or_broker_staff_role?(broker_staff)).to be_falsey
     end
   end
 
@@ -393,6 +437,10 @@ describe "A Broker Staff Invitation" do
     it "should invite the broker" do
       expect(Invitation.should_invite_broker_or_broker_staff_role?(broker_staff)).to be_truthy
     end
+
+    it "should not notify the broker staff of being approved" do
+      expect(Invitation.should_notify_linked_broker_or_broker_staff_role?(broker_staff)).to be_falsey
+    end
   end
 
   describe "when:
@@ -407,6 +455,10 @@ describe "A Broker Staff Invitation" do
 
     it "should invite the broker" do
       expect(Invitation.should_invite_broker_or_broker_staff_role?(broker_staff)).to be_truthy
+    end
+
+    it "should not notify the broker staff of being approved" do
+      expect(Invitation.should_notify_linked_broker_or_broker_staff_role?(broker_staff)).to be_falsey
     end
   end
 
@@ -422,6 +474,10 @@ describe "A Broker Staff Invitation" do
 
     it "should not invite the broker" do
       expect(Invitation.should_invite_broker_or_broker_staff_role?(broker_staff)).to be_falsey
+    end
+
+    it "should notify the broker staff of being approved" do
+      expect(Invitation.should_notify_linked_broker_or_broker_staff_role?(broker_staff)).to be_truthy
     end
   end
 end

@@ -3,7 +3,7 @@
   <div class="panel-body">
     <div class="row">
       <% if plan.try(:is_standard_plan) %>
-          <div class="col-md-12"><i class="fa fa-bookmark" data-toggle="tooltip" data-placement="top" data-container="body" title= "<%=l10n('insured.plan_shoppings.standard_plan_title_info') %>" > <%= plan.standard_plan_label %> </i></div>
+          <div class="col-md-12"><i tabindex="0" compare_plans class="fa fa-bookmark" data-toggle="tooltip" data-placement="top" data-container="body" title= "<%=l10n('insured.plan_shoppings.standard_plan_title_info') %>" > <%= plan.standard_plan_label %> </i></div>
       <% end %>
     </div>
     <div class="row">
@@ -17,7 +17,7 @@
         <h3 class="no-buffer">
           <%= link_to summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id, active_year: plan.try(:active_year), market_kind: @market_kind, coverage_kind: @coverage_kind}), {:remote => true} do %>
             <% if plan.is_csr?%>
-              <i class="far fa-check-square" title="Eligible for Cost Sharing Reduction" data-toggle="tooltip"></i>
+              <i tabindex="0" class="far fa-check-square" title="Eligible for Cost Sharing Reduction" data-toggle="tooltip"></i>
             <% end %>
             <%= plan.name %>
           <% end %>
@@ -64,7 +64,7 @@
                 <% else %>
                   <% if plan.network_information.present? %>
                       Network Notes
-                      <i class='fa fa-question-circle' data-toggle="tooltip" data-container="body" title="<%= plan.network_information %>"></i>
+                      <i tabindex="0" class='fa fa-question-circle' data-toggle="tooltip" data-container="body" title="<%= plan.network_information %>"></i>
                   <% end %>
                 <% end %>
               </td>
