@@ -104,9 +104,14 @@
             <% end %>
           </div>
           <div class="col-md-12 add-more-link-<%=other_income_kind%>" id="add-more-link">
-             <%= link_to "<span class='fa-icon fa-stack plus-mr' aria-hidden='true'><i class= 'fa fa-circle-thin fa-stack-2x'></i> <i class='fa fa-plus fa-stack-1x'></i></span> <b>Add More</b> #{ label }".html_safe, "javascript:void(0);", :id => "add_new_other_income_kind", :class => "#{'hidden' unless @applicant.incomes.of_kind(other_income_kind).present? }" %>
+            <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_other_income_kind')" id="add_new_other_income_kind" class="<%= 'hidden' unless @applicant.incomes.of_kind(other_income_kind).present? %>">
+              <span class="fa-icon fa-stack plus-mr" aria-hidden="true">
+                <i class="fa fa-circle-thin fa-stack-2x"></i>
+                <i class="fa fa-plus fa-stack-1x"></i>
+              </span>
+              <b> <%= l10n("add_more") %> </b> <%= label %>
+            </a>          
           </div>
-
           <div id="new-other-income-form" class='new-other-income-form hidden <%= other_income_kind %>'>
             <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { other_income: FinancialAssistance::Income.new, kind: other_income_kind, disabled: true, new_form: true} %>
           </div>
