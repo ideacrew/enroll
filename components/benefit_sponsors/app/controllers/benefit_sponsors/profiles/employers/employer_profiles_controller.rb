@@ -163,7 +163,7 @@ module BenefitSponsors
           begin
             if uri.present?
               # making call to subscriber
-              event = event('events.benefit_sponsors.employer_profile.bulk_ce_upload', attributes: {s3_reference_key: filename, bucket_name: 'ce-roster-upload', employer_profile_id: @employer_profile.id, filename: filename})
+              event = event('events.benefit_sponsors.employer_profile.bulk_ce_upload', attributes: {s3_reference_key: filename, bucket_name: 'ce-roster-upload', employer_profile_id: @employer_profile.id, filename: filename, s3_uri: uri})
               event.success.publish if event.success?
               # once we put file to s3 then redirecting user to the employees list page
               flash[:notice] = l10n("employers.employer_profiles.ce_bulk_upload_success_message")

@@ -11,15 +11,14 @@ module Subscribers
         logger.debug "invoked EmployerProfileSubscriber with #{delivery_info}"
 
         payload = JSON.parse(response, symbolize_names: true)
-        uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{payload[:bucket_name]}##{payload[:s3_reference_key]}"
-
         filename = payload[:filename]
         employer_profile_id = payload[:employer_profile_id]
+        s3_uri = payload[:s3_uri]
 
         subscriber_logger.info "EmployerProfileSubscriber on_bulk_ce_upload payload: #{payload}"
-        subscriber_logger.info "EmployerProfileSubscriber, uri: #{uri}, filename: #{filename}, employer_profile_id: #{employer_profile_id}"
+        subscriber_logger.info "EmployerProfileSubscriber, uri: #{s3_uri}, filename: #{filename}, employer_profile_id: #{employer_profile_id}"
 
-        result = Operations::BenefitSponsors::EmployerProfile::BulkCeUpload.new.call(uri: uri, employer_profile_id: employer_profile_id, filename: filename)
+        result = Operations::BenefitSponsors::EmployerProfile::BulkCeUpload.new.call(uri: s3_uri, employer_profile_id: employer_profile_id, filename: filename)
 
         begin
           if result.success?
