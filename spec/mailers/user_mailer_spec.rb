@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe UserMailer do
@@ -136,5 +138,22 @@ RSpec.describe UserMailer do
     it "should render the email with the proper text" do
       expect(identity_verification_denial.body.raw_source).to include(person_with_work_email.first_name)
     end
+  end
+end
+
+RSpec.describe UserMailer, "sending a approval linked notification email for a broker or broker staff" do
+  include Config::SiteHelper
+
+  let(:email) { "some-broker@adomain.com"}
+  let(:name) { "Broker Name"}
+
+  subject { UserMailer.broker_or_broker_staff_linked_invitation_email(email, name) }
+
+  it "has the login link" do
+    expect(subject.body.raw_source.include?("href=#{site_main_web_address_url}")).to be_truthy
+  end
+
+  it "has the greeting" do
+    expect(subject.body.raw_source.include?("Hi #{name},")).to be_truthy
   end
 end
