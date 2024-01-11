@@ -14,7 +14,7 @@
     <%= javascript_pack_tag 'legacy', 'data-turbolinks-track': 'reload' %>
     <%= csrf_meta_tags %>
 
-    <% if EnrollRegistry.feature_enabled?(:contrast_level_aa) %>
+    <% if true %>
       <%= javascript_pack_tag 'contrast_level_aa' %>
       <%= stylesheet_pack_tag 'contrast_level_aa' %>
     <% end %>
