@@ -20,7 +20,7 @@ RSpec.describe Operations::BenefitSponsors::EmployerProfile::BulkCeUpload, type:
     let!(:census_employees) {FactoryBot.create_list(:benefit_sponsors_census_employee, 2, :owner, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship) }
     let(:input_params) do
       {
-        s3_reference_key: 'sample-key', bucket_name: bucket_name, employer_profile_id: employer_profile.id, filename: filename, s3_uri: s3_uri
+        s3_reference_key: 'sample-key', bucket_name: bucket_name, employer_profile_id: employer_profile.id, filename: filename, uri: s3_uri
       }
     end
 
@@ -35,7 +35,7 @@ RSpec.describe Operations::BenefitSponsors::EmployerProfile::BulkCeUpload, type:
       context 'with valid input params' do
         before do
           s3_object = instance_double(Aws::S3Storage)
-          allow(Aws::S3Storage).to receive(:find).with(uri).and_return(s3_object)
+          allow(Aws::S3Storage).to receive(:find).with(s3_uri).and_return(s3_object)
           roster_upload_form = instance_double(::BenefitSponsors::Forms::RosterUploadForm)
           allow(::BenefitSponsors::Forms::RosterUploadForm).to receive(:call).with(any_args).and_return(roster_upload_form)
           allow(roster_upload_form).to receive(:save).and_return(true)
