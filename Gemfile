@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 source 'https://rubygems.org'
-git_source(:github) { |repo| "https://github.com/#{repo}.git" }
+git_source(:github) { |repo| 'https://github.com/#{repo}.git' }
 
 gem 'rails', '~> 5.2.4.3'
 gem 'sidekiq'
@@ -28,21 +28,21 @@ gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar.git
 #######################################################
 # Local components/engines
 #######################################################
-gem 'acapi',              git: "https://github.com/ideacrew/acapi.git", branch: 'trunk'
-gem 'aca_entities',       git: 'https://github.com/ideacrew/aca_entities.git', branch: 'trunk'
-gem 'event_source',       git:  'https://github.com/ideacrew/event_source.git', branch: 'trunk'
-gem "benefit_markets",    path: "components/benefit_markets"
-gem "benefit_sponsors",   path: "components/benefit_sponsors"
+gem 'acapi',                git:  'https://github.com/ideacrew/acapi.git', branch: 'trunk'
+gem 'aca_entities',         git:  'https://github.com/ideacrew/aca_entities.git', branch: 'trunk'
+gem 'event_source',         git:  'https://github.com/ideacrew/event_source.git', branch: 'trunk'
+gem 'benefit_markets',      path: 'components/benefit_markets'
+gem 'benefit_sponsors',     path: 'components/benefit_sponsors'
 gem 'financial_assistance', path: 'components/financial_assistance'
-gem "notifier",           path: "components/notifier"
-gem 'openhbx_cv2',        git:  'https://github.com/ideacrew/openhbx_cv2.git', branch: 'trunk'
-gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'trunk'
+gem 'notifier',             path: 'components/notifier'
+gem 'openhbx_cv2',          git:  'https://github.com/ideacrew/openhbx_cv2.git', branch: 'trunk'
+gem 'resource_registry',    git:  'https://github.com/ideacrew/resource_registry.git', branch: 'trunk'
 # gem 'resource_registry',  git: '../resource_registry'
 
-gem "sponsored_benefits", path: "components/sponsored_benefits"
-gem "transport_gateway",  path: "components/transport_gateway"
-gem "transport_profiles", path: "components/transport_profiles"
-gem 'ui_helpers',         path: "components/ui_helpers"
+gem 'sponsored_benefits', path: 'components/sponsored_benefits'
+gem 'transport_gateway',  path: 'components/transport_gateway'
+gem 'transport_profiles', path: 'components/transport_profiles'
+gem 'ui_helpers',         path: 'components/ui_helpers'
 #######################################################
 
 ## MongoDB gem dependencies
@@ -53,7 +53,7 @@ gem 'mongo_session_store',      '~> 3.1'
 gem 'mongoid-autoinc',          '~> 6.0'
 gem 'mongoid-history',          '~> 0.8'
 # gem 'mongoid-versioning',       '~> 1.2.0'
-gem 'mongoid_userstamp',        '~> 0.4', :path => "./project_gems/mongoid_userstamp-0.4.0"
+gem 'mongoid_userstamp',        '~> 0.4', :path => './project_gems/mongoid_userstamp-0.4.0'
 gem 'mongoid_rails_migrations', '~> 1.2'
 
 ## General gems
@@ -70,9 +70,9 @@ gem 'combine_pdf',              '~> 1.0'
 gem 'config',                   '~> 2.0'
 gem 'curl',                     '~> 0.0.9'
 gem 'devise',                   '~> 4.5'
-gem 'devise-jwt', "0.9.0"
-gem 'warden-jwt_auth', "0.6.0"
-gem 'jwt', "~> 2.2.1"
+gem 'devise-jwt',               '0.9.0'
+gem 'warden-jwt_auth',          '0.6.0'
+gem 'jwt',                      '~> 2.2.1'
 gem 'haml',                     '~> 5.0'
 gem 'httparty',                 '~> 0.16'
 gem 'i18n',                     '~> 1.5'
@@ -93,7 +93,7 @@ gem 'nokogiri'
 gem 'nokogiri-happymapper',     '~> 0.8.0', :require => 'happymapper'
 gem 'non-stupid-digest-assets'
 gem 'pundit',                   '~> 2.0'
-gem "recaptcha",                '~> 4.13', require: 'recaptcha/rails'
+gem 'recaptcha',                '~> 4.13', require: 'recaptcha/rails'
 gem 'redcarpet',                '~> 3.4'
 gem 'redis',                    '~> 4.0'
 gem 'redis-rails',              '~> 5.0.2'
@@ -113,15 +113,16 @@ gem 'wicked_pdf',               '~> 1.1.0'
 gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
 gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
-gem 'loofah', '~> 2.3.1'
-gem 'stimulus_reflex', '3.4.1'
+gem 'loofah',                   '~> 2.3.1'
+gem 'stimulus_reflex',          '3.4.1'
 gem 'rack-cors'
+gem 'holidays',                 '~> 8.6'
 
-gem 'dry-configurable', '0.13.0'
-gem 'dry-container', '0.9.0'
+gem 'dry-configurable',         '0.13.0'
+gem 'dry-container',            '0.9.0'
 
 group :development do
-  gem "certified",              '~> 1'
+  gem 'certified',              '~> 1'
   gem 'overcommit',             '~> 0.47'
   gem 'rubocop',                require: false
   gem 'rubocop-rspec'
