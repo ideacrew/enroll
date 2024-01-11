@@ -19,7 +19,7 @@ RSpec.describe Operations::Families::CreateOrUpdateMember, type: :model, dbclean
   let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
 
   let(:params) do
-    applicant_params.merge(family_id: family.id, relationship: 'spouse')
+    {applicant_params: applicant_params.merge(relationship: 'spouse'), family_id: family.id}
   end
 
   it 'should be a container-ready operation' do
@@ -31,7 +31,7 @@ RSpec.describe Operations::Families::CreateOrUpdateMember, type: :model, dbclean
       before do
         @result = subject.call(params)
         family.reload
-        @person = Person.by_hbx_id(params[:person_hbx_id]).first
+        @person = Person.by_hbx_id(applicant_params[:person_hbx_id]).first
       end
 
       it 'returns a success result' do
@@ -67,7 +67,7 @@ RSpec.describe Operations::Families::CreateOrUpdateMember, type: :model, dbclean
       before do
         @result = subject.call(params.except(:family_id))
         family.reload
-        @person = Person.by_hbx_id(params[:person_hbx_id]).first
+        @person = Person.by_hbx_id(applicant_params[:person_hbx_id]).first
       end
 
       it 'should return failure' do
@@ -86,7 +86,7 @@ RSpec.describe Operations::Families::CreateOrUpdateMember, type: :model, dbclean
 
   context '#update member' do
     let(:params) do
-      applicant_params.merge(family_id: family.id, gender: 'female', is_incarcerated: false, :ethnicity => ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"], i94_number: '45612378985', relationship: 'spouse')
+      {applicant_params: applicant_params.merge(gender: 'female', is_incarcerated: false, :ethnicity => ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"], i94_number: '45612378985', relationship: 'spouse'), family_id: family.id}
     end
 
     let!(:create_spouse) do
@@ -98,7 +98,7 @@ RSpec.describe Operations::Families::CreateOrUpdateMember, type: :model, dbclean
       before do
         @result = subject.call(params)
         family.reload
-        @person = Person.by_hbx_id(params[:person_hbx_id]).first
+        @person = Person.by_hbx_id(applicant_params[:person_hbx_id]).first
       end
 
       it 'returns a success result' do
@@ -132,7 +132,7 @@ RSpec.describe Operations::Families::CreateOrUpdateMember, type: :model, dbclean
       before do
         @result = subject.call(params.except(:family_id))
         family.reload
-        @person = Person.by_hbx_id(params[:person_hbx_id]).first
+        @person = Person.by_hbx_id(applicant_params[:person_hbx_id]).first
       end
 
       it 'should return failure' do
@@ -145,6 +145,29 @@ RSpec.describe Operations::Families::CreateOrUpdateMember, type: :model, dbclean
 
       it 'should not create family member' do
         expect(family.family_members.count).to eq 1
+      end
+    end
+  end
+
+  context '#sanitize_params' do
+    let(:subject) { described_class.new }
+
+    context 'when dob is not present' do
+      it 'returns a failure result' do
+        result = subject.sanitize_params(applicant_params.except(:dob))
+        expect(result).to be_failure
+      end
+    end
+
+    context 'when dob is present' do
+      it 'returns a success result' do
+        result = subject.sanitize_params(applicant_params)
+        expect(result).to be_success
+      end
+
+      it 'converts dob to the desired format if it is not a string' do
+        result = subject.sanitize_params(applicant_params)
+        expect(result.value!).to eq(applicant_params.merge(dob: dob.strftime('%d/%m/%Y')))
       end
     end
   end

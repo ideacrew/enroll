@@ -107,7 +107,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'deductions-delete')" id="deductions-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
           <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
         </div>
         <div class="modal-body">
@@ -126,7 +126,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'all-deductions-delete')" id="all-deductions-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
           <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
         </div>
         <div class="modal-body">
