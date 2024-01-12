@@ -112,6 +112,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.enrollments' => "Enrollment(s)",
   :'en.edit' => "Edit",
   :'en.open' => "Open",
+  :'en.add_more' => "Add More",
   :'en.insured.aptc_or_csr' => "APTC/CSR",
   :'en.members' => "Members",
   :'en.plan_contact_info' => "Plan Contact Info",
