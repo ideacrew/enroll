@@ -2,7 +2,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <button class="close" data-dismiss="modal" type="button">&times;</button>
+        <button onkeydown="handleContactInfoKeyDown(event, 'close_contact_plan', '<%= plan.kind.to_s %>-<%= plan.id %>-<%= hbx_enrollment.hbx_id%>')" id="close_contact_plan" class="close" data-dismiss="modal" type="button">&times;<span class="hide"><%=l10n("close")%></span></button>
         <h4 class="modal-title"><%= plan.issuer_profile.legal_name %>
           <%=l10n("plans.csl")%></h4>
       </div>

@@ -47,7 +47,7 @@
           <% end %>
         </div>
         <% unless @enrollment.employee_role.present? %>
-          <span class="btn btn-default" data-target="#how_to_pay" data-toggle="modal">How to Pay</span>
+          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'how_to_pay')" id="how_to_pay" class="btn btn-default" data-target="#how_to_pay" data-toggle="modal">How to Pay</span>
         <% end %>
         <%= render partial: "insured/plan_shoppings/pay_now", locals: { source: "Plan Shopping", hbx_enrollment: @enrollment }%>
         <%= link_to 'Print', '#', id: 'btnPrint', class: "btn btn-default interaction-click-control-print-purchase-confirmation" %>

@@ -237,6 +237,18 @@ Then(/^.+ should not see error message (.*)$/) do |text|
   page.should have_no_content(text)
 end
 
+Given(/^the strong password length feature is (.+)$/) do |feature|
+  if feature == "enabled"
+    allow(EnrollRegistry[:strong_password_length].feature).to receive(:is_enabled).and_return(true)
+  else
+    allow(EnrollRegistry[:strong_password_length].feature).to receive(:is_enabled).and_return(false)
+  end
+end
+
+Then(/^Individual should see a minimum password length of (.+)$/) do |length|
+  expect(page).to have_content("#{length} #{l10n('devise.registrations.characters_minimum')}")
+end
+
 Then(/^.+ should see the weak password error message$/) do
   page.should have_content(l10n("devise.errors.password_strength"))
 end
@@ -464,7 +476,7 @@ end
 And(/^.+ clicks on the Continue button of the Household Info page/) do
   screenshot("line 161")
   sleep 2
-  find(IvlIapFamilyInformation.continue_btn).click
+  find('.interaction-click-control-continue').click
 end
 
 Then(/consumer clicked on Go To My Account/) do
@@ -480,8 +492,8 @@ end
 
 Then(/Individual creates a new HBX account with a weak password$/) do
   fill_in CreateAccount.email_or_username, :with => "testflow@test.com"
-  fill_in CreateAccount.password, :with => "WeakPass1!"
-  fill_in CreateAccount.password_confirmation, :with => "WeakPass1!"
+  fill_in CreateAccount.password, :with => "BadPw1!"
+  fill_in CreateAccount.password_confirmation, :with => "BadPw1!"
   find(CreateAccount.create_account_btn).click
 end
 
@@ -519,6 +531,9 @@ And(/I signed in$/) do
   find(SignIn.sign_in_btn).click
 end
 
+When(/^the individual continues to the Choose Coverage page$/) do
+  expect(page).to have_content IvlChooseCoverage.choose_coverage_for_your_household_text
+end
 
 When(/^the individual clicks the Continue button of the Group Selection page$/) do
   expect(page).to have_content IvlChooseCoverage.choose_coverage_for_your_household_text

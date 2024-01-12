@@ -10,15 +10,27 @@
         </p>
       </div>
       <div class="modal-footer">
-        <%= link_to '<button class="btn btn-default pay_online_confirmation pull-right left-margin">Pay Online</button>'.html_safe, @wf_url, target: :_blank %> <span class="btn btn-default btn-small" data-dismiss="modal">Cancel</span>
+        <button class="btn btn-default pay_online_confirmation pull-right left-margin" id="pay-online-confirmation-final"><%= l10n("pay_online")%></button>
+        <span class="btn btn-default btn-small" data-dismiss="modal"><%= l10n("cancel")%></span>
       </div>
     </div>
   </div>
 </div>
 
+
 <script type="text/javascript">
   var conf_id = '#payOnlineConfirmation_' + '<%= @employer_profile.id %>';
   $('.pay_online_confirmation.btn').click(function() {
+    $.ajax({
+      url: '/benefit_sponsors/profiles/employers/employer_profiles/<%= @employer_profile.id %>/wells_fargo_sso',
+      method: 'GET',
+      dataType: 'json',
+      success: function(response) {
+        window.open(response.wf_url, '_blank');
+      }
+    });
+
+    // Hide the modal
     $(conf_id).modal('hide');
   });
 </script>

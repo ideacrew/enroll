@@ -3652,10 +3652,10 @@ ul.progress-wrapper li.complete {
     list-style: none;
     /*border-left: 2px solid #007bc4;*/
     padding-left: 35px;
-    color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+    color: var(--theme-primary-blue, #007bc4);
 }
 ul.progress-wrapper li.complete span.circle-progress {
-    background-color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+    background-color: var(--theme-primary-blue, #007bc4);
     border: none;
     width: 14px;
     left: 9px;
@@ -3664,14 +3664,14 @@ ul.progress-wrapper li.complete span.circle-progress {
 ul.progress-wrapper li.active {
     padding: 5px 0px;
     list-style: none;
-    /*border-left: 2px solid #007bc4;*/
+    /*border-left: 2px solid var(--theme-primary-blue, #007bc4);*/
     padding-left: 35px;
     font-weight: bold;
-    color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+    color: var(--theme-primary-blue, #007bc4);
 }
 ul.progress-wrapper li.active span.circle-progress {
     background-color: #ffffff;
-    border: 2px solid <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+    border: 2px solid var(--theme-primary-blue, #007bc4);
     width: 14px;
     left: 9px;
     height: 14px;
@@ -3686,7 +3686,7 @@ ul.progress-wrapper li.active span.circle-progress {
     margin-top: 5px;
 }
 ul.progress-wrapper li.complete .vertical-line-progress {
-    background-color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+    background-color: var(--theme-primary-blue, #007bc4);
 }
 ul.progress-wrapper li.active .vertical-line-progress {
     background-color: #cacaca;
@@ -3933,6 +3933,10 @@ label.checkbox-custom-label {
     margin: 0;
     padding: 0;
     text-transform: uppercase;
+}
+.checkbox-custom:focus + .checkbox-custom-label::before, .radio-custom:focus + .radio-custom-label::before{
+    padding: 0;
+    outline: -webkit-focus-ring-color auto 1px; 
 }
 .checkbox label {
     padding: 0;
@@ -4660,7 +4664,7 @@ table.table.table-no-sytle td {
 #qle-header .info-wrapper h4{
   margin: 0;
   line-height: 1.4em;
-  color: $qle-header-color;
+  color: var(--theme-primary-blue, $qle-header-color);
 }
 
 #qle-menu h5 {
@@ -4724,7 +4728,7 @@ position: absolute;
   margin-right: 20px;
 }
 #shop-for-plans-widget .btn, .employer-panel .btn {
-  color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+  color: var(--theme-primary-blue, #007bc4);
   font-weight: 600;
 }
 
