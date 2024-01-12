@@ -7,6 +7,7 @@
     --background-light-red: #F9F1F1; //error notice background color
     --primary-green: #5A7334; //green continue buttons
     --secondary-green: #738C4A; //green for continue button hover
+    --success-green-background: #E3F9E6; //green for success pill
 
     --primary-yellow: #FFD600;
     --soft-yellow: #FFFADF;
@@ -19,6 +20,7 @@
     --status-blue: #003260; //status pending
     --status-yellow: #E5A900; //status needs info
     --status-green: #027314; //status compelte
+    --light-gray: #A19F9D;
 
     --font: Barlow, sans-serif;
     --default-font-color: #323130;
@@ -48,7 +50,18 @@
   background-color: var(--status-yellow);
 }
 
+.success-notice {
+  padding: 8px 14px 8px 14px;
+  border-radius: 18px;
+  border: 1px solid ;
+  background-color: var(--success-green-background);
+}
+
 .warning-status-hide {
+  display: none !important;
+}
+
+.success-status-hide {
   display: none !important;
 }
 
@@ -67,4 +80,16 @@
   background-position: center;
   color: transparent !important;
   font-size: 27px !important;
+}
+
+.ready-4-review .note.purple::before {
+  display: none;
+}
+
+.note.purple {
+  display: none;
+}
+
+.complete-icon-text{
+  font-weight: normal !important;
 }
