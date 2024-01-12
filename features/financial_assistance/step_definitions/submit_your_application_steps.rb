@@ -16,7 +16,7 @@ Given(/^the user is on FAA Household Info: Family Members page$/) do
   # should be on application year select page
   # TODO: Will need to be updated when year select logic implemented
   if EnrollRegistry.feature_enabled?(:iap_year_selection)
-    find('a.interaction-click-control-continue').click
+    find('.interaction-click-control-continue').click
     sleep 2
   end
 
@@ -58,6 +58,35 @@ And(/^the user is on the FAA Household Info page$/) do
   # should be on checklist page now
   #find('a.interaction-click-control-continue').click
 
+end
+
+Given(/^all applicants are in Info Completed state%/) do
+  until find_all('.btn', text: 'ADD INCOME & COVERAGE INFO').empty?
+    find_all('.btn', text: 'ADD INCOME & COVERAGE INFO')[0].click
+    choose(IvlIapTaxInformationPage.file_taxes_no_radiobtn, wait: 5)
+    choose(IvlIapTaxInformationPage.claimed_as_tax_dependent_no_radiobtn)
+    find(IvlIapTaxInformationPage.continue_btn).click
+    choose(IvlIapJobIncomeInformationPage.has_job_income_no_radiobtn)
+    find(IvlIapJobIncomeInformationPage.continue_btn).click
+
+    choose(IvlIapOtherIncomePage.has_unemployment_income_no_radiobtn)
+    choose(IvlIapOtherIncomePage.has_other_income_no_radiobtn)
+    find(IvlIapOtherIncomePage.continue_btn).click
+
+    choose(IvlIapIncomeAdjustmentsPage.income_adjustments_no_radiobtn)
+    find(IvlIapIncomeAdjustmentsPage.continue_btn).click
+
+    choose(IvlIapHealthCoveragePage.has_enrolled_health_coverage_no_radiobtn)
+    choose(IvlIapHealthCoveragePage.has_eligible_health_coverage_no_radiobtn)
+    find(IvlIapHealthCoveragePage.continue).click
+    choose(IvlIapOtherQuestions.is_pregnant_no_radiobtn)
+    choose(IvlIapOtherQuestions.is_post_partum_period_no_radiobtn)
+    choose(IvlIapOtherQuestions.person_blind_no_radiobtn)
+    choose(IvlIapOtherQuestions.has_daily_living_help_no_radiobtn)
+    choose(IvlIapOtherQuestions.need_help_paying_bills_no_radiobtn)
+    choose(IvlIapOtherQuestions.physically_disabled_no_radiobtn)
+    find(IvlIapOtherQuestions.continue_btn).click
+  end
 end
 
 Given(/^all applicants are in Info Completed state with all types of income$/) do
@@ -155,12 +184,12 @@ Then(/^the Parent Living Outside Home Attestation Checkbox is present$/) do
 end
 
 Given(/^a required question is not answered$/) do
-  expect(find_all("input[type='checkbox']").any? {|checkbox| !checkbox.checked?}).to be(true)
-  expect(false).to eq(find('#living_outside_no').checked?).and eq(find('#living_outside_yes').checked?)
+  expect(find("#application_medicaid_terms").checked?).to be(false)
 end
 
 Given(/^the user has not signed their name$/) do
-  expect(true).to eq(find('#first_name_thank_you').text.empty?).or eq(find('#last_name_thank_you').text.empty?)
+  expect(find('#first_name_thank_you').text.empty?).to eq(true)
+  expect(find('#last_name_thank_you').text.empty?).to eq(true)
 end
 
 Then(/^the submit button will be disabled$/) do
@@ -168,9 +197,12 @@ Then(/^the submit button will be disabled$/) do
 end
 
 Given(/^all required questions are answered$/) do
-  find_all("input[type='checkbox']").each {|checkbox| checkbox.set(true)}
+  # getting and looping through each checkbox id looks unnecessary but using find_all directly does not work as expected
+  check_box_ids = find_all("input[type='checkbox']").map { |checkbox| checkbox[:id] }
+  check_box_ids.each { |id| find("##{id}").check }
+  # sets radio button to no
   find('#living_outside_no').set(true)
-  find('#application_report_change_terms').click
+  find('#medicaid_determination_no').set(true)
 end
 
 And(/^the user should be able to see medicaid determination question$/) do
@@ -180,14 +212,11 @@ And(/^the user should be able to see medicaid determination question$/) do
   end
 end
 
-Given(/^all required questions are answered including report change terms field$/) do
-  find_all("input[type='checkbox']").each {|checkbox| checkbox.set(true)}
-  find('#living_outside_no').set(true)
-end
-
 Given(/^the user has signed their name$/) do
   fill_in IvlConfirmYourPlanSelection.first_name, with: application.primary_applicant.first_name
   fill_in IvlConfirmYourPlanSelection.last_name, with: application.primary_applicant.last_name
+  # Remove focus from the last name field by clicking on header text
+  find('.fa-darkblue').click
 end
 
 Then(/^the submit button will be enabled$/) do

@@ -363,9 +363,6 @@ registry:
       - key: :address_verification
         item: :address_verification
         is_enabled: <%= ENV['ADDRESS_VERIFICATION_IS_ENABLED'] || false %>
-      - key: :eligibility_audit_log
-        item: :eligibility_audit_log
-        is_enabled: <%= ENV['ELIGIBILITY_AUDIT_LOG_IS_ENABLED'] || false %>
       - key: :notify_address_changed
         is_enabled: <%= ENV['NOTIFY_ADDRESS_CHANGED_IS_ENABLED'] || false %>
       - key: :ce_roster_bulk_upload

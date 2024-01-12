@@ -198,7 +198,12 @@ document.addEventListener("turbolinks:load", function() {
       }
     });
     /* cancel benefit edits */
-    $('.benefit-kinds').on('click', 'a.benefit-cancel', function(e) {
+    $('.benefit-kinds').on('click keydown', 'a.benefit-cancel', function(e) {
+      // if key pressed is anything but enter, ignore it
+      if (e.type === 'keydown' && e.key !== 'Enter') {
+        return;
+      }
+
       e.preventDefault();
       stopEditingBenefit();
 

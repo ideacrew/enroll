@@ -558,7 +558,7 @@ end
 
 Given(/^expands the "Other Options" panel/) do
   # TODO: Maybe figure out how to do this with something other than glyphicon
-  other_actions_link = page.all('a').detect { |link| link[:class] == 'glyphicon glyphicon-plus pull-right' }
+  other_actions_link = page.all('a').detect { |link| link[:id] == 'open_button' }
   other_actions_link.click
   expect(page).to have_content(
     l10n(

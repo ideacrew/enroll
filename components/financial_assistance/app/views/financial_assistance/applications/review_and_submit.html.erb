@@ -58,7 +58,7 @@
                         <%= start_to_end_dates(embedded_document) %>
                         <span class= "ml10">
                           <%= link_to income_and_deductions_edit(@application, applicant, embedded_document), id: 'edit-income-and-deductions-pencil' do %>
-                            <i class="fa fa-pencil fa-lg"></i>
+                            <i class="fa fa-pencil fa-lg"><span class="hide"><%=l10n("edit")%></span></i>
                           <% end %>
                         </span>
                       </td>
@@ -78,7 +78,7 @@
                   <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                     <div class="col-md-7 annual-income-row">
                       <%= applicant.first_name %>'s annual income for <%= @application.assistance_year %>
-                      <a href="#net_annual_income" data-toggle="modal" data-target="#net_annual_income"><i class="fa fa-info-circle"></i></a> :
+                      <a href="#net_annual_income" data-toggle="modal" data-target="#net_annual_income"><i class="fa fa-info-circle"><span class="hide"><%=l10n("info")%></span></i></a> :
                     </div>
                     <div class="col-md-5">
                       <%= number_to_currency(applicant.net_annual_income) %>
@@ -149,7 +149,7 @@
                   <div class="col-md-11 form-heading"> TAX INFO</div>
                   <div class="col-md-1">
                     <%= link_to go_to_step_application_applicant_path(@application, applicant, 1), id: 'edit-tax-info-pencil' do %>
-                      <i class="fa fa-pencil fa-lg"></i>
+                      <i class="fa fa-pencil fa-lg"><span class="hide"><%=l10n("edit")%></span></i>
                     <% end %>
                   </div>
                 </div>
@@ -186,7 +186,7 @@
                   <div class="col-md-11">INCOME</div>
                   <div class="col-md-1">
                     <%= link_to application_applicant_incomes_path(@application, applicant), id: 'edit-income-pencil' do %>
-                      <i class="fa fa-pencil fa-lg"></i>
+                      <i class="fa fa-pencil fa-lg"><span class="hide"><%=l10n("edit")%></span></i>
                     <% end %>
                   </div>
                 </div>
@@ -275,7 +275,7 @@
                   <div class="col-md-11">INCOME ADJUSTMENTS</div>
                   <div class="col-md-1">
                     <%= link_to application_applicant_deductions_path(@application, applicant), id: 'edit-income-adjustments-pencil' do %>
-                      <i class="fa fa-pencil fa-lg"></i>
+                      <i class="fa fa-pencil fa-lg"><span class="hide"><%=l10n("edit")%></span></i>
                     <% end %>
                   </div>
                 </div>
@@ -291,7 +291,7 @@
                 <div class="col-md-11">HEALTH COVERAGE</div>
                 <div class="col-md-1">
                   <%= link_to application_applicant_benefits_path(@application, applicant), id: 'edit-health-coverage-pencil', rel: 'noopener noreferrer' do %>
-                    <i class="fa fa-pencil fa-lg"></i>
+                    <i class="fa fa-pencil fa-lg"><span class="hide"><%=l10n("edit")%></span></i>
                   <% end %>
                 </div>
               </div>
@@ -393,7 +393,7 @@
               <div class="col-md-11">OTHER QUESTIONS</div>
               <div class="col-md-1">
                 <%= link_to other_questions_application_applicant_path(@application, applicant), id: 'edit-other-questions-pencil' do %>
-                  <i class="fa fa-pencil fa-lg"></i>
+                  <i class="fa fa-pencil fa-lg"><span class="hide"><%=l10n("edit")%></span></i>
                 <% end %>
               </div>
             </div>
@@ -562,7 +562,7 @@
                 <div class="col-md-11">FAMILY RELATIONSHIPS</div>
                 <div class="col-md-1">
                   <%= link_to financial_assistance.application_relationships_path(@application), id: 'edit-family-relationships-pencil' do %>
-                    <i class="fa fa-pencil fa-lg"></i>
+                    <i class="fa fa-pencil fa-lg"><span class="hide"><%=l10n("edit")%></span></i>
                   <% end %>
                 </div>
               </div>

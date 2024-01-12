@@ -4,7 +4,20 @@ function handleRadioKeyDown(event, radioId) {
     document.getElementById(radioId).click(); 
   }
 }
-  
+
+function handleCitizenKeyDown(event, radioIdBase) {
+  if (event.key === 'Enter') {
+    const personElement = document.getElementById(`person_${radioIdBase}`);
+    const dependentElement = document.getElementById(`dependent_${radioIdBase}`);
+
+    if (personElement) {
+      personElement.click();
+    } else if (dependentElement) {
+      dependentElement.click();
+    }
+  }
+}
+
 function handleButtonKeyDown(event, buttonId) {
   if (event.key === 'Enter') { 
     document.getElementById(buttonId).click(); 

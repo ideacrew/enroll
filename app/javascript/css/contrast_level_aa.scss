@@ -1,7 +1,7 @@
 :root {
     --secondary-font-color: #676C72; //secondary text gray
     --bold-font-color: #323130; //bold text
-    --theme-primary-100: #3B6B90; //primary blue
+    --theme-primary-blue: #3B6B90; //primary blue
     --theme-secondary: #425C6E; //secondary dark blue
     --primary-red: #D42537; //primary red
     --unfocused-red: #D4403A; //soft red color
@@ -43,8 +43,14 @@
   padding: 8px 14px 8px 14px;
   border-radius: 18px;
   border: 1px;
-  background-color: var(--soft-yellow);
+  background-color: var(--primary-orange);
 }
+
+.warning-status-hide {
+  display: none !important;
+}
+
+// use these in case we want to improve the icons used for "info needed" statuses on the FAA application workflow
 .warning-icon-small {
   background-image: url('../../assets/images/warning-icon-small.svg');
   background-repeat: no-repeat;

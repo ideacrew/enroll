@@ -173,6 +173,10 @@ def people
       broker_census_employee: true,
       password: 'aA1!aA1!aA1!',
       ssn: "222335220"
+    },
+    'Dual Role' => {
+      first_name: 'Dual',
+      last_name: 'Role'
     }
   }
 end

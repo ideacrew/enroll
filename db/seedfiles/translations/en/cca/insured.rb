@@ -62,6 +62,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.family_member' => "Family Member",
   :'en.family_members' => "Family Members",
   :'en.complete' => "Complete",
+  :'en.completed' => "Completed",
   :'en.view_documents' => "View Documents",
   :'en.download' => "Download",
   :'en.name' => "Name",
@@ -92,6 +93,9 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.insured.families.verification.documents_FAQ' => "Documents We Accept",
   :'en.delete' => "Delete",
   :'en.deleted' => "Deleted",
+  :'en.info' => "Info",
+  :'en.next' => "Next Page",
+  :'en.previous' => "Previous Page",
   :'en.insured.families.medicaid_and_tax_credits' => "Medicaid & Tax Credits",
   :'en.insured.families.apply_for_medicaid_widget' => "Apply, renew, read notices or find out what documents are needed for Medicaid or tax credit assisted coverage",
   :'en.insured.families.aptc_or_csr_enrollments' => "APTC / CSR Enrollments",
@@ -107,6 +111,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.active' => "Active",
   :'en.enrollments' => "Enrollment(s)",
   :'en.edit' => "Edit",
+  :'en.open' => "Open",
   :'en.insured.aptc_or_csr' => "APTC/CSR",
   :'en.members' => "Members",
   :'en.plan_contact_info' => "Plan Contact Info",
@@ -218,7 +223,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.my_broker' => "My Broker",
   :'en.action_needed' => "Action Needed",
   :'en.upload_paper_application' => "Upload Paper Application",
-  :'en.audit_log' => "Audit-Log",
+  :'en.audit_log' => "Audit Log",
   :'en.messages' => "Messages",
   :'en.my_account' => "My Account",
   :'en.manage_family' => "Manage Family",
@@ -438,5 +443,6 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.insured.verification_doc_file_error' => "Unable to upload file. Acceptable file types - PDF, JPEG, PNG, and GIF and ensure it does not exceed 100 MB.",
   :'en.insured.verification_acceptable_file_types_text' => "Acceptable file types:",
   :'en.insured.verification_acceptable_file_types' => "PDF, JPEG, PNG, and GIF",
-  :'en.insured.verification_max_file_size' => "File should not exceed 100 MB"
+  :'en.insured.verification_max_file_size' => "File should not exceed 100 MB",
+  :'en.waiting_for_eligibility' => "Waiting for your eligibility results..."
 }.freeze

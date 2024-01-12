@@ -40,7 +40,7 @@
   background:#fff;
   overflow:hidden;
   background-clip:padding-box;
-  border: 1px solid var(--soft-yellow, #EAAA00);
+  border: 1px solid var(--primary-orange, #EAAA00);
 }
 
 .note.purple {
@@ -50,13 +50,13 @@
   border: 0px;
 }
 .note.purple:before {
-  border-color:#fff #eee var(--soft-yellow, #EAAA00) var(--soft-yellow, #EAAA00); background:transparent;
+  border-color:#fff #eee var(--primary-orange, #EAAA00) var(--primary-orange, #EAAA00); background:transparent;
 }
 .note.white {
   background:#ffffff; color: #414141; border: 1px solid red;
 }
 .note.white:before {
-  border-color:#fff #fff var(--soft-yellow, #EAAA00) var(--soft-yellow, #EAAA00); background: var(--soft-yellow, #EAAA00);
+  border-color:#fff #fff var(--primary-orange, #EAAA00) var(--primary-orange, #EAAA00); background: var(--primary-orange, #EAAA00);
 }
 
 .note p {
@@ -68,20 +68,20 @@
 
 /*ready for review*/
 .ready-4-review .whitebox {
-  border-color: #69A30D;
+  border-color: var( --success-green, #69A30D);
 }
 .ready-4-review .note.purple::before {
-  border-color:#fff #eee #69A30D #69A30D;
+  border-color:#fff #eee var( --success-green, #69A30D) var( --success-green, #69A30D);
 }
 .whitebox {
   padding: 0;
 }
 .whitebox .info-needed {
-  border-top: 1px solid var(--soft-yellow, #EAAA00);
-  border-bottom: 1px solid var(--soft-yellow, #EAAA00);
+  border-top: 1px solid var(--primary-orange, #EAAA00);
+  border-bottom: 1px solid var(--primary-orange, #EAAA00);
   color: var(--primary-black, #ffffff);
   font-size: 16px;
-  background-color: var(--soft-yellow, #EAAA00);
+  background-color: var(--primary-orange, #EAAA00);
 }
 .whitebox .info-needed .fa {
   font-size: 22px;
@@ -90,7 +90,7 @@
 }
 .whitebox .info-needed span {
   font-weight: 600;
-  color: var(--primary-black, #ffffff);
+  color: var(--primary-white, #ffffff);
 }
 .whitebox .sub-desc {
   font-size: 12px;
@@ -112,9 +112,9 @@
   padding: .7em 1.5em 1em;
 }
 .ready-4-review .whitebox .info-needed {
-  border-top: 1px solid #69A30D;
-  border-bottom: 1px solid #69A30D;
-  background-color: #69A30D;
+  border-top: 1px solid var( --success-green, #69A30D);
+  border-bottom: 1px solid var( --success-green, #69A30D);
+  background-color: var( --success-green, #69A30D);
 }
 
 .app-year-header {
