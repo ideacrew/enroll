@@ -951,7 +951,6 @@ describe "Enabled/Disabled IVL market" do
   describe '#eligible_to_redirect_to_home_page?' do
     let(:user) { FactoryBot.create(:user, person: person) }
     let(:person) { FactoryBot.create(:person, :with_consumer_role) }
-
     let(:brce_enabled_or_disabled) { false }
 
     before :each do
@@ -1056,9 +1055,8 @@ describe "Enabled/Disabled IVL market" do
   end
 
   describe '#insured_role_exists?' do
-    let(:user) { FactoryBot.create(:user, person: person) }
-
     let(:brce_enabled_or_disabled) { false }
+    let(:user) { FactoryBot.create(:user, person: person) }
 
     before :each do
       allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
@@ -1109,180 +1107,6 @@ describe "Enabled/Disabled IVL market" do
           it 'returns false' do
             expect(helper.insured_role_exists?(user)).to eq(false)
           end
-        end
-      end
-    end
-  end
-
-  describe '#display_i_am_broker_for_consumer?' do
-    let(:site) do
-      FactoryBot.create(
-        :benefit_sponsors_site,
-        :with_benefit_market,
-        :as_hbx_profile,
-        site_key: ::EnrollRegistry[:enroll_app].settings(:site_key).item
-      )
-    end
-
-    let(:broker_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
-    let(:broker_agency_profile) { broker_agency_organization.broker_agency_profile }
-    let(:broker_agency_id) { broker_agency_profile.id }
-
-    let(:broker_agency_organization2) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
-    let(:broker_agency_profile2) { broker_agency_organization2.broker_agency_profile }
-
-    let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, :with_broker_role) }
-    let(:broker_role) { person.broker_role }
-
-    let(:broker_agency_staff_role) do
-      person.create_broker_agency_staff_role(
-        benefit_sponsors_broker_agency_profile_id: broker_agency_id
-      )
-    end
-
-    let(:brce_enabled_or_disabled) { false }
-
-    before :each do
-      allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
-      allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_role_consumer_enhancement).and_return(brce_enabled_or_disabled)
-    end
-
-    context 'resource registry feature is enabled' do
-      let(:brce_enabled_or_disabled) { true }
-
-      context 'when:
-        - person does not have active consumer role' do
-
-        let(:person) { FactoryBot.create(:person) }
-
-        it 'returns false' do
-          expect(helper.display_i_am_broker_for_consumer?(person)).to eq(false)
-        end
-      end
-
-      context 'when:
-        - person has an active consumer role
-        - person does not have a broker role' do
-
-        let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
-
-        it 'returns false' do
-          expect(helper.display_i_am_broker_for_consumer?(person)).to eq(false)
-        end
-      end
-
-      context 'when:
-        - person has an active consumer role
-        - person has a broker role
-        - person does not have an active broker role' do
-
-        it 'returns false' do
-          expect(helper.display_i_am_broker_for_consumer?(person)).to eq(false)
-        end
-      end
-
-      context 'when:
-        - person has an active consumer role
-        - person has a broker role
-        - broker_role is a primary broker for an agency
-        - person has an active broker role
-        - person does not have broker_agency_staff_role' do
-
-        before do
-          broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
-          broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id)
-          broker_role.approve!
-        end
-
-        it 'returns false' do
-          expect(helper.display_i_am_broker_for_consumer?(person)).to eq(false)
-        end
-      end
-
-      context 'when:
-        - person has an active consumer role
-        - person has a broker role
-        - broker_role is a primary broker for an agency
-        - person has an active broker role
-        - person has a broker_agency_staff_role
-        - person does not have an active broker_agency_staff_role' do
-
-        let(:broker_agency_id) { broker_agency_profile2.id }
-
-        before do
-          broker_agency_staff_role
-          broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
-          broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id)
-          broker_role.approve!
-        end
-
-        it 'returns false' do
-          expect(helper.display_i_am_broker_for_consumer?(person)).to eq(false)
-        end
-      end
-
-      context 'when:
-        - person has an active consumer role
-        - person has a broker role
-        - broker_role is a primary broker for an agency
-        - person has an active broker role
-        - person has a broker_agency_staff_role
-        - person has an active broker_agency_staff_role
-        - both broker_agency_staff_role and broker_role are not linked to the same Broker Agency Profile' do
-
-        let(:broker_agency_id) { broker_agency_profile.id }
-
-        before do
-          broker_agency_staff_role.broker_agency_accept!
-          broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_profile2.id)
-          broker_agency_profile2.update_attributes!(primary_broker_role_id: broker_role.id)
-          broker_role.approve!
-        end
-
-        it 'returns false' do
-          expect(helper.display_i_am_broker_for_consumer?(person)).to eq(false)
-        end
-      end
-
-      context 'when:
-        - person has an active consumer role
-        - person has a broker role
-        - broker_role is a primary broker for an agency
-        - person has an active broker role
-        - person has a broker_agency_staff_role
-        - person does not have a matching active broker_agency_staff_role
-        - both broker_agency_staff_role and broker_role are linked to the same Broker Agency Profile' do
-
-        before do
-          broker_agency_staff_role
-          broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
-          broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id)
-          broker_role.approve!
-        end
-
-        it 'returns false' do
-          expect(helper.display_i_am_broker_for_consumer?(person)).to eq(false)
-        end
-      end
-
-      context 'when:
-        - person has an active consumer role
-        - person has a broker role
-        - broker_role is a primary broker for an agency
-        - person has an active broker role
-        - person has a broker_agency_staff_role
-        - person has an active broker_agency_staff_role
-        - both broker_agency_staff_role and broker_role are linked to the same Broker Agency Profile' do
-
-        before do
-          broker_agency_staff_role.broker_agency_accept!
-          broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
-          broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id)
-          broker_role.approve!
-        end
-
-        it 'returns true' do
-          expect(helper.display_i_am_broker_for_consumer?(person)).to eq(true)
         end
       end
     end

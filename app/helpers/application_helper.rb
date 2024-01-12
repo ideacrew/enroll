@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ApplicationHelper
   include FloatHelper
   include ::FinancialAssistance::VerificationHelper
@@ -967,32 +969,7 @@ module ApplicationHelper
 
   def display_my_broker?(person, employee_role)
     employee_role ||= person.active_employee_roles.first
-    (person.has_active_employee_role? && employee_role.employer_profile.broker_agency_profile.present?) || display_i_am_broker_for_consumer?(person)
-  end
-
-  # @method display_i_am_broker_for_consumer?(person)
-  # Determines if the 'I am Broker' should be displayed for a given person with active Consumer Role.
-  #
-  # @param [Person] person The person for whom to check the broker status.
-  #
-  # @return [Boolean]
-  #   When the feature ':broker_role_consumer_enhancement' is enabled:
-  #     Returns true if person has an active consumer role, active broker role, active broker agency staff role, and both the active broker agency staff & active broker role have the same broker agency profile.
-  #   When the feature ':broker_role_consumer_enhancement' is disabled:
-  #     Returns true if person has an active consumer role and the primary family has a current broker agency.
-  #
-  # @example Check if 'I am Broker' should be displayed for a person with active Consumer Role
-  #   display_i_am_broker_for_consumer?(person) #=> true/false
-  def display_i_am_broker_for_consumer?(person)
-    if EnrollRegistry.feature_enabled?(:broker_role_consumer_enhancement)
-      broker_role = person.broker_role
-      matching_basr = person.broker_agency_staff_roles.where(
-        benefit_sponsors_broker_agency_profile_id: broker_role&.benefit_sponsors_broker_agency_profile_id
-      ).first
-      person.has_active_consumer_role? && broker_role.present? && broker_role.active? && matching_basr.present? && matching_basr.active?
-    else
-      person.has_active_consumer_role? && person.primary_family.current_broker_agency.present?
-    end
+    (person.has_active_employee_role? && employee_role.employer_profile.broker_agency_profile.present?) || (person.has_active_consumer_role? && person.primary_family.current_broker_agency.present?)
   end
 
   def display_family_members(family_members, primary_person)
