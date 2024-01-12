@@ -19,7 +19,7 @@ module Operations
           payload_with_attestation = yield merge_attestation_to_user(family_hash, attestation_hash)
           payload_value = yield validate_payload(payload_with_attestation)
           payload_entity = yield create_payload_entity(payload_value)
-          payload = yield publish(payload_entity)
+          payload = yield publish(payload_entity, interactive_verification)
 
           Success(payload)
         end
@@ -58,8 +58,10 @@ module Operations
           Success(AcaEntities::Families::Family.new(value.to_h))
         end
 
-        def publish(payload)
-          Operations::Fdsh::Ridp::PublishSecondaryRequest.new.call(payload)
+        def publish(payload, interactive_verification)
+          session_id = interactive_verification&.session_id
+          transmission_id = interactive_verification&.transaction_id
+          Operations::Fdsh::Ridp::PublishSecondaryRequest.new.call(payload, session_id, transmission_id)
         end
       end
     end

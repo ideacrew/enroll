@@ -144,10 +144,11 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
 
     context 'when password & password confirmation' do
       let(:params){valid_params.deep_merge!({password: "1Aa@"})}
+      let(:pwd_length){ User.configured_password_length.min }
       it 'does not match' do
         expect(User.create(**params).errors[:password].any?).to be_truthy
         expect(User.create(**params).errors[:password_confirmation].any?).to be_truthy
-        expect(User.create(**params).errors[:password]).to eq ["Password must have at least 4 alphabetical characters", "is too short (minimum is 12 characters)"]
+        expect(User.create(**params).errors[:password]).to eq ["Password must have at least 4 alphabetical characters", "is too short (minimum is #{pwd_length} characters)"]
         expect(User.create(**params).errors[:password_confirmation]).to eq ["doesn't match Password"]
       end
     end

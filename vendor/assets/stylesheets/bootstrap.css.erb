@@ -1207,7 +1207,7 @@ h6 .small,
 .h6 .small {
   font-weight: normal;
   line-height: 1;
-  color: #777;
+  color: var(--secondary-font-color, #777);
 }
 h1,
 .h1,
@@ -3411,8 +3411,7 @@ fieldset[disabled] .btn-danger.focus {
   background-color: var(--primary-green, #d9534f);
   border-color: var(--secondary-green, #d43f3a);
 }
-.btn-save:hover,
-.btn-save:focus {
+.btn-save:hover {
   color: #fff;
   -webkit-filter: brightness(70%);
   -webkit-transition: all 0.2s ease;
@@ -3423,7 +3422,7 @@ fieldset[disabled] .btn-danger.focus {
 }
 .btn-link {
   font-weight: normal;
-  color: #337ab7;
+  color: var(--theme-primary-blue, #337ab7);
   border-radius: 0;
 }
 .btn-link,
