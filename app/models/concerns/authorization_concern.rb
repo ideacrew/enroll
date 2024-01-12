@@ -38,7 +38,7 @@ module AuthorizationConcern
     validates :password, format: { without: /\s/, message: "Password must not contain spaces"}
     validates_presence_of     :password, if: :password_required?
     validates_confirmation_of :password, if: :password_required?
-    validates_length_of       :password, within: Devise.password_length, allow_blank: true
+    validates_length_of       :password, within: self.configured_password_length, allow_blank: true
     validates_format_of :email, with: Devise::email_regexp , allow_blank: true, :message => "is invalid"
 
     scope :locked, ->{ where(:locked_at.ne => nil) }
@@ -141,6 +141,12 @@ module AuthorizationConcern
 
   class_methods do
     MAX_SAME_CHAR_LIMIT = 4
+
+    def configured_password_length
+      default_min, default_max = EnrollRegistry[:enroll_app].setting(:default_password_length_range).item.split("..").map(&:to_i)
+      return Range.new(default_min, default_max) unless EnrollRegistry.feature_enabled?(:strong_password_length)
+      Devise.password_length
+    end
 
     def password_invalid?(password)
       ## TODO: oim_id is an explicit dependency to the User class
