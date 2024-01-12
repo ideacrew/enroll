@@ -157,6 +157,14 @@ When(/^the consumer clicks the Enrollments link$/) do
   find(".interaction-click-control-enrollments").click
 end
 
+And(/^the Applications link is visible$/) do
+  expect(page).to have_selector(".interaction-click-control-applications")
+end
+
+When(/^the consumer clicks the Applications link$/) do
+  find(".interaction-click-control-applications").click
+end
+
 Then(/^the consumer will navigate to the Enrollment History page$/) do
   expect(page).to have_selector("#enrollment-history-title")
 end
