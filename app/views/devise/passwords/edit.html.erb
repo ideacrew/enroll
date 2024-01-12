@@ -13,7 +13,7 @@
       <div id="pswd_info" class="tooltip_box" style="display: none;">
         <p>Your password must:</p>
         <ul>
-          <li id="length" class="valid">Be at least 12 characters</li>
+          <li id="length" class="valid">Be at least <%= User.configured_password_length.min %> characters</li>
           <li id="longer" class="invalid">Not be longer than 20 characters</li>
           <li id="lower" class="valid">Include at least one lowercase letter</li>
           <li id="upper" class="invalid">Include at least one uppercase letter</li>
