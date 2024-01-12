@@ -2,14 +2,6 @@
   <div class="row">
     <div class="inboxes" id="inbox_form">
       <div class="pull-right">
-        <%= link_to(inbox_insured_families_path(@provider, folder: 'Deleted')) do %>
-          <% if @folder == 'Deleted' %>
-            <strong><%= l10n("deleted") %></strong>
-          <% else %>
-            <%= l10n("deleted") %>
-          <% end %>
-        <% end %>
-        <span>&nbsp;|&nbsp;</span>
         <%= link_to(inbox_insured_families_path(@provider)) do %>
           <% if @folder == 'Inbox' %>
             <strong><%= l10n("inbox") %></strong>
@@ -19,12 +11,21 @@
           <span class="badge message-badge"><%= @provider.inbox.unread_messages.size %></span>
         <% end %>
         <% if @sent_box == true %>
+          <span>&nbsp;|&nbsp;</span>
           <%= link_to(inbox_insured_families_path(@provider, folder: 'Sent')) do %>
             <% if @folder == 'Sent' %>
               <strong><%= l10n("sent") %></strong>
             <% else %>
               <%= l10n("sent") %>
             <% end %>
+          <% end %>
+        <% end %>
+        <span>&nbsp;|&nbsp;</span>
+        <%= link_to(inbox_insured_families_path(@provider, folder: 'Deleted')) do %>
+          <% if @folder == 'Deleted' %>
+            <strong><%= l10n("deleted") %></strong>
+          <% else %>
+            <%= l10n("deleted") %>
           <% end %>
         <% end %>
       </div>
