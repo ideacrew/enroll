@@ -303,9 +303,9 @@ div#add-more-link {
 
 /*ready for review*/
 .ready-4-review .whitebox {
-  border-color: var( --success-green, #69A30D);
+  border-color: var( --light-gray, #69A30D);
 }
-.ready-4-review .note.purple::before { border-color:#fff #eee var( --success-green, #69A30D) var( --success-green, #69A30D); }
+.ready-4-review .note.purple::before { border-color:var(--light-gray, #fff) var(--light-gray, #eee) var( --light-gray, #69A30D) var( --light-gray, #69A30D); }
 
 .margin-bottom-adjustment {
   margin-bottom:-25px;
