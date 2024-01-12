@@ -148,6 +148,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.info_complete' => "Info Complete",
   :'en.info_needed' => "Info Needed",
   :'en.ready_for_review' => "Ready for Review",
+  :'en.add_more' => "Add More",
   :'en.insured.aptc_or_csr' => "APTC/CSR",
   :'en.insured.csr_percent_as_integer' => "CSR % as Integer",
   :'en.members' => "Members",

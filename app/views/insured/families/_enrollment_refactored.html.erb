@@ -146,7 +146,7 @@
         </div>
 
         <div class="plan-button-group">
-            <button class="btn btn-default">
+            <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'plan_doc')" id="plan_doc" class="btn btn-default">
                 <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: product } %>
             </button>
 
