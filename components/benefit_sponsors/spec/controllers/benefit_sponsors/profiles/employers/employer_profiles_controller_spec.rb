@@ -162,6 +162,53 @@ module BenefitSponsors
       end
     end
 
+    describe "GET wells_fargo_sso" do
+      before do
+        benefit_sponsorship.save!
+        allow(controller).to receive(:authorize).and_return(true)
+        sign_in user
+      end
+
+      context "when staff roles and email are present" do
+        before do
+          allow(::WellsFargo::BillPay::SingleSignOn).to receive(:new).and_return(double(url: "http://example.com", token: "token"))
+          get :wells_fargo_sso, params: {id: employer_profile.id.to_s}, format: :json
+        end
+
+        it "creates a WellsFargoSSO instance and sets @wf_url" do
+          expect(assigns(:wells_fargo_sso)).to be_present
+          expect(assigns(:wf_url)).to eq("http://example.com")
+        end
+
+        it "renders the JSON response with wf_url" do
+          expect(response).to have_http_status(:success)
+          expect(JSON.parse(response.body)).to eq({ "wf_url" => "http://example.com" })
+        end
+      end
+
+      context "when staff roles or email is not present" do
+        before do
+          allow(employer_profile.staff_roles).to receive(:first).and_return(nil)
+          allow(::WellsFargo::BillPay::SingleSignOn).to receive(:new).and_return(nil)
+        end
+
+        it "does not create a WellsFargoSSO instance" do
+          get :wells_fargo_sso, params: { id: employer_profile.id.to_s }, format: :json
+
+          expect(assigns(:wells_fargo_sso)).to be_nil
+          expect(assigns(:wf_url)).to be_nil
+        end
+
+        it "renders the JSON response with nil wf_url" do
+          get :wells_fargo_sso, params: { id: employer_profile.id.to_s }, format: :json
+
+          expect(response).to have_http_status(:success)
+          expect(JSON.parse(response.body)).to eq({ "wf_url" => nil })
+        end
+      end
+
+    end
+
 
     describe "POST terminate_employee_roster_enrollments", type: :controller, dbclean: :after_each do
 

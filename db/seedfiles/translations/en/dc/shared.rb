@@ -5,7 +5,8 @@ SHARED_TRANSLATIONS = {
     "en.zip" => "ZIP",
     "en.new_address_shared" => "NEW ADDRESS",
     "en.home_address_shared" => "Home Address",
-
+    "en.pay_online" => "Pay Online",
+    "en.cancel" => "Cancel",
     "en.support_texts.new_address_shared" => "NEW ADDRESS",
     "en.support_texts.home_address_shared" => "Home Address",
     "en.support_texts.is_applying_coverage" => "<b> Does this person need coverage? </b> <br> <br> If you need coverage, select ‘yes’. If you’re applying for coverage for someone else, but don’t need coverage for yourself, select ‘no’. If you don’t need or qualify for coverage, but someone in your family or that you include on your tax return does, you can apply on their behalf.",
