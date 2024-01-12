@@ -91,6 +91,7 @@ BenefitSponsors::Engine.routes.draw do
           get :inbox
           get :show_invoice
           get :download_invoice
+          get :wells_fargo_sso
         end
 
         resources :broker_agency, only: [:index, :show, :create] do
