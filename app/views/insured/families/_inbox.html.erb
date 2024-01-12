@@ -2,32 +2,32 @@
   <div class="row">
     <div class="inboxes" id="inbox_form">
       <div class="pull-right">
-        <%= link_to(inbox_insured_families_path(@provider)) do %>
+        <a href="<%= inbox_insured_families_path(@provider) %>">
           <% if @folder == 'Inbox' %>
             <strong><%= l10n("inbox") %></strong>
           <% else %>
             <%= l10n("inbox") %>
           <% end %>
           <span class="badge message-badge"><%= @provider.inbox.unread_messages.size %></span>
-        <% end %>
+        </a>
         <% if @sent_box == true %>
           <span>&nbsp;|&nbsp;</span>
-          <%= link_to(inbox_insured_families_path(@provider, folder: 'Sent')) do %>
+          <a href="<%= inbox_insured_families_path(@provider, folder: 'Sent') %>">
             <% if @folder == 'Sent' %>
               <strong><%= l10n("sent") %></strong>
             <% else %>
               <%= l10n("sent") %>
             <% end %>
-          <% end %>
+          </a>
         <% end %>
         <span>&nbsp;|&nbsp;</span>
-        <%= link_to(inbox_insured_families_path(@provider, folder: 'Deleted')) do %>
+        <a href="<%= inbox_insured_families_path(@provider, folder: 'Deleted') %>">
           <% if @folder == 'Deleted' %>
             <strong><%= l10n("deleted") %></strong>
           <% else %>
             <%= l10n("deleted") %>
           <% end %>
-        <% end %>
+        </a>
       </div>
     </div>
     <br/>
