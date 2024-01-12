@@ -60,7 +60,7 @@ module Operations
 
         def publish(payload, interactive_verification)
           session_id = interactive_verification&.session_id
-          transmission_id = interactive_verification&.transmission_id
+          transmission_id = interactive_verification&.transaction_id
           Operations::Fdsh::Ridp::PublishSecondaryRequest.new.call(payload, session_id, transmission_id)
         end
       end
