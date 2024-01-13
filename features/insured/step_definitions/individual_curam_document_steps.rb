@@ -29,7 +29,7 @@ When(/^the user visits messages page$/) do
 end
 
 When(/^the user visits the applications page$/) do
-  visit applications_path
+  visit financial_assistance.applications_path
 end
 
 When(/^selects a Person account and navigates to Messages page$/) do
