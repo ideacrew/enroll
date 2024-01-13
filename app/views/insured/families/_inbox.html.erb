@@ -11,7 +11,7 @@
           <span class="badge message-badge"><%= @provider.inbox.unread_messages.size %></span>
         </a>
         <% if @sent_box == true %>
-          <span>&nbsp;|&nbsp;</span>
+          <span style="padding: 1px;">|</span>
           <a href="<%= inbox_insured_families_path(@provider, folder: 'Sent') %>">
             <% if @folder == 'Sent' %>
               <strong><%= l10n("sent") %></strong>
@@ -20,7 +20,7 @@
             <% end %>
           </a>
         <% end %>
-        <span>&nbsp;|&nbsp;</span>
+        <span style="padding: 1px;">|</span>
         <a href="<%= inbox_insured_families_path(@provider, folder: 'Deleted') %>">
           <% if @folder == 'Deleted' %>
             <strong><%= l10n("deleted") %></strong>
