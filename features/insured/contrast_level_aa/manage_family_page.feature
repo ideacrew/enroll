@@ -15,4 +15,4 @@ Feature: Contrast level AA is enabled - existing consumer visits the manage fami
   Scenario: the user visits the personal tab
     Given individual clicks on the Manage Family button
     Then individual clicks on the Personal portal
-    And the consumer should see tribal name textbox without text
+    Then the page passes minimum level aa contrast guidelines

@@ -27,9 +27,9 @@
           <label class="static_label label-floatlabel"><%= l10n("relationship").to_s.upcase %></label>
           <span class="field_value floatlabel form-control active-floatlabel"> <%= dependent.relationship.try(:humanize) %> </span>
           <div class="text-right">
-            <%= link_to main_app.edit_insured_family_member_path(dependent), remote: true, class: 'close close-2' do %>
+            <a href="<%= main_app.edit_insured_family_member_path(dependent) %>" data-remote="true" class="close close-2">
               <i class="fas fa-pencil-alt"><span class="hide"><%= l10n("edit") %></span></i>
-            <% end %>
+            </a>
           </div>
         </div>
       </div>
