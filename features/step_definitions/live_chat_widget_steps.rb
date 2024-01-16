@@ -13,9 +13,9 @@ Then(/^they should not see the live chat button$/) do
 end
 
 And(/^they click the live chat button$/) do
-    find(AdminHomepage.chat_button).click
+  find(AdminHomepage.chat_button).click
 end
 
 And(/^they see the live chat widget$/) do
-    expect(page).to have_css(AdminHomepage.chat_widget_title)
+  expect(page).to have_css(AdminHomepage.chat_widget_title)
 end
