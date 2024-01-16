@@ -119,6 +119,10 @@ class AdminHomepage
     '[data-cuke="bot-button"]'
   end
 
+  def self.chat_widget_title
+    ".cx-title"
+  end
+
   def self.failed_validation_text
     "eligibility failed"
   end
