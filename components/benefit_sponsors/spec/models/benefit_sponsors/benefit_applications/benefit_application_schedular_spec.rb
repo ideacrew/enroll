@@ -182,5 +182,28 @@ module BenefitSponsors
         end
       end
     end
+
+    describe 'business_day?' do
+      context 'given a business day' do
+        it 'should return true' do
+          date = Date.new(2024,1,22)
+          expect(subject.business_day?(date)).to eq true
+        end
+      end
+
+      context 'given a holiday' do
+        it 'should return false' do
+          date = Date.new(2023,6,19) # Juneteenth 2023
+          expect(subject.business_day?(date)).to eq false
+        end
+      end
+
+      context 'given an observed holiday' do
+        it 'should return false' do
+          date = Date.new(2023,11,10) # Veteran's Day - Saturday 2023, observed on Friday
+          expect(subject.business_day?(date)).to eq false
+        end
+      end
+    end
   end
 end
