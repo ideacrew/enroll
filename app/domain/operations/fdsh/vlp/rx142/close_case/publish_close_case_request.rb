@@ -30,7 +30,7 @@ module Operations
               person = Person.where(hbx_id: correlation_id).first
               cv3_person = Operations::Fdsh::BuildAndValidatePersonPayload.new.call(person, :dhs)
 
-              event('events.fdsh.close_case_request.close_case_requested', attributes: cv3_person, headers: { case_number: case_number, correlation_id: correlation_id })
+              event('events.fdsh.close_case_requests.close_case_requested', attributes: cv3_person, headers: { case_number: case_number, correlation_id: correlation_id })
             end
 
             def publish(event)

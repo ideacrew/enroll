@@ -2,39 +2,32 @@
   <div class="row">
     <div class="inboxes" id="inbox_form">
       <div class="pull-right">
-        <%= link_to(inbox_insured_families_path(@provider, folder: 'Deleted'), class: 'pull-right') do %>
-        <% if @folder == 'Deleted' %>
-        <strong>
-          <%= l10n("deleted") %>
-        </strong>
-        <% else %>
-          <%= l10n("deleted") %>
+        <a href="<%= inbox_insured_families_path(@provider) %>">
+          <% if @folder == 'Inbox' %>
+            <strong><%= l10n("inbox") %></strong>
+          <% else %>
+            <%= l10n("inbox") %>
+          <% end %>
+          <span class="badge message-badge"><%= @provider.inbox.unread_messages.size %></span>
+        </a>
+        <% if @sent_box == true %>
+          <span style="padding: 1px;">|</span>
+          <a href="<%= inbox_insured_families_path(@provider, folder: 'Sent') %>">
+            <% if @folder == 'Sent' %>
+              <strong><%= l10n("sent") %></strong>
+            <% else %>
+              <%= l10n("sent") %>
+            <% end %>
+          </a>
         <% end %>
-        <% end %>
-        <span class="pull-right">
-          &nbsp;|&nbsp;
-        </span>
-        <%= link_to(inbox_insured_families_path(@provider), class: 'pull-right') do %>
-        <% if @folder == 'Inbox' %>
-        <strong>
-          <%= l10n("inbox") %>
-        </strong>
-        <% else %>
-          <%= l10n("inbox") %>
-        <% end %>
-        <span class="badge message-badge"><%= @provider.inbox.unread_messages.size %></span>
-        <% end %>
-        <%- if @sent_box == true %>
-        <%= link_to(inbox_insured_families_path(@provider, folder: 'Sent')) do%>
-        <% if @folder == 'Sent' %>
-        <strong>
-          <%= l10n("sent") %>          
-        </strong>
-        <% else %>
-          <%= l10n("sent") %>
-        <% end %>
-        <% end %>
-        <% end %>
+        <span style="padding: 1px;">|</span>
+        <a href="<%= inbox_insured_families_path(@provider, folder: 'Deleted') %>">
+          <% if @folder == 'Deleted' %>
+            <strong><%= l10n("deleted") %></strong>
+          <% else %>
+            <%= l10n("deleted") %>
+          <% end %>
+        </a>
       </div>
     </div>
     <br/>

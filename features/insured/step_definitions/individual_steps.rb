@@ -160,3 +160,7 @@ end
 Then(/^the consumer will navigate to the Enrollment History page$/) do
   expect(page).to have_selector("#enrollment-history-title")
 end
+
+And(/^the user clicks the deleted messages button$/) do
+  find(".interaction-click-control-deleted").click
+end

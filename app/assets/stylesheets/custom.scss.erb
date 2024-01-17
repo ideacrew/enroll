@@ -1355,17 +1355,17 @@ a.close-1, a.close-2{
   background: #fff;
   padding: 20px;
   text-align: center;
-  color: red;
+  color: var(--status-red, red);
   border: 1px solid #b7b7b7;
   border-top: none;
 }
 
 #remove_confirm a.cancel {
-  color: red;
+  color: var(--status-red, red);
 }
 
 #remove_confirm a.confirm {
-  color: black;
+  color: var(--primary-black, black);
 }
 /* New address flow start */
 
@@ -2412,7 +2412,7 @@ ul.navbar-nav.top-menu li {
 }
 
 #profile-content .panel .info-wrapper h3 {
-    color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+    color: var(--theme-primary-blue, #007bc4);
     font-weight: bold;
     margin-top: 0;
     text-transform: uppercase;
@@ -2428,7 +2428,7 @@ ul.list-qle li {
 }
 
 ul.list-qle li a {
-    color: #0079c7;
+    color: var(--theme-primary-blue, #0079c7);
     font-size: 17px;
     font-weight: 400;
 }
@@ -3821,7 +3821,7 @@ ul.list-right-section li a img {
 
 
 .my-account-page h1{
-    color: <%= EnrollRegistry[:cancel_plan_border].settings(:color).item %>;
+    color: var(--theme-primary-blue, #003260);
     font-size: 36px;
     margin-bottom: 10px;
     margin-top: 0;
@@ -4032,9 +4032,10 @@ h3.text-blue {
 }
 
 span.badge.message-badge {
-    background-color: $primary-button;
-    color: #fff;
-}
+    background-color: var(--status-yellow, $primary-button);
+    color: #000000;
+    font-weight: normal;
+} 
 .form-border {
     background: #ffffff none repeat scroll 0 0;
     border: 1px solid #b7b7b7;
@@ -4664,7 +4665,7 @@ table.table.table-no-sytle td {
 #qle-header .info-wrapper h4{
   margin: 0;
   line-height: 1.4em;
-  color: $qle-header-color;
+  color: var(--theme-primary-blue, $qle-header-color);
 }
 
 #qle-menu h5 {
@@ -4728,7 +4729,7 @@ position: absolute;
   margin-right: 20px;
 }
 #shop-for-plans-widget .btn, .employer-panel .btn {
-  color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+  color: var(--theme-primary-blue, #007bc4);
   font-weight: 600;
 }
 

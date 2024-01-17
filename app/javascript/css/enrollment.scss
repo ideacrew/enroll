@@ -137,20 +137,20 @@
                 text-align: right;
 
                 .btn {
-                  color: var(--button-default-color);
-                  border-color: var(--button-default-color);
+                  color: var(--theme-primary-blue, --button-default-color);
+                  border-color: var(--theme-primary-blue, --button-default-color);
                 }
             }
 
             &>.btn {
                 height: 34px;
                 padding-right: 0;
-                color: var(--button-default-color);
-                border-color: var(--button-default-color);
+                color: var(--theme-primary-blue, --button-default-color);
+                border-color: var(--theme-primary-blue, --button-default-color);
 
                 &:hover {
-                    color: var(--button-default-hover-color);
-                    border-color: var(--button-default-hover-color);
+                    color: var(--theme-primary-blue, --button-default-hover-color);
+                    border-color: var(--theme-primary-blue, --button-default-hover-color);
                 }
 
                 a {
