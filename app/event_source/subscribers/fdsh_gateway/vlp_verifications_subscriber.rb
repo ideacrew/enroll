@@ -20,7 +20,7 @@ module Subscribers
           correlation_id = metadata.correlation_id
           Operations::Fdsh::Vlp::Rx142::CloseCase::PublishCloseCaseRequest.new.call(result.value!, correlation_id) if EnrollRegistry.feature_enabled?(:send_close_case_request)
         else
-          errors = result.failure&.errors&.to_h
+          errors = result.failure
           logger.info "Vlp::VlpVerificationsSubscriber: on_initial_verification_complete acked with failure, errors: #{errors}"
         end
         ack(delivery_info.delivery_tag)
