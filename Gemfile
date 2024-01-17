@@ -117,6 +117,7 @@ gem 'loofah', '~> 2.3.1'
 gem 'stimulus_reflex', '3.4.1'
 gem 'rack-cors'
 gem 'holidays', '~> 8.6'
+gem 'devise-security', '~> 0.11.0'
 
 group :development do
   gem "certified",              '~> 1'
