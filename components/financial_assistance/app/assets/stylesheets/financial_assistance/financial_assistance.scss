@@ -174,7 +174,7 @@ span.span-text {
   border-top: 3px solid #ddd;
 }
 .complete-icon{
-  color: var( --success-green, #69A30D);
+  color: var( --status-green, #69A30D);
   font-weight: bold;
 }
 .complete-icon-text{
@@ -186,7 +186,7 @@ span.span-text {
   font-weight: 600;
 }
 .in-progress-icon{
-  color: var(--primary-orange, #EAAA00);
+  color: var(--status-yellow, #EAAA00);
 }
 .app-status{
   padding: 10px;

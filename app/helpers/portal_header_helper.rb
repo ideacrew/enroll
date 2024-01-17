@@ -11,7 +11,7 @@ module PortalHeaderHelper
       "<a class='portal'>#{l10n('welcome.index.welcome_to_site_header')}</a>".html_safe
     elsif current_user.try(:has_hbx_staff_role?)
       link_to "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm an Admin".html_safe, main_app.exchanges_hbx_profiles_root_path, class: "portal"
-    elsif current_user.person.try(:broker_role) && controller_path.exclude?('general_agencies')
+    elsif display_i_am_broker_for_consumer?(current_user.person) && controller_path.exclude?('general_agencies')
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, get_broker_profile_path, class: "portal"
     elsif current_user.try(:person).try(:csr_role) || current_user.try(:person).try(:assister_role)
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Trained Expert".html_safe, main_app.home_exchanges_agents_path, class: "portal"
@@ -75,4 +75,33 @@ module PortalHeaderHelper
     end
   end
   # rubocop:enable Naming/AccessorMethodName
+
+  # @method display_i_am_broker_for_consumer?(person)
+  # Determines if the 'I am Broker' should be displayed for a given person with active Consumer Role.
+  #
+  # @param [Person] person The person for whom to check the broker status.
+  #
+  # @return [Boolean]
+  #   When the feature ':broker_role_consumer_enhancement' is enabled and Active Consumer Role exists:
+  #     Returns true if active broker role, active broker agency staff role, and both the active broker agency staff & active broker role have the same broker agency profile.
+  #     else returns false.
+  #   When the feature ':broker_role_consumer_enhancement' is disabled:
+  #     Returns true if person has a broker role.
+  #     else returns false.
+  #
+  # @example Check if 'I am Broker' should be displayed for a person with active Consumer Role
+  #   display_i_am_broker_for_consumer?(person) #=> true/false
+  def display_i_am_broker_for_consumer?(person)
+    return if person.blank?
+
+    if EnrollRegistry.feature_enabled?(:broker_role_consumer_enhancement) && person.has_active_consumer_role?
+      broker_role = person.broker_role
+      matching_basr = person.broker_agency_staff_roles.where(
+        benefit_sponsors_broker_agency_profile_id: broker_role&.benefit_sponsors_broker_agency_profile_id
+      ).first
+      broker_role.present? && broker_role.active? && matching_basr.present? && matching_basr.active?
+    else
+      person.broker_role.present?
+    end
+  end
 end
