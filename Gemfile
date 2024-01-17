@@ -154,6 +154,7 @@ group :development, :test do
   gem 'stimulus_reflex_testing', '~> 0.3.0'
   gem 'yard',                   '~> 0.9.20',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
+  gem 'devise-security'
 end
 
 group :test do
