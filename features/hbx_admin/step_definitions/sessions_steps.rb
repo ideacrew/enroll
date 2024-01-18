@@ -9,8 +9,7 @@ Given(/^the preferred_user_access feature is (.*)?/) do |is_enabled|
 end
 
 # rubocop:disable Style/GlobalVars
-Given /^(.*) logs in on browser (.*)?$/ do |user, session_id|
-# Given(/^admin logs in on browser (.*)?/) do |session_id|
+Given (/^(.*) logs in on browser (.*)?$/) do |_user, session_id|
   in_session(session_id) do
     person = people["Hbx Admin"] || people["Broker Assisted"]
 
@@ -24,14 +23,14 @@ Given /^(.*) logs in on browser (.*)?$/ do |user, session_id|
   end
 end
 
-And(/^(.*) attempts to navigate on browser (.*)?/) do |user, session_id|
+And(/^(.*) attempts to navigate on browser (.*)?/) do |_user, session_id|
   in_session(session_id) do
     session = $sessions[session_id]
     session.visit exchanges_hbx_profiles_root_path
   end
 end
 
-Then(/^(.*) on browser (.*) should (.*) the logged out due to concurrent session message?/) do |user, session_id, visibility|
+Then(/^(.*) on browser (.*) should (.*) the logged out due to concurrent session message?/) do |_user, session_id, visibility|
   in_session(session_id) do
     session = $sessions[session_id]
     if visibility == "see"
