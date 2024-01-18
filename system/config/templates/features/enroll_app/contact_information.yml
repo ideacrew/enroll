@@ -1,0 +1,19 @@
+---
+registry:
+  - namespace:
+      - :enroll_app
+      - :contact_information
+    features:
+      - key: :po_lock_box_address
+        is_enabled: true
+        settings:
+          - key: :name
+            item: "DC Government Health Benefit Exchange"
+          - key: :number
+            item: "PO Box 717023"
+          - key: :city
+            item: "Philadelphia"
+          - key: :state
+            item: "PA"
+          - key: :zip_code
+            item: "19171-7023"
