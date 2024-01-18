@@ -6,7 +6,7 @@ module Events
       module Rx142
         # This class will register event
         class CloseCaseRequested < EventSource::Event
-          publisher_path 'publishers.close_case_publisher'
+          publisher_path 'publishers.fdsh.close_case_publisher'
 
         end
       end
