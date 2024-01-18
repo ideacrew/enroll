@@ -62,11 +62,11 @@
             </dl>
           </div>
           <div class="filter">
-            <label for="eligibility"><%= l10n("event_log.eligibility") %> <%= l10n("status") %></label>
+            <label for="<%= l10n("status").downcase %>"><%= l10n("event_log.eligibility") %> <%= l10n("status") %></label>
             <dl class="dropdown">
                 <dt>
                 <div class="fake-select" style="display: flex;align-items: center;">
-                  <span class="fake-select-label">All</span>
+                  <span class="fake-select-label"><%= l10n("All") %></span>
                   <p class="multiSel"></p>
                 </div>
                 </dt>
@@ -74,16 +74,15 @@
                 <dd>
                     <div class="mutliSelect">
                         <ul>
-                            <li><label><input type="checkbox" name="eligibility_status" value="all" checked/>All</label></li>
-                            <li><label><input type="checkbox" name="eligibility_status" value="eligible" checked/>Eligible</label></li>
-                            <li><label><input type="checkbox" name="eligibility_status" value="ineligible" checked/>Ineligible</label></li>
+                            <li><label><input type="checkbox" name="<%= l10n('status') %>" value="eligible" checked/><%= l10n("eligible") %></label></li>
+                            <li><label><input type="checkbox" name="<%= l10n('status') %>" value="ineligible" checked/><%= l10n("ineligible") %></label></li>
                         </ul>
                     </div>
                 </dd>
             </dl>
           </div>
           <div class="filter">
-            <label for="effective-on">Effective On</label>
+            <label for="effective-on"><%= l10n("Effective On") %></label>
             <input placeholder="MM/DD/YYYY" type="date" id="effective-on">
           </div>
         </div>
@@ -117,7 +116,7 @@
     <div class="event-log-header">
       <div class="event-log-export-text">
         <!-- chnage this to translation -->
-        <h3><b>Household Event Log for <%= hbx_id %></b></h3>
+        <h3><b><%= l10n("event_log.table_label") %> <%= hbx_id %></b></h3>
         <!-- fix export to match new table? -->
         <button id="export-table" class="button-primary"><%= l10n("event_log.export_table") %></button>
       </div>
@@ -134,33 +133,7 @@
         </tr>
         </thead>
         <tbody>
-          <tr class="primary-row" id="9">
-            <td><span class="glyphicon glyphicon-chevron-right"></span></td>
-            <td class="subject">John Doe</td>
-            <td class="eligibility">2024 IVL OSSE</td>
-            <td class="status">Eligible</td>
-            <td>01/01/2024</td>
-          </tr>
-          <tr class="secondary-header" id="9">
-            <td colspan="2"></td>
-            <th>Event Details</th>
-            <th>Account (HBX ID/User)</th>
-            <th>Account (Date/Time)</th>
-          </tr>
-          <tr class="detail-row" id="9">
-            <td colspan="2"></td>
-            <td>Designated Ineligible</td>
-            <td id="" class="user_id">system_account</td>
-            <td>10/23/2023 00:21:34</td>
-          </tr>
-          <tr class="detail-row" id="9">
-            <td colspan="2"></td>
-            <td>Auto-redetermined</td>
-            <td  id="7345673" class="user_id">joe.miller@dc.gov</td>
-            <td>01/04/2024 09:11:21</td>
-          </tr>
         <% @event_logs.each_with_index do |event_log, index| %>
-
           <tr class="primary-row" id=index>
             <td><span class="glyphicon glyphicon-chevron-right"></span></td>
             <td class="subject"><%= event_log[:subject] %></td>
@@ -170,9 +143,9 @@
           </tr>
           <tr class="secondary-header" id=index>
             <td colspan="2"></td>
-            <th>Event Details</th>
-            <th>Account (HBX ID/User)</th>
-            <th>Account (Date/Time)</th>
+            <th><%= l10n("Event Details") %></th>
+            <th><%= l10n("Account (HBX ID/User)") %></th>
+            <th><%= l10n("Account (Date/Time)") %></th>
           </tr>
           <tr class="detail-row" id=index>
             <td colspan="2"></td>

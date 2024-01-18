@@ -80,6 +80,7 @@ SHARED_TRANSLATIONS = {
     "en.event_log.end_date" => "End Date",
     "en.event_log.run_query" => "Run Query",
     "en.event_log.export_table" => "Export Table",
+    "en.event_log.table_label" => "Household Event Log for",
     "en.event_log.hbx_id_text" => "HBX ID:",
     "en.event_log.filters" => "Filters",
     "en.event_log.select_eligibility" => "Select Eligibility",
