@@ -394,6 +394,17 @@ module BenefitSponsors
         it 'returns the person' do
           expect(@result).to eq person1
         end
+
+        it 'places the person into the active state, after transitioning from the initial state' do
+          person1.reload
+          broker_agency_staff_role = person1.broker_agency_staff_roles.first
+          transition = broker_agency_staff_role.workflow_state_transitions.detect do |wst|
+            wst.from_state == "broker_agency_pending" &&
+              wst.to_state == "active" &&
+              wst.event == "broker_agency_accept!"
+          end
+          expect(transition).not_to be_nil
+        end
       end
 
       context 'person already has broker role with this broker agency' do
