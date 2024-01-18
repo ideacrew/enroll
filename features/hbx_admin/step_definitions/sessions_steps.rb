@@ -42,3 +42,4 @@ Then(/^(.*) on browser (.*) should (.*) the logged out due to concurrent session
   end
 end
 # rubocop:enable Style/GlobalVars
+

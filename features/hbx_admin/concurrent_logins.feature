@@ -25,3 +25,4 @@ Feature: Admin/Broker will be signed out if concurrent logins are detected
     And broker logs in on browser 2
     And broker attempts to navigate on browser 1
     Then broker on browser 1 should not see the logged out due to concurrent session message
+
