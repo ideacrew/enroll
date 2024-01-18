@@ -32,14 +32,14 @@ module EventLogs
 
     def eligibility_details
       log = self.monitorable
-      return unless json?(log&.payload)
+      return {} unless json?(log&.payload)
       parsed = JSON.parse(log.payload, symbolize_names: true)
       details = JSON.parse(self.attributes.to_json, symbolize_names: true)
       datetime = parsed.dig(:state_histories, 0, :effective_on)
-      details[:current_state] = parsed[:current_state]
-      details[:subject] = Person.by_hbx_id(self.subject_hbx_id)&.first&.full_name
-      details[:title] = parsed[:title]&.gsub("Aca ", "")&.gsub("Eligibility ", "")&.upcase
-      details[:effective_on] = DateTime.parse(datetime)&.strftime("%d/%m/%Y")
+      details[:current_state] = parsed[:current_state] || ""
+      details[:subject] = Person.by_hbx_id(self.subject_hbx_id)&.first&.full_name || ""
+      details[:title] = parsed[:title]&.gsub("Aca ", "")&.gsub("Eligibility ", "")&.upcase || ""
+      details[:effective_on] = datetime ? DateTime.parse(datetime)&.strftime("%d/%m/%Y") : ""
       details
     end
 

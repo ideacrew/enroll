@@ -53,8 +53,10 @@
                     <div class="mutliSelect">
                         <ul>
                           <li><label><input type="checkbox" name="<%= l10n("event_log.eligibility").downcase %>" value="all" checked/>All</label></li>
-                          <% @event_logs.map{|event_log| event_log[:title]&.upcase }.each do |category| %>
-                            <li><label><input type="checkbox" name="<%= l10n("event_log.eligibility").downcase %>" value="<%= category %>" checked/><%= category %></label></li>
+                          <% if @event_logs %>
+                            <% @event_logs.map{|event_log| event_log[:title]&.upcase }.each do |category| %>
+                              <li><label><input type="checkbox" name="<%= l10n("event_log.eligibility").downcase %>" value="<%= category %>" checked/><%= category %></label></li>
+                            <% end %>
                           <% end %>
                         </ul>
                     </div>
@@ -74,8 +76,8 @@
                 <dd>
                     <div class="mutliSelect">
                         <ul>
-                            <li><label><input type="checkbox" name="<%= l10n('status') %>" value="eligible" checked/><%= l10n("eligible") %></label></li>
-                            <li><label><input type="checkbox" name="<%= l10n('status') %>" value="ineligible" checked/><%= l10n("ineligible") %></label></li>
+                            <li><label><input type="checkbox" name="<%= l10n('status').downcase %>" value="eligible" checked/><%= l10n("eligible") %></label></li>
+                            <li><label><input type="checkbox" name="<%= l10n('status').downcase %>" value="ineligible" checked/><%= l10n("ineligible") %></label></li>
                         </ul>
                     </div>
                 </dd>
@@ -133,31 +135,34 @@
         </tr>
         </thead>
         <tbody>
+          <% if @event_logs&.any? %>
         <% @event_logs.each_with_index do |event_log, index| %>
-          <tr class="primary-row" id=index>
+          <tr class="primary-row" id="<%= index %>"%>
             <td><span class="glyphicon glyphicon-chevron-right"></span></td>
             <td class="subject"><%= event_log[:subject] %></td>
             <td class="eligibility"><%= event_log[:title]&.upcase %></td>
             <td class="status"><%= event_log[:current_state]&.titleize %></td>
             <td><%= event_log[:effective_on] %></td>
           </tr>
-          <tr class="secondary-header" id=index>
+          <tr class="secondary-header" id="<%= index %>">
             <td colspan="2"></td>
             <th><%= l10n("Event Details") %></th>
             <th><%= l10n("Account (HBX ID/User)") %></th>
             <th><%= l10n("Account (Date/Time)") %></th>
           </tr>
-          <tr class="detail-row" id=index>
+          <tr class="detail-row" id="<%= index %>">
             <td colspan="2"></td>
             <td></td>
             <td id="<%= event_log[:account_hbx_id] %>%" class="user_id"><%= event_log[:account_username] %></td>
             <td class="event-time"><%= event_log[:event_time] %></td>
           </tr>
         <% end %>
+        <% end %>
         </tbody>
       </table>
 
     </div>
+    <div id="no-results" style="display:none">Your search returned zero results, try adjusting your filters</div>
   </div>
 </div>
 
@@ -317,7 +322,7 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
     $('input[name="eligibility"]:checked').each(function( index ) {
       eligibilities.push($(this).val().toUpperCase())
     });
-    $('input[name="eligibility_status"]:checked').each(function( index ) {
+    $('input[name="status"]:checked').each(function( index ) {
       statuses.push($(this).val().toUpperCase())
     });
     $('#event-log-table tbody tr').each(function( index ) {
@@ -379,9 +384,7 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         var row = $(this).closest('tr').prop('id');
         var row_index = visible_rows.indexOf(row);
         var parsedDate = Date.parse($(this).text());
-        console.log("parsedDate: "+parsedDate);
-          console.log("value: "+Date.parse(value));
-          console.log("earlier:"+(Date.parse(value) > parsedDate))
+
         if (isNaN($(this).text()) && !isNaN(parsedDate)) {
           if (!(Date.parse(value) > parsedDate) && row_index !== -1) {
             visible_rows.splice( row_index, 1 );
@@ -394,13 +397,22 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         }
       });
     }
-    $('#event-log-table tbody tr').each(function( index ) {
-      var row = $(this).prop('id');
-      var row_index = visible_rows.indexOf(row)
-      if (row_index === -1) {
-        $(this).hide();
-      }
-    });
+    console.log(visible_rows)
+    if (visible_rows.length === 0) {
+      $('#event-table-data').hide()
+      $('#no-results').show()
+    } else {
+      $('#event-table-data').show()
+      $('#no-results').hide()
+      $('#event-log-table tbody tr').each(function( index ) {
+        var row = $(this).prop('id');
+        var row_index = visible_rows.indexOf(row)
+        if (row_index === -1) {
+          $(this).hide();
+        }
+      });
+    }
+
   });
 
   $('#reset-filters').click(function(){
