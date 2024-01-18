@@ -9,7 +9,7 @@ Given(/^the preferred_user_access feature is (.*)?/) do |is_enabled|
 end
 
 # rubocop:disable Style/GlobalVars
-Given (/^(.*) logs in on browser (.*)?$/) do |_user, session_id|
+Given(/^(.*) logs in on browser (.*)?$/) do |_user, session_id|
   in_session(session_id) do
     person = people["Hbx Admin"] || people["Broker Assisted"]
 
@@ -41,4 +41,3 @@ Then(/^(.*) on browser (.*) should (.*) the logged out due to concurrent session
   end
 end
 # rubocop:enable Style/GlobalVars
-
