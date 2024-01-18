@@ -107,8 +107,8 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def preferred_user_access(current_user)
-    return unless new_method(current_user)
+  def check_concurrent_sessions
+    return unless preferred_user_access(current_user)
     flash[:error] = l10n('devise.sessions.signed_out_concurrent_session')
     sign_out current_user
   end
