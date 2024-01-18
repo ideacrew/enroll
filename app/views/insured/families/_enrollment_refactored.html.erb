@@ -147,7 +147,7 @@
 
         <div class="plan-button-group">
             <button tabindex="0" onkeydown="handleButtonKeyDown(event, 'plan_doc_<%= hbx_enrollment.hbx_id %>')" class="btn btn-default">
-                <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: product } %>
+                <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: product, hbx_id: hbx_enrollment.hbx_id } %>
             </button>
 
             <button tabindex="0" onkeydown="handleContactInfoKeyDown(event, 'plan_contact_info-<%= hbx_enrollment.hbx_id%>', '<%= product.kind.to_s %>-<%= product.id %>-<%= hbx_enrollment.hbx_id%>')" class="btn btn-default">
