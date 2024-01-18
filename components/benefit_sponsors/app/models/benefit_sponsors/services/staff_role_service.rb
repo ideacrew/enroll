@@ -172,8 +172,12 @@ module BenefitSponsors
         if terminated_brokers_with_same_profile.present?
           terminated_brokers_with_same_profile.broker_agency_active!
         else
-          broker_agency_staff_role = BrokerAgencyStaffRole.new(person: person.first, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: "active")
-          broker_agency_staff_role.save
+          broker_agency_staff_role = person.first.create_broker_agency_staff_role(
+            {
+              benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id
+            }
+          )
+          broker_agency_staff_role.broker_agency_accept!
         end
         [true, person.first]
       end
