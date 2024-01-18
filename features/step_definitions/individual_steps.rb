@@ -1112,6 +1112,7 @@ end
 
 When(/.+ visits home page/) do
   visit "/families/home"
+  binding.irb
 end
 
 When(/^\w+ checks? the Insured portal open enrollment dates$/) do
@@ -1210,6 +1211,10 @@ end
 
 When(/Individual clicks on continue button on Choose Coverage page$/) do
   find(IvlChooseCoverage.continue_btn).click
+end
+
+And(/Individual clicks the Back to My Account button$/) do
+  find(".interaction-click-control-back-to-my-account")
 end
 
 And(/Individual signed in to resume enrollment$/) do

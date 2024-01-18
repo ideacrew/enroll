@@ -3,10 +3,10 @@
 Feature: Contrast level AA is enabled - existing consumer visits the my expert page
     Background:
     Given the contrast level aa feature is enabled
+    And the FAA feature configuration is enabled
     And an IVL Broker Agency exists
     And the broker Max Planck is primary broker for IVL Broker Agency
     And Individual has not signed up as an HBX user
-    And the FAA feature configuration is enabled
     When Individual visits the Consumer portal during open enrollment
     Then Individual creates a new HBX account
     Then Individual should see a successful sign up message
@@ -17,11 +17,9 @@ Feature: Contrast level AA is enabled - existing consumer visits the my expert p
     When Individual clicks on continue
     And Individual agrees to the privacy agreeement
     And Individual answers the questions of the Identity Verification page and clicks on submit
-    Then Individual is on the Help Paying for Coverage page
-    When Individual does not apply for assistance and clicks continue
-    And Individual clicks on the Continue button of the Family Information page
-    And Individual clicks on continue button on Choose Coverage page
-    And Individual clicks on the Help Me Sign Up link
+    And Individual has broker assigned to them
+    And Individual visits home page
+    And Individual clicks on the Get Help Signing Up button
 
   Scenario: the user visits the my expert page
     And Individual clicks on the Help from an Expert link
@@ -29,5 +27,5 @@ Feature: Contrast level AA is enabled - existing consumer visits the my expert p
     And Individual clicks on Select this Broker button
     And Individual clicks on close button
     And the page is refreshed
-    And the Individual clicks on the My Broker tab
+    And Individual clicks on the My Broker link
     Then the page passes minimum level aa contrast guidelines
