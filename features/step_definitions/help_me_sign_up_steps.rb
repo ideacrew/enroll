@@ -21,7 +21,7 @@ And(/Individual selects a broker?/) do
 end
 
 And(/Individual clicks on Select this Broker button$/) do
-  find(".close_broker_select").click
+  find(".help_button").click
 end
 
 And(/Individual clicks on close button$/) do
