@@ -30,6 +30,19 @@ module EventLogs
       end
     end
 
+    def eligibility_details
+      log = self.monitorable
+      return unless json?(log&.payload)
+      parsed = JSON.parse(log.payload, symbolize_names: true)
+      details = JSON.parse(self.attributes.to_json, symbolize_names: true)
+      datetime = parsed.dig(:state_histories, 0, :effective_on)
+      details[:current_state] = parsed[:current_state]
+      details[:subject] = Person.by_hbx_id(self.subject_hbx_id)&.first&.full_name
+      details[:title] = parsed[:title]&.gsub("Aca ", "")&.gsub("Eligibility ", "")&.upcase
+      details[:effective_on] = DateTime.parse(datetime)&.strftime("%d/%m/%Y")
+      details
+    end
+
     def self.fetch_event_logs(params)
       query = {}
       %w[subject_hbx_id event_category].each do |param|
@@ -50,6 +63,12 @@ module EventLogs
         query[:event_time].merge!({ "$lte" => end_date.end_of_day })
       end
       query.present? ? EventLogs::MonitoredEvent.where(query).order(:event_time.desc) : EventLogs::MonitoredEvent.all.order(:event_time.desc)
+    end
+
+    def json?(response)
+      !JSON.parse(response).nil?
+    rescue StandardError
+      false
     end
 
   end
