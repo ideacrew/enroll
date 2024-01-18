@@ -19,3 +19,20 @@ end
 And(/Individual selects a broker?/) do
   find(".broker_select_button").click
 end
+
+And(/Individual clicks on Select this Broker button$/) do
+  find("#broker-select").click
+end
+
+And(/Individual clicks on close button$/) do
+  find(".interaction-click-control-×").click
+end
+
+And(/Individual clicks on the My Broker tab$/) do
+  path = delete_consumer_broker_insured_family_path
+  find("a[href='#{path}']").click
+end
+
+And(/the page is refreshed/) do
+  visit current_path
+end
