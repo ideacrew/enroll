@@ -552,7 +552,7 @@ thead {
   }
 
 .pagination > .active > a {
-  background:$blue;
+  background: var(--theme-primary-blue, $blue);
 }
 
 .Summary-of-Benefits-and-Coverage{

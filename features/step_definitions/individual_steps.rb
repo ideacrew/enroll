@@ -487,7 +487,7 @@ Then(/Individual creates a new HBX account$/) do
   fill_in CreateAccount.email_or_username, :with => "testflow@test.com"
   fill_in CreateAccount.password, :with => "aA1!aA1!aA1!"
   fill_in CreateAccount.password_confirmation, :with => "aA1!aA1!aA1!"
-  find(CreateAccount.create_account_btn).click
+  find(CreateAccount.create_account_btn, wait: 5).click
 end
 
 Then(/Individual creates a new HBX account with a weak password$/) do
