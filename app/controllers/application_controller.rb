@@ -113,7 +113,7 @@ class ApplicationController < ActionController::Base
     flash[:error] = l10n('devise.sessions.signed_out_concurrent_session')
     sign_out current_user
   end
-  
+
   # preferred_user_access feature should be turned on DC & disabled in ME
   def preferred_user_access(current_user)
     valid_concurrent_session = EnrollRegistry.feature_enabled?(:prevent_concurrent_sessions) && concurrent_sessions?
