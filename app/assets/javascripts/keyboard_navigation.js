@@ -43,3 +43,11 @@ function handleCancelButtonKeyDown(event, buttonId, hideForm) {
     document.getElementById(hideForm).classList.add('hidden');
   }
 }
+
+function handleGlossaryFocus(glossaryId) {
+  $("#" + glossaryId).popover('show');
+}
+
+function handleGlossaryBlur(glossaryId) {
+  $("#" + glossaryId).popover('hide');
+}
