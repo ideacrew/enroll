@@ -107,36 +107,20 @@ class ApplicationController < ActionController::Base
 
   private
 
-  
-  def check_concurrent_sessions
-    return unless EnrollRegistry.feature_enabled?(:prevent_concurrent_sessions) && concurrent_sessions? && current_user.has_hbx_staff_role?
+  def preferred_user_access(current_user)
+    return unless new_method(current_user)
     flash[:error] = l10n('devise.sessions.signed_out_concurrent_session')
     sign_out current_user
   end
-  
-  # For DC (Current)
-  # return unless EnrollRegistry.feature_enabled?(:prevent_concurrent_sessions) && concurrent_sessions? && current_user.has_hbx_staff_role?
-  # For ME
-  # return unless EnrollRegistry.feature_enabled?(:prevent_concurrent_sessions) && concurrent_sessions?
 
   def preferred_user_access(current_user)
-    # Admin Only for DC
-    valid_array = []
-    valid_array << EnrollRegistry.feature_enabled?(:prevent_concurrent_sessions) && concurrent_sessions?
-    valid_array << current_user.has_hbx_staff_role? if EnrollRegistry.feature_enabled?(:preferred_user_access)
-
-    return valid_array
-    # dc - on
-    # me - off
+    if EnrollRegistry.feature_enabled?(:preferred_user_access)
+      EnrollRegistry.feature_enabled?(:prevent_concurrent_sessions) && concurrent_sessions? && current_user.has_hbx_staff_role?
+    else
+      EnrollRegistry.feature_enabled?(:prevent_concurrent_sessions) && concurrent_sessions?
+    end
   end
 
-  def preferred_user_access(current_user)
-  # Admin Only for DC
-  [
-    EnrollRegistry.feature_enabled?(:prevent_concurrent_sessions) && concurrent_sessions?,
-    current_user.has_hbx_staff_role? if true
-  ].compact
-  end
 
   def concurrent_sessions?
     # If the session token differs from the token stored in the db
