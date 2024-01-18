@@ -27,9 +27,11 @@ module Operations
             private
 
             def get_case_number(payload)
-              verification_response = payload.dig(:InitialVerificationResponseSet, :InitialVerificationIndividualResponses).first
-              case_number = verification_response.dig(:InitialVerificationIndividualResponseSet, :CaseNumber)
-              return Failure('No case number') unless case_number
+              verification_response = payload&.dig(:InitialVerificationResponseSet, :InitialVerificationIndividualResponses)&.first
+              return Failure('No individual responses found in CMS response') unless verification_response
+
+              case_number = verification_response&.dig(:InitialVerificationIndividualResponseSet, :CaseNumber)
+              return Failure('No case number found in CMS response') unless case_number
 
               Success(case_number)
             end

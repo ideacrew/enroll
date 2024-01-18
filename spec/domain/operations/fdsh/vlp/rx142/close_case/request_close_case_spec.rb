@@ -5,6 +5,8 @@ require "rails_helper"
 # spec for RequestCloseCase class
 RSpec.describe Operations::Fdsh::Vlp::Rx142::CloseCase::RequestCloseCase do
 
+  let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+
   let(:fdsh_response) do
     {
       ResponseMetadata: {
@@ -61,7 +63,6 @@ RSpec.describe Operations::Fdsh::Vlp::Rx142::CloseCase::RequestCloseCase do
   end
 
   context 'when valid CMS response received' do
-    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
 
     subject do
       described_class.new.call(payload, person.hbx_id)
@@ -86,9 +87,23 @@ RSpec.describe Operations::Fdsh::Vlp::Rx142::CloseCase::RequestCloseCase do
       end
     end
 
-    context 'without a valid case number' do
-      let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+    context 'without any individual responses' do
+      before do
+        payload[:InitialVerificationResponseSet][:InitialVerificationIndividualResponses] = nil
+        payload[:InitialVerificationResponseSet].compact
+      end
 
+      subject do
+        described_class.new.call(payload, person.hbx_id)
+      end
+
+      it "should fail" do
+        expect(subject).to be_failure
+        expect(subject.failure).to eq('No individual responses found in CMS response')
+      end
+    end
+
+    context 'without a valid case number' do
       before do
         individual_response = payload[:InitialVerificationResponseSet][:InitialVerificationIndividualResponses].first
         individual_response[:InitialVerificationIndividualResponseSet][:CaseNumber] = nil
@@ -100,7 +115,7 @@ RSpec.describe Operations::Fdsh::Vlp::Rx142::CloseCase::RequestCloseCase do
 
       it "should fail" do
         expect(subject).to be_failure
-        expect(subject.failure).to eq('No case number')
+        expect(subject.failure).to eq('No case number found in CMS response')
       end
     end
   end
