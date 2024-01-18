@@ -4,6 +4,10 @@ Given(/^the prevent_concurrent_sessions feature is (.*)?/) do |is_enabled|
   is_enabled == "enabled" ? enable_feature(:prevent_concurrent_sessions) : disable_feature(:prevent_concurrent_sessions)
 end
 
+Given(/^the preferred_user_access feature is (.*)?/) do |is_enabled|
+  is_enabled == "enabled" ? enable_feature(:preferred_user_access) : disable_feature(:preferred_user_access)
+end
+
 # rubocop:disable Style/GlobalVars
 Given(/^admin logs in on browser (.*)?/) do |session_id|
   in_session(session_id) do

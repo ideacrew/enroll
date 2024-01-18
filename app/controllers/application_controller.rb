@@ -107,10 +107,35 @@ class ApplicationController < ActionController::Base
 
   private
 
+  
   def check_concurrent_sessions
     return unless EnrollRegistry.feature_enabled?(:prevent_concurrent_sessions) && concurrent_sessions? && current_user.has_hbx_staff_role?
     flash[:error] = l10n('devise.sessions.signed_out_concurrent_session')
     sign_out current_user
+  end
+  
+  # For DC (Current)
+  # return unless EnrollRegistry.feature_enabled?(:prevent_concurrent_sessions) && concurrent_sessions? && current_user.has_hbx_staff_role?
+  # For ME
+  # return unless EnrollRegistry.feature_enabled?(:prevent_concurrent_sessions) && concurrent_sessions?
+
+  def preferred_user_access(current_user)
+    # Admin Only for DC
+    valid_array = []
+    valid_array << EnrollRegistry.feature_enabled?(:prevent_concurrent_sessions) && concurrent_sessions?
+    valid_array << current_user.has_hbx_staff_role? if EnrollRegistry.feature_enabled?(:preferred_user_access)
+
+    return valid_array
+    # dc - on
+    # me - off
+  end
+
+  def preferred_user_access(current_user)
+  # Admin Only for DC
+  [
+    EnrollRegistry.feature_enabled?(:prevent_concurrent_sessions) && concurrent_sessions?,
+    current_user.has_hbx_staff_role? if true
+  ].compact
   end
 
   def concurrent_sessions?
