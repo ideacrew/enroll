@@ -1212,6 +1212,10 @@ When(/Individual clicks on continue button on Choose Coverage page$/) do
   find(IvlChooseCoverage.continue_btn).click
 end
 
+And(/Individual clicks the Back to My Account button$/) do
+  find(".interaction-click-control-back-to-my-account")
+end
+
 And(/Individual signed in to resume enrollment$/) do
   visit '/'
   click_link('Consumer/Family Portal', wait: 10)
