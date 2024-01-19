@@ -8,6 +8,11 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 RSpec.describe Operations::Eligible::MigrateBenefitSponsorCatalog,
                type: :model,
                dbclean: :around_each do
+
+  before :all do
+    DatabaseCleaner.clean
+  end
+
   describe "benefit sponsor catalog migrations" do
     include_context "setup benefit market with market catalogs and product packages"
 
@@ -169,5 +174,9 @@ RSpec.describe Operations::Eligible::MigrateBenefitSponsorCatalog,
         )
       end
     end
+  end
+
+  after :all do
+    DatabaseCleaner.clean
   end
 end

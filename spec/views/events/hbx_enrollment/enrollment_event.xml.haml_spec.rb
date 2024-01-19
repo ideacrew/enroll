@@ -151,4 +151,8 @@ RSpec.describe "app/views/events/enrollment_event.xml.haml", dbclean: :around_ea
       end
     end
   end
+
+  after :all do
+    DatabaseCleaner.clean
+  end
 end

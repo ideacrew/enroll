@@ -198,4 +198,8 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb",dbclean: :arou
       expect(rendered).not_to have_text("You have no Employer Sponsored Insurance. If you wish to purchase insurance, please enroll in the Individual Market.")
     end
   end
+
+  after :all do
+    DatabaseCleaner.clean
+  end
 end

@@ -166,4 +166,8 @@ RSpec.describe 'reports:export_eligible_users_with_outstanding_income_evidences'
       end
     end
   end
+
+  after :all do
+    DatabaseCleaner.clean
+  end
 end

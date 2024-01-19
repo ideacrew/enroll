@@ -123,4 +123,8 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb", dbclean: :after_e
       end
     end
   end
+
+  after :all do
+    DatabaseCleaner.clean
+  end
 end
