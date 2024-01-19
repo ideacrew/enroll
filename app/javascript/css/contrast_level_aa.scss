@@ -93,3 +93,9 @@
 .complete-icon-text{
   font-weight: normal !important;
 }
+
+#account-detail .popover {
+  .arrow:after {
+    border-right-color: transparent;
+  }
+}

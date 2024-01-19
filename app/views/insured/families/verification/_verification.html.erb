@@ -94,7 +94,7 @@
                           <div class="v-doc col-md-1">
                             <span class="<%=pundit_class(Family, :updateable?)%>" >
                               <%= link_to document_path(vlp_doc, :person_id => person.id, :verification_type => verif_type.id, :doc_title => vlp_doc.title.titleize), method: :delete do %>
-                                <i class="far fa-trash-alt fa-lg role-trashcan pull-right" title="Delete"></i>
+                                <i class="far fa-trash-alt fa-lg role-trashcan pull-right" title="Delete"><span class="hide"><%=l10n("delete")%></span></i>
                               <% end %>
                             </span>
                           </div>
