@@ -2,14 +2,14 @@
   <h4> Did you or your spouse have health insurance for at least one day between <%= @qle_date_calc %> and <%= @qle_date %> ? </h4> <br/>
   <div class = 'moving_radio_btn'>
     <div class="n-radio-group">
-      <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'reason_accept1')" class="n-radio-row">
+      <div tabindex="0" onfocus="handleSEPRadioButton('reason_accept1')" class="n-radio-row">
         <label class="n-radio vertically-aligned-row" for="reason_accept1">
           <%= radio_button_tag :reason, "no", false, id: 'reason_accept1', class: "n-radio" %>
           <span class = "n-radio"></span>
             yes
         </label>
       </div>
-      <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'reason_accept')" class="n-radio-row">
+      <div tabindex="0" onfocus="handleSEPRadioButton('reason_accept')" class="n-radio-row">
         <label class="n-radio" for="reason_accept">
         <%= radio_button_tag :reason, "yes", true, id: 'reason_accept', class: "n-radio" %>
         <span class="n-radio"></span>
