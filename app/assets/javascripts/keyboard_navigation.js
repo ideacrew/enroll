@@ -37,6 +37,10 @@ function handleButtonKeyDown(event, buttonId) {
   }
 }
 
+function handleSEPRadioButton(buttonId) {
+  document.getElementById(buttonId).click(); 
+}
+
 function handleCancelButtonKeyDown(event, buttonId, hideForm) {
   if (event.key === 'Enter') { 
     document.getElementById(buttonId).click(); 
