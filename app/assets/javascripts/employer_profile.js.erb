@@ -736,7 +736,7 @@ $(document).on('click', '.cobra_confirm', function(event){
   // var cobra_date = target.find('input.date-picker').val();
   // var cobra_link = target.find('a.cobra_confirm_submit').data('link');
   if (!cobraAjaxInProgress) {
-    ajaxInProgress = true;
+    cobraAjaxInProgress = true;
     EmployerProfile.submitCobraDate(cobra_date, cobra_link, cobraAjaxInProgress);
   }
 })
