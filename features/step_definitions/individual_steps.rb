@@ -1112,7 +1112,6 @@ end
 
 When(/.+ visits home page/) do
   visit "/families/home"
-  binding.irb
 end
 
 When(/^\w+ checks? the Insured portal open enrollment dates$/) do

@@ -8,11 +8,11 @@ Given(/^an IVL Broker Agency exists$/) do
 end
 
 And(/Individual has broker assigned to them/) do
-    family = Family.first
-    broker_id = Person.where(:broker_role.exists => true).last.id
-    profile_id = BenefitSponsors::Organizations::GeneralOrganization.first.profiles.first.id
-    family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: profile_id, writing_agent_id: broker_id, is_active: true, start_on: Date.today)
-    family.save!
+  family = Family.first
+  broker_id = Person.where(:broker_role.exists => true).last.id
+  profile_id = BenefitSponsors::Organizations::GeneralOrganization.first.profiles.first.id
+  family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: profile_id, writing_agent_id: broker_id, is_active: true, start_on: Date.today)
+  family.save!
 end
 
 And(/^Individual clicks on the Help Me Sign Up link?/) do
@@ -45,7 +45,6 @@ And(/^the page is refreshed$/) do
 end
 
 And(/^Individual clicks on the My Broker link$/) do
-  binding.irb
   path = brokers_insured_families_path(tab: 'broker')
   find("a[href='#{path}']").click
 end
