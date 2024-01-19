@@ -4,10 +4,14 @@ Given(/^the prevent_concurrent_sessions feature is (.*)?/) do |is_enabled|
   is_enabled == "enabled" ? enable_feature(:prevent_concurrent_sessions) : disable_feature(:prevent_concurrent_sessions)
 end
 
+Given(/^the preferred_user_access feature is (.*)?/) do |is_enabled|
+  is_enabled == "enabled" ? enable_feature(:preferred_user_access) : disable_feature(:preferred_user_access)
+end
+
 # rubocop:disable Style/GlobalVars
-Given(/^admin logs in on browser (.*)?/) do |session_id|
+Given(/^(.*) logs in on browser (.*)?$/) do |_user, session_id|
   in_session(session_id) do
-    person = people["Hbx Admin"]
+    person = people["Hbx Admin"] || people["Broker Assisted"]
 
     session = $sessions[session_id]
     session.visit "/users/sign_in"
@@ -19,14 +23,14 @@ Given(/^admin logs in on browser (.*)?/) do |session_id|
   end
 end
 
-And(/^admin attempts to navigate on browser (.*)?/) do |session_id|
+And(/^(.*) attempts to navigate on browser (.*)?/) do |_user, session_id|
   in_session(session_id) do
     session = $sessions[session_id]
     session.visit exchanges_hbx_profiles_root_path
   end
 end
 
-Then(/^admin on browser (.*) should (.*) the logged out due to concurrent session message?/) do |session_id, visibility|
+Then(/^(.*) on browser (.*) should (.*) the logged out due to concurrent session message?/) do |_user, session_id, visibility|
   in_session(session_id) do
     session = $sessions[session_id]
     if visibility == "see"
