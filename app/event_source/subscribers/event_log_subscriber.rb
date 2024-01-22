@@ -16,7 +16,7 @@ module Subscribers
       subscriber_logger.info "EventLogEventsSubscriber#on_enroll_event_log_events, response: #{payload}"
       logger.info "EventLogEventsSubscriber#on_enroll_event_log_events payload: #{payload}" unless Rails.env.test?
 
-      store_event_log(payload, metadata)
+      store_event_log(payload, metadata) unless Rails.env.test?
       ack(delivery_info.delivery_tag)
     rescue StandardError, SystemStackError => e
       logger.info "EventLogEventsSubscriber#on_enroll_event_log_events: errored & acked. Backtrace: #{e.backtrace}"
