@@ -11,7 +11,7 @@ module Operations
       include EventSource::Command
       include EventSource::Logging
 
-      attr_accessor :subject, :default_eligibility
+      attr_accessor :subject, :default_eligibility, :prospective_eligibility
 
       # @param [Hash] opts Options to build eligibility
       # @option opts [<GlobalId>] :subject required
@@ -174,6 +174,8 @@ module Operations
       end
 
       def eligibility_event_for(current_state)
+        return 'events.people.eligibilities.ivl_osse_eligibility.eligibility_renewed' if prospective_eligibility
+
         case current_state
         when :eligible
           'events.people.eligibilities.ivl_osse_eligibility.eligibility_created'
