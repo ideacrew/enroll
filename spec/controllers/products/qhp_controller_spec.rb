@@ -94,41 +94,6 @@ RSpec.describe Products::QhpController, :type => :controller, dbclean: :around_e
     end
   end
 
-  context 'GET summary without HbxEnrollment BSON Id' do
-    let(:input_params) do
-      {
-        standard_component_id: '11111100001111-01',
-        active_year: '2015',
-        market_kind: 'shop',
-        coverage_kind: 'health'
-      }
-    end
-
-    it 'returns 500 status code' do
-      sign_in(user)
-      get :summary, params: input_params
-      expect(response).to have_http_status(500)
-    end
-  end
-
-  context 'GET summary with invalid HbxEnrollment BSON Id' do
-    let(:input_params) do
-      {
-        standard_component_id: '11111100001111-01',
-        active_year: '2015',
-        hbx_enrollment_id: '1234567890',
-        market_kind: 'shop',
-        coverage_kind: 'health'
-      }
-    end
-
-    it 'returns 500 status code' do
-      sign_in(user)
-      get :summary, params: input_params
-      expect(response).to have_http_status(500)
-    end
-  end
-
   context "GET summary", :dbclean => :around_each do
     let(:qhp_cost_share_variance){ double("QhpCostShareVariance", :hios_plan_and_variant_id => "id") }
     let(:product) { double("Product") }
@@ -189,6 +154,41 @@ RSpec.describe Products::QhpController, :type => :controller, dbclean: :around_e
       expect(response).to have_http_status(:success)
       expect(assigns(:market_kind)).to eq "individual"
       expect(assigns(:coverage_kind)).to eq "dental"
+    end
+  end
+
+  context 'GET summary without HbxEnrollment BSON Id' do
+    let(:input_params) do
+      {
+        standard_component_id: '11111100001111-01',
+        active_year: '2015',
+        market_kind: 'shop',
+        coverage_kind: 'health'
+      }
+    end
+
+    it 'returns 500 status code' do
+      sign_in(user)
+      get :summary, params: input_params
+      expect(response).to have_http_status(500)
+    end
+  end
+
+  context 'GET summary with invalid HbxEnrollment BSON Id' do
+    let(:input_params) do
+      {
+        standard_component_id: '11111100001111-01',
+        active_year: '2015',
+        hbx_enrollment_id: '1234567890',
+        market_kind: 'shop',
+        coverage_kind: 'health'
+      }
+    end
+
+    it 'returns 500 status code' do
+      sign_in(user)
+      get :summary, params: input_params
+      expect(response).to have_http_status(500)
     end
   end
 end
