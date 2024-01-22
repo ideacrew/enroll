@@ -36,7 +36,7 @@ module EventLogs
       parsed = JSON.parse(log.payload, symbolize_names: true)
       details = JSON.parse(self.attributes.to_json, symbolize_names: true)
       datetime = parsed.dig(:state_histories, 0, :effective_on)
-      effective_on = DateTime.parse(datetime)&.strftime("%d/%m/%Y")
+      effective_on = DateTime.parse(datetime.to_s)&.strftime("%d/%m/%Y") if datetime
       subject = Person.by_hbx_id(self.subject_hbx_id)&.first&.full_name
       detail = log.event_name&.match(/[^.]+\z/)&.to_s&.titleize
       build_details(parsed, details, effective_on, detail, subject)

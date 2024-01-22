@@ -114,11 +114,7 @@
 
     <div class="event-log-header">
       <div class="event-log-export-text">
-        <!-- chnage this to translation -->
-        <h3><b><%= l10n("event_log.table_label") %> <%= hbx_id %></b></h3>
-        <!-- fix export to match new table? -->
-
-        <button id="export-table" class="button-primary"><a href="/event_logs.csv?family=<%= @family.id %>" id="export-table" class="button-primary">Export CSV</a></button>
+        <h3><b><%= l10n("event_log.table_label") %> <%= hbx_id %></b></h3><a href="/event_logs.csv?family=<%= @family.id %>" id="export-table" class="button button-primary">Export CSV</a>
       </div>
     </div>
     <div id="event-table-data">
@@ -134,31 +130,30 @@
         </thead>
         <tbody>
         <% if @event_logs&.any? %>
-        <% @event_logs.each_with_index do |event_log, index| %>
-          <tr class="primary-row" id="<%= index %>"%>
-            <td><span class="glyphicon glyphicon-chevron-right"></span></td>
-            <td class="subject"><%= event_log[:subject] %></td>
-            <td class="eligibility"><%= event_log[:title]&.upcase %></td>
-            <td class="status"><%= event_log[:current_state]&.titleize %></td>
-            <td class="effective-on"><%= event_log[:effective_on] %></td>
-          </tr>
-          <tr class="secondary-header" id="<%= index %>">
-            <td colspan="2"></td>
-            <th><%= l10n("Event Details") %></th>
-            <th><%= l10n("Account (HBX ID/User)") %></th>
-            <th><%= l10n("Account (Date/Time)") %></th>
-          </tr>
-          <tr class="detail-row" id="<%= index %>">
-            <td colspan="2"></td>
-            <td><%= event_log[:detail] %></td>
-            <td id="<%= event_log[:account_hbx_id] %>%" class="user_id"><%= event_log[:account_username] %></td>
-            <td class="event-time"><%= event_log[:event_time] %></td>
-          </tr>
-        <% end %>
+          <% @event_logs.each_with_index do |event_log, index| %>
+            <tr class="primary-row" id="<%= index %>"%>
+              <td><span class="glyphicon glyphicon-chevron-right"></span></td>
+              <td class="subject"><%= event_log[:subject] %></td>
+              <td class="eligibility"><%= event_log[:title]&.upcase %></td>
+              <td class="status"><%= event_log[:current_state]&.titleize %></td>
+              <td class="effective-on"><%= event_log[:effective_on] %></td>
+            </tr>
+            <tr class="secondary-header" id="<%= index %>">
+              <td colspan="2"></td>
+              <th><%= l10n("Event Details") %></th>
+              <th><%= l10n("Account (HBX ID/User)") %></th>
+              <th><%= l10n("Account (Date/Time)") %></th>
+            </tr>
+            <tr class="detail-row" id="<%= index %>">
+              <td colspan="2"></td>
+              <td><%= event_log[:detail] %></td>
+              <td id="<%= event_log[:account_hbx_id] %>%" class="user_id"><%= event_log[:account_username] %></td>
+              <td class="event-time"><%= event_log[:event_time] %></td>
+            </tr>
+          <% end %>
         <% end %>
         </tbody>
       </table>
-
     </div>
     <div id="no-results" style="display:none"><%= l10n("event_log.no_results") %></div>
   </div>
@@ -200,14 +195,7 @@
       const isFiltersHidden = filters.css('display') === 'none';
       filters.css('display', isFiltersHidden ? 'block' : 'none');
       arrow.toggleClass('glyphicon-chevron-right glyphicon-chevron-down');
-
-      // Explicitly show/hide the button
-      runQueryButton.css('visibility', isFiltersHidden ? 'visible' : 'hidden');
     });
-
-    // Initially hide the runQueryButton
-    runQueryButton.css('visibility', 'hidden');
-
 
     exportTableButton.on('click', function() {
       window.location.href = '/event_logs.csv';
@@ -393,6 +381,7 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
       });
     }
 
+    // verified with delivery manager this is just an exact match
     if ($('#effective-on').val()) {
       value = $('#effective-on').val()
       $('td.effective-on').each(function( index ) {
