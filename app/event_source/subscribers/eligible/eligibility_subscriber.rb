@@ -69,7 +69,8 @@ module Subscribers
                 subject: subject,
                 evidence_key: evidence_key,
                 evidence_value: osse_eligibility.to_s,
-                effective_date: effective_date
+                effective_date: effective_date,
+                renewal_eligibility: true
               }
             )
 
@@ -96,7 +97,7 @@ module Subscribers
       def create_eligibility(options)
         operation = eligibility_operation_for(options[:subject]).new
         operation.default_eligibility = true if options[:evidence_value] == "false"
-
+        operation.prospective_eligibility = options[:renewal_eligibility] || false
         operation.call(
           {
             subject: options[:subject].to_global_id,
