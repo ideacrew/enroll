@@ -1035,6 +1035,11 @@ end
 
 Then(/^the employer should see billing information$/) do
   expect(page).to have_content('The invoice includes next month')
+  expect(page).to have_content(EnrollRegistry[:po_lock_box_address].settings(:name).item)
+  expect(page).to have_content(EnrollRegistry[:po_lock_box_address].settings(:number).item)
+  expect(page).to have_content(EnrollRegistry[:po_lock_box_address].settings(:state).item)
+  expect(page).to have_content(EnrollRegistry[:po_lock_box_address].settings(:city).item)
+  expect(page).to have_content(EnrollRegistry[:po_lock_box_address].settings(:zip_code).item)
 end
 
 Then(/^the employer should see Download,Print Option/) do
