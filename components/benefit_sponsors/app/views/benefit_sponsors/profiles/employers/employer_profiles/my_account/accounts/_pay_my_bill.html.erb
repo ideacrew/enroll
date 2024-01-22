@@ -32,13 +32,13 @@
     </li>
     <li>Pay by Mail <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Slowest payment option – takes up to 2 weeks to process."></i>
       <div class="row col-md-offset-1">
-        <%= BenefitSponsorsRegistry[:enroll_app].settings(:short_name).item %>
+        <%= po_lock_box_name %>
       </div>
       <div class="row col-md-offset-1">
-        <%= EnrollRegistry[:enroll_app].setting(:contact_center_po_box).item %>
+        <%= po_lock_box_number %>
       </div>
       <div class="row col-md-offset-1">
-        <%= EnrollRegistry[:enroll_app].setting(:contact_center_city).item %>, <%= Settings.contact_center.state %> <%= EnrollRegistry[:enroll_app].setting(:contact_center_zip_code).item %>
+        <%= po_lock_box_city %>, <%= po_lock_box_state %> <%= po_lock_box_zip_code %>
       </div>
     </li>
   </ol>
