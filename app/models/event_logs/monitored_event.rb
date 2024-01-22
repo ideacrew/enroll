@@ -38,16 +38,16 @@ module EventLogs
       datetime = parsed.dig(:state_histories, 0, :effective_on)
       effective_on = DateTime.parse(datetime)&.strftime("%d/%m/%Y")
       subject = Person.by_hbx_id(self.subject_hbx_id)&.first&.full_name
-      title = parsed[:title]&.gsub("Aca ", "")&.gsub("Eligibility ", "")&.upcase
-      build_details(parsed, details, effective_on, subject, title)
+      detail = log.event_name&.match(/[^.]+\z/)&.to_s&.titleize
+      build_details(parsed, details, effective_on, detail, subject)
     end
 
-    def build_details(parsed, details, effective_on, subject)
+    def build_details(parsed, details, effective_on, detail, subject)
       details[:current_state] = parsed[:current_state] || ""
       details[:subject] = subject || ""
-      details[:title] = title || ""
+      details[:title] = parsed[:title]&.gsub("Aca ", "")&.gsub("Eligibility ", "")&.upcase || ""
       details[:effective_on] = effective_on || ""
-      details[:detail] = log.event_name&.match(/[^.]+\z/)&.to_s&.titleize || ""
+      details[:detail] = detail || ""
       details
     end
 
