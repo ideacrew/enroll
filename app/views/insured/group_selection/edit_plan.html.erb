@@ -81,7 +81,7 @@
                 <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: product } %>
               </div>
               <div class="col-md-6 margin-top-15px">
-                <a class="vertically-aligned-row" data-target="#<%= product.kind.to_s %>-<%= product.id %>-<%= hbx_enrollment.hbx_id%>" data-toggle="modal">
+                <a tabindex="0" onkeydown="handleContactInfoKeyDown(event, 'plan_contact_info', '<%= product.kind.to_s %>-<%= product.id %>-<%= hbx_enrollment.hbx_id%>')" id="plan_contact_info" class="vertically-aligned-row" data-target="#<%= product.kind.to_s %>-<%= product.id %>-<%= hbx_enrollment.hbx_id%>" data-toggle="modal">
                   <i class="fa fa-phone fa-2x margin-right-15px"></i>
                   <span><%= l10n("plan_contact_info") %></span>
                 </a>
@@ -91,7 +91,7 @@
             </div>
             <div class="row">
               <div class="col-sm-6 transm">
-                <a id="cancel-button" class="btn btn-default btn-block interaction-click-control-cancel-plan">Cancel Plan</a>
+                <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'cancel-button')" id="cancel-button" class="btn btn-default btn-block interaction-click-control-cancel-plan">Cancel Plan</a>
               </div>
               <% if display_change_tax_credits_button?(hbx_enrollment) %>
                 <div class="col-sm-6">

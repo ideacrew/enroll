@@ -28,6 +28,10 @@ When(/^the user visits messages page$/) do
   visit inbox_insured_families_path
 end
 
+When(/^the user visits the applications page$/) do
+  visit financial_assistance.applications_path
+end
+
 When(/^selects a Person account and navigates to Messages page$/) do
   @person = FactoryBot.create(:person, :with_consumer_role)
   visit inbox_insured_families_path

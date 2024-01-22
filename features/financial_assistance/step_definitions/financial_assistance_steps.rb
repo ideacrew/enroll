@@ -791,3 +791,11 @@ And(/^all applicants are not medicaid chip eligible and are non magi medicaid el
     applicant.update_attributes(is_non_magi_medicaid_eligible: false)
   end
 end
+
+And(/^there is a (.*) evidence present with the option to upload a document$/) do |evidence_type|
+  evidence = application.applicants.first.send("#{evidence_type}_evidence".to_sym)
+  # confirm evidence is visible
+  find("#evidence_kind_#{evidence_type}_evidence")
+  # confirm id on hidden input for upload is present
+  find(:xpath, "//input[@id='upload_evidence_#{evidence.id}']", :visible => false)
+end

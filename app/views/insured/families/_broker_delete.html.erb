@@ -1,0 +1,21 @@
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="deleteModalLabel"><%= l10n("confirmation") %>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <i aria-hidden="true" class="fas fa-times"><span class="hide"><%=l10n("close")%></span></i>
+          </button>
+        </h4>
+      </div>
+      <div class="modal-body">
+        <%= l10n("confirm_delete_msg") %>
+      </div>
+      <div class="modal-footer" style="display: flex;">
+        <%= button_to l10n("Delete"), delete_consumer_broker_insured_family_path(@family), method: :delete, class: 'btn btn-save', style: 'margin-right: 5px'%>
+        <button type="button" class="btn btn-default" data-dismiss="modal"><%= l10n("Cancel") %></button>
+      </div>
+    </div>
+  </div>
+</div>

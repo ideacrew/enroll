@@ -1068,6 +1068,7 @@ describe "Enabled/Disabled IVL market" do
       let(:employee_role) { person.employee_roles.first }
 
       before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([employee_role])
       end
 
