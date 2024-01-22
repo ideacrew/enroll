@@ -813,8 +813,19 @@ Then(/^(\w+) creates a new account$/) do |person|
   click_button 'Create account'
 end
 
+And(/the consumer creates a new account with email$/) do |person|
+  fill_in 'user[email]', with: "email#{person}"
+  fill_in CreateAccount.password, with: "aA1!aA1!aA1!"
+  fill_in CreateAccount.password_confirmation, with: "aA1!aA1!aA1!"
+  find(CreateAccount.create_account_btn).click
+end
+
 When(/^\w+ clicks continue$/) do
   find(IvlChooseCoverage.continue_btn).click
+end
+
+When(/the consumer clicks on the privacy continue button$/) do
+  find('.interaction-click-control-continue').click
 end
 
 When(/^\w+ selects Company match for (\w+)$/) do |company|
@@ -1319,6 +1330,19 @@ When(/Individual creates an HBX account with SSN already in use$/) do
   fill_in IvlPersonalInformation.ssn, with: '212-31-3131'
   find(IvlPersonalInformation.male_radiobtn).click
   find(IvlPersonalInformation.need_coverage_yes).click
+  find(IvlPersonalInformation.continue_btn).click
+end
+
+When(/Individual fills in personal info$/) do
+  fill_in IvlPersonalInformation.first_name, with: "Jack"
+  fill_in IvlPersonalInformation.last_name, with: "Smith"
+  fill_in IvlPersonalInformation.dob, with: "11/11/1992"
+  fill_in IvlPersonalInformation.ssn, with: '212-31-3131'
+  find(IvlPersonalInformation.male_radiobtn).click
+  find(IvlPersonalInformation.need_coverage_yes).click
+end
+
+When(/Individual clicks the personal info continue button$/) do
   find(IvlPersonalInformation.continue_btn).click
 end
 
