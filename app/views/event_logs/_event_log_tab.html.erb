@@ -20,67 +20,64 @@
           <div class="filter">
             <label for="<%= l10n("subject").downcase %>"><%= l10n("Subject") %></label>
             <dl class="dropdown">
-                <dt>
-                <div class="fake-select" style="display: flex;align-items: center;">
-                  <span class="fake-select-label">All</span>
-                  <p class="multiSel"></p>
+              <dt>
+              <div class="fake-select" style="display: flex;align-items: center;">
+                <span class="fake-select-label">All</span>
+                <p class="multiSel"></p>
+              </div>
+              </dt>
+              <dd>
+                <div class="mutliSelect">
+                  <ul>
+                    <li><label><input type="checkbox" name="<%= l10n("subject").downcase %>" value="all" checked/>All</label></li>
+                    <% @family.family_members.each do |member| %>
+                      <li><label><input type="checkbox" name="<%= l10n("subject").downcase %>" value="<%= member.person.full_name %>" checked/><%= member.person.full_name %></label></li>
+                    <% end %>
+                  </ul>
                 </div>
-                </dt>
-
-                <dd>
-                    <div class="mutliSelect">
-                        <ul>
-                          <li><label><input type="checkbox" name="<%= l10n("subject").downcase %>" value="all" checked/>All</label></li>
-                          <% @family.family_members.each do |member| %>
-                            <li><label><input type="checkbox" name="<%= l10n("subject").downcase %>" value="<%= member.person.full_name %>" checked/><%= member.person.full_name %></label></li>
-                          <% end %>
-                        </ul>
-                    </div>
-                </dd>
+              </dd>
             </dl>
           </div>
           <div class="filter">
             <label for="<%= l10n("event_log.select_eligibility") %>"><%= l10n("event_log.eligibility") %></label>
             <dl class="dropdown">
-                <dt>
+              <dt>
                 <div class="fake-select" style="display: flex;align-items: center;">
                   <span class="fake-select-label">All</span>
                   <p class="multiSel"></p>
                 </div>
-                </dt>
-
-                <dd>
-                    <div class="mutliSelect">
-                        <ul>
-                          <li><label><input type="checkbox" name="<%= l10n("event_log.eligibility").downcase %>" value="all" checked/>All</label></li>
-                          <% if @event_logs %>
-                            <% @event_logs.map{|event_log| event_log[:title]&.upcase }.each do |category| %>
-                              <li><label><input type="checkbox" name="<%= l10n("event_log.eligibility").downcase %>" value="<%= category %>" checked/><%= category %></label></li>
-                            <% end %>
-                          <% end %>
-                        </ul>
-                    </div>
-                </dd>
+              </dt>
+              <dd>
+                <div class="mutliSelect">
+                  <ul>
+                    <li><label><input type="checkbox" name="<%= l10n("event_log.eligibility").downcase %>" value="all" checked/>All</label></li>
+                    <% if @event_logs %>
+                      <% @event_logs.map{|event_log| event_log[:title]&.upcase }.uniq.each do |category| %>
+                        <li><label><input type="checkbox" name="<%= l10n("event_log.eligibility").downcase %>" value="<%= category %>" checked/><%= category %></label></li>
+                      <% end %>
+                    <% end %>
+                  </ul>
+                </div>
+              </dd>
             </dl>
           </div>
           <div class="filter">
             <label for="<%= l10n("status").downcase %>"><%= l10n("event_log.eligibility") %> <%= l10n("status") %></label>
             <dl class="dropdown">
-                <dt>
-                <div class="fake-select" style="display: flex;align-items: center;">
-                  <span class="fake-select-label"><%= l10n("All") %></span>
-                  <p class="multiSel"></p>
+              <dt>
+              <div class="fake-select" style="display: flex;align-items: center;">
+                <span class="fake-select-label"><%= l10n("All") %></span>
+                <p class="multiSel"></p>
+              </div>
+              </dt>
+              <dd>
+                <div class="mutliSelect">
+                  <ul>
+                    <li><label><input type="checkbox" name="<%= l10n('status').downcase %>" value="eligible" checked/><%= l10n("eligible") %></label></li>
+                    <li><label><input type="checkbox" name="<%= l10n('status').downcase %>" value="ineligible" checked/><%= l10n("ineligible") %></label></li>
+                  </ul>
                 </div>
-                </dt>
-
-                <dd>
-                    <div class="mutliSelect">
-                        <ul>
-                            <li><label><input type="checkbox" name="<%= l10n('status').downcase %>" value="eligible" checked/><%= l10n("eligible") %></label></li>
-                            <li><label><input type="checkbox" name="<%= l10n('status').downcase %>" value="ineligible" checked/><%= l10n("ineligible") %></label></li>
-                        </ul>
-                    </div>
-                </dd>
+              </dd>
             </dl>
           </div>
           <div class="filter">
@@ -120,7 +117,8 @@
         <!-- chnage this to translation -->
         <h3><b><%= l10n("event_log.table_label") %> <%= hbx_id %></b></h3>
         <!-- fix export to match new table? -->
-        <button id="export-table" class="button-primary"><%= l10n("event_log.export_table") %></button>
+
+        <button id="export-table" class="button-primary"><a href="/event_logs.csv?family=<%= @family.id %>" id="export-table" class="button-primary">Export CSV</a></button>
       </div>
     </div>
     <div id="event-table-data">
@@ -135,14 +133,14 @@
         </tr>
         </thead>
         <tbody>
-          <% if @event_logs&.any? %>
+        <% if @event_logs&.any? %>
         <% @event_logs.each_with_index do |event_log, index| %>
           <tr class="primary-row" id="<%= index %>"%>
             <td><span class="glyphicon glyphicon-chevron-right"></span></td>
             <td class="subject"><%= event_log[:subject] %></td>
             <td class="eligibility"><%= event_log[:title]&.upcase %></td>
             <td class="status"><%= event_log[:current_state]&.titleize %></td>
-            <td><%= event_log[:effective_on] %></td>
+            <td class="effective-on"><%= event_log[:effective_on] %></td>
           </tr>
           <tr class="secondary-header" id="<%= index %>">
             <td colspan="2"></td>
@@ -152,7 +150,7 @@
           </tr>
           <tr class="detail-row" id="<%= index %>">
             <td colspan="2"></td>
-            <td></td>
+            <td><%= event_log[:detail] %></td>
             <td id="<%= event_log[:account_hbx_id] %>%" class="user_id"><%= event_log[:account_username] %></td>
             <td class="event-time"><%= event_log[:event_time] %></td>
           </tr>
@@ -162,7 +160,7 @@
       </table>
 
     </div>
-    <div id="no-results" style="display:none">Your search returned zero results, try adjusting your filters</div>
+    <div id="no-results" style="display:none"><%= l10n("event_log.no_results") %></div>
   </div>
 </div>
 
@@ -219,7 +217,7 @@
     hideFilters();
 
     enableExportButton();
-      showFilters();
+    showFilters();
   });
 
   function disableButtons() {
@@ -375,10 +373,7 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
       } );
     }
 
-    // To Do: build out effective on filter!!
-
     if ($('#start-date').val()) {
-      var account_rows = [];
       value = $('#start-date').val()
       $('td.event-time').each(function( index ) {
         var row = $(this).closest('tr').prop('id');
@@ -397,7 +392,21 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         }
       });
     }
-    console.log(visible_rows)
+
+    if ($('#effective-on').val()) {
+      value = $('#effective-on').val()
+      $('td.effective-on').each(function( index ) {
+        var row = $(this).closest('tr').prop('id');
+        var row_index = visible_rows.indexOf(row);
+        var parsedDate = Date.parse($(this).text());
+        if (isNaN($(this).text()) && !isNaN(parsedDate)) {
+          if (!(Date.parse(value) === parsedDate) && row_index !== -1) {
+            visible_rows.splice( row_index, 1 );
+          }
+        }
+      });
+    }
+
     if (visible_rows.length === 0) {
       $('#event-table-data').hide()
       $('#no-results').show()
@@ -412,11 +421,12 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         }
       });
     }
-
   });
 
   $('#reset-filters').click(function(){
     event.preventDefault();
+    $('#event-table-data').show()
+    $('#no-results').hide()
     $('.filter input[type="text"], .filter input[type="date"]').val('');
     $('.filter input[type="checkbox"]').prop('checked', true).removeClass('partial-all');;
     $('.fake-select-label').text("All");

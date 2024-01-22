@@ -86,6 +86,7 @@ SHARED_TRANSLATIONS = {
     "en.event_log.select_eligibility" => "Select Eligibility",
     "en.event_log.additional_details" => "Additional Event Details.",
     "en.event_log.shop_action" => "Please use the filters below to see specific actions taken on this organization.",
-    "en.event_log.ivl_action" => "Please use the filters below to see specific actions taken on this individual."
+    "en.event_log.ivl_action" => "Please use the filters below to see specific actions taken on this individual.",
+    "en.event_log.no_results" => "Your search returned zero results, try adjusting your filters"
 
 }

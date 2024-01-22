@@ -186,7 +186,7 @@ class Insured::FamiliesController < FamiliesController
     authorize @family, :can_view_audit_log?
     @tab = params['tab']
     hbxes = @family.family_members.map {|fm| fm.person.hbx_id}&.uniq
-    @event_logs = EventLogs::MonitoredEvent.where(:subject_hbx_id.in=>hbxes)&.order(:event_time.desc)&.map(&:eligibility_details)
+    @event_logs = EventLogs::MonitoredEvent.where(:subject_hbx_id.in => hbxes)&.order(:event_time.desc)&.map(&:eligibility_details)
   end
 
   def healthcare_for_childcare_program_form
