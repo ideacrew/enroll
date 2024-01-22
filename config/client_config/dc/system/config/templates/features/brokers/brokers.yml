@@ -24,6 +24,9 @@ registry:
       - key: :broker_training_link
         is_enabled: true
         item: ""
+      - key: broker_agreement_url
+        is_enabled: true
+        item: ""
       - key: :allow_edit_broker_email
         is_enabled: <%= ENV['ALLOW_EDIT_BROKER_EMAIL_IS_ENABLED'] || false %>
       - key: :allow_edit_broker_npn
@@ -32,3 +35,6 @@ registry:
         is_enabled: <%= ENV['BROKER_HIRED_EVENT_TO_EDI_IS_ENABLED'] || false %>
       - key: :send_broker_fired_event_to_edi
         is_enabled: <%= ENV['BROKER_FIRED_EVENT_TO_EDI_IS_ENABLED'] || false %>
+      # Enhancements for Brokers acting as consumers under the same account
+      - key: :broker_role_consumer_enhancement
+        is_enabled: <%= ENV['BROKER_ROLE_CONSUMER_ENHANCEMENT_IS_ENABLED'] || false %>

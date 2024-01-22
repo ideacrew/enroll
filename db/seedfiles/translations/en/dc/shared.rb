@@ -5,7 +5,8 @@ SHARED_TRANSLATIONS = {
     "en.zip" => "ZIP",
     "en.new_address_shared" => "NEW ADDRESS",
     "en.home_address_shared" => "Home Address",
-
+    "en.pay_online" => "Pay Online",
+    "en.cancel" => "Cancel",
     "en.support_texts.new_address_shared" => "NEW ADDRESS",
     "en.support_texts.home_address_shared" => "Home Address",
     "en.support_texts.is_applying_coverage" => "<b> Does this person need coverage? </b> <br> <br> If you need coverage, select ‘yes’. If you’re applying for coverage for someone else, but don’t need coverage for yourself, select ‘no’. If you don’t need or qualify for coverage, but someone in your family or that you include on your tax return does, you can apply on their behalf.",
@@ -70,5 +71,21 @@ SHARED_TRANSLATIONS = {
 
     "en.previous_step" => "PREVIOUS",
     "en.save_and_exit" => "SAVE & EXIT",
-    "en.help_sign_up" => "Help Me Sign Up"
+    "en.help_sign_up" => "Help Me Sign Up",
+    "en.event_log.eligibility" => "Eligibility",
+    "en.event_log.outcome" => "Outcome",
+    "en.event_log.performed_by" => "Performed By",
+    "en.event_log.time" => "Time",
+    "en.event_log.hbx_id_email" => "HBX ID / Email",
+    "en.event_log.start_date" => "Start Date",
+    "en.event_log.end_date" => "End Date",
+    "en.event_log.run_query" => "Run Query",
+    "en.event_log.export_table" => "Export Table",
+    "en.event_log.hbx_id_text" => "HBX ID:",
+    "en.event_log.filters" => "Filters",
+    "en.event_log.select_eligibility" => "Select Eligibility",
+    "en.event_log.additional_details" => "Additional Event Details.",
+    "en.event_log.shop_action" => "Please use the filters below to see specific actions taken on this organization.",
+    "en.event_log.ivl_action" => "Please use the filters below to see specific actions taken on this individual."
+
 }

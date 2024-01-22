@@ -338,6 +338,9 @@ RSpec.describe Exchanges::BrokerApplicantsController do
       let(:invitation) { Invitation.new }
       before :each do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:resend_broker_email_button).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prevent_concurrent_sessions).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:preferred_user_access).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_role_consumer_enhancement).and_return(false)
         put :update, params: {id: broker_role.person.id, sendemail: true}, format: :js
       end
 

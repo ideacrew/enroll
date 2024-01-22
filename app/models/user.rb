@@ -61,6 +61,9 @@ class User
   ## Seed: https://github.com/plataformatec/devise/wiki/How-To%3a-Require-admin-to-activate-account-before-sign_in
   field :approved, type: Boolean, default: true
 
+  # Session token for Devise to prevent concurrent user sessions
+  field :current_login_token
+
   ##RIDP
   field :identity_verified_date, type: Date
   field :identity_final_decision_code, type: String
@@ -238,6 +241,16 @@ class User
 
     def current_user=(user)
       Thread.current[:current_user] = user
+    end
+
+    def current_login_session=(resource)
+      Thread.current[:login_session_id] = resource ? SecureRandom.hex(16) : nil
+    end
+
+    def current_session_values=(session = nil)
+      session_values = session&.to_hash&.except("warden.user.user.key", "_csrf_token") || {}
+      session_values["session_id"] = session&.id
+      Thread.current[:current_session_values] = session_values
     end
 
     def get_saml_settings

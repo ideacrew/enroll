@@ -6,20 +6,20 @@
 
   /* Fields Background (Form Input) */
   .cx-widget.cx-theme-dark .cx-form-control {
-    background-color: #4b7ca4;
-    color: #fdfdfd;
+    background-color: var(--theme-primary-blue);
+    color: var(--primary-white);
   }
 
   /* Start Button */
   .cx-widget.cx-theme-dark .cx-btn-primary {
-    border-color: #8ba472 !important;
-    background: #8ba472;
+    border-color: var(--primary-green) !important;
+    background: var(--primary-green);
   }
 
   /* Cancel Button */
   .cx-widget.cx-theme-dark .cx-btn-default {
-    border-color: #4b7ca4!important;
-    background-color: #4b7ca4;
+    border-color: var(--theme-primary-blue) !important;
+    background-color: var(--theme-primary-blue);
   }
 
   .live-chat-button {
@@ -38,6 +38,12 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
+  }
+
+  /* Footer Text And Icon */
+  .cx-widget.cx-theme-dark .cx-branding *, .cx-widget.cx-theme-dark .cx-footer * {
+    fill: var(--primary-white);
+    color: var(--primary-white);
   }
 
 </style>

@@ -152,10 +152,9 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
 
         context "and today is the last day to obtain benefits starting first of next month" do
           before do
-            # Need to revert the monthly_effective_date_deadline with following changes back on 5/1/2020
-            # monthly_effective_date_deadline = HbxProfile::IndividualEnrollmentDueDayOfMonth
-            monthly_effective_date_deadline = 15
-            TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 9, monthly_effective_date_deadline))
+            TimeKeeper.set_date_of_record_unprotected!(
+              Date.new(2015, 9, HbxProfile::IndividualEnrollmentDueDayOfMonth)
+            )
           end
 
           it "should determine the earliest effective date is next month" do
@@ -165,16 +164,13 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
 
         context "and today is past the deadline to obtain benefits starting first of next month" do
           before do
-            # Need to revert the monthly_effective_date_deadline with following changes back on 5/1/2020
-            # monthly_effective_date_deadline = HbxProfile::IndividualEnrollmentDueDayOfMonth
-            monthly_effective_date_deadline = 15
-            TimeKeeper.set_date_of_record_unprotected!(Date.new(2015, 9, (monthly_effective_date_deadline + 1)))
+            TimeKeeper.set_date_of_record_unprotected!(
+              Date.new(2015, 9, HbxProfile::IndividualEnrollmentDueDayOfMonth).next_day
+            )
           end
 
           it "should determine the earliest effective date is month after next" do
-            # Need to revert the Date.new(2015, 10, 1) with following changes back on 5/1/2020
             expect(benefit_coverage_period.earliest_effective_date).to eq Date.new(2015, 11, 1)
-            # expect(benefit_coverage_period.earliest_effective_date).to eq Date.new(2015, 10, 1)
           end
         end
 

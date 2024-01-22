@@ -18,9 +18,9 @@
         <td>No</td>
         <td>
           <%if @application.active_applicants.find_by(family_member_id: member.id).applicant_validation_complete?%>
-          <span class="glyphicon glyphicon-ok complete-icon"></span>&nbsp;<span class="complete-icon">Complete</span>
+          <span class="glyphicon glyphicon-ok complete-icon"></span>&nbsp;<span class="complete-icon-text">Complete</span>
           <%else%>
-          <span class="glyphicon glyphicon-refresh in-progress-icon"></span>&nbsp;<span class ="in-progress-icon">In Progress</span>
+          <span class="glyphicon glyphicon-refresh in-progress-faa-icon in-progress-icon"></span>&nbsp;<span class ="in-progress-icon">In Progress</span>
           <%end%>
         </td>
         <td>

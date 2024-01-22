@@ -40,6 +40,7 @@ module Config::AcaModelConcern
     delegate :allow_mid_month_non_payment_terms?, to: :class
     delegate :enabled_metal_levels, to: :class
     delegate :offerings_constrained_to_service_areas?, to: :class
+    delegate :event_logging_enabled?, to: :class
   end
 
   class_methods do
@@ -193,6 +194,10 @@ module Config::AcaModelConcern
 
     def offers_nationwide_plans?
       @offers_nationwide_plans ||= Settings.aca.nationwide_markets
+    end
+
+    def event_logging_enabled?
+      @@event_logging_enabled ||= EnrollRegistry.feature_enabled?(:aca_event_logging)
     end
   end
 end

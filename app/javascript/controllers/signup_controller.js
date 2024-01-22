@@ -32,10 +32,11 @@ emailTooltip() {
 }
 
 passwordTooltip() {
+  let passwordLength = $('#user_password').minLength;
   const passwordHelper =
     `<p>Your password must:</p>
      <ul class="list-group pwHelper">
-      <li id="length" class="invalid"><i class="fa fa-times mr-3 length"></i>Be at least 8 characters</li>
+      <li id="length" class="invalid"><i class="fa fa-times mr-3 length"></i>Be at least ${passwordLength} characters</li>
       <li id="longer" class="invalid"><i class="fa fa-times mr-3 longer"></i>Not be longer than 20 characters</li>
       <li id="lower" class="invalid"><i class="fa fa-times mr-3 lower"></i>Include at least one lowercase letter</li>
       <li id="upper" class="invalid"><i class="fa fa-times mr-3 upper"></i>Include at least one uppercase letter</li>
@@ -60,7 +61,8 @@ validateInput() {
   // Password text must be present
   if (this.passwordFieldTarget.value.length > 0 && document.querySelector('.pwHelper')) {
     const value = this.passwordFieldTarget.value;
-    this.validateLength(value);
+    const minLength = $('#user_password').minLength;
+    this.validateLength(value, minLength);
     this.validateNumber(value);
     this.validateSpecialCharacters(value);
     this.validateUpCase(value);
@@ -68,7 +70,7 @@ validateInput() {
     this.validateRepeatedChar(value);
     this.validateWhiteSpace(value);
     this.validateUserIdMatch(value);
-    this.passwordComplexity(value);
+    this.passwordComplexity(value, minLength);
   } else if (this.passwordFieldTarget.value.length === 0) {
     // this.resetTooltips(['number', 'spec_char', 'mtt', 'wh_space', 'nm_uid']);
   }
@@ -86,11 +88,11 @@ resetIcons() {
 
 }
 
-validateLength(value) {
-  if (value.length >= 8 && value.length < 20) {
+validateLength(value, minLength) {
+  if (value.length >= minLength && value.length < 20) {
     document.querySelector('.length').classList.add('fa-check');
     document.querySelector('.longer').classList.add('fa-check');
-  } else if (value.length < 8 && this.usernameFieldTarget.value.length > 0) {
+  } else if (value.length < minLength && this.usernameFieldTarget.value.length > 0) {
     this.resetIcons();
   }
 }
@@ -179,8 +181,7 @@ validateUserIdMatch(value) {
   }
 }
 
-passwordComplexity(value) {
-  const minPasswordLength = 8;
+passwordComplexity(value, minPasswordLength) {
   const num = {};
   num.Excess = 0;
   num.Upper = 0;
@@ -217,7 +218,18 @@ passwordComplexity(value) {
     bonus.FlatNumber = -35;
   }
 
-  score = baseScore + (num.Excess*bonus.Excess) + (num.Upper*bonus.Upper) + (num.Numbers*bonus.Numbers) + (num.Symbols*bonus.Symbols) + bonus.Combo + bonus.FlatLower + bonus.FlatNumber;
+  // minPasswordLength was previously set to 8, but has been increased to 12
+  //   to prevent a password that meets every requirement in the tooltip
+  //   from displaying as "weak", which can not be submitted.
+  //   To keep the same scoring logic, strongPasswordBonus accounts for the
+  //   4 characters' worth of "bonus.Excess" points (3 each) that would be
+  //   added to the final score of a 12 character password with minPasswordLength set to 8.
+  let strongPasswordBonus = 0;
+  if (minPasswordLength > 8) {
+    strongPasswordBonus = (minPasswordLength - 8) * 3;
+  }
+
+  score = baseScore + (num.Excess*bonus.Excess) + (num.Upper*bonus.Upper) + (num.Numbers*bonus.Numbers) + (num.Symbols*bonus.Symbols) + bonus.Combo + bonus.FlatLower + bonus.FlatNumber + strongPasswordBonus;
 
   if (this.passwordFieldTarget.value === "") {
       const complexity = document.getElementById('complexity');
@@ -304,19 +316,37 @@ isEmail(email) {
   return /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i.test(email);
 }
 
-passwordsMatch() {
-  let password = this.passwordFieldTarget.value;
-  let password_confirmation = this.passwordConfirmationFieldTarget.value;
+validatePassword() {
   let createButton = document.querySelector('.create-account-btn');
   let pwError = document.getElementById('pwError');
+  let pwErrorMatch = document.getElementById('pwErrorMatch');
+  let pwErrorStrength = document.getElementById('pwErrorStrength');
 
-  if (password !== password_confirmation) {
+  if (!this.passwordsMatch()) {
     createButton.setAttribute('disabled', true);
+    pwErrorMatch.classList.remove('d-none');
+    pwErrorStrength.classList.add('d-none');
+    pwError.classList.remove('d-none');
+  } else if (!this.passwordIsStrong()) {
+    createButton.setAttribute('disabled', true);
+    pwErrorMatch.classList.add('d-none');
+    pwErrorStrength.classList.remove('d-none');
     pwError.classList.remove('d-none');
   } else {
     createButton.removeAttribute('disabled');
     pwError.classList.add('d-none');
   }
+}
+
+passwordsMatch() {
+  let password = this.passwordFieldTarget.value;
+  let password_confirmation = this.passwordConfirmationFieldTarget.value;
+  return password == password_confirmation;
+}
+
+passwordIsStrong() {
+  const complexity = document.getElementById('complexity');
+  return complexity.className != "weak";
 }
 
 preventEnterSubmission(event) {

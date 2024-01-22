@@ -26,6 +26,14 @@ Then(/^\w+ should see Go To Plan Compare button$/) do
   expect(page).to have_content("CHECKBOOK")
 end
 
+Then(/^\w+ should see (.*) title content$/) do |coverage_kind|
+  if coverage_kind == "health"
+    expect(page).to have_content(l10n("insured.plan_shoppings.show.health_title.content"))
+  else
+    expect(page).to have_content(l10n("insured.plan_shoppings.show.dental_title.content"))
+  end
+end
+
 When(/^\w+ visits? the Insured portal outside of open enrollment$/) do
   FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
   FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
@@ -229,6 +237,22 @@ Then(/^.+ should not see error message (.*)$/) do |text|
   page.should have_no_content(text)
 end
 
+Given(/^the strong password length feature is (.+)$/) do |feature|
+  if feature == "enabled"
+    allow(EnrollRegistry[:strong_password_length].feature).to receive(:is_enabled).and_return(true)
+  else
+    allow(EnrollRegistry[:strong_password_length].feature).to receive(:is_enabled).and_return(false)
+  end
+end
+
+Then(/^Individual should see a minimum password length of (.+)$/) do |length|
+  expect(page).to have_content("#{length} #{l10n('devise.registrations.characters_minimum')}")
+end
+
+Then(/^.+ should see the weak password error message$/) do
+  page.should have_content(l10n("devise.errors.password_strength"))
+end
+
 And(/(.*) selects eligible immigration status$/) do |text|
   if text == "Dependent"
     find(:xpath, '//label[@for="dependent_us_citizen_false"]').click
@@ -374,7 +398,7 @@ Then(/^Individual should be on verification page/) do
 end
 
 When(/^.+ clicks on the Continue button of the Family Information page$/) do
-  find(IvlFamilyInformation.continue_btn).click
+  find('.interaction-click-control-continue').click
   sleep 10
 end
 
@@ -452,7 +476,7 @@ end
 And(/^.+ clicks on the Continue button of the Household Info page/) do
   screenshot("line 161")
   sleep 2
-  find(IvlIapFamilyInformation.continue_btn).click
+  find('.interaction-click-control-continue').click
 end
 
 Then(/consumer clicked on Go To My Account/) do
@@ -463,6 +487,13 @@ Then(/Individual creates a new HBX account$/) do
   fill_in CreateAccount.email_or_username, :with => "testflow@test.com"
   fill_in CreateAccount.password, :with => "aA1!aA1!aA1!"
   fill_in CreateAccount.password_confirmation, :with => "aA1!aA1!aA1!"
+  find(CreateAccount.create_account_btn, wait: 5).click
+end
+
+Then(/Individual creates a new HBX account with a weak password$/) do
+  fill_in CreateAccount.email_or_username, :with => "testflow@test.com"
+  fill_in CreateAccount.password, :with => "BadPw1!"
+  fill_in CreateAccount.password_confirmation, :with => "BadPw1!"
   find(CreateAccount.create_account_btn).click
 end
 
@@ -500,6 +531,9 @@ And(/I signed in$/) do
   find(SignIn.sign_in_btn).click
 end
 
+When(/^the individual continues to the Choose Coverage page$/) do
+  expect(page).to have_content IvlChooseCoverage.choose_coverage_for_your_household_text
+end
 
 When(/^the individual clicks the Continue button of the Group Selection page$/) do
   expect(page).to have_content IvlChooseCoverage.choose_coverage_for_your_household_text
@@ -1178,6 +1212,10 @@ When(/Individual clicks on continue button on Choose Coverage page$/) do
   find(IvlChooseCoverage.continue_btn).click
 end
 
+And(/Individual clicks the Back to My Account button$/) do
+  find(".interaction-click-control-back-to-my-account")
+end
+
 And(/Individual signed in to resume enrollment$/) do
   visit '/'
   click_link('Consumer/Family Portal', wait: 10)
@@ -1212,8 +1250,8 @@ end
 
 Then(/Dependent creates a new HBX account$/) do
   fill_in CreateAccount.email_or_username, :with => "testtest@gmail.com"
-  fill_in CreateAccount.password, :with => "aA1!aA1!"
-  fill_in CreateAccount.password_confirmation, :with => "aA1!aA1!"
+  fill_in CreateAccount.password, :with => "aA1!aA1!aA1!"
+  fill_in CreateAccount.password_confirmation, :with => "aA1!aA1!aA1!"
   find(CreateAccount.create_account_btn).click
 end
 

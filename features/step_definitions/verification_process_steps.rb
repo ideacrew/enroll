@@ -38,7 +38,7 @@ Given(/^the consumer is logged in$/) do
 end
 
 Then(/^the consumer visits verification page$/) do
-  visit verification_insured_families_path
+  visit verification_insured_families_path(tab: 'verification')
   find(".interaction-click-control-documents", wait: 5).click
 end
 

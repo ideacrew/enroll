@@ -16,7 +16,11 @@ shared_examples "an invitation with invalid source kind and role" do |sk, role|
 end
 
 describe Invitation do
-  before :all do
+  before :each do
+    DatabaseCleaner.clean
+  end
+
+  after :each do
     DatabaseCleaner.clean
   end
 
@@ -194,6 +198,359 @@ describe Invitation do
         expect(invitation).to receive(:send_agent_invitation!)
         Invitation.invite_general_agency_staff!(general_agency_staff_role)
       end
+    end
+  end
+end
+
+describe "A Broker Invitation" do
+  let(:person) { instance_double(Person, :user => user, :consumer_role => consumer_role) }
+  let(:broker) { instance_double(BrokerRole, :person => person, :email_address => email_address) }
+
+  before :each do
+    allow(EnrollRegistry).to receive(
+      :feature_enabled?
+    ).with(:broker_role_consumer_enhancement).and_return(
+      setting_enabled
+    )
+  end
+
+  describe "when:
+              - :broker_role_consumer_enhancement is disabled
+              - the broker doesn't have an email" do
+    let(:setting_enabled) { false }
+    let(:consumer_role) { nil }
+    let(:user) { nil }
+    let(:email_address) { nil }
+
+    it "should not invite the broker" do
+      expect(Invitation.should_invite_broker_or_broker_staff_role?(broker)).to be_falsey
+    end
+
+    it "should not notify the broker of being approved" do
+      expect(Invitation.should_notify_linked_broker?(broker)).to be_falsey
+    end
+  end
+
+  describe "when:
+              - :broker_role_consumer_enhancement is disabled
+              - the broker doesn't has an email" do
+    let(:setting_enabled) { false }
+    let(:consumer_role) { nil }
+    let(:user) { nil }
+    let(:email_address) { "some email address" }
+
+    it "should invite the broker" do
+      expect(Invitation.should_invite_broker_or_broker_staff_role?(broker)).to be_truthy
+    end
+
+    it "should not notify the broker of being approved" do
+      expect(Invitation.should_notify_linked_broker?(broker)).to be_falsey
+    end
+  end
+
+  describe "when:
+              - :broker_role_consumer_enhancement is enabled
+              - the broker doesn't have an email" do
+    let(:setting_enabled) { true }
+    let(:consumer_role) { nil }
+    let(:user) { nil }
+    let(:email_address) { nil }
+
+    it "should not invite the broker" do
+      expect(Invitation.should_invite_broker_or_broker_staff_role?(broker)).to be_falsey
+    end
+
+    it "should not notify the broker of being approved" do
+      expect(Invitation.should_notify_linked_broker?(broker)).to be_falsey
+    end
+  end
+
+  describe "when:
+              - :broker_role_consumer_enhancement is enabled
+              - the broker has an email
+              - the broker's person DOESN'T HAVE a user
+              - the broker's person DOESN'T HAVE a consumer role" do
+    let(:setting_enabled) { true }
+    let(:consumer_role) { nil }
+    let(:user) { nil }
+    let(:email_address) { "some email address" }
+
+    it "should invite the broker" do
+      expect(Invitation.should_invite_broker_or_broker_staff_role?(broker)).to be_truthy
+    end
+
+    it "should not notify the broker of being approved" do
+      expect(Invitation.should_notify_linked_broker?(broker)).to be_falsey
+    end
+  end
+
+  describe "when:
+              - :broker_role_consumer_enhancement is enabled
+              - the broker has an email
+              - the broker's person DOESN'T HAVE a user
+              - the broker's person HAS a consumer role" do
+    let(:setting_enabled) { true }
+    let(:consumer_role) { double }
+    let(:user) { nil }
+    let(:email_address) { "some email address" }
+
+    it "should invite the broker" do
+      expect(Invitation.should_invite_broker_or_broker_staff_role?(broker)).to be_truthy
+    end
+
+    it "should not notify the broker of being approved" do
+      expect(Invitation.should_notify_linked_broker?(broker)).to be_falsey
+    end
+  end
+
+  describe "when:
+              - :broker_role_consumer_enhancement is enabled
+              - the broker has an email
+              - the broker's person HAS a user
+              - the broker's person DOESN'T HAVE a consumer role" do
+    let(:setting_enabled) { true }
+    let(:consumer_role) { nil }
+    let(:user) { double }
+    let(:email_address) { "some email address" }
+
+    it "should invite the broker" do
+      expect(Invitation.should_invite_broker_or_broker_staff_role?(broker)).to be_truthy
+    end
+
+    it "should not notify the broker of being approved" do
+      expect(Invitation.should_notify_linked_broker?(broker)).to be_falsey
+    end
+  end
+
+  describe "when:
+              - :broker_role_consumer_enhancement is enabled
+              - the broker has an email
+              - the broker's person HAS a user
+              - the broker's person HAS a consumer role" do
+    let(:setting_enabled) { true }
+    let(:consumer_role) { double }
+    let(:user) { double }
+    let(:email_address) { "some email address" }
+
+    it "should not invite the broker" do
+      expect(Invitation.should_invite_broker_or_broker_staff_role?(broker)).to be_falsey
+    end
+
+    it "should notify the broker of being approved" do
+      expect(Invitation.should_notify_linked_broker?(broker)).to be_truthy
+    end
+  end
+end
+
+describe "A Broker Staff Invitation" do
+  let(:person) { instance_double(Person, :user => user, :consumer_role => consumer_role, :broker_role => broker_role) }
+  let(:broker_staff) do
+    instance_double(
+      BrokerAgencyStaffRole,
+      :person => person,
+      :email_address => email_address,
+      :broker_agency_profile => broker_agency_profile
+    )
+  end
+  let(:broker_role) { nil }
+  let(:broker_agency_profile) do
+    instance_double(
+      BenefitSponsors::Organizations::BrokerAgencyProfile,
+      :id => "A BROKER AGENCY PROFILE ID"
+    )
+  end
+
+  before :each do
+    allow(EnrollRegistry).to receive(
+      :feature_enabled?
+    ).with(:broker_role_consumer_enhancement).and_return(
+      setting_enabled
+    )
+  end
+
+  describe "when:
+              - :broker_role_consumer_enhancement is disabled
+              - the broker staff doesn't have an email" do
+    let(:setting_enabled) { false }
+    let(:consumer_role) { nil }
+    let(:user) { nil }
+    let(:email_address) { nil }
+
+    it "should not invite the broker" do
+      expect(Invitation.should_invite_broker_or_broker_staff_role?(broker_staff)).to be_falsey
+    end
+
+    it "should not notify the broker staff of being approved" do
+      expect(Invitation.should_notify_linked_broker_staff?(broker_staff)).to be_falsey
+    end
+  end
+
+  describe "when:
+              - :broker_role_consumer_enhancement is disabled
+              - the broker staff doesn't have an email" do
+    let(:setting_enabled) { false }
+    let(:consumer_role) { nil }
+    let(:user) { nil }
+    let(:email_address) { "some email address" }
+
+    it "should invite the broker" do
+      expect(Invitation.should_invite_broker_or_broker_staff_role?(broker_staff)).to be_truthy
+    end
+
+    it "should not notify the broker staff of being approved" do
+      expect(Invitation.should_notify_linked_broker_staff?(broker_staff)).to be_falsey
+    end
+  end
+
+  describe "when:
+              - :broker_role_consumer_enhancement is enabled
+              - the broker staff doesn't have an email" do
+    let(:setting_enabled) { true }
+    let(:consumer_role) { nil }
+    let(:user) { nil }
+    let(:email_address) { nil }
+
+    it "should not invite the broker" do
+      expect(Invitation.should_invite_broker_or_broker_staff_role?(broker_staff)).to be_falsey
+    end
+
+    it "should not notify the broker staff of being approved" do
+      expect(Invitation.should_notify_linked_broker_staff?(broker_staff)).to be_falsey
+    end
+  end
+
+  describe "when:
+              - :broker_role_consumer_enhancement is enabled
+              - the broker staff has an email
+              - the broker staff's person DOESN'T HAVE a user
+              - the broker staff's person DOESN'T HAVE a consumer role" do
+    let(:setting_enabled) { true }
+    let(:consumer_role) { nil }
+    let(:user) { nil }
+    let(:email_address) { "some email address" }
+
+    it "should invite the broker" do
+      expect(Invitation.should_invite_broker_or_broker_staff_role?(broker_staff)).to be_truthy
+    end
+
+    it "should not notify the broker staff of being approved" do
+      expect(Invitation.should_notify_linked_broker_staff?(broker_staff)).to be_falsey
+    end
+  end
+
+  describe "when:
+              - :broker_role_consumer_enhancement is enabled
+              - the broker staff has an email
+              - the broker staff's person DOESN'T HAVE a user
+              - the broker staff's person HAS a consumer role" do
+    let(:setting_enabled) { true }
+    let(:consumer_role) { double }
+    let(:user) { nil }
+    let(:email_address) { "some email address" }
+
+    it "should invite the broker" do
+      expect(Invitation.should_invite_broker_or_broker_staff_role?(broker_staff)).to be_truthy
+    end
+
+    it "should not notify the broker staff of being approved" do
+      expect(Invitation.should_notify_linked_broker_staff?(broker_staff)).to be_falsey
+    end
+  end
+
+  describe "when:
+              - :broker_role_consumer_enhancement is enabled
+              - the broker staff has an email
+              - the broker staff's person HAS a user
+              - the broker staff's person DOESN'T HAVE a consumer role" do
+    let(:setting_enabled) { true }
+    let(:consumer_role) { nil }
+    let(:user) { double }
+    let(:email_address) { "some email address" }
+
+    it "should invite the broker" do
+      expect(Invitation.should_invite_broker_or_broker_staff_role?(broker_staff)).to be_truthy
+    end
+
+    it "should not notify the broker staff of being approved" do
+      expect(Invitation.should_notify_linked_broker_staff?(broker_staff)).to be_falsey
+    end
+  end
+
+  describe "when:
+              - :broker_role_consumer_enhancement is enabled
+              - the broker staff has an email
+              - the broker staff's person HAS a user
+              - the broker staff's person HAS a consumer role
+              - the broker staff has no broker role" do
+    let(:setting_enabled) { true }
+    let(:consumer_role) { double }
+    let(:user) { double }
+    let(:email_address) { "some email address" }
+
+    it "should not invite the broker" do
+      expect(Invitation.should_invite_broker_or_broker_staff_role?(broker_staff)).to be_falsey
+    end
+
+    it "should notify the broker staff of being approved" do
+      expect(Invitation.should_notify_linked_broker_staff?(broker_staff)).to be_truthy
+    end
+  end
+
+  describe "when:
+              - :broker_role_consumer_enhancement is enabled
+              - the broker staff has an email
+              - the broker staff's person HAS a user
+              - the broker staff's person HAS a consumer role
+              - the broker staff has a broker role with a different agency" do
+    let(:setting_enabled) { true }
+    let(:consumer_role) { double }
+    let(:user) { double }
+    let(:email_address) { "some email address" }
+    let(:broker_role) do
+      instance_double(
+        BrokerRole,
+        :broker_agency_profile => a_different_broker_agency_profile
+      )
+    end
+    let(:a_different_broker_agency_profile) do
+      instance_double(
+        BenefitSponsors::Organizations::BrokerAgencyProfile,
+        :id => "A DIFFERENT BROKER AGENCY PROFILE ID"
+      )
+    end
+
+    it "should not invite the broker" do
+      expect(Invitation.should_invite_broker_or_broker_staff_role?(broker_staff)).to be_falsey
+    end
+
+    it "should notify the broker staff of being approved" do
+      expect(Invitation.should_notify_linked_broker_staff?(broker_staff)).to be_truthy
+    end
+  end
+
+  describe "when:
+              - :broker_role_consumer_enhancement is enabled
+              - the broker staff has an email
+              - the broker staff's person HAS a user
+              - the broker staff's person HAS a consumer role
+              - the broker staff has a broker role with the same agency" do
+    let(:setting_enabled) { true }
+    let(:consumer_role) { double }
+    let(:user) { double }
+    let(:email_address) { "some email address" }
+    let(:broker_role) do
+      instance_double(
+        BrokerRole,
+        :broker_agency_profile => broker_agency_profile
+      )
+    end
+
+    it "should not invite the broker" do
+      expect(Invitation.should_invite_broker_or_broker_staff_role?(broker_staff)).to be_falsey
+    end
+
+    it "should NOT notify the broker staff of being approved" do
+      expect(Invitation.should_notify_linked_broker_staff?(broker_staff)).to be_falsey
     end
   end
 end

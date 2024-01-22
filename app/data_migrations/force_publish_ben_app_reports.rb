@@ -13,6 +13,7 @@ class ForcePublishBenAppReports < MongoidMigrationTask
       puts 'Creating detail and non-detail report...'
       detailed_report(start_on_date, current_date)
       non_detailed_report(start_on_date, current_date)
+      osse_subsidy_report(start_on_date)
     elsif ENV['detailed_report_only'] == "true"
       puts 'Creating detail report...'
       detailed_report(start_on_date, current_date)
@@ -50,7 +51,7 @@ class ForcePublishBenAppReports < MongoidMigrationTask
 
   def revert_benefit_applications(start_on_date, _current_date)
     puts "----renewing published count == #{benefit_applications_in_aasm_state(['pending'], start_on_date).count} prior to reverting----" unless Rails.env.test?
-    benefit_applications_in_aasm_state(['pending'], start_on_date).each do |ben_spon|
+    benefit_applications_in_aasm_state(['pending', :approved], start_on_date).each do |ben_spon|
       ben_app = ben_spon.renewal_benefit_application
       ben_app.revert_application! if ben_app.may_revert_application?
     end
@@ -84,7 +85,7 @@ class ForcePublishBenAppReports < MongoidMigrationTask
 
   def set_back_oe_date(start_on_date, current_date)
     puts "Setting back OE dates for the below ERs" unless Rails.env.test?
-    benefit_applications_in_aasm_state(['draft'], start_on_date).each do |ben_spon|
+    benefit_applications_in_aasm_state(['draft', :approved], start_on_date).each do |ben_spon|
       ben_app = ben_spon.renewal_benefit_application
       next unless ben_app.open_enrollment_period.min > current_date
 
@@ -318,4 +319,33 @@ class ForcePublishBenAppReports < MongoidMigrationTask
       return ''
     end
   end
+
+  # rubocop:disable Metrics/CyclomaticComplexity
+  def osse_subsidy_report(start_on_date)
+    today_time = TimeKeeper.date_of_record.strftime("%Y%m%d%H%M%S")
+    file_name = "#{Rails.root}/osse_subsidy_report_#{today_time}_#{today_time}.csv"
+
+    CSV.open(file_name, "w", force_quotes: true) do |csv|
+      BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:'benefit_applications.effective_period.min' => start_on_date).each do |ben_spon|
+        ben_spon.benefit_applications.each do |ben_app|
+          next unless ben_app.effective_period.min == start_on_date && ben_app.is_renewing?
+
+          renewal_bg_ids = ben_spon.renewal_benefit_application.benefit_packages&.pluck(:id) if ben_spon&.renewal_benefit_application&.present?
+
+          renewal_enrollments = HbxEnrollment.where({
+                                                      :sponsored_benefit_package_id.in => renewal_bg_ids,
+                                                      :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + ['auto_renewing']
+                                                    })
+
+          renewal_enrollments.each do |enr|
+            osse_subsidy = enr.eligible_child_care_subsidy.to_s
+            next if osse_subsidy == "0.00"
+
+            csv << [enr.subscriber&.hbx_id, enr.hbx_id, enr.effective_on, osse_subsidy]
+          end
+        end
+      end
+    end
+  end
+  # rubocop:enable Metrics/CyclomaticComplexity
 end

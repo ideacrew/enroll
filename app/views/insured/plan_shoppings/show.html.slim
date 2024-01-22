@@ -8,7 +8,10 @@
       .col-lg-8.col-md-8.col-sm-8.col-xs-12
         .ct-1
           h1.heading-text = l10n("insured.plan_shoppings.show.title")
-          h4.switch-header = l10n("insured.plan_shoppings.show.title.content")
+          - if @coverage_kind == "health"
+            h4.switch-header = l10n("insured.plan_shoppings.show.health_title.content")
+          - else
+            h4.switch-header = l10n("insured.plan_shoppings.show.dental_title.content")
           h4.swtich-header
           - if @market_kind == "shop" && EnrollRegistry.feature_enabled?(:display_cost_warning_message)
             - if @hbx_enrollment.sponsored_benefit.single_plan_type?
@@ -35,10 +38,10 @@
                   span.mr-1
                     strong = l10n("sort_by")
                   .btn-group#sort_by role="group"
-                    a.btn.btn-default data-sort-by="plan-name" onclick="filterBy(this)" = l10n("plan_name")
-                    a.btn.btn-default data-sort-by='plan-metal-premium' onclick="filterBy(this)" = l10n("premium_amount")
-                    a.btn.btn-default data-sort-by='plan-metal-deductible' onclick="filterBy(this)" = l10n("deductible")
-                    a.btn.btn-default data-sort-by='plan-carrier' onclick="filterBy(this)" = l10n("carrier")
+                    a.btn.btn-default id="plan_name_filter" tabindex="0" onkeydown="handleButtonKeyDown(event, 'plan_name_filter')" data-sort-by="plan-name" onclick="filterBy(this)" = l10n("plan_name")
+                    a.btn.btn-default id="premium_amount_filter" tabindex="0" onkeydown="handleButtonKeyDown(event, 'premium_amount_filter')" data-sort-by='plan-metal-premium' onclick="filterBy(this)" = l10n("premium_amount")
+                    a.btn.btn-default id="deductible_filter" tabindex="0" onkeydown="handleButtonKeyDown(event, 'deductible_filter')" data-sort-by='plan-metal-deductible' onclick="filterBy(this)" = l10n("deductible")
+                    a.btn.btn-default id="carrier_filter" tabindex="0" onkeydown="handleButtonKeyDown(event, 'carrier_filter')" data-sort-by='plan-carrier' onclick="filterBy(this)" = l10n("carrier")
                 - if @market_kind == 'individual' || @market_kind == 'coverall'
                   #ivl_plans
                     h3

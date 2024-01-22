@@ -10,11 +10,6 @@ describe BrokerRole, dbclean: :around_each do
   let(:npn1) {"48484848"}
   let(:provider_kind)  {"broker"}
 
-  # before :all do
-  #   @broker_agency_profile = FactoryBot.create(:broker_agency_profile)
-  # end
-
-
   describe ".new" do
     let(:valid_params) do
       {

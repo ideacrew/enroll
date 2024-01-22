@@ -102,6 +102,12 @@ module AuthorizationConcern
   class_methods do
     MAX_SAME_CHAR_LIMIT = 4
 
+    def configured_password_length
+      default_min, default_max = EnrollRegistry[:enroll_app].setting(:default_password_length_range).item.split("..").map(&:to_i)
+      return Range.new(default_min, default_max) unless EnrollRegistry.feature_enabled?(:strong_password_length)
+      Devise.password_length
+    end
+
     def password_invalid?(password)
       ## TODO: oim_id is an explicit dependency to the User class
       resource = self.new(oim_id: 'example1', password: password)

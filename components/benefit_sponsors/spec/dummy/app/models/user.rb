@@ -20,7 +20,7 @@ class User
   validates_uniqueness_of :email,:case_sensitive => false
   validates_presence_of     :password, if: :password_required?
   validates_confirmation_of :password, if: :password_required?
-  validates_length_of       :password, within: Devise.password_length, allow_blank: true
+  validates_length_of       :password, within: 8..20, allow_blank: true
   validates_format_of :email, with: Devise::email_regexp , allow_blank: true, :message => "(optional) is invalid"
 
   def oim_id_rules
@@ -167,7 +167,24 @@ class User
       raise e
     end
   end
+
   def get_announcements_by_roles_and_portal(portal_path="")
     []
+  end
+
+  class << self
+    def by_email(email)
+      where(email: /^#{email}$/i).first
+    end
+
+    def current_user=(user)
+      Thread.current[:current_user] = user
+    end
+
+    def current_session_values=(session = nil)
+      session_values = (session&.to_hash || {}).except("warden.user.user.key", "_csrf_token")
+      session_values.merge!({"session_id" => session.id}) if session
+      Thread.current[:current_session_values] = session_values
+    end
   end
 end

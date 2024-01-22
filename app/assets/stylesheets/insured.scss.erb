@@ -20,7 +20,7 @@
       background-image: none;
       background-color: transparent;
       .panel-title {
-        color: $brand-primary;
+        color: var(--theme-primary-blue, $brand-primary);
       }
     }
     .panel-body {
@@ -44,7 +44,7 @@
         font-size: 11px;
         margin-top: 10%;
         a {
-          color: $primary-gray;
+          color: var(--secondary-font-color, $primary-gray);
         }
       }
     }
@@ -59,7 +59,7 @@
       background-color: transparent;
       background-image: none;
       h3 {
-        color: $primary-panel !important;
+        color: var(--theme-primary-blue, $primary-panel) !important;
         font-weight: $primary-bold;
         text-transform: uppercase;
         font-size: 18px;
@@ -170,7 +170,7 @@
     .bg-title {
       margin-bottom: 10px;
       display: inline-block;
-      color: #69A30D;
+      color: var(--primary-green, #69A30D);
       font-size: 18px;
     }
     .icon-color {

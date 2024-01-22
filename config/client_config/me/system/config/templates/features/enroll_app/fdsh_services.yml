@@ -5,10 +5,21 @@ registry:
     features:
       - key: :ridp_h139
         is_enabled: true
+        settings:
+          - key: :payload_format
+            item: <%= ENV['RIDP_H139_PAYLOAD_FORMAT'] || "xml" %>
       - key: :paper_application_verification
         is_enabled: false
       - key: :vlp_h92
         is_enabled: true
+        settings:
+          - key: :payload_type
+            item: <%= ENV['VLP_PAYLOAD_TYPE'] || "xml" %>
+      - key: :vlp_rx142
+        is_enabled: true
+        settings:
+        - key: :payload_type
+          item: <%= ENV['VLP_RX142_PAYLOAD_TYPE'] || "xml" %>
       - key: :ssa_h3
         is_enabled: true
         settings:
@@ -24,6 +35,11 @@ registry:
         settings:
           - key: :payload_format
             item: <%= ENV['ESI_MEC_PAYLOAD_FORMAT'] || "xml" %>
+      - key: :ifsv
+        is_enabled: true
+        settings:
+          - key: :payload_format
+            item: <%= ENV['IFSV_PAYLOAD_FORMAT'] || "xml" %>
       - key: :renewal_eligibility_verification_using_rrv
         item: :renewal_eligibility_verification_using_rrv
         is_enabled: <%= ENV['RENEWAL_ELIGIBILITY_VERIFICATION_USING_RRV_IS_ENABLED'] || true %>
@@ -31,3 +47,6 @@ registry:
         is_enabled: <%= ENV['VALIDATE_AND_RECORD_PUBLISH_ERRORS_IS_ENABLED'] || false %>
       - key: :validate_and_record_publish_application_errors
         is_enabled: <%= ENV['VALIDATE_AND_RECORD_PUBLISH_APPLICATION_ERRORS_IS_ENABLED'] || false %>
+      - key: :send_close_case_request
+        item: :send_close_case_request
+        is_enabled: <%= ENV['SEND_CLOSE_CASE_REQUEST_IS_ENABLED'] || false %>

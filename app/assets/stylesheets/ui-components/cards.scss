@@ -61,7 +61,7 @@
     color: #414141;
   }
   .lg {
-      color: $primary-dark-gray;
+      color: var(--secondary-font-color, $primary-dark-gray);
   }
 }
 

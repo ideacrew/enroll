@@ -1310,7 +1310,7 @@ module FinancialAssistance
       save!
     end
 
-    # rubocop:disable Metrics/Naming/AccessorMethodName
+    # rubocop:disable Naming/AccessorMethodName
     def set_evidence_verified(evidence)
       evidence.verification_outstanding = false
       evidence.is_satisfied = true
@@ -1338,7 +1338,12 @@ module FinancialAssistance
     end
 
     def set_evidence_to_negative_response(evidence)
-      evidence.negative_response_received! if evidence.may_negative_response_received?
+      return unless evidence.may_negative_response_received?
+
+      evidence.verification_outstanding = false
+      evidence.is_satisfied = true
+      evidence.due_on = nil
+      evidence.negative_response_received!
       save!
     end
 
@@ -1358,7 +1363,7 @@ module FinancialAssistance
       evidence.move_to_rejected
       save!
     end
-    # rubocop:enable Metrics/Naming/AccessorMethodName
+    # rubocop:enable Naming/AccessorMethodName
 
     class << self
       def find(id)
@@ -1615,15 +1620,22 @@ module FinancialAssistance
       return unless application.draft?
       if is_active && !callback_update
         create_or_update_member_params = { applicant_params: self.attributes_for_export, family_id: application.family_id }
-        create_or_update_result = ::FinancialAssistance::Operations::Families::CreateOrUpdateMember.new.call(params: create_or_update_member_params)
+        create_or_update_result = if FinancialAssistanceRegistry[:avoid_dup_hub_calls_on_applicant_create_or_update].enabled?
+                                    create_or_update_member_params[:applicant_params].merge!(is_primary_applicant: is_primary_applicant?, skip_consumer_role_callbacks: true, skip_person_updated_event_callback: true)
+                                    ::Operations::Families::CreateOrUpdateMember.new.call(create_or_update_member_params)
+                                  else
+                                    ::FinancialAssistance::Operations::Families::CreateOrUpdateMember.new.call(params: create_or_update_member_params)
+                                  end
         if create_or_update_result.success?
           response_family_member_id = create_or_update_result.success[:family_member_id]
           update_attributes!(family_member_id: response_family_member_id) if family_member_id.nil?
+        else
+          Rails.logger.error {"Unable to propagate_applicant for person hbx_id: #{self.person_hbx_id} | application_hbx_id: #{application.hbx_id} | family_id: #{application.family_id} due to #{create_or_update_result.failure}"} unless Rails.env.test?
         end
         application.update_dependents_home_address if is_primary_applicant? && address_info_changed?
       end
     rescue StandardError => e
-      e.message
+      Rails.logger.error {"Unable to propagate_applicant for person hbx_id: #{self.person_hbx_id} | application_hbx_id: #{application.hbx_id} | family_id: #{application.family_id} due to #{e.message}"} unless Rails.env.test?
     end
 
     def address_info_changed?

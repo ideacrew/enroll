@@ -85,6 +85,11 @@ module BenefitSponsors
         }
       }
     end
+
+    let(:first_name) { 'Tyrion' }
+    let(:last_name) { 'Lannister' }
+    let(:person_date_of_birth) { dob }
+
     let(:valid_broker_params) do
       site
       {
@@ -96,12 +101,12 @@ module BenefitSponsors
           0 =>
           {
             :npn => "3458947593",
-            :first_name => "Tyrion",
-            :last_name => "Lannister",
+            first_name: first_name,
+            last_name: last_name,
             :email => "tyrion@lannister.com",
             :phone => nil,
             :status => nil,
-            :dob => dob,
+            :dob => person_date_of_birth,
             :person_id => nil,
             :area_code => nil,
             :number => nil,

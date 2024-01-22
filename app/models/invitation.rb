@@ -290,7 +290,7 @@ class Invitation
   end
 
   def self.invite_broker!(broker_role)
-    if !broker_role.email_address.blank?
+    if should_invite_broker_or_broker_staff_role?(broker_role)
       invitation = self.create(
         :role => "broker_role",
         :source_kind => "broker_role",
@@ -299,11 +299,13 @@ class Invitation
       )
       invitation.send_broker_invitation!(broker_role.parent.full_name)
       invitation
+    elsif should_notify_linked_broker?(broker_role)
+      UserMailer.broker_or_broker_staff_linked_invitation_email(broker_role.email_address, broker_role.parent.full_name).deliver_now
     end
   end
 
   def self.invite_broker_agency_staff!(broker_role)
-    if !broker_role.email_address.blank?
+    if should_invite_broker_or_broker_staff_role?(broker_role)
       invitation = self.create(
         :role => "broker_agency_staff_role",
         :source_kind => "broker_agency_staff_role",
@@ -312,6 +314,8 @@ class Invitation
       )
       invitation.send_broker_staff_invitation!(broker_role.parent.full_name, broker_role.parent.id)
       invitation
+    elsif should_notify_linked_broker_staff?(broker_role)
+      UserMailer.broker_or_broker_staff_linked_invitation_email(broker_role.email_address, broker_role.parent.full_name).deliver_now
     end
   end
 
@@ -376,5 +380,29 @@ class Invitation
       )
       return true if matching_invitation.present?
     end
+  end
+
+  def self.should_invite_broker_or_broker_staff_role?(role)
+    has_email = !role.email_address.blank?
+    return has_email unless EnrollRegistry.feature_enabled?(:broker_role_consumer_enhancement)
+    has_email && !claimed_consumer_role_with_login?(role)
+  end
+
+  def self.should_notify_linked_broker?(role)
+    return false unless EnrollRegistry.feature_enabled?(:broker_role_consumer_enhancement)
+    return false if role.email_address.blank?
+    claimed_consumer_role_with_login?(role)
+  end
+
+  def self.should_notify_linked_broker_staff?(role)
+    return false unless EnrollRegistry.feature_enabled?(:broker_role_consumer_enhancement)
+    return false if role.email_address.blank?
+    return false if role.person.broker_role&.broker_agency_profile&.id == role.broker_agency_profile.id
+    claimed_consumer_role_with_login?(role)
+  end
+
+  def self.claimed_consumer_role_with_login?(role)
+    person = role.person
+    person.user.present? && person.consumer_role.present?
   end
 end

@@ -1,17 +1,17 @@
 .btn-outline-primary {
-  color: var(--theme-primary-100, #007bc4);
-  border-color: var(--theme-primary-100, #007bc4);
+  color: var(--theme-primary-blue, #007bc4);
+  border-color: var(--theme-primary-blue, #007bc4);
   font-weight: 600;
   text-transform: capitalize;
 
   &:hover {
     background-color: var(--grey-000);
-    color: var(--theme-primary-100, #007bc4);
+    color: var(--theme-primary-blue, #007bc4);
   }
 
   &:not(:disabled):not(:disabled):active {
     background-color: var(--grey-000);
-    color: var(--theme-primary-100, #007bc4);
+    color: var(--theme-primary-blue, #007bc4);
   }
 }
 
@@ -22,32 +22,32 @@
 .btn-primary {
   text-transform: uppercase;
   font-weight: 600;
-  border-color: var(--error-color, #e72b2d);
+  border-color: var(--secondary-green, var(--error-color, #e72b2d));
   border-bottom-width: medium;
   color: var(--grey-000);
-  background-color: var(--error-color, #e72b2d);
+  background-color: var(--primary-green, var(--error-color, #e72b2d));
 
   &:hover:not(:disabled) {
-    background-color: var(--error-shade);
-    border-color: var(--error-color);
+    background-color: var(--primary-green, var(--error-shade));
+    border-color: var(--secondary-green, var(--error-color));
   }
 
   &:not(:disabled):not(:disabled):active {
-    background-color: var(--error-color);
-    border-color: var(--error-color);
-    box-shadow: 0 0 0 0.2rem var(--error-tint);
+    background-color: var(--primary-green, var(--error-color));
+    border-color: var(--secondary-green, var(--error-color));
+    box-shadow: 0 0 0 0.2rem var(--secondary-green, var(--error-tint));
   }
 
-  &:focus {
-    background-color: var(--error-color);
-    box-shadow: 0 0 0 0.2rem var(--error-tint);
-    border-color: var(--error-color);
+  &:focus, &:hover {
+    background-color: var(--primary-green, var(--error-color));
+    box-shadow: 0 0 0 0.1rem var(--secondary-green, var(--error-tint));
+    border-color: var(--secondary-green, var(--error-color));
   }
 
   &:disabled {
     opacity: 0.8;
-    background-color: var(--error-shade);
-    border-color: var(--error-shade);
+    background-color: var(--secondary-green, var(--error-shade));
+    border-color: var(--secondary-green, var(--error-shade));
   }
 }
 
@@ -56,16 +56,16 @@
 }
 
 .btn-link {
-  color: var(--theme-primary-100, #007bc4) !important;
+  color: var(--theme-primary-blue, #007bc4) !important;
 }
 
 .swal2-styled.swal2-confirm {
-  background-color: var(--theme-primary-100, #3085D6) !important;
+  background-color: var(--theme-primary-blue, #3085D6) !important;
 }
 
 .heading-text {
   font-weight: 400;
-  color: var(--theme-primary-100, #007bc4);
+  color: var(--theme-primary-blue, #007bc4);
 }
 
 .invalid-feedback {
@@ -79,7 +79,7 @@
 
 .navbar-main {
   background-color: var(--grey-000);
-  border-bottom: solid 3px var(--theme-primary-100, #007bc4);
+  border-bottom: solid 3px var(--theme-primary-blue, #007bc4);
   .navbar-brand {
     border-right: solid 1px var(--grey-050);
     img {
@@ -101,7 +101,7 @@
     border: none;
   }
   .fa-phone {
-    color: var(--theme-primary-100, #007bc4);
+    color: var(--theme-primary-blue, #007bc4);
   }
   .cc-number {
     color: var(--grey-120);
@@ -110,7 +110,7 @@
 
 .sub-text {
   font-weight: 200;
-  color: var(--theme-primary-100, #007bc4);
+  color: var(--theme-primary-blue, #007bc4);
 }
 
 // This is for conditional styles used only in

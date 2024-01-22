@@ -613,6 +613,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:contact_method_via_dropdown).and_return(true)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prevent_concurrent_sessions).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:preferred_user_access).and_return(false)
         sign_in user
         get :personal
       end
@@ -628,6 +630,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:contact_method_via_dropdown).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prevent_concurrent_sessions).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:preferred_user_access).and_return(false)
         sign_in user
         get :personal
       end
@@ -1536,6 +1540,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:show_non_pay_enrollments)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:validate_ssn).and_return(false)
       allow(EnrollRegistry).to receive(:feature_enabled?).with(:check_for_crm_updates).and_return(true)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:prevent_concurrent_sessions).and_return(false)
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:preferred_user_access).and_return(false)
     end
 
     context "without any FF " do

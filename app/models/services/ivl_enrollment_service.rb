@@ -20,9 +20,8 @@ module Services
     def expire_individual_market_enrollments
       @logger.info "Started expire_individual_market_enrollments process at #{TimeKeeper.datetime_of_record}"
       if EnrollRegistry.feature_enabled?(:async_expire_and_begin_coverages)
-        process_async_expiration_requests
+        process_async_expirations_request
       else
-        current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
         batch_size = 500
         offset = 0
         individual_market_enrollments = HbxEnrollment.where(
@@ -45,29 +44,22 @@ module Services
       @logger.info "Ended expire_individual_market_enrollments process at #{TimeKeeper.datetime_of_record}"
     end
 
-    def process_async_expiration_requests
-      @logger.info "Started generating IVL coverage expiration requests at #{TimeKeeper.datetime_of_record}"
-      current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
-      individual_market_enrollments = HbxEnrollment.where(
-        :effective_on.lt => current_benefit_period.start_on,
-        :kind.in => ["individual", "coverall"],
-        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ["coverage_termination_pending"]
-      )
-      @logger.info "Total enrollments to expire count: #{individual_market_enrollments.count}"
-      individual_market_enrollments.no_timeout.each_with_index do |enrollment, index|
-        trigger_expiration_request_event(enrollment, index)
-      rescue StandardError => e
-        @logger.error "ERROR - Failed expiration request for enrollment hbx_id: #{enrollment.hbx_id}; Exception: #{e.inspect}"
+    def process_async_expirations_request
+      @logger.info "Started process_async_expirations_request process at #{Time.now.strftime('%H:%M:%S.%L')}"
+      result = ::Operations::HbxEnrollments::RequestExpirations.new.call({})
+      if result.success?
+        @logger.info 'Successfully published expire coverages request.'
+      else
+        @logger.error "Publishing expire coverages request failed: #{result.failure}"
       end
-      @logger.info "Ended generating IVL coverage expiration requests at #{TimeKeeper.datetime_of_record}"
+      @logger.info "Ended process_async_expirations_request process at #{Time.now.strftime('%H:%M:%S.%L')}"
     end
 
     def begin_coverage_for_ivl_enrollments
       if EnrollRegistry.feature_enabled?(:async_expire_and_begin_coverages)
-        Rails.logger.error "async_expire_and_begin_coverages feature flag is enabled but async begin_coverage_for_ivl_enrollments still needs to be implemented!"
+        process_async_begin_coverages_request
       else
         @logger.info "Started begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record}"
-        current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
         batch_size = 500
         offset = 0
         ivl_enrollments = HbxEnrollment.where(
@@ -94,14 +86,19 @@ module Services
       end
     end
 
-    def trigger_expiration_request_event(enrollment, index)
-      event = event("events.individual.enrollments.expire_coverages.request", attributes: { enrollment_hbx_id: enrollment.hbx_id, index_id: index})
-      if event.success?
-        @logger.info "Publishing expire coverage request for enrollment hbx_id: #{enrollment.hbx_id}"
-        event.success.publish
+    def process_async_begin_coverages_request
+      @logger.info "Started process_async_begin_coverages_request process at #{Time.now.strftime('%H:%M:%S.%L')}"
+      result = Operations::HbxEnrollments::RequestBeginCoverages.new.call({})
+      if result.success?
+        @logger.info 'Successfully published begin coverages request.'
       else
-        @logger.error "ERROR - Expire coverage request failed: enrollment hbx_id: #{enrollment.hbx_id}"
+        @logger.error "Publishing begin coverages request failed: #{result.failure}"
       end
+      @logger.info "Ended process_async_begin_coverages_request process at #{Time.now.strftime('%H:%M:%S.%L')}"
+    end
+
+    def current_benefit_period
+      @current_benefit_period ||= HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
     end
 
     def enrollment_notice_for_ivl_families(new_date)

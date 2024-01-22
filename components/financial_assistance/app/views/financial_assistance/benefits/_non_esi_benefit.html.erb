@@ -10,8 +10,8 @@
           <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.end_on %></span>
         </div>
         <div class="col-md-2 no-pd form-group-lg class-fa-household fa-adjustment">
-          <a class="benefit-edit edit-pr"><i class="fa fa-pencil fa-lg" aria-hidden="true"></i></a>
-          <a class="benefit-delete"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></a>
+          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'non-esi-edit-<%= dom_id benefit %>')" id="non-esi-edit-<%= dom_id benefit %>" class="benefit-edit edit-pr"><i class="fa fa-pencil fa-lg" aria-hidden="true"></i><span class="hide"><%=l10n("edit")%></span></a>
+          <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'non-esi-delete-<%= dom_id benefit %>')" id="non-esi-delete-<%= dom_id benefit%>"class="benefit-delete"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i><span class="hide"><%=l10n("delete")%></span></a>
         </div>
       </div>
   </div>

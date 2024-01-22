@@ -11,7 +11,7 @@ module Subscribers
         logger.debug "invoked EmployerProfileSubscriber with #{delivery_info}"
 
         payload = JSON.parse(response, symbolize_names: true)
-        uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{payload['bucket_name']}##{payload['s3_reference_key']}"
+        uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{payload[:bucket_name]}##{payload[:s3_reference_key]}"
 
         filename = payload[:filename]
         employer_profile_id = payload[:employer_profile_id]
@@ -39,7 +39,7 @@ module Subscribers
         rescue StandardError => e
           logger.error "EmployerProfileSubscriber: on_bulk_ce_upload error_message: #{e.message}, backtrace: #{e.backtrace}"
         ensure
-          Aws::S3Storage.delete_file(payload['bucket_name'], payload['s3_reference_key'])
+          Aws::S3Storage.delete_file(payload[:bucket_name], payload[:s3_reference_key])
         end
         ack(delivery_info.delivery_tag)
       rescue StandardError, SystemStackError => e

@@ -829,6 +829,13 @@ class ConsumerRole
     subject_doc || vlp_documents.build({subject:subject})
   end
 
+  def immigration_documents_attributes=(array_attributes)
+    array_attributes.each do |vlp_document_attributes|
+      vlp_document = vlp_documents.find_or_initialize_by(subject: vlp_document_attributes['subject'])
+      vlp_document.assign_attributes(vlp_document_attributes)
+    end
+  end
+
   # collect all vlp documents for person and all dependents.
   # return the one with matching key
   def find_vlp_document_by_key(key)

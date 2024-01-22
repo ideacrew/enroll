@@ -171,11 +171,15 @@ $(function () {
   });
 
   // Disable form submit on pressing Enter, instead click Submit link
-  $('#qle_form').on('keyup keypress', function(e) {
+  $('#qle_form').on('keydown', function(e) {
     var code = e.keyCode || e.which;
-    if (code == 13) {
+    if (code == 13 && !$("div.n-radio-row").is(":focus") && !$("a.btn-primary").is(":focus")) {
       e.preventDefault();
       $("#qle_submit").click();
+      return false;
+    } else if (code == 13 && $("div.n-radio-row").is(":focus")) {
+      e.preventDefault();
+      $("#qle_submit_reason").click();
       return false;
     }
   });
@@ -197,7 +201,7 @@ $(function () {
   $(document).on('click', '#qle_submit_reason', function() {
     var health_message = ($("#health-ending-expanded").length == 1 );
     var not_expected_response = ( health_message ) ? 'no' : 'yes';
-    
+
     if( $("input:radio[name=reason]:checked").val() != 'None of the Above' && $("input:radio[name=reason]:checked").val() != not_expected_response){
       get_qle_date();
     } else {
@@ -206,6 +210,10 @@ $(function () {
       $("#qle-details .error-text").html(errorNoticeAction);
       $('#qle-details .error-info').removeClass('hidden');
     }
+  });
+
+  $(document).ready(function() {
+    $('#qle_reason').hide();
   });
 
 	$(document).on('click', '#qle_continue_button', function() {

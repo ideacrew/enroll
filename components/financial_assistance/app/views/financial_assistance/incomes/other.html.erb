@@ -44,9 +44,9 @@
           <% end %>
         </div>
 
-           <a class='new-unemployment-income'> <span class="fa-icon fa-stack plus-mr"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b> Add Another</b> Unemployment Income </a>
+           <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-unemployment-income')" id="new-unemployment-income" class='new-unemployment-income'> <span class="fa-icon fa-stack plus-mr"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b> Add Another</b> Unemployment Income </a>
 
-        <div class='new-unemployment-income-form hidden'>
+        <div id='new-unemployment-income-form' class='new-unemployment-income-form hidden'>
           <%= render partial: 'financial_assistance/incomes/unemployment_income_form', locals: { income: @applicant.incomes.build(kind: 'unemployment_income'), disabled: false, new_form: true } %>
         </div>
       </div> <br>
@@ -104,10 +104,15 @@
             <% end %>
           </div>
           <div class="col-md-12 add-more-link-<%=other_income_kind%>" id="add-more-link">
-             <%= link_to "<span class='fa-icon fa-stack plus-mr' aria-hidden='true'><i class= 'fa fa-circle-thin fa-stack-2x'></i> <i class='fa fa-plus fa-stack-1x'></i></span> <b>Add More</b> #{ label }".html_safe, "javascript:void(0);", :id => "add_new_other_income_kind", :class => "#{'hidden' unless @applicant.incomes.of_kind(other_income_kind).present? }" %>
+            <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'add_new_other_income_kind')" id="add_new_other_income_kind" class="<%= 'hidden' unless @applicant.incomes.of_kind(other_income_kind).present? %>">
+              <span class="fa-icon fa-stack plus-mr" aria-hidden="true">
+                <i class="fa fa-circle-thin fa-stack-2x"></i>
+                <i class="fa fa-plus fa-stack-1x"></i>
+              </span>
+              <b> <%= l10n("add_more") %> </b> <%= label %>
+            </a>          
           </div>
-
-          <div class='new-other-income-form hidden <%= other_income_kind %>'>
+          <div id="new-other-income-form" class='new-other-income-form hidden <%= other_income_kind %>'>
             <%= render partial: 'financial_assistance/incomes/other_income_form', locals: { other_income: FinancialAssistance::Income.new, kind: other_income_kind, disabled: true, new_form: true} %>
           </div>
         </div>
@@ -142,7 +147,7 @@
           <% end %>
         </div>
 
-        <a class='new-ai-an-income'> <span class="fa-icon fa-stack plus-mr"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b> Add Another</b> American Indian/Alaskan Native Income </a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'new-ai-income')" id="new-ai-income" class='new-ai-an-income'> <span class="fa-icon fa-stack plus-mr"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-plus fa-stack-1x"></i></span></span> <b> Add Another</b> American Indian/Alaskan Native Income </a>
 
         <div class='new-ai-an-income-form hidden'>
           <%= render partial: 'financial_assistance/incomes/ai_an_income_form', locals: { income: @applicant.incomes.build(kind: 'american_indian_and_alaskan_native'), disabled: false } %>
@@ -166,7 +171,7 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+            <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'unsaved-delete')" id="unsaved-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
             <h4 class="modal-title darkblue" id="myModalLabel">You Have Unsaved Changes</h4>
           </div>
           <div class="modal-body">
@@ -187,7 +192,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'other-income-delete')" id="other-income-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
           <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
         </div>
         <div class="modal-body">
@@ -207,7 +212,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'all-other-income-delete')" id="all-other-income-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
           <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
         </div>
         <div class="modal-body">
@@ -227,7 +232,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'other-existing-income-delete')" id="other-existing-income-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
           <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
         </div>
         <div class="modal-body">
@@ -247,7 +252,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'unemployment-delete')" id="unemployment-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
           <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
         </div>
         <div class="modal-body">
@@ -286,7 +291,7 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'ai-delete')" id="ai-delete" class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
           <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
         </div>
         <div class="modal-body">

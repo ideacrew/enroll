@@ -473,8 +473,13 @@ def process_ivl_families_medicaid_or_chip(families, file_name, offset_count)
       primary = family.primary_person
 
       if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-        thhs = family.tax_household_groups.active.where(:"start_on".gte => Date.new(next_year)).first&.tax_households
-        thhm_medicaid_members = thhs.map(&:tax_household_members).flatten.select {|th_member| th_member.is_medicaid_chip_eligible } if thhs.present?
+        # grab all tax households for any tax household groups starting in the next year
+        thhs = family.tax_household_groups.where(:"start_on".gte => Date.new(next_year)).map(&:tax_households).flatten
+        # grab all instances of tax household members that are determined medicaid eligible
+        all_medicaid_eligible_determinations = thhs.flat_map(&:tax_household_members).select(&:is_medicaid_chip_eligible)
+        
+        # remove duplicate members (those determined medicaid eligible in multiple determinations)
+        thhm_medicaid_members = all_medicaid_eligible_determinations.group_by(&:applicant_id).values.map(&:first)
       else
         thhs = family.latest_household.tax_households.where(effective_ending_on: nil, :"effective_starting_on".gte => Date.new(next_year)).first
         thhm_medicaid_members = thhs&.tax_household_members.where(is_medicaid_chip_eligible: true)
@@ -525,7 +530,12 @@ def process_ivl_families_with_qhp(families, file_name, offset_count)
     families.no_timeout.limit(10_000).offset(offset_count).inject([]) do |_dummy, family|
       primary = family.primary_person
       if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-        thhs = family.tax_household_groups.active.where(:"start_on".gte => Date.new(next_year)).first&.tax_households
+        # grab all tax households for any tax household groups starting in the next year
+        thhs = family.tax_household_groups.where(:"start_on".gte => Date.new(next_year)).map(&:tax_households).flatten
+        # grab all instances of tax household members that are determined medicaid eligible
+        all_medicaid_eligible_determinations = thhs.flat_map(&:tax_household_members).select(&:is_medicaid_chip_eligible)
+        # remove duplicate members (those determined medicaid eligible in multiple determinations)
+        thhm_medicaid_members = all_medicaid_eligible_determinations.group_by(&:applicant_id).values.map(&:first)
       else
         thh = family.latest_household.latest_active_tax_household_with_year(next_year)
       end
@@ -535,7 +545,8 @@ def process_ivl_families_with_qhp(families, file_name, offset_count)
         if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
           medicaid_eligible =
             if thhs.present?
-              thhs.map(&:tax_household_members).flatten.select {|th_member| th_member.applicant_id.to_s == f_member.id.to_s }.first&.is_medicaid_chip_eligible
+              # check list of medicaid eligible members for the current person
+              thhm_medicaid_members.any? { |th_member| th_member.applicant_id.to_s == f_member.id.to_s }
             else
               false
             end
@@ -589,14 +600,25 @@ def process_ivl_families_with_qhp_assistance(families, file_name, offset_count)
       primary = family.primary_person
 
       if EnrollRegistry.feature_enabled?(:temporary_configuration_enable_multi_tax_household_feature)
-        thhs = family.tax_household_groups.active.where(:"start_on".gte => Date.new(next_year)).first&.tax_households
-        thmm_members = thhs.map(&:tax_household_members).flatten if thhs.present?
-        thhm_aptc_members = thmm_members.select {|th_member| th_member.is_ia_eligible } if thmm_members.present?
+        # grab all tax households for any tax household groups starting in the next year
+        thhs = family.tax_household_groups.where(:"start_on".gte => Date.new(next_year)).map(&:tax_households).flatten
+
+        # grab all instances of tax household members that are determined ia eligible
+        all_ia_eligible_determinations = thhs.flat_map(&:tax_household_members).select(&:is_ia_eligible)
+        # remove duplicate members (those determined ia eligible in multiple determinations)
+        thhm_aptc_members = all_ia_eligible_determinations.group_by(&:applicant_id).values.map(&:first)
+
+        # grab all instances of tax household members that are determined medicaid eligible
+        all_medicaid_eligible_determinations = thhs.flat_map(&:tax_household_members).select(&:is_medicaid_chip_eligible)
+        # remove duplicate members (those determined medicaid eligible in multiple determinations)
+        thhm_medicaid_members = all_medicaid_eligible_determinations.group_by(&:applicant_id).values.map(&:first)
 
         if thhs.present? && thhm_aptc_members.present?
-          aptc = thhs.sum { |thh| thh.max_aptc.to_f }
           thhm_aptc_members.each do |aptc_thhm|
-            if aptc_thhm&.person&.is_applying_coverage
+            tax_households = aptc_thhm&.tax_household&.tax_household_group&.tax_households
+            aptc = tax_households&.sum { |thh| thh.max_aptc.to_f }
+            medicaid_eligible = thhm_medicaid_members.any? { |th_member| th_member.applicant_id.to_s == aptc_thhm.applicant_id.to_s }
+            if aptc_thhm&.person&.is_applying_coverage && !medicaid_eligible
               @total_members_with_qhp_assistance << aptc_thhm&.person&.hbx_id
               csv << [primary.hbx_id, primary.full_name, aptc, aptc_thhm&.person&.full_name, aptc_thhm&.is_ia_eligible, aptc_thhm&.csr_eligibility_kind]
             end

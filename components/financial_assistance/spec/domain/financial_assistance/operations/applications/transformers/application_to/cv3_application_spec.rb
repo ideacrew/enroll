@@ -1470,14 +1470,29 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::Transformers::Ap
       end
     end
 
-    context 'deduction with end_on in same year as assistance year' do
+    context 'deduction with end_on in same year as assistance year in non-leap year' do
       before do
         applicant.deductions.first.update_attributes!(end_on: Date.new(application.assistance_year,3,1))
       end
 
       it "should return deduction amount until the end date within the assistance year" do
-        result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
-        expect(result.to_i).to eql(854)
+        unless Date.gregorian_leap?(application.assistance_year)
+          result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
+          expect(result.to_i).to eql(854)
+        end
+      end
+    end
+
+    context 'deduction with end_on in same year as assistance year in leap year' do
+      before do
+        applicant.deductions.first.update_attributes!(end_on: Date.new(application.assistance_year,3,1))
+      end
+
+      it "should return deduction amount until the end date within the assistance year" do
+        if Date.gregorian_leap?(application.assistance_year)
+          result = subject.call(application.reload).success[:applicants].first[:mitc_income][:magi_deductions]
+          expect(result.to_i).to eql(866)
+        end
       end
     end
 

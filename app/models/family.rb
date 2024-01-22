@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A model for grouping and organizing a {Person} with their related {FamilyMember FamilyMember(s)},
 # benefit enrollment eligibility, financial assistance eligibility and availability, benefit enrollments,
 # broker agents, and documents.
@@ -8,6 +10,7 @@
 #
 # Family is a top level physical MongoDB Collection.
 
+#rubocop:disable Metrics/ClassLength
 class Family
   require 'autoinc'
   require "#{Rails.root}/app/models/concerns/crm_gateway/family_concern.rb"
@@ -24,7 +27,7 @@ class Family
   include GlobalID::Identification
   include EventSource::Command
 
-  IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner)
+  IMMEDIATE_FAMILY = %w[self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner].freeze
 
   field :version, type: Integer, default: 1
   embeds_many :versions, class_name: self.name, validate: false, cyclic: true, inverse_of: nil
@@ -49,7 +52,7 @@ class Family
   field :cv3_payload, type: Hash, default: {}
   field :crm_notifiction_needed, type: Boolean
 
-  belongs_to  :person, optional: true
+  belongs_to :person, optional: true
   has_many :hbx_enrollments
 
   # Collection of insured:  employees, consumers, residents
@@ -133,7 +136,11 @@ class Family
          'eligibility_determination.subjects.encrypted_ssn': 1 },
         { name: 'outstanding_verification_subjects_encrypted_ssn' })
 
-  # index("households.tax_households_id")
+  index({ 'eligibility_determination.subjects.eligibility_states.evidence_states.status': 1,
+          'eligibility_determination.subjects.eligibility_states.eligibility_item_key': 1,
+          'eligibility_determination.subjects.eligibility_states.evidence_states.due_on': 1},
+        { name: 'subjects_evidence_states_status_due_on'})
+
 
   validates :renewal_consent_through_year,
             numericality: {only_integer: true, inclusion: 2014..2025},
@@ -143,8 +150,8 @@ class Family
 
   after_initialize :build_household
 
- # after_save :update_family_search_collection
- # after_destroy :remove_family_search_record
+# after_save :update_family_search_collection
+# after_destroy :remove_family_search_record
 
   scope :with_enrollment_hbx_id, ->(enrollment_hbx_id) { where(
     :"_id".in => HbxEnrollment.where(hbx_id: enrollment_hbx_id).distinct(:family_id)
@@ -277,8 +284,23 @@ class Family
     ).distinct(:family_id))
   }
 
-  scope :outstanding_verifications_expiring_on, lambda {|date|
-    where(:"eligibility_determination.outstanding_verification_earliest_due_date" => date.beginning_of_day)
+  scope :outstanding_verifications_subjects_enrolled, lambda {
+    where({"eligibility_determination.subjects.eligibility_states.evidence_states.is_eligble" => true})
+  }
+
+  scope :outstanding_verifications_expiring_on, lambda { |date|
+    if EnrollRegistry.feature_enabled?(:trigger_document_reminder_notices_at_individual_level)
+      where({
+              "$and" =>
+                [
+                  {"eligibility_determination.subjects.eligibility_states.evidence_states.status" => {"$in": [:outstanding, :rejected, :review]}},
+                  {"eligibility_determination.subjects.eligibility_states.eligibility_item_key" => {"$in": %w[aptc_csr_credit aca_individual_market_eligibility] }},
+                  {"eligibility_determination.subjects.eligibility_states.evidence_states.due_on" => date.beginning_of_day}
+                ]
+            })
+    else
+      where(:"eligibility_determination.outstanding_verification_earliest_due_date" => date.beginning_of_day)
+    end
   }
 
   # Replaced scopes for moving HbxEnrollment to top level
@@ -819,6 +841,30 @@ class Family
       )
 
     active_household.add_household_coverage_member(family_member)
+    family_member
+  end
+
+  def build_family_member(person, **opts)
+    is_primary_applicant  = opts[:is_primary_applicant]  || false
+    is_coverage_applicant = opts[:is_coverage_applicant] || true
+    is_consent_applicant  = opts[:is_consent_applicant]  || false
+
+    existing_family_member = family_members.detect { |fm| fm.person_id.to_s == person.id.to_s }
+
+    if existing_family_member
+      active_household.build_household_coverage_member(existing_family_member)
+      existing_family_member.is_active = true
+      return existing_family_member
+    end
+
+    family_member = family_members.build(
+      person: person,
+      is_primary_applicant: is_primary_applicant,
+      is_coverage_applicant: is_coverage_applicant,
+      is_consent_applicant: is_consent_applicant
+    )
+
+    active_household.build_household_coverage_member(family_member)
     family_member
   end
 
@@ -1527,3 +1573,4 @@ private
     ::Operations::People::UpdateDueDateOnVlpDocuments.new.call(family: self, due_date: new_due_date)
   end
 end
+#rubocop:enable Metrics/ClassLength

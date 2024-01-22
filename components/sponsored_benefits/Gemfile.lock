@@ -86,6 +86,7 @@ PATH
       dry-struct
       dry-types
       dry-validation (~> 1.0)
+      holidays (~> 8.6)
       interactor (~> 3.0)
       interactor-rails (~> 2.2)
       language_list (~> 1)
@@ -117,6 +118,7 @@ PATH
       dry-types
       dry-validation (~> 1.0)
       ffi (~> 1.9)
+      holidays (~> 8.6)
       kaminari (~> 0.17.0)
       mongoid (~> 7.0.2)
       pundit (~> 2.0)
@@ -304,6 +306,7 @@ GEM
       haml (>= 4.0, < 6)
       nokogiri (>= 1.6.0)
       ruby_parser (~> 3.5)
+    holidays (8.6.0)
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
     ice_nine (0.11.2)

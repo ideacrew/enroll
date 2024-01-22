@@ -12,7 +12,7 @@
   }
 
   .applicant-nav a:visited {
-    color: #0079C0;
+    color: var(--theme-primary-blue, #0079C0);
     font-size: 14px;
   }
 
@@ -36,15 +36,15 @@
   }
 
   .activer.global-nav > a {
-    color: #CBE6FF;
+    color: var(--primary-white, #CBE6FF);
   }
 
   li:not(.activer) a:not(.disabled) {
-    color:#0079C0;
+    color: var(--theme-primary-blue, #0079C0);
   }
 
   .active {
-    border-left: 7px solid #0079C0 !important;
+    border-left: 7px solid var(--theme-primary-blue, #0079C0) !important;
     a
     {
       padding-left: 10px;
@@ -132,13 +132,13 @@
   }
 
   .applicant-check {
-    color: #69A30D;
+    color: var(--primary-green, #69A30D);
     padding-left: 16px;
     padding-top:17px;
   }
   .cna {
     cursor: not-allowed !important;
-    color:#909090 !important;
+    color: var(--secondary-font-color, #909090);
   }
 
   .cna {
@@ -148,7 +148,7 @@
 
 .nav > li.no-hover > a:hover, .nav > li.no-hover > a:focus {
   text-decoration: none;
-  background-color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %> !important;
+  background-color: var(--theme-primary-blue, #007bc4) !important;
 }
 
 .nav > li.no-hover-disable > a:hover, .nav > li.no-hover-disable > a:focus {
@@ -158,7 +158,7 @@
 
 .nav > li.activer.no-hover-disable > a:hover, .nav > li.activer.no-hover-disable > a:focus {
   text-decoration: none;
-  background-color: <%= EnrollRegistry[:qle_carousel].settings(:color).item %> !important;
+  background-color: var(--theme-primary-blue, #007bc4) !important;
 }
 .mr-top {
   margin-top: 0px !important;
@@ -206,12 +206,12 @@
 }
 
 .activer {
-  background: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+  background: var(--theme-primary-blue, #007bc4);
   color: white;
   font-weight: 600;
 }
 .activer > a {
-  background: <%= EnrollRegistry[:qle_carousel].settings(:color).item %>;
+  background: var(--theme-primary-blue, #007bc4);
   font-weight: 600;
 }
 

@@ -81,7 +81,7 @@ def people
     },
     "Hbx Admin Tier 3" => {
       email: 'themanda.tier3@dc.gov',
-      password: 'P@55word'
+      password: 'aA1!aA1!aA1!'
     },
     "Primary Broker" => {
       email: 'ricky.martin@example.com',
@@ -173,6 +173,10 @@ def people
       broker_census_employee: true,
       password: 'aA1!aA1!aA1!',
       ssn: "222335220"
+    },
+    'Dual Role' => {
+      first_name: 'Dual',
+      last_name: 'Role'
     }
   }
 end
@@ -927,7 +931,8 @@ end
 
 When(/^.+ selects? a last plan on the plan shopping page$/) do
   find_all(EmployeeChoosePlan.select_plan_btn, wait: 5)[-1].click
-  @current_plan_selection = BenefitMarkets::Products::HealthProducts::HealthProduct.all[-1]
+  effective_year = benefit_sponsorship.benefit_applications.active.first.effective_period.min.year
+  @current_plan_selection = BenefitMarkets::Products::HealthProducts::HealthProduct.by_year(effective_year)[-1]
 end
 
 Then(/^.+ should see the coverage summary page$/) do
@@ -1275,16 +1280,4 @@ end
 Then(/^I should see Shop for new plan button$/) do
   shop_for_new_plan_input = page.all('input').detect { |input| input[:value] == 'Shop for new plan' }
   expect(shop_for_new_plan_input.present?).to eq(true)
-end
-
-Then(/^they should see the live chat button$/) do
-  expect(page).to have_css(AdminHomepage.chat_button)
-end
-
-Then(/^they should see the bot button$/) do
-  expect(page).to have_css(AdminHomepage.bot_button)
-end
-
-Then(/^they should not see the live chat button$/) do
-  expect(page).to_not have_css(AdminHomepage.chat_button)
 end

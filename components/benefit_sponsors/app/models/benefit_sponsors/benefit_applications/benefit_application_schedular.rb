@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+require 'holidays'
 module BenefitSponsors
   module BenefitApplications
     class BenefitApplicationSchedular
@@ -150,16 +153,20 @@ module BenefitSponsors
         [open_enrollment_start_on, open_enrollment_end_on]
       end
 
-      #TODO: Implement the binder payment due dates using BankHolidaysHelper
-      #TODO: Logic around binder payment due dates is not clear at this point. Hence hard-coding the due dates for now.
       def map_binder_payment_due_date_by_start_on(is_renewing, start_on)
-        dates_map = {}
+        prior_month = start_on - 1.month
+        binder_payment_due_on = Date.new(prior_month.year, prior_month.month, EnrollRegistry[:enroll_app].setting(:binder_payment_default_date).item)
 
-        EnrollRegistry[:enroll_app].setting(:binder_payment_dates).item.each do |dates_pair|
-          dates_map[dates_pair.first[0].to_s] = Date.strptime(dates_pair.first[1], '%Y,%m,%d')
-        end
+        first_business_day_after(binder_payment_due_on) || enrollment_timetable_by_effective_date(is_renewing, start_on)[:binder_payment_due_on]
+      end
 
-        dates_map[start_on.strftime('%Y-%m-%d')] || enrollment_timetable_by_effective_date(is_renewing, start_on)[:binder_payment_due_on]
+      def first_business_day_after(date)
+        date = date.next until business_day?(date)
+        date
+      end
+
+      def business_day?(date)
+        !date.saturday? && !date.sunday? && !Holidays.on(date, :us).present?
       end
 
       def shop_enrollment_timetable(new_effective_date)
@@ -204,7 +211,7 @@ module BenefitSponsors
           result = "failure"
           msg = "must choose a start on date #{(TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + Settings.aca.shop_market.open_enrollment.maximum_length.months.months).beginning_of_month} or later"
         end
-        
+
         {result: (result || "ok"), msg: (msg || "")}
       end
 

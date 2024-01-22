@@ -75,6 +75,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
                             :with_silver_health_product,
                             :with_enrollment_members,
                             enrollment_members: family.family_members,
+                            effective_on: TimeKeeper.date_of_record.beginning_of_month,
                             family: family)
         end
 

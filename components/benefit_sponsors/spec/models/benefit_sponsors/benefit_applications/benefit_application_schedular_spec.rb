@@ -6,15 +6,25 @@ module BenefitSponsors
 
     describe "#map_binder_payment_due_date_by_start_on" do
       let(:benefit_application_schedular) { BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new }
-      let(:date_hash) { EnrollRegistry[:enroll_app].setting(:binder_payment_dates).item }
+      let(:date_hash) do
+        {
+          "2024-02-01" => "2024,1,12",
+          "2024-03-01" => "2024,2,12",
+          "2024-04-01" => "2024,3,12",
+          "2024-05-01" => "2024,4,12",
+          "2024-06-01" => "2024,5,13",
+          "2024-11-01" => "2024,10,14",
+          "2026-07-01" => "2026,6,12",
+          "2018-11-01" => "2018,10,12"
+        }
+      end
 
       context 'when start on in hash key' do
         it 'should return the corresponding value' do
           date_hash.each do |pair|
-            expect(benefit_application_schedular.map_binder_payment_due_date_by_start_on(false, Date.parse(pair.first[0].to_s))).to eq(Date.strptime(pair.first[1], '%Y,%m,%d'))
+            expect(benefit_application_schedular.map_binder_payment_due_date_by_start_on(false, Date.parse(pair.first.to_s))).to eq(Date.strptime(pair.last, '%Y,%m,%d'))
           end
         end
-        it { expect(benefit_application_schedular.map_binder_payment_due_date_by_start_on(false, Date.parse('2018-11-01'))).to eq(Date.new(2018, 10, Settings.aca.shop_market.binder_payment_due_on)) }
       end
     end
 
