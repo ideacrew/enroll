@@ -33,7 +33,7 @@ module Operations
 
         def construct_ridp_attestation_hash(interactive_verification)
           secondary_request = construct_secondary_request(interactive_verification)
-          request_payload[:secondary_request][:DSHReferenceNumber] = interactive_verification.transmission_id if EnrollRegistry[:ridp_h139].setting(:payload_format).item == "json"
+          secondary_request[:secondary_request][:DSHReferenceNumber] = interactive_verification.transaction_id if EnrollRegistry[:ridp_h139].setting(:payload_format).item == "json"
           {
             is_satisfied: false,
             is_self_attested: true,

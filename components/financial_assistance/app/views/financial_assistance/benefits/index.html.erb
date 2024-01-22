@@ -34,7 +34,7 @@
     </div>
 
     <div class='benefit-kinds', id='enrolled-benefit-kinds'>
-      <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit.valid_insurance_kinds, kind: "is_enrolled", text: "What type of coverage is this person currently enrolled in? *"} %>
+      <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit.valid_insurance_kinds, kind: "is_enrolled", text1: "What type of ", text2: " is this person currently enrolled in? *"} %>
     </div>
 
     <!--is eligible driver question-->
@@ -59,7 +59,7 @@
     </div>
 
     <div class='benefit-kinds', id='eligible-benefit-kinds'>
-      <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit.valid_insurance_kinds, kind: "is_eligible", text: "What type of coverage does this person have access to?"} %>
+      <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit.valid_insurance_kinds, kind: "is_eligible", text1: "What type of ", text2: " does this person have access to?"} %>
     </div>
 
     <!--health_service_through_referral driver question-->

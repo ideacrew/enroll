@@ -353,6 +353,34 @@ class BrokerRole
     aasm_state == 'active'
   end
 
+  # @method create_basr_for_person_with_consumer_role
+  # Creates a Broker Agency Staff Role (BASR) for a person with a consumer role.
+  #
+  # This method checks:
+  #   - if the 'broker_role_consumer_enhancement' feature is enabled
+  #   - if the person has a consumer role
+  #   - if the person has a user
+  #   - if the person already has a BASR for the current broker agency profile.
+  #   If all these conditions are met, it creates a new BASR for the person with the current broker agency profile.
+  #
+  # @return [BrokerAgencyStaffRole, nil]
+  #   Returns the newly created BrokerAgencyStaffRole if it was created, or nil if no role was created.
+  #
+  # @example Create a BASR for a person with a consumer role
+  #   create_basr_for_person_with_consumer_role
+  def create_basr_for_person_with_consumer_role
+    return unless EnrollRegistry.feature_enabled?(:broker_role_consumer_enhancement)
+    return if person.consumer_role.blank?
+    return if person.user.blank?
+    return if person.broker_agency_staff_roles.any? do |basr|
+      basr.benefit_sponsors_broker_agency_profile_id == benefit_sponsors_broker_agency_profile_id && basr.broker_agency_pending?
+    end
+
+    person.create_broker_agency_staff_role(
+      benefit_sponsors_broker_agency_profile_id: benefit_sponsors_broker_agency_profile_id
+    )
+  end
+
   private
 
   def npn_format

@@ -40,7 +40,7 @@
   background:#fff;
   overflow:hidden;
   background-clip:padding-box;
-  border: 1px solid var(--primary-orange, #EAAA00);
+  border: 1px solid var(--light-gray,#EAAA00);
 }
 
 .note.purple {
@@ -50,13 +50,13 @@
   border: 0px;
 }
 .note.purple:before {
-  border-color:#fff #eee var(--primary-orange, #EAAA00) var(--primary-orange, #EAAA00); background:transparent;
+  border-color:var(--light-gray, #fff) var(--light-gray, #eee) var(--light-gray, #EAAA00) var(--light-gray, #EAAA00); background:transparent;
 }
 .note.white {
   background:#ffffff; color: #414141; border: 1px solid red;
 }
 .note.white:before {
-  border-color:#fff #fff var(--primary-orange, #EAAA00) var(--primary-orange, #EAAA00); background: var(--primary-orange, #EAAA00);
+  border-color:var(--light-gray, #fff) var(--light-gray, #eee) var(--light-gray, #EAAA00) var(--light-gray, #EAAA00); background: var(--light-gray, #EAAA00);
 }
 
 .note p {
@@ -68,24 +68,24 @@
 
 /*ready for review*/
 .ready-4-review .whitebox {
-  border-color: var( --success-green, #69A30D);
+  border-color: var( --light-gray, #69A30D);
 }
 .ready-4-review .note.purple::before {
-  border-color:#fff #eee var( --success-green, #69A30D) var( --success-green, #69A30D);
+  border-color:var(--light-gray, #fff) var(--light-gray, #eee) var( --light-gray, #69A30D) var( --light-gray, #69A30D);
 }
 .whitebox {
   padding: 0;
 }
 .whitebox .info-needed {
-  border-top: 1px solid var(--primary-orange, #EAAA00);
-  border-bottom: 1px solid var(--primary-orange, #EAAA00);
+  border-top: 1px solid var(--status-yellow, #EAAA00);
+  border-bottom: 1px solid var(--status-yellow, #EAAA00);
   color: var(--primary-black, #ffffff);
   font-size: 16px;
-  background-color: var(--primary-orange, #EAAA00);
+  background-color: var(--status-yellow, #EAAA00);
 }
 .whitebox .info-needed .fa {
   font-size: 22px;
-  margin-right: 10px;
+  margin-right: 5px;
   color: #ffffff;
 }
 .whitebox .info-needed span {
@@ -112,9 +112,9 @@
   padding: .7em 1.5em 1em;
 }
 .ready-4-review .whitebox .info-needed {
-  border-top: 1px solid var( --success-green, #69A30D);
-  border-bottom: 1px solid var( --success-green, #69A30D);
-  background-color: var( --success-green, #69A30D);
+  border-top: 1px solid var( --status-green, #69A30D);
+  border-bottom: 1px solid var( --status-green, #69A30D);
+  background-color: var( --status-green, #69A30D);
 }
 
 .app-year-header {

@@ -22,15 +22,19 @@ And(/^the last visited page is RIDP agreement$/) do
   )
 end
 
-And(/^this person has an approved broker role, broker agency staff role associated to a broker agency profile$/) do
-  broker_role = FactoryBot.create(:broker_role, person: @dual_role_person)
+And(/^this person has an unapproved broker role and broker agency profile$/) do
+  @broker_role = FactoryBot.create(:broker_role, person: @dual_role_person)
   site = FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, site_key: ::EnrollRegistry[:enroll_app].settings(:site_key).item)
   broker_agency_organization = FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, legal_name: 'First Legal Name', site: site)
   @broker_agency_profile = broker_agency_organization.broker_agency_profile
-  broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: @broker_agency_profile.id)
-  @broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id)
-  broker_role.approve!
+  @broker_agency_profile.update_attributes!(primary_broker_role_id: @broker_role.id)
+  @broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: @broker_agency_profile.id)
+end
+
+And(/^the broker role is approved, broker agency staff is created and is associated to the broker agency profile$/) do
+  @broker_role.approve!
   @dual_role_person.create_broker_agency_staff_role(benefit_sponsors_broker_agency_profile_id: @broker_agency_profile.id).broker_agency_accept!
+  @broker_agency_profile.approve! if @broker_agency_profile.may_approve?
 end
 
 Given(/^broker_role_consumer_enhancement feature is enabled/) do
@@ -51,6 +55,10 @@ end
 
 Then(/^the user will be able to see My Portals dropdown$/) do
   expect(page).to have_content('MY PORTALS')
+end
+
+Then(/^the user will not be able to see My Portals dropdown$/) do
+  expect(page).not_to have_content('MY PORTALS')
 end
 
 And(/^the user clicks My Portals dropdown$/) do

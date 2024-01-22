@@ -4,19 +4,23 @@
     --theme-primary-blue: #3B6B90; //primary blue
     --theme-secondary: #425C6E; //secondary dark blue
     --primary-red: #D42537; //primary red
-    --unfocused-red: #D4403A; //soft red color
     --background-light-red: #F9F1F1; //error notice background color
     --primary-green: #5A7334; //green continue buttons
     --secondary-green: #738C4A; //green for continue button hover
-    --success-green: #027314; //green for success notices
+    --success-green-background: #E3F9E6; //green for success pill
 
-    --primary-orange: #E5A900;
     --primary-yellow: #FFD600;
     --soft-yellow: #FFFADF;
     --primary-white: #ffffff;
     --primary-black: #000000;
     --alert-notice-green: #62703E; //success notice green
-    --info-blue: #003260;
+    --soft-blue: #D6EBFF; //home page right nav text color
+    
+    --status-red: #A21E1F; //status danger
+    --status-blue: #003260; //status pending
+    --status-yellow: #E5A900; //status needs info
+    --status-green: #027314; //status complete
+    --light-gray: #A19F9D;
 
     --font: Barlow, sans-serif;
     --default-font-color: #323130;
@@ -43,10 +47,21 @@
   padding: 8px 14px 8px 14px;
   border-radius: 18px;
   border: 1px;
-  background-color: var(--primary-orange);
+  background-color: var(--status-yellow);
+}
+
+.success-notice {
+  padding: 8px 14px 8px 14px;
+  border-radius: 18px;
+  border: 1px solid ;
+  background-color: var(--success-green-background);
 }
 
 .warning-status-hide {
+  display: none !important;
+}
+
+.success-status-hide {
   display: none !important;
 }
 
@@ -65,4 +80,22 @@
   background-position: center;
   color: transparent !important;
   font-size: 27px !important;
+}
+
+.ready-4-review .note.purple::before {
+  display: none;
+}
+
+.note.purple {
+  display: none;
+}
+
+.complete-icon-text{
+  font-weight: normal !important;
+}
+
+#account-detail .popover {
+  .arrow:after {
+    border-right-color: transparent;
+  }
 }
