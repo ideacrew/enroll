@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require "#{FinancialAssistance::Engine.root}/spec/shared_examples/medicaid_gateway/test_case_d_response"
 
 RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::PublishFaaTotalIneligibilityNotice, dbclean: :after_each do
   include Dry::Monads[:result, :do]
