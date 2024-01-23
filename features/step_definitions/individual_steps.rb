@@ -686,6 +686,11 @@ When(/^I visit the Insured portal$/) do
   click_link 'Consumer/Family Portal'
 end
 
+When(/^the user visits the Insured portal$/) do
+  visit "/"
+  click_link 'Consumer/Family Portal'
+end
+
 Then(/Second user creates an individual account$/) do
   @browser.button(class: /interaction-click-control-create-account/).wait_until_present
   @browser.text_field(class: /interaction-field-control-user-email/).set(@u.email(:email2))
