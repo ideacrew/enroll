@@ -249,7 +249,7 @@ class User
 
     def current_session_values=(session = nil)
       session_values = session&.to_hash&.except("warden.user.user.key", "_csrf_token") || {}
-      session_values["session_id"] = session&.id
+      session_values["session_id"] = session&.id&.to_s
       Thread.current[:current_session_values] = session_values
     end
 
