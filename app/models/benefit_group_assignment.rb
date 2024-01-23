@@ -146,12 +146,14 @@ class BenefitGroupAssignment
   end
 
   def plan_year
-    warn "[Deprecated] Instead use benefit application" unless Rails.env.test?
-    return benefit_group.plan_year if is_case_old?
-    benefit_application
+    # [Deprecated] Instead use benefit application
+    benefit_application(dep_method_call: true)
   end
 
-  def benefit_application
+  def benefit_application(dep_method_call: false)
+    # Logic pulled from deprecated method plan_year
+    return benefit_group.plan_year if dep_method_call && is_case_old?
+
     benefit_package.benefit_application if benefit_package.present?
   end
 
@@ -165,30 +167,35 @@ class BenefitGroupAssignment
   end
 
   def benefit_group=(new_benefit_group)
-    warn "[Deprecated] Instead use benefit_package=" unless Rails.env.test?
-    if new_benefit_group.is_a?(BenefitGroup)
-      self.benefit_group_id = new_benefit_group._id
-      return @benefit_group = new_benefit_group
-    end
-    self.benefit_package=(new_benefit_group)
+    # [Deprecated] Instead use benefit_package=
+    self.benefit_package = ({ new_benefit_group: new_benefit_group, dep_method_call: true })
   end
 
   def benefit_group
-    return @benefit_group if defined? @benefit_group
-    warn "[Deprecated] Instead use benefit_package" unless Rails.env.test?
-    if is_case_old?
-      return @benefit_group = BenefitGroup.find(self.benefit_group_id)
+    # [Deprecated] Instead use benefit_package
+    benefit_package(dep_method_call: true)
+  end
+
+  def benefit_package=(options_or_new_bp)
+    # if Logic pulled from deprecated method benefit_group=
+    new_benefit_package = options_or_new_bp.is_a?(Hash) ? options_or_new_bp[:new_benefit_group] : options_or_new_bp
+    if options_or_new_bp.is_a?(Hash) && options_or_new_bp[:dep_method_call] && new_benefit_package.is_a?(BenefitGroup)
+      self.benefit_group_id = new_benefit_package._id
+      @benefit_group = new_benefit_package
+    else
+      raise ArgumentError, "expected BenefitPackage" unless new_benefit_package.is_a? BenefitSponsors::BenefitPackages::BenefitPackage
+      self.benefit_package_id = new_benefit_package._id
+      @benefit_package = new_benefit_package
     end
-    benefit_package
   end
 
-  def benefit_package=(new_benefit_package)
-    raise ArgumentError.new("expected BenefitPackage") unless new_benefit_package.is_a? BenefitSponsors::BenefitPackages::BenefitPackage
-    self.benefit_package_id = new_benefit_package._id
-    @benefit_package = new_benefit_package
-  end
+  def benefit_package(dep_method_call: false)
+    # Logic pulled from deprecated method benefit_group
+    if dep_method_call
+      return @benefit_group if defined? @benefit_group
+      return @benefit_group = BenefitGroup.find(self.benefit_group_id) if is_case_old?
+    end
 
-  def benefit_package
     return if benefit_package_id.nil?
     return @benefit_package if defined? @benefit_package
     @benefit_package = BenefitSponsors::BenefitPackages::BenefitPackage.find(benefit_package_id)
@@ -428,9 +435,7 @@ class BenefitGroupAssignment
   end
 
   def propogate_delink
-    if hbx_enrollment.present?
-      hbx_enrollment.terminate_coverage! if hbx_enrollment.may_terminate_coverage?
-    end
+    hbx_enrollment.terminate_coverage! if hbx_enrollment.present? && hbx_enrollment.may_terminate_coverage?
     # self.hbx_enrollment_id = nil
   end
 

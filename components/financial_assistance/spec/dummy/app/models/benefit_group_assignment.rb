@@ -68,12 +68,14 @@ class BenefitGroupAssignment
   end
 
   def plan_year
-    warn "[Deprecated] Instead use benefit application" unless Rails.env.test?
-    return benefit_group.plan_year if is_case_old?
-    benefit_application
+    # [Deprecated] Instead use benefit application
+    benefit_application(dep_method_call: true)
   end
 
-  def benefit_application
+  def benefit_application(dep_method_call: false)
+    # Logic pulled from deprecated method plan_year
+    return benefit_group.plan_year if dep_method_call && is_case_old?
+
     benefit_package.benefit_application if benefit_package.present?
   end
 
@@ -83,7 +85,7 @@ class BenefitGroupAssignment
   end
 
   def benefit_group=(new_benefit_group)
-    warn "[Deprecated] Instead use benefit_package=" unless Rails.env.test?
+    # [Deprecated] Instead use benefit_package=
     if new_benefit_group.is_a?(BenefitGroup)
       self.benefit_group_id = new_benefit_group._id
       return @benefit_group = new_benefit_group
@@ -93,7 +95,7 @@ class BenefitGroupAssignment
 
   def benefit_group
     return @benefit_group if defined? @benefit_group
-    warn "[Deprecated] Instead use benefit_package" unless Rails.env.test?
+    # [Deprecated] Instead use benefit_package
     return @benefit_group = BenefitGroup.find(self.benefit_group_id) if is_case_old?
     benefit_package
   end
