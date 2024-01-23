@@ -4,7 +4,12 @@
 class EventLogsController < ApplicationController
   before_action :check_hbx_staff_role
   def index
-    @event_logs = EventLogs::MonitoredEvent.fetch_event_logs(event_log_params)
+    if params[:family]
+      family = Family.find(params[:family])
+      hbxes = family.family_members.map {|fm| fm.person.hbx_id}&.uniq
+      family_logs = EventLogs::MonitoredEvent.where(:subject_hbx_id.in => hbxes)&.order(:event_time.desc)&.map(&:eligibility_details)
+    end
+    @event_logs = family_logs || EventLogs::MonitoredEvent.all&.map(&:eligibility_details)
     respond_to do |format|
       format.js
       format.csv do
@@ -17,7 +22,7 @@ class EventLogsController < ApplicationController
   private
 
   def event_log_params
-    params.permit(:subject_hbx_id, :event_category, :account, :event_start_date, :event_end_date)
+    params.permit(:family)
   end
 
   def check_hbx_staff_role
