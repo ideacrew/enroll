@@ -31,7 +31,7 @@ jobs:
             'insured',
             'permissions',
             'plan_shopping',
-            'registrations',
+            'registration',
           ]
     runs-on: ubuntu-latest
     services:
