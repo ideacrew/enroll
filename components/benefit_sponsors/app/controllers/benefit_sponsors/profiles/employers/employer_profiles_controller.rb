@@ -155,17 +155,19 @@ module BenefitSponsors
         def bulk_upload_with_async_process(file)
           filename = file.original_filename
           # preparing the file upload to s3
-          uri = Aws::S3Storage.save(file.path, 'ce-roster-upload')
-          if uri.present?
-            # making call to subscriber
-            event = event('events.benefit_sponsors.employer_profile.bulk_ce_upload', attributes: {s3_reference_key: filename, bucket_name: 'ce-roster-upload', employer_profile_id: @employer_profile.id, filename: filename})
-            event.success.publish if event.success?
-            # once we put file to s3 then redirecting user to the employees list page
-            redirect_to employees_upload_url(@employer_profile.id)
-          else
-            flash[:notice] = 'File not uploaded to S3'
-            respond_to do |format|
-              format.html {  render default_url}
+          s3_reference_key = Aws::S3Storage.save(file.path, 'ce-roster-upload')
+          @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, @employer_profile)
+          begin
+            if s3_reference_key.present?
+              # making call to subscriber
+              event = event('events.benefit_sponsors.employer_profile.bulk_ce_upload', attributes: {s3_reference_key: s3_reference_key, bucket_name: 'ce-roster-upload', employer_profile_id: @employer_profile.id, filename: filename})
+              event.success.publish if event.success?
+              # once we put file to s3 then redirecting user to the employees list page
+              flash[:notice] = l10n("employers.employer_profiles.ce_bulk_upload_success_message")
+              redirect_to employees_upload_url(@employer_profile.id)
+            else
+              flash[:notice] = l10n("employers.employer_profiles.ce_bulk_upload_error_message")
+              render @roster_upload_form.redirection_url || default_url
             end
           end
         end
