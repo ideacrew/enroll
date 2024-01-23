@@ -3,56 +3,165 @@
     <h1><b><%= l10n("audit_log") %></b></h1>
     <h3><b><%= name %></b></h3>
     <p><b><%= l10n("event_log.hbx_id_text") %></b> <%= hbx_id %></p>
+    <p><b><%= l10n("Account") %> <%= l10n("Primary") %>:</b> <%= l10n("Self") %></p>
     <% if active_tab == 'event_log_ivl' %>
       <p><%= l10n("event_log.ivl_action") %></p>
     <% else %>
       <p><%= l10n("event_log.shop_action") %></p>
     <% end %>
-
     <div class="filters-container">
       <div id="filters-toggle" class="filters-toggle">
         <span class="glyphicon glyphicon-chevron-right" id="filters-arrow"></span>
         <span class="filters-text"><%= l10n("event_log.filters") %></span>
       </div>
-      <div class="filters" id="filters">
+      <form class="filters" id="filters">
+        <h2><%= l10n("event_log.eligibility") %></h2>
         <div class="filter-row">
-          <label for="eligibility"><%= l10n("event_log.eligibility") %></label>
-          <select id="eligibility">
-            <option value=""><%= l10n("event_log.select_eligibility") %></option>
-            <% EventLogs::MonitoredEvent.get_category_options(hbx_id).each do |category| %>
-              <option value="<%= category %>"><%= category.to_s.titleize %></option>
-            <% end %>
-          </select>
+          <div class="filter">
+            <label for="<%= l10n("subject").downcase %>"><%= l10n("Subject") %></label>
+            <dl class="dropdown">
+              <dt>
+              <div class="fake-select" style="display: flex;align-items: center;">
+                <span class="fake-select-label">All</span>
+                <p class="multiSel"></p>
+              </div>
+              </dt>
+              <dd>
+                <div class="mutliSelect">
+                  <ul>
+                    <li><label><input type="checkbox" name="<%= l10n("subject").downcase %>" value="all" checked/>All</label></li>
+                    <% @family.family_members.each do |member| %>
+                      <li><label><input type="checkbox" name="<%= l10n("subject").downcase %>" value="<%= member.person.full_name %>" checked/><%= member.person.full_name %></label></li>
+                    <% end %>
+                  </ul>
+                </div>
+              </dd>
+            </dl>
+          </div>
+          <div class="filter">
+            <label for="<%= l10n("event_log.select_eligibility") %>"><%= l10n("event_log.eligibility") %></label>
+            <dl class="dropdown">
+              <dt>
+                <div class="fake-select" style="display: flex;align-items: center;">
+                  <span class="fake-select-label">All</span>
+                  <p class="multiSel"></p>
+                </div>
+              </dt>
+              <dd>
+                <div class="mutliSelect">
+                  <ul>
+                    <li><label><input type="checkbox" name="<%= l10n("event_log.eligibility").downcase %>" value="all" checked/>All</label></li>
+                    <% if @event_logs %>
+                      <% @event_logs.map{|event_log| event_log[:title]&.upcase }.uniq.each do |category| %>
+                        <li><label><input type="checkbox" name="<%= l10n("event_log.eligibility").downcase %>" value="<%= category %>" checked/><%= category %></label></li>
+                      <% end %>
+                    <% end %>
+                  </ul>
+                </div>
+              </dd>
+            </dl>
+          </div>
+          <div class="filter">
+            <label for="<%= l10n("status").downcase %>"><%= l10n("event_log.eligibility") %> <%= l10n("status") %></label>
+            <dl class="dropdown">
+              <dt>
+              <div class="fake-select" style="display: flex;align-items: center;">
+                <span class="fake-select-label"><%= l10n("All") %></span>
+                <p class="multiSel"></p>
+              </div>
+              </dt>
+              <dd>
+                <div class="mutliSelect">
+                  <ul>
+                    <li><label><input type="checkbox" name="<%= l10n('status').downcase %>" value="eligible" checked/><%= l10n("eligible") %></label></li>
+                    <li><label><input type="checkbox" name="<%= l10n('status').downcase %>" value="ineligible" checked/><%= l10n("ineligible") %></label></li>
+                  </ul>
+                </div>
+              </dd>
+            </dl>
+          </div>
+          <div class="filter">
+            <label for="effective-on"><%= l10n("Effective On") %></label>
+            <input placeholder="MM/DD/YYYY" type="date" id="effective-on">
+          </div>
         </div>
+        <h2><%= l10n("Event") %> <%= l10n("Details") %></h2>
         <div class="filter-row">
-          <label for="user-id"><%= l10n("event_log.hbx_id_email") %></label>
-          <input type="text" id="user-id">
+          <div class="filter">
+            <label for="user-id"><%= l10n("event_log.hbx_id_email") %></label>
+            <input type="text" id="user-id">
+          </div>
+          <div>
+          <div class="sub-filter-row">
+          <div class="filter">
+            <label for="start-date"><%= l10n("event_log.start_date") %></label>
+            <input placeholder="MM/DD/YYYY" type="date" id="start-date">
+          </div>
+          <div class="between-input-label"><%= l10n("to") %></div>
+          <div class="filter">
+            <label>&nbsp;</label>
+            <input type="date" id="end-date" disabled aria-label="<%= l10n("event_log.end_date") %>">
+          </div>
+          </div>
+          </div>
         </div>
-        <div class="filter-row">
-          <label for="start-date"><%= l10n("event_log.start_date") %></label>
-          <input placeholder="MM/DD/YYYY" type="date" id="start-date">
+        <div class="run-query">
+          <button id="reset-filters" class="button-ghost"><%= l10n("Reset Filters") %></button>
+          <button id="run-query" class="button-primary"><%= l10n("Search") %></button>
         </div>
-        <div class="filter-row">
-          <label for="end-date"><%= l10n("event_log.end_date") %></label>
-          <input type="date" id="end-date" disabled>
-        </div>
-      </div>
-      <div class="run-query">
-        <button id="run-query"><%= l10n("event_log.run_query") %></button>
       </div>
     </div>
 
     <div class="event-log-header">
       <div class="event-log-export-text">
-        <h3><b>Event Log for <%= hbx_id %></b></h3>
-        <button id="export-table"><%= l10n("event_log.export_table") %></button>
+        <h3><b><%= l10n("event_log.table_label") %> <%= hbx_id %></b></h3><a href="/event_logs.csv?family=<%= @family.id %>" id="export-table" class="button button-primary">Export CSV</a>
       </div>
     </div>
-    <div id="event-table-data"></div>
+    <div id="event-table-data">
+      <table id="event-log-table" class="table">
+        <thead>
+        <tr class="">
+          <th><span class="glyphicon glyphicon-chevron-right" id="log-expansion-icon" onclick="toggleShowAllRows()"></span></th>
+          <th><%= l10n("Subject") %></th>
+          <th><%= l10n("event_log.eligibility") %></th>
+          <th><%= l10n("event_log.eligibility") %> <%= l10n("Status") %></th>
+          <th><%= l10n("Effective") %> <%= l10n("On") %></th>
+        </tr>
+        </thead>
+        <tbody>
+        <% if @event_logs&.any? %>
+          <% @event_logs.each_with_index do |event_log, index| %>
+            <tr class="primary-row" id="<%= index %>"%>
+              <td><span class="glyphicon glyphicon-chevron-right"></span></td>
+              <td class="subject"><%= event_log[:subject] %></td>
+              <td class="eligibility"><%= event_log[:title]&.upcase %></td>
+              <td class="status"><%= event_log[:current_state]&.titleize %></td>
+              <td class="effective-on"><%= event_log[:effective_on] %></td>
+            </tr>
+            <tr class="secondary-header" id="<%= index %>">
+              <td colspan="2"></td>
+              <th><%= l10n("Event Details") %></th>
+              <th><%= l10n("Account (HBX ID/User)") %></th>
+              <th><%= l10n("Account (Date/Time)") %></th>
+            </tr>
+            <tr class="detail-row" id="<%= index %>">
+              <td colspan="2"></td>
+              <td><%= event_log[:detail] %></td>
+              <td id="<%= event_log[:account_hbx_id] %>%" class="user_id"><%= event_log[:account_username] %></td>
+              <td class="event-time"><%= event_log[:event_time] %></td>
+            </tr>
+          <% end %>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+    <div id="no-results" style="display:none"><%= l10n("event_log.no_results") %></div>
   </div>
 </div>
 
 <script>
+  // clean up old code!!
+  // note here to clean up styles!!
   $(document).ready(function() {
     // DOM elements
     const filtersToggle = $('#filters-toggle');
@@ -84,45 +193,8 @@
     // Event handler for filters toggle
     filtersToggle.on('click', function() {
       const isFiltersHidden = filters.css('display') === 'none';
-      filters.css('display', isFiltersHidden ? 'flex' : 'none');
+      filters.css('display', isFiltersHidden ? 'block' : 'none');
       arrow.toggleClass('glyphicon-chevron-right glyphicon-chevron-down');
-
-      // Explicitly show/hide the button
-      runQueryButton.css('visibility', isFiltersHidden ? 'visible' : 'hidden');
-    });
-
-    // Initially hide the runQueryButton
-    runQueryButton.css('visibility', 'hidden');
-
-    // Event handler for runQueryButton click
-    runQueryButton.on('click', function() {
-      // Disable the buttons during the Ajax call
-      disableButtons();
-
-      // Perform an Ajax request
-      $.ajax({
-        type: 'POST',
-        url: '/event_logs',
-        dataType: 'script',
-        data: {
-          event_category: categoryFilter.val(),
-          account: accountFilter.val(),
-          event_start_date: startDateFilter.val(),
-          event_end_date: endDateFilter.val(),
-          subject_hbx_id: hbx_id
-        },
-        success: function(response) {
-          // Handle success
-        },
-        error: function(error) {
-          // Handle error
-          console.error('AJAX call error:', error);
-        },
-        complete: function() {
-          // Re-enable the buttons after the Ajax call is complete
-          enableButtons();
-        }
-      });
     });
 
     exportTableButton.on('click', function() {
@@ -132,12 +204,8 @@
     disableExportButton();
     hideFilters();
 
-    // Initial Ajax request
-    initialAjaxRequest(function() {
-      // Callback: Enable the exportTableButton when the initial request is complete
-      enableExportButton();
-      showFilters();
-    });
+    enableExportButton();
+    showFilters();
   });
 
   function disableButtons() {
@@ -146,22 +214,6 @@
 
   function enableButtons() {
     $('#run-query, #export-table').prop('disabled', false);
-  }
-
-  // Function for initial Ajax request with a callback
-  function initialAjaxRequest(callback) {
-    $.ajax({
-      type: 'POST',
-      url: '/event_logs',
-      dataType: 'script',
-      data: {
-        subject_hbx_id: <%= sanitize hbx_id.to_json %>
-      },
-      complete: function() {
-        // Call the callback function when the initial request is complete
-        callback();
-      }
-    });
   }
 
   function enableExportButton() {
@@ -180,4 +232,195 @@
     $('.filters-container').css('visibility', 'hidden');
   }
 
+  function toggleShowAllRows() {
+    if (!$('#event-log-table thead tr').hasClass('showing')) {
+      $('#event-log-table tbody tr:not(.primary-row)').show()
+      $('table .glyphicon' ).removeClass('glyphicon-chevron-right')
+      $('table .glyphicon' ).addClass('glyphicon-chevron-down')
+    } else {
+      $('#event-log-table tbody tr:not(.primary-row)').hide()
+      $('table .glyphicon' ).addClass('glyphicon-chevron-right')
+      $('table .glyphicon' ).removeClass('glyphicon-chevron-down')
+    }
+    $('#event-log-table thead tr').toggleClass('showing')
+  }
+
+$(".dropdown dt .fake-select").on('click', function() {
+  if (!$(this).closest('.dropdown').find("dd ul").hasClass('open')) {
+    $(".dropdown dd ul").removeClass('open');
+    $(".dropdown").find("dd ul").hide();
+    $(this).closest('.dropdown').find("dd ul").addClass('open');
+    $(this).closest('.dropdown').find("dd ul").slideToggle('fast');
+  } else {
+    $(this).closest('.dropdown').find("dd ul").hide();
+    $(this).closest('.dropdown').find("dd ul").removeClass('open');
+  }
+});
+
+$(".dropdown dd ul li .fake-select").on('click', function() {
+  $(this).closest('.dropdown').find("dd ul").hide();
+});
+
+$(document).bind('click', function(e) {
+  var $clicked = $(e.target);
+  if (!$clicked.parents().hasClass("dropdown")) $(".dropdown dd ul").hide();
+});
+
+$('.mutliSelect input[type="checkbox"]').on('click', function() {
+  var label = $(this).closest('.dropdown').find('.fake-select-label');
+  var boxes = $(this).closest('.dropdown').find('input[type="checkbox"]');
+  if ($(this).val() === 'all') {
+    $(this).removeClass('partial-all');
+    boxes.prop('checked', this.checked);
+    label.text("All");
+  } else {
+    var checked_count =  $(this).closest('.mutliSelect').find('input:checked').length
+    if (checked_count !== boxes.length && checked_count !== 0) {
+      $(this).closest('.mutliSelect').find('input[value="all"]').prop('checked', false).addClass('partial-all')
+    } else {
+      $(this).closest('.mutliSelect').find('input[value="all"]').removeClass('partial-all')
+    }
+
+    label.text(checked_count + " Selected");
+  }
+});
+
+  $('.primary-row').click(function(){
+    $(this).find('.glyphicon-chevron-right, .glyphicon-chevron-down').toggleClass('glyphicon-chevron-right glyphicon-chevron-down')
+    $(this).nextAll('tr').each( function() {
+      if ($(this).hasClass('primary-row')) {
+        return false;
+      }
+      $(this).toggle();
+    });
+  });
+
+  // filter the data on the page
+  $('#run-query').on('click', function(event) {
+    event.preventDefault();
+    var subjects = [],
+        eligibilities = [],
+        statuses = [],
+        visible_rows = [];
+    $('input[name="subject"]:checked').each(function( index ) {
+      subjects.push($(this).val().toUpperCase())
+    });
+    $('input[name="eligibility"]:checked').each(function( index ) {
+      eligibilities.push($(this).val().toUpperCase())
+    });
+    $('input[name="status"]:checked').each(function( index ) {
+      statuses.push($(this).val().toUpperCase())
+    });
+    $('#event-log-table tbody tr').each(function( index ) {
+      var row = $(this).prop('id');
+      var row_index = visible_rows.indexOf(row)
+      if (row_index === -1) {
+        visible_rows.push($(this).prop('id'))
+      }
+    });
+    if (!subjects.includes("ALL")){
+      $('td.subject').each(function( index ) {
+        var row = $(this).closest('tr').prop('id');
+        var row_index = visible_rows.indexOf(row)
+        if (!subjects.includes($(this).text().toUpperCase()) && row_index !== -1) {
+          visible_rows.splice( row_index, 1 );
+        }
+      });
+    }
+    if (!eligibilities.includes("ALL")){
+      $('td.eligibility').each(function( index ) {
+        var row = $(this).closest('tr').prop('id');
+        var row_index = visible_rows.indexOf(row)
+        if (!eligibilities.includes($(this).text().toUpperCase()) && row_index !== -1) {
+          visible_rows.splice( row_index, 1 );
+        }
+      });
+    }
+    if (!statuses.includes("ALL")){
+      $('td.status').each(function( index ) {
+        var row = $(this).closest('tr').prop('id');
+        var row_index = visible_rows.indexOf(row)
+        if (!statuses.includes($(this).text().toUpperCase()) && row_index !== -1) {
+          visible_rows.splice( row_index, 1 );
+        }
+      });
+    }
+    if ($('#user-id').val()) {
+      var account_rows = [];
+      var value = $('#user-id').val();
+      $('td.user_id').each(function( index ) {
+        var row = $(this).closest('tr').prop('id');
+        has_account_name = (value.toUpperCase() === $(this).text().toUpperCase())
+        has_id = (value.toUpperCase() === $(this).prop('id').toUpperCase())
+        if (has_account_name || has_id) {
+          account_rows.push(row)
+        }
+      });
+      visible_rows = visible_rows.filter( function( el ) {
+        return account_rows.includes( el );
+      } );
+    }
+
+    if ($('#start-date').val()) {
+      value = $('#start-date').val()
+      $('td.event-time').each(function( index ) {
+        var row = $(this).closest('tr').prop('id');
+        var row_index = visible_rows.indexOf(row);
+        var parsedDate = Date.parse($(this).text());
+
+        if (isNaN($(this).text()) && !isNaN(parsedDate)) {
+          if (!(Date.parse(value) > parsedDate) && row_index !== -1) {
+            visible_rows.splice( row_index, 1 );
+          }
+          if ($('#end-date').val()) {
+            if (!($('#end-date').val() > parsedDate) && row_index !== -1) {
+              visible_rows.splice( row_index, 1 );
+            }
+          }
+        }
+      });
+    }
+
+    // verified with delivery manager this is just an exact match
+    if ($('#effective-on').val()) {
+      value = $('#effective-on').val()
+      $('td.effective-on').each(function( index ) {
+        var row = $(this).closest('tr').prop('id');
+        var row_index = visible_rows.indexOf(row);
+        var parsedDate = Date.parse($(this).text());
+        if (isNaN($(this).text()) && !isNaN(parsedDate)) {
+          if (!(Date.parse(value) === parsedDate) && row_index !== -1) {
+            visible_rows.splice( row_index, 1 );
+          }
+        }
+      });
+    }
+
+    if (visible_rows.length === 0) {
+      $('#event-table-data').hide()
+      $('#no-results').show()
+    } else {
+      $('#event-table-data').show()
+      $('#no-results').hide()
+      $('#event-log-table tbody tr').each(function( index ) {
+        var row = $(this).prop('id');
+        var row_index = visible_rows.indexOf(row)
+        if (row_index === -1) {
+          $(this).hide();
+        }
+      });
+    }
+  });
+
+  $('#reset-filters').click(function(){
+    event.preventDefault();
+    $('#event-table-data').show()
+    $('#no-results').hide()
+    $('.filter input[type="text"], .filter input[type="date"]').val('');
+    $('.filter input[type="checkbox"]').prop('checked', true).removeClass('partial-all');;
+    $('.fake-select-label').text("All");
+    $('#event-log-table tbody tr.primary-row').each(function( index ) {
+      $(this).show();
+    });
+  });
 </script>
