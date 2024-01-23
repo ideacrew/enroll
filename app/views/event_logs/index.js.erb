@@ -1,6 +1,3 @@
-// Update event table data using AJAX and rendered partial
-$("#event-table-data").html("<%= escape_javascript(render 'event_data') %>");
-
 // Handle click on elements with the class 'event-with-arrow'
 $('.event-with-arrow').on('click', function() {
   const eventId = this.getAttribute('data-attr-id');
