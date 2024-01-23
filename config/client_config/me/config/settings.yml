@@ -136,7 +136,7 @@ aca:
       start_on: <%= Date.new(2021,11,1) %>
       end_on: <%= Date.new(2022,01,31) %>
   shop_market:
-    valid_employer_attestation_documents_url: 'https://www.coverme.gov/business/business-resource-center/employer-verification-checklist'
+    valid_employer_attestation_documents_url: 'https://www.ideacrew.com/business/business-resource-center/employer-verification-checklist'
     small_market_employee_count_maximum: 50
     employer_contribution_percent_minimum: 50
     employer_dental_contribution_percent_minimum: 0
