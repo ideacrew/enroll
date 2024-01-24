@@ -114,22 +114,6 @@ module CapybaraHelpers
       translation_key.gsub(/\W+/, '').titleize
     end
   end
-
-  # rubocop:disable Style/GlobalVars
-  def select_session(id)
-    Capybara.instance_variable_set("@session_pool", {"#{Capybara.current_driver}#{Capybara.app.object_id}" => $sessions[id]})
-  end
-
-  def in_session(id)
-    $sessions ||= {}
-    $sessions[:default] ||= Capybara.current_session
-    $sessions[id]       ||= Capybara::Session.new(Capybara.current_driver, Capybara.app)
-
-    select_session(id)
-    yield
-    select_session(:default)
-  end
-  # rubocop:enable Style/GlobalVars
 end
 
 World(CapybaraHelpers)
