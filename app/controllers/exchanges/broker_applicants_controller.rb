@@ -105,10 +105,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
     agency = broker_role.broker_agency_profile
     agency.approve! if agency.may_approve?
 
-    basr ||= broker_role.person.broker_agency_staff_roles.detect do |staff_role|
-      staff_role.benefit_sponsors_broker_agency_profile_id == broker_role.benefit_sponsors_broker_agency_profile_id && staff_role.broker_agency_pending?
-    end
-
+    basr ||= broker_role.person.pending_basr_by_profile_id(broker_role.benefit_sponsors_broker_agency_profile_id)
     basr.broker_agency_accept! if basr&.may_broker_agency_accept?
   end
 
