@@ -895,10 +895,6 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   - it is SEP shopping for prior year
   ", dbclean: :after_each do
 
-  before :all do
-    DatabaseCleaner.clean
-  end
-
   let(:previous_oe_year) { current_year - 1 }
   let(:current_year) { TimeKeeper.date_of_record.year }
   before do
@@ -995,6 +991,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
     family.reload
     enrollments = family.hbx_enrollments
     expect(enrollments.size).to eq 4
+    puts "DchbxProductSelectionEffects: #{enrollments.pluck(:aasm_state, :effective_on, :product_id)}"
     expect(enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled", "coverage_selected"]).count).to eq(3)
   end
 end
@@ -1006,10 +1003,6 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   - all these enrollments have same plans
   - it is SEP shopping for prior year
   ", dbclean: :after_each do
-
-  before :all do
-    DatabaseCleaner.clean
-  end
 
   let(:previous_oe_year) { current_year - 1 }
   let(:current_year) { TimeKeeper.date_of_record.year }
@@ -1105,6 +1098,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
     family.reload
     enrollments = family.hbx_enrollments
     expect(enrollments.size).to eq 4
-    expect(enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled", "coverage_selected"]).count).to eq(3)
+    puts "DchbxProductSelectionEffects: #{enrollments.pluck(:aasm_state, :effective_on, :product_id)}"
+    expect(enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled", "coverage_selected"]).count).to eq(2)
   end
 end

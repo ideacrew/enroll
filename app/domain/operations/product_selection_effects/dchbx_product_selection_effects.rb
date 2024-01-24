@@ -99,7 +99,8 @@ module Operations
           next unless enrollment.same_signatures(renewal_enrollment) && !renewal_enrollment.is_shop?
 
           if superseded_and_eligible_for_cancellation?(enrollment, renewal_enrollment)
-            renewal_enrollment.cancel_coverage_for_superseded_term!
+            transition_args = { "reason" => Enrollments::TerminationReasons::SUPERSEDED_SILENT }
+            renewal_enrollment.cancel_coverage_for_superseded_term!(transition_args)
           elsif renewal_enrollment.may_cancel_coverage?
             renewal_enrollment.cancel_ivl_enrollment
           end
