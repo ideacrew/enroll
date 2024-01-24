@@ -99,10 +99,10 @@ module Operations
           next unless enrollment.same_signatures(renewal_enrollment) && !renewal_enrollment.is_shop?
           next unless renewal_enrollment.may_cancel_coverage?
 
-          if product_matched?(enrollment, renewal_enrollment)
-            renewal_enrollment.cancel_ivl_enrollment
-          else
+          if renewal_enrollment.enrollment_superseded_and_eligible_for_cancellation?(renewal_enrollment.effective_on) && !product_matched?(enrollment, renewal_enrollment)
             renewal_enrollment.cancel_coverage_for_superseded_term!
+          else
+            renewal_enrollment.cancel_ivl_enrollment
           end
         end
       end
