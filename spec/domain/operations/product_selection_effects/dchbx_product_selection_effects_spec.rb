@@ -895,10 +895,17 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   - it is SEP shopping for prior year
   ", dbclean: :after_each do
 
+  before :all do
+    DatabaseCleaner.clean
+  end
+
   let(:previous_oe_year) { current_year - 1 }
   let(:current_year) { TimeKeeper.date_of_record.year }
   before do
     allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 1, 20))
+    allow(
+      EnrollRegistry[:cancel_superseded_terminated_enrollments].feature
+    ).to receive(:is_enabled).and_return(true)
   end
 
   include_context 'family with two members and one enrollment and one predecessor enrollment'
@@ -911,20 +918,20 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
     p
   end
 
-  let(:prior_year_product) do
+  let!(:prior_year_product) do
     product = BenefitMarkets::Products::Product.all.by_year(2023).first
     product.update_attributes(hios_id: "41842DC0400026-01", hios_base_id: "41842DC0400026", csr_variant_id: "01")
     product
   end
 
-  let(:renewal_year_product) do
+  let!(:renewal_year_product) do
     product = prior_year_product.renewal_product
     product.update_attributes(hios_id: "41842DC0400026-01", hios_base_id: "41842DC0400026", csr_variant_id: "01")
     product
   end
 
-  let(:product_2024_1) {BenefitMarkets::Products::Product.all.by_year(2024).where(:hios_id.nin => [prior_year_product.hios_id])[0]}
-  let(:product_2024_2) {BenefitMarkets::Products::Product.all.by_year(2024).where(:hios_id.nin => [prior_year_product.hios_id])[1]}
+  let!(:product_2024_1) {BenefitMarkets::Products::Product.all.by_year(2024).where(:hios_id.nin => [prior_year_product.hios_id])[0]}
+  let!(:product_2024_2) {BenefitMarkets::Products::Product.all.by_year(2024).where(:hios_id.nin => [prior_year_product.hios_id])[1]}
 
   let!(:current_enrollment_2_1) do
     FactoryBot.create(:hbx_enrollment,
@@ -1000,10 +1007,17 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   - it is SEP shopping for prior year
   ", dbclean: :after_each do
 
+  before :all do
+    DatabaseCleaner.clean
+  end
+
   let(:previous_oe_year) { current_year - 1 }
   let(:current_year) { TimeKeeper.date_of_record.year }
   before do
     allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 1, 20))
+    allow(
+      EnrollRegistry[:cancel_superseded_terminated_enrollments].feature
+    ).to receive(:is_enabled).and_return(false)
   end
 
   include_context 'family with two members and one enrollment and one predecessor enrollment'
