@@ -57,7 +57,7 @@ module BenefitSponsors
           when 'inbox'
               # do something
           when 'event_log_shop'
-            # do something
+            @event_logs = EventLogs::MonitoredEvent.where(subject_hbx_id: @employer_profile.hbx_id)&.order(:event_time.desc)&.map(&:eligibility_details)
           else
             else_block
           end
