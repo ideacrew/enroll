@@ -82,6 +82,7 @@
               <dd>
                 <div class="mutliSelect">
                   <ul>
+                    <li><label><input type="checkbox" name="<%= l10n('status').downcase %>" value="all" checked/>All</label></li>
                     <li><label><input type="checkbox" name="<%= l10n('status').downcase %>" value="eligible" checked/><%= l10n("eligible") %></label></li>
                     <li><label><input type="checkbox" name="<%= l10n('status').downcase %>" value="ineligible" checked/><%= l10n("ineligible") %></label></li>
                   </ul>
@@ -150,9 +151,9 @@
               <td class="effective-on"><%= details[0][:effective_on] %></td>
             </tr>
             <tr class="secondary-header" id="<%= index %>">
-              <td colspan="2"></td>
+              <td colspan="<%= type === 'consumer' ? 2 : 1 %>%"></td>
               <th><%= l10n("Event Details") %></th>
-              <th><%= l10n("Account (HBX ID/User)") %></th>
+              <th><%= l10n("event_log.account_label") %></th>
               <th><%= l10n("Account (Date/Time)") %></th>
             </tr>
             <% details.each do |detail| %>
@@ -248,11 +249,11 @@
 
   function toggleShowAllRows() {
     if (!$('#event-log-table thead tr').hasClass('showing')) {
-      $('#event-log-table tbody tr:not(.primary-row)').show()
+      $('#event-log-table tbody tr:not(.primary-row):not(.hidden-by-filters)').show();
       $('table .glyphicon' ).removeClass('glyphicon-chevron-right')
       $('table .glyphicon' ).addClass('glyphicon-chevron-down')
     } else {
-      $('#event-log-table tbody tr:not(.primary-row)').hide()
+      $('#event-log-table tbody tr:not(.primary-row)').hide();
       $('table .glyphicon' ).addClass('glyphicon-chevron-right')
       $('table .glyphicon' ).removeClass('glyphicon-chevron-down')
     }
@@ -360,50 +361,44 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
       });
     }
     if ($('#user-id').val()) {
-      var account_rows = [];
       var value = $('#user-id').val();
       $('td.user_id').each(function( index ) {
         var row = $(this).closest('tr').prop('id');
+        var row_index = visible_rows.indexOf(row);
         has_account_name = (value.toUpperCase() === $(this).text().toUpperCase())
         has_id = (value.toUpperCase() === $(this).prop('id').toUpperCase())
-        if (has_account_name || has_id) {
-          account_rows.push(row)
+        if (!(has_account_name || has_id) && row_index !== -1) {
+          visible_rows.splice( row_index, 1 );
         }
       });
-      visible_rows = visible_rows.filter( function( el ) {
-        return account_rows.includes( el );
-      } );
     }
-
     if ($('#start-date').val()) {
       value = $('#start-date').val()
       $('td.event-time').each(function( index ) {
         var row = $(this).closest('tr').prop('id');
         var row_index = visible_rows.indexOf(row);
-        var parsedDate = Date.parse($(this).text());
-
+        var parsedDate = new Date($(this).text());
         if (isNaN($(this).text()) && !isNaN(parsedDate)) {
-          if (!(Date.parse(value) > parsedDate) && row_index !== -1) {
+          if ((new Date(value).getTime() > parsedDate.getTime()) && row_index !== -1) {
             visible_rows.splice( row_index, 1 );
           }
           if ($('#end-date').val()) {
-            if (!($('#end-date').val() > parsedDate) && row_index !== -1) {
+            if ((new Date($('#end-date').val()).getTime() < parsedDate.getTime()) && row_index !== -1) {
               visible_rows.splice( row_index, 1 );
             }
           }
         }
       });
     }
-
     // verified with delivery manager this is just an exact match
     if ($('#effective-on').val()) {
       value = $('#effective-on').val()
       $('td.effective-on').each(function( index ) {
         var row = $(this).closest('tr').prop('id');
         var row_index = visible_rows.indexOf(row);
-        var parsedDate = Date.parse($(this).text());
+        var parsedDate = new Date($(this).text());
         if (isNaN($(this).text()) && !isNaN(parsedDate)) {
-          if (!(Date.parse(value) === parsedDate) && row_index !== -1) {
+          if (!(new Date(value) === parsedDate) && row_index !== -1) {
             visible_rows.splice( row_index, 1 );
           }
         }
@@ -420,7 +415,7 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         var row = $(this).prop('id');
         var row_index = visible_rows.indexOf(row)
         if (row_index === -1) {
-          $(this).hide();
+          $(this).hide().addClass("hidden-by-filters");
         }
       });
     }
@@ -433,6 +428,9 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
     $('.filter input[type="text"], .filter input[type="date"]').val('');
     $('.filter input[type="checkbox"]').prop('checked', true).removeClass('partial-all');;
     $('.fake-select-label').text("All");
+    $('#event-log-table tbody tr').each(function( index ) {
+      $(this).removeClass("hidden-by-filters");
+    });
     $('#event-log-table tbody tr.primary-row').each(function( index ) {
       $(this).show();
     });
