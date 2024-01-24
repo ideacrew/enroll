@@ -20,15 +20,14 @@ RSpec.describe EventLogsController, :type => :controller do
   end
 
   context "#index" do
-    let(:event_log_params) { { "family" => family.id } }
+    let(:event_log_params) { { "group" => family.id, "type" => "consumer" } }
 
-    it "should assign event logs with a param" do
+    it "should assign event logs with params" do
       FactoryBot.create(:monitored_event, account_username: user.email, monitorable: person_event_log, subject_hbx_id: person.hbx_id)
       FactoryBot.create(:monitored_event, account_username: user.email, monitorable: person_event_log)
       get :index, params: event_log_params, format: :js
       expect(assigns(:event_logs).count).to eq 1
-      expect(assigns(:event_logs).first[:title]).to eq "FAKE EVENT"
-      expect(assigns(:event_logs).first[:subject]).to eq person.full_name
+      expect(assigns(:event_logs).first.subject_hbx_id).to eq person.hbx_id
     end
 
     it "should assign event logs without a param" do
