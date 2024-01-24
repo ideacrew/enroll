@@ -107,10 +107,17 @@ module Operations
         end
       end
 
-      def product_matched?(enr, enrollment)
-        return false unless enr.product.present?
-        enr.product_id == enrollment&.product&.renewal_product&.id || enr.product.hios_base_id == enrollment&.product&.renewal_product&.hios_base_id ||
-          enr.product.issuer_profile_id == enrollment&.product&.renewal_product&.issuer_profile_id
+      def product_matched?(enrollment, renewal_enrollment)
+        return false unless enrollment.product.present?
+
+        renewal_product = renewal_enrollment&.product
+        return false unless renewal_product.present?
+
+        product_id_match = enrollment.product.renewal_product_id == renewal_product.id
+        hios_base_id_match = enrollment.product.renewal_product.hios_base_id == renewal_product.hios_base_id
+        issuer_profile_id_match = enrollment.product.renewal_product.issuer_profile_id == renewal_product.issuer_profile_id
+
+        product_id_match || hios_base_id_match || issuer_profile_id_match
       end
 
       def generate_enrollment_signature(enrollment)
