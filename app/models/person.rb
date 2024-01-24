@@ -26,6 +26,8 @@ class Person
   # verification history tracking
   include Mongoid::History::Trackable
 
+  include HistoryTrackerToRecord
+
   track_history :on => [:first_name,
                         :middle_name,
                         :last_name,
@@ -68,6 +70,25 @@ class Person
   VERIFICATION_TYPES = ['Social Security Number', 'American Indian Status', 'Citizenship', 'Immigration status']
 
   NON_SHOP_ROLES = ['Individual','Coverall']
+
+  IVL_ELIGIBILITY_EXCLUDED_CHAINS = [
+    # "verification_types",
+    "employee_roles",
+    "employer_staff_roles",
+    "general_agency_staff_roles",
+    "csr_role",
+    "assister_role",
+    "hbx_staff_role",
+    "broker_agency_staff_roles",
+    "individual_market_transitions",
+    "broker_role",
+    "phones",
+    "emails",
+    "inbox",
+    "messages",
+    "workflow_state_transitions",
+    "raw_event_responses"
+  ]
 
   field :hbx_id, type: String
   field :external_person_id, type: String
@@ -192,6 +213,9 @@ class Person
     inclusion: { in: Person::GENDER_KINDS, message: "%{value} is not a valid gender" }
 
   add_observer ::BenefitSponsors::Observers::EmployerStaffRoleObserver.new, :contact_changed?
+
+  index({"created_at" => 1, "updated_at" => 1})
+  index({"created_at" => 1, "updated_at" => 1, "consumer_role._id" => 1})
 
   index({hbx_id: 1}, {sparse:true, unique: true})
   index({external_person_id: 1}, {sparse: true, unique: true})
