@@ -71,12 +71,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       broker_role.approve!
       broker_role.reload
 
-      if broker_role.is_primary_broker?
-        broker_role.create_basr_for_person_with_consumer_role
-        broker_role.broker_agency_profile.approve! if broker_role.broker_agency_profile.aasm_state != "is_approved"
-        staff_role = broker_role.person.broker_agency_staff_roles[0]
-        staff_role&.broker_agency_accept!
-      end
+      create_and_approve_staff_role_and_approve_agency(broker_role)
 
       if broker_role.agency_pending?
         send_secure_message_to_broker_agency(broker_role) if broker_role.broker_agency_profile
@@ -88,6 +83,34 @@ class Exchanges::BrokerApplicantsController < ApplicationController
   end
 
   private
+
+  # @method create_and_approve_staff_role_and_approve_agency(broker_role)
+  # Creates a Broker Agency Staff Role (BASR) for a person with a consumer role and approves both the agency and the staff role.
+  #
+  # This method checks if the broker role is a primary broker.
+  # If it is, it creates a BASR for the person associated with the broker role.
+  # It then approves the broker agency profile associated with the broker role, if it is in a state where it may be approved.
+  # Finally, it accepts the newly created BASR, if it is in a state where it may be accepted.
+  #
+  # @param [BrokerRole] broker_role The broker role for which to create a BASR and approve the agency and staff role.
+  #
+  # @return [void] This method does not return a value. It modifies the state of the broker role, the broker agency profile, and the BASR.
+  #
+  # @example Create a BASR and approve both the agency and the staff role for a primary broker role
+  #   create_and_approve_staff_role_and_approve_agency(broker_role)
+  def create_and_approve_staff_role_and_approve_agency(broker_role)
+    return unless broker_role.is_primary_broker?
+
+    basr = broker_role.create_basr_for_person_with_consumer_role
+    agency = broker_role.broker_agency_profile
+    agency.approve! if agency.may_approve?
+
+    basr ||= broker_role.person.broker_agency_staff_roles.detect do |staff_role|
+      staff_role.benefit_sponsors_broker_agency_profile_id == broker_role.benefit_sponsors_broker_agency_profile_id && staff_role.broker_agency_pending?
+    end
+
+    basr.broker_agency_accept! if basr&.may_broker_agency_accept?
+  end
 
   def broker_role_update_params
     # Only assign if nil
