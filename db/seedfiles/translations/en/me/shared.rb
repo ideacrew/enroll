@@ -72,4 +72,25 @@ SHARED_TRANSLATIONS = {
     "en.previous_step" => "Previous Step",
     "en.save_and_exit" => "Log Out",
     "en.help_sign_up" => "Help Me Sign Up"
+    # event log
+    "en.event_log.eligibility" => "Eligibility",
+    "en.event_log.outcome" => "Outcome",
+    "en.event_log.performed_by" => "Performed By",
+    "en.event_log.time" => "Time",
+    "en.event_log.hbx_id_email" => "Account (HBX ID / Email)",
+    "en.event_log.start_date" => "Action Date",
+    "en.event_log.end_date" => "End Date",
+    "en.event_log.run_query" => "Run Query",
+    "en.event_log.export_table" => "Export Table",
+    "en.event_log.table_label_consumer" => "Household Event Log for ",
+    "en.event_log.table_label_employer" => "Event Log",
+    "en.event_log.hbx_id_text" => "HBX ID:",
+    "en.event_log.filters" => "Filters",
+    "en.event_log.select_eligibility" => "Select Eligibility",
+    "en.event_log.additional_details" => "Additional Event Details.",
+    "en.event_log.shop_action" => "Please use the filters below to see specific actions taken on this organization.",
+    "en.event_log.ivl_action" => "Please use the filters below to see specific actions taken on this individual.",
+    "en.event_log.no_results" => "Your search returned zero results, try adjusting your filters",
+    "en.event_log.empty_employer" => "There have been no auditable actions on this organization at this time.",
+    "en.event_log.empty_consumer" => "There have been no auditable actions on this family at this time."
 }
