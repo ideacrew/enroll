@@ -923,8 +923,8 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
     product
   end
 
-  let(:product_2024_1) {BenefitMarkets::Products::Product.all.by_year(2024).where(:"hios_id".nin => [prior_year_product.hios_id])[0]}
-  let(:product_2024_2) {BenefitMarkets::Products::Product.all.by_year(2024).where(:"hios_id".nin => [prior_year_product.hios_id])[1]}
+  let(:product_2024_1) {BenefitMarkets::Products::Product.all.by_year(2024).where(:hios_id.nin => [prior_year_product.hios_id])[0]}
+  let(:product_2024_2) {BenefitMarkets::Products::Product.all.by_year(2024).where(:hios_id.nin => [prior_year_product.hios_id])[1]}
 
   let!(:current_enrollment_2_1) do
     FactoryBot.create(:hbx_enrollment,
