@@ -141,13 +141,30 @@ RSpec.describe UserMailer do
   end
 end
 
-RSpec.describe UserMailer, "sending a approval linked notification email for a broker or broker staff" do
+RSpec.describe UserMailer, "sending an approval linked notification email for a broker" do
   include Config::SiteHelper
 
   let(:email) { "some-broker@adomain.com"}
   let(:name) { "Broker Name"}
 
-  subject { UserMailer.broker_or_broker_staff_linked_invitation_email(email, name) }
+  subject { UserMailer.broker_linked_invitation_email(email, name) }
+
+  it "has the login link" do
+    expect(subject.body.raw_source.include?("href=#{site_main_web_address_url}")).to be_truthy
+  end
+
+  it "has the greeting" do
+    expect(subject.body.raw_source.include?("Hi #{name},")).to be_truthy
+  end
+end
+
+RSpec.describe UserMailer, "sending an approval linked notification email for broker staff" do
+  include Config::SiteHelper
+
+  let(:email) { "some-broker@adomain.com"}
+  let(:name) { "Broker Name"}
+
+  subject { UserMailer.broker_staff_linked_invitation_email(email, name) }
 
   it "has the login link" do
     expect(subject.body.raw_source.include?("href=#{site_main_web_address_url}")).to be_truthy

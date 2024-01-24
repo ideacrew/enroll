@@ -1,22 +1,28 @@
 <div class="event-log-tab">
+  <% group = @family || @employer_profile %>
   <div>
     <h1><b><%= l10n("audit_log") %></b></h1>
     <h3><b><%= name %></b></h3>
-    <p><b><%= l10n("event_log.hbx_id_text") %></b> <%= hbx_id %></p>
-    <p><b><%= l10n("Account") %> <%= l10n("Primary") %>:</b> <%= l10n("Self") %></p>
+    <% if !@event_logs&.any?%>
+      <p><%= type === 'consumer' ? l10n("event_log.empty_consumer") : l10n("event_log.empty_employer") %>
+    <% else %>
     <% if active_tab == 'event_log_ivl' %>
+      <p><b><%= l10n("event_log.hbx_id_text") %></b> <%= hbx_id %></p>
+      <p><b><%= l10n("Account") %> <%= l10n("Primary") %>:</b> <%= l10n("Self") %></p>
       <p><%= l10n("event_log.ivl_action") %></p>
     <% else %>
       <p><%= l10n("event_log.shop_action") %></p>
     <% end %>
+
     <div class="filters-container">
       <div id="filters-toggle" class="filters-toggle">
         <span class="glyphicon glyphicon-chevron-right" id="filters-arrow"></span>
         <span class="filters-text"><%= l10n("event_log.filters") %></span>
       </div>
       <form class="filters" id="filters">
-        <h2><%= l10n("event_log.eligibility") %></h2>
+        <h2><%= l10n("event_log.eligibility") %> <%= l10n("Details") %></h2>
         <div class="filter-row">
+          <% if type == 'consumer' %>
           <div class="filter">
             <label for="<%= l10n("subject").downcase %>"><%= l10n("Subject") %></label>
             <dl class="dropdown">
@@ -30,16 +36,19 @@
                 <div class="mutliSelect">
                   <ul>
                     <li><label><input type="checkbox" name="<%= l10n("subject").downcase %>" value="all" checked/>All</label></li>
-                    <% @family.family_members.each do |member| %>
-                      <li><label><input type="checkbox" name="<%= l10n("subject").downcase %>" value="<%= member.person.full_name %>" checked/><%= member.person.full_name %></label></li>
+                    <% if members&.any? %>
+                    <% members.each do |member| %>
+                      <li><label><input type="checkbox" name="<%= l10n("subject").downcase %>" value="<%= member.full_name %>" checked/><%= member.full_name %></label></li>
+                    <% end %>
                     <% end %>
                   </ul>
                 </div>
               </dd>
             </dl>
           </div>
+          <% end %>
           <div class="filter">
-            <label for="<%= l10n("event_log.select_eligibility") %>"><%= l10n("event_log.eligibility") %></label>
+            <label for="<%= l10n("event_log.select_eligibility") %>">Type</label>
             <dl class="dropdown">
               <dt>
                 <div class="fake-select" style="display: flex;align-items: center;">
@@ -62,7 +71,7 @@
             </dl>
           </div>
           <div class="filter">
-            <label for="<%= l10n("status").downcase %>"><%= l10n("event_log.eligibility") %> <%= l10n("status") %></label>
+            <label for="<%= l10n("status").downcase %>"><%= l10n("status") %></label>
             <dl class="dropdown">
               <dt>
               <div class="fake-select" style="display: flex;align-items: center;">
@@ -114,7 +123,8 @@
 
     <div class="event-log-header">
       <div class="event-log-export-text">
-        <h3><b><%= l10n("event_log.table_label") %> <%= hbx_id %></b></h3><a href="/event_logs.csv?family=<%= @family.id %>" id="export-table" class="button button-primary">Export CSV</a>
+        <h3><b><%= type === "consumer" ? l10n("event_log.table_label_consumer") + hbx_id : l10n("event_log.table_label_employer")%></b></h3>
+        <a href="/event_logs.csv?group=<%= group.id %>?type=<%= type %>" id="export-table" class="button button-primary"><%= l10n("Export") %> CSV</a>
       </div>
     </div>
     <div id="event-table-data">
@@ -122,7 +132,7 @@
         <thead>
         <tr class="">
           <th><span class="glyphicon glyphicon-chevron-right" id="log-expansion-icon" onclick="toggleShowAllRows()"></span></th>
-          <th><%= l10n("Subject") %></th>
+          <% if type == 'consumer' %><th><%= l10n("Subject") %></th><% end %>
           <th><%= l10n("event_log.eligibility") %></th>
           <th><%= l10n("event_log.eligibility") %> <%= l10n("Status") %></th>
           <th><%= l10n("Effective") %> <%= l10n("On") %></th>
@@ -130,13 +140,14 @@
         </thead>
         <tbody>
         <% if @event_logs&.any? %>
-          <% @event_logs.each_with_index do |event_log, index| %>
+          <% sets = @event_logs.group_by{|e| [e[:subject], e[:title]]} %>
+          <% sets.each_with_index do |(event_log, details), index| %>
             <tr class="primary-row" id="<%= index %>"%>
               <td><span class="glyphicon glyphicon-chevron-right"></span></td>
-              <td class="subject"><%= event_log[:subject] %></td>
-              <td class="eligibility"><%= event_log[:title]&.upcase %></td>
-              <td class="status"><%= event_log[:current_state]&.titleize %></td>
-              <td class="effective-on"><%= event_log[:effective_on] %></td>
+              <% if type == 'consumer' %><td class="subject"><%= event_log[0] %></td><% end %>
+              <td class="eligibility"><%= event_log[1]&.upcase %></td>
+              <td class="status"><%= details[0][:current_state]&.titleize %></td>
+              <td class="effective-on"><%= details[0][:effective_on] %></td>
             </tr>
             <tr class="secondary-header" id="<%= index %>">
               <td colspan="2"></td>
@@ -144,12 +155,14 @@
               <th><%= l10n("Account (HBX ID/User)") %></th>
               <th><%= l10n("Account (Date/Time)") %></th>
             </tr>
+            <% details.each do |detail| %>
             <tr class="detail-row" id="<%= index %>">
               <td colspan="2"></td>
-              <td><%= event_log[:detail] %></td>
-              <td id="<%= event_log[:account_hbx_id] %>%" class="user_id"><%= event_log[:account_username] %></td>
-              <td class="event-time"><%= event_log[:event_time] %></td>
+              <td><%= detail[:detail] %></td>
+              <td id="<%= detail[:account_hbx_id] %>%" class="user_id"><%= detail[:account_username] %></td>
+              <td class="event-time"><%= detail[:event_time] %></td>
             </tr>
+            <% end %>
           <% end %>
         <% end %>
         </tbody>
@@ -157,6 +170,7 @@
     </div>
     <div id="no-results" style="display:none"><%= l10n("event_log.no_results") %></div>
   </div>
+  <% end %>
 </div>
 
 <script>
