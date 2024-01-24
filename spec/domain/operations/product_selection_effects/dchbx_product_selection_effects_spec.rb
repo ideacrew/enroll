@@ -995,6 +995,9 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
       enrollments = family.hbx_enrollments
       expect(enrollments.size).to eq 4
       expect(enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled", "coverage_selected", "unverified"]).count).to eq(3)
+      canceled_enrollment = enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled"]).first
+      transition = canceled_enrollment.workflow_state_transitions.first
+      expect(canceled_enrollment.is_transition_superseded_silent?(transition)).to be_truthy
     end
   end
 
@@ -1068,7 +1071,11 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
       family.reload
       enrollments = family.hbx_enrollments
       expect(enrollments.size).to eq 4
-      expect(enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_terminated", "coverage_canceled", "coverage_selected", "unverified"]).count).to eq(3)
+      expect(enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled", "coverage_selected", "unverified"]).count).to eq(3)
+
+      canceled_enrollment = enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled"]).first
+      transition = canceled_enrollment.workflow_state_transitions.first
+      expect(canceled_enrollment.is_transition_superseded_silent?(transition)).to be_falsey
     end
   end
 
@@ -1182,7 +1189,10 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
       family.reload
       enrollments = family.hbx_enrollments
       expect(enrollments.size).to eq 4
-      expect(enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_terminated", "coverage_canceled", "coverage_selected", "unverified"]).count).to eq(3)
+      expect(enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled", "coverage_selected", "unverified"]).count).to eq(3)
+      canceled_enrollment = enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled"]).first
+      transition = canceled_enrollment.workflow_state_transitions.first
+      expect(canceled_enrollment.is_transition_superseded_silent?(transition)).to be_falsey
     end
   end
 
@@ -1256,7 +1266,10 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
       family.reload
       enrollments = family.hbx_enrollments
       expect(enrollments.size).to eq 4
-      expect(enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_terminated", "coverage_canceled", "coverage_selected", "unverified"]).count).to eq(3)
+      expect(enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled", "coverage_selected", "unverified"]).count).to eq(3)
+      canceled_enrollment = enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled"]).first
+      transition = canceled_enrollment.workflow_state_transitions.first
+      expect(canceled_enrollment.is_transition_superseded_silent?(transition)).to be_falsey
     end
   end
 end

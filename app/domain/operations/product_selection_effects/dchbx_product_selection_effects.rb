@@ -101,7 +101,7 @@ module Operations
           if superseded_and_eligible_for_cancellation?(enrollment, renewal_enrollment)
             transition_args = { "reason" => Enrollments::TerminationReasons::SUPERSEDED_SILENT }
             renewal_enrollment.cancel_coverage_for_superseded_term!(transition_args)
-          elsif renewal_enrollment.may_cancel_coverage?
+          else
             renewal_enrollment.cancel_ivl_enrollment
           end
         end
