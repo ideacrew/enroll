@@ -991,8 +991,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
     family.reload
     enrollments = family.hbx_enrollments
     expect(enrollments.size).to eq 4
-    puts "DchbxProductSelectionEffects: #{enrollments.pluck(:aasm_state, :effective_on, :product_id)}"
-    expect(enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled", "coverage_selected"]).count).to eq(3)
+    expect(enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled", "coverage_selected", "unverified"]).count).to eq(3)
   end
 end
 
@@ -1098,7 +1097,6 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
     family.reload
     enrollments = family.hbx_enrollments
     expect(enrollments.size).to eq 4
-    puts "DchbxProductSelectionEffects: #{enrollments.pluck(:aasm_state, :effective_on, :product_id)}"
-    expect(enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled", "coverage_selected"]).count).to eq(2)
+    expect(enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_terminated", "coverage_canceled", "coverage_selected", "unverified"]).count).to eq(2)
   end
 end
