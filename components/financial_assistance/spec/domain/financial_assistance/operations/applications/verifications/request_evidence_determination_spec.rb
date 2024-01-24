@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require "#{FinancialAssistance::Engine.root}/spec/dummy/app/domain/operations/individual/open_enrollment_start_on"
 
 RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::RequestEvidenceDetermination, dbclean: :after_each do
   include Dry::Monads[:result, :do]
