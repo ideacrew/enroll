@@ -52,7 +52,7 @@ RSpec.describe ::FinancialAssistance::Operations::Transfers::MedicaidGateway::Ac
 
         context 'when the family has already received the notice' do
           before do
-            family.primary_person.inbox.messages.create(subject: 'Find Out If You Qualify For Health Insurance On CoverME.gov')
+            family.primary_person.inbox.messages.create(subject: 'Find Out If You Qualify For Health Insurance On IdeaCrew')
           end
 
           it 'should not receive duplicate account transfer notice' do

@@ -23,10 +23,10 @@ registry:
         is_enabled: true
       - key: :broker_training_link
         is_enabled: true
-        item: "https://coverme.inquisiqlms.com/"
+        item: "https://ideacrew.inquisiqlms.com/"
       - key: broker_agreement_url
         is_enabled: true
-        item: "https://coverme.gov/brokeragreement"
+        item: "https://ideacrew.com/brokeragreement"
       - key: :allow_edit_broker_email
         is_enabled: <%= ENV['ALLOW_EDIT_BROKER_EMAIL_IS_ENABLED'] || false %>
       - key: :allow_edit_broker_npn

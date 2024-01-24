@@ -3,7 +3,7 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 # This class to update yearly_expected_contribution for 2022 active determinations
-# This migration is specific for state of Maine
+# This migration is specific for state of State
 class UpdateExpectedContributionFor2022ActiveDeterminations < MongoidMigrationTask
 
   def update_tax_households(family, eligibility, yearly_expected_contribution)

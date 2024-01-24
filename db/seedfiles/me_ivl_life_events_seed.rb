@@ -485,7 +485,7 @@ end
 
 # TODO: Says first of next month plan selection
 QualifyingLifeEventKind.find_or_create_by(
-  title: "Denied MaineCare or Cub Care after enrollment period"
+  title: "Denied Medicaid or CHIP after enrollment period"
 ).tap do |qlek|
   qlek.update_attributes(
   tool_tip: "A marketplace enrollee is found newly eligible or ineligible for advance premium tax credits, or someone who is not enrolled has a decrease in income that makes them eligible",

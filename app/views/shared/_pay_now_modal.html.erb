@@ -43,7 +43,7 @@
             <input type="hidden" name="RelayState" value=<%= pay_now_relay_state(carrier) %>/>
           <% end %>
           <button type="submit" class="btn btn-primary pull-right sp interaction-click-control-print-purchase-confirmation" id="pay-now" value="<%= hbx_enrollment.hbx_id %>">
-            <%= EnrollRegistry[:enroll_app].setting(:short_name).item == "CoverME.gov" ?  l10n("continue") : l10n("leave_dc_health_link") %>
+            <%= l10n("continue") %>
           </button>
         </form>
       </div>

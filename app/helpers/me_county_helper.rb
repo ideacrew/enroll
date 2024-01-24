@@ -10,7 +10,7 @@
 # agent.log = Logger.new "mech.log"
 # agent.user_agent_alias = 'Mac Safari'
 # agent.verify_mode = OpenSSL::SSL::VERIFY_NONE
-# page = agent.get('https://en.wikipedia.org/wiki/List_of_municipalities_in_Maine')
+# page = agent.get('https://en.wikipedia.org/wiki/List_of_municipalities_in_State')
 # doc = Nokogiri::HTML(page.body)
 # cities_and_counties_tables =  doc.css('table').select { |table| table[:class] == "sortable wikitable" }.map(&:to_s).flatten.pop
 # sanitized_array = ActionView::Base.full_sanitizer.sanitize(cities_and_counties_tables).split("\n").reject { |value| value == "" || !value[/\d/].nil? || ["Town", "County", "Land area(sq mil)"].include?(value) }
@@ -27,7 +27,7 @@
   # hash_of_counties_and_cities[county_name] << county_or_city_name
 # end
 # hash_of_counties_and_cities
-# https://en.wikipedia.org/wiki/List_of_municipalities_in_Maine
+# https://en.wikipedia.org/wiki/List_of_municipalities_in_State
 # rubocop:disable Metrics/ModuleLength
 module MeCountyHelper
   # rubocop:disable Metrics/MethodLength

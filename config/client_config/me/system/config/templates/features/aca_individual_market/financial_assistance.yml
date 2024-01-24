@@ -290,7 +290,7 @@ registry:
       is_enabled: true
       settings:
         - key: :name
-          item: "MaineCare or Cub Care"
+          item: "Medicaid or CHIP"
     - key: :medicaid_or_chip_agency_long_name
       is_enabled: true
       settings:

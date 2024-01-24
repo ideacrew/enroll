@@ -13,7 +13,7 @@ module Insured
         "Kaiser Permanente" => "https://kp.org/paypremium",
         "Community Health Options" => "https://healthoptions.org",
         "Harvard Pilgrim Health Care" => "https://www.harvardpilgrim.org/public/home",
-        "Anthem Blue Cross and Blue Shield" => "https://www.anthem.com/contact-us/maine",
+        "Anthem Blue Cross and Blue Shield" => "https://www.anthem.com/contact-us/state",
         "Northeast Delta Dental" => "https://www.nedelta.com/Home",
         "Taro Health" => EnrollRegistry['taro_health_pay_now'].setting(:taro_health_home_page_url).item
       }.freeze

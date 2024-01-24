@@ -26,10 +26,10 @@ def program_eligible_for(application)
   return if active_applicants.blank?
 
   eligible_programs = []
-  eligible_programs << "MaineCare and Cub Care(Medicaid)" if active_applicants.where(is_medicaid_chip_eligible: true).present?
+  eligible_programs << "Medicaid and CHIP(Medicaid)" if active_applicants.where(is_medicaid_chip_eligible: true).present?
   eligible_programs << "Financial assistance(APTC eligible)" if active_applicants.where(is_ia_eligible: true).present?
   eligible_programs << "Does not qualify" if active_applicants.where(is_totally_ineligible: true).present?
-  eligible_programs << "Special Maine care eligible" if application.applicants.pluck(:is_eligible_for_non_magi_reasons).any?(true)
+  eligible_programs << "Special Medicaid eligible" if application.applicants.pluck(:is_eligible_for_non_magi_reasons).any?(true)
   eligible_programs.join(",")
 end
 
