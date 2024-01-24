@@ -2266,7 +2266,7 @@ class HbxEnrollment
                   to: :coverage_canceled, after: :propogate_cancel
       transitions from: :coverage_expired, to: :coverage_canceled, :guard => :is_ivl_by_kind?, after: :propogate_cancel
       transitions from: [:coverage_terminated, :coverage_expired], to: :coverage_canceled,
-                  guard: :can_be_canceled?
+                  guard: :prior_plan_year_coverage?
     end
 
     # This event is used to cancel coverage for superseded terminated enrollments
@@ -2345,12 +2345,6 @@ class HbxEnrollment
 
   def can_be_expired?
     benefit_group.blank? || (benefit_group.present? && benefit_group.end_on <= TimeKeeper.date_of_record)
-  end
-
-  def can_be_canceled?
-    return true unless is_shop?
-
-    prior_plan_year_coverage?
   end
 
   def prior_plan_year_coverage?

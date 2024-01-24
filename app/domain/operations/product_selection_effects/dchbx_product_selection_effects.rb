@@ -99,13 +99,18 @@ module Operations
           next unless enrollment.same_signatures(renewal_enrollment) && !renewal_enrollment.is_shop?
           next unless renewal_enrollment.may_cancel_coverage?
 
-          is_same_plan = enrollment.product.renewal_product.is_same_plan_by_hios_id_and_active_year?(renewal_enrollment.product)
-          if is_same_plan
+          if product_matched?(enrollment, renewal_enrollment)
             renewal_enrollment.cancel_ivl_enrollment
           else
-            renewal_enrollment.cancel_coverage!
+            renewal_enrollment.cancel_coverage_for_superseded_term!
           end
         end
+      end
+
+      def product_matched?(enr, enrollment)
+        return false unless enr.product.present?
+        enr.product_id == enrollment&.product&.renewal_product&.id || enr.product.hios_base_id == enrollment&.product&.renewal_product&.hios_base_id ||
+          enr.product.issuer_profile_id == enrollment&.product&.renewal_product&.issuer_profile_id
       end
 
       def generate_enrollment_signature(enrollment)
