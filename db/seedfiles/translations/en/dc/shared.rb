@@ -90,5 +90,6 @@ SHARED_TRANSLATIONS = {
     "en.event_log.ivl_action" => "Please use the filters below to see specific actions taken on this individual.",
     "en.event_log.no_results" => "Your search returned zero results, try adjusting your filters",
     "en.event_log.empty_employer" => "There have been no auditable actions on this organization at this time.",
-    "en.event_log.empty_consumer" => "There have been no auditable actions on this family at this time."
+    "en.event_log.empty_consumer" => "There have been no auditable actions on this family at this time.",
+    "en.event_log.account_label" => "Account (HBX ID/User)"
 }
