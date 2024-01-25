@@ -353,4 +353,98 @@ RSpec.describe Exchanges::BrokerApplicantsController do
       end
     end
   end
+
+  describe '#update' do
+    context "when:
+      - person A exists with broker role and broker agency staff role associated with broker agency A
+      - person B exists with a Consumer Role
+      - person B has a User
+      - person B has a broker agency staff role for broker agency A
+      - person B has a broker role and broker agency staff role associated with broker agency B
+      - admin approves person B's Broker Application" do
+
+      let(:site) do
+        FactoryBot.create(
+          :benefit_sponsors_site,
+          :with_benefit_market,
+          :as_hbx_profile,
+          site_key: ::EnrollRegistry[:enroll_app].settings(:site_key).item
+        )
+      end
+
+      let(:broker_agency_organization_A) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+
+      let(:broker_agency_profile_A) { broker_agency_organization_A.broker_agency_profile }
+
+      let(:person_A) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+
+      let(:broker_role_A) { FactoryBot.create(:broker_role, person: person_A, benefit_sponsors_broker_agency_profile_id: broker_agency_profile_A.id) }
+
+      let(:basr_1_A) do
+        person_A.create_broker_agency_staff_role(
+          benefit_sponsors_broker_agency_profile_id: broker_agency_profile_A.id
+        )
+      end
+
+      let(:broker_agency_organization_B) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+
+      let(:broker_agency_profile_B) { broker_agency_organization_B.broker_agency_profile }
+
+      let(:person_B) do
+        FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, :with_hbx_staff_role)
+      end
+
+      let(:broker_role_B) { FactoryBot.create(:broker_role, person: person_B, benefit_sponsors_broker_agency_profile_id: broker_agency_profile_B.id) }
+
+      let(:basr_2_A) do
+        basf = person_B.create_broker_agency_staff_role(
+          benefit_sponsors_broker_agency_profile_id: broker_agency_profile_A.id
+        )
+        basf.broker_agency_accept!
+        basf
+      end
+
+      let(:basr_2_B) do
+        person_B.create_broker_agency_staff_role(
+          benefit_sponsors_broker_agency_profile_id: broker_agency_profile_B.id
+        )
+      end
+
+      let(:user) { FactoryBot.create(:user, :with_hbx_staff_role, person: person_B) }
+
+      let(:input_params) do
+        {
+          id: person_B.id,
+          approve: true,
+          person: {
+            broker_role_attributes: {
+              training: true,
+              carrier_appointments: {}
+            }
+          }
+        }
+      end
+
+      before :each do
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:broker_role_consumer_enhancement).and_return(true)
+
+        broker_agency_profile_A.update_attributes!(primary_broker_role_id: broker_role_A.id)
+        basr_1_A
+
+        broker_agency_profile_B.update_attributes!(primary_broker_role_id: broker_role_B.id)
+        basr_2_A
+        basr_2_B
+
+        sign_in(user)
+        put :update, params: input_params, format: :js
+      end
+
+      it 'approves the broker, broker agency profile and broker agency staff role' do
+        expect(broker_role_B.reload.active?).to be_truthy
+        expect(broker_agency_profile_B.reload.is_approved?).to be_truthy
+        expect(basr_2_B.reload.active?).to be_truthy
+      end
+    end
+  end
 end

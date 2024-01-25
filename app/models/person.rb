@@ -1334,6 +1334,19 @@ class Person
     basr
   end
 
+  # @method pending_basr_by_profile_id(profile_id)
+  # Retrieves the first pending Broker Agency Staff Role (BASR) for a given broker agency profile ID.
+  #
+  # @param [BSON::ObjectId] profile_id The ID of the Broker Agency Profile for which to retrieve the pending BASR.
+  #
+  # @return [BrokerAgencyStaffRole, nil] Returns the first pending broker agency staff role for the given broker agency profile ID, or nil if no such role exists.
+  #
+  # @example Retrieve the first pending BASR for a given profile ID
+  #   person.pending_basr_by_profile_id(profile_id) #=> BrokerAgencyStaffRole or nil
+  def pending_basr_by_profile_id(profile_id)
+    broker_agency_staff_roles.broker_agency_pending.by_profile_id(profile_id).first
+  end
+
   private
 
   def assign(collection, association)

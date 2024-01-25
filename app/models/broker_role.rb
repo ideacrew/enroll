@@ -372,9 +372,7 @@ class BrokerRole
     return unless EnrollRegistry.feature_enabled?(:broker_role_consumer_enhancement)
     return if person.consumer_role.blank?
     return if person.user.blank?
-    return if person.broker_agency_staff_roles.any? do |basr|
-      basr.benefit_sponsors_broker_agency_profile_id == benefit_sponsors_broker_agency_profile_id && basr.broker_agency_pending?
-    end
+    return if person.pending_basr_by_profile_id(benefit_sponsors_broker_agency_profile_id)
 
     person.create_broker_agency_staff_role(
       benefit_sponsors_broker_agency_profile_id: benefit_sponsors_broker_agency_profile_id
