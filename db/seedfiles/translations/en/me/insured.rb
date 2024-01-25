@@ -428,7 +428,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.interactive_identity_verifications.failed_validation.step_3' => "Answer Experian’s questions to verify your identity.",
 
   :'en.years' => "years",
-  :'en.site_name' => "CoverME.gov",
+  :'en.site_name' => "IdeaCrew SBM",
   :'en.coverage_on' => "coverage on",
   :'en.coverage_info_msg' => "The following people are currently enrolled in",
   :'en.coverage_info_msg_2' => "The plan they have now won't be cancelled automatically when signing up for additional coverage.",

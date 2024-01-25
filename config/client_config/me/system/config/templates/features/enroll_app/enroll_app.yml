@@ -40,7 +40,7 @@ registry:
           - key: :domain_name
             item: 'cme.enroll.openhbx.org'
           - key: :site_title
-            item: 'CoverME.gov'
+            item: 'IdeaCrew SBM'
           - key: :home_url
             item: 'https://cme.enroll.openhbx.org/'
           - key: :home_business_url
@@ -64,11 +64,11 @@ registry:
           - key: :state_name
             item: 'State'
           - key: :short_name
-            item: 'CoverME.gov'
+            item: 'IdeaCrew'
           - key: :byline
             item: "The State's Official Health Insurance Marketplace"
           - key: :long_name
-            item: 'CoverME.gov'
+            item: 'IdeaCrew State Based Marketplace'
           - key: :header_message
             item: "The State's Official Health Insurance Marketplace"
           - key: :byline
