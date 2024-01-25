@@ -313,7 +313,7 @@ class Plan
   # TODO: Refactor this to in_state_network or something similar
   scope :by_dc_network, ->(types) { where(:dc_in_network => {"$in" => types})}
 
-  # TODO: Value is hardcoded for Maine, figure out how to update this
+  # TODO: Value is hardcoded for State, figure out how to update this
   def in_state_network
     self.dc_in_network
   end

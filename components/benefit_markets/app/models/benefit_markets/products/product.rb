@@ -177,7 +177,7 @@ module BenefitMarkets
 
       alias name title
 
-    # TODO: Value is hardcoded for Maine, figure out how to update this
+    # TODO: Value is hardcoded for State, figure out how to update this
       alias in_state_network dc_in_network
 
     # Highly nested scopes don't behave in a way I entirely understand with

@@ -20,15 +20,15 @@ registry:
           - key: :policies_url
             item: ''
           - key: :faqs_url
-            item: 'https://www.coverme.gov/get-help'
+            item: 'https://www.ideacrew.com/get-help'
           - key: :help_url
-            item: 'https://www.coverme.gov/help/'
+            item: 'https://www.ideacrew.com/help/'
           - key: :business_resource_center_url
             item: ''
           - key: :nondiscrimination_notice_url
             item: ''
           - key: :submit_docs_url
-            item: 'https://www.CoverME.gov/forms'
+            item: 'https://www.ideacrew.com/forms'
           - key: :state_residency
             item: 'ME Residency'
           - key: :site_key
@@ -40,39 +40,39 @@ registry:
           - key: :domain_name
             item: 'cme.enroll.openhbx.org'
           - key: :site_title
-            item: 'CoverME.gov'
+            item: 'IdeaCrew SBM'
           - key: :home_url
             item: 'https://cme.enroll.openhbx.org/'
           - key: :home_business_url
-            item: 'https://www.coverme.gov'
+            item: 'https://www.ideacrew.com'
           - key: :help_url
-            item: 'https://www.coverme.gov/help/'
+            item: 'https://www.ideacrew.com/help/'
           - key: :main_web_address_url
-            item: 'https://www.coverme.gov'
+            item: 'https://www.ideacrew.com'
           - key: :invoice_bill_url
             item: ''
           - key: :payment_pdf_url
             item: 'pdf/employers_paying_your_premiums_online.pdf'
           - key: :user_sign_in_url
-            item: 'https://www.coverme.gov'
+            item: 'https://www.ideacrew.com'
           - key: :website_name
-            item: https://www.coverme.gov"
+            item: https://www.ideacrew.com"
           - key: :main_web_address
-            item: 'https://www.coverme.gov'
+            item: 'https://www.ideacrew.com'
           - key: :main_web_address
-            item: 'https://www.coverme.gov'
+            item: 'https://www.ideacrew.com'
           - key: :state_name
-            item: 'Maine'
+            item: 'State'
           - key: :short_name
-            item: 'CoverME.gov'
+            item: 'IdeaCrew'
           - key: :byline
-            item: "Maine's Official Health Insurance Marketplace"
+            item: "The State's Official Health Insurance Marketplace"
           - key: :long_name
-            item: 'CoverME.gov'
+            item: 'IdeaCrew State Based Marketplace'
           - key: :header_message
-            item: "Maine's Official Health Insurance Marketplace"
+            item: "The State's Official Health Insurance Marketplace"
           - key: :byline
-            item: "Welcome to Maine's Health Insurance Marketplace"
+            item: "Welcome to IdeaCrews's Health Insurance Marketplace"
           - key: :logo_file_name
             item: 'logo_me.svg'
           - key: :make_their_premium_payments_online
@@ -145,13 +145,13 @@ registry:
           - key: :exchange_hbx_id
             item: 'ME0'
           - key: :mail_address
-            item: 'info@coverme.gov'
+            item: 'info@ideacrew.com'
           - key: :no_reply_email
-            item: 'noreply@coverme.gov'
+            item: 'noreply@ideacrew.com'
           - key: :mail_address
-            item: 'info@coverme.gov'
+            item: 'info@ideacrew.com'
           - key: :producer_email_address
-            item: 'mehl.producer@coverme.gov'
+            item: 'mehl.producer@ideacrew.com'
           - key: :privacy_policy
             item: ''
           - key: :late_rates_message
@@ -173,23 +173,23 @@ registry:
           - key: :publisher
             item: 'mehl'
           - key: :prod_tax_info
-            item: 'https://www.maine.gov/revenue/tax-return-forms/individual-income-tax-2020'
+            item: 'https://www.state.gov/revenue/tax-return-forms/individual-income-tax-2020'
           - key: :staging_tax_info_url
-            item: 'https://www.maine.gov/revenue/tax-return-forms/individual-income-tax-2020'
+            item: 'https://www.state.gov/revenue/tax-return-forms/individual-income-tax-2020'
           - key: :nationwide_area
             item: 'Nationwide'
           - key: :statewide_area
-            item: 'Maine/Regional'
+            item: 'State/Regional'
           - key: :standard_plan_label
             item: 'CLEAR CHOICE PLAN'
           - key: :exchange_name
-            item: 'CoverME.gov Health Benefit Exchange'
+            item: 'IdeaCrew Health Benefit Exchange'
           - key: :social_media
             item: ''
           - key: :state_long_title
-            item: 'the state of Maine'
+            item: 'State'
           - key: :state_dmv_link
-            item: 'https://www.maine.gov/sos/bmv/'
+            item: 'https://www.state.gov/sos/bmv/'
           - key: :contact_center_po_box
             item: 'PO Box 616'
           - key: :contact_center_city
@@ -203,16 +203,16 @@ registry:
           - key: :contact_center_zip_code
             item: '04332-6626'
           - key: :contact_center_email_address
-            item: 'smallbusiness@coverme.gov'
+            item: 'smallbusiness@ideacrew.com'
           - key: :social_media
             item: ''
           - key: :health_benefit_exchange_authority_phone_number
             item: '(866) 636-0355'
           - key: :contact_center_name
-            item: 'CoverME.gov Customer Assistance Center'
+            item: 'IdeaCrew Customer Assistance Center'
           - key: :contact_center_short_number
             item: '(866) 636-0355'
-          - key: :contact_center_tty_number # Need to figure out what this should be for Maine
+          - key: :contact_center_tty_number # Need to figure out what this should be for State
             item: '711'
           - key: :producer_advisory_committee_url
             item: ''

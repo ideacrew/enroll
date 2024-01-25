@@ -9,7 +9,7 @@ FactoryBot.define do
       address { FactoryBot.build(:benefit_sponsors_locations_address, kind: "primary") }
     end
 
-    # TODO: Refactor this with Maine info
+    # TODO: Refactor this with State info
     trait :with_me_address do
       is_primary { true }
       address { FactoryBot.build(:benefit_sponsors_locations_address, :me_shop_baseline) }

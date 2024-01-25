@@ -17,7 +17,7 @@ site:
   use_default_devise_path: true
 
 contact_center:
-  alt_name: 'CoverME.gov Customer Service'
+  alt_name: 'IdeaCrew Customer Service'
   phone_number: '(866) 636-0355'
   fax: '1-617-933-3099'
   alt_fax: '617-722-4033'
@@ -26,22 +26,22 @@ contact_center:
   payment_phone_number: '855-532-LINK'
   ivl_number: '1-877-623-6765'
   ivl_phone_number: '1-877-623-6765'
-  email_address: 'smallbusiness@coverme.gov'
+  email_address: 'smallbusiness@ideacrew.com'
   state: 'ME'
-  non_discrimination_email: 'info@coverme.gov'
+  non_discrimination_email: 'info@ideacrew.com'
 
-  appeals: 'info@coverme.gov'
+  appeals: 'info@ideacrew.com'
 
   # Voting Info for FA Engine Steps
-  # TOOD: This needs to be updated. These are pulled of Maine government website.
+  # TOOD: This needs to be updated. These are pulled of State government website.
   # # https://www.maine.gov/sos/cec/elec/voter-info/index.html
   board_of_elections_entity: 'Elections Division<br>Department of the Secretary of State'
   board_of_elections_address: 'Burton M. Cross Building<br>111 Sewall St (101 SHS)<br>Augusta, ME 04333-0101'
-  board_of_elections_email: 'cec.elections@maine.gov'
+  board_of_elections_email: 'cec.elections@state.gov'
   board_of_elections_phone_number: '(207) 624-7650'
 
   mailing_address:
-    name: 'CoverME.gov'
+    name: 'IdeaCrew'
     address_1: 'PO Box 97022'
     address_2:
     city: 'Washington'
@@ -49,7 +49,7 @@ contact_center:
     zip_code: '20090'
 
   appeal_center:
-    name: 'CoverME.gov'
+    name: 'IdeaCrew'
     address_1: 'PO Box 97022'
     address_2:
     city: 'Washington'
@@ -86,7 +86,7 @@ invoices:
 
 aca:
   state_key: 'me'
-  state_name: 'Maine'
+  state_name: 'State'
   state_abbreviation: 'ME'
   market_kinds: ['individual']
   nationwide_markets: true
@@ -136,7 +136,7 @@ aca:
       start_on: <%= Date.new(2021,11,1) %>
       end_on: <%= Date.new(2022,01,31) %>
   shop_market:
-    valid_employer_attestation_documents_url: 'https://www.coverme.gov/business/business-resource-center/employer-verification-checklist'
+    valid_employer_attestation_documents_url: 'https://www.ideacrew.com/business/business-resource-center/employer-verification-checklist'
     small_market_employee_count_maximum: 50
     employer_contribution_percent_minimum: 50
     employer_dental_contribution_percent_minimum: 0

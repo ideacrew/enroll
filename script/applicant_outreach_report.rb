@@ -47,11 +47,11 @@ def program_eligible_for(applicant)
   return if applicant.blank?
 
   eligible_programs = []
-  eligible_programs << "MaineCare and Cub Care(Medicaid)" if applicant.is_medicaid_chip_eligible
+  eligible_programs << "Medicaid and CHIP(Medicaid)" if applicant.is_medicaid_chip_eligible
   eligible_programs << "Financial assistance(APTC eligible)" if applicant.is_ia_eligible
   eligible_programs << "Does not qualify" if applicant.is_totally_ineligible
   eligible_programs << "QHP without financial assistance" if applicant.is_without_assistance
-  eligible_programs << "Special Maine care eligible" if applicant.is_eligible_for_non_magi_reasons
+  eligible_programs << "Special Medicaid eligible" if applicant.is_eligible_for_non_magi_reasons
   eligible_programs.join(",")
 end
 

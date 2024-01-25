@@ -1,8 +1,8 @@
 - is_ivl_osse_filter_eligible = ivl_osse_filtering_enabled? && @hbx_enrollment.ivl_osse_eligible?
 #filter-sidebar.col-lg-3.col-md-3.co-sm-3.col-xs-12.pl-0
   .checkbox-filter-wrapper-uc
-    / TODO: These links will be deprecated for Maine. New feature checks will be added here to make them dissappear.
-    / Maine will have a "Go To Plan Compare" link in more_plan_details.html.erb which opens the estimate your cost module
+    / TODO: These links will be deprecated for State. New feature checks will be added here to make them dissappear.
+    / State will have a "Go To Plan Compare" link in more_plan_details.html.erb which opens the estimate your cost module
     - if EnrollRegistry.feature_enabled?(:find_my_doctor_options)
       h4 = find_my_doctor
       - if checkbook_integration_enabled?

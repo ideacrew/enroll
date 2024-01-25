@@ -80,7 +80,7 @@ namespace :dry_run do
         'Welcome to CoverME.gov!' => 'IVLMWE',
         'Your Plan Enrollment' => 'IVLENR',
         'Your Eligibility Results - Tax Credit' => 'IVLERA',
-        'Your Eligibility Results - MaineCare or Cub Care' => 'IVLERM',
+        'Your Eligibility Results - Medicaid or CHIP' => 'IVLERM',
         'Your Eligibility Results - Marketplace Health Insurance' => 'IVLERQ',
         'Your Eligibility Results - Marketplace Insurance' => 'IVLERU',
         'Open Enrollment - Tax Credit' => 'IVLOEA',

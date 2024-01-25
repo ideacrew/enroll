@@ -3,7 +3,7 @@
 # rubocop:disable Metrics/ClassLength
 require File.join(Rails.root, "lib/migration_task")
 
-# It defines Maine(ME) permissions for hbx_staff
+# It defines State(ME) permissions for hbx_staff
 class MeDefinePermissions < MigrationTask
 #All hbx_roles can view families, employers, broker_agencies, brokers and general agencies
 #The convention for a privilege group 'x' is  'modify_x', or view 'view_x'

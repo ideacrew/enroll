@@ -21,9 +21,9 @@
                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 fa-text-color margin-tb-10">
                     <%= l10n('faa.premium_reductions') %>
                     <% if EnrollRegistry[:mainecare_cubcare_glossary].enabled? %>
-                      <%= render partial: 'shared/glossary', locals: {key: 'medicaid', term: 'MaineCare'} %>
+                      <%= render partial: 'shared/glossary', locals: {key: 'medicaid', term: 'Medicaid'} %>
                       <%= l10n('faa.premium_reductions2') %>
-                      <%= render partial: 'shared/glossary', locals: {key: 'child_health_insurance_plan', term: 'Cub Care'} %>
+                      <%= render partial: 'shared/glossary', locals: {key: 'child_health_insurance_plan', term: 'CHIP'} %>
                       ?
                     <% end %>
                   </span>
@@ -44,17 +44,17 @@
                   <% end %>
                 </div>
               </div>
-                
+
               <% if @person.mec_check_response == "Success" %>
                 <div id="mec-check-response">
                   <%= render partial: 'financial_assistance/applications/mec_check_results', locals: { person: @person } %>
-                </div>             
+                </div>
               <% end %>
 
               <% if @shop_coverage_result.to_s == "true" %>
                 <div id="shop-check-response">
                   <%= render partial: 'financial_assistance/applications/shop_check_results' %>
-                </div>             
+                </div>
               <% end %>
             </div>
 

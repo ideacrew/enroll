@@ -38,7 +38,7 @@ When(/Primary Broker enters personal information POM/) do
   fill_in BrokerRegistration.broker_dob, with: '02/02/1989'
   fill_in BrokerRegistration.email, with: 'pomexample@gmail.com'
   if EnrollRegistry.feature_enabled?(:allow_alphanumeric_npn)
-    # Maine allows Alphanumeric
+    # State allows Alphanumeric
     fill_in BrokerRegistration.npn, with: BrokerRegistration.alphanumeric_npn
     # Assures the javascript didn't block the full NPN
     input = page.all('input').detect { |input_element| input_element[:id] == 'inputNPN' }

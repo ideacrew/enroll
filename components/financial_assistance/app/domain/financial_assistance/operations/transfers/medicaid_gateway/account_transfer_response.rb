@@ -52,7 +52,7 @@ module FinancialAssistance
             return unless ::EnrollRegistry.feature_enabled?(:account_transfer_notice_trigger)
 
             # Temporary solution to skip multiple AccountTransfer notices if primary has already received a notice
-            message_subject = 'Find Out If You Qualify For Health Insurance On CoverME.gov'
+            message_subject = 'Find Out If You Qualify For Health Insurance On IdeaCrew'
             inbox = family.primary_person.inbox
             return if inbox.present? && inbox.messages.pluck(:subject).include?(message_subject)
 
