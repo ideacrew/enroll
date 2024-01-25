@@ -33,7 +33,6 @@ class Invitation
 
   validate :allowed_invite_types
 
-
   aasm do
     state :sent, initial: true
     state :claimed
@@ -41,6 +40,31 @@ class Invitation
     event :claim do
       transitions from: :sent, to: :claimed, :after => Proc.new { |*args| process_claim!(*args) }
     end
+  end
+
+  def may_be_claimed_by?(user_obj)
+    case role
+    when "broker_role"
+      valid_broker_role_invitation?(user_obj)
+    when "broker_agency_staff_role"
+      valid_broker_staff_invitation?(user_obj)
+    else
+      true
+    end
+  end
+
+  def valid_broker_role_invitation?(user_obj)
+    broker_role = BrokerRole.find(source_id)
+    person = broker_role.person
+    return true if person.user_id.blank?
+    person.user_id == user_obj.id
+  end
+
+  def valid_broker_staff_invitation?(user_obj)
+    staff_role = BrokerAgencyStaffRole.find(source_id)
+    person = staff_role.person
+    return true if person.user_id.blank?
+    person.user_id == user_obj.id
   end
 
   def claim_invitation!(user_obj, redirection_obj)
