@@ -71,7 +71,7 @@ SHARED_TRANSLATIONS = {
 
     "en.previous_step" => "Previous Step",
     "en.save_and_exit" => "Log Out",
-    "en.help_sign_up" => "Help Me Sign Up"
+    "en.help_sign_up" => "Help Me Sign Up",
     # event log
     "en.event_log.eligibility" => "Eligibility",
     "en.event_log.outcome" => "Outcome",
