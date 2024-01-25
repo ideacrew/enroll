@@ -216,8 +216,29 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       post :create, params: { person: person_params }
       expect(response).to have_http_status(:redirect)
     end
+  end
 
+  context 'POST create', dbclean: :after_each do
+    let(:person_params){{'dob' => '1985-10-01', 'first_name' => 'martin','gender' => 'male','last_name' => 'york','middle_name' => '','name_sfx' => '','ssn' => '000000111','user_id' => 'xyz'}}
+    let(:person_user){ double('User') }
 
+    before(:each) do
+      allow(Factories::EnrollmentFactory).to receive(:construct_employee_role).and_return(consumer_role)
+      allow(consumer_role).to receive(:person).and_return(person)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(family).to receive(:create_dep_consumer_role)
+      allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      allow(User).to receive(:find).and_return(person_user)
+      allow(person_user).to receive(:person).and_return(person)
+    end
+
+    it 'should handle StandardError and show warning' do
+      allow(person).to receive(:save).and_raise(StandardError)
+      sign_in user
+      post :create, params: { person: person_params }
+      expect(response).to have_http_status(:redirect)
+      expect(flash[:warning]).to eq('There may be an existing Person record (or) An issue with the Person record')
+    end
   end
 
   context "POST create with failed construct_employee_role", dbclean: :after_each do
