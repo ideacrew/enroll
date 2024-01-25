@@ -49,10 +49,8 @@ module Subscribers
             result.failure
           end
 
-        logger.info "$$ headers are #{headers}"
-        subscriber_logger.error "$$ headers are #{headers}"
-        logger.info "EventLogSubscriber: event failed1 to persist due to errors: #{errors.to_h}, #{errors.inspect}"
-        subscriber_logger.error "EventLogSubscriber: event failed1 to persist due to errors: #{errors.to_h}, #{errors.inspect}"
+        logger.error "EventLogSubscriber: event failed to persist due to errors: #{errors.to_h}"
+        subscriber_logger.error "EventLogSubscriber: event failed to persist due to errors: #{errors.to_h}"
       end
     end
 
