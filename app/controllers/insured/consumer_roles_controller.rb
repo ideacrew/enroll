@@ -178,7 +178,7 @@ class Insured::ConsumerRolesController < ApplicationController
         end
       end
     rescue Exception => e
-      text = "There may be an existing Person record (or) An issue with the Person record"
+      text = 'There may be an existing Person record (or) An issue with the Person record'
       flash[:warning] = text if @person.errors.present?
       redirect_to search_insured_consumer_role_index_path
       return
