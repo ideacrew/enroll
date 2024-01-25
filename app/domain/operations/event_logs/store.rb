@@ -56,6 +56,7 @@ module Operations
         account = headers[:account]
         options[:event_time] = formated_time(headers[:event_time])
         options[:session_detail] = account[:session]
+        options[:session_detail][:login_session_id] = options[:session_detail][:login_session_id] || options[:session_detail][:session_id]
         options[:account_id] = account[:id]
         options[:monitored_event] = construct_monitored_event(payload, headers)
         options[:payload] = payload.to_json
