@@ -2,7 +2,7 @@
 
 nav class=("navbar navbar-expand-lg navbar-main pt-0 pb-0 #{"pre_prod_nav_color" if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true'}")
   .container
-    a.navbar-brand.pr-3.pt-3.pb-3 href="#" = image_pack_tag "logo_#{ENV['CLIENT'] || "ic"}.svg"
+    a.navbar-brand.logo-file.pr-3.pt-4.pb-4 href="#" = image_pack_tag "logo_#{ENV['CLIENT'] || "ic"}.svg"
     button.navbar-toggler aria-controls="navbarNav" aria-expanded="false" aria-label=("Toggle navigation") data-target="#navbarNav" data-toggle="collapse" type="button"
       span.navbar-toggler-icon
 
