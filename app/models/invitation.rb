@@ -33,7 +33,6 @@ class Invitation
 
   validate :allowed_invite_types
 
-
   aasm do
     state :sent, initial: true
     state :claimed
@@ -41,6 +40,31 @@ class Invitation
     event :claim do
       transitions from: :sent, to: :claimed, :after => Proc.new { |*args| process_claim!(*args) }
     end
+  end
+
+  def may_be_claimed_by?(user_obj)
+    case role
+    when "broker_role"
+      valid_broker_role_invitation?(user_obj)
+    when "broker_agency_staff_role"
+      valid_broker_staff_invitation?(user_obj)
+    else
+      true
+    end
+  end
+
+  def valid_broker_role_invitation?(user_obj)
+    broker_role = BrokerRole.find(source_id)
+    person = broker_role.person
+    return true if person.user_id.blank?
+    person.user_id == user_obj.id
+  end
+
+  def valid_broker_staff_invitation?(user_obj)
+    staff_role = BrokerAgencyStaffRole.find(source_id)
+    person = staff_role.person
+    return true if person.user_id.blank?
+    person.user_id == user_obj.id
   end
 
   def claim_invitation!(user_obj, redirection_obj)
@@ -300,7 +324,7 @@ class Invitation
       invitation.send_broker_invitation!(broker_role.parent.full_name)
       invitation
     elsif should_notify_linked_broker?(broker_role)
-      UserMailer.broker_or_broker_staff_linked_invitation_email(broker_role.email_address, broker_role.parent.full_name).deliver_now
+      UserMailer.broker_linked_invitation_email(broker_role.email_address, broker_role.parent.full_name).deliver_now
     end
   end
 
@@ -315,7 +339,7 @@ class Invitation
       invitation.send_broker_staff_invitation!(broker_role.parent.full_name, broker_role.parent.id)
       invitation
     elsif should_notify_linked_broker_staff?(broker_role)
-      UserMailer.broker_or_broker_staff_linked_invitation_email(broker_role.email_address, broker_role.parent.full_name).deliver_now
+      UserMailer.broker_staff_linked_invitation_email(broker_role.email_address, broker_role.parent.full_name).deliver_now
     end
   end
 

@@ -6,7 +6,8 @@ RSpec.describe Operations::BenefitSponsors::EmployerProfile::BulkCeUpload, type:
 
   describe '#call' do
     let(:bucket_name) { 'ce-roster-upload' }
-    let(:uri) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}{#sample-key}" }
+    let(:s3_reference_key) { "f55679fe-34ca-426c-b68b-d5d92f16255c" }
+    let(:uri) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}##{s3_reference_key}" }
     let(:filename) { "test.xlsx" }
     let(:bucket_name) { 'ce-roster-upload' }
     let(:person) { FactoryBot.create(:person) }
@@ -20,8 +21,7 @@ RSpec.describe Operations::BenefitSponsors::EmployerProfile::BulkCeUpload, type:
     let!(:census_employees) {FactoryBot.create_list(:benefit_sponsors_census_employee, 2, :owner, employer_profile: employer_profile, benefit_sponsorship: benefit_sponsorship) }
     let(:input_params) do
       {
-        uri: uri,
-        s3_reference_key: 'sample-key', bucket_name: bucket_name, employer_profile_id: employer_profile.id, filename: filename
+        uri: uri, s3_reference_key: s3_reference_key, bucket_name: bucket_name, employer_profile_id: employer_profile.id, filename: filename
       }
     end
 
