@@ -101,7 +101,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
   def create_and_approve_staff_role_and_approve_agency(broker_role)
     return unless broker_role.is_primary_broker?
 
-    basr = broker_role.create_basr_for_person
+    basr = broker_role.create_basr_for_person_with_consumer_role
     agency = broker_role.broker_agency_profile
     agency.approve! if agency.may_approve?
 
