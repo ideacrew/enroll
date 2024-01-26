@@ -145,13 +145,17 @@
           <% sets.each_with_index do |(event_log, details), index| %>
             <tr class="primary-row" id="<%= index %>"%>
               <td><span class="glyphicon glyphicon-chevron-right"></span></td>
-              <% if type == 'consumer' %><td class="subject"><%= event_log[0] %></td><% end %>
+              <% if type == 'consumer' %>
+                <td class="subject"><%= event_log[0] %></td>
+              <% else %>
+                <td class="subject"><%= name %></td>
+              <% end %>
               <td class="eligibility"><%= event_log[1]&.upcase %></td>
               <td class="status"><%= details[0][:current_state]&.titleize %></td>
               <td class="effective-on"><%= details[0][:effective_on] %></td>
             </tr>
             <tr class="secondary-header" id="<%= index %>">
-              <td colspan="<%= type === 'consumer' ? 2 : 1 %>%"></td>
+              <td colspan="2"></td>
               <th><%= l10n("Event Details") %></th>
               <th><%= l10n("event_log.account_label") %></th>
               <th><%= l10n("Account (Date/Time)") %></th>
@@ -160,7 +164,7 @@
             <tr class="detail-row" id="<%= index %>">
               <td colspan="2"></td>
               <td><%= detail[:detail] %></td>
-              <td id="<%= detail[:account_hbx_id] %>%" class="user_id"><%= detail[:account_username] %></td>
+              <td id="<%= detail[:account_hbx_id] %>" class="user_id"><%= detail[:account_username] %></td>
               <td class="event-time"><%= detail[:event_time] %></td>
             </tr>
             <% end %>
@@ -366,9 +370,11 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         var row = $(this).closest('tr').prop('id');
         var row_index = visible_rows.indexOf(row);
         has_account_name = (value.toUpperCase() === $(this).text().toUpperCase())
-        has_id = (value.toUpperCase() === $(this).prop('id').toUpperCase())
-        if (!(has_account_name || has_id) && row_index !== -1) {
-          visible_rows.splice( row_index, 1 );
+        if (!(has_account_name)) {
+          has_id = (value.toUpperCase() === $(this).prop('id').toUpperCase())
+          if (!(has_id) && row_index !== -1) {
+            visible_rows.splice( row_index, 1 );
+          }
         }
       });
     }
@@ -378,12 +384,18 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         var row = $(this).closest('tr').prop('id');
         var row_index = visible_rows.indexOf(row);
         var parsedDate = new Date($(this).text());
+        var start = new Date(value)
+        // set the start time to beginning of the day
+        start.setUTCHours(0,0,0,0);
         if (isNaN($(this).text()) && !isNaN(parsedDate)) {
-          if ((new Date(value).getTime() > parsedDate.getTime()) && row_index !== -1) {
+          if ((start.getTime() > parsedDate.getTime()) && row_index !== -1) {
             visible_rows.splice( row_index, 1 );
           }
           if ($('#end-date').val()) {
-            if ((new Date($('#end-date').val()).getTime() < parsedDate.getTime()) && row_index !== -1) {
+            var end = new Date($('#end-date').val())
+            // set end time to the end of the day
+            end.setUTCHours(23,59,59,999);
+            if ((end.getTime() < parsedDate.getTime()) && row_index !== -1) {
               visible_rows.splice( row_index, 1 );
             }
           }
@@ -397,8 +409,12 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         var row = $(this).closest('tr').prop('id');
         var row_index = visible_rows.indexOf(row);
         var parsedDate = new Date($(this).text());
+        var start = new Date(value)
+        // set to same time of day so they match
+        start.setUTCHours(0,0,0,0)
+        parsedDate.setUTCHours(0,0,0,0)
         if (isNaN($(this).text()) && !isNaN(parsedDate)) {
-          if (!(new Date(value) === parsedDate) && row_index !== -1) {
+          if (!(start.getTime() === parsedDate.getTime()) && row_index !== -1) {
             visible_rows.splice( row_index, 1 );
           }
         }
