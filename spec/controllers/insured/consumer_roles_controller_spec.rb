@@ -232,7 +232,25 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       post :create, params: { person: person_params }
       allow(person).to receive(:save).and_raise(StandardError)
       expect(response).to have_http_status(:redirect)
-      expect(flash[:warning]).to eq(l10n('existing_person_record_warning_message'))
+      expect(flash[:warning]).to eq(l10n('insured.existing_person_record_warning_message'))
+    end
+  end
+
+  context 'POST create: if same user try to claim the account', dbclean: :after_each do
+    let!(:person_params){person.attributes.slice('dob', 'first_name', 'gender', 'last_name', 'middle_name', 'name_sfx', 'user_id').merge!('ssn': '268-47-9234', 'no_ssn': '0', 'dob_check': '', 'is_applying_coverage': 'true') }
+    let!(:person_user){ FactoryBot.create(:user, person: person) }
+    let!(:person) { FactoryBot.create(:person)}
+
+    before(:each) do
+      person_user.person.update_attributes(ssn: nil)
+    end
+
+    it 'should not show warning' do
+      sign_in person_user
+      post :create, params: { person: person_params }
+      allow(person).to receive(:save).and_raise(StandardError)
+      expect(response).to have_http_status(:redirect)
+      expect(flash[:warning]).to be_nil
     end
   end
 
