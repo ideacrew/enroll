@@ -2,14 +2,14 @@
 
 nav class=("navbar navbar-expand-lg navbar-main pt-0 pb-0 #{"pre_prod_nav_color" if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true'}")
   .container
-    a.navbar-brand.logo-file.pr-3.pt-4.pb-4 href="#" = image_pack_tag "logo_#{ENV['CLIENT'] || "ic"}.svg"
+    a.navbar-brand.logo-file.pr-3.pt-4.pb-4 href="#" = image_pack_tag "logo_ic_white.svg"
     button.navbar-toggler aria-controls="navbarNav" aria-expanded="false" aria-label=("Toggle navigation") data-target="#navbarNav" data-toggle="collapse" type="button"
       span.navbar-toggler-icon
 
     #navbarNav.collapse.navbar-collapse
       ul.navbar-nav
         li.nav-item.active
-          a.nav-link.pt-0.portal
+          a.nav-link.pt-0.pb-0.portal
             = get_header_text(controller_name)
 
     ul.list-group.list-group-flush
