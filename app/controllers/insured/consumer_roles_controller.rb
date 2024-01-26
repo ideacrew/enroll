@@ -164,17 +164,23 @@ class Insured::ConsumerRolesController < ApplicationController
     @person&.primary_family&.create_dep_consumer_role
     is_assisted = session["individual_assistance_path"]
     role_for_user = is_assisted ? "assisted_individual" : "individual"
-    create_sso_account(current_user, @person, 15, role_for_user) do
-      respond_to do |format|
-        format.html do
-          if is_assisted
-            @person.primary_family&.update_attribute(:e_case_id, "curam_landing_for#{@person.id}")
-            redirect_to navigate_to_assistance_saml_index_path
-          else
-            redirect_to :action => "edit", :id => @consumer_role.id
+    begin
+      create_sso_account(current_user, @person, 15, role_for_user) do
+        respond_to do |format|
+          format.html do
+            if is_assisted
+              @person.primary_family&.update_attribute(:e_case_id, "curam_landing_for#{@person.id}")
+              redirect_to navigate_to_assistance_saml_index_path
+            else
+              redirect_to :action => "edit", :id => @consumer_role.id
+            end
           end
         end
       end
+    rescue StandardError => e
+      flash[:warning] = l10n('insured.existing_person_record_warning_message') if @person.errors.present?
+      logger.error "#{e.message}\n#{e.backtrace.join("\n")}"
+      redirect_to search_insured_consumer_role_index_path
     end
   end
 
