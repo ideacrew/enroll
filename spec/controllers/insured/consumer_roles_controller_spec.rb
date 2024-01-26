@@ -232,7 +232,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       post :create, params: { person: person_params }
       allow(person).to receive(:save).and_raise(StandardError)
       expect(response).to have_http_status(:redirect)
-      expect(flash[:warning]).to eq(l10n("existing_person_record_warning_message")
+      expect(flash[:warning]).to eq(l10n('existing_person_record_warning_message'))
     end
   end
 
