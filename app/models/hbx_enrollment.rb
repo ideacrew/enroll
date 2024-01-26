@@ -386,6 +386,7 @@ class HbxEnrollment
   scope :individual_market,   ->{ where(:kind.nin => ["employer_sponsored", "employer_sponsored_cobra"]) }
   scope :verification_needed, ->{ where(:is_any_enrollment_member_outstanding => true, :aasm_state.in => ENROLLED_STATUSES).or({:terminated_on => nil }, {:terminated_on.gt => TimeKeeper.date_of_record}).order(created_at: :desc) }
   scope :outstanding_enrollments, ->{ individual_market.enrolled.current_year.where(:is_any_enrollment_member_outstanding => true) }
+  scope :individual_aptc_only, ->{ where(:kind.in => ["individual"]) }
 
   scope :canceled, -> { where(:aasm_state.in => CANCELED_STATUSES) }
   scope :family_home_page_hidden_enrollments, ->(family) do

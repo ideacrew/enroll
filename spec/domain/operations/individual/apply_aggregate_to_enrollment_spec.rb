@@ -39,21 +39,35 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
 
   let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
   let!(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
+  let!(:person_coverall) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
   let(:address) { person.rating_address }
   let(:consumer_role) { person.consumer_role }
   let!(:family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
+  let!(:family_coverall) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person_coverall)}
   let!(:primary_fm) {family.primary_applicant}
+  let!(:primary_fm_coverall) {family_coverall.primary_applicant}
   let!(:household) {family.active_household}
+  let!(:household_coverall) {family_coverall.active_household}
   let!(:start_on) {TimeKeeper.date_of_record.beginning_of_year}
   let(:family_member1) {family.family_members[1]}
+  let(:family_member1_coverall) {family_coverall.family_members[1]}
+
   let!(:tax_household) do
     tax_household = FactoryBot.create(:tax_household, effective_ending_on: nil, household: family.households.first)
     FactoryBot.create(:tax_household_member, tax_household: tax_household, applicant_id: family_member1.id, is_ia_eligible: true)
     tax_household
   end
+
+  let!(:tax_household_coverall) do
+    tax_household = FactoryBot.create(:tax_household, effective_ending_on: nil, household: family_coverall.households.first)
+    FactoryBot.create(:tax_household_member, tax_household: tax_household, applicant_id: family_member1_coverall.id, is_ia_eligible: true)
+    tax_household
+  end
+
   let(:sample_max_aptc_1) {1200}
   let(:sample_csr_percent_1) {87}
   let!(:eligibility_determination) {FactoryBot.create(:eligibility_determination, tax_household: tax_household, max_aptc: sample_max_aptc_1, csr_percent_as_integer: sample_csr_percent_1)}
+  let!(:eligibility_determination_coverall) {FactoryBot.create(:eligibility_determination, tax_household: tax_household_coverall, max_aptc: sample_max_aptc_1, csr_percent_as_integer: sample_csr_percent_1)}
   let!(:product1) do
     prod =
       FactoryBot.create(
@@ -89,7 +103,25 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
     FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member1.id, hbx_enrollment: enr)
     enr
   end
-  let!(:hbx_enrollments) {[hbx_with_aptc_1]}
+
+  let(:hbx_with_aptc_2) do
+    enr = FactoryBot.create(:hbx_enrollment,
+                            product: product1,
+                            family: family_coverall,
+                            household: household_coverall,
+                            is_active: true,
+                            aasm_state: 'coverage_selected',
+                            changing: false,
+                            effective_on: start_on,
+                            kind: "coverall",
+                            applied_aptc_amount: 100,
+                            rating_area_id: rating_area.id,
+                            consumer_role_id: consumer_role.id,
+                            elected_aptc_pct: 0.7)
+    FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member1_coverall.id, hbx_enrollment: enr)
+    enr
+  end
+  let!(:hbx_enrollments) {[hbx_with_aptc_1, hbx_with_aptc_2]}
 
   let!(:consumer_role1) do
     cr = FactoryBot.build(:consumer_role, :contact_method => "Paper Only")
@@ -170,6 +202,19 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
         family.reload
         expect(family.hbx_enrollments.to_a.count).to eq 2
       end
+    end
+  end
+
+  context 'does not apply aggregate on ineligible enrollments' do
+    before(:each) do
+      allow(TimeKeeper).to receive(:date_of_record).and_return Date.new(start_on.year, 1, 26)
+      allow(family_coverall).to receive(:active_household).and_return(household_coverall)
+    end
+
+    it 'returns nil result' do
+      input_params = {eligibility_determination: eligibility_determination_coverall}
+      @result = subject.call(input_params)
+      expect(@result.success).to eq nil
     end
   end
 
