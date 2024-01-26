@@ -178,8 +178,7 @@ class Insured::ConsumerRolesController < ApplicationController
         end
       end
     rescue StandardError => e
-      text = 'There may be an existing Person record (or) An issue with the Person record'
-      flash[:warning] = text  if @person.errors.present?
+      flash[:warning] = l10n("existing_person_record_warning_message"  if @person.errors.present?
       logger.error "#{e.message}\n#{e.backtrace.join("\n")}"
       redirect_to search_insured_consumer_role_index_path
     end
