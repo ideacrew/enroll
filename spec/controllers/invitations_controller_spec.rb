@@ -11,6 +11,7 @@ RSpec.describe InvitationsController do
       allow(user).to receive(:person).and_return nil
       sign_in(user)
       allow(Invitation).to receive(:find).with(invitation_id).and_return(invitation)
+      allow(invitation).to receive(:may_be_claimed_by?).with(user).and_return(true)
     end
 
     describe "with an already claimed invitation" do
