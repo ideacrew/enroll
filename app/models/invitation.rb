@@ -119,13 +119,11 @@ class Invitation
     redirection_obj.create_sso_account(user_obj, person, 15, "broker") do
       person.user = user_obj
       person.save!
+
       broker_agency_profile = broker_role.broker_agency_profile
 
-      person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new({
-        :broker_agency_profile => broker_agency_profile,
-        :aasm_state => 'active'
-      })
-      person.save!
+      Operations::EnsureBrokerStaffRoleForPrimaryBroker.new(:invitation_claimed).call(broker_role)
+
       user_obj.roles << "broker" unless user_obj.roles.include?("broker")
       if broker_role.is_primary_broker? && !user_obj.roles.include?("broker_agency_staff")
         user_obj.roles << "broker_agency_staff"

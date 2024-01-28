@@ -99,14 +99,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
   # @example Create a BASR and approve both the agency and the staff role for a primary broker role
   #   create_and_approve_staff_role_and_approve_agency(broker_role)
   def create_and_approve_staff_role_and_approve_agency(broker_role)
-    return unless broker_role.is_primary_broker?
-
-    basr = broker_role.create_basr_for_person_with_consumer_role
-    agency = broker_role.broker_agency_profile
-    agency.approve! if agency.may_approve?
-
-    basr ||= broker_role.person.pending_basr_by_profile_id(broker_role.benefit_sponsors_broker_agency_profile_id)
-    basr.broker_agency_accept! if basr&.may_broker_agency_accept?
+    Operations::EnsureBrokerStaffRoleForPrimaryBroker.new(:application_approved).call(broker_role)
   end
 
   def broker_role_update_params
