@@ -155,7 +155,7 @@ end
 
 Then(/^the page passes minimum level aa contrast guidelines$/) do
   # Ensures the axecore contrast tests are not run immediately after the DOM is available but prior to the page
-  # fully rendering in the browser.
+  # fully rendering in the browser. Waits until DOMContentLoaded has completed prior to running Axe step.
   if page.evaluate_script('document.readyState') == 'loading'
     page.execute_script <<~JS
       document.addEventListener('DOMContentLoaded', function() {

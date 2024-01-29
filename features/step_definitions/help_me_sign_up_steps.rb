@@ -25,7 +25,7 @@ end
 
 And(/^Individual clicks on the Help from an Expert link?/) do
   path = benefit_sponsors.staff_index_profiles_broker_agencies_broker_agency_profiles_path
-  find("a[href='#{path}']").click
+  find("a[href='#{path}']", wait: 5).click
 end
 
 And(/^Individual selects a broker?/) do
