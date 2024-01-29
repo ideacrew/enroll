@@ -732,7 +732,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       shop_enrollment.update_attributes!(effective_on: Date.new(year, 1, 1))
       shop_enrollment.product.update_attributes!(application_period: Date.new(year - 1, 1, 1)..Date.new(year - 1, 12, 31))
       BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
-      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(100.00)#.with(
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(100.00)
       sign_in(user)
       get :thankyou, params: {id: shop_enrollment.id, plan_id: shop_enrollment.product.id, market_kind: 'shop'}
       expect(response).to render_template('insured/plan_shoppings/thankyou.html.erb')
