@@ -59,7 +59,7 @@ module Factories
       # assignment = census_employee.benefit_group_assignment_by_package(sponsored_benefit_package.id)
       clone_enrollment.benefit_group_assignment_id = assignment.id
       clone_enrollment.hbx_enrollment_members = clone_enrollment_members
-
+      census_employee.save
       clone_enrollment.select_coverage
       clone_enrollment.begin_coverage if TimeKeeper.date_of_record >= effective_on && !enrollment.external_enrollment
 
