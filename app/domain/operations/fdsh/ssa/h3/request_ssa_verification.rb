@@ -34,11 +34,11 @@ module Operations
             return Failure("Person is required to request ssa verification") if person&.hbx_id.blank?
 
             Success({ key: :ssa_verification,
-              title: 'SSA Verification',
-              description: 'Request for SSA verification to fdsh gateway',
-              correlation_id: person.hbx_id,
-              started_at: DateTime.now,
-              publish_on: DateTime.now})
+                      title: 'SSA Verification',
+                      description: 'Request for SSA verification to fdsh gateway',
+                      correlation_id: person.hbx_id,
+                      started_at: DateTime.now,
+                      publish_on: DateTime.now})
           end
 
           def create_job(values)
