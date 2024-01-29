@@ -576,12 +576,15 @@ var EmployerProfile = ( function( window, undefined ) {
     }
   }
 
-  function submitCobraDate(cobra_date, cobra_link) {
+  function submitCobraDate(cobra_date, cobra_link, cobraAjaxInProgress) {
     $.ajax({
       type: 'get',
       datatype : 'js',
       url: cobra_link,
       data: {cobra_date: cobra_date},
+      complete: function() {
+        cobraAjaxInProgress = false;
+      }
     });
   }
 
@@ -723,6 +726,7 @@ $(document).on('click', "a.interaction-click-control-terminate", function(){
     $("li>a:contains('Collapse Form')").addClass('disabled');
 });
 
+var cobraAjaxInProgress = false;
 $(document).on('click', '.cobra_confirm', function(event){
   event.preventDefault();
   var datepicker = $(this).prev();
@@ -731,7 +735,10 @@ $(document).on('click', '.cobra_confirm', function(event){
   // var target = $("tr."+type+'_'+ce_id);
   // var cobra_date = target.find('input.date-picker').val();
   // var cobra_link = target.find('a.cobra_confirm_submit').data('link');
-  EmployerProfile.submitCobraDate(cobra_date, cobra_link);
+  if (!cobraAjaxInProgress) {
+    cobraAjaxInProgress = true;
+    EmployerProfile.submitCobraDate(cobra_date, cobra_link, cobraAjaxInProgress);
+  }
 })
 
 $(document).on('click', ".delete_confirm", function(){
