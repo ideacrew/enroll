@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe ::Operations::Families::RelocateEnrolledProducts, dbclean: :after_each do
   before :all do
     DatabaseCleaner.clean
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 10, 1))
   end
 
   let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
@@ -205,9 +206,18 @@ RSpec.describe ::Operations::Families::RelocateEnrolledProducts, dbclean: :after
         }
         @result = subject.call(@params)
       end
+
       it "should return success" do
         expect(@result).to be_success
       end
+
+      it "should have prospective year enrollment" do
+        expect(@result.success[enrollment_3.hbx_id][:enrollment_hbx_id]).to eql(enrollment_3.hbx_id)
+      end
     end
+  end
+
+  after :all do
+    TimeKeeper.set_date_of_record_unprotected!(Date.today)
   end
 end
