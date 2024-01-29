@@ -162,19 +162,39 @@ class Insured::ConsumerRolesController < ApplicationController
       return
     end
     @person&.primary_family&.create_dep_consumer_role
+
     is_assisted = session["individual_assistance_path"]
     role_for_user = is_assisted ? "assisted_individual" : "individual"
-    create_sso_account(current_user, @person, 15, role_for_user) do
-      respond_to do |format|
-        format.html do
-          if is_assisted
-            @person.primary_family&.update_attribute(:e_case_id, "curam_landing_for#{@person.id}")
-            redirect_to navigate_to_assistance_saml_index_path
-          else
-            redirect_to :action => "edit", :id => @consumer_role.id
+    begin
+      create_sso_account(current_user, @person, 15, role_for_user) do
+
+        # This is a massive hack and should be delt with as part of a refactor of
+        # consumer role matching, but since a consumer role has been claimed, we
+        # need to check if broker roles have been properly claimed.  This way
+        # brokers who never claim an outstanding invitation will still have
+        # access to their broker profile, now that they've registered as a
+        # consumer.  I would have rolled this up into the enrollment factory, but
+        # that area is some of our most delicate and oldest code, I'm going to
+        # avoid changing it until we have a chance to refactor.  Just as
+        # important, this functions against "linked" users, so it needs to
+        # happen AFTER the user_id has been set for the person.
+        Operations::EnsureBrokerStaffRoleForPrimaryBroker.new(:consumer_role_linked).call(@person.broker_role)
+
+        respond_to do |format|
+          format.html do
+            if is_assisted
+              @person.primary_family&.update_attribute(:e_case_id, "curam_landing_for#{@person.id}")
+              redirect_to navigate_to_assistance_saml_index_path
+            else
+              redirect_to :action => "edit", :id => @consumer_role.id
+            end
           end
         end
       end
+    rescue StandardError => e
+      flash[:warning] = l10n('insured.existing_person_record_warning_message') if @person.errors.present?
+      logger.error "#{e.message}\n#{e.backtrace.join("\n")}"
+      redirect_to search_insured_consumer_role_index_path
     end
   end
 

@@ -119,8 +119,8 @@ class UserMailer < ApplicationMailer
   def broker_linked_invitation_email(email, person_name)
     return if email.blank?
 
-    mail({to: email, subject: l10n("user_mailer.broker_staff_linked_notification_email.subject")}) do |format|
-      format.html { render "broker_staff_linked_notification_email", :locals => { :person_name => person_name, :login_url => site_main_web_address_url }}
+    mail({to: email, subject: l10n("user_mailer.broker_linked_notification_email.subject")}) do |format|
+      format.html { render "broker_linked_notification_email", :locals => { :person_name => person_name, :login_url => site_main_web_address_url }}
     end
   end
 
