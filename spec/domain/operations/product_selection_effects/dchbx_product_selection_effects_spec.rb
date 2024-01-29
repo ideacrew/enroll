@@ -886,3 +886,419 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
     expect(enrollments.where(:aasm_state.nin => ["coverage_canceled", "coverage_terminated"]).count).to eq(2)
   end
 end
+
+describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "when:
+- cancel_superseded_terminated_enrollments feature is enabled
+", dbclean: :after_each do
+
+  let(:previous_oe_year) { current_year - 1 }
+  let(:current_year) { TimeKeeper.date_of_record.year }
+  before do
+    allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 1, 20))
+    allow(
+      EnrollRegistry[:cancel_superseded_terminated_enrollments].feature
+    ).to receive(:is_enabled).and_return(true)
+  end
+  include_context 'family with two members and one enrollment and one predecessor enrollment'
+
+  let!(:dependent_person){ family.family_members[1].person}
+  let!(:primary_person) do
+    p = family.family_members[0].person
+    p.person_relationships.where(relative_id:  dependent_person.id).first.update_attributes(kind: "spouse")
+    p.save
+    p
+  end
+
+  let!(:prior_year_product) do
+    product = BenefitMarkets::Products::Product.all.by_year(2023).first
+    product.update_attributes(hios_id: "41842DC0400026-01", hios_base_id: "41842DC0400026", csr_variant_id: "01")
+    product
+  end
+
+  let!(:renewal_year_product) do
+    product = prior_year_product.renewal_product
+    product.update_attributes(hios_id: "41842DC0400026-01", hios_base_id: "41842DC0400026", csr_variant_id: "01")
+    product
+  end
+
+
+  describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "when:
+  - there is a current year coverage for primary
+  - there is a terminated renewal current year coverage for primary
+  - all these enrollments have different plans
+  - it is SEP shopping for prior year
+  ", dbclean: :after_each do
+
+    let!(:product_2024_1) {BenefitMarkets::Products::Product.all.by_year(2024).where(:hios_id.nin => [prior_year_product.hios_id])[0]}
+    let!(:product_2024_2) {BenefitMarkets::Products::Product.all.by_year(2024).where(:hios_id.nin => [prior_year_product.hios_id])[1]}
+
+    let!(:current_enrollment_2_1) do
+      FactoryBot.create(:hbx_enrollment,
+                        product_id: product_2024_1.id,
+                        kind: 'individual',
+                        family: family,
+                        consumer_role_id: primary_person.consumer_role.id,
+                        effective_on: Date.new(current_year, 2,1))
+    end
+
+    let!(:current_enrollment_member_2_1) do
+      FactoryBot.create(:hbx_enrollment_member,
+                        coverage_start_on: current_enrollment_2_1.effective_on,
+                        hbx_enrollment: current_enrollment_2_1,
+                        applicant_id: family.family_members[0].id)
+    end
+
+    let!(:delete_enrollment){family.hbx_enrollments.by_year(2023).delete_all}
+
+    let!(:terminated_enrollment_current_year) do
+      enrollment = family.hbx_enrollments.by_year(2024)[0]
+      enrollment.update_attributes(aasm_state: "coverage_terminated", terminated_on: Date.new(current_year,1,31))
+      enrollment.product = product_2024_2
+      enrollment.save!
+      enrollment
+    end
+
+    let!(:active_enrollment_current_year) {family.hbx_enrollments.by_year(2024)[1]}
+    let!(:product_selection) do
+      Entities::ProductSelection.new({:enrollment => primary_enrollment, :product => primary_enrollment.product, :family => family})
+    end
+
+    let!(:dependent_consumer_role) {FactoryBot.create(:consumer_role, person: dependent_person)}
+    let!(:primary_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        product_id: prior_year_product.id,
+                        kind: 'individual',
+                        family: family,
+                        consumer_role_id: primary_person.consumer_role.id,
+                        effective_on: Date.new(previous_oe_year, 11,1))
+    end
+
+    let!(:primary_enrollment_member) do
+      FactoryBot.create(:hbx_enrollment_member,
+                        coverage_start_on: primary_enrollment.effective_on,
+                        hbx_enrollment: primary_enrollment,
+                        applicant_id: family.family_members[0].id)
+    end
+
+    subject do
+      family.reload
+      renewal_year_product
+      product_selection
+      Operations::ProductSelectionEffects::DchbxProductSelectionEffects
+    end
+
+    before do
+      family.hbx_enrollments.map(&:generate_hbx_signature)
+      family.hbx_enrollments.map(&:save)
+      subject.call(product_selection)
+      family.reload
+      @enrollments = family.hbx_enrollments
+    end
+
+    it "should cancel signature enrollments" do
+      expect(@enrollments.size).to eq 4
+      expect(@enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled", "coverage_selected", "unverified"]).count).to eq(3)
+    end
+
+    it "should not cancel silently" do
+      canceled_enrollments = @enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled"])
+      canceled_enrollments.each do |enrollment|
+        transition = enrollment.workflow_state_transitions.first
+        expect(enrollment.is_transition_superseded_silent?(transition)).to be_falsey
+      end
+    end
+  end
+
+  describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "when:
+  - there is a current year coverage for primary
+  - there is a terminated renewal current year coverage for primary
+  - all these enrollments have same plans
+  - it is SEP shopping for prior year
+  ", dbclean: :after_each do
+
+    let!(:product_2024_1) {BenefitMarkets::Products::Product.all.by_year(2024).where(:hios_id.in => [prior_year_product.hios_id])[0]}
+    let!(:current_enrollment_2_1) do
+      FactoryBot.create(:hbx_enrollment,
+                        product_id: product_2024_1.id,
+                        kind: 'individual',
+                        family: family,
+                        consumer_role_id: primary_person.consumer_role.id,
+                        effective_on: Date.new(current_year, 2,1))
+    end
+
+    let!(:current_enrollment_member_2_1) do
+      FactoryBot.create(:hbx_enrollment_member,
+                        coverage_start_on: current_enrollment_2_1.effective_on,
+                        hbx_enrollment: current_enrollment_2_1,
+                        applicant_id: family.family_members[0].id)
+    end
+
+    let!(:delete_enrollment){family.hbx_enrollments.by_year(2023).delete_all}
+
+    let!(:terminated_enrollment_current_year) do
+      enrollment = family.hbx_enrollments.by_year(2024)[0]
+      enrollment.update_attributes(aasm_state: "coverage_terminated", terminated_on: Date.new(current_year,1,31))
+      enrollment.product = product_2024_1
+      enrollment.save!
+      enrollment
+    end
+
+    let!(:active_enrollment_current_year) {family.hbx_enrollments.by_year(2024)[1]}
+    let!(:product_selection) do
+      Entities::ProductSelection.new({:enrollment => primary_enrollment, :product => primary_enrollment.product, :family => family})
+    end
+
+    let!(:dependent_consumer_role) {FactoryBot.create(:consumer_role, person: dependent_person)}
+    let!(:primary_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        product_id: prior_year_product.id,
+                        kind: 'individual',
+                        family: family,
+                        consumer_role_id: primary_person.consumer_role.id,
+                        effective_on: Date.new(previous_oe_year, 11,1))
+    end
+
+    let!(:primary_enrollment_member) do
+      FactoryBot.create(:hbx_enrollment_member,
+                        coverage_start_on: primary_enrollment.effective_on,
+                        hbx_enrollment: primary_enrollment,
+                        applicant_id: family.family_members[0].id)
+    end
+
+    subject do
+      family.reload
+      renewal_year_product
+      product_selection
+      Operations::ProductSelectionEffects::DchbxProductSelectionEffects
+    end
+
+    before do
+      family.hbx_enrollments.map(&:generate_hbx_signature)
+      family.hbx_enrollments.map(&:save)
+      subject.call(product_selection)
+      family.reload
+      @enrollments = family.hbx_enrollments
+    end
+
+    it "should not cancel terminated enrollments" do
+
+      expect(@enrollments.size).to eq 4
+      expect(@enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled", "coverage_selected", "unverified"]).count).to eq(3)
+    end
+
+    it "should cancel silently" do
+      canceled_enrollments = @enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled"])
+      canceled_enrollments.each do |enrollment|
+        transition = enrollment.workflow_state_transitions.first
+        expect(enrollment.is_transition_superseded_silent?(transition)).to be_truthy
+      end
+    end
+  end
+end
+
+
+describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "when:
+- cancel_superseded_terminated_enrollments feature is disabled
+", dbclean: :after_each do
+
+  let(:previous_oe_year) { current_year - 1 }
+  let(:current_year) { TimeKeeper.date_of_record.year }
+  before do
+    allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 1, 20))
+    allow(
+      EnrollRegistry[:cancel_superseded_terminated_enrollments].feature
+    ).to receive(:is_enabled).and_return(false)
+  end
+
+  include_context 'family with two members and one enrollment and one predecessor enrollment'
+
+  let!(:dependent_person){ family.family_members[1].person}
+  let!(:primary_person) do
+    p = family.family_members[0].person
+    p.person_relationships.where(relative_id:  dependent_person.id).first.update_attributes(kind: "spouse")
+    p.save
+    p
+  end
+
+  let!(:prior_year_product) do
+    product = BenefitMarkets::Products::Product.all.by_year(2023).first
+    product.update_attributes(hios_id: "41842DC0400026-01", hios_base_id: "41842DC0400026", csr_variant_id: "01")
+    product
+  end
+
+  let!(:renewal_year_product) do
+    product = prior_year_product.renewal_product
+    product.update_attributes(hios_id: "41842DC0400026-01", hios_base_id: "41842DC0400026", csr_variant_id: "01")
+    product
+  end
+
+  describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "when:
+  - there is a current year coverage for primary
+  - there is a terminated renewal current year coverage for primary
+  - all these enrollments have different plans
+  - it is SEP shopping for prior year
+  ", dbclean: :after_each do
+
+    let!(:product_2024_1) {BenefitMarkets::Products::Product.all.by_year(2024).where(:hios_id.nin => [prior_year_product.hios_id])[0]}
+    let!(:product_2024_2) {BenefitMarkets::Products::Product.all.by_year(2024).where(:hios_id.nin => [prior_year_product.hios_id])[1]}
+
+    let!(:current_enrollment_2_1) do
+      FactoryBot.create(:hbx_enrollment,
+                        product_id: product_2024_1.id,
+                        kind: 'individual',
+                        family: family,
+                        consumer_role_id: primary_person.consumer_role.id,
+                        effective_on: Date.new(current_year, 2,1))
+    end
+
+    let!(:current_enrollment_member_2_1) do
+      FactoryBot.create(:hbx_enrollment_member,
+                        coverage_start_on: current_enrollment_2_1.effective_on,
+                        hbx_enrollment: current_enrollment_2_1,
+                        applicant_id: family.family_members[0].id)
+    end
+
+    let!(:delete_enrollment){family.hbx_enrollments.by_year(2023).delete_all}
+
+    let!(:terminated_enrollment_current_year) do
+      enrollment = family.hbx_enrollments.by_year(2024)[0]
+      enrollment.update_attributes(aasm_state: "coverage_terminated", terminated_on: Date.new(current_year,1,31))
+      enrollment.product = product_2024_2
+      enrollment.save!
+      enrollment
+    end
+
+    let!(:active_enrollment_current_year) {family.hbx_enrollments.by_year(2024)[1]}
+    let!(:product_selection) do
+      Entities::ProductSelection.new({:enrollment => primary_enrollment, :product => primary_enrollment.product, :family => family})
+    end
+
+    let!(:dependent_consumer_role) {FactoryBot.create(:consumer_role, person: dependent_person)}
+    let!(:primary_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        product_id: prior_year_product.id,
+                        kind: 'individual',
+                        family: family,
+                        consumer_role_id: primary_person.consumer_role.id,
+                        effective_on: Date.new(previous_oe_year, 11,1))
+    end
+
+    let!(:primary_enrollment_member) do
+      FactoryBot.create(:hbx_enrollment_member,
+                        coverage_start_on: primary_enrollment.effective_on,
+                        hbx_enrollment: primary_enrollment,
+                        applicant_id: family.family_members[0].id)
+    end
+
+    subject do
+      family.reload
+      renewal_year_product
+      product_selection
+      Operations::ProductSelectionEffects::DchbxProductSelectionEffects
+    end
+
+    before do
+      family.hbx_enrollments.map(&:generate_hbx_signature)
+      family.hbx_enrollments.map(&:save)
+      subject.call(product_selection)
+      family.reload
+      @enrollments = family.hbx_enrollments
+    end
+
+    it "should not cancel terminated enrollments" do
+      expect(@enrollments.size).to eq 4
+      expect(@enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled", "coverage_selected", "unverified"]).count).to eq(2)
+      expect(@enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_terminated"]).count).to eq(1)
+    end
+
+    it "should not cancel silently" do
+      canceled_enrollment = @enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled"]).first
+      transition = canceled_enrollment.workflow_state_transitions.first
+      expect(canceled_enrollment.is_transition_superseded_silent?(transition)).to be_falsey
+    end
+  end
+
+  describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "when:
+    - there is a current year coverage for primary
+    - there is a terminated renewal current year coverage for primary
+    - all these enrollments have same plans
+    - it is SEP shopping for prior year
+    ", dbclean: :after_each do
+
+    let!(:product_2024_1) {BenefitMarkets::Products::Product.all.by_year(2024).where(:hios_id.in => [prior_year_product.hios_id])[0]}
+    let!(:current_enrollment_2_1) do
+      FactoryBot.create(:hbx_enrollment,
+                        product_id: product_2024_1.id,
+                        kind: 'individual',
+                        family: family,
+                        consumer_role_id: primary_person.consumer_role.id,
+                        effective_on: Date.new(current_year, 2,1))
+    end
+
+    let!(:current_enrollment_member_2_1) do
+      FactoryBot.create(:hbx_enrollment_member,
+                        coverage_start_on: current_enrollment_2_1.effective_on,
+                        hbx_enrollment: current_enrollment_2_1,
+                        applicant_id: family.family_members[0].id)
+    end
+
+    let!(:delete_enrollment){family.hbx_enrollments.by_year(2023).delete_all}
+
+    let!(:terminated_enrollment_current_year) do
+      enrollment = family.hbx_enrollments.by_year(2024)[0]
+      enrollment.update_attributes(aasm_state: "coverage_terminated", terminated_on: Date.new(current_year,1,31))
+      enrollment.product = product_2024_1
+      enrollment.save!
+      enrollment
+    end
+
+    let!(:active_enrollment_current_year) {family.hbx_enrollments.by_year(2024)[1]}
+    let!(:product_selection) do
+      Entities::ProductSelection.new({:enrollment => primary_enrollment, :product => primary_enrollment.product, :family => family})
+    end
+
+    let!(:dependent_consumer_role) {FactoryBot.create(:consumer_role, person: dependent_person)}
+    let!(:primary_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        product_id: prior_year_product.id,
+                        kind: 'individual',
+                        family: family,
+                        consumer_role_id: primary_person.consumer_role.id,
+                        effective_on: Date.new(previous_oe_year, 11,1))
+    end
+
+    let!(:primary_enrollment_member) do
+      FactoryBot.create(:hbx_enrollment_member,
+                        coverage_start_on: primary_enrollment.effective_on,
+                        hbx_enrollment: primary_enrollment,
+                        applicant_id: family.family_members[0].id)
+    end
+
+    subject do
+      family.reload
+      renewal_year_product
+      product_selection
+      Operations::ProductSelectionEffects::DchbxProductSelectionEffects
+    end
+
+    before do
+      family.hbx_enrollments.map(&:generate_hbx_signature)
+      family.hbx_enrollments.map(&:save)
+      subject.call(product_selection)
+      family.reload
+      @enrollments = family.hbx_enrollments
+    end
+
+    it "should not cancel terminated enrollments" do
+      expect(@enrollments.size).to eq 4
+      expect(@enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled", "coverage_selected", "unverified"]).count).to eq(2)
+      expect(@enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_terminated"]).count).to eq(1)
+    end
+
+    it "should not cancel silently" do
+      canceled_enrollment = @enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled"]).first
+      transition = canceled_enrollment.workflow_state_transitions.first
+      expect(canceled_enrollment.is_transition_superseded_silent?(transition)).to be_falsey
+    end
+  end
+end

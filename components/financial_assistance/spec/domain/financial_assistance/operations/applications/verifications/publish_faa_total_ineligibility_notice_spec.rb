@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require "#{FinancialAssistance::Engine.root}/spec/dummy/app/domain/operations/individual/open_enrollment_start_on"
 require "#{FinancialAssistance::Engine.root}/spec/shared_examples/medicaid_gateway/test_case_d_response"
 
 RSpec.describe ::FinancialAssistance::Operations::Applications::Verifications::PublishFaaTotalIneligibilityNotice, dbclean: :after_each do
