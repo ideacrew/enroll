@@ -39,7 +39,7 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment, dbclean: :aft
 
   let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
   let!(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
-  let!(:person_coverall) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
+  let!(:person_coverall) {FactoryBot.create(:person, :with_resident_role, :with_active_resident_role)}
   let(:address) { person.rating_address }
   let(:consumer_role) { person.consumer_role }
   let!(:family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}

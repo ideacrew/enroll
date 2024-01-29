@@ -28,7 +28,7 @@ module Operations
 
       def fetch_enrollments_to_renew(eligibility_determination)
         effective_year = eligibility_determination.tax_household.effective_starting_on.year
-        enrollments = eligibility_determination.family.active_household.hbx_enrollments.individual_aptc_only.enrolled_and_renewal.individual_market.by_health.by_year(effective_year)
+        enrollments = eligibility_determination.family.active_household.hbx_enrollments.individual_only.enrolled_and_renewal.individual_market.by_health.by_year(effective_year)
         return Failure('Cannot find any IVL health enrollments in any of the active states.') if enrollments.blank?
         enrollment_list = enrollments.reject do |enr|
           next if enr.product.blank?
