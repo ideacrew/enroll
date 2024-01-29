@@ -16,5 +16,4 @@ Feature: Contrast level AA is enabled - The page that appears while the user is 
     And the submit button will be enabled
     And the user clicks SUBMIT
     Then the user should see the waiting for eligibility results page
-    And the browser has finished rendering the page
-    And the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
+    Then the page passes minimum level aa contrast guidelines

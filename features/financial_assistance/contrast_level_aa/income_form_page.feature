@@ -18,11 +18,9 @@ Feature: Contrast level AA is enabled - job and self employed income form page
 
   Scenario: User reaches the income form page
     Given the user is on the Job Income page
-    And the browser has finished rendering the page
-    Then the page should be axe clean according to: wcag2aa; checking only: color-contrast
+    Then the page passes minimum level aa contrast guidelines
 
   Scenario: User answers yes to having self employment income
     Given the user answers yes to having self employment income
-    And the browser has finished rendering the page
     Then self employment form should show
-    And the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
+    Then the page passes minimum level aa contrast guidelines

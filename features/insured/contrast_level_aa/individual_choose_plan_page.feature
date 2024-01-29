@@ -21,5 +21,4 @@ Feature: Contrast level AA is enabled - Insured Plan Shopping on Individual mark
     And Individual clicks on the Continue button of the Family Information page
     And Individual clicks on continue button on Choose Coverage page
     And Individual select three plans to compare
-    And the browser has finished rendering the page
-    Then the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
+    Then the page passes minimum level aa contrast guidelines

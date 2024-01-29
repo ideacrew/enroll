@@ -20,13 +20,13 @@ Feature: Contrast level AA is enabled - unemployment and other income form page
   Scenario: User answers no to having other income
     Given the user answers no to having other income
     Then the other income choices should not show
-    And the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
+    Then the page passes minimum level aa contrast guidelines
 
   Scenario: User answers yes to having other income
     Given the user answers yes to having other income
     Then the other income choices should show
     Then the divorce agreement copy should not show
-    And the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
+    Then the page passes minimum level aa contrast guidelines
 
   Scenario: User enters negative Income amount for valid income type
     Given the user answers yes to having other income
@@ -34,5 +34,4 @@ Feature: Contrast level AA is enabled - unemployment and other income form page
     And the user fills out the other income information with negative income
     Then the save button should be enabled
     And the user saves the other income information
-    And the browser has finished rendering the page
-    And the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
+    Then the page passes minimum level aa contrast guidelines

@@ -15,12 +15,10 @@ Feature: Contrast level AA is enabled - Functionality for the Family Relationshi
     And there is a nil value for at least one relationship
     When the user populates the drop down with a value
     And the relationship is saved
-    And the browser has finished rendering the page
-    Then the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
+    Then the page passes minimum level aa contrast guidelines
 
 
   Scenario: Missing value is highlighted
     And there is a nil value for at least one relationship
     And the family member row will be highlighted
-    And the browser has finished rendering the page
-    Then the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
+    Then the page passes minimum level aa contrast guidelines

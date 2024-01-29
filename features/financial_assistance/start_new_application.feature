@@ -37,8 +37,7 @@ Feature: Cost Savings -  Start New Application
     Then consumer should see 'Start New Application' button
     When consumer click 'Start New Application' button
     Then the user will navigate to the assistance year selection page with multiple options
-    And the browser has finished rendering the page
-    Then the page should be axe clean according to: wcag2aa; checking only: color-contrast
+    Then the page passes minimum level aa contrast guidelines
 
   Scenario: FAA is enabled - year selection disabled - and consumer has a no existing FAA applications
     Given the iap year selection feature is disabled
@@ -101,5 +100,4 @@ Feature: Cost Savings -  Start New Application
     Then consumer should see 'Start New Application' button
     When consumer click 'Start New Application' button
     And the user will navigate to the non-OE assistance year selection page
-    And the browser has finished rendering the page
-    Then the page should be axe clean according to: wcag2aa; checking only: color-contrast
+    Then the page passes minimum level aa contrast guidelines

@@ -21,5 +21,4 @@ Feature: Contrast level AA is enabled - Insured Plan Shopping on Individual mark
     And Individual clicks on the Continue button of the Family Information page
     When Individual click the "Had a baby" in qle carousel
     And Individual selects a current qle date
-    And the browser has finished rendering the page
-    Then the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
+    Then the page passes minimum level aa contrast guidelines

@@ -37,5 +37,4 @@ Feature: Start a new Financial Assistance Application
     And selects yes they would like help paying for coverage
     Then they should see a new finanical assistance application
     Then They should see the application assistance year above Info Needed
-    And the browser has finished rendering the page
-    Then the page should be axe clean excluding "a[disabled]" according to: wcag2aa; checking only: color-contrast
+    Then the page passes minimum level aa contrast guidelines
