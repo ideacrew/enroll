@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe BrokerRole, type: :model, dbclean: :after_each do
-  describe '#create_basr_for_person' do
+  describe '#create_basr_for_person_with_consumer_role' do
     let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
     let(:broker_role) { FactoryBot.create(:broker_role, person: person) }
     let(:user) { FactoryBot.create(:user, person: person) }
@@ -35,7 +35,7 @@ RSpec.describe BrokerRole, type: :model, dbclean: :after_each do
       let(:brce_feature_enabled) { false }
 
       it 'returns nil without creating a new BrokerAgencyStaffRole' do
-        expect(broker_role.create_basr_for_person).to be_nil
+        expect(broker_role.create_basr_for_person_with_consumer_role).to be_nil
         expect(person.broker_agency_staff_roles.to_a).to be_empty
       end
     end
@@ -48,16 +48,10 @@ RSpec.describe BrokerRole, type: :model, dbclean: :after_each do
         - person has a broker role' do
 
         let(:person) { FactoryBot.create(:person) }
-        let(:broker_role) { FactoryBot.create(:broker_role, person: person) }
 
-        before do
-          broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
-        end
-
-        it 'returns newly created BrokerAgencyStaffRole' do
-          result = broker_role.create_basr_for_person
-          expect(result).to be_a(BrokerAgencyStaffRole)
-          expect(person.broker_agency_staff_roles.count).to eq(1)
+        it 'returns nil without creating a new BrokerAgencyStaffRole' do
+          expect(broker_role.create_basr_for_person_with_consumer_role).to be_nil
+          expect(person.broker_agency_staff_roles.to_a).to be_empty
         end
       end
 
@@ -66,17 +60,9 @@ RSpec.describe BrokerRole, type: :model, dbclean: :after_each do
         - person has a broker role
         - person does not have a user role' do
 
-        let(:person) { FactoryBot.create(:person, :with_consumer_role) }
-        let(:broker_role) { FactoryBot.create(:broker_role, person: person) }
-
-        before do
-          broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
-        end
-
-        it 'returns newly created BrokerAgencyStaffRole' do
-          result = broker_role.create_basr_for_person
-          expect(result).to be_a(BrokerAgencyStaffRole)
-          expect(person.broker_agency_staff_roles.count).to eq(1)
+        it 'returns nil without creating a new BrokerAgencyStaffRole' do
+          expect(broker_role.create_basr_for_person_with_consumer_role).to be_nil
+          expect(person.broker_agency_staff_roles.to_a).to be_empty
         end
       end
 
@@ -99,7 +85,7 @@ RSpec.describe BrokerRole, type: :model, dbclean: :after_each do
         end
 
         it 'returns nil without creating a new BrokerAgencyStaffRole' do
-          expect(broker_role.create_basr_for_person).to be_nil
+          expect(broker_role.create_basr_for_person_with_consumer_role).to be_nil
           expect(person.broker_agency_staff_roles.to_a).to eq([matching_basr])
         end
       end
@@ -123,7 +109,7 @@ RSpec.describe BrokerRole, type: :model, dbclean: :after_each do
         end
 
         it 'returns newly created BrokerAgencyStaffRole' do
-          result = broker_role.create_basr_for_person
+          result = broker_role.create_basr_for_person_with_consumer_role
           expect(result).to be_a(BrokerAgencyStaffRole)
           expect(result.broker_agency_pending?).to be_truthy
           expect(person.broker_agency_staff_roles.count).to eq(2)
@@ -149,7 +135,7 @@ RSpec.describe BrokerRole, type: :model, dbclean: :after_each do
         end
 
         it 'returns newly created BrokerAgencyStaffRole' do
-          result = broker_role.create_basr_for_person
+          result = broker_role.create_basr_for_person_with_consumer_role
           expect(result).to be_a(BrokerAgencyStaffRole)
           expect(result.broker_agency_pending?).to be_truthy
           expect(person.broker_agency_staff_roles.count).to eq(2)
@@ -168,7 +154,7 @@ RSpec.describe BrokerRole, type: :model, dbclean: :after_each do
         end
 
         it 'returns newly created BrokerAgencyStaffRole' do
-          result = broker_role.create_basr_for_person
+          result = broker_role.create_basr_for_person_with_consumer_role
           expect(result).to be_a(BrokerAgencyStaffRole)
           expect(result.broker_agency_pending?).to be_truthy
           expect(person.broker_agency_staff_roles.count).to eq(1)

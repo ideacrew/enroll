@@ -162,10 +162,24 @@ class Insured::ConsumerRolesController < ApplicationController
       return
     end
     @person&.primary_family&.create_dep_consumer_role
+
     is_assisted = session["individual_assistance_path"]
     role_for_user = is_assisted ? "assisted_individual" : "individual"
     begin
       create_sso_account(current_user, @person, 15, role_for_user) do
+
+        # This is a massive hack and should be delt with as part of a refactor of
+        # consumer role matching, but since a consumer role has been claimed, we
+        # need to check if broker roles have been properly claimed.  This way
+        # brokers who never claim an outstanding invitation will still have
+        # access to their broker profile, now that they've registered as a
+        # consumer.  I would have rolled this up into the enrollment factory, but
+        # that area is some of our most delicate and oldest code, I'm going to
+        # avoid changing it until we have a chance to refactor.  Just as
+        # important, this functions against "linked" users, so it needs to
+        # happen AFTER the user_id has been set for the person.
+        Operations::EnsureBrokerStaffRoleForPrimaryBroker.new(:consumer_role_linked).call(@person.broker_role)
+
         respond_to do |format|
           format.html do
             if is_assisted
