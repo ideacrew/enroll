@@ -29,7 +29,8 @@ And(/^Individual clicks on the Help from an Expert link?/) do
 end
 
 And(/^Individual selects a broker?/) do
-  find(".broker_select_button", wait: 5).click
+  expect(page).to have_css(".broker_select_button", wait: 5)
+  find(".broker_select_button").click(wait_until: 5)
 end
 
 And(/^Individual clicks on Select this Broker button$/) do
