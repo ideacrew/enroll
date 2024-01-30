@@ -98,13 +98,11 @@
 javascript:
   document.addEventListener('DOMContentLoaded', function() {
     window.localStorage.removeItem("jwt");
-    window.localStorage.removeItem("token");
     var agencyStaffLink = document.getElementById('agencyStaffLinkToExternal');
     agencyStaffLink.addEventListener('click', function(event) {
       event.preventDefault();
       var jwtToken = "<%= jwt_for_external_application %>";
       window.localStorage.setItem("jwt", jwtToken);
-      window.localStorage.setItem("token", jwtVal);
       window.location.href = agencyStaffLink.href;
     });
   });
