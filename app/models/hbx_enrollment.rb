@@ -2934,20 +2934,29 @@ class HbxEnrollment
     lcsp = BenefitMarkets::Products::Product.by_year(effective_year_for_lcsp).where(hios_id: hios_id).first
     return if lcsp.nil?
 
+    subsidy = product_price_for(hbx_enrollment_member, lcsp)
+    return subsidy unless product
+
+    product_price = product_price_for(hbx_enrollment_member, product)
+    return subsidy if subsidy.to_f <= product_price.to_f
+
+    BigDecimal(product_price.to_s).round(2)
+  end
+
+  def product_price_for(member, product_for_calc)
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(self)
     previous_product = parent_enrollment&.product
-
     sponsored_cost_calculator.action = if product && previous_product && product.id == previous_product.id
                                          :calc_non_product_change_childcare_subsidy
                                        else
                                          :calc_childcare_subsidy
                                        end
 
-    member_groups_lcsp = sponsored_cost_calculator.groups_for_products([lcsp])
-    member_enrollment = member_groups_lcsp[0].group_enrollment.member_enrollments.detect{ |me| me.member_id.to_s == hbx_enrollment_member.id.to_s }
-    return if member_enrollment.nil?
+    member_group = sponsored_cost_calculator.groups_for_products([product_for_calc]).first
+    product_price = member_group.group_enrollment.member_enrollments.find{|me| me.member_id == member.id }&.product_price
+    return unless product_price
 
-    BigDecimal(member_enrollment&.product_price&.to_s).round(2)
+    BigDecimal(product_price.to_s).round(2)
   end
 
   def verify_and_reset_osse_subsidy_amount(member_group)
