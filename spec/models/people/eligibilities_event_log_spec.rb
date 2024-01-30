@@ -15,6 +15,7 @@ RSpec.describe People::EligibilitiesEventLog, type: :model, dbclean: :around_eac
           {
             account_id: user.id,
             subject_gid: person.to_global_id,
+            resource_gid: person.to_global_id,
             correlation_id: "a156ad4c031",
             host_id: :enroll,
             event_category: :osse_eligibility,
@@ -35,6 +36,15 @@ RSpec.describe People::EligibilitiesEventLog, type: :model, dbclean: :around_eac
               params.slice(:account_id, :event_category)
             ).first
           ).to eq described_class.first
+        end
+
+
+        it "should persist resource gid" do
+          described_class.create(params)
+
+          expect(
+            described_class.first.resource_gid
+          ).to eq person.to_global_id.to_s
         end
       end
     end

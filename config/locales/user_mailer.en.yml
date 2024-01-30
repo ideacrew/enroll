@@ -1,0 +1,20 @@
+en:
+  user_mailer:
+    broker_linked_notification_email:
+      subject: Access your expert portal
+      full_text: |
+        <p>Hi %{first_name},</p>
+        <p>Your application to assist consumers on %{site_short_name} has been approved.</p>
+        <p>You will need to claim your access to your expert portal to assist consumers. You can do this by pressing the 'Login' button in the email and entering the username and password you use to login to your personal account.</p>
+        <p>You can move between your personal and expert portals by selecting ‘My Portals’ on the upper right-hand corner of your screen. By accessing your expert portal, you affirm that you have read and agreed to the %{site_short_name} broker agreement available at <a href="%{broker_agreement_url}">%{broker_agreement_url}</a>.</p>
+        <a href=%{login_url} class='button-link'>Login</a><br>
+        <p>Questions? Call us at %{contact_center_phone_number}.</p>
+        <p>The %{site_short_name} Team</p>
+    broker_staff_linked_notification_email:
+      subject: Access your expert portal
+      full_text: |
+        <p>Hi %{first_name},</p>
+        <p>Your application to assist consumers on %{site_short_name} has been approved. You can move between your personal and expert portals by selecting ‘My Portals’ on the upper right-hand corner of your screen.</p>
+        <a href=%{login_url} class='button-link'>Login</a><br>
+        <p>Questions? Call us at %{contact_center_phone_number}.</p>
+        <p>The %{site_short_name} Team</p>

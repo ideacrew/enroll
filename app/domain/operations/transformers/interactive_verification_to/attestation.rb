@@ -16,9 +16,7 @@ module Operations
         require 'securerandom'
 
         def call(interactive_verification)
-          request_payload = yield construct_payload(interactive_verification)
-
-          Success(request_payload)
+          construct_payload(interactive_verification)
         end
 
         private
@@ -34,12 +32,14 @@ module Operations
         end
 
         def construct_ridp_attestation_hash(interactive_verification)
+          secondary_request = construct_secondary_request(interactive_verification)
+          secondary_request[:secondary_request][:DSHReferenceNumber] = interactive_verification.transaction_id if EnrollRegistry[:ridp_h139].setting(:payload_format).item == "json"
           {
             is_satisfied: false,
             is_self_attested: true,
             satisfied_at: nil,
             status: 'in_progress',
-            evidences: [construct_secondary_request(interactive_verification)]
+            evidences: [secondary_request]
           }
         end
 

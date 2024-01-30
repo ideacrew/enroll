@@ -1316,6 +1316,37 @@ class Person
     end
   end
 
+  # Creates a new Broker Agency Staff Role with given input params.
+  #
+  # @note This method may raise an exception if the Broker Agency Staff Role is not created successfully.
+  #
+  # @param [Hash] basr_params.
+  #   The acceptable keys: :aasm_state, :benefit_sponsors_broker_agency_profile_id, :reason
+  #   Currently, we only create Broker Agency Staff Role with benefit_sponsors_broker_agency_profile_id
+  # @return [BrokerAgencyStaffRole] broker_agency_staff_role if the Broker Agency Staff Role is created successfully.
+  def create_broker_agency_staff_role(basr_params)
+    basr = broker_agency_staff_roles.build(
+      {
+        benefit_sponsors_broker_agency_profile_id: basr_params[:benefit_sponsors_broker_agency_profile_id]
+      }
+    )
+    save!
+    basr
+  end
+
+  # @method pending_basr_by_profile_id(profile_id)
+  # Retrieves the first pending Broker Agency Staff Role (BASR) for a given broker agency profile ID.
+  #
+  # @param [BSON::ObjectId] profile_id The ID of the Broker Agency Profile for which to retrieve the pending BASR.
+  #
+  # @return [BrokerAgencyStaffRole, nil] Returns the first pending broker agency staff role for the given broker agency profile ID, or nil if no such role exists.
+  #
+  # @example Retrieve the first pending BASR for a given profile ID
+  #   person.pending_basr_by_profile_id(profile_id) #=> BrokerAgencyStaffRole or nil
+  def pending_basr_by_profile_id(profile_id)
+    broker_agency_staff_roles.broker_agency_pending.by_profile_id(profile_id).first
+  end
+
   private
 
   def assign(collection, association)

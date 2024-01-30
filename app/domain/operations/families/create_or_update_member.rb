@@ -23,11 +23,12 @@ module Operations
 
       def validate(params)
         Failure("family id is required") unless params[:family_id].present?
-        Success([params[:family_id], params.except(:family_id)])
+        Success([params[:family_id], params[:applicant_params]])
       end
 
       def sanitize_params(applicant_params)
         dob_value = applicant_params[:dob]
+        return Failure("dob is required") unless dob_value.present?
 
         applicant_params.merge!(dob: dob_value.strftime('%d/%m/%Y')) unless dob_value.is_a?(String)
         Success(applicant_params)

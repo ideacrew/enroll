@@ -237,6 +237,18 @@ Then(/^.+ should not see error message (.*)$/) do |text|
   page.should have_no_content(text)
 end
 
+Given(/^the strong password length feature is (.+)$/) do |feature|
+  if feature == "enabled"
+    allow(EnrollRegistry[:strong_password_length].feature).to receive(:is_enabled).and_return(true)
+  else
+    allow(EnrollRegistry[:strong_password_length].feature).to receive(:is_enabled).and_return(false)
+  end
+end
+
+Then(/^Individual should see a minimum password length of (.+)$/) do |length|
+  expect(page).to have_content("#{length} #{l10n('devise.registrations.characters_minimum')}")
+end
+
 Then(/^.+ should see the weak password error message$/) do
   page.should have_content(l10n("devise.errors.password_strength"))
 end
@@ -386,7 +398,7 @@ Then(/^Individual should be on verification page/) do
 end
 
 When(/^.+ clicks on the Continue button of the Family Information page$/) do
-  find(IvlFamilyInformation.continue_btn).click
+  find('.interaction-click-control-continue').click
   sleep 10
 end
 
@@ -464,7 +476,7 @@ end
 And(/^.+ clicks on the Continue button of the Household Info page/) do
   screenshot("line 161")
   sleep 2
-  find(IvlIapFamilyInformation.continue_btn).click
+  find('.interaction-click-control-continue').click
 end
 
 Then(/consumer clicked on Go To My Account/) do
@@ -475,13 +487,13 @@ Then(/Individual creates a new HBX account$/) do
   fill_in CreateAccount.email_or_username, :with => "testflow@test.com"
   fill_in CreateAccount.password, :with => "aA1!aA1!aA1!"
   fill_in CreateAccount.password_confirmation, :with => "aA1!aA1!aA1!"
-  find(CreateAccount.create_account_btn).click
+  find(CreateAccount.create_account_btn, wait: 5).click
 end
 
 Then(/Individual creates a new HBX account with a weak password$/) do
   fill_in CreateAccount.email_or_username, :with => "testflow@test.com"
-  fill_in CreateAccount.password, :with => "WeakPass1!"
-  fill_in CreateAccount.password_confirmation, :with => "WeakPass1!"
+  fill_in CreateAccount.password, :with => "BadPw1!"
+  fill_in CreateAccount.password_confirmation, :with => "BadPw1!"
   find(CreateAccount.create_account_btn).click
 end
 
@@ -519,6 +531,9 @@ And(/I signed in$/) do
   find(SignIn.sign_in_btn).click
 end
 
+When(/^the individual continues to the Choose Coverage page$/) do
+  expect(page).to have_content IvlChooseCoverage.choose_coverage_for_your_household_text
+end
 
 When(/^the individual clicks the Continue button of the Group Selection page$/) do
   expect(page).to have_content IvlChooseCoverage.choose_coverage_for_your_household_text
@@ -671,6 +686,11 @@ When(/^I visit the Insured portal$/) do
   click_link 'Consumer/Family Portal'
 end
 
+When(/^the user visits the Insured portal$/) do
+  visit "/"
+  click_link 'Consumer/Family Portal'
+end
+
 Then(/Second user creates an individual account$/) do
   @browser.button(class: /interaction-click-control-create-account/).wait_until_present
   @browser.text_field(class: /interaction-field-control-user-email/).set(@u.email(:email2))
@@ -798,8 +818,19 @@ Then(/^(\w+) creates a new account$/) do |person|
   click_button 'Create account'
 end
 
+And(/the consumer creates a new account with email$/) do |person|
+  fill_in 'user[email]', with: "email#{person}"
+  fill_in CreateAccount.password, with: "aA1!aA1!aA1!"
+  fill_in CreateAccount.password_confirmation, with: "aA1!aA1!aA1!"
+  find(CreateAccount.create_account_btn).click
+end
+
 When(/^\w+ clicks continue$/) do
   find(IvlChooseCoverage.continue_btn).click
+end
+
+When(/the consumer clicks on the privacy continue button$/) do
+  find('.interaction-click-control-continue').click
 end
 
 When(/^\w+ selects Company match for (\w+)$/) do |company|
@@ -1197,6 +1228,10 @@ When(/Individual clicks on continue button on Choose Coverage page$/) do
   find(IvlChooseCoverage.continue_btn).click
 end
 
+And(/Individual clicks the Back to My Account button$/) do
+  find(".interaction-click-control-back-to-my-account")
+end
+
 And(/Individual signed in to resume enrollment$/) do
   visit '/'
   click_link('Consumer/Family Portal', wait: 10)
@@ -1300,6 +1335,19 @@ When(/Individual creates an HBX account with SSN already in use$/) do
   fill_in IvlPersonalInformation.ssn, with: '212-31-3131'
   find(IvlPersonalInformation.male_radiobtn).click
   find(IvlPersonalInformation.need_coverage_yes).click
+  find(IvlPersonalInformation.continue_btn).click
+end
+
+When(/Individual fills in personal info$/) do
+  fill_in IvlPersonalInformation.first_name, with: "Jack"
+  fill_in IvlPersonalInformation.last_name, with: "Smith"
+  fill_in IvlPersonalInformation.dob, with: "11/11/1992"
+  fill_in IvlPersonalInformation.ssn, with: '212-31-3131'
+  find(IvlPersonalInformation.male_radiobtn).click
+  find(IvlPersonalInformation.need_coverage_yes).click
+end
+
+When(/Individual clicks the personal info continue button$/) do
   find(IvlPersonalInformation.continue_btn).click
 end
 

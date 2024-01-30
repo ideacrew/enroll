@@ -22,8 +22,8 @@
         <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= income.end_on %></span>
       </div>
       <div class="col-md-1 form-group-lg class-fa-household no-pd fa-adjustment">
-        <a class="unemployment-income-edit edit-pr"><i class="fa fa-pencil fa-lg" aria-hidden="true"></i></a>
-        <a class="unemployment-income-delete"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'unemployment-income-edit-<%= dom_id income %>')" id="unemployment-income-edit-<%= dom_id income %>" class="unemployment-income-edit edit-pr"><i class="fa fa-pencil fa-lg" aria-hidden="true"></i><span class="hide"><%=l10n("edit")%></span></a>
+        <a tabindex="0" onkeydown="handleButtonKeyDown(event, 'unemployment-income-delete-<%= dom_id income %>')" id="unemployment-income-delete-<%= dom_id income %>" class="unemployment-income-delete"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i><span class="hide"><%=l10n("delete")%></span></a>
       </div>
     </div>
   </div>

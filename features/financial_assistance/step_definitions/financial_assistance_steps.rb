@@ -558,7 +558,7 @@ end
 
 Given(/^expands the "Other Options" panel/) do
   # TODO: Maybe figure out how to do this with something other than glyphicon
-  other_actions_link = page.all('a').detect { |link| link[:class] == 'glyphicon glyphicon-plus pull-right' }
+  other_actions_link = page.all('a').detect { |link| link[:id] == 'open_button' }
   other_actions_link.click
   expect(page).to have_content(
     l10n(
@@ -790,4 +790,12 @@ And(/^all applicants are not medicaid chip eligible and are non magi medicaid el
     applicant.update_attributes(is_medicaid_chip_eligible: false)
     applicant.update_attributes(is_non_magi_medicaid_eligible: false)
   end
+end
+
+And(/^there is a (.*) evidence present with the option to upload a document$/) do |evidence_type|
+  evidence = application.applicants.first.send("#{evidence_type}_evidence".to_sym)
+  # confirm evidence is visible
+  find("#evidence_kind_#{evidence_type}_evidence")
+  # confirm id on hidden input for upload is present
+  find(:xpath, "//input[@id='upload_evidence_#{evidence.id}']", :visible => false)
 end

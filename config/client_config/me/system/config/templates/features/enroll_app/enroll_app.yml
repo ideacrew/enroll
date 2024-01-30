@@ -272,6 +272,8 @@ registry:
             item: 100
           - key: :child_age_limit
             item: 20
+          - key: :default_password_length_range
+            item: 8..20
       - key: :data_seeds_ui
         item: :data_seeds_ui
         is_enabled: true
@@ -380,9 +382,6 @@ registry:
       - key: :address_verification
         item: :address_verification
         is_enabled: <%= ENV['ADDRESS_VERIFICATION_IS_ENABLED'] || false %>
-      - key: :eligibility_audit_log
-        item: :eligibility_audit_log
-        is_enabled: <%= ENV['ELIGIBILITY_AUDIT_LOG_IS_ENABLED'] || false %>
       - key: :notify_address_changed
         is_enabled: <%= ENV['NOTIFY_ADDRESS_CHANGED_IS_ENABLED'] || false %>
       - key: :ce_roster_bulk_upload
@@ -881,3 +880,9 @@ registry:
       - key: :prevent_concurrent_sessions
         item: :prevent_concurrent_sessions
         is_enabled: <%= ENV['PREVENT_CONCURRENT_SESSIONS_IS_ENABLED'] || false %>
+      - key: :strong_password_length
+        item: :strong_password_length
+        is_enabled: <%= ENV['STRONG_PASSWORD_LENGTH_IS_ENABLED'] || false %>
+      - key: :preferred_user_access
+        item: :preferred_user_access
+        is_enabled: <%= ENV['PREFERRED_USER_ACCESS'] || false %>

@@ -29,7 +29,7 @@
             <div class="col-8 p-0">
               <%= f.label :password %>
               <small class="pl-2 text-muted">
-                <%= User.validators.select{|v| v.attributes == [:password] && v.options.has_key?(:minimum) }.first.options[:minimum] %> characters minimum
+                <%= "#{User.configured_password_length.min} #{l10n('devise.registrations.characters_minimum')}" %>
               </small>
             </div>
             <div class="col-4 p-0">
@@ -39,9 +39,9 @@
               </div>
             </div>
           </div>
-          <%= f.password_field :password, autocomplete: "off", class: "form-control", minlength:"12", maxlength:"20", required: true, data: { action: "focus->signup#passwordTooltip", toggle: "tooltip", placement: "right", trigger: 'click', html: true, target: 'signup.passwordField' } %>
+          <%= f.password_field :password, autocomplete: "off", class: "form-control", minlength:"#{User.configured_password_length.min}", maxlength:"20", required: true, data: { action: "focus->signup#passwordTooltip", toggle: "tooltip", placement: "right", trigger: 'click', html: true, target: 'signup.passwordField' } %>
           <div class="invalid-feedback">
-            Must be at least 12 characters and cannot contain username
+            <%= l10n('devise.errors.password_length_username', length: User.configured_password_length.min) %>
           </div>
         </div>
         <div class="form-group">
@@ -56,9 +56,9 @@
               </div>
             </div>
           </div>
-          <%= f.password_field :password_confirmation, autocomplete: "off", class: "form-control", minlength:"12", required: true, data: {action: "focus->signup#hideTooltips click->signup#hideTooltips keyup->signup#checkMatch blur->signup#validatePassword", target: 'signup.passwordConfirmationField'} %>
+          <%= f.password_field :password_confirmation, autocomplete: "off", class: "form-control", minlength:"#{User.configured_password_length.min}", required: true, data: {action: "focus->signup#hideTooltips click->signup#hideTooltips keyup->signup#checkMatch blur->signup#validatePassword", target: 'signup.passwordConfirmationField'} %>
           <div class="invalid-feedback">
-            Must be at least 12 characters and cannot contain username
+            <%= l10n('devise.errors.password_length_username', length: User.configured_password_length.min) %>
           </div>
         </div>
         <div class="form-group d-none" id="optionalEmail">

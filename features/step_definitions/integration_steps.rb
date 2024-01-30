@@ -173,6 +173,10 @@ def people
       broker_census_employee: true,
       password: 'aA1!aA1!aA1!',
       ssn: "222335220"
+    },
+    'Dual Role' => {
+      first_name: 'Dual',
+      last_name: 'Role'
     }
   }
 end
@@ -884,7 +888,8 @@ When(/^.+ filters plans by Carrier/) do
 end
 
 Then(/^.+ should see plans filtered by Carrier/) do
-  find_all('.plan-row').each do |row|
+  sleep(2)
+  find_all('.plan-row', wait: 5).each do |row|
     expect(row.find('h3 small', wait: 5).text).to eq @carrier_selected
   end
 end
@@ -1276,16 +1281,4 @@ end
 Then(/^I should see Shop for new plan button$/) do
   shop_for_new_plan_input = page.all('input').detect { |input| input[:value] == 'Shop for new plan' }
   expect(shop_for_new_plan_input.present?).to eq(true)
-end
-
-Then(/^they should see the live chat button$/) do
-  expect(page).to have_css(AdminHomepage.chat_button)
-end
-
-Then(/^they should see the bot button$/) do
-  expect(page).to have_css(AdminHomepage.bot_button)
-end
-
-Then(/^they should not see the live chat button$/) do
-  expect(page).to_not have_css(AdminHomepage.chat_button)
 end

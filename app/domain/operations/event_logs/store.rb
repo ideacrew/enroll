@@ -46,6 +46,7 @@ module Operations
         options =
           headers.slice(
             :subject_gid,
+            :resource_gid,
             :correlation_id,
             :message_id,
             :host_id,
@@ -55,8 +56,10 @@ module Operations
         account = headers[:account]
         options[:event_time] = formated_time(headers[:event_time])
         options[:session_detail] = account[:session]
+        # TODO: Work with @raghuram to understand why login_session_id is not available in session object in some cases.
+        # substitute login_session_id with session_id token for now.
+        options[:session_detail][:login_session_id] = options[:session_detail][:login_session_id] || options[:session_detail][:session_id]
         options[:account_id] = account[:id]
-        options[:session_detail][:login_session_id] = SecureRandom.uuid
         options[:monitored_event] = construct_monitored_event(payload, headers)
         options[:payload] = payload.to_json
         options[:event_category] = event_category_for(options[:event_name])

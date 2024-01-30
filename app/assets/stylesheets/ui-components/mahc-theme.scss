@@ -76,7 +76,7 @@ h1,h2,h3,h4,h5,h6 {
           line-height: 50px;
           padding: 23px 15px;
           font-weight: 600;
-          color: #487ba2;
+          color: var(--theme-primary-blue, #487ba2);
           &:hover {
             background-color: $background-hover;
             text-decoration: none;
@@ -176,7 +176,7 @@ h1,h2,h3,h4,h5,h6 {
     padding-right: 15px;
   }
   li a {
-    color: #cbe6ff;
+    color: var(--soft-blue, #cbe6ff);
     text-align: left;
     padding-left: 15px;
     font-weight: 600;
@@ -242,7 +242,7 @@ h1,h2,h3,h4,h5,h6 {
 .btn-min:hover,
 .btn-min:focus,
 .btn-min.focus {
-  color: #487ba2;
+  color: var(--theme-primary-blue, #487ba2);
   transform: scale(1.1);
 }
 .btn:active,
@@ -264,9 +264,9 @@ fieldset[disabled] .btn {
 }
 
 .btn-default {
-  color: var(--theme-primary-100, $secondary-button-text);
+  color: var(--theme-primary-blue, $secondary-button-text);
   background-color: $secondary-button-background;
-  border-color: var(--theme-primary-100, $secondary-button-border);
+  border-color: var(--theme-primary-blue, $secondary-button-border);
   text-transform: $secondary-button-text-casing;
   font-weight: $primary-bold;
   box-sizing: border-box;
@@ -356,7 +356,7 @@ thead {
     padding-right: 6px;
   }
   ul.progress-wrapper li.complete .vertical-line-progress {
-    background-color: #487ba2;
+    background-color: var(--theme-primary-blue, #487ba2);
   }
   .vertical-line-progress {
     background-color: #cacaca;
@@ -379,17 +379,17 @@ thead {
     padding: 5px 0px;
     list-style: none;
     padding-left: 35px;
-    color: #487ba2;
+    color: var(--theme-primary-blue, #487ba2);
   }
   ul.progress-wrapper li.active {
     padding: 5px 0px;
     list-style: none;
     padding-left: 35px;
     font-weight: bold;
-    color: #487ba2;
+    color: var(--theme-primary-blue, #487ba2);
   }
   ul.progress-wrapper li.complete span.circle-progress {
-    background-color: #487ba2;
+    background-color: var(--theme-primary-blue, #487ba2);
     border: none;
     width: 14px;
     left: 9px;
@@ -552,7 +552,7 @@ thead {
   }
 
 .pagination > .active > a {
-  background:$blue;
+  background: var(--theme-primary-blue, $blue);
 }
 
 .Summary-of-Benefits-and-Coverage{
@@ -560,11 +560,11 @@ thead {
 }
 
 .fa-arrow-down:before {
-  color: var(--theme-primary-100, #007bc4);
+  color: var(--theme-primary-blue, #007bc4);
 }
 
 .fa-info-circle:before {
-  color: var(--theme-primary-100, #007bc4);
+  color: var(--theme-primary-blue, #007bc4);
 }
 
 #datatable_filter_source_kind {
@@ -573,4 +573,12 @@ thead {
 
 #fteEmployee, #pteEmployee, #medSecPayers {
   padding:0;
+}
+
+.white {
+  color: #ffffff !important;
+}
+
+.black {
+  color: var(--primary-black, #ffffff) !important;
 }

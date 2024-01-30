@@ -156,5 +156,15 @@ end
 And(/^the browser has finished rendering the page$/) do
   # Ensures the axecore contrast tests are not run immediately after the DOM is available but prior to the page
   # fully rendering in the browser.
+  # USE THIS ONLY AFTER CONFIRMING THAT IT IS ABSOLUTELY NECESSARY
   sleep(1)
+end
+
+Then(/^the page passes minimum level aa contrast guidelines$/) do
+  # Ensures the axecore contrast tests are not run immediately after the DOM is available but prior to the page
+  # fully rendering in the browser.
+  sleep(1)
+  # User Interface Components that are not available for user interaction (e.g., a disabled control in HTML) are
+  # not required to meet contrast requirements according to WCAG guidelines.
+  steps %(the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast)
 end
