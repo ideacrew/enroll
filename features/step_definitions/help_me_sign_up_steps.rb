@@ -30,7 +30,7 @@ end
 
 And(/^Individual selects a broker?/) do
   expect(page).to have_css(".broker_select_button", wait: 5)
-  find(".broker_select_button", wait: 5).click
+  find(".broker_select_button", wait: 10).click
 end
 
 And(/^Individual clicks on Select this Broker button$/) do
