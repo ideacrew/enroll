@@ -6,11 +6,11 @@
     <% if !@event_logs&.any?%>
       <p><%= type === 'consumer' ? l10n("event_log.empty_consumer") : l10n("event_log.empty_employer") %>
     <% else %>
-    <% if active_tab == 'event_log_ivl' %>
-      <p><b><%= l10n("event_log.hbx_id_text") %></b> <%= hbx_id %></p>
+    <% if type == 'consumer' %>
       <p><b><%= l10n("Account") %> <%= l10n("Primary") %>:</b> <%= l10n("Self") %></p>
       <p><%= l10n("event_log.ivl_action") %></p>
     <% else %>
+      <p><b><%= l10n("event_log.hbx_id_text") %></b> <%= hbx_id %></p>
       <p><%= l10n("event_log.shop_action") %></p>
     <% end %>
 
@@ -272,7 +272,7 @@
       }
       $(this).toggle();
     });
-    if ($('tr.primary-row').is(":visible").length === $('tr.primary-row .glyphicon-chevron-down').is(":visible").length) {
+    if ($('tr.primary-row:visible').length === $('tr.primary-row:visible .glyphicon-chevron-down').length) {
       $('#event-log-table thead tr').addClass('showing')
       $("#log-expansion-icon").removeClass('glyphicon-chevron-right')
       $("#log-expansion-icon").addClass('glyphicon-chevron-down')
@@ -346,6 +346,8 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         visible_rows.push($(this).prop('id'))
       }
     });
+
+    // subject filter
     if (!subjects.includes("ALL")){
       $('td.subject').each(function( index ) {
         var row = $(this).closest('tr').prop('id');
@@ -355,6 +357,8 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         }
       });
     }
+
+    // eligibility type filter
     if (!eligibilities.includes("ALL")){
       $('td.eligibility').each(function( index ) {
         var row = $(this).closest('tr').prop('id');
@@ -364,6 +368,8 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         }
       });
     }
+
+    // eligibility status filter
     if (!statuses.includes("ALL")){
       $('td.status').each(function( index ) {
         var row = $(this).closest('tr').prop('id');
@@ -373,44 +379,8 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         }
       });
     }
-    if ($('#user-id').val()) {
-      var value = $('#user-id').val();
-      $('td.user_id').each(function( index ) {
-        var row = $(this).closest('tr').prop('id');
-        var row_index = visible_rows.indexOf(row);
-        has_account_name = (value.toUpperCase() === $(this).text().toUpperCase())
-        if (!(has_account_name)) {
-          has_id = (value.toUpperCase() === $(this).prop('id').toUpperCase())
-          if (!(has_id) && row_index !== -1) {
-            visible_rows.splice( row_index, 1 );
-          }
-        }
-      });
-    }
-    if ($('#start-date').val()) {
-      value = $('#start-date').val()
-      $('td.event-time').each(function( index ) {
-        var row = $(this).closest('tr').prop('id');
-        var row_index = visible_rows.indexOf(row);
-        var parsedDate = new Date($(this).text());
-        var start = new Date(value)
-        // set the start time to beginning of the day
-        start.setUTCHours(0,0,0,0);
-        if (isNaN($(this).text()) && !isNaN(parsedDate)) {
-          if ((start.getTime() > parsedDate.getTime()) && row_index !== -1) {
-            visible_rows.splice( row_index, 1 );
-          }
-          if ($('#end-date').val()) {
-            var end = new Date($('#end-date').val())
-            // set end time to the end of the day
-            end.setUTCHours(23,59,59,999);
-            if ((end.getTime() < parsedDate.getTime()) && row_index !== -1) {
-              visible_rows.splice( row_index, 1 );
-            }
-          }
-        }
-      });
-    }
+
+    // effective on filter
     // verified with delivery manager this is just an exact match
     if ($('#effective-on').val()) {
       value = $('#effective-on').val()
@@ -429,6 +399,67 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         }
       });
     }
+
+    // event detail filters
+    // because these are nested, need to check each row
+    $('tr.primary-row').each(function( index ) {
+      var row = $(this).prop('id');
+      var row_index = visible_rows.indexOf(row);
+      var accounts = []
+      var action_dates = []
+      $('td.user_id').each(function( index ) {
+        if ($(this).closest('tr').prop('id') === row) {
+          accounts.push($(this).prop('id').toUpperCase());
+          accounts.push($(this).text().toUpperCase());
+        }
+      });
+      $('td.event-time').each(function( index ) {
+        if ($(this).closest('tr').prop('id') === row) {
+          action_dates.push(new Date($(this).text()).getTime());
+        }
+      });
+      if ($('#user-id').val()) {
+        var row_index = visible_rows.indexOf(row);
+        var value = $('#user-id').val().toUpperCase();
+        var value_index = accounts.indexOf(value);
+        if (value_index === -1 && row_index !== -1) {
+          visible_rows.splice( row_index, 1 );
+        }
+      }
+      if ($('#start-date').val()) {
+        var value = $('#start-date').val()
+        var ok_rows = 0
+        var row_index = visible_rows.indexOf(row);
+        var start = new Date(value);
+        // set the start time to beginning of the day
+        start.setUTCHours(0,0,0,0);
+        $.each( action_dates, function( i, date ){
+          if (start.getTime() < date) {
+            ok_rows += 1
+          }
+        });
+        if (ok_rows === 0 && row_index !== -1) {
+          visible_rows.splice( row_index, 1 );
+        }
+      }
+      if ($('#end-date').val()) {
+        var value = $('#end-date').val()
+        var ok_rows = 0
+        var row_index = visible_rows.indexOf(row);
+        var end = new Date(value);
+        // set the end time to end of the day
+        end.setUTCHours(23,59,59,999);
+        $.each( action_dates, function( i, date ){
+          if (end.getTime() > date) {
+            ok_rows += 1
+          }
+        });
+        if (ok_rows === 0 && row_index !== -1) {
+          visible_rows.splice( row_index, 1 );
+        }
+      }
+    });
+
 
     if (visible_rows.length === 0) {
       $('#event-table-data').hide()
