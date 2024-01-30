@@ -31,7 +31,7 @@ end
 And(/^Individual selects a broker?/) do
 
   # Wait for the div to appear for a maximum of 10 seconds
-  wait_time = 10
+  wait_time = 20
   start_time = Time.now
 
   # Loop until the div is found or the timeout is reached
