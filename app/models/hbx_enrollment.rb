@@ -61,18 +61,18 @@ class HbxEnrollment
                             )
   WAIVED_STATUSES     = %w(inactive renewing_waived)
 
-  INDIVIDUAL_KIND     = "individual"
-  COVERALL_KIND       = "coverall"
-  GROUP_KINDS         = %w(employer_sponsored employer_sponsored_cobra)
-  OTHER_KINDS         = %w(unassisted_qhp insurance_assisted_qhp streamlined_medicaid emergency_medicaid hcr_chip)
+  INDIVIDUAL_KIND     = "individual".freeze
+  COVERALL_KIND       = "coverall".freeze
+  GROUP_KINDS         = %w[employer_sponsored employer_sponsored_cobra].freeze
+  OTHER_KINDS         = %w[unassisted_qhp insurance_assisted_qhp streamlined_medicaid emergency_medicaid hcr_chip].freeze
 
   ENROLLED_AND_RENEWAL_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES
 
   ENROLLED_RENEWAL_WAIVED_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES + WAIVED_STATUSES
   TERM_REASONS = %w[non_payment voluntary_withdrawl retroactive_canceled].freeze
 
-  IVL_KINDS = [INDIVIDUAL_KIND, COVERALL_KIND]
-  INSURANCE_KINDS = [IVL_KINDS, GROUP_KINDS, OTHER_KINDS]
+  IVL_KINDS = [INDIVIDUAL_KIND, COVERALL_KIND].freeze
+  INSURANCE_KINDS = [IVL_KINDS, GROUP_KINDS, OTHER_KINDS].freeze
 
   module TermReason
     NON_PAYMENT = 'non_payment'.freeze
@@ -396,7 +396,7 @@ class HbxEnrollment
   scope :outstanding_enrollments, ->{ individual_market.enrolled.current_year.where(:is_any_enrollment_member_outstanding => true) }
   scope :individual_only,     ->{ where(kind: INDIVIDUAL_KIND) }
 
-  scope :apply_aggregate, ->(year) { 
+  scope :apply_aggregate, lambda { |year|
     by_year(year)
       .enrolled_and_renewal
       .by_health
