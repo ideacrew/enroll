@@ -29,27 +29,7 @@ And(/^Individual clicks on the Help from an Expert link?/) do
 end
 
 And(/^Individual selects a broker?/) do
-
-  # Wait for the div to appear for a maximum of 10 seconds
-  wait_time = 20
-  start_time = Time.now
-
-  # Loop until the div is found or the timeout is reached
-  while (Time.now - start_time) < wait_time
-    if page.has_css?(".broker_select_button")
-      break
-    end
-    sleep 0.5 # Wait for a short interval before checking again
-  end
-
-  # Perform actions after the div appears
-  if page.has_css?(".broker_select_button")
-    expect(page).to have_css(".broker_select_button")
-    find(".broker_select_button").click
-  else
-    expect(page).to have_css(".broker_select_button")
-    find(".broker_select_button").click
-  end
+  find(".broker_select_button", wait: 5).click
 end
 
 And(/^Individual clicks on Select this Broker button$/) do
