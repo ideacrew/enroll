@@ -56,7 +56,7 @@
               - if external_application_configured?("admin") && EnrollRegistry.feature_enabled?(:agency_staff)
                 li
                   - url = ExternalApplications::ApplicationProfile.find_by_application_name("admin").url + "/agencies/agency-staff"
-                  = link_to(url, "aria-expanded" => "true", data: { turbolinks: false }, headers: { "Authorization" => "Bearer #{jwt_for_external_application}" }) do
+                  = link_to(url, "aria-expanded" => "true", data: { turbolinks: false }, id: "agencyStaffLinkToExternal") do
                     span.hidden-xs
                       | Agency Staff
                     span.glyphicon.glyphicon-th-list.hidden-md.hidden-sm.hidden-lg title="Agency Staff"
@@ -93,3 +93,19 @@
               li.pl-1 role="presentation" class="#{pundit_class HbxProfile, :view_admin_tabs?}"
                 = link_to(notifier.notice_kinds_path, "aria-expanded" => "true", "aria-controls" => "notices", "role" => "tab" ) do
                   | Notices
+
+
+javascript:
+  document.addEventListener('DOMContentLoaded', function() {
+    window.localStorage.removeItem("jwt");
+    window.localStorage.removeItem("token");
+    var agencyStaffLink = document.getElementById('agencyStaffLinkToExternal');
+    agencyStaffLink.addEventListener('click', function(event) {
+      event.preventDefault();
+      var jwtToken = "<%= jwt_for_external_application %>";
+      window.localStorage.setItem("jwt", jwtToken);
+      window.localStorage.setItem("token", jwtVal);
+      window.location.href = agencyStaffLink.href;
+    });
+  });
+

@@ -9,6 +9,7 @@ function setupExternalRedirectedListener() {
 
     if (redirUrl != null) {
       window.localStorage.setItem("jwt", jwtVal);
+      window.localStorage.setItem("token", jwtVal);
       window.location.assign(redirUrl);
     }
   }
