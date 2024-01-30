@@ -46,6 +46,9 @@ And(/^Individual selects a broker?/) do
   if page.has_css?(".broker_select_button")
     expect(page).to have_css(".broker_select_button")
     find(".broker_select_button").click
+  else
+    expect(page).to have_css(".broker_select_button")
+    find(".broker_select_button").click
   end
 end
 
