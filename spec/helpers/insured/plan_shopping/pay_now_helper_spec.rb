@@ -20,7 +20,7 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
                         issuer_profile: issuer_profile)
     end
 
-    HbxEnrollment::Kinds.each do |market|
+    HbxEnrollment::INSURANCE_KINDS.each do |market|
       context "#{market} market" do
         let!(:hbx_enrollment) do
           FactoryBot.create(:hbx_enrollment,
