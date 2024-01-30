@@ -45,9 +45,6 @@ class HbxEnrollment
 
   Authority           = [:open_enrollment]
 
-
-  Kinds               = %w(individual employer_sponsored employer_sponsored_cobra coverall unassisted_qhp insurance_assisted_qhp streamlined_medicaid emergency_medicaid hcr_chip)
-
   ENROLLMENT_KINDS    = %w(open_enrollment special_enrollment)
   COVERAGE_KINDS      = %w(health dental)
 
@@ -72,7 +69,7 @@ class HbxEnrollment
   TERM_REASONS = %w[non_payment voluntary_withdrawl retroactive_canceled].freeze
 
   IVL_KINDS = [INDIVIDUAL_KIND, COVERALL_KIND].freeze
-  INSURANCE_KINDS = [IVL_KINDS, GROUP_KINDS, OTHER_KINDS].freeze
+  INSURANCE_KINDS = IVL_KINDS + GROUP_KINDS + OTHER_KINDS
 
   module TermReason
     NON_PAYMENT = 'non_payment'.freeze
@@ -530,7 +527,7 @@ class HbxEnrollment
             presence: true,
             allow_blank: false,
             allow_nil:   false,
-            inclusion: {in: Kinds, message: "%{value} is not a valid enrollment type"}
+            inclusion: {in: INSURANCE_KINDS, message: "%{value} is not a valid enrollment type"}
 
   validates :enrollment_kind,
             allow_blank: false,
@@ -2597,7 +2594,7 @@ class HbxEnrollment
   end
 
   def is_ivl_by_kind?
-    (Kinds - ["employer_sponsored", "employer_sponsored_cobra"]).include?(kind)
+    (INSURANCE_KINDS - ["employer_sponsored", "employer_sponsored_cobra"]).include?(kind)
   end
 
   def is_enrolled_by_aasm_state?
