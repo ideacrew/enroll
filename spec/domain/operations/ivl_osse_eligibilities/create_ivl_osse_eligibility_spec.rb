@@ -46,9 +46,13 @@ RSpec.describe ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility,
   end
 
   let(:evidence_value) { "false" }
+  let!(:system_user) { FactoryBot.create(:user, email: "admin@dc.gov") }
+  let(:trackable_event_instance) { Operations::EventLogs::TrackableEvent.new}
 
   before do
     allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+    allow(trackable_event_instance).to receive(:publish).and_return(Dry::Monads::Success(true))
+    allow(Operations::EventLogs::TrackableEvent).to receive(:new).and_return(trackable_event_instance)
     catalog_eligibility
   end
 
