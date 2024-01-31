@@ -18,7 +18,6 @@ Feature: Contrast level AA is enabled - Functionality for the Family Relationshi
     And the relationship is saved
     Then the page passes minimum level aa contrast guidelines
 
-
   Scenario: Missing value is highlighted
     And there is a nil value for at least one relationship
     And the family member row will be highlighted
