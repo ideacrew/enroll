@@ -45,9 +45,6 @@ class HbxEnrollment
 
   Authority           = [:open_enrollment]
 
-
-  Kinds               = %w(individual employer_sponsored employer_sponsored_cobra coverall unassisted_qhp insurance_assisted_qhp streamlined_medicaid emergency_medicaid hcr_chip)
-
   ENROLLMENT_KINDS    = %w(open_enrollment special_enrollment)
   COVERAGE_KINDS      = %w(health dental)
 
@@ -61,10 +58,18 @@ class HbxEnrollment
                             )
   WAIVED_STATUSES     = %w(inactive renewing_waived)
 
+  INDIVIDUAL_KIND     = "individual".freeze
+  COVERALL_KIND       = "coverall".freeze
+  GROUP_KINDS         = %w[employer_sponsored employer_sponsored_cobra].freeze
+  OTHER_KINDS         = %w[unassisted_qhp insurance_assisted_qhp streamlined_medicaid emergency_medicaid hcr_chip].freeze
+
   ENROLLED_AND_RENEWAL_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES
 
   ENROLLED_RENEWAL_WAIVED_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES + WAIVED_STATUSES
   TERM_REASONS = %w[non_payment voluntary_withdrawl retroactive_canceled].freeze
+
+  IVL_KINDS = [INDIVIDUAL_KIND, COVERALL_KIND].freeze
+  INSURANCE_KINDS = IVL_KINDS + GROUP_KINDS + OTHER_KINDS
 
   module TermReason
     NON_PAYMENT = 'non_payment'.freeze
@@ -386,6 +391,14 @@ class HbxEnrollment
   scope :individual_market,   ->{ where(:kind.nin => ["employer_sponsored", "employer_sponsored_cobra"]) }
   scope :verification_needed, ->{ where(:is_any_enrollment_member_outstanding => true, :aasm_state.in => ENROLLED_STATUSES).or({:terminated_on => nil }, {:terminated_on.gt => TimeKeeper.date_of_record}).order(created_at: :desc) }
   scope :outstanding_enrollments, ->{ individual_market.enrolled.current_year.where(:is_any_enrollment_member_outstanding => true) }
+  scope :individual_only,     ->{ where(kind: INDIVIDUAL_KIND) }
+
+  scope :apply_aggregate, lambda { |year|
+    by_year(year)
+      .enrolled_and_renewal
+      .by_health
+      .individual_only
+  }
 
   scope :canceled, -> { where(:aasm_state.in => CANCELED_STATUSES) }
   scope :family_home_page_hidden_enrollments, ->(family) do
@@ -514,7 +527,7 @@ class HbxEnrollment
             presence: true,
             allow_blank: false,
             allow_nil:   false,
-            inclusion: {in: Kinds, message: "%{value} is not a valid enrollment type"}
+            inclusion: {in: INSURANCE_KINDS, message: "%{value} is not a valid enrollment type"}
 
   validates :enrollment_kind,
             allow_blank: false,
@@ -2581,7 +2594,7 @@ class HbxEnrollment
   end
 
   def is_ivl_by_kind?
-    (Kinds - ["employer_sponsored", "employer_sponsored_cobra"]).include?(kind)
+    (INSURANCE_KINDS - ["employer_sponsored", "employer_sponsored_cobra"]).include?(kind)
   end
 
   def is_enrolled_by_aasm_state?
