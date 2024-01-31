@@ -34,7 +34,7 @@ Feature: A dedicated page that gives the user prior notice that that application
     When the user clicks the SAVE & EXIT link
     Then the next time the user logs in the user will see Application checklist page
 
-  @contrast
+  @accessibility
   Scenario: contrast level aa is enabled - User clicks previous or the back browser button with year selection enabled.
     Given the contrast level aa feature is enabled
     And the iap year selection feature is enabled

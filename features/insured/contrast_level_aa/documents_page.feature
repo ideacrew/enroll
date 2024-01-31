@@ -1,4 +1,4 @@
-@contrast
+@accessibility
 Feature: Contrast level AA is enabled - Documents page
 
   Scenario: Consumer goes to the Documents page

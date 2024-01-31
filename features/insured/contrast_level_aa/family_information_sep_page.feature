@@ -1,4 +1,4 @@
-@contrast
+@accessibility
 Feature: Contrast level AA is enabled - Insured Plan Shopping with SEP
   Background:
     Given the contrast level aa feature is enabled

@@ -1,4 +1,4 @@
-@contrast
+@accessibility
 Feature: Contrast level AA is enabled - Functionality for the Family Relationships page
 
   Background: Family Relationships page

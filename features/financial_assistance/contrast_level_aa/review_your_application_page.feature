@@ -1,4 +1,4 @@
-@contrast
+@accessibility
 Feature: Contrast level AA is enabled - Review your application page functionality
 
   Background: Review your application page

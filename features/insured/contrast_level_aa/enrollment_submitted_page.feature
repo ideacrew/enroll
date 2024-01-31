@@ -1,4 +1,4 @@
-@contrast
+@accessibility
 Feature: Contrast level AA is enabled - Insured Plan Shopping on Individual market
 
   Background:

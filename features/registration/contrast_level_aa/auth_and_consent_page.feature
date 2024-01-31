@@ -1,4 +1,4 @@
-@contrast
+@accessibility
 Feature: Contrast level AA is enabled - Consumer goes to the auth and consent page
   Scenario: Consumer visits the auth and consent page
     Given the contrast level aa feature is enabled

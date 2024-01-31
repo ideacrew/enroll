@@ -30,7 +30,7 @@ Feature: Start a new Financial Assistance Application
     And consumer clicks on pencil symbol next to primary person
     Then consumer should see today date and clicks continue
 
-  @contrast
+  @accessibility
   Scenario: contrast level aa is enabled - A consumer should see the applications assistance year when feature enabled
     Given the contrast level aa feature is enabled
     And IAP Assistance Year Display feature is enabled

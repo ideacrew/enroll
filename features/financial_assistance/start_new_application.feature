@@ -20,7 +20,7 @@ Feature: Cost Savings -  Start New Application
       | submitted |
       | determined |
 
-  @contrast
+  @accessibility
   Scenario: FAA is enabled - year selection enabled - contrast level aa is enabled - and consumer has a no existing FAA applications
     Given the contrast level aa feature is enabled
     And the iap year selection feature is enabled
@@ -85,7 +85,7 @@ Feature: Cost Savings -  Start New Application
     When consumer click 'Start New Application' button
     Then the consumer is navigated to year selection page
 
-  @contrast
+  @accessibility
   Scenario: FAA is enabled - year selection enabled - OE ended - year selection form enabled - contrast level aa is enabled - and consumer has a no existing FAA applications
     Given the contrast level aa feature is enabled
     And the iap year selection feature is enabled

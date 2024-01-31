@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-@contrast
+@accessibility
 Feature: Contrast level AA is enabled - job and self employed income form page
 
   Background: User logs in and visits applicant's Job income page

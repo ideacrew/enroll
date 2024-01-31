@@ -1,4 +1,4 @@
-@contrast
+@accessibility
 Feature: Contrast level AA is enabled - The page that appears while the user is waiting for eligibility results to be returned
 
   Scenario: User is waiting for eligibility results

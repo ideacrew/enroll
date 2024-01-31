@@ -1,4 +1,4 @@
-@contrast
+@accessibility
 Feature: Contrast level AA is enabled - Start a new Financial Assistance Application and fills out Income Adjustments form
 
   Background: User logs in and visits applicant's income adjustments page
