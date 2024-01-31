@@ -1,3 +1,4 @@
+@contrast
 Feature: Contrast level AA is enabled - This is the final review page before submiting an application
 
   Background: Submit Your Application page

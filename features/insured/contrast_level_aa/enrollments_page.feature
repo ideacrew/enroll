@@ -1,3 +1,4 @@
+@contrast
 Feature: Contrast level AA is enabled - Enrollment History Page
 
   Background:

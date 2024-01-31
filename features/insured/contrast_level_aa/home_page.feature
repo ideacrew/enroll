@@ -1,3 +1,4 @@
+@contrast
 Feature: Contrast level AA is enabled - Consumer shops for plan
   Background: Setup IVL benefit packages and benefit coverage periods
     Given the contrast level aa feature is enabled

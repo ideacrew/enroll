@@ -84,6 +84,7 @@ Feature: A dedicated page that gives the user access to Tax Info page for a give
     And the user clicks on the CONTINUE button
     Then the dependent should now be claimed by the primary dependent
 
+  @contrast
   Scenario: contrast level aa is enabled - Tax Info page meets AA compliance
     Given the contrast level aa feature is enabled
 	  And the user is editing an application for financial assistance
