@@ -56,6 +56,7 @@ module Operations
         account = headers[:account]
         options[:event_time] = formated_time(headers[:event_time])
         options[:session_detail] = account[:session]
+        options[:session_detail][:login_session_id] ||= account[:session][:session_id] if account[:session]
         options[:account_id] = account[:id]
         options[:monitored_event] = construct_monitored_event(payload, headers)
         options[:payload] = payload.to_json
@@ -71,7 +72,7 @@ module Operations
         user_account = account_with(account[:id])
         options[:account_hbx_id] = user_account.person.hbx_id
         options[:account_username] = user_account.oim_id || user_account.email
-        options[:login_session_id] = account[:session][:login_session_id]
+        options[:login_session_id] = account[:session][:login_session_id] if account[:session]
         options[:event_category] = event_category_for(headers[:event_name])
         options.merge(
           {

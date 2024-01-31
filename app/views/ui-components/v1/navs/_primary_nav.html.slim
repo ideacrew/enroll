@@ -55,7 +55,8 @@
                   = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'general-agencies', link_path: main_app.general_agency_index_exchanges_hbx_profiles_path, display_name: 'General Agencies', active_tab: 'general-agencies', remote: false, pundit_object: nil, pundit_method: nil}
               - if external_application_configured?("admin") && EnrollRegistry.feature_enabled?(:agency_staff)
                 li
-                  = link_to(ExternalApplications::ApplicationProfile.find_by_application_name("admin").url + "/agencies/agency-staff?auth_token=" + jwt_for_external_application, "aria-expanded" => "true", data: { turbolinks: false } ) do
+                  - url = ExternalApplications::ApplicationProfile.find_by_application_name("admin").url + "/agencies/agency-staff"
+                  = link_to(url, "aria-expanded" => "true", data: { turbolinks: false }, id: "agencyStaffLinkToExternal") do
                     span.hidden-xs
                       | Agency Staff
                     span.glyphicon.glyphicon-th-list.hidden-md.hidden-sm.hidden-lg title="Agency Staff"
@@ -92,3 +93,17 @@
               li.pl-1 role="presentation" class="#{pundit_class HbxProfile, :view_admin_tabs?}"
                 = link_to(notifier.notice_kinds_path, "aria-expanded" => "true", "aria-controls" => "notices", "role" => "tab" ) do
                   | Notices
+
+
+javascript:
+  document.addEventListener('DOMContentLoaded', function() {
+    window.localStorage.removeItem("jwt");
+    const agencyStaffLink = document.getElementById('agencyStaffLinkToExternal');
+    agencyStaffLink.addEventListener('click', function(event) {
+      event.preventDefault();
+      const jwtToken = "<%= jwt_for_external_application %>";
+      window.localStorage.setItem("jwt", jwtToken);
+      window.location.href = agencyStaffLink.href;
+    });
+  });
+

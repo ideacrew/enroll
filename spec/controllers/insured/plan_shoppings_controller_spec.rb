@@ -700,6 +700,17 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
                         product: product)
     end
 
+    let(:shop_enrollment) do
+      FactoryBot.create(:hbx_enrollment, :with_product, sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id,
+                                                        family: household.family,
+                                                        household: household,
+                                                        hbx_enrollment_members: [hbx_enrollment_member],
+                                                        coverage_kind: "health",
+                                                        external_enrollment: false,
+                                                        sponsored_benefit_id: sponsored_benefit.id,
+                                                        rating_area_id: rating_area.id)
+    end
+
     it 'should update the member coverage start on for continuous coverage' do
       sign_in(user)
       get :thankyou, params: { id: hbx_enrollment.id, plan_id: product.id }
@@ -718,10 +729,12 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
     it "should render thank you page if SHOP enrollment effective date doesn't match product dates" do
       allow(EnrollRegistry[:enrollment_product_date_match].feature).to receive(:is_enabled).and_return(false)
-      hbx_enrollment.update_attributes!(effective_on: Date.new(year, 1, 1))
-      product.update_attributes!(application_period: Date.new(year - 1, 1, 1)..Date.new(year - 1, 12, 31))
+      shop_enrollment.update_attributes!(effective_on: Date.new(year, 1, 1))
+      shop_enrollment.product.update_attributes!(application_period: Date.new(year - 1, 1, 1)..Date.new(year - 1, 12, 31))
+      BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(100.00)
       sign_in(user)
-      get :thankyou, params: {id: hbx_enrollment.id, plan_id: product.id, market_kind: 'shop'}
+      get :thankyou, params: {id: shop_enrollment.id, plan_id: shop_enrollment.product.id, market_kind: 'shop'}
       expect(response).to render_template('insured/plan_shoppings/thankyou.html.erb')
     end
 

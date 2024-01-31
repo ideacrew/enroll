@@ -6,11 +6,11 @@
     <% if !@event_logs&.any?%>
       <p><%= type === 'consumer' ? l10n("event_log.empty_consumer") : l10n("event_log.empty_employer") %>
     <% else %>
-    <% if active_tab == 'event_log_ivl' %>
-      <p><b><%= l10n("event_log.hbx_id_text") %></b> <%= hbx_id %></p>
+    <% if type == 'consumer' %>
       <p><b><%= l10n("Account") %> <%= l10n("Primary") %>:</b> <%= l10n("Self") %></p>
       <p><%= l10n("event_log.ivl_action") %></p>
     <% else %>
+      <p><b><%= l10n("event_log.hbx_id_text") %></b> <%= hbx_id %></p>
       <p><%= l10n("event_log.shop_action") %></p>
     <% end %>
 
@@ -37,8 +37,8 @@
                   <ul>
                     <li><label><input type="checkbox" name="<%= l10n("subject").downcase %>" value="all" checked/>All</label></li>
                     <% if members&.any? %>
-                    <% members.each do |member| %>
-                      <li><label><input type="checkbox" name="<%= l10n("subject").downcase %>" value="<%= member.full_name %>" checked/><%= member.full_name %></label></li>
+                    <% members.uniq.each do |member| %>
+                      <li><label><input type="checkbox" name="<%= l10n("subject").downcase %>" value="<%= member %>" checked/><%= member %></label></li>
                     <% end %>
                     <% end %>
                   </ul>
@@ -125,7 +125,7 @@
     <div class="event-log-header">
       <div class="event-log-export-text">
         <h3><b><%= type === "consumer" ? l10n("event_log.table_label_consumer") + hbx_id : l10n("event_log.table_label_employer")%></b></h3>
-        <a href="/event_logs.csv?group=<%= group.id %>?type=<%= type %>" id="export-table" class="button button-primary"><%= l10n("Export") %> CSV</a>
+        <a href="/event_logs.csv?group=<%= group.id %>?type=<%= type %>" id="export-table" class="button button-primary"><%= l10n("Export") %> <%= l10n("to") %> CSV</a>
       </div>
     </div>
     <div id="event-table-data">
@@ -133,7 +133,7 @@
         <thead>
         <tr class="">
           <th><span class="glyphicon glyphicon-chevron-right" id="log-expansion-icon" onclick="toggleShowAllRows()"></span></th>
-          <% if type == 'consumer' %><th><%= l10n("Subject") %></th><% end %>
+          <th><%= l10n("Subject") %></th>
           <th><%= l10n("event_log.eligibility") %></th>
           <th><%= l10n("event_log.eligibility") %> <%= l10n("Status") %></th>
           <th><%= l10n("Effective") %> <%= l10n("On") %></th>
@@ -145,13 +145,17 @@
           <% sets.each_with_index do |(event_log, details), index| %>
             <tr class="primary-row" id="<%= index %>"%>
               <td><span class="glyphicon glyphicon-chevron-right"></span></td>
-              <% if type == 'consumer' %><td class="subject"><%= event_log[0] %></td><% end %>
+              <% if type == 'consumer' %>
+                <td class="subject"><%= event_log[0] %></td>
+              <% else %>
+                <td class="subject"><%= name %></td>
+              <% end %>
               <td class="eligibility"><%= event_log[1]&.upcase %></td>
               <td class="status"><%= details[0][:current_state]&.titleize %></td>
               <td class="effective-on"><%= details[0][:effective_on] %></td>
             </tr>
             <tr class="secondary-header" id="<%= index %>">
-              <td colspan="<%= type === 'consumer' ? 2 : 1 %>%"></td>
+              <td colspan="2"></td>
               <th><%= l10n("Event Details") %></th>
               <th><%= l10n("event_log.account_label") %></th>
               <th><%= l10n("Account (Date/Time)") %></th>
@@ -160,7 +164,7 @@
             <tr class="detail-row" id="<%= index %>">
               <td colspan="2"></td>
               <td><%= detail[:detail] %></td>
-              <td id="<%= detail[:account_hbx_id] %>%" class="user_id"><%= detail[:account_username] %></td>
+              <td id="<%= detail[:account_hbx_id] %>" class="user_id"><%= detail[:account_username] %></td>
               <td class="event-time"><%= detail[:event_time] %></td>
             </tr>
             <% end %>
@@ -260,6 +264,25 @@
     $('#event-log-table thead tr').toggleClass('showing')
   }
 
+  $('.primary-row').click(function(){
+    $(this).find('.glyphicon-chevron-right, .glyphicon-chevron-down').toggleClass('glyphicon-chevron-right glyphicon-chevron-down')
+    $(this).nextAll('tr').each( function() {
+      if ($(this).hasClass('primary-row')) {
+        return false;
+      }
+      $(this).toggle();
+    });
+    if ($('tr.primary-row:visible').length === $('tr.primary-row:visible .glyphicon-chevron-down').length) {
+      $('#event-log-table thead tr').addClass('showing')
+      $("#log-expansion-icon").removeClass('glyphicon-chevron-right')
+      $("#log-expansion-icon").addClass('glyphicon-chevron-down')
+    } else {
+      $('#event-log-table thead tr').removeClass('showing')
+      $("#log-expansion-icon").addClass('glyphicon-chevron-right')
+      $("#log-expansion-icon").removeClass('glyphicon-chevron-down')
+    }
+  });
+
 $(".dropdown dt .fake-select").on('click', function() {
   if (!$(this).closest('.dropdown').find("dd ul").hasClass('open')) {
     $(".dropdown dd ul").removeClass('open');
@@ -300,16 +323,6 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
   }
 });
 
-  $('.primary-row').click(function(){
-    $(this).find('.glyphicon-chevron-right, .glyphicon-chevron-down').toggleClass('glyphicon-chevron-right glyphicon-chevron-down')
-    $(this).nextAll('tr').each( function() {
-      if ($(this).hasClass('primary-row')) {
-        return false;
-      }
-      $(this).toggle();
-    });
-  });
-
   // filter the data on the page
   $('#run-query').on('click', function(event) {
     event.preventDefault();
@@ -333,6 +346,8 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         visible_rows.push($(this).prop('id'))
       }
     });
+
+    // subject filter
     if (!subjects.includes("ALL")){
       $('td.subject').each(function( index ) {
         var row = $(this).closest('tr').prop('id');
@@ -342,6 +357,8 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         }
       });
     }
+
+    // eligibility type filter
     if (!eligibilities.includes("ALL")){
       $('td.eligibility').each(function( index ) {
         var row = $(this).closest('tr').prop('id');
@@ -351,6 +368,8 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         }
       });
     }
+
+    // eligibility status filter
     if (!statuses.includes("ALL")){
       $('td.status').each(function( index ) {
         var row = $(this).closest('tr').prop('id');
@@ -360,36 +379,8 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         }
       });
     }
-    if ($('#user-id').val()) {
-      var value = $('#user-id').val();
-      $('td.user_id').each(function( index ) {
-        var row = $(this).closest('tr').prop('id');
-        var row_index = visible_rows.indexOf(row);
-        has_account_name = (value.toUpperCase() === $(this).text().toUpperCase())
-        has_id = (value.toUpperCase() === $(this).prop('id').toUpperCase())
-        if (!(has_account_name || has_id) && row_index !== -1) {
-          visible_rows.splice( row_index, 1 );
-        }
-      });
-    }
-    if ($('#start-date').val()) {
-      value = $('#start-date').val()
-      $('td.event-time').each(function( index ) {
-        var row = $(this).closest('tr').prop('id');
-        var row_index = visible_rows.indexOf(row);
-        var parsedDate = new Date($(this).text());
-        if (isNaN($(this).text()) && !isNaN(parsedDate)) {
-          if ((new Date(value).getTime() > parsedDate.getTime()) && row_index !== -1) {
-            visible_rows.splice( row_index, 1 );
-          }
-          if ($('#end-date').val()) {
-            if ((new Date($('#end-date').val()).getTime() < parsedDate.getTime()) && row_index !== -1) {
-              visible_rows.splice( row_index, 1 );
-            }
-          }
-        }
-      });
-    }
+
+    // effective on filter
     // verified with delivery manager this is just an exact match
     if ($('#effective-on').val()) {
       value = $('#effective-on').val()
@@ -397,13 +388,78 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         var row = $(this).closest('tr').prop('id');
         var row_index = visible_rows.indexOf(row);
         var parsedDate = new Date($(this).text());
+        var start = new Date(value)
+        // set to same time of day so they match
+        start.setUTCHours(0,0,0,0)
+        parsedDate.setUTCHours(0,0,0,0)
         if (isNaN($(this).text()) && !isNaN(parsedDate)) {
-          if (!(new Date(value) === parsedDate) && row_index !== -1) {
+          if (!(start.getTime() === parsedDate.getTime()) && row_index !== -1) {
             visible_rows.splice( row_index, 1 );
           }
         }
       });
     }
+
+    // event detail filters
+    // because these are nested, need to check each row
+    $('tr.primary-row').each(function( index ) {
+      var row = $(this).prop('id');
+      var row_index = visible_rows.indexOf(row);
+      var accounts = []
+      var action_dates = []
+      $('td.user_id').each(function( index ) {
+        if ($(this).closest('tr').prop('id') === row) {
+          accounts.push($(this).prop('id').toUpperCase());
+          accounts.push($(this).text().toUpperCase());
+        }
+      });
+      $('td.event-time').each(function( index ) {
+        if ($(this).closest('tr').prop('id') === row) {
+          action_dates.push(new Date($(this).text()).getTime());
+        }
+      });
+      if ($('#user-id').val()) {
+        var row_index = visible_rows.indexOf(row);
+        var value = $('#user-id').val().toUpperCase();
+        var value_index = accounts.indexOf(value);
+        if (value_index === -1 && row_index !== -1) {
+          visible_rows.splice( row_index, 1 );
+        }
+      }
+      if ($('#start-date').val()) {
+        var value = $('#start-date').val()
+        var ok_rows = 0
+        var row_index = visible_rows.indexOf(row);
+        var start = new Date(value);
+        // set the start time to beginning of the day
+        start.setUTCHours(0,0,0,0);
+        $.each( action_dates, function( i, date ){
+          if (start.getTime() < date) {
+            ok_rows += 1
+          }
+        });
+        if (ok_rows === 0 && row_index !== -1) {
+          visible_rows.splice( row_index, 1 );
+        }
+      }
+      if ($('#end-date').val()) {
+        var value = $('#end-date').val()
+        var ok_rows = 0
+        var row_index = visible_rows.indexOf(row);
+        var end = new Date(value);
+        // set the end time to end of the day
+        end.setUTCHours(23,59,59,999);
+        $.each( action_dates, function( i, date ){
+          if (end.getTime() > date) {
+            ok_rows += 1
+          }
+        });
+        if (ok_rows === 0 && row_index !== -1) {
+          visible_rows.splice( row_index, 1 );
+        }
+      }
+    });
+
 
     if (visible_rows.length === 0) {
       $('#event-table-data').hide()
