@@ -9,11 +9,11 @@ module Operations
       module H3
         # This class will update the person and consumer role based on response
         class SsaVerificationResponseProcessor
-          send(:include, Dry::Monads[:result, :do, :try])
-          include EventSource::Command
+          include ::Operations::Transmittable::TransmittableUtils
 
           def call(params)
-            transmittable_objects = yield find_transmittable(params[:metadata].job_id)
+            transmittable_objects = yield find_transmittable(params)
+            transaction = yield save_payload(transmittable_objects, params[:response])
             person = yield find_person(params[:person_hbx_id])
             consumer_role = yield store_response_and_get_consumer_role(person, params[:response])
             updated_consumer_role = yield update_consumer_role(consumer_role, params[:response])
@@ -39,14 +39,31 @@ module Operations
           # when to close out the job if more than one response expected, would it have separate operation?
 
 
-          def find_transmittable(job_id)
-            return Success() unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == true
-            result = Operations::Transmittable::GenerateResponseObjects.new.call({job_id: job_id, payload: params[:response], correlation_id: params[:person_hbx_id], subject_type: "person"})
+          def find_transmittable(params)
+            # return Success() unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == true
+            result = Operations::Transmittable::GenerateResponseObjects.new.call({job_id: params[:metadata].job_id,
+                                                                                  key: :ssa_verification_response,
+                                                                                  payload: params[:response], 
+                                                                                  correlation_id: params[:person_hbx_id],
+                                                                                  subject_type: "person"})
             return result if result.success?
-            add_errors({ job: @job, transmission: @transmission }, "Failed to create response objects due to #{result.failure}", :find_transmittable)
-            status_result = update_status({ job: @job }, :failed, result.failure)
+            add_errors(:find_transmittable, "Failed to create response objects due to #{result.failure}", { job: @job, transmission: @transmission })
+            status_result = update_status(result.failure, :failed, { job: @job })
             return status_result if status_result.failure?
             result
+          end
+
+          def save_payload(transmittable_objects, payload)
+            transaction = transmittable_objects[:transaction]
+            transaction.json_payload = payload
+            if transaction.save
+              Success(transaction)
+            else
+              add_errors(:save_payload, "Failed to save payload on response transaction", { job: transmittable_objects[:job], transmission: transmittable_objects[:transmission] })
+              status_result = update_status(result.failure, :failed, { job: transmittable_objects[:job], transmission: transmittable_objects[:transmission] })
+              return status_result if status_result.failure?
+              Failure("Failed to save payload on response transaction")
+            end
           end
 
           def find_person(person_hbx_id)
@@ -106,14 +123,6 @@ module Operations
           def record_results(transmittable_objects)
             return Success() unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == true
             update_status(transmittable_objects, :succeeded, "Processed SSA response")
-          end
-
-          def add_errors(transmittable_objects, message, error_key)
-            Operations::Transmittable::AddError.new.call({ transmittable_objects: transmittable_objects, key: error_key, message: message })
-          end
-
-          def update_status(transmittable_objects, state, message)
-            Operations::Transmittable::UpdateProcessStatus.new.call({ transmittable_objects: transmittable_objects, state: state, message: message })
           end
         end
       end
