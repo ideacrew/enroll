@@ -92,7 +92,7 @@
           </div>
           <div class="filter">
             <label for="effective-on"><%= l10n("Effective On") %></label>
-            <input placeholder="MM/DD/YYYY" type="date" id="effective-on">
+            <input placeholder="MM/DD/YYYY" type="date" max="9999-12-31" id="effective-on">
           </div>
         </div>
         <h2><%= l10n("Event") %> <%= l10n("Details") %></h2>
@@ -105,12 +105,12 @@
           <div class="sub-filter-row">
           <div class="filter">
             <label for="start-date"><%= l10n("event_log.start_date") %></label>
-            <input placeholder="MM/DD/YYYY" type="date" id="start-date">
+            <input placeholder="MM/DD/YYYY" max="9999-12-31" type="date" id="start-date">
           </div>
           <div class="between-input-label"><%= l10n("to") %></div>
           <div class="filter">
             <label>&nbsp;</label>
-            <input type="date" id="end-date" disabled aria-label="<%= l10n("event_log.end_date") %>">
+            <input type="date" id="end-date" max="9999-12-31" disabled aria-label="<%= l10n("event_log.end_date") %>">
           </div>
           </div>
           </div>
@@ -348,7 +348,7 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
     });
 
     // subject filter
-    if (!subjects.includes("ALL")){
+    if (!subjects.length === 0 && !subjects.includes("ALL")){
       $('td.subject').each(function( index ) {
         var row = $(this).closest('tr').prop('id');
         var row_index = visible_rows.indexOf(row)
@@ -418,6 +418,7 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
           action_dates.push(new Date($(this).text()).getTime());
         }
       });
+
       if ($('#user-id').val()) {
         var row_index = visible_rows.indexOf(row);
         var value = $('#user-id').val().toUpperCase();
@@ -426,6 +427,7 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
           visible_rows.splice( row_index, 1 );
         }
       }
+
       if ($('#start-date').val()) {
         var value = $('#start-date').val()
         var ok_rows = 0
@@ -442,6 +444,7 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
           visible_rows.splice( row_index, 1 );
         }
       }
+
       if ($('#end-date').val()) {
         var value = $('#end-date').val()
         var ok_rows = 0
@@ -459,7 +462,6 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         }
       }
     });
-
 
     if (visible_rows.length === 0) {
       $('#event-table-data').hide()
