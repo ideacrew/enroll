@@ -13,14 +13,41 @@ module Operations
           include EventSource::Command
 
           def call(params)
+            transmittable_objects = yield find_transmittable(params[:metadata].job_id)
             person = yield find_person(params[:person_hbx_id])
             consumer_role = yield store_response_and_get_consumer_role(person, params[:response])
             updated_consumer_role = yield update_consumer_role(consumer_role, params[:response])
-
+            _updated_transmittable_objects = yield record_results(transmittable_objects)
             Success(updated_consumer_role)
           end
 
           private
+
+          # we should feature flag X
+          # for all services, check if success or failure X
+          # if failure response, find job (don't record if not found?), save failure X
+          # if success response:
+          # * find job
+          # * create response transmission and transaction, save the response payload
+          # * link to the subject
+          # * process the response using existing operation(s) X
+          # * mark the transmittable objects as succeeded X
+          #
+          # Questions:
+          # generic operation(s) or not? - yes for the successful response
+          # what to do if job not found for a successful response? create job and process as before just recording the response
+          # when to close out the job if more than one response expected, would it have separate operation?
+
+
+          def find_transmittable(job_id)
+            return Success() unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == true
+            result = Operations::Transmittable::GenerateResponseObjects.new.call({job_id: job_id, payload: params[:response], correlation_id: params[:person_hbx_id], subject_type: "person"})
+            return result if result.success?
+            add_errors({ job: @job, transmission: @transmission }, "Failed to create response objects due to #{result.failure}", :find_transmittable)
+            status_result = update_status({ job: @job }, :failed, result.failure)
+            return status_result if status_result.failure?
+            result
+          end
 
           def find_person(person_hbx_id)
             person = Person.where(hbx_id: person_hbx_id).first
@@ -74,6 +101,19 @@ module Operations
 
             consumer_role.save
             Success(consumer_role)
+          end
+
+          def record_results(transmittable_objects)
+            return Success() unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == true
+            update_status(transmittable_objects, :succeeded, "Processed SSA response")
+          end
+
+          def add_errors(transmittable_objects, message, error_key)
+            Operations::Transmittable::AddError.new.call({ transmittable_objects: transmittable_objects, key: error_key, message: message })
+          end
+
+          def update_status(transmittable_objects, state, message)
+            Operations::Transmittable::UpdateProcessStatus.new.call({ transmittable_objects: transmittable_objects, state: state, message: message })
           end
         end
       end
