@@ -13,7 +13,7 @@ module Operations
 
           def call(params)
             transmittable_objects = yield find_transmittable(params)
-            transaction = yield save_payload(transmittable_objects, params[:response])
+            _transaction = yield save_payload(transmittable_objects, params[:response])
             person = yield find_person(params[:person_hbx_id])
             consumer_role = yield store_response_and_get_consumer_role(person, params[:response])
             updated_consumer_role = yield update_consumer_role(consumer_role, params[:response])
@@ -43,7 +43,7 @@ module Operations
             # return Success() unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == true
             result = Operations::Transmittable::GenerateResponseObjects.new.call({job_id: params[:metadata].job_id,
                                                                                   key: :ssa_verification_response,
-                                                                                  payload: params[:response], 
+                                                                                  payload: params[:response],
                                                                                   correlation_id: params[:person_hbx_id],
                                                                                   subject_type: "person"})
             return result if result.success?
