@@ -54,7 +54,7 @@ module Subscribers
         subscriber_logger.info "EligibilitySubscriber#on_enroll_enterprise_events, response: #{payload}"
 
         subject = GlobalID::Locator.locate(payload[:subject_gid])
-        eligibility_date = TimeKeeper.date_of_record
+        eligibility_date = payload[:eligibility_date].to_date || TimeKeeper.date_of_record
         effective_date = payload[:effective_date].to_date
         evidence_key = payload[:evidence_key].to_sym
 

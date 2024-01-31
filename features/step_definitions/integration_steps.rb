@@ -888,7 +888,8 @@ When(/^.+ filters plans by Carrier/) do
 end
 
 Then(/^.+ should see plans filtered by Carrier/) do
-  find_all('.plan-row').each do |row|
+  sleep(2)
+  find_all('.plan-row', wait: 5).each do |row|
     expect(row.find('h3 small', wait: 5).text).to eq @carrier_selected
   end
 end
