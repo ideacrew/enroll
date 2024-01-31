@@ -11,16 +11,17 @@ module Operations
         class RequestSsaVerification
           # primary request from fdsh gateway
 
-          include Dry::Monads[:result, :do, :try]
-          include EventSource::Command
+          include ::Operations::Transmittable::TransmittableUtils
 
           # @param [ Hash ] params Applicant Attributes
           # @return [ BenefitMarkets::Entities::Applicant ] applicant Applicant
           def call(person)
             values = yield build_transmittable_values(person)
-            _job = yield create_job(values)
-            _transmission = yield create_transmission(values)
-            _transaction = yield create_transaction(values, person)
+            @job = yield create_job(values)
+            transmission_params = yield construct_response_transmission_params(values)
+            @transmission = yield create_request_transmission(transmission_params, @job)
+            transaction_params = yield construct_response_transaction_params(values, person)
+            @transaction = yield create_request_transaction(transaction_params, @job)
             _payload_entity = yield build_and_validate_payload_entity(person)
             event  = yield build_event
             result = yield publish(event)
@@ -41,44 +42,21 @@ module Operations
                       publish_on: DateTime.now})
           end
 
-          def create_job(values)
-            result = Operations::Transmittable::FindOrCreateJob.new.call(values)
-
-            if result.success?
-              @job = result.value!
-              Success(@job)
-            else
-              result
-            end
-          end
-
-          def create_transmission(values)
+          def construct_response_transmission_params(values)
             values[:key] = :ssa_verification_request
-            result = Operations::Transmittable::CreateTransmission.new.call(values.merge({ job: @job, event: 'initial', state_key: :initial }))
-
-            if result.success?
-              @transmission = result.value!
-            else
-              add_errors({ job: @job }, "Failed to create transmission due to #{result.failure}", :create_request_transmission)
-              status_result = update_status({ job: @job }, :failed, result.failure)
-              return status_result if status_result.failure?
-            end
-            result
+            values[:event] = 'initial'
+            values[:state_key] = :initial
+            values[:job] = @job
+            Success(values)
           end
 
-          def create_transaction(values, person)
-            result = Operations::Transmittable::CreateTransaction.new.call(values.merge({ transmission: @transmission,
-                                                                                          subject: person,
-                                                                                          event: 'initial',
-                                                                                          state_key: :initial }))
-            if result.success?
-              @transaction = result.value!
-            else
-              add_errors({ job: @job, transmission: @transmission }, "Failed to create transaction due to #{result.failure}", :create_transaction)
-              status_result = update_status({ job: @job, transmission: @transmission }, :failed, result.failure)
-              return status_result if status_result.failure?
-            end
-            result
+          def construct_response_transaction_params(values, person)
+            values[:key] = :ssa_verification_request
+            values[:event] = 'initial'
+            values[:state_key] = :initial
+            values[:transmission] = @transmission
+            values[:subject] = person
+            Success(values)
           end
 
           def build_and_validate_payload_entity(person)
@@ -88,19 +66,19 @@ module Operations
               @transaction.save
               @transaction.json_payload ? Success(@transaction) : Failure("Unable to save transaction with payload")
             else
-              add_errors({ job: @job, transmission: @transmission, transaction: @transaction },
-                         "Unable to transform payload",
-                         :build_and_validate_payload_entity)
-              status_result = update_status({ job: @job, transmission: @transmission, transaction: @transaction }, :failed, "Unable to transform payload")
+              add_errors("Unable to transform payload",
+                         :build_and_validate_payload_entity,
+                         { job: @job, transmission: @transmission, transaction: @transaction })
+              status_result = update_status("Unable to transform payload", :failed,
+                                            { job: @job, transmission: @transmission, transaction: @transaction })
               return status_result if status_result.failure?
               result
             end
           rescue StandardError
-            add_errors({ job: @job, transmission: @transmission, transaction: @transaction },
-                       "Unable to save transaction with payload",
-                       :generate_transmittable_payload)
-            status_result = update_status({ job: @job, transmission: @transmission, transaction: @transaction }, :failed,
-                                          "Unable to save transaction with payload")
+            add_errors("Unable to save transaction with payload", :generate_transmittable_payload,
+                       { job: @job, transmission: @transmission, transaction: @transaction })
+            status_result = update_status("Unable to save transaction with payload", :failed,
+                                          { job: @job, transmission: @transmission, transaction: @transaction })
             return status_result if status_result.failure?
             result
           end
@@ -114,18 +92,10 @@ module Operations
 
           def publish(event)
             event.publish
-            update_status({ job: @job }, :transmitted, "successfully sent request to fdsh_gateway")
-            update_status({ transmission: @transmission, transaction: @transaction }, :succeeded, "successfully sent request to fdsh_gateway")
+            update_status("successfully sent request to fdsh_gateway", :transmitted, { job: @job })
+            update_status("successfully sent request to fdsh_gateway", :succeeded, { transmission: @transmission, transaction: @transaction })
 
             Success("Successfully published the payload to fdsh_gateway")
-          end
-
-          def add_errors(transmittable_objects, message, error_key)
-            Operations::Transmittable::AddError.new.call({ transmittable_objects: transmittable_objects, key: error_key, message: message })
-          end
-
-          def update_status(transmittable_objects, state, message)
-            Operations::Transmittable::UpdateProcessStatus.new.call({ transmittable_objects: transmittable_objects, state: state, message: message })
           end
         end
       end
