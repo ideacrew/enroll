@@ -19,13 +19,16 @@ RSpec.describe Services::IvlOsseEligibilityService, type: :model, :dbclean => :a
   let(:person) { FactoryBot.create(:person, :with_consumer_role)}
   let(:role) { person.consumer_role }
   let(:current_date) { TimeKeeper.date_of_record }
-
+  let!(:system_user) { FactoryBot.create(:user, email: "admin@dc.gov") }
   let(:params) { { person_id: person.id, osse: { current_date.year.to_s => "true", current_date.last_year.year.to_s => "false" } } }
+  let(:trackable_event_instance) { Operations::EventLogs::TrackableEvent.new}
 
   subject { described_class.new(params) }
 
   before do
     allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+    allow(trackable_event_instance).to receive(:publish).and_return(Dry::Monads::Success(true))
+    allow(Operations::EventLogs::TrackableEvent).to receive(:new).and_return(trackable_event_instance)
     catalog_eligibility
   end
 
