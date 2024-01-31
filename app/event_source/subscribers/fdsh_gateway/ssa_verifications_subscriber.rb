@@ -13,8 +13,8 @@ module Subscribers
         job_id = metadata.job_id
         status = metadata.status
         verification_payload = { person_hbx_id: metadata.correlation_id, metadata: metadata, response: payload }
-        if status === "failure"
-          handle_failure_response(job_id, status)
+        if status == "failure"
+          handle_failure_response(job_id)
         else
           result = Operations::Fdsh::Ssa::H3::SsaVerificationResponseProcessor.new.call(verification_payload)
         end
@@ -31,7 +31,7 @@ module Subscribers
         logger.error "Ssa::SsaverificationsSubscriber: on_ssa_verification_complete error_message: #{e.message}, backtrace: #{e.backtrace}"
       end
 
-      def handle_failure_response(job_id, status)
+      def handle_failure_response(job_id)
         job = Transmittable::Job.where(job_id: job_id)&.last
         return unless job
         message = "Job failed in FDSH Gateway"
