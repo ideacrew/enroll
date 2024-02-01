@@ -11,7 +11,7 @@ concurrency:
 env:
   REPORT_PATH: 'ci/cuke-report.json'
   CUCUMBER_SPLIT_CONFIGURATION_PATH: 'ci/cucumber-split-config.json'
-  CLIENT: 'dc'
+  CLIENT: 'me'
 
 jobs:
   view_linter:
