@@ -987,17 +987,25 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
       Operations::ProductSelectionEffects::DchbxProductSelectionEffects
     end
 
-    it "should cancel signature enrollments" do
+    before do
       family.hbx_enrollments.map(&:generate_hbx_signature)
       family.hbx_enrollments.map(&:save)
       subject.call(product_selection)
       family.reload
-      enrollments = family.hbx_enrollments
-      expect(enrollments.size).to eq 4
-      expect(enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled", "coverage_selected", "unverified"]).count).to eq(3)
-      canceled_enrollment = enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled"]).first
-      transition = canceled_enrollment.workflow_state_transitions.first
-      expect(canceled_enrollment.is_transition_superseded_silent?(transition)).to be_truthy
+      @enrollments = family.hbx_enrollments
+    end
+
+    it "should cancel signature enrollments" do
+      expect(@enrollments.size).to eq 4
+      expect(@enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled", "coverage_selected", "unverified"]).count).to eq(3)
+    end
+
+    it "should not cancel silently" do
+      canceled_enrollments = @enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled"])
+      canceled_enrollments.each do |enrollment|
+        transition = enrollment.workflow_state_transitions.first
+        expect(enrollment.is_transition_superseded_silent?(transition)).to be_falsey
+      end
     end
   end
 
@@ -1064,21 +1072,28 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
       Operations::ProductSelectionEffects::DchbxProductSelectionEffects
     end
 
-    it "should not cancel terminated enrollments" do
+    before do
       family.hbx_enrollments.map(&:generate_hbx_signature)
       family.hbx_enrollments.map(&:save)
       subject.call(product_selection)
       family.reload
-      enrollments = family.hbx_enrollments
-      expect(enrollments.size).to eq 4
-      expect(enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled", "coverage_selected", "unverified"]).count).to eq(3)
+      @enrollments = family.hbx_enrollments
+    end
 
-      canceled_enrollment = enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled"]).first
-      transition = canceled_enrollment.workflow_state_transitions.first
-      expect(canceled_enrollment.is_transition_superseded_silent?(transition)).to be_falsey
+    it "should not cancel terminated enrollments" do
+
+      expect(@enrollments.size).to eq 4
+      expect(@enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled", "coverage_selected", "unverified"]).count).to eq(3)
+    end
+
+    it "should cancel silently" do
+      canceled_enrollments = @enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled"])
+      canceled_enrollments.each do |enrollment|
+        transition = enrollment.workflow_state_transitions.first
+        expect(enrollment.is_transition_superseded_silent?(transition)).to be_truthy
+      end
     end
   end
-
 end
 
 
@@ -1182,15 +1197,22 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
       Operations::ProductSelectionEffects::DchbxProductSelectionEffects
     end
 
-    it "should not cancel terminated enrollments" do
+    before do
       family.hbx_enrollments.map(&:generate_hbx_signature)
       family.hbx_enrollments.map(&:save)
       subject.call(product_selection)
       family.reload
-      enrollments = family.hbx_enrollments
-      expect(enrollments.size).to eq 4
-      expect(enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled", "coverage_selected", "unverified"]).count).to eq(3)
-      canceled_enrollment = enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled"]).first
+      @enrollments = family.hbx_enrollments
+    end
+
+    it "should not cancel terminated enrollments" do
+      expect(@enrollments.size).to eq 4
+      expect(@enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled", "coverage_selected", "unverified"]).count).to eq(2)
+      expect(@enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_terminated"]).count).to eq(1)
+    end
+
+    it "should not cancel silently" do
+      canceled_enrollment = @enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled"]).first
       transition = canceled_enrollment.workflow_state_transitions.first
       expect(canceled_enrollment.is_transition_superseded_silent?(transition)).to be_falsey
     end
@@ -1259,15 +1281,22 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
       Operations::ProductSelectionEffects::DchbxProductSelectionEffects
     end
 
-    it "should not cancel terminated enrollments" do
+    before do
       family.hbx_enrollments.map(&:generate_hbx_signature)
       family.hbx_enrollments.map(&:save)
       subject.call(product_selection)
       family.reload
-      enrollments = family.hbx_enrollments
-      expect(enrollments.size).to eq 4
-      expect(enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled", "coverage_selected", "unverified"]).count).to eq(3)
-      canceled_enrollment = enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled"]).first
+      @enrollments = family.hbx_enrollments
+    end
+
+    it "should not cancel terminated enrollments" do
+      expect(@enrollments.size).to eq 4
+      expect(@enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled", "coverage_selected", "unverified"]).count).to eq(2)
+      expect(@enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_terminated"]).count).to eq(1)
+    end
+
+    it "should not cancel silently" do
+      canceled_enrollment = @enrollments.by_year(current_year).where(:aasm_state.in => ["coverage_canceled"]).first
       transition = canceled_enrollment.workflow_state_transitions.first
       expect(canceled_enrollment.is_transition_superseded_silent?(transition)).to be_falsey
     end

@@ -64,6 +64,7 @@ module Operations
 
       def filter_enrollments(all_enrollments, primary_family_id, _person_hbx_id)
         all_enrollments = all_enrollments.where(family_id: primary_family_id, kind: "individual")
+        all_enrollments = all_enrollments.by_year(TimeKeeper.date_of_record.next_year.year) if TimeKeeper.date_of_record.month == 12
         return Failure("RelocateEnrolledProducts: No enrollments found for a given criteria") if all_enrollments.blank?
 
         Success(all_enrollments)
