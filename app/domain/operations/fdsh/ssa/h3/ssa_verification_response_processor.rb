@@ -13,7 +13,6 @@ module Operations
 
           def call(params)
             transmittable_objects = yield find_transmittable(params)
-            _transaction = yield save_payload(transmittable_objects, params[:response])
             person = yield find_person(params[:person_hbx_id])
             consumer_role = yield store_response_and_get_consumer_role(person, params[:response])
             updated_consumer_role = yield update_consumer_role(consumer_role, params[:response])
@@ -41,7 +40,7 @@ module Operations
 
           def find_transmittable(params)
             # return Success() unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == true
-            result = Operations::Transmittable::GenerateResponseObjects.new.call({job_id: params[:metadata].job_id,
+            result = Operations::Transmittable::GenerateResponseObjects.new.call({job_id: params[:metadata]&.job_id,
                                                                                   key: :ssa_verification_response,
                                                                                   payload: params[:response],
                                                                                   correlation_id: params[:person_hbx_id],
@@ -51,19 +50,6 @@ module Operations
             status_result = update_status(result.failure, :failed, { job: @job })
             return status_result if status_result.failure?
             result
-          end
-
-          def save_payload(transmittable_objects, payload)
-            transaction = transmittable_objects[:transaction]
-            transaction.json_payload = payload
-            if transaction.save
-              Success(transaction)
-            else
-              add_errors(:save_payload, "Failed to save payload on response transaction", { job: transmittable_objects[:job], transmission: transmittable_objects[:transmission] })
-              status_result = update_status(result.failure, :failed, { job: transmittable_objects[:job], transmission: transmittable_objects[:transmission] })
-              return status_result if status_result.failure?
-              Failure("Failed to save payload on response transaction")
-            end
           end
 
           def find_person(person_hbx_id)
@@ -121,8 +107,8 @@ module Operations
           end
 
           def record_results(transmittable_objects)
-            return Success() unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == true
-            update_status(transmittable_objects, :succeeded, "Processed SSA response")
+            # return Success() unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == true
+            update_status("Processed SSA response", :succeeded, transmittable_objects)
           end
         end
       end
