@@ -4,9 +4,18 @@ module AuthorizationConcern
   included do
     # Include default devise modules. Others available are:
     # :confirmable, :lockable, :timeoutable and :omniauthable
-    devise :database_authenticatable, :registerable, :lockable,
-           :recoverable, :jwt_authenticatable, :rememberable, :trackable, :timeoutable, :authentication_keys => {email: false, login: true},
-           jwt_revocation_strategy: self
+    if EnrollRegistry.feature_enabled?(:prevent_concurrent_sessions)
+      devise :database_authenticatable, :registerable, :lockable,
+             :recoverable, :jwt_authenticatable, :rememberable, :trackable, :timeoutable,
+             :session_limitable, # Limit number of sessions
+             :authentication_keys => {email: false, login: true},
+             jwt_revocation_strategy: self
+    else
+      devise :database_authenticatable, :registerable, :lockable,
+             :recoverable, :jwt_authenticatable, :rememberable, :trackable, :timeoutable,
+             :authentication_keys => {email: false, login: true},
+             jwt_revocation_strategy: self
+    end
 
     ## Database authenticatable
     field :email,              type: String, default: ""
@@ -33,6 +42,9 @@ module AuthorizationConcern
     field :failed_attempts, type: Integer, default: 0 # Only if lock strategy is :failed_attempts
     field :unlock_token,    type: String # Only if unlock strategy is :email or :both
     field :locked_at,       type: Time
+
+    ## Session Limitable
+    field :unique_session_id, type: String
 
     validate :password_complexity
     validates :password, format: { without: /\s/, message: "Password must not contain spaces"}
