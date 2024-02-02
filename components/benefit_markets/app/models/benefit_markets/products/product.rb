@@ -196,7 +196,7 @@ module BenefitMarkets
         end
 
         def network_labels
-          ['Nationwide', EnrollRegistry[:enroll_app].setting(:statewide_area).item]
+          ['Nationwide', 'State/Regional']
         end
       end
 
@@ -212,7 +212,7 @@ module BenefitMarkets
 
       def network
         return 'Nationwide' if nationwide
-        return EnrollRegistry[:enroll_app].setting(:statewide_area).item if in_state_network
+        return 'State/Regional'
       end
 
       def can_use_aptc?
