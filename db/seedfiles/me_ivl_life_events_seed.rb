@@ -123,10 +123,10 @@ QualifyingLifeEventKind.find_or_create_by(
 end
 
 QualifyingLifeEventKind.find_or_create_by(
-  title: "Enrollment error by CoverME”"
+  title: "Enrollment error by IdeaCrewDemo"
 ).tap do |qlek|
   qlek.update_attributes(
-    tool_tip: "Someone is not enrolled or enrolled in the wrong plan due to an error by CoverME",
+    tool_tip: "Someone is not enrolled or enrolled in the wrong plan due to an error by IdeaCrewDemo",
     action_kind: "add_member",
     market_kind: "individual",
     ordinal_position: 23,
