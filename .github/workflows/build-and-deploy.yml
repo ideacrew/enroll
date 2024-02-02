@@ -92,6 +92,9 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v3
+      
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Add git HEAD info to docker image
         run: |
@@ -143,9 +146,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: .
+          platforms: linux/amd64,linux/arm64
           builder: ${{ steps.buildx.outputs.name }}
           file: .docker/production/Dockerfile.gha
           # Set the desired build target here
