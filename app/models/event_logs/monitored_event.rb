@@ -37,7 +37,7 @@ module EventLogs
       details = JSON.parse(self.attributes.to_json, symbolize_names: true)
       datetime = parsed.dig(:state_histories, 0, :effective_on)
       effective_on = DateTime.parse(datetime.to_s)&.strftime("%d/%m/%Y") if datetime
-      subject = Person.by_hbx_id(self.subject_hbx_id)&.first&.full_name
+      subject = get_subject_name(log.subject_gid)
       detail = log.event_name&.match(/[^.]+\z/)&.to_s&.titleize
       build_details(parsed, details, effective_on, detail, subject)
     end
@@ -49,6 +49,12 @@ module EventLogs
       details[:effective_on] = effective_on || ""
       details[:detail] = detail || ""
       details
+    end
+
+    def get_subject_name(gid)
+      subject = GlobalID::Locator.locate(gid)
+      return subject.full_name if subject.instance_of?(Person)
+      subject&.legal_name
     end
 
     def self.fetch_event_logs(params)

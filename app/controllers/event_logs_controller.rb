@@ -4,16 +4,8 @@
 class EventLogsController < ApplicationController
   before_action :check_hbx_staff_role
   def index
-    if params[:group] && params[:type]
-      if params[:type] == "consumer"
-        family = Family.find(params[:group])
-        hbxes = family.family_members.map {|fm| fm.person.hbx_id}&.uniq
-        group_logs = EventLogs::MonitoredEvent.where(:subject_hbx_id.in => hbxes)
-      else
-        group_logs = EventLogs::MonitoredEvent.where(subject_hbx_id: params[:group])
-      end
-    end
-    @event_logs = group_logs || EventLogs::MonitoredEvent.all
+    events = params[:events]
+    @event_logs = events ? EventLogs::MonitoredEvent.where(:_id.in => params[:events]) : EventLogs::MonitoredEvent.all
     respond_to do |format|
       format.js
       format.csv do
@@ -26,7 +18,7 @@ class EventLogsController < ApplicationController
   private
 
   def event_log_params
-    params.permit(:family)
+    params.permit(:family, :events)
   end
 
   def check_hbx_staff_role
