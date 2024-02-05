@@ -106,7 +106,7 @@ module BenefitSponsors
 
       it "calls save_in_batches when FF is enabled and ASYNC_PROCESS_THRESHOLD is stubbed" do
         allow(EnrollRegistry[:ce_roster_bulk_upload].feature).to receive(:is_enabled).and_return(true)
-        allow(@roster_upload_form.census_records).to receive(:size).and_return(BenefitSponsors::Forms::RosterUploadForm::ASYNC_PROCESS_THRESHOLD)
+        allow(@roster_upload_form.census_records).to receive(:size).and_return(EnrollRegistry[:roster_upload_async_process_min_threshold].item.to_i)
         expect(@roster_upload_service_class).to_not receive(:save)
         expect(@roster_upload_service_class).to receive(:save_in_batches)
         @roster_upload_form.save

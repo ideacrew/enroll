@@ -260,7 +260,7 @@ module BenefitSponsors
 
       def assign_benefit_package_assignments(form, member)
         return unless form.benefit_group.present? || form.plan_year.present?
-        application = profile.benefit_applications.by_year(2024).first
+        application = profile.benefit_applications.by_year(form.plan_year.to_i).first
         return unless application.blank?
         benefit_package = application.benefit_packages.where(title: form.benefit_group).first
         return unless benefit_package.blank?

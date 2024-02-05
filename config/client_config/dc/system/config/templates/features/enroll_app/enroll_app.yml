@@ -876,6 +876,9 @@ registry:
       - key: :employee_match_max_attempts
         item: <%= ENV['EMPLOYEE_MATCH_MAX_ATTEMPTS'] || 3 %>
         is_enabled: true
+      - key: :roster_upload_async_process_min_threshold
+        item: <%= ENV['ROSTER_UPLOAD_ASYNC_PROCESS_MIN_THRESHOLD'] || 150 %>
+        is_enabled: true
       - key: :prevent_concurrent_sessions
         item: :prevent_concurrent_sessions
         is_enabled: <%= ENV['PREVENT_CONCURRENT_SESSIONS_IS_ENABLED'] || false %>

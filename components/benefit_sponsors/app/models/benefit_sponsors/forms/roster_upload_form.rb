@@ -7,7 +7,6 @@ module BenefitSponsors
 
       TEMPLATE_DATE = Date.new(2016, 10, 26)
       TEMPLATE_VERSION = "1.1"
-      ASYNC_PROCESS_THRESHOLD = 200
 
       attribute :template_version
       attribute :template_date
@@ -40,7 +39,8 @@ module BenefitSponsors
 
       def persist!
         if valid?
-          if ce_roster_bulk_upload_enabled? && self.census_records.size >= ASYNC_PROCESS_THRESHOLD
+          async_process_min_threshold = EnrollRegistry[:roster_upload_async_process_min_threshold].item.to_i
+          if ce_roster_bulk_upload_enabled? && self.census_records.size >= async_process_min_threshold
             service.save_in_batches(self)
           else
             service.save(self)
