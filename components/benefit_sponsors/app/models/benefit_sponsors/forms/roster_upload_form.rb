@@ -38,7 +38,11 @@ module BenefitSponsors
 
       def persist!
         if valid?
-          service.save(self)
+          if ce_roster_bulk_upload_enabled?
+            service.save_in_batches(self)
+          else
+            service.save(self)
+          end
         end
       end
 
