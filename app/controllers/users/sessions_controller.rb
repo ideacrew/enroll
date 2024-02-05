@@ -4,7 +4,6 @@ class Users::SessionsController < Devise::SessionsController
   respond_to :html, :js
   after_action :log_failed_login, :only => :new
   before_action :set_ie_flash_by_announcement, only: [:new]
-  skip_before_action :check_concurrent_sessions
 
   def new
     super do
