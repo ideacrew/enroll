@@ -39,7 +39,7 @@ module Operations
 
 
           def find_transmittable(params)
-            # return Success() unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == true
+            return Success() unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == "true"
             result = Operations::Transmittable::GenerateResponseObjects.new.call({job_id: params[:metadata]&.job_id,
                                                                                   key: :ssa_verification_response,
                                                                                   payload: params[:response],
@@ -107,7 +107,7 @@ module Operations
           end
 
           def record_results(transmittable_objects)
-            # return Success() unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == true
+            return Success() unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == "true"
             update_status("Processed SSA response", :succeeded, transmittable_objects)
           end
         end

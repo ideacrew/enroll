@@ -14,7 +14,7 @@ module Operations
         subject = yield find_subject(params[:subject_type], params[:correlation_id])
         transaction_params = values.merge({ transmission: @transmission, subject: subject, event: 'acked', state_key: :acked })
         @transaction = yield create_response_transaction(transaction_params, { job: @job, transmission: @transmission })
-        _transaction = yield save_payload(params[:response])
+        _transaction = yield save_payload(params[:payload])
 
         transmittable
       end
@@ -68,20 +68,10 @@ module Operations
       end
 
       def transmittable
-        # if @transaction.json_payload
         Success({ transaction: @transaction,
                   transmission: @transmission,
                   job: @job})
-        # else
-        #   add_errors(:transmittable,  "Transaction does not have a payload",
-        #   { job: @job, transmission: @transmission, transaction: @transaction })
-        #   status_result = update_status("Transaction does not have a payload", :failed,
-        #   { job: @job, transmission: @transmission, transaction: @transaction })
-        #   return status_result if status_result.failure?
-        #   Failure("Transaction does not have a payload")
-        # end
       end
-
     end
   end
 end
