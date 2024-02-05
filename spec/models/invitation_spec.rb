@@ -554,3 +554,267 @@ describe "A Broker Staff Invitation" do
     end
   end
 end
+
+describe Invitation, "for:
+  - a broker role
+  - when the associated person doesn't have a user yet" do
+
+  let(:current_user) do
+    instance_double(User)
+  end
+
+  let(:broker_role) do
+    instance_double(
+      BrokerRole,
+      :person => person
+    )
+  end
+
+  let(:person) do
+    instance_double(
+      Person,
+      :user_id => nil
+    )
+  end
+
+  subject do
+    Invitation.new(
+      :role => "broker_role",
+      :source_id => broker_role_id
+    )
+  end
+
+  let(:broker_role_id) { "SOME BROKER ROLE ID" }
+
+  before :each do
+    allow(BrokerRole).to receive(:find).with(broker_role_id).and_return(broker_role)
+  end
+
+  it "may be claimed by the current user" do
+    expect(subject.may_be_claimed_by?(current_user)).to be_truthy
+  end
+end
+
+describe Invitation, "for:
+  - a broker role
+  - when the associated person has the same user" do
+
+  let(:current_user) do
+    instance_double(
+      User,
+      :id => same_user_id
+    )
+  end
+
+  let(:broker_role) do
+    instance_double(
+      BrokerRole,
+      :person => person
+    )
+  end
+
+  let(:person) do
+    instance_double(
+      Person,
+      :user_id => same_user_id
+    )
+  end
+
+  subject do
+    Invitation.new(
+      :role => "broker_role",
+      :source_id => broker_role_id
+    )
+  end
+
+  let(:same_user_id) { "SOME USER ID" }
+
+  let(:broker_role_id) { "SOME BROKER ROLE ID" }
+
+  before :each do
+    allow(BrokerRole).to receive(:find).with(broker_role_id).and_return(broker_role)
+  end
+
+  it "may be claimed by the current user" do
+    expect(subject.may_be_claimed_by?(current_user)).to be_truthy
+  end
+end
+
+describe Invitation, "for:
+  - a broker role
+  - when the associated person has a different user" do
+
+  let(:current_user) do
+    instance_double(
+      User,
+      :id => broker_user_id
+    )
+  end
+
+  let(:broker_role) do
+    instance_double(
+      BrokerRole,
+      :person => person
+    )
+  end
+
+  let(:person) do
+    instance_double(
+      Person,
+      :user_id => person_user_id
+    )
+  end
+
+  subject do
+    Invitation.new(
+      :role => "broker_role",
+      :source_id => broker_role_id
+    )
+  end
+
+  let(:broker_user_id) { "BROKER USER ID" }
+
+  let(:person_user_id) { "PERSON USER ID" }
+
+  let(:broker_role_id) { "SOME BROKER ROLE ID" }
+
+  before :each do
+    allow(BrokerRole).to receive(:find).with(broker_role_id).and_return(broker_role)
+  end
+
+  it "may NOT be claimed by the current user" do
+    expect(subject.may_be_claimed_by?(current_user)).to be_falsey
+  end
+end
+
+describe Invitation, "for:
+  - a broker staff role
+  - when the associated person doesn't have a user yet" do
+
+  let(:current_user) do
+    instance_double(User)
+  end
+
+  let(:broker_agency_staff_role) do
+    instance_double(
+      BrokerAgencyStaffRole,
+      :person => person
+    )
+  end
+
+  let(:person) do
+    instance_double(
+      Person,
+      :user_id => nil
+    )
+  end
+
+  subject do
+    Invitation.new(
+      :role => "broker_agency_staff_role",
+      :source_id => broker_agency_staff_role_id
+    )
+  end
+
+  let(:broker_agency_staff_role_id) { "SOME BROKER STAFF ROLE ID" }
+
+  before :each do
+    allow(BrokerAgencyStaffRole).to receive(:find).with(broker_agency_staff_role_id).and_return(broker_agency_staff_role)
+  end
+
+  it "may be claimed by the current user" do
+    expect(subject.may_be_claimed_by?(current_user)).to be_truthy
+  end
+end
+
+describe Invitation, "for:
+  - a broker staff role
+  - when the associated person has the same user" do
+
+  let(:current_user) do
+    instance_double(
+      User,
+      :id => same_user_id
+    )
+  end
+
+  let(:broker_agency_staff_role) do
+    instance_double(
+      BrokerAgencyStaffRole,
+      :person => person
+    )
+  end
+
+  let(:person) do
+    instance_double(
+      Person,
+      :user_id => same_user_id
+    )
+  end
+
+  subject do
+    Invitation.new(
+      :role => "broker_agency_staff_role",
+      :source_id => broker_agency_staff_role_id
+    )
+  end
+
+  let(:same_user_id) { "SOME USER ID" }
+
+  let(:broker_agency_staff_role_id) { "SOME BROKER STAFF ROLE ID" }
+
+  before :each do
+    allow(BrokerAgencyStaffRole).to receive(:find).with(broker_agency_staff_role_id).and_return(broker_agency_staff_role)
+  end
+
+  it "may be claimed by the current user" do
+    expect(subject.may_be_claimed_by?(current_user)).to be_truthy
+  end
+end
+
+describe Invitation, "for:
+  - a broker staff role
+  - when the associated person a different user" do
+
+  let(:current_user) do
+    instance_double(
+      User,
+      :id => broker_staff_user_id
+    )
+  end
+
+  let(:broker_agency_staff_role) do
+    instance_double(
+      BrokerAgencyStaffRole,
+      :person => person
+    )
+  end
+
+  let(:person) do
+    instance_double(
+      Person,
+      :user_id => person_user_id
+    )
+  end
+
+  subject do
+    Invitation.new(
+      :role => "broker_agency_staff_role",
+      :source_id => broker_agency_staff_role_id
+    )
+  end
+
+  let(:broker_staff_user_id) { "BROKER STAFF USER ID" }
+
+  let(:person_user_id) { "PERSON USER ID" }
+
+  let(:broker_agency_staff_role_id) { "SOME BROKER STAFF ROLE ID" }
+
+  before :each do
+    allow(BrokerAgencyStaffRole).to receive(:find).with(broker_agency_staff_role_id).and_return(broker_agency_staff_role)
+  end
+
+  it "may be claimed by the current user" do
+    expect(subject.may_be_claimed_by?(current_user)).to be_falsey
+  end
+end

@@ -49,8 +49,8 @@ module Subscribers
             result.failure
           end
 
-        logger.info "EventLogSubscriber: event failed to persist due to errors: #{errors}"
-        subscriber_logger.error "EventLogSubscriber: event failed to persist due to errors: #{errors}"
+        logger.error "EventLogSubscriber: event failed to persist due to errors: #{errors.to_h}"
+        subscriber_logger.error "EventLogSubscriber: event failed to persist due to errors: #{errors.to_h}"
       end
     end
 

@@ -33,7 +33,6 @@ class Invitation
 
   validate :allowed_invite_types
 
-
   aasm do
     state :sent, initial: true
     state :claimed
@@ -41,6 +40,31 @@ class Invitation
     event :claim do
       transitions from: :sent, to: :claimed, :after => Proc.new { |*args| process_claim!(*args) }
     end
+  end
+
+  def may_be_claimed_by?(user_obj)
+    case role
+    when "broker_role"
+      valid_broker_role_invitation?(user_obj)
+    when "broker_agency_staff_role"
+      valid_broker_staff_invitation?(user_obj)
+    else
+      true
+    end
+  end
+
+  def valid_broker_role_invitation?(user_obj)
+    broker_role = BrokerRole.find(source_id)
+    person = broker_role.person
+    return true if person.user_id.blank?
+    person.user_id == user_obj.id
+  end
+
+  def valid_broker_staff_invitation?(user_obj)
+    staff_role = BrokerAgencyStaffRole.find(source_id)
+    person = staff_role.person
+    return true if person.user_id.blank?
+    person.user_id == user_obj.id
   end
 
   def claim_invitation!(user_obj, redirection_obj)
@@ -95,13 +119,11 @@ class Invitation
     redirection_obj.create_sso_account(user_obj, person, 15, "broker") do
       person.user = user_obj
       person.save!
+
       broker_agency_profile = broker_role.broker_agency_profile
 
-      person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new({
-        :broker_agency_profile => broker_agency_profile,
-        :aasm_state => 'active'
-      })
-      person.save!
+      Operations::EnsureBrokerStaffRoleForPrimaryBroker.new(:invitation_claimed).call(broker_role)
+
       user_obj.roles << "broker" unless user_obj.roles.include?("broker")
       if broker_role.is_primary_broker? && !user_obj.roles.include?("broker_agency_staff")
         user_obj.roles << "broker_agency_staff"

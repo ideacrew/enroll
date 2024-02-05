@@ -157,6 +157,7 @@ describe 'shared/_my_portal_links.html.erb', dbclean: :after_each do
         }
       )
 
+      person.consumer_role.update_attributes!(bookmark_url: auth_and_consent_url)
       allow(user).to receive(:consumer_identity_verified?).and_return(identity_verified)
 
       sign_in(user)

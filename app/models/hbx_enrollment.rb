@@ -45,9 +45,6 @@ class HbxEnrollment
 
   Authority           = [:open_enrollment]
 
-
-  Kinds               = %w(individual employer_sponsored employer_sponsored_cobra coverall unassisted_qhp insurance_assisted_qhp streamlined_medicaid emergency_medicaid hcr_chip)
-
   ENROLLMENT_KINDS    = %w(open_enrollment special_enrollment)
   COVERAGE_KINDS      = %w(health dental)
 
@@ -61,10 +58,18 @@ class HbxEnrollment
                             )
   WAIVED_STATUSES     = %w(inactive renewing_waived)
 
+  INDIVIDUAL_KIND     = "individual".freeze
+  COVERALL_KIND       = "coverall".freeze
+  GROUP_KINDS         = %w[employer_sponsored employer_sponsored_cobra].freeze
+  OTHER_KINDS         = %w[unassisted_qhp insurance_assisted_qhp streamlined_medicaid emergency_medicaid hcr_chip].freeze
+
   ENROLLED_AND_RENEWAL_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES
 
   ENROLLED_RENEWAL_WAIVED_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES + WAIVED_STATUSES
   TERM_REASONS = %w[non_payment voluntary_withdrawl retroactive_canceled].freeze
+
+  IVL_KINDS = [INDIVIDUAL_KIND, COVERALL_KIND].freeze
+  INSURANCE_KINDS = IVL_KINDS + GROUP_KINDS + OTHER_KINDS
 
   module TermReason
     NON_PAYMENT = 'non_payment'.freeze
@@ -386,6 +391,14 @@ class HbxEnrollment
   scope :individual_market,   ->{ where(:kind.nin => ["employer_sponsored", "employer_sponsored_cobra"]) }
   scope :verification_needed, ->{ where(:is_any_enrollment_member_outstanding => true, :aasm_state.in => ENROLLED_STATUSES).or({:terminated_on => nil }, {:terminated_on.gt => TimeKeeper.date_of_record}).order(created_at: :desc) }
   scope :outstanding_enrollments, ->{ individual_market.enrolled.current_year.where(:is_any_enrollment_member_outstanding => true) }
+  scope :individual_only,     ->{ where(kind: INDIVIDUAL_KIND) }
+
+  scope :apply_aggregate, lambda { |year|
+    by_year(year)
+      .enrolled_and_renewal
+      .by_health
+      .individual_only
+  }
 
   scope :canceled, -> { where(:aasm_state.in => CANCELED_STATUSES) }
   scope :family_home_page_hidden_enrollments, ->(family) do
@@ -514,7 +527,7 @@ class HbxEnrollment
             presence: true,
             allow_blank: false,
             allow_nil:   false,
-            inclusion: {in: Kinds, message: "%{value} is not a valid enrollment type"}
+            inclusion: {in: INSURANCE_KINDS, message: "%{value} is not a valid enrollment type"}
 
   validates :enrollment_kind,
             allow_blank: false,
@@ -2581,7 +2594,7 @@ class HbxEnrollment
   end
 
   def is_ivl_by_kind?
-    (Kinds - ["employer_sponsored", "employer_sponsored_cobra"]).include?(kind)
+    (INSURANCE_KINDS - ["employer_sponsored", "employer_sponsored_cobra"]).include?(kind)
   end
 
   def is_enrolled_by_aasm_state?
@@ -2918,20 +2931,29 @@ class HbxEnrollment
     lcsp = BenefitMarkets::Products::Product.by_year(effective_year_for_lcsp).where(hios_id: hios_id).first
     return if lcsp.nil?
 
+    subsidy = product_price_for(hbx_enrollment_member, lcsp)
+    return subsidy unless product
+
+    product_price = product_price_for(hbx_enrollment_member, product)
+    return subsidy if subsidy.to_f <= product_price.to_f
+
+    BigDecimal(product_price.to_s).round(2)
+  end
+
+  def product_price_for(member, product_for_calc)
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(self)
     previous_product = parent_enrollment&.product
-
     sponsored_cost_calculator.action = if product && previous_product && product.id == previous_product.id
                                          :calc_non_product_change_childcare_subsidy
                                        else
                                          :calc_childcare_subsidy
                                        end
 
-    member_groups_lcsp = sponsored_cost_calculator.groups_for_products([lcsp])
-    member_enrollment = member_groups_lcsp[0].group_enrollment.member_enrollments.detect{ |me| me.member_id.to_s == hbx_enrollment_member.id.to_s }
-    return if member_enrollment.nil?
+    member_group = sponsored_cost_calculator.groups_for_products([product_for_calc]).first
+    product_price = member_group.group_enrollment.member_enrollments.find{|me| me.member_id == member.id }&.product_price
+    return unless product_price
 
-    BigDecimal(member_enrollment&.product_price&.to_s).round(2)
+    BigDecimal(product_price.to_s).round(2)
   end
 
   def verify_and_reset_osse_subsidy_amount(member_group)

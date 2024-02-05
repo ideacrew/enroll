@@ -1229,6 +1229,7 @@
       "spec/data_migrations/assign_attested_residency_state_spec.rb",
       "spec/models/factories/family_enrollment_clone_factory_spec.rb",
       "components/benefit_sponsors/spec/models/benefit_sponsors/model_events/generate_initial_invoice_spec.rb",
+      "components/financial_assistance/spec/domain/financial_assistance/operations/applications/pvc/medicare/add_pvc_medicare_determination_spec.rb",
       "spec/models/services/ivl_enrollment_renewal_service_spec.rb",
       "spec/domain/operations/families/create_or_update_family_member_spec.rb",
       "components/benefit_sponsors/spec/models/benefit_sponsors/model_events/renewal_employer_open_enrollment_completed_spec.rb",
