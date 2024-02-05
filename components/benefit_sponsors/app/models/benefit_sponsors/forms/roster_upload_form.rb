@@ -38,7 +38,7 @@ module BenefitSponsors
 
       def persist!
         if valid?
-          if ce_roster_bulk_upload_enabled?
+          if EnrollRegistry.feature?(:ce_roster_bulk_upload) && EnrollRegistry.feature_enabled?(:ce_roster_bulk_upload)
             service.save_in_batches(self)
           else
             service.save(self)
