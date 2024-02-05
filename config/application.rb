@@ -10,6 +10,8 @@ require "sprockets/railtie" # Uncomment this line for Rails 3.1+
 # Configure fallbacks for mongoid errors:
 require "i18n/backend/fallbacks"
 
+DEVISE_ORM = :mongoid
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
