@@ -103,6 +103,10 @@ module BenefitSponsors
       end
 
       def save(form)
+        @subscriber_logger ||=
+          Logger.new(
+            "#{Rails.root}/log/roster_save.log"
+          )
         system_memory_usage
         @profile = form.profile
         @terminate_queue = {}
@@ -125,6 +129,10 @@ module BenefitSponsors
       end
 
       def save_in_batches(form)
+        @subscriber_logger ||=
+          Logger.new(
+            "#{Rails.root}/log/roster_save_in_batches.log"
+          )
         @profile = form.profile
         persisted = true
         form.census_records.each_slice(BATCH_SIZE).with_index do |batch, batch_index|
@@ -282,6 +290,7 @@ module BenefitSponsors
           rss_memory_in_kb = `ps -o rss= -p #{Process.pid}`.to_i
           rss_memory_in_mb = rss_memory_in_kb / 1024.0
 
+          @subscriber_logger.info "RSS Memory (Current Process): #{rss_memory_in_mb} MB"
           puts "RSS Memory (Current Process): #{rss_memory_in_mb} MB"
           rss_memory_in_mb
         rescue StandardError => e
