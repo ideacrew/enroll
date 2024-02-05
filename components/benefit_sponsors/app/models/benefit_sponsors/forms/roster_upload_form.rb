@@ -3,9 +3,11 @@ module BenefitSponsors
     class RosterUploadForm
       include ActiveModel::Validations
       include Virtus.model
+      include Config::AcaHelper
 
       TEMPLATE_DATE = Date.new(2016, 10, 26)
       TEMPLATE_VERSION = "1.1"
+      ASYNC_PROCESS_THRESHOLD = 200
 
       attribute :template_version
       attribute :template_date
@@ -38,7 +40,7 @@ module BenefitSponsors
 
       def persist!
         if valid?
-          if EnrollRegistry.feature?(:ce_roster_bulk_upload) && EnrollRegistry.feature_enabled?(:ce_roster_bulk_upload)
+          if ce_roster_bulk_upload_enabled? && self.census_records.size >= ASYNC_PROCESS_THRESHOLD
             service.save_in_batches(self)
           else
             service.save(self)

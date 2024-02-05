@@ -83,5 +83,42 @@ module BenefitSponsors
         expect(ce.employment_terminated_on).to eq TimeKeeper.date_of_record
       end
     end
+
+    describe "#save_in_batches" do
+      before do
+        @file_path = Dir.glob(File.join(Rails.root, "spec/test_data/census_employee_import/DCHL Employee Census.xlsx")).first
+        allow(user).to receive(:person).and_return(person)
+        @file = ActionDispatch::Http::UploadedFile.new(
+          tempfile: File.new(@file_path),
+          filename: File.basename(@file_path)
+        )
+        @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(@file, benefit_sponsorship.profile)
+        @roster_upload_service_class = BenefitSponsors::Services::RosterUploadService.new
+        allow(@roster_upload_form).to receive(:service).and_return(@roster_upload_service_class)
+      end
+
+      it "does not call save_in_batches when FF is disabled" do
+        allow(EnrollRegistry[:ce_roster_bulk_upload].feature).to receive(:is_enabled).and_return(false)
+        expect(@roster_upload_service_class).to receive(:save)
+        expect(@roster_upload_service_class).to_not receive(:save_in_batches)
+        @roster_upload_form.save
+      end
+
+      it "calls save_in_batches when FF is enabled and ASYNC_PROCESS_THRESHOLD is stubbed" do
+        allow(EnrollRegistry[:ce_roster_bulk_upload].feature).to receive(:is_enabled).and_return(true)
+        allow(@roster_upload_form.census_records).to receive(:size).and_return(BenefitSponsors::Forms::RosterUploadForm::ASYNC_PROCESS_THRESHOLD)
+        expect(@roster_upload_service_class).to_not receive(:save)
+        expect(@roster_upload_service_class).to receive(:save_in_batches)
+        @roster_upload_form.save
+      end
+
+      it "calls save_in_batches when FF is enabled" do
+        allow(EnrollRegistry[:ce_roster_bulk_upload].feature).to receive(:is_enabled).and_return(true)
+        expect(@roster_upload_service_class).to receive(:save)
+        expect(@roster_upload_service_class).to_not receive(:save_in_batches)
+        @roster_upload_form.save
+      end
+    end
+
   end
 end

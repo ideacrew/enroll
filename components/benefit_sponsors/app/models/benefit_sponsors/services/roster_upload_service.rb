@@ -8,7 +8,7 @@ module BenefitSponsors
 
       TEMPLATE_DATE_CELL = 7
       TEMPLATE_VERSION_CELL = 13
-      BATCH_SIZE = 10
+      UPLOAD_BATCH_SIZE = 20
 
       CENSUS_MEMBER_RECORD = %w[
         employer_assigned_family_id
@@ -103,16 +103,10 @@ module BenefitSponsors
       end
 
       def save(form)
-        @subscriber_logger ||=
-          Logger.new(
-            "#{Rails.root}/log/roster_save.log"
-          )
-        system_memory_usage
         @profile = form.profile
         @terminate_queue = {}
         @persist_queqe = {}
         form.census_records.each_with_index do |census_form, i|
-          system_memory_usage
           @index = i
           if census_form.employment_terminated_on.present?
             _insert_into_terms_queqe(census_form)
@@ -129,14 +123,9 @@ module BenefitSponsors
       end
 
       def save_in_batches(form)
-        @subscriber_logger ||=
-          Logger.new(
-            "#{Rails.root}/log/roster_save_in_batches.log"
-          )
         @profile = form.profile
         persisted = true
-        form.census_records.each_slice(BATCH_SIZE).with_index do |batch, batch_index|
-          system_memory_usage
+        form.census_records.each_slice(UPLOAD_BATCH_SIZE).with_index do |batch, batch_index|
           @terminate_queue = {}
           @persist_queqe = {}
           process_batch(batch, batch_index)
@@ -155,7 +144,7 @@ module BenefitSponsors
 
       def process_batch(batch, batch_index)
         batch.each_with_index do |census_record, index|
-          @index = batch_index * BATCH_SIZE + index
+          @index = batch_index * UPLOAD_BATCH_SIZE + index
           if census_record.employment_terminated_on.present?
             _insert_into_terms_queqe(census_record)
           else
@@ -283,20 +272,6 @@ module BenefitSponsors
         end
         member.benefit_group_assignments << assignment
         member
-      end
-
-      def system_memory_usage
-        begin
-          rss_memory_in_kb = `ps -o rss= -p #{Process.pid}`.to_i
-          rss_memory_in_mb = rss_memory_in_kb / 1024.0
-
-          @subscriber_logger.info "RSS Memory (Current Process): #{rss_memory_in_mb} MB"
-          puts "RSS Memory (Current Process): #{rss_memory_in_mb} MB"
-          rss_memory_in_mb
-        rescue StandardError => e
-          puts "Unable to read memory information: #{e.message}"
-          0.0
-        end
       end
 
       def build_benefit_package_assignment(benefit_package)
