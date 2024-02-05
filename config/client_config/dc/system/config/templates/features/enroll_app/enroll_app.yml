@@ -878,7 +878,7 @@ registry:
         is_enabled: true
       - key: :prevent_concurrent_sessions
         item: :prevent_concurrent_sessions
-        is_enabled: <%= ENV['PREVENT_CONCURRENT_SESSIONS_IS_ENABLED'] || true %>
+        is_enabled: <%= ENV['PREVENT_CONCURRENT_SESSIONS_IS_ENABLED'] || false %>
       - key: :strong_password_length
         item: :strong_password_length
         is_enabled: <%= ENV['STRONG_PASSWORD_LENGTH_IS_ENABLED'] || false %>
