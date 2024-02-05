@@ -8,7 +8,7 @@ module BenefitSponsors
 
       TEMPLATE_DATE_CELL = 7
       TEMPLATE_VERSION_CELL = 13
-      BATCH_SIZE = 50
+      BATCH_SIZE = 10
 
       CENSUS_MEMBER_RECORD = %w[
         employer_assigned_family_id
@@ -103,10 +103,12 @@ module BenefitSponsors
       end
 
       def save(form)
+        system_memory_usage
         @profile = form.profile
         @terminate_queue = {}
         @persist_queqe = {}
         form.census_records.each_with_index do |census_form, i|
+          system_memory_usage
           @index = i
           if census_form.employment_terminated_on.present?
             _insert_into_terms_queqe(census_form)
@@ -124,12 +126,18 @@ module BenefitSponsors
 
       def save_in_batches(form)
         @profile = form.profile
-        @terminate_queue = {}
-        @persist_queqe = {}
+        persisted = true
         form.census_records.each_slice(BATCH_SIZE).with_index do |batch, batch_index|
+          system_memory_usage
+          @terminate_queue = {}
+          @persist_queqe = {}
           process_batch(batch, batch_index)
+          unless persist_census_records(form) && terminate_census_records
+            persisted = false
+            break
+          end
         end
-        unless persist_census_records(form) && terminate_census_records
+        unless persisted
           form.redirection_url = "/benefit_sponsors/profiles/employers/employer_profiles/_employee_csv_upload_errors"
           return false
         end
@@ -255,7 +263,7 @@ module BenefitSponsors
 
       def assign_benefit_package_assignments(form, member)
         return unless form.benefit_group.present? || form.plan_year.present?
-        application = profile.benefit_applications.by_year(form.plan_year.to_i).first
+        application = profile.benefit_applications.by_year(2024).first
         return unless application.blank?
         benefit_package = application.benefit_packages.where(title: form.benefit_group).first
         return unless benefit_package.blank?
@@ -267,6 +275,19 @@ module BenefitSponsors
         end
         member.benefit_group_assignments << assignment
         member
+      end
+
+      def system_memory_usage
+        begin
+          rss_memory_in_kb = `ps -o rss= -p #{Process.pid}`.to_i
+          rss_memory_in_mb = rss_memory_in_kb / 1024.0
+
+          puts "RSS Memory (Current Process): #{rss_memory_in_mb} MB"
+          rss_memory_in_mb
+        rescue StandardError => e
+          puts "Unable to read memory information: #{e.message}"
+          0.0
+        end
       end
 
       def build_benefit_package_assignment(benefit_package)
