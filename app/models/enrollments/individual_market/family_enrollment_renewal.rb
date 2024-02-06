@@ -267,7 +267,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     return false if enrollment.is_health_enrollment?
     return false unless dental_renewal_product.allows_child_only_offering?
 
-    member.person.age_on(member.coverage_start_on) < 19 && member.person.age_on(renewal_coverage_start) >= 19
+    member.person.age_on(renewal_coverage_start) >= 19
   end
 
   # Find the dental product using renewal_product_id
@@ -279,6 +279,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   def eligible_to_get_covered?(member)
     valid_relations_for_pediatric_dental = ["self", "child", "ward", "foster_child", "adopted_child"]
     return true unless valid_relations_for_pediatric_dental.include?(member.family_member.relationship)
+    return true if member.family_member.relationship == "self" &&  member.person.age_on(member.coverage_start_on) > 19
 
     return false if turned_19_during_renewal_with_pediatric_only_qdp?(member)
 
