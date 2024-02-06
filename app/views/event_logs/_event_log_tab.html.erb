@@ -15,9 +15,11 @@
     <% end %>
 
     <div class="filters-container">
-      <div id="filters-toggle" class="filters-toggle">
-        <span class="glyphicon glyphicon-chevron-right" id="filters-arrow"></span>
-        <span class="filters-text"><%= l10n("event_log.filters") %></span>
+      <div>
+        <span id="filters-toggle" class="filters-toggle">
+          <span class="glyphicon glyphicon-chevron-right" id="filters-arrow"></span>
+          <span class="filters-text" ><%= l10n("event_log.filters") %></span>
+        </span>
       </div>
       <form class="filters" id="filters">
         <h2><%= l10n("event_log.eligibility") %> <%= l10n("Details") %></h2>
