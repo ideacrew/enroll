@@ -267,7 +267,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     return false if enrollment.is_health_enrollment?
     return false unless dental_renewal_product.allows_child_only_offering?
 
-    member.person.age_on(renewal_coverage_start) >= 19
+    member.person.age_on(member.coverage_start_on) < 19 && member.person.age_on(renewal_coverage_start) >= 19
   end
 
   # Find the dental product using renewal_product_id
