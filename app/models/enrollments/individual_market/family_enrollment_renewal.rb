@@ -277,7 +277,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   # rubocop:disable Style/RedundantReturn
   def eligible_to_get_covered?(member)
-    valid_relations_for_pediatric_dental = %w[child ward foster_child adopted_child]
+    valid_relations_for_pediatric_dental = ["self", "child", "ward", "foster_child", "adopted_child"]
     return true unless valid_relations_for_pediatric_dental.include?(member.family_member.relationship)
 
     return false if turned_19_during_renewal_with_pediatric_only_qdp?(member)
