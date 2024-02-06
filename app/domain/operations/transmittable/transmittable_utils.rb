@@ -34,6 +34,9 @@ module Operations
         ::Operations::Transmittable::CreateJob.new.call(job_params)
       end
 
+      # @param [Hash] opts The options to find or create a transmittable job
+      # @option opts [Hash] :job_params The params to find or create a job
+      # @return [Dry::Monads::Result]
       def find_or_create_job_by_job_id(job_params)
         Operations::Transmittable::FindOrCreateJob.new.call(job_params)
       end
@@ -135,11 +138,7 @@ module Operations
       def find_job_by_global_id(job_gid)
         job = GlobalID::Locator.locate(job_gid)
 
-        if job.present?
-          Success(job)
-        else
-          Failure("No Transmittable::Job found with given global ID: #{job_gid}")
-        end
+        job.present? ? Success(job) : Failure("No Transmittable::Job found with given global ID: #{job_gid}")
       end
 
       # Finds a Transmittable::Transmission based on its global identifier.
@@ -149,25 +148,25 @@ module Operations
       def find_transmission_by_global_id(transmission_gid)
         transmission = GlobalID::Locator.locate(transmission_gid)
 
-        if transmission.present?
-          Success(transmission)
-        else
-          Failure("No Transmittable::Transmission found with given global ID: #{transmission_gid}")
-        end
+        transmission.present? ? Success(transmission) : Failure("No Transmittable::Transmission found with given global ID: #{transmission_gid}")
       end
 
       # Finds a Transmittable::Transaction based on its global identifier.
-      #
       # @param [String] transaction_gid The global identifier of the Transmittable::Transaction.
       # @return [Dry::Monads::Result]
       def find_transaction_by_global_id(transaction_gid)
         transaction = GlobalID::Locator.locate(transaction_gid)
 
-        if transaction.present?
-          Success(transaction)
-        else
-          Failure("No Transmittable::Transaction found with given global ID: #{transaction_gid}")
-        end
+        transaction.present? ? Success(transaction) : Failure("No Transmittable::Transaction found with given global ID: #{transaction_gid}")
+      end
+
+      # Finds a subject based on its global identifier.
+      # @param [String] subject_gid The global identifier of the subject.
+      # @return [Dry::Monads::Result]
+      def find_subject_by_global_id(subject_gid)
+        subject = GlobalID::Locator.locate(subject_gid)
+
+        subject.present? ? Success(subject) : Failure("No subject found with given global ID: #{subject_gid}")
       end
     end
   end

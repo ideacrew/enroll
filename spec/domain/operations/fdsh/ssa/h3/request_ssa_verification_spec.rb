@@ -23,6 +23,21 @@ module Operations
       it "should pass" do
         expect(@result).to be_success
       end
+    end
+
+    context "when use_transmittable is true" do
+      before do
+        allow(EnrollRegistry[:ssa_h3].setting(:use_transmittable)).to receive(:item).and_return("true")
+        @result = described_class.new.call(person)
+      end
+
+      it "should pass" do
+        expect(@result).to be_success
+      end
+
+      it "should pass" do
+        expect(@result).to be_success
+      end
 
       it "should create a job" do
         job = ::Transmittable::Job.where(key: :ssa_verification).last

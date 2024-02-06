@@ -7,7 +7,7 @@ module Operations
   module Fdsh
     module Ssa
       module H3
-        # vlp initial request
+        # ssa initial request
         class RequestSsaVerification
           # primary request from fdsh gateway
 
@@ -16,14 +16,16 @@ module Operations
           # @param [ Hash ] params Applicant Attributes
           # @return [ BenefitMarkets::Entities::Applicant ] applicant Applicant
           def call(person)
-            values = yield build_transmittable_values(person)
-            @job = yield create_job(values)
-            transmission_params = yield construct_response_transmission_params(values)
-            @transmission = yield create_request_transmission(transmission_params, @job)
-            transaction_params = yield construct_response_transaction_params(values, person)
-            @transaction = yield create_request_transaction(transaction_params, @job)
-            _payload_entity = yield build_and_validate_payload_entity(person)
-            event  = yield build_event
+            if EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == "true"
+              values = yield build_transmittable_values(person)
+              @job = yield create_job(values)
+              transmission_params = yield construct_response_transmission_params(values)
+              @transmission = yield create_request_transmission(transmission_params, @job)
+              transaction_params = yield construct_response_transaction_params(values, person)
+              @transaction = yield create_request_transaction(transaction_params, @job)
+            end
+            payload_entity = yield build_and_validate_payload_entity(person)
+            event  = yield build_event(payload_entity&.to_h)
             result = yield publish(event)
 
             Success(result)
@@ -61,10 +63,11 @@ module Operations
 
           def build_and_validate_payload_entity(person)
             result = Operations::Fdsh::BuildAndValidatePersonPayload.new.call(person, :ssa)
+            return result unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == "true"
             if result.success?
               @transaction.json_payload = result.value!.to_h
               @transaction.save
-              @transaction.json_payload ? Success(@transaction) : Failure("Unable to save transaction with payload")
+              @transaction.json_payload ? Success(@transaction.json_payload) : Failure("Unable to save transaction with payload")
             else
               add_errors("Unable to transform payload",
                          :build_and_validate_payload_entity,
@@ -83,18 +86,18 @@ module Operations
             result
           end
 
-          def build_event
-            payload = @transaction.json_payload
-            event('events.fdsh.ssa.h3.ssa_verification_requested', attributes: payload, headers: { job_id: @job.job_id,
-                                                                                                   correlation_id: @transaction.transaction_id,
+          def build_event(payload)
+            event('events.fdsh.ssa.h3.ssa_verification_requested', attributes: payload, headers: { job_id: @job&.job_id,
+                                                                                                   correlation_id: payload[:hbx_id],
                                                                                                    payload_type: EnrollRegistry[:ssa_h3].setting(:payload_type).item })
           end
 
           def publish(event)
             event.publish
-            update_status("successfully sent request to fdsh_gateway", :transmitted, { job: @job })
-            update_status("successfully sent request to fdsh_gateway", :succeeded, { transmission: @transmission, transaction: @transaction })
-
+            if EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == "true"
+              update_status("successfully sent request to fdsh_gateway", :transmitted, { job: @job })
+              update_status("successfully sent request to fdsh_gateway", :succeeded, { transmission: @transmission, transaction: @transaction })
+            end
             Success("Successfully published the payload to fdsh_gateway")
           end
         end
