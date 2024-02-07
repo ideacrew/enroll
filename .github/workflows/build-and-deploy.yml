@@ -92,6 +92,9 @@ jobs:
           --health-retries 5
     steps:
       - uses: actions/checkout@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
       
       - name: Add git HEAD info to docker image
         run: |
