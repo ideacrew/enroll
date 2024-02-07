@@ -320,7 +320,6 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
     } else {
       $(this).closest('.mutliSelect').find('input[value="all"]').removeClass('partial-all')
     }
-
     label.text(checked_count + " Selected");
   }
 });
@@ -330,10 +329,8 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
     event.preventDefault();
 
     // reset visibility before running a new search
-    $('#event-log-table tbody tr.primary-row').each(function( index ) {
+    $('#event-log-table tbody tr').each(function( index ) {
       $(this).show();
-    });
-    $('#event-log-table tbody tr.detail-row').each(function( index ) {
       $(this).removeClass("hidden-by-filters");
     });
 
@@ -509,8 +506,6 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
     $('.fake-select-label').text("All");
     $('#event-log-table tbody tr').each(function( index ) {
       $(this).removeClass("hidden-by-filters");
-    });
-    $('#event-log-table tbody tr.primary-row').each(function( index ) {
       $(this).show();
     });
   });
