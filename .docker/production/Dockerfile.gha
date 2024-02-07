@@ -191,7 +191,7 @@ ENV ENROLL_DB_PORT=27017
 ENV ENROLL_DB_NAME=enroll_production
 ENV RABBITMQ_URL=amqp://${HOSTNAME}:5672
 ENV RABBITMQ_HOST=amqp://${HOSTNAME}
-
+ENV NOKOGIRI_USE_SYSTEM_LIBRARIES=1
 
 # The CLIENT variable is required to build an image specific to the client
 ARG CLIENT
