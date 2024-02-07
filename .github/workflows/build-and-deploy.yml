@@ -93,9 +93,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Add git HEAD info to docker image
         run: |
           git show --quiet HEAD > release.txt
@@ -158,8 +155,6 @@ jobs:
           network: host
           # send to public registry if not a pull request
           push: ${{ github.event_name != 'pull_request' }}
-          # create local image (for scanning) if it is a pull request
-          load: ${{ github.event_name == 'pull_request' }}
           tags: |
             ${{ format('{0}/{1}-{2}', needs.prep.outputs.registryEcr, needs.prep.outputs.taggedImage, matrix.client) }}
             ${{ format('{0}/{1}-{2}', needs.prep.outputs.registryEcr, needs.prep.outputs.latestTag, matrix.client) }}
