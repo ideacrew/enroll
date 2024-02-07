@@ -12,7 +12,6 @@ class SamlController < ApplicationController
     response.settings = saml_settings
 
     relay_state = params['RelayState'] || response.attributes['relay_state']
-    sign_out current_user if current_user.present?
 
     if response.is_valid? && response.name_id.present?
       username = response.name_id.downcase
