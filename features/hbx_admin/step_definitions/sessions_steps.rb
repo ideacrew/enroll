@@ -4,10 +4,6 @@ Given(/^the prevent_concurrent_sessions feature is (.*)?/) do |is_enabled|
   is_enabled == "enabled" ? enable_feature(:prevent_concurrent_sessions) : disable_feature(:prevent_concurrent_sessions)
 end
 
-Given(/^the preferred_user_access feature is (.*)?/) do |is_enabled|
-  is_enabled == "enabled" ? enable_feature(:preferred_user_access) : disable_feature(:preferred_user_access)
-end
-
 Given(/^(.*) logs in on browser (.*)?$/) do |_user, session_id|
   using_session(session_id) do
     person = people["Hbx Admin"] || people["Broker Assisted"]
@@ -30,9 +26,9 @@ end
 Then(/^(.*) on browser (.*) should (.*) the logged out due to concurrent session message?/) do |_user, session_id, visibility|
   using_session(session_id) do
     if visibility == "see"
-      expect(page).to have_content(l10n('devise.sessions.signed_out_concurrent_session'))
+      expect(page).to have_content(l10n('devise.failure.session_limited'))
     else
-      expect(page).not_to have_content(l10n('devise.sessions.signed_out_concurrent_session'))
+      expect(page).not_to have_content(l10n('devise.failure.session_limited'))
     end
   end
 end

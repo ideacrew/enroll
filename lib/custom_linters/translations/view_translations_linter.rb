@@ -94,7 +94,7 @@ class ViewTranslationsLinter
       # removes leading and ending extra blankspace, and blank strings, and downcase, returning an array like:
       # ["list all attributes", "success"]
       #  Further reading: https://stackoverflow.com/a/54405741/5331859
-      potential_substrings_no_html_tags = ActionView::Base.full_sanitizer.sanitize(stringified_view).split("\n")
+      potential_substrings_no_html_tags = ActionView::Base.full_sanitizer.sanitize(stringified_view.gsub(/<%.*?%>/, "")).split("\n")
       return [] if potential_substrings_no_html_tags.blank?
       potential_substrings_words_only = potential_substrings_no_html_tags&.reject(&:blank?)
       return [] if potential_substrings_words_only.blank?

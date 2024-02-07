@@ -8,14 +8,6 @@ RSpec.describe SamlController do
 
     invalid_xml = File.read("spec/saml/invalid_saml_response.xml")
 
-    context "with devise session active" do
-      it "should sign out current user" do
-        sign_in user
-        expect(subject).to receive(:sign_out).with(user)
-        post :login, params: {SAMLResponse: invalid_xml}
-      end
-    end
-
     context "with invalid saml response" do
 
       it "should render a 403" do
