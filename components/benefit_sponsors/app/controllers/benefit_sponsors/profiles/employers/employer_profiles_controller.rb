@@ -58,6 +58,7 @@ module BenefitSponsors
           when 'inbox'
               # do something
           when 'event_log_shop'
+            authorize @employer_profile, :can_view_audit_log?
             @event_logs = EventLogs::MonitoredEvent.where(subject_hbx_id: @employer_profile.hbx_id)&.order(:event_time.desc)&.map(&:eligibility_details)
           else
             else_block

@@ -91,5 +91,11 @@ module BenefitSponsors
     def can_modify_employer?
       user.has_hbx_staff_role? && user.person.hbx_staff_role.permission.modify_employer
     end
+
+    def can_view_audit_log?
+      return false if user.blank? || user.person.blank?
+
+      user.has_hbx_staff_role? && user.person.hbx_staff_role.permission.can_view_audit_log
+    end
   end
 end
