@@ -83,11 +83,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
 
       context 'for a terminated enrollment' do
         before do
-          # binding.pry
-          # TODO: REMOVE
-          # enrollment.eligible_child_care_subsidy = Money.new(100)
           @reinstated_enrollment = subject.call({hbx_enrollment: enrollment, options: {benefit_package: new_bga.benefit_package}}).success
-          # binding.pry
         end
 
         it 'should build reinstated enrollment' do
