@@ -70,3 +70,8 @@ Feature: UI validations for Email, Username, SSN already in use, and weak Passwo
     When Individual visits the Consumer portal during open enrollment
     When Individual creates a new HBX account with a weak password
     Then Individual should see a minimum password length of 8
+
+  Scenario: Password field tooltip is displayed on focus and strong password length feature is disabled
+    Given the strong password length feature is disabled
+    When Individual focus on the password field
+    Then Individual should see the password tooltip with text minimum characters 8

@@ -32,7 +32,7 @@ emailTooltip() {
 }
 
 passwordTooltip() {
-  let passwordLength = $('#user_password').minLength;
+  let passwordLength = document.getElementById("user_password").minLength;
   const passwordHelper =
     `<p>Your password must:</p>
      <ul class="list-group pwHelper">
@@ -61,7 +61,7 @@ validateInput() {
   // Password text must be present
   if (this.passwordFieldTarget.value.length > 0 && document.querySelector('.pwHelper')) {
     const value = this.passwordFieldTarget.value;
-    const minLength = $('#user_password').minLength;
+    const minLength = document.getElementById("user_password").minLength;
     this.validateLength(value, minLength);
     this.validateNumber(value);
     this.validateSpecialCharacters(value);
