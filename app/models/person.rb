@@ -26,6 +26,9 @@ class Person
   # verification history tracking
   include Mongoid::History::Trackable
 
+  # transmittable subject
+  include Transmittable::Subject
+
   track_history :on => [:first_name,
                         :middle_name,
                         :last_name,
