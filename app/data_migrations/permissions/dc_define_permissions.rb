@@ -129,6 +129,7 @@ class DcDefinePermissions < MigrationTask
     hbx_admin_can_edit_osse_eligibility
     hbx_admin_can_view_notice_templates
     hbx_admin_can_edit_notice_templates
+    hbx_admin_can_view_audit_log
   end
 
   def build_test_roles
@@ -179,6 +180,11 @@ class DcDefinePermissions < MigrationTask
     Permission.hbx_staff.update_attributes!(can_edit_osse_eligibility: true)
     Permission.super_admin.update_attributes!(can_edit_osse_eligibility: true)
     Permission.hbx_tier3.update_attributes!(can_edit_osse_eligibility: true)
+  end
+
+  def hbx_admin_can_view_audit_log
+    Permission.super_admin.update_attributes!(can_view_audit_log: true)
+    Permission.hbx_tier3.update_attributes!(can_view_audit_log: true)
   end
 
   def hbx_admin_can_update_ssn
