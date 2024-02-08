@@ -129,6 +129,19 @@ RSpec.shared_context "setup family initial and renewal enrollments data", :share
     prod
   end
 
+  let!(:current_dental_product) do
+    prod =
+    FactoryBot.create(:benefit_markets_products_dental_products_dental_product,
+      :with_renewal_product,
+      application_period: application_period,
+      product_package_kinds: [:single_product],
+      service_area: service_area,
+      renewal_service_area: renewal_service_area,
+      metal_level_kind: :dental
+    )
+    prod
+  end
+
   let(:premium_table)        { build(:benefit_markets_products_premium_table, effective_period: application_period, rating_area: rating_area) }
 
   let!(:renewal_product) do

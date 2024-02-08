@@ -270,9 +270,61 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
     end
 
+    describe '#eligible_to_get_covered?' do
+      before do
+        allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(2023, 11, 1))
+        date = TimeKeeper.date_of_record
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:atleast_one_silver_plan_donot_cover_pediatric_dental_cost).and_return(true)
+        allow(EnrollRegistry[:atleast_one_silver_plan_donot_cover_pediatric_dental_cost].settings(date.next_year.year.to_s.to_sym)).to receive(:item).and_return(true)
+        allow(enrollment_renewal).to receive(:dental_renewal_product).and_return(current_dental_product)
+        allow(current_dental_product).to receive(:allows_child_only_offering?).and_return(true)
+      end
+
+      let!(:enrollment_renewal){ Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new}
+      let(:dob_date) {TimeKeeper.date_of_record - value.years }
+      let!(:primary_dob_update) { primary.update_attributes(dob: dob_date) }
+      let(:member) do
+        en_member = enrollment.hbx_enrollment_members.first
+        enrollment.update_attributes(coverage_kind: 'dental', product: current_dental_product)
+        en_member.update_attributes(coverage_start_on: TimeKeeper.date_of_record.beginning_of_year)
+        en_member
+      end
+
+      subject do
+        enrollment_renewal.enrollment = enrollment
+        enrollment_renewal.assisted = false
+        enrollment_renewal.aptc_values = {}
+        enrollment_renewal.renewal_coverage_start = TimeKeeper.date_of_record.next_year.beginning_of_year
+        enrollment_renewal
+      end
+
+      context 'where member age is less than 19 years old' do
+        let(:value) { 18 }
+        it 'member is not eligible to get covered' do
+          expect(subject.eligible_to_get_covered?(member)).to be_truthy
+        end
+      end
+
+      context 'where member age is 19 years old' do
+        let(:value) { 19 }
+        it 'member is not eligible to get covered' do
+          expect(subject.eligible_to_get_covered?(member)).to be_falsey
+        end
+      end
+
+      context 'where member age is greater than 19 years old' do
+        let(:value) { 20 }
+        it 'member is eligible to get covered' do
+          expect(subject.eligible_to_get_covered?(member)).to be_truthy
+        end
+      end
+    end
+
     after :all do
       file_path = "#{Rails.root}/log/family_enrollment_renewal_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log"
       FileUtils.rm_rf(file_path) if File.file?(file_path)
+      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.today)
     end
   end
 end

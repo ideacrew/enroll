@@ -279,10 +279,9 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   def eligible_to_get_covered?(member)
     valid_relations_for_pediatric_dental = ["self", "child", "ward", "foster_child", "adopted_child"]
     return true unless valid_relations_for_pediatric_dental.include?(member.family_member.relationship)
-    return true if member.family_member.relationship == "self" && member.person.age_on(member.coverage_start_on) > 19
+    return true if member.family_member.relationship == "self" && member.person.age_on(member.coverage_start_on) >= 19
 
     return false if turned_19_during_renewal_with_pediatric_only_qdp?(member)
-
     return true if member.family_member.age_off_excluded
 
     if EnrollRegistry.feature_enabled?(:age_off_relaxed_eligibility)
