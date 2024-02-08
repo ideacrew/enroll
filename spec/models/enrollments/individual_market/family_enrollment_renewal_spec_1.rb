@@ -299,21 +299,21 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         enrollment_renewal
       end
 
-      context 'where member age is less than 19 years old' do
+      context 'when member age is less than 19 years old' do
         let(:value) { 18 }
-        it 'member is not eligible to get covered' do
+        it 'member is eligible to get covered' do
           expect(subject.eligible_to_get_covered?(member)).to be_truthy
         end
       end
 
-      context 'where member age is 19 years old' do
+      context 'when member age is 19 years old' do
         let(:value) { 19 }
         it 'member is not eligible to get covered' do
           expect(subject.eligible_to_get_covered?(member)).to be_falsey
         end
       end
 
-      context 'where member age is greater than 19 years old' do
+      context 'when member age is greater than 19 years old' do
         let(:value) { 20 }
         it 'member is eligible to get covered' do
           expect(subject.eligible_to_get_covered?(member)).to be_truthy
