@@ -83,7 +83,11 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
 
       context 'for a terminated enrollment' do
         before do
+          # binding.pry
+          # TODO: REMOVE
+          # enrollment.eligible_child_care_subsidy = Money.new(100)
           @reinstated_enrollment = subject.call({hbx_enrollment: enrollment, options: {benefit_package: new_bga.benefit_package}}).success
+          # binding.pry
         end
 
         it 'should build reinstated enrollment' do
@@ -117,6 +121,17 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
           expect(enrollment_member.coverage_start_on).to eq enrollment.effective_on
           expect(enrollment_member.eligibility_date).to eq @reinstated_enrollment.effective_on
           expect(@reinstated_enrollment.hbx_enrollment_members.size).to eq enrollment.hbx_enrollment_members.size
+        end
+      end
+
+      context 'for a terminated HC4CC enrollment' do
+        before do
+          enrollment.eligible_child_care_subsidy = Money.new(15000)
+          @reinstated_enrollment = subject.call({hbx_enrollment: enrollment, options: {benefit_package: new_bga.benefit_package}}).success
+        end
+
+        it 'should reapply childcare subsidy for reinstated HC4CC enrollment' do
+          expect(@reinstated_enrollment.eligible_child_care_subsidy.to_s).to eq "150.00"
         end
       end
 

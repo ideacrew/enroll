@@ -46,6 +46,7 @@ module Entities
       attribute :applied_aptc_amount,                  Types::Strict::Float.optional.meta(omittable: true)
       attribute :consumer_role_id,                     Types::Bson.optional.meta(omittable: true)
       attribute :resident_role_id,                     Types::Bson.optional.meta(omittable: true)
+      attribute :eligible_child_care_subsidy,          Types::Strict::Float.optional.meta(omittable: true)
       # SHOP fields
       attribute :employee_role_id,                     Types::Bson.optional.meta(omittable: true)
       attribute :benefit_group_id,                     Types::Bson.optional.meta(omittable: true)
