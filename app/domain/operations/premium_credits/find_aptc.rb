@@ -161,7 +161,7 @@ module Operations
         coinciding_enrollments.reduce(0.0) do |sum, previous_enrollment|
           th_enrollment = TaxHouseholdEnrollment.where(enrollment_id: previous_enrollment.id, tax_household_id: aptc_grant.tax_household_id).first
           next sum if th_enrollment.blank?
-          value = round_down_float_two_decimals(th_enrollment.available_max_aptc)
+          value = round_down_float_two_decimals(th_enrollment.available_max_aptc || 0.0)
 
           sum += (value > 0.0 ? value : 0.0)
           sum

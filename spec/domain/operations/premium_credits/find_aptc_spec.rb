@@ -601,6 +601,47 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
               expect(result.value!).to eq 1045.00
             end
           end
+
+          context 'when primary is enrolling with a coinciding dependent enrollment with nil max aptc value' do
+            let(:benchmark_premium) { primary_bp }
+
+            let!(:prev_enrollment) do
+              FactoryBot.create(:hbx_enrollment,
+                                :individual_shopping,
+                                :with_silver_health_product,
+                                :with_enrollment_members,
+                                elected_aptc_pct: 1.0,
+                                enrollment_members: dependents,
+                                family: family,
+                                applied_aptc_amount: 0.00,
+                                effective_on: TimeKeeper.date_of_record.beginning_of_month,
+                                aasm_state: 'coverage_selected')
+            end
+
+            let!(:tax_household_enrollment) do
+              TaxHouseholdEnrollment.create(
+                enrollment_id: prev_enrollment.id,
+                tax_household_id: aptc_grant.tax_household_id,
+                household_benchmark_ehb_premium: 320.00,
+                available_max_aptc: nil
+              )
+            end
+
+            let!(:hbx_enrollment) do
+              FactoryBot.create(:hbx_enrollment,
+                                :individual_shopping,
+                                :with_silver_health_product,
+                                :with_enrollment_members,
+                                effective_on: TimeKeeper.date_of_record.beginning_of_month,
+                                enrollment_members: [primary_applicant],
+                                family: family)
+            end
+
+            it 'returns difference of benchmark_premium and remaining monthly_expected_contribution that was met from prev enrollment' do
+              expect(result.success?).to eq true
+              expect(result.value!).to eq 0.0
+            end
+          end
         end
 
         context 'three members enrolling in different plans' do
