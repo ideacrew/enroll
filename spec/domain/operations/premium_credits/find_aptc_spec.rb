@@ -639,7 +639,7 @@ RSpec.describe Operations::PremiumCredits::FindAptc, dbclean: :after_each do
 
             it 'returns difference of benchmark_premium and remaining monthly_expected_contribution that was met from prev enrollment' do
               expect(result.success?).to eq true
-              expect(result.value!).to eq 0.0
+              expect(result.value!).to eq 1045.00
             end
           end
         end
