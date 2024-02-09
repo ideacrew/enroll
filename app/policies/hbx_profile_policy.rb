@@ -209,6 +209,12 @@ class HbxProfilePolicy < ApplicationPolicy
     true if role
   end
 
+  def can_view_audit_log?
+    role = user_hbx_staff_role
+    return false unless role
+    role.permission.can_view_audit_log
+  end
+
   private
 
   def user_hbx_staff_role

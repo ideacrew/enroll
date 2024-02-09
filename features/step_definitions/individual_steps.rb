@@ -504,6 +504,14 @@ When(/I click on none of the situations listed above apply checkbox$/) do
   expect(page).to have_content 'To enroll before open enrollment'
 end
 
+When(/Individual focus on the password field$/) do
+  page.execute_script("document.getElementById('user_password').focus()")
+end
+
+Then(/^Individual should see the password tooltip with text minimum characters (.+)$/) do |length|
+  expect(page).to have_content("Be at least #{length} characters")
+end
+
 And(/I click on back to my account button$/) do
   expect(page).to have_content "To enroll before open enrollment, you must qualify for a special enrollment period"
   find('.interaction-click-control-back-to-my-account').click

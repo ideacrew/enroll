@@ -9,20 +9,37 @@ module Operations
       module H3
         # This class will update the person and consumer role based on response
         class SsaVerificationResponseProcessor
-          send(:include, Dry::Monads[:result, :do, :try])
-          include EventSource::Command
+          include ::Operations::Transmittable::TransmittableUtils
 
           def call(params)
-            person = yield find_person(params[:person_hbx_id])
+            transmittable_objects = yield find_transmittable(params)
+            person = yield find_person(params[:person_hbx_id], transmittable_objects[:subject])
             consumer_role = yield store_response_and_get_consumer_role(person, params[:response])
             updated_consumer_role = yield update_consumer_role(consumer_role, params[:response])
-
+            _updated_transmittable_objects = yield record_results(transmittable_objects)
             Success(updated_consumer_role)
           end
 
           private
 
-          def find_person(person_hbx_id)
+          def find_transmittable(params)
+            return Success({}) unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == "true"
+            person = find_person(params[:person_hbx_id], nil)
+            subject = person.value!&.to_global_id&.uri if person.success?
+            result = Operations::Transmittable::GenerateResponseObjects.new.call({job_id: params[:metadata]&.job_id,
+                                                                                  key: :ssa_verification_response,
+                                                                                  payload: params[:response],
+                                                                                  correlation_id: params[:person_hbx_id],
+                                                                                  subject_gid: subject})
+            return result if result.success?
+            add_errors(:find_transmittable, "Failed to create response objects due to #{result.failure}", { job: @job, transmission: @transmission })
+            status_result = update_status(result.failure, :failed, { job: @job })
+            return status_result if status_result.failure?
+            result
+          end
+
+          def find_person(person_hbx_id, subject)
+            return Success(subject) if subject
             person = Person.where(hbx_id: person_hbx_id).first
             person.present? ? Success(person) : Failure("person not found with hbx_id: #{person_hbx_id}")
           end
@@ -74,6 +91,11 @@ module Operations
 
             consumer_role.save
             Success(consumer_role)
+          end
+
+          def record_results(transmittable_objects)
+            return Success() unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == "true"
+            update_status("Processed SSA response", :succeeded, transmittable_objects.except(:subject))
           end
         end
       end
