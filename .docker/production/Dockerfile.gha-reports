@@ -11,6 +11,12 @@ FROM public.ecr.aws/ideacrew/enroll:${BRANCH}-${COMMIT_SHA}-${CLIENT}
 # Switch back to root to install system libraries
 USER root
 
+RUN git clone https://github.com/nvm-sh/nvm.git ~/.nvm
+RUN cd ~/.nvm && . nvm.sh && nvm install 18.19.0 && nvm use 18 && nvm alias default 18
+RUN echo 'export NVM_DIR="/home/nginx/.nvm"' > ~/.bashrc
+RUN echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> ~/.bashrc
+RUN source ~/.bashrc
+
 RUN apt-get update \
     && apt-get -yq dist-upgrade \
     && apt-get install -y \
