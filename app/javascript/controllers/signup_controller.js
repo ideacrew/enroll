@@ -329,7 +329,6 @@ isEmail(email) {
 }
 
 validatePassword() {
-    debugger
   let createButton = document.querySelector('.create-account-btn');
   let pwError = document.getElementById('pwError');
   let pwErrorMatch = document.getElementById('pwErrorMatch');
