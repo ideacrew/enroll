@@ -27,7 +27,7 @@ module Operations
 
     context "when use_transmittable is true" do
       before do
-        allow(EnrollRegistry[:ssa_h3].setting(:use_transmittable)).to receive(:item).and_return("true")
+        allow(EnrollRegistry[:ssa_h3].setting(:use_transmittable)).to receive(:item).and_return(true)
         @result = described_class.new.call(person)
       end
 
