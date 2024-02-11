@@ -11,7 +11,7 @@ FROM public.ecr.aws/ideacrew/enroll:${BRANCH}-${COMMIT_SHA}-${CLIENT}
 # Switch back to root to install system libraries
 USER root
 
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+SHELL ["/bin/bash", "-c"]
 RUN apt-get update \
     && apt-get -yq dist-upgrade \
     && apt-get install -y \
