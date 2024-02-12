@@ -55,6 +55,8 @@ module WellsFargo
           )
 
           req_options = {
+            open_timeout: 30,
+            ssl_timeout: 30,
             use_ssl: uri.scheme == "https"
           }
 
