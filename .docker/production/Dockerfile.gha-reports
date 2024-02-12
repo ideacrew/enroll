@@ -19,7 +19,8 @@ RUN apt-get update \
 
 RUN touch ~/.bashrc
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-RUN source ~/.bashrc && nvm install 18.19.0 && \
+ENV BASH_ENV=~/.bashrc 
+RUN nvm install 18.19.0 && \
     nvm use 18 && nvm alias default 18 && \
     npm install -g npm@10.4.0 && npm install -g secure-spreadsheet
 
