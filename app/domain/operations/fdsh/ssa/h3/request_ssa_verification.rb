@@ -16,7 +16,7 @@ module Operations
           # @param [ Hash ] params Applicant Attributes
           # @return [ BenefitMarkets::Entities::Applicant ] applicant Applicant
           def call(person)
-            if EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == "true"
+            if EnrollRegistry[:ssa_h3].setting(:use_transmittable).item
               values = yield build_transmittable_values(person)
               @job = yield create_job(values)
               transmission_params = yield construct_response_transmission_params(values)
@@ -63,7 +63,7 @@ module Operations
 
           def build_and_validate_payload_entity(person)
             result = Operations::Fdsh::BuildAndValidatePersonPayload.new.call(person, :ssa)
-            return result unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == "true"
+            return result unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item
             if result.success?
               @transaction.json_payload = result.value!.to_h
               @transaction.save
@@ -94,7 +94,7 @@ module Operations
 
           def publish(event)
             event.publish
-            if EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == "true"
+            if EnrollRegistry[:ssa_h3].setting(:use_transmittable).item
               update_status("successfully sent request to fdsh_gateway", :transmitted, { job: @job })
               update_status("successfully sent request to fdsh_gateway", :succeeded, { transmission: @transmission, transaction: @transaction })
             end
