@@ -16,7 +16,6 @@ module BenefitSponsors
         ]
         before_action :load_group_enrollments, only: [:coverage_reports], if: :is_format_csv?
         before_action :check_and_download_invoice, only: [:download_invoice, :show_invoice]
-        before_action :wells_fargo_sso, only: [:show]
         before_action :set_flash_by_announcement, only: :show
         layout "two_column", except: [:new]
 
@@ -66,6 +65,7 @@ module BenefitSponsors
         end
 
         def accounts_block
+          wells_fargo_sso
           collect_and_sort_invoices(params[:sort_order])
           @benefit_sponsorship = @employer_profile.organization.active_benefit_sponsorship
           @benefit_sponsorship_account = @benefit_sponsorship.benefit_sponsorship_account

@@ -207,6 +207,32 @@ module BenefitSponsors
         end
       end
 
+      context 'employee tab' do
+        before do
+          allow(::WellsFargo::BillPay::SingleSignOn).to receive(:new).and_return(double(url: "http://example.com", token: "token"))
+          get :show, params: {id: benefit_sponsor.profiles.first.id.to_s, tab: 'employees'}
+          allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
+        end
+
+        it "does not create a WellsFargoSSO instance" do
+          expect(assigns(:wells_fargo_sso)).to be_nil
+          expect(assigns(:wf_url)).to be_nil
+        end
+      end
+
+      context 'accounts tab' do
+        before do
+          allow(::WellsFargo::BillPay::SingleSignOn).to receive(:new).and_return(double(url: "http://example.com", token: "token"))
+          get :show, params: {id: benefit_sponsor.profiles.first.id.to_s, tab: 'accounts'}
+          allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
+        end
+
+        it "creates a WellsFargoSSO instance and sets @wf_url" do
+          expect(assigns(:wells_fargo_sso)).to be_present
+          expect(assigns(:wf_url)).to eq("http://example.com")
+        end
+      end
+
     end
 
 
