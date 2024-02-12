@@ -173,6 +173,8 @@ class Person
   embeds_many :documents, as: :documentable
   embeds_many :verification_types, cascade_callbacks: true, validate: true
 
+  embeds_many :demographics, as: :demographable, class_name: 'Demographics'
+
   attr_accessor :effective_date, :skip_person_updated_event_callback, :is_consumer_role, :is_resident_role
 
   accepts_nested_attributes_for :consumer_role, :resident_role, :broker_role, :hbx_staff_role,
