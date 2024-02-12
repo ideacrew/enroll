@@ -11,13 +11,20 @@ FROM public.ecr.aws/ideacrew/enroll:${BRANCH}-${COMMIT_SHA}-${CLIENT}
 # Switch back to root to install system libraries
 USER root
 
+SHELL ["/bin/bash", "-c"]
 RUN apt-get update \
     && apt-get -yq dist-upgrade \
     && apt-get install -y \
       openssh-client lftp
 
+RUN touch ~/.bashrc
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+ENV BASH_ENV=~/.bashrc
+RUN nvm install 18.19.0 && \
+    nvm use 18 && nvm alias default 18 && \
+    npm install -g npm@10.4.0 && npm install -g secure-spreadsheet
+
 RUN curl https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o "awscliv2.zip" && unzip awscliv2.zip && ./aws/install && rm awscliv2.zip
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.22.10/bin/linux/amd64/kubectl
 RUN chmod 744 ./kubectl
 RUN mv ./kubectl /usr/local/bin/kubectl
-RUN npm install -g secure-spreadsheet
