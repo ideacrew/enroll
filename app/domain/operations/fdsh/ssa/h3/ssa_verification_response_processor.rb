@@ -23,7 +23,7 @@ module Operations
           private
 
           def find_transmittable(params)
-            return Success({}) unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == "true"
+            return Success({}) unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item
             person = find_person(params[:person_hbx_id], nil)
             subject = person.value!&.to_global_id&.uri if person.success?
             result = Operations::Transmittable::GenerateResponseObjects.new.call({job_id: params[:metadata]&.job_id,
@@ -94,7 +94,7 @@ module Operations
           end
 
           def record_results(transmittable_objects)
-            return Success() unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item == "true"
+            return Success() unless EnrollRegistry[:ssa_h3].setting(:use_transmittable).item
             update_status("Processed SSA response", :succeeded, transmittable_objects.except(:subject))
           end
         end
