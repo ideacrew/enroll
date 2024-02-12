@@ -15,9 +15,11 @@
     <% end %>
 
     <div class="filters-container">
-      <div id="filters-toggle" class="filters-toggle">
-        <span class="glyphicon glyphicon-chevron-right" id="filters-arrow"></span>
-        <span class="filters-text"><%= l10n("event_log.filters") %></span>
+      <div>
+        <span id="filters-toggle" class="filters-toggle">
+          <span class="glyphicon glyphicon-chevron-right" id="filters-arrow"></span>
+          <span class="filters-text" ><%= l10n("event_log.filters") %></span>
+        </span>
       </div>
       <form class="filters" id="filters">
         <h2><%= l10n("event_log.eligibility") %> <%= l10n("Details") %></h2>
@@ -266,7 +268,7 @@
 
   $('.primary-row').click(function(){
     $(this).find('.glyphicon-chevron-right, .glyphicon-chevron-down').toggleClass('glyphicon-chevron-right glyphicon-chevron-down')
-    $(this).nextAll('tr').each( function() {
+    $(this).nextAll('tr:not(.hidden-by-filters)').each( function() {
       if ($(this).hasClass('primary-row')) {
         return false;
       }
@@ -318,7 +320,6 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
     } else {
       $(this).closest('.mutliSelect').find('input[value="all"]').removeClass('partial-all')
     }
-
     label.text(checked_count + " Selected");
   }
 });
@@ -328,8 +329,9 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
     event.preventDefault();
 
     // reset visibility before running a new search
-    $('#event-log-table tbody tr.primary-row').each(function( index ) {
+    $('#event-log-table tbody tr').each(function( index ) {
       $(this).show();
+      $(this).removeClass("hidden-by-filters");
     });
 
     var subjects = [],
@@ -413,16 +415,11 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
     $('tr.primary-row').each(function( index ) {
       var row = $(this).prop('id');
       var row_index = visible_rows.indexOf(row);
-      var accounts = []
       var action_dates = []
-      $('td.user_id').each(function( index ) {
-        if ($(this).closest('tr').prop('id') === row) {
-          accounts.push($(this).prop('id').toUpperCase());
-          accounts.push($(this).text().toUpperCase());
-        }
-      });
+      var detail_rows = []
       $('td.event-time').each(function( index ) {
         if ($(this).closest('tr').prop('id') === row) {
+          detail_rows.push($(this).closest('tr'));
           action_dates.push(new Date($(this).text()).getTime());
         }
       });
@@ -430,8 +427,17 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
       if ($('#user-id').val()) {
         var row_index = visible_rows.indexOf(row);
         var value = $('#user-id').val().toUpperCase();
-        var value_index = accounts.indexOf(value);
-        if (value_index === -1 && row_index !== -1) {
+        var ok_rows = 0;
+        $.each( detail_rows, function( i, date ){
+          var user_id = $(this).find('td.user_id').prop('id').toUpperCase()
+          var user_email = $(this).find('td.user_id').text().toUpperCase()
+          if (user_id === value || user_email === value) {
+            ok_rows += 1
+          } else {
+            $(this).hide().addClass("hidden-by-filters");
+          }
+        });
+        if (ok_rows === 0 && row_index !== -1) {
           visible_rows.splice( row_index, 1 );
         }
       }
@@ -446,6 +452,8 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         $.each( action_dates, function( i, date ){
           if (start.getTime() < date) {
             ok_rows += 1
+          } else {
+            detail_rows[i].hide().addClass("hidden-by-filters");
           }
         });
         if (ok_rows === 0 && row_index !== -1) {
@@ -463,6 +471,8 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         $.each( action_dates, function( i, date ){
           if (end.getTime() > date) {
             ok_rows += 1
+          } else {
+            detail_rows[i].hide().addClass("hidden-by-filters");
           }
         });
         if (ok_rows === 0 && row_index !== -1) {
@@ -496,8 +506,6 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
     $('.fake-select-label').text("All");
     $('#event-log-table tbody tr').each(function( index ) {
       $(this).removeClass("hidden-by-filters");
-    });
-    $('#event-log-table tbody tr.primary-row').each(function( index ) {
       $(this).show();
     });
   });

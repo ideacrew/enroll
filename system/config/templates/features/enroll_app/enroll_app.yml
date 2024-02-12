@@ -589,7 +589,7 @@ registry:
           - key: :cut_off_age
             item: 26
           - key: :relationship_kinds
-            item: ['child', 'ward', 'foster_child', 'adopted_child']
+            item: ['self', 'child', 'ward', 'foster_child', 'adopted_child']
       - key: :age_off_relaxed_eligibility
         item: Operations::AgeOffRelaxedEligibility.new
         is_enabled: true
@@ -885,6 +885,3 @@ registry:
       - key: :strong_password_length
         item: :strong_password_length
         is_enabled: <%= ENV['STRONG_PASSWORD_LENGTH_IS_ENABLED'] || false %>
-      - key: :preferred_user_access
-        item: :preferred_user_access
-        is_enabled: <%= ENV['PREFERRED_USER_ACCESS'] || false %>

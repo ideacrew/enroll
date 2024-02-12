@@ -515,14 +515,20 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       expect(assigns(:employer_profile)).to eq abc_profile
     end
 
+    # It is not clear what this spec is trying to test.  Is it trying to test:
+    # * When a broker purchases something for someone else, they see the correct page?
+    # * When a broker also has a consumer role and purchases something, they see the correct page, for themselves?
+    # I recommend we split this into two parts, and will create a ticket to that effect.
     it "returns http success as BROKER" do
       person = create(:person)
       FactoryBot.create(:family,:family_members => [{:is_primary_applicant => true, :is_active => true, :person_id => person.id}])
       current_broker_user = FactoryBot.create(:user, :roles => ['broker_agency_staff'],
                                                      :person => person)
       current_broker_user.person.broker_role = BrokerRole.new({:broker_agency_profile_id => 99})
-      allow(session).to receive(:[]).and_return(person.id.to_s)
+      session[:person_id] = person.id.to_s
+      # allow(session).to receive(:[]).and_return(person.id.to_s)
       sign_in(current_broker_user)
+
       get :thankyou, params: {id: "id", plan_id: "plan_id"}
       expect(response).to have_http_status(:success)
     end
