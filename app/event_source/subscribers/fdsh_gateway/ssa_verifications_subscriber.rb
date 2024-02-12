@@ -10,11 +10,10 @@ module Subscribers
       subscribe(:on_ssa_verification_complete) do |delivery_info, metadata, response|
         logger.info "Ssa::SsaverificationsSubscriber: invoked on_ssa_verification_complete with delivery_info: #{delivery_info.inspect}, response: #{response.inspect}"
         payload = JSON.parse(response, :symbolize_names => true)
-        job_id = metadata.job_id
-        status = metadata.status
+        status = metadata[:headers].status
         verification_payload = { person_hbx_id: metadata.correlation_id, metadata: metadata, response: payload }
         if status == "failure"
-          handle_failure_response(job_id)
+          handle_failure_response(metadata[:headers]&.job_id)
         else
           result = Operations::Fdsh::Ssa::H3::SsaVerificationResponseProcessor.new.call(verification_payload)
         end
@@ -32,6 +31,7 @@ module Subscribers
       end
 
       def handle_failure_response(job_id)
+        return unless job_id
         job = Transmittable::Job.where(job_id: job_id)&.last
         return unless job
         message = "Job failed in FDSH Gateway"
