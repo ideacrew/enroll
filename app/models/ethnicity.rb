@@ -16,9 +16,7 @@ class Ethnicity
   # 'Cuban', 'Mexican, Mexican American or Chicano/a', 'Puerto Rican', 'Other'
   # The ethnicity options.
   # @return [Array<String>] An array of ethnicity options.
-  ETHNICITY_OPTIONS = %w[
-    cuban mexican_mexican_american_or_chicano puerto_rican other
-  ].freeze
+  ETHNICITY_OPTIONS = %w[cuban mexican_mexican_american_or_chicano puerto_rican other].freeze
 
   # The mapping of ethnicity options to their human readable forms.
   # @return [Hash] A hash mapping ethnicity options to their human readable forms.
@@ -53,6 +51,13 @@ class Ethnicity
     'refused' => 'Choose not to answer' # 'Refused'
   }.freeze
 
+  # The system unknown value.
+  # @return [String] The system unknown value.
+  # This value can be used to migrate the system unknown ethnicity information
+  # from the old data model(system) to the new data model(system).
+  # We can persist this value for the field hispanic_or_latino.
+  SYSTEM_UNKNOWN = 'system_unknown'
+
   # @!attribute [rw] hispanic_or_latino
   #   @return [String] The hispanic or latino option that the user has selected.
   #   This is a string that represents the hispanic or latino option.
@@ -73,8 +78,14 @@ class Ethnicity
 
   # Returns the CMS reporting group based on the attested races.
   #
-  # @return [String] The CMS reporting group.
+  # @return [String, nil] The CMS reporting group.
+  #   when hispanic_or_latino is either nil or 'system_unknown' then it returns nil.
   def cms_reporting_group
-    hispanic_or_latino == 'yes' ? 'hispanic_or_latino' : 'not_hispanic_or_latino'
+    case hispanic_or_latino
+    when 'yes'
+      'hispanic_or_latino'
+    when 'no', 'do_not_know', 'refused'
+      'not_hispanic_or_latino'
+    end
   end
 end

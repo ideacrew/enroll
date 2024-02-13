@@ -13,7 +13,7 @@ FactoryBot.define do
     # This is a callback that will get executed before the
     # instance is created. The `event` field is set to `:create`.
     # Moved event attribute to before create callback
-    # to avoid confusion with the EventSource::Event.
+    # to avoid name collision with the EventSource::Event.
     before(:create) do |instance|
       instance.event = :create
     end
