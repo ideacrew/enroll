@@ -22,6 +22,10 @@ FactoryBot.define do
       create_list(:employee_role, 1, person: p) unless p.employee_roles
     end
 
+    trait :with_demographics do
+      demographics { [FactoryBot.build(:demographics)] }
+    end
+
     trait :with_mailing_address do
       addresses { [FactoryBot.build(:address, :mailing_kind)]}
     end
