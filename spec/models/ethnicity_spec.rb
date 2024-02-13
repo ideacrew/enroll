@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe Ethnicity, type: :model do
   let(:person) { FactoryBot.create(:person) }
   let(:demographics) do
-    FactoryBot.create(:demographics, :with_race_and_ethnicity, demographable_id: person.id)
+    FactoryBot.create(:demographics, :with_race_and_ethnicity, demographable: person)
   end
 
   let(:ethnicity) { demographics.ethnicity }
