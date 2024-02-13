@@ -45,7 +45,7 @@ module EventLogs
     def build_details(parsed, details, effective_on, detail, subject)
       details[:current_state] = parsed[:current_state] || ""
       details[:subject] = subject || ""
-      details[:title] = parsed[:title]&.gsub("Aca ", "")&.gsub("Eligibility ", "")&.upcase || ""
+      details[:title] = parsed[:title]&.gsub(/osse/i, "Hc4cc")&.gsub("Aca ", "")&.gsub("Eligibility ", "")&.upcase || ""
       details[:effective_on] = effective_on || ""
       details[:detail] = detail || ""
       details

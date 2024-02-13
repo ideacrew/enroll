@@ -33,7 +33,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'dry-schema', '~> 1.0'
   s.add_dependency 'dry-validation', '~> 1.0'
   s.add_dependency 'dry-initializer'
-  s.add_dependency 'dry-auto_inject', '0.6.1'
+  s.add_dependency 'dry-auto_inject'
   s.add_dependency 'dry-container'
   s.add_dependency 'dry-struct'
   s.add_dependency 'dry-monads'

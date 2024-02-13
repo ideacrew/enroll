@@ -20,7 +20,7 @@ nav
         | Messages
         span.badge.message-unread #{profile_unread_messages_count(profile)}
 
-    - if current_user.try(:has_hbx_staff_role?) && event_logging_enabled?
+    - if event_logging_enabled? && pundit_allow(HbxProfile, :can_view_audit_log?)
       li
         = link_to 'Audit Log', benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab => 'event_log_shop'), "aria-expanded" => "true"
   .my-account-widget.panel.panel-default
