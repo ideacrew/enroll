@@ -19,12 +19,6 @@ module HistoryTrackingUtils
   include Mongoid::Timestamps
 
   included do
-    # Below fields for tracking Histroy of a model.
-    # Repeatable
-    # Trackable
-    # Embedded
-    # Could be a mixin
-
     # @!attribute [rw] started_at
     #   @return [DateTime] The date and time when the lifecycle of the object started.
     field :started_at, type: DateTime
@@ -65,10 +59,8 @@ module HistoryTrackingUtils
     #   @return [String] Any additional information that is relevant to the system internally.
     #   This field could be used to add free text.
     field :comment, type: String
+
+    # Scopes
+    scope :latest, -> { order(created_at: :desc) }
   end
 end
-
-# TODO: Add YARD documentation for the class, fields, constants and methods.
-#       Add required scopes for the fields.
-#       Add any additional methods required for the class.
-#       Add tests for the class and methods
