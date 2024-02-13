@@ -29,7 +29,7 @@ And(/^Individual clicks on the Help from an Expert link?/) do
 end
 
 And(/^Individual selects a broker?/) do
-  find(".broker_select_button").click
+  find(".broker_select_button", wait: 5).click
 end
 
 And(/^Individual clicks on Select this Broker button$/) do
