@@ -2,8 +2,6 @@
 
 FactoryBot.define do
   factory :demographics, class: 'Demographics' do
-    association :demographable
-
     started_at { DateTime.now }
     ended_at { nil }
     status { :draft }
