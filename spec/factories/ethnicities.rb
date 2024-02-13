@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :ethnicities, class: 'Ethnicity' do
+  factory :ethnicity, class: 'Ethnicity' do
     association :demographics
 
     hispanic_or_latino { 'yes' }
