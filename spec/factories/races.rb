@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :races, class: 'Race' do
+  factory :race, class: 'Race' do
     association :demographics
 
     attested_races { ['white'] }

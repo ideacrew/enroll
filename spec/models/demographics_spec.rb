@@ -22,13 +22,17 @@ RSpec.describe Demographics, type: :model do
 
     context 'child associations' do
       context 'race' do
-        expect(demographics.race).to eq(race)
-        expect(demographics.race).to be_a(Race)
+        it 'returns correct association' do
+          expect(demographics.race).to eq(race)
+          expect(demographics.race).to be_a(Race)
+        end
       end
 
       context 'ethnicity' do
-        expect(demographics.ethnicity).to eq(ethnicity)
-        expect(demographics.ethnicity).to be_a(Ethnicity)
+        it 'returns correct association' do
+          expect(demographics.ethnicity).to be_a(Ethnicity)
+          expect(demographics.ethnicity).to eq(ethnicity)
+        end
       end
     end
   end
