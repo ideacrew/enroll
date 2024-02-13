@@ -1,3 +1,4 @@
+@accessibility
 Feature: Contrast level AA is enabled - User data usage preferences and voter registration
 
   Background: Your Preferences Page
