@@ -19,8 +19,10 @@ FactoryBot.define do
     end
 
     trait :with_race_and_ethnicity do
-      ethnicity { FactoryBot.build(:ethnicity) }
-      race { FactoryBot.build(:race) }
+      after(:create) do |demographics, evaluator|
+        create_list(:ethnicity, 1, demographics: demographics)
+        create_list(:race, 1, demographics: demographics)
+      end
     end
   end
 end
