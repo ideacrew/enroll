@@ -1,3 +1,4 @@
+@accessibility
 Feature: Contrast level AA is enabled - Household Coverage Selection Page
 
  Background: Individual market setup
@@ -25,5 +26,4 @@ Feature: Contrast level AA is enabled - Household Coverage Selection Page
     Given EnrollRegistry temporary_configuration_enable_multi_tax_household_feature feature is enabled
     Then multi tax household info is prepared for aptc user with selected eligibility
     And the individual continues to the Choose Coverage page
-    And the browser has finished rendering the page
-    And the page should be axe clean excluding "a[disabled], .disabled" according to: wcag2aa; checking only: color-contrast
+    Then the page passes minimum level aa contrast guidelines
