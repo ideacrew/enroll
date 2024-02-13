@@ -174,6 +174,11 @@ class Person
   embeds_many :documents, as: :documentable
   embeds_many :verification_types, cascade_callbacks: true, validate: true
 
+  # @!attribute [rw] demographics
+  #   @return [Array<Demographics>] The demographics associated with the person.
+  #   @!parse extend Mongoid::Association::Embedded::EmbedsMany
+  #   This is an array of Demographics objects, with each object representing a demographic.
+  #   The array is empty by default.
   embeds_many :demographics, as: :demographable, class_name: 'Demographics'
 
   attr_accessor :effective_date, :skip_person_updated_event_callback, :is_consumer_role, :is_resident_role
