@@ -1,3 +1,4 @@
+@accessibility
 Feature: Contrast level AA is enabled - User is not applying for financial assistance
   Background:
     Given the contrast level aa feature is enabled
