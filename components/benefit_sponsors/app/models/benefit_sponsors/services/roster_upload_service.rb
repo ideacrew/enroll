@@ -8,6 +8,7 @@ module BenefitSponsors
 
       TEMPLATE_DATE_CELL = 7
       TEMPLATE_VERSION_CELL = 13
+      UPLOAD_BATCH_SIZE = 20
 
       CENSUS_MEMBER_RECORD = %w[
         employer_assigned_family_id
@@ -57,7 +58,6 @@ module BenefitSponsors
       end
 
       def load_census_records_form
-        census_records = []
         columns = sheet.row(2)
         (4..sheet.last_row).inject([]) do |result, id|
           row = Hash[[columns, sheet.row(id)].transpose]
@@ -120,6 +120,37 @@ module BenefitSponsors
         end
         form.redirection_url = "/benefit_sponsors/profiles/employers/employer_profiles/#{profile.id}?tab=employees"
         true
+      end
+
+      def save_in_batches(form)
+        @profile = form.profile
+        persisted = true
+        form.census_records.each_slice(UPLOAD_BATCH_SIZE).with_index do |batch, batch_index|
+          @terminate_queue = {}
+          @persist_queqe = {}
+          process_batch(batch, batch_index)
+          unless persist_census_records(form) && terminate_census_records
+            persisted = false
+            break
+          end
+        end
+        unless persisted
+          form.redirection_url = "/benefit_sponsors/profiles/employers/employer_profiles/_employee_csv_upload_errors"
+          return false
+        end
+        form.redirection_url = "/benefit_sponsors/profiles/employers/employer_profiles/#{profile.id}?tab=employees"
+        true
+      end
+
+      def process_batch(batch, batch_index)
+        batch.each_with_index do |census_record, index|
+          @index = batch_index * UPLOAD_BATCH_SIZE + index
+          if census_record.employment_terminated_on.present?
+            _insert_into_terms_queqe(census_record)
+          else
+            _insert_into_persist_queqe(census_record)
+          end
+        end
       end
 
       def persist_census_records(form)
