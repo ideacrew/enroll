@@ -34,15 +34,15 @@ module HistoryTrackingUtils
     field :ended_at, type: DateTime
 
     # @!attribute [rw] status
-    #   @return [String] The lifecycle state or status of the record.
-    field :status, type: String
+    #   @return [Symbol] The lifecycle state or status of the record.
+    field :status, type: Symbol
 
     # @!attribute [rw] event
     #   @return [Symbol] The event that changed the status of the object.
     field :event, type: Symbol
 
     # @!attribute [rw] changed_or_corrected
-    #   @return [String] Indicates whether the data has been changed or corrected.
+    #   @return [Symbol] Indicates whether the data has been changed or corrected.
     #   This field is typically populated with the value 'changed',
     #   but in rare cases (such as developer intervention to correct data),
     #   it may be populated with the value 'corrected'.
