@@ -25,8 +25,3 @@ class Demographics
   #   @!parse extend Mongoid::Association::Embedded::EmbedsOne
   embeds_one :race
 end
-
-# TODO: Add YARD documentation for the class, fields, constants and methods.
-#       Add required scopes for the fields.
-#       Add any additional methods required for the class.
-#       Add tests for the class and methods
