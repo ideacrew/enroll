@@ -76,7 +76,7 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
 
       context 'with invalid params' do
         let!(:params) { { "applicant_id" => applicant.id, "evidence" => esi_evidence.id, "evidence_kind" => "test", "application_id" => application.id, file: file} }
-    
+
         it 'does not upload a new VerificationDocument' do
           post :upload, params: params
           expect(response).to raise_error(NilClassPolicy)
@@ -141,7 +141,7 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
 
       context 'with invalid params' do
         let!(:params) { { "applicant_id" => nil, "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, file: file} }
-    
+
         it 'does not upload a new VerificationDocument' do
           post :upload, params: params
           expect(flash[:error]).to eq("Invalid parameters")
@@ -207,7 +207,7 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
 
       context 'with invalid params' do
         let!(:params) { { "applicant_id" => nil, "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, file: file} }
-    
+
         it 'does not upload a new VerificationDocument' do
           post :upload, params: params
           expect(flash[:error]).to eq("Invalid parameters")

@@ -11,7 +11,7 @@ module FinancialAssistance
     before_action :set_document, only: [:destroy]
 
     def upload
-      render plain: "Record not found", status: :not_found if false
+      # render plain: "Record not found", status: :not_found if false
 
       authorize record, :can_upload?
 
