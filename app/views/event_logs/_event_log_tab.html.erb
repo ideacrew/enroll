@@ -167,7 +167,7 @@
               <td colspan="2"></td>
               <td><%= detail[:detail] %></td>
               <td id="<%= detail[:account_hbx_id] %>" class="user_id"><%= detail[:account_username] %></td>
-              <td class="event-time"><%= detail[:event_time] %></td>
+              <td class="event-time"><%= format_time_display(detail[:event_time]) %></td>
             </tr>
             <% end %>
           <% end %>
