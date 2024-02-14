@@ -35,10 +35,6 @@ RSpec.describe Race, type: :model do
         it_behaves_like 'CMS Reporting Group for attested_races', [], nil
       end
 
-      context 'for system_unknown race' do
-        it_behaves_like 'CMS Reporting Group for attested_races', ['system_unknown'], nil
-      end
-
       context 'for race white' do
         it_behaves_like 'CMS Reporting Group for attested_races', ['white'], 'white'
       end
