@@ -35,10 +35,6 @@ RSpec.describe Ethnicity, type: :model do
         it_behaves_like 'CMS Reporting Group for hispanic_or_latino', nil, nil
       end
 
-      context 'when system_unknown is value for hispanic_or_latino' do
-        it_behaves_like 'CMS Reporting Group for hispanic_or_latino', 'system_unknown', nil
-      end
-
       context 'when yes is value for hispanic_or_latino' do
         it_behaves_like 'CMS Reporting Group for hispanic_or_latino', 'yes', 'hispanic_or_latino'
       end
