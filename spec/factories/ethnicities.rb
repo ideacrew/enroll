@@ -6,6 +6,7 @@ FactoryBot.define do
 
     hispanic_or_latino { 'yes' }
     attested_ethnicities { ['cuban'] }
+    attestation { 'non_attested' }
     other_ethnicity { nil }
   end
 end

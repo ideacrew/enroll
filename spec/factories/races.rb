@@ -5,6 +5,7 @@ FactoryBot.define do
     association :demographics
 
     attested_races { ['white'] }
+    attestation { 'non_attested' }
     other_race { nil }
   end
 end

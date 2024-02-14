@@ -81,12 +81,18 @@ class Race
   RACES_FOR_CMS_GROUP_NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER = %w[samoan native_hawaiian guamanian_or_chamorro other_pacific_islander].freeze
   RACES_FOR_CMS_GROUP_UNKNOWN = %w[do_not_know refused].freeze
 
-  # The system unknown value.
-  # @return [String] The system unknown value.
-  # This value can be used to migrate the system unknown race information
-  # from the old data model(system) to the new data model(system).
-  # We can persist this value for the field attested_races.
-  SYSTEM_UNKNOWN = 'system_unknown'
+  # The attestation kinds.
+  # @return [Array<String>] An array of attestation kinds.
+  # We could expand ATTESTATION_KINDS to include 'self_attested' 'broker_attested' and 'admin_attested'.
+  ATTESTATION_KINDS = %w[non_attested].freeze
+
+  # @!attribute [rw] attestation
+  #   @return [String, nil] The source of attestation for the ethnicity information.
+  #   This field is used to track the source of attestation.
+  #   It can be updated with the value 'non_attested' when we do not have ethnicity
+  #   information when migrating from the old data model to the new data model.
+  #   It is nil by default.
+  field :attestation, type: String
 
   # @!attribute [rw] attested_races
   #   @return [Array<String>] The list of races that the user has attested to.
@@ -104,7 +110,6 @@ class Race
   #
   # @return [String, nil] The CMS reporting group.
   #   Returns nil if attested_races is empty.
-  #   Returns nil if attested_races has only 'system_unknown' as a value.
   #   Returns 'white' if attested_races has only 'white' as a value.
   #   Returns 'black_or_african_american' if attested_races has only 'black_or_african_american' as a value.
   #   Returns 'american_indian_or_alaska_native' if attested_races has only 'american_indian_or_alaska_native' as a value.
@@ -113,7 +118,7 @@ class Race
   #   Returns 'unknown' if attested_races has any and only 'do_not_know' or 'refused'.
   #   Returns 'multi_racial' if attested_races has any other combination of values.
   def cms_reporting_group
-    return nil if attested_races.empty? || (attested_races - [SYSTEM_UNKNOWN]).empty?
+    return nil if attested_races.empty?
     return 'white' if (attested_races - RACES_FOR_CMS_GROUP_WHITE).empty?
     return 'black_or_african_american' if (attested_races - RACES_FOR_CMS_GROUP_BLACK_OR_AFRICAN_AMERICAN).empty?
     return 'american_indian_or_alaska_native' if (attested_races - RACES_FOR_CMS_GROUP_AMERICAN_INDIAN_OR_ALASKA_NATIVE).empty?

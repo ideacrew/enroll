@@ -51,12 +51,18 @@ class Ethnicity
     'refused' => 'Choose not to answer' # 'Refused'
   }.freeze
 
-  # The system unknown value.
-  # @return [String] The system unknown value.
-  # This value can be used to migrate the system unknown ethnicity information
-  # from the old data model(system) to the new data model(system).
-  # We can persist this value for the field hispanic_or_latino.
-  SYSTEM_UNKNOWN = 'system_unknown'
+  # The attestation kinds.
+  # @return [Array<String>] An array of attestation kinds.
+  # We could expand ATTESTATION_KINDS to include 'self_attested' 'broker_attested' and 'admin_attested'.
+  ATTESTATION_KINDS = %w[non_attested].freeze
+
+  # @!attribute [rw] attestation
+  #   @return [String, nil] The source of attestation for the ethnicity information.
+  #   This field is used to track the source of attestation.
+  #   It can be updated with the value 'non_attested' when we do not have ethnicity
+  #   information when migrating from the old data model to the new data model.
+  #   It is nil by default.
+  field :attestation, type: String
 
   # @!attribute [rw] hispanic_or_latino
   #   @return [String] The hispanic or latino option that the user has selected.
@@ -79,7 +85,7 @@ class Ethnicity
   # Returns the CMS reporting group based on the attested races.
   #
   # @return [String, nil] The CMS reporting group.
-  #   when hispanic_or_latino is either nil or 'system_unknown' then it returns nil.
+  #   when hispanic_or_latino is nil then it returns nil.
   def cms_reporting_group
     case hispanic_or_latino
     when 'yes'
