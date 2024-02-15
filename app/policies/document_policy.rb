@@ -8,6 +8,8 @@
 #   policy = DocumentPolicy.new(user, record)
 #   policy.can_upload? #=> true
 class DocumentPolicy < ApplicationPolicy
+  ACCESSABLE_ROLES = %w[hbx_staff_role broker_role active_broker_staff_roles].freeze
+
   def can_upload?
     allowed_to_modify?
   end
@@ -31,19 +33,59 @@ class DocumentPolicy < ApplicationPolicy
   #
   # @note The user is the one who is trying to perform the action. The record_user is the user who owns the record. The record is an instance of Document.
   def allowed_to_modify?
-    (role.present? && role.permission.modify_family) || (user == record_user)
+    role_has_permission_to_modify? || (current_user == associated_user)
+  end
+
+  def role_has_permission_to_modify?
+    role.present? && (can_hbx_staff_modify? || can_broker_modify?)
+  end
+
+  def can_hbx_staff_modify?
+    role.is_a?(HbxStaffRole) && role&.permission&.modify_family
+  end
+
+  def can_broker_modify?
+    (role.is_a?(::BrokerRole) || role.is_a?(::BrokerAgencyStaffRole)) && broker_agency_profile_matches?
+  end
+
+  def broker_agency_profile_matches?
+    associated_family.active_broker_agency_account.present? && associated_family.active_broker_agency_account.broker_agency_profile_id == role.broker_agency_profile_id
   end
 
   def role
-    user&.person&.hbx_staff_role
+    @role ||= find_role
   end
 
-  def record_user
+  def find_role
+    person = user&.person
+    return nil unless person
+
+    ACCESSABLE_ROLES.detect do |role|
+      return person.send(role) if person.respond_to?(role) && person.send(role)
+    end
+
+    nil
+  end
+
+  def current_user
+    user
+  end
+
+  def associated_user
     case documentable
     when Eligibilities::Evidence
-      documentable.applicant.family.primary_person.user
+      associated_family.primary_person.user
     when Person
       documentable.user
+    end
+  end
+
+  def associated_family
+    case documentable
+    when Eligibilities::Evidence
+      documentable.applicant.family
+    when Person
+      documentable.primary_family
     end
   end
 
