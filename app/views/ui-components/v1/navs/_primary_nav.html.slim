@@ -56,7 +56,7 @@
               - if external_application_configured?("admin") && EnrollRegistry.feature_enabled?(:agency_staff)
                 li
                   - url = ExternalApplications::ApplicationProfile.find_by_application_name("admin").url + "/agencies/agency-staff"
-                  = link_to(url, "aria-expanded" => "true", data: { turbolinks: false }, id: "agencyStaffLinkToExternal") do
+                  = link_to(url, "aria-expanded" => "true", data: { turbolinks: false, jwt_token: jwt_for_external_application }, id: "agencyStaffLinkToExternal") do
                     span.hidden-xs
                       | Agency Staff
                     span.glyphicon.glyphicon-th-list.hidden-md.hidden-sm.hidden-lg title="Agency Staff"
@@ -101,9 +101,8 @@ javascript:
     const agencyStaffLink = document.getElementById('agencyStaffLinkToExternal');
     agencyStaffLink.addEventListener('click', function(event) {
       event.preventDefault();
-      const jwtToken = "<%= jwt_for_external_application %>";
+      const jwtToken = agencyStaffLink.dataset.jwtToken;
       window.localStorage.setItem("jwt", jwtToken);
       window.location.href = agencyStaffLink.href;
     });
   });
-
