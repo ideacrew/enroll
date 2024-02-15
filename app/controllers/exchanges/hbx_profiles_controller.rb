@@ -20,7 +20,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   before_action :redirect_if_staff_tab_is_disabled, only: [:staff_index]
   before_action :set_cache_headers, only: [:show, :family_index_dt, :user_account_index, :identity_verification, :broker_agency_index, :outstanding_verification_dt, :configuration, :inbox]
   before_action :redirect_if_general_agency_is_disabled, only: [:general_agency_index]
-  before_action :redirect_if_employer_index_is_disabled, only: [:employer_datatable]
+  before_action :redirect_if_employer_datatable_is_disabled, only: [:employer_datatable]
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
   layout 'single_column'
@@ -874,8 +874,8 @@ def employer_poc
 
   private
 
-  def redirect_if_employer_index_is_disabled
-    redirect_to(exchanges_hbx_profiles_root_path, notice: l10n('insured.employer_index_disabled_warning')) unless EnrollRegistry.feature_enabled?(:aca_shop_market)
+  def redirect_if_employer_datatable_is_disabled
+    redirect_to(exchanges_hbx_profiles_root_path, notice: l10n('insured.employer_datatable_disabled_warning')) unless EnrollRegistry.feature_enabled?(:aca_shop_market)
   end
 
   def redirect_if_general_agency_is_disabled

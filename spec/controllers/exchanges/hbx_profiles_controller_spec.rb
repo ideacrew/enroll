@@ -247,7 +247,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
       it "has flash message" do
         get :employer_datatable, format: :html
-        expect(flash[:notice]).to eql(l10n('insured.employer_index_disabled_warning'))
+        expect(flash[:notice]).to eql(l10n('insured.employer_datatable_disabled_warning'))
       end
     end
 
