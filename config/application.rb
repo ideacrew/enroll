@@ -1,16 +1,20 @@
 # frozen_string_literal: true
 
-# Devise security won't work without this.
-DEVISE_ORM = :mongoid
+require_relative 'boot'
 
-require File.expand_path('../boot', __FILE__)
-
-# require 'rails/all'
+require "rails"
+# Pick the frameworks you want:
+require "active_model/railtie"
+require "active_job/railtie"
+# require "active_record/railtie"
+# require "active_storage/engine"
 require "action_controller/railtie"
 require "action_mailer/railtie"
-require "rails/test_unit/railtie"
+# require "action_mailbox/engine"
+require "action_view/railtie"
 require "action_cable/engine"
-require "sprockets/railtie" # Uncomment this line for Rails 3.1+
+require "sprockets/railtie"
+require "rails/test_unit/railtie"
 
 # Configure fallbacks for mongoid errors:
 require "i18n/backend/fallbacks"
@@ -44,7 +48,7 @@ module Enroll
     config.assets.enabled = true
     config.assets.paths << "#{Rails.root}/app/assets/info"
     I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
-    config.i18n.fallbacks = {'am' => 'en', 'es' => 'en', 'ja' => 'en'}
+    config.i18n.fallbacks = [I18n.default_locale, {'am' => 'en', 'es' => 'en', 'ja' => 'en'}]
     config.paths.add "app/api", glob: "**/*.rb"
     config.autoload_paths += Dir["#{Rails.root}/app/api/api/*/*"]
 

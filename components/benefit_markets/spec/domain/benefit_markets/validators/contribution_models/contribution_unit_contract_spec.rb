@@ -8,7 +8,7 @@ RSpec.describe BenefitMarkets::Validators::ContributionModels::ContributionUnitC
   let(:display_name)                   { "Employee Only" }
   let(:order)                          { 1 }
   let(:member_relationship_map_params) { {relationship_name: name1, count: 1} }
-  let(:member_relationship_map) { ::BenefitMarkets::ContributionModels::MemberRelationshipMap.new(member_relationship_map_params).as_json }
+  let(:member_relationship_map) { ::BenefitMarkets::ContributionModels::MemberRelationshipMap.new(member_relationship_map_params).serializable_hash }
   let(:member_relationship_maps)  { [member_relationship_map] }
 
   let(:missing_params)            { {_id: BSON::ObjectId.new, name: name1, display_name: display_name, member_relationship_maps: member_relationship_maps} }

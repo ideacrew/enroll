@@ -76,9 +76,9 @@ module BenefitSponsors
 
     def as_json(params = {})
       {
-        members: members.as_json,
+        members: members.serializable_hash,
         group_id: group_id,
-        group_enrollment: group_enrollment.as_json,
+        group_enrollment: group_enrollment.serializable_hash
       }
     end
 

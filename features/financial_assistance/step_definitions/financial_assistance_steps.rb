@@ -59,7 +59,7 @@ end
 
 Then(/^they should see a new finanical assistance application$/) do
   expect(page.current_url).to match("/applications/.*/edit")
-  expect(page).to have_content(l10n('insured.family_members.index.continue_to_get_insurance'))
+  expect(page).to have_content(l10n('insured.family_members.index.continue_to_get_insurance'), wait: 10)
 end
 
 Given(/IAP Assistance Year Display feature is enabled/) do

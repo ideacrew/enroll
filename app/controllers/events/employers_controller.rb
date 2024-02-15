@@ -11,7 +11,7 @@ module Events
       manual_gen = headers["manual_gen"].present? && (headers["manual_gen"] == "true" || headers["manual_gen"] == true) ? true : false
       if !employer_org.nil?
         employer = employer_org.employer_profile
-        event_payload = render_to_string "events/v2/employers/updated", :formats => ["xml"], :locals => { employer: employer, manual_gen: manual_gen, benefit_application_id: plan_year_id }
+        event_payload = render_to_string "events/v2/employers/updated", :formats => [:xml], :locals => { employer: employer, manual_gen: manual_gen, benefit_application_id: plan_year_id }
         with_response_exchange(connection) do |ex|
           ex.publish(
             event_payload,

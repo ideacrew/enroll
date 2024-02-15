@@ -29,11 +29,13 @@ module BenefitSponsors
       let(:open_enrollment_period_start_on) { effective_period_start_on.prev_month }
       let(:open_enrollment_period_end_on)   { open_enrollment_period_start_on + 9.days }
       let(:open_enrollment_period)          { open_enrollment_period_start_on..open_enrollment_period_end_on }
+      let(:sponsored_benefit)               { current_benefit_package.sponsored_benefits.first }
 
       subject { BenefitSponsors::Serializers::BenefitApplicationIssuer.to_csv(benefit_sponsorship.benefit_applications.first) }
 
       it 'returns a csv line for each carrier' do
-        all_records = product_package.products.map(&:issuer_profile).map do |issuer_profile|
+        products = product_package.products_for_plan_option_choice(sponsored_benefit.product_option_choice).by_service_areas(sponsored_benefit.recorded_service_area_ids)
+        all_records = products.map(&:issuer_profile).map do |issuer_profile|
           [abc_organization.hbx_id,
            abc_organization.fein,
            effective_period_start_on.strftime('%Y-%m-%d'),

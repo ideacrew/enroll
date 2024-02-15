@@ -64,10 +64,12 @@ module BenefitMarketWorld
   end
 
   def issuer_profile(carrier = :default)
+    @issuer_profile = {} unless defined? @issuer_profile
     @issuer_profile[carrier] ||= FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, carrier, assigned_site: site)
   end
 
   def dental_issuer_profile(carrier = :default)
+    @dental_issuer_profile = {} unless defined? @dental_issuer_profile
     @dental_issuer_profile[carrier] ||= FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, carrier, assigned_site: site)
   end
 
