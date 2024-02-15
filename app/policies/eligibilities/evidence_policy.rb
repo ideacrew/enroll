@@ -34,52 +34,52 @@ module Eligibilities
     #   allowed_to_modify? #=> true
     #
     # @note The user is the one who is trying to perform the action. The record_user is the user who owns the record. The record is an instance of Eligibilities::Evidence.
-  def allowed_to_modify?
-    role_has_permission_to_modify? || (current_user == associated_user)
-  end
-
-  def role_has_permission_to_modify?
-    role.present? && (can_hbx_staff_modify? || can_broker_modify?)
-  end
-
-  def can_hbx_staff_modify?
-    role.is_a?(HbxStaffRole) && role&.permission&.modify_family
-  end
-
-  def can_broker_modify?
-    (role.is_a?(::BrokerRole) || role.is_a?(::BrokerAgencyStaffRole)) && broker_agency_profile_matches?
-  end
-
-  def broker_agency_profile_matches?
-    associated_family.active_broker_agency_account.present? && associated_family.active_broker_agency_account.broker_agency_profile_id == role.broker_agency_profile_id
-  end
-
-  def role
-    @role ||= find_role
-  end
-
-  def find_role
-    person = user&.person
-    return nil unless person
-
-    ACCESSABLE_ROLES.detect do |role|
-      return person.send(role) if person.respond_to?(role) && person.send(role)
+    def allowed_to_modify?
+      role_has_permission_to_modify? || (current_user == associated_user)
     end
 
-    nil
-  end
+    def role_has_permission_to_modify?
+      role.present? && (can_hbx_staff_modify? || can_broker_modify?)
+    end
 
-  def current_user
-    user
-  end
+    def can_hbx_staff_modify?
+      role.is_a?(HbxStaffRole) && role&.permission&.modify_family
+    end
 
-  def associated_user
-    associated_family.primary_person.user
-  end
+    def can_broker_modify?
+      (role.is_a?(::BrokerRole) || role.is_a?(::BrokerAgencyStaffRole)) && broker_agency_profile_matches?
+    end
 
-  def associated_family
-    record.applicant.family
-  end
+    def broker_agency_profile_matches?
+      associated_family.active_broker_agency_account.present? && associated_family.active_broker_agency_account.broker_agency_profile_id == role.broker_agency_profile_id
+    end
+
+    def role
+      @role ||= find_role
+    end
+
+    def find_role
+      person = user&.person
+      return nil unless person
+
+      ACCESSABLE_ROLES.detect do |role|
+        return person.send(role) if person.respond_to?(role) && person.send(role)
+      end
+
+      nil
+    end
+
+    def current_user
+      user
+    end
+
+    def associated_user
+      associated_family.primary_person.user
+    end
+
+    def associated_family
+      record.applicant.family
+    end
 
     def record_user
       record.applicant.family.primary_person.user
