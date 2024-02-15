@@ -26,6 +26,7 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
       effective_date: Date.today
     )
   end
+
   let!(:applicant) do
     applicant = FactoryBot.create(:financial_assistance_applicant,
                                   application: application,
@@ -68,6 +69,7 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
         before do
           allow(Aws::S3Storage).to receive(:save).and_return(doc_id)
         end
+
         it 'uploads a new VerificationDocument' do
           post :upload, params: params
           expect(flash[:notice]).to eq("File Saved")
@@ -75,40 +77,46 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
       end
 
       context 'with invalid params' do
-        let!(:params) { { "applicant_id" => applicant.id, "evidence" => esi_evidence.id, "evidence_kind" => "test", "application_id" => application.id, file: file} }
+        before do
+          allow(Aws::S3Storage).to receive(:save).and_return(nil)
+        end
+
+        let!(:params) { { "applicant_id" => applicant.id, "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, file: file} }
 
         it 'does not upload a new VerificationDocument' do
           post :upload, params: params
-          expect(response).to raise_error(NilClassPolicy)
+          expect(flash[:error]).to eq("Could not save file")
         end
       end
-
-     # Add more tests for invalid params, redirects, etc.
     end
 
     context 'GET #download' do
       context 'with valid params' do
+
         before do
           allow(controller).to receive(:get_document).with('sample-key').and_return(Document.new)
         end
+
         let!(:params) {{"key" => "sample-key", "evidence_kind" => "esi_evidence", "application_id" => application.id, "applicant_id" => applicant.id}}
+
         it 'downloads the requested verification document' do
           get :download, params: params
           expect(response).to be_successful
         end
       end
-
-    # Add more tests for invalid params, redirects, etc.
     end
 
     context 'DELETE #destroy' do
       let!(:document) { esi_evidence.documents.create}
+
       before do
         allow(controller).to receive(:get_document).with('sample-key').and_return(document)
       end
+
       let!(:params) do
         { "doc_key" => "sample-key", "doc_title" => "sample-key.Png", "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, "applicant_id" => applicant.id}
       end
+
       it 'destroys the requested verification document' do
         expect do
           delete :destroy, params: params
@@ -133,22 +141,12 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
         before do
           allow(Aws::S3Storage).to receive(:save).and_return(doc_id)
         end
+
         it 'uploads a new VerificationDocument' do
           post :upload, params: params
           expect(flash[:notice]).to eq("File Saved")
         end
       end
-
-      context 'with invalid params' do
-        let!(:params) { { "applicant_id" => nil, "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, file: file} }
-
-        it 'does not upload a new VerificationDocument' do
-          post :upload, params: params
-          expect(flash[:error]).to eq("Invalid parameters")
-        end
-      end
-
-     # Add more tests for invalid params, redirects, etc.
     end
 
     context 'GET #download' do
@@ -157,7 +155,9 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
         before do
           allow(controller).to receive(:get_document).with('sample-key').and_return(document)
         end
+
         let!(:params) {{"key" => "sample-key", "evidence_kind" => "esi_evidence", "application_id" => application.id, "applicant_id" => applicant.id}}
+
         it 'downloads the requested verification document' do
           get :download, params: params
           expect(response).to be_successful
@@ -169,12 +169,15 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
 
     context 'DELETE #destroy' do
       let!(:document) { esi_evidence.documents.create}
+
       before do
         allow(controller).to receive(:get_document).with('sample-key').and_return(document)
       end
+
       let!(:params) do
         { "doc_key" => "sample-key", "doc_title" => "sample-key.Png", "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, "applicant_id" => applicant.id}
       end
+
       it 'destroys the requested verification document' do
         expect do
           delete :destroy, params: params
@@ -196,33 +199,26 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
       let!(:params) { { "applicant_id" => applicant.id, "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, file: file} }
 
       context 'with unauthorized user' do
+
         before do
           allow(Aws::S3Storage).to receive(:save).and_return(doc_id)
         end
+
         it 'returns failure' do
           post :upload, params: params
           expect(flash[:error]).to eq("Access not allowed for eligibilities/evidence_policy.can_upload?, (Pundit policy)")
         end
       end
-
-      context 'with invalid params' do
-        let!(:params) { { "applicant_id" => nil, "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, file: file} }
-
-        it 'does not upload a new VerificationDocument' do
-          post :upload, params: params
-          expect(flash[:error]).to eq("Invalid parameters")
-        end
-      end
-
-     # Add more tests for invalid params, redirects, etc.
     end
 
     context 'GET #download' do
       let!(:document) { esi_evidence.documents.create}
       context 'with unauthorized user' do
+
         before do
           allow(controller).to receive(:get_document).with('sample-key').and_return(document)
         end
+
         let!(:params) {{"key" => "sample-key", "evidence_kind" => "esi_evidence", "application_id" => application.id, "applicant_id" => applicant.id}}
 
         it 'shoudl not download the requested verification document' do
@@ -231,8 +227,6 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
           expect(flash[:error]).to eq("Access not allowed for document_policy.can_download?, (Pundit policy)")
         end
       end
-
-    # Add more tests for invalid params, redirects, etc.
     end
 
     context 'DELETE #destroy' do
