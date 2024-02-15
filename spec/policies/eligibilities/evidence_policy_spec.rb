@@ -50,68 +50,68 @@ RSpec.describe Eligibilities::EvidencePolicy, type: :policy do
     let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
     let(:user) { admin_user }
 
-  context 'with permission' do
-    let!(:permission) { FactoryBot.create(:permission, :super_admin) }
+    context 'with permission' do
+      let!(:permission) { FactoryBot.create(:permission, :super_admin) }
 
-    context '#can_upload?' do
-      it 'returns the result of #allowed_to_modify?' do
-        expect(policy.can_upload?).to be_truthy
+      context '#can_upload?' do
+        it 'returns the result of #allowed_to_modify?' do
+          expect(policy.can_upload?).to be_truthy
+        end
+      end
+
+      context '#can_download?' do
+        it 'returns the result of #allowed_to_modify?' do
+          expect(policy.can_download?).to be_truthy
+        end
+      end
+
+      context '#can_destroy?' do
+        it 'returns the result of #allowed_to_modify?' do
+          expect(policy.can_destroy?).to be_truthy
+        end
+      end
+
+      context '#allowed_to_modify?' do
+        context 'when the user has the modify_family permission' do
+
+          it 'returns true' do
+            expect(policy.send(:allowed_to_modify?)).to be true
+          end
+        end
       end
     end
 
-    context '#can_download?' do
-      it 'returns the result of #allowed_to_modify?' do
-        expect(policy.can_download?).to be_truthy
+    context 'without permission' do
+      let!(:permission) { FactoryBot.create(:permission, :developer) }
+
+      context '#can_upload?' do
+        it 'returns the result of #allowed_to_modify?' do
+          expect(policy.can_upload?).to be_falsey
+        end
       end
-    end
 
-    context '#can_destroy?' do
-      it 'returns the result of #allowed_to_modify?' do
-        expect(policy.can_destroy?).to be_truthy
+      context '#can_download?' do
+        it 'returns the result of #allowed_to_modify?' do
+          expect(policy.can_download?).to be_falsey
+        end
       end
-    end
 
-    context '#allowed_to_modify?' do
-      context 'when the user has the modify_family permission' do
+      context '#can_destroy?' do
+        it 'returns the result of #allowed_to_modify?' do
+          expect(policy.can_destroy?).to be_falsey
+        end
+      end
 
-        it 'returns true' do
-          expect(policy.send(:allowed_to_modify?)).to be true
+      context '#allowed_to_modify?' do
+        context 'when the user has the modify_family permission' do
+
+          it 'returns true' do
+            expect(policy.send(:allowed_to_modify?)).to be false
+          end
         end
       end
     end
   end
-
-  context 'without permission' do
-    let!(:permission) { FactoryBot.create(:permission, :developer) }
-
-    context '#can_upload?' do
-      it 'returns the result of #allowed_to_modify?' do
-        expect(policy.can_upload?).to be_falsey
-      end
-    end
-
-    context '#can_download?' do
-      it 'returns the result of #allowed_to_modify?' do
-        expect(policy.can_download?).to be_falsey
-      end
-    end
-
-    context '#can_destroy?' do
-      it 'returns the result of #allowed_to_modify?' do
-        expect(policy.can_destroy?).to be_falsey
-      end
-    end
-
-    context '#allowed_to_modify?' do
-      context 'when the user has the modify_family permission' do
-
-        it 'returns true' do
-          expect(policy.send(:allowed_to_modify?)).to be false
-        end
-      end
-    end
-  end
-end
 
   context 'record user' do
     let(:user) { record_user }
@@ -148,7 +148,7 @@ end
     let!(:fake_person) { FactoryBot.create(:person, :with_consumer_role) }
     let!(:fake_user) {FactoryBot.create(:user, :person => fake_person)}
     let!(:fake_family) { FactoryBot.create(:family, :with_primary_family_member, person: fake_person) }
-    let!(:fake_family_member) { fake_family.family_members.first }  
+    let!(:fake_family_member) { fake_family.family_members.first }
     let(:user) { fake_user }
 
     context '#can_upload?' do
