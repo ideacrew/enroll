@@ -71,15 +71,6 @@ RSpec.describe DocumentPolicy, type: :policy do
           expect(policy.can_destroy?).to be_truthy
         end
       end
-
-      context '#allowed_to_modify?' do
-        context 'when the user has the modify_family permission' do
-
-          it 'returns true' do
-            expect(policy.send(:allowed_to_modify?)).to be true
-          end
-        end
-      end
     end
 
     context 'without permission' do
@@ -100,15 +91,6 @@ RSpec.describe DocumentPolicy, type: :policy do
       context '#can_destroy?' do
         it 'returns the result of #allowed_to_modify?' do
           expect(policy.can_destroy?).to be_falsey
-        end
-      end
-
-      context '#allowed_to_modify?' do
-        context 'when the user has the modify_family permission' do
-
-          it 'returns true' do
-            expect(policy.send(:allowed_to_modify?)).to be false
-          end
         end
       end
     end
@@ -132,15 +114,6 @@ RSpec.describe DocumentPolicy, type: :policy do
     context '#can_destroy?' do
       it 'returns the result of #allowed_to_modify?' do
         expect(policy.can_destroy?).to be_truthy
-      end
-    end
-
-    context '#allowed_to_modify?' do
-      context 'when the user has the modify_family permission' do
-
-        it 'returns true' do
-          expect(policy.send(:allowed_to_modify?)).to be true
-        end
       end
     end
   end
@@ -169,12 +142,65 @@ RSpec.describe DocumentPolicy, type: :policy do
         expect(policy.can_destroy?).to be_falsey
       end
     end
+  end
 
-    context '#allowed_to_modify?' do
-      context 'when the user has the modify_family permission' do
+  context 'broker logged in' do
+    let!(:broker_user) {FactoryBot.create(:user, :person => writing_agent.person, roles: ['broker_role', 'broker_agency_staff_role'])}
+    let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
+    let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
+    let(:assister)  do
+      assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00")
+      assister.save(validate: false)
+      assister
+    end
 
-        it 'returns true' do
-          expect(policy.send(:allowed_to_modify?)).to be false
+    let(:user) { broker_user }
+
+    context 'hired by family' do
+      before(:each) do
+        family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                            writing_agent_id: writing_agent.id,
+                                                                                            start_on: Time.now,
+                                                                                            is_active: true)
+        family.reload
+      end
+
+
+      context '#can_upload?' do
+        it 'returns the result of #allowed_to_modify?' do
+          expect(policy.can_upload?).to be_truthy
+        end
+      end
+
+      context '#can_download?' do
+        it 'returns the result of #allowed_to_modify?' do
+          expect(policy.can_download?).to be_truthy
+        end
+      end
+
+      context '#can_destroy?' do
+        it 'returns the result of #allowed_to_modify?' do
+          expect(policy.can_destroy?).to be_truthy
+        end
+      end
+    end
+
+    context 'not hired by family' do
+      context '#can_upload?' do
+        it 'returns the result of #allowed_to_modify?' do
+          expect(policy.can_upload?).to be_falsey
+        end
+      end
+
+      context '#can_download?' do
+        it 'returns the result of #allowed_to_modify?' do
+          expect(policy.can_download?).to be_falsey
+        end
+      end
+
+      context '#can_destroy?' do
+        it 'returns the result of #allowed_to_modify?' do
+          expect(policy.can_destroy?).to be_falsey
         end
       end
     end
