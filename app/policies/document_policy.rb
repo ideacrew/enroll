@@ -49,7 +49,7 @@ class DocumentPolicy < ApplicationPolicy
   end
 
   def broker_agency_profile_matches?
-    associated_family.active_broker_agency_account.present? && associated_family.active_broker_agency_account.broker_agency_profile_id == role.broker_agency_profile_id
+    associated_family.active_broker_agency_account.present? && associated_family.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id == role.benefit_sponsors_broker_agency_profile_id
   end
 
   def role

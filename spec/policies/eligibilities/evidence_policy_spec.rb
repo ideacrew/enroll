@@ -6,7 +6,7 @@ require 'rails_helper'
 RSpec.describe Eligibilities::EvidencePolicy, type: :policy do
   let(:policy) { described_class.new(user, record) }
   let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
-  let!(:record_user) {FactoryBot.create(:user, :person => person)}
+  let!(:associated_user) {FactoryBot.create(:user, :person => person)}
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let!(:family_member) { family.family_members.first }
   let!(:application) do
@@ -114,7 +114,7 @@ RSpec.describe Eligibilities::EvidencePolicy, type: :policy do
   end
 
   context 'record user' do
-    let(:user) { record_user }
+    let(:user) { associated_user }
 
     context '#can_upload?' do
       it 'returns the result of #allowed_to_modify?' do
