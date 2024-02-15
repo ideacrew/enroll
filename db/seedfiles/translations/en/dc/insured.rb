@@ -600,5 +600,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.verification_acceptable_file_types' => "PDF, JPEG, PNG, and GIF",
   :'en.insured.verification_max_file_size' => "File should not exceed 100 MB",
   :'en.waiting_for_eligibility' => "Waiting for your eligibility results...",
-  :'en.insured.existing_person_record_warning_message' => 'Person is already affiliated with another account.'
+  :'en.insured.existing_person_record_warning_message' => 'Person is already affiliated with another account.',
+  :'en.insured.general_agency_index_disabled_warning' => 'The General Agency Index is Disabled',
+  :'en.insured.employer_datatable_disabled_warning' => 'The Employer Data Table is Disabled'
 }.freeze

@@ -218,6 +218,51 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   end
 =end
 
+  describe "employer_datatable" do
+    let(:user) { double("User")}
+    let(:person) { double("Person")}
+    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:hbx_profile) { double("HbxProfile", id: double("id"))}
+
+    before do
+      allow(user).to receive(:person).and_return(person)
+      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
+      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
+      allow(person).to receive(:agent?).and_return(hbx_staff_role)
+      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
+      sign_in(user)
+    end
+
+    context "feature is disabled" do
+      before do
+        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(false)
+      end
+
+      it "redirects to exchanges root path" do
+        get :employer_datatable, format: :html
+
+        expect(response).to redirect_to exchanges_hbx_profiles_root_path
+      end
+
+      it "has flash message" do
+        get :employer_datatable, format: :html
+        expect(flash[:notice]).to eql(l10n('insured.employer_index_disabled_warning'))
+      end
+    end
+
+    context "feature is enabled" do
+      before do
+        EnrollRegistry[:aca_shop_market].feature.stub(:is_enabled).and_return(true)
+      end
+
+      it "renders employer_datatable" do
+        get :employer_datatable, format: :html
+        expect(response).to have_http_status(:success)
+      end
+    end
+  end
+
   describe "#check_hbx_staff_role" do
     let(:user) { double("user")}
     let(:person) { double("person", agent?: true)}
@@ -1014,9 +1059,18 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       it "should returns http success" do
         expect(:get => :general_agency_index).not_to be_routable
       end
+
+      it "redirects to exchanges root path" do
+        get :general_agency_index, format: :html, xhr: true
+        expect(response).to redirect_to exchanges_hbx_profiles_root_path
+      end
+
+      it "has flash message" do
+        get :general_agency_index, format: :html, xhr: true
+        expect(flash[:notice]).to eql(l10n('insured.general_agency_index_disabled_warning'))
+      end
     end
   end
-
 
   describe 'GET view_terminated_hbx_enrollments' do
     let!(:person) { FactoryBot.create(:person)}
