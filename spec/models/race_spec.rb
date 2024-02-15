@@ -69,18 +69,6 @@ RSpec.describe Race, type: :model do
         it_behaves_like 'CMS Reporting Group for attested_races', ['refused'], 'unknown'
       end
 
-      def combinations_of_dual_race
-        races_by_cms_group = [
-          Race::RACES_FOR_CMS_GROUP_WHITE.sample,
-          Race::RACES_FOR_CMS_GROUP_BLACK_OR_AFRICAN_AMERICAN.sample,
-          Race::RACES_FOR_CMS_GROUP_AMERICAN_INDIAN_OR_ALASKA_NATIVE.sample,
-          Race::RACES_FOR_CMS_GROUP_ASIAN.sample,
-          Race::RACES_FOR_CMS_GROUP_NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER.sample
-        ]
-
-        races_by_cms_group.combination(2).to_a + races_by_cms_group.combination(3).to_a + races_by_cms_group.combination(4).to_a + races_by_cms_group
-      end
-
       context 'for dual races' do
         races_by_cms_group = [
           Race::RACES_FOR_CMS_GROUP_WHITE.sample,

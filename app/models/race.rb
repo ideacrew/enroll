@@ -21,6 +21,7 @@ class Race
     other_pacific_islander american_indian_or_alaskan_native other
   ].freeze
 
+  # TODO: Use Translation Helper to populate human readable values for the constant.
   # The mapping of defined race options to their display names or reporting names.
   # @return [Hash] A hash mapping defined race options to their display names or reporting names.
   DEFINED_RACE_OPTIONS_MAPPING = {
@@ -45,6 +46,7 @@ class Race
   # @return [Array<String>] An array of undefined race options.
   UNDEFINED_RACE_OPTIONS = %w[do_not_know refused].freeze
 
+  # TODO: Use Translation Helper to populate human readable values for the constant.
   # The mapping of undefined race options to their human readable forms.
   # @return [Hash] A hash mapping undefined race options to their human readable forms.
   UNDEFINED_RACE_OPTIONS_MAPPING = { 'do_not_know' => 'Do not know', 'refused' => 'Choose not to answer' }.freeze
@@ -60,6 +62,7 @@ class Race
     native_hawaiian_or_other_pacific_islander multi_racial
   ].freeze
 
+  # TODO: Use Translation Helper to populate human readable values for the constant.
   # The mapping of CMS reporting group kinds to their human readable forms.
   # @return [Hash] A hash mapping CMS reporting group kinds to their human readable forms.
   CMS_REPORTING_GROUP_KINDS_MAPPING = {

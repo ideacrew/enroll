@@ -18,6 +18,7 @@ class Ethnicity
   # @return [Array<String>] An array of ethnicity options.
   ETHNICITY_OPTIONS = %w[cuban mexican_mexican_american_or_chicano puerto_rican other].freeze
 
+  # TODO: Use Translation Helper to populate human readable values for the constant.
   # The mapping of ethnicity options to their human readable forms.
   # @return [Hash] A hash mapping ethnicity options to their human readable forms.
   ETHNICITY_OPTIONS_MAPPING = {
@@ -31,6 +32,7 @@ class Ethnicity
   # @return [Array<String>] An array of CMS reporting group kinds.
   CMS_REPORTING_GROUP_KINDS = %w[hispanic_or_latino not_hispanic_or_latino unknown].freeze
 
+  # TODO: Use Translation Helper to populate human readable values for the constant.
   # The mapping of CMS reporting group kinds to their human readable forms.
   # @return [Hash] A hash mapping CMS reporting group kinds to their human readable forms.
   CMS_REPORTING_GROUP_KINDS_MAPPING = {
@@ -42,6 +44,7 @@ class Ethnicity
   # @return [Array<String>] An array of defined hispanic or latino options.
   HISPANIC_OR_LATINO_OPTIONS = %w[yes no do_not_know refused].freeze
 
+  # TODO: Use Translation Helper to populate human readable values for the constant.
   # The mapping of defined hispanic or latino options to their display names.
   # @return [Hash] A hash mapping defined hispanic or latino options to their display names.
   HISPANIC_OR_LATINO_OPTIONS_MAPPING = {
