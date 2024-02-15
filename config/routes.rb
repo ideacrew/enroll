@@ -828,5 +828,6 @@ Rails.application.routes.draw do
     end
   end
 
+  post '/csp_violation_reports' => 'csp_violation_reports#create'
   root 'welcome#index'
 end
