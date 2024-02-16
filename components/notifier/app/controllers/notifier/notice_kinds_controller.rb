@@ -1,7 +1,10 @@
 module Notifier
   class NoticeKindsController < Notifier::ApplicationController
     include ::Config::SiteConcern
+    include ::L10nHelper
     rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+
+    before_action :disable_notice_tab, only: [:index]
     
     layout 'notifier/single_column'
 
@@ -152,6 +155,10 @@ module Notifier
     end
 
     private
+
+    def disable_notice_tab
+      redirect_to(main_app.exchanges_hbx_profiles_root_path, alert: l10n('insured.notices_tab_disabled_warning_message')) unless EnrollRegistry.feature_enabled?(:notices_tab)
+    end
 
     def file_content_type
       params[:file].content_type

@@ -602,5 +602,6 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.waiting_for_eligibility' => "Waiting for your eligibility results...",
   :'en.insured.existing_person_record_warning_message' => 'Person is already affiliated with another account.',
   :'en.insured.general_agency_index_disabled_warning' => 'The General Agency Index is Disabled',
-  :'en.insured.employer_datatable_disabled_warning' => 'The Employer Data Table is Disabled'
+  :'en.insured.employer_datatable_disabled_warning' => 'The Employer Data Table is Disabled',
+  :'en.insured.notices_tab_disabled_warning_message' => 'Notices Tab is Disabled'
 }.freeze

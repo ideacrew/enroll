@@ -14,7 +14,7 @@ registry:
         - key: :inbox_tab
           is_enabled: true
         - key: :notices_tab
-          is_enabled: false
+          is_enabled: <%= ENV['NOTICES_TAB_IS_ENABLED'] || false %>
         - key: :calendar_tab
           is_enabled: false
         - key: :staff_tab
