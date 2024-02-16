@@ -57,7 +57,7 @@ class ConsumerRolePolicy < ApplicationPolicy
     if person
       return true if @user.has_hbx_staff_role? || person.consumer_role.identity_validation == 'valid'
     end
-    return false
+    false
   end
 
   def update?
