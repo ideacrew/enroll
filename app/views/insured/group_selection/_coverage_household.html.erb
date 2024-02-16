@@ -99,9 +99,9 @@
   $(document).on('turbolinks:load', function() {
     $(document).on("change", "input[type=checkbox]", function () {
       if (this.checked) {
-        $(this).closest('tr').find("input[type='radio']").attr('disabled','false');
+        $(this).closest('tr').find("input[type='radio']").prop('disabled','false');
       } else {
-        $(this).closest('tr').find("input[type='radio']").attr('disabled','true');
+        $(this).closest('tr').find("input[type='radio']").prop('disabled','true');
       }
     });
   });

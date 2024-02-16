@@ -1,5 +1,6 @@
 //= require jquery2
 //= require jquery_ujs
+//= require jquery-ui
 //= require bootstrap-treeview
 //= require bowser.min
 //= require ./sweetalerts
