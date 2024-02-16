@@ -63,9 +63,9 @@ QuotePageLoad = (function() {
     }
   var _set_plan_counts = function() {
       $('#show_plan_criteria_count').text('Plans that meet your criteria: ' + String(available_health_plans))
-      $('#show_plan_selected_count').text('You have selected ' + String($('.btn.active').size()) +' plans.')
+      $('#show_plan_selected_count').text('You have selected ' + String($('.btn.active').length) +' plans.')
       $('#show_dental_plan_criteria_count').text('Plans that meet your criteria: ' + '13')
-      $('#show_dental_plan_selected_count').text('You have selected ' + String($('.btn.active').size()) +' plans.')
+      $('#show_dental_plan_selected_count').text('You have selected ' + String($('.btn.active').length) +' plans.')
   }
   var _turn_off_criteria = function() {
       $.each($('#feature-mgmt .active'), function(index,value){ $(value).addClass('criteria').removeClass('active') })
@@ -340,7 +340,7 @@ QuotePageLoad = (function() {
       $('.health_plan_buttons .btn').on('click', function() {
           var plan = $(this)
           delta = plan.hasClass('active') ? -1 : 1;
-          adjusted_health_count = $('.health_plan_buttons.active').size() + delta
+          adjusted_health_count = $('.health_plan_buttons.active').length + delta
           if ( (adjusted_health_count > 3) && (delta == 1)  ) {
             alert('You may not select more than 3 health plans at a time')
             setTimeout(function(){
@@ -356,7 +356,7 @@ QuotePageLoad = (function() {
       $('.dental_plan_buttons .btn').on('click', function() {
           var plan = $(this)
           delta = plan.hasClass('active') ? -1 : 1;
-          adjusted_dental_count = $('.dental_plan_buttons.active').size() + delta
+          adjusted_dental_count = $('.dental_plan_buttons.active').length + delta
           if ( (adjusted_dental_count > 3) && (delta == 1)  ) {
             alert('You may not select more than 3 dental plans at a time')
             setTimeout(function(){

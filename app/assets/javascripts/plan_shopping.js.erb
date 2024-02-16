@@ -50,7 +50,7 @@ function filterPlanByRange(type, combinedSelectors) {
 function applyPlanFilterCBs(cbKlass, cbFilterKlass, planValueTag) {
   var selectedPlanTypes = [];
   var spCheckboxes = $('input.' + cbKlass + ':checked');
-  if (spCheckboxes.size() > 0) {
+  if (spCheckboxes.length > 0) {
     spCheckboxes.each(function(idx, ele) {
       var ptName = $(ele).attr(cbFilterKlass);
       var qstring = "[" + planValueTag  + "='" + ptName + "']";
