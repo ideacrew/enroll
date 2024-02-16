@@ -177,8 +177,17 @@ RSpec.describe BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibi
 
   describe "#eligibility_event_for" do
     subject(:instance) { described_class.new }
+    let(:prospective_eligibility) { false }
 
     before { instance.prospective_eligibility = prospective_eligibility }
+
+    context "when default_eligibility is true" do
+
+      it "should return false" do
+        instance.default_eligibility = true
+        expect(instance.send(:eligibility_event_for, :eligible)).to be_falsey
+      end
+    end
 
     context "when current_state is eligible" do
       let(:current_state) { :eligible }
