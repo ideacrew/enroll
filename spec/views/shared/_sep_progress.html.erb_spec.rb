@@ -27,7 +27,7 @@ describe "shared/_sep_progress.html.erb" do
 
     links.each do |link_name|
       action = should_be_visible ? :to : :not_to
-      expect(rendered).send(action, have_selector('a', text: l10n(link_name)))
+      expect(rendered).send(action, have_selector('a', text: t(link_name)))
     end
   end
 

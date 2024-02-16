@@ -1,6 +1,7 @@
 class Employers::PlanYearsController < ApplicationController
   include Config::AcaConcern
   include ResourceConfigurator
+  include HtmlScrubberUtil
   before_action :find_employer, expect: [:late_rates_check]
   before_action :generate_carriers_and_plans, only: [:create, :reference_plan_options, :update, :edit]
   before_action :updateable?, only: [:new, :edit, :create, :update, :revert, :publish, :force_publish, :make_default_benefit_group]
@@ -359,7 +360,7 @@ class Employers::PlanYearsController < ApplicationController
         error_messages = application_errors.inject(""){|memo, error| "#{memo}<li>#{error[0]}: #{error[1].flatten.join(',')}</li>"} +
                          errors.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}
 
-        flash[:error] = "Renewing Plan Year could not be reverted to draft. #{error_messages}".html_safe
+        flash[:error] = sanitize_html("Renewing Plan Year could not be reverted to draft. #{error_messages}")
       end
     elsif @employer_profile.plan_years.include?(@plan_year) && @plan_year.may_revert_application?
       @plan_year.revert_application
@@ -371,12 +372,12 @@ class Employers::PlanYearsController < ApplicationController
         error_messages = application_errors.inject(""){|memo, error| "#{memo}<li>#{error[0]}: #{error[1].flatten.join(',')}</li>"} +
                          errors.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}
 
-        flash[:error] = "Published Plan Year could not be reverted to draft. #{error_messages}".html_safe
+        flash[:error] = sanitize_html("Published Plan Year could not be reverted to draft. #{error_messages}")
       end
     end
     render :js => "window.location = #{employers_employer_profile_path(@employer_profile, tab: 'benefits').to_json}"
   end
-
+  # rubocop:disable Style/StringConcatenation
   def publish
     @plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
 
@@ -395,12 +396,13 @@ class Employers::PlanYearsController < ApplicationController
         end
       else
         errors = @plan_year.application_errors.values + @plan_year.open_enrollment_date_errors.values
-        flash[:error] = "Plan Year failed to publish. #{('<li>' + errors.flatten.join('</li><li>') + '</li>') if errors.try(:any?)}".html_safe
+        flash[:error] = sanitize_html("Plan Year failed to publish. #{('<li>' + errors.flatten.join('</li><li>') + '</li>') if errors.try(:any?)}")
       end
 
       render :js => "window.location = #{employers_employer_profile_path(@employer_profile, tab: 'benefits').to_json}"
     end
   end
+  # rubocop:enable Style/StringConcatenation
 
   def force_publish
     plan_year = @employer_profile.find_plan_year(params[:plan_year_id])
@@ -584,5 +586,4 @@ class Employers::PlanYearsController < ApplicationController
   def no_products_message(plan_year)
     "Unable to continue application, as this employer is either ineligible to enroll on the #{EnrollRegistry[:enroll_app].setting(:long_name).item}, or no products are available for a benefit plan year starting #{plan_year.start_on}"
   end
-
 end

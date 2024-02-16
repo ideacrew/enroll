@@ -71,18 +71,18 @@
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<u>#{notice.enrollments[0].plan_name}</u>"} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-  ["Your Total Monthly Premium Cost:
+  [sanitize_html("Your Total Monthly Premium Cost:
     &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-    $ [Plan 1 Consumer Monthly Premium]".html_safe] } %>
+    $ [Plan 1 Consumer Monthly Premium]")] } %>
 <% notice.other_enrollments.each do |enrollment| %>
 <% link_text = "Summary of Benefits and Coverage" %>
 <% link_text = "Plan Summary" unless enrollment.coverage_kind == "health" %>
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<u>#{enrollment.plan_name}</u>"} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-  ["Your Total Monthly Premium Cost:
+  [sanitize_html("Your Total Monthly Premium Cost:
     &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-    $ [Plan N Consumer Monthly Premium]".html_safe] } %>
+    $ [Plan N Consumer Monthly Premium]")] } %>
 <% end %>
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>If you do not make your monthly premium payments on time, you could lose your health insurance</strong>. 45 C.F.R. 155.430(b)(2)(ii). You will receive a separate invoice with instructions on how to make that payment. <strong>You must pay your premiums directly to the health plan or dental plan <b>by the date indicated on that invoice</b></strong>.  #{EnrollRegistry[:enroll_app].setting(:contact_center_name).item} is not responsible for collecting your premiums.  Additionally, any auto-payments you may have previously established with the carrier prior to enrolling through #{EnrollRegistry[:enroll_app].setting(:contact_center_name).item} will not carry-over; you must make new payment arrangements."} %>
 
@@ -134,7 +134,7 @@
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<u>Primary documentation</u>:  (Only One (1) is needed) "} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-  [["U.S. Passport", ["<i>Note</i>: Expired passports are acceptable.".html_safe]],
+  [["U.S. Passport", [sanitize_html("<i>Note</i>: Expired passports are acceptable.")]],
    "Certificate of Naturalization",
    "Certificate of Citizenship",
    "Consular report of Birth Abroad of U.S. Citizen",
@@ -143,7 +143,7 @@
       ["Identify the Tribe issuing the document;",
         "Identify the individual by name; and",
         "Confirm the individual’s enrollment in or affiliation with the Tribe.",
-        "<strong>Examples:</strong> Tribal enrollment card, Certificate of Degree of Indian Blood, Tribal Census document".html_safe]]
+        sanitize_html("<strong>Examples:</strong> Tribal enrollment card, Certificate of Degree of Indian Blood, Tribal Census document")]]
   ] } %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => { content: "<u>Secondary documentation</u>:  (Must Present One (1) of the following, along with ID)"} %>
@@ -235,7 +235,7 @@
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You can send the necessary documents either online, through U.S. Postal mail, or in-person."], heading: 'How to Send the Documents Requested', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-  ["Online:  Log into your account on #{EnrollRegistry[:enroll_app].setting(:website_name).item}. You can upload a scanned copy of the document.",
+  [sanitize_html("Online:  Log into your account on #{EnrollRegistry[:enroll_app].setting(:website_name).item}. You can upload a scanned copy of the document.",
     "U.S. Postal Mail  -   #{EnrollRegistry[:enroll_app].setting(:contact_center_name).item}<br>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     Department of Human Services<br>
@@ -243,8 +243,8 @@
     P.O. Box 91560<br>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     Washington, DC 20090<br><br>
-    <i>Be sure to write your account number ([account number]) on your submission.</i>".html_safe,
-    "<b>In-Person</b> – Take the document(s) to any Economic Security Administration Office (call the #{EnrollRegistry[:enroll_app].setting(:contact_center_name).item} at (855) 532 5465 for locations).".html_safe
+    <i>Be sure to write your account number ([account number]) on your submission.</i>"),
+    sanitize_html("<b>In-Person</b> – Take the document(s) to any Economic Security Administration Office (call the #{EnrollRegistry[:enroll_app].setting(:contact_center_name).item} at (855) 532 5465 for locations).")
        ] } %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["We need the documents above <b>by [Date=Date of Notice +95 days]</b> in order to make a final decision on your eligibility for your health plan. If you do not provide the documents by this deadline, we will assume that our records are correct. <u>Your health insurance coverage may be terminated.</u>"], heading: 'How Soon We Need Your Documents', sub_heading: ''} %>

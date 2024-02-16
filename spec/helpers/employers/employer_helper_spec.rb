@@ -119,7 +119,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
           end
 
           it "should return enrollment status for both health & dental" do
-            expect(helper.enrollment_state(census_employee)).to eq "Enrolled (Health)<Br/> Enrolled (Dental)"
+            expect(helper.enrollment_state(census_employee)).to eq "Enrolled (Health)<br> Enrolled (Dental)"
           end
         end
 
@@ -200,7 +200,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
           end
 
           it "should return enrollment status for both health & dental" do
-            expect(helper.humanize_enrollment_states(benefit_group_assignment)).to eq "Coverage Selected (Health)<Br/> Coverage Selected (Dental)"
+            expect(helper.humanize_enrollment_states(benefit_group_assignment)).to eq "Coverage Selected (Health)<br> Coverage Selected (Dental)"
           end
         end
 

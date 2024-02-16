@@ -43,7 +43,7 @@
       <% end %>
       <td><%= er.active_general_agency_legal_name %></td>
       <% if @profile %>
-        <td><%= link_to 'Send Secure Message'.html_safe, new_employers_inbox_path(id: er.id, profile_id: @profile._id, to: er.legal_name), class: "btn btn-default " + (pundit_class HbxProfile, :modify_admin_tabs?), remote: true %></td>
+        <td><%= link_to 'Send Secure Message', new_employers_inbox_path(id: er.id, profile_id: @profile._id, to: er.legal_name), class: "btn btn-default " + (pundit_class HbxProfile, :modify_admin_tabs?), remote: true %></td>
       <% end %>
     </tr>
   <% end %>

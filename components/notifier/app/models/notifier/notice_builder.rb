@@ -4,6 +4,7 @@ module Notifier
     include Config::SiteHelper
     include ApplicationHelper
     include Notifier::ApplicationHelper
+    include PdfScrubberUtil
 
     def to_html(options = {})
       data_object = (resource.present? ? construct_notice_object : recipient.constantize.stubbed_object)
@@ -68,12 +69,7 @@ module Notifier
     end
 
     def to_pdf
-      sanitized_html = sanitize_html(execute_html_pdf_render)
-      WickedPdf.new.pdf_from_string(sanitized_html, pdf_options)
-    end
-
-    def sanitize_html(html)
-      Loofah.scrub_fragment(html, :strip).to_s
+      WickedPdf.new.pdf_from_string(execute_html_pdf_render, pdf_options)
     end
 
     def generate_pdf_notice
@@ -411,7 +407,7 @@ module Notifier
     protected
 
     def execute_html_pdf_render
-      @execute_html_pdf_render ||= self.to_html({kind: 'pdf'})
+      @execute_html_pdf_render ||= sanitize_pdf(self.to_html({kind: 'pdf'}))
     end
 
     def recipient_target

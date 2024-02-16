@@ -7,7 +7,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "app/controllers/financial_assistance/evidences_controller.rb",
-      "line": 77,
+      "line": 76,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "@docs_owner.send(params[:evidence_kind])",
       "render_path": null,
@@ -53,7 +53,7 @@
       "check_name": "EOLRails",
       "message": "Support for Rails 5.2.4.3 ended on 2022-06-01",
       "file": "Gemfile.lock",
-      "line": 380,
+      "line": 385,
       "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
       "code": null,
       "render_path": null,
@@ -66,6 +66,6 @@
       "note": ""
     }
   ],
-  "updated": "2023-02-22 16:32:09 +0000",
+  "updated": "2024-02-20 15:13:10 +0000",
   "brakeman_version": "5.4.1"
 }

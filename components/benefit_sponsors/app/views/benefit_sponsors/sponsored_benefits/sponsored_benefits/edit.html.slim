@@ -13,7 +13,9 @@
       = f.hidden_field :product_package_kind, value: f.object.product_package_kind
       = render "sponsored_benefit", f: f
       = link_to "Cancel", profiles_employers_employer_profile_path(f.object.service.profile, :tab=>'benefits'), class: "btn btn-default"
-      = link_to "Remove Dental Benefits <i class='fa fa-trash-o' aria-hidden='true'></i> ".html_safe, benefit_sponsorship_benefit_application_benefit_package_sponsored_benefit_path(id: f.object.id), method: :delete, class: 'btn btn-primary mtz btn-br'
+      = link_to(benefit_sponsorship_benefit_application_benefit_package_sponsored_benefit_path(id: f.object.id), method: :delete, class: 'btn btn-primary mtz btn-br') do
+        Remove Dental Benefits
+        i.fa.fa-trash-o aria-hidden='true'
       = f.submit "Submit Dental Benefits", class: "btn btn-primary pull-right hidden", id: "submitDentalBenefits"
       = f.submit "Save Benefit Package", class: "btn btn-primary pull-right", id: "saveBenefitPackage"
       = pundit_span EmployerProfile, :updateable?
@@ -21,9 +23,6 @@
 
 
 javascript:
-
-  // var form = #{@sponsored_benefit_form.to_json.html_safe}
-
   // function setEditSliderInput(element) {
   //   document.querySelector(".edit_slider-"+element.dataset.unitId).value = element.value
   // }
