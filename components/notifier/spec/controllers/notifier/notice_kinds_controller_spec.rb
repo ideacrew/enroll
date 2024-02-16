@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Notifier::NoticeKindsController, dbclean: :around_each do
@@ -18,7 +20,7 @@ RSpec.describe Notifier::NoticeKindsController, dbclean: :around_each do
       allow(hbx_staff_role).to receive(:permission).and_return(permission)
       sign_in(user)
     end
-    
+
     context "with notices tab feature enabled" do
 
       before do
