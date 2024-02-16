@@ -183,6 +183,7 @@ class DcDefinePermissions < MigrationTask
   end
 
   def hbx_admin_can_view_audit_log
+    Permission.hbx_staff.update_attributes!(can_view_audit_log: true)
     Permission.super_admin.update_attributes!(can_view_audit_log: true)
     Permission.hbx_tier3.update_attributes!(can_view_audit_log: true)
   end
