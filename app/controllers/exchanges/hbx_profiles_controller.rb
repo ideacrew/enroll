@@ -875,11 +875,11 @@ def employer_poc
   private
 
   def redirect_if_employer_datatable_is_disabled
-    redirect_to(exchanges_hbx_profiles_root_path, notice: l10n('insured.employer_datatable_disabled_warning')) unless EnrollRegistry.feature_enabled?(:aca_shop_market)
+    redirect_to(exchanges_hbx_profiles_root_path, alert: l10n('insured.employer_datatable_disabled_warning')) unless EnrollRegistry.feature_enabled?(:aca_shop_market)
   end
 
   def redirect_if_general_agency_is_disabled
-    redirect_to(exchanges_hbx_profiles_root_path, notice: l10n('insured.general_agency_index_disabled_warning')) unless EnrollRegistry.feature_enabled?(:general_agency)
+    redirect_to(exchanges_hbx_profiles_root_path, alert: l10n('insured.general_agency_index_disabled_warning')) unless EnrollRegistry.feature_enabled?(:general_agency)
   end
 
   def redirect_if_staff_tab_is_disabled
