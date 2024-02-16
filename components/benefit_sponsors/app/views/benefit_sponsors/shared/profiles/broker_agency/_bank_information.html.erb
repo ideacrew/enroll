@@ -74,10 +74,10 @@
         loadAchRecord(originalVal);
       }
       if (originalVal !== valueOfConfirm) {
-        $('button.interaction-click-control-create-broker-agency').attr('disabled',true)
+        $('button.interaction-click-control-create-broker-agency').prop('disabled',true)
         $('button.interaction-click-control-create-broker-agency.valid').attr('data-original-title', 'ACH Routing # mismatch').tooltip('show');
       } else {
-        $('button.interaction-click-control-create-broker-agency.valid').attr('disabled',false)
+        $('button.interaction-click-control-create-broker-agency.valid').prop('disabled',false)
         $('button.interaction-click-control-create-broker-agency.valid').tooltip('hide');
       }
     });
@@ -85,11 +85,11 @@
     $('body').on('keyup', 'input.interaction-field-control-organization-ach-record-routing-number-confirmation', function(){
       var valueOfRoutingNum = $('input.interaction-field-control-organization-ach-record-routing-number').val();
       if (valueOfRoutingNum !== $(this).val()) {
-        $('button.interaction-click-control-create-broker-agency').attr('disabled',true)
+        $('button.interaction-click-control-create-broker-agency').prop('disabled',true)
         $('button.interaction-click-control-create-broker-agency.valid').attr('data-original-title', 'ACH Routing # mismatch').tooltip('show');
       } else {
         $('button.interaction-click-control-create-broker-agency.valid').tooltip('hide');
-        $('button.interaction-click-control-create-broker-agency.valid').attr('disabled',false)
+        $('button.interaction-click-control-create-broker-agency.valid').prop('disabled',false)
       }
     });
   });
