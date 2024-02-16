@@ -944,7 +944,9 @@ module BenefitSponsors
           effective_date = Date.new(year, 1, 1)
           next if eligibility_on(effective_date)
 
-          ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new.call(
+          operation = ::BenefitSponsors::Operations::BenefitSponsorships::ShopOsseEligibilities::CreateShopOsseEligibility.new
+          operation.default_eligibility = true
+          operation.call(
             initial_osse_eligibility_params(effective_date)
           )
         rescue StandardError => e

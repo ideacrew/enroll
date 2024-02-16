@@ -164,6 +164,7 @@ module Operations
 
       def publish_event(eligibility)
         event_name = eligibility_event_for(eligibility.current_state)
+        return Succcess(eligibility) unless event_name
 
         Operations::EventLogs::TrackableEvent.new.call({
                                                          event_name: event_name,
@@ -173,7 +174,11 @@ module Operations
                                                        })
       end
 
+      # This method is used to determine the event name for the current eligibility state.
+      # If default_eligibility is true, returns false indicating no eligibility event.
+      # If prospective_eligibility is true, returns the string representing the event for renewed eligibility.
       def eligibility_event_for(current_state)
+        return false if default_eligibility
         return 'events.people.eligibilities.ivl_osse_eligibility.eligibility_renewed' if prospective_eligibility
 
         case current_state
@@ -181,6 +186,8 @@ module Operations
           'events.people.eligibilities.ivl_osse_eligibility.eligibility_created'
         when :ineligible
           'events.people.eligibilities.ivl_osse_eligibility.eligibility_terminated'
+        else
+          false
         end
       end
     end
