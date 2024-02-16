@@ -54,7 +54,7 @@ class ConsumerRolePolicy < ApplicationPolicy
   # then the user has access to continue past RIDP.
   def accessible?
     person = @user.person
-    return true if person && (@user.has_hbx_staff_role? || person.consumer_role.identity_validation == 'valid')
+    return person && (@user.has_hbx_staff_role? || person.consumer_role.identity_verified?)
     false
   end
 
