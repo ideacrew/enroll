@@ -471,7 +471,7 @@ function disableActionButtons() {
     $(function () {
       $('[data-toggle="tooltip"]').tooltip()
     });
-    $('.plan_design_proposals .save-action').attr('disabled', 'disabled');
+    $('.plan_design_proposals .save-action').prop('disabled', true);
     $('.plan_design_proposals .plan-selection-button-group').attr({
      'data-toggle': "tooltip",
      'data-placement': "top",
