@@ -45,9 +45,9 @@
     CONTINUE
 - elsif ridp == true && step == 2
   - if next_link.present?  && current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Phone" || @person.primary_family.application_type == "Paper")
-    = link_to "Continue", (pundit_allow(@person.consumer_role, :ridp_accessible?) ? next_link : request.path), :method => :get, :class => "button btn btn-lg btn-primary  btn-block interaction-click-control-continue" + pundit_class(@person.consumer_role, :ridp_accessible?), id: 'btn-continue', :disabled => (application_verified || identity_verified) ? false : true
+    = link_to "Continue", (pundit_allow(@person.consumer_role, :ridp_verified?) ? next_link : request.path), :method => :get, :class => "button btn btn-lg btn-primary  btn-block interaction-click-control-continue" + pundit_class(@person.consumer_role, :ridp_verified?), id: 'btn-continue', :disabled => (application_verified || identity_verified) ? false : true
   - elsif next_link.present?
-    = link_to "Continue", (pundit_allow(@person.consumer_role, :ridp_accessible?) ? next_link : request.path), :method => :get, :class => "button btn btn-lg btn-primary  btn-block interaction-click-control-continue" + pundit_class(@person.consumer_role, :ridp_accessible?), id: 'btn-continue', :disabled => !identity_verified
+    = link_to "Continue", (pundit_allow(@person.consumer_role, :ridp_verified?) ? next_link : request.path), :method => :get, :class => "button btn btn-lg btn-primary  btn-block interaction-click-control-continue" + pundit_class(@person.consumer_role, :ridp_verified?), id: 'btn-continue', :disabled => !identity_verified
   - elsif EnrollRegistry.feature_enabled?(:ridp_h139) && Rails.env.production? && !(ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true')
     = link_to "Continue", new_insured_fdsh_ridp_verification_path, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue'
   - else

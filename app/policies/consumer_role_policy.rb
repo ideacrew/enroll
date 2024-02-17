@@ -50,16 +50,25 @@ class ConsumerRolePolicy < ApplicationPolicy
     return false
   end
 
-  # Checking presence of hbx_staff_role and if identity_validation is valid. If either are true,
-  # then the user has access to continue past RIDP.
-  def ridp_accessible?
-    user_person = @user.person
-    broker_staff_roles = user_person.active_broker_staff_roles
-    broker_role = user_person.broker_role
-    if broker_role.present? || broker_staff_roles.any?
-      can_broker_modify_consumer?(broker_role, broker_staff_roles)
-    end
-    @record&.person.primary_family.family_members.detect{|fm| fm.person_id == user_person.id} || @user&.person.hbx_staff_role.permission.modify_family || @user.person.consumer_role.identity_verified?
+  # Checking if consumer identity has been verified or if user has hbx_staff_role.
+  # If either are true, then the user has access beyond the RIDP page.
+  def ridp_verified?
+    user_person = @user&.person
+    # NOTE: brokers and consumers both require consumer identity to be verified beyond ridp page
+    # TODO:
+    # 1. Need to confirm how this behaves when user is logged in as broker
+    #    If @user returns the broker, then we need to find a way to check the consumer's identity.
+    #    Presumably, consumer role id or consumer's person id is available somewhere in the request.
+    #    If @user is returning the consumer somehow, then the condition below is sufficient.
+    # 2. Confirm how this behaves when user is logged in as hbx admin
+
+    # Leaving commented code below, but it may need to be removed when above is confirmed
+    # broker_staff_roles = user_person.active_broker_staff_roles
+    # broker_role = user_person.broker_role
+    # if broker_role.present? || broker_staff_roles.any?
+    #   can_broker_modify_consumer?(broker_role, broker_staff_roles)
+    # end
+    user_person&.hbx_staff_role&.permission&.modify_family || user_person&.consumer_role&.identity_verified?
   end
 
   def can_broker_modify_consumer?(broker, broker_staff)
