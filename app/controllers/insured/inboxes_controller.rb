@@ -1,4 +1,5 @@
 class Insured::InboxesController < InboxesController
+  before_action :authorize_inbox
 
   def new
     @inbox_to_name = params['to']
@@ -13,5 +14,11 @@ class Insured::InboxesController < InboxesController
 
   def successful_save_path
     exchanges_hbx_profiles_root_path
+  end
+
+  private
+
+  def authorize_inbox
+    binding.irb
   end
 end
