@@ -13,18 +13,10 @@
 class FamilyMemberPolicy < ApplicationPolicy
   ACCESSABLE_ROLES = %w[hbx_staff_role broker_role active_broker_staff_roles].freeze
 
-  # NOTE: while 'can_view?' is the name of this method, it only applies to the `index` method of the `insured/family_members_controller`
-  def can_view?
-    allowed_to_modify?
-  end
-
-  def can_create?
-    allowed_to_modify?
-  end
-
-  # NOTE: while 'can_modify_existing?' is the name of this method, it also applies to the `show` and `edit` methods of the `insured/family_members_controller`
-  # as well as the `update` and `destroy` methods
-  def can_modify_existing?
+  # NOTE: while 'can_modify_family_members?' is the name of this method, it also applies to the `show` and `edit`, `new`, and `index` methods of the `insured/family_members_controller`
+  # as well as the `create`, `update`, and `destroy` methods
+  # We're only using this one method now -- more can be made as the need to separate permissions for different CRUD operations arises
+  def can_modify_family_members?
     allowed_to_modify?
   end
 

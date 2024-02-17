@@ -18,21 +18,9 @@ RSpec.describe FamilyMemberPolicy, type: :policy do
     context 'with permission' do
       let!(:permission) { FactoryBot.create(:permission, :super_admin) }
 
-      context '#can_view?' do
+      context '#can_modify_family_members?' do
         it 'returns the result of #allowed_to_modify?' do
-          expect(policy.can_view?).to be_truthy
-        end
-      end
-
-      context '#can_create?' do
-        it 'returns the result of #allowed_to_modify?' do
-          expect(policy.can_create?).to be_truthy
-        end
-      end
-
-      context '#can_modify_existing?' do
-        it 'returns the result of #allowed_to_modify?' do
-          expect(policy.can_modify_existing?).to be_truthy
+          expect(policy.can_modify_family_members?).to be_truthy
         end
       end
     end
@@ -40,21 +28,9 @@ RSpec.describe FamilyMemberPolicy, type: :policy do
     context 'without permission' do
       let!(:permission) { FactoryBot.create(:permission, :developer) }
 
-      context '#can_view?' do
+      context '#can_modify_family_members?' do
         it 'returns the result of #allowed_to_modify?' do
-          expect(policy.can_view?).to be_falsey
-        end
-      end
-
-      context '#can_create?' do
-        it 'returns the result of #allowed_to_modify?' do
-          expect(policy.can_create?).to be_falsey
-        end
-      end
-
-      context '#can_modify_existing?' do
-        it 'returns the result of #allowed_to_modify?' do
-          expect(policy.can_modify_existing?).to be_falsey
+          expect(policy.can_modify_family_members?).to be_falsey
         end
       end
     end
@@ -63,21 +39,9 @@ RSpec.describe FamilyMemberPolicy, type: :policy do
   context 'record user' do
     let(:user) { associated_user }
 
-    context '#can_view?' do
+    context '#can_modify_family_members?' do
       it 'returns the result of #allowed_to_modify?' do
-        expect(policy.can_view?).to be_truthy
-      end
-    end
-
-    context '#can_create?' do
-      it 'returns the result of #allowed_to_modify?' do
-        expect(policy.can_create?).to be_truthy
-      end
-    end
-
-    context '#can_modify_existing?' do
-      it 'returns the result of #allowed_to_modify?' do
-        expect(policy.can_modify_existing?).to be_truthy
+        expect(policy.can_modify_family_members?).to be_truthy
       end
     end
   end
@@ -89,21 +53,9 @@ RSpec.describe FamilyMemberPolicy, type: :policy do
     let!(:fake_family_member) { fake_family.family_members.first }
     let(:user) { fake_user }
 
-    context '#can_view?' do
+    context '#can_modify_family_members?' do
       it 'returns the result of #allowed_to_modify?' do
-        expect(policy.can_view?).to be_falsey
-      end
-    end
-
-    context '#can_create?' do
-      it 'returns the result of #allowed_to_modify?' do
-        expect(policy.can_create?).to be_falsey
-      end
-    end
-
-    context '#can_modify_existing?' do
-      it 'returns the result of #allowed_to_modify?' do
-        expect(policy.can_modify_existing?).to be_falsey
+        expect(policy.can_modify_family_members?).to be_falsey
       end
     end
   end
@@ -129,42 +81,18 @@ RSpec.describe FamilyMemberPolicy, type: :policy do
         family.reload
       end
 
-
-      context '#can_view?' do
+      context '#can_modify_family_members?' do
         it 'returns the result of #allowed_to_modify?' do
-          expect(policy.can_view?).to be_truthy
-        end
-      end
-
-      context '#can_create?' do
-        it 'returns the result of #allowed_to_modify?' do
-          expect(policy.can_create?).to be_truthy
-        end
-      end
-
-      context '#can_modify_existing?' do
-        it 'returns the result of #allowed_to_modify?' do
-          expect(policy.can_modify_existing?).to be_truthy
+          expect(policy.can_modify_family_members?).to be_truthy
         end
       end
     end
 
     context 'not hired by family' do
-      context '#can_view?' do
-        it 'returns the result of #allowed_to_modify?' do
-          expect(policy.can_view?).to be_falsey
-        end
-      end
 
-      context '#can_create?' do
+      context '#can_modify_family_members?' do
         it 'returns the result of #allowed_to_modify?' do
-          expect(policy.can_create?).to be_falsey
-        end
-      end
-
-      context '#can_modify_existing?' do
-        it 'returns the result of #allowed_to_modify?' do
-          expect(policy.can_modify_existing?).to be_falsey
+          expect(policy.can_modify_family_members?).to be_falsey
         end
       end
     end

@@ -333,6 +333,6 @@ class Insured::FamilyMembersController < ApplicationController
   def authorize_family_access
     family_member = @family.primary_family_member
 
-    authorize family_member, :can_modify_existing?
+    authorize family_member, :can_modify_family_members?
   end
 end

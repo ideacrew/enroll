@@ -23,9 +23,8 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
   describe "GET index" do
     before do
-      # NOTE: both of these inclusions need to be made here due to the limitations of Factory/instance_double relationships
+      # NOTE: this inclusion needed to be made due to the limitations of Factory relationships
       allow(person).to receive(:primary_family).and_return(test_family)
-      # allow(person).to receive(:user).and_return(user)
     end
 
     context 'normal' do
@@ -48,8 +47,8 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       end
 
       it "assigns the family" do
-        # I'm not sure why this was ever assigned to equal nil
-        # the _family_members partial won't even render correctly if @family is nil
+        # I'm not sure why this test ever expected for the controller to assign `family` to equal nil
+        # the _family_members partial rendered in the `index` view will throw an error if @family is nil
         expect(assigns(:family)).to eq test_family
       end
     end
@@ -74,6 +73,8 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       end
 
       it "assigns the family" do
+        # I'm not sure why this test ever expected for the controller to assign `family` to equal nil
+        # the _family_members partial rendered in the `index` view will throw an error if @family is nil
         expect(assigns(:family)).to eq test_family
       end
     end
@@ -405,15 +406,12 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
   end
 
   describe "DELETE destroy" do
-    # let(:family) { double(Family, active_family_members: [])}
-
     let(:dependent) { double(family_id: test_family.id) }
     let(:dependent_id) { "234dlfjadsklfj" }
 
     before :each do
       sign_in(user)
       allow(Family).to receive(:find).with(dependent.family_id).and_return(test_family)
-      # subject.instance_variable_set(:@family, family)
     end
 
     it "should destroy the dependent" do
