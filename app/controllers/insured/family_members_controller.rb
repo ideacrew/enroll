@@ -50,6 +50,8 @@ class Insured::FamilyMembersController < ApplicationController
       @family.hire_broker_agency(broker_role_id)
     end
     @family = Family.find(params[:family_id]) if params[:family_id]
+    authorize_family_access
+
     @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
 
@@ -82,6 +84,9 @@ class Insured::FamilyMembersController < ApplicationController
 
   def new
     @dependent = ::Forms::FamilyMember.new(:family_id => params.require(:family_id))
+    @family = Family.find(params[:family_id])
+    authorize_family_access
+
     respond_to do |format|
       format.html
       format.js
@@ -92,6 +97,8 @@ class Insured::FamilyMembersController < ApplicationController
     @dependent = ::Forms::FamilyMember.new(params[:dependent].merge({skip_consumer_role_callbacks: true}))
     @address_errors = validate_address_params(params)
     @family = Family.find(@dependent.family_id)
+    authorize_family_access
+
     if @family.primary_applicant.person.resident_role?
       if @address_errors.blank? && @dependent.save
         @created = true
@@ -215,6 +222,8 @@ class Insured::FamilyMembersController < ApplicationController
     set_admin_bookmark_url(resident_index_insured_family_members_path)
     @resident_role = ResidentRole.find(params[:resident_role_id])
     @family = @resident_role.person.primary_family
+    authorize_family_access
+
     @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
 
@@ -241,6 +250,9 @@ class Insured::FamilyMembersController < ApplicationController
 
   def new_resident_dependent
     @dependent = ::Forms::FamilyMember.new(:family_id => params.require(:family_id))
+    @family = Family.find(params[:family_id])
+    authorize_family_access
+
     respond_to do |format|
       format.html
       format.js
@@ -249,6 +261,9 @@ class Insured::FamilyMembersController < ApplicationController
 
   def edit_resident_dependent
     @dependent = ::Forms::FamilyMember.find(params.require(:id))
+    @family = Family.find(params[:family_id])
+    authorize_family_access
+
     respond_to do |format|
       format.html
       format.js
@@ -257,6 +272,9 @@ class Insured::FamilyMembersController < ApplicationController
 
   def show_resident_dependent
     @dependent = ::Forms::FamilyMember.find(params.require(:id))
+    @family = Family.find(params[:family_id])
+    authorize_family_access
+
     respond_to do |format|
       format.html
       format.js
@@ -305,5 +323,13 @@ class Insured::FamilyMembersController < ApplicationController
   def set_dependent_and_family
     @dependent = ::Forms::FamilyMember.find(params.require(:id))
     @family = Family.find(@dependent.family_id)
+    authorize_family_access
+  end
+
+  def authorize_family_access
+    family_member = @family.primary_family_member
+    binding.irb
+
+    authorize family_member, :can_modify_existing?
   end
 end

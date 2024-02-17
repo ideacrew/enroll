@@ -14,10 +14,11 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
   let(:census_employee) { FactoryBot.create(:census_employee) }
 
   before do
+    allow_any_instance_of(described_class).to receive(:authorize_family_access).and_return(true)
+
     employer_profile.plan_years << published_plan_year
     employer_profile.save
   end
-
 
   describe "GET index" do
     context 'normal' do
