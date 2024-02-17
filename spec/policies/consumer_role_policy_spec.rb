@@ -78,6 +78,7 @@ describe ConsumerRolePolicy, dbclean: :after_each do
     let(:person) { FactoryBot.create(:person, :with_hbx_staff_role) }
     let(:hbx_staff_role) { FactoryBot.create(:hbx_staff_role, person: person)}
     let(:permission) { FactoryBot.create(:permission)}
+    let(:user_without_staff_role) { FactoryBot.create(:user, person: consumer_person) }
 
     it "grants access when hbx_staff" do
       allow(hbx_staff_role).to receive(:permission).and_return permission
@@ -87,7 +88,7 @@ describe ConsumerRolePolicy, dbclean: :after_each do
     end
 
     it "denies access when normal user" do
-      expect(subject).not_to permit(User.new, consumer_role)
+      expect(subject).not_to permit(user_without_staff_role, consumer_role)
     end
 
     context "consumer" do
