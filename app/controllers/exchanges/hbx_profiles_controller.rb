@@ -19,6 +19,8 @@ class Exchanges::HbxProfilesController < ApplicationController
   before_action :find_benefit_sponsorship, only: [:oe_extendable_applications, :oe_extended_applications, :edit_open_enrollment, :extend_open_enrollment, :close_extended_open_enrollment, :edit_fein, :update_fein, :force_publish, :edit_force_publish]
   before_action :redirect_if_staff_tab_is_disabled, only: [:staff_index]
   before_action :set_cache_headers, only: [:show, :family_index_dt, :user_account_index, :identity_verification, :broker_agency_index, :outstanding_verification_dt, :configuration, :inbox]
+  before_action :redirect_if_general_agency_is_disabled, only: [:general_agency_index]
+  before_action :redirect_if_employer_datatable_is_disabled, only: [:employer_datatable]
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
   layout 'single_column'
@@ -871,6 +873,14 @@ def employer_poc
   end
 
   private
+
+  def redirect_if_employer_datatable_is_disabled
+    redirect_to(exchanges_hbx_profiles_root_path, alert: l10n('insured.employer_datatable_disabled_warning')) unless EnrollRegistry.feature_enabled?(:aca_shop_market)
+  end
+
+  def redirect_if_general_agency_is_disabled
+    redirect_to(exchanges_hbx_profiles_root_path, alert: l10n('insured.general_agency_index_disabled_warning')) unless EnrollRegistry.feature_enabled?(:general_agency)
+  end
 
   def redirect_if_staff_tab_is_disabled
     redirect_to(main_app.root_path, notice: l10n("staff_index_not_enabled")) unless EnrollRegistry.feature_enabled?(:staff_tab)

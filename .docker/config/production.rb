@@ -52,8 +52,9 @@ Rails.application.configure do
       policy.default_src :self, :https
       policy.font_src :self, :https, :data, "*.gstatic.com  *.fontawesome.com"
       policy.img_src :self, :https, :data, "*.google-analytics.com *.gstatic.com *.googletagmanager.com"
-      policy.script_src :self, :https, :unsafe_inline, "https://tagmanager.google.com https://www.googletagmanager.com https://apps.usw2.pure.cloud *.fontawesome.com *.google-analytics.com"
+      policy.script_src :self, :https, :unsafe_inline, :unsafe_eval, "https://tagmanager.google.com https://www.googletagmanager.com https://apps.usw2.pure.cloud *.fontawesome.com *.google-analytics.com"
       policy.style_src :self, :https, :unsafe_inline, "https://tagmanager.google.com https://www.googletagmanager.com https://fonts.googleapis.com *.fontawesome.com"
+      policy.media_src :self, :https, :data
     end
   end
 
