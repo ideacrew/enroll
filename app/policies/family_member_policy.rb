@@ -8,8 +8,9 @@
 # The permissions are determined based on the user's role and their relationship to the record.
 #
 # @example Checking if a user can update a FamilyMember record
-#   policy = DocumentPolicy.new(user, record)
-#   policy.can_upload? #=> true
+#   policy = FamilyMemberPolicy.new(user, record)
+#   policy.can_modify_family_members? #=> true, OR
+#   authorize family_member, :method_name #=> true
 class FamilyMemberPolicy < ApplicationPolicy
   ACCESSABLE_ROLES = %w[hbx_staff_role broker_role active_broker_staff_roles].freeze
 
