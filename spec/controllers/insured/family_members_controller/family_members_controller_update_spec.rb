@@ -33,13 +33,6 @@ RSpec.describe Insured::FamilyMembersController do
         family: family
       )
     end
-    let(:primary_family_member) do
-      instance_double(
-        FamilyMember,
-        person: person,
-        family: family
-      )
-    end
     let(:dependent_person) do
       instance_double(
         Person,
@@ -80,9 +73,6 @@ RSpec.describe Insured::FamilyMembersController do
       sign_in(user)
 
       allow(person).to receive(:agent?).and_return(false)
-      allow(family).to receive(:primary_family_member).and_return(primary_family_member)
-      allow(family).to receive(:primary_person).and_return(person)
-      allow(person).to receive(:user).and_return(user)
       allow(Forms::FamilyMember).to receive(:find).with(dependent_id).and_return(dependent)
       allow(Family).to receive(:find).with(family_id).and_return(family)
       allow(dependent).to receive(:update_attributes).with(dependent_controller_parameters).and_return(true)
