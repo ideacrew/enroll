@@ -7,10 +7,10 @@
       <br></li>
     <li class="list-group-item">
       Subject:
-      <%= message.try(:subject).html_safe %>
+      <%= sanitize(message&.subject) %>
       <br></li>
     <li class="list-group-item">
-      <%= message.try(:body).html_safe %>
+      <%= sanitize(message&.body) %>
       <br></li>
   </ul>
   <br class="clear"/>
