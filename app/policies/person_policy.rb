@@ -8,4 +8,10 @@ class PersonPolicy < ApplicationPolicy
     return true if user.person.hbx_staff_role
     true if user.person.broker_role || record.broker_role
   end
+
+  def can_access_identity_verifications?
+    return true if user.person.hbx_staff_role
+    return true if user.person.id == record.id
+    false
+  end
 end

@@ -58,4 +58,36 @@ describe Insured::FdshRidpVerificationsController do
       end
     end
   end
+
+  describe '.failed_validation' do
+    let(:user){ FactoryBot.create(:user, :consumer, person: person) }
+    let(:person){ FactoryBot.create(:person, :with_consumer_role) }
+
+    context "GET failed_validation", dbclean: :after_each do
+      before(:each) do
+        sign_in user
+        allow(user).to receive(:person).and_return(person)
+      end
+
+      it "should render template" do
+        allow_any_instance_of(ConsumerRole).to receive(:move_identity_documents_to_outstanding).and_return(true)
+        get :failed_validation, params: {}
+
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("failed_validation")
+      end
+
+      context "when tried to access unauthorized person" do
+        let(:person_B){ FactoryBot.create(:person, :with_consumer_role) }
+        let!(:user_B){ FactoryBot.create(:user, person: person_B) }
+
+        it "should redirect with authorization error" do
+          get :failed_validation, params: {person_id: person_B.id.to_s}
+
+          expect(response).to have_http_status(:redirect)
+          expect(flash[:error]).to eq("Access not allowed for person_policy.can_access_identity_verifications?, (Pundit policy)")
+        end
+      end
+    end
+  end
 end
