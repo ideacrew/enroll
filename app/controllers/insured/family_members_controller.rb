@@ -50,10 +50,12 @@ class Insured::FamilyMembersController < ApplicationController
       @family.hire_broker_agency(broker_role_id)
     end
     @family = Family.find(params[:family_id]) if params[:family_id]
-    authorize_family_access
+    # authorize_family_access
 
     @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
+
+    binding.irb
 
     if params[:sep_id].present?
       @sep = @family.special_enrollment_periods.find(params[:sep_id])
@@ -83,8 +85,10 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def new
-    @dependent = ::Forms::FamilyMember.new(:family_id => params.require(:family_id))
-    @family = Family.find(params[:family_id])
+    family_id = params.require(:family_id)
+    @dependent = ::Forms::FamilyMember.new(:family_id => family_id)
+
+    @family = Family.find(family_id)
     authorize_family_access
 
     respond_to do |format|
@@ -328,7 +332,6 @@ class Insured::FamilyMembersController < ApplicationController
 
   def authorize_family_access
     family_member = @family.primary_family_member
-    binding.irb
 
     authorize family_member, :can_modify_existing?
   end

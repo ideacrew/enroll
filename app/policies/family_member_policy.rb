@@ -79,14 +79,14 @@ class FamilyMemberPolicy < ApplicationPolicy
   end
 
   def associated_user
-    associated_family_primary_member.user
+    associated_family_primary_member&.user
   end
 
   def associated_family_primary_member
-    associated_family.primary_person
+    associated_family&.primary_person
   end
 
   def associated_family
-    record.family
+    record&.family
   end
 end
