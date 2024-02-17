@@ -23,7 +23,7 @@ Rails.application.routes.draw do
   mount SponsoredBenefits::Engine,    at: "/sponsored_benefits"
   mount TransportGateway::Engine,     at: "/transport_gateway"
   mount TransportProfiles::Engine,    at: "/transport_profiles"
-  mount Notifier::Engine,             at: "/notifier"
+  mount Notifier::Engine,             at: "/notifier" if EnrollRegistry.feature_enabled?(:notices_tab)
   mount FinancialAssistance::Engine,  at: '/financial_assistance'
 
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :passwords => 'users/passwords' }

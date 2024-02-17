@@ -89,14 +89,6 @@ When(/^the user types in the staff index URL$/) do
   visit "/exchanges/hbx_profiles/staff_index"
 end
 
-When(/^the user visits the notices page$/) do
-  visit "/notifier/notice_kinds"
-end
-
-Then(/^the user will not be able to access the notices page$/) do
-  expect(page).to have_content(l10n('insured.notices_tab_disabled_warning_message'))
-end
-
 Then(/^the user will not be able to access staff index page$/) do
   expect(page).to_not have_content("CSR, CAC and Assisters")
   expect(page).to have_content(l10n("staff_index_not_enabled"))
