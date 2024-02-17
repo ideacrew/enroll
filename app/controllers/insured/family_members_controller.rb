@@ -50,12 +50,10 @@ class Insured::FamilyMembersController < ApplicationController
       @family.hire_broker_agency(broker_role_id)
     end
     @family = Family.find(params[:family_id]) if params[:family_id]
-    # authorize_family_access
+    authorize_family_access
 
     @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
-
-    binding.irb
 
     if params[:sep_id].present?
       @sep = @family.special_enrollment_periods.find(params[:sep_id])
@@ -100,6 +98,7 @@ class Insured::FamilyMembersController < ApplicationController
   def create
     @dependent = ::Forms::FamilyMember.new(params[:dependent].merge({skip_consumer_role_callbacks: true}))
     @address_errors = validate_address_params(params)
+
     @family = Family.find(@dependent.family_id)
     authorize_family_access
 
@@ -327,6 +326,7 @@ class Insured::FamilyMembersController < ApplicationController
   def set_dependent_and_family
     @dependent = ::Forms::FamilyMember.find(params.require(:id))
     @family = Family.find(@dependent.family_id)
+
     authorize_family_access
   end
 

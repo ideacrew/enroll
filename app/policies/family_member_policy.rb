@@ -39,7 +39,6 @@ class FamilyMemberPolicy < ApplicationPolicy
   #
   # @note The user is the one who is trying to perform the action. The record_user is the user who owns the record. The record is an instance of FamilyMember.
   def allowed_to_modify?
-    binding.irb
     (current_user == associated_user) || role_has_permission_to_modify_family_members?
   end
 
