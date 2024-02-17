@@ -24,7 +24,7 @@ RSpec.describe Insured::FamilyMembersController do
         extended_family_coverage_household: extended_family_coverage_household
       )
     end
-    let(:family) { instance_double(Family, id: family_id, active_family_members: [], active_household: active_household, primary_family_member: nil) }
+    let(:family) { instance_double(Family, id: family_id, active_family_members: [], active_household: active_household) }
     let(:family_id) { "SOME FAMILY ID" }
     let(:family_member) do
       instance_double(
