@@ -19,6 +19,6 @@ class Insured::InboxesController < InboxesController
   private
 
   def authorize_inbox
-    binding.irb
+    authorize @inbox_provider, :can_access_insured_inbox?
   end
 end

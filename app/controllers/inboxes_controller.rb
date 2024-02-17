@@ -30,7 +30,6 @@ class InboxesController < ApplicationController
     end
   end
 
-
   def destroy
     #@message.destroy
     @message.update_attributes(folder: Message::FOLDER_TYPES[:deleted])

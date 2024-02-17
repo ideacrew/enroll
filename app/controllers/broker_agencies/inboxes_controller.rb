@@ -47,7 +47,7 @@ class BrokerAgencies::InboxesController < InboxesController
   end
 
   def find_inbox_provider
-    id = params["id"]||params['profile_id']
+    id = params["id"] || params['profile_id']
     if Person.where(:id => params["id"]).present?
       @inbox_provider = Person.find(params["id"])
     else
@@ -63,5 +63,4 @@ class BrokerAgencies::InboxesController < InboxesController
   def successful_save_path
     exchanges_hbx_profiles_root_path
   end
-
 end

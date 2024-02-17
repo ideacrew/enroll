@@ -12,11 +12,11 @@
 class InboxPolicy < ApplicationPolicy
   ACCESSABLE_ROLES = %w[hbx_staff_role broker_role active_broker_staff_roles].freeze
 
-  # NOTE: while 'can_modify_family_members?' is the name of this method, it also applies to the `show` and `edit`, `new`, and `index` methods of the `insured/family_members_controller`
+  # NOTE: while 'can_access_inbox?' is the name of this method, it also applies to the `show` and `edit`, `new`, and `index` methods of the `insured/family_members_controller`
   # as well as the `create`, `update`, and `destroy` methods
   # We're only using this one method now -- more can be made as the need to separate permissions for different CRUD operations arises
-  def can_modify_family_members?
-    allowed_to_modify?
+  def can_access_insured_inbox?
+    allowed_to_modify_insured?
   end
 
   private
@@ -30,6 +30,11 @@ class InboxPolicy < ApplicationPolicy
   #
   # @note The user is the one who is trying to perform the action. The record_user is the user who owns the record. The record is an instance of Inbox.
   def allowed_to_modify?
+    binding.irb
+    (current_user == associated_user) || role_has_permission_to_modify_family_members?
+  end
+
+  def allowed_to_modify_insured?
     (current_user == associated_user) || role_has_permission_to_modify_family_members?
   end
 
@@ -69,6 +74,11 @@ class InboxPolicy < ApplicationPolicy
   end
 
   def associated_user
-    record&.recipient
+    recipient = record&.recipient 
+
+    case recipient
+    when is_a?(Person)
+    when is_a?(HbxProfile)
+    end
   end
 end
