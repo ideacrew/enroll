@@ -59,7 +59,8 @@ gem 'mongoid_rails_migrations', '~> 1.2'
 ## General gems
 gem 'aasm',                     '~> 4.8'
 gem 'recurring_select'
-
+gem 'bootstrap',                '~> 5.2'
+gem 'dartsass-sprockets'
 gem 'aws-sdk',                  '~> 2.2.4'
 gem 'bcrypt',                   '~> 3.1'
 gem 'bootsnap',                 '>= 1.1', require: false
@@ -102,7 +103,7 @@ gem 'roo',                      '~> 2.7.0'
 gem 'rubyzip', '>= 1.3.0'
 gem 'ruby-saml',                '~> 1.3'
 gem 'sassc',                    '~> 2.0'
-gem 'sass-rails',               '~> 5'
+# gem 'sass-rails',               '~> 5'
 gem 'slim',                     '~> 3.0'
 gem 'slim-rails',               '~> 3.2'
 gem 'symmetric-encryption',     '3.9.1'
