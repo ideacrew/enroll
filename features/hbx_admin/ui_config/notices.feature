@@ -13,4 +13,3 @@ Feature: Notices tab
         Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
         Given user visits the HBX Portal
         Then they should not see the Notices tab
-
