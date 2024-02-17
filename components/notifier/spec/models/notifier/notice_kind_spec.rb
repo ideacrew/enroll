@@ -86,6 +86,18 @@ module Notifier
           expect(subject.valid?).to eq false
           expect(subject.errors.full_messages).to eq ['Template is invalid']
         end
+
+        it 'makes record invalid' do
+          template.raw_body = "raw body content with invalid elements #{%x|env|}" # rubocop:disable Style/CommandLiteral, Style/PercentLiteralDelimiters
+          expect(subject.valid?).to eq false
+          expect(subject.errors.full_messages).to eq ['Template is invalid']
+        end
+
+        it 'makes record invalid' do
+          template.raw_body = "raw body content with invalid elements #{`env`}"
+          expect(subject.valid?).to eq false
+          expect(subject.errors.full_messages).to eq ['Template is invalid']
+        end
       end
 
       context 'when raw_body does not have any blocking elements' do
