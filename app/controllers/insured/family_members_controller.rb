@@ -84,11 +84,10 @@ class Insured::FamilyMembersController < ApplicationController
 
   def new
     family_id = params.require(:family_id)
-    @dependent = ::Forms::FamilyMember.new(:family_id => family_id)
-
     @family = Family.find(family_id)
     authorize_family_access
 
+    @dependent = ::Forms::FamilyMember.new(:family_id => family_id)
     respond_to do |format|
       format.html
       format.js
@@ -96,11 +95,11 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def create
+    @family = Family.find(params[:dependent][:family_id])
+    authorize_family_access
+
     @dependent = ::Forms::FamilyMember.new(params[:dependent].merge({skip_consumer_role_callbacks: true}))
     @address_errors = validate_address_params(params)
-
-    @family = Family.find(@dependent.family_id)
-    authorize_family_access
 
     if @family.primary_applicant.person.resident_role?
       if @address_errors.blank? && @dependent.save
@@ -221,11 +220,12 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def resident_index
-    set_bookmark_url
-    set_admin_bookmark_url(resident_index_insured_family_members_path)
     @resident_role = ResidentRole.find(params[:resident_role_id])
     @family = @resident_role.person.primary_family
     authorize_family_access
+
+    set_bookmark_url
+    set_admin_bookmark_url(resident_index_insured_family_members_path)
 
     @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
@@ -252,10 +252,11 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def new_resident_dependent
-    @dependent = ::Forms::FamilyMember.new(:family_id => params.require(:family_id))
-    @family = Family.find(params[:family_id])
+    family_id = params.require(:family_id)
+    @family = Family.find(family_id)
     authorize_family_access
 
+    @dependent = ::Forms::FamilyMember.new(:family_id => family_id)
     respond_to do |format|
       format.html
       format.js
@@ -263,10 +264,11 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def edit_resident_dependent
-    @dependent = ::Forms::FamilyMember.find(params.require(:id))
-    @family = Family.find(params[:family_id])
+    family_id = params.require(:id)
+    @family = Family.find(family_id)
     authorize_family_access
 
+    @dependent = ::Forms::FamilyMember.find(family_id)
     respond_to do |format|
       format.html
       format.js
@@ -274,10 +276,11 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def show_resident_dependent
-    @dependent = ::Forms::FamilyMember.find(params.require(:id))
-    @family = Family.find(params[:family_id])
+    family_id = params.require(:id)
+    @family = Family.find(family_id)
     authorize_family_access
 
+    @dependent = ::Forms::FamilyMember.find(family_id)
     respond_to do |format|
       format.html
       format.js
