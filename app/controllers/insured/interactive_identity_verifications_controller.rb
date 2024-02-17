@@ -1,6 +1,7 @@
 module Insured
   class InteractiveIdentityVerificationsController < ApplicationController
     before_action :set_current_person
+    before_action :set_consumer_bookmark_url, only: [:service_unavailable, :failed_validation]
 
     def new
       service = ::IdentityVerification::InteractiveVerificationService.new
@@ -24,16 +25,15 @@ module Insured
     end
 
     def service_unavailable
-      set_consumer_bookmark_url
       @person.consumer_role.move_identity_documents_to_outstanding
       render "service_unavailable"
     end
 
     def failed_validation
-      set_consumer_bookmark_url
+      @person = Person.find(params[:person_id]) if params[:person_id].present?
+      authorize @person, :can_access_identity_verifications?
       @step = params[:step]
       @verification_transaction_id = params[:verification_transaction_id]
-      @person = Person.find(params[:person_id]) if params[:person_id].present?
       @person.consumer_role.move_identity_documents_to_outstanding
       render "failed_validation"
     end
