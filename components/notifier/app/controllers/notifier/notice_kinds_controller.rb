@@ -2,6 +2,7 @@ module Notifier
   class NoticeKindsController < Notifier::ApplicationController
     include ::Config::SiteConcern
     rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+
     layout 'notifier/single_column'
 
     def index
