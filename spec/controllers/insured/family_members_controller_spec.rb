@@ -15,6 +15,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
   let(:census_employee) { FactoryBot.create(:census_employee) }
 
   before do
+    # A relationship between the user and the person is established here mostly due to the new requirements from the FamilyMemberPolicy
     user.update(person: person)
 
     employer_profile.plan_years << published_plan_year
