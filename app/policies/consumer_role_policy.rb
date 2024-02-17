@@ -53,7 +53,22 @@ class ConsumerRolePolicy < ApplicationPolicy
   # Checking presence of hbx_staff_role and if identity_validation is valid. If either are true,
   # then the user has access to continue past RIDP.
   def ridp_accessible?
-    @user.has_hbx_staff_role? || @user.person.consumer_role.identity_verified?
+    user_person = @user.person
+    broker_staff_roles = user_person.active_broker_staff_roles
+    broker_role = user_person.broker_role
+    if broker_role.present? || broker_staff_roles.any?
+      can_broker_modify_consumer?(broker_role, broker_staff_roles)
+    end
+    @record&.person.primary_family.family_members.detect{|fm| fm.person_id == user_person.id} || @user&.person.hbx_staff_role.permission.modify_family || @user.person.consumer_role.identity_verified?
+  end
+
+  def can_broker_modify_consumer?(broker, broker_staff)
+    ivl_broker_account = @record&.person.primary_family.active_broker_agency_account
+    return false unless ivl_broker_account.present?
+    return true if broker.present? && ivl_broker_account.benefit_sponsors_broker_agency_profile_id == broker.benefit_sponsors_broker_agency_profile_id
+    staff_account = broker_staff.detect{|staff_role| staff_role.benefit_sponsors_broker_agency_profile_id == ivl_broker_account.benefit_sponsors_broker_agency_profile_id} if broker_staff.present?
+    return false unless staff_account
+    return true if ivl_broker_account.benefit_sponsors_broker_agency_profile_id == staff_account.benefit_sponsors_broker_agency_profile_id
   end
 
   def update?
