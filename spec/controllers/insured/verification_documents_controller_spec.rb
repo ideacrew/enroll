@@ -99,7 +99,7 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
       # does not allow huge files to be uploaded
       it_behaves_like 'restrictions on verification document upload' do
         let(:upload_file_path) { "#{Rails.root}/test/uhic.jpg" }
-        doc_limit_in_mb = EnrollRegistry[:verification_doc_size_limit_in_mb].item
+        doc_limit_in_mb = EnrollRegistry[:upload_doc_size_limit_in_mb].item
         before { allow_any_instance_of(ActionDispatch::Http::UploadedFile).to receive(:size).and_return(doc_limit_in_mb * doc_limit_in_mb * 1024 * 1024) }
       end
 

@@ -142,6 +142,9 @@ class Exchanges::HbxProfilesController < ApplicationController
     @subject = params[:subject].presence
     @body = params[:body].presence
     @element_to_replace_id = params[:actions_id]
+    if params[:file].present?
+      return unless validate_file_upload(params[:file], FileUploadValidator::VERIFICATION_DOC_TYPES)
+    end
     result = ::Operations::SecureMessageAction.new.call(
       params: params.permit(:actions_id, :body, :file, :resource_name, :resource_id, :subject, :controller).to_h,
       user: current_user

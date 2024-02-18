@@ -9,7 +9,7 @@
       <i class="fa fa-file-text-o" aria-hidden="true"></i>
       &nbsp;
       <span class="upload-value"><%=l10n("choose_files") %>...</span>
-      <%= file_field_tag "file[]", type: :file, accept: 'image/png,image/gif,image/jpeg,application/pdf', class: "doc-upload-file", :multiple => true %>
+      <%= file_field_tag "file[]", type: :file, accept: FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), class: "doc-upload-file", :multiple => true %>
     </div>
   </div>
     <%= submit_tag l10n("upload"), class: "btn btn-default btn-xs" %>

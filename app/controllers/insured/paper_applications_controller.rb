@@ -11,6 +11,8 @@ class Insured::PaperApplicationsController < ApplicationController
       return
     end
 
+    return unless validate_file_upload(params[:file], FileUploadValidator::VERIFICATION_DOC_TYPES)
+
     @doc_errors = []
     @docs_owner = find_docs_owner(params[:family_member])
 
@@ -22,7 +24,7 @@ class Insured::PaperApplicationsController < ApplicationController
         flash[:error] = "Could not save file. " + @doc_errors.join(". ")
       end
     else
-        flash[:error] = "Could not save file"
+      flash[:error] = "Could not save file"
     end
     redirect_to upload_application_insured_families_path
   end

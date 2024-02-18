@@ -347,11 +347,9 @@ class Insured::FamiliesController < FamiliesController
       flash[:error] = "File or Subject not provided"
       redirect_back(fallback_location: :back)
       return
-    elsif file_content_type != 'application/pdf'
-      flash[:error] = "Please upload a PDF file. Other file formats are not supported."
-      redirect_back(fallback_location: :back)
-      return
     end
+
+    return unless validate_file_upload(params[:file], FileUploadValidator::PDF_TYPE)
 
     doc_uri = Aws::S3Storage.save(file_path, 'notices')
 

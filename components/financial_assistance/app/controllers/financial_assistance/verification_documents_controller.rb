@@ -13,6 +13,7 @@ module FinancialAssistance
     def upload
       @doc_errors = []
       if params[:file]
+        return unless validate_file_uploads(params[:file], FileUploadValidator::VERIFICATION_DOC_TYPES)
         params[:file].each do |file|
           doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
           if doc_uri.present?

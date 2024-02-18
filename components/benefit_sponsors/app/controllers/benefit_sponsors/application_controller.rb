@@ -4,6 +4,7 @@ module BenefitSponsors
     before_action :set_last_portal_visited
     include Pundit
     include ::L10nHelper
+    include ::FileUploadHelper
 
     helper BenefitSponsors::Engine.helpers
 

@@ -32,6 +32,9 @@ module Exchanges
 
     def create
       @bulk_notice = Admin::BulkNotice.new(user_id: current_user)
+      if params[:file]
+        return unless validate_file_upload(params[:file], FileUploadValidator::VERIFICATION_DOC_TYPES)
+      end
 
       if @bulk_notice.update_attributes(bulk_notice_params)
         @bulk_notice.upload_document(params, current_user) if params[:file]

@@ -69,6 +69,10 @@ module SponsoredBenefits
     end
 
     def bulk_employee_upload
+      if params[:file]
+        return unless validate_file_upload(params[:file], FileUploadValidator::CSV_TYPES + FileUploadValidator::XLS_TYPES)
+      end
+
       @census_employee_import = SponsoredBenefits::Forms::PlanDesignCensusEmployeeImport.new({file: params.require(:file), proposal: @plan_design_proposal})
 
       respond_to do |format|
@@ -86,7 +90,7 @@ module SponsoredBenefits
 
     def export_plan_design_employees
       sponsorship = @plan_design_proposal.profile.benefit_sponsorships[0]
-     
+
       respond_to do |format|
         format.csv { send_data sponsorship.census_employees.to_csv, filename: "#{@plan_design_proposal.plan_design_organization.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
       end
