@@ -60,7 +60,7 @@
                         <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'upload_identity_<%= verif_type.id %>')" class="btn btn-default btn-file">
                           <i class="fa fa-upload" aria-hidden="true"></i>
                           <%= l10n('upload_documents') %>
-                          <%= file_field_tag "file[]", type: :file, accept: FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), id: "upload_identity_#{verif_type.id}", class: "doc-upload-file", tabindex:"-1", :multiple => true, value: "Upload Documents"%>
+                          <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), id: "upload_identity_#{verif_type.id}", class: "doc-upload-file", tabindex:"-1", :multiple => true, value: "Upload Documents"%>
                         </span  >
                         <%= hidden_field_tag 'docs_owner', person.id  %>
                         <%= hidden_field_tag 'verification_type', verif_type.id  %>

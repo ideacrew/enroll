@@ -15,11 +15,7 @@ module FileUploadHelper
     if file_validator.valid?
       true # Valid file, return true to indicate success
     else
-      flash[:error] = l10n(
-        "upload_doc_error",
-        file_types: file_validator.human_readable_file_types,
-        size_in_mb: EnrollRegistry[:upload_file_size_limit_in_mb].item
-      )
+      flash[:error] = "Unable to upload file."
       false # Return false to indicate failure
     end
   end

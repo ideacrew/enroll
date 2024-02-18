@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
-require 'active_model'
-
-# Validator class responsible for handling file size and content type validation of uploaded files
+# This is not an ActiveRecord model, but rather a virtual model for holding and validating file uploads using the ActiveModel API.
 class FileUploadValidator
+  include ActiveModel::Model
   include ActiveModel::Validations
 
   # Common content type groups.

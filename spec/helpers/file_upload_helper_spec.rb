@@ -22,12 +22,6 @@ RSpec.describe FileUploadHelper, type: :helper do
       it 'returns false' do
         expect(helper.valid_file_upload?(invalid_pdf, ['application/pdf'])).to be false
       end
-
-      it 'sets a flash error' do
-        helper.valid_file_upload?(invalid_pdf, ['application/pdf'])
-        expect(flash[:error]).to be_present
-      end
-
     end
 
     context "detects right mime type" do

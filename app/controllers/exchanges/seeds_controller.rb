@@ -27,7 +27,8 @@ module Exchanges
         csv_template: params[:csv_template],
         aasm_state: 'draft'
       )
-      if params[:file].present? !valid_file_upload?(params[:file], FileUploadValidator::CSV_TYPES)
+
+      if params[:file].present? && !valid_file_upload?(params[:file], FileUploadValidator::CSV_TYPES)
         redirect_to exchanges_seeds_path
         return
       end

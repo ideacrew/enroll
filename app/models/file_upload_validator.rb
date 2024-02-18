@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
-require 'active_model'
-
-# Validator class responsible for handling file size and content type validation of uploaded files
+# This is not an ActiveRecord model, but rather a virtual model for holding and validating file uploads using the ActiveModel API.
 class FileUploadValidator
+  include ActiveModel::Model
   include ActiveModel::Validations
 
   # Common content type groups.
@@ -17,7 +16,7 @@ class FileUploadValidator
 
   MAX_FILE_SIZE_MB = EnrollRegistry[:upload_file_size_limit_in_mb].item.to_i
   validates :file_data, file_size: { less_than_or_equal_to: MAX_FILE_SIZE_MB.megabytes },
-                        file_content_type: { allow: ->(validator) { validator.allowed_content_types }, mode: :strict }
+            file_content_type: { allow: ->(validator) { validator.allowed_content_types }, mode: :strict }
 
   def initialize(file_data:, content_types:)
     @file_data = file_data
