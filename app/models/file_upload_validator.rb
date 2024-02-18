@@ -16,7 +16,7 @@ class FileUploadValidator
 
   MAX_FILE_SIZE_MB = EnrollRegistry[:upload_file_size_limit_in_mb].item.to_i
   validates :file_data, file_size: { less_than_or_equal_to: MAX_FILE_SIZE_MB.megabytes },
-            file_content_type: { allow: ->(validator) { validator.allowed_content_types }, mode: :strict }
+                        file_content_type: { allow: ->(validator) { validator.allowed_content_types }, mode: :strict }
 
   def initialize(file_data:, content_types:)
     @file_data = file_data
