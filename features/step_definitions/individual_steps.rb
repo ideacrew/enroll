@@ -8,10 +8,6 @@ class VlpDocument
                         "Other (With Alien Number)", "Other (With I-94 Number)"].freeze
 end
 
-before do
-  allow(controller).to receive(:authorize).and_return(true)
-end
-
 When(/^.+ visits the Consumer portal during open enrollment$/) do
   visit "/"
   find(HomePage.consumer_family_portal_btn).click
