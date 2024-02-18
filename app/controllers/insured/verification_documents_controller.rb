@@ -8,27 +8,25 @@ class Insured::VerificationDocumentsController < ApplicationController
 
   def upload
     @doc_errors = []
-    if params[:file]
-      unless valid_file_uploads?(params[:file], FileUploadValidator::VERIFICATION_DOC_TYPES)
-        redirect_to verification_insured_families_path and return
-      end
-      params[:file].each do |file|
-        doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
-        if doc_uri.present?
-          if update_vlp_documents(file_name(file), doc_uri)
-            add_type_history_element(file)
-            flash[:notice] = "File Saved"
-          else
-            flash[:error] = "Could not save file. " + @doc_errors.join(". ")
-            redirect_back(fallback_location: verification_insured_families_path)
-            return
-          end
+    if params[:file] && !valid_file_uploads?(params[:file], FileUploadValidator::VERIFICATION_DOC_TYPES)
+      redirect_to verification_insured_families_path
+      return
+    end
+
+    params[:file].each do |file|
+      doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
+      if doc_uri.present?
+        if update_vlp_documents(file_name(file), doc_uri)
+          add_type_history_element(file)
+          flash[:notice] = "File Saved"
         else
-          flash[:error] = "Could not save file"
+          flash[:error] = "Could not save file. #{@doc_errors.join('. ')}"
+          redirect_back(fallback_location: verification_insured_families_path)
+          break
         end
+      else
+        flash[:error] = "Could not save file"
       end
-    else
-      flash[:error] = "File not uploaded. Please select the file to upload."
     end
     redirect_to verification_insured_families_path
   end

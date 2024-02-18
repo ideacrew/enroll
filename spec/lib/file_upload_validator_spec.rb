@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 # Assume the existence of a dummy model for testing purposes
@@ -8,7 +10,7 @@ class DummyModel
 
   # Dummy file attribute to mimic the ActiveModel behaviour
   validates :file, file_size: { less_than: 10.megabytes },
-            file_content_type: { allow: ['application/pdf'] }
+                   file_content_type: { allow: ['application/pdf'] }
 end
 
 RSpec.describe FileUploadValidator, type: :validator do

@@ -1190,7 +1190,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
     it "does not allow docx files to be uploaded" do
       file = fixture_file_upload("#{Rails.root}/test/sample.docx")
-      post :upload_notice, params: {:file => file, :subject=> subject}
+      post :upload_notice, params: {:file => file, :subject => subject}
       expect(flash[:error]).to include("Unable to upload file.")
       expect(response).to be_redirect
     end

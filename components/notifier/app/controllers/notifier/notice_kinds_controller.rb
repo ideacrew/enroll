@@ -140,9 +140,12 @@ module Notifier
       service.builder = builder_param
       respond_to do |format|
         format.html
-        format.json { render json: {
-          placeholders: service.placeholders, setting_placeholders: service.setting_placeholders
-        } }
+        format.json do
+          render json: {
+            placeholders: service.placeholders,
+            setting_placeholders: service.setting_placeholders
+          }
+        end
       end
     end
 

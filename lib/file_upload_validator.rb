@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_model'
 
 # Validator class responsible for handling file size and content type validation of uploaded files
@@ -5,9 +7,9 @@ class FileUploadValidator
   include ActiveModel::Validations
 
   # Common content type groups.
-  VERIFICATION_DOC_TYPES = %w(application/pdf image/jpeg image/png image/gif).freeze
-  XLS_TYPES = %w(application/vnd.ms-excel application/vnd.openxmlformats-officedocument.spreadsheetml.sheet).freeze
-  CSV_TYPES = %w(text/csv).freeze
+  VERIFICATION_DOC_TYPES = %w[application/pdf image/jpeg image/png image/gif].freeze
+  XLS_TYPES = %w[application/vnd.ms-excel application/vnd.openxmlformats-officedocument.spreadsheetml.sheet].freeze
+  CSV_TYPES = %w[text/csv].freeze
   PDF_TYPE = ['application/pdf'].freeze
 
   attr_accessor :file_data
@@ -15,7 +17,7 @@ class FileUploadValidator
 
   MAX_FILE_SIZE_MB = EnrollRegistry[:upload_file_size_limit_in_mb].item.to_i
   validates :file_data, file_size: { less_than_or_equal_to: MAX_FILE_SIZE_MB.megabytes },
-            file_content_type: { allow: ->(validator) { validator.allowed_content_types }, mode: :strict }
+                        file_content_type: { allow: ->(validator) { validator.allowed_content_types }, mode: :strict }
 
   def initialize(file_data:, content_types:)
     @file_data = file_data
@@ -30,7 +32,7 @@ class FileUploadValidator
       'image/gif' => 'GIF',
       'text/csv' => 'CSV',
       'application/vnd.ms-excel' => 'XLS',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'XLSX',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'XLSX'
       # Additional mappings as needed...
     }.freeze
 
