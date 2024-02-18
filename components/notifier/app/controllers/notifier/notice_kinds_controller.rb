@@ -91,8 +91,9 @@ module Notifier
       authorize ::Notifier::NoticeKind
       @errors = []
 
-      if params[:file]
-        return unless validate_file_upload(params[:file], FileUploadValidator::CSV_TYPES)
+      if params[:file].present? && !valid_file_upload?(params[:file], FileUploadValidator::CSV_TYPES)
+        redirect_back(fallback_location: :back)
+        return
       end
 
       if file_content_type == 'text/csv'

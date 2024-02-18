@@ -10,6 +10,7 @@ require 'shoulda/matchers'
 require 'webmock/rspec'
 require 'stimulus_reflex_testing/rspec'
 require "#{Rails.root}/lib/custom_linters/translations/view_translations_linter_helper.rb"
+require "#{Rails.root}/lib/file_upload_validator.rb"
 
 WebMock.allow_net_connect!
 
@@ -79,6 +80,7 @@ RSpec.configure do |config|
   config.include ActionView::Helpers::TranslationHelper
   config.include L10nHelper
   config.include ViewTranslationsLinterHelper
+  config.include ActionDispatch::TestProcess
 
   config.infer_spec_type_from_file_location!
 

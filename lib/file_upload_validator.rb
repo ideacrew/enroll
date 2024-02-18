@@ -13,7 +13,7 @@ class FileUploadValidator
   attr_accessor :file_data
   attr_reader :allowed_content_types
 
-  MAX_FILE_SIZE_MB = EnrollRegistry[:upload_doc_size_limit_in_mb].item.to_i
+  MAX_FILE_SIZE_MB = EnrollRegistry[:upload_file_size_limit_in_mb].item.to_i
   validates :file_data, file_size: { less_than_or_equal_to: MAX_FILE_SIZE_MB.megabytes },
             file_content_type: { allow: ->(validator) { validator.allowed_content_types }, mode: :strict }
 

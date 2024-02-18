@@ -11,7 +11,10 @@ class Insured::PaperApplicationsController < ApplicationController
       return
     end
 
-    return unless validate_file_upload(params[:file], FileUploadValidator::VERIFICATION_DOC_TYPES)
+    unless valid_file_upload?(params[:file], FileUploadValidator::VERIFICATION_DOC_TYPES)
+      redirect_back(fallback_location: :back)
+      return
+    end
 
     @doc_errors = []
     @docs_owner = find_docs_owner(params[:family_member])

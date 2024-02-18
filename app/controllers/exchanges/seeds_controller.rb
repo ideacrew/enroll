@@ -27,8 +27,9 @@ module Exchanges
         csv_template: params[:csv_template],
         aasm_state: 'draft'
       )
-      if params[:file]
-        return unless validate_file_upload(params[:file], FileUploadValidator::CSV_TYPES)
+      if params[:file].present? !valid_file_upload?(params[:file], FileUploadValidator::CSV_TYPES)
+        redirect_back(fallback_location: :back)
+        return
       end
       # TODO: need to figure out how to save the file
       CSV.foreach(params[:file].send(:tempfile), headers: true) do |csv_row|
