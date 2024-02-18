@@ -358,7 +358,7 @@ class Insured::FamilyMembersController < ApplicationController
   def set_view_person
     # The unfortunate inclusion of this method on all read-related actions (:index, :show, :new, :edit)
     # is being added to the last line of those methods because this controller was not designed to handle
-    # anyone _except_ an associated_user accessing family members on their own account
+    # an admin accessing family members on an unrelated user account
 
     @person = @family.primary_person if @person != @family.primary_person
   end
