@@ -68,7 +68,12 @@ module Notifier
     end
 
     def to_pdf
-      WickedPdf.new.pdf_from_string(execute_html_pdf_render, pdf_options)
+      sanitized_html = sanitize_html(execute_html_pdf_render)
+      WickedPdf.new.pdf_from_string(sanitized_html, pdf_options)
+    end
+
+    def sanitize_html(html)
+      Loofah.scrub_fragment(html, :strip).to_s
     end
 
     def generate_pdf_notice
