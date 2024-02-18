@@ -683,6 +683,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         allow(admin_person).to receive(:hbx_staff_role).and_return(true)
         sign_in(admin_user)
         allow(controller).to receive(:current_user).and_return(admin_user)
+        allow(controller).to receive(:authorize).and_return(true)
       end
 
       it 'should find application with missing family id' do
