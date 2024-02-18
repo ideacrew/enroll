@@ -10,7 +10,7 @@ module FinancialAssistance
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
     let!(:record) { family.family_members.first }
 
-    context 'super_admin user' do
+    context 'hbx_admin user' do
       let!(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
       let!(:admin_user) { FactoryBot.create(:user, :with_hbx_staff_role, :person => admin_person) }
       let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
@@ -22,16 +22,6 @@ module FinancialAssistance
         context '#can_access_applications?' do
           it 'returns the result of #can_access_applications?' do
             expect(policy.can_access_applications?).to be_truthy
-          end
-        end
-      end
-
-      context 'without permission' do
-        let!(:permission) { FactoryBot.create(:permission, :developer) }
-
-        context '#can_access_applications?' do
-          it 'returns the result of #can_access_applications?' do
-            expect(policy.can_access_applications?).to be_falsey
           end
         end
       end

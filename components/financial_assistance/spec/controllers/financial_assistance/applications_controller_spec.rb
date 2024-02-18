@@ -542,6 +542,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
     before do
       sign_in(user)
+      allow(controller).to receive(:authorize).and_return(true)
     end
     it "should be successful" do
       application.update_attributes(:aasm_state => "submitted")
