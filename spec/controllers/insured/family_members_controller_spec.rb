@@ -863,9 +863,9 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
         context 'with permissions/hired by family' do
           before(:each) do
             test_family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
-                                                                                                writing_agent_id: writing_agent.id,
-                                                                                                start_on: Time.now,
-                                                                                                is_active: true)
+                                                                                                     writing_agent_id: writing_agent.id,
+                                                                                                     start_on: Time.now,
+                                                                                                     is_active: true)
           end
 
           it "can't view another user's family_members index page" do
@@ -892,9 +892,9 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
         context 'with permissions/hired by family' do
           before(:each) do
             test_family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
-                                                                                                writing_agent_id: writing_agent.id,
-                                                                                                start_on: Time.now,
-                                                                                                is_active: true)
+                                                                                                     writing_agent_id: writing_agent.id,
+                                                                                                     start_on: Time.now,
+                                                                                                     is_active: true)
           end
 
           it "can create family members on behalf of another user" do
@@ -942,9 +942,9 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
         context 'with permissions/hired by family' do
           before(:each) do
             test_family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
-                                                                                                writing_agent_id: writing_agent.id,
-                                                                                                start_on: Time.now,
-                                                                                                is_active: true)
+                                                                                                     writing_agent_id: writing_agent.id,
+                                                                                                     start_on: Time.now,
+                                                                                                     is_active: true)
           end
 
           it "can update family members for a user" do
