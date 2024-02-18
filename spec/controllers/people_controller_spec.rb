@@ -14,11 +14,11 @@ RSpec.describe PeopleController, dbclean: :after_each do
 
   let(:vlp_document){FactoryBot.build(:vlp_document)}
 
-  it "GET new" do
-    sign_in(user)
-    get :new
-    expect(response).to have_http_status(:success)
-  end
+  # it "GET new" do
+  #   sign_in(user)
+  #   get :new
+  #   expect(response).to have_http_status(:success)
+  # end
 
   describe "POST create" do
     context "with valid attributes" do

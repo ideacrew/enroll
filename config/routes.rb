@@ -643,7 +643,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :people, only: [:update, :create, :index] do #TODO: delete
+  resources :people, only: [:index] do #TODO: delete
     # get 'select_employer'
     # get 'my_account'
 
