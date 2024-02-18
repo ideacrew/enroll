@@ -1,38 +1,39 @@
 # frozen_string_literal: true
 
-# The FamilyMemberPolicy class is responsible for determining what actions a user can perform when modifying their family
-# on either a QLE or SEP-related page
-# These permissions do NOT apply to the family tab accessed by users during registration or under the 'Manage Family' sidebar
+# The InboxPolicy class is responsible for determining what actions a user can perform when viewing/sending messages
 
-# This class will check if the user has the necessary permissions to view, add, update, or modify a FamilyMember record.
+# This class will check if the user has the necessary permissions to view, add, update, or modify an Inbox record.
 # The permissions are determined based on the user's role and their relationship to the record.
 #
-# @example Checking if a user can update a FamilyMember record
-#   policy = FamilyMemberPolicy.new(user, record)
-#   policy.can_modify_family_members? #=> true, OR
-#   authorize family_member, :method_name #=> true
-class FamilyMemberPolicy < ApplicationPolicy
+# @example Checking if a user can update an Inbox record
+#   policy = InboxPolicy.new(user, record)
+#   policy.can_upload? #=> true, OR
+#   authorize inbox_record, :method_name #=> true
+class InboxPolicy < ApplicationPolicy
   ACCESSABLE_ROLES = %w[hbx_staff_role broker_role active_broker_staff_roles].freeze
 
-  # NOTE: while 'can_modify_family_members?' is the name of this method, it also applies to the `show` and `edit`, `new`, and `index` methods of the `insured/family_members_controller`
+  # NOTE: while 'can_access_inbox?' is the name of this method, it also applies to the `show` and `edit`, `new`, and `index` methods of the `insured/family_members_controller`
   # as well as the `create`, `update`, and `destroy` methods
   # We're only using this one method now -- more can be made as the need to separate permissions for different CRUD operations arises
-  def can_modify_family_members?
+  def can_access_insured_inbox?
     allowed_to_modify?
   end
 
   private
 
-  # Determines if the user is allowed to perform CRUD operations on a FamilyMember record
+  # Determines if the user is allowed to perform CRUD operations on an Inbox record
   #
   # @return [Boolean] Returns true if the user has the 'modify_family' permission or if the user is the primary person of the family associated with the record.
   #
-  # @example Check if a user can modify a FamilyMember record
+  # @example Check if a user can modify an Inbox record
   #   allowed_to_modify? #=> true
   #
-  # @note The user is the one who is trying to perform the action. The record_user is the user who owns the record. The record is an instance of FamilyMember.
+  # @note The user is the one who is trying to perform the action. The record_user is the user who owns the record. The record is an instance of Inbox.
   def allowed_to_modify?
     (current_user == associated_user) || role_has_permission_to_modify_family_members?
+  end
+
+  def allowed_to_modify_insured?
   end
 
   def role_has_permission_to_modify_family_members?
@@ -71,14 +72,11 @@ class FamilyMemberPolicy < ApplicationPolicy
   end
 
   def associated_user
-    associated_family_primary_member&.user
-  end
+    recipient = record&.recipient 
 
-  def associated_family_primary_member
-    associated_family&.primary_person
-  end
-
-  def associated_family
-    record&.family
+    case recipient
+    when is_a?(Person)
+    when is_a?(HbxProfile)
+    end
   end
 end

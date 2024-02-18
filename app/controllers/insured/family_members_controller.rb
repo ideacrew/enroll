@@ -49,6 +49,7 @@ class Insured::FamilyMembersController < ApplicationController
       broker_role_id = @consumer_role.person.broker_role.try(:id)
       @family.hire_broker_agency(broker_role_id)
     end
+
     @family = Family.find(params[:family_id]) if params[:family_id]
     authorize_family_access
 
@@ -334,8 +335,9 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def authorize_family_access
-    family_member = @family.primary_family_member
-
-    authorize family_member, :can_modify_family_members?
+    # We're using FamilyPolicy method here because FamilyMember is an extension of Family
+    # All users/roles with the permissions to alter a Family should have the same permissions on the FamilyMember
+    # While using a single :show? method in the family policy isn't ideal, it does cover a variety of unforseen edge cases that could emerge when determining a user role
+    authorize @family, :show?
   end
 end
