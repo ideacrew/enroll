@@ -37,9 +37,9 @@ module FinancialAssistance
     end
 
     def download
-      @document = get_document(params[:key])
-
       authorize record, :can_download?
+
+      @document = get_document(params[:key])
 
       if @document.present?
         bucket = env_bucket_name('id-verification')
@@ -80,7 +80,7 @@ module FinancialAssistance
     private
 
     def record
-      @document || @evidence
+      @evidence
     end
 
     def set_document

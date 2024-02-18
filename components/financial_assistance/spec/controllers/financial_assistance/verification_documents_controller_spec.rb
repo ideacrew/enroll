@@ -41,7 +41,7 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
     applicant
   end
 
-  let(:esi_evidence) do
+  let!(:esi_evidence) do
     applicant.create_esi_evidence(
       key: :esi_mec,
       title: 'Esi',
@@ -51,7 +51,6 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
       is_satisfied: true
     )
   end
-
 
   context 'admin' do
     before do
@@ -222,7 +221,7 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
         it 'shoudl not download the requested verification document' do
           get :download, params: params
           expect(response).to have_http_status(:found)
-          expect(flash[:error]).to eq("Access not allowed for document_policy.can_download?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for eligibilities/evidence_policy.can_download?, (Pundit policy)")
         end
       end
     end
@@ -362,7 +361,7 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
           it 'downloads the requested verification document' do
             get :download, params: params
             expect(response).to have_http_status(:found)
-            expect(flash[:error]).to eq("Access not allowed for document_policy.can_download?, (Pundit policy)")
+            expect(flash[:error]).to eq("Access not allowed for eligibilities/evidence_policy.can_download?, (Pundit policy)")
           end
         end
       end
