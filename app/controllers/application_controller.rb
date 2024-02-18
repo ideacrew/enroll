@@ -306,6 +306,7 @@ class ApplicationController < ActionController::Base
 
     # TODO: We need to be mindful of this in situations where the person_id is being erroneously set
     # to the current hbx_admin
+    # FOLLOWUP: This method does sometimes set the admin to @person which affects the views related to /insured/family_members
     def set_current_person(required: true)
       if current_user.try(:person).try(:agent?) && session[:person_id].present?
         @person = Person.find(session[:person_id])
