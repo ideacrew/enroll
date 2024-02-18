@@ -5,7 +5,7 @@ module FinancialAssistance
   class ApplicationsController < FinancialAssistance::ApplicationController
 
     before_action :set_current_person
-    before_action :find_application, :except => [:index, :index_with_filter, :new, :copy, :uqhp_flow, :review, :raw_application, :checklist_pdf]
+    before_action :find_and_authorize_application, :except => [:index, :index_with_filter, :new, :copy, :uqhp_flow, :review, :raw_application, :checklist_pdf]
 
     around_action :cache_current_hbx, :only => [:index_with_filter]
 
@@ -13,6 +13,7 @@ module FinancialAssistance
     include ::UIHelpers::WorkflowController
     include Acapi::Notifiers
     include FinancialAssistance::L10nHelper
+    include Pundit
     require 'securerandom'
 
     before_action :check_eligibility, only: [:create, :get_help_paying_coverage_response, :copy]
@@ -177,6 +178,7 @@ module FinancialAssistance
     def review
       save_faa_bookmark(request.original_url)
       @application = FinancialAssistance::Application.where(id: params["id"]).first
+      authorize @application, :can_access_applications?
       @applicants = @application.active_applicants if @application.present?
       build_applicants_name_by_hbx_id_hash
 
@@ -289,7 +291,7 @@ module FinancialAssistance
     end
 
     def check_eligibility_results_received
-      application = find_application
+      application = find_and_authorize_application
       render :plain => determination_token_present?(application)
     end
 
@@ -422,6 +424,12 @@ module FinancialAssistance
 
     def find
       find_application
+    end
+
+    def find_and_authorize_application
+      application = find_application
+
+      authorize application, :can_access_applications?
     end
 
     def save_faa_bookmark(url)
