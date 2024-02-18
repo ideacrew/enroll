@@ -260,7 +260,6 @@ module Forms
     end
 
     def self.find(family_member_id)
-
       found_family_member = ::FamilyMember.find(family_member_id)
       has_same_address_with_primary = compare_address_with_primary(found_family_member);
       home_address = if has_same_address_with_primary
