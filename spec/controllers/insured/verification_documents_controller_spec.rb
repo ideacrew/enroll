@@ -1,5 +1,4 @@
 require 'rails_helper'
-require "#{Rails.root}/spec/shared_examples/upload_verification_document_spec.rb"
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe Insured::VerificationDocumentsController, :type => :controller do

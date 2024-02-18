@@ -120,7 +120,7 @@ module BenefitSponsors
         end
 
         it "does not allow docx files to be uploaded" do
-          file = fixture_file_upload("#{Rails.root}/test/sample.docx")
+          file = fixture_file_upload("#{Rails.root}/spec/test_data/sample.docx")
           post :bulk_employee_upload, :params => {:employer_profile_id => benefit_sponsor.profiles.first.id, :file => file}
 
           expect(flash[:error]).to include("Unable to upload file.")
