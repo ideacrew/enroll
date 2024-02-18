@@ -10,6 +10,8 @@ class Insured::FamilyMembersController < ApplicationController
   before_action :set_dependent_and_family, only: [:destroy, :show, :edit, :update]
   before_action :set_cache_headers, only: [:edit, :new]
 
+  after_action :set_view_person, only: [:index]
+
   rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
 
   def index
@@ -45,9 +47,10 @@ class Insured::FamilyMembersController < ApplicationController
       @family = @person.primary_family
     elsif @type == "consumer"
       @consumer_role = @person.consumer_role
-      @family = @consumer_role.person.primary_family
-      broker_role_id = @consumer_role.person.broker_role.try(:id)
-      @family.hire_broker_agency(broker_role_id)
+
+      # This controller assumes the user accessing this page will NOT be an admin
+      # The logic previously present here has been moved to a method only called _if_ @consumer_role is not nil
+      update_family_broker_agency if @consumer_role
     end
 
     @family = Family.find(params[:family_id]) if params[:family_id]
@@ -81,6 +84,8 @@ class Insured::FamilyMembersController < ApplicationController
       @prev_url_include_intractive_identity = false
       @prev_url_include_consumer_role_id = false
     end
+
+    set_view_person
   end
 
   def new
@@ -93,6 +98,8 @@ class Insured::FamilyMembersController < ApplicationController
       format.html
       format.js
     end
+
+    set_view_person
   end
 
   def create
@@ -159,6 +166,7 @@ class Insured::FamilyMembersController < ApplicationController
       format.html
       format.js
     end
+    set_view_person
   end
 
   def edit
@@ -169,6 +177,7 @@ class Insured::FamilyMembersController < ApplicationController
       format.html
       format.js
     end
+    set_view_person
   end
 
   def update
@@ -290,6 +299,12 @@ class Insured::FamilyMembersController < ApplicationController
 
   private
 
+  def update_family_broker_agency
+    @family = @consumer_role.person.primary_family
+    broker_role_id = @consumer_role.person.broker_role.try(:id)
+    @family.hire_broker_agency(broker_role_id)
+  end
+
   def consumer_role_for_create(dependent)
     consumer_role = dependent.family_member.try(:person).try(:consumer_role)
     consumer_role.skip_consumer_role_callbacks = true if consumer_role.present?
@@ -338,6 +353,15 @@ class Insured::FamilyMembersController < ApplicationController
     # We're using FamilyPolicy method here because FamilyMember is an extension of Family
     # All users/roles with the permissions to alter a Family should have the same permissions on the FamilyMember
     # While using a single :show? method in the family policy isn't ideal, it does cover a variety of unforseen edge cases that could emerge when determining a user role
+
     authorize @family, :show?
+  end
+
+  def set_view_person
+    # The unfortunate inclusion of this method on all read-related actions (:index, :show, :new, :edit)
+    # is being added to the last line of those methods because this controller was not designed to handle
+    # anyone _except_ an associated_user accessing family members on their own account
+
+    @person = @family.primary_person if @person != @family.primary_person
   end
 end
