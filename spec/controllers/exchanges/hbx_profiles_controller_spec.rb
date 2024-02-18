@@ -824,6 +824,14 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       expect(response.body).to have_content('must be filled')
     end
 
+    it "does not allow docx files to be uploaded" do
+      file = fixture_file_upload("#{Rails.root}/test/sample.docx")
+      profile_valid_params[:file] = file
+      get :create_send_secure_message, xhr:  true, params:  profile_valid_params
+
+      expect(flash[:error]).to include("Unable to upload file.")
+    end
+
     context 'when resource is profile' do
       it 'should set instance variables' do
         invalid_params = {resource_id: employer_profile.id, subject: 'test', body: 'test', actions_id: '', resource_name: employer_profile.class.to_s}

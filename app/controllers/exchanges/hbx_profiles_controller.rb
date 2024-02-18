@@ -143,7 +143,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @body = params[:body].presence
     @element_to_replace_id = params[:actions_id]
     if params[:file].present? && !valid_file_upload?(params[:file], FileUploadValidator::VERIFICATION_DOC_TYPES)
-      redirect_back(fallback_location: :back)
+      redirect_to family_index_dt_exchanges_hbx_profiles_path
       return
     end
     result = ::Operations::SecureMessageAction.new.call(

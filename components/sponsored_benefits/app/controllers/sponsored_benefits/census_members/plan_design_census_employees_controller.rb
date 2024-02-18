@@ -70,7 +70,7 @@ module SponsoredBenefits
 
     def bulk_employee_upload
       if params[:file].present? && !valid_file_upload?(params[:file], FileUploadValidator::CSV_TYPES + FileUploadValidator::XLS_TYPES)
-        redirect_back(fallback_location: :back)
+        redirect_back fallback_location: main_app.root_path
         return
       end
 

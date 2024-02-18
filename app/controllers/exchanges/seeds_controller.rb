@@ -28,7 +28,7 @@ module Exchanges
         aasm_state: 'draft'
       )
       if params[:file].present? !valid_file_upload?(params[:file], FileUploadValidator::CSV_TYPES)
-        redirect_back(fallback_location: :back)
+        redirect_to exchanges_seeds_path
         return
       end
       # TODO: need to figure out how to save the file

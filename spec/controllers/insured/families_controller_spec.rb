@@ -1188,6 +1188,13 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       expect(response).to be_redirect
     end
 
+    it "does not allow docx files to be uploaded" do
+      file = fixture_file_upload("#{Rails.root}/test/sample.docx")
+      post :upload_notice, params: {:file => file, :subject=> subject}
+      expect(flash[:error]).to include("Unable to upload file.")
+      expect(response).to be_redirect
+    end
+
     it "when failure displays 'File not uploaded'" do
       post :upload_notice
       expect(flash[:error]).to eq("File or Subject not provided")

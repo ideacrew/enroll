@@ -199,7 +199,7 @@ module BenefitSponsors
           authorize @employer_profile, :show?
 
           if params[:file].present? && !valid_file_upload?(params[:file], FileUploadValidator::CSV_TYPES + FileUploadValidator::XLS_TYPES)
-            redirect_back(fallback_location: :back)
+            render default_url
             return
           end
 

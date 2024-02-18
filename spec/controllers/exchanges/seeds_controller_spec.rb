@@ -99,6 +99,12 @@ RSpec.describe Exchanges::SeedsController, :type => :controller do
         expect(flash[:error]).to include("CSV does not match individual_market_seed template. Must use headers (in any order) ")
       end
     end
+    it "does not allow docx files to be uploaded" do
+      create_params[:file] = fixture_file_upload("#{Rails.root}/test/sample.docx")
+      post :create, params: create_params, as: :json
+
+      expect(flash[:error]).to include("Unable to use CSV template")
+    end
   end
   describe "#edit" do
     it "should render the edit page when seed id is passed" do

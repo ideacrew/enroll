@@ -10,8 +10,7 @@ class Insured::VerificationDocumentsController < ApplicationController
     @doc_errors = []
     if params[:file]
       unless valid_file_uploads?(params[:file], FileUploadValidator::VERIFICATION_DOC_TYPES)
-        redirect_back(fallback_location: :back)
-        return
+        redirect_to verification_insured_families_path and return
       end
       params[:file].each do |file|
         doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
