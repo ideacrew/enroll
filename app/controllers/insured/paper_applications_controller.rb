@@ -12,7 +12,7 @@ class Insured::PaperApplicationsController < ApplicationController
     end
 
     unless valid_file_upload?(params[:file], FileUploadValidator::VERIFICATION_DOC_TYPES)
-      redirect_back(fallback_location: :back)
+      redirect_to upload_application_insured_families_path
       return
     end
 
