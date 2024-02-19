@@ -271,6 +271,44 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
 
     end
+
+
+    context 'broker logged in' do
+      let!(:broker_user) { FactoryBot.create(:user, :person => writing_agent.person, roles: ['broker_role', 'broker_agency_staff_role']) }
+      let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
+      let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
+      let(:assister)  do
+        assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00")
+        assister.save(validate: false)
+        assister
+      end
+      let(:user) { broker_user }
+
+      context 'hired by family' do
+        before(:each) do
+          family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                              writing_agent_id: writing_agent.id,
+                                                                                              start_on: Time.now,
+                                                                                              is_active: true)
+          family.reload
+        end
+
+        it "should render" do
+          get :edit, params: { id: application.id }
+          expect(assigns(:application)).to eq application
+          expect(response).to render_template(:financial_assistance_nav)
+        end
+      end
+
+      context 'not hired by family' do
+        it "should render" do
+          get :edit, params: { id: application.id }
+          expect(assigns(:application)).to eq application
+          expect(response).to have_http_status(:redirect)
+          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.can_access_application?, (Pundit policy)")
+        end
+      end
+    end
   end
 
   context "POST step" do
@@ -505,6 +543,55 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         expect(flash[:error].to_s).to match(message)
       end
     end
+
+    context 'broker logged in' do
+      let!(:broker_user) { FactoryBot.create(:user, :person => writing_agent.person, roles: ['broker_role', 'broker_agency_staff_role']) }
+      let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
+      let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
+      let(:assister)  do
+        assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00")
+        assister.save(validate: false)
+        assister
+      end
+      let(:user) { broker_user }
+      let(:current_hbx_profile) { OpenStruct.new(under_open_enrollment?: true) }
+
+      before do
+        FinancialAssistance::Application.where(family_id: family_id).each {|app| app.update_attributes(aasm_state: "determined")}
+        allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_profile)
+      end
+
+      context 'hired by family' do
+        before(:each) do
+          family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                              writing_agent_id: writing_agent.id,
+                                                                                              start_on: Time.now,
+                                                                                              is_active: true)
+          family.reload
+        end
+
+        it "should render" do
+          skip "skipped: iap_year_selection enabled" if FinancialAssistanceRegistry[:iap_year_selection].enabled?
+
+          get :copy, params: { id: application.id }
+          existing_app_ids = [application.id, application2.id]
+          copy_app = FinancialAssistance::Application.where(family_id: family_id).reject {|app| existing_app_ids.include? app.id}.first
+          expect(response).to redirect_to(edit_application_path(copy_app.id))
+        end
+      end
+
+      context 'not hired by family' do
+        it "should render" do
+          skip "skipped: iap_year_selection enabled" if FinancialAssistanceRegistry[:iap_year_selection].enabled?
+
+          get :copy, params: { id: application.id }
+          existing_app_ids = [application.id, application2.id]
+          copy_app = FinancialAssistance::Application.where(family_id: family_id).reject {|app| existing_app_ids.include? app.id}.first
+          expect(response).to have_http_status(:redirect)
+          expect(flash[:error]).to match(/not allowed to can_copy/)
+        end
+      end
+    end
   end
 
   context "uqhp_flow" do
@@ -542,7 +629,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
     before do
       sign_in(user)
-      allow(controller).to receive(:authorize).and_return(true)
     end
     it "should be successful" do
       application.update_attributes(:aasm_state => "submitted")

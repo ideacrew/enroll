@@ -179,8 +179,7 @@ module FinancialAssistance
     def review
       save_faa_bookmark(request.original_url)
       @application = FinancialAssistance::Application.where(id: params["id"]).first
-      authorize @application, :can_review?
-
+      authorize @application, :can_review? if @application
       @applicants = @application.active_applicants if @application.present?
       build_applicants_name_by_hbx_id_hash
 

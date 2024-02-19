@@ -19,9 +19,43 @@ module FinancialAssistance
       context 'with permission' do
         let!(:permission) { FactoryBot.create(:permission, :super_admin) }
 
-        context '#can_access_applications?' do
-          it 'returns the result of #can_access_applications?' do
-            expect(policy.can_access_applications?).to be_truthy
+        context '#can_access_application?' do
+          it 'returns the result of #can_access_application?' do
+            expect(policy.can_access_application?).to be_truthy
+          end
+        end
+
+        context '#can_copy?' do
+          it 'returns the result of #can_copy?' do
+            expect(policy.can_copy?).to be_truthy
+          end
+        end
+
+        context '#can_review?' do
+          it 'returns the result of #can_review?' do
+            expect(policy.can_review?).to be_truthy
+          end
+        end
+      end
+
+      context 'without permission' do
+        let!(:permission) { FactoryBot.create(:permission, :developer) }
+
+        context '#can_access_application?' do
+          it 'returns the result of #can_access_application?' do
+            expect(policy.can_access_application?).to be_falsey
+          end
+        end
+
+        context '#can_copy?' do
+          it 'returns the result of #can_copy?' do
+            expect(policy.can_copy?).to be_falsey
+          end
+        end
+
+        context '#can_review?' do
+          it 'returns the result of #can_review?' do
+            expect(policy.can_review?).to be_falsey
           end
         end
       end
@@ -30,9 +64,9 @@ module FinancialAssistance
     context 'record user' do
       let(:user) { associated_user }
 
-      context '#can_access_applications?' do
-        it 'returns the result of #can_access_applications?' do
-          expect(policy.can_access_applications?).to be_truthy
+      context '#can_access_application?' do
+        it 'returns the result of #can_access_application?' do
+          expect(policy.can_access_application?).to be_truthy
         end
       end
     end
@@ -44,9 +78,21 @@ module FinancialAssistance
       let!(:fake_family_member) { fake_family.family_members.first }
       let(:user) { fake_user }
 
-      context '#can_access_applications?' do
-        it 'returns the result of #can_access_applications?' do
-          expect(policy.can_access_applications?).to be_falsey
+      context '#can_access_application?' do
+        it 'returns the result of #can_access_application?' do
+          expect(policy.can_access_application?).to be_falsey
+        end
+
+        context '#can_copy?' do
+          it 'returns the result of #can_copy?' do
+            expect(policy.can_copy?).to be_falsey
+          end
+        end
+
+        context '#can_review?' do
+          it 'returns the result of #can_review?' do
+            expect(policy.can_review?).to be_falsey
+          end
         end
       end
     end
@@ -71,15 +117,27 @@ module FinancialAssistance
           family.reload
         end
 
-        it 'returns the result of #can_access_applications?' do
-          expect(policy.can_access_applications?).to be_truthy
+        it 'returns the result of #can_access_application?' do
+          expect(policy.can_access_application?).to be_truthy
         end
       end
 
 
       context 'not hired by family' do
-        it 'returns the result of #can_access_applications?' do
-          expect(policy.can_access_applications?).to be_falsey
+        it 'returns the result of #can_access_application?' do
+          expect(policy.can_access_application?).to be_falsey
+        end
+      end
+
+      context '#can_copy?' do
+        it 'returns the result of #can_copy?' do
+          expect(policy.can_copy?).to be_falsey
+        end
+      end
+
+      context '#can_review?' do
+        it 'returns the result of #can_review?' do
+          expect(policy.can_review?).to be_falsey
         end
       end
     end
