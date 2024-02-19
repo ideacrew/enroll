@@ -8,16 +8,32 @@ module FinancialAssistance
   class ApplicationPolicy < Policy
     ACCESSABLE_ROLES = %w[hbx_staff_role broker_role active_broker_staff_roles].freeze
 
-    def can_access_applications?
+    def can_access_application?
+      allowed_to_modify?
+    end
+
+    def can_copy?
+      allowed_to_modify?
+    end
+
+    def can_review?
+      allowed_to_modify?
+    end
+
+    private
+
+    def allowed_to_modify?
       return true if current_user == associated_user
       return true if role_has_permission_to_access_applications?
       false
     end
 
-    private
-
     def role_has_permission_to_access_applications?
-      role.present? && (current_user.has_hbx_staff_role? || can_broker_access?)
+      role.present? && (can_hbx_staff_modify? || can_broker_access?)
+    end
+
+    def can_hbx_staff_modify?
+      role.is_a?(HbxStaffRole) && role&.permission&.modify_family
     end
 
     def can_broker_access?

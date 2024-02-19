@@ -13,7 +13,6 @@ module FinancialAssistance
     include ::UIHelpers::WorkflowController
     include Acapi::Notifiers
     include FinancialAssistance::L10nHelper
-    include Pundit
     require 'securerandom'
 
     before_action :check_eligibility, only: [:create, :get_help_paying_coverage_response, :copy]
@@ -117,6 +116,8 @@ module FinancialAssistance
       copy_result = ::FinancialAssistance::Operations::Applications::Copy.new.call(application_id: params[:id])
       if copy_result.success?
         @application = copy_result.success
+        authorize @application, :can_copy?
+
         @application.set_assistance_year
         assistance_year_page = EnrollRegistry.feature_enabled?(:iap_year_selection) && (HbxProfile.current_hbx.under_open_enrollment? || EnrollRegistry.feature_enabled?(:iap_year_selection_form))
         redirect_path = assistance_year_page ? application_year_selection_application_path(@application) : edit_application_path(@application)
@@ -178,7 +179,8 @@ module FinancialAssistance
     def review
       save_faa_bookmark(request.original_url)
       @application = FinancialAssistance::Application.where(id: params["id"]).first
-      authorize @application, :can_access_applications?
+      authorize @application, :can_review?
+
       @applicants = @application.active_applicants if @application.present?
       build_applicants_name_by_hbx_id_hash
 
@@ -429,7 +431,7 @@ module FinancialAssistance
     def find_and_authorize_application
       application = find_application
 
-      authorize application, :can_access_applications?
+      authorize application, :can_access_application?
     end
 
     def save_faa_bookmark(url)
