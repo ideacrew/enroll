@@ -1182,6 +1182,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     it "when successful displays 'File Saved'" do
+      file = fixture_file_upload("#{Rails.root}/test/JavaScript.pdf")
       post :upload_notice, params: {:file => file, :subject=> subject}
       expect(flash[:notice]).to eq("File Saved")
       expect(response).to have_http_status(:found)
