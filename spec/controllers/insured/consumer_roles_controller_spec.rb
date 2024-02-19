@@ -849,6 +849,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:draft_application_after_ridp).and_return(true)
         allow(user).to receive(:person).and_return(person)
+        allow(controller).to receive(:authorize).and_return(true)
         sign_in user
       end
 
