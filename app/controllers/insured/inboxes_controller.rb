@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # This controller is responsible for the :new, :create, :show and :destroy actions of an consumer-embedded inbox
-class Insured::InboxesController < InboxesController
+class Insured::InboxesController < InboxesController # rubocop:disable Style/ClassAndModuleChildren
   def new
     @inbox_to_name = params['to']
     @inbox_provider_name = 'HBX ADMIN'
