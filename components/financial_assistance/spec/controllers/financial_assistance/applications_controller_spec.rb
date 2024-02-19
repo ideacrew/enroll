@@ -585,8 +585,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
           skip "skipped: iap_year_selection enabled" if FinancialAssistanceRegistry[:iap_year_selection].enabled?
 
           get :copy, params: { id: application.id }
-          existing_app_ids = [application.id, application2.id]
-          copy_app = FinancialAssistance::Application.where(family_id: family_id).reject {|app| existing_app_ids.include? app.id}.first
           expect(response).to have_http_status(:redirect)
           expect(flash[:error]).to match(/not allowed to can_copy/)
         end
