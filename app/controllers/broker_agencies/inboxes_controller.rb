@@ -63,4 +63,5 @@ class BrokerAgencies::InboxesController < InboxesController
   def successful_save_path
     exchanges_hbx_profiles_root_path
   end
+
 end
