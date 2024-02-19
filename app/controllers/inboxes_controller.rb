@@ -37,9 +37,7 @@ class InboxesController < ApplicationController
     #@message.destroy
     @message.update_attributes(folder: Message::FOLDER_TYPES[:deleted])
     flash[:notice] = "Successfully deleted inbox message."
-    if params[:url].present?
-      @inbox_url = params[:url]
-    end
+    @inbox_url = params[:url] if params[:url].present?
   end
 
   private
