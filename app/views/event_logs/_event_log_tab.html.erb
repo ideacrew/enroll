@@ -127,7 +127,7 @@
     <div class="event-log-header">
       <div class="event-log-export-text">
         <h3><b><%= type === "consumer" ? l10n("event_log.table_label_consumer") + hbx_id : l10n("event_log.table_label_employer")%></b></h3>
-        <a href="/event_logs.csv?<% @event_logs.each do |event| %>&events[]=<%= event[:_id] %><% end %>" id="export-table" class="button button-primary"><%= l10n("Export") %> <%= l10n("to") %> CSV</a>
+        <a href="#" id="export-table" class="button button-primary"><%= l10n("Export") %> <%= l10n("to") %> CSV</a>
       </div>
     </div>
     <div id="event-table-data">
@@ -163,7 +163,7 @@
               <th><%= l10n("Account (Date/Time)") %></th>
             </tr>
             <% details.each do |detail| %>
-            <tr class="detail-row" id="<%= index %>">
+            <tr class="detail-row" data-event-id="<%= detail[:_id] %>" id="<%= index %>">
               <td colspan="2"></td>
               <td><%= detail[:detail] %></td>
               <td id="<%= detail[:account_hbx_id] %>" class="user_id"><%= detail[:account_username] %></td>
@@ -219,10 +219,6 @@
       arrow.toggleClass('glyphicon-chevron-right glyphicon-chevron-down');
     });
 
-    exportTableButton.on('click', function() {
-      window.location.href = '/event_logs.csv';
-    });
-
     disableExportButton();
     hideFilters();
 
@@ -245,6 +241,28 @@
   function disableExportButton() {
     $('#export-table').prop('disabled', true);
   }
+
+  // Handle click event for csv export
+  $('#export-table').on('click', function(event) {
+    event.preventDefault();
+
+    var eventIds = [];
+    $('.primary-row').each(function() {
+      var primaryRowId = $(this).attr('id');
+
+      if ($(this).is(':visible')) {
+        var detailRows = $('.detail-row[id="' + primaryRowId + '"]');
+
+        detailRows.each(function() {
+          var eventId = $(this).data('event-id');
+          eventIds.push(eventId);
+        });
+      }
+    });
+
+    var url = '/event_logs.csv?' + $.param({ events: eventIds });
+    window.location.href = url;
+  });
 
   function showFilters() {
     $('.filters-container').css('visibility', 'visible');
