@@ -347,8 +347,9 @@ class Insured::FamiliesController < FamiliesController
       flash[:error] = "File or Subject not provided"
       redirect_back(fallback_location: :back)
       return
-    elsif file_content_type != 'application/pdf'
-      flash[:error] = "Please upload a PDF file. Other file formats are not supported."
+    end
+
+    unless valid_file_upload?(params[:file], FileUploadValidator::PDF_TYPE)
       redirect_back(fallback_location: :back)
       return
     end

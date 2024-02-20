@@ -11,7 +11,7 @@
 
   </div>
 <%= form_for @plan_design_proposal, url: bulk_employee_upload_plan_design_proposal_plan_design_census_employees_path(@plan_design_proposal), method: 'post', :html => { :multipart => true } do |f| %>
-<%= file_field_tag :file %>
+<%= file_field_tag :file, accept: (FileUploadValidator::CSV_TYPES + FileUploadValidator::XLS_TYPES).join(',') %>
 <%#=pundit_span EmployerProfile, :updateable? %>
 <%= label_tag :file, 'Select File To Upload', class: 'select btn btn-primary ' %>
 <%= f.submit 'Upload', class: 'btn btn-primary ' %>
