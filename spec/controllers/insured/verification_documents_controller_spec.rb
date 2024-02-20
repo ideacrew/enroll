@@ -98,6 +98,14 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
 
         expect(flash[:error]).to include("Unable to upload file.")
       end
+
+      it "does not allow docx files to be uploaded" do
+        file = fixture_file_upload("#{Rails.root}/test/fake_sample.docx.jpg")
+        params = { person: {consumer_role: person.consumer_role}, file: [file] }
+        post :upload, params: params
+
+        expect(flash[:error]).to include("Unable to upload file.")
+      end
      end
     end
 

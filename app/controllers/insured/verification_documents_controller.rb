@@ -23,7 +23,7 @@ class Insured::VerificationDocumentsController < ApplicationController
           else
             flash[:error] = "Could not save file. #{@doc_errors.join('. ')}"
             redirect_back(fallback_location: verification_insured_families_path)
-            break
+            return
           end
         else
           flash[:error] = "Could not save file"

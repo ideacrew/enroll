@@ -22,7 +22,7 @@ class Insured::RidpDocumentsController < ApplicationController
           else
             flash[:error] = "Could not save file. #{@doc_errors&.join('. ')}"
             redirect_back fallback_location: '/'
-            break
+            return
           end
         else
           flash[:error] = "Could not save file"
