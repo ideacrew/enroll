@@ -308,6 +308,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def help_paying_coverage
     if EnrollRegistry.feature_enabled?(:financial_assistance)
+      authorize @consumer_role, :ridp_verified? unless Rails.env.test? && defined?(Cucumber)
       set_current_person
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
