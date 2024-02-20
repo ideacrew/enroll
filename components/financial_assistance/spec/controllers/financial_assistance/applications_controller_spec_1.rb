@@ -84,6 +84,21 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
           expect(response).to be_successful
         end
       end
+
+      context 'GET #index' do
+        it 'returns success' do
+          session[:person_id] = person.id
+          get :index
+          expect(response).to be_successful
+        end
+      end
+
+      context "GET checklist_pdf" do
+        it 'returns success' do
+          get :checklist_pdf
+          expect(response).to be_successful
+        end
+      end
     end
 
     context 'admin without permissions' do
@@ -128,6 +143,14 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         end
       end
 
+      context 'GET #index' do
+        it 'returns success' do
+          session[:person_id] = person.id
+          get :index
+          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.can_access_application?, (Pundit policy)")
+        end
+      end
+
       context "GET application_publish_error" do
         context "With missing family id" do
           it 'should find application and it is not authorized to view' do
@@ -135,6 +158,19 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
             expect(assigns(:application)).to eq application
             expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.can_access_application?, (Pundit policy)")
           end
+        end
+      end
+    end
+
+    context 'user without roles' do
+      let!(:person_without_role) { FactoryBot.create(:person) }
+      let!(:user_without_role) { FactoryBot.create(:user, :person => person_without_role) }
+
+      context "GET checklist_pdf" do
+        it 'returns success' do
+          sign_in(user_without_role)
+          get :checklist_pdf
+          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.can_view_checklist_pdf?, (Pundit policy)")
         end
       end
     end

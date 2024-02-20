@@ -6,7 +6,11 @@ module FinancialAssistance
   # It checks if the user has the necessary permissions to perform actions on applications.
   # The permissions are determined based on the user's role and their relationship to the record.
   class ApplicationPolicy < Policy
-    ACCESSABLE_ROLES = %w[hbx_staff_role broker_role active_broker_staff_roles].freeze
+    ACCESSABLE_ROLES = %w[hbx_staff_role broker_role active_broker_staff_roles consumer_role].freeze
+
+    def can_view_checklist_pdf?
+      allowed_to_view?
+    end
 
     def can_access_application?
       allowed_to_modify?
@@ -17,6 +21,10 @@ module FinancialAssistance
     end
 
     private
+
+    def allowed_to_view?
+      role.present?
+    end
 
     def allowed_to_modify?
       return true if current_user == associated_user
@@ -34,6 +42,10 @@ module FinancialAssistance
 
     def can_broker_access?
       (role.is_a?(::BrokerRole) || role.is_a?(::BrokerAgencyStaffRole)) && broker_agency_profile_matches?
+    end
+
+    def can_consumer_access?
+      role.is_a?(::ConsumerRole)
     end
 
     def broker_agency_profile_matches?

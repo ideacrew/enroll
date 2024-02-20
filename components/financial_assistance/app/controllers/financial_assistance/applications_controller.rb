@@ -24,7 +24,10 @@ module FinancialAssistance
     # We should ONLY be getting applications that are associated with PrimaryFamily of Current Person.
     # DO NOT include applications from other families.
     def index
-      @applications = FinancialAssistance::Application.where("family_id" => get_current_person.financial_assistance_identifier)
+      family = get_current_person.primary_family
+      @applications = FinancialAssistance::Application.where("family_id" => family.id)
+
+      authorize @applications.order('submitted_at desc').first, :can_access_application?
     end
 
     def index_with_filter
@@ -37,6 +40,9 @@ module FinancialAssistance
       if result.success?
         value = result.value!
         @applications = value[:applications]
+
+        authorize @applications.order('submitted_at desc').first, :can_access_application?
+
         @filtered_applications = value[:filtered_applications]
         @recent_determined_hbx_id = value[:recent_determined_hbx_id]
       else
@@ -295,6 +301,8 @@ module FinancialAssistance
     end
 
     def checklist_pdf
+      authorize Application, :can_view_checklist_pdf?
+
       send_file(
         FinancialAssistance::Engine.root.join(
           FinancialAssistanceRegistry[:ivl_application_checklist].setting(:file_location).item.to_s
