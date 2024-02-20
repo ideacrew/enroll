@@ -24,12 +24,6 @@ RSpec.describe FinancialAssistance::ApplicationPolicy, dbclean: :after_each  do
         end
       end
 
-      context '#can_copy?' do
-        it 'returns the result of #can_copy?' do
-          expect(policy.can_copy?).to be_truthy
-        end
-      end
-
       context '#can_review?' do
         it 'returns the result of #can_review?' do
           expect(policy.can_review?).to be_truthy
@@ -43,12 +37,6 @@ RSpec.describe FinancialAssistance::ApplicationPolicy, dbclean: :after_each  do
       context '#can_access_application?' do
         it 'returns the result of #can_access_application?' do
           expect(policy.can_access_application?).to be_falsey
-        end
-      end
-
-      context '#can_copy?' do
-        it 'returns the result of #can_copy?' do
-          expect(policy.can_copy?).to be_falsey
         end
       end
 
@@ -80,12 +68,6 @@ RSpec.describe FinancialAssistance::ApplicationPolicy, dbclean: :after_each  do
     context '#can_access_application?' do
       it 'returns the result of #can_access_application?' do
         expect(policy.can_access_application?).to be_falsey
-      end
-
-      context '#can_copy?' do
-        it 'returns the result of #can_copy?' do
-          expect(policy.can_copy?).to be_falsey
-        end
       end
 
       context '#can_review?' do
@@ -125,12 +107,6 @@ RSpec.describe FinancialAssistance::ApplicationPolicy, dbclean: :after_each  do
     context 'not hired by family' do
       it 'returns the result of #can_access_application?' do
         expect(policy.can_access_application?).to be_falsey
-      end
-    end
-
-    context '#can_copy?' do
-      it 'returns the result of #can_copy?' do
-        expect(policy.can_copy?).to be_falsey
       end
     end
 

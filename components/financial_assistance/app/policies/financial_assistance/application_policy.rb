@@ -12,10 +12,6 @@ module FinancialAssistance
       allowed_to_modify?
     end
 
-    def can_copy?
-      allowed_to_modify?
-    end
-
     def can_review?
       allowed_to_modify?
     end

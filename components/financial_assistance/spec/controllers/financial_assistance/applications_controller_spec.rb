@@ -586,7 +586,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
           get :copy, params: { id: application.id }
           expect(response).to have_http_status(:redirect)
-          expect(flash[:error]).to match(/not allowed to can_copy/)
+          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.can_access_application?, (Pundit policy)")
         end
       end
     end

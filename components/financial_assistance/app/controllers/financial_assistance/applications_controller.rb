@@ -5,7 +5,7 @@ module FinancialAssistance
   class ApplicationsController < FinancialAssistance::ApplicationController
 
     before_action :set_current_person
-    before_action :find_and_authorize_application, :except => [:index, :index_with_filter, :new, :copy, :uqhp_flow, :review, :raw_application, :checklist_pdf]
+    before_action :find_and_authorize_application, :except => [:index, :index_with_filter, :new, :uqhp_flow, :review, :raw_application, :checklist_pdf]
 
     around_action :cache_current_hbx, :only => [:index_with_filter]
 
@@ -116,7 +116,6 @@ module FinancialAssistance
       copy_result = ::FinancialAssistance::Operations::Applications::Copy.new.call(application_id: params[:id])
       if copy_result.success?
         @application = copy_result.success
-        authorize @application, :can_copy?
 
         @application.set_assistance_year
         assistance_year_page = EnrollRegistry.feature_enabled?(:iap_year_selection) && (HbxProfile.current_hbx.under_open_enrollment? || EnrollRegistry.feature_enabled?(:iap_year_selection_form))
@@ -179,11 +178,11 @@ module FinancialAssistance
     def review
       save_faa_bookmark(request.original_url)
       @application = FinancialAssistance::Application.where(id: params["id"]).first
-      authorize @application, :can_review? if @application
-      @applicants = @application.active_applicants if @application.present?
-      build_applicants_name_by_hbx_id_hash
+      return redirect_to applications_path if @application.blank?
 
-      redirect_to applications_path if @application.blank?
+      authorize @application, :can_review?
+      @applicants = @application.active_applicants
+      build_applicants_name_by_hbx_id_hash
     end
 
     def raw_application
