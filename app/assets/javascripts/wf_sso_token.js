@@ -25,7 +25,7 @@ $(document).on('click', '.payOnlineButton', function() {
         // prevent multiple click handlers from being attached
         $(document).off('click', '.pay_online_confirmation.btn')
         $(document).on('click', '.pay_online_confirmation.btn', function() {
-          window.open(wf_url, '_blank');
+          window.open(wf_url, '_blank', 'noopener');
           $(modal_id).modal('hide');
         });
       }
