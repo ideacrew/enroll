@@ -74,7 +74,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         context 'with invalid params' do
           let!(:params) {{ id: "test" }}
 
-          it 'does not copy application' do
+          it 'returns application not found error' do
             expect { get :copy, params: params }.to raise_error
           end
         end
@@ -84,7 +84,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         context 'with valid params' do
           let!(:params) {{ id: application.id }}
 
-          it 'downloads the requested verification document' do
+          it 'returns success' do
             application.update_attributes(:aasm_state => "draft")
             get :review_and_submit, params: params
             expect(response).to be_successful
@@ -95,7 +95,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       context 'GET #review' do
         let!(:params) {{ id: application.id }}
 
-        it 'destroys the requested verification document' do
+        it 'returns success' do
           get :review, params: params
           expect(response).to be_successful
         end
@@ -165,7 +165,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         context 'with invalid params' do
           let!(:params) {{ id: "test" }}
 
-          it 'does not copy application' do
+          it 'returns application not found error' do
             expect { get :copy, params: params }.to raise_error
           end
         end
@@ -175,7 +175,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         context 'with valid params' do
           let!(:params) {{ id: application.id }}
 
-          it 'downloads the requested verification document' do
+          it 'returns success' do
             application.update_attributes(:aasm_state => "draft")
             get :review_and_submit, params: params
             expect(response).to be_successful
@@ -186,7 +186,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       context 'GET #review' do
         let!(:params) {{ id: application.id }}
 
-        it 'destroys the requested verification document' do
+        it 'returns success' do
           get :review, params: params
           expect(response).to be_successful
         end
@@ -203,7 +203,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
           let!(:params) {{ id: application.id }}
 
 
-          it 'does not copy application' do
+          it 'returns application not found error for unauthorized user' do
             expect { get :copy, params: params }.to raise_error
           end
         end
@@ -213,7 +213,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         context 'with valid params' do
           let!(:params) {{ id: application.id }}
 
-          it 'returns authorization failure' do
+          it 'returns application not found error for unauthorized user' do
             application.update_attributes(:aasm_state => "draft")
             expect { get :review_and_submit, params: params }.to raise_error
           end
@@ -223,7 +223,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       context 'GET #review' do
         let!(:params) {{ id: application.id }}
 
-        it 'returns application not found error for unauthorized user' do
+        it 'returns authorization failure' do
           get :review, params: params
           expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.can_review?, (Pundit policy)")
         end
