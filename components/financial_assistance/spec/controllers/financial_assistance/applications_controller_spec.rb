@@ -747,13 +747,13 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     context "With missing family id" do
+      let!(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+      let!(:admin_user) {FactoryBot.create(:user, :with_hbx_staff_role, :person => admin_person)}
+      let!(:permission) { FactoryBot.create(:permission, :super_admin) }
+      let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
+
       before do
-        allow(admin_user).to receive(:try).with(:id).and_call_original
-        allow(admin_user).to receive(:try).with(:person).and_return(admin_person)
-        allow(admin_person).to receive(:hbx_staff_role).and_return(true)
         sign_in(admin_user)
-        allow(controller).to receive(:current_user).and_return(admin_user)
-        allow(controller).to receive(:authorize).and_return(true)
       end
 
       it 'should find application with missing family id' do

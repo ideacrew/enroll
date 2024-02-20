@@ -4,11 +4,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   routes { FinancialAssistance::Engine.routes }
 
   describe 'pundit policy authorization checks' do
-    let!(:fake_person) { FactoryBot.create(:person, :with_consumer_role) }
-    let!(:fake_user) {FactoryBot.create(:user, :person => fake_person)}
-    let!(:fake_family) { FactoryBot.create(:family, :with_primary_family_member, person: fake_person) }
-    let!(:fake_family_member) { fake_family.family_members.first }
-
     let!(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
     let!(:admin_user) {FactoryBot.create(:user, :with_hbx_staff_role, :person => admin_person)}
     let!(:permission) { FactoryBot.create(:permission, :super_admin) }
@@ -41,17 +36,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
                                     person_hbx_id: person.hbx_id,
                                     family_member_id: family_member.id)
       applicant
-    end
-
-    let!(:esi_evidence) do
-      applicant.create_esi_evidence(
-        key: :esi_mec,
-        title: 'Esi',
-        aasm_state: 'pending',
-        due_on: nil,
-        verification_outstanding: false,
-        is_satisfied: true
-      )
     end
 
     context 'admin with permissions' do
@@ -143,6 +127,16 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
           expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.can_review?, (Pundit policy)")
         end
       end
+
+      context "GET application_publish_error" do
+        context "With missing family id" do
+          it 'should find application and it is not authorized to view' do
+            get :application_publish_error, params: { id: application.id }
+            expect(assigns(:application)).to eq application
+            expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.can_access_application?, (Pundit policy)")
+          end
+        end
+      end
     end
 
     context 'associated_user' do
@@ -194,6 +188,10 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     context 'unauthorized user' do
+      let(:fake_person) { FactoryBot.create(:person, :with_consumer_role) }
+      let(:fake_user) {FactoryBot.create(:user, :person => fake_person)}
+      let!(:fake_family) { FactoryBot.create(:family, :with_primary_family_member, person: fake_person) }
+
       before do
         sign_in(fake_user)
       end
@@ -226,6 +224,14 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         it 'returns authorization failure' do
           get :review, params: params
           expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.can_review?, (Pundit policy)")
+        end
+      end
+
+      context "GET application_publish_error" do
+        context "With missing family id" do
+          it 'should find application and it is not authorized to view' do
+            expect { get :application_publish_error, params: params }.to raise_error
+          end
         end
       end
     end
