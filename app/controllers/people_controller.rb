@@ -2,7 +2,7 @@ class PeopleController < ApplicationController
   include ApplicationHelper
   include ErrorBubble
   include VlpDoc
-  
+
   before_action :sanitize_contact_method, only: [:update]
   before_action :set_requested_record, except: [:index]
 
@@ -52,7 +52,6 @@ class PeopleController < ApplicationController
     end
   end
 
-
   def show
     authorize record, :can_show?
     # when we were doing cleanup on feb 2024 I was not able to delete :show because it was still used on specs
@@ -64,7 +63,7 @@ class PeopleController < ApplicationController
     build_nested_models
   end
 
-private
+  private
 
   def set_requested_record
     @person = find_person(params[:id])
