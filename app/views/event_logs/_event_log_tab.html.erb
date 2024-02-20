@@ -219,27 +219,17 @@
       arrow.toggleClass('glyphicon-chevron-right glyphicon-chevron-down');
     });
 
-    disableExportButton();
-    hideFilters();
-
-    enableExportButton();
-    showFilters();
+    if ($('tr.primary-row:visible').length === 0) {
+      disableExportButton();
+    }
   });
 
-  function disableButtons() {
-    $('#run-query, #export-table').prop('disabled', true);
-  }
-
-  function enableButtons() {
-    $('#run-query, #export-table').prop('disabled', false);
-  }
-
   function enableExportButton() {
-    $('#export-table').prop('disabled', false);
+    $('#export-table').show();
   }
 
   function disableExportButton() {
-    $('#export-table').prop('disabled', true);
+    $('#export-table').hide();
   }
 
   // Handle click event for csv export
@@ -504,9 +494,11 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
     if (visible_rows.length === 0) {
       $('#event-table-data').hide()
       $('#no-results').show()
+      disableExportButton();
     } else {
       $('#event-table-data').show()
       $('#no-results').hide()
+      enableExportButton();
       $('#event-log-table tbody tr').each(function( index ) {
         var row = $(this).prop('id');
         var row_index = visible_rows.indexOf(row)

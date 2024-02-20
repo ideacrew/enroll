@@ -18,7 +18,7 @@ class EventLogsController < ApplicationController
   private
 
   def event_params
-    params.require(:events)
+    params[:events] || []
   end
 
   def check_hbx_staff_role
