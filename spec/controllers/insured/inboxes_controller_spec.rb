@@ -59,7 +59,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
 
     context 'without permissions' do
       let(:fake_person) { FactoryBot.create(:person, :with_consumer_role) }
-      let(:fake_user) { FactoryBot.create(:user, :person => fake_person) }
+      let(:fake_user) { FactoryBot.create(:user, person: fake_person) }
       let!(:fake_family) { FactoryBot.create(:family, :with_primary_family_member, person: fake_person) }
 
       before do

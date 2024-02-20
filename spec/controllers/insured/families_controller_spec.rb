@@ -539,105 +539,296 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   end
 
   describe "GET manage_family" do
-    let(:employee_roles) { double }
-    let(:employee_role) { double("EmployeeRole", market_kind: 'shop') }
+    context "without auth" do
+      let(:employee_roles) { double }
+      let(:employee_role) { double("EmployeeRole", market_kind: 'shop') }
 
-    before :each do
-      allow(person).to receive(:active_employee_roles).and_return([employee_role])
-      allow(family).to receive(:coverage_waived?).and_return(true)
-      allow(family).to receive(:active_family_members).and_return(family_members)
+      before :each do
+        allow(controller).to receive(:authorize).and_return(true)
+        allow(person).to receive(:active_employee_roles).and_return([employee_role])
+        allow(family).to receive(:coverage_waived?).and_return(true)
+        allow(family).to receive(:active_family_members).and_return(family_members)
+      end
+
+      it "should be a success" do
+        allow(controller).to receive(:authorize).and_return(true)
+        allow(person).to receive(:has_multiple_roles?).and_return(false)
+        get :manage_family
+        expect(response).to have_http_status(:success)
+      end
+
+      it "should render manage family section" do
+        allow(controller).to receive(:authorize).and_return(true)
+        allow(person).to receive(:has_multiple_roles?).and_return(false)
+        get :manage_family
+        expect(response).to render_template("manage_family")
+      end
+
+      it "should assign variables" do
+        allow(controller).to receive(:authorize).and_return(true)
+        allow(person).to receive(:has_multiple_roles?).and_return(false)
+        get :manage_family
+        expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
+        expect(assigns(:family_members)).to eq(family_members)
+      end
+
+      it "assigns variable to change QLE to IVL flow" do
+        allow(controller).to receive(:authorize).and_return(true)
+        allow(person).to receive(:has_multiple_roles?).and_return(true)
+        get :manage_family, params: {market: "shop_market_events"}
+        expect(assigns(:manually_picked_role)).to eq "shop_market_events"
+      end
+
+      it "assigns variable to change QLE to Employee flow" do
+        allow(controller).to receive(:authorize).and_return(true)
+        allow(person).to receive(:has_multiple_roles?).and_return(true)
+        get :manage_family, params: {market: "individual_market_events"}
+        expect(assigns(:manually_picked_role)).to eq "individual_market_events"
+      end
+
+      it "doesn't assign the variable to show different flow for QLE" do
+        allow(controller).to receive(:authorize).and_return(true)
+        allow(person).to receive(:has_multiple_roles?).and_return(false)
+        get :manage_family, params: {market: "shop_market_events"}
+        expect(assigns(:manually_picked_role)).to eq nil
+      end
     end
 
-    it "should be a success" do
-      allow(person).to receive(:has_multiple_roles?).and_return(false)
-      get :manage_family
-      expect(response).to have_http_status(:success)
-    end
+    context 'with auth' do
+      let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+      let(:user) { FactoryBot.create(:user, person: person) }
+      let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
 
-    it "should render manage family section" do
-      allow(person).to receive(:has_multiple_roles?).and_return(false)
-      get :manage_family
-      expect(response).to render_template("manage_family")
-    end
+      before do
+        allow(person).to receive(:user).and_return(user)
+      end
 
-    it "should assign variables" do
-      allow(person).to receive(:has_multiple_roles?).and_return(false)
-      get :manage_family
-      expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
-      expect(assigns(:family_members)).to eq(family_members)
-    end
+      context 'as a user not associated with the account' do
+        let(:fake_person) { FactoryBot.create(:person, :with_consumer_role) }
+        let(:fake_user) { FactoryBot.create(:user, person: fake_person) }
+        let!(:fake_family) { FactoryBot.create(:family, :with_primary_family_member, person: fake_person) }
 
-    it "assigns variable to change QLE to IVL flow" do
-      allow(person).to receive(:has_multiple_roles?).and_return(true)
-      get :manage_family, params: {market: "shop_market_events"}
-      expect(assigns(:manually_picked_role)).to eq "shop_market_events"
-    end
+        before do
+          sign_in(fake_user)
+        end
 
-    it "assigns variable to change QLE to Employee flow" do
-      allow(person).to receive(:has_multiple_roles?).and_return(true)
-      get :manage_family, params: {market: "individual_market_events"}
-      expect(assigns(:manually_picked_role)).to eq "individual_market_events"
-    end
+        it 'redirects the user to their own account' do
+          get :manage_family, params: { family: family.id }
 
-    it "doesn't assign the variable to show different flow for QLE" do
-      allow(person).to receive(:has_multiple_roles?).and_return(false)
-      get :manage_family, params: {market: "shop_market_events"}
-      expect(assigns(:manually_picked_role)).to eq nil
+          expect(response).to render_template("manage_family")
+          expect(assigns(:family)).to eq(fake_family)
+        end
+      end
+
+      context 'as an admin' do
+        let!(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+        let!(:admin_user) { FactoryBot.create(:user, :with_hbx_staff_role, person: admin_person) }
+        let!(:permission) { FactoryBot.create(:permission, :super_admin) }
+        let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
+
+        before do
+          sign_in(admin_user)
+        end
+
+        it 'should be a success' do
+          get :manage_family, params: { family: family.id }
+
+          expect(response).to render_template("manage_family")
+          expect(assigns(:family)).to eq(family)
+        end
+      end
+
+      context 'as broker' do
+        let!(:broker_user) {FactoryBot.create(:user, :person => writing_agent.person, roles: ['broker_role', 'broker_agency_staff_role'])}
+        let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
+        let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
+        let(:assister)  do
+          assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00")
+          assister.save(validate: false)
+          assister
+        end
+
+        context 'associated with the family' do
+          before do
+            family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                                writing_agent_id: writing_agent.id,
+                                                                                                start_on: Time.now,
+                                                                                                is_active: true)
+            sign_in(broker_user)
+          end
+
+          it 'should be a success' do
+            get :manage_family, params: { family: family.id }
+
+            expect(response).to have_http_status(:success)
+            expect(response).to render_template("manage_family")
+            expect(assigns(:family)).to eq(family)
+          end
+        end
+
+        context 'not associated with the family' do
+          before do
+            sign_in(broker_user)
+          end
+
+          it 'should not be a success' do
+            get :manage_family, params: { family: family.id }
+
+            expect(response).to have_http_status(:redirect)
+            expect(response).to_not render_template("manage_family")
+            expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
+          end
+        end
+      end
     end
   end
 
   describe "GET personal" do
-    context "render template" do
-      before :each do
-        allow(family).to receive(:active_family_members).and_return(family_members)
-        sign_in user
-        get :personal
+    context 'without auth' do
+      before do
+        allow(controller).to receive(:authorize).and_return(true)
       end
 
-      it "should be a success" do
-        expect(response).to have_http_status(:success)
+      context "render template" do
+        before :each do
+          allow(family).to receive(:active_family_members).and_return(family_members)
+          sign_in user
+          get :personal
+        end
+
+        it "should be a success" do
+          expect(response).to have_http_status(:success)
+        end
+
+        it "should render person edit page" do
+          expect(response).to render_template("personal")
+        end
+
+        it "should assign variables" do
+          expect(assigns(:family_members)).to eq(family_members)
+        end
       end
 
-      it "should render person edit page" do
-        expect(response).to render_template("personal")
+      context "choosing contact_method via dropdown is enabled" do
+        before :each do
+          allow(family).to receive(:active_family_members).and_return(family_members)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:contact_method_via_dropdown).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:prevent_concurrent_sessions).and_return(false)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:preferred_user_access).and_return(false)
+          sign_in user
+          get :personal
+        end
+
+        it "should not assign value" do
+          expect(assigns(:contact_preferences_mapping)).to eq(nil)
+        end
       end
 
-      it "should assign variables" do
-        expect(assigns(:family_members)).to eq(family_members)
+      context "choosing contact_method via dropdown is disabled (choose from checkbox)" do
+        before :each do
+          allow(family).to receive(:active_family_members).and_return(family_members)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(true)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:contact_method_via_dropdown).and_return(false)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:prevent_concurrent_sessions).and_return(false)
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:preferred_user_access).and_return(false)
+          sign_in user
+          get :personal
+        end
+
+        it "should assign value" do
+          expect(assigns(:contact_preferences_mapping)).not_to be_nil
+        end
       end
     end
 
-    context "choosing contact_method via dropdown is enabled" do
-      before :each do
-        allow(family).to receive(:active_family_members).and_return(family_members)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(true)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:contact_method_via_dropdown).and_return(true)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prevent_concurrent_sessions).and_return(false)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:preferred_user_access).and_return(false)
-        sign_in user
-        get :personal
+    context 'with auth' do
+      let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+      let(:user) { FactoryBot.create(:user, person: person) }
+      let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+
+      before do
+        allow(person).to receive(:user).and_return(user)
       end
 
-      it "should not assign value" do
-        expect(assigns(:contact_preferences_mapping)).to eq(nil)
-      end
-    end
+      context 'as a user not associated with the account' do
+        let(:fake_person) { FactoryBot.create(:person, :with_consumer_role) }
+        let(:fake_user) { FactoryBot.create(:user, person: fake_person) }
+        let!(:fake_family) { FactoryBot.create(:family, :with_primary_family_member, person: fake_person) }
 
-    context "choosing contact_method via dropdown is disabled (choose from checkbox)" do
-      before :each do
-        allow(family).to receive(:active_family_members).and_return(family_members)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(true)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(true)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:contact_method_via_dropdown).and_return(false)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:prevent_concurrent_sessions).and_return(false)
-        allow(EnrollRegistry).to receive(:feature_enabled?).with(:preferred_user_access).and_return(false)
-        sign_in user
-        get :personal
+        before do
+          sign_in(fake_user)
+        end
+
+        it 'redirects the user to their own account' do
+          get :personal, params: { family: family.id }
+
+          expect(response).to render_template("personal")
+          expect(assigns(:family)).to eq(fake_family)
+        end
       end
 
-      it "should assign value" do
-        expect(assigns(:contact_preferences_mapping)).not_to be_nil
+      context 'as an admin' do
+        let!(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+        let!(:admin_user) { FactoryBot.create(:user, :with_hbx_staff_role, person: admin_person) }
+        let!(:permission) { FactoryBot.create(:permission, :super_admin) }
+        let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
+
+        before do
+          sign_in(admin_user)
+        end
+
+        it 'should be a success' do
+          get :personal, params: { family: family.id }
+
+          expect(response).to render_template("personal")
+          expect(assigns(:family)).to eq(family)
+        end
+      end
+
+      context 'as broker' do
+        let!(:broker_user) {FactoryBot.create(:user, :person => writing_agent.person, roles: ['broker_role', 'broker_agency_staff_role'])}
+        let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
+        let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
+        let(:assister)  do
+          assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00")
+          assister.save(validate: false)
+          assister
+        end
+
+        context 'associated with the family' do
+          before do
+            family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                                writing_agent_id: writing_agent.id,
+                                                                                                start_on: Time.now,
+                                                                                                is_active: true)
+            sign_in(broker_user)
+          end
+
+          it 'should be a success' do
+            get :personal, params: { family: family.id }
+
+            expect(response).to have_http_status(:success)
+            expect(response).to render_template("personal")
+            expect(assigns(:family)).to eq(family)
+          end
+        end
+
+        context 'not associated with the family' do
+          before do
+            sign_in(broker_user)
+          end
+
+          it 'should not be a success' do
+            get :personal, params: { family: family.id }
+
+            expect(response).to have_http_status(:redirect)
+            expect(response).to_not render_template("personal")
+            expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
+          end
+        end
       end
     end
   end

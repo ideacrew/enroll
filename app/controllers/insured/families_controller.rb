@@ -94,6 +94,8 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def manage_family
+    authorize @family, :show?
+
     set_bookmark_url
     set_admin_bookmark_url(manage_family_insured_families_path)
     @family_members = @family.active_family_members
@@ -155,6 +157,8 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def personal
+    authorize @family, :show?
+
     @tab = params['tab']
     @contact_preferences_mapping = ConsumerRole::CONTACT_METHOD_MAPPING.invert unless EnrollRegistry.feature_enabled?(:contact_method_via_dropdown)
     @family_members = @family.active_family_members
