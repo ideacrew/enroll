@@ -27,7 +27,11 @@ module FinancialAssistance
       family = get_current_person.primary_family
       @applications = FinancialAssistance::Application.where("family_id" => family.id)
 
-      authorize @applications.order('submitted_at desc').first, :can_access_application?
+      if @applications.present?
+        authorize @applications.order('submitted_at desc').first, :can_access_application?
+      else
+        skip_authorization
+      end
     end
 
     def index_with_filter
@@ -41,7 +45,11 @@ module FinancialAssistance
         value = result.value!
         @applications = value[:applications]
 
-        authorize @applications.order('submitted_at desc').first, :can_access_application?
+        if @applications.present?
+          authorize @applications.order('submitted_at desc').first, :can_access_application?
+        else
+          skip_authorization
+        end
 
         @filtered_applications = value[:filtered_applications]
         @recent_determined_hbx_id = value[:recent_determined_hbx_id]
