@@ -291,8 +291,7 @@ module FinancialAssistance
     end
 
     def check_eligibility_results_received
-      application = find_and_authorize_application
-      render :plain => determination_token_present?(application)
+      render :plain => determination_token_present?(@application)
     end
 
     def checklist_pdf
