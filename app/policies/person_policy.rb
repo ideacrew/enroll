@@ -66,7 +66,6 @@ class PersonPolicy < ApplicationPolicy
   def find_role
     person = user&.person
     return nil unless person
-
     ACCESSABLE_ROLES.detect do |role|
       return person.send(role) if person.respond_to?(role) && person.send(role)
     end

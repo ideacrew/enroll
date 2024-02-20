@@ -3,46 +3,35 @@
 require 'rails_helper'
 
 RSpec.describe PeopleController, dbclean: :after_each do
-  let(:census_employee_id) { "abcdefg" }
-
-  # let!(:user) { FactoryBot.create(:user, :with_hbx_staff_role) }
-  # let!(:person_hbx) { FactoryBot.create(:person, user: user_with_hbx_staff_role )}
-
-  # let!(:permission)               { FactoryBot.create(:permission, :hbx_staff) }
-  # let!(:user) { FactoryBot.create(:user, :with_hbx_staff_role) }
-
-  # let(:user) { FactoryBot.build(:user, :with_hbx_staff_role) }
-  # let(:user) {FactoryBot.create(:hbx_staff_role, person: @hbx_staff_person, subrole: "hbx_staff", permission_id: Permission.hbx_staff.id)}
   let(:email) {FactoryBot.build(:email)}
   let(:consumer_role){FactoryBot.build(:consumer_role, :contact_method => "Paper Only")}
   let(:census_employee){FactoryBot.build(:census_employee)}
   let(:employee_role){FactoryBot.build(:employee_role, :census_employee => census_employee)}
   let(:person) { FactoryBot.create(:person) }
-
   let(:user) { FactoryBot.create(:user, person: person) }
-  # let(:broker_user) { FactoryBot.create(:user, person: broker_person ) }
+
 
   let(:vlp_document){FactoryBot.build(:vlp_document)}
 
-  # it "GET new" do
-  #   sign_in(user)
-  #   get :new
-  #   expect(response).to have_http_status(:success)
-  # end
+  describe "different roles" do
+    let!(:permission)                           { FactoryBot.create(:permission, :hbx_staff) }
+    let!(:person_with_hbx_staff_role)           { FactoryBot.create(:person, :with_hbx_staff_role)}
+    let!(:hack_to_get_the_correct_permission)   { person_with_hbx_staff_role.hbx_staff_role.permission_id = permission.id}
+    let!(:hbx_staff_user)                       { FactoryBot.create(:user, :person => person_with_hbx_staff_role) }
+    let!(:other_user)                           { FactoryBot.create(:user) }
 
-  # describe "POST create" do
-  #   context "with valid attributes" do
-  #     it 'should add a new person' do
-  #       expect { post :create, params: {person: FactoryBot.attributes_for(:person)} }.to change(Person,:count).by(0)
-  #     end
-  #   end
+    it "should allow hbx staff to show person" do
+      sign_in hbx_staff_user
+      get :show, params: {id: person.id}
+      expect(response).to have_http_status(:success)
+    end
 
-  #   context "with invalid attributes"  do
-  #     it 'should not add a new person' do
-  #       expect { post :create, params: {person: FactoryBot.attributes_for(:person,:with_bad_mailing_address)} }.to_not change(Person,:count)
-  #     end
-  #   end
-  # end
+    it "should not allow cross person review" do
+      sign_in other_user
+      get :show, params: {id: person.id}
+      expect(response).to have_http_status(:redirect)
+    end
+  end
 
   describe "POST update" do
     let(:vlp_documents_attributes) { {"1" => vlp_document.attributes.to_hash}}
@@ -198,7 +187,6 @@ RSpec.describe PeopleController, dbclean: :after_each do
     context "when employee" do
       it "when employee" do
         person_attributes[:emails_attributes] = email_attributes
-        # allow(controller).to receive(:get_census_employee).and_return(census_employee)
         allow(person).to receive(:update_attributes).and_return(true)
 
         post :update, params: {id: person.id, person: person_attributes}
