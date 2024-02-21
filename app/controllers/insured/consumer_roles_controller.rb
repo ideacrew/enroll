@@ -310,6 +310,7 @@ class Insured::ConsumerRolesController < ApplicationController
     if EnrollRegistry.feature_enabled?(:financial_assistance)
       set_current_person
       # Rails.env.test? && defined?(Cucumber) is used to bypass the authorization check in cucumber tests
+      # This is a temporary fix and should be removed once the cucumber tests are modified and the ridp verification is stubbed in lower environments.
       authorize @person.consumer_role, :ridp_verified? unless Rails.env.test? && defined?(Cucumber)
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
