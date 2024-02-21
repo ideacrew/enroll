@@ -29,9 +29,9 @@ RSpec.describe EventLogsController, :type => :controller do
       expect(assigns(:event_logs).first.subject_hbx_id).to eq person.hbx_id
     end
 
-    it "should assign event logs without a param" do
+    it "should fetch none without a param" do
       get :index, format: :js
-      expect(assigns(:event_logs).count).to eq 2
+      expect(assigns(:event_logs).count).to eq 0
     end
 
     it "should render index" do

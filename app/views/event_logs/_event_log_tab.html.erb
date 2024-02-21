@@ -37,10 +37,10 @@
               <dd>
                 <div class="mutliSelect">
                   <ul>
-                    <li><label><input type="checkbox" name="<%= l10n("subject").downcase %>" value="all" checked/>All</label></li>
+                    <li><label><input type="checkbox" name="subject" value="all" checked/>All</label></li>
                     <% if members&.any? %>
                     <% members.uniq.each do |member| %>
-                      <li><label><input type="checkbox" name="<%= l10n("subject").downcase %>" value="<%= member %>" checked/><%= member %></label></li>
+                      <li><label><input type="checkbox" name="subject" value="<%= member %>" checked/><%= member %></label></li>
                     <% end %>
                     <% end %>
                   </ul>
@@ -61,10 +61,10 @@
               <dd>
                 <div class="mutliSelect">
                   <ul>
-                    <li><label><input type="checkbox" name="<%= l10n("event_log.eligibility").downcase %>" value="all" checked/>All</label></li>
+                    <li><label><input type="checkbox" name="eligibility" value="all" checked/>All</label></li>
                     <% if @event_logs %>
                       <% @event_logs.map{|event_log| event_log[:title]&.upcase }.uniq.each do |category| %>
-                        <li><label><input type="checkbox" name="<%= l10n("event_log.eligibility").downcase %>" value="<%= category %>" checked/><%= category %></label></li>
+                        <li><label><input type="checkbox" name="eligibility" value="<%= category %>" checked/><%= category %></label></li>
                       <% end %>
                     <% end %>
                   </ul>
@@ -84,9 +84,9 @@
               <dd>
                 <div class="mutliSelect">
                   <ul>
-                    <li><label><input type="checkbox" name="<%= l10n('status').downcase %>" value="all" checked/>All</label></li>
-                    <li><label><input type="checkbox" name="<%= l10n('status').downcase %>" value="eligible" checked/><%= l10n("eligible") %></label></li>
-                    <li><label><input type="checkbox" name="<%= l10n('status').downcase %>" value="ineligible" checked/><%= l10n("ineligible") %></label></li>
+                    <li><label><input type="checkbox" name="status" value="all" checked/>All</label></li>
+                    <li><label><input type="checkbox" name="status" value="eligible" checked/><%= l10n("eligible") %></label></li>
+                    <li><label><input type="checkbox" name="status" value="ineligible" checked/><%= l10n("ineligible") %></label></li>
                   </ul>
                 </div>
               </dd>
@@ -127,7 +127,7 @@
     <div class="event-log-header">
       <div class="event-log-export-text">
         <h3><b><%= type === "consumer" ? l10n("event_log.table_label_consumer") + hbx_id : l10n("event_log.table_label_employer")%></b></h3>
-        <a href="/event_logs.csv?<% @event_logs.each do |event| %>&events[]=<%= event[:_id] %><% end %>" id="export-table" class="button button-primary"><%= l10n("Export") %> <%= l10n("to") %> CSV</a>
+        <a href="#" id="export-table" class="button button-primary"><%= l10n("Export") %> <%= l10n("to") %> CSV</a>
       </div>
     </div>
     <div id="event-table-data">
@@ -163,7 +163,7 @@
               <th><%= l10n("Account (Date/Time)") %></th>
             </tr>
             <% details.each do |detail| %>
-            <tr class="detail-row" id="<%= index %>">
+            <tr class="detail-row" data-event-id="<%= detail[:_id] %>" id="<%= index %>">
               <td colspan="2"></td>
               <td><%= detail[:detail] %></td>
               <td id="<%= detail[:account_hbx_id] %>" class="user_id"><%= detail[:account_username] %></td>
@@ -195,6 +195,7 @@
     const startDateFilter = $('#start-date');
     const endDateFilter = $('#end-date');
     const hbx_id = <%= sanitize hbx_id.to_json %>;
+
     // Event handler for start date change
     startDateFilter.on('change', function() {
       const startDate = new Date(startDateFilter.val());
@@ -218,32 +219,40 @@
       arrow.toggleClass('glyphicon-chevron-right glyphicon-chevron-down');
     });
 
-    exportTableButton.on('click', function() {
-      window.location.href = '/event_logs.csv';
-    });
-
-    disableExportButton();
-    hideFilters();
-
-    enableExportButton();
-    showFilters();
+    if ($('tr.primary-row:visible').length === 0) {
+      disableExportButton();
+    }
   });
 
-  function disableButtons() {
-    $('#run-query, #export-table').prop('disabled', true);
-  }
-
-  function enableButtons() {
-    $('#run-query, #export-table').prop('disabled', false);
-  }
-
   function enableExportButton() {
-    $('#export-table').prop('disabled', false);
+    $('#export-table').show();
   }
 
   function disableExportButton() {
-    $('#export-table').prop('disabled', true);
+    $('#export-table').hide();
   }
+
+  // Handle click event for csv export
+  $('#export-table').on('click', function(event) {
+    event.preventDefault();
+
+    var eventIds = [];
+    $('.primary-row').each(function() {
+      var primaryRowId = $(this).attr('id');
+
+      if ($(this).is(':visible')) {
+        var detailRows = $('.detail-row[id="' + primaryRowId + '"]');
+
+        detailRows.each(function() {
+          var eventId = $(this).data('event-id');
+          eventIds.push(eventId);
+        });
+      }
+    });
+
+    var url = '/event_logs.csv?' + $.param({ events: eventIds });
+    window.location.href = url;
+  });
 
   function showFilters() {
     $('.filters-container').css('visibility', 'visible');
@@ -347,6 +356,7 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
     $('input[name="status"]:checked').each(function( index ) {
       statuses.push($(this).val().toUpperCase())
     });
+
     $('#event-log-table tbody tr').each(function( index ) {
       var row = $(this).prop('id');
       var row_index = visible_rows.indexOf(row)
@@ -484,9 +494,11 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
     if (visible_rows.length === 0) {
       $('#event-table-data').hide()
       $('#no-results').show()
+      disableExportButton();
     } else {
       $('#event-table-data').show()
       $('#no-results').hide()
+      enableExportButton();
       $('#event-log-table tbody tr').each(function( index ) {
         var row = $(this).prop('id');
         var row_index = visible_rows.indexOf(row)
