@@ -72,5 +72,61 @@ describe ConsumerRolePolicy, dbclean: :after_each do
       end
     end
   end
+
+  permissions :ridp_verified? do
+    let(:hbx_staff_user) {FactoryBot.create(:user, person: person)}
+    let(:person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+    let(:hbx_staff_role) { FactoryBot.create(:hbx_staff_role, person: person)}
+    let(:permission) { FactoryBot.create(:permission)}
+    let(:user_without_staff_role) { FactoryBot.create(:user, person: consumer_person) }
+
+    it "grants access when hbx_staff" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission
+      allow(person).to receive(:hbx_staff_role).and_return hbx_staff_role
+      allow(hbx_staff_user).to receive(:person).and_return person
+      expect(subject).to permit(hbx_staff_user, consumer_role)
+    end
+
+    it "denies access when normal user" do
+      expect(subject).not_to permit(user_without_staff_role, consumer_role)
+    end
+
+    context "consumer" do
+      let(:user) { FactoryBot.create(:user, :consumer, person: consumer_role.person) }
+      let(:consumer_role) { FactoryBot.create(:consumer_role) }
+      let(:other_consumer_role) { FactoryBot.build(:consumer_role) }
+
+      it "grants access when identity validation is complete" do
+        allow(user).to receive(:has_hbx_staff_role?).and_return false
+        allow(consumer_role).to receive(:identity_validation).and_return 'valid'
+        expect(subject).to permit(user, consumer_role)
+      end
+
+      it "denies access when identity validation is incomplete" do
+        allow(user).to receive(:has_hbx_staff_role?).and_return false
+        allow(other_consumer_role).to receive(:identity_validation).and_return 'invalid'
+        expect(subject).not_to permit(user, other_consumer_role)
+      end
+    end
+
+    context "broker" do
+      let(:user) { FactoryBot.create(:user, :broker, person: broker_person) }
+      let(:consumer_role) { FactoryBot.create(:consumer_role) }
+      let(:broker_role) { FactoryBot.create(:broker_role) }
+      let(:other_consumer_role) { FactoryBot.build(:consumer_role) }
+
+      it "grants access when identity validation is complete" do
+        allow(user).to receive(:has_hbx_staff_role?).and_return false
+        allow(consumer_role).to receive(:identity_validation).and_return 'valid'
+        expect(subject).to permit(user, consumer_role)
+      end
+
+      it "denies access when identity validation is incomplete" do
+        allow(user).to receive(:has_hbx_staff_role?).and_return false
+        allow(other_consumer_role).to receive(:identity_validation).and_return 'invalid'
+        expect(subject).not_to permit(user, consumer_role)
+      end
+    end
+  end
 end
 end

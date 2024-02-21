@@ -50,6 +50,16 @@ class ConsumerRolePolicy < ApplicationPolicy
     return false
   end
 
+  # Checking if consumer identity has been verified or if user has hbx_staff_role.
+  # If either are true, then the user has access beyond the RIDP page.
+  def ridp_verified?
+    user_person = @user&.person
+
+    # NOTE: brokers and consumers both require consumer identity to be verified beyond ridp page
+    # the second condition covers both cases
+    user_person&.hbx_staff_role&.permission&.modify_family || @record&.person&.consumer_role&.identity_verified?
+  end
+
   def update?
     edit?
   end
