@@ -861,7 +861,6 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         let!(:application) { FactoryBot.create(:financial_assistance_application, aasm_state: 'draft', assistance_year: assistance_year, family_id: family.id, applicants: [applicant])}
 
         it 'should error out for attempting to navigate without identity verification' do
-          edit_application_path = FinancialAssistance::Engine.routes.url_helpers.edit_application_path(application).split('/.').last
           expect { get :help_paying_coverage }.to raise_error(Pundit::NotDefinedError)
         end
       end
