@@ -173,6 +173,8 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def inbox
+    authorize @family, :show?
+
     @tab = params['tab']
     @folder = params[:folder] || 'Inbox'
     @sent_box = false
@@ -213,6 +215,8 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def verification
+    authorize @family, :show?
+
     @family_members = @person.primary_family.has_active_consumer_family_members
   end
 
