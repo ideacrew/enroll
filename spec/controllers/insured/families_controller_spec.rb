@@ -506,38 +506,36 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   end
 
   describe "GET verification" do
-    context 'without auth' do
-      let(:person) { FactoryBot.create(:person, :with_consumer_role) }
-      let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
-      let(:user) { FactoryBot.create(:user, person: person) }
-      let(:family_member) { FamilyMember.new(:person => person) }
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let(:user) { FactoryBot.create(:user, person: person) }
+    let(:family_member) { FamilyMember.new(:person => person) }
 
-      before :each do
-        allow(controller).to receive(:authorize).and_return(true)
-        allow(person).to receive(:primary_family).and_return(family)
-        allow(family).to receive(:has_active_consumer_family_members).and_return([family_member])
-        allow(person).to receive(:is_consumer_role_active?).and_return true
-      end
+    before :each do
+      allow(controller).to receive(:authorize).and_return(true)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(family).to receive(:has_active_consumer_family_members).and_return([family_member])
+      allow(person).to receive(:is_consumer_role_active?).and_return true
+    end
 
-      it "should be success" do
-        get :verification
-        expect(response).to have_http_status(:success)
-      end
+    it "should be success" do
+      get :verification
+      expect(response).to have_http_status(:success)
+    end
 
-      it "should error out" do
-        expect { get '/insured/families/verification.bac' }.to raise_error(ActionController::UrlGenerationError)
-      end
+    it "should error out" do
+      expect { get '/insured/families/verification.bac' }.to raise_error(ActionController::UrlGenerationError)
+    end
 
-      it "renders verification template" do
-        get :verification
-        expect(response).to render_template("verification")
-      end
+    it "renders verification template" do
+      get :verification
+      expect(response).to render_template("verification")
+    end
 
-      it "assign variables" do
-        get :verification
-        expect(assigns(:family_members)).to be_an_instance_of(Array)
-        expect(assigns(:family_members)).to eq([family_member])
-      end
+    it "assign variables" do
+      get :verification
+      expect(assigns(:family_members)).to be_an_instance_of(Array)
+      expect(assigns(:family_members)).to eq([family_member])
     end
   end
 
