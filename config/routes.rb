@@ -643,21 +643,10 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :people do #TODO: delete
-    get 'select_employer'
-    get 'my_account'
-
-    collection do
-      post 'person_confirm'
-      post 'plan_details'
-      get 'check_qle_marriage_date'
-    end
-
-    member do
-      get 'get_member'
-    end
-
-  end
+  # TO-DO: this routes were split into costumer and employer namespaces
+  # however a lot of helpers needs this magic methods, we need to do a further
+  # refactor to remove this dependencies
+  resources :people, only: [:show, :index, :update]
 
   match 'families/home', to: 'insured/families#home', via: [:get], as: "family_account"
 
