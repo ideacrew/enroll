@@ -5,7 +5,7 @@ module FinancialAssistance
   class ApplicationsController < FinancialAssistance::ApplicationController
 
     before_action :set_current_person
-    before_action :find_application, :except => [:index, :index_with_filter, :new, :copy, :uqhp_flow, :review, :raw_application, :checklist_pdf]
+    before_action :find_and_authorize_application, :except => [:index, :index_with_filter, :new, :uqhp_flow, :review, :raw_application, :checklist_pdf]
 
     around_action :cache_current_hbx, :only => [:index_with_filter]
 
@@ -25,7 +25,14 @@ module FinancialAssistance
     # We should ONLY be getting applications that are associated with PrimaryFamily of Current Person.
     # DO NOT include applications from other families.
     def index
-      @applications = FinancialAssistance::Application.where("family_id" => get_current_person.financial_assistance_identifier)
+      family = get_current_person.primary_family
+      @applications = FinancialAssistance::Application.where("family_id" => family.id)
+
+      if @applications.present?
+        authorize @applications.order('submitted_at desc').first, :can_access_application?
+      else
+        skip_authorization
+      end
     end
 
     def index_with_filter
@@ -38,6 +45,13 @@ module FinancialAssistance
       if result.success?
         value = result.value!
         @applications = value[:applications]
+
+        if @applications.present?
+          authorize @applications.order('submitted_at desc').first, :can_access_application?
+        else
+          skip_authorization
+        end
+
         @filtered_applications = value[:filtered_applications]
         @recent_determined_hbx_id = value[:recent_determined_hbx_id]
       else
@@ -117,6 +131,7 @@ module FinancialAssistance
       copy_result = ::FinancialAssistance::Operations::Applications::Copy.new.call(application_id: params[:id])
       if copy_result.success?
         @application = copy_result.success
+
         @application.set_assistance_year
         assistance_year_page = EnrollRegistry.feature_enabled?(:iap_year_selection) && (HbxProfile.current_hbx.under_open_enrollment? || EnrollRegistry.feature_enabled?(:iap_year_selection_form))
         redirect_path = assistance_year_page ? application_year_selection_application_path(@application) : edit_application_path(@application)
@@ -178,10 +193,11 @@ module FinancialAssistance
     def review
       save_faa_bookmark(request.original_url)
       @application = FinancialAssistance::Application.where(id: params["id"]).first
-      @applicants = @application.active_applicants if @application.present?
-      build_applicants_name_by_hbx_id_hash
+      return redirect_to applications_path if @application.blank?
 
-      redirect_to applications_path if @application.blank?
+      authorize @application, :can_review?
+      @applicants = @application.active_applicants
+      build_applicants_name_by_hbx_id_hash
     end
 
     def raw_application
@@ -290,11 +306,12 @@ module FinancialAssistance
     end
 
     def check_eligibility_results_received
-      application = find_application
-      render :plain => determination_token_present?(application)
+      render :plain => determination_token_present?(@application)
     end
 
     def checklist_pdf
+      authorize Application, :can_view_checklist_pdf?
+
       send_file(
         FinancialAssistance::Engine.root.join(
           FinancialAssistanceRegistry[:ivl_application_checklist].setting(:file_location).item.to_s
@@ -423,6 +440,12 @@ module FinancialAssistance
 
     def find
       find_application
+    end
+
+    def find_and_authorize_application
+      application = find_application
+
+      authorize application, :can_access_application?
     end
 
     def save_faa_bookmark(url)
