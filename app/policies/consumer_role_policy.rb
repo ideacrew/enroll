@@ -55,7 +55,7 @@ class ConsumerRolePolicy < ApplicationPolicy
   def ridp_verified?
     # NOTE: brokers and consumers both require consumer identity to be verified beyond ridp page
     # the second condition covers both cases
-    current_user.person.hbx_staff_role&.permission&.modify_family || record.identity_verified?
+    @user&.person&.hbx_staff_role&.permission&.modify_family || record.identity_verified?
   end
 
   def update?
