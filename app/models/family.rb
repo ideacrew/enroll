@@ -293,7 +293,7 @@ class Family
       where({
               "$and" =>
                 [
-                  {"eligibility_determination.subjects.outstanding_verification_status" => {"$nin": ["not_enrolled"]}},
+                  {"eligibility_determination.subjects" => {"$not": {"$elemMatch": {"outstanding_verification_status": "not_enrolled"}}}},
                   {"eligibility_determination.subjects.eligibility_states.evidence_states.status" => {"$in": [:outstanding, :rejected]}},
                   {"eligibility_determination.subjects.eligibility_states.eligibility_item_key" => {"$in": %w[aptc_csr_credit aca_individual_market_eligibility] }},
                   {"eligibility_determination.subjects.eligibility_states.evidence_states.due_on" => date.beginning_of_day}
