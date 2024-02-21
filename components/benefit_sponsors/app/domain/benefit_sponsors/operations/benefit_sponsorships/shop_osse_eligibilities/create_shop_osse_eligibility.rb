@@ -102,7 +102,7 @@ module BenefitSponsors
             end
 
             if subject.save
-              Success(eligibility_record)
+              Success(eligibility_record.reload)
             else
               Failure(subject.errors.full_messages)
             end
