@@ -553,43 +553,36 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     it "should be a success" do
-      allow(controller).to receive(:authorize).and_return(true)
       allow(person).to receive(:has_multiple_roles?).and_return(false)
       get :manage_family
       expect(response).to have_http_status(:success)
     end
 
     it "should render manage family section" do
-      allow(controller).to receive(:authorize).and_return(true)
       allow(person).to receive(:has_multiple_roles?).and_return(false)
       get :manage_family
       expect(response).to render_template("manage_family")
     end
 
     it "should assign variables" do
-      allow(controller).to receive(:authorize).and_return(true)
-      allow(person).to receive(:has_multiple_roles?).and_return(false)
       get :manage_family
       expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
       expect(assigns(:family_members)).to eq(family_members)
     end
 
     it "assigns variable to change QLE to IVL flow" do
-      allow(controller).to receive(:authorize).and_return(true)
       allow(person).to receive(:has_multiple_roles?).and_return(true)
       get :manage_family, params: {market: "shop_market_events"}
       expect(assigns(:manually_picked_role)).to eq "shop_market_events"
     end
 
     it "assigns variable to change QLE to Employee flow" do
-      allow(controller).to receive(:authorize).and_return(true)
       allow(person).to receive(:has_multiple_roles?).and_return(true)
       get :manage_family, params: {market: "individual_market_events"}
       expect(assigns(:manually_picked_role)).to eq "individual_market_events"
     end
 
     it "doesn't assign the variable to show different flow for QLE" do
-      allow(controller).to receive(:authorize).and_return(true)
       allow(person).to receive(:has_multiple_roles?).and_return(false)
       get :manage_family, params: {market: "shop_market_events"}
       expect(assigns(:manually_picked_role)).to eq nil
@@ -702,7 +695,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
 
       it 'redirects the user to their own account on verification' do
-        # unlike some of the other endpoints, /verification checks the session[:person_id]
+        # unlike some of the other endpoints, /verification needs to check the session[:person_id] to avoid erroring out
         session[:person_id] = person.id
         get :verification, params: { family: family.id }
 
@@ -743,7 +736,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
 
       it 'should be a success on GET verification' do
-        # unlike some of the other endpoints, /verification checks the session[:person_id]
+        # unlike some of the other endpoints, /verification needs to check the session[:person_id] to avoid erroring out
         session[:person_id] = person.id
         get :verification, params: { family: family.id }
 
@@ -793,7 +786,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         end
 
         it 'should be a success on GET verification' do
-          # unlike some of the other endpoints, /verification checks the session[:person_id]
+          # unlike some of the other endpoints, /verification needs to check the session[:person_id] to avoid erroring out
           session[:person_id] = person.id
           get :verification, params: { family: family.id }
 
@@ -833,7 +826,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         end
 
         it 'should not be a success on GET verification' do
-          # unlike some of the other endpoints, /verification checks the session[:person_id]
+          # unlike some of the other endpoints, /verification needs to check the session[:person_id] to avoid erroring out
           session[:person_id] = person.id
           get :verification, params: { family: family.id }
 
