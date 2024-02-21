@@ -565,6 +565,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     it "should assign variables" do
+      allow(person).to receive(:has_multiple_roles?).and_return(false)
       get :manage_family
       expect(assigns(:qualifying_life_events)).to be_an_instance_of(Array)
       expect(assigns(:family_members)).to eq(family_members)
