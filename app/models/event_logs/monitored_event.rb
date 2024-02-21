@@ -85,5 +85,34 @@ module EventLogs
       false
     end
 
+    def self.to_csv(event_logs)
+      CSV.generate(headers: true) do |csv|
+        csv << [
+          "Subject",
+          "Eligibility",
+          "Eligibility Status",
+          "Effective On",
+          "Event Details",
+          "Performed By",
+          "Time"
+        ]
+
+        event_logs.each do |event_log|
+          details = event_log.eligibility_details
+          performed_by =
+            details[:account_username] + " (" + details[:account_hbx_id] + ")"
+
+          csv << [
+            details[:subject],
+            details[:title].to_s.upcase,
+            details[:current_state]&.titleize,
+            details[:effective_on],
+            details[:detail],
+            performed_by,
+            details[:event_time]
+          ]
+        end
+      end
+    end
   end
 end
