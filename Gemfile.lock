@@ -342,6 +342,13 @@ GEM
       jmespath (~> 1.0)
     aws-sdk-resources (2.2.37)
       aws-sdk-core (= 2.2.37)
+    axe-core-api (4.8.2)
+      dumb_delegator
+      virtus
+    axe-core-cucumber (4.8.2)
+      axe-core-api
+      dumb_delegator
+      virtus
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
@@ -505,6 +512,7 @@ GEM
       dry-equalizer (~> 0.2)
       dry-initializer (~> 3.0)
       dry-schema (~> 1.5, >= 1.5.2)
+    dumb_delegator (1.0.0)
     easy_diff (1.0.0)
     email_spec (2.2.0)
       htmlentities (~> 4.3.3)
@@ -1048,6 +1056,7 @@ DEPENDENCIES
   action_mailer_cache_delivery (~> 0.3)
   addressable (~> 2.3)
   aws-sdk (~> 2.2.4)
+  axe-core-cucumber (~> 4.8.0)
   bcrypt (~> 3.1)
   benefit_markets!
   benefit_sponsors!
