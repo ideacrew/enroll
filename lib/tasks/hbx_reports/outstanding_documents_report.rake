@@ -1,4 +1,5 @@
 require 'rake'
+require "#{Rails.root}/lib/html_scrubber_util"
 require "#{Rails.root}/lib/documents_verification_status"
 require "#{Rails.root}/app/helpers/verification_helper"
 include VerificationHelper

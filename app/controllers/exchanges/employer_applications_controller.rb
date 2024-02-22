@@ -5,6 +5,7 @@ module Exchanges
     include Pundit
     include Config::AcaHelper
     include ::L10nHelper
+    include HtmlScrubberUtil
 
     before_action :can_modify_plan_year?, only: [:terminate, :cancel, :reinstate]
     before_action :check_hbx_staff_role, except: :term_reasons
@@ -39,7 +40,7 @@ module Exchanges
       @service = BenefitSponsors::Services::BenefitApplicationActionService.new(@application, { transmit_to_carrier: transmit_to_carrier })
       result, _application, errors = @service.cancel_application
       if errors.present?
-        flash[:error] = "#{@benefit_sponsorship.organization.legal_name}'s Application could not be canceled due to #{errors.inject(''){|memo, error| '#{memo}<li>#{error}</li>'}.html_safe}"
+        flash[:error] = sanitize_html("#{@benefit_sponsorship.organization.legal_name}'s Application could not be canceled due to #{errors.inject(''){|memo, error| "#{memo}<li>#{error}</li>"}}")
       else
         flash[:notice] = "#{@benefit_sponsorship.organization.legal_name}'s Application canceled successfully."
       end

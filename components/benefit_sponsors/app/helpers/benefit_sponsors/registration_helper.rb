@@ -1,5 +1,6 @@
 module BenefitSponsors
   module RegistrationHelper
+    include HtmlScrubberUtil
 
     def is_broker_profile?(profile_type)
       profile_type == "broker_agency"
@@ -15,7 +16,7 @@ module BenefitSponsors
 
     def l10n(translation_key, interpolated_keys={})
       begin
-        I18n.t(translation_key, interpolated_keys.merge(raise: true)).html_safe
+        sanitize_html(I18n.t(translation_key, interpolated_keys.merge(raise: true)))
       rescue I18n::MissingTranslationData
         translation_key.gsub(/\W+/, '').titleize
       end

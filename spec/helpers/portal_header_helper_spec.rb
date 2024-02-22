@@ -2,6 +2,7 @@
 
 require 'rails_helper'
 
+# rubocop:disable Style/StringConcatenation
 RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
 
   describe "portal_display_name" do
@@ -24,17 +25,17 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
 
       it "should have I'm an Employer link when user has active employer_staff_role" do
         allow(current_user).to receive(:has_employer_staff_role?).and_return true
-        expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/benefit_sponsors/profiles/employers/employer_profiles/" + emp_id.to_s + "?tab=home\"><img src=\"/images/icons/icon-business-owner.png\" /> &nbsp; I'm an Employer</a>"
+        expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/benefit_sponsors/profiles/employers/employer_profiles/" + emp_id.to_s + "?tab=home\"><img src=\"/images/icons/icon-business-owner.png\" />   I'm an Employer</a>"
       end
 
       it "should have I'm an Employee link when user has active employee_staff_role" do
         allow(current_user.person).to receive(:active_employee_roles).and_return [employee_role]
-        expect(portal_display_name('')).to eq "<a class=\"portal\" href=\"/families/home\"><img src=\"/images/icons/#{site_key}-icon-individual.png\" /> &nbsp; I'm an Employee</a>"
+        expect(portal_display_name('')).to eq "<a class=\"portal\" href=\"/families/home\"><img src=\"/images/icons/#{site_key}-icon-individual.png\" />   I'm an Employee</a>"
       end
 
       it "should have Welcome prompt when user has no active role" do
         allow(current_user).to receive(:has_employer_staff_role?).and_return(false)
-        expect(portal_display_name(controller)).to eq "<a class='portal'>#{EnrollRegistry[:enroll_app].setting(:byline).item}</a>"
+        expect(portal_display_name(controller)).to eq "<a class=\"portal\">#{EnrollRegistry[:enroll_app].setting(:byline).item}</a>"
       end
 
       context "user with active employer staff roles && employee roles" do
@@ -46,13 +47,13 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
         it "should have I'm an Employer link when user switches to Employer account" do
           emp_id = employer_staff_role.benefit_sponsor_employer_profile_id
           allow(controller).to receive(:controller_path).and_return("employers")
-          url_path = "<a class=\"portal\" href=\"/benefit_sponsors/profiles/employers/employer_profiles/" + emp_id.to_s + "?tab=home\"><img src=\"/images/icons/icon-business-owner.png\" /> &nbsp; I'm an Employer</a>"
+          url_path = "<a class=\"portal\" href=\"/benefit_sponsors/profiles/employers/employer_profiles/" + emp_id.to_s + "?tab=home\"><img src=\"/images/icons/icon-business-owner.png\" />   I'm an Employer</a>"
           expect(portal_display_name(controller)).to eq url_path
         end
 
         it "should have I'm an Employee link when user switches to Employee account" do
           allow(controller).to receive(:controller_path).and_return("insured")
-          expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/families/home\"><img src=\"/images/icons/#{EnrollRegistry[:enroll_app].settings(:site_key).item}-icon-individual.png\" /> &nbsp; I'm an Employee</a>"
+          expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/families/home\"><img src=\"/images/icons/#{EnrollRegistry[:enroll_app].settings(:site_key).item}-icon-individual.png\" />   I'm an Employee</a>"
         end
       end
     end
@@ -65,13 +66,13 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
       end
 
       it "should have Individual and Family link when user completes RIDP and Consent form" do
-        expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/families/home\"><img src=\"/images/icons/icon-family.png\" /> &nbsp; Individual and Family</a>"
+        expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/families/home\"><img src=\"/images/icons/icon-family.png\" />   Individual and Family</a>"
       end
 
       it "should not have Individual and Family link for users with no identity_verified_date" do
         current_user.identity_verified_date = nil
         current_user.save
-        expect(portal_display_name(controller)).to eq "<a class='portal'><img src=\"/images/icons/icon-family.png\" /> &nbsp; Individual and Family</a>"
+        expect(portal_display_name(controller)).to eq "<a class=\"portal\"><img src=\"/images/icons/icon-family.png\" />   Individual and Family</a>"
       end
     end
 
@@ -88,12 +89,14 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
       end
 
       it "should have I'm a General Agency link when user has active employer_staff_role" do
-        expect(portal_display_name(controller)).to eq "<a class=\"portal\" href=\"/benefit_sponsors/profiles/general_agencies/general_agency_profiles/" + general_agency_profile.id.to_s + "\"><img src=\"/images/icons/icon-expert.png\" /> &nbsp; I'm a General Agency</a>"
+        expect(portal_display_name(controller)).to eq(
+          "<a class=\"portal\" href=\"/benefit_sponsors/profiles/general_agencies/general_agency_profiles/" + general_agency_profile.id.to_s + "\"><img src=\"/images/icons/icon-expert.png\" />   I'm a General Agency</a>"
+        )
       end
 
       it "should have Welcome prompt when user has no active role" do
         allow(current_user).to receive(:has_general_agency_staff_role?).and_return(false)
-        expect(portal_display_name(controller)).to eq "<a class='portal'>#{EnrollRegistry[:enroll_app].setting(:byline).item}</a>"
+        expect(portal_display_name(controller)).to eq "<a class=\"portal\">#{EnrollRegistry[:enroll_app].setting(:byline).item}</a>"
       end
     end
 
@@ -259,3 +262,4 @@ RSpec.describe PortalHeaderHelper, :type => :helper, dbclean: :after_each do
     end
   end
 end
+# rubocop:enable Style/StringConcatenation

@@ -1,6 +1,6 @@
-<%= l10n("user_mailer.broker_invitation.message_to_broker",
+<%= sanitize_html(l10n("user_mailer.broker_invitation.message_to_broker",
   broker_name: broker.person.full_name,
   person_name: person.full_name,
   message_body: message_body
-).html_safe %>
+)) %>
 

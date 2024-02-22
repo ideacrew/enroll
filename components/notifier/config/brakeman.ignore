@@ -7,7 +7,7 @@
       "check_name": "SendFile",
       "message": "Model attribute used in file name",
       "file": "app/controllers/notifier/notice_kinds_controller.rb",
-      "line": 59,
+      "line": 65,
       "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
       "code": "send_file(\"#{Rails.root}/tmp/#{Notifier::NoticeKind.find(params[:id]).notice_recipient.hbx_id}_#{Notifier::NoticeKind.find(params[:id]).title.titleize.gsub(/\\s+/, \"_\")}.pdf\", :type => \"application/pdf\", :disposition => \"inline\")",
       "render_path": null,
@@ -30,7 +30,7 @@
       "check_name": "EOLRails",
       "message": "Support for Rails 5.2.4.4 ended on 2022-06-01",
       "file": "Gemfile.lock",
-      "line": 248,
+      "line": 253,
       "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
       "code": null,
       "render_path": null,
@@ -41,8 +41,29 @@
         1104
       ],
       "note": ""
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "f1883011123a505937fd52d7f6616ec461355355168c5098c7a48004de0a16af",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/helpers/notifier/application_helper.rb",
+      "line": 49,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "setting.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Notifier::ApplicationHelper",
+        "method": "setting_portal_link"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Reviewed for external parameters."
     }
   ],
-  "updated": "2023-02-22 16:32:24 +0000",
+  "updated": "2024-02-20 15:16:50 +0000",
   "brakeman_version": "5.4.1"
 }

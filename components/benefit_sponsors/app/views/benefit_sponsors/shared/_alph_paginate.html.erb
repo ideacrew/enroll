@@ -2,7 +2,9 @@
 <ul class='pagination'>
   <%- if defined?(full_index_url) && full_index_url.present? %>
     <li class="<%= 'active' if params[:page].nil? %>">
-      <%= link_to '&nbsp;ALL&nbsp;'.html_safe, full_index_url, remote: true %>
+      <%= link_to(full_index_url, remote: true) do %>
+        &nbsp;ALL&nbsp;
+      <% end %>
     </li>
   <% end %>
   <% alphs.each do |alph| %>

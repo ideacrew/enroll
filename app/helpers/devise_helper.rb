@@ -1,4 +1,6 @@
 module DeviseHelper
+  include HtmlScrubberUtil
+
   def devise_error_messages!
     return "" if resource.errors.empty?
 
@@ -19,7 +21,7 @@ module DeviseHelper
     </div>
     HTML
 
-    html.html_safe
+    sanitize_html(html)
   end
 
 end

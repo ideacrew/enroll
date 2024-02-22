@@ -196,7 +196,7 @@ module FinancialAssistance
           line_two = address.address_2
           line_three = "#{address.city}, #{address.state} #{address.zip}"
 
-          expect(address.to_s).to eq "#{line_one}<br/>#{line_two}<br/>#{line_three}"
+          expect(address.to_s).to eq "#{line_one}<br>#{line_two}<br>#{line_three}"
         end
       end
 

@@ -19,7 +19,9 @@
 <div class="vertically-aligned-row">
   <div class="col-xs-12 col-sm-4 col-md-3">
     <div class="row">
-      <%= link_to "<i class='fa fa-caret-left' aria-hidden='true'></i>&nbsp; #{l10n('.back')}".html_safe, :back, class: 'btn btn-default btn-block' %>
+      <%= link_to(:back, class: 'btn btn-default btn-block') do %>
+        <i class='fa fa-caret-left' aria-hidden='true'></i>&nbsp; <%= l10n('.back') %>
+      <% end %>
     </div>
   </div>
 </div>

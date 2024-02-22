@@ -28,11 +28,12 @@
           <label class="static_label label-floatlabel"><%= l10n("relationship").to_s.upcase %></label>
           <span class="field_value floatlabel form-control active-floatlabel rel_label"> <%= dependent.relation_with_primary.try(:humanize) %> </span>
           <div class="text-right">
-            <%=
-              link_to edit_application_applicant_path(@application, dependent), remote: true, class: 'close close-2' do
-                '<i class="fas fa-pencil-alt"><span class="hide">Edit</span></i>'.html_safe
-              end
-            %>
+            <%= link_to(
+                  edit_application_applicant_path(@application, dependent),
+                  remote: true, class:
+                  'close close-2') do %>
+              <i class="fas fa-pencil-alt"><span class="hide">Edit</span></i>
+            <% end %>
           </div>
         </div>
       </div>
