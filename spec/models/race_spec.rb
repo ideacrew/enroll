@@ -43,8 +43,8 @@ RSpec.describe Race, type: :model do
         it_behaves_like 'CMS Reporting Group for attested_races', ['black_or_african_american'], 'black_or_african_american'
       end
 
-      context 'for race american_indian_or_alaska_native' do
-        it_behaves_like 'CMS Reporting Group for attested_races', ['american_indian_or_alaska_native'], 'american_indian_or_alaska_native'
+      context 'for race american_indian_or_alaskan_native' do
+        it_behaves_like 'CMS Reporting Group for attested_races', ['american_indian_or_alaskan_native'], 'american_indian_or_alaskan_native'
       end
 
       context 'for any sub race asian' do
@@ -73,7 +73,7 @@ RSpec.describe Race, type: :model do
         races_by_cms_group = [
           Race::RACES_FOR_CMS_GROUP_WHITE.sample,
           Race::RACES_FOR_CMS_GROUP_BLACK_OR_AFRICAN_AMERICAN.sample,
-          Race::RACES_FOR_CMS_GROUP_AMERICAN_INDIAN_OR_ALASKA_NATIVE.sample,
+          Race::RACES_FOR_CMS_GROUP_AMERICAN_INDIAN_OR_ALASKAN_NATIVE.sample,
           Race::RACES_FOR_CMS_GROUP_ASIAN.sample,
           Race::RACES_FOR_CMS_GROUP_NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER.sample
         ]
