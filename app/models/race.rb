@@ -7,6 +7,8 @@ class Race
   include Mongoid::Document
   include Mongoid::Timestamps
 
+  extend L10nHelper
+
   # @!attribute [rw] demographics
   #   @return [Demographics] The demographics associated with the race.
   #   This is an instance of the Demographics class.
@@ -21,35 +23,36 @@ class Race
     other_pacific_islander american_indian_or_alaskan_native other
   ].freeze
 
-  # TODO: Use Translation Helper to populate human readable values for the constant.
   # The mapping of defined race options to their display names or reporting names.
   # @return [Hash] A hash mapping defined race options to their display names or reporting names.
   DEFINED_RACE_OPTIONS_MAPPING = {
-    'white' => 'White',
-    'black_or_african_american' => 'Black or African American',
-    'asian_indian' => 'Asian Indian',
-    'chinese' => 'Chinese',
-    'filipino' => 'Filipino',
-    'japanese' => 'Japanese',
-    'korean' => 'Korean',
-    'vietnamese' => 'Vietnamese',
-    'other_asian' => 'Other Asian',
-    'samoan' => 'Samoan',
-    'native_hawaiian' => 'Native Hawaiian',
-    'guamanian_or_chamorro' => 'Guamanian or Chamorro',
-    'other_pacific_islander' => 'Other Pacific Islander',
-    'american_indian_or_alaskan_native' => 'American Indian or Alaskan Native',
-    'other' => 'Other'
+    'white' => l10n('demographics.race.white'),
+    'black_or_african_american' => l10n('demographics.race.black_or_african_american'),
+    'asian_indian' => l10n('demographics.race.asian_indian'),
+    'chinese' => l10n('demographics.race.chinese'),
+    'filipino' => l10n('demographics.race.filipino'),
+    'japanese' => l10n('demographics.race.japanese'),
+    'korean' => l10n('demographics.race.korean'),
+    'vietnamese' => l10n('demographics.race.vietnamese'),
+    'other_asian' => l10n('demographics.race.other_asian'),
+    'samoan' => l10n('demographics.race.samoan'),
+    'native_hawaiian' => l10n('demographics.race.native_hawaiian'),
+    'guamanian_or_chamorro' => l10n('demographics.race.guamanian_or_chamorro'),
+    'other_pacific_islander' => l10n('demographics.race.other_pacific_islander'),
+    'american_indian_or_alaskan_native' => l10n('demographics.race.american_indian_or_alaskan_native'),
+    'other' => l10n('other')
   }.freeze
 
   # The undefined race options.
   # @return [Array<String>] An array of undefined race options.
   UNDEFINED_RACE_OPTIONS = %w[do_not_know refused].freeze
 
-  # TODO: Use Translation Helper to populate human readable values for the constant.
   # The mapping of undefined race options to their human readable forms.
   # @return [Hash] A hash mapping undefined race options to their human readable forms.
-  UNDEFINED_RACE_OPTIONS_MAPPING = { 'do_not_know' => 'Do not know', 'refused' => 'Choose not to answer' }.freeze
+  UNDEFINED_RACE_OPTIONS_MAPPING = {
+    'do_not_know' => l10n('do_not_know'),
+    'refused' => l10n('refused')
+  }.freeze
 
   # The combined race options.
   # @return [Array<String>] An array of all race options.
@@ -58,17 +61,16 @@ class Race
   # The CMS reporting group kinds.
   # @return [Array<String>] An array of CMS reporting group kinds.
   CMS_REPORTING_GROUP_KINDS = %w[
-    white black_or_african_american american_indian_or_alaska_native asian
+    white black_or_african_american american_indian_or_alaskan_native asian
     native_hawaiian_or_other_pacific_islander multi_racial
   ].freeze
 
-  # TODO: Use Translation Helper to populate human readable values for the constant.
   # The mapping of CMS reporting group kinds to their human readable forms.
   # @return [Hash] A hash mapping CMS reporting group kinds to their human readable forms.
   CMS_REPORTING_GROUP_KINDS_MAPPING = {
     'white' => 'White',
     'black_or_african_american' => 'Black or African American',
-    'american_indian_or_alaska_native' => 'American Indian or Alaska Native',
+    'american_indian_or_alaskan_native' => 'American Indian or Alaskan Native',
     'asian' => 'Asian',
     'native_hawaiian_or_other_pacific_islander' => 'Native Hawaiian or Other Pacific Islander',
     'multi_racial' => 'Multi Racial',
@@ -79,7 +81,7 @@ class Race
   # @return [Array<String>] An array of Races for each CMS reporting groups.
   RACES_FOR_CMS_GROUP_WHITE = %w[white].freeze
   RACES_FOR_CMS_GROUP_BLACK_OR_AFRICAN_AMERICAN = %w[black_or_african_american].freeze
-  RACES_FOR_CMS_GROUP_AMERICAN_INDIAN_OR_ALASKA_NATIVE = %w[american_indian_or_alaska_native].freeze
+  RACES_FOR_CMS_GROUP_AMERICAN_INDIAN_OR_ALASKAN_NATIVE = %w[american_indian_or_alaskan_native].freeze
   RACES_FOR_CMS_GROUP_ASIAN = %w[asian_indian chinese filipino japanese korean vietnamese other_asian].freeze
   RACES_FOR_CMS_GROUP_NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER = %w[samoan native_hawaiian guamanian_or_chamorro other_pacific_islander].freeze
   RACES_FOR_CMS_GROUP_UNKNOWN = %w[do_not_know refused].freeze
@@ -109,13 +111,21 @@ class Race
   #   It is nil by default.
   field :other_race, type: String
 
+  # Returns the human readable form of the CMS reporting group.
+  #
+  # @return [String, nil] The human readable form of the CMS reporting group.
+  # This method is only expected to be used in reports.
+  def human_readable_cms_reporting_group
+    CMS_REPORTING_GROUP_KINDS_MAPPING[cms_reporting_group]
+  end
+
   # Returns the CMS reporting group based on the attested races.
   #
   # @return [String, nil] The CMS reporting group.
   #   Returns nil if attested_races is empty.
   #   Returns 'white' if attested_races has only 'white' as a value.
   #   Returns 'black_or_african_american' if attested_races has only 'black_or_african_american' as a value.
-  #   Returns 'american_indian_or_alaska_native' if attested_races has only 'american_indian_or_alaska_native' as a value.
+  #   Returns 'american_indian_or_alaskan_native' if attested_races has only 'american_indian_or_alaskan_native' as a value.
   #   Returns 'asian' if attested_races has any and only values from 'asian_indian', 'chinese', 'filipino', 'japanese', 'korean', 'vietnamese', 'other_asian'.
   #   Returns 'native_hawaiian_or_other_pacific_islander' if attested_races has any and only values from 'samoan', 'native_hawaiian', 'guamanian_or_chamorro', 'other_pacific_islander'.
   #   Returns 'unknown' if attested_races has any and only 'do_not_know' or 'refused'.
@@ -124,7 +134,7 @@ class Race
     return nil if attested_races.empty?
     return 'white' if (attested_races - RACES_FOR_CMS_GROUP_WHITE).empty?
     return 'black_or_african_american' if (attested_races - RACES_FOR_CMS_GROUP_BLACK_OR_AFRICAN_AMERICAN).empty?
-    return 'american_indian_or_alaska_native' if (attested_races - RACES_FOR_CMS_GROUP_AMERICAN_INDIAN_OR_ALASKA_NATIVE).empty?
+    return 'american_indian_or_alaskan_native' if (attested_races - RACES_FOR_CMS_GROUP_AMERICAN_INDIAN_OR_ALASKAN_NATIVE).empty?
     return 'asian' if (attested_races - RACES_FOR_CMS_GROUP_ASIAN).empty?
     return 'native_hawaiian_or_other_pacific_islander' if (attested_races - RACES_FOR_CMS_GROUP_NATIVE_HAWAIIAN_OR_OTHER_PACIFIC_ISLANDER).empty?
     return 'unknown' if (attested_races - RACES_FOR_CMS_GROUP_UNKNOWN).empty?

@@ -7,6 +7,8 @@ class Ethnicity
   include Mongoid::Document
   include Mongoid::Timestamps
 
+  extend L10nHelper
+
   # @!attribute [rw] demographics
   #   @return [Demographics] The demographics associated with the ethnicity.
   #   This is an instance of the Demographics class.
@@ -18,21 +20,19 @@ class Ethnicity
   # @return [Array<String>] An array of ethnicity options.
   ETHNICITY_OPTIONS = %w[cuban mexican_mexican_american_or_chicano puerto_rican other].freeze
 
-  # TODO: Use Translation Helper to populate human readable values for the constant.
   # The mapping of ethnicity options to their human readable forms.
   # @return [Hash] A hash mapping ethnicity options to their human readable forms.
   ETHNICITY_OPTIONS_MAPPING = {
-    'cuban' => 'Cuban',
-    'mexican_mexican_american_or_chicano' => 'Mexican, Mexican American or Chicano/a',
-    'puerto_rican' => 'Puerto Rican',
-    'other' => 'Other'
+    'cuban' => l10n('demographics.ethnicity.cuban'),
+    'mexican_mexican_american_or_chicano' => l10n('demographics.ethnicity.mexican_mexican_american_or_chicano'),
+    'puerto_rican' => l10n('demographics.ethnicity.puerto_rican'),
+    'other' => l10n('other')
   }.freeze
 
   # The CMS reporting group kinds.
   # @return [Array<String>] An array of CMS reporting group kinds.
   CMS_REPORTING_GROUP_KINDS = %w[hispanic_or_latino not_hispanic_or_latino unknown].freeze
 
-  # TODO: Use Translation Helper to populate human readable values for the constant.
   # The mapping of CMS reporting group kinds to their human readable forms.
   # @return [Hash] A hash mapping CMS reporting group kinds to their human readable forms.
   CMS_REPORTING_GROUP_KINDS_MAPPING = {
@@ -44,14 +44,13 @@ class Ethnicity
   # @return [Array<String>] An array of defined hispanic or latino options.
   HISPANIC_OR_LATINO_OPTIONS = %w[yes no do_not_know refused].freeze
 
-  # TODO: Use Translation Helper to populate human readable values for the constant.
   # The mapping of defined hispanic or latino options to their display names.
   # @return [Hash] A hash mapping defined hispanic or latino options to their display names.
   HISPANIC_OR_LATINO_OPTIONS_MAPPING = {
-    'yes' => 'Yes',
-    'no' => 'No',
-    'do_not_know' => 'Do not know',
-    'refused' => 'Choose not to answer' # 'Refused'
+    'yes' => l10n('yes'),
+    'no' => l10n('no'),
+    'do_not_know' => l10n('do_not_know'),
+    'refused' => l10n('refused')
   }.freeze
 
   # The attestation kinds.
@@ -84,6 +83,14 @@ class Ethnicity
   #   This is a free text field that can be used to specify the ethnicity.
   #   It is nil by default.
   field :other_ethnicity, type: String
+
+  # Returns the human readable form of the CMS reporting group.
+  #
+  # @return [String, nil] The human readable form of the CMS reporting group.
+  # This method is only expected to be used in reports.
+  def human_readable_cms_reporting_group
+    CMS_REPORTING_GROUP_KINDS_MAPPING[cms_reporting_group]
+  end
 
   # Returns the CMS reporting group based on the attested races.
   #

@@ -193,8 +193,6 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.benefit_type' => "Benefit Type",
   :'en.member_ct' => "Member Ct",
   :'en.start_date' => "Start Date",
-  :'en.yes' => "Yes",
-  :'en.no' => "No",
   :'en.none_given' => "None given",
   :'en.send_secure_message' => "Send Secure Message",
   :'en.consumer?' => "Consumer?",
