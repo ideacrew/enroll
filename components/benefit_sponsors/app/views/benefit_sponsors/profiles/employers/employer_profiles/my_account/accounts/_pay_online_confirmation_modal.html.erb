@@ -16,7 +16,9 @@
         </p>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-default pay_online_confirmation pull-right left-margin" id="pay-online-confirmation-final" disabled><%= l10n("pay_online")%></button>
+        <a id="pay-online-confirmation-link" href="#" target="_blank">
+          <button class="btn btn-default pay_online_confirmation pull-right left-margin" id="pay-online-confirmation-final" disabled><%= l10n("pay_online")%></button>
+        </a>
         <span class="btn btn-default btn-small" data-dismiss="modal"><%= l10n("cancel")%></span>
       </div>
     </div>
