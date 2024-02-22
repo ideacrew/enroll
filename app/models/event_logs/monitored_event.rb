@@ -100,7 +100,7 @@ module EventLogs
         event_logs.each do |event_log|
           details = event_log.eligibility_details
           performed_by =
-            details[:account_username] + " (" + details[:account_hbx_id] + ")"
+            "#{details[:account_username]} (#{details[:account_hbx_id]})"
 
           csv << [
             details[:subject],
