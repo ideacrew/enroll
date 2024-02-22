@@ -1,5 +1,7 @@
 <div class="popover-markup" style="display: inline;">
-      <%= link_to "#{l10n("verify")} <i class='fa fa-check-circle-o' aria-hidden='true'></i>".html_safe, "#", class:"btn btn-success btn-xs trigger " %>
+      <%= link_to("#", class:"btn btn-success btn-xs trigger ") do %>
+        <%= l10n("verify") %> <i class='fa fa-check-circle-o' aria-hidden='true'></i>
+      <% end %>
 
     <!-- Admin comment form -->
       <div class="head hide"><%=l10n("insured.families.verification.provide_verification_reason") %>:</div>

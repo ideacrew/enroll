@@ -121,7 +121,7 @@
     <%= render partial: 'notices/shared/unordered_list', locals: {
       previous: "",
       listings: ["Those who qualify must enroll before the deadline. ",
-                 "Login to your account at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a> to enroll now.".html_safe]} %>
+                 sanitize_html("Login to your account at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a> to enroll now.")]} %>
 
     <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "If someone in your household had a recent life change, they may still be able to enroll for #{notice.coverage_year-1}. Getting married, having a baby, or losing other health coverage are just a few examples of recent life changes that may qualify for a special enrollment period. If you also need a special enrollment period, login to your account at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a> or call us at #{notice.hbe.phone}. If you qualify, there’s limited time to sign up."} %>
@@ -134,7 +134,7 @@
     <%= render partial: 'notices/shared/unordered_list', locals: {
       previous: "",
       listings: ["Those who qualify must enroll before the deadline. ",
-                 "Login to your account at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a> to enroll now.".html_safe]} %>
+                 sanitize_html("Login to your account at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a> to enroll now.")]} %>
 
     <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "To find out if those who qualify can enroll now, login to your account at <a href=#{EnrollRegistry[:enroll_app].setting(:home_url).item}>#{notice.hbe.short_url}</a>, or call us at #{notice.hbe.phone}. If you qualify, there’s limited time to sign up."} %>

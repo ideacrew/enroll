@@ -35,8 +35,16 @@
                     <td></td>
                     <td><%= commission_statement_formatted_date(statement.date) %></td>
                     <td><%= commission_statement_coverage_period(statement.date) %></td>
-                    <td><%= link_to "<i class='fa fa-cloud-download' aria-hidden='false' title='Download' data-toggle='tooltip'></i>".html_safe, download_commission_statement_broker_agencies_profile_path(@broker_agency_profile, :statement_id => statement.id), :target => "_blank" , :type => "pdf", :disposition =>  "inline" %></td>
-                    <td><%= link_to "<i class='fa fa-file-pdf-o' aria-hidden='true' data-toggle='tooltip'></i>".html_safe,  show_commission_statement_broker_agencies_profile_path(@broker_agency_profile, :statement_id => statement.id), :target => "_blank" %></td>
+                    <td>
+                      <%= link_to(download_commission_statement_broker_agencies_profile_path(@broker_agency_profile, :statement_id => statement.id), :target => "_blank" , :type => "pdf", :disposition =>  "inline") do %>
+                        <i class='fa fa-cloud-download' aria-hidden='false' title='Download' data-toggle='tooltip'></i>
+                      <% end %>
+                    </td>
+                    <td>
+                      <%= link_to(show_commission_statement_broker_agencies_profile_path(@broker_agency_profile, :statement_id => statement.id), :target => "_blank") do %>
+                        <i class='fa fa-file-pdf-o' aria-hidden='true' data-toggle='tooltip'></i>
+                      <% end %>
+                    </td>
                   </tr>
                 <% end %>
               <% end %>

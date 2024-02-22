@@ -1,5 +1,5 @@
 
-<%= l10n("user_mailer.broker_staff_linked_notification_email.full_text",
+<%= sanitize_html(l10n("user_mailer.broker_staff_linked_notification_email.full_text",
       first_name: person_name,
       person_name: person_name,
       site_short_name: site_short_name,
@@ -10,4 +10,4 @@
       site_title: EnrollRegistry[:enroll_app].setting(:site_title).item,
       broker_agreement_url: EnrollRegistry[:broker_agreement_url].item,
       login_url: login_url
-).html_safe %>
+)) %>

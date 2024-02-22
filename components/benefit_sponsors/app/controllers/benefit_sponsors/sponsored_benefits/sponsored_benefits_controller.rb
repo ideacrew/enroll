@@ -4,6 +4,8 @@ module BenefitSponsors
       
       layout "two_column"
 
+      include HtmlScrubberUtil
+
       # before_action :find_benefit_application, :find_employer
 
       def new
@@ -68,7 +70,7 @@ module BenefitSponsors
       private
 
       def error_messages(object)
-        object.errors.full_messages.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}.html_safe
+        sanitize_html(object.errors.full_messages.inject(""){|memo, error| "#{memo}<li>#{error}</li>"})
       end
 
       def identifier_params

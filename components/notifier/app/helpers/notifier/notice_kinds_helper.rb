@@ -1,5 +1,6 @@
 module Notifier
   module NoticeKindsHelper
+    include HtmlScrubberUtil
 
     def date_of_notice
       TimeKeeper.date_of_record.strftime('%m/%d/%Y')
@@ -61,7 +62,7 @@ module Notifier
     end
 
     def notice_template(notice_kind)
-      notice_kind.template.raw_body.gsub('#{', '<%=').gsub('}','%>').gsub('[[', '<%').gsub(']]', '%>').html_safe
+      sanitize_html(notice_kind.template.raw_body.gsub('#{', '<%=').gsub('}','%>').gsub('[[', '<%').gsub(']]', '%>'))
     end
   end
 end

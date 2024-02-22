@@ -58,7 +58,7 @@ module Insured
 
       def carrier_link(product)
         legal_name = product.issuer_profile.legal_name
-        (link_to l10n("plans.issuer.pay_now.make_first_payment"), carrier_url(legal_name), class: "btn-link btn-block dropdown-item", style: 'padding: 6px 12px; margin: 4px 0;', target: '_blank').html_safe
+        link_to(l10n("plans.issuer.pay_now.make_first_payment"), carrier_url(legal_name), class: "btn-link btn-block dropdown-item", style: 'padding: 6px 12px; margin: 4px 0;', target: '_blank')
       end
 
       def enrollment_is_ivl_or_coverall?(hbx_enrollment)

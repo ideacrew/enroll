@@ -4,7 +4,7 @@
       <td>
         <ul style="list-style: none; margin-top: 10px; margin-bottom: 5px;">
           <% listings.each do |item| %>
-            <li><%= item.html_safe %></li>
+            <li><%= sanitize_html(item) %></li>
           <% end %>
         </ul>
       </td>

@@ -1,6 +1,7 @@
 class BrokerAgencies::QuotesController < ApplicationController
 
   include BrokerAgencies::QuoteHelper
+  include HtmlScrubberUtil
 
   before_action :validate_roles, :set_broker_role
   before_action :find_quote , :only => [:destroy ,:show, :delete_member, :delete_household, :publish_quote, :view_published_quote]
@@ -12,16 +13,18 @@ class BrokerAgencies::QuotesController < ApplicationController
 
   end
 
+  # rubocop:disable Style/StringConcatenation
   def publish_quote
     if @quote.may_publish?
       @quote.publish!
       flash[:notice] = "Quote Published"
     else
       errors = @quote.quote_warnings.values
-      flash[:error] = "Quote failed to publish. #{('<li>' + errors.flatten.join('</li><li>') + '</li>') if errors.try(:any?)}".html_safe
+      flash[:error] = sanitize_html("Quote failed to publish. #{('<li>' + errors.flatten.join('</li><li>') + '</li>') if errors.try(:any?)}")
       redirect_to broker_agencies_broker_role_quote_path(params[:broker_role_id],params[:id])
     end
   end
+  # rubocop:enable Style/StringConcatenation
 
   # displays index page of quotes
   def my_quotes
