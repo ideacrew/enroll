@@ -849,11 +849,10 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:draft_application_after_ridp).and_return(true)
         allow(user).to receive(:person).and_return(person)
-        allow(controller).to receive(:authorize).and_return(true)
         sign_in user
       end
 
-      context 'user has most recent existing application in draft state' do
+      context 'unverified user has most recent existing application in draft state' do
         let!(:person){ FactoryBot.create(:person) }
         let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
         let!(:primary) { family.primary_family_member }
@@ -861,11 +860,27 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
         let!(:assistance_year) { FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value! }
         let!(:application) { FactoryBot.create(:financial_assistance_application, aasm_state: 'draft', assistance_year: assistance_year, family_id: family.id, applicants: [applicant])}
 
+        it 'should error out for attempting to navigate without identity verification' do
+          expect { get :help_paying_coverage }.to raise_error(Pundit::NotDefinedError)
+        end
+      end
+
+      context 'verified user has most recent existing application in draft state' do
+        before do
+          allow(person.consumer_role).to receive(:identity_verified?).and_return(true)
+        end
+
+        let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+        let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+        let!(:primary) { family.primary_family_member }
+        let!(:applicant) { FactoryBot.create(:financial_assistance_applicant, family_member_id: primary.id, person_hbx_id: primary.hbx_id) }
+        let!(:assistance_year) { FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new.call.value! }
+        let!(:application) { FactoryBot.create(:financial_assistance_application, aasm_state: 'draft', assistance_year: assistance_year, family_id: family.id, applicants: [applicant])}
+
         it 'should redirect to draft application edit page' do
-          edit_application_path = FinancialAssistance::Engine.routes.url_helpers.edit_application_path(application).split('/.').last
           get :help_paying_coverage
           expect(response).to have_http_status(:redirect)
-          expect(response).to redirect_to(edit_application_path)
+          expect(response).to redirect_to(FinancialAssistance::Engine.routes.url_helpers.edit_application_path(application).split('/.').last)
         end
       end
     end
