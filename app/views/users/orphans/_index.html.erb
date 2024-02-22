@@ -27,7 +27,7 @@
           <%= l10n('.invalid_accounts_contents') %>
         </p>
         <p>
-          <%= l10n('.disable_customer_access_contents').html_safe %>
+          <%= sanitize_html(l10n('.disable_customer_access_contents')) %>
         </p>
 
         <h3><%= @orphans.size %> <%= l10n('.accounts_without_matching_person') %></h3>
@@ -38,7 +38,7 @@
               <th><%= l10n('.th_created_at') %></th>
               <th><%= l10n('.th_last_signin') %></th>
               <th><%= l10n('.th_signin_count') %></th>
-              <tsh><%= l10n('.th_enterprise_id') %></tsh>
+              <th><%= l10n('.th_enterprise_id') %></th>
               <th><%= l10n('.th_delete') %></th>
             </tr>
           </thead>

@@ -7,13 +7,13 @@ module Effective
       include Config::AcaModelConcern
       include Config::SiteModelConcern
       include ApplicationHelper
-      include SanitizeConcern
+      include HtmlScrubberUtil
 
       datatable do
         #table_column :family_hbx_id, :proc => Proc.new { |row| row.hbx_assigned_id }, :filter => false, :sql_column => "hbx_id"
         table_column :name, :label => 'Name', :proc => proc { |row|
           link_to_with_noopener_noreferrer(
-            sanitize(row.primary_person.full_name),
+            sanitize_html(row.primary_applicant.person.full_name),
             resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id)
           )
         }, :filter => false, :sortable => false
@@ -37,7 +37,7 @@ module Effective
             add_sep_link_type(pundit_allow(HbxProfile, :can_add_sep?))],
            ['Create Eligibility', new_eligibility_exchanges_hbx_profiles_path(person_id: row.primary_applicant.person.id,
                                                                               family: row.id, family_actions_id: "family_actions_#{row.id}"), new_eligibility_family_member_link_type(row, pundit_allow(HbxProfile, :can_add_pdc?))],
-           ["<div class='#{pundit_class(Family, :can_view_sep_history?)}'> View SEP History </div>".html_safe, show_sep_history_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id}"), 'ajax'],
+           [sanitize_html("<div class='#{pundit_class(Family, :can_view_sep_history?)}'> View SEP History </div>"), show_sep_history_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id}"), 'ajax'],
            ['Cancel Enrollment', cancel_enrollment_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id}"), cancel_enrollment_type(row, pundit_allow(Family, :can_cancel_enrollment?))],
            #cancel_enrollment_type(row, pundit_allow(Family, :can_update_ssn?))],
            ['Terminate Enrollment', terminate_enrollment_exchanges_hbx_profiles_path(family: row.id, family_actions_id: "family_actions_#{row.id}"), terminate_enrollment_type(row, pundit_allow(Family, :can_terminate_enrollment?))],
@@ -46,7 +46,7 @@ module Effective
             update_terminated_enrollment_type(row, pundit_allow(Family, :change_enrollment_end_date?))],
            ['Reinstate', view_terminated_hbx_enrollments_exchanges_hbx_profiles_path(family: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"),
             reinstate_enrollment_type(row, pundit_allow(Family, :can_reinstate_enrollment?))],
-           ["<div class='#{pundit_class(Family, :can_update_ssn?)}'> Edit DOB / SSN </div>".html_safe, edit_dob_ssn_path(id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"), 'ajax'],
+           [sanitize_html("<div class='#{pundit_class(Family, :can_update_ssn?)}'> Edit DOB / SSN </div>"), edit_dob_ssn_path(id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"), 'ajax'],
            ['View Username and Email', get_user_info_exchanges_hbx_profiles_path(person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"),
             (individual_market_is_enabled? && pundit_allow(Family, :can_view_username_and_email?)) ? 'ajax' : 'disabled'],
            ['Collapse Form', hide_form_exchanges_hbx_profiles_path(family_id: row.id, person_id: row.primary_applicant.person.id, family_actions_id: "family_actions_#{row.id}"), no_transition_families_is_enabled? ? 'ajax' : '']

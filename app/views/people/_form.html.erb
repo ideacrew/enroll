@@ -19,7 +19,9 @@
 
     <div class="row ">
       <div class="col-md-12 <%= pundit_class Family, :updateable?%>">
-        <%= link_to '<i class="fa fa-chevron-left"></i> Back'.html_safe, '#', class: 'btn btn-primary disabled' %> &nbsp;
+        <%= link_to('#', class: 'btn btn-primary disabled') do %>
+          <i class="fa fa-chevron-left"></i> Back
+        <% end %>&nbsp;
         <button type="submit" class="btn btn-primary" id="continue-employer">
           <i class="fa fa-user-plus"></i> Continue
         </button>
@@ -27,7 +29,9 @@
     </div><br>
     <div class="row">
       <div class="col-md-12 <%=pundit_class Family,:updateable?%>">
-        <%= link_to '<i class="fa fa-user"></i> My Account'.html_safe, family_account_path, class: 'btn btn-primary' %> &nbsp;
+        <%= link_to(family_account_path, class: 'btn btn-primary') do %>
+          <i class="fa fa-user"></i> My Account
+        <% end %>&nbsp;
         <button type="submit" class="btn btn-primary">
           <i class="fa fa-floppy-o"></i> Save & Exit
         </button>

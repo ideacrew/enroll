@@ -3,7 +3,7 @@
     <% if defined? previous %>
       <tr>
         <td style="padding-bottom: 6px">
-          <%= previous.html_safe %>
+          <%= sanitize_html(previous) %>
         </td>
       </tr>
     <% end %>
@@ -21,7 +21,7 @@
     <% if defined? after %>
     <tr>
       <td style="padding-bottom: 0px;">
-        <%= after.html_safe %>
+        <%= sanitize_html(after) %>
       </td>
     </tr>
     <% end %>
