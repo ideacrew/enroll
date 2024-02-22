@@ -415,7 +415,7 @@ Then(/(.*) should see all the family members names/) do |role|
   people = Person.all
   people.each do |person|
     expect(page).to have_content "#{person.last_name}"
-
+    expect(page).to have_content "#{person.first_name}"
   end
 end
 
