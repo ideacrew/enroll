@@ -1,7 +1,7 @@
 br
 field.form-group
   = check_box_tag :all_marketplace_required_trainings, nil, false, class: "broker-attestation-field", onChange: "allowBrokerAgencyFormSubmission()"
-  = "  #{l10n("broker_attestation.required_trainings", trainings_link: 'https://coverme.inquisiqlms.com/', site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item)}".html_safe
+  = sanitize_html(l10n("broker_attestation.required_trainings", trainings_link: 'https://coverme.inquisiqlms.com/', site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item))
 
 br
 field.form-group
@@ -10,7 +10,7 @@ field.form-group
 br
 field.form-group
   = check_box_tag :marketplace_broker_agreement, nil, false, class: "broker-attestation-field", onChange: "allowBrokerAgencyFormSubmission()"
-  = "  #{l10n("broker_attestation.broker_agreement", agreement_pdf_url: '/ohim_broker_agreement.pdf', site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item)}".html_safe
+  = sanitize_html(l10n("broker_attestation.broker_agreement", agreement_pdf_url: '/ohim_broker_agreement.pdf', site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item))
 
 
 javascript:

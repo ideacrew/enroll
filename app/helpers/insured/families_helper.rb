@@ -2,6 +2,7 @@
 
 module Insured::FamiliesHelper
   include FloatHelper
+  include HtmlScrubberUtil
 
   def display_change_tax_credits_button?(hbx_enrollment)
     hbx_enrollment.has_at_least_one_aptc_eligible_member?(hbx_enrollment.effective_on.year) &&
@@ -13,13 +14,21 @@ module Insured::FamiliesHelper
   def plan_shopping_dependent_text(hbx_enrollment)
     subscriber, dependents = hbx_enrollment.hbx_enrollment_members.partition {|h| h.is_subscriber == true }
     if subscriber.present? && dependents.count == 0
-      ("<span class='dependent-text'>#{subscriber.first.person.full_name}</span>").html_safe
+      sanitize_html("<span class='dependent-text'>#{subscriber.first.person.full_name}</span>")
     elsif subscriber.blank? && dependents.count == 1
-      ("<span class='dependent-text'>#{dependents.first.person.full_name}</span>").html_safe
+      sanitize_html("<span class='dependent-text'>#{dependents.first.person.full_name}</span>")
     elsif subscriber.blank? && dependents.count > 1
-      (link_to(pluralize(dependents.count, "dependent"), "", data: {toggle: "modal", target: "#dependentsList"}, class: "dependent-text")).html_safe + render(partial: "shared/dependents_list_modal", locals: {subscriber: subscriber, dependents: dependents})
+      link_to(
+        pluralize(dependents.count, "dependent"),
+        "",
+        data: {toggle: "modal", target: "#dependentsList"},
+        class: "dependent-text"
+      ) +
+        render(partial: "shared/dependents_list_modal", locals: {subscriber: subscriber, dependents: dependents})
     else
-      ("<span class='dependent-text'>#{subscriber.first.person.full_name}</span>" + " + " + link_to(pluralize(dependents.count, "dependent"), "", data: {toggle: "modal", target: "#dependentsList"}, class: "dependent-text")).html_safe + render(partial: "shared/dependents_list_modal", locals: {subscriber: subscriber, dependents: dependents})
+      sanitize_html("<span class='dependent-text'>#{subscriber.first.person.full_name}</span> + ") +
+        link_to(pluralize(dependents.count, "dependent"), "", data: {toggle: "modal", target: "#dependentsList"}, class: "dependent-text") +
+        render(partial: "shared/dependents_list_modal", locals: {subscriber: subscriber, dependents: dependents})
     end
   end
 
@@ -83,9 +92,11 @@ module Insured::FamiliesHelper
       plan_details << "NATIONWIDE NETWORK"
     end
 
-    plan_details.inject([]) do |data, element|
-      data << "#{element}"
-    end.join("&nbsp<label class='separator'></label>").html_safe
+    sanitize_html(
+      plan_details.inject([]) do |data, element|
+        data << element.to_s
+      end.join("&nbsp;<label class='separator'></label>")
+    )
   end
 
   def render_product_type_details(metal_level_kind, nationwide)
@@ -98,9 +109,11 @@ module Insured::FamiliesHelper
 
     product_details << 'NATIONWIDE NETWORK' if nationwide
 
-    product_details.inject([]) do |data, element|
-      data << element.to_s
-    end.join("&nbsp<label class='separator'></label>").html_safe
+    sanitize_html(
+      product_details.inject([]) do |data, element|
+        data << element.to_s
+      end.join("&nbsp;<label class='separator'></label>")
+    )
   end
 
   def qle_link_generater(qle, index)
@@ -120,7 +133,7 @@ module Insured::FamiliesHelper
       options.merge!(data: data)
     end
 
-    qle_title_html = "<u>#{qle.title}</u>".html_safe if qle.reason == 'covid-19'
+    qle_title_html = sanitize_html("<u>#{qle.title}</u>") if qle.reason == 'covid-19'
 
     link_to qle_title_html || qle.title, "javascript:void(0)", options
   end

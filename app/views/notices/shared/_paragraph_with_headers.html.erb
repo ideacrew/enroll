@@ -3,18 +3,18 @@
     <tbody>
       <% if heading.present? %>
         <tr>
-          <td style="font-size: 14px; padding-bottom: 8px;"><%= heading.html_safe %></td>
+          <td style="font-size: 14px; padding-bottom: 8px;"><%= sanitize_html(heading) %></td>
         </tr>
       <% end %>
       <% if sub_heading.present? %>
         <tr>
-          <td style="padding-bottom: 5px;"><%= sub_heading.html_safe %></td>
+          <td style="padding-bottom: 5px;"><%= sanitize_html(sub_heading) %></td>
         </tr>
       <% end %>
       <% if contents.present? %>
         <% contents.each do |para| %>
           <tr>
-            <td style="padding-bottom: <%= bottom_margin if defined? bottom_margin %>;"><%= para.html_safe %></td>
+            <td style="padding-bottom: <%= bottom_margin if defined? bottom_margin %>;"><%= sanitize_html(para) %></td>
           </tr>
         <% end %>
       <% end %>

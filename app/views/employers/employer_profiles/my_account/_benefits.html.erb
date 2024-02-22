@@ -68,10 +68,13 @@
         <%= pundit_span EmployerProfile, :updateable? %>
             <% if plan_year.draft? || plan_year.renewing_draft? %>
                 <% if plan_year.overlapping_published_plan_years.empty? %>
-                    <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-default pull-right #{rates_available?(@employer_profile, plan_year.start_on)}" %>
-
+                    <%= link_to(employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-default pull-right #{rates_available?(@employer_profile, plan_year.start_on)}") do %>
+                        Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>
+                    <% end %>
                 <% end %>
-                <%= link_to "Edit Plan Year &nbsp;<i class='fas fa-pencil-alt' aria-hidden='true'></i>".html_safe, edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-default pull-right mrz"%>
+                <%= link_to(edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-default pull-right mrz") do %>
+                    Edit Plan Year &nbsp;<i class='fas fa-pencil-alt' aria-hidden='true'></i>
+                <% end %>
             <% end %>
             <%= pundit_span(EmployerProfile, :revert_application?) %>
                 <% if current_user.has_hbx_staff_role? && ( plan_year.may_revert_application? || plan_year.may_revert_renewal? ) %>
@@ -490,8 +493,12 @@
       </div>
         <%= pundit_span EmployerProfile, :updateable? %>
             <div class="below clear">
-              <%= link_to "Delete Benefit Package <i class='fa fa-trash-o' aria-hidden='true'></i> ".html_safe, "", data: { toggle: "modal", target: "#deleteBenefitPackageModal-#{bg.id}" }, class: 'btn btn-default' if plan_year.aasm_state == "draft" || plan_year.aasm_state == "renewing_draft" %>
-              <%= render partial: "employers/plan_years/delete_benefit_package_modal", locals: { plan_year: plan_year, bg: bg } if plan_year.aasm_state == "draft" || plan_year.aasm_state == "renewing_draft" %>
+              <% if plan_year.aasm_state == "draft" || plan_year.aasm_state == "renewing_draft"%>
+                <%= link_to("", data: { toggle: "modal", target: "#deleteBenefitPackageModal-#{bg.id}" }, class: 'btn btn-default') do %>
+                  Delete Benefit Package <i class='fa fa-trash-o' aria-hidden='true'></i>
+                <% end %>
+                <%= render partial: "employers/plan_years/delete_benefit_package_modal", locals: { plan_year: plan_year, bg: bg } %>
+              <% end %>
             </div>
         </span>
       <% end %>

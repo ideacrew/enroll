@@ -3,7 +3,7 @@
     <% if defined? previous %>
       <tr>
         <td>
-          <%= previous.html_safe %>
+          <%= sanitize_html(previous) %>
         </td>
       </tr>   
     <% end %>
@@ -13,16 +13,16 @@
           <% listings.each do |listing| %>
             <li style="margin-top: 10px;">
             <% if listing.is_a?(Array) %>
-              <%= listing[0].html_safe %>
+              <%= sanitize_html(listing[0]) %>
               <ol style="list-style-type: lower-alpha;">
                 <% listing[1].each do |item| %>
                   <li style="margin-top: 5px;">
-                  <%= item.html_safe %>
+                  <%= sanitize_html(item) %>
                   </li>
                 <% end %>
               </ol>
             <% else %>
-              <%= listing.html_safe %>          
+              <%= sanitize_html(listing) %>          
             <% end %>
             </li>
           <% end %>
@@ -32,7 +32,7 @@
     <% if defined? after %>
     <tr>
       <td>
-        <%= after.html_safe %>
+        <%= sanitize_html(after) %>
       </td>
     </tr>   
     <% end %>

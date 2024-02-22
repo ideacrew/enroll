@@ -13,7 +13,9 @@
           <i class="fa fa-user-times" aria-hidden="true"></i>
         </a>
       <% else %>
-        <%= link_to "#{l10n('insured.delete_broker')} &nbsp;<i class='fa fa-user-times' aria-hidden='true'></i>".html_safe, delete_consumer_broker_insured_family_path(@family) , method: :delete , data: { confirm: l10n("confirm_delete_msg") }, class: 'btn btn-default'+pundit_class(Family,:updateable?) %>
+        <%= link_to(delete_consumer_broker_insured_family_path(@family) , method: :delete , data: { confirm: l10n("confirm_delete_msg") }, class: 'btn btn-default'+ pundit_class(Family,:updateable?)) do %>
+          <%= l10n('insured.delete_broker') %> &nbsp;<i class='fa fa-user-times' aria-hidden='true'></i>
+        <% end %>
       <% end %>       
     </div>
   </div>
