@@ -29,6 +29,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
         it 'will render :new' do
           get :new, params: { id: person.id, profile_id: hbx_profile.id, to: 'test' }, format: :js, xhr: true
 
+          expect(assigns(:inbox_provider).present?).to be_truthy
           expect(response).to render_template('new')
           expect(response).to have_http_status(:success)
         end
@@ -36,6 +37,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
         it 'will create a new message' do
           post :create, params: { id: person.id, profile_id: hbx_profile.id, message: valid_params }
 
+          expect(assigns(:inbox_provider).present?).to be_truthy
           expect(response).to have_http_status(:redirect)
           expect(flash[:notice]).to eq("Successfully sent message.")
         end
@@ -45,6 +47,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
         it 'will show specific message' do
           get :show, params: { id: person.id, message_id: message.id }
 
+          expect(assigns(:inbox_provider).present?).to be_truthy
           expect(response).to render_template('show')
           expect(response).to have_http_status(:success)
         end
@@ -52,6 +55,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
         it 'will delete a message' do
           delete :destroy, params: { id: person.id, message_id: message.id }, xhr: true
 
+          expect(assigns(:inbox_provider).present?).to be_truthy
           expect(response).to have_http_status(:success)
         end
       end
@@ -70,6 +74,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
         it 'will not render :new' do
           get :new, params: { id: person.id, profile_id: hbx_profile.id, to: 'test' }, format: :js, xhr: true
 
+          expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(403)
           expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
         end
@@ -77,6 +82,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
         it 'will not create a new message' do
           post :create, params: { id: person.id, profile_id: hbx_profile.id, message: valid_params }
 
+          expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(:redirect)
           expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
         end
@@ -86,6 +92,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
         it 'will not show specific message' do
           get :show, params: { id: person.id, message_id: message.id }
 
+          expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(:redirect)
           expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
         end
@@ -93,6 +100,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
         it 'will not delete a message' do
           delete :destroy, params: { id: person.id, message_id: message.id }, xhr: true
 
+          expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(403)
           expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
         end
@@ -116,6 +124,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
         it 'will render :new' do
           get :new, params: { id: person.id, profile_id: hbx_profile.id, to: 'test' }, format: :js, xhr: true
 
+          expect(assigns(:inbox_provider).present?).to be_truthy
           expect(response).to render_template('new')
           expect(response).to have_http_status(:success)
         end
@@ -123,6 +132,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
         it 'will create a new message' do
           post :create, params: { id: person.id, profile_id: hbx_profile.id, message: valid_params }
 
+          expect(assigns(:inbox_provider).present?).to be_truthy
           expect(response).to have_http_status(:redirect)
           expect(flash[:notice]).to eq("Successfully sent message.")
         end
@@ -132,6 +142,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
         it 'will show specific message' do
           get :show, params: { id: person.id, message_id: message.id }
 
+          expect(assigns(:inbox_provider).present?).to be_truthy
           expect(response).to render_template('show')
           expect(response).to have_http_status(:success)
         end
@@ -139,6 +150,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
         it 'will delete a message' do
           delete :destroy, params: { id: person.id, message_id: message.id }, xhr: true
 
+          expect(assigns(:inbox_provider).present?).to be_truthy
           expect(response).to have_http_status(:success)
         end
       end
@@ -156,6 +168,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
         it 'will not render :new' do
           get :new, params: { id: person.id, profile_id: hbx_profile.id, to: 'test' }, format: :js, xhr: true
 
+          expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(403)
           expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
         end
@@ -163,6 +176,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
         it 'will not create a new message' do
           post :create, params: { id: person.id, profile_id: hbx_profile.id, message: valid_params }
 
+          expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(:redirect)
           expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
         end
@@ -170,15 +184,17 @@ RSpec.describe Insured::InboxesController, :type => :controller do
 
       describe 'GET show / DELETE destroy' do
         it 'will not show specific message' do
-          get :show, params: { id: person.id, message_id: message.id }
+          get :show, params: { id: person.id, message_id: message.id }, xhr: true, format: :js
 
-          expect(response).to have_http_status(:redirect)
+          expect(assigns(:inbox_provider).present?).to be_falsey
+          expect(response).to have_http_status(403)
           expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
         end
 
         it 'will not delete a message' do
           delete :destroy, params: { id: person.id, message_id: message.id }, xhr: true
 
+          expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(403)
           expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
         end
@@ -209,6 +225,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
         it 'will render :new' do
           get :new, params: { id: person.id, profile_id: hbx_profile.id, to: 'test' }, format: :js, xhr: true
 
+          expect(assigns(:inbox_provider).present?).to be_truthy
           expect(response).to render_template('new')
           expect(response).to have_http_status(:success)
         end
@@ -216,6 +233,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
         it 'will create a new message' do
           post :create, params: { id: person.id, profile_id: hbx_profile.id, message: valid_params }
 
+          expect(assigns(:inbox_provider).present?).to be_truthy
           expect(response).to have_http_status(:redirect)
           expect(flash[:notice]).to eq("Successfully sent message.")
         end
@@ -225,6 +243,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
         it 'will show specific message' do
           get :show, params: { id: person.id, message_id: message.id }
 
+          expect(assigns(:inbox_provider).present?).to be_truthy
           expect(response).to render_template('show')
           expect(response).to have_http_status(:success)
         end
@@ -232,6 +251,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
         it 'will delete a message' do
           delete :destroy, params: { id: person.id, message_id: message.id }, xhr: true
 
+          expect(assigns(:inbox_provider).present?).to be_truthy
           expect(response).to have_http_status(:success)
         end
       end
@@ -246,6 +266,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
         it 'will not render :new' do
           get :new, params: { id: person.id, profile_id: hbx_profile.id, to: 'test' }, format: :js, xhr: true
 
+          expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(403)
           expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
         end
@@ -253,6 +274,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
         it 'will not create a new message' do
           post :create, params: { id: person.id, profile_id: hbx_profile.id, message: valid_params }
 
+          expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(:redirect)
           expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
         end
@@ -262,6 +284,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
         it 'will not show specific message' do
           get :show, params: { id: person.id, message_id: message.id }
 
+          expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(:redirect)
           expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
         end
@@ -269,6 +292,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
         it 'will not delete a message' do
           delete :destroy, params: { id: person.id, message_id: message.id }, xhr: true
 
+          expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(403)
           expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
         end
