@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
-require_relative 'boot'
+# Devise security won't work without this.
+DEVISE_ORM = :mongoid
 
+require_relative 'boot'
 require "rails"
 # Pick the frameworks you want:
 require "active_model/railtie"
@@ -47,14 +49,14 @@ module Enroll
     # config.active_record.raise_in_transactional_callbacks = true
     config.assets.enabled = true
     config.assets.paths << "#{Rails.root}/app/assets/info"
-    I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
+    I18n::Backend::Simple.include I18n::Backend::Fallbacks
     config.i18n.fallbacks = [I18n.default_locale, {'am' => 'en', 'es' => 'en', 'ja' => 'en'}]
     config.paths.add "app/api", glob: "**/*.rb"
     config.autoload_paths += Dir["#{Rails.root}/app/api/api/*/*"]
 
     #Thanks to Wojtek Kruszewski: https://gist.github.com/WojtekKruszewski
     config.log_tags = [    #'-anything',
-      ->(req){
+      lambda { |req|
         SessionTaggedLogger.extract_session_id_from_request(req)
       }
     ]

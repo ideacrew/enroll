@@ -64,8 +64,8 @@ gem 'combine_pdf',              '~> 1.0'
 gem 'config',                   '~> 2.0'
 gem 'curl',                     '~> 0.0.9'
 gem 'devise',                   '~> 4.5'
-gem 'devise-jwt', "0.9.0"
-gem 'warden-jwt_auth', "0.6.0"
+gem 'devise-jwt',               '0.9.0'
+gem 'warden-jwt_auth',          '0.6.0'
 gem 'jwt', "~> 2.2.1"
 gem 'haml',                     '~> 5.0'
 gem 'httparty',                 '~> 0.16'
