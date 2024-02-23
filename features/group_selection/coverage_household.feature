@@ -10,6 +10,6 @@ Feature: Coverage Household Page
     And I select a past qle date
     Then I should see confirmation and continue
     And ivl clicked continue on household info page
+    And consumer should see all the family members names
     And consumer reselects family member
     Then consumer should be able to toggle tobacco use question
-    
