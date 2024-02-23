@@ -597,6 +597,9 @@ jobs:
           key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
+      - name: Nightly Accessibility Cucumber
+        if: github.event.schedule == '0 5 * * *'
+        run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }} --tags @accessibility
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
