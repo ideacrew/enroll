@@ -48,6 +48,7 @@ module EventLogs
       details[:title] = parsed[:title]&.gsub(/osse/i, "Hc4cc")&.gsub("Aca ", "")&.gsub("Eligibility ", "")&.upcase || ""
       details[:effective_on] = effective_on || ""
       details[:detail] = detail || ""
+      details[:event_time] = format_time_display(details[:event_time])
       details
     end
 
@@ -113,6 +114,10 @@ module EventLogs
           ]
         end
       end
+    end
+
+    def format_time_display(timestamp)
+      timestamp.present? ? timestamp.in_time_zone('Eastern Time (US & Canada)') : ""
     end
   end
 end
