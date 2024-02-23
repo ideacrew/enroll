@@ -3,6 +3,7 @@ module BenefitSponsors
     class BenefitApplicationsController < ApplicationController
       layout "two_column"
       include Pundit
+      include HtmlScrubberUtil
 
       def new
         @benefit_application_form = BenefitSponsors::Forms::BenefitApplicationForm.for_new(params.permit(:benefit_sponsorship_id))
@@ -55,7 +56,8 @@ module BenefitSponsors
             format.js
           end
         else
-          flash[:error] = "Plan Year failed to publish. #{@benefit_application_form.errors.messages.values.flatten.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}.html_safe}"
+          error_message_html = sanitize_html(@benefit_application_form.errors.messages.values.flatten.inject("") { |memo, error| "#{memo}<li>#{error}</li>" })
+          flash[:error] = "Plan Year failed to publish. #{error_message_html}"
           render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits').to_json}"
         end
       end
@@ -78,7 +80,7 @@ module BenefitSponsors
         if @benefit_application_form.revert
           flash[:notice] = "Plan Year successfully reverted to draft state."
         else
-          flash[:error] = "Plan Year could not be reverted to draft state. #{error_messages(@benefit_application_form)}".html_safe
+          flash[:error] = sanitize_html("Plan Year could not be reverted to draft state. #{error_messages(@benefit_application_form)}")
         end
         render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits').to_json}"
       end
@@ -93,7 +95,7 @@ module BenefitSponsors
       private
 
       def error_messages(instance)
-        instance.errors.full_messages.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}.html_safe
+        sanitize_html(instance.errors.full_messages.inject(""){|memo, error| "#{memo}<li>#{error}</li>"})
       end
 
       def application_params

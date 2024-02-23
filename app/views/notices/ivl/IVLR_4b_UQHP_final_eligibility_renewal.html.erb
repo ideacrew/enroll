@@ -34,13 +34,13 @@
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "You should use this open enrollment period to:",
-  listings: [ "<strong>Choose your 2016 plan:</strong> You can pick a different health plan for 2016 starting on November 1, 2015.
-    If you don’t pick a new plan, we will renew your coverage in the same plan or a similar one for 2016.".html_safe,
-    "<strong>Pay your premiums:</strong> You must continue to pay your premiums for your 2015 plan on time to have your coverage renewed for 2016.
-    You must also make sure to update your payments for your 2016 plan(s).".html_safe,
-    "<strong>Provide proof:</strong> If you received an earlier notice from #{EnrollRegistry[:enroll_app].setting(:short_name).item} indicating that we need documentation of certain information,
+  listings: [ sanitize_html("<strong>Choose your 2016 plan:</strong> You can pick a different health plan for 2016 starting on November 1, 2015.
+    If you don’t pick a new plan, we will renew your coverage in the same plan or a similar one for 2016."),
+    sanitize_html("<strong>Pay your premiums:</strong> You must continue to pay your premiums for your 2015 plan on time to have your coverage renewed for 2016.
+    You must also make sure to update your payments for your 2016 plan(s)."),
+    sanitize_html("<strong>Provide proof:</strong> If you received an earlier notice from #{EnrollRegistry[:enroll_app].setting(:short_name).item} indicating that we need documentation of certain information,
     please be sure to submit those documents if you haven’t already.  An outstanding document request will not impact your renewal.
-    However, failing to submit the document(s) by the date indicated on the request may cause your coverage to be terminated in the future."]
+    However, failing to submit the document(s) by the date indicated on the request may cause your coverage to be terminated in the future.")]
   } %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
@@ -158,16 +158,16 @@
 
 
     <%= render partial: 'notices/shared/unordered_list', locals: {
-      previous: "<span #{@style_underline}>Primary documentation:</span> (Only One (1) is needed)".html_safe,
-      listings: [["U.S. Passport", ["<i>Note:</i> Expired passports are acceptable."]], "Certificate of Naturalization".html_safe,
+      previous: sanitize_html("<span #{@style_underline}>Primary documentation:</span> (Only One (1) is needed)"),
+      listings: [["U.S. Passport", ["<i>Note:</i> Expired passports are acceptable."]], "Certificate of Naturalization",
       "Certificate of Citizenship", "Consular report of Birth Abroad of U.S. Citizen", "A valid Driver’s License from a state that requires proof of citizenship and verification of Social Security
       Number prior to issuance of the license", ["A tribal document issued by a federally-recognized Indian Tribe, which must:",
       ["Identify the Tribe issuing the document;", "Identify the individual by name; and", "Confirm the individual’s enrollment in or affiliation with the Tribe.",
-        "<strong>Examples:</strong> Tribal enrollment card, Certificate of Degree of Indian Blood, Tribal Census document".html_safe]]]
+        sanitize_html("<strong>Examples:</strong> Tribal enrollment card, Certificate of Degree of Indian Blood, Tribal Census document")]]]
       } %>
 
     <%= render partial: 'notices/shared/unordered_list', locals: {
-      previous: "<span #{@style_underline}>Secondary documentation:</span> (Must Present One (1) of the following, along with ID)".html_safe,
+      previous: sanitize_html("<span #{@style_underline}>Secondary documentation:</span> (Must Present One (1) of the following, along with ID)"),
       listings: ["A U.S. birth certificate showing birth in one of the 50 states, DC, Guam, American Samoa, Swain’s Island, Puerto Rico, the
       Virgin Islands, or the Commonwealth of the Northern Mariana Islands.  If born in the Puerto Rico, the Virgin Islands, or Commonwealth
       of the Northern Mariana Islands prior to the time these areas became part of the U.S., the individual will satisfy the citizenship
@@ -403,14 +403,14 @@
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "You can send the necessary documents either online, through U.S. Postal mail, or in-person.",
-  listings: ["<strong>Online:</strong> Log into your account.  You can upload a scanned copy of the document.".html_safe,
-             "U.S. Postal Mail: <span style='margin-left: 10px;'>#{EnrollRegistry[:enroll_app].setting(:short_name).item}</span><br>
+  listings: [sanitize_html("<strong>Online:</strong> Log into your account.  You can upload a scanned copy of the document."),
+             sanitize_html("U.S. Postal Mail: <span style='margin-left: 10px;'>#{EnrollRegistry[:enroll_app].setting(:short_name).item}</span><br>
              <span style='margin-left:96px;'>Department of Human Services</span><br>
              <span style='margin-left:96px;'>P.O. Box 91560</span><br>
              <span style='margin-left:96px;'>Washington, DC 20090</span><br>
-             <i>Be sure to write your account number (<account number>) on your submission.</i>".html_safe,
-            "<strong>In-Person:</strong> Take the document(s) to any Economic Security Administration Office
-            (call the #{EnrollRegistry[:enroll_app].setting(:contact_center_name).item} at #{Settings.contact_center.phone_number} for locations).".html_safe]
+             <i>Be sure to write your account number (<account number>) on your submission.</i>"),
+            sanitize_html("<strong>In-Person:</strong> Take the document(s) to any Economic Security Administration Office
+            (call the #{EnrollRegistry[:enroll_app].setting(:contact_center_name).item} at #{Settings.contact_center.phone_number} for locations).")]
 } %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {

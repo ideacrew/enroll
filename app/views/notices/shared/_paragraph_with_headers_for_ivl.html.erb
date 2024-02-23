@@ -3,17 +3,17 @@
     <tbody>
       <% if heading.present? %>
       <tr>
-        <td style="font-size: 14px;"><%= heading.html_safe %></td>
+        <td style="font-size: 14px;"><%= sanitize_html(heading) %></td>
       </tr>
       <% end %>
       <% if sub_heading.present? %>
       <tr>
-        <td style="color:black;"><%= sub_heading.html_safe %></td>
+        <td style="color:black;"><%= sanitize_html(sub_heading) %></td>
       </tr>
       <% end %>
       <% contents.each do |para| %>
       <tr>
-        <td style="padding-top: 8px; padding-bottom: 6px" ><%= para.html_safe %></td>
+        <td style="padding-top: 8px; padding-bottom: 6px" ><%= sanitize_html(para) %></td>
       </tr>
       <% end %>
     </tbody>

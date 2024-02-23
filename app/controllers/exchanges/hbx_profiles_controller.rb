@@ -5,6 +5,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   include ::Pundit
   include ::SepAll
   include ::Config::AcaHelper
+  include HtmlScrubberUtil
 
   before_action :permitted_params_family_index_dt, only: [:family_index_dt]
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
@@ -980,7 +981,7 @@ def employer_poc
   end
 
   def benefit_application_error_messages(obj)
-    obj.errors.full_messages.collect { |error| "<li>#{error}</li>".html_safe }
+    obj.errors.full_messages.collect { |error| sanitize_html("<li>#{error}</li>") }
   end
 
   def new_ba_params
@@ -1050,7 +1051,7 @@ def employer_poc
       contact_center_tty_number: EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item.to_s
     }
     translation_interpolated_keys.merge!(insured_phone_number: insured_phone_number || '', insured_email: insured_email || '')
-    body = l10n(translation_key, translation_interpolated_keys).html_safe
+    body = sanitize_html(l10n(translation_key, translation_interpolated_keys))
     hbx_profile = HbxProfile.find_by_state_abbreviation(aca_state_abbreviation)
     message_params = {
       sender_id: hbx_profile.id,
@@ -1123,5 +1124,4 @@ def employer_poc
     @benefit_sponsorship = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.find(params[:benefit_sponsorship_id] || params[:id])
     raise "Unable to find benefit sponsorship" if @benefit_sponsorship.blank?
   end
-
 end

@@ -1,5 +1,6 @@
 module VerificationHelper
   include DocumentsVerificationStatus
+  include HtmlScrubberUtil
 
   def doc_status_label(doc)
     case doc.status
@@ -190,24 +191,24 @@ module VerificationHelper
 
   def show_v_type(status, admin = nil)
     if status == "curam"
-      admin ? "External Source".center(12) : "verified".capitalize.center(12).gsub(' ', '&nbsp;').html_safe
+      admin ? "External Source".center(12) : sanitize_html("verified".capitalize.center(12).gsub(' ', '&nbsp;'))
     elsif status
       status = "verified" if status == "valid"
       status = l10n('verification_type.validation_status') if status == 'rejected'
-      status.titleize.center(12).gsub(' ', '&nbsp;').html_safe
+      sanitize_html(status.titleize.center(12).gsub(' ', '&nbsp;'))
     end
   end
 
   def show_ridp_type(ridp_type, person)
     case ridp_type_status(ridp_type, person)
     when 'in review'
-      "&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;".html_safe
+      sanitize_html("&nbsp;&nbsp;&nbsp;In Review&nbsp;&nbsp;&nbsp;")
     when 'valid'
-      "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".html_safe
+      sanitize_html("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verified&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
     when 'rejected'
       l10n('verification_type.validation_status')
     else
-      "&nbsp;&nbsp;Outstanding&nbsp;&nbsp;".html_safe
+      sanitize_html("&nbsp;&nbsp;Outstanding&nbsp;&nbsp;")
     end
   end
 

@@ -127,10 +127,10 @@
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "<strong>Types of cost-sharing include:</strong>",
-  listings: ["<strong>The annual deductible</strong> - the amount you must pay for services before your plan begins to pay. Some plans help pay for certain services like routine doctor visits before you meet the deductible.".html_safe,
-             "<strong>Copayments</strong> – fixed dollar amounts you pay when you receive some services. (For example, $25 for a doctor visit).".html_safe,
-             "<strong>Coinsurance</strong> – a percentage dollar amount you pay when you receive some services. (For example, if your plan pays up to $1,000 for an emergency room visit, and coinsurance is 20 percent, you would pay $200).".html_safe,
-             "<strong>The annual out-of-pocket limit</strong> – the most you'll have to pay for covered services before your plan pays 100 percent. This applies to the deductible, copayments, and coinsurance.".html_safe]} %>
+  listings: [sanitize_html("<strong>The annual deductible</strong> - the amount you must pay for services before your plan begins to pay. Some plans help pay for certain services like routine doctor visits before you meet the deductible."),
+             sanitize_html("<strong>Copayments</strong> – fixed dollar amounts you pay when you receive some services. (For example, $25 for a doctor visit)."),
+             sanitize_html("<strong>Coinsurance</strong> – a percentage dollar amount you pay when you receive some services. (For example, if your plan pays up to $1,000 for an emergency room visit, and coinsurance is 20 percent, you would pay $200)."),
+             sanitize_html("<strong>The annual out-of-pocket limit</strong> – the most you'll have to pay for covered services before your plan pays 100 percent. This applies to the deductible, copayments, and coinsurance.")]} %>
 
 <% if notice.csr_enrollments.present? %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {

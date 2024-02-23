@@ -3,7 +3,7 @@
     <tbody>
       <tr class="fssizeuser" style="margin-top: <%= top_margin if defined? top_margin %>; margin-bottom: <%= bottom_margin if defined? bottom_margin %>;">
         <td>
-          <%= content.html_safe %>
+          <%= sanitize_html(content) %>
         </td>
       </tr>
     </tbody>
