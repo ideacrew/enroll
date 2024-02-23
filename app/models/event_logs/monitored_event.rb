@@ -33,26 +33,49 @@ module EventLogs
     def eligibility_details
       log = self.monitorable
       return {} unless json?(log&.payload)
-      parsed = JSON.parse(log.payload, symbolize_names: true)
+      payload = JSON.parse(log.payload, symbolize_names: true)
       details = JSON.parse(self.attributes.to_json, symbolize_names: true)
-      datetime = parsed.dig(:state_histories, -1, :effective_on)
-      effective_on = DateTime.parse(datetime.to_s)&.strftime("%m/%d/%Y") if datetime
-      subject = get_subject_name(log.subject_gid)
-      detail = log.event_name&.match(/[^.]+\z/)&.to_s&.titleize
-      build_details(parsed, details, effective_on, detail, subject)
+      build_details(payload, details)
     end
 
-    def build_details(parsed, details, effective_on, detail, subject)
-      details[:current_state] = parsed[:current_state] || ""
-      details[:subject] = subject || ""
-      details[:title] = parsed[:title]&.gsub(/osse/i, "Hc4cc")&.gsub("Aca ", "")&.gsub("Eligibility ", "")&.upcase || ""
-      details[:effective_on] = effective_on || ""
-      details[:detail] = detail || ""
+    def build_details(payload, details)
+      details[:current_state] = payload[:current_state] || ""
+      details[:subject] = get_subject_name(subject) || ""
+      details[:title] = payload[:title]&.gsub(/osse/i, "Hc4cc")&.gsub("Aca ", "")&.gsub("Eligibility ", "")&.upcase || ""
+      details[:effective_on] = effective_on(payload)
+      details[:detail] = event_name
+      attach_osse_application_period(details)
       details
     end
 
-    def get_subject_name(gid)
-      subject = GlobalID::Locator.locate(gid)
+    def subject
+      return @subject if defined?(@subject)
+      @subject = GlobalID::Locator.locate(self.monitorable.subject_gid)
+    end
+
+    def event_name
+      event = self.monitorable&.event_name
+      event&.match(/[^.]+\z/)&.to_s&.titleize || ""
+    end
+
+    def effective_on(payload)
+      datetime = payload.dig(:state_histories, -1, :effective_on)
+      DateTime.parse(datetime.to_s) if datetime
+    end
+
+    def attach_osse_application_period(details)
+      return unless event_category == :shop_osse_eligibility && subject.is_a?(BenefitSponsors::Organizations::GeneralOrganization)
+      return if details[:effective_on].blank?
+
+      benefit_sponsorship = subject.active_benefit_sponsorship
+      applications = benefit_sponsorship.benefit_applications.by_year(details[:effective_on].year).approved_and_terminated
+      application = applications.select(&:osse_eligible?).last
+
+      return unless application
+      details[:effective_on] = application.effective_period.min
+    end
+
+    def get_subject_name(subject)
       return subject.full_name if subject.instance_of?(Person)
       subject&.legal_name
     end
@@ -106,7 +129,7 @@ module EventLogs
             details[:subject],
             details[:title].to_s.upcase,
             details[:current_state]&.titleize,
-            details[:effective_on],
+            details[:effective_on]&.strftime("%m/%d/%Y"),
             details[:detail],
             performed_by,
             details[:event_time]

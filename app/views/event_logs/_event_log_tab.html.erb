@@ -154,7 +154,7 @@
               <% end %>
               <td class="eligibility"><%= event_log[1]&.upcase %></td>
               <td class="status"><%= details[0][:current_state]&.titleize %></td>
-              <td class="effective-on"><%= details[0][:effective_on] %></td>
+              <td class="effective-on"><%= details[0][:effective_on]&.strftime("%m/%d/%Y") %></td>
             </tr>
             <tr class="secondary-header" id="<%= index %>">
               <td colspan="2"></td>
