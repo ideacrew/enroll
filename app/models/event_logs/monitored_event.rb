@@ -44,6 +44,7 @@ module EventLogs
       details[:title] = payload[:title]&.gsub(/osse/i, "Hc4cc")&.gsub("Aca ", "")&.gsub("Eligibility ", "")&.upcase || ""
       details[:effective_on] = effective_on(payload)
       details[:detail] = event_name
+      details[:event_time] = format_time_display(details[:event_time])
       attach_osse_application_period(details)
       details
     end
@@ -136,6 +137,10 @@ module EventLogs
           ]
         end
       end
+    end
+
+    def format_time_display(timestamp)
+      timestamp.present? ? timestamp.in_time_zone('Eastern Time (US & Canada)') : ""
     end
   end
 end

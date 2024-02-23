@@ -416,8 +416,18 @@ Then(/(.*) should see all the family members names/) do |role|
   people.each do |person|
     expect(page).to have_content "#{person.last_name}"
     expect(page).to have_content "#{person.first_name}"
-
   end
+end
+
+And(/consumer reselects family member/) do
+  # mimic user behavior
+  find('#family_member_ids_0').click
+  find('#family_member_ids_0').click
+end
+
+Then(/consumer should be able to toggle tobacco use question/) do
+  find(IvlChooseCoverage.is_tobacco_user_yes).click
+  expect(find("#is_tobacco_user_Y_0", visible: false).checked?).to be_truthy
 end
 
 When(/(.*) (.*) the primary person/) do |role, checked|
