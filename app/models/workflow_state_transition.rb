@@ -3,6 +3,7 @@
 class WorkflowStateTransition
   include Mongoid::Document
   include Mongoid::Timestamps
+  include HtmlScrubberUtil
 
   embedded_in :transitional, polymorphic: true
 
@@ -24,9 +25,9 @@ class WorkflowStateTransition
 
   def to_html
     if from_state.blank?
-      "<div>#{transition_at.strftime("%m/%d/%Y %H:%M UTC")} - Application received.</div>".html_safe
+      sanitize_html("<div>#{transition_at.strftime('%m/%d/%Y %H:%M UTC')} - Application received.</div>")
     else
-      "<div>#{transition_at.strftime("%m/%d/%Y %H:%M UTC")} - State changed from <b>#{from_state.camelcase}</b> to <b>#{to_state.camelcase}</b>.</div>".html_safe
+      sanitize_html("<div>#{transition_at.strftime('%m/%d/%Y %H:%M UTC')} - State changed from <b>#{from_state.camelcase}</b> to <b>#{to_state.camelcase}</b>.</div>")
     end
   end
 

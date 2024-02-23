@@ -117,7 +117,7 @@ module Operations
       end
 
       subject do
-        described_class.new.call({person_hbx_id: person.hbx_id, response: response.to_h})
+        described_class.new.call({person_hbx_id: person.hbx_id, metadata: {headers: {}}, response: response.to_h})
       end
 
       it "should pass" do
@@ -152,10 +152,10 @@ module Operations
       end
 
       before do
-        allow(EnrollRegistry[:ssa_h3].setting(:use_transmittable)).to receive(:item).and_return("true")
+        allow(EnrollRegistry[:ssa_h3].setting(:use_transmittable)).to receive(:item).and_return(true)
         person.consumer_role.update!(aasm_state: "ssa_pending")
         person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, :identifier => 'identifier', :verification_type => 'Immigration type')
-        @result = described_class.new.call({person_hbx_id: person.hbx_id, response: response.to_h})
+        @result = described_class.new.call({person_hbx_id: person.hbx_id, metadata: {headers: {}}, response: response.to_h})
       end
 
       it "should pass" do

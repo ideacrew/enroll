@@ -215,7 +215,12 @@
                 <%= l10n("cancel") %>
               </a>
           <% else %>
-              <%= link_to "<span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span> #{l10n("cancel")}".html_safe, insured_family_member_path(@applicant), :remote => true %>
+              <%= link_to(
+                    insured_family_member_path(@applicant),
+                    :remote => true
+                  ) do %>
+                <span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span><%= l10n("cancel") %>
+              <% end %>
           <% end %>
 
           <%= f.button(id: 'confirm-member', class: "btn btn-primary btn-br pull-right mz hidden dependent-disable", onclick: "$('#btn-continue').removeClass('disabled');") do %>

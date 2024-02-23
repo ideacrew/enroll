@@ -91,6 +91,7 @@ RSpec.describe Insured::ConsumerRolesController do
         allow(EnrollRegistry[:financial_assistance].feature).to receive(:is_enabled).and_return(true)
         allow(EnrollRegistry[:validate_quadrant].feature).to receive(:is_enabled).and_return(true)
         # allow(EnrollRegistry).to receive(:feature_enabled?).with(:location_residency_verification_type).and_return(true)
+        allow(controller).to receive(:authorize).and_return(true)
         sign_in user
       end
 

@@ -14,6 +14,8 @@
           <br></li>
       </ul>
       <br class="clear"/>
-      <%= sanitize link_to "<i aria-hidden='true' class='fa fa-caret-left'></i>&nbsp;Back</a>".html_safe, :back, class: 'btn btn-default' %>
+      <%= link_to(:back, class: 'btn btn-default') do %>
+        <i aria-hidden='true' class='fa fa-caret-left'></i>&nbsp;Back</a>
+      <% end %>
     </div>
 <% end %>

@@ -35,8 +35,8 @@ module EventLogs
       return {} unless json?(log&.payload)
       parsed = JSON.parse(log.payload, symbolize_names: true)
       details = JSON.parse(self.attributes.to_json, symbolize_names: true)
-      datetime = parsed.dig(:state_histories, 0, :effective_on)
-      effective_on = DateTime.parse(datetime.to_s)&.strftime("%d/%m/%Y") if datetime
+      datetime = parsed.dig(:state_histories, -1, :effective_on)
+      effective_on = DateTime.parse(datetime.to_s)&.strftime("%m/%d/%Y") if datetime
       subject = get_subject_name(log.subject_gid)
       detail = log.event_name&.match(/[^.]+\z/)&.to_s&.titleize
       build_details(parsed, details, effective_on, detail, subject)
@@ -85,5 +85,34 @@ module EventLogs
       false
     end
 
+    def self.to_csv(event_logs)
+      CSV.generate(headers: true) do |csv|
+        csv << [
+          "Subject",
+          "Eligibility",
+          "Eligibility Status",
+          "Effective On",
+          "Event Details",
+          "Performed By",
+          "Time"
+        ]
+
+        event_logs.each do |event_log|
+          details = event_log.eligibility_details
+          performed_by =
+            "#{details[:account_username]} (#{details[:account_hbx_id]})"
+
+          csv << [
+            details[:subject],
+            details[:title].to_s.upcase,
+            details[:current_state]&.titleize,
+            details[:effective_on],
+            details[:detail],
+            performed_by,
+            details[:event_time]
+          ]
+        end
+      end
+    end
   end
 end

@@ -8,6 +8,7 @@ module BenefitSponsors
         include BenefitSponsors::RegistrationHelper
         include ActiveModel::Validations
         include BenefitSponsors::Forms::NpnField
+        include HtmlScrubberUtil
 
         attr_accessor :profile_id, :profile_type, :organization, :profile, :current_user, :claimed, :pending, :first_name, :last_name, :email, :dob, :npn, :fein, :legal_name, :person, :market_kind, :area_code, :number, :extension, :handler
 
@@ -574,14 +575,14 @@ module BenefitSponsors
           if is_broker_profile? && Person.where("broker_role.npn" => npn).any?
             errors.add(
               :organization,
-              l10n(
+              sanitize_html(l10n(
                 "broker_agencies.profiles.npn_taken_error",
                 main_web_address: EnrollRegistry[:enroll_app].setting(:main_web_address).item,
                 site_short_name: EnrollRegistry[:enroll_app].setting(:short_name).item,
                 website_url: EnrollRegistry[:enroll_app].setting(:website_url).item,
                 contact_center_short_number: EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item,
                 contact_center_tty_number: EnrollRegistry[:enroll_app].settings(:contact_center_tty_number).item
-              ).html_safe
+              ))
             )
             return true
           end
