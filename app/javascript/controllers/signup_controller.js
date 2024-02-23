@@ -62,7 +62,8 @@ validateInput() {
   if (this.passwordFieldTarget.value.length > 0 && document.querySelector('.pwHelper')) {
     const value = this.passwordFieldTarget.value;
     const minLength = document.getElementById("user_password").minLength;
-    this.validateLength(value, minLength);
+    this.checkMinLength(value, minLength);
+    this.checkMaxLength(value);
     this.validateNumber(value);
     this.validateSpecialCharacters(value);
     this.validateUpCase(value);
@@ -76,24 +77,35 @@ validateInput() {
   }
 }
 
-resetIcons() {
+resetMinLengthIcon() {
   if (document.querySelector('.pwHelper')) {
     document.querySelector('.length').classList.remove('fa-check');
     document.getElementById('length').style.color = '';
     document.querySelector('.length').classList.add('fa-times');
-    document.querySelector('.longer').classList.remove('fa-check');
-    document.querySelector('.longer').classList.add('fa-times');
-    document.getElementById('longer').style.color = '';
   }
-
 }
 
-validateLength(value, minLength) {
-  if (value.length >= minLength && value.length < 20) {
+resetMaxLengthIcon() {
+  if (document.querySelector('.pwHelper')) {
+    document.querySelector('.longer').classList.remove('fa-check');
+    document.getElementById('longer').style.color = '';
+    document.querySelector('.longer').classList.add('fa-times');
+  }
+}
+
+checkMinLength(value, minLength) {
+  if (value.length >= minLength) {
     document.querySelector('.length').classList.add('fa-check');
+  } else if (value.length < minLength && this.usernameFieldTarget.value.length > 0) {
+    this.resetMinLengthIcon();
+  }
+}
+
+checkMaxLength(value, minLength) {
+  if ((value.length > 0 && value.length <= 20)) {
     document.querySelector('.longer').classList.add('fa-check');
   } else if (value.length < minLength && this.usernameFieldTarget.value.length > 0) {
-    this.resetIcons();
+    this.resetMaxLengthIcon();
   }
 }
 
