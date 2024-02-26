@@ -183,6 +183,8 @@ RSpec.describe EventLogs::MonitoredEvent, type: :model, dbclean: :around_each do
     end
 
     before do
+      allow(::EnrollRegistry).to receive(:feature?).and_return(true)
+      allow(::EnrollRegistry).to receive(:feature_enabled?).and_return(true)
       TimeKeeper.set_date_of_record_unprotected!(beginning_of_year + 4.months)
     end
 
@@ -236,6 +238,7 @@ RSpec.describe EventLogs::MonitoredEvent, type: :model, dbclean: :around_each do
       end
 
       let(:monitored_event) { event_log.monitored_event }
+
       let(:event_log) do
         Operations::EventLogs::Store
           .new
@@ -244,6 +247,12 @@ RSpec.describe EventLogs::MonitoredEvent, type: :model, dbclean: :around_each do
       end
 
       context "when application osse eligible" do
+        before do
+          allow_any_instance_of(
+            BenefitSponsors::BenefitApplications::BenefitApplication
+          ).to receive(:osse_eligible?).and_return(true)
+        end
+
         subject { monitored_event.eligibility_details }
 
         it "should return osse eligibile application effective date" do
