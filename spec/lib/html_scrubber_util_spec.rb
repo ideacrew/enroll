@@ -40,4 +40,13 @@ RSpec.describe HtmlScrubberUtil do
       expect(result).to include("style")
     end
   end
+
+  context "given a title tag" do
+    let(:source_html) { "<title></title>" }
+    let(:result) { TestingScrubber.sanitize_html(source_html) }
+
+    it "does not scrub the title" do
+      expect(result).to include("title")
+    end
+  end
 end
