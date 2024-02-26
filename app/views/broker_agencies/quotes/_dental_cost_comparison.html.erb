@@ -8,7 +8,7 @@
   <ul>
     <% @qbg.quote_dental_relationship_benefits.each do |qrb|
       unless @employee_relationship_map[qrb.relationship].blank? %>
-      <ul style="padding-left: 18px;"><li><%= @employee_relationship_map[qrb.relationship] %> - <%= qrb.premium_pct.to_i %>%</li></ul>
+      <ul class="inline-padding-left-18px"><li><%= @employee_relationship_map[qrb.relationship] %> - <%= qrb.premium_pct.to_i %>%</li></ul>
     <%
   end
       end %>
@@ -41,7 +41,7 @@
           carrier_high = @roster_elected_plan_bounds[:carrier_high][abbrev]
        %>
        <tr class='publish' id='publish_<%=@quote_results[k][:plan_id]%>'>
-         <td class="quote_detail_results" style='white-space:nowrap'><%= k %></td>
+         <td class="quote_detail_results inline-white-space-nowrap"><%= k %></td>
          <td class="quote_detail_results text-center dental_publish">
             <div class='btn' id="single_dental_plan_<%= i%>">
              $<%= cost %>
@@ -71,7 +71,7 @@
       </td>
     <% @quote_results.each do |qr| %>
       <td colspan="1" class="quote_detail_plan_header">
-        <div style='width: 300px'>
+        <div class='inline-width-300px'>
         <b><%= qr[0] %></b><br>
         <sm><%= l10n("employee")%>:
         $<%= qr[1][:total_employee_cost].ceil %>,
@@ -85,13 +85,13 @@
     <% end %>
     </tr>
 
-    <tr style="font-weight: bolder; ">
+    <tr class="inline-font-weight-bolder">
       <td class="quote_detail_results_header"><%= l10n("name")%></td>
       <td class="quote_detail_results_header"><%= l10n("relationship")%> (%)</td>
       <td class="quote_detail_results_header"><%= l10n("age")%></td>
       <% @quote_results.keys.each do |de| %>
 
-        <td class="quote_detail_results_header" style='padding-left: 100px'><%= l10n("employer_cost")%></td>
+        <td class="quote_detail_results_header inline-padding-left-100px"><%= l10n("employer_cost")%></td>
       <% end %>
 
     </tr>
@@ -111,7 +111,7 @@
           <%= qr[:age] %>
         </td>
         <% @quote_results.keys.each do |de| %>
-          <td class="quote_detail_results"  style='padding-left: 100px'>
+          <td class="quote_detail_results inline-padding-left-100px">
             <b><%= @quote_results[de][:detail].flatten[index][:employer_contribution].round(2) %></b></td>
         <% end %>
       </tr>

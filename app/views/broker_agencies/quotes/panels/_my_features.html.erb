@@ -9,7 +9,7 @@
     <a role="button" data-toggle="collapse" data-parent="#accordion" href="#feature-mgmt" aria-expanded="true" aria-controls="feature-mgmt">
     <b><%= l10n("broker_agencies.quotes.panels.health_features_and_cost_criteria")%></b>
     <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span></a>
-    <span style='margin-left: 50px; font-size: 120%;'  id='show_plan_criteria_count'>Plan count</span>
+    <span class="inline-margin-left-50px inline-font-size-120-percent"  id='show_plan_criteria_count'>Plan count</span>
     <label class='btn btn-normal hide' id='reset_criteria'><%= l10n("reset_criteria")%></label>
   </div>
   <div id="feature-mgmt" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="">
@@ -35,7 +35,7 @@
         <div class="container-fluid">
           <div>
             <h5><%= l10n("showing")%> <strong id="x-of-plans"><%= @health_plans.count %></strong> of <strong><%= @health_plans.count %></strong>  <%= l10n("  plans_based_on_your_selection_criteria")%></h5>
-            <div class="btn-group plan_buttons health_plan_buttons" data-toggle="buttons" style='max-height: 300px; overflow-y: scroll' id="quote-plan-list">
+            <div class="btn-group plan_buttons health_plan_buttons inline-max-height-300px inline-overflow-y-scroll" data-toggle="buttons" id="quote-plan-list">
               <% @health_plans.each_with_index do |p,index| %>
                 <label class="btn health_plan_buttons <%= "active" if params['plans'].try(:include?, p.id.to_s) %>" >
                 <input name="plans[]" <%= "checked" if params['plans'].try(:include?, p.id.to_s) %> type="checkbox" id="quote_health_plan_list" autocomplete="off" value="<%= p.id %>">

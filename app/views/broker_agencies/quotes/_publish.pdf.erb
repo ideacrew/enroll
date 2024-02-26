@@ -207,7 +207,7 @@
                   </td>
                   <% quote_health_results.each do |qr| %>
                     <td colspan="1" class="thead-default">
-                      <div style='width: 300px'>
+                      <div class='inline-width-300px'>
                         <b><%= qr[0] %></b><br>
                         <sm>Employee:
                         $<%= qr[1][:total_employee_cost].ceil %>,
@@ -221,12 +221,12 @@
                   <% end %>
                 </tr>
 
-                <tr style="font-weight: bolder; ">
+                <tr class="inline-font-weight-bolder ">
                   <td class="thead-default">Name</td>
                   <td class="thead-default">Relationship Contribution</td>
                   <td class="thead-default">Age</td>
                   <% quote_health_results.keys.each do |de| %>
-                    <td class="thead-default" style='padding-left: 100px'>Employee Cost</td>
+                    <td class="thead-default inline-padding-left-100px">Employee Cost</td>
                   <% end %>
                 </tr>
                 <% quote_health_results.first[1][:detail].flatten.each_with_index do |qr, index| %>
@@ -241,7 +241,7 @@
                       <%= qr[:age] %>
                     </td>
                     <% quote_health_results.keys.each do |de| %>
-                      <td class="quote_detail_results"  style='padding-left: 100px'>
+                      <td class="quote_detail_results inline-padding-left-100px">
                       <b><%= quote_health_results[de][:detail].flatten[index][:employee_cost].round(2) %></b>
                       </td>
                     <% end %>
@@ -258,7 +258,7 @@
                   </td>
                   <% quote_dental_results.each do |qr| %>
                     <td colspan="1" class="thead-default">
-                      <div style='width: 300px'>
+                      <div class='inline-width-300px'>
                         <b><%= qr[0] %></b><br>
                         <sm>Employee:
                         $<%= qr[1][:total_employee_cost].ceil %>,
@@ -271,12 +271,12 @@
                     </td>
                   <% end %>
                 </tr>
-                <tr style="font-weight: bolder; ">
+                <tr class="inline-font-weight-bolder">
                   <td class="thead-default">Name</td>
                   <td class="thead-default">Relationship (%)</td>
                   <td class="thead-default">Age</td>
                   <% quote_dental_results.keys.each do |de| %>
-                    <td class="thead-default" style='padding-left: 100px'>Employee Cost</td>
+                    <td class="thead-default inline-padding-left-100px">Employee Cost</td>
                   <% end %>
                 </tr>
                 <% quote_dental_results.first[1][:detail].flatten.each_with_index do |qr, index| %>
@@ -291,7 +291,7 @@
                       <%= qr[:age] %>
                     </td>
                     <% quote_dental_results.keys.each do |de| %>
-                      <td class="quote_detail_results"  style='padding-left: 100px'>
+                      <td class="quote_detail_results inline-padding-left-100px">
                       <b><%= quote_dental_results[de][:detail].flatten[index][:employee_cost].round(2) %></b></td>
                     <% end %>
                   </tr>

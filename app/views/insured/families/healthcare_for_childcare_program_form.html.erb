@@ -14,7 +14,7 @@
     <%= hidden_field_tag 'eligibilities[person_id]', @service.person.id %>
     <%= submit_tag l10n('save_changes'), class: 'btn btn-primary active pull-left col-12', style: 'background-color: #007bc4'%></br>
     <div class='table-responsive col-12 mt-3' style="padding-top: 10px">
-      <table style='width: 70%; border-collapse: collapse; border: 0px solid #d5d5d5'>
+      <table class="inline-border-0-solid-d5d5d5 inline-border-collapse" style='width: 70%;'>
         <thead style='height: 40px;'>
           <th style='width: 20%; height: 40px; padding: 10px'>Plan Year</th>
           <th style='width: 20%'>Active</th>
@@ -23,7 +23,7 @@
         </thead>
         <% individual_osse_eligibility_years_for_display.each do |year| %>
           <% previous_year = TimeKeeper.date_of_record.year - 1 %>
-          <tr style='border: 0px solid #d5d5d5; height: 50px; '>
+          <tr class="inline-border-0-solid-d5d5d5" style='height: 50px; '>
             <td style='padding: 20px'><strong><%= year %></strong></td>
             <td><%= radio_button_tag "eligibilities[osse][#{year}]", "true", @osse_status_by_year[year][:is_eligible], class: "radio-button",  disabled: !pundit_allow(HbxProfile, :can_edit_osse_eligibility?) || (year < previous_year) %></td>
             <td><%= radio_button_tag "eligibilities[osse][#{year}]", "false", !@osse_status_by_year[year][:is_eligible], class: "radio-button",  disabled: !pundit_allow(HbxProfile, :can_edit_osse_eligibility?) || (year < previous_year) %></td>

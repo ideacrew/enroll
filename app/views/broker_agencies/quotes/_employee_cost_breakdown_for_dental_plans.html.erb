@@ -6,11 +6,11 @@
         </td>
         <% quote_results.each do |qr| %>
           <td colspan="1" class="quote_detail_plan_header">
-            <div style='width: 300px'>
+            <div class="inline-width-300px">
               <b><%= qr[0] %></b><br>
-              <sm>Employee: 
+              <sm>Employee:
               $<%= qr[1][:total_employee_cost].ceil %>,
-              Employer: 
+              Employer:
 
               <span >$<%= qr[1][:total_employer_cost].ceil %></span>
               <br>
@@ -19,12 +19,12 @@
           </td>
         <% end %>
       </tr>
-      <tr style="font-weight: bolder; ">
+      <tr class="inline-font-weight-bolder">
         <td class="quote_detail_results_header">Name</td>
         <td class="quote_detail_results_header">Relationship (%)</td>
         <td class="quote_detail_results_header">Age</td>
         <% quote_results.keys.each do |de| %>
-          <td class="quote_detail_results_header" style='padding-left: 100px'>Employee Cost</td>
+          <td class="quote_detail_results_header inline-padding-left-100px">Employee Cost</td>
         <% end %>
       </tr>
       <% quote_results.first[1][:detail].flatten.each_with_index do |qr, index| %>
@@ -39,7 +39,7 @@
             <%= qr[:age] %>
           </td>
           <% quote_results.keys.each do |de| %>
-            <td class="quote_detail_results"  style='padding-left: 100px'>
+            <td class="quote_detail_results inline-padding-left-100px">
             <b><%= quote_results[de][:detail].flatten[index][:employee_cost].round(2) %></b></td>
           <% end %>
         </tr>

@@ -9,7 +9,7 @@
     <% @childcare_forms.each do |person, form| %>
       <div class="person-form">
         <h4><strong><%= person.full_name.titleize %></strong></h4>
-        <div class="row no-buffer vertically-aligned-row form-row" style="width: 100%; border: 1px solid #ddd; border-top: none; margin-top: 15px; padding: 3px; background-color: #fff;">
+        <div class="row no-buffer vertically-aligned-row form-row inline-border-1-ddd inline-border-top-0" style="width: 100%; margin-top: 15px; padding: 3px; background-color: #fff;">
           <div class="col-md-9">
             <%= l10n('hc4cc_subsidy_with_pipe') %><%= current_osse_status_for_role(form.role) %>
           </div>
