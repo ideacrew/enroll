@@ -54,7 +54,7 @@
 - elsif step == 6
   = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind), :class => 'btn btn-lg btn-primary  btn-block disabled', id: 'btn-continue', :method => :post, :disabled => !@enrollable
 - elsif step == 7
-  = link_to 'GO TO MY ACCOUNT', family_account_path, class: 'btn  btn-primary', id: 'btn-continue', style: 'width: 100%;'
+  = link_to 'GO TO MY ACCOUNT', family_account_path, class: 'btn btn-primary inline-width-100-percent', id: 'btn-continue'
 - else
   %button.btn.btn-lg.btn-primary.btn-block#btn-continue{type: 'submit'}
     CONTINUE

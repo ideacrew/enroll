@@ -11,7 +11,7 @@
   </div>
 
   <%= form_tag(profiles_employers_employer_profile_update_osse_eligibilities_path(employer_profile_id: @employer_profile.id), method: "post") do %>
-    <%= submit_tag l10n('save_changes'), class: 'btn btn-primary active pull-left col-12', style: 'background-color: #007bc4'%></br>
+    <%= submit_tag l10n('save_changes'), class: 'btn btn-primary active pull-left col-12 inline-bg-color-primary-blue' %></br>
     <div class='table-responsive col-12 mt-3' style="padding-top: 10px">
       <table style='width: 70%; border-collapse: collapse; border: 0px solid #d5d5d5'>
         <thead style='height: 40px;'>
@@ -33,6 +33,6 @@
         <% end %>
       </table>
     </div></br>
-    <%= submit_tag l10n('save_changes'), class: 'btn btn-primary active pull-left col-12', style: 'background-color: #007bc4' %>
+    <%= submit_tag l10n('save_changes'), class: 'btn btn-primary active pull-left col-12 inline-bg-color-primary-blue' %>
   <% end %>
 </div>

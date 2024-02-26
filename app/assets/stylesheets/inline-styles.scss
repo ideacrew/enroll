@@ -1,4 +1,16 @@
+@import "variables";
+
+// align-self
+
+.inline-align-self-flex-end {
+  align-self: flex-end;
+}
+
 // background color //
+
+.inline-bg-color-primary-blue {
+  background-color: var(--theme-primary-blue, #007bc4) !important;
+}
 
 // borders
 
@@ -113,6 +125,10 @@
 }
 
 // floats
+
+.inline-float-left {
+  float: left !important;
+}
 
 .inline-float-right {
   float: right !important;
@@ -354,7 +370,7 @@
 }
 
 .inline-margin-4px-0 {
-  margin: 5px 0 !important;
+  margin: 4px 0 !important;
 }
 
 .inline-margin-5px-0 {
@@ -791,6 +807,10 @@
   text-align: center !important;
 }
 
+.inline-text-align-right {
+  text-align: right !important;
+}
+
 // top
 
 .inline-top-20px {
@@ -831,6 +851,10 @@
 
 .inline-style-width-15px {
   width: 15px !important;
+}
+
+.inline-style-width-45px {
+  width: 45px !important;
 }
 
 .inline-style-width-50px {
@@ -927,6 +951,7 @@
 .inline-white-space-nowrap {
   white-space: nowrap  !important;
 }
+
 
 
 // combos

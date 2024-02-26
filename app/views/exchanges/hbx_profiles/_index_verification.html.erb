@@ -10,12 +10,7 @@
     margin-left: 75em;
   }
 </style>
-<!-- <div class="container">
-  <div id="upload">
-    <%#= link_to "<i class='fa fa-cloud-upload' aria-hidden='true'></i> Upload".html_safe, '/employers/employer_attestations/new', remote: 'true', class: "btn btn-default ",style: "float: right" %>
-  </div>
-</div> -->
-<%#= render_datatable(@datatable) %>
+
 <% @documents.each do |doc| %>
   <%# if doc.employer_profile && doc.employer_profile.employer_attestation && doc.employer_profile.employer_attestation.has_documents? %>
  <% @document = doc.employer_profile.employer_attestation.employer_attestation_documents.last %>

@@ -127,7 +127,7 @@
               <div class="row no-buffer vertically-aligned-row" style="width: 100%; border: 1px solid #ddd; border-top: none; margin-top: 8px; padding: 8px; background-color: #fff;">
                 <div class="col-md-9"><%= l10n('hc4cc_subsidy_with_pipe') %><%= employer_current_year_osse_status %></div>
                 <div class="col-md-3">
-                  <%= link_to l10n('select_eligibility_years'), profiles_employers_employer_profile_osse_eligibilities_path(employer_profile_id: @agency.profile_id), id: "check_osse_eligibilities", class: 'btn btn-primary active', style: 'background-color: #007bc4' %>
+                  <%= link_to l10n('select_eligibility_years'), profiles_employers_employer_profile_osse_eligibilities_path(employer_profile_id: @agency.profile_id), id: "check_osse_eligibilities", class: 'btn btn-primary active inline-bg-color-primary-blue' %>
                 </div>
               </div>
             </div>
@@ -143,7 +143,7 @@
                   <%= office_fields.hidden_field '_destroy', value: false, id: 'delete_location' %>
                   <%= render partial: './ui-components/v1/forms/office_locations/old_style_address', locals: {office_fields: office_fields, profile_type: f_profile.object.profile_type}  %>
                 </div>
-              <% end %> 
+              <% end %>
             </div>
             <a class="btn btn-default pull-left col-12" data-action="click->office-locations#addLocation">Add Office Location</a>
           </div>
