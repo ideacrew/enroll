@@ -100,6 +100,29 @@
         <h2><%= l10n("Event") %> <%= l10n("Details") %></h2>
         <div class="filter-row">
           <div class="filter">
+            <label for="<%= l10n("status").downcase %>"><%= l10n("event_log.action_taken") %></label>
+            <dl class="dropdown">
+            <dt>
+              <div class="fake-select" style="display: flex;align-items: center;">
+                <span class="fake-select-label"><%= l10n("All") %></span>
+                <p class="multiSel"></p>
+              </div>
+            </dt>
+            <dd>
+              <div class="mutliSelect">
+                <ul>
+                  <li><label><input type="checkbox" name="action_taken" value="all" checked/>All</label></li>
+                  <% if @event_logs %>
+                    <% @event_logs.map{|event_log| event_log[:detail] }.uniq.each do |category| %>
+                      <li><label><input type="checkbox" name="action_taken" value="<%= category %>" checked/><%= category %></label></li>
+                    <% end %>
+                  <% end %>
+                </ul>
+              </div>
+            </dd>
+            </dl>
+          </div>
+          <div class="filter">
             <label for="user-id"><%= l10n("event_log.hbx_id_email") %></label>
             <input type="text" id="user-id">
           </div>
@@ -165,7 +188,7 @@
             <% details.each do |detail| %>
             <tr class="detail-row" data-event-id="<%= detail[:_id] %>" id="<%= index %>">
               <td colspan="2"></td>
-              <td><%= detail[:detail] %></td>
+              <td class="action-taken"><%= detail[:detail] %></td>
               <td id="<%= detail[:account_hbx_id] %>" class="user_id"><%= detail[:account_username] %></td>
               <td class="event-time"><%= detail[:event_time] %></td>
             </tr>
@@ -347,6 +370,8 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         eligibilities = [],
         statuses = [],
         visible_rows = [];
+        actions_taken = [];
+
     $('input[name="subject"]:checked').each(function( index ) {
       subjects.push($(this).val().toUpperCase())
     });
@@ -355,6 +380,9 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
     });
     $('input[name="status"]:checked').each(function( index ) {
       statuses.push($(this).val().toUpperCase())
+    });
+    $('input[name="action_taken"]:checked').each(function( index ) {
+      actions_taken.push($(this).val().toUpperCase())
     });
 
     $('#event-log-table tbody tr').each(function( index ) {
@@ -433,6 +461,24 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
           action_dates.push(new Date($(this).text()).getTime());
         }
       });
+
+      // eligibility status filter
+      if (!actions_taken.includes("ALL")){
+        var row_index = visible_rows.indexOf(row);
+        var ok_rows = 0;
+
+        $.each( detail_rows, function(){
+          var action_taken = $(this).find('td.action-taken').text()
+          if (actions_taken.includes(action_taken.toUpperCase())) {
+            ok_rows += 1
+          } else {
+            $(this).hide().addClass("hidden-by-filters");
+          }
+        });
+        if (ok_rows === 0 && row_index !== -1) {
+          visible_rows.splice( row_index, 1 );
+        }
+      }
 
       if ($('#user-id').val()) {
         var row_index = visible_rows.indexOf(row);
