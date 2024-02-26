@@ -182,8 +182,12 @@ RSpec.describe EventLogs::MonitoredEvent, type: :model, dbclean: :around_each do
       end
     end
 
-    before(:each) do
+    before do
       TimeKeeper.set_date_of_record_unprotected!(beginning_of_year + 4.months)
+    end
+
+    after do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
     end
 
     context ".eligibility_details" do
@@ -232,8 +236,7 @@ RSpec.describe EventLogs::MonitoredEvent, type: :model, dbclean: :around_each do
       end
 
       let(:monitored_event) { event_log.monitored_event }
-
-      let!(:event_log) do
+      let(:event_log) do
         Operations::EventLogs::Store
           .new
           .call(payload: payload, headers: headers)
@@ -241,12 +244,6 @@ RSpec.describe EventLogs::MonitoredEvent, type: :model, dbclean: :around_each do
       end
 
       context "when application osse eligible" do
-        before(:each) do
-          allow(monitored_event).to receive(
-            :osse_eligibile_application_for
-          ).with(TimeKeeper.date_of_record.year).and_return(initial_application)
-        end
-
         subject { monitored_event.eligibility_details }
 
         it "should return osse eligibile application effective date" do
@@ -263,40 +260,40 @@ RSpec.describe EventLogs::MonitoredEvent, type: :model, dbclean: :around_each do
           expect(subject[:title]).to eq "SHOP HC4CC 2024"
           expect(subject[:detail]).to eq "Eligibility Created"
           expect(subject[:event_time].to_date).to eq event_log
-               .event_time
-               .in_time_zone("Eastern Time (US & Canada)")
-               .to_date
+            .event_time
+            .in_time_zone("Eastern Time (US & Canada)")
+            .to_date
         end
       end
 
       context "when application not osse eligible" do
-        before(:each) do
-          allow(monitored_event).to receive(
-            :osse_eligibile_application_for
-          ).with(TimeKeeper.date_of_record.year).and_return(nil)
+        before do
+          allow_any_instance_of(
+            BenefitSponsors::BenefitApplications::BenefitApplication
+          ).to receive(:osse_eligible?).and_return(false)
         end
 
         let(:eligibility_effective_date) do
           payload.dig(:state_histories, -1, :effective_on)
         end
 
+        subject { monitored_event.eligibility_details }
+
         it "should return eligibility effective date" do
-          details = monitored_event.eligibility_details
-          expect(details[:effective_on]).to eq eligibility_effective_date
+          expect(subject[:effective_on]).to eq eligibility_effective_date
         end
 
         it "should return other attributes" do
-          details = monitored_event.eligibility_details
-          expect(details[:current_state]).to eq payload[:current_state].to_s
+          expect(subject[:current_state]).to eq payload[:current_state].to_s
           expect(
-            details[:subject]
+            subject[:subject]
           ).to eq benefit_sponsorship.organization.legal_name
-          expect(details[:title]).to eq "SHOP HC4CC 2024"
-          expect(details[:detail]).to eq "Eligibility Created"
-          expect(details[:event_time].to_date).to eq event_log
-               .event_time
-               .in_time_zone("Eastern Time (US & Canada)")
-               .to_date
+          expect(subject[:title]).to eq "SHOP HC4CC 2024"
+          expect(subject[:detail]).to eq "Eligibility Created"
+          expect(subject[:event_time].to_date).to eq event_log
+            .event_time
+            .in_time_zone("Eastern Time (US & Canada)")
+            .to_date
         end
       end
     end
