@@ -603,7 +603,7 @@ jobs:
       - name: Run tests
         env:
           COVERAGE: 'true'
-        run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }} --tags 'not @accessibility'
+        run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
       - name: Nightly Accessibility Cucumber
         if: github.event.schedule == '0 5 * * *'
         run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }} --tags @accessibility
