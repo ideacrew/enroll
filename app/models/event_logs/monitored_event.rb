@@ -68,12 +68,15 @@ module EventLogs
       return unless event_category == :shop_osse_eligibility && subject.is_a?(BenefitSponsors::Organizations::GeneralOrganization)
       return if details[:effective_on].blank?
 
-      benefit_sponsorship = subject.active_benefit_sponsorship
-      applications = benefit_sponsorship.benefit_applications.by_year(details[:effective_on].year).approved_and_terminated
-      application = applications.select(&:osse_eligible?).last
-
+      application = osse_eligibile_application_for(details[:effective_on].year)
       return unless application
       details[:effective_on] = application.effective_period.min
+    end
+
+    def osse_eligibile_application_for(year)
+      benefit_sponsorship = subject.active_benefit_sponsorship
+      applications = benefit_sponsorship.benefit_applications.by_year(year).approved_and_terminated
+      applications.select(&:osse_eligible?).last
     end
 
     def get_subject_name(subject)
