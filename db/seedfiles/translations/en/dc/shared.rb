@@ -76,6 +76,7 @@ SHARED_TRANSLATIONS = {
     "en.event_log.outcome" => "Outcome",
     "en.event_log.performed_by" => "Performed By",
     "en.event_log.time" => "Time",
+    "en.event_log.action_taken" => "Action Taken",
     "en.event_log.hbx_id_email" => "Account (HBX ID / Email)",
     "en.event_log.start_date" => "Action Date Range",
     "en.event_log.end_date" => "End Date",
