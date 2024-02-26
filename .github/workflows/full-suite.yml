@@ -597,16 +597,16 @@ jobs:
           key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
-      - name: Nightly Accessibility Cucumber
-        if: github.event.schedule == '0 5 * * *'
-        run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }} --tags @accessibility
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
       - name: Run tests
         env:
           COVERAGE: 'true'
-        run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
+        run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }} --tags 'not @accessibility'
+      - name: Nightly Accessibility Cucumber
+        if: github.event.schedule == '0 5 * * *'
+        run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }} --tags @accessibility
       - name: copy coverage report
         run: |
           cp coverage/coverage.xml ${{ github.workspace }}/coverage/cukes-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
