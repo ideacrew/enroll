@@ -5,11 +5,15 @@ class Insured::VerificationDocumentsController < ApplicationController
 
   before_action :get_family
   before_action :updateable?, :find_type, :find_docs_owner, only: [:upload]
-  before_action :validate_file_type, only: :upload
 
   def upload
     @doc_errors = []
-    if params[:file]
+    if params[:file].blank?
+      flash[:error] = "File not uploaded. Please select the file to upload."
+    elsif !valid_file_uploads?(params[:file], FileUploadValidator::VERIFICATION_DOC_TYPES)
+      redirect_to verification_insured_families_path
+      return
+    else
       params[:file].each do |file|
         doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
         if doc_uri.present?
@@ -17,7 +21,7 @@ class Insured::VerificationDocumentsController < ApplicationController
             add_type_history_element(file)
             flash[:notice] = "File Saved"
           else
-            flash[:error] = "Could not save file. " + @doc_errors.join(". ")
+            flash[:error] = "Could not save file. #{@doc_errors.join('. ')}"
             redirect_back(fallback_location: verification_insured_families_path)
             return
           end
@@ -25,8 +29,6 @@ class Insured::VerificationDocumentsController < ApplicationController
           flash[:error] = "Could not save file"
         end
       end
-    else
-      flash[:error] = "File not uploaded. Please select the file to upload."
     end
     redirect_to verification_insured_families_path
   end
@@ -116,28 +118,6 @@ class Insured::VerificationDocumentsController < ApplicationController
     person_consumer_role=Person.find(person.id).consumer_role
     person_consumer_role.vlp_documents = existing_documents.uniq
     person_consumer_role.save
-  end
-
-  def validate_file_type
-    return unless params[:file]
-
-    doc_limit_mb = EnrollRegistry[:verification_doc_size_limit_in_mb].item.to_i
-    max_file_size_in_bytes = doc_limit_mb * 1024 * 1024
-    params[:file].each do |file|
-      file_path = file.path
-      # Sanitize the file path using Shellwords.escape to prevent command injection
-      escaped_file_path = Shellwords.escape(file_path)
-      command = "file --mime-type -b #{escaped_file_path}"
-      # https://docs.ruby-lang.org/en/2.4.0/Open3.html
-      # prevent users from uploading files with deceptive extensions, Ex - attempting to upload a '.mp4' that has been changed to '.mp4.jpeg'
-      mime_type, = Open3.capture3(command)
-      mime_type = mime_type.strip
-
-      next if VlpDocument::ALLOWED_MIME_TYPES.include?(mime_type) && file.size < max_file_size_in_bytes
-      File.delete(file_path) if File.exist?(file_path)
-      flash[:error] = l10n("insured.verification_doc_file_error")
-      redirect_to verification_insured_families_path
-    end
   end
 
 end
