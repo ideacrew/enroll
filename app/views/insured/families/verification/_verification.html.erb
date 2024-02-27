@@ -2,13 +2,13 @@
   <div class="col-xs-6">
     <h4>
       <% if can_show_due_date?(@person) %>
-          <%= l10n("document_due_date") %>:&nbsp;&nbsp;
-          <% due_date = @person.primary_family&.eligibility_determination&.outstanding_verification_earliest_due_date || default_verification_due_date %>
-          <% if due_date <= TimeKeeper.date_of_record %>
-            <span class="label label-danger"><%= due_date %> (<%= l10n("past_due") %>)</span>
-          <% else %>
-            <span class="label label-warning"><%= due_date %></span>
-          <% end %>
+        <%= l10n("document_due_date") %>:&nbsp;&nbsp;
+        <% due_date = @person.primary_family&.eligibility_determination&.outstanding_verification_earliest_due_date || default_verification_due_date %>
+        <% if due_date <= TimeKeeper.date_of_record %>
+          <span class="label label-danger"><%= due_date %> (<%= l10n("past_due") %>)</span>
+        <% else %>
+          <span class="label label-warning"><%= due_date %></span>
+        <% end %>
       <% end %>
     </h4>
   </div>
@@ -44,7 +44,7 @@
                     <span class="label lb-md label-<%=verification_type_class(verif_type.validation_status)%>">
                       <%= show_v_type(verif_type.validation_status, current_user.has_hbx_staff_role?) %>
                     </span>&nbsp;
-                      <%= pundit_span Family, :updateable? %>
+                    <%= pundit_span Family, :updateable? %>
                   </div>
 
                   <div class="v-type-due-date col-md-3">
@@ -60,7 +60,7 @@
                         <span tabindex="0" onkeydown="handleButtonKeyDown(event, 'upload_identity_<%= verif_type.id %>')" class="btn btn-default btn-file">
                           <i class="fa fa-upload" aria-hidden="true"></i>
                           <%= l10n('upload_documents') %>
-                          <%= file_field_tag "file[]", type: :file, accept: VlpDocument::ALLOWED_MIME_TYPES.join(','), id: "upload_identity_#{verif_type.id}", class: "doc-upload-file", tabindex:"-1", :multiple => true, value: "Upload Documents", onchange: "validateFileSize(this)"%>
+                          <%= file_field_tag "file[]", type: :file, accept: ::FileUploadValidator::VERIFICATION_DOC_TYPES.join(','), id: "upload_identity_#{verif_type.id}", class: "doc-upload-file", tabindex:"-1", :multiple => true, value: "Upload Documents"%>
                         </span  >
                         <%= hidden_field_tag 'docs_owner', person.id  %>
                         <%= hidden_field_tag 'verification_type', verif_type.id  %>
@@ -75,7 +75,7 @@
                 </div>
               </div>
               <% if current_user.has_hbx_staff_role? %>
-                    <%= render :partial => "insured/families/verification/admin_verification_actions", locals: { person: person, type: verif_type, v_type: v_type, f_member: f_member} %>
+                <%= render :partial => "insured/families/verification/admin_verification_actions", locals: { person: person, type: verif_type, v_type: v_type, f_member: f_member} %>
               <% end %>
 
               <div class="row">
@@ -117,7 +117,7 @@
 <div class="row">
   <div class="col-xs-6 <%= pundit_class HbxProfile, :modify_admin_tabs?%> ">
     <% if current_user.has_hbx_staff_role? && all_family_members_verified && verification_needed?(@person) && EnrollRegistry.feature_enabled?(:complete_verification_for_enrollment) %>
-        <%= link_to l10n("insured.families.verification.complete_verification_for_enrollment"), enrollment_verification_documents_path(:person_id => @person.id), class: "btn btn-danger btn-sm", data: { confirm: l10n("insured.families.verification.complete_verification_for_enrollment_confirm") } %>
+      <%= link_to l10n("insured.families.verification.complete_verification_for_enrollment"), enrollment_verification_documents_path(:person_id => @person.id), class: "btn btn-danger btn-sm", data: { confirm: l10n("insured.families.verification.complete_verification_for_enrollment_confirm") } %>
     <% end %>
   </div>
   <div class="col-xs-6">
@@ -135,19 +135,4 @@
   $(document).ready(function() {
     Insured.custom_upload_init();
   });
-
-  function validateFileSize(input) {
-    const idVerificationFileSizeInMB = <%= EnrollRegistry[:verification_doc_size_limit_in_mb].item.to_i %>;
-    const maxFileSizeBytes = idVerificationFileSizeInMB * 1024 * 1024;
-
-    for (let i = 0; i < input.files.length; i++) {
-      const file = input.files[i];
-
-      if (file.size > maxFileSizeBytes) {
-        alert(`File '${file.name}' exceeds the maximum size of ${idVerificationFileSizeInMB} MB.`);
-        input.value = ''; // Clear the input to prevent submission
-        return; // Stop further processing if any file exceeds the limit
-      }
-    }
-  }
 </script>

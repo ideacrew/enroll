@@ -375,6 +375,9 @@ GEM
     faraday_middleware (1.1.0)
       faraday (~> 1.0)
     ffi (1.15.5)
+    file_validators (3.0.0)
+      activemodel (>= 3.2)
+      mime-types (>= 1.0)
     forgery (0.7.0)
     fugit (1.5.1)
       et-orbi (~> 1.1, >= 1.1.8)
@@ -709,6 +712,7 @@ DEPENDENCIES
   effective_datatables!
   event_source!
   factory_bot_rails (~> 4)
+  file_validators
   forgery (~> 0.7.0)
   mongoid-rspec (~> 4)
   mongoid_rails_migrations (~> 1.2.0)
