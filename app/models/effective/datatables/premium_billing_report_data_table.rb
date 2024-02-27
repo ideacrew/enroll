@@ -10,7 +10,7 @@ module Effective
         :proc => Proc.new { |row|
           hbx = row[1]
           content_tag(:span, class: 'name') do
-            name_to_listing(hbx.employee_role.person)
+            h(name_to_listing(hbx.employee_role.person))
           end +
           content_tag(:span, content_tag(:p, "DOB: #{format_date hbx.employee_role.person.dob}")) +
           content_tag(:span, content_tag(:p, "SSN: #{number_to_obscured_ssn hbx.employee_role.person.ssn}")) +

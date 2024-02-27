@@ -16,7 +16,7 @@ module Effective
 
       def load_verification_type_columns
         table_column :name, :label => 'Name', :proc => proc { |row|
-          link_to_with_noopener_noreferrer(row.primary_applicant.person.full_name, resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id))
+          link_to_with_noopener_noreferrer(h(row.primary_applicant.person.full_name), resume_enrollment_exchanges_agents_path(person_id: row.primary_applicant.person.id))
         }, :filter => false, :sortable => true
         table_column :ssn, :label => 'SSN', :proc => proc { |row| truncate(number_to_obscured_ssn(row.primary_applicant.person.ssn)) }, :filter => false, :sortable => false
         table_column :dob, :label => 'DOB', :proc => proc { |row| format_date(row.primary_applicant.person.dob)}, :filter => false, :sortable => false

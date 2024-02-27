@@ -24,7 +24,7 @@ module Effective
 
         table_column :employee_name, :width => '50px', :proc => Proc.new { |row|
           @employer_profile = row.employer_profile
-          (link_to row.full_name, main_app.employers_employer_profile_census_employee_path(@employer_profile.id, row.id, tab: 'employees')) + raw("<br>")
+          (link_to h(row.full_name), main_app.employers_employer_profile_census_employee_path(@employer_profile.id, row.id, tab: 'employees')) + raw("<br>")
         }, :sortable => false, :filter => false
 
         table_column :dob, :label => 'DOB', :proc => Proc.new { |row|

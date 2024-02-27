@@ -14,11 +14,11 @@ module Effective
           #row.legal_name
           #(link_to row.legal_name.titleize, employers_employer_profile_path(@employer_profile, :tab=>'home')) + raw("<br>") + truncate(row.id.to_s, length: 8, omission: '' )
           #link_to broker_agency_profile.legal_name, broker_agencies_profile_path(broker_agency_profile)
-          link_to row.legal_name, benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(row.broker_agency_profile)
+          link_to h(row.legal_name), benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(row.broker_agency_profile)
           }, :sortable => false, :filter => false
 
         table_column :dba, :proc => Proc.new { |row|
-          row.dba
+          h(row.dba)
         }, :sortable => false, :filter => false
         table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| row.fein }, :sortable => false, :filter => false
 
