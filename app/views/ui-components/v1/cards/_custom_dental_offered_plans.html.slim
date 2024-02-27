@@ -19,7 +19,7 @@
             = "#{bg.effective_on_kind.humanize} following #{bg.effective_on_offset} days"
     .health
       div style="float:right"
-        button#showhidebutton type="button" data-toggle="collapse" data-target="#collapseHealth" aria-expanded="false" aria-controls="collapseHealth"
+        button#showhidebutton type="button" class="normal-font-weight" data-toggle="collapse" data-target="#collapseHealth" aria-expanded="false" aria-controls="collapseHealth"
           | View Details
           a
             i.fa.fa-chevron-down.fa-lg
@@ -64,7 +64,7 @@
   - if bg.dental_reference_plan_id.present?
     .dental
       div style="float:right"
-        button#showhidebuttonDental type="button" data-toggle="collapse" data-target="#collapseDental" aria-expanded="false" aria-controls="collapseDental"
+        button#showhidebuttonDental type="button" class="normal-font-weight" data-toggle="collapse" data-target="#collapseDental" aria-expanded="false" aria-controls="collapseDental"
           | View Details
           a
             i.fa.fa-chevron-down.fa-lg
