@@ -8,7 +8,12 @@ class Insured::RidpDocumentsController < ApplicationController
   def upload
     @doc_errors = []
     @docs_owner = @person
-    if params[:file]
+    if params[:file].blank?
+      flash[:error] = "File not uploaded. Please select the file to upload."
+    elsif !valid_file_uploads?(params[:file], FileUploadValidator::VERIFICATION_DOC_TYPES)
+      redirect_back fallback_location: '/'
+      return
+    else
       params[:file].each do |file|
         doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
         if doc_uri.present?
@@ -23,9 +28,8 @@ class Insured::RidpDocumentsController < ApplicationController
           flash[:error] = "Could not save file"
         end
       end
-    else
-      flash[:error] = "File not uploaded. Please select the file to upload."
     end
+
     redirect_back fallback_location: '/'
   end
 

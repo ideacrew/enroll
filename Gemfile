@@ -117,6 +117,7 @@ gem 'loofah', '~> 2.3.1'
 gem 'stimulus_reflex', '3.4.1'
 gem 'rack-cors'
 gem 'holidays', '~> 8.6'
+gem 'file_validators'
 
 group :development do
   gem "certified",              '~> 1'
