@@ -3,6 +3,7 @@
 module FinancialAssistance
   class ApplicationController < ::ApplicationController
     protect_from_forgery with: :exception
+    include ::FileUploadHelper
 
     before_action :verify_financial_assistance_enabled
 

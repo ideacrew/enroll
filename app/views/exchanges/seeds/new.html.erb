@@ -12,7 +12,7 @@
 
       </div>
       <div class='form-group'>
-        <%= file_field_tag :file, accept: 'csv', class: "btn-file doc-upload-file"%><br>
+        <%= file_field_tag :file, accept: FileUploadValidator::CSV_TYPES.join(','), class: "btn-file doc-upload-file"%><br>
         <%= f.submit "Submit", class: 'btn btn-alt-blue col-2 offset-10' %>
       </div>
     <% end %>

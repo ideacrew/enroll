@@ -11,7 +11,7 @@
 
 <div class="content landing">
   <%= render "./ui-components/v1/navs/primary_nav", :active_tab => "home-tab" %>
-  
+
   <div class="home">
 
     <div class="tab-row">
@@ -52,7 +52,7 @@
       </div>
       <%= form_tag(upload_notices_notice_kinds_path, multipart: true, method: :post) do %>
       <div class="modal-body">
-        <%= file_field_tag :file %>
+        <%= file_field_tag :file, accept: FileUploadValidator::CSV_TYPES.join(',') %>
       </div>
 
       <div class="modal-footer">
@@ -72,10 +72,10 @@
 
   $(document).ajaxComplete(function() {
     if ($('.alert-notice')[0]) {
-      $('.alert-notice').hide() 
+      $('.alert-notice').hide()
     }
     if ($('.alert-error')[0]) {
-      $('.alert-error').hide() 
+      $('.alert-error').hide()
     }
     if ($.isEmptyObject(CKEDITOR.instances)) {
       CKEDITOR.replace('notice_kind_template_raw_body', {});

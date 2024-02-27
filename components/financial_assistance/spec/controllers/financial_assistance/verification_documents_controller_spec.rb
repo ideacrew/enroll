@@ -52,14 +52,14 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
     )
   end
 
+  let(:file) { [fixture_file_upload("#{Rails.root}/test/uhic.jpg")] }
+
   context 'admin' do
     before do
       sign_in(admin_user)
     end
 
     context 'POST #upload' do
-      let!(:tempfile) { Tempfile.new(['test_document', '.pdf']) }
-      let!(:file) { [Rack::Test::UploadedFile.new(tempfile.path, 'application/pdf')] }
       let!(:bucket_name) { 'id-verification' }
       let!(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}sample-key" }
       let!(:params) { { "applicant_id" => applicant.id, "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, file: file} }
@@ -130,8 +130,6 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
     end
 
     context 'POST #upload' do
-      let!(:tempfile) { Tempfile.new(['test_document', '.pdf']) }
-      let!(:file) { [Rack::Test::UploadedFile.new(tempfile.path, 'application/pdf')] }
       let!(:bucket_name) { 'id-verification' }
       let!(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}sample-key" }
       let!(:params) { { "applicant_id" => applicant.id, "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, file: file} }
@@ -189,8 +187,6 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
     end
 
     context 'POST #upload' do
-      let!(:tempfile) { Tempfile.new(['test_document', '.pdf']) }
-      let!(:file) { [Rack::Test::UploadedFile.new(tempfile.path, 'application/pdf')] }
       let!(:bucket_name) { 'id-verification' }
       let!(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}sample-key" }
       let!(:params) { { "applicant_id" => applicant.id, "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, file: file} }
@@ -272,8 +268,6 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
 
 
       context 'POST #upload' do
-        let!(:tempfile) { Tempfile.new(['test_document', '.pdf']) }
-        let!(:file) { [Rack::Test::UploadedFile.new(tempfile.path, 'application/pdf')] }
         let!(:bucket_name) { 'id-verification' }
         let!(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}sample-key" }
         let!(:params) { { "applicant_id" => applicant.id, "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, file: file} }
@@ -331,8 +325,6 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
       end
 
       context 'POST #upload' do
-        let!(:tempfile) { Tempfile.new(['test_document', '.pdf']) }
-        let!(:file) { [Rack::Test::UploadedFile.new(tempfile.path, 'application/pdf')] }
         let!(:bucket_name) { 'id-verification' }
         let!(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}sample-key" }
         let!(:params) { { "applicant_id" => applicant.id, "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, file: file} }
