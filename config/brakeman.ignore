@@ -419,6 +419,27 @@
       "note": "Raw html image tag, no user input allowed."
     },
     {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "3291f33ffbcb6bb388bb080269a67bf3f4689c4afa88de149fd16e34b74986e5",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "lib/pdf_scrubber_util.rb",
+      "line": 10,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "ActionController::Base.helpers.sanitize(value, :tags => Loofah::HTML5::SafeList::ACCEPTABLE_ELEMENTS.delete(\"select\").merge([\"style\", \"title\"]), :attributes => Loofah::HTML5::SafeList::ACCEPTABLE_ATTRIBUTES.add(\"style\")).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "PdfScrubberUtil",
+        "method": "sanitize_pdf"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": ""
+    },
+    {
       "warning_type": "Command Injection",
       "warning_code": 14,
       "fingerprint": "32a4fba0025fc7cdd09a396e504a40ce8c53a4ad3262246c5f3bd0b3849a47f2",
@@ -693,27 +714,6 @@
         22
       ],
       "note": ""
-    },
-    {
-      "warning_type": "Usage of html_safe",
-      "warning_code": 2,
-      "fingerprint": "50fc2f6fb0ff3689f1044372d33bc887584cf7545eb47c5d4e631102356929c0",
-      "check_name": "HtmlSafeUsage",
-      "message": "Html_safe used",
-      "file": "lib/pdf_scrubber_util.rb",
-      "line": 10,
-      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
-      "code": "ActionController::Base.helpers.sanitize(value, :tags => Loofah::HTML5::SafeList::ACCEPTABLE_ELEMENTS.delete(\"select\").add(\"style\"), :attributes => Loofah::HTML5::SafeList::ACCEPTABLE_ATTRIBUTES.add(\"style\")).html_safe",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "PdfScrubberUtil",
-        "method": "sanitize_pdf"
-      },
-      "user_input": null,
-      "confidence": "Medium",
-      "cwe_id": null,
-      "note": "Safe called after explicit scrubbing."
     },
     {
       "warning_type": "Usage of html_safe",
@@ -2296,6 +2296,6 @@
       "note": ""
     }
   ],
-  "updated": "2024-02-26 15:28:27 -0600",
+  "updated": "2024-02-27 08:42:15 -0600",
   "brakeman_version": "5.4.1"
 }
