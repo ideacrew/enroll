@@ -9,7 +9,7 @@ module HtmlScrubberUtil
   def sanitize_html(value)
     ActionController::Base.helpers.sanitize(
       value,
-      tags: Loofah::HTML5::SafeList::ACCEPTABLE_ELEMENTS,
+      tags: Loofah::HTML5::SafeList::ACCEPTABLE_ELEMENTS.dup.delete("select").add("style"),
       attributes: Loofah::HTML5::SafeList::ACCEPTABLE_ATTRIBUTES.dup.add("style")
     ).html_safe
   end
