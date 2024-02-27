@@ -41,12 +41,30 @@ RSpec.describe HtmlScrubberUtil do
     end
   end
 
-  context "given a style attribute" do
-    let(:source_html) { "<div style=\"somewhere\"></div>" }
+  context "given a data-toggle attribute" do
+    let(:source_html) { "<div data-toggle=\"tooltip\"></div>" }
     let(:result) { TestingScrubber.sanitize_html(source_html) }
 
-    it "does not scrub the style attribute" do
-      expect(result).to include("style")
+    it "does not scrub the data-toggle attribute" do
+      expect(result).to include("data-toggle")
+    end
+  end
+
+  context "given a data-slide-to attribute" do
+    let(:source_html) { "<div data-slide-to=\"0\"></div>" }
+    let(:result) { TestingScrubber.sanitize_html(source_html) }
+
+    it "does not scrub the data-slide-to attribute" do
+      expect(result).to include("data-slide-to")
+    end
+  end
+
+  context "given a data-target attribute" do
+    let(:source_html) { "<div data-target=\"#some-element\"></div>" }
+    let(:result) { TestingScrubber.sanitize_html(source_html) }
+
+    it "does not scrub the data-target attribute" do
+      expect(result).to include("data-target")
     end
   end
 end
