@@ -401,6 +401,27 @@
     {
       "warning_type": "Usage of html_safe",
       "warning_code": 2,
+      "fingerprint": "2b928dacb5985ae7f3a03e7575a6a916b2025a8ef059d886eb411a463c6d7a30",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "lib/html_scrubber_util.rb",
+      "line": 10,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "ActionController::Base.helpers.sanitize(value, :tags => Loofah::HTML5::SafeList::ACCEPTABLE_ELEMENTS.delete(\"select\").add(\"style\"), :attributes => Loofah::HTML5::SafeList::ACCEPTABLE_ATTRIBUTES.add(\"style\").add(\"data-toggle\").add(\"data-slide-to\").add(\"data-target\")).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "HtmlScrubberUtil",
+        "method": "sanitize_html"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": ""
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
       "fingerprint": "2babd752f4f07d86c0cf403f946b348ec2a25b95dfab59561bdcc62be79187f1",
       "check_name": "HtmlSafeUsage",
       "message": "Html_safe used",
@@ -1049,27 +1070,6 @@
         77
       ],
       "note": ""
-    },
-    {
-      "warning_type": "Usage of html_safe",
-      "warning_code": 2,
-      "fingerprint": "62626698d10a3174d1a1c3fea559d4ad648531bfaf57418b725196517f2feb10",
-      "check_name": "HtmlSafeUsage",
-      "message": "Html_safe used",
-      "file": "lib/html_scrubber_util.rb",
-      "line": 10,
-      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
-      "code": "ActionController::Base.helpers.sanitize(value, :tags => (Loofah::HTML5::SafeList::ACCEPTABLE_ELEMENTS), :attributes => Loofah::HTML5::SafeList::ACCEPTABLE_ATTRIBUTES.add(\"style\")).html_safe",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "HtmlScrubberUtil",
-        "method": "sanitize_html"
-      },
-      "user_input": null,
-      "confidence": "Medium",
-      "cwe_id": null,
-      "note": "Safe used after explicit scrubbing."
     },
     {
       "warning_type": "Remote Code Execution",
