@@ -152,7 +152,7 @@
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "",
-  listings: ["<span #{@style_color_text}>[IF Indian = No AND CSR-eligible AND Enrolled in Silver Plan]</span>
+  listings: [sanitize_html("<span #{@style_color_text}>[IF Indian = No AND CSR-eligible AND Enrolled in Silver Plan]</span>
   The following members of your household are eligible for cost-sharing reductions and selected a silver-level plan:<br><br>
   [Assisted 1 and CSR-eligible and Enrolled in a Silver Plan First Name][Assisted 1 and CSR-eligible and Enrolled in a Silver Plan First Name]
   [IF Person N field populated] [Assisted N and CSR-eligible and Enrolled in a Silver Plan First Name][Assisted N and CSR-eligible and Enrolled
@@ -161,8 +161,8 @@
   and you selected a silver-level plan, the total amount [Plan Name]  can require you pay for health services in [coverage year] is reduced.
   A detailed explanation of your costs and benefits can be found in your plan’s Summary of Benefits and Coverage available on <a href='http://www.DCHealthLink.com'>#{EnrollRegistry[:enroll_app].setting(:website_name).item}</a>.
   This information will include your deductible, or the amount you must pay for health services before your plan will begin paying the
-  costs of your health services. Certain services will be covered even before you have paid the deductible.".html_safe,
-  "<span #{@style_color_text}>[IF Indian=No AND CSR-eligible NOT enrolled in Silver Plan]</span>
+  costs of your health services. Certain services will be covered even before you have paid the deductible."),
+  sanitize_html("<span #{@style_color_text}>[IF Indian=No AND CSR-eligible NOT enrolled in Silver Plan]</span>
   Based on the information you entered on your application, renewal form, or otherwise available in our data sources,
   the following members of your household <span style='text-decoration:underline;'>are</span> eligible for extra help paying for your health insurance through cost-sharing reductions,
   <span style='text-decoration:underline;'>but will not receive that help because they did not enroll in a silver-level plan.</span>
@@ -172,23 +172,23 @@
   [CSR-eligible Not Indian Not Silver First Name][CSR-eligible Not Indian Not Silver Last Name]<br><br>
   A detailed explanation of your costs and benefits can be found in your plan’s Summary of Benefits and Coverage on <a href='http://www.DCHealthLink.com'>#{EnrollRegistry[:enroll_app].setting(:website_name).item}</a>.
   This information will include your deductible, or the amount you must pay for health services before your plan will begin
-  paying the costs of your health services. Certain services will be covered even before you have paid the deductible.".html_safe,
-  "<span #{@style_color_text}>[IF Indian=No AND Not CSR-eligible]</span> Based on the information you entered on your application,
+  paying the costs of your health services. Certain services will be covered even before you have paid the deductible."),
+  sanitize_html("<span #{@style_color_text}>[IF Indian=No AND Not CSR-eligible]</span> Based on the information you entered on your application,
   renewal form, or otherwise available in our data sources, the following members of your household are not eligible for
   extra help paying for your health insurance through cost-sharing reductions. 45 C.F.R. §155.305(g):<br><br>
   [Assisted 1 and Not CSR-eligible First Name][Assisted 1 and Not CSR-eligible Last Name]<br><br>
   <span #{@style_color_text}>[IF Person N field populated]</span> [Assisted N and Not CSR-eligible First Name][Assisted N and Not CSR-eligible Last Name]<br><br>
   A detailed explanation of your costs and benefits can be found in your plan’s Summary of Benefits and Coverage available on <a href='http://www.DCHealthLink.com'>#{EnrollRegistry[:enroll_app].setting(:website_name).item}</a>.
   This information will include your deductible, or the amount you must pay for health services before your plan will begin paying the
-   costs of your health services. Certain services will be covered even before you have paid the deductible.".html_safe,
-  "<span #{@style_color_text}>[IF Indian=Yes AND MAGI≤300% FPL]</span> Based on their American Indian status, the following members of
+   costs of your health services. Certain services will be covered even before you have paid the deductible."),
+  sanitize_html("<span #{@style_color_text}>[IF Indian=Yes AND MAGI≤300% FPL]</span> Based on their American Indian status, the following members of
   your household are also eligible for extra help paying for health insurance through cost-sharing reductions:<br><br>
   [American Indian 1 Under 300 First Name>][American Indian 1 Under 300 Last Name]
   <span #{@style_color_text}>[IF Person N field populated]</span> [American Indian N Under 300 First Name][American Indian N Under 300 Last Name]<br><br>
 
   As American Indians, the above individual(s) do not need to pay any co-payments, deductibles, or co-insurance for the health
-    services that your plan covers. <span style='text-decoration:underline;'>However, you must still pay your portion of the monthly premiums.</span>".html_safe,
-  "<span #{@style_color_text}>[IF Indian=Yes AND MAGI>300% FPL]</span> The following members of your household are eligible for
+    services that your plan covers. <span style='text-decoration:underline;'>However, you must still pay your portion of the monthly premiums.</span>"),
+  sanitize_html("<span #{@style_color_text}>[IF Indian=Yes AND MAGI>300% FPL]</span> The following members of your household are eligible for
   reduced cost-sharing, because of their American Indian status, when receiving services at Indian Health Service facilities:<br><br>
   [American Indian 1 Over 300 First Name][American Indian 1 Over 300 Last Name]
   <span #{@style_color_text}>[IF Person N field populated]</span> [American Indian N Over 300 First Name][American Indian N Over 300 Last Name]<br><br>
@@ -196,7 +196,7 @@
   A detailed explanation of your costs and benefits can be found in your plan’s Summary of Benefits and Coverage available on
   <a href='http://www.DCHealthLink.com'>#{EnrollRegistry[:enroll_app].setting(:website_name).item}</a>. This information will include your deductible, or the amount you
   must pay for health services before your plan will begin paying the costs of your health services.
-    Certain services will be covered even before you have paid the deductible.".html_safe]} %>
+    Certain services will be covered even before you have paid the deductible.")]} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
   contents: ["You will be able to change plans during the annual open enrollment period at the end of each year.

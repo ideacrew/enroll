@@ -3,7 +3,7 @@
     <tr style="margin-top: <%= top_margin if defined? top_margin %>;">
       <td>
         <ol class="custom1">
-          <li class="customli"> <%= listing.html_safe %></li>
+          <li class="customli"> <%= sanitize_html(listing) %></li>
         </ol>
       </td>
     </tr>

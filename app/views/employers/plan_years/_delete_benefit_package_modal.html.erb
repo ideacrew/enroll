@@ -16,7 +16,9 @@
       </div>
       <div class="modal-footer">
 				<%= link_to 'Cancel', "", class: 'btn btn-default', data: {'dismiss': 'modal' } %>
-        <%= link_to "Delete <i class='fa fa-trash-o' aria-hidden='true'></i> ".html_safe, employers_employer_profile_plan_year_delete_benefit_group_path(employer_profile_id: @employer_profile.id, plan_year_id: plan_year.id, benefit_group_id: bg.id), method: :post, remote: true, class: 'btn btn-primary mtz btn-br' %>
+        <%= link_to(employers_employer_profile_plan_year_delete_benefit_group_path(employer_profile_id: @employer_profile.id, plan_year_id: plan_year.id, benefit_group_id: bg.id), method: :post, remote: true, class: 'btn btn-primary mtz btn-br') do %>
+          Delete <i class='fa fa-trash-o' aria-hidden='true'></i>
+        <% end %>
       </div>
     </div>
   </div>

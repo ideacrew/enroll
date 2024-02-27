@@ -1,7 +1,7 @@
-<%= l10n(
+<%= sanitize_html(l10n(
   "user_mailer.broker_staff_invitation_email.full_text",
   person_name: person_name, site_short_name: site_short_name,
   invitation_url: claim_invitation_url(invitation),
   person_id: person_id,
   contact_center_phone_number: EnrollRegistry[:enroll_app].setting(:contact_center_short_number).item
-  ).html_safe %>
+  )) %>
