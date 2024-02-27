@@ -703,7 +703,7 @@
       "file": "lib/pdf_scrubber_util.rb",
       "line": 10,
       "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
-      "code": "ActionController::Base.helpers.sanitize(value, :tags => Loofah::HTML5::SafeList::ACCEPTABLE_ELEMENTS.delete(\"select\").add(\"style\"), :attributes => Loofah::HTML5::SafeList::ACCEPTABLE_ATTRIBUTES.add(\"style\")).html_safe",
+      "code": "ActionController::Base.helpers.sanitize(value, :tags => Loofah::HTML5::SafeList::ACCEPTABLE_ELEMENTS.delete(\"select\").add(\"style\"), :attributes => Loofah::HTML5::SafeList::ACCEPTABLE_ATTRIBUTES.add(\"style\").add(\"data-toggle\").add(\"data-slide-to\").add(\"data-target\")).html_safe",
       "render_path": null,
       "location": {
         "type": "method",

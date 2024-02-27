@@ -10,7 +10,11 @@ module HtmlScrubberUtil
     ActionController::Base.helpers.sanitize(
       value,
       tags: Loofah::HTML5::SafeList::ACCEPTABLE_ELEMENTS,
-      attributes: Loofah::HTML5::SafeList::ACCEPTABLE_ATTRIBUTES.dup.add("style")
+      attributes: Loofah::HTML5::SafeList::ACCEPTABLE_ATTRIBUTES.dup
+        .add("style")
+        .add("data-toggle")
+        .add("data-slide-to")
+        .add("data-target")
     ).html_safe
   end
 end
