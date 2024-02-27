@@ -111,10 +111,19 @@ module BenefitSponsors
           benefit_sponsorship.save!
           allow(controller).to receive(:authorize).and_return(true)
           sign_in user
-          post :bulk_employee_upload, :params => {:employer_profile_id => benefit_sponsor.profiles.first.id, :file => file}
         end
 
         it 'should throw error' do
+          post :bulk_employee_upload, :params => {:employer_profile_id => benefit_sponsor.profiles.first.id, :file => file}
+
+          expect(response).to render_template("benefit_sponsors/profiles/employers/employer_profiles/_employee_csv_upload_errors", "layouts/two_column")
+        end
+
+        it "does not allow docx files to be uploaded" do
+          file = fixture_file_upload("#{Rails.root}/test/sample.docx")
+          post :bulk_employee_upload, :params => {:employer_profile_id => benefit_sponsor.profiles.first.id, :file => file}
+
+          expect(flash[:error]).to include("Unable to upload file.")
           expect(response).to render_template("benefit_sponsors/profiles/employers/employer_profiles/_employee_csv_upload_errors", "layouts/two_column")
         end
       end

@@ -79,6 +79,7 @@ RSpec.configure do |config|
   config.include ActionView::Helpers::TranslationHelper
   config.include L10nHelper
   config.include ViewTranslationsLinterHelper
+  config.include ActionDispatch::TestProcess
 
   config.infer_spec_type_from_file_location!
 
