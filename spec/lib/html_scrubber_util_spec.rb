@@ -41,6 +41,15 @@ RSpec.describe HtmlScrubberUtil do
     end
   end
 
+  context "given a style attribute" do
+    let(:source_html) { "<style>Test</style>" }
+    let(:result) { TestingScrubber.sanitize_html(source_html) }
+
+    it "does not scrub the style attribute" do
+      expect(result).to include("style")
+    end
+  end
+
   context "given a data-toggle attribute" do
     let(:source_html) { "<div data-toggle=\"tooltip\"></div>" }
     let(:result) { TestingScrubber.sanitize_html(source_html) }
