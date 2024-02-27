@@ -262,6 +262,7 @@ class ApplicationController < ActionController::Base
     end
 
     def after_sign_in_path_for(resource)
+      User.current_login_session = resource
       if request.referrer =~ /sign_in/
         redirect_path = confirm_last_portal(request, resource)
         session[:portal] || redirect_path
@@ -271,6 +272,7 @@ class ApplicationController < ActionController::Base
     end
 
     def after_sign_out_path_for(resource_or_scope)
+      User.current_login_session = nil
       logout_saml_index_path
     end
 
@@ -301,6 +303,7 @@ class ApplicationController < ActionController::Base
 
     def set_current_user
       User.current_user = current_user
+      User.current_session_values = session
       SAVEUSER[:current_user_id] = current_user.try(:id)
       session_id = SessionTaggedLogger.extract_session_id_from_request(request)
       unless SessionIdHistory.where(session_id: session_id).present?
@@ -310,6 +313,7 @@ class ApplicationController < ActionController::Base
 
     def clear_current_user
       User.current_user = nil
+      User.current_session_values = nil
       SAVEUSER[:current_user_id] = nil
     end
 

@@ -243,6 +243,16 @@ class User
       Thread.current[:current_user] = user
     end
 
+    def current_login_session=(resource)
+      Thread.current[:login_session_id] = resource ? SecureRandom.hex(16) : nil
+    end
+
+    def current_session_values=(session = nil)
+      session_values = session&.to_hash&.except("warden.user.user.key", "_csrf_token") || {}
+      session_values["session_id"] = session&.id
+      Thread.current[:current_session_values] = session_values
+    end
+
     def get_saml_settings
       settings = OneLogin::RubySaml::Settings.new
 

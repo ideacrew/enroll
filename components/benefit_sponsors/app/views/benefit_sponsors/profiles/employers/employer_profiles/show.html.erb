@@ -29,6 +29,8 @@
 
 <%- elsif @tab == 'families' %>
 <%= render partial:  "benefit_sponsors/profiles/employers/employer_profiles/my_account/families" %>
+<%- elsif @tab == 'event_log_shop' %>
+  <%= render partial:  "event_logs/event_log_tab", :locals => {active_tab: @tab, name: @employer_profile.organization.legal_name&.humanize&.titleize, hbx_id: @employer_profile.hbx_id, type: 'employer', members: @auditable_employees} %>
 <%- end %>
 
 <%- if @tab == 'home' %>
