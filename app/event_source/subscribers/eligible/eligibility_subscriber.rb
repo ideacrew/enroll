@@ -54,7 +54,7 @@ module Subscribers
         subscriber_logger.info "EligibilitySubscriber#on_enroll_enterprise_events, response: #{payload}"
 
         subject = GlobalID::Locator.locate(payload[:subject_gid])
-        eligibility_date = TimeKeeper.date_of_record
+        eligibility_date = payload[:eligibility_date].to_date || TimeKeeper.date_of_record
         effective_date = payload[:effective_date].to_date
         evidence_key = payload[:evidence_key].to_sym
 
@@ -69,7 +69,8 @@ module Subscribers
                 subject: subject,
                 evidence_key: evidence_key,
                 evidence_value: osse_eligibility.to_s,
-                effective_date: effective_date
+                effective_date: effective_date,
+                renewal_eligibility: true
               }
             )
 
@@ -96,7 +97,7 @@ module Subscribers
       def create_eligibility(options)
         operation = eligibility_operation_for(options[:subject]).new
         operation.default_eligibility = true if options[:evidence_value] == "false"
-
+        operation.prospective_eligibility = options[:renewal_eligibility] || false
         operation.call(
           {
             subject: options[:subject].to_global_id,

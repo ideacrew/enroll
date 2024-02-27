@@ -1,0 +1,11 @@
+// Handle click on elements with the class 'event-with-arrow'
+$('.event-with-arrow').on('click', function() {
+  const eventId = this.getAttribute('data-attr-id');
+  const eventExpansion = $("#event-expansion-" + eventId);
+
+  // Toggle the 'display-none' class for event expansion
+  eventExpansion.toggleClass('display-none');
+
+  // Toggle the icon class between 'glyphicon-chevron-down' and 'glyphicon-chevron-right'
+  $(this).find('.glyphicon').toggleClass('glyphicon-chevron-down glyphicon-chevron-right');
+});
