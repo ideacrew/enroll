@@ -547,3 +547,24 @@ a.disabled {
   color: var(--grey-130);
   font-weight: 600;
 }
+
+.nav-stacked li {
+  padding: $spacer;
+  margin-bottom: ($spacer * .25);
+  width: 100%;
+  background: var(--grey-010);
+  color: var(--info-color);
+  a {
+    color: var(--info-color);
+  }
+  &.activer {
+    background: var(--info-color);
+    color: var(--grey-000);
+    a {
+      color: var(--grey-000);
+    }
+  }
+  &.active {
+    @extend .font-weight-bold;
+  }
+}
