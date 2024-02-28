@@ -1,0 +1,25 @@
+footer.footer-wrapper class=("#{"pre_prod_nav_color" if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true'}")
+  .container
+    .row.pt-3.pb-3
+      .col-md-6
+        = copyright_notice
+      .col-md-6
+          ul.list-unstyled.list-group.list-group-horizontal.float-right
+            li.mr-3
+              a.call-customer-service href="tel:#{contact_center_short_number}"
+                span
+                  i.fas.fa-phone.fa-lg.fa-rotate-90
+                  | &nbsp;
+                  = "#{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} / TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item}"
+            - if contact_center_email_address_is_enabled?
+              li.mr-3
+                = mail_to contact_center_email_address, target: '_blank', rel: 'noopener noreferrer' do
+                  span
+                    i.fas.fa-envelope.fa-lg
+                    | &nbsp;
+                    = EnrollRegistry[:enroll_app].setting(:mail_address).item
+            li
+              = link_to site_faqs_url, target: '_blank', rel: 'noopener noreferrer' do
+                i.fas.fa-question.fa-lg
+                | &nbsp;
+                | GET HELP
