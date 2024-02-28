@@ -118,9 +118,9 @@ gem 'stimulus_reflex', '3.4.1'
 gem 'rack-cors'
 gem 'holidays', '~> 8.6'
 
-gem 'dry-configurable', '0.13.0'
-gem 'dry-container', '0.9.0'
-gem 'devise-security'
+# gem 'dry-configurable', '0.13.0'
+# gem 'dry-container', '0.9.0'
+# gem 'devise-security'
 gem 'file_validators'
 
 group :development do
