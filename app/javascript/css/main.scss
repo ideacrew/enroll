@@ -51,7 +51,7 @@ footer {
 }
 
 .welcome-text {
-  margin-top: 70px;
+  margin-top: $spacer * 2;
 }
 
 #sort_notification_msg {
@@ -78,6 +78,27 @@ footer {
   background-color: var(--error-tint);
 }
 
-.right-align {
-  margin-left: 690px;
+.hide, .hidden {
+  @extend .sr-only;
+}
+
+.nav-stacked li {
+  padding: $spacer;
+  margin-bottom: ($spacer * .25);
+  width: 100%;
+  background: var(--grey-010);
+  color: var(--info-color);
+  a {
+    color: var(--info-color);
+  }
+  &.activer {
+    background: var(--info-color);
+    color: var(--grey-000);
+    a {
+      color: var(--grey-000);
+    }
+  }
+  &.active {
+    @extend .font-weight-bold;
+  }
 }
