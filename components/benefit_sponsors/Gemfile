@@ -23,6 +23,7 @@ gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.g
 gem 'aca_entities',       git: 'https://github.com/ideacrew/aca_entities.git', branch: 'trunk'
 # gem 'resource_registry',  git: '../../../resource_registry'
 gem 'event_source',       git:  'https://github.com/ideacrew/event_source.git', branch: 'trunk'
+gem 'file_validators'
 
 group :development, :test do
   gem 'rails-controller-testing'
