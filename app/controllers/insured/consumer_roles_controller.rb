@@ -5,9 +5,8 @@ class Insured::ConsumerRolesController < ApplicationController
   include VlpDoc
   include ErrorBubble
 
-  layout :resolve_layout
+  layout 'bootstrap_4', only: [:privacy, :search] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
 
-  before_action :enable_bs4_layout, only: [:privacy, :search, :match, :edit, :update, :ridp_agreement, :help_paying_coverage, :upload_ridp_document] if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
   before_action :check_consumer_role, only: [:search, :match]
   before_action :find_consumer_role, only: [:edit, :update]
   before_action :individual_market_is_enabled?
@@ -137,8 +136,8 @@ class Insured::ConsumerRolesController < ApplicationController
         text = "The Social Security number entered is associated with an existing user. "
         text += "Please #{view_context.link_to('sign in', SamlInformation.iam_login_url)} with your username and password "
         text += "or #{view_context.link_to('click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
-        flash[:alert] = sanitize_html(text)
-        format.html { @bs4 ? redirect_back(fallback_location: ssn_taken_insured_consumer_role_index_path) : redirect_to(ssn_taken_insured_consumer_role_index_path) }
+        flash[:alert] = text
+        format.html {redirect_to ssn_taken_insured_consumer_role_index_path}
       else
         format.html { render 'search' }
       end
@@ -215,7 +214,6 @@ class Insured::ConsumerRolesController < ApplicationController
         @target = Forms::FamilyMember.new
       end
     end
-    @bs4 = true if params[:bs4] == "true"
     @vlp_doc_target = params[:vlp_doc_target]
     vlp_doc_subject = params[:vlp_doc_subject]
     @country = vlp_docs.detect{|doc| doc.subject == vlp_doc_subject }.try(:country_of_citizenship) if vlp_docs
@@ -239,7 +237,7 @@ class Insured::ConsumerRolesController < ApplicationController
     mec_check(@person.hbx_id) if EnrollRegistry.feature_enabled?(:mec_check) && @person.send(:mec_check_eligible?)
     @shop_coverage_result = EnrollRegistry.feature_enabled?(:shop_coverage_check) ? (check_shop_coverage.success? && check_shop_coverage.success.present?) : nil
     @consumer_role.skip_consumer_role_callbacks = true
-    valid_params = {"skip_person_updated_event_callback" => true, "skip_lawful_presence_determination_callbacks" => true}.merge(params.require(:person).permit(*existing_personal_parameters_list))
+    valid_params = {"skip_person_updated_event_callback" => true, "skip_lawful_presence_determination_callbacks" => true}.merge(params.require(:person).permit(*person_parameters_list))
 
     if update_vlp_documents(@consumer_role, 'person') && @consumer_role.update_by_person(valid_params)
       @consumer_role.update_attribute(:is_applying_coverage, params[:person][:is_applying_coverage]) unless params[:person][:is_applying_coverage].nil?
@@ -472,15 +470,6 @@ class Insured::ConsumerRolesController < ApplicationController
     params.dig("person", "consumer_role_attributes").merge!("contact_method" => ConsumerRole::CONTACT_METHOD_MAPPING[contact_method])
   end
 
-  def existing_personal_parameters_list
-    if EnrollRegistry.feature_enabled?(:mask_ssn_ui_fields)
-      # NOTE: with this update, the only place ssn/dob/no_ssn can be updated is the edit ssn dob feature, which is restricted to admin
-      person_parameters_list - [:dob, :ssn, :no_ssn]
-    else
-      person_parameters_list
-    end
-  end
-
   def person_parameters_list
     [
       { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county, :id, :_destroy] },
@@ -565,19 +554,5 @@ class Insured::ConsumerRolesController < ApplicationController
 
     @person_params[:dob] = @person.dob.strftime("%Y-%m-%d")
     @person_params.merge!({user_id: current_user.id})
-  end
-
-  def enable_bs4_layout
-    @bs4 = true
-  end
-
-  def resolve_layout
-    return "application" unless EnrollRegistry.feature_enabled?(:bs4_consumer_flow)
-    case action_name
-    when "privacy"
-      "bootstrap_4"
-    else
-      "progress"
-    end
   end
 end

@@ -401,6 +401,12 @@ registry:
         item: :bs4_admin_flow
         is_enabled: <%= ENV['BS4_ADMIN_FLOW_IS_ENABLED'] || false %>
   - namespace:
+      - :bootstrap_4
+    features:
+      - key: :bs4_consumer_flow
+        item: :bs4_consumer_flow
+        is_enabled: <%= ENV['BS4_CONSUMER_FLOW_IS_ENABLED'] || false %>
+  - namespace:
       - :pay_now_feature
     features:
       - key: :validate_saml
