@@ -41,12 +41,12 @@ RSpec.describe HtmlScrubberUtil do
     end
   end
 
-  context "given a style attribute" do
+  context "given a style tag" do
     let(:source_html) { "<style>Test</style>" }
     let(:result) { TestingScrubber.sanitize_html(source_html) }
 
-    it "does not scrub the style attribute" do
-      expect(result).to include("style")
+    it "does not scrub the style tag" do
+      expect(result).to include("<style>")
     end
   end
 
