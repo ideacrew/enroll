@@ -55,6 +55,7 @@ Rails.application.configure do
       policy.script_src :self, :https, :unsafe_inline, :unsafe_eval, "https://tagmanager.google.com https://www.googletagmanager.com https://apps.usw2.pure.cloud *.fontawesome.com *.google-analytics.com"
       policy.style_src :self, :https, :unsafe_inline, "https://tagmanager.google.com https://www.googletagmanager.com https://fonts.googleapis.com *.fontawesome.com"
       policy.media_src :self, :https, :data
+      policy.connect_src :self, :https, "https://api.usw2.pure.cloud/ wss://streaming.usw2.pure.cloud"
     end
   end
 
