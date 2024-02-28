@@ -7,11 +7,12 @@
     <%= favicon_link_tag Settings.site.tab_icon, :rel => 'shortcut icon', :type => 'image/vnd.microsoft.icon' %>
 
     <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{site_short_name} | #{site_short_name}" %></title>
-
-    <%= javascript_pack_tag 'application' %>
+    <%= stylesheet_link_tag "application", :media => "all" %>
     <%= javascript_include_tag "application" %>
-    <%= stylesheet_pack_tag 'application', media: "all" %>
 
+
+    <%= stylesheet_link_tag "sponsored_benefits/application", :media => "all" %>
+    <%= javascript_include_tag "sponsored_benefits/application" %>
     <%= javascript_pack_tag ENV['CLIENT'] %>
     <%= stylesheet_pack_tag ENV['CLIENT'] %>
     <%= javascript_pack_tag 'legacy', 'data-turbolinks-track': 'reload' %>
@@ -27,36 +28,33 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-
+      <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+      <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+      <![endif]-->
     <%= render "layouts/analytics" if ENV['GA_TRACKING_ID'].present? %>
 
-    <%= yield :head %>
-
+        <%= yield :head %>
     <% if EnrollRegistry.feature_enabled?(:live_chat_widget) %>
       <%= render "shared/customer_support/live_chat_scripts" unless EnrollRegistry.feature_enabled?(:external_qna_bot) %>
     <% end %>
   </head>
-
   <body class="font">
-    <%= render partial: './ui-components/bs4/v1/navs/header' %>
 
+    <%= render partial: './ui-components/v1/navs/header' %>
     <%= yield :horizontal_menu %>
     <%= render_flash %>
     <%= render 'users/security_question_responses/modal' %>
 
     <div class="content <%= controller_name %> content-bottom">
-      <%= yield %>
-    </div>
 
+        <%= yield %>
+    </div>
     <% if EnrollRegistry.feature_enabled?(:live_chat_widget) %>
       <%= render "shared/customer_support/live_chat_widget" %>
     <% end %>
+    <%= render partial: './ui-components/v1/layouts/footer' %>
 
-    <%= render partial: './ui-components/bs4/v1/footers/footer' %>
   </body>
  </html>
