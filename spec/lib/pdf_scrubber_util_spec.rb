@@ -32,6 +32,15 @@ RSpec.describe PdfScrubberUtil do
     end
   end
 
+  context "given a title tag" do
+    let(:source_html) { "<title>div { }</title><div>Text</div>" }
+    let(:result) { TestingPdfScrubber.sanitize_pdf(source_html) }
+
+    it "does not scrub the title tag" do
+      expect(result).to include("title")
+    end
+  end
+
   context "given a vanilla div" do
     let(:source_html) { "<div></div>" }
     let(:result) { TestingPdfScrubber.sanitize_pdf(source_html) }
