@@ -15,7 +15,6 @@
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
     <%= csrf_meta_tags %>
 
-
     <%= javascript_pack_tag ENV['CLIENT'] %>
     <%= stylesheet_pack_tag ENV['CLIENT'] %>
 
@@ -47,7 +46,7 @@
   </head>
   <body class="font" data-controller="<%= controller.controller_name %>" data-action="<%= action_name %>">
 
-    <%= render partial: './ui-components/bs4/v1/navs/header' %>
+    <%= render partial: './ui-components/v1/navs/header' %>
 
     <div class="content <%= controller_name %> content-bottom">
       <% if aca_security_questions %>
@@ -69,8 +68,7 @@
     <% if EnrollRegistry.feature_enabled?(:live_chat_widget) %>
       <%= render "shared/customer_support/live_chat_widget" %>
     <% end %>
-
-    <%= render partial: './ui-components/bs4/v1/footers/footer' %>
+    <%= render partial: './ui-components/v1/layouts/footer' %>
 
   </body>
  </html>
