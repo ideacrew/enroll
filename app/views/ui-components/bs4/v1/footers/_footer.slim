@@ -4,7 +4,7 @@ footer.footer-wrapper class=("#{"pre_prod_nav_color" if ENV['ENROLL_REVIEW_ENVIR
       .col-md-6
         = copyright_notice
       .col-md-6
-          ul.list-unstyled.list-group.list-group-horizontal
+          ul.list-unstyled.list-group.list-group-horizontal.float-right
             li.mr-3
               a.call-customer-service href="tel:#{contact_center_short_number}"
                 span
@@ -18,7 +18,7 @@ footer.footer-wrapper class=("#{"pre_prod_nav_color" if ENV['ENROLL_REVIEW_ENVIR
                     i.fas.fa-envelope.fa-lg
                     | &nbsp;
                     = EnrollRegistry[:enroll_app].setting(:mail_address).item
-            li.mr-3
+            li
               = link_to site_faqs_url, target: '_blank', rel: 'noopener noreferrer' do
                 i.fas.fa-question.fa-lg
                 | &nbsp;
