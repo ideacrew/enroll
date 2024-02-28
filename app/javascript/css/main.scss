@@ -538,3 +538,24 @@ a.disabled {
   color: var(--primary-color);
   border-bottom: 1px dashed var(--primary-color);
 }
+
+.nav-stacked li {
+  padding: $spacer;
+  margin-bottom: ($spacer * .25);
+  width: 100%;
+  background: var(--grey-010);
+  color: var(--info-color);
+  a {
+    color: var(--info-color);
+  }
+  &.activer {
+    background: var(--info-color);
+    color: var(--grey-000);
+    a {
+      color: var(--grey-000);
+    }
+  }
+  &.active {
+    @extend .font-weight-bold;
+  }
+}
