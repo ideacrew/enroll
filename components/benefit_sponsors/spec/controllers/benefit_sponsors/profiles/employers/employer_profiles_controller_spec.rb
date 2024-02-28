@@ -65,16 +65,37 @@ module BenefitSponsors
           benefit_sponsorship.save!
           allow(controller).to receive(:authorize).and_return(true)
           sign_in user
-          get :show, params: {id: benefit_sponsor.profiles.first.id.to_s, tab: 'accounts'}
-          allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
         end
 
-        it "should render show template" do
-          expect(response).to render_template("show")
+        context 'with no page_num params' do
+          before do
+            get :show, params: {id: benefit_sponsor.profiles.first.id.to_s, tab: 'accounts'}
+            allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
+          end
+
+          it "should render show template" do
+            expect(response).to render_template("show")
+          end
+
+          it "should return http success" do
+            expect(response).to have_http_status(:success)
+          end
         end
 
-        it "should return http success" do
-          expect(response).to have_http_status(:success)
+        context 'with page_num params' do
+
+          before do
+            get :show, params: {id: benefit_sponsor.profiles.first.id.to_s, tab: 'accounts', page_num: 3}
+            allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
+          end
+
+          it "should render show template" do
+            expect(response).to render_template("show")
+          end
+
+          it "should return http success" do
+            expect(response).to have_http_status(:success)
+          end
         end
       end
     end
@@ -213,6 +234,18 @@ module BenefitSponsors
 
           expect(response).to have_http_status(:success)
           expect(JSON.parse(response.body)).to eq({ "wf_url" => nil })
+        end
+      end
+
+      context "when page_num value is present" do
+        before do
+          allow(::WellsFargo::BillPay::SingleSignOn).to receive(:new).and_return(double(url: "http://example.com", token: "token"))
+          get :wells_fargo_sso, params: {id: employer_profile.id.to_s, page_num: 3}, format: :json
+        end
+
+        it "should not render the JSON response with wf_url" do
+          expect(response).to have_http_status(:success)
+          expect(response.body).to eq("")
         end
       end
 
