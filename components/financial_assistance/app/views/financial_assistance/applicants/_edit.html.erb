@@ -17,7 +17,9 @@
               <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => 'NONE', class: "floatlabel form-control", autocomplete: :off %>
               <div class="text-right">
                 <% unless @applicant.is_primary_applicant? %>
-                  <%= button_tag ('<i class="fa fa-times"><span class="hide">Delete</span></i>'.html_safe), id: "delete_applicant_button", class: "close" %>
+                  <%= button_tag(id: "delete_applicant_button", class: "close") do %>
+                    <i class="fa fa-times"><span class="hide">Delete</span></i>
+                  <% end %>
                 <% end %>
               </div>
           </div>

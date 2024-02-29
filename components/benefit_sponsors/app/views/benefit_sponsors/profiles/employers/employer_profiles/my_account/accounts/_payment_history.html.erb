@@ -53,11 +53,17 @@
         <% num_of_pages.each do |page_num|%>
           <div class="btn-group" role="group">
             <% if @page_num.nil? && page_num == 1 %>
-              <%= link_to "<button class='btn btn-default active' id='page-num-1'>1</button>".html_safe, profiles_employers_employer_profile_path(@employer_profile, tab: "accounts", page_num: "1"), :remote => true %>
+              <%= link_to(profiles_employers_employer_profile_path(@employer_profile, tab: "accounts", page_num: "1"), :remote => true) do %>
+                <button class='btn btn-default active' id='page-num-1'>1</button>
+              <% end %>
             <% elsif page_num == @page_num.to_i %>
-              <%= link_to "<button class='btn btn-default active' id='page-num-#{page_num}'>#{page_num}</button>".html_safe, profiles_employers_employer_profile_path(@employer_profile, tab: "accounts", page_num: page_num), :remote => true %>
+              <%= link_to(profiles_employers_employer_profile_path(@employer_profile, tab: "accounts", page_num: page_num), :remote => true) do %>
+                <button class='btn btn-default active' id='page-num-<%= page_num %>'><%= page_num %></button>
+              <% end %>
             <% else %>
-            <%= link_to "<button class='btn btn-default' id='page-num-#{page_num}'>#{page_num}</button>".html_safe, profiles_employers_employer_profile_path(@employer_profile, tab: "accounts", page_num: page_num), :remote => true %>
+              <%= link_to( profiles_employers_employer_profile_path(@employer_profile, tab: "accounts", page_num: page_num), :remote => true) do %>
+                <button class='btn btn-default' id='page-num-<%= page_num %>'><%= page_num %></button>
+              <% end %>
             <% end %>
           </div>
         <% end %>

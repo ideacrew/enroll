@@ -7,7 +7,7 @@
       "check_name": "SendFile",
       "message": "Model attribute used in file name",
       "file": "components/notifier/app/controllers/notifier/notice_kinds_controller.rb",
-      "line": 59,
+      "line": 65,
       "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
       "code": "send_file(\"#{Rails.root}/tmp/#{Notifier::NoticeKind.find(params[:id]).notice_recipient.hbx_id}_#{Notifier::NoticeKind.find(params[:id]).title.titleize.gsub(/\\s+/, \"_\")}.pdf\", :type => \"application/pdf\", :disposition => \"inline\")",
       "render_path": null,
@@ -22,6 +22,58 @@
         22
       ],
       "note": ""
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "045a512f5377deb1e2c43103ad4d557cc2e35672332ec4b801f0cc3bb497b5c6",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans.js.erb",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"plans\", { :locals => ({ :plans => (::Queries::EmployerPlanOfferings.new(plan_design_organization).dental_reference_plans_by_id(params[:plans_ids], params[:active_year]).select do\n a.premium_tables.present?\n end) }) })).html_safe",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "SponsoredBenefits::Organizations::PlanDesignProposals::PlansController",
+          "method": "dental_reference_plans",
+          "line": 34,
+          "file": "components/sponsored_benefits/app/controllers/sponsored_benefits/organizations/plan_design_proposals/plans_controller.rb",
+          "rendered": {
+            "name": "sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans",
+            "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Render update via javascript - the used template is already checked."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "05c045082fc39db1f7f864f8de707d75646d431b8ebfc3486b7f1c34a661895c",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/benefit_sponsors/app/views/benefit_sponsors/benefit_packages/benefit_packages/_product_choices.html.erb",
+      "line": 190,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "@benefit_package_form.catalog.sponsor_contributions(@benefit_package_form.id).to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "benefit_sponsors/benefit_packages/benefit_packages/_product_choices"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "JSON serialization already checks for XSS."
     },
     {
       "warning_type": "Mass Assignment",
@@ -113,6 +165,26 @@
       "note": ""
     },
     {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "0e35c13172c376de7d2f1c0dd5f3dacea4f85650eb4d1eac50fe7476054790df",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/contributions/index.js.erb",
+      "line": 5,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"sponsored_benefits/organizations/plan_design_proposals/shared/employee_composite_costs\", { :locals => ({ :benefit_group => benefit_group }) })).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/contributions/index"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Partial update via javascript.  The used template has already been cleaned."
+    },
+    {
       "warning_type": "Command Injection",
       "warning_code": 14,
       "fingerprint": "132c37aeaaedb5c65a6e90b1ab75386acec6e2264bbcb81a0c5f780acd2e232f",
@@ -134,6 +206,66 @@
         77
       ],
       "note": ""
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "147913cb4030505ec4908eb47c6be6c4643ac6bb6c1da62083fc44e785ea8c13",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/people/get_employer.js.erb",
+      "line": 4,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"employers\", {})).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "people/get_employer"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Partial update via javascript - the used template has already been cleaned."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "177c2cc4b576fa9f0afa31e593493fb91d1a93c3ffa861f25fd25863c5e00c9d",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/benefit_sponsors/app/views/benefit_sponsors/benefit_applications/benefit_applications/shared/_benefit_application_fields.html.slim",
+      "line": 107,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "@benefit_application_form.start_on_options.to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "benefit_sponsors/benefit_applications/benefit_applications/shared/_benefit_application_fields"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "JSON serialization already checks for XSS."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "177c2cc4b576fa9f0afa31e593493fb91d1a93c3ffa861f25fd25863c5e00c9d",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/benefit_sponsors/app/views/benefit_sponsors/benefit_applications/benefit_applications/shared/_benefit_application_fields.html.slim",
+      "line": 166,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "@benefit_application_form.start_on_options.to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "benefit_sponsors/benefit_applications/benefit_applications/shared/_benefit_application_fields"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "JSON serialization already checks for XSS."
     },
     {
       "warning_type": "Command Injection",
@@ -165,7 +297,7 @@
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "app/data_migrations/force_publish_ben_app_reports.rb",
-      "line": 236,
+      "line": 237,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "system(\"rm -rf #{\"#{Rails.root}/dry_run_dc_nfp_detailed_report_#{TimeKeeper.date_of_record.strftime(\"%Y_%m_%d\")}.csv\"}\")",
       "render_path": null,
@@ -180,6 +312,26 @@
         77
       ],
       "note": ""
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "2761b290695873fb424dd9df46d56ab5c6dbc4b776b7c0c91575c0cae0f2190a",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/benefit_sponsors/app/views/benefit_sponsors/benefit_packages/benefit_packages/_product_choices.html.erb",
+      "line": 185,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "@benefit_package_form.catalog.plan_options.to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "benefit_sponsors/benefit_packages/benefit_packages/_product_choices"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "JSON serialization already checks for XSS."
     },
     {
       "warning_type": "Mass Assignment",
@@ -202,6 +354,26 @@
         915
       ],
       "note": ""
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "281582e58d6f92fe6b658278617d82af807312c3a2b63400467d5e51af27137c",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/ui-components/v1/cards/_metal_level_select.html.slim",
+      "line": 135,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "f.object.sponsor_contribution.min_contributions_map.to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "ui-components/v1/cards/_metal_level_select"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Already passed through JSON serialization."
     },
     {
       "warning_type": "SQL Injection",
@@ -227,13 +399,54 @@
       "note": ""
     },
     {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "2babd752f4f07d86c0cf403f946b348ec2a25b95dfab59561bdcc62be79187f1",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/ui-components/v1/modals/_read_only_modal.html.slim",
+      "line": 7,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "header_icon.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "ui-components/v1/modals/_read_only_modal"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Raw html image tag, no user input allowed."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "3291f33ffbcb6bb388bb080269a67bf3f4689c4afa88de149fd16e34b74986e5",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "lib/pdf_scrubber_util.rb",
+      "line": 10,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "ActionController::Base.helpers.sanitize(value, :tags => Loofah::HTML5::SafeList::ACCEPTABLE_ELEMENTS.delete(\"select\").merge([\"style\", \"title\"]), :attributes => Loofah::HTML5::SafeList::ACCEPTABLE_ATTRIBUTES.add(\"style\")).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "PdfScrubberUtil",
+        "method": "sanitize_pdf"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": ""
+    },
+    {
       "warning_type": "Command Injection",
       "warning_code": 14,
       "fingerprint": "32a4fba0025fc7cdd09a396e504a40ce8c53a4ad3262246c5f3bd0b3849a47f2",
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "app/data_migrations/force_publish_ben_app_reports.rb",
-      "line": 183,
+      "line": 184,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "system(\"rm -rf #{\"#{Rails.root}/dry_run_dc_nfp_non_detailed_report_#{TimeKeeper.date_of_record.strftime(\"%Y_%m_%d\")}.csv\"}\")",
       "render_path": null,
@@ -248,6 +461,26 @@
         77
       ],
       "note": ""
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "373cac33045cda16ef222ff154defec6951fca8bcaad1c7ddbaeb105b87953cc",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/plans/index.js.erb",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"plans\", { :locals => ({ :plans => (@plans) }) })).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/plans/index"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Partial update via javascript - the used template is already cleaned."
     },
     {
       "warning_type": "Mass Assignment",
@@ -310,7 +543,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 197,
+          "line": 203,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -328,6 +561,27 @@
         79
       ],
       "note": ""
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "4473a1774822ffd9f554afcea3c8aa5a79e3b490e7776313c6c62e2da3ff4fab",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/models/effective/mongoid_datatable.rb",
+      "line": 18,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "I18n.t(translation_key, interpolated_keys.merge(:raise => true)).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Effective::MongoidDatatable",
+        "method": "l10n"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Tables need to produce HTML - it is the responsibility of the table subclass to scrub."
     },
     {
       "warning_type": "File Access",
@@ -397,13 +651,55 @@
       "note": ""
     },
     {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "4f539a24c7eb1efd381be0097aead4b9a473552799baf4fb59562ed1193ca6b0",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/exchanges/hbx_profiles/_new_benefit_application.html.slim",
+      "line": 129,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "BenefitSponsors::Forms::BenefitApplicationForm.for_new(new_ba_params).start_on_options.to_json.html_safe",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Exchanges::HbxProfilesController",
+          "method": "new_benefit_application",
+          "line": 67,
+          "file": "app/controllers/exchanges/hbx_profiles_controller.rb",
+          "rendered": {
+            "name": "exchanges/hbx_profiles/new_benefit_application",
+            "file": "app/views/exchanges/hbx_profiles/new_benefit_application.js.erb"
+          }
+        },
+        {
+          "type": "template",
+          "name": "exchanges/hbx_profiles/new_benefit_application",
+          "line": 10,
+          "file": "app/views/exchanges/hbx_profiles/new_benefit_application.js.erb",
+          "rendered": {
+            "name": "exchanges/hbx_profiles/_new_benefit_application",
+            "file": "app/views/exchanges/hbx_profiles/_new_benefit_application.html.slim"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "exchanges/hbx_profiles/_new_benefit_application"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "JSON serialization is already checked."
+    },
+    {
       "warning_type": "File Access",
       "warning_code": 16,
       "fingerprint": "50aa7bd54085347f6528d46a9b45c5211cde34856f8b5c760de6de5be822a7bc",
       "check_name": "FileAccess",
       "message": "Model attribute used in file name",
       "file": "app/models/one_login/ruby_saml/saml_generator.rb",
-      "line": 35,
+      "line": 38,
       "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
       "code": "File.read(SamlInformation.pay_now_private_key_location)",
       "render_path": null,
@@ -420,27 +716,108 @@
       "note": ""
     },
     {
-      "warning_type": "Dynamic Render Path",
-      "warning_code": 15,
-      "fingerprint": "5422444e7f2f2ee38545a0181b07ead8b4b7e5304f41a594778fe1c48b1c190b",
-      "check_name": "Render",
-      "message": "Render path contains parameter value",
-      "file": "app/controllers/exceptions_controller.rb",
-      "line": 21,
-      "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
-      "code": "render(file => \"public/#{(params[:code] or 500)}.html\", { :status => ((params[:code] or 500)), :layout => false })",
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "5265cd39efe2c8fe4c7f817b6d80be40da3849d7fae4dbc62f61d47e50982664",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/ui-components/v1/cards/_metal_level_select.html.slim",
+      "line": 132,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "@benefit_package_form.catalog.plan_options.to_json.html_safe",
       "render_path": null,
       "location": {
-        "type": "method",
-        "class": "ExceptionsController",
-        "method": "show"
+        "type": "template",
+        "template": "ui-components/v1/cards/_metal_level_select"
       },
-      "user_input": "params[:code]",
+      "user_input": null,
       "confidence": "Medium",
-      "cwe_id": [
-        22
+      "cwe_id": null,
+      "note": "Already passed through JSON serialization."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "5454ab23b78644cd9cf746a06ecd01e042518d8bb122c545f25ed237c7d113c6",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/ui-components/v1/cards/_metal_level_select.html.slim",
+      "line": 133,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "@benefit_package_form.service.benefit_application.effective_period.min.strftime(\"%m-%d\").to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "ui-components/v1/cards/_metal_level_select"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Already passed through JSON serialization."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "54f80fadf2b8c71954acbb578e36470496d5c3a3b012d37a52b2ef1bce6a2689",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/employers/plan_years/dental_reference_plans.js.erb",
+      "line": 9,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"employers/plan_years/plan_selection/dental_plans\", {})).html_safe",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Employers::PlanYearsController",
+          "method": "dental_reference_plans",
+          "line": 30,
+          "file": "app/controllers/employers/plan_years_controller.rb",
+          "rendered": {
+            "name": "employers/plan_years/dental_reference_plans",
+            "file": "app/views/employers/plan_years/dental_reference_plans.js.erb"
+          }
+        }
       ],
-      "note": ""
+      "location": {
+        "type": "template",
+        "template": "employers/plan_years/dental_reference_plans"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Partial render update via javascript - used template is checked already."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "54f80fadf2b8c71954acbb578e36470496d5c3a3b012d37a52b2ef1bce6a2689",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/employers/plan_years/dental_reference_plans.js.erb",
+      "line": 44,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"employers/plan_years/plan_selection/dental_plans\", {})).html_safe",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Employers::PlanYearsController",
+          "method": "dental_reference_plans",
+          "line": 30,
+          "file": "app/controllers/employers/plan_years_controller.rb",
+          "rendered": {
+            "name": "employers/plan_years/dental_reference_plans",
+            "file": "app/views/employers/plan_years/dental_reference_plans.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "employers/plan_years/dental_reference_plans"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Partial render update via javascript - used template is checked already."
     },
     {
       "warning_type": "Command Injection",
@@ -464,6 +841,38 @@
         77
       ],
       "note": ""
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "55ccf1c8ec6bcba765dd313612e5ad89018713292cf9cee67bff3eba81765560",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/plans/index.js.erb",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"plans\", { :locals => ({ :plans => ((((::Queries::EmployerPlanOfferings.new(plan_design_organization).send(\"single_carrier_offered_#{kind}_plans\", params[:carrier_id], params[:active_year]) or ::Queries::EmployerPlanOfferings.new(plan_design_organization).metal_level_offered_health_plans(params[:metal_level], params[:active_year])) or ::Queries::EmployerPlanOfferings.new(plan_design_organization).send(\"single_option_offered_#{kind}_plans\", params[:carrier_id], params[:active_year])) or ::Queries::EmployerPlanOfferings.new(plan_design_organization).sole_source_offered_health_plans(params[:carrier_id], params[:active_year])).select do\n a.premium_tables.present?\n end) }) })).html_safe",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "SponsoredBenefits::Organizations::PlanDesignProposals::PlansController",
+          "method": "index",
+          "line": 20,
+          "file": "components/sponsored_benefits/app/controllers/sponsored_benefits/organizations/plan_design_proposals/plans_controller.rb",
+          "rendered": {
+            "name": "sponsored_benefits/organizations/plan_design_proposals/plans/index",
+            "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/plans/index.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/plans/index"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Render update via javascript - the used template is already checked."
     },
     {
       "warning_type": "Mass Assignment",
@@ -495,7 +904,7 @@
       "check_name": "FileAccess",
       "message": "Model attribute used in file name",
       "file": "app/models/one_login/ruby_saml/saml_generator.rb",
-      "line": 36,
+      "line": 39,
       "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
       "code": "File.read(SamlInformation.pay_now_x509_cert_location)",
       "render_path": null,
@@ -512,6 +921,58 @@
       "note": ""
     },
     {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "57e5c4e7dbedc87ce6c9e88a87d5562a2e2139391aeabb8a447d4d662ede2332",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/contributions/index.js.erb",
+      "line": 5,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"sponsored_benefits/organizations/plan_design_proposals/shared/employee_composite_costs\", { :locals => ({ :benefit_group => benefit_group }) })).html_safe",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "SponsoredBenefits::Organizations::PlanDesignProposals::ContributionsController",
+          "method": "index",
+          "line": 14,
+          "file": "components/sponsored_benefits/app/controllers/sponsored_benefits/organizations/plan_design_proposals/contributions_controller.rb",
+          "rendered": {
+            "name": "sponsored_benefits/organizations/plan_design_proposals/contributions/index",
+            "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/contributions/index.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/contributions/index"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Render update via javascript - the used template is already checked."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "5c38214552b23bdf7ff8dacc85962a04c885796d9ade832ca10afc13ca21d157",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/plans/index.js.erb",
+      "line": 2,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"plan_search_fields\", { :locals => ({ :search_options => (@search_options), :search_titles => (@search_option_titles) }) })).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/plans/index"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Partial update via javascript - the used template is already cleaned."
+    },
+    {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 2,
       "fingerprint": "610a15e39096f8ef290305891b1b39a1a8027b84ef6618aca8929993351e3152",
@@ -526,7 +987,7 @@
           "type": "controller",
           "class": "Insured::GroupSelectionController",
           "method": "edit_plan",
-          "line": 197,
+          "line": 203,
           "file": "app/controllers/insured/group_selection_controller.rb",
           "rendered": {
             "name": "insured/group_selection/edit_plan",
@@ -544,6 +1005,27 @@
         79
       ],
       "note": ""
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "614f339fe4886387e697fe85bc2b6c352c1bc3d6790be2efa775e1e96abaf0e0",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/helpers/portal_header_helper.rb",
+      "line": 130,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "l10n(*args).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "PortalHeaderHelper",
+        "method": "translated_header_portal_link"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Translations checked for user-created values."
     },
     {
       "warning_type": "Command Injection",
@@ -592,6 +1074,59 @@
       "note": ""
     },
     {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "68daaeaa46c4ab256e078ef5ceafd048b49ba05ca7e53a029cdad7aa94e9f89e",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/benefit_sponsors/app/helpers/benefit_sponsors/portal_header_helper.rb",
+      "line": 42,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "l10n(*args).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "BenefitSponsors::PortalHeaderHelper",
+        "method": "translated_header_portal_link"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Translation checked for user-created values."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "6ab7d86fdf47229c8a3e03b86a5de4134b3d2e3c348f74981617563fab182f40",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/employers/plan_years/calc_offered_plan_contributions.js.erb",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"employers/plan_years/plan_selection/plan_details\", { :locals => ({ :is_edit => params[:is_edit], :calc_offered => true }) })).html_safe",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Employers::PlanYearsController",
+          "method": "calc_offered_plan_contributions",
+          "line": 259,
+          "file": "app/controllers/employers/plan_years_controller.rb",
+          "rendered": {
+            "name": "employers/plan_years/calc_offered_plan_contributions",
+            "file": "app/views/employers/plan_years/calc_offered_plan_contributions.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "employers/plan_years/calc_offered_plan_contributions"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Partial render update via javascript - used template is checked already."
+    },
+    {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 2,
       "fingerprint": "6c26117cb8a16470d6e0cf73d4e2183c08714a1346985e7f9d7632dec54d26ee",
@@ -606,7 +1141,7 @@
           "type": "controller",
           "class": "Exchanges::HbxProfilesController",
           "method": "view_enrollment_to_update_end_date",
-          "line": 510,
+          "line": 513,
           "file": "app/controllers/exchanges/hbx_profiles_controller.rb",
           "rendered": {
             "name": "exchanges/hbx_profiles/view_enrollment_to_update_end_date",
@@ -680,6 +1215,27 @@
       "note": ""
     },
     {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "722156ad8833f8a147cfd5b70430051b005853a3c9bea0799aa27fecde24c451",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/notifier/app/helpers/notifier/application_helper.rb",
+      "line": 49,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "setting.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Notifier::ApplicationHelper",
+        "method": "setting_portal_link"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Checked for external parameters."
+    },
+    {
       "warning_type": "SQL Injection",
       "warning_code": 0,
       "fingerprint": "725e6a432f0a633359b94a1008214214550ab409c862b5db16f29c145d432867",
@@ -701,6 +1257,90 @@
         89
       ],
       "note": ""
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "7724ae35cb748c95f78a624c43a4d7d6b2bf6ac8e5c2d01cdf3881c7d38e1cc8",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/contributions/index.js.erb",
+      "line": 7,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"sponsored_benefits/organizations/plan_design_proposals/shared/benefit_group_cost_summary\", { :locals => ({ :benefit_group => benefit_group, :kind => kind }) })).html_safe",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "SponsoredBenefits::Organizations::PlanDesignProposals::ContributionsController",
+          "method": "index",
+          "line": 14,
+          "file": "components/sponsored_benefits/app/controllers/sponsored_benefits/organizations/plan_design_proposals/contributions_controller.rb",
+          "rendered": {
+            "name": "sponsored_benefits/organizations/plan_design_proposals/contributions/index",
+            "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/contributions/index.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/contributions/index"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Render update via javascript - the used template is already checked."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "8250b14b6acd103805ad12f9915d3050b9b8391a4e79cccedb20d2e78c1b4a58",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans.js.erb",
+      "line": 4,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "::Queries::EmployerPlanOfferings.new(plan_design_organization).dental_reference_plans_by_id(params[:plans_ids], params[:active_year]).select do\n a.premium_tables.present?\n end.map do\n a.id.to_s\n end.to_json.html_safe",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "SponsoredBenefits::Organizations::PlanDesignProposals::PlansController",
+          "method": "dental_reference_plans",
+          "line": 34,
+          "file": "components/sponsored_benefits/app/controllers/sponsored_benefits/organizations/plan_design_proposals/plans_controller.rb",
+          "rendered": {
+            "name": "sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans",
+            "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Already passed through JSON serialization."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "84c16681d9764df958a5c7efb79f7693a6558ea0edeb0d0f9d4bad986cf554bf",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/ui-components/v1/cards/_reference_plan.html.slim",
+      "line": 48,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "f.object.sponsor_contribution.min_contributions_map.to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "ui-components/v1/cards/_reference_plan"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Already passed through json serialization."
     },
     {
       "warning_type": "Mass Assignment",
@@ -793,6 +1433,270 @@
       "note": ""
     },
     {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "8dc7c9aa27c548e08772ae9757a88741df396d2fa68554266a504dbfd1fcd883",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans.js.erb",
+      "line": 2,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"plan_search_fields\", { :locals => ({ :search_options => ::Plan.search_options(::Queries::EmployerPlanOfferings.new(plan_design_organization).dental_reference_plans_by_id(params[:plans_ids], params[:active_year]).select do\n a.premium_tables.present?\n end), :search_titles => ({ :plan_type => (if EnrollRegistry.feature_enabled?(:hmo_ppo_plan_type) then\n  \"HMO / PPO\"\nelse\n  \"Plan Type\"\nend), :plan_hsa => \"HSA - Compatible\", :metal_level => \"Metal Level\", :plan_deductible => \"Individual deductible (in network)\" }) }) })).html_safe",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "SponsoredBenefits::Organizations::PlanDesignProposals::PlansController",
+          "method": "dental_reference_plans",
+          "line": 34,
+          "file": "components/sponsored_benefits/app/controllers/sponsored_benefits/organizations/plan_design_proposals/plans_controller.rb",
+          "rendered": {
+            "name": "sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans",
+            "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Render update via javascript - used template is already checked."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "8f1a52877f4e8e64a2f3fabfb2be41307f5421650083792a79d54b0af5704f8a",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/contributions/index.js.erb",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"sponsored_benefits/organizations/plan_design_proposals/shared/pdp_plan_details\", {})).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/contributions/index"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Partial update via javascript - the used template has already been cleaned."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "8fdf64eca967aca03ba1d4a7648ed95dd4beb502e0ec0de3130f3bc97baba22a",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/employers/plan_years/calc_offered_plan_contributions.js.erb",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"employers/plan_years/plan_selection/plan_details\", { :locals => ({ :is_edit => (@is_edit), :calc_offered => true }) })).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "employers/plan_years/calc_offered_plan_contributions"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Partial update via javascript - the used template has already been cleaned."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "9d4b9216f06c37bc9f2eed10c9438bbbe1f813c124038dbf9bcfd595bb2dafe8",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/employers/plan_years/calc_employer_contributions.js.erb",
+      "line": 2,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"employers/plan_years/plan_selection/plan_details\", {})).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "employers/plan_years/calc_employer_contributions"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Partial update via javascript - the used template has already been cleaned."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "a2cde980bdaac3ef17b5d76b4b0c54afe5f33ba112ea79711e9a2f5240df616b",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/sponsored_benefits/app/controllers/sponsored_benefits/organizations/plan_design_proposals/plans_controller.rb",
+      "line": 31,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "::Queries::EmployerPlanOfferings.new(plan_design_organization).dental_reference_plans_by_id(params[:plans_ids], params[:active_year]).select do\n a.premium_tables.present?\n end.map do\n a.id.to_s\n end.to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "SponsoredBenefits::Organizations::PlanDesignProposals::PlansController",
+        "method": "dental_reference_plans"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Already passed through JSON serialization."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "a2f40cc3526c9e047ac2ee620cf9b71e13ca54b28a74d103783dc6279e4a7336",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "project_gems/effective_datatables-2.6.14/app/views/effective/datatables/_datatable.html.haml",
+      "line": 42,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "col.to_s.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "effective/datatables/_datatable"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Datatable columns must be rendered as is.  It is the responsibility of the table object to do any scrubbing."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "a2f40cc3526c9e047ac2ee620cf9b71e13ca54b28a74d103783dc6279e4a7336",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "project_gems/effective_datatables-2.6.14/app/views/effective/datatables/_datatable.html.haml",
+      "line": 49,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "col.to_s.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "effective/datatables/_datatable"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Datatable columns must be rendered as is.  It is the responsibility of the table object to do any scrubbing."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "a5b9e523cd2f74410f411df729a1b2196629adc8963449e0763910b745b0e1c0",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/exchanges/hbx_profiles/_new_benefit_application.html.slim",
+      "line": 129,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "@ba_form.start_on_options.to_json.html_safe",
+      "render_path": [
+        {
+          "type": "template",
+          "name": "exchanges/hbx_profiles/new_benefit_application",
+          "line": 10,
+          "file": "app/views/exchanges/hbx_profiles/new_benefit_application.js.erb",
+          "rendered": {
+            "name": "exchanges/hbx_profiles/_new_benefit_application",
+            "file": "app/views/exchanges/hbx_profiles/_new_benefit_application.html.slim"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "exchanges/hbx_profiles/_new_benefit_application"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "JSON serialization is already checked."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "a7054b18fb932474405a426c3e8961b5044788dd0c850c64283846cdb13c6183",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/employers/plan_years/reference_plans.js.erb",
+      "line": 2,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"employers/plan_years/plan_selection/single_carriers\", { :locals => ({ :plans => (@plans), :benefit_group => (@benefit_group) }) })).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "employers/plan_years/reference_plans"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Partial update via javascript - the used template has already been cleaned."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "aaa0288e835c23b720c7ef74ac172440d89b7fd7af4c3af2514d5a8ba9272ea6",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/contributions/index.js.erb",
+      "line": 7,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"sponsored_benefits/organizations/plan_design_proposals/shared/benefit_group_cost_summary\", { :locals => ({ :benefit_group => benefit_group, :kind => kind }) })).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/contributions/index"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Partial update via javascript.  The used template has already been cleaned."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "aef324875d5d7035a3167b9ccc851d58d708b15a8f4a07170973d6fe71106ce4",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/benefit_sponsors/app/views/benefit_sponsors/sponsored_benefits/sponsored_benefits/_sponsored_benefit.html.slim",
+      "line": 115,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "@sponsored_benefit_form.catalog.plan_options.to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "benefit_sponsors/sponsored_benefits/sponsored_benefits/_sponsored_benefit"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Already passed through JSON serialization."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "aef324875d5d7035a3167b9ccc851d58d708b15a8f4a07170973d6fe71106ce4",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/benefit_sponsors/app/views/benefit_sponsors/sponsored_benefits/sponsored_benefits/_sponsored_benefit.html.slim",
+      "line": 153,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "@sponsored_benefit_form.catalog.plan_options.to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "benefit_sponsors/sponsored_benefits/sponsored_benefits/_sponsored_benefit"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Already passed through JSON serialization."
+    },
+    {
       "warning_type": "Command Injection",
       "warning_code": 14,
       "fingerprint": "b122d2f7957b4b965ade2855ead1eda0b76571257de543ed1ead416bd5a54418",
@@ -814,6 +1718,66 @@
         77
       ],
       "note": ""
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "bcb33106511c9afd61f3a662472251bdf471d4d7e90bc8b5241d76b222655063",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/ui-components/v1/cards/_metal_level_select.html.slim",
+      "line": 134,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "@benefit_package_form.catalog.sponsor_contributions(@benefit_package_form.id).to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "ui-components/v1/cards/_metal_level_select"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Already passed through JSON serialization."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "c019f42028ad97c8c5c62f4d736c609ee96a27cb74ceb04cbd726449dd88752d",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/exchanges/hbx_profiles/_new_benefit_application.html.slim",
+      "line": 129,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "@ba_form.start_on_options.to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "exchanges/hbx_profiles/_new_benefit_application"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Already passed through JSON serialization."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "c0c68eaf4dc6745a04c0197f8e8d1afb3d8164f01e143a3799014f376db7d8a3",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/employers/plan_years/plan_details.js.erb",
+      "line": 2,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"employers/plan_years/plan_selection/plan_details\", {})).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "employers/plan_years/plan_details"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Partial update via javascript - the used template has already been cleaned."
     },
     {
       "warning_type": "SQL Injection",
@@ -839,13 +1803,45 @@
       "note": ""
     },
     {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "c8b7cdfe4241de496ca20d7fc1385d91e18d06c879305566c5c0535ac764824f",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/plans/index.js.erb",
+      "line": 2,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"plan_search_fields\", { :locals => ({ :search_options => ::Plan.search_options((((::Queries::EmployerPlanOfferings.new(plan_design_organization).send(\"single_carrier_offered_#{kind}_plans\", params[:carrier_id], params[:active_year]) or ::Queries::EmployerPlanOfferings.new(plan_design_organization).metal_level_offered_health_plans(params[:metal_level], params[:active_year])) or ::Queries::EmployerPlanOfferings.new(plan_design_organization).send(\"single_option_offered_#{kind}_plans\", params[:carrier_id], params[:active_year])) or ::Queries::EmployerPlanOfferings.new(plan_design_organization).sole_source_offered_health_plans(params[:carrier_id], params[:active_year])).select do\n a.premium_tables.present?\n end), :search_titles => ({ :plan_type => ((Settings.aca.state_abbreviation == \"DC\") ? (\"Plan Type\") : (\"HMO / PPO\")), :plan_hsa => \"HSA - Compatible\", :metal_level => \"Metal Level\", :plan_deductible => \"Individual deductible (in network)\" }) }) })).html_safe",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "SponsoredBenefits::Organizations::PlanDesignProposals::PlansController",
+          "method": "index",
+          "line": 20,
+          "file": "components/sponsored_benefits/app/controllers/sponsored_benefits/organizations/plan_design_proposals/plans_controller.rb",
+          "rendered": {
+            "name": "sponsored_benefits/organizations/plan_design_proposals/plans/index",
+            "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/plans/index.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/plans/index"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Render update via javascript - the used template is already checked."
+    },
+    {
       "warning_type": "Dangerous Send",
       "warning_code": 23,
       "fingerprint": "c91b6616e76312d2e686dfb12ae27d00ddca89d40690b61f5798edcb37aa6ad5",
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "components/financial_assistance/app/controllers/financial_assistance/verification_documents_controller.rb",
-      "line": 115,
+      "line": 122,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "@docs_owner.send(params[:evidence_kind])",
       "render_path": null,
@@ -860,6 +1856,46 @@
         77
       ],
       "note": ""
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "c991c458b3a0cacfea78122dbd696e05bfa7dc1056751bf2181e8d466bbbe486",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/events/v2/employers/group_xml.haml",
+      "line": 20,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "organization[2].html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "events/v2/employers/group_xml"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "XML format - no need for scrubbing."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "cb09d555db109145f5f7605bce9aaee4a6541dde8e5fe02fab5258df2380acec",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans.js.erb",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"plans\", { :locals => ({ :plans => (@plans) }) })).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Partial update via javascript - the used template is already cleaned."
     },
     {
       "warning_type": "Command Injection",
@@ -883,6 +1919,46 @@
         77
       ],
       "note": ""
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "cd82e6f5a96948dd7591e8adc1b5e21e7af0bcfb1f4db163cd5ff90804392bd6",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/people/_get_employer.js.erb",
+      "line": 4,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"people/employers\", {})).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "people/_get_employer"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Partial update via javascript - the used template has already been cleaned."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "ce3c3106e783a6450c4e84399b0c94c828e8aceed8b76166cef5b11545656f5b",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans.js.erb",
+      "line": 2,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"plan_search_fields\", { :locals => ({ :search_options => (@search_options), :search_titles => (@search_option_titles) }) })).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Partial update via javascript - the used template is already cleaned."
     },
     {
       "warning_type": "Mass Assignment",
@@ -914,7 +1990,7 @@
       "check_name": "EOLRails",
       "message": "Support for Rails 5.2.4.4 ended on 2022-06-01",
       "file": "Gemfile.lock",
-      "line": 758,
+      "line": 723,
       "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
       "code": null,
       "render_path": null,
@@ -924,7 +2000,7 @@
       "cwe_id": [
         1104
       ],
-      "note": ""
+      "note": "Planned to be delt with by rails upgrade."
     },
     {
       "warning_type": "Command Injection",
@@ -933,7 +2009,7 @@
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "app/data_migrations/force_publish_ben_app_reports.rb",
-      "line": 63,
+      "line": 64,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "system(\"rm -rf #{\"#{Rails.root}/unnassigned_packages_#{TimeKeeper.date_of_record.strftime(\"%Y_%m_%d\")}.csv\"}\")",
       "render_path": null,
@@ -950,11 +2026,176 @@
       "note": ""
     },
     {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "db2bb99857bc843d14c9dce0d7eba27ede26171de272a61865f1c6db8ced8b11",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/benefit_sponsors/app/views/benefit_sponsors/sponsored_benefits/sponsored_benefits/_sponsored_benefit.html.slim",
+      "line": 112,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "@sponsored_benefit_form.employees_cost.to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "benefit_sponsors/sponsored_benefits/sponsored_benefits/_sponsored_benefit"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Already passed through JSON serialization."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "de5a01ebe8bd4e2d3eba022576a96eb2cabaab038e62d4f1b6f0d09247615008",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/employers/plan_years/calc_employer_contributions.js.erb",
+      "line": 2,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"employers/plan_years/plan_selection/plan_details\", {})).html_safe",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Employers::PlanYearsController",
+          "method": "calc_employer_contributions",
+          "line": 228,
+          "file": "app/controllers/employers/plan_years_controller.rb",
+          "rendered": {
+            "name": "employers/plan_years/calc_employer_contributions",
+            "file": "app/views/employers/plan_years/calc_employer_contributions.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "employers/plan_years/calc_employer_contributions"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Partial render update via javascript - used template is checked already."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "e67a15558b0ea585f2a4795d7ac2845607499df53160a552da6d20a536fc564e",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/contributions/index.js.erb",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"sponsored_benefits/organizations/plan_design_proposals/shared/pdp_plan_details\", {})).html_safe",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "SponsoredBenefits::Organizations::PlanDesignProposals::ContributionsController",
+          "method": "index",
+          "line": 14,
+          "file": "components/sponsored_benefits/app/controllers/sponsored_benefits/organizations/plan_design_proposals/contributions_controller.rb",
+          "rendered": {
+            "name": "sponsored_benefits/organizations/plan_design_proposals/contributions/index",
+            "file": "components/sponsored_benefits/app/views/sponsored_benefits/organizations/plan_design_proposals/contributions/index.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/contributions/index"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Render update via javascript - the used template is already checked."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "e7a6fbdc397ebf18da07d2201bf9d7666f1ba756085931fc56beb5b2cc6690cc",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/employers/plan_years/dental_reference_plans.js.erb",
+      "line": 9,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"employers/plan_years/plan_selection/dental_plans\", {})).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "employers/plan_years/dental_reference_plans"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Partial update via javascript - the used template has already been cleaned."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "e7a6fbdc397ebf18da07d2201bf9d7666f1ba756085931fc56beb5b2cc6690cc",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/employers/plan_years/dental_reference_plans.js.erb",
+      "line": 44,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"employers/plan_years/plan_selection/dental_plans\", {})).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "employers/plan_years/dental_reference_plans"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Partial update via javascript - the used template has already been cleaned."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "eab7b66203537fef1114e5fd92f6de12d677914993cc3afba2fdbe44100a8004",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/people/person_confirm.js.erb",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"person_confirm\", {})).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "people/person_confirm"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Partial update via javascript - the used template has already been cleaned."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "ed4ca6af14e3a0ed486a0d02a91b87403ef84a56baf6bad56b3683ae12ff7c40",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "lib/html_scrubber_util.rb",
+      "line": 10,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "ActionController::Base.helpers.sanitize(value, :tags => Loofah::HTML5::SafeList::ACCEPTABLE_ELEMENTS.delete(\"select\").add(\"style\"), :attributes => Loofah::HTML5::SafeList::ACCEPTABLE_ATTRIBUTES.merge([\"style\", \"data-toggle\", \"data-slide-to\", \"data-target\"])).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "HtmlScrubberUtil",
+        "method": "sanitize_html"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": ""
+    },
+    {
       "warning_type": "Unmaintained Dependency",
       "warning_code": 121,
       "fingerprint": "edf687f759ec9765bd5db185dbc615c80af77d6e7e19386fc42934e7a80307af",
       "check_name": "EOLRuby",
-      "message": "Support for Ruby 2.5.9 ended on 2021-03-31",
+      "message": "Support for Ruby 2.6.3 ended on 2022-03-31",
       "file": ".ruby-version",
       "line": 1,
       "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
@@ -966,7 +2207,7 @@
       "cwe_id": [
         1104
       ],
-      "note": ""
+      "note": "Planned to be delt with by ruby upgrade."
     },
     {
       "warning_type": "File Access",
@@ -975,7 +2216,7 @@
       "check_name": "SendFile",
       "message": "Model attribute used in file name",
       "file": "app/controllers/employers/employer_profiles_controller.rb",
-      "line": 257,
+      "line": 255,
       "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
       "code": "send_file(EmployerProfile.find(params[:id]).documents.find(params[:ids][0]).identifier, :file_name => EmployerProfile.find(params[:id]).documents.find(params[:ids][0]).title, :content_type => EmployerProfile.find(params[:id]).documents.find(params[:ids][0]).format)",
       "render_path": null,
@@ -992,13 +2233,53 @@
       "note": ""
     },
     {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "eff70e80b0f4e5de613bf529192c2eb7489756ebff3a800633c2f2b5c3392395",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "components/benefit_sponsors/app/views/benefit_sponsors/sponsored_benefits/sponsored_benefits/_sponsored_benefit.html.slim",
+      "line": 154,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "@sponsored_benefit_form.catalog.sponsor_contributions(@sponsored_benefit_form.benefit_package_id).to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "benefit_sponsors/sponsored_benefits/sponsored_benefits/_sponsored_benefit"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Already passed through JSON serialization."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "f2d601a05b3ae0d031c34b87f7b3d891ef7467503cf018a142c18374501a3246",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/ui-components/v1/cards/_reference_plan.html.slim",
+      "line": 47,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "@benefit_package_form.service.benefit_application.effective_period.min.strftime(\"%m-%d\").to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "ui-components/v1/cards/_reference_plan"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Already passed through JSON serialization."
+    },
+    {
       "warning_type": "Dangerous Send",
       "warning_code": 23,
       "fingerprint": "fe091e35222c7350dd304ed5916f06adccf2544e596f991c680011db3bcd801f",
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "components/financial_assistance/app/controllers/financial_assistance/evidences_controller.rb",
-      "line": 77,
+      "line": 76,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "@docs_owner.send(params[:evidence_kind])",
       "render_path": null,
@@ -1015,6 +2296,6 @@
       "note": ""
     }
   ],
-  "updated": "2023-02-22 16:19:14 +0000",
+  "updated": "2024-02-27 15:36:31 -0700",
   "brakeman_version": "5.4.1"
 }

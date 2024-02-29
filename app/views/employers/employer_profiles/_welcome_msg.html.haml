@@ -11,7 +11,9 @@
 
 .row
   .col-md-2
-    = link_to "<i class=\"fa fa-user-plus\"></i> #{t('button.continue')}".html_safe, search_employers_people_path, :remote => true, :class => "btn btn-primary btn-continue"
+    = link_to(search_employers_people_path, :remote => true, :class => "btn btn-primary btn-continue") do
+      %i.fa.fa-user-plus
+      = t('button.continue')
 
 .row.footer
   .col-md-12

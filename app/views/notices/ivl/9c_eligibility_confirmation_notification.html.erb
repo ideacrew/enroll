@@ -37,11 +37,11 @@
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["<div style='text-decoration: underline;'>#{notice.enrollments[0].plan_name}</div>"], heading: 'What You Must Pay Each Month', sub_heading: ''} %>
 
-<%= render partial: 'notices/shared/unordered_list', :locals => { listings: ["Your Total Monthly Premium Cost:&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;#{number_to_currency(notice.enrollments[0].premium)}".html_safe] } %>
+<%= render partial: 'notices/shared/unordered_list', :locals => { listings: [sanitize_html("Your Total Monthly Premium Cost:&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;#{number_to_currency(notice.enrollments[0].premium)}")] } %>
 
 <% notice.other_enrollments.each do |enrollment| %>
   <%= render partial: 'notices/shared/paragraph', :locals => { content: "<div style='text-decoration: underline;'>#{enrollment.plan_name}</div>" } %>
-  <%= render partial: 'notices/shared/unordered_list', :locals => { listings: ["Your Total Monthly Premium Cost:&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;#{number_to_currency(enrollment.premium)}".html_safe] } %>
+  <%= render partial: 'notices/shared/unordered_list', :locals => { listings: [sanitize_html("Your Total Monthly Premium Cost:&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;#{number_to_currency(enrollment.premium)}")] } %>
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>If you do not make your monthly premium payments on time, you could lose your health insurance.</strong> 45 C.F.R. 155.430(b)(2)(ii). You will receive a separate invoice with instructions on how to make that payment. <strong>You must pay your premiums directly to the health plan or dental plan <u>by the date indicated on that invoice</u></strong>.  #{EnrollRegistry[:enroll_app].setting(:contact_center_name).item} is not responsible for collecting your premiums.  Additionally, any auto-payments you may have previously established with your health insurance company prior to enrolling through #{EnrollRegistry[:enroll_app].setting(:contact_center_name).item} will not carry-over; you must make new payment arrangements."} %>

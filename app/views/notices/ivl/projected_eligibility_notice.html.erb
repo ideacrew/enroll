@@ -176,9 +176,9 @@
 
     <%= render partial: 'notices/shared/unordered_list', locals: {
       previous: "",
-      listings: ["<strong>Medicaid</strong> – free, comprehensive health coverage".html_safe,
-                "<strong>Advance premium tax credits</strong> – help paying your monthly premium for private health insurance".html_safe,
-                "<strong>Cost-sharing reductions</strong> – a discount that lowers your share of out-of-pocket costs for medical services".html_safe]} %>
+      listings: [sanitize_html("<strong>Medicaid</strong> – free, comprehensive health coverage"),
+                sanitize_html("<strong>Advance premium tax credits</strong> – help paying your monthly premium for private health insurance"),
+                sanitize_html("<strong>Cost-sharing reductions</strong> – a discount that lowers your share of out-of-pocket costs for medical services")]} %>
 
     <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
      content: "To see if you can get help, login to your account at <a href=#{site_home_url}>#{notice.hbe.short_url}</a>, and apply for Medicaid and tax credits. When you do, we’ll also see if you qualify for cost-sharing reductions. You can also call us at #{notice.hbe.phone}."} %>

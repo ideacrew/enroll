@@ -1,30 +1,52 @@
 module Notifier
   module ApplicationHelper
+    # rubocop:disable Layout/SpaceAroundOperators
     def portal_display_name(controller)
       if current_user.nil?
-        "<a class='portal'>#{EnrollRegistry[:enroll_app].setting(:header_message).item}</a>".html_safe
+        setting_portal_link(EnrollRegistry[:enroll_app].setting(:header_message).item)
       elsif current_user.try(:has_hbx_staff_role?)
-        link_to "#{image_tag 'icons/icon-exchange-admin.png'} &nbsp; I'm an Admin".html_safe, main_app.exchanges_hbx_profiles_root_path, class: "portal"
+        portal_link_with_image('icons/icon-exchange-admin.png', " &nbsp; I'm an Admin", main_app.exchanges_hbx_profiles_root_path, class: "portal")
       elsif current_user.person.try(:broker_role)
-        link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id), class: "portal"
+        portal_link_with_image('icons/icon-expert.png', " &nbsp; I'm a Broker", broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id), class: "portal")
       elsif current_user.try(:person).try(:csr_role) || current_user.try(:person).try(:assister_role)
-        link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Trained Expert".html_safe, home_exchanges_agents_path, class: "portal"
+        portal_link_with_image('icons/icon-expert.png', " &nbsp; I'm a Trained Expert", home_exchanges_agents_path, class: "portal")
       elsif current_user.person && current_user.person.active_employee_roles.any?
-        link_to "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an #{controller=='employer_profiles'? 'Employer': 'Employee'}".html_safe, family_account_path, class: "portal"
+        portal_link_with_image('icons/icon-individual.png', " &nbsp; I'm an #{controller=='employer_profiles'? 'Employer': 'Employee'}", family_account_path, class: "portal")
       elsif (controller_path.include?("insured") && current_user.try(:has_consumer_role?))
         if current_user.identity_verified_date.present?
-          link_to "#{image_tag 'icons/icon-family.png'} &nbsp; Individual and Family".html_safe, family_account_path, class: "portal"
+          portal_link_with_image('icons/icon-family.png', " &nbsp; Individual and Family", family_account_path, class: "portal")
         else
-          "<a class='portal'>#{image_tag 'icons/icon-family.png'} &nbsp; Individual and Family</a>".html_safe
+          portal_link_with_image_and_no_navigation('icons/icon-family.png', " &nbsp; Individual and Family", class: portal)
         end
       elsif current_user.try(:has_broker_agency_staff_role?)
-        link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id), class: "portal"
+        portal_link_with_image('icons/icon-expert.png', " &nbsp; I'm a Broker", broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id), class: "portal")
       elsif current_user.try(:has_employer_staff_role?)
-        link_to "#{image_tag 'icons/icon-business-owner.png'} &nbsp; I'm an Employer".html_safe, employers_employer_profile_path(id: current_user.person.active_employer_staff_roles.first.employer_profile_id), class: "portal"
+        portal_link_with_image('icons/icon-business-owner.png', " &nbsp; I'm an Employer", employers_employer_profile_path(id: current_user.person.active_employer_staff_roles.first.employer_profile_id), class: "portal")
       elsif current_user.has_general_agency_staff_role?
-        link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a General Agency".html_safe, general_agencies_root_path, class: "portal"
+        portal_link_with_image('icons/icon-expert.png', " &nbsp; I'm a General Agency", general_agencies_root_path, class: "portal")
       else
-        "<a class='portal'>#{EnrollRegistry[:enroll_app].setting(:header_message).item}</a>".html_safe
+        setting_portal_link(EnrollRegistry[:enroll_app].setting(:header_message).item)
+      end
+    end
+    # rubocop:enable Layout/SpaceAroundOperators
+
+    def portal_link_with_image(image_path, link_text, *args)
+      link_to(*args) do
+        concat image_tag(image_path)
+        concat sanitize(link_text)
+      end
+    end
+
+    def portal_link_with_image_and_no_navigation(image_path, link_text, *args)
+      content_tag("a", *args) do
+        concat image_tag(image_path)
+        concat sanitize(link_text)
+      end
+    end
+
+    def setting_portal_link(setting)
+      content_tag("a", class: "portal") do
+        setting.html_safe
       end
     end
 

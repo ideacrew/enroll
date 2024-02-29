@@ -4,6 +4,7 @@
 
 module FinancialAssistance
   module VerificationHelper
+    include HtmlScrubberUtil
 
     def fetch_latest_determined_application(family_id)
       FinancialAssistance::Application.where(family_id: family_id).determined.order_by(:created_at => 'desc').first
@@ -11,7 +12,7 @@ module FinancialAssistance
 
     def show_verification_status(status, admin = nil)
       status = "verified" if status == "valid"
-      (status || '').titleize.center(12).gsub(' ', '&nbsp;').html_safe
+      sanitize_html((status || '').titleize.center(12).gsub(' ', '&nbsp;'))
     end
 
     def admin_verification_action(admin_action, evidence, update_reason)

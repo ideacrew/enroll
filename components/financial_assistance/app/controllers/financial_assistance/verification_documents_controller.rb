@@ -7,12 +7,19 @@ module FinancialAssistance
     include VerificationHelper
 
     before_action :fetch_applicant
-    before_action :updateable?, :find_type, only: [:upload, :update_evidence, :download]
+    before_action :find_type, only: [:upload, :update_evidence, :download]
     before_action :set_document, only: [:destroy]
 
     def upload
+      authorize record, :can_upload?
+
       @doc_errors = []
-      if params[:file]
+      if params[:file].blank?
+        flash[:error] = "File not uploaded. Please select the file to upload."
+      elsif !valid_file_uploads?(params[:file], FileUploadValidator::VERIFICATION_DOC_TYPES)
+        redirect_to main_app.verification_insured_families_path
+        return
+      else
         params[:file].each do |file|
           doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
           if doc_uri.present?
@@ -28,18 +35,19 @@ module FinancialAssistance
             flash[:error] = "Could not save file"
           end
         end
-      else
-        flash[:error] = "File not uploaded. Please select the file to upload."
       end
       redirect_to main_app.verification_insured_families_path
     end
 
     def download
-      document = get_document(params[:key])
-      if document.present?
+      authorize record, :can_download?
+
+      @document = get_document(params[:key])
+
+      if @document.present?
         bucket = env_bucket_name('id-verification')
         uri = "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket}##{params[:key]}"
-        send_data Aws::S3Storage.find(uri), download_options(document)
+        send_data Aws::S3Storage.find(uri), download_options(@document)
       else
         flash[:error] = "File does not exist or you are not authorized to access it."
         redirect_to main_app.verification_insured_families_path
@@ -47,6 +55,8 @@ module FinancialAssistance
     end
 
     def destroy
+      authorize record, :can_destroy?
+
       @document.delete if @evidence.type_unverified?
       if @document.destroyed?
         add_verification_history(@document)
@@ -72,8 +82,8 @@ module FinancialAssistance
 
     private
 
-    def updateable?
-      authorize Family, :updateable?
+    def record
+      @evidence
     end
 
     def set_document

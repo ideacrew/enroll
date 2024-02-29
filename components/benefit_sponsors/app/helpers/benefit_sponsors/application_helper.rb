@@ -1,5 +1,7 @@
 module BenefitSponsors
   module ApplicationHelper
+    include HtmlScrubberUtil
+
     def bootstrap_class_for flash_type
       case flash_type
         when "notice"
@@ -75,7 +77,7 @@ module BenefitSponsors
           rendered << get_flash(type, messages)
         end
       end
-      rendered.join('').html_safe
+      sanitize_html(rendered.join)
     end
 
     def get_flash(type, msg)

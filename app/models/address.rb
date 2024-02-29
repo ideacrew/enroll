@@ -5,6 +5,7 @@ class Address
   include Mongoid::Document
   include Mongoid::Timestamps
   include Mongoid::History::Trackable
+  include HtmlScrubberUtil
 
   embedded_in :person
   embedded_in :office_location
@@ -125,9 +126,9 @@ class Address
   # @return [ String ] the full address
   def to_html
     if address_2.blank?
-      "<div>#{address_1.strip}</div><div>#{city}, #{state} #{zip}</div>".html_safe
+      sanitize_html("<div>#{address_1.strip}</div><div>#{city}, #{state} #{zip}</div>")
     else
-      "<div>#{address_1.strip}</div><div>#{address_2}</div><div>#{city}, #{state} #{zip}</div>".html_safe
+      sanitize_html("<div>#{address_1.strip}</div><div>#{address_2}</div><div>#{city}, #{state} #{zip}</div>")
     end
   end
 
@@ -140,7 +141,7 @@ class Address
   def to_s
     city_delim = city.present? ? "#{city}," : city
     line3 = [city_delim, state, zip].reject(&:nil? || empty?).join(' ')
-    [address_1, address_2, line3].reject(&:nil? || empty?).join('<br/>').html_safe
+    sanitize_html([address_1, address_2, line3].reject(&:nil? || empty?).join('<br/>'))
   end
 
   def to_a

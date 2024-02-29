@@ -18,7 +18,7 @@
 
       </div>
       <%= form_for @employer_profile, {:url => profiles_employers_employer_profile_bulk_employee_upload_path(@employer_profile.id), method: 'post', :html => { :multipart => true }} do |f| %>
-      <%= file_field_tag :file %>
+      <%= file_field_tag :file, accept: (FileUploadValidator::CSV_TYPES + FileUploadValidator::XLS_TYPES).join(',') %>
       <%= label_tag :file, 'Select File To Upload', class: 'select btn btn-primary' %>
       <%= f.submit 'Upload', class: 'btn btn-primary', disabled: true %>
       <% end %>
