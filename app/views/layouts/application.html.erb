@@ -6,9 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <%= favicon_link_tag Settings.site.tab_icon, :rel => 'shortcut icon', :type => EnrollRegistry[:enroll_app].settings(:favicon_tab_icon).item %>
 
-    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-    <script src="https://code.jquery.com/jquery-migrate-1.4.1.js"></script>
-
     <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{site_short_name} | #{site_short_name}" %></title>
     <%= stylesheet_link_tag "application", :media => "all" %>
     <%= stylesheet_link_tag "sponsored_benefits/application", :media => "all" %>
@@ -41,8 +38,8 @@
     <% end %>
     <%= render "layouts/analytics" if ENV['GA_TRACKING_ID'].present? %>
 
-    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-    <script src="https://code.jquery.com/jquery-migrate-1.4.1.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://code.jquery.com/jquery-migrate-3.4.1.js"></script>
   </head>
   <body class="font">
 
