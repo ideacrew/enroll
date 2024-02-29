@@ -219,7 +219,7 @@ RSpec.describe Operations::PremiumCredits::FindAptcWithTaxHouseholds, dbclean: :
           before do
             hbx_enrollment.update_attributes!(effective_on: TimeKeeper.date_of_record)
             hbx_enrollment.hbx_enrollment_members.each do |mmbr|
-              mmbr.person.update_attributes!(dob: Date.new(dob_year, today.month, today.day) - 15.days)
+              mmbr.person.update_attributes!(dob: Date.new(dob_year, today.month, today.beginning_of_month.day) - 15.days)
               mmbr.update_attributes!(coverage_start_on: 1.month.ago.to_date)
             end
           end
