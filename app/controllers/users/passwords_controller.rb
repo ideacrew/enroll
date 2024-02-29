@@ -42,9 +42,8 @@ class Users::PasswordsController < Devise::PasswordsController
   private
 
   def show_generic_forgot_password_text
-    if EnrollRegistry.feature_enabled?(:generic_forgot_password_text)
-      flash[:notice] = l10n('devise.passwords.new.generic_forgot_password_text')
-    end
+    return unless EnrollRegistry.feature_enabled?(:generic_forgot_password_text)
+    flash[:notice] = l10n('devise.passwords.new.generic_forgot_password_text')
   end
 
   def verify_recaptcha_for_user_not_found
