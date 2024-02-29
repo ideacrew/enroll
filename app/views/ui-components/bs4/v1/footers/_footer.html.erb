@@ -1,0 +1,40 @@
+<footer class="page-footer page-footer fixed-bottom">
+  <div class="container">
+    <div class="row pt-3 pb-3">
+      <div class="col-md-6">
+        <%= copyright_notice %>
+      </div>
+      <div class="col-md-6">
+        <ul class="list-unstyled list-group list-group-horizontal float-right">
+          <li class="mr-3">
+            <a class="call-customer-service" href="tel:<%= contact_center_short_number %>">
+              <span>
+                <i class="fas fa-phone fa-lg fa-rotate-90"></i>
+                &nbsp;
+                <%= "#{EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item} / TTY: #{EnrollRegistry[:enroll_app].setting(:contact_center_tty_number).item}" %>
+              </span>
+            </a>
+          </li>
+          <% if contact_center_email_address_is_enabled? %>
+            <li class="mr-3">
+              <%= mail_to contact_center_email_address, target: '_blank', rel: 'noopener noreferrer' do %>
+                <span>
+                  <i class="fas fa-envelope fa-lg"></i>
+                  &nbsp;
+                  <%= EnrollRegistry[:enroll_app].setting(:mail_address).item %>
+                </span>
+              <% end %>
+            </li>
+          <% end %>
+          <li>
+            <%= link_to site_faqs_url, target: '_blank', rel: 'noopener noreferrer' do %>
+              <i class="fas fa-question fa-lg"></i>
+              &nbsp;
+              GET HELP
+            <% end %>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</footer>
