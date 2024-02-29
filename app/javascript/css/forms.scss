@@ -1,19 +1,3 @@
-#personal_info {
-  input:not([type='checkbox']):not([type='radio']):not(.ssn-input),
-  select,
-  .input {
-    width: 180px;
-  }
-
-  .no-ssn-container {
-    width: 180px;
-
-    label {
-      font-weight: normal;
-    }
-  }
-}
-
 #new_user {
   #pass_strength,
   #pass_match {
@@ -53,10 +37,7 @@
   }
 }
 
-label,
-legend,
-.label,
-.legend {
+label, legend {
   display: block;
   font-size: 16px;
   line-height: 24px;
@@ -65,34 +46,12 @@ legend,
   color: var(--text-secondary);
 }
 
-button,
-.btn {
-  label {
-    display: inline;
-    margin-bottom: 0ch;
-    line-height: 20px;
-    color: var(--gray-000);
-  }
-}
-
-label.required:after,
-.label.required:after,
-legend.required:after,
-.legend.required:after,
-dt.required:after,
-.applications .required:not(input):not(select):after {
-  content: '*';
-  margin-left: 0.25ch;
-  color: var(--enrollment-status-red);
-  font-weight: 600;
-}
-
-input:not([type='submit']),
+input,
 select,
-.input,
-#ssn-input-container {
+.input {
   box-sizing: border-box;
   height: 36px;
+  width: 250px;
   padding: 6px 8px;
   background: var(--grey-000);
   border: 1px solid var(--grey-100);
@@ -100,10 +59,9 @@ select,
   &:hover {
     border-color: var(--grey-120);
   }
-  &:disabled,
-  &[readonly] {
-    background: var(--grey-030);
-    color: var(--input-text-color);
+  &:disabled {
+    background: var(--grey-120);
+    color: var(--grey-120);
   }
   &:active,
   &:focus {
@@ -112,75 +70,8 @@ select,
   }
 }
 
-#ssn-input-container {
-  width: 180px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  .ssn-input {
-    padding: 0px;
-    border: unset;
-    width: 120px;
-    height: 34px;
-
-    &:hover {
-      border-color: unset;
-    }
-  }
-
-  img {
-    cursor: pointer;
-  }
-}
-
-input.fake-disabled-input:not([type='submit']):disabled,
-#ssn-input-container.div-disabled {
-  background: var(--grey-030);
-  color: var(--default-font-color);
-
-  .ssn-input {
-    background: inherit;
-    color: inherit;
-  }
-}
-
-input[type='checkbox'],
-input[type='radio'] {
-  &:active,
-  &:focus {
-    outline: 1px solid var(--grey-150);
-  }
-}
-
-.focus {
-  &:active,
-  &:focus,
-  &:focus-within {
-    outline: -webkit-focus-ring-color auto 1px;
-    outline-offset: 4px;
-  }
-}
-
-.focus-btn {
-  &:active,
-  &:focus,
-  &:focus-within {
-    border-color: var(--button-primary-hover-color);
-    outline: 2px solid hsl(30, 3%, 12%);
-    outline: 2px solid var(--grey-190);
-    outline-offset: 2px;
-  }
-}
-
-input.full-width,
-select.full-width,
-.input.full-width {
-  width: 100%;
-}
-
-input:not([type='hidden']) + label,
-input:not([type='hidden']) + fieldset,
+input + label,
+input + fieldset,
 select + label,
 select + fieldset,
 .input + label,
@@ -197,27 +88,13 @@ select {
   background-position-y: 5px;
 }
 
-select.button-select {
-  -webkit-appearance: menulist-button;
-  box-sizing: border-box;
-  background-image: none;
-  padding: 0 10px;
-  font-weight: 600;
-  line-height: 40px;
-  height: 40px;
-  border-radius: 4px;
-  border: 2px solid var(--button-primary-color);
-  color: var(--button-primary-color);
-}
-
-input[type='checkbox'],
-input[type='radio'] {
+input[type='checkbox'], input[type='radio'] {
   vertical-align: middle;
   position: relative;
-  width: 24px;
-  margin-right: $spacer * 0.25;
-  margin-left: 0;
-  accent-color: var(--button-primary-color);
+  scale: 3;
+  margin-right: 1em;
+  margin-left: 1em;
+  width: auto;
 }
 
 fieldset {
@@ -227,10 +104,6 @@ fieldset {
 
 fieldset label:not(:last-child) {
   margin-right: $spacer;
-}
-
-label.radio {
-  font-weight: 400;
 }
 
 input[type='file'] {
@@ -251,127 +124,4 @@ select:invalid,
 input[type='date']:invalid::-webkit-datetime-edit {
   color: var(--placeholder-color);
   -webkit-text-fill-color: var(--placeholder-color);
-}
-
-.search-input-with-icon {
-  position: relative;
-  width: 100%;
-  height: 36px;
-  input {
-    height: 100%;
-    width: 100%;
-    padding-right: $spacer * 2;
-  }
-  button,
-  .button,
-  .btn {
-    position: absolute;
-    right: $spacer / 2;
-    top: $spacer / 4;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-sizing: border-box;
-  }
-  .search-glyph {
-    font-size: 1.5em;
-    -webkit-transform: rotate(-45deg);
-    -moz-transform: rotate(-45deg);
-    -o-transform: rotate(-45deg);
-    transform: rotate(-45deg);
-  }
-}
-
-.btn-file {
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-file input[type='file'] {
-  position: absolute;
-  top: 0;
-  right: 0;
-  min-width: 100%;
-  min-height: 100%;
-  font-size: 100px;
-  text-align: right;
-  filter: alpha(opacity=0);
-  opacity: 0;
-  outline: none;
-  background: white;
-  cursor: inherit;
-  display: block;
-}
-
-.sr-required-indicator {
-  margin-left: 0.25ch;
-  color: var(--enrollment-status-red);
-  font-weight: 600;
-}
-
-#broker_agency_form.bs4-active {
-  .broker-registration-tabs {
-    border-bottom: 2px solid var(--silver-border);
-    font-size: 0;
-    // font-size needs to be set to 0 here to hide
-    // the space between the jQuery-ui tabs
-
-    li {
-      padding: 8px 16px;
-      border-radius: 4px 4px 0 0;
-      border: 2px solid var(--tab-active-border);
-      border-bottom: none;
-    }
-
-    li.ui-state-active {
-      background-color: var(--body-color);
-      border-color: var(--silver-border);
-      border-width: 2px 2px 0 2px;
-      position: relative;
-
-      // while class is active, add make font bold + primary color
-      a {
-        font-weight: 700;
-        color: var(--primary-color);
-      }
-    }
-
-    li.ui-state-active::before {
-      content: '';
-      background-color: var(--body-color);
-      border-left: 2px solid transparent;
-      border-right: 2px solid transparent;
-      height: 4px;
-      position: absolute;
-      bottom: -3px;
-      left: 0px;
-      right: 0px;
-    }
-  }
-
-  // legend here needs to explicitly be default color (black)
-  // because otherwise it is grey, which is not in the design
-  legend {
-    color: var(--default-font-color);
-  }
-
-  input[type='text'],
-  input[type='date'] {
-    width: 100%;
-  }
-
-  select {
-    border-color: var(--grey-100);
-  }
-
-  // adding border-0 to these classes does not work
-  // because it is a jquery-ui class
-  #broker_registration,
-  #broker_agency_staff {
-    border: none;
-  }
-}
-
-#update_tax_credit_section input[type="number"] {
-  width: 100px;
 }

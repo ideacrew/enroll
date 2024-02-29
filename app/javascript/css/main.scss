@@ -1,3 +1,4 @@
+@import 'contrast_level_aa';
 .special-cover-header,
 #special-cover-header {
   display: block;
@@ -39,9 +40,6 @@ footer {
   font-size: 14px;
   color: var(--grey-000);
   background-color: var(--theme-primary-blue, #007bc4);
-  position: absolute;
-  left: 0;
-  bottom: 0;
   width: 100%;
   a,
   a:hover {
@@ -52,6 +50,10 @@ footer {
 
 .welcome-text {
   margin-top: $spacer * 2;
+}
+
+nav .login-options li {
+  margin-right: 0
 }
 
 #sort_notification_msg {
@@ -101,4 +103,74 @@ footer {
   &.active {
     @extend .font-weight-bold;
   }
+}
+
+a {
+  color: var(--theme-secondary);
+}
+
+.progress-nav ul {
+  position: relative;
+  padding-left: 45px;
+  list-style: none;
+  li {
+    position: relative;
+  }
+  li:not(:last-child) {
+    @extend .pb-4;
+  }
+  li::before {
+    display: inline-block;
+    content: '';
+    position: absolute;
+    left: -30px;
+    height: 100%;
+    width: 10px;
+  }
+  li::after {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: -37px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #CCC;
+    border-radius: 50%;
+    background-color: #FFF;
+  }
+  li.done::before {
+    border-left: 2px solid green;
+  }
+  li.done::after {
+    content: "";
+    font-size: 13px;
+    color: #FFF;
+    text-align: center;
+    border: 2px solid green;
+    background-color: green;
+  }
+  li.active::before {
+    border-left: 2px solid green;
+  }
+  li.active::after {
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: -37px;
+    width: 20px;
+    height: 20px;
+    color: green;
+    border: 2px solid green;
+    background-color: white;
+  }
+}
+.progress-nav ul::before {
+  display: inline-block;
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 15px;
+  width: 10px;
+  height: 100%;
 }

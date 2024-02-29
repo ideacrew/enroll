@@ -40,7 +40,7 @@
 
     <%= yield :horizontal_menu %>
 
-    <div class="content <%= controller_name %> content-bottom nm-content">
+    <main class="pb-5 <%= controller_name %>">
       <% if aca_security_questions %>
         <%= render 'users/security_question_responses/modal' %>
       <% end %>
@@ -57,7 +57,7 @@
         <%= yield %>
       <% end %>
 
-    </div>
+    </main>
 
     <% if EnrollRegistry.feature_enabled?(:live_chat_widget) %>
       <%= render "shared/customer_support/live_chat_widget" %>

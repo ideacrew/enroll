@@ -3,19 +3,28 @@
     <%= render partial: 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
   <% end %>
 <% end %>
-<% if @bs4 %>
-  <%= render partial: 'shared/progress_side_nav', locals: {nav: sign_up_nav_options(1, dont_show_exit_button: true)} %>
-  <div id="new_person_wrapper">
-    <%= form_for @person, { :autocomplete => :off , :as => :person, :url => match_insured_consumer_role_index_path ,:method => :post } do |f| %>
-      <h1>
-        <%= l10n("personal_information") %>
-      </h1>
-      <p>
-        <%= l10n("insured.consumer_roles.search.enter_personal_info_msg") %>
-      </p>
-      <%= render 'insured/consumer_roles/remote_search_form', f: f %>
-      <%= render partial: "shared/progress_navigation_buttons", locals: {dont_show_prev_button: false, run_person_validations: true} %>
-    <% end %>
+<% if EnrollRegistry.feature_enabled?(:bs4_consumer_flow) %>
+  <div class="container mt-5">
+    <div id="new_person_wrapper">
+      <%= form_for @person, { :autocomplete => :off , :as => :person, :url => match_insured_consumer_role_index_path ,:method => :post } do |f| %>
+        <div class="row">
+          <div class="col-9">
+            <h1>
+              <%= l10n("personal_information") %>
+            </h1>
+            <p>
+              <%= l10n("insured.consumer_roles.search.enter_personal_info_msg") %>
+            </p>
+            <p>* = required field</p>
+            <%= render 'insured/consumer_roles/remote_search_form', f: f %>
+          </div>
+          <div class="col">
+            <%= render partial: 'shared/left_nav.html.erb' %>
+            <%= render partial: 'shared/individual_progress', locals: {step: '1'} %>
+          </div>
+        </div>
+      <% end %>
+    </div>
   </div>
 <% else %>
   <div class="container pd-container">
