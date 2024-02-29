@@ -1,4 +1,4 @@
-<div class="container privacy">
+<div class="container privacy <%= 'mt-5' if EnrollRegistry.feature_enabled?(:bs4_consumer_flow)%>">
   <h1><%= l10n("your_information") %></h1>
   <p class="starter">
     <%= l10n("privacy_statement") %></p>

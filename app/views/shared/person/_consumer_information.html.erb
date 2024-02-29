@@ -1,88 +1,154 @@
-<div id="personal_info" class="focus_effect module">
-  <%= hidden_field "people","id" %>
-  <%= f.hidden_field :dob_check  %>
-
-  <div class="row row-form-wrapper no-buffer">
-    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :first_name, class: "required floatlabel form-control", required: true, placeholder: 'FIRST NAME *', autocomplete: :off %>
-    </div>
-    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :middle_name, class: "floatlabel form-control", placeholder: 'MIDDLE NAME', autocomplete: :off %>
-    </div>
-    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= f.text_field :last_name, class: "required floatlabel form-control", required: true, placeholder: 'LAST NAME *', autocomplete: :off %>
-    </div>
-    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <div class="selectric-labeled">
-        <span><strong>Suffix</strong></span>
-        <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => 'NONE', class: "floatlabel form-control", autocomplete: :off %>
+<% readonly_status = @person.is_a?(Person) %>
+<% if EnrollRegistry.feature_enabled?(:bs4_consumer_flow) %>
+  <div id="personal_info">
+    <%= hidden_field "people","id" %>
+    <%= f.hidden_field :dob_check  %>
+    <div class="d-flex mb-4">
+      <div class="mr-3">
+        <%= f.label :first_name, "First Name", class: "required" %>
+        <%= f.text_field :first_name, class: "required", required: true, placeholder: 'FIRST NAME *', autocomplete: :off %>
+      </div>
+      <div>
+        <%= f.label :middle_name, "Middle Name" %>
+        <%= f.text_field :middle_name, class: "required", required: false, placeholder: 'MIDDLE NAME', autocomplete: :off %>
       </div>
     </div>
-  </div>
-
-  <div class="row row-form-wrapper no-buffer">
-    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg top-buffer" >
-      <label id="is_applying_coverage_value">Does <%= @person.first_name.present? ? @person.first_name : "this person" %> need coverage? *</label>
+    <div class="d-flex mb-4">
+      <div class="mr-3">
+        <%= f.label :last_name, "Last Name", class: "required" %>
+        <%= f.text_field :last_name, class: "required", required: true, placeholder: 'LAST NAME *', autocomplete: :off %>
+      </div>
+      <div>
+        <%= f.label :name_sfx, "Suffix" %>
+        <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => 'NONE', autocomplete: :off %>
+      </div>
     </div>
     <% first_checked, second_checked = is_applying_coverage_value_consumer(@use_person, @person, @consumer_role) %>
-    <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
-  </div>
-
-  <div class="row row-form-wrapper no-buffer">
-    <% readonly_status = @person.is_a?(Person) %>
-    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "DATE OF BIRTH *",
-                                                 :'data-date-min' => "-110y", :'data-date-max' => "+0",
-                                                 required: true, disabled: readonly_status, readonly: f.object.is_a?(Forms::EmployeeRole) } %>
-    </div>
-
-    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-7 form-group form-group-lg no-pd">
-      <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
-        <%= f.text_field :ssn, placeholder: "#{l10n("social_security").to_s.upcase}", class: "required floatlabel form-control",
-          pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
-          oninput: "this.setCustomValidity('')", disabled: readonly_status, readonly: f.object.is_a?(Forms::EmployeeRole) %>
-      <% else %>
-        <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required floatlabel form-control", disabled: readonly_status,
-          readonly: f.object.is_a?(Forms::EmployeeRole) %>
-      <% end %>
-    </div>
-
-    <div class="col-lg-3 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
-      <%= f.check_box :no_ssn %>
-      <%= f.label :no_ssn, :value => true do %>
-        <span class='no_ssn'>&nbsp;<%= l10n("do_not_have_ssn") %></span>
-      <% end %>
-      <span>
-        <i tabindex="0" class='fa fa-question-circle' id="no_ssn_tooltip" data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.no_ssn_tooltip")%>"></i>
-        <span class="hide"> "<%=l10n("insured.consumer_roles.search.no_ssn_tooltip")%>"</span>
-      </span>
-    </div>
-
-    <div class="col-lg-1 col-md-2 col-sm-2 col-xs-2 form-group form-group-lg no-pd border_bottom_zero">
-      <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_male')" class="radio">
-        <%= f.radio_button :gender, "male", class: "required floatlabel", id: "radio_male", checked: true %>
-        <label for="radio_male"><span>MALE</span></label>
+    <%# need to redo this partial: %>
+    <fieldset>
+      <legend id="is_applying_coverage_value">Does <%= @person.first_name.present? ? @person.first_name : "this person" %> need coverage? * <a href="#is_applying_coverage" data-toggle="modal" data-target="#is_applying_coverage">Not sure?</a></legend>
+      <div class="d-flex mb-4 align-items-center">
+        <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
+      </div>
+    </fieldset>
+    <div class="d-flex mb-4">
+      <div class="mr-3">
+        <%= f.label :dob, "Date of Birth", class: "required" %>
+        <%= f.date_field :dob, placeholder:"MM/DD/YYYY", min: 110.years.ago, max:"9999-12-31", required: true %>
+      </div>
+      <div>
+        <%= f.label :gender, "Gender" %>
+        <%= f.select :gender, [ ['Male', 'male'], ['Female', 'female'] ], autocomplete: :off %>
+        <span>
+          <i tabindex="0" class='fa fa-question-circle no-pd pull-right' id="gender-tooltip" data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.gender_tooltip")%>"></i>
+          <span class="hide"> "<%=l10n("insured.consumer_roles.search.gender_tooltip")%>"</span>
+        </span>
       </div>
     </div>
-    <div class="col-lg-1 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
-      <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_female')" class="radio">
-        <%= f.radio_button :gender, "female", class: "required floatlabel", id: "radio_female", checked: false %>
-        <label for="radio_female"><span>FEMALE</span></label>
+    <div class="d-flex mb-4">
+      <div class="mr-3">
+        <%= f.label :ssn, "Social Security" %>
+        <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
+          <%= f.text_field :ssn, placeholder: "#{l10n("social_security").to_s.upcase}", class: "required",
+            pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
+            oninput: "this.setCustomValidity('')", disabled: readonly_status, readonly: f.object.is_a?(Forms::EmployeeRole) %>
+        <% else %>
+          <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required", disabled: readonly_status,
+            readonly: f.object.is_a?(Forms::EmployeeRole) %>
+        <% end %>
+      </div>
+      <div class="pt-4">
+        <%= f.label :no_ssn, class: "mt-1 d-inline-block" do %>
+          <%= f.check_box :no_ssn %><span class='no_ssn'>&nbsp;<%= l10n("do_not_have_ssn") %></span>
+        <% end %><span>
+          <i tabindex="0" class='fa fa-question-circle' id="no_ssn_tooltip" data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.no_ssn_tooltip")%>"></i>
+          <span class="hide"> "<%=l10n("insured.consumer_roles.search.no_ssn_tooltip")%>"</span>
+        </span>
       </div>
     </div>
-  <span>
-    <i tabindex="0" class='fa fa-question-circle no-pd pull-right' id="gender-tooltip" data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.gender_tooltip")%>"></i>
-    <span class="hide"> "<%=l10n("insured.consumer_roles.search.gender_tooltip")%>"</span>
-  </span>
   </div>
-</div>
+<% else %>
+  <div id="personal_info" class="focus_effect module">
+    <%= hidden_field "people","id" %>
+    <%= f.hidden_field :dob_check  %>
 
-<%= render 'shared/ssn_coverage_msg' %>
+    <div class="row row-form-wrapper no-buffer">
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :first_name, class: "required floatlabel form-control", required: true, placeholder: 'FIRST NAME *', autocomplete: :off %>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :middle_name, class: "floatlabel form-control", placeholder: 'MIDDLE NAME', autocomplete: :off %>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <%= f.text_field :last_name, class: "required floatlabel form-control", required: true, placeholder: 'LAST NAME *', autocomplete: :off %>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <div class="selectric-labeled">
+          <span><strong>Suffix</strong></span>
+          <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => 'NONE', class: "floatlabel form-control", autocomplete: :off %>
+        </div>
+      </div>
+    </div>
 
+    <div class="row row-form-wrapper no-buffer">
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg top-buffer" >
+        <label id="is_applying_coverage_value">Does <%= @person.first_name.present? ? @person.first_name : "this person" %> need coverage? *</label>
+      </div>
+      <% first_checked, second_checked = is_applying_coverage_value_consumer(@use_person, @person, @consumer_role) %>
+      <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
+    </div>
 
-<script type="text/javascript">
-  $(document).ready(function(){
-    $('.field_with_errors > *').unwrap();
-    Freebies.floatlabels();
-  });
-</script>
+    <div class="row row-form-wrapper no-buffer">
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+
+      </div>
+
+      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-7 form-group form-group-lg no-pd">
+        <% if EnrollRegistry.feature_enabled?(:ssn_ui_validation) %>
+          <%= f.text_field :ssn, placeholder: "#{l10n("social_security").to_s.upcase}", class: "required floatlabel form-control",
+            pattern: "(?!666|000|9\\d{2})\\d{3}[\\- ]{0,1}(?!00)\\d{2}[\\- ]{0,1}(?!0{4})\\d{4}", oninvalid: "this.setCustomValidity('Invalid Social Security number.')",
+            oninput: "this.setCustomValidity('')", disabled: readonly_status, readonly: f.object.is_a?(Forms::EmployeeRole) %>
+        <% else %>
+          <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required floatlabel form-control", disabled: readonly_status,
+            readonly: f.object.is_a?(Forms::EmployeeRole) %>
+        <% end %>
+      </div>
+
+      <div class="col-lg-3 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
+        <%= f.check_box :no_ssn %>
+        <%= f.label :no_ssn, :value => true do %>
+          <span class='no_ssn'>&nbsp;<%= l10n("do_not_have_ssn") %></span>
+        <% end %>
+        <span>
+          <i tabindex="0" class='fa fa-question-circle' id="no_ssn_tooltip" data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.no_ssn_tooltip")%>"></i>
+          <span class="hide"> "<%=l10n("insured.consumer_roles.search.no_ssn_tooltip")%>"</span>
+        </span>
+      </div>
+
+      <div class="col-lg-1 col-md-2 col-sm-2 col-xs-2 form-group form-group-lg no-pd border_bottom_zero">
+        <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_male')" class="radio">
+          <%= f.radio_button :gender, "male", class: "required floatlabel", id: "radio_male", checked: true %>
+          <label for="radio_male"><span>MALE</span></label>
+        </div>
+      </div>
+      <div class="col-lg-1 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
+        <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'radio_female')" class="radio">
+          <%= f.radio_button :gender, "female", class: "required floatlabel", id: "radio_female", checked: false %>
+          <label for="radio_female"><span>FEMALE</span></label>
+        </div>
+      </div>
+    <span>
+      <i tabindex="0" class='fa fa-question-circle no-pd pull-right' id="gender-tooltip" data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.gender_tooltip")%>"></i>
+      <span class="hide"> "<%=l10n("insured.consumer_roles.search.gender_tooltip")%>"</span>
+    </span>
+    </div>
+  </div>
+  <%= render 'shared/ssn_coverage_msg' %>
+  <script type="text/javascript">
+    $(document).ready(function(){
+      $('.field_with_errors > *').unwrap();
+      Freebies.floatlabels();
+    });
+  </script>
+<% end %>
+
