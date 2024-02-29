@@ -92,10 +92,25 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
       expect(helper.set_default_termination_date_value(enrollment)).to eq(TimeKeeper.date_of_record)
     end
 
-    it "sets to last day of enrollment if current_date is outside the plan_year" do
-      enrollment.effective_on = (TimeKeeper.date_of_record - 2.year)
-      expect(helper.set_default_termination_date_value(enrollment)).to eq(enrollment.effective_on + 2.year)
+    context "inside a leap year" do
+      if TimeKeeper.date_of_record.leap?
+        it "sets to last day of enrollment if current_date is outside the plan_year" do
+          enrollment.effective_on = (TimeKeeper.date_of_record - 4.year)
+          expect(helper.set_default_termination_date_value(enrollment)).to eq(enrollment.effective_on + 4.year)
+        end
+      end
     end
+
+    context "outside of leap year" do
+      unless TimeKeeper.date_of_record.leap?
+        it "sets to last day of enrollment if current_date is outside the plan_year" do
+          enrollment.effective_on = (TimeKeeper.date_of_record - 2.year)
+          expect(helper.set_default_termination_date_value(enrollment)).to eq(enrollment.effective_on + 2.year)
+        end
+      end
+    end
+
+    
   end
 
   describe "SET optional_effective_on date on a SEP" do
