@@ -9,6 +9,7 @@ class Users::PasswordsController < Devise::PasswordsController
     if verify_recaptcha_if_needed
       self.resource = resource_class.send_reset_password_instructions(resource_params)
       yield resource if block_given?
+      show_generic_forgot_password_text
       if successfully_sent?(resource)
         resource.security_question_responses.destroy_all
 
@@ -27,6 +28,7 @@ class Users::PasswordsController < Devise::PasswordsController
   end
 
   def user_not_found
+    show_generic_forgot_password_text
     if verify_recaptcha_for_user_not_found
       respond_to do |format|
         format.html { respond_with({}, location: after_sending_reset_password_instructions_path_for(resource_name)) }
@@ -38,6 +40,12 @@ class Users::PasswordsController < Devise::PasswordsController
   end
 
   private
+
+  def show_generic_forgot_password_text
+    if EnrollRegistry.feature_enabled?(:generic_forgot_password_text)
+      flash[:notice] = l10n('devise.passwords.new.generic_forgot_password_text')
+    end
+  end
 
   def verify_recaptcha_for_user_not_found
     return true unless helpers.forgot_password_recaptcha_enabled?
