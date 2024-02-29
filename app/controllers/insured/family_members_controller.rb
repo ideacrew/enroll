@@ -45,11 +45,15 @@ class Insured::FamilyMembersController < ApplicationController
       @family = @person.primary_family
     elsif @type == "consumer"
       @consumer_role = @person.consumer_role
-      @family = @consumer_role.person.primary_family
-      broker_role_id = @consumer_role.person.broker_role.try(:id)
-      @family.hire_broker_agency(broker_role_id)
+
+      # This controller assumes the user accessing this page will NOT be an admin
+      # The logic previously present here has been moved to a method only called _if_ @consumer_role is not nil
+      update_family_broker_agency if @consumer_role
     end
+
     @family = Family.find(params[:family_id]) if params[:family_id]
+    authorize_family_access
+
     @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
 
@@ -78,20 +82,31 @@ class Insured::FamilyMembersController < ApplicationController
       @prev_url_include_intractive_identity = false
       @prev_url_include_consumer_role_id = false
     end
+
+    set_view_person
   end
 
   def new
-    @dependent = ::Forms::FamilyMember.new(:family_id => params.require(:family_id))
+    family_id = params.require(:family_id)
+    @family = Family.find(family_id)
+    authorize_family_access
+
+    @dependent = ::Forms::FamilyMember.new(:family_id => family_id)
     respond_to do |format|
       format.html
       format.js
     end
+
+    set_view_person
   end
 
   def create
+    @family = Family.find(params[:dependent][:family_id])
+    authorize_family_access
+
     @dependent = ::Forms::FamilyMember.new(params[:dependent].merge({skip_consumer_role_callbacks: true}))
     @address_errors = validate_address_params(params)
-    @family = Family.find(@dependent.family_id)
+
     if @family.primary_applicant.person.resident_role?
       if @address_errors.blank? && @dependent.save
         @created = true
@@ -149,6 +164,7 @@ class Insured::FamilyMembersController < ApplicationController
       format.html
       format.js
     end
+    set_view_person
   end
 
   def edit
@@ -159,6 +175,7 @@ class Insured::FamilyMembersController < ApplicationController
       format.html
       format.js
     end
+    set_view_person
   end
 
   def update
@@ -211,10 +228,13 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def resident_index
-    set_bookmark_url
-    set_admin_bookmark_url(resident_index_insured_family_members_path)
     @resident_role = ResidentRole.find(params[:resident_role_id])
     @family = @resident_role.person.primary_family
+    authorize_family_access
+
+    set_bookmark_url
+    set_admin_bookmark_url(resident_index_insured_family_members_path)
+
     @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
 
@@ -240,7 +260,11 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def new_resident_dependent
-    @dependent = ::Forms::FamilyMember.new(:family_id => params.require(:family_id))
+    family_id = params.require(:family_id)
+    @family = Family.find(family_id)
+    authorize_family_access
+
+    @dependent = ::Forms::FamilyMember.new(:family_id => family_id)
     respond_to do |format|
       format.html
       format.js
@@ -248,7 +272,11 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def edit_resident_dependent
-    @dependent = ::Forms::FamilyMember.find(params.require(:id))
+    family_id = params.require(:id)
+    @family = Family.find(family_id)
+    authorize_family_access
+
+    @dependent = ::Forms::FamilyMember.find(family_id)
     respond_to do |format|
       format.html
       format.js
@@ -256,7 +284,11 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def show_resident_dependent
-    @dependent = ::Forms::FamilyMember.find(params.require(:id))
+    family_id = params.require(:id)
+    @family = Family.find(family_id)
+    authorize_family_access
+
+    @dependent = ::Forms::FamilyMember.find(family_id)
     respond_to do |format|
       format.html
       format.js
@@ -264,6 +296,12 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   private
+
+  def update_family_broker_agency
+    @family = @consumer_role.person.primary_family
+    broker_role_id = @consumer_role.person.broker_role.try(:id)
+    @family.hire_broker_agency(broker_role_id)
+  end
 
   def consumer_role_for_create(dependent)
     consumer_role = dependent.family_member.try(:person).try(:consumer_role)
@@ -305,5 +343,23 @@ class Insured::FamilyMembersController < ApplicationController
   def set_dependent_and_family
     @dependent = ::Forms::FamilyMember.find(params.require(:id))
     @family = Family.find(@dependent.family_id)
+
+    authorize_family_access
+  end
+
+  def authorize_family_access
+    # We're using FamilyPolicy method here because FamilyMember is an extension of Family
+    # All users/roles with the permissions to alter a Family should have the same permissions on the FamilyMember
+    # While using a single :show? method in the family policy isn't ideal, it does cover a variety of unforseen edge cases that could emerge when determining access permissions for insured/family_members
+
+    authorize @family, :show?
+  end
+
+  def set_view_person
+    # The unfortunate inclusion of this method on all read-related actions (:index, :show, :new, :edit)
+    # is being added to the last line of those methods because this controller was not designed to handle
+    # an admin accessing family members on an unrelated user account
+
+    @person = @family.primary_person if @person != @family.primary_person
   end
 end

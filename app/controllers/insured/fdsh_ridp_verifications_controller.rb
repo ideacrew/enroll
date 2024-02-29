@@ -5,6 +5,7 @@ module Insured
   class FdshRidpVerificationsController < ApplicationController
     before_action :set_current_person
     before_action :set_cache_headers, only: [:failed_validation]
+    before_action :set_consumer_bookmark_url, only: [:service_unavailable, :failed_validation]
 
     def new
       result = Operations::Fdsh::Ridp::RequestPrimaryDetermination.new.call(@person.primary_family)
@@ -95,6 +96,21 @@ module Insured
       render :plain => result.success?
     end
 
+    def service_unavailable
+      @person.consumer_role.move_identity_documents_to_outstanding
+      render "service_unavailable"
+    end
+
+    def failed_validation
+      @person = Person.find(params[:person_id]) if params[:person_id].present?
+      authorize @person, :can_access_identity_verifications?
+      @step = params[:step]
+      @verification_transaction_id = params[:verification_transaction_id]
+      @person = Person.find(params[:person_id]) if params[:person_id].present?
+      @person.consumer_role.move_identity_documents_to_outstanding
+      render "failed_validation"
+    end
+
     def received_response(event_kind)
       find_params = {primary_member_hbx_id: @person.primary_family.primary_applicant.hbx_id, event_kind: event_kind}
       Operations::Fdsh::Ridp::FindEligibilityResponse.new.call(find_params)
@@ -103,21 +119,6 @@ module Insured
     def find_response(event_kind)
       primary_member_hbx_id = @person.primary_family.primary_applicant.hbx_id
       ::Fdsh::Ridp::EligibilityResponseModel.where(event_kind: event_kind, primary_member_hbx_id: primary_member_hbx_id, :deleted_at.ne => nil).to_a.max_by(&:deleted_at)
-    end
-
-    def service_unavailable
-      set_consumer_bookmark_url
-      @person.consumer_role.move_identity_documents_to_outstanding
-      render "service_unavailable"
-    end
-
-    def failed_validation
-      set_consumer_bookmark_url
-      @step = params[:step]
-      @verification_transaction_id = params[:verification_transaction_id]
-      @person = Person.find(params[:person_id]) if params[:person_id].present?
-      @person.consumer_role.move_identity_documents_to_outstanding
-      render "failed_validation"
     end
 
     def session_identification_id(response)

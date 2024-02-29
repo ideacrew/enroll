@@ -94,6 +94,8 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def manage_family
+    authorize @family, :show?
+
     set_bookmark_url
     set_admin_bookmark_url(manage_family_insured_families_path)
     @family_members = @family.active_family_members
@@ -155,6 +157,8 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def personal
+    authorize @family, :show?
+
     @tab = params['tab']
     @contact_preferences_mapping = ConsumerRole::CONTACT_METHOD_MAPPING.invert unless EnrollRegistry.feature_enabled?(:contact_method_via_dropdown)
     @family_members = @family.active_family_members
@@ -169,6 +173,8 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def inbox
+    authorize @family, :show?
+
     @tab = params['tab']
     @folder = params[:folder] || 'Inbox'
     @sent_box = false
@@ -209,6 +215,8 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def verification
+    authorize @family, :show?
+
     @family_members = @person.primary_family.has_active_consumer_family_members
   end
 
@@ -347,8 +355,9 @@ class Insured::FamiliesController < FamiliesController
       flash[:error] = "File or Subject not provided"
       redirect_back(fallback_location: :back)
       return
-    elsif file_content_type != 'application/pdf'
-      flash[:error] = "Please upload a PDF file. Other file formats are not supported."
+    end
+
+    unless valid_file_upload?(params[:file], FileUploadValidator::PDF_TYPE)
       redirect_back(fallback_location: :back)
       return
     end

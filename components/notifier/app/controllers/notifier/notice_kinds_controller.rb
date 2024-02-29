@@ -2,7 +2,7 @@ module Notifier
   class NoticeKindsController < Notifier::ApplicationController
     include ::Config::SiteConcern
     rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
-    
+
     layout 'notifier/single_column'
 
     def index
@@ -42,7 +42,7 @@ module Notifier
         redirect_to notice_kinds_path
       else
         @errors = notice_kind.errors.messages
-        
+
         @notice_kinds = Notifier::NoticeKind.all
         @datatable = Effective::Datatables::NoticesDatatable.new
 
@@ -80,7 +80,7 @@ module Notifier
     def download_notices
       authorize ::Notifier::NoticeKind
       notices = Notifier::NoticeKind.where(:id.in => params['ids'].split(","))
-      
+
       send_data notices.to_csv,
         :filename => "notices_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv",
         :disposition => 'attachment',
@@ -90,6 +90,11 @@ module Notifier
     def upload_notices
       authorize ::Notifier::NoticeKind
       @errors = []
+
+      if params[:file].present? && !valid_file_upload?(params[:file], FileUploadValidator::CSV_TYPES)
+        redirect_back(fallback_location: :back)
+        return
+      end
 
       if file_content_type == 'text/csv'
         notices = Roo::Spreadsheet.open(params[:file].tempfile.path)
@@ -135,9 +140,12 @@ module Notifier
       service.builder = builder_param
       respond_to do |format|
         format.html
-        format.json { render json: { 
-          placeholders: service.placeholders, setting_placeholders: service.setting_placeholders
-        } }
+        format.json do
+          render json: {
+            placeholders: service.placeholders,
+            setting_placeholders: service.setting_placeholders
+          }
+        end
       end
     end
 
