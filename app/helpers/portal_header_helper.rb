@@ -13,6 +13,7 @@ module PortalHeaderHelper
       portal_link_with_image(
         'icons/icon-exchange-admin.png',
         " &nbsp; I'm an Admin",
+        "Admin icon",
         main_app.exchanges_hbx_profiles_root_path,
         class: "portal"
       )
@@ -20,6 +21,7 @@ module PortalHeaderHelper
       portal_link_with_image(
         'icons/icon-expert.png',
         " &nbsp; I'm a Broker",
+        "Expert icon",
         get_broker_profile_path,
         class: "portal"
       )
@@ -27,6 +29,7 @@ module PortalHeaderHelper
       portal_link_with_image(
         'icons/icon-expert.png',
         " &nbsp; I'm a Trained Expert",
+        "Expert icon",
         main_app.home_exchanges_agents_path,
         class: "portal"
       )
@@ -35,6 +38,7 @@ module PortalHeaderHelper
         portal_link_with_image(
           'icons/icon-expert.png',
           " &nbsp; I'm a Broker",
+          "Broker icon",
           get_broker_profile_path,
           class: "portal"
         )
@@ -42,6 +46,7 @@ module PortalHeaderHelper
         portal_link_with_image(
           'icons/icon-expert.png',
           "&nbsp; I'm a General Agency",
+          "Expert icon",
           benefit_sponsors.profiles_general_agencies_general_agency_profile_path(id: current_user.person.general_agency_staff_roles.first.benefit_sponsors_general_agency_profile_id),
           class: "portal"
         )
@@ -52,6 +57,7 @@ module PortalHeaderHelper
           portal_link_with_image(
             'icons/icon-business-owner.png',
             " &nbsp; I'm an Employer",
+            "Employer icon",
             employer_profile_path,
             class: "portal"
           )
@@ -59,6 +65,7 @@ module PortalHeaderHelper
           portal_link_with_image(
             'icons/icon-expert.png',
             " &nbsp; I'm a Broker",
+            "Expert icon",
             get_broker_profile_path,
             class: "portal"
           )
@@ -67,6 +74,7 @@ module PortalHeaderHelper
         portal_link_with_image(
           exchange_icon_path('icon-individual.png'),
           " &nbsp; I'm an Employee",
+          "Employee icon",
           main_app.family_account_path,
           class: "portal"
         )
@@ -77,6 +85,7 @@ module PortalHeaderHelper
         portal_link_with_image(
           'icons/icon-family.png',
           " &nbsp; Individual and Family",
+          "Family icon",
           main_app.family_account_path,
           class: "portal"
         )
@@ -84,6 +93,7 @@ module PortalHeaderHelper
         portal_link_with_image_and_no_navigation(
           'icons/icon-family.png',
           " &nbsp; Individual and Family",
+          "Family icon",
           class: "portal"
         )
       end
@@ -92,6 +102,7 @@ module PortalHeaderHelper
       portal_link_with_image(
         'icons/icon-expert.png',
         " &nbsp; I'm a Broker",
+        "Expert icon",
         get_broker_profile_path,
         class: "portal"
       )
@@ -101,6 +112,7 @@ module PortalHeaderHelper
         portal_link_with_image(
           'icons/icon-business-owner.png',
           " &nbsp; I'm an Employer",
+          "Employer icon",
           benefit_sponsors.profiles_employers_employer_profile_path(id: current_user.person.active_employer_staff_roles.first.benefit_sponsor_employer_profile_id, :tab => 'home'),
           class: "portal"
         )
@@ -108,6 +120,7 @@ module PortalHeaderHelper
         portal_link_with_image(
           'icons/icon-expert.png',
           " &nbsp; I'm a General Agency",
+          "Expert icon",
           benefit_sponsors.profiles_general_agencies_general_agency_profile_path(id: current_user.person.active_general_agency_staff_roles.first.benefit_sponsors_general_agency_profile_id),
           class: "portal"
         )
@@ -116,6 +129,7 @@ module PortalHeaderHelper
       portal_link_with_image(
         'icons/icon-business-owner.png',
         " &nbsp; I'm an Employer",
+        "Employer icon",
         benefit_sponsors.profiles_employers_employer_profile_path(id: current_user.person.active_employer_staff_roles.first.benefit_sponsor_employer_profile_id, :tab => 'home'),
         class: "portal"
       )
@@ -131,16 +145,16 @@ module PortalHeaderHelper
     end
   end
 
-  def portal_link_with_image_and_no_navigation(image_path, link_text, *args)
+  def portal_link_with_image_and_no_navigation(image_path, link_text, alt = link_text, *args)
     content_tag("a", *args) do
-      concat image_tag(image_path)
+      concat image_tag(image_path, alt: alt)
       concat sanitize(link_text)
     end
   end
 
   def portal_link_with_image(image_path, link_text,*args)
     link_to(*args) do
-      concat image_tag(image_path)
+      concat image_tag(image_path, alt: alt)
       concat sanitize(link_text)
     end
   end
