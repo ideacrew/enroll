@@ -109,8 +109,6 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
         end
       end
     end
-
-    
   end
 
   describe "SET optional_effective_on date on a SEP" do
