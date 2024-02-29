@@ -1,0 +1,56 @@
+<% content_for :horizontal_status do %>
+  <% if show_component(request.path) %>
+    <%= render partial: 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+  <% end %>
+<% end %>
+<% if EnrollRegistry.feature_enabled?(:bs4_consumer_flow) %>
+  <div class="container mt-5">
+    <div id="new_person_wrapper">
+      <%= form_for @person, { :autocomplete => :off , :as => :person, :url => match_insured_consumer_role_index_path ,:method => :post } do |f| %>
+        <div class="row">
+          <div class="col-9">
+            <h1>
+              <%= l10n("personal_information") %>
+            </h1>
+            <p>
+              <%= l10n("insured.consumer_roles.search.enter_personal_info_msg") %>
+            </p>
+            <p>* = required field</p>
+            <%= render 'insured/consumer_roles/remote_search_form', f: f %>
+          </div>
+          <div class="col">
+            <%= render partial: 'shared/left_nav.html.erb' %>
+            <%= render partial: 'shared/individual_progress', locals: {step: '1'} %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% else %>
+  <div class="container pd-container">
+    <div id="new_person_wrapper">
+      <div class="row">
+        <%= form_for @person, { :autocomplete => :off , :as => :person, :url => match_insured_consumer_role_index_path ,:method => :post } do |f| %>
+          <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+            <%= render partial: 'shared/left_nav.html.erb' %>
+          </div>
+          <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
+            <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
+              <h2 class="darkblue">
+                <%= l10n("personal_information") %>
+              </h2>
+              <p>
+                <%= l10n("insured.consumer_roles.search.enter_personal_info_msg") %>
+              </p>
+              <p class="memo">* = required field</p>
+              <%= render 'insured/consumer_roles/remote_search_form', f: f %>
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+              <%= render partial: 'shared/individual_progress', locals: {step: '1'} %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
