@@ -17,8 +17,6 @@ class VlpDocument < Document
       "Card Number"
     ]
 
-  ALLOWED_MIME_TYPES = %w[image/png image/jpeg image/gif application/pdf].freeze
-
   #list of the documents consumer can provide to verify SSN
   SSN_DOCUMENTS_KINDS = ['US Passport', 'Social Security Card',]
 

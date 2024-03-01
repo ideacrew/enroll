@@ -23,6 +23,10 @@ class IvlChooseCoverage
     'label[for="coverage_kind_dental"] span'
   end
 
+  def self.is_tobacco_user_yes
+    '[data-cuke="is_tobacco_user_Y_0"]'
+  end
+
   def self.shop_for_new_plan_btn
     'input[class="btn btn-primary  btn-lg no-op  interaction-click-control-shop-for-new-plan"]'
   end
