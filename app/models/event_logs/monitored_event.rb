@@ -45,7 +45,7 @@ module EventLogs
       details[:effective_on] = effective_on(payload)
       details[:detail] = event_name
       details[:event_time] = format_time_display(details[:event_time])
-      attach_osse_application_period(details)
+      attach_osse_application_period(details) if details[:current_state] == "eligible"
       details
     end
 
