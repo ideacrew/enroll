@@ -1128,7 +1128,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
           @original_product,
           effective_period.min,
-          age,
+          51,
           "R-DC001"
         ).and_return(100.00)
       end
