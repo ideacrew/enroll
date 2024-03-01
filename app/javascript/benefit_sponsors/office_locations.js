@@ -9,13 +9,13 @@ function checkOLKind(element) {
     row.find('#inputZip').attr('data-action', 'change->zip-check#zipChange');
   } else {
     row.find('#inputCounty').removeAttr('required');
-    row.find('#inputCounty').removeProp('required');
+    row.find('#inputCounty').removeAttr('required');
     row.find('#inputZip').removeAttr('data-action');
-    row.find('#inputZip').removeProp('data-action');
+    row.find('#inputZip').removeAttr('data-action');
     row.find('#inputZip').removeAttr('required');
-    row.find('#inputZip').removeProp('required');
+    row.find('#inputZip').removeAttr('required');
     row.find('#inputZip').removeAttr('data-options');
-    row.find('#inputZip').removeProp('data-options');
+    row.find('#inputZip').removeAttr('data-options');
     // removes blank option from select options
     //setTimeout(function() {
     //  element.options[0].remove()
