@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PersonPolicy < ApplicationPolicy
   ACCESSABLE_ROLES = %w[hbx_staff_role broker_role active_broker_staff_roles].freeze
 
@@ -7,6 +9,10 @@ class PersonPolicy < ApplicationPolicy
 
   def can_update?
     allowed_to_modify?
+  end
+
+  def can_download_document?
+    allowed_to_download?
   end
 
   def updateable?
@@ -26,6 +32,10 @@ class PersonPolicy < ApplicationPolicy
   end
 
   private
+
+  def allowed_to_download?
+    (current_user == associated_user) || role_has_permission_to_modify?
+  end
 
   def allowed_to_modify?
     (current_user.person == record) || (current_user == associated_user) || role_has_permission_to_modify?
@@ -52,11 +62,37 @@ class PersonPolicy < ApplicationPolicy
   end
 
   def can_broker_modify?
-    (role.is_a?(::BrokerRole) || role.is_a?(::BrokerAgencyStaffRole)) && broker_agency_profile_matches?
+    (role.is_a?(::BrokerRole) || role.any? { |r| r.is_a?(::BrokerAgencyStaffRole) }) && (matches_individual_broker_account? || matches_shop_broker_account?)
   end
 
-  def broker_agency_profile_matches?
-    associated_family.active_broker_agency_account.present? && associated_family.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id == role.benefit_sponsors_broker_agency_profile_id
+  def matches_individual_broker_account?
+    return false unless associated_family.active_broker_agency_account.present?
+    matches_broker_agency_profile?(associated_family.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id)
+  end
+
+  def matches_shop_broker_account?
+    return false unless associated_employee_roles.present?
+    associated_employee_roles.any? do |employee_role|
+      matches_broker_agency_profile?(employee_role.employer_profile.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id)
+    end
+  end
+
+  # Checks if the broker agency profile ID of any of the roles
+  # matches the provided broker agency profile ID.
+  #
+  # @note The `role` can be a single broker role or multiple active broker agency staff roles.
+  #
+  # @param active_broker_agency_profile_id [String] The broker agency profile ID to match against.
+  #
+  # @return [Boolean] returns true if there is a match, false otherwise.
+  def matches_broker_agency_profile?(active_broker_agency_profile_id)
+    Array(role).any? do |role|
+      role.benefit_sponsors_broker_agency_profile_id == active_broker_agency_profile_id
+    end
+  end
+
+  def associated_employee_roles
+    record.active_employee_roles
   end
 
   def role
