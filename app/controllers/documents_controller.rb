@@ -1,6 +1,7 @@
 class DocumentsController < ApplicationController
   include ActionView::Helpers::TranslationHelper
   include L10nHelper
+  before_action :fetch_record, only: [:authorized_download, :cartafact_download]
   before_action :updateable?, except: [:show_docs, :download]
   before_action :set_document, only: [:destroy, :update]
   before_action :set_verification_type
@@ -24,21 +25,10 @@ class DocumentsController < ApplicationController
   end
 
   def authorized_download
+    authorize record, :can_download_document?
+
     begin
-      model = params[:model].camelize
-      model_id = params[:model_id]
-      relation = ["documents"].include?(params[:relation]) ? params[:relation] : "documents"
-      relation_id = params[:relation_id]
-
-      #this is a fix for new model inbox-messages notice download
-      if model == "AcaShopCcaEmployerProfile"
-        model = "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile"
-      end
-      model_klass = Document::RESOURCE_LIST.include?(model) ? model.safe_constantize : nil
-      raise "Sorry! Invalid Request" unless model_klass
-
-      model_object = model_klass.find(model_id)
-      documents = model_object.send(relation.to_sym)
+      documents = record.send(relation.to_sym)
       if authorized_to_download?(model_object, documents, relation_id)
         uri = documents.find(relation_id).identifier
         send_data Aws::S3Storage.find(uri), get_options(params)
@@ -51,6 +41,8 @@ class DocumentsController < ApplicationController
   end
 
   def cartafact_download
+    authorize record, :can_download_document?
+
     result = ::Operations::Documents::Download.call({params: cartafact_download_params.to_h.deep_symbolize_keys, user: current_user})
     if result.success?
       response_data = result.value!
@@ -258,6 +250,20 @@ class DocumentsController < ApplicationController
   end
 
   private
+
+  def fetch_record
+    model_id = params[:model_id]
+    model = params[:model].camelize
+    model_klass = Document::RESOURCE_LIST.include?(model) ? model.safe_constantize : nil
+
+    raise "Sorry! Invalid Request" unless model_klass
+
+    @record = model_klass.find(model_id)
+  end
+
+  def record
+    @record
+  end
 
   def updateable?
     authorize Family, :updateable?
