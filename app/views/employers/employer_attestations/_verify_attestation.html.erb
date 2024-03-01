@@ -7,7 +7,7 @@
 
       <div class="panel-body">
         <p id="print_<%=@document.id%>">
-          <iframe src="<%= employers_employer_attestation_authorized_download_path(@document.id) + "?id=#{@employer_profile.id}&content_type=#{@document.format}&filename=#{@document.title.gsub(/[^0-9a-z]/i,'')}&disposition=inline" %>" style="border: 0" width="100%" height="500" frameborder="1" scrolling="no"></iframe>
+          <iframe src="<%= employers_employer_attestation_authorized_download_path(@document.id) + "?id=#{@employer_profile.id}&content_type=#{@document.format}&filename=#{@document.title.gsub(/[^0-9a-z]/i,'')}&disposition=inline" %>" class="inline-border-none" width="100%" height="500" frameborder="1" scrolling="no"></iframe>
 
         </p>
         <p class="text-right">
@@ -95,7 +95,7 @@
                 </div>
               </div>
               <% end %>
-            </div> 
+            </div>
         </div>
       </div>
     </div>

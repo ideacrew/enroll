@@ -1,5 +1,5 @@
 <% opts = opts || {} %>
-<%= form_tag url, { method: :get, remote: (defined?(remote) ? remote : false), class: "form form-inline input-no-pd", role: "search", style: "margin: 0;"} do %>
+<%= form_tag url, { method: :get, remote: (defined?(remote) ? remote : false), class: "form form-inline input-no-pd inline-margin-0", role: "search" } do %>
   <div class="input-group">
       <%= label_tag :q, "Search term", {class: "sr-only"} %>
       <%= text_field_tag :q, q, {placeholder: placeholder, class: "form-control"} %>

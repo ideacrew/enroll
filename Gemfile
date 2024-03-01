@@ -59,6 +59,8 @@ gem 'mongoid_rails_migrations', '~> 1.2'
 ## General gems
 gem 'aasm',                     '~> 4.8'
 gem 'recurring_select'
+gem 'bootstrap',                '~> 4.6', '>= 4.6.2'
+gem 'popper_js',                '~> 1.16', '>= 1.16.1'
 
 gem 'aws-sdk',                  '~> 2.2.4'
 gem 'bcrypt',                   '~> 3.1'

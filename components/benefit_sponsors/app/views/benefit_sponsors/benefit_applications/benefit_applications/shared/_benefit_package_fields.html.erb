@@ -18,13 +18,13 @@
             <!-- Offset :  -->
             <label class="title">NAME YOUR BENEFIT PACKAGE</label>
             <% title_value = f.object.title.present? ? f.object.title : "#{TimeKeeper.date_of_record.year} Employer Benefits" %>
-            <%= f.text_field :title, class: "form-control", style: "font-weight: normal !important;", required: true %>
+            <%= f.text_field :title, class: "form-control inline-font-weight-normal", required: true %>
           </div>
         </div>
         <div class="row row-form-wrapper no-buffer description">
           <div class="col-xs-12 form-group form-group-lg">
             <label class="title">DESCRIPTION</label>
-            <%= f.text_field :description, class: "form-control", style: "font-weight: normal !important;" %>
+            <%= f.text_field :description, class: "form-control inline-font-weight-normal" %>
           </div>
         </div>
         <div class="row row-form-wrapper no-buffer">

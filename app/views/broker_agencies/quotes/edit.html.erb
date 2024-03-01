@@ -1,7 +1,7 @@
 <div class="container module broker_quote_tool">
 	<%= form_for @quote, url: {action: "update"}, method: "put", :locals => { :broker_role_id => @broker.id }, class: "form-inline" do |f| %>
 	<%= render "edit_form" ,f:f %>
-	<div class="footer" style="padding:10px">
+	<div class="footer inline-padding-10px">
 	  <div class="row">
 				<div class="col-sm-9">
 					<%

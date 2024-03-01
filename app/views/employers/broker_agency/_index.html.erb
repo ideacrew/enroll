@@ -6,13 +6,13 @@
       <div class="search-wp">
         <%= render 'shared/search', url: "/employers/employer_profiles/#{@employer_profile.id}/broker_agency", q: @q, remote: true, placeholder: 'Agency/Broker Name, NPN' %>
         <span class="pull-right">
-          <a class="broker-advanced-search-options" style="cursor: pointer;">Advanced Options</a>
+          <a class="broker-advanced-search-options inline-cursor-pointer">Advanced Options</a>
         </span>
       </div>
 
       <%= hidden_field_tag "broker_search_url", employers_employer_profile_broker_agency_index_path(@employer_profile) %>
 
-      <div id="advanced_options" style="display: none;">
+      <div id="advanced_options" class="inline-display-none">
            <div class="language_multi_select pull-right">
              <%= select_tag(:languages_spoken, options_for_select(language_options), { id: 'broker_agency_language_select', multiple: "multiple" } ) %>
           </div>

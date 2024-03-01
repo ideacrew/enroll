@@ -167,17 +167,17 @@
       </div>
       <div class="col-sm-12" id="brGuide">
         <%= form_tag(:controller => "broker_agencies/broker_roles", action: 'email_guide') do %>
-            <div class="form-group col-sm-3" style="padding-left:0px">
-              <%= text_field_tag :first_name, nil, class: 'form-control', id: 'inputFirst', placeholder: 'First Name *', style: 'width:100%', onblur: 'validateField()' %>
+            <div class="form-group col-sm-3 inline-padding-left-0">
+              <%= text_field_tag :first_name, nil, class: 'form-control inline-width-100-percent', id: 'inputFirst', placeholder: 'First Name *', onblur: 'validateField()' %>
             </div>
             <div class="form-group col-sm-3">
-              <%= text_field_tag :last_name, nil, class: 'form-control', id: 'inputLast', placeholder: 'Last Name *', style: 'width:100%', onblur: 'validateField()' %>
+              <%= text_field_tag :last_name, nil, class: 'form-control inline-width-100-percent', id: 'inputLast', placeholder: 'Last Name *', onblur: 'validateField()' %>
             </div>
             <div class="form-group col-sm-3">
-              <%= email_field_tag :email, nil, class: 'form-control', id: 'inputEmail', placeholder: 'Email *', style: 'width:100%', onblur: 'validateField()' %>
+              <%= email_field_tag :email, nil, class: 'form-control inline-width-100-percent', id: 'inputEmail', placeholder: 'Email *', onblur: 'validateField()' %>
             </div>
             <div class="form-group col-sm-3">
-              <%= submit_tag 'Submit', class: 'btn btn-primary blocking', style: "margin-top:-1px", id: 'brSubmit' %>
+              <%= submit_tag 'Submit', class: 'btn btn-primary blocking inline-margin-top-minus-1', id: 'brSubmit' %>
             </div>
 
         <% end %>

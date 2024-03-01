@@ -10,7 +10,7 @@
         <%= f.label :password, "New Password" %><br />
         <%= f.password_field :password, autofocus: true, class: "form-control" %>
       </div>
-      <div id="pswd_info" class="tooltip_box" style="display: none;">
+      <div id="pswd_info" class="tooltip_box inline-display-none">
         <p>Your password must:</p>
         <ul>
           <li id="length" class="valid">Be at least <%= User.configured_password_length.min %> characters</li>

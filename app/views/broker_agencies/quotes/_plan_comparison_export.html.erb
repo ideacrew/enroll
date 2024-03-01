@@ -1,23 +1,23 @@
 <div class="container-fluid">
-  <h3 style='text-align:center'><%= l10n("plan_comparison_chart")%></h3>
+  <h3 class='inline-text-align-center'><%= l10n("plan_comparison_chart")%></h3>
   <div class="mygrid-wrapper-div">
-   <table class="table bordered compare-table", border = "1", style="font-size:11px;" id="compare_plans_table">
+   <table class="table bordered compare-table inline-font-size-11px", border = "1", id="compare_plans_table">
         <tr>
           <th class="row-title"><%= l10n("plans")%></th>
           <% qhps.each do |qhp|%>
-            <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;" class='movable'><%= display_carrier_logo(Maybe.new(qhp.plan), { width: 80, pdf: true }) %></th>
+            <th colspan="2" class='movable inline-border-none inline-qle-card'><%= display_carrier_logo(Maybe.new(qhp.plan), { width: 80, pdf: true }) %></th>
           <% end %>
         </tr>
         <tr>
           <th></th>
           <% qhps.each do |qhp|%>
-            <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;" class="ttc fourteen blue"><%= qhp.plan.name %></th>
+            <th colspan="2" class="ttc fourteen blue inline-border-none inline-qle-card"><%= qhp.plan.name %></th>
           <% end %>
         </tr>
         <tr>
           <th></th>
           <% qhps.each do |qhp|%>
-            <th class="fourteen lg" colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><span class="<%= qhp.plan.metal_level.humanize.downcase %>-icon"><%= display_dental_metal_level qhp.plan %></span> &nbsp;&#149;&nbsp;
+            <th class="fourteen lg inline-border-none inline-qle-card" colspan="2"><span class="<%= qhp.plan.metal_level.humanize.downcase %>-icon"><%= display_dental_metal_level qhp.plan %></span> &nbsp;&#149;&nbsp;
             <%= qhp.plan.plan_type.upcase %>
             </th>
           <% end %>

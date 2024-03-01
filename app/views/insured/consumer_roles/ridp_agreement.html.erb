@@ -14,7 +14,7 @@
           <%= "Please contact #{EnrollRegistry[:enroll_app].setting(:contact_center_name).item}: #{Settings.contact_center.phone_number} for more information" %>
         </div>
       </div>
-      <div class="row row-form-wrapper no-buffer" style="border-top: solid 1px #b7b7b7;">
+      <div class="row row-form-wrapper no-buffer inline-border-top-1-b7b7b7">
         <div tabindex="0" onkeydown="handleRadioKeyDown(event, 'agreement_agree')" class="col-lg-2 radio skinned-form-controls skinned-form-controls-mac">
           <%= radio_button_tag :agreement, "agree", true, class: "required floatlabel"  %>
           <label for="agreement_agree"><span style="white-space: nowrap;"><%= l10n('faa.i_agree') %></span></label>

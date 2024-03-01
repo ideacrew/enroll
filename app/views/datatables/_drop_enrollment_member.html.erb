@@ -12,12 +12,12 @@
 <td colspan="90%">
   <% if @hbxs.present? %>
     <% @hbxs.each do |hbx|%>
-      <%= form_tag update_enrollment_member_drop_exchanges_hbx_profiles_path, :method => :post, remote: true do %> 
+      <%= form_tag update_enrollment_member_drop_exchanges_hbx_profiles_path, :method => :post, remote: true do %>
         <h3 class='title' data-cuke="drop_enrollment_members_title"><%= l10n('admin_actions.drop_enrollment_members') %></h3>
         <p><%= l10n('admin_actions.drop_member_description') %></p>
         <p class='title'><b><%= l10n('admin_actions.enrollment_hbx_id') %>:</b> <%= hbx.hbx_id %></p>
         <p class='title'><b><%= l10n('plan') %>:</b> <%= hbx.product.title %></p>
-        <p><%= l10n('termination_date') %>: <%= text_field_tag "termination_date_#{hbx.id}", nil, value:  set_default_termination_date_value(hbx), id: "termination-date-picker_#{hbx.id}", class: "form-control date-field date-picker", "data-date-min" =>  set_date_min_to_beginning_of_year(hbx, 1), "data-date-max" =>  set_date_max_to_plan_end_of_year(hbx), 'data-cuke': 'drop_termination_date' %></p> 
+        <p><%= l10n('termination_date') %>: <%= text_field_tag "termination_date_#{hbx.id}", nil, value:  set_default_termination_date_value(hbx), id: "termination-date-picker_#{hbx.id}", class: "form-control date-field date-picker inline-style-width-90px", "data-date-min" =>  set_date_min_to_beginning_of_year(hbx, 1), "data-date-max" =>  set_date_max_to_plan_end_of_year(hbx), 'data-cuke': 'drop_termination_date' %></p>
         <br />
         <table  class="table table-striped">
           <tr>

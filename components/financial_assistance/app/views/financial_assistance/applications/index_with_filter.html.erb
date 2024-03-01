@@ -21,7 +21,7 @@
             <% if @applications.present? %>
               <label class="font-weight-bold"><%= l10n('application_year') %></label>
               <%= select("filter", "year", @applications.distinct(:assistance_year)&.compact&.sort&.reverse&.each,
-              {include_blank: "All Years", :selected => params.dig(:filter, :year) }, 
+              {include_blank: "All Years", :selected => params.dig(:filter, :year) },
               {:onchange => "this.form.submit();"})%>
             <% end %>
           <% end %>
@@ -45,7 +45,7 @@
                 <td class="text-nowrap">
                   <%= application.hbx_id %>
                   <% if application.hbx_id == @recent_determined_hbx_id %>
-                    <span class="bg-primary" style="font-size: smaller; border-radius: 10px; padding: 4px 8px; margin-left: 10px;"><%= l10n('current') %></span> 
+                    <span class="bg-primary" style="font-size: smaller; border-radius: 10px; padding: 4px 8px; margin-left: 10px;"><%= l10n('current') %></span>
                   <% end %>
                 </td>
                 <td><%= application.assistance_year %></td>
@@ -72,7 +72,7 @@
         <% end %>
 
         <div>
-          <%= form_tag(main_app.help_paying_coverage_response_insured_consumer_role_index_path, method: :get, id: 'start_new_app', style: "align-self:flex-end;") do %>
+          <%= form_tag(main_app.help_paying_coverage_response_insured_consumer_role_index_path, method: :get, id: 'start_new_app', class: "inline-align-self-flex-end") do %>
             <%= hidden_field_tag :is_applying_for_assistance, 'true' %>
             <% if FinancialAssistanceRegistry.feature_enabled?(:iap_year_selection) %>
               <%= submit_tag l10n('faa.start_new_application'), class: "btn btn-primary"%>
@@ -81,7 +81,7 @@
             <% end %>
           <% end %>
           </div>
-        
+
       </div>
     </div>
   </div>
