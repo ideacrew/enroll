@@ -2,7 +2,7 @@
 
 RSpec.shared_context 'cms ME simple_scenarios test_case_d', :shared_context => :metadata do
   let(:current_date) { Date.today }
-  let(:member_dob) { Date.new(current_date.year - 22, current_date.month, current_date.day) }
+  let(:member_dob) { Date.new(current_date.year - 22, current_date.month, current_date.beginning_of_month.day) }
   let(:aptc_effective_date) { Date.today.next_month.beginning_of_month }
   let(:notice_options) { { send_eligibility_notices: true, send_open_enrollment_notices: false, :paper_notification => true} }
   let(:response_payload) do
