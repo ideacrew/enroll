@@ -120,6 +120,17 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
         end
       end
 
+      context 'for a terminated HC4CC enrollment' do
+        before do
+          enrollment.eligible_child_care_subsidy = Money.new(15_000)
+          @reinstated_enrollment = subject.call({hbx_enrollment: enrollment, options: {benefit_package: new_bga.benefit_package}}).success
+        end
+
+        it 'should reapply childcare subsidy for reinstated HC4CC enrollment' do
+          expect(@reinstated_enrollment.eligible_child_care_subsidy.to_s).to eq "150.00"
+        end
+      end
+
       context "should trigger enrollment event" do
         it 'publish amqp message' do
           expect_any_instance_of(HbxEnrollment).to receive(:notify)

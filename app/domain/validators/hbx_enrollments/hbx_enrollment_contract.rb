@@ -64,6 +64,8 @@ module Validators
         optional(:elected_premium_credit).maybe(:float)
         optional(:applied_premium_credit).maybe(:float)
 
+        optional(:eligible_child_care_subsidy).maybe(:float)
+
         optional(:hbx_enrollment_members).array(:hash)
 
         optional(:family_id).maybe(Types::Bson)
