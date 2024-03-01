@@ -1124,7 +1124,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         @original_product.update_attributes(hsa_eligibility: true)
         slug = Struct.new(:dob, :member_id)
         family_member = family_members.last
-        age = ::BenefitSponsors::CoverageAgeCalculator.new.calc_coverage_age_for(slug.new(family_member.person.dob, family_member.person.id), nil, effective_period.max, {}, nil)
+        age = ::BenefitSponsors::CoverageAgeCalculator.new.calc_coverage_age_for(slug.new(family_member.person.dob, family_member.person.id), nil, effective_period.min, {}, nil)
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
           @original_product,
           effective_period.min,
