@@ -5,11 +5,11 @@ on:
   push:
     branches:
       - 'trunk'
-      - '185545425_shop_end_to_end'
+      - '187050786_update_jquery'
   pull_request:
     branches:
       - 'trunk'
-      - '185545425_shop_end_to_end'
+      - '187050786_update_jquery'
 
 concurrency:
   group: docker-${{ github.ref }}
