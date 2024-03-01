@@ -37,7 +37,7 @@ $(document).on('click', 'input#datatable_filter_bulk_actions', function(){
   if($(this).is(':checked')){
     $('input[data-role="bulk-actions-resource"]').prop('checked', true);
   }else{
-    $('input[data-role="bulk-actions-resource"]').removeProp('checked');
+    $('input[data-role="bulk-actions-resource"]').removeAttr('checked');
   }
   employers_check_allow_assign(this);
 });

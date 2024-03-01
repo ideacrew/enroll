@@ -222,8 +222,7 @@ function applyListeners() {
 
 var PersonValidations = (function (window, undefined) {
   function manageRequiredValidations(this_obj) {
-    hidden_requireds = $('[required]').not(':visible');
-    $('[required]').not(':visible').removeProp('required');
+    $('[required]').not(':visible').removeAttr('required');
     this_obj.closest('div').find('button[type="submit"]').trigger('click');
     this_obj.closest('div').find('.dependent-disable').prop('disabled', true);
   }
@@ -262,7 +261,7 @@ var PersonValidations = (function (window, undefined) {
       $('#tribal-name-alert').addClass('hide');
     });
 
-    if ($('input[name="person[is_applying_coverage]"]').length > 0 
+    if ($('input[name="person[is_applying_coverage]"]').length > 0
     && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
       return true;
     }
@@ -280,7 +279,7 @@ var PersonValidations = (function (window, undefined) {
       $('#tribal-state').val("");
       $('input#tribal-name').val("");
       $('#tribal-id').val("");
-      $('.tribe_codes:checked').removeAttr('checked'); 
+      $('.tribe_codes:checked').removeAttr('checked');
     }
 
     if (tribe_member_yes){
@@ -291,7 +290,7 @@ var PersonValidations = (function (window, undefined) {
 
       if ($('.featured_tribes_selection').length > 0 && $('#tribal-state').val() == $('#enroll_state_abbr').val()){
         var tribe_codes_array = $('.tribe_codes:checked').map(function(){ return $(this).val(); }).get();
-        if (tribe_codes_array.length < 1) { 
+        if (tribe_codes_array.length < 1) {
           alert("At least one tribe must be selected.");
           PersonValidations.restoreRequiredAttributes(e);
         }
@@ -304,7 +303,7 @@ var PersonValidations = (function (window, undefined) {
         if (!tribe_codes_array.includes("OT")){
           $('input#tribal-name').val("");
         }
-      } 
+      }
       else if ($('input#tribal-name').val() == ""){
           $('#tribal-name-alert').show();
           PersonValidations.restoreRequiredAttributes(e);
