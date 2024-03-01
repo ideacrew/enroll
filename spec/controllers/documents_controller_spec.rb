@@ -335,4 +335,49 @@ RSpec.describe DocumentsController, :type => :controller do
 
     end
   end
+
+  describe "authorize cartafact_download" do
+
+    let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:associated_user) {FactoryBot.create(:user, :person => person)}
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let!(:family_member) { family.family_members.first }
+    let!(:document) {person.documents.create}
+
+    let(:broker_agency_profile) do
+      FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile)
+    end
+
+    let!(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: 'active')}
+    let!(:broker_user) {FactoryBot.create(:user, :person => broker_agency_staff_role.person, roles: ['broker_agency_staff_role'])}
+    let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
+
+    let(:existing_broker_staff_role) do
+      person.broker_agency_staff_roles.first
+    end
+
+    let(:broker_role) do
+      role = BrokerRole.new(
+        :broker_agency_profile => broker_agency_profile,
+        :aasm_state => "applicant",
+        :npn => "123456789",
+        :provider_kind => "broker"
+      )
+      person.broker_role = role
+      person.save!
+      person.broker_role
+    end
+
+    before(:each) do
+      family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                          start_on: Time.now,
+                                                                                          is_active: true)
+      family.reload
+    end
+
+    it 'broker should be able to download' do
+      sign_in broker_user
+      get :cartafact_download, params: {model: "Person", model_id: person.id, relation: "documents", relation_id: document.id}
+    end
+  end
 end
