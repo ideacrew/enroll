@@ -181,9 +181,9 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.update_reminder" => "If you make changes to your %{year} coverage that should apply to your %{year2} coverage too, you will need to come back and update your %{year2} application. You can do this by copying your latest %{year} application and submitting it for %{year2}. ",
   "en.faa.learn_more_about_life_changes" => "Learn more about life changes",
   # Mec check
-  "en.faa.mc_success" => "It looks like you may already be enrolled in Medicaid or CHIP. If you need to update information like your income, address, or who is in your household, contact DC Health Link at <a href='tel:1-855-532-5465'>1-855-532-5465</a> to make these changes before completing a DC Health Link application.",
+  "en.faa.mc_success" => "<b>It looks like you already have Medicaid coverage.</b> If you’re enrolled in Medicaid and need to renew your coverage or update your information, go to <a target='_blank' href='https://districtdirect.dc.gov'>districtdirect.dc.gov</a> or contact District Direct at (202) 727-5355 / TTD: (800) 877-8339.",
   "en.faa.shop_check_success" => "It looks like you may already be enrolled in employer sponsored coverage. If you need to update information like your income, address, or who is in your household, visit the Manage Family page to make these changes before completing a DC Health Link application.",
-  "en.faa.mc_continue" => "Select 'CONTINUE' if you would still like to complete a DC Health Link application.",
+  "en.faa.mc_continue" => "<b>Still want to apply for lower monthly premiums or lost (or will soon lose) Medicaid coverage?</b> Select 'CONTINUE' if you would still like to complete a DC Health Link application.",
   # FAA display evidence type
   "en.faa.evidence_type_aces" => "Coverage from Medicaid and CHIP",
   "en.faa.evidence_type_esi" => "Coverage from a job",
