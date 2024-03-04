@@ -9,7 +9,7 @@ module PdfScrubberUtil
   def sanitize_pdf(value)
     ActionController::Base.helpers.sanitize(
       value,
-      tags: Loofah::HTML5::SafeList::ACCEPTABLE_ELEMENTS.dup.delete("select").add("style"),
+      tags: Loofah::HTML5::SafeList::ACCEPTABLE_ELEMENTS.dup.delete("select").merge(['style', 'title']),
       attributes: Loofah::HTML5::SafeList::ACCEPTABLE_ATTRIBUTES.dup.add("style")
     ).html_safe
   end

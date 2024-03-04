@@ -419,6 +419,27 @@
       "note": "Raw html image tag, no user input allowed."
     },
     {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "3291f33ffbcb6bb388bb080269a67bf3f4689c4afa88de149fd16e34b74986e5",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "lib/pdf_scrubber_util.rb",
+      "line": 10,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "ActionController::Base.helpers.sanitize(value, :tags => Loofah::HTML5::SafeList::ACCEPTABLE_ELEMENTS.delete(\"select\").merge([\"style\", \"title\"]), :attributes => Loofah::HTML5::SafeList::ACCEPTABLE_ATTRIBUTES.add(\"style\")).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "PdfScrubberUtil",
+        "method": "sanitize_pdf"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": ""
+    },
+    {
       "warning_type": "Command Injection",
       "warning_code": 14,
       "fingerprint": "32a4fba0025fc7cdd09a396e504a40ce8c53a4ad3262246c5f3bd0b3849a47f2",
@@ -693,27 +714,6 @@
         22
       ],
       "note": ""
-    },
-    {
-      "warning_type": "Usage of html_safe",
-      "warning_code": 2,
-      "fingerprint": "50fc2f6fb0ff3689f1044372d33bc887584cf7545eb47c5d4e631102356929c0",
-      "check_name": "HtmlSafeUsage",
-      "message": "Html_safe used",
-      "file": "lib/pdf_scrubber_util.rb",
-      "line": 10,
-      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
-      "code": "ActionController::Base.helpers.sanitize(value, :tags => Loofah::HTML5::SafeList::ACCEPTABLE_ELEMENTS.delete(\"select\").add(\"style\"), :attributes => Loofah::HTML5::SafeList::ACCEPTABLE_ATTRIBUTES.add(\"style\")).html_safe",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "PdfScrubberUtil",
-        "method": "sanitize_pdf"
-      },
-      "user_input": null,
-      "confidence": "Medium",
-      "cwe_id": null,
-      "note": "Safe called after explicit scrubbing."
     },
     {
       "warning_type": "Usage of html_safe",
@@ -1049,27 +1049,6 @@
         77
       ],
       "note": ""
-    },
-    {
-      "warning_type": "Usage of html_safe",
-      "warning_code": 2,
-      "fingerprint": "62626698d10a3174d1a1c3fea559d4ad648531bfaf57418b725196517f2feb10",
-      "check_name": "HtmlSafeUsage",
-      "message": "Html_safe used",
-      "file": "lib/html_scrubber_util.rb",
-      "line": 10,
-      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
-      "code": "ActionController::Base.helpers.sanitize(value, :tags => (Loofah::HTML5::SafeList::ACCEPTABLE_ELEMENTS), :attributes => Loofah::HTML5::SafeList::ACCEPTABLE_ATTRIBUTES.add(\"style\")).html_safe",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "HtmlScrubberUtil",
-        "method": "sanitize_html"
-      },
-      "user_input": null,
-      "confidence": "Medium",
-      "cwe_id": null,
-      "note": "Safe used after explicit scrubbing."
     },
     {
       "warning_type": "Remote Code Execution",
@@ -1862,7 +1841,7 @@
       "check_name": "Send",
       "message": "User controlled method execution",
       "file": "components/financial_assistance/app/controllers/financial_assistance/verification_documents_controller.rb",
-      "line": 115,
+      "line": 122,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
       "code": "@docs_owner.send(params[:evidence_kind])",
       "render_path": null,
@@ -2191,6 +2170,27 @@
       "note": "Partial update via javascript - the used template has already been cleaned."
     },
     {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "ed4ca6af14e3a0ed486a0d02a91b87403ef84a56baf6bad56b3683ae12ff7c40",
+      "check_name": "HtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "lib/html_scrubber_util.rb",
+      "line": 10,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "ActionController::Base.helpers.sanitize(value, :tags => Loofah::HTML5::SafeList::ACCEPTABLE_ELEMENTS.delete(\"select\").add(\"style\"), :attributes => Loofah::HTML5::SafeList::ACCEPTABLE_ATTRIBUTES.merge([\"style\", \"data-toggle\", \"data-slide-to\", \"data-target\"])).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "HtmlScrubberUtil",
+        "method": "sanitize_html"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": ""
+    },
+    {
       "warning_type": "Unmaintained Dependency",
       "warning_code": 121,
       "fingerprint": "edf687f759ec9765bd5db185dbc615c80af77d6e7e19386fc42934e7a80307af",
@@ -2296,6 +2296,6 @@
       "note": ""
     }
   ],
-  "updated": "2024-02-20 17:29:18 +0000",
+  "updated": "2024-02-27 15:36:31 -0700",
   "brakeman_version": "5.4.1"
 }

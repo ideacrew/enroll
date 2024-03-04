@@ -114,6 +114,10 @@ h1,h2,h3,h4,h5,h6 {
   }
 }
 
+button, .button, .normal-font-weight {
+  font-weight: 400;
+}
+
 #uic-primary-nav {
   background:$dark-blue;
 
@@ -576,7 +580,7 @@ thead {
 }
 
 .white {
-  color: #ffffff !important;
+  color: var(--primary-white, #007BC4) !important;
 }
 
 .black {

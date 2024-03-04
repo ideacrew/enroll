@@ -46,7 +46,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
                       family_member_id: family.primary_applicant.id,
                       first_name: 'Gerald',
                       last_name: 'Rivers',
-                      dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                      dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.beginning_of_month.day),
                       application: application)
   end
 
@@ -126,7 +126,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::AptcCsrCreditEli
                             family_member_id: family2.primary_applicant.id,
                             first_name: family2.primary_applicant.first_name,
                             last_name: family2.primary_applicant.last_name,
-                            dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                            dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.beginning_of_month.day),
                             application: application2,
                             is_applying_coverage: false)
         end

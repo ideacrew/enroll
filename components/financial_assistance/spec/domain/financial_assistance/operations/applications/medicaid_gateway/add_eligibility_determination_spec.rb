@@ -23,7 +23,7 @@ RSpec.describe ::FinancialAssistance::Operations::Applications::MedicaidGateway:
                       is_primary_applicant: true,
                       first_name: 'Gerald',
                       last_name: 'Rivers',
-                      dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.day),
+                      dob: Date.new(Date.today.year - 22, Date.today.month, Date.today.beginning_of_month.day),
                       application: application)
   end
 
