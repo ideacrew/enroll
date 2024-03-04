@@ -58,6 +58,8 @@ RSpec.describe Insured::RidpDocumentsController, type: :controller, dbclean: :af
         allow_any_instance_of(Insured::RidpDocumentsController).to receive(:update_ridp_documents).with("sample-filename", doc_id).and_return(true)
         allow(Aws::S3Storage).to receive(:save).with(file_path, bucket_name).and_return(doc_id)
         sign_in user
+        file = fixture_file_upload("#{Rails.root}/test/uhic.jpg")
+        params[:file] = [file]
         post :upload, params: params
       end
 

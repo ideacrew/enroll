@@ -3,6 +3,7 @@ class Notice
   include Config::AcaHelper
   include Config::SiteHelper
   include Config::ContactCenterHelper
+  include PdfScrubberUtil
 
   attr_accessor :from, :to, :options, :name, :subject, :template,:mpi_indicator, :event_name, :notice_data, :recipient_document_store ,:market_kind, :file_name, :notice , :random_str ,:recipient, :header, :sep, :state
 
@@ -25,11 +26,15 @@ class Notice
   end
 
   def html(options = {})
-    ApplicationController.new.render_to_string({
-      :template => options[:custom_template] || template,
-      :layout => layout,
-      :locals => { notice: notice }
-    })
+    sanitize_pdf(
+      ApplicationController.new.render_to_string(
+        {
+          :template => options[:custom_template] || template,
+          :layout => layout,
+          :locals => { notice: notice }
+        }
+      )
+    )
   end
 
   def random_str

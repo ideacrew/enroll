@@ -72,12 +72,39 @@
           <%#= pundit_span EmployerProfile, :updateable? %>
           <% if benefit_application.draft? %>
               <%# if benefit_application.overlapping_published_benefit_applications.empty? %>
-              <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, benefit_sponsorship_benefit_application_submit_application_path(benefit_application.benefit_sponsorship, benefit_application), method: :post, remote: true, class: "btn btn-default pull-right", disabled: product_rates_available?(benefit_application.benefit_sponsorship, benefit_application.start_on.to_date) %>
+              <%= link_to(
+                    benefit_sponsorship_benefit_application_submit_application_path(
+                      benefit_application.benefit_sponsorship,
+                      benefit_application
+                    ),
+                    method: :post,
+                    remote: true,
+                    class: "btn btn-default pull-right",
+                    disabled: product_rates_available?(benefit_application.benefit_sponsorship, benefit_application.start_on.to_date)) do %>
+                Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>
+              <% end %>
               <%# end %>
               <% if benefit_application.benefit_packages.empty? || benefit_application.benefit_packages.count > 1 %>
-                <%= link_to "Edit Plan Year &nbsp;<i class='fas fa-pencil-alt' aria-hidden='true'></i>".html_safe, edit_benefit_sponsorship_benefit_application_path(benefit_application.benefit_sponsorship, benefit_application), class: "btn btn-default pull-right mrz mr-1"%>
+                <%= link_to(
+                      edit_benefit_sponsorship_benefit_application_path(
+                        benefit_application.benefit_sponsorship,
+                        benefit_application
+                      ),
+                      class: "btn btn-default pull-right mrz mr-1") do %>
+                  Edit Plan Year &nbsp;<i class='fas fa-pencil-alt' aria-hidden='true'></i>
+                <% end %>
               <% else %>
-                <%= link_to "Edit Plan Year &nbsp;<i class='fas fa-pencil-alt' aria-hidden='true'></i>".html_safe, edit_benefit_sponsorship_benefit_application_benefit_package_path(benefit_application.benefit_sponsorship, benefit_application, benefit_application.benefit_packages.first, :show_benefit_application_tile => true), method: :get, class: "btn btn-default pull-right mrz mr-1"%>
+                <%= link_to(
+                      edit_benefit_sponsorship_benefit_application_benefit_package_path(
+                        benefit_application.benefit_sponsorship,
+                        benefit_application,
+                        benefit_application.benefit_packages.first,
+                        :show_benefit_application_tile => true
+                      ),
+                      method: :get,
+                      class: "btn btn-default pull-right mrz mr-1") do %>
+                  Edit Plan Year &nbsp;<i class='fas fa-pencil-alt' aria-hidden='true'></i>
+                <% end %>
               <% end %>
           <% end %>
           <%#= pundit_span(EmployerProfile, :revert_application?) %>
@@ -193,7 +220,7 @@
                 </section>
 
                 <div class="col-xs-2 top-view-details">
-                  <button class="nav-toggle row view" id="showhidebutton" onclick="EmployerProfile.viewDetails($(this))">View Details
+                  <button class="nav-toggle row view normal-font-weight" id="showhidebutton" onclick="EmployerProfile.viewDetails($(this))">View Details
                     <i class="fa fa-chevron-down fa-lg"></i>
                   </button>
                 </div>
@@ -238,7 +265,14 @@
           </div>
             <%= pundit_span @employer_profile, :updateable? %>
                 <div class="below clear">
-                  <%= link_to "Delete Benefit Package <i class='fas fa-trash-alt' aria-hidden='true'></i> ".html_safe, "", data: { toggle: "modal", target: "#deleteBenefitPackageModal-#{package.id.to_s}" }, class: 'btn btn-default' if benefit_application.aasm_state.to_s == "draft" || benefit_application.aasm_state.to_s == "renewing_draft" %>
+                  <% if benefit_application.aasm_state.to_s == "draft" || benefit_application.aasm_state.to_s == "renewing_draft" %>
+                    <%= link_to(
+                          "",
+                          data: { toggle: "modal", target: "#deleteBenefitPackageModal-#{package.id.to_s}" },
+                          class: 'btn btn-default') do %>
+                      Delete Benefit Package <i class='fas fa-trash-alt' aria-hidden='true'></i>
+                    <% end %>
+                  <% end %>
                   <%= render partial: "benefit_sponsors/profiles/employers/benefit_packages/delete_benefit_package_modal", locals: { benefit_application: benefit_application, package: package } if benefit_application.aasm_state.to_s == "draft" || benefit_application.aasm_state.to_s == "renewing_draft" %>
                 </div>
             </span>

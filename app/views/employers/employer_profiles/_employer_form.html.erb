@@ -97,7 +97,7 @@
         </div>
 
         <br/>
-        <button type="submit" class="btn btn-primary"> <%= "Save".html_safe %></button>
+        <button type="submit" class="btn btn-primary">Save</button>
         <%= link_to 'Cancel', edit_employers_employer_profile_path(@employer_profile.organization, add_staff: 'no'), class:'btn btn-default btn-sm' %>
       <% end %>
 
@@ -124,7 +124,7 @@
         <br>
         <div class="form-inputs">
           <%= pundit_span(EmployerProfile,:updateable?) %>
-             <%= link_to_add_fields 'Add Office Location'.html_safe, f, :office_locations, 'btn btn-default btn-sm' %>
+             <%= link_to_add_fields 'Add Office Location', f, :office_locations, 'btn btn-default btn-sm' %>
           </span>
           <%= link_to "Cancel", employers_employer_profile_path(id: @organization.employer_profile.id, tab: 'home'), class:'btn btn-default btn-sm' %>
         </div>
@@ -137,7 +137,7 @@
         <p>
           <% button_name = @organization.persisted? ? 'Save' : 'Create' %>
           <button type="submit" class="btn btn-primary btn-lg pull-right">
-            <%= "#{button_name}".html_safe %>
+            <%= button_name %>
           </button> &nbsp;&nbsp;
         </p>
       <% end %>

@@ -58,6 +58,7 @@ class Person
 
 
   extend Mongorder
+  include HtmlScrubberUtil
 #  validates_with Validations::DateRangeValidator
 
   GENDER_KINDS = %W(male female)
@@ -1381,14 +1382,14 @@ class Person
                                    else
                                      "inbox.create_inbox_normal_user_message"
                                    end
-    welcome_body = l10n(
+    welcome_body = sanitize_html(l10n(
       welcome_body_translation_key,
       site_short_name: site_short_name,
       state_name: site_state_name,
       contact_center_short_number: EnrollRegistry[:enroll_app].settings(:contact_center_short_number).item,
       contact_center_tty_number: contact_center_tty_number,
       contact_center_name: contact_center_name
-    ).html_safe
+    ))
     mailbox = Inbox.create(recipient: self)
     mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: "#{site_short_name}")
   end

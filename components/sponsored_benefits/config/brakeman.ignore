@@ -1,13 +1,378 @@
 {
   "ignored_warnings": [
     {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "04bda251500c463fe3cfd1b36b7f7d6809eb4192694f188881fcb8596ab87e88",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/controllers/sponsored_benefits/organizations/plan_design_proposals/plans_controller.rb",
+      "line": 31,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "::Queries::EmployerPlanOfferings.new(plan_design_organization).dental_reference_plans_by_id(params[:plans_ids], params[:active_year]).select do\n a.premium_tables.present?\n end.map do\n a.id.to_s\n end.to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "SponsoredBenefits::Organizations::PlanDesignProposals::PlansController",
+        "method": "dental_reference_plans"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "JSON serialization - will not have tags."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "183abd5188a52b2ef4c488905ef35562c02f0078960518a321eab7022767565a",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans.js.erb",
+      "line": 2,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"plan_search_fields\", { :locals => ({ :search_options => (@search_options), :search_titles => (@search_option_titles) }) })).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Checked partial render used by UJS to render another template."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "23bad23bfe4d53a1419a755e01338d3e3cf33734bcef6802475f5070eb2edf6d",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/plans/index.js.erb",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"plans\", { :locals => ({ :plans => (@plans) }) })).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/plans/index"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Checked partial render used by UJS to render another template."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "2c9b8f73673d1b6aef7fbc2852652b5007a302d0252415cb30acd2dd7d0f2528",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/contributions/index.js.erb",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"sponsored_benefits/organizations/plan_design_proposals/shared/pdp_plan_details\", {})).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/contributions/index"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Checked partial render used by UJS to render another template."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "2e2360c6ec8fe60fe269482505522e4654f5c12ebf62f3c40f3ccbef08869e50",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/contributions/index.js.erb",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"sponsored_benefits/organizations/plan_design_proposals/shared/pdp_plan_details\", {})).html_safe",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "SponsoredBenefits::Organizations::PlanDesignProposals::ContributionsController",
+          "method": "index",
+          "line": 14,
+          "file": "app/controllers/sponsored_benefits/organizations/plan_design_proposals/contributions_controller.rb",
+          "rendered": {
+            "name": "sponsored_benefits/organizations/plan_design_proposals/contributions/index",
+            "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/contributions/index.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/contributions/index"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Checked partial render used by UJS to render another template."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "31dc01baea67c06e0c83db476bb458f4787924c4ae0a49334fb9cf7bb53c512c",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/contributions/index.js.erb",
+      "line": 7,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"sponsored_benefits/organizations/plan_design_proposals/shared/benefit_group_cost_summary\", { :locals => ({ :benefit_group => benefit_group, :kind => kind }) })).html_safe",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "SponsoredBenefits::Organizations::PlanDesignProposals::ContributionsController",
+          "method": "index",
+          "line": 14,
+          "file": "app/controllers/sponsored_benefits/organizations/plan_design_proposals/contributions_controller.rb",
+          "rendered": {
+            "name": "sponsored_benefits/organizations/plan_design_proposals/contributions/index",
+            "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/contributions/index.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/contributions/index"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Checked partial render used by UJS to render another template."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "31e532792ffb6ea7a6d8af551ec3087212964d3fbf03b4010b8bd113a08d01cf",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/contributions/index.js.erb",
+      "line": 5,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"sponsored_benefits/organizations/plan_design_proposals/shared/employee_composite_costs\", { :locals => ({ :benefit_group => benefit_group }) })).html_safe",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "SponsoredBenefits::Organizations::PlanDesignProposals::ContributionsController",
+          "method": "index",
+          "line": 14,
+          "file": "app/controllers/sponsored_benefits/organizations/plan_design_proposals/contributions_controller.rb",
+          "rendered": {
+            "name": "sponsored_benefits/organizations/plan_design_proposals/contributions/index",
+            "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/contributions/index.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/contributions/index"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Checked partial render used by UJS to render another template."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "3d466c3a71e29d90e5b8b83f72024f0f5499eb1a56603e35e3f7c2ca6832578b",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans.js.erb",
+      "line": 2,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"plan_search_fields\", { :locals => ({ :search_options => ::Plan.search_options(::Queries::EmployerPlanOfferings.new(plan_design_organization).dental_reference_plans_by_id(params[:plans_ids], params[:active_year]).select do\n a.premium_tables.present?\n end), :search_titles => ({ :plan_type => (if EnrollRegistry.feature_enabled?(:hmo_ppo_plan_type) then\n  \"HMO / PPO\"\nelse\n  \"Plan Type\"\nend), :plan_hsa => \"HSA - Compatible\", :metal_level => \"Metal Level\", :plan_deductible => \"Individual deductible (in network)\" }) }) })).html_safe",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "SponsoredBenefits::Organizations::PlanDesignProposals::PlansController",
+          "method": "dental_reference_plans",
+          "line": 34,
+          "file": "app/controllers/sponsored_benefits/organizations/plan_design_proposals/plans_controller.rb",
+          "rendered": {
+            "name": "sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans",
+            "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Checked partial render used by UJS to render another template."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "4bdb27ff0b27dc9162fab5e38b0df5c9195b8cb57afa60c96e608f60a66cb8fd",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/plans/index.js.erb",
+      "line": 2,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"plan_search_fields\", { :locals => ({ :search_options => (@search_options), :search_titles => (@search_option_titles) }) })).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/plans/index"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Checked partial render used by UJS to render another template."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "52e3d7f39ea1ab46041ee2576825c0900b40e4819bf807b59bf5ff360c47dc58",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/contributions/index.js.erb",
+      "line": 5,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"sponsored_benefits/organizations/plan_design_proposals/shared/employee_composite_costs\", { :locals => ({ :benefit_group => benefit_group }) })).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/contributions/index"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Checked partial render used by UJS to render another template."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "59746f1015a424f6ada6c28d085dbabb28fd693cc11282079253d1d3c6f0b220",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans.js.erb",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"plans\", { :locals => ({ :plans => (@plans) }) })).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Checked partial render used by UJS to render another template."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "770a8cd2199e8b37f3e741fc303147cb07a204ef9d8b26fd2b7935b2ac9ba82e",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans.js.erb",
+      "line": 4,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "::Queries::EmployerPlanOfferings.new(plan_design_organization).dental_reference_plans_by_id(params[:plans_ids], params[:active_year]).select do\n a.premium_tables.present?\n end.map do\n a.id.to_s\n end.to_json.html_safe",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "SponsoredBenefits::Organizations::PlanDesignProposals::PlansController",
+          "method": "dental_reference_plans",
+          "line": 34,
+          "file": "app/controllers/sponsored_benefits/organizations/plan_design_proposals/plans_controller.rb",
+          "rendered": {
+            "name": "sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans",
+            "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Checked partial render used by UJS to render another template."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "b1be5240e7fdb0ca5dbe977611cdc7e82843f11797ec2001278780bf8bc6bc34",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/plans/index.js.erb",
+      "line": 2,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"plan_search_fields\", { :locals => ({ :search_options => ::Plan.search_options((((::Queries::EmployerPlanOfferings.new(plan_design_organization).send(\"single_carrier_offered_#{kind}_plans\", params[:carrier_id], params[:active_year]) or ::Queries::EmployerPlanOfferings.new(plan_design_organization).metal_level_offered_health_plans(params[:metal_level], params[:active_year])) or ::Queries::EmployerPlanOfferings.new(plan_design_organization).send(\"single_option_offered_#{kind}_plans\", params[:carrier_id], params[:active_year])) or ::Queries::EmployerPlanOfferings.new(plan_design_organization).sole_source_offered_health_plans(params[:carrier_id], params[:active_year])).select do\n a.premium_tables.present?\n end), :search_titles => ({ :plan_type => ((Settings.aca.state_abbreviation == \"DC\") ? (\"Plan Type\") : (\"HMO / PPO\")), :plan_hsa => \"HSA - Compatible\", :metal_level => \"Metal Level\", :plan_deductible => \"Individual deductible (in network)\" }) }) })).html_safe",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "SponsoredBenefits::Organizations::PlanDesignProposals::PlansController",
+          "method": "index",
+          "line": 20,
+          "file": "app/controllers/sponsored_benefits/organizations/plan_design_proposals/plans_controller.rb",
+          "rendered": {
+            "name": "sponsored_benefits/organizations/plan_design_proposals/plans/index",
+            "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/plans/index.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/plans/index"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": ""
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "bcef27a31fc83a5a0c177157635695b3a748bf02489f404fb2e715738e5163c4",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/plans/index.js.erb",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"plans\", { :locals => ({ :plans => ((((::Queries::EmployerPlanOfferings.new(plan_design_organization).send(\"single_carrier_offered_#{kind}_plans\", params[:carrier_id], params[:active_year]) or ::Queries::EmployerPlanOfferings.new(plan_design_organization).metal_level_offered_health_plans(params[:metal_level], params[:active_year])) or ::Queries::EmployerPlanOfferings.new(plan_design_organization).send(\"single_option_offered_#{kind}_plans\", params[:carrier_id], params[:active_year])) or ::Queries::EmployerPlanOfferings.new(plan_design_organization).sole_source_offered_health_plans(params[:carrier_id], params[:active_year])).select do\n a.premium_tables.present?\n end) }) })).html_safe",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "SponsoredBenefits::Organizations::PlanDesignProposals::PlansController",
+          "method": "index",
+          "line": 20,
+          "file": "app/controllers/sponsored_benefits/organizations/plan_design_proposals/plans_controller.rb",
+          "rendered": {
+            "name": "sponsored_benefits/organizations/plan_design_proposals/plans/index",
+            "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/plans/index.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/plans/index"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": ""
+    },
+    {
       "warning_type": "Unmaintained Dependency",
       "warning_code": 120,
       "fingerprint": "d84924377155b41e094acae7404ec2e521629d86f97b0ff628e3d1b263f8101c",
       "check_name": "EOLRails",
       "message": "Support for Rails 5.2.4.4 ended on 2022-06-01",
       "file": "Gemfile.lock",
-      "line": 365,
+      "line": 391,
       "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
       "code": null,
       "render_path": null,
@@ -17,9 +382,61 @@
       "cwe_id": [
         1104
       ],
-      "note": ""
+      "note": "Checked partial render used by UJS to render another template."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "e7172b56bab2e9e29001067258563dfc540b26b57847ac888a4ca528338d7b04",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/contributions/index.js.erb",
+      "line": 7,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"sponsored_benefits/organizations/plan_design_proposals/shared/benefit_group_cost_summary\", { :locals => ({ :benefit_group => benefit_group, :kind => kind }) })).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/contributions/index"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Checked partial render used by UJS to render another template."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "fa7c47394f66f992441819763079b42b7c84f72d357532868f9ce4cd466c268f",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans.js.erb",
+      "line": 1,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "escape_javascript(render(partial => \"plans\", { :locals => ({ :plans => (::Queries::EmployerPlanOfferings.new(plan_design_organization).dental_reference_plans_by_id(params[:plans_ids], params[:active_year]).select do\n a.premium_tables.present?\n end) }) })).html_safe",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "SponsoredBenefits::Organizations::PlanDesignProposals::PlansController",
+          "method": "dental_reference_plans",
+          "line": 34,
+          "file": "app/controllers/sponsored_benefits/organizations/plan_design_proposals/plans_controller.rb",
+          "rendered": {
+            "name": "sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans",
+            "file": "app/views/sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans.js.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "sponsored_benefits/organizations/plan_design_proposals/plans/dental_reference_plans"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Checked partial render used by UJS to render another template."
     }
   ],
-  "updated": "2023-02-22 16:32:39 +0000",
+  "updated": "2024-02-20 15:17:19 +0000",
   "brakeman_version": "5.4.1"
 }

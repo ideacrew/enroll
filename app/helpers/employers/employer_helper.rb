@@ -1,4 +1,6 @@
 module Employers::EmployerHelper
+  include HtmlScrubberUtil
+
   def address_kind
     @family.try(:census_employee).try(:address).try(:kind) || 'home'
   end
@@ -23,26 +25,32 @@ module Employers::EmployerHelper
   end
 
   def enrollment_state(census_employee=nil)
-    humanize_enrollment_states(census_employee.active_benefit_group_assignment).gsub("Coverage Selected", "Enrolled").gsub("Coverage Waived", "Waived").gsub("Coverage Terminated", "Terminated").gsub("Coverage Termination Pending", "Coverage Termination Pending").html_safe
+    sanitize_html(
+      humanize_enrollment_states(
+        census_employee.active_benefit_group_assignment
+      ).gsub("Coverage Selected", "Enrolled").gsub("Coverage Waived", "Waived").gsub("Coverage Terminated", "Terminated").gsub("Coverage Termination Pending", "Coverage Termination Pending")
+    )
   end
 
   def renewal_enrollment_state(census_employee=nil)
-    humanize_enrollment_states(census_employee.renewal_benefit_group_assignment).gsub("Coverage Renewing", "Auto-Renewing").gsub("Coverage Selected", "Enrolling").gsub("Coverage Waived", "Waiving").gsub("Coverage Terminated", "Terminating").html_safe
+    sanitize_html(
+      humanize_enrollment_states(
+        census_employee.renewal_benefit_group_assignment
+      ).gsub("Coverage Renewing", "Auto-Renewing").gsub("Coverage Selected", "Enrolling").gsub("Coverage Waived", "Waiving").gsub("Coverage Terminated", "Terminating")
+    )
   end
 
   def off_cycle_enrollment_state(census_employee = nil)
-    humanize_enrollment_states(census_employee.off_cycle_benefit_group_assignment).gsub("Coverage Selected", "Enrolled")
+    sanitize_html(humanize_enrollment_states(census_employee.off_cycle_benefit_group_assignment).gsub("Coverage Selected", "Enrolled")
                                                                                   .gsub("Coverage Waived", "Waived").gsub("Coverage Terminated", "Terminated")
-                                                                                  .gsub("Coverage Termination Pending", "Coverage Termination Pending")
-                                                                                  .html_safe
+                                                                                  .gsub("Coverage Termination Pending", "Coverage Termination Pending"))
   end
 
   def reinstated_enrollment_state(census_employee = nil)
-    humanize_enrollment_states(census_employee.future_active_reinstated_benefit_group_assignment)
+    sanitize_html(humanize_enrollment_states(census_employee.future_active_reinstated_benefit_group_assignment)
       .gsub("Coverage Selected", "Enrolled")
       .gsub("Coverage Waived", "Waived").gsub("Coverage Terminated", "Terminated")
-      .gsub("Coverage Termination Pending", "Coverage Termination Pending")
-      .html_safe
+      .gsub("Coverage Termination Pending", "Coverage Termination Pending"))
   end
 
   def humanize_enrollment_states(benefit_group_assignment)
@@ -59,7 +67,7 @@ module Employers::EmployerHelper
       enrollment_states << '' if enrollment_states.compact.empty?
     end
 
-    "#{enrollment_states.compact.join('<br/> ').titleize.to_s}".html_safe
+    sanitize_html(enrollment_states.compact.join('<br/> ').titleize)
   end
 
   def benefit_group_assignment_status(enrollment_status)
@@ -218,7 +226,7 @@ module Employers::EmployerHelper
       content_tag(:span, :class=>"confirm-cobra" ,:style=>"display:inline;") do
         content_tag(:input, nil, :type => "text" ,:class => "text-center date-picker", :value => census_employee.suggested_cobra_effective_date , :disabled => disabled )
       end
-    end.html_safe
+    end
   end
 
   def cobra_button(census_employee)

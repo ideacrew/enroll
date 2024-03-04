@@ -1,13 +1,173 @@
 {
   "ignored_warnings": [
     {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "06494e1fe2ae0d63f43e94a82faf1c27bd8cb853281131f0e7f9961b08c56e4c",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/benefit_sponsors/sponsored_benefits/sponsored_benefits/_sponsored_benefit.html.slim",
+      "line": 154,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "@sponsored_benefit_form.catalog.sponsor_contributions(@sponsored_benefit_form.benefit_package_id).to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "benefit_sponsors/sponsored_benefits/sponsored_benefits/_sponsored_benefit"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Safe is called after json serialization."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "5c4f53166f0f39628840a1a0973a82dc9788b28dcd3f9719dff85ea016d0e591",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/benefit_sponsors/benefit_packages/benefit_packages/_product_choices.html.erb",
+      "line": 185,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "@benefit_package_form.catalog.plan_options.to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "benefit_sponsors/benefit_packages/benefit_packages/_product_choices"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Safe is called after json serialization."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "712fa91eb75de7791612a3d56154e4109c0f82707866c827bdf013ada09d132d",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/benefit_sponsors/sponsored_benefits/sponsored_benefits/_sponsored_benefit.html.slim",
+      "line": 115,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "@sponsored_benefit_form.catalog.plan_options.to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "benefit_sponsors/sponsored_benefits/sponsored_benefits/_sponsored_benefit"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Safe is called after json serialization."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "712fa91eb75de7791612a3d56154e4109c0f82707866c827bdf013ada09d132d",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/benefit_sponsors/sponsored_benefits/sponsored_benefits/_sponsored_benefit.html.slim",
+      "line": 153,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "@sponsored_benefit_form.catalog.plan_options.to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "benefit_sponsors/sponsored_benefits/sponsored_benefits/_sponsored_benefit"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Safe is called after json serialization."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "73bd2c0b550d894f968f5b8a1e543a06ee065e00ee85159202e59493c082cb53",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/benefit_sponsors/benefit_applications/benefit_applications/shared/_benefit_application_fields.html.slim",
+      "line": 107,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "@benefit_application_form.start_on_options.to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "benefit_sponsors/benefit_applications/benefit_applications/shared/_benefit_application_fields"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Safe is called after json serialization."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "73bd2c0b550d894f968f5b8a1e543a06ee065e00ee85159202e59493c082cb53",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/benefit_sponsors/benefit_applications/benefit_applications/shared/_benefit_application_fields.html.slim",
+      "line": 166,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "@benefit_application_form.start_on_options.to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "benefit_sponsors/benefit_applications/benefit_applications/shared/_benefit_application_fields"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Safe is called after json serialization."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "81bfd2ee591420c38f6232c86af9db9a329637912782cdb2323aa2308b7ab82e",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/benefit_sponsors/sponsored_benefits/sponsored_benefits/_sponsored_benefit.html.slim",
+      "line": 112,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "@sponsored_benefit_form.employees_cost.to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "benefit_sponsors/sponsored_benefits/sponsored_benefits/_sponsored_benefit"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Safe is called after json serialization."
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "9eab52704b7220aa3747335fbb373569971fea2a2ed922915faca807017876ef",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/views/benefit_sponsors/benefit_packages/benefit_packages/_product_choices.html.erb",
+      "line": 190,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "@benefit_package_form.catalog.sponsor_contributions(@benefit_package_form.id).to_json.html_safe",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "benefit_sponsors/benefit_packages/benefit_packages/_product_choices"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Safe is called after json serialization."
+    },
+    {
       "warning_type": "Unmaintained Dependency",
       "warning_code": 120,
       "fingerprint": "d84924377155b41e094acae7404ec2e521629d86f97b0ff628e3d1b263f8101c",
       "check_name": "EOLRails",
       "message": "Support for Rails 5.2.4.4 ended on 2022-06-01",
       "file": "Gemfile.lock",
-      "line": 493,
+      "line": 505,
       "link": "https://brakemanscanner.org/docs/warning_types/unmaintained_dependency/",
       "code": null,
       "render_path": null,
@@ -18,8 +178,29 @@
         1104
       ],
       "note": ""
+    },
+    {
+      "warning_type": "Usage of html_safe",
+      "warning_code": 2,
+      "fingerprint": "e064d898edab61626fb4b4f56580c8e7b8f5d46198768e230485a566889ad723",
+      "check_name": "EngineHtmlSafeUsage",
+      "message": "Html_safe used",
+      "file": "app/helpers/benefit_sponsors/portal_header_helper.rb",
+      "line": 42,
+      "link": "https://brakemanscanner.org/docs/warning_types/usage_of_html_safe/",
+      "code": "l10n(*args).html_safe",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "BenefitSponsors::PortalHeaderHelper",
+        "method": "translated_header_portal_link"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": null,
+      "note": "Usage was reviewed for no dynamic content."
     }
   ],
-  "updated": "2023-02-22 16:31:10 +0000",
+  "updated": "2024-02-20 15:12:27 +0000",
   "brakeman_version": "5.4.1"
 }
