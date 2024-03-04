@@ -3,9 +3,15 @@
     <div class="er-success bg-success">
         <div class="text-success pl-1 pr-1">
             <p>                    
-              <%= l10n("faa.mc_success") %>
+              <b><%= l10n("faa.mc_success_existing") %></b>
+              <%= l10n("faa.mc_success_enroll") %>
+              <a target='_blank' href=<%= "https://" + l10n("faa.mc_success_link") %>><%= l10n("faa.mc_success_link") %></a>
+              <%= l10n("faa.mc_success_phone") %>
             </p>
-            <p><%= l10n("faa.mc_continue") %></p>
+            <p>
+              <b><%= l10n("faa.mc_continue_bold") %></b>
+              <%= l10n("faa.mc_continue_application") %>
+            </p>
         </div>
     </div>
 </div>
