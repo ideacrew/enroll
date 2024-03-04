@@ -371,6 +371,9 @@ registry:
       - key: :contrast_level_aa
         item: :contrast_level_aa
         is_enabled: <%= ENV['CONTRAST_LEVEL_AA_IS_ENABLED'] || false %>
+      - key: :generic_forgot_password_text
+        item: :generic_forgot_password_text
+        is_enabled: <%= ENV['GENERIC_FORGOT_PASSWORD_TEXT_IS_ENABLED'] || false %>
   - namespace:
       - :pay_now_feature
     features:
