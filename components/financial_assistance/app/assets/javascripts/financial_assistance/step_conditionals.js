@@ -337,7 +337,7 @@ $(document).ready(function(){
   $("body").on("change", "#is_pregnant_no", function(){
     if ($('#is_pregnant_no').is(':checked')) {
       $('#is_post_partum_period_yes').parents('.row-form-wrapper').removeClass('hide');
-      $('#is_post_partum_period_yes, #is_post_partum_period_no').attr('checked', false);
+      $('#is_post_partum_period_yes, #is_post_partum_period_no').prop('checked', false);
       $('#children_expected_count, #applicant_pregnancy_due_on').parents('.row-form-wrapper').addClass('hide');
       $('#medicaid_pregnancy_yes').parents('.row-form-wrapper').addClass('hide');
     };
@@ -406,7 +406,7 @@ $(document).ready(function(){
 
   if($('#is_student_yes').is(':checked')) {
     $('#student_kind, #applicant_student_status_end_on, #student_school_kind').parents('.row-form-wrapper').removeClass('hide');
-  } else {  
+  } else {
     $('#student_kind, #applicant_student_status_end_on, #student_school_kind').parents('.row-form-wrapper').addClass('hide');
   }
 

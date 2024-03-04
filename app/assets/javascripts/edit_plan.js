@@ -5,7 +5,7 @@ $(document).on("ready ajax:success", function() {
   // maximum date is end of current year (I.E. 12/31/2019)
   $("#term-date").datepicker({minDate: 0, maxDate: new Date(new Date().getFullYear(), 11, 31)});
   $("#term-date").change(function(){
-    if( $("#agreement_action-confirm-yes").attr('checked') ){
+    if( $("#agreement_action-confirm-yes").prop('checked') ){
       $("#btn-cancel").attr("disabled", false);
     }
   });
@@ -14,7 +14,7 @@ $(document).on("ready ajax:success", function() {
   $("#agreement_action-confirm-yes").click(function(){
     $(".interaction-click-control-action-confirm").attr("disabled", false);
     $("#action-confirm-date").attr("hidden", false);
-    $(this).attr('checked','checked');
+    $(this).prop('checked',true);
     if($('#term-date') && $('#term-date').val() != "") {
       $("#btn-cancel").attr("disabled", false);
     }
@@ -131,9 +131,9 @@ $(document).on("ready ajax:success", function() {
     var mthh_enabled = $('#mthh_enabled').val() == 'true';
     var max_aptc_available = document.getElementById("max_aptc_available").innerHTML;
     var max_aptc = mthh_enabled ? document.getElementById("max_tax_credit").innerHTML : null;
-   
+
     var new_percent = mthh_enabled && ((percent / 100) * max_aptc > max_aptc_available) ? parseFloat((max_aptc_available / max_aptc) * 100).toFixed(0) : percent;
-    var aptc_total_cash_amount_to_apply = mthh_enabled ? toFixedTrunc(max_aptc * (new_percent / 100)) : toFixedTrunc(max_aptc_available * (new_percent / 100)) 
+    var aptc_total_cash_amount_to_apply = mthh_enabled ? toFixedTrunc(max_aptc * (new_percent / 100)) : toFixedTrunc(max_aptc_available * (new_percent / 100))
     // Update the percentage
     $('#aptc_applied_pct_1_percent').val(new_percent + '%');
     // Update the view to reflect the total cash to be applied

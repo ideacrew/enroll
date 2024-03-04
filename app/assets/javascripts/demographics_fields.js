@@ -58,11 +58,11 @@ function applyListenersFor(target) {
   $("input[name='" + target + "[us_citizen]']").change(function () {
     $('#vlp_documents_container').hide();
     $('#vlp_documents_container .vlp_doc_area').html('');
-    $("input[name='" + target + "[naturalized_citizen]']").attr(
+    $("input[name='" + target + "[naturalized_citizen]']").prop(
       'checked',
       false
     );
-    $("input[name='" + target + "[eligible_immigration_status]']").attr(
+    $("input[name='" + target + "[eligible_immigration_status]']").prop(
       'checked',
       false
     );

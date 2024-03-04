@@ -92,7 +92,7 @@ function maybeAddComparisonPlan(cb) {
 			var lookup_string = "input[data-hios-id='" +
 				removed_id + "'].ivl-select-plan-for-comparison";
 			$(lookup_string).each(function(idx, ele) {
-				$(ele).attr("checked", false);
+				$(ele).prop("checked", false);
 			});
 		}
 		plansToCompareArray.push(new_plan);
@@ -248,7 +248,7 @@ $(function() {
 
   $(document).on('click', '.all-filters-row .reset-btn', function(){
     resetAptc();
-    $("#filter-sidebar input[type='checkbox']").attr("checked", false);
+    $("#filter-sidebar input[type='checkbox']").prop("checked", false);
     $("#filter-sidebar input[type='text'].plan-metal-premium-from-selection-filter").val("0");
     $("#filter-sidebar input[type='text'].plan-metal-premium-to-selection-filter").val($('#max_total_employee_cost').val());
     $("#filter-sidebar input[type='text'].plan-metal-deductible-from-selection-filter").val("0");

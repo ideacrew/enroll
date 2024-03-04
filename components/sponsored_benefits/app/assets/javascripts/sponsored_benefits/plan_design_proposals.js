@@ -695,7 +695,7 @@ function comparisonPlans() {
     }
     if ($.unique(selected_rpids).length > 3) {
       alert("You can only compare up to 3 plans");
-      $(this).attr('checked', false);
+      $(this).prop('checked', false);
       removeA($.unique(selected_rpids), value);
     }
   });
@@ -724,7 +724,7 @@ function viewComparisons() {
 function clearComparisons() {
   $('.reference-plan').each(function() {
     var checkboxes = $(this).find('input[type=checkbox]');
-    checkboxes.attr('checked', false);
+    checkboxes.prop('checked', false);
     removeA($.unique(selected_rpids), checkboxes.val());
     disableCompareButton();
   });

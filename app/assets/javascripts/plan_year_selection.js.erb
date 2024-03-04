@@ -455,14 +455,14 @@ ready = function() {
           $(this).closest('.benefit-group-fields').find('.health.select-reference').remove();
           $(this).closest('.benefit-group-fields').find('.health.selected-plan, .health .referenceplan').fadeOut();
           $(this).closest('.benefit-group-fields').find('.reference-plans').css({ "height": "auto", "y-overflow": "default" })
-          $(this).closest('.benefit-group-fields').find(nav+' .plan-options input[type=radio]').attr('checked', 0);
+          $(this).closest('.benefit-group-fields').find(nav+' .plan-options input[type=radio]').prop('checked', false);
         } else {
           nav = '.dental';
           $(this).closest('.benefit-group-fields').find('.dental .nav-tabs, .dental .plan-options, .dental .dental-plan-offering').hide();
           $(this).closest('.benefit-group-fields').find('.dental.select-reference').remove();
           $(this).closest('.benefit-group-fields').find('.dental.selected-plan, .dental.referenceplan').fadeOut();
           $(this).closest('.benefit-group-fields').find('.dental-reference-plans').css({ "height": "auto", "y-overflow": "default" })
-          $(this).closest('.benefit-group-fields').find(nav+' .plan-options input[type=radio]').attr('checked', 0);
+          $(this).closest('.benefit-group-fields').find(nav+' .plan-options input[type=radio]').prop('checked', false);
         }
 
         if ($(this).find('input[type=radio]').is(':checked')) {
@@ -498,7 +498,7 @@ $(document).on('click', '.reference-plan input[type=radio] + label', function() 
   // if ( $(this).closest('#dental-reference-plans-options-modal').length > 0 ) {
   //
   //   var reference_plan_id = $(this).closest('.reference-plan').find('input').attr('value');
-  //   $(this).closest('.reference-plan').find('input').attr('checked', 1)
+  //   $(this).closest('.reference-plan').find('input').prop('checked', true)
   //   var location_id = $(this).parents('fieldset').attr('id')
   //   $(this).parents('fieldset').find('.dental-ref-plan').val(reference_plan_id);
   //   $('body').removeClass('modal-open');

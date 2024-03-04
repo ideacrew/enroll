@@ -95,13 +95,13 @@ $(function () {
   $(document).on('click', 'a.qle-menu-item', function() {
     init_qle_message();
     $('#qle_flow_info #qle-menu').hide();
-    
+
     if($(this).data('reason') == 'covid-19'){
       $('.qle-details-title').html("<u>"+$(this).data('title')+"</u>");
     } else {
       $('.qle-details-title').html($(this).data('title'));
     }
-    
+
     $('.qle-label').html($(this).data('label'));
     $('#change_plan').val($(this).data('title'));
     $('#qle_id').val($(this).data('id'));
@@ -256,7 +256,7 @@ $(function () {
     if(this.checked) {
       $('#outside-open-enrollment').modal('show');
       $('#outside-open-enrollment').on('hidden.bs.modal', function (e) {
-        $("#no_qle_checkbox").attr("checked",false)
+        $("#no_qle_checkbox").prop("checked",false)
       });
     }
   });
