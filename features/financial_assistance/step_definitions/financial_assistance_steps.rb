@@ -608,12 +608,12 @@ end
 
 Then(/^they should see the Medicaid Currently Enrolled warning text$/) do
   expect(page).to have_selector('#mec-check-response')
-  expect(page).to have_content('Still want to apply for lower monthly premiums or lost (or will soon lose) Medicaid coverage?')
+  expect(page).to have_content(l10n('faa.mc_continue'))
 end
 
 Then(/^they should see the shop coverage exists warning text$/) do
   expect(page).to have_content(l10n('faa.shop_check_success'))
-  expect(page).to have_content('Still want to apply for lower monthly premiums or lost (or will soon lose) Medicaid coverage?')
+  expect(page).to have_content(l10n('faa.mc_continue'))
 end
 
 Then(/^they should not see the shop coverage exists warning text$/) do
