@@ -36,6 +36,8 @@ module BenefitSponsors
       add_observer ::BenefitSponsors::Observers::BrokerAgencyAccountObserver.new, [:broker_fired?, :broker_hired?]
       add_observer ::BenefitSponsors::Observers::NoticeObserver.new, [:process_broker_agency_events]
 
+      scope :active, -> { where(is_active: true) }
+
       # belongs_to broker_agency_profile
       def broker_agency_profile=(new_broker_agency_profile)
         raise ArgumentError.new("expected BrokerAgencyProfile") unless new_broker_agency_profile.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)

@@ -18,6 +18,24 @@ class ConsumerRolePolicy < ApplicationPolicy
     end
   end
 
+  # Checks if the logged in person of the current_user is the same as the primary applicant of the application,
+  # if the logged in current_user is a broker and is the active broker of the family of the application,
+  # or if the logged in current_user is a hbx_staff and is authorized to modify_family.
+  #
+  # @return [Boolean] Returns true if any of the conditions are met, false otherwise.
+  def modify_and_view?
+    user.person.id == record.person.id ||
+      associated_active_broker? ||
+      eligible_hbx_staff?
+  end
+
+  # Checks if the consumer's identity has been verified.
+  #
+  # @return [Boolean] Returns true if the consumer's identity has been verified, false otherwise.
+  def ridp_verified?
+    record.identity_verified?
+  end
+
   def search?
     privacy?
   end
@@ -52,10 +70,10 @@ class ConsumerRolePolicy < ApplicationPolicy
 
   # Checking if consumer identity has been verified or if user has hbx_staff_role.
   # If either are true, then the user has access beyond the RIDP page.
-  def ridp_verified?
+  def help_paying_coverage?
     # NOTE: brokers and consumers both require consumer identity to be verified beyond ridp page
     # the second condition covers both cases
-    @user&.person&.hbx_staff_role&.permission&.modify_family || record.identity_verified?
+    @user&.person&.hbx_staff_role&.permission&.modify_family || ridp_verified?
   end
 
   def update?
@@ -72,4 +90,28 @@ class ConsumerRolePolicy < ApplicationPolicy
     return false
   end
 
+  private
+
+  # Checks if the user is hbx staff member and is eligible to modify a family.
+  # A user is considered eligible if they have the hbx staff role and permission to modify a family.
+  #
+  # @return [Boolean, nil] Returns true if the user is an eligible hbx staff member, false if they are not, or nil if the user or their permissions are not defined.
+  def eligible_hbx_staff?
+    user.person.hbx_staff_role&.permission&.modify_family
+  end
+
+  # Checks if the user is associated with an active broker.
+  # A user is considered associated with an active broker if the broker is not blank, is active, and matches the broker associated with the primary family of the person associated with the record.
+  #
+  # @return [Boolean] Returns true if the user is associated with an active broker, false otherwise.
+  def associated_active_broker?
+    broker = user.person.broker_role
+    return false if broker.blank? || !broker.active?
+
+    baa = record.person.primary_family.active_broker_agency_account
+    return false if baa.blank?
+
+    baa.benefit_sponsors_broker_agency_profile_id == broker.benefit_sponsors_broker_agency_profile_id &&
+      baa.writing_agent_id == broker.id
+  end
 end

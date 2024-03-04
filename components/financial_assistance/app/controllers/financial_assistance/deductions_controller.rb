@@ -10,6 +10,8 @@ module FinancialAssistance
     before_action :set_cache_headers, only: [:index]
 
     def index
+      authorize @applicant, :index?
+
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       render layout: 'financial_assistance_nav'

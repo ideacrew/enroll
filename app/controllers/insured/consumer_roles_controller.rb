@@ -311,7 +311,7 @@ class Insured::ConsumerRolesController < ApplicationController
       set_current_person
       # defined?(Cucumber) is used to bypass the authorization check in cucumber tests
       # This is a temporary fix and should be removed once the cucumber tests are modified and the ridp verification is stubbed in lower environments.
-      authorize @person.consumer_role, :ridp_verified? unless defined?(Cucumber)
+      authorize @person.consumer_role, :help_paying_coverage? unless defined?(Cucumber)
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @transaction_id = params[:id]

@@ -73,7 +73,7 @@ describe ConsumerRolePolicy, dbclean: :after_each do
     end
   end
 
-  permissions :ridp_verified? do
+  permissions :help_paying_coverage? do
     let(:hbx_staff_user) {FactoryBot.create(:user, person: person)}
     let(:person) { FactoryBot.create(:person, :with_hbx_staff_role) }
     let(:hbx_staff_role) { FactoryBot.create(:hbx_staff_role, person: person)}
