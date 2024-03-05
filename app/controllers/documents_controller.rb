@@ -22,7 +22,7 @@ class DocumentsController < ApplicationController
 
     begin
       relation_id = params[:relation_id]
-      documents = record.send("documents")
+      documents = record.documents
       uri = documents.find(relation_id).identifier
       send_data Aws::S3Storage.find(uri), get_options(params)
     rescue => e
