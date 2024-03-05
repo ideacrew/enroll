@@ -2,7 +2,6 @@ class DocumentsController < ApplicationController
   include ActionView::Helpers::TranslationHelper
   include L10nHelper
   before_action :fetch_record, only: [:authorized_download, :cartafact_download]
-  before_action :updateable?, except: [:show_docs, :download, :authorized_download, :cartafact_download, :update_verification_type, :extend_due_date, :destroy, :update_ridp_verification_type]
   before_action :set_document, only: [:destroy, :update]
   before_action :set_verification_type
   before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type, :extend_due_date, :update_ridp_verification_type]
@@ -206,10 +205,6 @@ class DocumentsController < ApplicationController
                                                   modifier: actor,
                                                   update_reason: reason)
     end
-  end
-
-  def updateable?
-    authorize Family, :updateable?
   end
 
   def get_options(params)
