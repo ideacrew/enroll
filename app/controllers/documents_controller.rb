@@ -2,7 +2,7 @@ class DocumentsController < ApplicationController
   include ActionView::Helpers::TranslationHelper
   include L10nHelper
   before_action :fetch_record, only: [:authorized_download, :cartafact_download]
-  before_action :updateable?, except: [:show_docs, :download, :authorized_download, :cartafact_download]
+  before_action :updateable?, except: [:show_docs, :download, :authorized_download, :cartafact_download, :update_verification_type, :extend_due_date, :destroy]
   before_action :set_document, only: [:destroy, :update]
   before_action :set_verification_type
   before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type, :extend_due_date, :update_ridp_verification_type]
@@ -55,9 +55,11 @@ class DocumentsController < ApplicationController
   end
 
   def update_verification_type
+    authorize HbxProfile, can_update_verification_type?
+
+    @family_member = FamilyMember.find(params[:family_member_id])
     update_reason = params[:verification_reason]
     admin_action = params[:admin_action]
-    family_member = FamilyMember.find(params[:family_member_id]) if params[:family_member_id].present?
     reasons_list = VlpDocument::VERIFICATION_REASONS + VlpDocument::ALL_TYPES_REJECT_REASONS + VlpDocument::CITIZEN_IMMIGR_TYPE_ADD_REASONS
     if (reasons_list).include? (update_reason)
       verification_result = @person.consumer_role.admin_verification_action(admin_action, @verification_type, update_reason)
@@ -116,6 +118,7 @@ class DocumentsController < ApplicationController
 
   def fed_hub_request
     authorize HbxProfile, :can_call_hub?
+
     request_hash = {person_id: @person.id, verification_type: @verification_type.type_name}
     result = ::Operations::CallFedHub.new.call(request_hash)
     key, message = result.failure? ? result.failure : result.success
@@ -148,6 +151,8 @@ class DocumentsController < ApplicationController
   end
 
   def extend_due_date
+    authorize HbxProfile, can_update_verification_type?
+
     @family_member = FamilyMember.find(params[:family_member_id])
     enrollment = @family_member.family.enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => @family_member.id).first
     if enrollment.present?
@@ -165,6 +170,8 @@ class DocumentsController < ApplicationController
   end
 
   def destroy
+    authorize @person, can_delete_document?
+
     @document.delete if @verification_type.type_unverified?
     if @document.destroyed?
       @person.save!
@@ -235,18 +242,6 @@ class DocumentsController < ApplicationController
     redirect_to exchanges_hbx_profiles_path+'?tab=documents'
   end
 
-  def add_type_history_element
-    actor = current_user ? current_user.email : "external source or script"
-    action = params[:admin_action] || params[:action]
-    action = "Delete #{params[:doc_title]}" if action == "destroy"
-    reason = params[:verification_reason]
-    if @verification_type
-      @verification_type.add_type_history_element(action: action.split('_').join(' '),
-                                                  modifier: actor,
-                                                  update_reason: reason)
-    end
-  end
-
   private
 
   def fetch_record
@@ -261,6 +256,18 @@ class DocumentsController < ApplicationController
 
   def record
     @record
+  end
+
+  def add_type_history_element
+    actor = current_user ? current_user.email : "external source or script"
+    action = params[:admin_action] || params[:action]
+    action = "Delete #{params[:doc_title]}" if action == "destroy"
+    reason = params[:verification_reason]
+    if @verification_type
+      @verification_type.add_type_history_element(action: action.split('_').join(' '),
+                                                  modifier: actor,
+                                                  update_reason: reason)
+    end
   end
 
   def updateable?

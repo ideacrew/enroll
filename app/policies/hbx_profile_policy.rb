@@ -198,6 +198,12 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.can_call_hub
   end
 
+  def can_update_verification_type?
+    role = user_hbx_staff_role
+    return false unless role
+    role.permission.modify_family
+  end
+
   def can_edit_osse_eligibility?
     role = user_hbx_staff_role
     return false unless role
