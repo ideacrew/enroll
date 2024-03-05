@@ -21,7 +21,7 @@ class DocumentsController < ApplicationController
 
     begin
       relation_id = params[:relation_id]
-      documents = record.documents
+      documents = @record.documents
       uri = documents.find(relation_id).identifier
       send_data Aws::S3Storage.find(uri), get_options(params)
     rescue => e
@@ -48,7 +48,7 @@ class DocumentsController < ApplicationController
   def update_verification_type
     authorize HbxProfile, :can_update_verification_type?
 
-    @family_member = FamilyMember.find(params[:family_member_id])
+    family_member = FamilyMember.find(params[:family_member_id]) if params[:family_member_id].present?
     update_reason = params[:verification_reason]
     admin_action = params[:admin_action]
     reasons_list = VlpDocument::VERIFICATION_REASONS + VlpDocument::ALL_TYPES_REJECT_REASONS + VlpDocument::CITIZEN_IMMIGR_TYPE_ADD_REASONS

@@ -5,7 +5,10 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller do
-  let(:user) { FactoryBot.create(:user) }
+  let(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+  let(:admin_user) {FactoryBot.create(:user, :with_hbx_staff_role, :person => admin_person)}
+
+  let(:user) { FactoryBot.create(:user, person: person) }
   let(:person) { FactoryBot.create(:person, :with_consumer_role) }
   let(:person_with_family) { FactoryBot.create(:person, :with_family) }
   let(:person_with_fam_hbx_enrollment) { person_with_family.primary_family.active_household.hbx_enrollments.build }
@@ -22,13 +25,13 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
   before :each do
     # Needed for the American indian status type
     allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(false)
-    sign_in user
-    person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
   end
 
   describe "destroy" do
     before :each do
+      person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
       person.verification_types.each{|type| type.vlp_documents << document}
+      sign_in user
       delete :destroy, params: { person_id: person.id, id: document.id, verification_type: citizenship_type.id }
     end
     it "redirects_to verification page" do
@@ -70,6 +73,8 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
         'primary_family.active_household.hbx_enrollments.verification_needed'
       ).and_return([person_with_fam_hbx_enrollment])
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
+      sign_in user
     end
 
     it "should update enrollments to in review and redirect to verification_insured_families_path" do
@@ -89,16 +94,21 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
       user.person.hbx_staff_role.update_attributes(permission_id: permission.id)
       user
     end
+
     before :each do
       request.env["HTTP_REFERER"] = "http://test.com"
       allow(consumer_role).to receive(:invoke_residency_verification!).and_return(true)
+      person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
+      sign_in user
     end
+
     context 'Call Hub for SSA verification' do
       it 'should redirect if verification type is SSN or Citizenship' do
         post :fed_hub_request, params: { verification_type: ssn_type.id, person_id: person.id, id: document.id }
         expect(flash[:success]).to eq('Request was sent to FedHub.')
       end
     end
+
     context 'Call Hub for Residency verification' do
       it 'should redirect if verification type is Residency' do
         person.consumer_role.update_attributes(aasm_state: 'verification_outstanding')
@@ -169,6 +179,8 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
   describe "PUT extend due date" do
     before :each do
       request.env["HTTP_REFERER"] = "http://test.com"
+      person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
+      sign_in user
       put :extend_due_date, params: { family_member_id: family.primary_applicant.id, person_id: person.id, verification_type: citizenship_type.id }
     end
 
@@ -177,20 +189,26 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
     end
   end
   describe "PUT update_verification_type" do
+    let!(:permission) { FactoryBot.create(:permission, :super_admin) }
+    let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
+
     before :each do
       request.env["HTTP_REFERER"] = "http://test.com"
+      person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
+      sign_in admin_user
     end
 
     shared_examples_for "update verification type" do |type, reason, admin_action, attribute, result|
       it "updates #{attribute} for #{type} to #{result} with #{admin_action} admin action" do
-        post :update_verification_type, params:  { person_id: person.id,
-                                          verification_type: send(type).id,
-                                          verification_reason: reason,
-                                          admin_action: admin_action}
+        post :update_verification_type, params: { person_id: person.id,
+                                                  verification_type: send(type).id,
+                                                  verification_reason: reason,
+                                                  admin_action: admin_action}
         person.reload
-        if attribute == "validation"
+        case attribute
+        when "validation"
           expect(person.verification_types.find(send(type).id).validation_status).to eq(result)
-        elsif attribute == "update_reason"
+        when "update_reason"
           expect(person.verification_types.find(send(type).id).update_reason).to eq(result)
         end
       end
@@ -234,10 +252,10 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
 
     context "verification reason inputs" do
       it "should not update verification attributes without verification reason" do
-        post :update_verification_type, params:  { person_id: person.id,
-                                          verification_type: citizenship_type.id,
-                                          verification_reason: "",
-                                          admin_action: "verify"}
+        post :update_verification_type, params: { person_id: person.id,
+                                                  verification_type: citizenship_type.id,
+                                                  verification_reason: "",
+                                                  admin_action: "verify"}
         person.reload
         expect(person.consumer_role.lawful_presence_update_reason).to eq nil
       end
@@ -274,17 +292,23 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
       end
     end
   end
+
   describe "PUT update_ridp_verification_type" do
+    let!(:permission) { FactoryBot.create(:permission, :super_admin) }
+    let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
+
     before :each do
       request.env["HTTP_REFERER"] = "http://test.com"
+      person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
+      sign_in admin_user
     end
 
     shared_examples_for "update ridp verification type" do |type, reason, admin_action, updated_attr, result|
       it "updates #{updated_attr} for #{type} to #{result} with #{admin_action} admin action" do
         post :update_ridp_verification_type, params: { person_id: person.id,
-                                               ridp_verification_type: type,
-                                               verification_reason: reason,
-                                               admin_action: admin_action}
+                                                       ridp_verification_type: type,
+                                                       verification_reason: reason,
+                                                       admin_action: admin_action}
         person.reload
         expect(person.consumer_role.send(updated_attr)).to eq(result)
       end
@@ -311,37 +335,6 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
   end
 
   describe "GET cartafact_download" do
-
-    context 'not passing current user' do
-      let(:tempfile) do
-        tf = Tempfile.new('test.pdf')
-        tf.write("DATA GOES HERE")
-        tf.rewind
-        tf
-      end
-
-      let(:operation_success) do
-        double(
-          success?: true,
-          value!: tempfile
-        )
-      end
-
-      before do
-        allow(Operations::Documents::Download).to receive(:call).and_return(operation_success)
-        get :cartafact_download, params: {model: "test", model_id: "1234", relation: "test", relation_id: "1234"}
-      end
-
-      it 'should pass' do
-        expect(response.status).to eq(200)
-        expect(response.headers["Content-Disposition"]).to eq 'attachment'
-      end
-
-    end
-  end
-
-  describe "authorize cartafact_download" do
-
     let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
     let!(:associated_user) {FactoryBot.create(:user, :person => person)}
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
@@ -372,6 +365,13 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
       person.broker_role
     end
 
+    let(:tempfile) do
+      tf = Tempfile.new('test.pdf')
+      tf.write("DATA GOES HERE")
+      tf.rewind
+      tf
+    end
+
     before(:each) do
       family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
                                                                                           start_on: Time.now,
@@ -380,8 +380,11 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
     end
 
     it 'broker should be able to download' do
+      allow(Operations::Documents::Download).to receive(:call).and_return(Dry::Monads::Success(tempfile))
       sign_in broker_user
       get :cartafact_download, params: {model: "Person", model_id: person.id, relation: "documents", relation_id: document.id}
+      expect(response.status).to eq(200)
+      expect(response.headers["Content-Disposition"]).to eq 'attachment'
     end
   end
 
@@ -399,6 +402,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
       context 'for a user with POC role' do
         before do
           person.employer_staff_roles << er_staff_role
+          person.save!
           sign_in user
         end
 

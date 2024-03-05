@@ -65,10 +65,6 @@ class PersonPolicy < ApplicationPolicy
     role.present? && (can_hbx_staff_modify? || can_broker_modify?)
   end
 
-  def can_hbx_staff_modify?
-    role.is_a?(HbxStaffRole) && role&.permission&.modify_family
-  end
-
   def can_broker_modify?
     (role.is_a?(::BrokerRole) || role.any? { |r| r.is_a?(::BrokerAgencyStaffRole) }) && (matches_individual_broker_account? || matches_shop_broker_account?)
   end
