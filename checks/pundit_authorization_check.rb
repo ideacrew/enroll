@@ -35,6 +35,7 @@ class Brakeman::CheckPunditAuthorization < Brakeman::BaseCheck
           :warning_code => :custom_check,
           :message => "Endpoint not authorized",
           :confidence => :medium,
+          :cwe_id => [639],
           :code => m[:src]
       end
     end
