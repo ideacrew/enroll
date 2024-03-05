@@ -25,12 +25,11 @@ class DocumentsController < ApplicationController
   end
 
   def authorized_download
-    authorize record, :can_download_document?
+    authorize @record, :can_download_document?
 
     begin
-      relation = params[:relation] || "documents"
       relation_id = params[:relation_id]
-      documents = record.send(relation.to_sym)
+      documents = record.send("documents")
       uri = documents.find(relation_id).identifier
       send_data Aws::S3Storage.find(uri), get_options(params)
     rescue => e
@@ -39,7 +38,7 @@ class DocumentsController < ApplicationController
   end
 
   def cartafact_download
-    authorize record, :can_download_document?
+    authorize @record, :can_download_document?
 
     result = ::Operations::Documents::Download.call({params: cartafact_download_params.to_h.deep_symbolize_keys, user: current_user})
     if result.success?
@@ -252,10 +251,6 @@ class DocumentsController < ApplicationController
     raise "Sorry! Invalid Request" unless model_klass
 
     @record = model_klass.find(model_id)
-  end
-
-  def record
-    @record
   end
 
   def add_type_history_element
