@@ -252,7 +252,7 @@ class DocumentsController < ApplicationController
   def fetch_record
     model_id = params[:model_id]
     model = params[:model].camelize
-    model_klass = Document::MODEL_CLASS_MAPPING[model] : nil
+    model_klass = Document::MODEL_CLASS_MAPPING[model]
 
     raise "Sorry! Invalid Request" unless model_klass
 
