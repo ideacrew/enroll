@@ -17,6 +17,7 @@ module Brakeman
              :warning_type => "Usage of html_safe",
              :warning_code => :cross_site_scripting,
              :message => "html_safe used",
+             :cwe_id => [79],
              :result => result
       end
     end
