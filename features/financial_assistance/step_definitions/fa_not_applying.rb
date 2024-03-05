@@ -91,8 +91,9 @@ And(/^the user fills the the add member form/) do
   fill_in "jq_datepicker_ignore_dependent[dob]", :with => "04/15/1988"
   click_link('15')
 
-  find('.house .selectric span.label').click
-  find(".house .selectric-items li", text: 'Spouse').click
+
+  find('.select-relation .selectric span.label').click
+  find(".select-relation .selectric-items li", text: 'Spouse').click
 
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
@@ -112,8 +113,8 @@ And(/^the user fills the applicant add member form with indian member yes/) do
   fill_in "jq_datepicker_ignore_applicant[dob]", :with => "04/15/1988"
   click_link('15')
 
-  find('.house .selectric span.label').click
-  find(".house .selectric-items li", text: 'Spouse').click
+  find('.select-relation .selectric span.label').click
+  find(".select-relation .selectric-items li", text: 'Spouse').click
 
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="applicant_us_citizen_true"]').click
@@ -132,8 +133,8 @@ And(/^the user fills the applicant add member form with indian member no/) do
   fill_in "jq_datepicker_ignore_applicant[dob]", :with => "04/15/1988"
   click_link('15')
 
-  find('.house .selectric span.label').click
-  find(".house .selectric-items li", text: 'Spouse').click
+  find('.select-relation .selectric span.label').click
+  find(".select-relation .selectric-items li", text: 'Spouse').click
 
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="applicant_us_citizen_true"]').click
