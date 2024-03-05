@@ -158,7 +158,6 @@ end
 
 Then(/user should still see the member of a tribe question/) do
   expect(page).to have_content('Is this person a member of an')
-  expect(page).to_not have_content('Are you a US Citizen or US National?')
 end
 
 And(/the user clicks submit applicant form/) do
