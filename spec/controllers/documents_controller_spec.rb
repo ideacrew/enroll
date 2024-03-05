@@ -1,6 +1,10 @@
-require 'rails_helper'
+# frozen_string_literal: true
 
-RSpec.describe DocumentsController, :type => :controller do
+require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
+
+RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller do
   let(:user) { FactoryBot.create(:user) }
   let(:person) { FactoryBot.create(:person, :with_consumer_role) }
   let(:person_with_family) { FactoryBot.create(:person, :with_family) }
@@ -378,6 +382,130 @@ RSpec.describe DocumentsController, :type => :controller do
     it 'broker should be able to download' do
       sign_in broker_user
       get :cartafact_download, params: {model: "Person", model_id: person.id, relation: "documents", relation_id: document.id}
+    end
+  end
+
+  describe "#authorized_download" do
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+
+    let(:profile) { benefit_sponsorship.organization.profiles.first }
+    let(:person) { FactoryBot.create(:person) }
+    let(:user) { FactoryBot.create(:user, person: person) }
+    let(:er_staff_role) { FactoryBot.create(:benefit_sponsor_employer_staff_role, benefit_sponsor_employer_profile_id: benefit_sponsorship.organization.employer_profile.id) }
+    let(:document) {profile.documents.create(identifier: "urn:opentest:terms:t1:test_storage:t3:bucket:test-test-id-verification-test#sample-key")}
+
+    context 'employer staff role' do
+      context 'for a user with POC role' do
+        before do
+          person.employer_staff_roles << er_staff_role
+          sign_in user
+        end
+
+        it 'current user employer should be able to download' do
+          get :authorized_download, params: {model: "BenefitSponsors::Organizations::AcaShopDcEmployerProfile", model_id: profile.id, relation: "documents", relation_id: document.id}
+          expect(response).to be_successful
+        end
+      end
+
+      context 'for a user without POC role' do
+        before do
+          sign_in user
+        end
+
+        it 'current user employer should be able to download' do
+          get :authorized_download, params: {model: "BenefitSponsors::Organizations::AcaShopDcEmployerProfile", model_id: profile.id, relation: "documents", relation_id: document.id}
+          expect(response).to have_http_status(:found)
+          expect(flash[:error]).to eq("Access not allowed for benefit_sponsors/employer_profile_policy.can_download_document?, (Pundit policy)")
+        end
+      end
+    end
+
+    context 'broker role' do
+      let(:broker_agency_profile) do
+        FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile)
+      end
+
+      let(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: 'active')}
+      let(:broker_user) {FactoryBot.create(:user, :person => broker_agency_staff_role.person, roles: ['broker_agency_staff_role'])}
+      let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
+
+      let(:existing_broker_staff_role) do
+        person.broker_agency_staff_roles.first
+      end
+
+      let(:broker_role) do
+        role = BrokerRole.new(
+          :broker_agency_profile => broker_agency_profile,
+          :aasm_state => "applicant",
+          :npn => "123456789",
+          :provider_kind => "broker"
+        )
+        person.broker_role = role
+        person.save!
+        person.broker_role
+      end
+
+      context 'with authorized account' do
+        before do
+          profile.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                               writing_agent_id: broker_role.id,
+                                                                                               start_on: Time.now,
+                                                                                               is_active: true)
+          sign_in broker_user
+        end
+
+        it 'broker should be able to download' do
+          get :authorized_download, params: {model: "BenefitSponsors::Organizations::AcaShopDcEmployerProfile", model_id: profile.id, relation: "documents", relation_id: document.id}
+          expect(response).to be_successful
+        end
+      end
+
+      context 'without authorized account' do
+        before do
+          sign_in broker_user
+        end
+
+        it 'broker should be able to download' do
+          get :authorized_download, params: {model: "BenefitSponsors::Organizations::AcaShopDcEmployerProfile", model_id: profile.id, relation: "documents", relation_id: document.id}
+          expect(response).to have_http_status(:found)
+          expect(flash[:error]).to eq("Access not allowed for benefit_sponsors/employer_profile_policy.can_download_document?, (Pundit policy)")
+        end
+      end
+    end
+
+    context 'hbx staff role' do
+      let(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+      let(:admin_user) {FactoryBot.create(:user, :with_hbx_staff_role, :person => admin_person)}
+
+      context 'with permission to access' do
+        let!(:permission) { FactoryBot.create(:permission, :super_admin) }
+        let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
+
+        before do
+          sign_in admin_user
+        end
+
+        it 'hbx staff should be able to download' do
+          get :authorized_download, params: {model: "BenefitSponsors::Organizations::AcaShopDcEmployerProfile", model_id: profile.id, relation: "documents", relation_id: document.id}
+          expect(response).to be_successful
+        end
+      end
+
+      context 'without permission to access' do
+        let!(:permission) { FactoryBot.create(:permission, :hbx_csr_tier1, modify_employer: false) }
+        let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
+
+        before do
+          sign_in admin_user
+        end
+
+        it 'hbx staff should be able to download' do
+          get :authorized_download, params: {model: "BenefitSponsors::Organizations::AcaShopDcEmployerProfile", model_id: profile.id, relation: "documents", relation_id: document.id}
+          expect(response).to have_http_status(:found)
+          expect(flash[:error]).to eq("Access not allowed for benefit_sponsors/employer_profile_policy.can_download_document?, (Pundit policy)")
+        end
+      end
     end
   end
 end

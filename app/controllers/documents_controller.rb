@@ -2,7 +2,7 @@ class DocumentsController < ApplicationController
   include ActionView::Helpers::TranslationHelper
   include L10nHelper
   before_action :fetch_record, only: [:authorized_download, :cartafact_download]
-  before_action :updateable?, except: [:show_docs, :download]
+  before_action :updateable?, except: [:show_docs, :download, :authorized_download, :cartafact_download]
   before_action :set_document, only: [:destroy, :update]
   before_action :set_verification_type
   before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type, :extend_due_date, :update_ridp_verification_type]
@@ -28,13 +28,11 @@ class DocumentsController < ApplicationController
     authorize record, :can_download_document?
 
     begin
+      relation = params[:relation] || "documents"
+      relation_id = params[:relation_id]
       documents = record.send(relation.to_sym)
-      if authorized_to_download?(model_object, documents, relation_id)
-        uri = documents.find(relation_id).identifier
-        send_data Aws::S3Storage.find(uri), get_options(params)
-      else
-       raise "Sorry! You are not authorized to download this document."
-      end
+      uri = documents.find(relation_id).identifier
+      send_data Aws::S3Storage.find(uri), get_options(params)
     rescue => e
       redirect_back(fallback_location: root_path, :flash => {error: e.message})
     end
