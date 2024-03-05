@@ -35,6 +35,10 @@ class PersonPolicy < ApplicationPolicy
     false
   end
 
+  def can_hbx_staff_modify?
+    role.is_a?(HbxStaffRole) && role&.permission&.modify_family
+  end
+
   private
 
   def allowed_to_download?

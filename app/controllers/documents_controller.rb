@@ -2,7 +2,7 @@ class DocumentsController < ApplicationController
   include ActionView::Helpers::TranslationHelper
   include L10nHelper
   before_action :fetch_record, only: [:authorized_download, :cartafact_download]
-  before_action :updateable?, except: [:show_docs, :download, :authorized_download, :cartafact_download, :update_verification_type, :extend_due_date, :destroy]
+  before_action :updateable?, except: [:show_docs, :download, :authorized_download, :cartafact_download, :update_verification_type, :extend_due_date, :destroy, :update_ridp_verification_type]
   before_action :set_document, only: [:destroy, :update]
   before_action :set_verification_type
   before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type, :extend_due_date, :update_ridp_verification_type]
@@ -54,7 +54,7 @@ class DocumentsController < ApplicationController
   end
 
   def update_verification_type
-    authorize HbxProfile, can_update_verification_type?
+    authorize HbxProfile, :can_update_verification_type?
 
     @family_member = FamilyMember.find(params[:family_member_id])
     update_reason = params[:verification_reason]
@@ -76,6 +76,8 @@ class DocumentsController < ApplicationController
   end
 
   def update_ridp_verification_type
+    authorize @person, :can_hbx_staff_modify?
+
     ridp_type = params[:ridp_verification_type]
     update_reason = params[:verification_reason]
     admin_action = params[:admin_action]
@@ -150,7 +152,7 @@ class DocumentsController < ApplicationController
   end
 
   def extend_due_date
-    authorize HbxProfile, can_update_verification_type?
+    authorize HbxProfile, :can_update_verification_type?
 
     @family_member = FamilyMember.find(params[:family_member_id])
     enrollment = @family_member.family.enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => @family_member.id).first
@@ -169,7 +171,7 @@ class DocumentsController < ApplicationController
   end
 
   def destroy
-    authorize @person, can_delete_document?
+    authorize @person, :can_delete_document?
 
     @document.delete if @verification_type.type_unverified?
     if @document.destroyed?
