@@ -92,22 +92,20 @@ class DocumentsController < ApplicationController
 
     family = @person.primary_family
     if family.active_household.hbx_enrollments.verification_needed.any?
-      family.active_household.hbx_enrollments.verification_needed.each do |enrollment|
-        enrollment.evaluate_individual_market_eligiblity
-      end
+      family.active_household.hbx_enrollments.verification_needed.each(&:evaluate_individual_market_eligiblity)
       family.save!
       respond_to do |format|
-        format.html {
+        format.html do
           flash[:success] = "Enrollment group was completely verified."
           redirect_back(fallback_location: root_path)
-        }
+        end
       end
     else
       respond_to do |format|
-        format.html {
+        format.html do
           flash[:danger] = "Family does not have any active Enrollment to verify."
           redirect_back(fallback_location: root_path)
-        }
+        end
       end
     end
   end
