@@ -6,12 +6,37 @@ class ApplicationPolicy
     @record = record
   end
 
+  def individual_market_primary_family_member?
+  end
+
+  def shop_market_primary_family_member?
+  end
+
+  def fehb_market_primary_family_member?
+  end
+  
+  def active_family_broker?
+  end
+
+  def individual_market_admin?
+  end
+
+  def shop_market_admin?
+  end
+
+  def fehb_market_admin?
+  end
+
+  def general_agency_staff?
+  end
+
   def index?
     read_all?
   end
 
   def show?
-    scope.where(:id => record.id).exists?
+
+    # scope.where(:id => record.id).exists?
   end
 
   def create?
