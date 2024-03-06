@@ -2,44 +2,36 @@
 
 require "rails_helper"
 
-describe PersonPolicy do
+RSpec.describe PersonPolicy, type: :policy do
   context 'with hbx_staff_role' do
-    let(:person){FactoryBot.create(:person, user: user)}
-    let(:user){FactoryBot.create(:user)}
-    let(:hbx_staff_role) { FactoryBot.create(:hbx_staff_role, person: person)}
-    let(:policy){PersonPolicy.new(user,person)}
+    let(:record_person) {FactoryBot.create(:person)}
+    let(:admin_person){FactoryBot.create(:person)}
+    let(:admin_user){FactoryBot.create(:user, person: admin_person)}
+    let(:hbx_staff_role) { FactoryBot.create(:hbx_staff_role, person: admin_person)}
     let(:hbx_profile) {FactoryBot.create(:hbx_profile)}
     Permission.all.delete
 
     context 'allowed to modify? for hbx_staff_role subroles' do
-      it 'hbx_staff' do
-        allow(hbx_staff_role).to receive(:permission).and_return(FactoryBot.create(:permission, :hbx_staff))
+      let(:policy){PersonPolicy.new(admin_user, record_person)}
+
+      it 'hbx_staff with modify family permission' do
+        allow(hbx_staff_role).to receive(:permission).and_return(FactoryBot.create(:permission, :hbx_staff, modify_family: true))
         expect(policy.can_update?).to be true
       end
 
-      it 'hbx_read_only' do
-        allow(hbx_staff_role).to receive(:permission).and_return(FactoryBot.create(:permission, :hbx_read_only))
-        expect(policy.updateable?).to be true
+      it 'hbx_staff without modify family permission' do
+        allow(hbx_staff_role).to receive(:permission).and_return(FactoryBot.create(:permission, :hbx_staff, modify_family: false))
+        expect(policy.can_update?).to be false
       end
 
-      it 'hbx_csr_supervisor' do
-        allow(hbx_staff_role).to receive(:permission).and_return(FactoryBot.create(:permission, :hbx_csr_supervisor))
-        expect(policy.updateable?).to be true
+      it 'hbx_read_only with modify family permission' do
+        allow(hbx_staff_role).to receive(:permission).and_return(FactoryBot.create(:permission, :hbx_read_only, modify_family: true))
+        expect(policy.can_update?).to be true
       end
 
-      it 'hbx_csr_tier2' do
-        allow(hbx_staff_role).to receive(:permission).and_return(FactoryBot.create(:permission, :hbx_csr_tier2))
-        expect(policy.updateable?).to be true
-      end
-
-      it 'csr_tier1' do
-        allow(hbx_staff_role).to receive(:permission).and_return(FactoryBot.create(:permission, :hbx_csr_tier1))
-        expect(policy.updateable?).to be true
-      end
-
-      it 'developer' do
-        allow(hbx_staff_role).to receive(:permission).and_return(FactoryBot.create(:permission, :developer))
-        expect(policy.updateable?).to be false
+      it 'hbx_read_only without modify family permission' do
+        allow(hbx_staff_role).to receive(:permission).and_return(FactoryBot.create(:permission, :hbx_read_only, modify_family: false))
+        expect(policy.can_update?).to be false
       end
     end
 
@@ -76,6 +68,7 @@ describe PersonPolicy do
     end
 
     context 'permissions' do
+      let(:policy){PersonPolicy.new(admin_user, record_person)}
       subject { described_class }
 
       permissions :can_access_identity_verifications? do
