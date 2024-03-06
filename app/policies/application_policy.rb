@@ -7,7 +7,7 @@ class ApplicationPolicy
   end
 
   def individual_market_primary_family_member?(family)
-    individual_market_with_consumer_role? && user == family.primary_person.user
+    individual_market_with_consumer_role?(family) && user == family.primary_person.user
   end
 
   def active_associated_family_broker?(family)
@@ -30,7 +30,7 @@ class ApplicationPolicy
     consumer_role.identity_verified?
   end
 
-  def individual_market_with_consumer_role?
+  def individual_market_with_consumer_role?(family)
     family.primary_person.consumer_role.present?
   end
 
