@@ -70,7 +70,7 @@ class ApplicationPolicy
   # @return [Boolean, nil] Returns true if the user is a shop market admin,
   # false if they are not, or nil if the user or their permissions are not defined.
   def shop_market_admin?
-    user.person.hbx_staff_role&.permission&modify_employer
+    user.person.hbx_staff_role&.permission&.modify_employer
   end
 
   # Checks if the user is a fehb market admin.
