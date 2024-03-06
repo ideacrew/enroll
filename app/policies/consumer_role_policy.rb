@@ -19,14 +19,19 @@ class ConsumerRolePolicy < ApplicationPolicy
   end
 
   # Checks if the logged in person of the current_user is the same as the primary applicant of the application,
-  # if the logged in current_user is a broker and is the active broker of the family of the application,
-  # or if the logged in current_user is a hbx_staff and is authorized to modify_family.
+  # if the logged in current_user is a broker and is the active broker of the family of the application.
   #
   # @return [Boolean] Returns true if any of the conditions are met, false otherwise.
-  def modify_and_view?
-    user.person.id == record.person.id ||
-      associated_active_broker? ||
-      eligible_hbx_staff?
+  def modify_and_view_as_self_or_broker?
+    user.person.id == record.person.id || associated_active_broker?
+  end
+
+  # Checks if the user is hbx staff member and is eligible to modify a family.
+  # A user is considered eligible if they have the hbx staff role and permission to modify a family.
+  #
+  # @return [Boolean, nil] Returns true if the user is an eligible hbx staff member, false if they are not, or nil if the user or their permissions are not defined.
+  def hbx_staff_modify_family?
+    user.person.hbx_staff_role&.permission&.modify_family
   end
 
   # Checks if the consumer's identity has been verified.
@@ -91,14 +96,6 @@ class ConsumerRolePolicy < ApplicationPolicy
   end
 
   private
-
-  # Checks if the user is hbx staff member and is eligible to modify a family.
-  # A user is considered eligible if they have the hbx staff role and permission to modify a family.
-  #
-  # @return [Boolean, nil] Returns true if the user is an eligible hbx staff member, false if they are not, or nil if the user or their permissions are not defined.
-  def eligible_hbx_staff?
-    user.person.hbx_staff_role&.permission&.modify_family
-  end
 
   # Checks if the user is associated with an active broker.
   # A user is considered associated with an active broker if the broker is not blank, is active, and matches the broker associated with the primary family of the person associated with the record.

@@ -34,7 +34,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       )
     end
 
-    permissions :index? do
+    permissions :can_access_endpoint? do
       before do
         primary_applicant
         consumer_role.move_identity_documents_to_verified

@@ -8,10 +8,9 @@ module FinancialAssistance
     before_action :find_application_and_applicant
     before_action :load_support_texts, only: [:index]
     before_action :set_cache_headers, only: [:index]
+    before_action :authorize_applicant
 
     def index
-      authorize @applicant, :index?
-
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       render layout: 'financial_assistance_nav'
@@ -85,6 +84,10 @@ module FinancialAssistance
     end
 
     private
+
+    def authorize_applicant
+      authorize @applicant, :can_access_endpoint?
+    end
 
     def format_date(params)
       return if params[:deduction].blank?

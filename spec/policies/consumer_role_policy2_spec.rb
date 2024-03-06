@@ -10,7 +10,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     let(:consumer_role) { person.consumer_role }
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
 
-    permissions :modify_and_view? do
+    permissions :modify_and_view_as_self_or_broker? do
       context 'when a valid user is logged in' do
         context 'when the user is a consumer' do
           let(:user_of_family) { FactoryBot.create(:user, person: person) }
@@ -18,45 +18,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
           it 'grants access' do
             expect(subject).to permit(logged_in_user, consumer_role)
-          end
-        end
-
-        context 'when the user is a hbx staff' do
-          let(:hbx_profile) do
-            FactoryBot.create(
-              :hbx_profile,
-              :normal_ivl_open_enrollment,
-              us_state_abbreviation: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
-              cms_id: "#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.upcase}0"
-            )
-          end
-          let(:hbx_staff_person) { FactoryBot.create(:person) }
-          let(:hbx_staff_role) do
-            hbx_staff_person.create_hbx_staff_role(
-              permission_id: permission.id,
-              subrole: permission.name,
-              hbx_profile: hbx_profile
-            )
-          end
-          let(:hbx_admin_user) do
-            FactoryBot.create(:user, person: hbx_staff_person)
-            hbx_staff_role.person.user
-          end
-
-          context 'when the hbx staff has the correct permission' do
-            let(:permission) { FactoryBot.create(:permission, :super_admin) }
-
-            it 'grants access' do
-              expect(subject).to permit(hbx_admin_user, consumer_role)
-            end
-          end
-
-          context 'when the hbx staff does not have the correct permission' do
-            let(:permission) { FactoryBot.create(:permission, :developer) }
-
-            it 'denies access' do
-              expect(subject).not_to permit(hbx_admin_user, consumer_role)
-            end
           end
         end
 
@@ -141,6 +102,47 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           it 'denies access' do
             consumer_role.update_attributes(identity_validation: 'rejected')
             expect(subject).not_to permit(logged_in_user, consumer_role)
+          end
+        end
+      end
+    end
+
+    permissions :hbx_staff_modify_family? do
+      context 'when the user is a hbx staff' do
+        let(:hbx_profile) do
+          FactoryBot.create(
+            :hbx_profile,
+            :normal_ivl_open_enrollment,
+            us_state_abbreviation: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
+            cms_id: "#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.upcase}0"
+          )
+        end
+        let(:hbx_staff_person) { FactoryBot.create(:person) }
+        let(:hbx_staff_role) do
+          hbx_staff_person.create_hbx_staff_role(
+            permission_id: permission.id,
+            subrole: permission.name,
+            hbx_profile: hbx_profile
+          )
+        end
+        let(:hbx_admin_user) do
+          FactoryBot.create(:user, person: hbx_staff_person)
+          hbx_staff_role.person.user
+        end
+
+        context 'when the hbx staff has the correct permission' do
+          let(:permission) { FactoryBot.create(:permission, :super_admin) }
+
+          it 'grants access' do
+            expect(subject).to permit(hbx_admin_user, consumer_role)
+          end
+        end
+
+        context 'when the hbx staff does not have the correct permission' do
+          let(:permission) { FactoryBot.create(:permission, :developer) }
+
+          it 'denies access' do
+            expect(subject).not_to permit(hbx_admin_user, consumer_role)
           end
         end
       end
