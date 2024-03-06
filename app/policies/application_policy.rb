@@ -6,28 +6,56 @@ class ApplicationPolicy
     @record = record
   end
 
-  def individual_market_primary_family_member?
+  def individual_market_primary_family_member?(family)
+    individual_market_with_consumer_role? && user == family.primary_person.user
+  end
+
+  def active_associated_family_broker?(family)
+    broker = user.person.broker_role
+    return false if broker.blank? || !broker.active?
+
+    broker_agency_account = family.active_broker_agency_account
+    return false if broker_agency_account.blank?
+
+    broker_agency_account.benefit_sponsors_broker_agency_profile_id == broker.benefit_sponsors_broker_agency_profile_id &&
+      broker_agency_account.writing_agent_id == broker.id
+  end
+
+  def ridp_verified_primary_person?(family)
+    consumer_role = family.primary_person.consumer_role
+    # For Employee Role and Resident Role we don't need to check for RIDP verification.
+    # Also, we should not block the roles because of RIDP Verification check.
+    return true if consumer_role.blank?
+
+    consumer_role.identity_verified?
+  end
+
+  def individual_market_with_consumer_role?
+    family.primary_person.consumer_role.present?
+  end
+
+  def individual_market_admin?(family)
+    individual_market_with_consumer_role? && user.person.hbx_staff_role&.permission&.modify_family
   end
 
   def shop_market_primary_family_member?
+    false
   end
 
   def fehb_market_primary_family_member?
-  end
-  
-  def active_family_broker?
-  end
-
-  def individual_market_admin?
+    false
   end
 
   def shop_market_admin?
+    false
   end
 
   def fehb_market_admin?
+    false
   end
 
   def general_agency_staff?
+    false
   end
 
   def index?

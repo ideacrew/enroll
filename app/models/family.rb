@@ -441,7 +441,7 @@ class Family
   end
 
   def primary_person
-    primary_applicant&.person
+    @primary_person ||= primary_applicant&.person
   end
 
   def primary_family_member=(new_primary_family_member)
