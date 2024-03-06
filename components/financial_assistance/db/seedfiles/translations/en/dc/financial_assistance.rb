@@ -182,8 +182,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.learn_more_about_life_changes" => "Learn more about life changes",
   # Mec check
   "en.faa.mc_success_existing" => "It looks like you already have Medicaid coverage.",
-  "en.faa.mc_success_enroll" => "If you’re enrolled in Medicaid and need to renew your coverage or update your information, go to ",
-  "en.faa.mc_success_link" => "districtdirect.dc.gov",
+  "en.faa.mc_success_enroll" => "If you’re enrolled in Medicaid and need to renew your coverage or update your information, go to %{medicaid_agency_url}",
   "en.faa.mc_success_phone" => " or contact District Direct at (202) 727-5355 / TTD: (800) 877-8339.",
   "en.faa.shop_check_success" => "It looks like you may already be enrolled in employer sponsored coverage. If you need to update information like your income, address, or who is in your household, visit the Manage Family page to make these changes before completing a DC Health Link application.",
   "en.faa.mc_continue_bold" => "Still want to apply for lower monthly premiums or lost (or will soon lose) Medicaid coverage?",
