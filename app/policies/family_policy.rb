@@ -6,52 +6,22 @@ class FamilyPolicy < ApplicationPolicy
     @user # or user
   end
 
-  def non_ridp_verified_person?
-    # record is the family
-    !record.primary_person.consumer_role.identity_verified?
-  end
-
   def primary_person
     record.primary_person
   end
 
-  # Checks if logged in user is same as the primary person's user record.
-  def individual_market_primary_family_member?
-    # person.consumer_role.identity_verified?
-    # return false if non_ridp_verified_person?
-    # .. bunnch of other validations
-
-    @user == primary_person.user
-  end
-
-  # Checks if the user is associated with an active broker.
-  # A user is considered associated with an active broker if the broker is not blank, is active, and matches the broker associated with the primary family of the person associated with the record.
-  #
-  # @return [Boolean] Returns true if the user is associated with an active broker, false otherwise.
-  def active_associated_family_broker?
-    broker = user.person.broker_role
-    return false if broker.blank? || !broker.active?
-
-    broker_agency_account = record.active_broker_agency_account
-    return false if broker_agency_account.blank?
-
-    broker_agency_account.benefit_sponsors_broker_agency_profile_id == broker.benefit_sponsors_broker_agency_profile_id &&
-      broker_agency_account.writing_agent_id == broker.id
-  end
-
   def show?
-    return false if non_ridp_verified_person?
+    return true if individual_market_primary_family_member?(record)
+    return true if active_associated_family_broker?(record)
+    return false unless ridp_verified_primary_person?(record)
+    return true if individual_market_admin?(family)
 
-    return true if individual_market_admin?
+    return true if shop_market_primary_family_member?
+    return true if fehb_market_primary_family_member?
     return true if shop_market_admin?
     return true if fehb_market_admin?
     return true if general_agency_staff?
-    
-    return true if individual_market_primary_family_member?
-    return true if shop_market_primary_family_member?
-    return true if fehb_market_primary_family_member?
-    
-    return true if active_associated_family_broker?
+
     false
   end
 
