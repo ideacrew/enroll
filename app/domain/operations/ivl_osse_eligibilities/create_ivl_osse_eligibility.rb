@@ -8,8 +8,10 @@ module Operations
     # Operation to support IVL osse eligibility creation
     class CreateIvlOsseEligibility
       send(:include, Dry::Monads[:result, :do])
+      include EventSource::Command
+      include EventSource::Logging
 
-      attr_accessor :subject, :default_eligibility
+      attr_accessor :subject, :default_eligibility, :prospective_eligibility
 
       # @param [Hash] opts Options to build eligibility
       # @option opts [<GlobalId>] :subject required
@@ -24,9 +26,10 @@ module Operations
         eligibility_options =
           yield build_eligibility_options(values, eligibility_record)
         eligibility = yield create_eligibility(values, eligibility_options)
-        persisted_eligibility = yield store(values, eligibility)
+        eligibility_record = yield store(values, eligibility)
+        _event = yield publish_event(eligibility_record)
 
-        Success(persisted_eligibility)
+        Success(eligibility_record)
       end
 
       private
@@ -96,7 +99,7 @@ module Operations
         save_proc =
           proc do
             if subject.save
-              Success(eligibility_record)
+              Success(eligibility_record.reload)
             else
               Failure(subject.errors.full_messages)
             end
@@ -157,6 +160,35 @@ module Operations
         end
 
         eligibility_record
+      end
+
+      def publish_event(eligibility)
+        event_name = eligibility_event_for(eligibility.current_state)
+        return Succcess(eligibility) unless event_name
+
+        Operations::EventLogs::TrackableEvent.new.call({
+                                                         event_name: event_name,
+                                                         payload: eligibility.attributes.to_h,
+                                                         subject: eligibility.eligible.person,
+                                                         resource: eligibility
+                                                       })
+      end
+
+      # This method is used to determine the event name for the current eligibility state.
+      # If default_eligibility is true, returns false indicating no eligibility event.
+      # If prospective_eligibility is true, returns the string representing the event for renewed eligibility.
+      def eligibility_event_for(current_state)
+        return false if default_eligibility
+        return 'events.people.eligibilities.ivl_osse_eligibility.eligibility_renewed' if prospective_eligibility
+
+        case current_state
+        when :eligible
+          'events.people.eligibilities.ivl_osse_eligibility.eligibility_created'
+        when :ineligible
+          'events.people.eligibilities.ivl_osse_eligibility.eligibility_terminated'
+        else
+          false
+        end
       end
     end
   end

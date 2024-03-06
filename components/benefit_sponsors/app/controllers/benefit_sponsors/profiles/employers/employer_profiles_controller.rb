@@ -56,6 +56,9 @@ module BenefitSponsors
             @employees = EmployeeRole.find_by_employer_profile(@employer_profile).compact.select { |ee| CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include?(ee.census_employee.aasm_state)}
           when 'inbox'
               # do something
+          when 'event_log_shop'
+            authorize @employer_profile, :can_view_audit_log?
+            @event_logs = EventLogs::MonitoredEvent.where(subject_hbx_id: @employer_profile.hbx_id)&.order(:event_time.desc)&.map(&:eligibility_details)
           else
             else_block
           end

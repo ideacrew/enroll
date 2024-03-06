@@ -46,9 +46,13 @@ RSpec.describe ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility,
   end
 
   let(:evidence_value) { "false" }
+  let!(:system_user) { FactoryBot.create(:user, email: "admin@dc.gov") }
+  let(:trackable_event_instance) { Operations::EventLogs::TrackableEvent.new}
 
   before do
     allow(EnrollRegistry).to receive(:feature_enabled?).and_return(true)
+    allow(trackable_event_instance).to receive(:publish).and_return(Dry::Monads::Success(true))
+    allow(Operations::EventLogs::TrackableEvent).to receive(:new).and_return(trackable_event_instance)
     catalog_eligibility
   end
 
@@ -134,6 +138,69 @@ RSpec.describe ::Operations::IvlOsseEligibilities::CreateIvlOsseEligibility,
       expect(evidence_state_history.to_state).to eq(:approved)
       expect(evidence_state_history.is_eligible).to be_truthy
       expect(evidence.is_satisfied).to be_truthy
+    end
+  end
+
+  describe "#eligibility_event_for" do
+    subject(:instance) { described_class.new }
+    let(:prospective_eligibility) { false }
+
+    before { instance.prospective_eligibility = prospective_eligibility }
+
+    context "when default_eligibility is true" do
+
+      it "should return false" do
+        instance.default_eligibility = true
+        expect(instance.send(:eligibility_event_for, :eligible)).to be_falsey
+      end
+    end
+
+    context "when current_state is eligible" do
+      let(:current_state) { :eligible }
+
+      context "when prospective_eligibility is true" do
+        let(:prospective_eligibility) { true }
+
+        it "should return eligibility renewed event" do
+          expect(instance.send(:eligibility_event_for, current_state)).to eq(
+            "events.people.eligibilities.ivl_osse_eligibility.eligibility_renewed"
+          )
+        end
+      end
+
+      context "when prospective_eligibility is false" do
+        let(:prospective_eligibility) { false }
+
+        it "should return eligibility created event" do
+          expect(instance.send(:eligibility_event_for, current_state)).to eq(
+            "events.people.eligibilities.ivl_osse_eligibility.eligibility_created"
+          )
+        end
+      end
+    end
+
+    context "when current_state is ineligible" do
+      let(:current_state) { :ineligible }
+
+      context "when prospective_eligibility is true" do
+        let(:prospective_eligibility) { true }
+
+        it "should return eligibility renewed event" do
+          expect(instance.send(:eligibility_event_for, current_state)).to eq(
+            "events.people.eligibilities.ivl_osse_eligibility.eligibility_renewed"
+          )
+        end
+      end
+
+      context "when prospective_eligibility is false" do
+        let(:prospective_eligibility) { false }
+
+        it "should return eligibility terminated event" do
+          expect(instance.send(:eligibility_event_for, current_state)).to eq(
+            "events.people.eligibilities.ivl_osse_eligibility.eligibility_terminated"
+          )
+        end
+      end
     end
   end
 end
