@@ -117,7 +117,7 @@ module Operations
       end
 
       subject do
-        described_class.new.call({person_hbx_id: person.hbx_id, response: response.to_h})
+        described_class.new.call({person_hbx_id: person.hbx_id, metadata: {headers: {}}, response: response.to_h})
       end
 
       it "should pass" do
@@ -152,22 +152,29 @@ module Operations
       end
 
       before do
+        allow(EnrollRegistry[:ssa_h3].setting(:use_transmittable)).to receive(:item).and_return(true)
         person.consumer_role.update!(aasm_state: "ssa_pending")
         person.consumer_role.vlp_documents << FactoryBot.build(:vlp_document, :identifier => 'identifier', :verification_type => 'Immigration type')
-      end
-
-      subject do
-        described_class.new.call({person_hbx_id: person.hbx_id, response: response.to_h})
+        @result = described_class.new.call({person_hbx_id: person.hbx_id, metadata: {headers: {}}, response: response.to_h})
       end
 
       it "should pass" do
-        expect(subject).to be_success
+        expect(@result).to be_success
       end
 
       it "consumer role should be valid" do
-        subject
         expect(person.reload.consumer_role.vlp_authority).to eq 'ssa'
         expect(person.consumer_role.valid?).to be_truthy
+      end
+
+      it 'should have transmittable object for response' do
+        job = ::Transmittable::Job.where(key: :ssa_verification_response).first
+        expect(job.process_status.latest_state).to eq :succeeded
+      end
+
+      it 'transaction should have response payload' do
+        transaction = ::Transmittable::Transaction.where(key: :ssa_verification_response).first
+        expect(transaction.json_payload).not_to eq nil
       end
     end
   end

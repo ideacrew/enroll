@@ -9,7 +9,9 @@
   </div>
 
   <div class="pull-right upload-document-location">
-    <%= link_to "<i class='fas fa-cloud-upload-alt' aria-hidden='true'></i> Upload".html_safe, main_app.new_document_employers_employer_profile_path(@employer_profile), remote: 'true', class: "btn #{@employer_profile.employer_attestation.editable? ? 'btn-default' : 'btn-default disabled' }" %>
+    <%= link_to(main_app.new_document_employers_employer_profile_path(@employer_profile), remote: 'true', class: "btn #{@employer_profile.employer_attestation.editable? ? 'btn-default' : 'btn-default disabled' }") do %>
+      <i class='fas fa-cloud-upload-alt' aria-hidden='true'></i> Upload
+    <% end %>
   </div>
   </div>
 

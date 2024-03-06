@@ -1,5 +1,0 @@
-"Subject","Eligibility", "Eligibility Status", "Effective On", "Event Details","Performed By","Time"
-<% event_logs.each do |event_log| %>
-   <% performed_by = event_log[:account_username] + " (" + event_log[:account_hbx_id] + ")" %>
-  <%= event_log[:subject] %>, <%= event_log[:title].to_s.upcase %>,<%= event_log[:current_state]&.titleize %>,<%= event_log[:effective_on] %>,<%= event_log[:detail] %>,<%= performed_by %>,<%= event_log[:event_time] %>
-<% end %>

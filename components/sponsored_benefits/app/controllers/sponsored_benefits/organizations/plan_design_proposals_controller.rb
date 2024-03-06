@@ -64,7 +64,7 @@ module SponsoredBenefits
         @plan_design_proposal.publish!
         flash[:notice] = "Quote Published"
       else
-        flash[:error] = "Quote failed to publish.".html_safe
+        flash[:error] = "Quote failed to publish."
       end
       respond_to do |format|
         format.js { render json: { url: organizations_plan_design_proposal_path(@plan_design_proposal, profile_id: params[:profile_id]) } }

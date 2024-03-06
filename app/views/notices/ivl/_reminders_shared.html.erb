@@ -69,10 +69,10 @@
     "Consular report of Birth Abroad of U.S. Citizen",
     "A valid Driver’s License from a state that requires proof of citizenship and verification of Social Security Number prior to issuance of the license.",
     ["A tribal document issued by a federally-recognized Indian Tribe, which must:",
-        ["Identify the Tribe issuing the document;",
+        [sanitize_html("Identify the Tribe issuing the document;",
           "Identify the individual by name; and",
           "Confirm the individual’s enrollment in or affiliation with the Tribe.",
-          "<strong>Examples</strong>: tribal enrollment card, Certificate of Degree of Indian Blood, Tribal Census document".html_safe]]]} %>
+          "<strong>Examples</strong>: tribal enrollment card, Certificate of Degree of Indian Blood, Tribal Census document")]]]} %>
 
   <%= render partial: 'notices/shared/unordered_list', locals: {
     previous: "<span #{@style_underline}>Secondary documentation:</span> (Must Present One (1) of the following, along with ID)",
@@ -375,9 +375,3 @@
     the postmark date (or date at the top) of the determination notice.  D.C. Official Code §4-210.09, 42 C.F.R. §431.221,
     and 45 C.F.R. §155.520. <strong>See the insert for more information on your appeal rights.</strong>"],
     heading: 'If You Think We Made a Mistake', sub_heading: ''} %>
-
-
-<%#= render partial: 'notices/shared/paragraph', :locals => {
-  content: "<strong>Note: If this notice was sent to you in error, and your health plan for 2015 has already been cancelled or
-  terminated, you must go to <a href='www.DCHealthLink.com'>#{EnrollRegistry[:enroll_app].setting(:website_name).item}</a> during open enrollment to re-enroll for 2016.
-  Your coverage will not be automatically renewed.</strong>".html_safe} %>

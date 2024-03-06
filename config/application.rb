@@ -1,3 +1,8 @@
+# frozen_string_literal: true
+
+# Devise security won't work without this.
+DEVISE_ORM = :mongoid
+
 require File.expand_path('../boot', __FILE__)
 
 # require 'rails/all'

@@ -277,11 +277,11 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   # rubocop:disable Style/RedundantReturn
   def eligible_to_get_covered?(member)
-    child_relations = %w[child ward foster_child adopted_child]
-    return true unless child_relations.include?(member.family_member.relationship)
+    valid_relations_for_pediatric_dental = ["self", "child", "ward", "foster_child", "adopted_child"]
+    return true unless valid_relations_for_pediatric_dental.include?(member.family_member.relationship)
+    return true if member.family_member.relationship == "self" && member.person.age_on(member.coverage_start_on) >= 19
 
     return false if turned_19_during_renewal_with_pediatric_only_qdp?(member)
-
     return true if member.family_member.age_off_excluded
 
     if EnrollRegistry.feature_enabled?(:age_off_relaxed_eligibility)
@@ -294,7 +294,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
         }
       end
       return true if dependent_coverage_eligible.success?
-    elsif child_relations.include?(member.family_member.relationship)
+    elsif valid_relations_for_pediatric_dental.include?(member.family_member.relationship)
       return true if member.person.age_on(renewal_coverage_start.prev_day) < 26
     end
 

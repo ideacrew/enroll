@@ -20,29 +20,28 @@ RSpec.describe EventLogsController, :type => :controller do
   end
 
   context "#index" do
-    let(:event_log_params) { { "group" => family.id, "type" => "consumer" } }
 
     it "should assign event logs with params" do
-      FactoryBot.create(:monitored_event, account_username: user.email, monitorable: person_event_log, subject_hbx_id: person.hbx_id)
+      event1 = FactoryBot.create(:monitored_event, account_username: user.email, monitorable: person_event_log, subject_hbx_id: person.hbx_id)
       FactoryBot.create(:monitored_event, account_username: user.email, monitorable: person_event_log)
-      get :index, params: event_log_params, format: :js
+      get :index, params: {events: [event1.id]}, format: :js
       expect(assigns(:event_logs).count).to eq 1
       expect(assigns(:event_logs).first.subject_hbx_id).to eq person.hbx_id
     end
 
-    it "should assign event logs without a param" do
+    it "should fetch none without a param" do
       get :index, format: :js
-      expect(assigns(:event_logs).count).to eq 2
+      expect(assigns(:event_logs).count).to eq 0
     end
 
     it "should render index" do
-      get :index, params: event_log_params, format: :js
+      get :index, params: {}, format: :js
       expect(response).to render_template(:index)
     end
 
     context "csv" do
       it "should render csv" do
-        get :index, params: event_log_params.merge(format: :csv)
+        get :index, params: {format: :csv}
         expect(response.header["Content-Type"]).to eq "text/csv"
       end
     end

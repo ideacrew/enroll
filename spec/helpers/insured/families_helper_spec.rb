@@ -15,7 +15,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
     it "it should return subscribers full name in span with dependent-text class" do
       allow(hbx_enrollment_member_two).to receive(:is_subscriber).and_return(true)
       allow(hbx_enrollment_member).to receive_message_chain("person.full_name").and_return("Bobby Boucher")
-      expect(helper.plan_shopping_dependent_text(hbx_enrollment)).to eq "<span class='dependent-text'>Bobby Boucher</span>"
+      expect(helper.plan_shopping_dependent_text(hbx_enrollment)).to eq "<span class=\"dependent-text\">Bobby Boucher</span>"
     end
 
     it "it should return subscribers and dependents modal" do
@@ -637,7 +637,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
 
   describe '#render_product_type_details', dbclean: :after_each do
     it 'should return gold icon with nationwide' do
-      expect(helper.render_product_type_details(:gold, true)).to eq "<span class=\"gold-icon\">Gold</span>&nbsp<label class='separator'></label>NATIONWIDE NETWORK"
+      expect(helper.render_product_type_details(:gold, true)).to eq "<span class=\"gold-icon\">Gold</span> <label class=\"separator\"></label>NATIONWIDE NETWORK"
     end
 
     it 'should return gold icon without nationwide' do

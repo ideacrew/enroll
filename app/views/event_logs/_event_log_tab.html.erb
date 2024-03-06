@@ -1,5 +1,4 @@
 <div class="event-log-tab">
-  <% group = @family || @employer_profile %>
   <div>
     <h1><b><%= l10n("audit_log") %></b></h1>
     <h3><b><%= name %></b></h3>
@@ -8,6 +7,7 @@
     <% else %>
     <% if type == 'consumer' %>
       <p><b><%= l10n("Account") %> <%= l10n("Primary") %>:</b> <%= l10n("Self") %></p>
+      <p><b><%= l10n("event_log.hbx_id_text") %></b> <%= hbx_id %></p>
       <p><%= l10n("event_log.ivl_action") %></p>
     <% else %>
       <p><b><%= l10n("event_log.hbx_id_text") %></b> <%= hbx_id %></p>
@@ -15,15 +15,17 @@
     <% end %>
 
     <div class="filters-container">
-      <div id="filters-toggle" class="filters-toggle">
-        <span class="glyphicon glyphicon-chevron-right" id="filters-arrow"></span>
-        <span class="filters-text"><%= l10n("event_log.filters") %></span>
+      <div>
+        <span id="filters-toggle" class="filters-toggle">
+          <span class="glyphicon glyphicon-chevron-right" id="filters-arrow"></span>
+          <span class="filters-text" ><%= l10n("event_log.filters") %></span>
+        </span>
       </div>
       <form class="filters" id="filters">
         <h2><%= l10n("event_log.eligibility") %> <%= l10n("Details") %></h2>
         <div class="filter-row">
           <% if type == 'consumer' %>
-          <div class="filter">
+          <div class="filter" id="subjectFilter">
             <label for="<%= l10n("subject").downcase %>"><%= l10n("Subject") %></label>
             <dl class="dropdown">
               <dt>
@@ -35,10 +37,10 @@
               <dd>
                 <div class="mutliSelect">
                   <ul>
-                    <li><label><input type="checkbox" name="<%= l10n("subject").downcase %>" value="all" checked/>All</label></li>
+                    <li><label><input type="checkbox" name="subject" value="all" checked/>All</label></li>
                     <% if members&.any? %>
                     <% members.uniq.each do |member| %>
-                      <li><label><input type="checkbox" name="<%= l10n("subject").downcase %>" value="<%= member %>" checked/><%= member %></label></li>
+                      <li><label><input type="checkbox" name="subject" value="<%= member %>" checked/><%= member %></label></li>
                     <% end %>
                     <% end %>
                   </ul>
@@ -59,10 +61,10 @@
               <dd>
                 <div class="mutliSelect">
                   <ul>
-                    <li><label><input type="checkbox" name="<%= l10n("event_log.eligibility").downcase %>" value="all" checked/>All</label></li>
+                    <li><label><input type="checkbox" name="eligibility" value="all" checked/>All</label></li>
                     <% if @event_logs %>
                       <% @event_logs.map{|event_log| event_log[:title]&.upcase }.uniq.each do |category| %>
-                        <li><label><input type="checkbox" name="<%= l10n("event_log.eligibility").downcase %>" value="<%= category %>" checked/><%= category %></label></li>
+                        <li><label><input type="checkbox" name="eligibility" value="<%= category %>" checked/><%= category %></label></li>
                       <% end %>
                     <% end %>
                   </ul>
@@ -82,9 +84,9 @@
               <dd>
                 <div class="mutliSelect">
                   <ul>
-                    <li><label><input type="checkbox" name="<%= l10n('status').downcase %>" value="all" checked/>All</label></li>
-                    <li><label><input type="checkbox" name="<%= l10n('status').downcase %>" value="eligible" checked/><%= l10n("eligible") %></label></li>
-                    <li><label><input type="checkbox" name="<%= l10n('status').downcase %>" value="ineligible" checked/><%= l10n("ineligible") %></label></li>
+                    <li><label><input type="checkbox" name="status" value="all" checked/>All</label></li>
+                    <li><label><input type="checkbox" name="status" value="eligible" checked/><%= l10n("eligible") %></label></li>
+                    <li><label><input type="checkbox" name="status" value="ineligible" checked/><%= l10n("ineligible") %></label></li>
                   </ul>
                 </div>
               </dd>
@@ -97,6 +99,29 @@
         </div>
         <h2><%= l10n("Event") %> <%= l10n("Details") %></h2>
         <div class="filter-row">
+          <div class="filter">
+            <label for="<%= l10n("status").downcase %>"><%= l10n("event_log.action_taken") %></label>
+            <dl class="dropdown">
+            <dt>
+              <div class="fake-select" style="display: flex;align-items: center;">
+                <span class="fake-select-label"><%= l10n("All") %></span>
+                <p class="multiSel"></p>
+              </div>
+            </dt>
+            <dd>
+              <div class="mutliSelect">
+                <ul>
+                  <li><label><input type="checkbox" name="action_taken" value="all" checked/>All</label></li>
+                  <% if @event_logs %>
+                    <% @event_logs.map{|event_log| event_log[:detail] }.uniq.each do |category| %>
+                      <li><label><input type="checkbox" name="action_taken" value="<%= category %>" checked/><%= category %></label></li>
+                    <% end %>
+                  <% end %>
+                </ul>
+              </div>
+            </dd>
+            </dl>
+          </div>
           <div class="filter">
             <label for="user-id"><%= l10n("event_log.hbx_id_email") %></label>
             <input type="text" id="user-id">
@@ -125,18 +150,18 @@
     <div class="event-log-header">
       <div class="event-log-export-text">
         <h3><b><%= type === "consumer" ? l10n("event_log.table_label_consumer") + hbx_id : l10n("event_log.table_label_employer")%></b></h3>
-        <a href="/event_logs.csv?group=<%= group.id %>?type=<%= type %>" id="export-table" class="button button-primary"><%= l10n("Export") %> <%= l10n("to") %> CSV</a>
+        <a href="#" id="export-table" class="button button-primary"><%= l10n("Export") %> <%= l10n("to") %> CSV</a>
       </div>
     </div>
     <div id="event-table-data">
-      <table id="event-log-table" class="table">
+      <table id="event-log-table" class="table event-log">
         <thead>
         <tr class="">
           <th><span class="glyphicon glyphicon-chevron-right" id="log-expansion-icon" onclick="toggleShowAllRows()"></span></th>
           <th><%= l10n("Subject") %></th>
           <th><%= l10n("event_log.eligibility") %></th>
           <th><%= l10n("event_log.eligibility") %> <%= l10n("Status") %></th>
-          <th><%= l10n("Effective") %> <%= l10n("On") %></th>
+          <th><%= l10n("Effective") %></th>
         </tr>
         </thead>
         <tbody>
@@ -148,11 +173,11 @@
               <% if type == 'consumer' %>
                 <td class="subject"><%= event_log[0] %></td>
               <% else %>
-                <td class="subject"><%= name %></td>
+                <td class="subject"><%= event_log[0] %></td>
               <% end %>
               <td class="eligibility"><%= event_log[1]&.upcase %></td>
               <td class="status"><%= details[0][:current_state]&.titleize %></td>
-              <td class="effective-on"><%= details[0][:effective_on] %></td>
+              <td class="effective-on"><%= details[0][:effective_on]&.strftime("%m/%d/%Y") %></td>
             </tr>
             <tr class="secondary-header" id="<%= index %>">
               <td colspan="2"></td>
@@ -161,9 +186,9 @@
               <th><%= l10n("Account (Date/Time)") %></th>
             </tr>
             <% details.each do |detail| %>
-            <tr class="detail-row" id="<%= index %>">
+            <tr class="detail-row" data-event-id="<%= detail[:_id] %>" id="<%= index %>">
               <td colspan="2"></td>
-              <td><%= detail[:detail] %></td>
+              <td class="action-taken"><%= detail[:detail] %></td>
               <td id="<%= detail[:account_hbx_id] %>" class="user_id"><%= detail[:account_username] %></td>
               <td class="event-time"><%= detail[:event_time] %></td>
             </tr>
@@ -193,6 +218,7 @@
     const startDateFilter = $('#start-date');
     const endDateFilter = $('#end-date');
     const hbx_id = <%= sanitize hbx_id.to_json %>;
+
     // Event handler for start date change
     startDateFilter.on('change', function() {
       const startDate = new Date(startDateFilter.val());
@@ -216,32 +242,40 @@
       arrow.toggleClass('glyphicon-chevron-right glyphicon-chevron-down');
     });
 
-    exportTableButton.on('click', function() {
-      window.location.href = '/event_logs.csv';
-    });
-
-    disableExportButton();
-    hideFilters();
-
-    enableExportButton();
-    showFilters();
+    if ($('tr.primary-row:visible').length === 0) {
+      disableExportButton();
+    }
   });
 
-  function disableButtons() {
-    $('#run-query, #export-table').prop('disabled', true);
-  }
-
-  function enableButtons() {
-    $('#run-query, #export-table').prop('disabled', false);
-  }
-
   function enableExportButton() {
-    $('#export-table').prop('disabled', false);
+    $('#export-table').show();
   }
 
   function disableExportButton() {
-    $('#export-table').prop('disabled', true);
+    $('#export-table').hide();
   }
+
+  // Handle click event for csv export
+  $('#export-table').on('click', function(event) {
+    event.preventDefault();
+
+    var eventIds = [];
+    $('.primary-row').each(function() {
+      var primaryRowId = $(this).attr('id');
+
+      if ($(this).is(':visible')) {
+        var detailRows = $('.detail-row:visible[id="' + primaryRowId + '"]');
+
+        detailRows.each(function() {
+          var eventId = $(this).data('event-id');
+          eventIds.push(eventId);
+        });
+      }
+    });
+
+    var url = '/event_logs.csv?' + $.param({ events: eventIds });
+    window.location.href = url;
+  });
 
   function showFilters() {
     $('.filters-container').css('visibility', 'visible');
@@ -266,7 +300,7 @@
 
   $('.primary-row').click(function(){
     $(this).find('.glyphicon-chevron-right, .glyphicon-chevron-down').toggleClass('glyphicon-chevron-right glyphicon-chevron-down')
-    $(this).nextAll('tr').each( function() {
+    $(this).nextAll('tr:not(.hidden-by-filters)').each( function() {
       if ($(this).hasClass('primary-row')) {
         return false;
       }
@@ -318,7 +352,6 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
     } else {
       $(this).closest('.mutliSelect').find('input[value="all"]').removeClass('partial-all')
     }
-
     label.text(checked_count + " Selected");
   }
 });
@@ -326,10 +359,19 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
   // filter the data on the page
   $('#run-query').on('click', function(event) {
     event.preventDefault();
+
+    // reset visibility before running a new search
+    $('#event-log-table tbody tr').each(function( index ) {
+      $(this).show();
+      $(this).removeClass("hidden-by-filters");
+    });
+
     var subjects = [],
         eligibilities = [],
         statuses = [],
         visible_rows = [];
+        actions_taken = [];
+
     $('input[name="subject"]:checked').each(function( index ) {
       subjects.push($(this).val().toUpperCase())
     });
@@ -339,6 +381,10 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
     $('input[name="status"]:checked').each(function( index ) {
       statuses.push($(this).val().toUpperCase())
     });
+    $('input[name="action_taken"]:checked').each(function( index ) {
+      actions_taken.push($(this).val().toUpperCase())
+    });
+
     $('#event-log-table tbody tr').each(function( index ) {
       var row = $(this).prop('id');
       var row_index = visible_rows.indexOf(row)
@@ -348,7 +394,9 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
     });
 
     // subject filter
-    if (!subjects.length === 0 && !subjects.includes("ALL")){
+    // have to check for visibilitiy so it doesn't filter out all rows automatically
+    // for employer flow
+    if ($('#subjectFilter').is(":visible") && !subjects.includes("ALL")){
       $('td.subject').each(function( index ) {
         var row = $(this).closest('tr').prop('id');
         var row_index = visible_rows.indexOf(row)
@@ -405,25 +453,47 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
     $('tr.primary-row').each(function( index ) {
       var row = $(this).prop('id');
       var row_index = visible_rows.indexOf(row);
-      var accounts = []
       var action_dates = []
-      $('td.user_id').each(function( index ) {
-        if ($(this).closest('tr').prop('id') === row) {
-          accounts.push($(this).prop('id').toUpperCase());
-          accounts.push($(this).text().toUpperCase());
-        }
-      });
+      var detail_rows = []
       $('td.event-time').each(function( index ) {
         if ($(this).closest('tr').prop('id') === row) {
+          detail_rows.push($(this).closest('tr'));
           action_dates.push(new Date($(this).text()).getTime());
         }
       });
 
+      // eligibility status filter
+      if (!actions_taken.includes("ALL")){
+        var row_index = visible_rows.indexOf(row);
+        var ok_rows = 0;
+
+        $.each( detail_rows, function(){
+          var action_taken = $(this).find('td.action-taken').text()
+          if (actions_taken.includes(action_taken.toUpperCase())) {
+            ok_rows += 1
+          } else {
+            $(this).hide().addClass("hidden-by-filters");
+          }
+        });
+        if (ok_rows === 0 && row_index !== -1) {
+          visible_rows.splice( row_index, 1 );
+        }
+      }
+
       if ($('#user-id').val()) {
         var row_index = visible_rows.indexOf(row);
         var value = $('#user-id').val().toUpperCase();
-        var value_index = accounts.indexOf(value);
-        if (value_index === -1 && row_index !== -1) {
+        var ok_rows = 0;
+        $.each( detail_rows, function( i, date ){
+          var user_id = $(this).find('td.user_id').prop('id').toUpperCase()
+          var user_email = $(this).find('td.user_id').text().toUpperCase()
+          if (user_id === value || user_email === value) {
+            ok_rows += 1
+          } else {
+            $(this).hide().addClass("hidden-by-filters");
+          }
+        });
+        if (ok_rows === 0 && row_index !== -1) {
           visible_rows.splice( row_index, 1 );
         }
       }
@@ -438,6 +508,8 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         $.each( action_dates, function( i, date ){
           if (start.getTime() < date) {
             ok_rows += 1
+          } else {
+            detail_rows[i].hide().addClass("hidden-by-filters");
           }
         });
         if (ok_rows === 0 && row_index !== -1) {
@@ -455,6 +527,8 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
         $.each( action_dates, function( i, date ){
           if (end.getTime() > date) {
             ok_rows += 1
+          } else {
+            detail_rows[i].hide().addClass("hidden-by-filters");
           }
         });
         if (ok_rows === 0 && row_index !== -1) {
@@ -466,9 +540,11 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
     if (visible_rows.length === 0) {
       $('#event-table-data').hide()
       $('#no-results').show()
+      disableExportButton();
     } else {
       $('#event-table-data').show()
       $('#no-results').hide()
+      enableExportButton();
       $('#event-log-table tbody tr').each(function( index ) {
         var row = $(this).prop('id');
         var row_index = visible_rows.indexOf(row)
@@ -488,8 +564,6 @@ $('.mutliSelect input[type="checkbox"]').on('click', function() {
     $('.fake-select-label').text("All");
     $('#event-log-table tbody tr').each(function( index ) {
       $(this).removeClass("hidden-by-filters");
-    });
-    $('#event-log-table tbody tr.primary-row').each(function( index ) {
       $(this).show();
     });
   });

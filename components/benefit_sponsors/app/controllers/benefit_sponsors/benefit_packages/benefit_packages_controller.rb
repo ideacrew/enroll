@@ -5,6 +5,7 @@ module BenefitSponsors
       before_action :check_for_late_rates, only: [:new]
 
       include Pundit
+      include HtmlScrubberUtil
 
       layout "two_column"
 
@@ -95,7 +96,7 @@ module BenefitSponsors
       end
 
       def error_messages(object)
-        object.errors.full_messages.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}.html_safe
+        sanitize_html(object.errors.full_messages.inject(""){|memo, error| "#{memo}<li>#{error}</li>"})
       end
 
       def benefit_package_params

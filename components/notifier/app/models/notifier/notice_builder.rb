@@ -4,6 +4,7 @@ module Notifier
     include Config::SiteHelper
     include ApplicationHelper
     include Notifier::ApplicationHelper
+    include PdfScrubberUtil
 
     def to_html(options = {})
       data_object = (resource.present? ? construct_notice_object : recipient.constantize.stubbed_object)
@@ -406,7 +407,7 @@ module Notifier
     protected
 
     def execute_html_pdf_render
-      @execute_html_pdf_render ||= self.to_html({kind: 'pdf'})
+      @execute_html_pdf_render ||= sanitize_pdf(self.to_html({kind: 'pdf'}))
     end
 
     def recipient_target

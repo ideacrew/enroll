@@ -371,6 +371,9 @@ registry:
       - key: :contrast_level_aa
         item: :contrast_level_aa
         is_enabled: <%= ENV['CONTRAST_LEVEL_AA_IS_ENABLED'] || false %>
+      - key: :generic_forgot_password_text
+        item: :generic_forgot_password_text
+        is_enabled: <%= ENV['GENERIC_FORGOT_PASSWORD_TEXT_IS_ENABLED'] || false %>
   - namespace:
       - :pay_now_feature
     features:
@@ -589,7 +592,7 @@ registry:
           - key: :cut_off_age
             item: 26
           - key: :relationship_kinds
-            item: ['child', 'ward', 'foster_child', 'adopted_child']
+            item: ['self', 'child', 'ward', 'foster_child', 'adopted_child']
       - key: :age_off_relaxed_eligibility
         item: Operations::AgeOffRelaxedEligibility.new
         is_enabled: true
@@ -876,12 +879,12 @@ registry:
       - key: :employee_match_max_attempts
         item: <%= ENV['EMPLOYEE_MATCH_MAX_ATTEMPTS'] || 3 %>
         is_enabled: true
+      - key: :roster_upload_async_process_min_threshold
+        item: <%= ENV['ROSTER_UPLOAD_ASYNC_PROCESS_MIN_THRESHOLD'] || 150 %>
+        is_enabled: true
       - key: :prevent_concurrent_sessions
         item: :prevent_concurrent_sessions
         is_enabled: <%= ENV['PREVENT_CONCURRENT_SESSIONS_IS_ENABLED'] || false %>
       - key: :strong_password_length
         item: :strong_password_length
         is_enabled: <%= ENV['STRONG_PASSWORD_LENGTH_IS_ENABLED'] || false %>
-      - key: :preferred_user_access
-        item: :preferred_user_access
-        is_enabled: <%= ENV['PREFERRED_USER_ACCESS'] || false %>

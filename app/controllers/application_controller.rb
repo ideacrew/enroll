@@ -5,6 +5,7 @@ class ApplicationController < ActionController::Base
   include Config::ContactCenterConcern
   include Acapi::Notifiers
   include ::L10nHelper
+  include ::FileUploadHelper
 
   after_action :update_url, :unless => :format_js?
   helper BenefitSponsors::Engine.helpers
@@ -23,7 +24,6 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception, prepend: true
 
   ## Devise filters
-  before_action :check_concurrent_sessions
   before_action :require_login, unless: :authentication_not_required?
   before_action :authenticate_user_from_token!
   before_action :authenticate_me!
@@ -106,32 +106,6 @@ class ApplicationController < ActionController::Base
   end
 
   private
-
-  def check_concurrent_sessions
-    return unless preferred_user_access(current_user)
-
-    flash[:error] = l10n('devise.sessions.signed_out_concurrent_session')
-    sign_out current_user
-  end
-
-  # preferred_user_access feature should be turned on DC & disabled in ME
-  def preferred_user_access(current_user)
-    valid_concurrent_session = EnrollRegistry.feature_enabled?(:prevent_concurrent_sessions) && concurrent_sessions?
-    if EnrollRegistry.feature_enabled?(:preferred_user_access)
-      valid_concurrent_session && current_user.has_hbx_staff_role?
-    else
-      valid_concurrent_session
-    end
-  end
-
-
-  def concurrent_sessions?
-    # If the session token differs from the token stored in the db
-    # a new login for this user is detected.
-    # Checking for User class prevents spec breaking for Doubles.
-    # Currently only enabled for admin users.
-    current_user.instance_of?(User) && (session[:login_token] != current_user&.current_login_token)
-  end
 
   def redirect_if_prod
     redirect_to root_path, :flash => { :error => "Unable to run seeds on prod environment." } unless ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true' || !Rails.env.production?
@@ -333,6 +307,7 @@ class ApplicationController < ActionController::Base
 
     # TODO: We need to be mindful of this in situations where the person_id is being erroneously set
     # to the current hbx_admin
+    # FOLLOWUP: This method does sometimes set the admin to @person which affects the views related to /insured/family_members
     def set_current_person(required: true)
       if current_user.try(:person).try(:agent?) && session[:person_id].present?
         @person = Person.find(session[:person_id])

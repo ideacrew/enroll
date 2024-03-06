@@ -8,6 +8,7 @@
 
 ENV['RAILS_ENV'] ||= 'test'
 $LOADING_CUCUMBER_ENV = true
+require File.expand_path("#{File.dirname(__FILE__)}/testing_environment_variables")
 if ENV["COVERAGE"]
   require 'simplecov'
   SimpleCov.command_name "specs_#{Process.pid}_#{ENV['TEST_ENV_NUMBER'] || '1'}"

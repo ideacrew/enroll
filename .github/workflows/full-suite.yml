@@ -35,15 +35,46 @@ jobs:
           bundler-cache: true
           rubygems: 3.3.26
       - run: gem install brakeman
-      - run: brakeman -i config/brakeman.ignore
-      - name: Run Brakeman In Components
+      - run: brakeman -i config/brakeman.ignore --add-checks-path checks --format html --out brakeman.html
+      - name: upload brakeman failure report
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: Security Reports
+          path: brakeman.html
+  brakeman-engines:
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        engine:
+          - benefit_markets
+          - benefit_sponsors
+          - financial_assistance
+          - notifier
+          - sponsored_benefits
+          - transport_gateway
+          - transport_profiles
+          - ui_helpers
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          rubygems: 3.3.26
+      - run: gem install brakeman
+      - name: Run Brakeman In ${{ matrix.engine }}
         run: |
-          for test_dir in `ls -1 components`; do
-            cd components/$test_dir
-            brakeman -i config/brakeman.ignore
-            cd ../..
-          done
+          cd components/${{ matrix.engine }}
+          brakeman -i config/brakeman.ignore --add-checks-path ../../engine_checks/ --format html --out ../../${{ matrix.engine }}.brakeman.html
+      - name: upload brakeman failure report
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: Security Reports
+          path: ${{ matrix.engine }}.brakeman.html
   engines:
+    needs: [brakeman-engines]
     runs-on: ubuntu-20.04
     services:
       rabbitmq:
@@ -103,7 +134,7 @@ jobs:
           path: vendor/bundle
           key: v5-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
-            v5-${{ matrix.engine-name }}-
+            v5-${{ matrix.engine-name }}-${{ hashFiles('**/Gemfile.lock') }}
       - name: bundle install
         run: |
           gem update --system --quiet --silent
@@ -152,6 +183,7 @@ jobs:
           name: code-coverage
           path: ${{ github.workspace }}/engines-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
   financial-assistance:
+    needs: [brakeman-engines]
     runs-on: ubuntu-20.04
     services:
       rabbitmq:
@@ -267,6 +299,7 @@ jobs:
       #     bundle config path ../../vendor/bundle
       #     rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   benefit-sponsors:
+    needs: [brakeman-engines]
     runs-on: ubuntu-20.04
     services:
       rabbitmq:
@@ -318,7 +351,7 @@ jobs:
           path: vendor/bundle
           key: benefit_sponsors-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
-            benefit_sponsors-
+            benefit_sponsors-${{ hashFiles('**/Gemfile.lock') }}
       - name: bundle install
         run: |
           gem update --system --quiet --silent
@@ -361,6 +394,7 @@ jobs:
           name: code-coverage
           path: ${{ github.workspace }}/bs-${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
   rspec:
+    needs: [brakeman, brakeman-engines]
     runs-on: ubuntu-latest
     services:
       rabbitmq:
@@ -460,6 +494,7 @@ jobs:
           name: code-coverage
           path: ${{ github.workspace }}/coverage/${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
   cucumber:
+    needs: [brakeman, brakeman-engines]
     runs-on: ubuntu-latest
     services:
       rabbitmq:

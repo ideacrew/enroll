@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# The base inbox controller all other inbox controllers inherit from
 class InboxesController < ApplicationController
   before_action :find_inbox_provider, except: [:msg_to_portal]
   before_action :find_hbx_profile, only: [:new, :create]
@@ -30,14 +33,11 @@ class InboxesController < ApplicationController
     end
   end
 
-
   def destroy
     #@message.destroy
     @message.update_attributes(folder: Message::FOLDER_TYPES[:deleted])
     flash[:notice] = "Successfully deleted inbox message."
-    if params[:url].present?
-      @inbox_url = params[:url]
-    end
+    @inbox_url = params[:url] if params[:url].present?
   end
 
   private
@@ -61,6 +61,7 @@ class InboxesController < ApplicationController
 
   def set_inbox_and_assign_message
     @inbox = @inbox_provider.inbox
+
     @new_message = Message.new(params.require(:message).permit(:subject, :body, :folder, :to, :from, :sender_id, :parent_message_id, :message_read))
   end
 end

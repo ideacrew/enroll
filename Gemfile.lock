@@ -25,27 +25,29 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/acapi.git
-  revision: 1c596657b145faf493ef4bdede218384515c012a
-  branch: amqp_proc_title
+  revision: 2e9e00bf93956817159c34ba2fb812e8074fe729
+  branch: trunk
   specs:
     acapi (1.3.4)
       activesupport (> 4.2.0)
-      bunny (~> 2.14.0)
+      bunny (>= 1.7.0, < 3)
       sneakers
 
 GIT
   remote: https://github.com/ideacrew/event_source.git
-  revision: f4e83cbdf124c4d48e469e239f36261191ee61c9
+  revision: ed23a949f6900cf2a756d4cee3889a3aa100716f
   branch: trunk
   specs:
     event_source (0.5.8)
+      addressable (>= 2.8.0)
       bunny (>= 2.14)
       deep_merge (~> 1.2.0)
+      dry-configurable (~> 0.12)
       dry-events (~> 0.3)
       dry-inflector (~> 0.2)
       dry-initializer (~> 3.0)
       dry-monads (~> 1.3)
-      dry-schema (= 1.6.2)
+      dry-schema (~> 1.6)
       dry-struct (~> 1.4)
       dry-types (~> 1.5)
       dry-validation (~> 1.6)
@@ -53,15 +55,14 @@ GIT
       faraday_middleware (~> 1.0)
       logging (~> 2.3.0)
       mime-types
-      nokogiri (>= 1.10.8)
+      nokogiri (>= 1.13.0)
       oj (~> 3.11)
       ox (~> 2.14)
-      resque-bus (~> 0.7.0)
       typhoeus (~> 1.4.0)
 
 GIT
   remote: https://github.com/ideacrew/openhbx_cv2.git
-  revision: 6567dd46112982e6a9c90001b617caf313271fc9
+  revision: 41f3152d127b141f0c6a8351dc8bd057e758b976
   branch: trunk
   specs:
     openhbx_cv2 (0.0.1)
@@ -70,25 +71,22 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/resource_registry.git
-  revision: 02f549334dc8eecce557daa45a543b00d8787d93
+  revision: 326b5606bd2cd29209446682e26d477ec235dbd1
   branch: trunk
   specs:
     resource_registry (0.7.0)
       bootsnap (~> 1.0)
       deep_merge (>= 1.0.0)
-      dry-configurable (= 0.9)
-      dry-container (~> 0.7)
+      dry-configurable (~> 0.12)
+      dry-container (~> 0.9)
       dry-matcher (~> 0.7)
-      dry-monads (~> 1.2)
+      dry-monads (~> 1.3)
       dry-struct (~> 1.0)
       dry-types (~> 1.0)
       dry-validation (~> 1.2)
       i18n (>= 0.7.0)
-      loofah (>= 2.3.1)
       mime-types
-      nokogiri (>= 1.9.1)
       ox (~> 2.0)
-      rack (>= 1.6.13)
 
 GIT
   remote: https://github.com/prawnpdf/prawn.git
@@ -130,7 +128,7 @@ PATH
       browser (= 2.7.0)
       config (~> 2.0)
       devise (~> 4.5)
-      dry-auto_inject (= 0.6.1)
+      dry-auto_inject
       dry-container
       dry-initializer
       dry-monads
@@ -201,7 +199,7 @@ PATH
       aasm (~> 4.8.0)
       config (~> 2.0)
       devise (~> 4.5)
-      dry-auto_inject (= 0.6.1)
+      dry-auto_inject
       dry-container
       dry-initializer
       dry-monads
@@ -354,8 +352,9 @@ GEM
     browser (2.7.0)
     bson (4.10.0)
     builder (3.2.4)
-    bunny (2.14.4)
-      amq-protocol (~> 2.3, >= 2.3.0)
+    bunny (2.22.0)
+      amq-protocol (~> 2.3, >= 2.3.1)
+      sorted_set (~> 1, >= 1.0.2)
     cable_ready (4.5.0)
       rails (>= 5.2)
       thread-local (>= 1.1.0)
@@ -434,23 +433,25 @@ GEM
       railties (>= 4.1.0)
       responders
       warden (~> 1.2.3)
-    devise-jwt (0.5.9)
+    devise-jwt (0.9.0)
       devise (~> 4.0)
-      warden-jwt_auth (~> 0.3.6)
+      warden-jwt_auth (~> 0.6)
+    devise-security (0.18.0)
+      devise (>= 4.3.0)
     diff-lcs (1.4.4)
     docile (1.4.0)
     dotenv (2.8.1)
     dotenv-rails (2.8.1)
       dotenv (= 2.8.1)
       railties (>= 3.2)
-    dry-auto_inject (0.6.1)
+    dry-auto_inject (0.8.0)
       dry-container (>= 0.3.4)
-    dry-configurable (0.9.0)
+    dry-configurable (0.13.0)
       concurrent-ruby (~> 1.0)
-      dry-core (~> 0.4, >= 0.4.7)
-    dry-container (0.7.2)
+      dry-core (~> 0.6)
+    dry-container (0.9.0)
       concurrent-ruby (~> 1.0)
-      dry-configurable (~> 0.1, >= 0.1.3)
+      dry-configurable (~> 0.13, >= 0.13.0)
     dry-core (0.6.0)
       concurrent-ruby (~> 1.0)
     dry-equalizer (0.3.0)
@@ -462,15 +463,15 @@ GEM
     dry-logic (1.2.0)
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.5, >= 0.5)
-    dry-matcher (0.8.3)
-      dry-core (>= 0.4.8)
+    dry-matcher (0.9.0)
+      dry-core (~> 0.4, >= 0.4.8)
     dry-monads (1.3.5)
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.4, >= 0.4.4)
       dry-equalizer
-    dry-schema (1.6.2)
+    dry-schema (1.8.0)
       concurrent-ruby (~> 1.0)
-      dry-configurable (~> 0.8, >= 0.8.3)
+      dry-configurable (~> 0.13, >= 0.13.0)
       dry-core (~> 0.5, >= 0.5)
       dry-initializer (~> 3.0)
       dry-logic (~> 1.0)
@@ -502,8 +503,6 @@ GEM
     equalizer (0.0.11)
     erubi (1.10.0)
     erubis (2.7.0)
-    et-orbi (1.2.5)
-      tzinfo
     ethon (0.12.0)
       ffi (>= 1.3.0)
     execjs (2.7.0)
@@ -533,12 +532,12 @@ GEM
       activesupport (>= 4.2)
     ffaker (2.18.0)
     ffi (1.9.25)
+    file_validators (3.0.0)
+      activemodel (>= 3.2)
+      mime-types (>= 1.0)
     font-awesome-rails (4.7.0.7)
       railties (>= 3.2, < 7)
     forgery (0.7.0)
-    fugit (1.5.2)
-      et-orbi (~> 1.1, >= 1.1.8)
-      raabro (~> 1.4)
     gherkin (5.1.0)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
@@ -592,7 +591,7 @@ GEM
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
     json (2.5.1)
-    json-schema (4.0.0)
+    json-schema (4.1.1)
       addressable (>= 2.8)
     jsonapi-renderer (0.2.2)
     jwt (2.2.1)
@@ -614,7 +613,7 @@ GEM
       rb-inotify (~> 0.9, >= 0.9.7)
       ruby_dep (~> 1.2)
     little-plugger (1.1.4)
-    logging (2.3.0)
+    logging (2.3.1)
       little-plugger (~> 1.1)
       multi_json (~> 1.14)
     loofah (2.3.1)
@@ -632,7 +631,7 @@ GEM
     mimemagic (0.3.8)
       nokogiri (~> 1)
     mini_mime (1.0.2)
-    mini_portile2 (2.4.0)
+    mini_portile2 (2.8.5)
     minitest (5.14.2)
     monetize (1.9.4)
       money (~> 6.12)
@@ -677,7 +676,7 @@ GEM
     multi_json (1.15.0)
     multi_test (1.1.0)
     multi_xml (0.6.0)
-    multipart-post (2.1.1)
+    multipart-post (2.3.0)
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
     net-sftp (2.1.2)
@@ -685,18 +684,19 @@ GEM
     net-ssh (4.2.0)
     newrelic_rpm (5.7.0.350)
     nio4r (2.5.8)
-    nokogiri (1.10.10)
-      mini_portile2 (~> 2.4.0)
+    nokogiri (1.13.10)
+      mini_portile2 (~> 2.8.0)
+      racc (~> 1.4)
     nokogiri-happymapper (0.8.1)
       nokogiri (~> 1.5)
     non-stupid-digest-assets (1.0.9)
       sprockets (>= 2.0)
-    oj (3.13.11)
+    oj (3.14.2)
     orm_adapter (0.5.0)
     overcommit (0.52.1)
       childprocess (>= 0.6.3, < 4)
       iniparse (~> 1.4)
-    ox (2.14.5)
+    ox (2.14.14)
     parallel (1.19.1)
     parallel_tests (2.26.2)
       parallel
@@ -712,10 +712,7 @@ GEM
     puma (3.12.4)
     pundit (2.1.0)
       activesupport (>= 3.0.0)
-    queue-bus (0.12.0)
-      multi_json
-      redis
-    raabro (1.4.0)
+    racc (1.7.3)
     rack (2.2.3)
     rack-cors (1.1.1)
       rack (>= 2.0.0)
@@ -764,6 +761,7 @@ GEM
       ffi (~> 1.0)
     rbnacl (7.1.1)
       ffi
+    rbtree (0.4.6)
     rdoc (6.2.1)
     recaptcha (4.14.0)
       json
@@ -803,19 +801,6 @@ GEM
       redis-namespace (~> 1.3)
       sinatra (>= 0.9.2)
       vegas (~> 0.1.2)
-    resque-bus (0.7.0)
-      queue-bus (>= 0.7, < 1)
-      resque (>= 1.10.0, < 2.0)
-      resque-retry
-      resque-scheduler (>= 2.0.1)
-    resque-retry (1.7.6)
-      resque (>= 1.25, < 3.0)
-      resque-scheduler (~> 4.0)
-    resque-scheduler (4.4.0)
-      mono_logger (~> 1.0)
-      redis (>= 3.3)
-      resque (>= 1.26)
-      rufus-scheduler (~> 3.2)
     rexml (3.2.6)
     roo (2.7.1)
       nokogiri (~> 1)
@@ -874,8 +859,6 @@ GEM
     ruby_parser (3.16.0)
       sexp_processor (~> 4.15, >= 4.15.1)
     rubyzip (1.3.0)
-    rufus-scheduler (3.8.0)
-      fugit (~> 1.1, >= 1.1.6)
     safe_yaml (1.0.5)
     sass (3.7.4)
       sass-listen (~> 4.0.0)
@@ -898,6 +881,7 @@ GEM
       rubyzip (>= 1.2.2)
     serverengine (2.0.7)
       sigdump (~> 0.2.2)
+    set (1.0.3)
     sexp_processor (4.15.3)
     shoulda-matchers (3.1.3)
       activesupport (>= 4.0.0)
@@ -906,7 +890,7 @@ GEM
       rack (~> 2.0)
       rack-protection (>= 2.0.0)
       redis (>= 4.1.0)
-    sigdump (0.2.4)
+    sigdump (0.2.5)
     simple_form (5.1.0)
       actionpack (>= 5.2)
       activemodel (>= 5.2)
@@ -936,6 +920,9 @@ GEM
       rake
       serverengine (~> 2.0.5)
       thor
+    sorted_set (1.0.3)
+      rbtree
+      set (~> 1.0)
     spring (1.7.2)
     spring-watcher-listen (2.0.1)
       listen (>= 2.7, < 4.0)
@@ -970,7 +957,7 @@ GEM
     turbolinks (5.2.1)
       turbolinks-source (~> 5.2)
     turbolinks-source (5.2.0)
-    typhoeus (1.4.0)
+    typhoeus (1.4.1)
       ethon (>= 0.9.0)
     tzinfo (1.2.9)
       thread_safe (~> 0.1)
@@ -987,9 +974,9 @@ GEM
       equalizer (~> 0.0, >= 0.0.9)
     warden (1.2.8)
       rack (>= 2.0.6)
-    warden-jwt_auth (0.3.6)
-      dry-auto_inject (~> 0.6)
-      dry-configurable (~> 0.8)
+    warden-jwt_auth (0.6.0)
+      dry-auto_inject (~> 0.8)
+      dry-configurable (~> 0.13)
       jwt (~> 2.1)
       warden (~> 1.2)
     watir (6.18.0)
@@ -1054,8 +1041,11 @@ DEPENDENCIES
   curl (~> 0.0.9)
   database_cleaner (~> 1.7)
   devise (~> 4.5)
-  devise-jwt (~> 0.5.9)
+  devise-jwt (= 0.9.0)
+  devise-security
   dotenv-rails
+  dry-configurable (= 0.13.0)
+  dry-container (= 0.9.0)
   effective_datatables!
   email_spec (~> 2)
   event_source!
@@ -1063,6 +1053,7 @@ DEPENDENCIES
   fakeredis (~> 0.7.0)
   fast_jsonapi
   ffaker
+  file_validators
   financial_assistance!
   forgery (~> 0.7.0)
   globalid
@@ -1095,7 +1086,7 @@ DEPENDENCIES
   mongoid_userstamp (~> 0.4)!
   net-ssh (= 4.2.0)
   newrelic_rpm (~> 5.0)
-  nokogiri (~> 1.10.8)
+  nokogiri
   nokogiri-happymapper (~> 0.8.0)
   non-stupid-digest-assets
   notifier!
@@ -1151,6 +1142,7 @@ DEPENDENCIES
   ui_helpers!
   virtus (~> 1.0)
   warden (~> 1.2.7)
+  warden-jwt_auth (= 0.6.0)
   watir (~> 6.18.0)
   web-console (>= 3)
   webdrivers (~> 5.3.1)
@@ -1160,9 +1152,6 @@ DEPENDENCIES
   wkhtmltopdf-binary-edge (~> 0.12.3.0)
   yard (~> 0.9.20)
   yard-mongoid (~> 0.1)
-
-RUBY VERSION
-   ruby 2.6.3
 
 BUNDLED WITH
    2.3.24

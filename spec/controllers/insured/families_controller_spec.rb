@@ -506,14 +506,15 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   end
 
   describe "GET verification" do
-    let(:person) {FactoryBot.create(:person, :with_consumer_role)}
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
-    let(:user){ FactoryBot.create(:user, person: person) }
+    let(:user) { FactoryBot.create(:user, person: person) }
     let(:family_member) { FamilyMember.new(:person => person) }
 
     before :each do
-      allow(person).to receive(:primary_family).and_return (family)
-      allow(family). to receive(:has_active_consumer_family_members). and_return([family_member])
+      allow(controller).to receive(:authorize).and_return(true)
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(family).to receive(:has_active_consumer_family_members).and_return([family_member])
       allow(person).to receive(:is_consumer_role_active?).and_return true
     end
 
@@ -543,6 +544,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     let(:employee_role) { double("EmployeeRole", market_kind: 'shop') }
 
     before :each do
+      allow(controller).to receive(:authorize).and_return(true)
       allow(person).to receive(:active_employee_roles).and_return([employee_role])
       allow(family).to receive(:coverage_waived?).and_return(true)
       allow(family).to receive(:active_family_members).and_return(family_members)
@@ -587,6 +589,10 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   end
 
   describe "GET personal" do
+    before do
+      allow(controller).to receive(:authorize).and_return(true)
+    end
+
     context "render template" do
       before :each do
         allow(family).to receive(:active_family_members).and_return(family_members)
@@ -644,6 +650,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
   describe "GET inbox" do
     before :each do
+      allow(controller).to receive(:authorize).and_return(true)
       allow(family).to receive(:active_family_members).and_return(family_members)
     end
 
@@ -667,6 +674,192 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
   end
 
+  describe "GET verification, manage_family, personal, inbox with auth" do
+    let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+    let(:user) { FactoryBot.create(:user, person: person) }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+
+    before do
+      allow(person).to receive(:primary_family).and_return(family)
+      allow(person).to receive(:user).and_return(user)
+    end
+
+    context 'as a user not associated with the account' do
+      let(:fake_person) { FactoryBot.create(:person, :with_consumer_role) }
+      let(:fake_user) { FactoryBot.create(:user, person: fake_person) }
+      let!(:fake_family) { FactoryBot.create(:family, :with_primary_family_member, person: fake_person) }
+
+      before do
+        sign_in(fake_user)
+      end
+
+      it 'redirects the user to their own account on verification' do
+        # unlike some of the other endpoints, /verification needs to check the session[:person_id] to avoid erroring out
+        session[:person_id] = person.id
+        get :verification, params: { family: family.id }
+
+        expect(response).to render_template("verification")
+        expect(assigns(:family)).to eq(fake_family)
+      end
+
+      it 'redirects the user to their own account on manage_family' do
+        get :manage_family, params: { family: family.id }
+
+        expect(response).to render_template("manage_family")
+        expect(assigns(:family)).to eq(fake_family)
+      end
+
+      it 'redirects the user to their own account on personal' do
+        get :personal, params: { family: family.id }
+
+        expect(response).to render_template("personal")
+        expect(assigns(:family)).to eq(fake_family)
+      end
+
+      it 'redirects the user to their own account on inbox' do
+        get :inbox, params: { family: family.id }
+
+        expect(response).to render_template("inbox")
+        expect(assigns(:family)).to eq(fake_family)
+      end
+    end
+
+    context 'as an admin' do
+      let!(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+      let!(:admin_user) { FactoryBot.create(:user, :with_hbx_staff_role, person: admin_person) }
+      let!(:permission) { FactoryBot.create(:permission, :super_admin) }
+      let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
+
+      before do
+        sign_in(admin_user)
+      end
+
+      it 'should be a success on GET verification' do
+        # unlike some of the other endpoints, /verification needs to check the session[:person_id] to avoid erroring out
+        session[:person_id] = person.id
+        get :verification, params: { family: family.id }
+
+        expect(response).to render_template("verification")
+        expect(assigns(:family)).to eq(family)
+      end
+
+      it 'should be a success on GET manage_family' do
+        get :manage_family, params: { family: family.id }
+
+        expect(response).to render_template("manage_family")
+        expect(assigns(:family)).to eq(family)
+      end
+
+      it 'should be a success on GET personal' do
+        get :personal, params: { family: family.id }
+
+        expect(response).to render_template("personal")
+        expect(assigns(:family)).to eq(family)
+      end
+
+      it 'should be a success on GET inbox' do
+        get :inbox, params: { family: family.id }
+
+        expect(response).to render_template("inbox")
+        expect(assigns(:family)).to eq(family)
+      end
+    end
+
+    context 'as broker' do
+      let!(:broker_user) {FactoryBot.create(:user, :person => writing_agent.person, roles: ['broker_role', 'broker_agency_staff_role'])}
+      let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
+      let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
+      let(:assister)  do
+        assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00")
+        assister.save(validate: false)
+        assister
+      end
+
+      context 'associated with the family' do
+        before do
+          family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                              writing_agent_id: writing_agent.id,
+                                                                                              start_on: Time.now,
+                                                                                              is_active: true)
+          sign_in(broker_user)
+        end
+
+        it 'should be a success on GET verification' do
+          # unlike some of the other endpoints, /verification needs to check the session[:person_id] to avoid erroring out
+          session[:person_id] = person.id
+          get :verification, params: { family: family.id }
+
+          expect(response).to have_http_status(:success)
+          expect(response).to render_template("verification")
+          expect(assigns(:family)).to eq(family)
+        end
+
+        it 'should be a success on GET manage_family' do
+          get :manage_family, params: { family: family.id }
+
+          expect(response).to have_http_status(:success)
+          expect(response).to render_template("manage_family")
+          expect(assigns(:family)).to eq(family)
+        end
+
+        it 'should be a success on GET personal' do
+          get :personal, params: { family: family.id }
+
+          expect(response).to have_http_status(:success)
+          expect(response).to render_template("personal")
+          expect(assigns(:family)).to eq(family)
+        end
+
+        it 'should be a success on GET inbox' do
+          get :inbox, params: { family: family.id }
+
+          expect(response).to have_http_status(:success)
+          expect(response).to render_template("inbox")
+          expect(assigns(:family)).to eq(family)
+        end
+      end
+
+      context 'not associated with the family' do
+        before do
+          sign_in(broker_user)
+        end
+
+        it 'should not be a success on GET verification' do
+          # unlike some of the other endpoints, /verification needs to check the session[:person_id] to avoid erroring out
+          session[:person_id] = person.id
+          get :verification, params: { family: family.id }
+
+          expect(response).to have_http_status(:redirect)
+          expect(response).to_not render_template("verification")
+          expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
+        end
+
+        it 'should not be a success on GET manage_family' do
+          get :manage_family, params: { family: family.id }
+
+          expect(response).to have_http_status(:redirect)
+          expect(response).to_not render_template("manage_family")
+          expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
+        end
+
+        it 'should not be a success on GET personal' do
+          get :personal, params: { family: family.id }
+
+          expect(response).to have_http_status(:redirect)
+          expect(response).to_not render_template("personal")
+          expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
+        end
+
+        it 'should not be a success on GET inbox' do
+          get :inbox, params: { family: family.id }
+
+          expect(response).to have_http_status(:redirect)
+          expect(response).to_not render_template("inbox")
+          expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
+        end
+      end
+    end
+  end
 
   describe "GET find_sep" do
     let(:user) { double(identity_verified?: true, idp_verified?: true) }
@@ -1182,9 +1375,17 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     it "when successful displays 'File Saved'" do
+      file = fixture_file_upload("#{Rails.root}/test/JavaScript.pdf")
       post :upload_notice, params: {:file => file, :subject=> subject}
       expect(flash[:notice]).to eq("File Saved")
       expect(response).to have_http_status(:found)
+      expect(response).to be_redirect
+    end
+
+    it "does not allow docx files to be uploaded" do
+      file = fixture_file_upload("#{Rails.root}/test/sample.docx")
+      post :upload_notice, params: {:file => file, :subject => subject}
+      expect(flash[:error]).to include("Unable to upload file.")
       expect(response).to be_redirect
     end
 

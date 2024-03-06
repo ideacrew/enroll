@@ -43,5 +43,4 @@
             input.form-control type="text" value="#{f.parent.msp_count}"
 
 .pull-right
-  = link_to "Edit Plan Year &nbsp;<i class='fas fa-pencil-alt' aria-hidden='true'></i>".html_safe, edit_benefit_sponsorship_benefit_application_path(f.parent.service.benefit_sponsorship, f.service.benefit_application), remote: true, class: "btn btn-default pull-right mrz mr-1", id:'editPlanYearButton'
-
+  = link_to(raw("Edit Plan Year&nbsp;<i class=\"fas fa-pencil-alt\" aria-hidden=\"true\"></i>"), edit_benefit_sponsorship_benefit_application_path(f.parent.service.benefit_sponsorship, f.service.benefit_application), remote: true, class: "btn btn-default pull-right mrz mr-1", id:'editPlanYearButton')
