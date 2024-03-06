@@ -39,19 +39,19 @@ class ApplicationPolicy
   end
 
   def shop_market_admin?
-    hbx_staff_admin?
+    user.person.hbx_staff_role&.permission&modify_employer
   end
 
   def fehb_market_admin?
-    hbx_staff_admin?
+    shop_market_admin?
   end
 
-  def shop_market_primary_family_member?
-    false
+  def shop_market_primary_family_member?(family)
+    family.primary_person.employee_roles.present? && user == family.primary_person.user
   end
 
-  def fehb_market_primary_family_member?
-    false
+  def fehb_market_primary_family_member?(family)
+    shop_market_primary_family_member?(family)
   end
 
   def general_agency_staff?
