@@ -75,7 +75,7 @@ module CapybaraHelpers
   #       Recent reading indicates it might have been swapped out for
   #       "jQuery.ajax.active".
   def finished_all_ajax_requests?
-    page.evaluate_script('jQuery.active').zero?
+    page.evaluate_script('jQuery.ajax.active')&.zero?
   end
 
   def click_outside_datepicker(text_outside_datepicker)
