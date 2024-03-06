@@ -5,22 +5,54 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller do
+  #super admin hbx staff role
   let(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
   let(:admin_user) {FactoryBot.create(:user, :with_hbx_staff_role, :person => admin_person)}
+  let!(:permission) { FactoryBot.create(:permission, :super_admin) }
+  let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
 
-  let(:user) { FactoryBot.create(:user, person: person) }
-  let(:person) { FactoryBot.create(:person, :with_consumer_role) }
-  let(:person_with_family) { FactoryBot.create(:person, :with_family) }
-  let(:person_with_fam_hbx_enrollment) { person_with_family.primary_family.active_household.hbx_enrollments.build }
-  let(:consumer_role) {FactoryBot.build(:consumer_role)}
+  #associated consumer role
+  let(:consumer_person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:consumer_user) { FactoryBot.create(:user, person: consumer_person) }
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: consumer_person) }
+  let!(:consumer_role) do
+    consumer_person.consumer_role.update_attributes(aasm_state: 'verification_outstanding')
+    consumer_person.consumer_role
+  end
   let(:document) {FactoryBot.build(:vlp_document)}
-  let(:family)  {FactoryBot.create(:family, :with_primary_family_member)}
-  let(:hbx_enrollment) { FactoryBot.build(:hbx_enrollment) }
   let(:ssn_type) { FactoryBot.build(:verification_type, type_name: 'Social Security Number') }
   let(:local_type) { FactoryBot.build(:verification_type, type_name: EnrollRegistry[:enroll_app].setting(:state_residency).item) }
   let(:citizenship_type) { FactoryBot.build(:verification_type, type_name: 'Citizenship') }
   let(:immigration_type) { FactoryBot.build(:verification_type, type_name: 'Immigration status') }
   let(:native_type) { FactoryBot.build(:verification_type, type_name: "American Indian Status") }
+
+  # unauthorized consumer role
+  let(:fake_person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:fake_user) { FactoryBot.create(:user, person: fake_person) }
+  let!(:fake_family) { FactoryBot.create(:family, :with_primary_family_member, person: fake_person) }
+  let!(:fake_consumer_role) do
+    fake_person.consumer_role.update_attributes(aasm_state: 'verification_outstanding')
+    fake_person.consumer_role
+  end
+
+  # broker role
+  let(:broker_agency_profile) do
+    FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile)
+  end
+  let(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: 'active')}
+  let(:broker_user) {FactoryBot.create(:user, :person => broker_agency_staff_role.person, roles: ['broker_role'])}
+  let(:broker_person) { broker_agency_staff_role.person }
+  let(:broker_role) do
+    role = BrokerRole.new(
+      :broker_agency_profile => broker_agency_profile,
+      :aasm_state => "applicant",
+      :npn => "123456789",
+      :provider_kind => "broker"
+    )
+    broker_person.broker_role = role
+    broker_person.save!
+    broker_person.broker_role
+  end
 
   before :each do
     # Needed for the American indian status type
@@ -29,30 +61,30 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
 
   describe "destroy" do
     before :each do
-      person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
-      person.verification_types.each{|type| type.vlp_documents << document}
-      sign_in user
-      delete :destroy, params: { person_id: person.id, id: document.id, verification_type: citizenship_type.id }
+      consumer_person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
+      consumer_person.verification_types.each{|type| type.vlp_documents << document}
+      sign_in consumer_user
+      delete :destroy, params: { person_id: consumer_person.id, id: document.id, verification_type: citizenship_type.id }
     end
+
     it "redirects_to verification page" do
       expect(response).to redirect_to verification_insured_families_path
     end
 
     it "should delete document record" do
-      person.reload
-      expect(person.verification_types.by_name("Citizenship").first.vlp_documents).to be_empty
+      consumer_person.reload
+      expect(consumer_person.verification_types.by_name("Citizenship").first.vlp_documents).to be_empty
     end
 
     context 'when person has outstanding verification types' do
       it 'should move consumer role to verification oustanding' do
-        expect(person.consumer_role.reload.aasm_state).to eq('verification_outstanding')
+        expect(consumer_role.reload.aasm_state).to eq('verification_outstanding')
       end
     end
 
     it "redirects if the document doesnt exist" do
-      # is already destroyed in the before action
-      person.reload
-      delete :destroy, params: { person_id: person.id, id: document.id, verification_type: citizenship_type.id }
+      consumer_person.reload
+      delete :destroy, params: { person_id: consumer_person.id, id: document.id, verification_type: citizenship_type.id }
       expect(flash[:error]).to eq(
         l10n(
           "documents.controller.missing_document_message",
@@ -64,70 +96,70 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
   end
 
   describe 'GET show_docs' do
+    let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01') }
+    let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, eligibility_date: TimeKeeper.date_of_record.beginning_of_month) }
+
     before :each do
-      allow(user).to receive(:person).and_return(person_with_family)
-      person_with_fam_hbx_enrollment.family = person_with_family.primary_family
-      person_with_fam_hbx_enrollment.kind = 'individual'
-      person_with_fam_hbx_enrollment.save!
-      user.person.stub_chain(
-        'primary_family.active_household.hbx_enrollments.verification_needed'
-      ).and_return([person_with_fam_hbx_enrollment])
-      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
-      person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
-      sign_in user
+      consumer_role.person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
+      consumer_person.verification_types.update_all(validation_status: "outstanding")
+      FactoryBot.create(:hbx_enrollment,
+                        product: product,
+                        hbx_enrollment_members: [hbx_enrollment_member],
+                        family: family,
+                        is_any_enrollment_member_outstanding: true,
+                        household: family.active_household,
+                        coverage_kind: "health",
+                        effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month,
+                        enrollment_kind: "open_enrollment",
+                        kind: "individual",
+                        submitted_at: TimeKeeper.date_of_record,
+                        aasm_state: 'coverage_selected')
+
+      sign_in admin_user
     end
 
     it "should update enrollments to in review and redirect to verification_insured_families_path" do
-      get :show_docs
-      enrollment = user.person.primary_family.active_household.hbx_enrollments.verification_needed.first
+      get :show_docs,  params: {person_id: consumer_person.id}
+      enrollment = family.active_household.hbx_enrollments.verification_needed.first
       expect(enrollment.review_status).to eq('in review')
       expect(response).to redirect_to(verification_insured_families_path)
     end
   end
 
   describe 'POST Fed_Hub_Request' do
-    let(:consumer_role) { person.consumer_role }
-    let(:permission) { FactoryBot.create(:permission, :super_admin) }
-    let(:user) do
-      person = FactoryBot.create(:person, :with_hbx_staff_role)
-      user = FactoryBot.create(:user, person: person)
-      user.person.hbx_staff_role.update_attributes(permission_id: permission.id)
-      user
-    end
-
     before :each do
       request.env["HTTP_REFERER"] = "http://test.com"
       allow(consumer_role).to receive(:invoke_residency_verification!).and_return(true)
-      person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
-      sign_in user
+      consumer_person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
+      sign_in admin_user
     end
 
     context 'Call Hub for SSA verification' do
       it 'should redirect if verification type is SSN or Citizenship' do
-        post :fed_hub_request, params: { verification_type: ssn_type.id, person_id: person.id, id: document.id }
+        post :fed_hub_request, params: { verification_type: ssn_type.id, person_id: consumer_person.id, id: document.id }
         expect(flash[:success]).to eq('Request was sent to FedHub.')
       end
     end
 
     context 'Call Hub for Residency verification' do
       it 'should redirect if verification type is Residency' do
-        person.consumer_role.update_attributes(aasm_state: 'verification_outstanding')
-        post :fed_hub_request, params: { verification_type: local_type.id, person_id: person.id, id: document.id }
+        consumer_person.consumer_role.update_attributes(aasm_state: 'verification_outstanding')
+        post :fed_hub_request, params: { verification_type: local_type.id, person_id: consumer_person.id, id: document.id }
         expect(flash[:success]).to eq('Request was sent to Local Residency.')
       end
     end
 
     context 'Call Hub for DHS verification(immigration status)' do
       before :each do
-        person.verification_types = [FactoryBot.build(:verification_type, type_name: 'Immigration status')]
-        person.save!
-        person.consumer_role.update_attributes(aasm_state: 'verification_outstanding', active_vlp_document_id: person.consumer_role.vlp_documents.first.id)
-        @immigration_type = person.verification_types.where(type_name: 'Immigration status').first
+        consumer_person.verification_types = [FactoryBot.build(:verification_type, type_name: 'Immigration status')]
+        consumer_person.save!
+        consumer_person.consumer_role.update_attributes(aasm_state: 'verification_outstanding', active_vlp_document_id: consumer_person.consumer_role.vlp_documents.first.id)
+        @immigration_type = consumer_person.verification_types.where(type_name: 'Immigration status').first
         @immigration_type.update_attributes!(inactive: false)
       end
 
       it 'should redirect if verification type is Immigration status' do
-        post :fed_hub_request, params: { verification_type: @immigration_type.id, person_id: person.id, id: document.id }
+        post :fed_hub_request, params: { verification_type: @immigration_type.id, person_id: consumer_person.id, id: document.id }
         expect(flash[:success]).to eq('Request was sent to FedHub.')
       end
 
@@ -135,29 +167,29 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
         let(:bad_document) { FactoryBot.build(:vlp_document, subject: 'Other (With Alien Number)') }
 
         before do
-          person.consumer_role.vlp_documents = [bad_document]
-          person.consumer_role.active_vlp_document_id = bad_document.id
-          person.save!
+          consumer_person.consumer_role.vlp_documents = [bad_document]
+          consumer_person.consumer_role.active_vlp_document_id = bad_document.id
+          consumer_person.save!
           @immigration_type.update_attributes!(inactive: false)
         end
 
         it 'should redirect if verification type is Immigration status' do
-          post :fed_hub_request, params: { verification_type: @immigration_type.id, person_id: person.id, id: bad_document.id }
+          post :fed_hub_request, params: { verification_type: @immigration_type.id, person_id: consumer_person.id, id: bad_document.id }
           expect(flash[:danger]).to eq('Please fill in your information for Document Description.')
         end
       end
 
       context 'no vlp document type' do
         before do
-          person.consumer_role.vlp_documents = []
-          person.save!
+          consumer_person.consumer_role.vlp_documents = []
+          consumer_person.save!
           @immigration_type.update_attributes!(inactive: false)
         end
 
         it 'should redirect if verification type is Immigration status' do
-          post :fed_hub_request, params: { verification_type: @immigration_type.id, person_id: person.id }
+          post :fed_hub_request, params: { verification_type: @immigration_type.id, person_id: consumer_person.id }
 
-          person.reload
+          consumer_person.reload
           @immigration_type.reload
           expect(@immigration_type.validation_status).to eq 'negative_response_received'
           error_message = @immigration_type.type_history_elements.last.update_reason
@@ -170,7 +202,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
       let(:permission) { FactoryBot.create(:permission, :hbx_csr_tier1) }
 
       it 'should redirect with pundit error' do
-        post :fed_hub_request, params: { verification_type: ssn_type.id, person_id: person.id, id: document.id }
+        post :fed_hub_request, params: { verification_type: ssn_type.id, person_id: consumer_person.id, id: document.id }
         expect(flash[:error]).to eq('Access not allowed for hbx_profile_policy.can_call_hub?, (Pundit policy)')
       end
     end
@@ -179,37 +211,35 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
   describe "PUT extend due date" do
     before :each do
       request.env["HTTP_REFERER"] = "http://test.com"
-      person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
-      sign_in user
-      put :extend_due_date, params: { family_member_id: family.primary_applicant.id, person_id: person.id, verification_type: citizenship_type.id }
+      consumer_role.person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
+      sign_in admin_user
+      put :extend_due_date, params: { family_member_id: family.primary_applicant.id, person_id: consumer_person.id, verification_type: citizenship_type.id }
     end
 
     it "should redirect to back" do
       expect(response).to redirect_to "http://test.com"
     end
   end
-  describe "PUT update_verification_type" do
-    let!(:permission) { FactoryBot.create(:permission, :super_admin) }
-    let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
 
+  describe "PUT update_verification_type" do
     before :each do
       request.env["HTTP_REFERER"] = "http://test.com"
-      person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
+      consumer_role.person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
       sign_in admin_user
     end
 
     shared_examples_for "update verification type" do |type, reason, admin_action, attribute, result|
       it "updates #{attribute} for #{type} to #{result} with #{admin_action} admin action" do
-        post :update_verification_type, params: { person_id: person.id,
+        post :update_verification_type, params: { person_id: consumer_person.id,
                                                   verification_type: send(type).id,
                                                   verification_reason: reason,
                                                   admin_action: admin_action}
-        person.reload
+        consumer_person.reload
         case attribute
         when "validation"
-          expect(person.verification_types.find(send(type).id).validation_status).to eq(result)
+          expect(consumer_person.verification_types.find(send(type).id).validation_status).to eq(result)
         when "update_reason"
-          expect(person.verification_types.find(send(type).id).update_reason).to eq(result)
+          expect(consumer_person.verification_types.find(send(type).id).update_reason).to eq(result)
         end
       end
     end
@@ -221,7 +251,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
 
     context "American Indian Status verification type" do
       before do
-        person.update_attributes(:tribal_id => "444444444")
+        consumer_person.update_attributes(:tribal_id => "444444444")
       end
       it_behaves_like "update verification type", "native_type", "Document in EnrollApp", "verify", "validation", "verified"
       it_behaves_like "update verification type", "native_type", "Document in EnrollApp", "verify", "update_reason", "Document in EnrollApp"
@@ -236,28 +266,28 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
     end
 
     it 'updates verification type if verification reason is expired' do
-      params = { person_id: person.id, verification_type: citizenship_type.id, verification_reason: 'Expired', admin_action: 'return_for_deficiency'}
+      params = { person_id: consumer_person.id, verification_type: citizenship_type.id, verification_reason: 'Expired', admin_action: 'return_for_deficiency'}
       put :update_verification_type, params: params
-      person.reload
+      consumer_person.reload
 
-      expect(person.verification_types.where(:type_name => citizenship_type.type_name).first.update_reason).to eq("Expired")
+      expect(consumer_person.verification_types.where(:type_name => citizenship_type.type_name).first.update_reason).to eq("Expired")
     end
 
     context "redirection" do
       it "should redirect to back" do
-        post :update_verification_type, params: { person_id: person.id }
+        post :update_verification_type, params: { person_id: consumer_person.id }
         expect(response).to redirect_to "http://test.com"
       end
     end
 
     context "verification reason inputs" do
       it "should not update verification attributes without verification reason" do
-        post :update_verification_type, params: { person_id: person.id,
+        post :update_verification_type, params: { person_id: consumer_person.id,
                                                   verification_type: citizenship_type.id,
                                                   verification_reason: "",
                                                   admin_action: "verify"}
-        person.reload
-        expect(person.consumer_role.lawful_presence_update_reason).to eq nil
+        consumer_person.reload
+        expect(consumer_person.consumer_role.lawful_presence_update_reason).to eq nil
       end
 
       VlpDocument::VERIFICATION_REASONS.each do |reason|
@@ -266,17 +296,15 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
     end
 
     context 'admin_rejected a verification_type' do
-      let!(:person) { FactoryBot.create(:person, :with_family, :with_consumer_role) }
-      let!(:user) { FactoryBot.create(:user, person: person) }
       let!(:verification_type) do
-        person.verification_types.create!(type_name: 'Citizenship', validation_status: 'unverified')
+        consumer_person.verification_types.create!(type_name: 'Citizenship', validation_status: 'unverified')
       end
 
       let(:input_params) do
-        { person_id: person.id,
+        { person_id: consumer_person.id,
           verification_type: verification_type.id,
           admin_action: 'return_for_deficiency',
-          family_member_id: person.primary_family.primary_applicant.id,
+          family_member_id: family.primary_applicant.id,
           verification_reason: 'Illegible' }
       end
 
@@ -299,18 +327,18 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
 
     before :each do
       request.env["HTTP_REFERER"] = "http://test.com"
-      person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
+      consumer_person.verification_types = [ssn_type, local_type, citizenship_type, native_type, immigration_type]
       sign_in admin_user
     end
 
     shared_examples_for "update ridp verification type" do |type, reason, admin_action, updated_attr, result|
       it "updates #{updated_attr} for #{type} to #{result} with #{admin_action} admin action" do
-        post :update_ridp_verification_type, params: { person_id: person.id,
+        post :update_ridp_verification_type, params: { person_id: consumer_person.id,
                                                        ridp_verification_type: type,
                                                        verification_reason: reason,
                                                        admin_action: admin_action}
-        person.reload
-        expect(person.consumer_role.send(updated_attr)).to eq(result)
+        consumer_person.reload
+        expect(consumer_person.consumer_role.send(updated_attr)).to eq(result)
       end
     end
 
@@ -328,43 +356,14 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
 
     context "redirection" do
       it "should redirect to back" do
-        post :update_ridp_verification_type, params: { person_id: person.id }
+        post :update_ridp_verification_type, params: { person_id: consumer_person.id }
         expect(response).to have_http_status(:redirect)
       end
     end
   end
 
   describe "GET cartafact_download" do
-    let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
-    let!(:associated_user) {FactoryBot.create(:user, :person => person)}
-    let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
-    let!(:family_member) { family.family_members.first }
-    let!(:document) {person.documents.create}
-
-    let(:broker_agency_profile) do
-      FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile)
-    end
-
-    let!(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: 'active')}
-    let!(:broker_user) {FactoryBot.create(:user, :person => broker_agency_staff_role.person, roles: ['broker_agency_staff_role'])}
-    let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
-
-    let(:existing_broker_staff_role) do
-      person.broker_agency_staff_roles.first
-    end
-
-    let(:broker_role) do
-      role = BrokerRole.new(
-        :broker_agency_profile => broker_agency_profile,
-        :aasm_state => "applicant",
-        :npn => "123456789",
-        :provider_kind => "broker"
-      )
-      person.broker_role = role
-      person.save!
-      person.broker_role
-    end
-
+    let!(:document) {consumer_person.documents.create}
     let(:tempfile) do
       tf = Tempfile.new('test.pdf')
       tf.write("DATA GOES HERE")
@@ -372,38 +371,91 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
       tf
     end
 
-    before(:each) do
-      family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
-                                                                                          start_on: Time.now,
-                                                                                          is_active: true)
-      family.reload
+    context 'when broker role' do
+      context 'is authorized' do
+        before(:each) do
+          family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                              start_on: Time.now,
+                                                                                              is_active: true)
+          family.reload
+        end
+
+        it 'should be able to download' do
+          allow(Operations::Documents::Download).to receive(:call).and_return(Dry::Monads::Success(tempfile))
+          sign_in broker_user
+          get :cartafact_download, params: {model: "Person", model_id: consumer_person.id, relation: "documents", relation_id: document.id}
+          expect(response.status).to eq(200)
+          expect(response.headers["Content-Disposition"]).to eq 'attachment'
+        end
+      end
+
+      context 'is not authorized' do
+        it 'should not be able to download' do
+          sign_in broker_user
+          get :cartafact_download, params: {model: "Person", model_id: consumer_person.id, relation: "documents", relation_id: document.id}
+          expect(flash[:error]).to eq("Access not allowed for person_policy.can_download_document?, (Pundit policy)")
+        end
+      end
     end
 
-    it 'broker should be able to download' do
-      allow(Operations::Documents::Download).to receive(:call).and_return(Dry::Monads::Success(tempfile))
-      sign_in broker_user
-      get :cartafact_download, params: {model: "Person", model_id: person.id, relation: "documents", relation_id: document.id}
-      expect(response.status).to eq(200)
-      expect(response.headers["Content-Disposition"]).to eq 'attachment'
+    context 'when hbx staff role' do
+      context 'is authorized' do
+        it 'should be able to download' do
+          allow(Operations::Documents::Download).to receive(:call).and_return(Dry::Monads::Success(tempfile))
+          sign_in admin_user
+          get :cartafact_download, params: {model: "Person", model_id: consumer_person.id, relation: "documents", relation_id: document.id}
+          expect(response.status).to eq(200)
+          expect(response.headers["Content-Disposition"]).to eq 'attachment'
+        end
+      end
+
+      context 'is not authorized' do
+        let!(:permission) { FactoryBot.create(:permission, :hbx_csr_tier1, modify_family: false) }
+        let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
+
+        it 'should not be able to download' do
+          sign_in admin_user
+          get :cartafact_download, params: {model: "Person", model_id: consumer_person.id, relation: "documents", relation_id: document.id}
+          expect(flash[:error]).to eq("Access not allowed for person_policy.can_download_document?, (Pundit policy)")
+        end
+      end
+    end
+
+    context 'when consumer role' do
+      it 'should be able to download' do
+        allow(Operations::Documents::Download).to receive(:call).and_return(Dry::Monads::Success(tempfile))
+        sign_in consumer_user
+        get :cartafact_download, params: {model: "Person", model_id: consumer_person.id, relation: "documents", relation_id: document.id}
+        expect(response.status).to eq(200)
+        expect(response.headers["Content-Disposition"]).to eq 'attachment'
+      end
+    end
+
+    context 'unauthorized consumer' do
+      it 'should not be able to download' do
+        sign_in fake_user
+        get :cartafact_download, params: {model: "Person", model_id: consumer_person.id, relation: "documents", relation_id: document.id}
+        expect(flash[:error]).to eq("Access not allowed for person_policy.can_download_document?, (Pundit policy)")
+      end
     end
   end
 
-  describe "#authorized_download" do
+  describe "GET authorized_download" do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
 
     let(:profile) { benefit_sponsorship.organization.profiles.first }
-    let(:person) { FactoryBot.create(:person) }
-    let(:user) { FactoryBot.create(:user, person: person) }
+    let(:employer_staff_person) { FactoryBot.create(:person) }
+    let(:employer_staff_user) { FactoryBot.create(:user, person: employer_staff_person) }
     let(:er_staff_role) { FactoryBot.create(:benefit_sponsor_employer_staff_role, benefit_sponsor_employer_profile_id: benefit_sponsorship.organization.employer_profile.id) }
     let(:document) {profile.documents.create(identifier: "urn:opentest:terms:t1:test_storage:t3:bucket:test-test-id-verification-test#sample-key")}
 
     context 'employer staff role' do
       context 'for a user with POC role' do
         before do
-          person.employer_staff_roles << er_staff_role
-          person.save!
-          sign_in user
+          employer_staff_person.employer_staff_roles << er_staff_role
+          employer_staff_person.save!
+          sign_in employer_staff_user
         end
 
         it 'current user employer should be able to download' do
@@ -414,7 +466,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
 
       context 'for a user without POC role' do
         before do
-          sign_in user
+          sign_in employer_staff_user
         end
 
         it 'current user employer should be able to download' do
@@ -426,30 +478,6 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
     end
 
     context 'broker role' do
-      let(:broker_agency_profile) do
-        FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile)
-      end
-
-      let(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: 'active')}
-      let(:broker_user) {FactoryBot.create(:user, :person => broker_agency_staff_role.person, roles: ['broker_agency_staff_role'])}
-      let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
-
-      let(:existing_broker_staff_role) do
-        person.broker_agency_staff_roles.first
-      end
-
-      let(:broker_role) do
-        role = BrokerRole.new(
-          :broker_agency_profile => broker_agency_profile,
-          :aasm_state => "applicant",
-          :npn => "123456789",
-          :provider_kind => "broker"
-        )
-        person.broker_role = role
-        person.save!
-        person.broker_role
-      end
-
       context 'with authorized account' do
         before do
           profile.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
@@ -479,13 +507,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
     end
 
     context 'hbx staff role' do
-      let(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
-      let(:admin_user) {FactoryBot.create(:user, :with_hbx_staff_role, :person => admin_person)}
-
       context 'with permission to access' do
-        let!(:permission) { FactoryBot.create(:permission, :super_admin) }
-        let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
-
         before do
           sign_in admin_user
         end
