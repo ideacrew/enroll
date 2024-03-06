@@ -25,20 +25,15 @@ class FamilyPolicy < ApplicationPolicy
     false
   end
 
-  def create?
-  end
+  def create?; end
 
-  def update?
-  end
+  def update?; end
 
-  def destroy?
-  end
+  def destroy?; end
 
-  def edit?
-  end
+  def edit?; end
 
-  def index?    
-  end
+  def index?; end
 
   def show?
     user_person = @user.person
