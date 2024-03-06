@@ -4,13 +4,12 @@
         <div class="text-success pl-1 pr-1">
             <p>                   
               <% 
+                medicaid_short_url = l10n("faa.mc_success_link")
                 medicaid_agency_url = EnrollRegistry[:enroll_app].setting(:medicaid_agency_url).item
-                medicaid_url = "https://" + medicaid_agency_url
                 medicaid_agency_phone = EnrollRegistry[:enroll_app].setting(:medicaid_agency_phone).item
               %>
               <b><%= l10n("faa.mc_success_existing", medicaid_agency_phone: link_to(medicaid_agency_phone, "tel:#{medicaid_agency_phone}", target: '_blank')) %></b>
-              <%= l10n("faa.mc_success_enroll", medicaid_agency_url: link_to(medicaid_agency_url, medicaid_url, target: '_blank')) %>
-              <a target='_blank' href=<%= "https://" + medicaid_agency_url %> ><%= l10n("faa.mc_success_link") %></a>
+              <%= l10n("faa.mc_success_enroll", medicaid_agency_url: link_to(medicaid_short_url, medicaid_agency_url, target: '_blank')) %>
               <%= l10n("faa.mc_success_phone") %>
             </p>
             <p>

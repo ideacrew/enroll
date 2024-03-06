@@ -242,7 +242,7 @@ registry:
           - key: :medicaid_agency_phone
             item: "(202) 727-5355"
           - key: :medicaid_agency_url
-            item: "districtdirect.dc.gov"
+            item: "https://districtdirect.dc.gov"
           - key: :verifiable_immigration_statuses
             item: false
           - key: :appeal_link

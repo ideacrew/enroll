@@ -618,7 +618,7 @@ end
 
 Then(/^they should not see the shop coverage exists warning text$/) do
   expect(page).to_not have_content(l10n('faa.shop_check_success'))
-  expect(page).to_not have_content('Still want to apply for lower monthly premiums or lost (or will soon lose) Medicaid coverage?')
+  expect(page).to_not have_content('faa.mc_continue_bold')
 end
 
 # TODO: Refactor these with the resource_registry_world.rb helpers
