@@ -10,7 +10,7 @@ class FamilyPolicy < ApplicationPolicy
     record.primary_person
   end
 
-  def show?
+  def new_show?
     return true if individual_market_primary_family_member?(record)
     return true if active_associated_family_broker?(record)
     return false unless ridp_verified_primary_person?(record)
@@ -26,28 +26,21 @@ class FamilyPolicy < ApplicationPolicy
   end
 
   def create?
-
   end
 
   def update?
-
   end
 
   def destroy?
-  
   end
 
   def edit?
-
   end
 
-  def index?
-    
+  def index?    
   end
 
-
-
-  def original_show
+  def show?
     user_person = @user.person
     if user_person
       primary_applicant = @record.primary_applicant
