@@ -9,9 +9,9 @@ class Users::PasswordsController < Devise::PasswordsController
     if verify_recaptcha_if_needed
       self.resource = resource_class.send_reset_password_instructions(resource_params)
       yield resource if block_given?
-      show_generic_forgot_password_text
       if successfully_sent?(resource)
         resource.security_question_responses.destroy_all
+        show_generic_forgot_password_text
 
         respond_to do |format|
           format.html { respond_with({}, location: after_sending_reset_password_instructions_path_for(resource_name)) }
