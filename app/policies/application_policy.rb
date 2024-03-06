@@ -7,7 +7,7 @@ class ApplicationPolicy
   end
 
   def individual_market_primary_family_member?(family)
-    individual_market_with_consumer_role?(family) && user == family.primary_person.user
+    (family.primary_person.consumer_role.present? || family.primary_person.resident_role.present?) && user == family.primary_person.user
   end
 
   def active_associated_family_broker?(family)
@@ -28,10 +28,6 @@ class ApplicationPolicy
     return true if consumer_role.blank?
 
     consumer_role.identity_verified?
-  end
-
-  def individual_market_with_consumer_role?(family)
-    family.primary_person.consumer_role.present?
   end
 
   def hbx_staff_admin?
@@ -67,8 +63,7 @@ class ApplicationPolicy
   end
 
   def show?
-
-    # scope.where(:id => record.id).exists?
+    scope.where(:id => record.id).exists?
   end
 
   def create?
