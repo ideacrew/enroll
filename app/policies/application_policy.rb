@@ -34,8 +34,20 @@ class ApplicationPolicy
     family.primary_person.consumer_role.present?
   end
 
-  def individual_market_admin?(family)
-    individual_market_with_consumer_role? && user.person.hbx_staff_role&.permission&.modify_family
+  def hbx_staff_admin?
+    user.person.hbx_staff_role&.permission&.modify_family
+  end
+
+  def individual_market_admin?
+    hbx_staff_admin?
+  end
+
+  def shop_market_admin?
+    hbx_staff_admin?
+  end
+
+  def fehb_market_admin?
+    hbx_staff_admin?
   end
 
   def shop_market_primary_family_member?
@@ -43,14 +55,6 @@ class ApplicationPolicy
   end
 
   def fehb_market_primary_family_member?
-    false
-  end
-
-  def shop_market_admin?
-    false
-  end
-
-  def fehb_market_admin?
     false
   end
 
