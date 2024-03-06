@@ -54,7 +54,7 @@ When(/^the user enters (mid_month|any_day|last_day|last_month) and other details
 end
 
 When(/^user clicks submit button$/) do
-  find('.plan-year-submit', text: 'SUBMIT', wait: 5).click
+  find('.plan-year-submit', wait: 5).click
 end
 
 And(/^employer clicks OK in warning modal$/) do
