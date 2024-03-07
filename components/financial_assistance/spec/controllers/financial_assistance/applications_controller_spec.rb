@@ -216,8 +216,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
   before do
     Family.all.each do |fam|
-      c_role = fam.primary_person.consumer_role
-      c_role.move_identity_documents_to_verified if c_role
+      fam.primary_person.consumer_role&.move_identity_documents_to_verified
     end
     allow(person).to receive(:financial_assistance_identifier).and_return(family_id)
     sign_in(user)
