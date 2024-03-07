@@ -8,6 +8,7 @@ Feature: Cost Savings -  Start New Application
   Scenario Outline: FAA is enabled - and consumer has a FAA applications
     Given the FAA feature configuration is enabled
     And a family with financial application in <application_state> state exists
+    And the user is RIDP verified
     And the user with consumer role is logged in
     When consumer visits home page
     And the Cost Savings link is visible
@@ -23,6 +24,7 @@ Feature: Cost Savings -  Start New Application
   Scenario: FAA is enabled - year selection disabled - and consumer has a no existing FAA applications
     Given the iap year selection feature is disabled
     Given a consumer exists
+    And the user is RIDP verified
     And the consumer is logged in
     And consumer has successful ridp
     And the FAA feature configuration is enabled
@@ -39,6 +41,7 @@ Feature: Cost Savings -  Start New Application
     And current hbx is not under open enrollment
     Given the date is after open enrollment
     Given a consumer exists
+    And the user is RIDP verified
     And the consumer is logged in
     And consumer has successful ridp
     And the FAA feature configuration is enabled
@@ -55,6 +58,7 @@ Feature: Cost Savings -  Start New Application
     And current hbx is under open enrollment
     Given the date is after open enrollment
     Given a consumer exists
+    And the user is RIDP verified
     And the consumer is logged in
     And consumer has successful ridp
     And the FAA feature configuration is enabled
