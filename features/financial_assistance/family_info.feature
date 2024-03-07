@@ -4,9 +4,9 @@ Feature: Start a new Financial Assistance Application
   Background:
     Given the FAA feature configuration is enabled
     Given the date is within open enrollment
-    Given a consumer, with a family, exists
-    And is logged in
+    Given a consumer exists with family
     And the consumer is RIDP verified
+    And is logged in
     And a benchmark plan exists
 
   Scenario: A consumer should see the applications assistance year when feature enabled
