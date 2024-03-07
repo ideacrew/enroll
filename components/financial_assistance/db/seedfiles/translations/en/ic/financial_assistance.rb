@@ -174,9 +174,8 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.update_reminder" => "If you make changes to your %{year} coverage that should apply to your %{year2} coverage too, you will need to come back and update your %{year2} application. You can do this by copying your latest %{year} application and submitting it for %{year2}.",
   # Mec check
   "en.faa.mc_success_existing" => "It looks like you already have Medicaid coverage.",
-  "en.faa.mc_success_enroll" => "If you’re enrolled in Medicaid and need to renew your coverage or update your information, go to ",
+  "en.faa.mc_success_enroll" => "If you’re enrolled in Medicaid and need to renew your coverage or update your information, go to %{medicaid_agency_url} or contact District Direct at %{medicaid_agency_phone} / TTD: %{medicaid_agency_phone_ttd}.",
   "en.faa.mc_success_link" => "districtdirect.dc.gov",
-  "en.faa.mc_success_phone" => " or contact District Direct at (202) 727-5355 / TTD: (800) 877-8339.",
   "en.faa.shop_check_success" => "It looks like you may already be enrolled in employer sponsored coverage. If you need to update information like your income, address, or who is in your household, visit the Manage Family page to make these changes before completing a CoverME.gov application.",
   "en.faa.mc_continue" => "Select 'CONTINUE' if you would still like to complete a CoverME.gov application.",
   # FAA display evidence type

@@ -187,7 +187,6 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.mc_success_existing" => "It looks like you may already be enrolled in MaineCare or Cub Care. If you need to update information like your income, address, or who is in your household, contact the Office for Family Independence at %{medicaid_agency_phone} to make these changes before completing a CoverME.gov application.",
   "en.faa.mc_success_enroll" => "",
   "en.faa.mc_success_link" => "",
-  "en.faa.mc_success_phone" => "",
   "en.faa.shop_check_success" => "It looks like you may already be enrolled in employer sponsored coverage. If you need to update information like your income, address, or who is in your household, visit the Manage Family page to make these changes before completing a CoverME.gov application.",
   "en.faa.mc_continue" => "Select 'CONTINUE' if you would still like to complete a CoverME.gov application.",
   "en.faa.mc_continue_bold" => "",

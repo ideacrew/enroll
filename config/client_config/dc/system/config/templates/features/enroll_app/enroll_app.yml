@@ -239,6 +239,8 @@ registry:
             item: false
           - key: :send_rating_area_for_ivl_policy_to_edi
             item: false
+          - key: :medicaid_agency_phone_ttd
+            item: "(800) 877-8339"
           - key: :medicaid_agency_phone
             item: "(202) 727-5355"
           - key: :medicaid_agency_url
