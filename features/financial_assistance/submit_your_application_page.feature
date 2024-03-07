@@ -3,6 +3,7 @@ Feature: This is the final review page before submiting an application
   Background: Submit Your Application page
     Given a consumer exists
     And is logged in
+    And the user is RIDP verified
     And the FAA feature configuration is enabled
     And the user will navigate to the FAA Household Info page
     And all applicants are in Info Completed state
