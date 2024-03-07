@@ -165,4 +165,13 @@ class FamilyPolicy < ApplicationPolicy
 
     user.has_hbx_staff_role? && user.person.hbx_staff_role.permission.can_view_audit_log
   end
+
+  def can_authorize_individual_market_family?
+    ridp_verified_primary_person?(record) &&
+      (
+        individual_market_primary_family_member?(record) ||
+          active_associated_family_broker?(record) ||
+          individual_market_admin?(record)
+      )
+  end
 end

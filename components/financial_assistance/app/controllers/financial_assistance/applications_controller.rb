@@ -5,6 +5,7 @@ module FinancialAssistance
   class ApplicationsController < FinancialAssistance::ApplicationController
 
     before_action :set_current_person
+    before_action :set_family
     before_action :find_and_authorize_application, :except => [:index, :index_with_filter, :new, :uqhp_flow, :review, :raw_application]
 
     around_action :cache_current_hbx, :only => [:index_with_filter]
@@ -25,20 +26,19 @@ module FinancialAssistance
     # We should ONLY be getting applications that are associated with PrimaryFamily of Current Person.
     # DO NOT include applications from other families.
     def index
-      family = get_current_person.primary_family
       @applications = FinancialAssistance::Application.where("family_id" => family.id)
 
       if @applications.present?
-        authorize @applications.order('submitted_at desc').first, :can_access_application?
+        authorize @applications.order('submitted_at desc').first, :can_authorize_family?
       else
-        skip_authorization
+        authorize @family, :can_authorize_individual_market_family?
       end
     end
 
     def index_with_filter
       result = FinancialAssistance::Operations::Applications::QueryFilteredApplications.new.call(
         {
-          family_id: get_current_person.financial_assistance_identifier,
+          family_id: family.id,
           filter_year: params.dig(:filter, :year)
         }
       )
@@ -47,9 +47,9 @@ module FinancialAssistance
         @applications = value[:applications]
 
         if @applications.present?
-          authorize @applications.order('submitted_at desc').first, :can_access_application?
+          authorize @applications.order('submitted_at desc').first, :can_authorize_family?
         else
-          skip_authorization
+          authorize @family, :can_authorize_individual_market_family?
         end
 
         @filtered_applications = value[:filtered_applications]
@@ -60,6 +60,8 @@ module FinancialAssistance
     end
 
     def new
+      authorize @family, :can_authorize_individual_market_family?
+
       @application = FinancialAssistance::Application.new
     end
 
@@ -153,6 +155,7 @@ module FinancialAssistance
     end
 
     def uqhp_flow
+      authorize @family, :can_authorize_individual_market_family?
       ::FinancialAssistance::Application.where(aasm_state: "draft", family_id: get_current_person.financial_assistance_identifier).destroy_all
       redirect_to main_app.insured_family_members_path(consumer_role_id: @person.consumer_role.id)
     end
@@ -195,7 +198,7 @@ module FinancialAssistance
       @application = FinancialAssistance::Application.where(id: params["id"]).first
       return redirect_to applications_path if @application.blank?
 
-      authorize @application, :can_review?
+      authorize @application, :can_authorize_family?
       @applicants = @application.active_applicants
       build_applicants_name_by_hbx_id_hash
     end
@@ -318,7 +321,6 @@ module FinancialAssistance
     end
 
     def update_transfer_requested
-      @application = Application.find(params[:id])
       @button_sent_text = l10n("faa.sent_to_external_verification")
 
       respond_to do |format|
@@ -348,6 +350,10 @@ module FinancialAssistance
     # rubocop:enable Style/ExplicitBlockArgument
 
     private
+
+    def set_family
+      @family = @person.primary_family
+    end
 
     def determination_token_present?(application)
       Rails.cache.read("application_#{application.hbx_id}_determined").present?.to_s
@@ -443,7 +449,7 @@ module FinancialAssistance
     def find_and_authorize_application
       application = find_application
 
-      authorize application, :can_access_application?
+      authorize application, :can_authorize_family?
     end
 
     def save_faa_bookmark(url)
