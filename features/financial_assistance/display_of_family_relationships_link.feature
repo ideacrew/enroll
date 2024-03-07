@@ -1,10 +1,10 @@
 Feature: Conditional Display of Family Relationships link in the left nav of the FAA Household Info page.
 
   Background: Household Info page
-    Given a consumer exists
+    Given a consumer exists with family
+    And the consumer is RIDP verified
     And is logged in
     And a benchmark plan exists
-    And the user is RIDP verified
     And the user will navigate to the FAA Household Info page
 
   Scenario: Relationships link does not display when there is only one household member
@@ -25,6 +25,3 @@ Feature: Conditional Display of Family Relationships link in the left nav of the
     And at least one applicant is in the Info Needed state
     And the Family Relationships link displays in the left column of the page
     Then the Family Relationships link is disabled
-
-
-
