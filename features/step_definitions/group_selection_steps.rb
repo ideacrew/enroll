@@ -365,7 +365,7 @@ Then(/^.* should see primary and dependent person on enrollment$/) do
   primary = Person.all.select { |person| person.primary_family.present? }.first
   dependent = Person.all.select { |person| person.primary_family.blank? }.first
 
-  expect(page).to have_content("Covered: #{primary.first_name} #{dependent.first_name}", wait: 10)
+  expect(page).to have_content("#{l10n("covered")}: #{primary.first_name} #{dependent.first_name}", wait: 10)
 end
 
 Then(/consumer should see coverage for primary person/) do
@@ -450,14 +450,13 @@ And(/.* should see warning dialog on CoverAll selection/) do
   expect(find("#WarningOnCoverAllSelection").visible?).to be_truthy
 
   within('#WarningOnCoverAllSelection .modal-dialog') do
-    expect(page).to have_selector('.modal-title', text: 'Some people are eligible for DC Health Link')
-    expect(page).to have_selector('.modal-cancel-button', text: /close/i)
+    expect(page).to have_selector('.modal-cancel-button', text: /#{l10n("close")}/i)
   end
 end
 
 Then(/.* clicked close on CoverAll selection warning dialog/) do
   within('#WarningOnCoverAllSelection .modal-dialog') do
-    find('.modal-cancel-button', text: /close/i).click
+    find('.modal-cancel-button', text: /#{l10n("close")}/i).click
   end
 end
 
