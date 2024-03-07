@@ -6,6 +6,7 @@ Feature: Start a new Financial Assistance Application and answers questions on O
     And FAA primary_caregiver_relationship_other_question feature is enabled
     Given a consumer, with a family, exists
     And is logged in
+    And the consumer is RIDP verified
     And the user SSN is nil
     And the user has an age greater than 18 years old, with a young child 
     And the user will navigate to the FAA Household Info page
