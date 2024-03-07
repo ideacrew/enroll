@@ -33,7 +33,7 @@ module Operations
       def validate(params)
         errors = []
         errors << "subject is required" unless params[:subject]
-        errors << "resource is required" unless params[:subject]
+        errors << "resource is required" unless params[:resource]
         errors << "event name is required" unless params[:event_name]
 
         errors.empty? ? Success(params) : Failure(errors)
