@@ -94,6 +94,15 @@ class ApplicationPolicy
     false
   end
 
+  def can_authorize_individual_market_family?(family)
+    ridp_verified_primary_person?(family) &&
+      (
+        individual_market_primary_family_member?(family) ||
+          active_associated_family_broker?(family) ||
+          individual_market_admin?
+      )
+  end
+
   def index?
     read_all?
   end

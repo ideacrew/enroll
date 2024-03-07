@@ -31,7 +31,7 @@ module FinancialAssistance
       if @applications.present?
         authorize @applications.order('submitted_at desc').first, :can_authorize_family?
       else
-        authorize @family, :can_authorize_individual_market_family?
+        authorize @family, :can_authorize_individual_market?
       end
     end
 
@@ -49,7 +49,7 @@ module FinancialAssistance
         if @applications.present?
           authorize @applications.order('submitted_at desc').first, :can_authorize_family?
         else
-          authorize @family, :can_authorize_individual_market_family?
+          authorize @family, :can_authorize_individual_market?
         end
 
         @filtered_applications = value[:filtered_applications]
@@ -60,7 +60,7 @@ module FinancialAssistance
     end
 
     def new
-      authorize @family, :can_authorize_individual_market_family?
+      authorize @family, :can_authorize_individual_market?
 
       @application = FinancialAssistance::Application.new
     end
@@ -155,7 +155,7 @@ module FinancialAssistance
     end
 
     def uqhp_flow
-      authorize @family, :can_authorize_individual_market_family?
+      authorize @family, :can_authorize_individual_market?
       ::FinancialAssistance::Application.where(aasm_state: "draft", family_id: get_current_person.financial_assistance_identifier).destroy_all
       redirect_to main_app.insured_family_members_path(consumer_role_id: @person.consumer_role.id)
     end
