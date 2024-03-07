@@ -6,13 +6,8 @@ module FinancialAssistance
 
     private
 
-    def can_transform?(family)
-      ridp_verified_primary_person?(family) &&
-        (
-          individual_market_primary_family_member?(family) ||
-            active_associated_family_broker?(family) ||
-            individual_market_admin?(family)
-        )
+    def can_authorize_family?(family)
+      ::FamilyPolicy.new(user, family).can_authorize_individual_market_family?
     end
   end
 end
