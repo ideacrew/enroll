@@ -34,6 +34,10 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   let(:effective_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
   let(:application_period) {effective_on.beginning_of_year..effective_on.end_of_year}
 
+  before do
+    family.primary_person.consumer_role.move_identity_documents_to_verified
+  end
+
   describe "GET index" do
     before(:each) do
       sign_in user
@@ -211,6 +215,10 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   let(:application20) { FactoryBot.create(:application, family: family2, aasm_state: "draft", effective_on: effective_on, application_period: application_period)}
 
   before do
+    Family.all.each do |fam|
+      c_role = fam.primary_person.consumer_role
+      c_role.move_identity_documents_to_verified if c_role
+    end
     allow(person).to receive(:financial_assistance_identifier).and_return(family_id)
     sign_in(user)
   end
@@ -829,7 +837,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     let(:person) { FactoryBot.create(:person, :with_consumer_role, first_name: "test1") }
     let(:user) { FactoryBot.create(:user, :person => person) }
 
-
     before do
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:filtered_application_list).and_return(true)
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:haven_determination).and_call_original
@@ -847,7 +854,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       describe "GET /applications" do
         let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
         let!(:application) { FactoryBot.create :financial_assistance_application, :with_applicants, family_id: family.id, aasm_state: 'determined' }
+
         before(:each) do
+          person.consumer_role.move_identity_documents_to_verified
           sign_in(user)
         end
 
