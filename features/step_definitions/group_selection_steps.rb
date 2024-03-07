@@ -365,7 +365,7 @@ Then(/^.* should see primary and dependent person on enrollment$/) do
   primary = Person.all.select { |person| person.primary_family.present? }.first
   dependent = Person.all.select { |person| person.primary_family.blank? }.first
 
-  expect(page).to have_content("#{l10n("covered")}: #{primary.first_name} #{dependent.first_name}", wait: 10)
+  expect(page).to have_content("#{l10n('covered')}: #{primary.first_name} #{dependent.first_name}", wait: 10)
 end
 
 Then(/consumer should see coverage for primary person/) do
