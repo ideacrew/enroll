@@ -12,11 +12,7 @@ module FinancialAssistance
     include GoldenSeedFinancialAssistanceHelper
     def consumer(*traits)
       attributes = traits.extract_options!
-      @consumer ||= (FactoryBot.create :user, :consumer, *traits, :with_consumer_role, attributes).tap do |usr|
-        # Resetting the identity validation as cucumber tests are expected to pass through the identity validation.
-        # Also, the identity validation is set to valid by default in the factory.
-        usr.person.consumer_role.update_attributes!(identity_validation: 'na')
-      end
+      @consumer ||= FactoryBot.create :user, :consumer, *traits, :with_consumer_role, attributes
     end
 
     def application(*traits)
