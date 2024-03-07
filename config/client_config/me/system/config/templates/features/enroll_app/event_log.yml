@@ -7,4 +7,4 @@ registry:
         is_enabled: <%= ENV['ACA_EVENT_LOGGING_IS_ENABLED'] || false %>
         settings:
           - key: :system_account_email
-            item: "admin@dc.gov"
+            item: ""

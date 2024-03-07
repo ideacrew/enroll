@@ -18,7 +18,7 @@ module SessionConcern
 
     def system_account
       system_email = EnrollRegistry[:aca_event_logging].setting(:system_account_email)&.item
-      @system_account ||= User.find_by(email: system_email) if system_email
+      @system_account ||= User.find_by(email: system_email) if system_email.present?
     end
   end
 end
