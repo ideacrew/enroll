@@ -5,3 +5,6 @@ registry:
     features:
       - key: :aca_event_logging
         is_enabled: <%= ENV['ACA_EVENT_LOGGING_IS_ENABLED'] || false %>
+        settings:
+          - key: :system_account_email
+            item: ""
