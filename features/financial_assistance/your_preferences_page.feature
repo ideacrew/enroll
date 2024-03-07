@@ -1,9 +1,9 @@
 Feature: User data usage preferences and voter registration
 
   Background: Your Preferences Page
-    Given a consumer exists
+    Given a consumer exists with family
+    And the consumer is RIDP verified
     And is logged in
-    And the user is RIDP verified
     And the FAA feature configuration is enabled
     And the user will navigate to the FAA Household Info page
     And all applicants are in Info Completed state with all types of income
