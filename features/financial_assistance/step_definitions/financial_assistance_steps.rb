@@ -18,6 +18,10 @@ Given(/^is logged in$/) do
   login_as consumer, scope: :user
 end
 
+And(/^the consumer is RIDP verified$/) do
+  consumer.person.consumer_role.move_identity_documents_to_verified
+end
+
 Given(/^a benchmark plan exists$/) do
   create_plan
 end

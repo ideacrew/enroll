@@ -4,6 +4,7 @@ Feature: Functionality for the Destroy Applicant
     Given a consumer exists
     And is logged in
     And a benchmark plan exists
+    And the user is RIDP verified
     And the FAA feature configuration is enabled
     And the user will navigate to the FAA Household Info page
     And at least two other household members exist

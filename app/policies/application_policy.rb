@@ -46,26 +46,17 @@ class ApplicationPolicy
     consumer_role.identity_verified?
   end
 
-  # Checks if the user is an hbx staff admin.
-  # A user is considered an hbx staff admin if they have the permission to modify a family.
-  #
-  # @return [Boolean, nil] Returns true if the user is an hbx staff admin,
-  # false if they are not, or nil if the user or their permissions are not defined.
-  def hbx_staff_admin?
-    user.person.hbx_staff_role&.permission&.modify_family
-  end
-
   # Checks if the user is an individual market admin.
-  # A user is considered an individual market admin if they are an hbx staff admin.
+  # A user is considered an individual market admin if they are an hbx staff modify family.
   #
   # @return [Boolean, nil] Returns true if the user is an individual market admin,
   # false if they are not, or nil if the user or their permissions are not defined.
   def individual_market_admin?
-    hbx_staff_admin?
+    hbx_staff_modify_family?
   end
 
   # Checks if the user is a shop market admin.
-  # A user is considered a shop market admin if they are an hbx staff admin.
+  # A user is considered a shop market admin if they are an hbx staff modify family.
   #
   # @return [Boolean, nil] Returns true if the user is a shop market admin,
   # false if they are not, or nil if the user or their permissions are not defined.
@@ -74,7 +65,7 @@ class ApplicationPolicy
   end
 
   # Checks if the user is a fehb market admin.
-  # A user is considered a fehb market admin if they are an hbx staff admin.
+  # A user is considered a fehb market admin if they are an hbx staff modify family.
   #
   # @return [Boolean, nil] Returns true if the user is a fehb market admin,
   # false if they are not, or nil if the user or their permissions are not defined.
@@ -129,6 +120,15 @@ class ApplicationPolicy
 
   def destroy?
     false
+  end
+
+  # Checks if the user is an hbx staff modify family.
+  # A user is considered an hbx staff modify family if they have the permission to modify a family.
+  #
+  # @return [Boolean, nil] Returns true if the user is an hbx staff modify family,
+  # false if they are not, or nil if the user or their permissions are not defined.
+  def hbx_staff_modify_family?
+    user.person.hbx_staff_role&.permission&.modify_family
   end
 
   def scope
