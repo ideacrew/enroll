@@ -5,7 +5,7 @@ module FinancialAssistance
   class ApplicationsController < FinancialAssistance::ApplicationController
 
     before_action :set_current_person
-    before_action :find_and_authorize_application, :except => [:index, :index_with_filter, :new, :uqhp_flow, :review, :raw_application, :checklist_pdf]
+    before_action :find_and_authorize_application, :except => [:index, :index_with_filter, :new, :uqhp_flow, :review, :raw_application]
 
     around_action :cache_current_hbx, :only => [:index_with_filter]
 
@@ -310,8 +310,6 @@ module FinancialAssistance
     end
 
     def checklist_pdf
-      authorize Application, :can_view_checklist_pdf?
-
       send_file(
         FinancialAssistance::Engine.root.join(
           FinancialAssistanceRegistry[:ivl_application_checklist].setting(:file_location).item.to_s
