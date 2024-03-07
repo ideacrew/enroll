@@ -26,7 +26,7 @@ module FinancialAssistance
     # We should ONLY be getting applications that are associated with PrimaryFamily of Current Person.
     # DO NOT include applications from other families.
     def index
-      @applications = FinancialAssistance::Application.where("family_id" => family.id)
+      @applications = FinancialAssistance::Application.where("family_id" => @family.id)
 
       if @applications.present?
         authorize @applications.order('submitted_at desc').first, :can_authorize_family?
@@ -38,7 +38,7 @@ module FinancialAssistance
     def index_with_filter
       result = FinancialAssistance::Operations::Applications::QueryFilteredApplications.new.call(
         {
-          family_id: family.id,
+          family_id: @family.id,
           filter_year: params.dig(:filter, :year)
         }
       )
