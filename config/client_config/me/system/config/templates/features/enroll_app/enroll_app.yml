@@ -260,6 +260,8 @@ registry:
             item: true
           - key: :medicaid_agency_phone
             item: '(855) 797-4357'
+          - key: :medicaid_agency_url
+            item: ''
           - key: :verifiable_immigration_statuses
             item: true
           - key: :appeal_link
