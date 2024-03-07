@@ -21,6 +21,7 @@ FactoryBot.define do
     ridp_documents {[FactoryBot.build(:ridp_document)]}
     bookmark_url { nil }
     is_applying_coverage { true }
+    identity_validation { 'valid' }
 
     transient do
       vlp_document { FactoryBot.build(:vlp_document) }

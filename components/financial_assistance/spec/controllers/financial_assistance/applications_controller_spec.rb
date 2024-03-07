@@ -245,7 +245,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       before do
         allow(admin_user).to receive(:try).with(:id).and_call_original
         allow(admin_user).to receive(:try).with(:person).and_return(admin_person)
-        allow(admin_person).to receive(:hbx_staff_role).and_return(true)
+        allow(admin_person).to receive(:agent?).and_return(true)
         sign_in(admin_user)
         allow(controller).to receive(:current_user).and_return(admin_user)
       end
@@ -261,9 +261,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     context 'broker logged in' do
       let!(:broker_user) { FactoryBot.create(:user, :person => writing_agent.person, roles: ['broker_role', 'broker_agency_staff_role']) }
       let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
-      let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
+      let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: "active") }
       let(:assister)  do
-        assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00")
+        assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00", aasm_state: "active")
         assister.save(validate: false)
         assister
       end
@@ -290,7 +290,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
           get :edit, params: { id: application.id }
           expect(assigns(:application)).to eq application
           expect(response).to have_http_status(:redirect)
-          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.can_access_application?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.can_authorize_family?, (Pundit policy)")
         end
       end
     end
@@ -532,9 +532,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     context 'broker logged in' do
       let!(:broker_user) { FactoryBot.create(:user, :person => writing_agent.person, roles: ['broker_role', 'broker_agency_staff_role']) }
       let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
-      let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
+      let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: "active") }
       let(:assister)  do
-        assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00")
+        assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00", aasm_state: "active")
         assister.save(validate: false)
         assister
       end
@@ -571,7 +571,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
           get :copy, params: { id: application.id }
           expect(response).to have_http_status(:redirect)
-          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.can_access_application?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.can_authorize_family?, (Pundit policy)")
         end
       end
     end
