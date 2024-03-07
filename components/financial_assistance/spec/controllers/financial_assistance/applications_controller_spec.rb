@@ -35,7 +35,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   let(:application_period) {effective_on.beginning_of_year..effective_on.end_of_year}
 
   describe "GET index" do
-
     before(:each) do
       sign_in user
     end
@@ -180,8 +179,8 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   let!(:applicant2) { FactoryBot.create(:applicant, application: application2,  family_member_id: family_member_id) }
   let(:application_valid_params) { {"medicaid_terms" => "yes", "report_change_terms" => "yes", "medicaid_insurance_collection_terms" => "yes", "parent_living_out_of_home_terms" => "true", "attestation_terms" => "yes", "submission_terms" => "yes"} }
   let!(:hbx_profile) {FactoryBot.create(:hbx_profile,:open_enrollment_coverage_period)}
-  let(:admin_person) { FactoryBot.create(:person) }
-  let(:admin_user) { FactoryBot.create(:user, :person => admin_person, oim_id: '1234567899', email: 'test@test.com') }
+  let(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+  let(:admin_user) { FactoryBot.create(:user, :with_hbx_staff_role, :person => admin_person, oim_id: '1234567899', email: 'test@test.com') }
 
   #set of objects that doesnt belong to the first family/user to validate the records returned only belong to the user logged in
   let(:person10) { FactoryBot.create(:person, :with_consumer_role)}
@@ -233,7 +232,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
   describe "GET edit" do
     context "With valid data" do
-
       it "should render" do
         get :edit, params: { id: application.id }
         expect(assigns(:application)).to eq application
@@ -242,21 +240,12 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     context "With missing family id" do
-      before do
-        allow(admin_user).to receive(:try).with(:id).and_call_original
-        allow(admin_user).to receive(:try).with(:person).and_return(admin_person)
-        allow(admin_person).to receive(:agent?).and_return(true)
-        sign_in(admin_user)
-        allow(controller).to receive(:current_user).and_return(admin_user)
-      end
-
       it "should find the correct application" do
-        get :edit, params: { id: application.id }
+        sign_in(admin_user)
+        get :edit, params: { id: application.id }, session: { person_id: application.family.primary_person.id }
         expect(assigns(:application)).to eq application
       end
-
     end
-
 
     context 'broker logged in' do
       let!(:broker_user) { FactoryBot.create(:user, :person => writing_agent.person, roles: ['broker_role', 'broker_agency_staff_role']) }
@@ -595,7 +584,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     context 'when the application does not have valid relations' do
-
       before do
         allow_any_instance_of(FinancialAssistance::Application).to receive(:valid_relations?).and_return(false)
       end
@@ -609,10 +597,10 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   end
 
   context "GET review" do
-
     before do
       sign_in(user)
     end
+
     it "should be successful" do
       application.update_attributes(:aasm_state => "submitted")
       get :review, params: { id: application.id }
@@ -696,16 +684,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     context "With missing family id" do
-      before do
-        allow(admin_user).to receive(:try).with(:id).and_call_original
-        allow(admin_user).to receive(:try).with(:person).and_return(admin_person)
-        allow(admin_person).to receive(:hbx_staff_role).and_return(true)
-        sign_in(admin_user)
-        allow(controller).to receive(:current_user).and_return(admin_user)
-      end
-
       it "should find application" do
-        get :wait_for_eligibility_response, params: { id: application.id }
+        sign_in(admin_user)
+        get :wait_for_eligibility_response, params: { id: application.id }, session: { person_id: application.family.primary_person.id }
         expect(assigns(:application)).to eq application
       end
     end
@@ -721,16 +702,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     context "With missing family id" do
-      before do
-        allow(admin_user).to receive(:try).with(:id).and_call_original
-        allow(admin_user).to receive(:try).with(:person).and_return(admin_person)
-        allow(admin_person).to receive(:hbx_staff_role).and_return(true)
-        sign_in(admin_user)
-        allow(controller).to receive(:current_user).and_return(admin_user)
-      end
-
       it 'should find the correct application' do
-        get :eligibility_results, params: {:id => application.id, :cur => 1}
+        sign_in(admin_user)
+        get :eligibility_results, params: {:id => application.id, :cur => 1}, session: { person_id: application.family.primary_person.id }
         expect(assigns(:application)).to eq application
       end
     end
@@ -752,11 +726,8 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       let!(:permission) { FactoryBot.create(:permission, :super_admin) }
       let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
 
-      before do
-        sign_in(admin_user)
-      end
-
       it 'should find application with missing family id' do
+        sign_in(admin_user)
         get :application_publish_error, params: { id: application.id }
         expect(assigns(:application)).to eq application
         expect(response).to render_template(:financial_assistance_nav)
@@ -795,17 +766,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   end
 
   context "with missing family id" do
-    before do
-      allow(admin_user).to receive(:try).with(:id).and_call_original
-      allow(admin_user).to receive(:try).with(:person).and_return(admin_person)
-      allow(admin_person).to receive(:hbx_staff_role).and_return(true)
-      sign_in(admin_user)
-      allow(controller).to receive(:current_user).and_return(admin_user)
-
-    end
-
     it "should find the correct application" do
-      get :check_eligibility_results_received, params: { id: application.id }
+      sign_in(admin_user)
+      get :check_eligibility_results_received, params: { id: application.id }, session: { person_id: application.family.primary_person.id }
       expect(assigns(:application)).to eq application
     end
   end
@@ -846,17 +809,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     context "with missing family id" do
-      before do
-        allow(admin_user).to receive(:try).with(:id).and_call_original
-        allow(admin_user).to receive(:try).with(:person).and_return(admin_person)
-        allow(admin_person).to receive(:hbx_staff_role).and_return(true)
-        sign_in(admin_user)
-        allow(controller).to receive(:current_user).and_return(admin_user)
-
-      end
-
       it "finds the correct application" do
-        get :eligibility_response_error, params: { id: application.id }
+        sign_in(admin_user)
+        get :eligibility_response_error, params: { id: application.id }, session: { person_id: application.family.primary_person.id }
         expect(assigns(:application)).to eq application
       end
     end
