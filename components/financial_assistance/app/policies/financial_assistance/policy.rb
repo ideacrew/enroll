@@ -7,7 +7,7 @@ module FinancialAssistance
     private
 
     def can_authorize_family?(family)
-      ::FamilyPolicy.new(user, family).can_authorize_individual_market_family?
+      ::FamilyPolicy.new(user, family).can_authorize_individual_market?
     end
   end
 end
