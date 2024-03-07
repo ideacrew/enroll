@@ -6,6 +6,10 @@ describe FixExperianVerifiedPeople, dbclean: :after_each do
 
   let(:person) { FactoryBot.create(:person, :with_consumer_role)}
 
+  before do
+    person.consumer_role.update!(identity_validation: 'na')
+  end
+
   it "moves identity and application documents to verified state" do
     person.user = FactoryBot.create(:user)
     person.user.update_attributes!("identity_final_decision_code" => "acc")
