@@ -29,7 +29,7 @@ module FinancialAssistance
       @applications = FinancialAssistance::Application.where("family_id" => @family.id)
 
       if @applications.present?
-        authorize @applications.order('submitted_at desc').first, :can_authorize_family?
+        authorize @applications.order('submitted_at desc').first, :can_authorize_application?
       else
         authorize @family, :can_authorize_individual_market?
       end
@@ -47,7 +47,7 @@ module FinancialAssistance
         @applications = value[:applications]
 
         if @applications.present?
-          authorize @applications.order('submitted_at desc').first, :can_authorize_family?
+          authorize @applications.order('submitted_at desc').first, :can_authorize_application?
         else
           authorize @family, :can_authorize_individual_market?
         end
@@ -198,7 +198,7 @@ module FinancialAssistance
       @application = FinancialAssistance::Application.where(id: params["id"]).first
       return redirect_to applications_path if @application.blank?
 
-      authorize @application, :can_authorize_family?
+      authorize @application, :can_authorize_application?
       @applicants = @application.active_applicants
       build_applicants_name_by_hbx_id_hash
     end
@@ -449,7 +449,7 @@ module FinancialAssistance
     def find_and_authorize_application
       application = find_application
 
-      authorize application, :can_authorize_family?
+      authorize application, :can_authorize_application?
     end
 
     def save_faa_bookmark(url)
