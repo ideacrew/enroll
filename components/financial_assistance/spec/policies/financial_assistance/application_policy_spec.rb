@@ -10,18 +10,9 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     let(:consumer_role) { person.consumer_role }
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
     let(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id) }
-    # let(:primary_applicant) do
-    #   FactoryBot.create(
-    #     :financial_assistance_applicant,
-    #     application: application,
-    #     family_member_id: primary_family_member.id,
-    #     person_hbx_id: person.hbx_id
-    #   )
-    # end
 
     permissions :can_authorize_family? do
       before do
-        # primary_applicant
         consumer_role.move_identity_documents_to_verified
       end
 
