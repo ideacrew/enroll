@@ -59,14 +59,13 @@ class ApplicationPolicy
   end
 
   # Checks if the primary person of the given family has their identity verified.
-  # For Employee Role and Resident Role, RIDP verification is not required.
-  # Also, roles should not be blocked because of RIDP Verification check.
+  # The method assumes that the consumer_role is already defined and belongs to the primary person of the family.
   #
   # @param family [Family] The family to check.
-  # @return [Boolean] Returns true if the primary person of the family has their identity verified or if the consumer role is blank, false otherwise.
+  # @return [Boolean] Returns true if the primary person of the family has their identity verified, false otherwise.
   def ridp_verified_primary_person?(family)
     consumer_role = family.primary_person.consumer_role
-    return true if consumer_role.blank?
+    return false if consumer_role.blank?
 
     consumer_role.identity_verified?
   end
@@ -77,7 +76,7 @@ class ApplicationPolicy
   # @return [Boolean, nil] Returns true if the user is an individual market admin,
   # false if they are not, or nil if the user or their permissions are not defined.
   def individual_market_admin?
-    hbx_staff_modify_family?
+    user.person.hbx_staff_role&.permission&.modify_family
   end
 
   # Checks if the user is a shop market admin.
