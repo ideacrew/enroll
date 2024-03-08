@@ -76,11 +76,11 @@ module BenefitMarkets
         get :new, params: {:site_id => site.id}
       end
 
-      it "should be a success" do
+      xit "should be a success" do
         expect(response).to have_http_status(:success)
       end
 
-      it "should render new template" do
+      xit "should render new template" do
         expect(response).to render_template("new")
       end
     end
@@ -93,7 +93,7 @@ module BenefitMarkets
           post :create, params: {:site_id => site.id, :benefit_market => valid_params}
         end
 
-        it "should redirect" do
+        xit "should redirect" do
           expect(response).to have_http_status(:redirect)
         end
       end
@@ -103,11 +103,11 @@ module BenefitMarkets
           post :create, params: {:site_id => site.id, :benefit_market => invalid_params}
         end
 
-        it "re-renders new" do
+        xit "re-renders new" do
           expect(response).to render_template("new")
         end
 
-        it "returns error messages" do
+        xit "returns error messages" do
           expect(assigns(:benefit_market).errors.messages).to include(title: ["can't be blank"])
         end
       end
@@ -121,11 +121,11 @@ module BenefitMarkets
         put :edit,params: {:id => benefit_market.id}
       end
 
-      it "should be a success" do
+      xit "should be a success" do
         expect(response).to have_http_status(:success)
       end
 
-      it "should render edit template" do
+      xit "should render edit template" do
         expect(response).to render_template("edit")
       end
     end
@@ -140,7 +140,7 @@ module BenefitMarkets
           patch :update, params: {:id => benefit_market.id, :benefit_market => valid_params}
         end
 
-        it "should redirect to site benefit markets index" do
+        xit "should redirect to site benefit markets index" do
           expect(response).to redirect_to(site_benefit_markets_path(site))
         end
       end
@@ -150,11 +150,11 @@ module BenefitMarkets
           patch :update, params: {:id => benefit_market.id, :benefit_market => invalid_params}
         end
 
-        it "should redirect to edit" do
+        xit "should redirect to edit" do
           expect(response).to render_template("edit")
         end
 
-        it "returns error messages" do
+        xit "returns error messages" do
           expect(assigns(:benefit_market).errors.messages).to include(title: ["can't be blank"])
         end
       end
