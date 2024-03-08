@@ -107,9 +107,13 @@ coverage
 
 .env
 
-# Ignore HUGO output dirs
+# Exclude hugo content
+hugo/.hugo_build.lock
+hugo/node_modules
 hugo/public
-hugo/static
+hugo/static/doc
+hugo/package-lock.json
+hugo/resources/_gen
 
 # Intermediary Cucumber Reports
 /ci/cucumber/*.json
