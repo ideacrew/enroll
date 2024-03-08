@@ -16,7 +16,13 @@
     <%= javascript_pack_tag ENV['CLIENT'] %>
     <%= stylesheet_pack_tag ENV['CLIENT'] %>
     <%= javascript_pack_tag 'legacy', 'data-turbolinks-track': 'reload' %>
-    <script src="https://code.jquery.com/jquery-migrate-3.4.1.js"></script>
+    <!-- JQuery migrate has 2 versions, one for development/testing and one for production.
+         The former will show the areas it is patching, the latter won't -->
+    <% if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true' || !Rails.env.production? %>
+      <script src="https://code.jquery.com/jquery-migrate-3.4.1.js"></script>
+    <% else %>
+      <script src="https://code.jquery.com/jquery-migrate-3.4.1.min.js"></script>
+    <% end %>
     <%= csrf_meta_tags %>
 
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
