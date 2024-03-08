@@ -7,12 +7,11 @@ Feature: Cost Savings Raw Application
   Background:
     Given the FAA feature configuration is enabled
     And FAA display_medicaid_question feature is enabled
-    And a family with financial application in determined state exists
+    And a family with financial application and applicants in determined state exists
+    And the user is RIDP verified
     And the user with hbx_staff role is logged in
 
   Scenario: FAA Feature Is Enabled - Admin logs in and clicks on Person
-    And a family with financial application in determined state exists
-    And the user with hbx_staff role is logged in
     When admin visits home page
     And the Cost Savings link is visible
     And user clicks on Cost Savings link
@@ -20,8 +19,6 @@ Feature: Cost Savings Raw Application
     Then the user should see text Full Application
 
   Scenario: FAA Feature Is Enabled - Admin clicks on Full application action
-    And a family with financial application in determined state exists
-    And the user with hbx_staff role is logged in
     When admin visits home page
     And the Cost Savings link is visible
     And user clicks on Cost Savings link
@@ -33,7 +30,6 @@ Feature: Cost Savings Raw Application
     And user should see Medicaid eligibility question
 
   Scenario: FAA Feature Is Enabled - Admin clicks on Full application action
-    And a family with financial application and applicants in determined state exists
     And the primary applicant age greater than 18
     And the user with hbx_staff role is logged in
     When admin visits home page
@@ -45,7 +41,6 @@ Feature: Cost Savings Raw Application
     Then admin should see county under Mailing and Home address
 
   Scenario: MVS Feature Is Enabled - Admin clicks on Full application action and sees MVS question
-    And a family with financial application and applicants in determined state exists
     And the primary applicant age greater than 18
     And FAA minimum_value_standard_question feature is enabled
     And FAA disable_employer_address_fields feature is enabled
@@ -63,6 +58,7 @@ Feature: Cost Savings Raw Application
   Scenario: Admin clicks on Full application action, sees TYPES of other income
     When the ssi_income_types feature is enabled
     When an applicant with other income exists for a determined financial application
+    And the user is RIDP verified
     And the primary applicant age greater than 18
     And the user with hbx_staff role is logged in
     When admin visits home page
@@ -75,7 +71,6 @@ Feature: Cost Savings Raw Application
     And the wages and salaries type should display
 
   Scenario: Admin clicks on review application action, sees caretaker questions
-    Given a family with financial application and applicants in determined state exists
     And the primary applicant age greater than 18
     And the user with hbx_staff role is logged in
     When admin visits home page
