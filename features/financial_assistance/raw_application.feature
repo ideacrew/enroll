@@ -57,6 +57,7 @@ Feature: Cost Savings Raw Application
   Scenario: Admin clicks on Full application action, sees TYPES of other income
     When the ssi_income_types feature is enabled
     When an applicant with other income exists for a determined financial application
+    And the primary applicant age greater than 18
     And the user is RIDP verified
     And the user with hbx_staff role is logged in
     When admin visits home page
