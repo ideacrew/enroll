@@ -10,7 +10,7 @@ module FinancialAssistance
     # TODO: Add policies for all the endpoints of the ApplicationController for Application
     # Call the test method to check if the user has the necessary permissions to perform actions on application(s)
 
-    def can_authorize_application?
+    def can_access_application?
       can_authorize_family?(record.family)
     end
   end
