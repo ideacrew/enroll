@@ -1,9 +1,10 @@
 class ApplicationPolicy
-  attr_reader :user, :record
+  attr_reader :user, :record, :current_person
 
   def initialize(user, record)
     @user = user
     @record = record
+    @current_person = user&.person
   end
 
   # Checks if the primary person of the given family is an individual market primary family member.
@@ -23,9 +24,9 @@ class ApplicationPolicy
   # @param family [Family] The family to check.
   # @return [Boolean] Returns true if the user is associated with an active broker for the family, false otherwise.
   def active_associated_family_broker?(family)
-    return false unless user.person
-    broker_role = user.person.broker_role
-    broker_staff_roles = user.person.broker_agency_staff_roles.where(aasm_state: 'active')
+    return false unless current_person
+    broker_role = current_person.broker_role
+    broker_staff_roles = current_person.broker_agency_staff_roles.where(aasm_state: 'active')
 
     return false if (broker_role.blank? || !broker_role.active?) && broker_staff_roles.blank?
     return false if broker_profile_ids(family).blank?
@@ -40,9 +41,9 @@ class ApplicationPolicy
   # @param family [Family] The family to check.
   # @return [Boolean] Returns true if the user is associated with an active broker for the family, false otherwise.
   def active_associated_family_general_agency?(family)
-    return false unless user.person
+    return false unless current_person
 
-    ga_roles = user.person&.active_general_agency_staff_roles
+    ga_roles = current_person&.active_general_agency_staff_roles
     return false if ga_roles.blank?
     return false if broker_profile_ids(family).blank?
 
@@ -85,7 +86,7 @@ class ApplicationPolicy
   # @return [Boolean, nil] Returns true if the user is a shop market admin,
   # false if they are not, or nil if the user or their permissions are not defined.
   def shop_market_admin?
-    user.person.hbx_staff_role&.permission&.modify_employer
+    current_person.hbx_staff_role&.permission&.modify_employer
   end
 
   # Checks if the user is a fehb market admin.
@@ -113,7 +114,7 @@ class ApplicationPolicy
     individual_market_primary_family_member?(family) || individual_market_admin? || active_associated_family_broker?(family)
   end
 
-  def can_access_individual_market_family(family)
+  def can_access_individual_market_family?(family)
     ridp_verified_primary_person?(family) &&
       (
         individual_market_primary_family_member?(family) ||
@@ -164,7 +165,7 @@ class ApplicationPolicy
   # @return [Boolean, nil] Returns true if the user is an hbx staff modify family,
   # false if they are not, or nil if the user or their permissions are not defined.
   def hbx_staff_modify_family?
-    user.person.hbx_staff_role&.permission&.modify_family
+    current_person.hbx_staff_role&.permission&.modify_family
   end
 
   def scope

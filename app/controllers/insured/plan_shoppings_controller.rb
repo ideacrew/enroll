@@ -255,7 +255,7 @@ class Insured::PlanShoppingsController < ApplicationController
   private
 
   def authorize_current_user
-    authorize @hbx_enrollment, :can_access_enrollment?
+    authorize @hbx_enrollment.family, :can_access_enrollment?
   end
 
   def show_ivl(hbx_enrollment_id)

@@ -169,4 +169,17 @@ class FamilyPolicy < ApplicationPolicy
   def can_access_individual_market?
     can_access_individual_market_family?(record)
   end
+
+  def can_access_enrollment?
+    case record.kind
+    when HbxEnrollment::INDIVIDUAL_KIND
+      can_access_individual_market_family?(record)
+    when HbxEnrollment::COVERALL_KIND
+      can_access_individual_market_family_without_ridp?(record)
+    when *HbxEnrollment::GROUP_KINDS
+      can_access_shop_market_family?(record) || can_access_fehb_market_family?(record)
+    else
+      false
+    end
+  end
 end
