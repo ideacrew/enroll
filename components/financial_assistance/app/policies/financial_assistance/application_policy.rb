@@ -1,15 +1,14 @@
 # frozen_string_literal: true
 
 module FinancialAssistance
-  # This class is base policy class
-  # The ApplicationPolicy class is responsible for determining what actions a user can perform on Application records.
-  # It checks if the user has the necessary permissions to perform actions on applications.
-  # The permissions are determined based on the user's role and their relationship to the record.
+  # The ApplicationPolicy class defines the policy for accessing financial assistance applications.
+  # It provides methods to check if a user has the necessary permissions to perform various actions on an application.
   class ApplicationPolicy < Policy
 
-    # TODO: Add policies for all the endpoints of the ApplicationController for Application
-    # Call the test method to check if the user has the necessary permissions to perform actions on application(s)
-
+    # Checks if the user can access the application.
+    # A user can access the application if they are authorized to access the family associated with the application.
+    #
+    # @return [Boolean] Returns true if the user can access the application, false otherwise.
     def can_access_application?
       can_authorize_family?(record.family)
     end
