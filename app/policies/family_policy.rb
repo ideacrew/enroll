@@ -167,11 +167,16 @@ class FamilyPolicy < ApplicationPolicy
   end
 
   # Checks if the user can access the individual market for the current family record.
-  # This method delegates the check to the `can_access_individual_market_family?`
-  # method with the current family record as the parameter.
+  # A user can access the individual market if the primary person of the family has their identity verified,
+  # and the user is either the primary family member, associated with an active broker, or an individual market admin.
   #
   # @return [Boolean] Returns true if the user can access the individual market for the current family record, false otherwise.
   def can_access_individual_market?
-    can_access_individual_market_family?(record)
+    ridp_verified_primary_person?(record) &&
+      (
+        individual_market_primary_family_member?(record) ||
+          active_associated_family_broker?(record) ||
+          individual_market_admin?
+      )
   end
 end
