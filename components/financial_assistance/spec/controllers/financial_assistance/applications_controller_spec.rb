@@ -286,7 +286,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
           get :edit, params: { id: application.id }
           expect(assigns(:application)).to eq application
           expect(response).to have_http_status(:redirect)
-          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.can_authorize_application?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.can_access_application?, (Pundit policy)")
         end
       end
     end
@@ -567,7 +567,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
           get :copy, params: { id: application.id }
           expect(response).to have_http_status(:redirect)
-          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.can_authorize_application?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.can_access_application?, (Pundit policy)")
         end
       end
     end

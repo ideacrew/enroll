@@ -85,7 +85,7 @@ class ApplicationPolicy
     false
   end
 
-  def can_authorize_individual_market_family?(family)
+  def can_access_individual_market_family?(family)
     ridp_verified_primary_person?(family) &&
       (
         individual_market_primary_family_member?(family) ||

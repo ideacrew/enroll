@@ -166,7 +166,7 @@ class FamilyPolicy < ApplicationPolicy
     user.has_hbx_staff_role? && user.person.hbx_staff_role.permission.can_view_audit_log
   end
 
-  def can_authorize_individual_market?
-    can_authorize_individual_market_family?(record)
+  def can_access_individual_market?
+    can_access_individual_market_family?(record)
   end
 end

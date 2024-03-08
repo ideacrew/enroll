@@ -29,9 +29,9 @@ module FinancialAssistance
       @applications = FinancialAssistance::Application.where("family_id" => @family.id)
 
       if @applications.present?
-        authorize @applications.order('submitted_at desc').first, :can_authorize_application?
+        authorize @applications.order('submitted_at desc').first, :can_access_application?
       else
-        authorize @family, :can_authorize_individual_market?
+        authorize @family, :can_access_individual_market?
       end
     end
 
@@ -47,9 +47,9 @@ module FinancialAssistance
         @applications = value[:applications]
 
         if @applications.present?
-          authorize @applications.order('submitted_at desc').first, :can_authorize_application?
+          authorize @applications.order('submitted_at desc').first, :can_access_application?
         else
-          authorize @family, :can_authorize_individual_market?
+          authorize @family, :can_access_individual_market?
         end
 
         @filtered_applications = value[:filtered_applications]
@@ -60,7 +60,7 @@ module FinancialAssistance
     end
 
     def new
-      authorize @family, :can_authorize_individual_market?
+      authorize @family, :can_access_individual_market?
 
       @application = FinancialAssistance::Application.new
     end
@@ -155,7 +155,7 @@ module FinancialAssistance
     end
 
     def uqhp_flow
-      authorize @family, :can_authorize_individual_market?
+      authorize @family, :can_access_individual_market?
       ::FinancialAssistance::Application.where(aasm_state: "draft", family_id: get_current_person.financial_assistance_identifier).destroy_all
       redirect_to main_app.insured_family_members_path(consumer_role_id: @person.consumer_role.id)
     end
@@ -198,7 +198,7 @@ module FinancialAssistance
       @application = FinancialAssistance::Application.where(id: params["id"]).first
       return redirect_to applications_path if @application.blank?
 
-      authorize @application, :can_authorize_application?
+      authorize @application, :can_access_application?
       @applicants = @application.active_applicants
       build_applicants_name_by_hbx_id_hash
     end
@@ -449,7 +449,7 @@ module FinancialAssistance
     def find_and_authorize_application
       application = find_application
 
-      authorize application, :can_authorize_application?
+      authorize application, :can_access_application?
     end
 
     def save_faa_bookmark(url)
