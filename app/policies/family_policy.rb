@@ -31,11 +31,9 @@ class FamilyPolicy < ApplicationPolicy
 
   def destroy?; end
 
-  def edit?; end
-
   def index?; end
 
-  def show?
+  def legacy_show?
     user_person = @user.person
     if user_person
       primary_applicant = @record.primary_applicant
