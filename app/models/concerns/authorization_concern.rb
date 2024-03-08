@@ -6,7 +6,7 @@ module AuthorizationConcern
     # :confirmable, :lockable, :timeoutable and :omniauthable
     if EnrollRegistry.feature_enabled?(:prevent_concurrent_sessions)
       devise :database_authenticatable, :registerable, :lockable,
-             :recoverable, :jwt_authenticatable, :rememberable, :trackable, :timeoutable,
+             :recoverable, :jwt_authenticatable, :rememberable, :trackable, :timeoutable, :expirable,
              :session_limitable, # Limit number of sessions
              :authentication_keys => {email: false, login: true},
              jwt_revocation_strategy: self
@@ -46,6 +46,11 @@ module AuthorizationConcern
     ## Session Limitable
     field :unique_session_id, type: String
 
+    ## Expirable
+
+    field :last_activity_at, type: Time
+    field :expired_at, type: Time
+    
     validate :password_complexity
     validates :password, format: { without: /\s/, message: "Password must not contain spaces"}
     validates_presence_of     :password, if: :password_required?
@@ -59,6 +64,11 @@ module AuthorizationConcern
     before_save :ensure_authentication_token
 
     has_many :whitelisted_jwts
+ 
+    def update_last_activity!
+      return unless EnrollRegistry.feature_enabled?(:admin_account_autolock)
+      self.update_attributes!(last_activity_at: Time.now) if has_hbx_staff_role?
+    end
 
     def generate_jwt(scope, audience)
       token, payload = Warden::JWTAuth::UserEncoder.new.call(
