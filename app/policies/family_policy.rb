@@ -33,6 +33,7 @@ class FamilyPolicy < ApplicationPolicy
 
   def index?; end
 
+  # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   def legacy_show?
     user_person = @user.person
     if user_person
@@ -65,6 +66,7 @@ class FamilyPolicy < ApplicationPolicy
     end
     false
   end
+  # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
   def can_view_entire_family_enrollment_history?
     return true if user.person.hbx_staff_role

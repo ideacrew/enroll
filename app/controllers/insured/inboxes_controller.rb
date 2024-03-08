@@ -27,8 +27,8 @@ class Insured::InboxesController < InboxesController # rubocop:disable Style/Cla
 
     # We're using a FamilyPolicy method here because a modifying a Consumer/Employee/Resident Inbox has all of the same permissions as Family
     # All users/roles with the permissions to alter a Family should have the same permissions on the Inbox/Messages
-    # While using a single :show? method from the family policy isn't ideal, it does cover a variety of unforseen edge cases that could emerge when determining access permissions for insured/inboxes
-    authorize associated_family, :show?
+    # While using a single :legacy_show? method from the family policy isn't ideal, it does cover a variety of unforseen edge cases that could emerge when determining access permissions for insured/inboxes
+    authorize associated_family, :legacy_show?
 
     # We assign @inbox_provider here as to avoid making a duplicate call
     @inbox_provider = person
