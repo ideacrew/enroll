@@ -23,14 +23,38 @@ class ApplicationPolicy
   # @param family [Family] The family to check.
   # @return [Boolean] Returns true if the user is associated with an active broker for the family, false otherwise.
   def active_associated_family_broker?(family)
-    broker = user.person.broker_role
-    return false if broker.blank? || !broker.active?
+    return false unless user.person
+    broker_role = user.person.broker_role
+    broker_staff_roles = user.person.broker_agency_staff_roles.where(aasm_state: 'active')
 
-    broker_agency_account = family.active_broker_agency_account
-    return false if broker_agency_account.blank?
+    return false if (broker_role.blank? || !broker_role.active?) && broker_staff_roles.blank?
+    return false if broker_profile_ids(family).blank?
 
-    broker_agency_account.benefit_sponsors_broker_agency_profile_id == broker.benefit_sponsors_broker_agency_profile_id &&
-      broker_agency_account.writing_agent_id == broker.id
+    broker_profile_ids(family).include?(broker_role.benefit_sponsors_broker_agency_profile_id) || broker_staff_roles.map(&:benefit_sponsors_broker_agency_profile_id).include?(ivl_broker_agency_id(family))
+  end
+
+  # Checks if the user is associated with an active general agency for the given family.
+  # A user is considered associated with an active general agency if the broker is not blank, is active,
+  # and matches the general agency associated with the active broker agency account of the family.
+  #
+  # @param family [Family] The family to check.
+  # @return [Boolean] Returns true if the user is associated with an active broker for the family, false otherwise.
+  def active_associated_family_general_agency?(family)
+    return false unless user.person
+
+    ga_roles = user.person&.active_general_agency_staff_roles
+    return false if ga_roles.blank?
+    return false if broker_profile_ids(family).blank?
+
+    ::SponsoredBenefits::Organizations::PlanDesignOrganization.where(
+      :owner_profile_id.in => broker_profile_ids(family),
+      :general_agency_accounts => {
+        :"$elemMatch" => {
+          aasm_state: :active,
+          :benefit_sponsrship_general_agency_profile_id.in => ga_roles.map(&:benefit_sponsors_general_agency_profile_id)
+        }
+      }
+    ).present?
   end
 
   # Checks if the primary person of the given family has their identity verified.
@@ -92,6 +116,14 @@ class ApplicationPolicy
           active_associated_family_broker?(family) ||
           individual_market_admin?
       )
+  end
+
+  def can_access_shop_market_family?(family)
+    shop_market_primary_family_member?(family) || shop_market_admin? || active_associated_family_broker?(family) || active_associated_family_general_agency?(family)
+  end
+
+  def can_accss_fehb_market_family?(family)
+    fehb_market_primary_family_member?(family) || shop_market_admin? || active_associated_family_broker?(family) || active_associated_family_general_agency?(family)
   end
 
   def index?
@@ -166,5 +198,21 @@ class ApplicationPolicy
     def resolve
       scope
     end
+  end
+
+  private
+
+  def broker_profile_ids(family)
+    @broker_profile_ids ||= ([ivl_broker_agency_id(family)] + shop_broker_agency_ids(family)).compact
+  end
+
+  def ivl_broker_agency_id(family)
+    @ivl_broker_agency_id ||= family.current_broker_agency&.benefit_sponsors_broker_agency_profile_id
+  end
+
+  def shop_broker_agency_ids(family)
+    @shop_broker_agency_ids ||= family.primary_person.active_employee_roles.map do |er|
+      er.employer_profile&.active_broker_agency_account&.benefit_sponsors_broker_agency_profile_id
+    end.compact
   end
 end
