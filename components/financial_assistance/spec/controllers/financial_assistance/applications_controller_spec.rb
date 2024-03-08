@@ -573,14 +573,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
   end
 
-  context "uqhp_flow" do
-    it "should redirect to insured family members" do
-      get :uqhp_flow
-      expect(FinancialAssistance::Application.where(family_id: family_id, aasm_state: "draft").count).to eq 0
-      expect(response).to redirect_to(main_app.insured_family_members_path(consumer_role_id: person.consumer_role.id))
-    end
-  end
-
   context "GET review_and_submit" do
     it 'should review and submit page' do
       application.update_attributes(:aasm_state => "draft")
