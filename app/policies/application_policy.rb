@@ -85,6 +85,13 @@ class ApplicationPolicy
     false
   end
 
+  # Checks if the user can access the individual market for the given family.
+  # A user can access the individual market for the family if the primary person of the family has their identity verified,
+  # and the user is either the primary family member, associated with an active broker, or an individual market admin.
+  # This method is specifically used for Individual market endpoints where the primary person is expected to be RIDP verified.
+  #
+  # @param family [Family] The family to check.
+  # @return [Boolean] Returns true if the user can access the individual market for the family, false otherwise.
   def can_access_individual_market_family?(family)
     ridp_verified_primary_person?(family) &&
       (

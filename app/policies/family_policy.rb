@@ -166,6 +166,11 @@ class FamilyPolicy < ApplicationPolicy
     user.has_hbx_staff_role? && user.person.hbx_staff_role.permission.can_view_audit_log
   end
 
+  # Checks if the user can access the individual market for the current family record.
+  # This method delegates the check to the `can_access_individual_market_family?`
+  # method with the current family record as the parameter.
+  #
+  # @return [Boolean] Returns true if the user can access the individual market for the current family record, false otherwise.
   def can_access_individual_market?
     can_access_individual_market_family?(record)
   end

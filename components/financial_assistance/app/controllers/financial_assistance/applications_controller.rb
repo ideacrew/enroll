@@ -6,7 +6,7 @@ module FinancialAssistance
 
     before_action :set_current_person
     before_action :set_family
-    before_action :find_and_authorize_application, :except => [:index, :index_with_filter, :new, :uqhp_flow, :review, :raw_application]
+    before_action :find_and_authorize_application, :except => [:index, :index_with_filter, :new, :review, :raw_application]
 
     around_action :cache_current_hbx, :only => [:index_with_filter]
 
@@ -26,16 +26,13 @@ module FinancialAssistance
     # We should ONLY be getting applications that are associated with PrimaryFamily of Current Person.
     # DO NOT include applications from other families.
     def index
+      authorize @family, :can_access_individual_market?
       @applications = FinancialAssistance::Application.where("family_id" => @family.id)
-
-      if @applications.present?
-        authorize @applications.order('submitted_at desc').first, :can_access_application?
-      else
-        authorize @family, :can_access_individual_market?
-      end
     end
 
     def index_with_filter
+      authorize @family, :can_access_individual_market?
+
       result = FinancialAssistance::Operations::Applications::QueryFilteredApplications.new.call(
         {
           family_id: @family.id,
@@ -45,12 +42,6 @@ module FinancialAssistance
       if result.success?
         value = result.value!
         @applications = value[:applications]
-
-        if @applications.present?
-          authorize @applications.order('submitted_at desc').first, :can_access_application?
-        else
-          authorize @family, :can_access_individual_market?
-        end
 
         @filtered_applications = value[:filtered_applications]
         @recent_determined_hbx_id = value[:recent_determined_hbx_id]
@@ -149,20 +140,6 @@ module FinancialAssistance
     end
 
     def help_paying_coverage; end
-
-    def render_message
-      @message = params["message"]
-    end
-
-    def uqhp_flow
-      authorize @family, :can_access_individual_market?
-      ::FinancialAssistance::Application.where(aasm_state: "draft", family_id: get_current_person.financial_assistance_identifier).destroy_all
-      redirect_to main_app.insured_family_members_path(consumer_role_id: @person.consumer_role.id)
-    end
-
-    def redirect_to_msg
-      redirect_to render_message_applications_path(message: @message)
-    end
 
     def application_year_selection
       save_faa_bookmark(request.original_url)
