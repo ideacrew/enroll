@@ -18,6 +18,13 @@
       <%= javascript_pack_tag 'contrast_level_aa' %>
       <%= stylesheet_pack_tag 'contrast_level_aa' %>
     <% end %>
+    <!-- JQuery migrate has 2 versions, one for development/testing and one for production.
+      The former will show the areas it is patching, the latter won't -->
+    <% if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true' || !Rails.env.production? %>
+      <script src="https://code.jquery.com/jquery-migrate-3.4.1.js"></script>
+    <% else %>
+      <script src="https://code.jquery.com/jquery-migrate-3.4.1.min.js"></script>
+    <% end %>
 
     <%= action_cable_meta_tag %>
     <%= csrf_meta_tags %>
