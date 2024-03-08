@@ -109,7 +109,11 @@ class ApplicationPolicy
     false
   end
 
-  def can_access_individual_market_family?(family)
+  def can_access_individual_market_family_without_ridp?(family)
+    individual_market_primary_family_member?(family) || individual_market_admin? || active_associated_family_broker?(family)
+  end
+
+  def can_access_individual_market_family(family)
     ridp_verified_primary_person?(family) &&
       (
         individual_market_primary_family_member?(family) ||
@@ -122,7 +126,7 @@ class ApplicationPolicy
     shop_market_primary_family_member?(family) || shop_market_admin? || active_associated_family_broker?(family) || active_associated_family_general_agency?(family)
   end
 
-  def can_accss_fehb_market_family?(family)
+  def can_access_fehb_market_family?(family)
     fehb_market_primary_family_member?(family) || shop_market_admin? || active_associated_family_broker?(family) || active_associated_family_general_agency?(family)
   end
 
