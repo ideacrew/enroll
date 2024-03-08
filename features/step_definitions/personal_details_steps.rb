@@ -6,13 +6,6 @@ Then(/Employee (.*) should click the Personal Tab/) do |named_person|
   find('a.interaction-click-control-personal').click
 end
 
-Then(/Employee (.*) should click Change my Password/) do |named_person|
-  if aca_security_questions
-    wait_for_ajax
-    page.execute_script("document.querySelector('#change_password_link').click()")
-  end
-end
-
 Then(/Employee (.*) should click Update my security challenge responses/) do |named_person|
   if aca_security_questions
     wait_for_ajax

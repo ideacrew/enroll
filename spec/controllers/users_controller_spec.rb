@@ -11,30 +11,6 @@ describe UsersController, dbclean: :after_each do
     DatabaseCleaner.clean
   end
 
-  describe '.change_password' do
-    let(:user) { build(:user, id: '1', password: 'Complex!@#$') }
-    let(:original_password) { 'Complex!@#$' }
-    before do
-      allow(User).to receive(:find).with('1').and_return(user)
-      sign_in(user)
-      post :change_password, params: { id: '1', user: { password: original_password, new_password: 'S0methingElse!@#$', password_confirmation: 'S0methingElse!@#$'} }
-    end
-
-    context "with a matching current password" do
-      xit 'changes the password' do
-        expect(user.valid_password? 'S0methingElse!@#$').to be_truthy
-      end
-    end
-
-    context "with an invalid current password" do
-      let(:original_password) { 'Potato' }
-      xit 'does not change the password' do
-        expect(user.valid_password? 'Complex!@#$').to be_truthy
-      end
-    end
-  end
-
-
   before :each do
     allow(UserPolicy).to receive(:new).with(admin, User).and_return(user_policy)
     allow(User).to receive(:find).with(user_id).and_return(user)
