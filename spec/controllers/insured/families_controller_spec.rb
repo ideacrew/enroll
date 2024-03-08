@@ -131,7 +131,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   end
 
   describe "GET home" do
-    let(:family_access_policy) { instance_double(FamilyPolicy, :show? => true) }
+    let(:family_access_policy) { instance_double(FamilyPolicy, :legacy_show? => true) }
 
     before :each do
       allow(FamilyPolicy).to receive(:new).with(user, family).and_return(family_access_policy)
@@ -831,7 +831,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
           expect(response).to have_http_status(:redirect)
           expect(response).to_not render_template("verification")
-          expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
         end
 
         it 'should not be a success on GET manage_family' do
@@ -839,7 +839,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
           expect(response).to have_http_status(:redirect)
           expect(response).to_not render_template("manage_family")
-          expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
         end
 
         it 'should not be a success on GET personal' do
@@ -847,7 +847,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
           expect(response).to have_http_status(:redirect)
           expect(response).to_not render_template("personal")
-          expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
         end
 
         it 'should not be a success on GET inbox' do
@@ -855,7 +855,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
           expect(response).to have_http_status(:redirect)
           expect(response).to_not render_template("inbox")
-          expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
         end
       end
     end
