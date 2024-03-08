@@ -74,6 +74,15 @@ And(/(.*) has a dependent in (.*) relationship with age (.*) than 26/) do |role,
   final_person.save
 end
 
+And(/consumer has a dependent in (.*) relationship with (.*) role/) do |kind, role|
+
+  if role == 'resident'
+    step "Resident has a dependent in #{kind} relationship with age greater than 26"
+  else
+    step "consumer has a dependent in #{kind} relationship with age greater than 26"
+  end
+end
+
 Given(/a matched Employee exists with resident role/) do
   FactoryBot.create(:employee_role, person: @person, employer_profile: @profile, benefit_sponsors_employer_profile_id: @profile.id)
   ce = FactoryBot.build(
@@ -352,8 +361,16 @@ Then(/(.*) should see primary person/) do |role|
   expect(page).to have_content("Covered: #{primary.first_name}", wait: 10)
 end
 
+Then(/^.* should see primary and dependent person on enrollment$/) do
+  primary = Person.all.select { |person| person.primary_family.present? }.first
+  dependent = Person.all.select { |person| person.primary_family.blank? }.first
+
+  expect(page).to have_content("#{l10n('covered')}: #{primary.first_name} #{dependent.first_name}", wait: 10)
+end
+
 Then(/consumer should see coverage for primary person/) do
   primary = Person.all.select { |person| person.primary_family.present? }.first
+
   expect(page).to have_content("Coverage For:   #{primary.first_name}", wait: 10)
 end
 
@@ -416,6 +433,30 @@ Then(/(.*) should see all the family members names/) do |role|
   people.each do |person|
     expect(page).to have_content "#{person.last_name}"
     expect(page).to have_content "#{person.first_name}"
+  end
+end
+
+And(/.* should see eligibility failed error on dependent with resident role/) do
+  expect(find('.ineligible_ivl_row .ivl_errors')).to have_content("eligibility failed on active_individual_role")
+  expect(find(IvlChooseCoverage.dependent_1_checkbox).checked?).to be_falsey
+end
+
+Then(/.* should see all family members eligible$/) do
+  expect(find(IvlChooseCoverage.primary_checkbox).checked?).to be_truthy
+  expect(find(IvlChooseCoverage.dependent_1_checkbox).checked?).to be_truthy
+end
+
+And(/.* should see warning dialog on CoverAll selection/) do
+  expect(find("#WarningOnCoverAllSelection").visible?).to be_truthy
+
+  within('#WarningOnCoverAllSelection .modal-dialog') do
+    expect(page).to have_selector('.modal-cancel-button', text: /#{l10n("close")}/i)
+  end
+end
+
+Then(/.* clicked close on CoverAll selection warning dialog/) do
+  within('#WarningOnCoverAllSelection .modal-dialog') do
+    find('.modal-cancel-button', text: /#{l10n("close")}/i).click
   end
 end
 
@@ -507,7 +548,7 @@ When(/employee clicked on shop for plans/) do
   find(EmployeeHomepage.shop_for_plans_btn, :wait => 10).click
 end
 
-When(/employee switched for (.*) benefits/) do |market_kind|
+When(/.* switched for (.*) benefits/) do |market_kind|
   case market_kind
   when "individual"
     find(EmployeeChooseCoverage.individual_benefits_radiobtn).click
