@@ -14,7 +14,8 @@ describe AngularAdminApplicationPolicy do
       instance_double(
         User,
         {
-          :has_hbx_staff_role? => false
+          :has_hbx_staff_role? => false,
+          :person => double
         }
       )
     end
