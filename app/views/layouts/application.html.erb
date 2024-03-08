@@ -23,7 +23,13 @@
       <%= javascript_pack_tag 'contrast_level_aa' %>
       <%= stylesheet_pack_tag 'contrast_level_aa' %>
     <% end %>
-    <script src="https://code.jquery.com/jquery-migrate-3.4.1.js"></script>
+    <!-- JQuery migrate has 2 versions, one for development/testing and one for production.
+         The former will show the areas it is patching, the latter won't -->
+    <% if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true' || !Rails.env.production? %>
+      <script src="https://code.jquery.com/jquery-migrate-3.4.1.js"></script>
+    <% else %>
+      <script src="https://code.jquery.com/jquery-migrate-3.4.1.min.js"></script>
+    <% end %>
 
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
