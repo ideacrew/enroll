@@ -52,7 +52,6 @@ $(document).on('ready page:load turbolinks:load', function () {
   Freebies.fadeElement($("body"));
   Freebies.allFreebies();
   Responsive.setSizeListeners();
-  semantic_class(); //Calls semantic class on all input fields & buttons (eg. interaction-click-control-continue)
 });
 
 function applyJQDatePickerSetup(ele) {
@@ -283,6 +282,8 @@ $(document).on('turbolinks:load', function () {
     parent.history.back();
     return false;
   });
+
+  semantic_class(); //Calls semantic class on all input fields & buttons (eg. interaction-click-control-continue)
 
   $(document).on("focus", "[class~='date-picker']", function(e){
     dateMin = $(this).attr("data-date-min");
