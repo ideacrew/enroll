@@ -215,18 +215,27 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   let(:application20) { FactoryBot.create(:application, family: family2, aasm_state: "draft", effective_on: effective_on, application_period: application_period)}
 
   before do
-    Family.all.each do |fam|
-      fam.primary_person.consumer_role&.move_identity_documents_to_verified
-    end
     allow(person).to receive(:financial_assistance_identifier).and_return(family_id)
     sign_in(user)
+    family.primary_person.consumer_role.move_identity_documents_to_verified
   end
 
-  context "GET Index" do
-    it "should assign applications", dbclean: :after_each do
-      get :index
-      applications = FinancialAssistance::Application.where(family_id: family_id)
-      expect(assigns(:applications)).to match_array(applications.to_a)
+  describe '#index' do
+    context 'primary person is RIDP verified' do
+      it 'assigns applications' do
+        get :index
+        applications = FinancialAssistance::Application.where(family_id: family_id)
+        expect(assigns(:applications)).to match_array(applications.to_a)
+      end
+    end
+
+    context 'primary person is not RIDP verified' do
+      it 'redirects to root_path' do
+        family.primary_person.consumer_role.update_attributes(identity_validation: 'na', application_validation: 'na')
+        get :index
+        expect(response).to redirect_to(main_app.root_path)
+        expect(flash[:error]).to eq("Primary Person's RIDP is not verified. Please verify RIDP first.")
+      end
     end
   end
 

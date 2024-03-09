@@ -320,7 +320,7 @@ module FinancialAssistance
 
       # TODO: Add translation for the below flash message.
       flash[:error] = "Primary Person's RIDP is not verified. Please verify RIDP first."
-      redirect_to root_path
+      redirect_to main_app.root_path
     end
 
     def transfer_direction(application)
