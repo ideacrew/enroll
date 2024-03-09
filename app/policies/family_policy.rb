@@ -28,12 +28,12 @@ class FamilyPolicy < ApplicationPolicy
     return true if active_associated_individual_market_family_broker?(record)
     return true if individual_market_admin?(record)
 
+    return true if shop_market_primary_family_member?(record)
+    return true if fehb_market_primary_family_member?(record)
+
     return true if coverall_market_primary_family_member?(record)
     return true if active_associated_coverall_market_family_broker?(record)
     return true if coverall_market_admin?(record)
-
-    return true if shop_market_primary_family_member?(record)
-    return true if fehb_market_primary_family_member?(record)
 
     false
   end

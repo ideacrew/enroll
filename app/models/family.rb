@@ -444,6 +444,14 @@ class Family
     @primary_person ||= primary_applicant&.person
   end
 
+  def primary_consumer
+    @primary_consumer ||= primary_person&.consumer_role
+  end
+
+  def primary_resident
+    @primary_resident ||= primary_person&.resident_role
+  end
+
   def primary_family_member=(new_primary_family_member)
     self.primary_family_member.is_primary_applicant = false unless primary_family_member.blank?
 
