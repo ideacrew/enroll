@@ -2,15 +2,6 @@
 class BrokerAgencies::BrokerRolesController < ApplicationController
   before_action :assign_filter_and_agency_type
 
-  def new_broker
-    @broker_candidate = Forms::BrokerCandidate.new
-    @organization = Forms::BrokerAgencyProfile.new
-    respond_to do |format|
-      format.html { render 'new' }
-      format.js
-    end
-  end
-
   def new_staff_member
     @broker_candidate = Forms::BrokerCandidate.new
 
