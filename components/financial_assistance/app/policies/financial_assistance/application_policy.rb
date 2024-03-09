@@ -5,7 +5,11 @@ module FinancialAssistance
   # It provides methods to check if a user has the necessary permissions to perform various actions on an application.
   class ApplicationPolicy < Policy
     def edit?
-      ::FamilyPolicy.new(user, record.family).edit?
+      return true if individual_market_primary_family_member?(record.family)
+      return true if active_associated_individual_market_family_broker?(record.family)
+      return true if individual_market_admin?(record.family)
+
+      false
     end
   end
 end
