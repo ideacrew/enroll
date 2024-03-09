@@ -2,15 +2,6 @@
 class BrokerAgencies::BrokerRolesController < ApplicationController
   before_action :assign_filter_and_agency_type
 
-  def check_ach_routing
-    begin
-      @ach_record = AchRecord.find_by(routing_number: Regexp.escape(params[:ach_record][:routing_number]))
-      render @ach_record.present? ? 'broker_agencies/applicants/check_ach_routing' : 'broker_agencies/applicants/invalid_ach'
-    rescue Mongoid::Errors::DocumentNotFound => e
-      render 'broker_agencies/applicants/invalid_ach'
-    end
-  end
-
   def new_broker
     @broker_candidate = Forms::BrokerCandidate.new
     @organization = Forms::BrokerAgencyProfile.new
