@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Inboxes
+    # Needs to explictly inherit from BenefitSponsors::ApplicationController, or won't have access to authorize method
     class MessagesController < BenefitSponsors::ApplicationController
       before_action :authenticate_user!
       before_action :set_current_user
