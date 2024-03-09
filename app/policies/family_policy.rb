@@ -1,11 +1,6 @@
 # frozen_string_literal: true
 
 class FamilyPolicy < ApplicationPolicy
-
-  def account_holder
-    @user # or user
-  end
-
   def primary_person
     record.primary_person
   end

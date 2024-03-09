@@ -3,15 +3,20 @@
 module FinancialAssistance
   # The ApplicationPolicy class defines the policy for accessing financial assistance applications.
   # It provides methods to check if a user has the necessary permissions to perform various actions on an application.
-  class ApplicationPolicy < Policy
+  class ApplicationPolicy < ::ApplicationPolicy
+
+    def application_family
+      @application_family ||= record.family
+    end
+
     def new?; end
 
     def create?; end
 
     def edit?
-      return true if individual_market_primary_family_member?(record.family)
-      return true if active_associated_individual_market_family_broker?(record.family)
-      return true if individual_market_admin?(record.family)
+      return true if individual_market_primary_family_member?(application_family)
+      return true if active_associated_individual_market_family_broker?(application_family)
+      return true if individual_market_admin?
 
       false
     end

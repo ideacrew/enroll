@@ -6,22 +6,41 @@ class ApplicationPolicy
     @record = record
   end
 
-  def current_person
-    @current_person ||= user.person
+  def account_holder
+    user
   end
 
-  # TODO: Remove the following line after the complete implementation of the methods
-  # MARCO's reference commit - https://github.com/ideacrew/enroll/commit/d70f1722dc9c8cc27d3ccdc9a5b1e77e2d34c7d8
+  def account_holder_person
+    @account_holder_person ||= account_holder.person
+  end
 
-  # START - Individual Market related methods
+  def individual_market_role
+    @individual_market_role ||= account_holder_person&.consumer_role
+  end
+
+  def coverall_market_role
+    @coverall_market_role ||= account_holder_person&.resident_role
+  end
+
+  def account_holder_family
+    @account_holder_family ||= account_holder_person&.primary_family
+  end
+
+  # START - ACA Individual Market related methods
   def individual_market_primary_family_member?(family)
-    family.primary_consumer && current_person == family.primary_person
+    individual_market_ridp_verified? && (account_holder_family == family)
+  end
+
+  def individual_market_non_ridp_primary_family_member?(family)
+    individual_market_role && (account_holder_family == family)
+  end
+
+  def individual_market_ridp_verified?
+    individual_market_role&.identity_verified?
   end
 
   def active_associated_individual_market_family_broker?(family)
-    return false unless family.primary_consumer
-
-    broker = current_person.broker_role
+    broker = account_holder_person.broker_role
     return false if broker.blank? || !broker.active? || !broker.individual_market?
 
     broker_agency_account = family.active_broker_agency_account
@@ -31,20 +50,26 @@ class ApplicationPolicy
       broker_agency_account.writing_agent_id == broker.id
   end
 
-  def individual_market_admin?(family)
-    family.primary_consumer && current_person.hbx_staff_role&.permission&.modify_family
-  end
-  # END - Individual Market related methods
+  def individual_market_admin?
+    hbx_role = account_holder_person.hbx_staff_role
+    return false if hbx_role.blank?
 
-  # START - Coverall Market related methods
+    permission = hbx_role.permission
+    return false if permission.blank?
+
+    permission.modify_family
+  end
+  # END - ACA Individual Market related methods
+
+  # START - Non-ACA Coverall Market related methods
   def coverall_market_primary_family_member?(family)
-    family.primary_resident && current_person == family.primary_person
+    coverall_market_role && account_holder_person == family.primary_person
   end
 
   def active_associated_coverall_market_family_broker?(family)
-    return false unless family.primary_resident
+    return false unless coverall_market_role
 
-    broker = current_person.broker_role
+    broker = account_holder_person.broker_role
     return false if broker.blank? || !broker.active? || !broker.individual_market?
 
     broker_agency_account = family.active_broker_agency_account
@@ -55,21 +80,21 @@ class ApplicationPolicy
   end
 
   def coverall_market_admin?(family)
-    family.primary_resident && current_person.hbx_staff_role&.permission&.modify_family
+    coverall_market_role && account_holder_person.hbx_staff_role&.permission&.modify_family
   end
-  # END - Coverall Market related methods
+  # END - Non-ACA Coverall Market related methods
 
-  # START - Shop Market related methods
+  # START - ACA Shop Market related methods
   def shop_market_primary_family_member?(family)
-    family.primary_person.employee_roles.present? && current_person == family.primary_person
+    family.primary_person.employee_roles.present? && account_holder_person == family.primary_person
   end
-  # END - Shop Market related methods
+  # END - ACA Shop Market related methods
 
-  # START - Fehb Market related methods
+  # START - Non-ACA Fehb Market related methods
   def fehb_market_primary_family_member?(family)
     shop_market_primary_family_member?(family)
   end
-  # END - Fehb Market related methods
+  # END - Non-ACA Fehb Market related methods
 
   def index?
     read_all?
