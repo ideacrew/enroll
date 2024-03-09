@@ -6,7 +6,8 @@ module FinancialAssistance
 
     before_action :set_current_person
     before_action :set_family
-    before_action :find_and_authorize_application, :except => [:index, :index_with_filter, :new, :review, :raw_application]
+    before_action :find_application, :except => [:index, :index_with_filter, :new, :review, :raw_application]
+    before_action :check_ridp_verification
 
     around_action :cache_current_hbx, :only => [:index_with_filter]
 
@@ -17,7 +18,7 @@ module FinancialAssistance
     include ::FileUploadHelper
     require 'securerandom'
 
-    before_action :check_eligibility, only: [:create, :get_help_paying_coverage_response, :copy]
+    before_action :check_eligibility, only: [:copy]
     before_action :init_cfl_service, only: [:review_and_submit, :raw_application]
     before_action :set_cache_headers, only: [:index, :relationships, :review_and_submit, :index_with_filter]
 
@@ -58,6 +59,7 @@ module FinancialAssistance
     end
 
     def edit
+      authorize @application, :edit?
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
 
@@ -67,6 +69,7 @@ module FinancialAssistance
 
     # rubocop:disable Metrics/AbcSize
     def step
+      authorize @application, :step?
       save_faa_bookmark(request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
       flash[:error] = nil
@@ -122,6 +125,7 @@ module FinancialAssistance
     # rubocop:enable Metrics/AbcSize
 
     def copy
+      authorize @application, :copy?
       copy_result = ::FinancialAssistance::Operations::Applications::Copy.new.call(application_id: params[:id])
       if copy_result.success?
         @application = copy_result.success
@@ -140,20 +144,25 @@ module FinancialAssistance
       redirect_to applications_path(tab: 'cost_savings')
     end
 
-    def help_paying_coverage; end
+    def help_paying_coverage
+      authorize @application, :help_paying_coverage?
+    end
 
     def application_year_selection
+      authorize @application, :application_year_selection?
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       render layout: 'financial_assistance'
     end
 
     def application_checklist
+      authorize @application, :application_checklist?
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
     end
 
     def review_and_submit
+      authorize @application, :review_and_submit?
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @all_relationships = @application.relationships
@@ -176,7 +185,7 @@ module FinancialAssistance
       @application = FinancialAssistance::Application.where(id: params["id"]).first
       return redirect_to applications_path if @application.blank?
 
-      authorize @application, :edit?
+      authorize @application, :review?
       @applicants = @application.active_applicants
       build_applicants_name_by_hbx_id_hash
     end
@@ -237,6 +246,84 @@ module FinancialAssistance
       redirect_to applications_path if @application.nil?
     end
 
+    def wait_for_eligibility_response
+      authorize @application, :wait_for_eligibility_response?
+      save_faa_bookmark(applications_path)
+      set_admin_bookmark_url
+      render layout: 'financial_assistance'
+    end
+
+    def eligibility_results
+      authorize @application, :eligibility_results?
+      save_faa_bookmark(request.original_url)
+      set_admin_bookmark_url
+      render layout: (params.keys.include?('cur') ? 'financial_assistance_nav' : 'financial_assistance')
+    end
+
+    def application_publish_error
+      authorize @application, :application_publish_error?
+      save_faa_bookmark(request.original_url)
+      set_admin_bookmark_url
+    end
+
+    def eligibility_response_error
+      authorize @application, :eligibility_response_error?
+      save_faa_bookmark(request.original_url)
+      set_admin_bookmark_url
+      redirect_to eligibility_results_application_path(@application.id, cur: 1) if eligibility_results_received?(@application)
+      @application.update_attributes(determination_http_status_code: 999) if @application.determination_http_status_code.nil?
+      @application.send_failed_response
+    end
+
+    def check_eligibility_results_received
+      authorize @application, :check_eligibility_results_received?
+      render :plain => determination_token_present?(@application)
+    end
+
+    def checklist_pdf
+      authorize @application, :checklist_pdf?
+      send_file(
+        FinancialAssistance::Engine.root.join(
+          FinancialAssistanceRegistry[:ivl_application_checklist].setting(:file_location).item.to_s
+        ), :disposition => "inline", :type => "application/pdf"
+      )
+    end
+
+    def update_transfer_requested
+      authorize @application, :update_transfer_requested?
+      @button_sent_text = l10n("faa.sent_to_external_verification")
+
+      respond_to do |format|
+        if @application.update_attributes(transfer_requested: true)
+          format.js
+        else
+          # TODO: respond with HTML on failure???
+          format.html
+        end
+      end
+    end
+
+    def update_application_year
+      authorize @application, :update_application_year?
+      new_year = params[:application][:assistance_year]
+
+      @application.update_attributes(assistance_year: new_year) if new_year && new_year != @application.assistance_year
+
+      redirect_to application_checklist_application_path(@application)
+    end
+
+    private
+
+    def check_ridp_verification
+      role = @person&.consumer_role
+
+      unless role&.identity_verified?
+        # TODO: Add translation for the below flash message.
+        flash[:error] = "Primary Person's RIDP is not verified. Please verify RIDP first."
+        redirect_to root_path
+      end
+    end
+
     def transfer_direction(application)
       return 'In' unless application.transfer_id.nil?
       return 'Out' if application.account_transferred
@@ -261,64 +348,6 @@ module FinancialAssistance
       end
     end
 
-    def wait_for_eligibility_response
-      save_faa_bookmark(applications_path)
-      set_admin_bookmark_url
-      render layout: 'financial_assistance'
-    end
-
-    def eligibility_results
-      save_faa_bookmark(request.original_url)
-      set_admin_bookmark_url
-      render layout: (params.keys.include?('cur') ? 'financial_assistance_nav' : 'financial_assistance')
-    end
-
-    def application_publish_error
-      save_faa_bookmark(request.original_url)
-      set_admin_bookmark_url
-    end
-
-    def eligibility_response_error
-      save_faa_bookmark(request.original_url)
-      set_admin_bookmark_url
-      redirect_to eligibility_results_application_path(@application.id, cur: 1) if eligibility_results_received?(@application)
-      @application.update_attributes(determination_http_status_code: 999) if @application.determination_http_status_code.nil?
-      @application.send_failed_response
-    end
-
-    def check_eligibility_results_received
-      render :plain => determination_token_present?(@application)
-    end
-
-    def checklist_pdf
-      send_file(
-        FinancialAssistance::Engine.root.join(
-          FinancialAssistanceRegistry[:ivl_application_checklist].setting(:file_location).item.to_s
-        ), :disposition => "inline", :type => "application/pdf"
-      )
-    end
-
-    def update_transfer_requested
-      @button_sent_text = l10n("faa.sent_to_external_verification")
-
-      respond_to do |format|
-        if @application.update_attributes(transfer_requested: true)
-          format.js
-        else
-          # TODO: respond with HTML on failure???
-          format.html
-        end
-      end
-    end
-
-    def update_application_year
-      new_year = params[:application][:assistance_year]
-
-      @application.update_attributes(assistance_year: new_year) if new_year && new_year != @application.assistance_year
-
-      redirect_to application_checklist_application_path(@application)
-    end
-
     # rubocop:disable Style/ExplicitBlockArgument
     def cache_current_hbx
       ::Caches::CurrentHbx.with_cache do
@@ -326,8 +355,6 @@ module FinancialAssistance
       end
     end
     # rubocop:enable Style/ExplicitBlockArgument
-
-    private
 
     def set_family
       @family = @person.primary_family
@@ -398,7 +425,6 @@ module FinancialAssistance
 
     def check_eligibility
       call_service
-      return if params['action'] == "get_help_paying_coverage_response"
       [(flash[:error] = helpers.l10n(helpers.decode_msg(@message))), (redirect_to applications_path)] unless @assistance_status
     end
 
@@ -422,12 +448,6 @@ module FinancialAssistance
 
     def find
       find_application
-    end
-
-    def find_and_authorize_application
-      application = find_application
-
-      authorize application, :edit?
     end
 
     def save_faa_bookmark(url)
