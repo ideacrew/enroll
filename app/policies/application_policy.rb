@@ -7,27 +7,23 @@ class ApplicationPolicy
     @current_person = user&.person
   end
 
-  # Checks if the primary person of the given family is an individual market primary family member.
-  # A primary person is considered an individual market primary family member if they have either a consumer role or a resident role,
-  # and the user is the same as the user of the primary person.
-  #
-  # @param family [Family] The family to check.
-  # @return [Boolean] Returns true if the primary person of the family is an individual market primary family member, false otherwise.
-  def individual_market_primary_family_member?(family)
-    (family.primary_person.consumer_role.present? || family.primary_person.resident_role.present?) && user == family.primary_person.user
+  def current_person
+    @current_person ||= user.person
   end
 
-  # Checks if the user is associated with an active broker for the given family.
-  # A user is considered associated with an active broker if the broker is not blank, is active,
-  # and matches the broker associated with the active broker agency account of the family.
-  #
-  # @param family [Family] The family to check.
-  # @return [Boolean] Returns true if the user is associated with an active broker for the family, false otherwise.
-  def active_associated_family_broker?(family)
-    return false unless current_person
-    broker_role = current_person.broker_role
-    broker_staff_roles = current_person.broker_agency_staff_roles.where(aasm_state: 'active')
+  # TODO: Remove the following line after the complete implementation of the methods
+  # MARCO's reference commit - https://github.com/ideacrew/enroll/commit/d70f1722dc9c8cc27d3ccdc9a5b1e77e2d34c7d8
 
+  # START - Individual Market related methods
+  def individual_market_primary_family_member?(family)
+    family.primary_consumer && current_person == family.primary_person
+  end
+
+  def active_associated_individual_market_family_broker?(family)
+    return false unless family.primary_consumer
+
+    broker = current_person.broker_role
+    return false if broker.blank? || !broker.active? || !broker.individual_market?
     return false if (broker_role.blank? || !broker_role.active?) && broker_staff_roles.blank?
     return false if broker_profile_ids(family).blank?
 
@@ -58,25 +54,14 @@ class ApplicationPolicy
     ).present?
   end
 
-  # Checks if the primary person of the given family has their identity verified.
-  # The method assumes that the consumer_role is already defined and belongs to the primary person of the family.
-  #
-  # @param family [Family] The family to check.
-  # @return [Boolean] Returns true if the primary person of the family has their identity verified, false otherwise.
-  def ridp_verified_primary_person?(family)
-    consumer_role = family.primary_person.consumer_role
-    return false if consumer_role.blank?
-
-    consumer_role.identity_verified?
+  def individual_market_admin?(family)
+    family.primary_consumer && current_person.hbx_staff_role&.permission&.modify_family
   end
+  # END - Individual Market related methods
 
-  # Checks if the user is an individual market admin.
-  # A user is considered an individual market admin if they are an hbx staff modify family.
-  #
-  # @return [Boolean, nil] Returns true if the user is an individual market admin,
-  # false if they are not, or nil if the user or their permissions are not defined.
-  def individual_market_admin?
-    user.person.hbx_staff_role&.permission&.modify_family
+  # START - Coverall Market related methods
+  def coverall_market_primary_family_member?(family)
+    family.primary_resident && current_person == family.primary_person
   end
 
   # Checks if the user is a shop market admin.
@@ -87,27 +72,35 @@ class ApplicationPolicy
   def shop_market_admin?
     current_person.hbx_staff_role&.permission&.modify_employer
   end
+  def active_associated_coverall_market_family_broker?(family)
+    return false unless family.primary_resident
 
-  # Checks if the user is a fehb market admin.
-  # A user is considered a fehb market admin if they are an hbx staff modify family.
-  #
-  # @return [Boolean, nil] Returns true if the user is a fehb market admin,
-  # false if they are not, or nil if the user or their permissions are not defined.
-  def fehb_market_admin?
-    shop_market_admin?
+    broker = current_person.broker_role
+    return false if broker.blank? || !broker.active? || !broker.individual_market?
+
+    broker_agency_account = family.active_broker_agency_account
+    return false if broker_agency_account.blank?
+
+    broker_agency_account.benefit_sponsors_broker_agency_profile_id == broker.benefit_sponsors_broker_agency_profile_id &&
+      broker_agency_account.writing_agent_id == broker.id
   end
 
+  def coverall_market_admin?(family)
+    family.primary_resident && current_person.hbx_staff_role&.permission&.modify_family
+  end
+  # END - Coverall Market related methods
+
+  # START - Shop Market related methods
   def shop_market_primary_family_member?(family)
-    family.primary_person.employee_roles.present? && user == family.primary_person.user
+    family.primary_person.employee_roles.present? && current_person == family.primary_person
   end
+  # END - Shop Market related methods
 
+  # START - Fehb Market related methods
   def fehb_market_primary_family_member?(family)
     shop_market_primary_family_member?(family)
   end
-
-  def general_agency_staff?
-    false
-  end
+  # END - Fehb Market related methods
 
   def can_access_individual_market_family_without_ridp?(family)
     individual_market_primary_family_member?(family) || individual_market_admin? || active_associated_family_broker?(family)
