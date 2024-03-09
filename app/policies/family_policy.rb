@@ -10,17 +10,30 @@ class FamilyPolicy < ApplicationPolicy
     record.primary_person
   end
 
-  def new_show?
-    return true if individual_market_primary_family_member?(record)
-    return true if active_associated_family_broker?(record)
-    return false unless ridp_verified_primary_person?(record)
-    return true if individual_market_admin?(family)
+  def edit?
+    show?
+  end
 
-    return true if shop_market_primary_family_member?
-    return true if fehb_market_primary_family_member?
-    return true if shop_market_admin?
-    return true if fehb_market_admin?
-    return true if general_agency_staff?
+  def index?
+    show?
+  end
+
+  def new?
+    show?
+  end
+
+  # March 08 2024
+  def show?
+    return true if individual_market_primary_family_member?(record)
+    return true if active_associated_individual_market_family_broker?(record)
+    return true if individual_market_admin?(record)
+
+    return true if coverall_market_primary_family_member?(record)
+    return true if active_associated_coverall_market_family_broker?(record)
+    return true if coverall_market_admin?(record)
+
+    return true if shop_market_primary_family_member?(record)
+    return true if fehb_market_primary_family_member?(record)
 
     false
   end
@@ -30,8 +43,6 @@ class FamilyPolicy < ApplicationPolicy
   def update?; end
 
   def destroy?; end
-
-  def index?; end
 
   # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   def legacy_show?
@@ -164,19 +175,5 @@ class FamilyPolicy < ApplicationPolicy
     return false if user.blank? || user.person.blank?
 
     user.has_hbx_staff_role? && user.person.hbx_staff_role.permission.can_view_audit_log
-  end
-
-  # Checks if the user can access the individual market for the current family record.
-  # A user can access the individual market if the primary person of the family has their identity verified,
-  # and the user is either the primary family member, associated with an active broker, or an individual market admin.
-  #
-  # @return [Boolean] Returns true if the user can access the individual market for the current family record, false otherwise.
-  def can_access_individual_market?
-    ridp_verified_primary_person?(record) &&
-      (
-        individual_market_primary_family_member?(record) ||
-          active_associated_family_broker?(record) ||
-          individual_market_admin?
-      )
   end
 end
