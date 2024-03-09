@@ -14,11 +14,23 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     permissions :edit? do
       context 'when a valid user is logged in' do
         context 'when the user is a consumer' do
-          let(:user_of_family) { FactoryBot.create(:user, person: person) }
-          let(:logged_in_user) { user_of_family }
+          context 'consumer is RIDP verified' do
+            let(:user_of_family) { FactoryBot.create(:user, person: person) }
+            let(:logged_in_user) { user_of_family }
 
-          it 'grants access' do
-            expect(subject).to permit(logged_in_user, application)
+            it 'grants access' do
+              consumer_role.move_identity_documents_to_verified
+              expect(subject).to permit(logged_in_user, application)
+            end
+          end
+
+          context 'consumer is not RIDP verified' do
+            let(:user_of_family) { FactoryBot.create(:user, person: person) }
+            let(:logged_in_user) { user_of_family }
+
+            it 'denies access' do
+              expect(subject).not_to permit(logged_in_user, application)
+            end
           end
         end
 

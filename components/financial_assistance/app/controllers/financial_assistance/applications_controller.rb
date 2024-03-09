@@ -7,7 +7,6 @@ module FinancialAssistance
     before_action :set_current_person
     before_action :set_family
     before_action :find_application, :except => [:index, :index_with_filter, :new, :review, :raw_application]
-    before_action :check_ridp_verification
 
     around_action :cache_current_hbx, :only => [:index_with_filter]
 
@@ -315,15 +314,6 @@ module FinancialAssistance
     end
 
     private
-
-    def check_ridp_verification
-      role = @person&.consumer_role
-      return if role&.identity_verified?
-
-      # TODO: Add translation for the below flash message.
-      flash[:error] = "Primary Person's RIDP is not verified. Please verify RIDP first."
-      redirect_to main_app.root_path
-    end
 
     def transfer_direction(application)
       return 'In' unless application.transfer_id.nil?

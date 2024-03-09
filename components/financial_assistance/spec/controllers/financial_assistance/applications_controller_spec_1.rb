@@ -4,6 +4,10 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   routes { FinancialAssistance::Engine.routes }
 
   describe 'pundit policy authorization checks' do
+    after :all do
+      DatabaseCleaner.clean
+    end
+
     let!(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
     let!(:admin_user) {FactoryBot.create(:user, :with_hbx_staff_role, :person => admin_person)}
     let!(:permission) { FactoryBot.create(:permission, :super_admin) }
@@ -121,7 +125,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
             get :copy, params: params
             copy_app = FinancialAssistance::Application.where(family_id: family.id).reject {|app| [application.id].include? app.id}.first
             expect(copy_app.present?).to be_falsey
-            expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.edit?, (Pundit policy)")
+            expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.copy?, (Pundit policy)")
           end
         end
       end
@@ -133,7 +137,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
           it 'returns authorization failure' do
             application.update_attributes(:aasm_state => "draft")
             get :review_and_submit, params: params
-            expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.edit?, (Pundit policy)")
+            expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.review_and_submit?, (Pundit policy)")
           end
         end
       end
@@ -143,7 +147,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
         it 'returns authorization failure' do
           get :review, params: params
-          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.edit?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.review?, (Pundit policy)")
         end
       end
 
@@ -160,7 +164,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
           it 'should find application and it is not authorized to view' do
             get :application_publish_error, params: { id: application.id }
             expect(assigns(:application)).to eq application
-            expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.edit?, (Pundit policy)")
+            expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.application_publish_error?, (Pundit policy)")
           end
         end
       end
@@ -176,7 +180,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
           person_with_developer_role.hbx_staff_role.update_attributes(permission_id: developer_permission.id)
           sign_in(user_with_developer_role)
           get :checklist_pdf, params: { id: application.id }
-          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.edit?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.checklist_pdf?, (Pundit policy)")
         end
       end
     end
@@ -265,7 +269,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
         it 'returns authorization failure' do
           get :review, params: params
-          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.edit?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.review?, (Pundit policy)")
         end
       end
 

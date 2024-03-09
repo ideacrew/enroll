@@ -5,6 +5,10 @@ require 'rails_helper'
 RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each, type: :controller do
   routes { FinancialAssistance::Engine.routes }
 
+  after :all do
+    DatabaseCleaner.clean
+  end
+
   let(:person1) { FactoryBot.create(:person, :with_consumer_role)}
   let!(:user) { FactoryBot.create(:user, :person => person1) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person1) }
@@ -230,11 +234,11 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     context 'primary person is not RIDP verified' do
-      it 'redirects to root_path' do
+      it 'redirects to root_path with a flash message' do
         family.primary_person.consumer_role.update_attributes(identity_validation: 'na', application_validation: 'na')
         get :index
         expect(response).to redirect_to(main_app.root_path)
-        expect(flash[:error]).to eq("Primary Person's RIDP is not verified. Please verify RIDP first.")
+        expect(flash[:error]).to eq('Access not allowed for family_policy.index?, (Pundit policy)')
       end
     end
   end
@@ -300,7 +304,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
           get :edit, params: { id: application.id }, session: { person_id: family.primary_person.id }
           expect(assigns(:application)).to eq application
           expect(response).to have_http_status(:redirect)
-          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.edit?, (Pundit policy)")
+          expect(flash[:error]).to eq('Access not allowed for financial_assistance/application_policy.edit?, (Pundit policy)')
         end
       end
     end
@@ -586,7 +590,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
           get :copy, params: { id: application.id }, session: { person_id: family.primary_person.id }
           expect(response).to have_http_status(:redirect)
-          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.copy?, (Pundit policy)")
+          expect(flash[:error]).to eq('Access not allowed for financial_assistance/application_policy.copy?, (Pundit policy)')
         end
       end
     end

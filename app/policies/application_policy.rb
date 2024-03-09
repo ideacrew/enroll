@@ -39,6 +39,7 @@ class ApplicationPolicy
     individual_market_role&.identity_verified?
   end
 
+  # TODO: We need to check if Primary Person's RIDP needs to be verified for Brokers
   def active_associated_individual_market_family_broker?(family)
     broker = account_holder_person.broker_role
     return false if broker.blank? || !broker.active? || !broker.individual_market?
@@ -50,6 +51,7 @@ class ApplicationPolicy
       broker_agency_account.writing_agent_id == broker.id
   end
 
+  # TODO: We need to check if Primary Person's RIDP needs to be verified for Hbx Staff Admins
   def individual_market_admin?
     hbx_role = account_holder_person.hbx_staff_role
     return false if hbx_role.blank?
@@ -59,6 +61,12 @@ class ApplicationPolicy
 
     permission.modify_family
   end
+
+  # # TODO: We need to implement General Agency Staff access for Individual Market if needed
+  # def active_associated_individual_market_family_general_agency_staff?(family)
+  #   false
+  # end
+
   # END - ACA Individual Market related methods
 
   # START - Non-ACA Coverall Market related methods
