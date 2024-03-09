@@ -26,12 +26,13 @@ module FinancialAssistance
     # We should ONLY be getting applications that are associated with PrimaryFamily of Current Person.
     # DO NOT include applications from other families.
     def index
-      authorize @family, :can_access_individual_market?
+      authorize @family, :index?
+
       @applications = FinancialAssistance::Application.where("family_id" => @family.id)
     end
 
     def index_with_filter
-      authorize @family, :can_access_individual_market?
+      authorize @family, :index?
 
       result = FinancialAssistance::Operations::Applications::QueryFilteredApplications.new.call(
         {
@@ -51,7 +52,7 @@ module FinancialAssistance
     end
 
     def new
-      authorize @family, :can_access_individual_market?
+      authorize @family, :new?
 
       @application = FinancialAssistance::Application.new
     end
@@ -175,7 +176,7 @@ module FinancialAssistance
       @application = FinancialAssistance::Application.where(id: params["id"]).first
       return redirect_to applications_path if @application.blank?
 
-      authorize @application, :can_access_application?
+      authorize @application, :edit?
       @applicants = @application.active_applicants
       build_applicants_name_by_hbx_id_hash
     end
@@ -426,7 +427,7 @@ module FinancialAssistance
     def find_and_authorize_application
       application = find_application
 
-      authorize application, :can_access_application?
+      authorize application, :edit?
     end
 
     def save_faa_bookmark(url)

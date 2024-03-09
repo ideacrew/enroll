@@ -11,27 +11,14 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
     let(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id) }
 
-    permissions :can_access_application? do
-      before do
-        consumer_role.move_identity_documents_to_verified
-      end
-
+    permissions :edit? do
       context 'when a valid user is logged in' do
         context 'when the user is a consumer' do
           let(:user_of_family) { FactoryBot.create(:user, person: person) }
           let(:logged_in_user) { user_of_family }
 
-          context 'with ridp verified' do
-            it 'grants access' do
-              expect(subject).to permit(logged_in_user, application)
-            end
-          end
-
-          context 'without ridp verified' do
-            it 'denies access' do
-              consumer_role.update_attributes(identity_validation: 'rejected')
-              expect(subject).not_to permit(logged_in_user, application)
-            end
+          it 'grants access' do
+            expect(subject).to permit(logged_in_user, application)
           end
         end
 
@@ -77,8 +64,9 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
 
         context 'when the user is an assigned broker' do
-          let(:broker_person) { FactoryBot.create(:person, :with_broker_role) }
-          let(:broker_role) { broker_person.broker_role }
+          let(:market_kind) { 'both' }
+          let(:broker_person) { FactoryBot.create(:person) }
+          let(:broker_role) { FactoryBot.create(:broker_role, person: broker_person, market_kind: market_kind) }
           let(:broker_user) { FactoryBot.create(:user, person: broker_person) }
 
           let(:site) do
@@ -115,11 +103,20 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             broker_agency_account
           end
 
-          context 'with associated broker' do
+          context 'with active associated individual market certified broker' do
             let(:baa_active) { true }
 
             it 'grants access' do
               expect(subject).to permit(logged_in_user, application)
+            end
+          end
+
+          context 'with active associated shop market certified broker' do
+            let(:baa_active) { false }
+            let(:market_kind) { 'shop' }
+
+            it 'denies access' do
+              expect(subject).not_to permit(logged_in_user, application)
             end
           end
 
