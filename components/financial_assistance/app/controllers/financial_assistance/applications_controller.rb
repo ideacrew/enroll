@@ -316,12 +316,11 @@ module FinancialAssistance
 
     def check_ridp_verification
       role = @person&.consumer_role
+      return if role&.identity_verified?
 
-      unless role&.identity_verified?
-        # TODO: Add translation for the below flash message.
-        flash[:error] = "Primary Person's RIDP is not verified. Please verify RIDP first."
-        redirect_to root_path
-      end
+      # TODO: Add translation for the below flash message.
+      flash[:error] = "Primary Person's RIDP is not verified. Please verify RIDP first."
+      redirect_to root_path
     end
 
     def transfer_direction(application)
