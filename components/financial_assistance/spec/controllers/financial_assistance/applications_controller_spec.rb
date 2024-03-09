@@ -39,7 +39,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   let(:application_period) {effective_on.beginning_of_year..effective_on.end_of_year}
 
   before do
-    family.primary_consumer.move_identity_documents_to_verified
+    family.primary_person.consumer_role.move_identity_documents_to_verified
   end
 
   describe "GET index" do
@@ -221,7 +221,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   before do
     allow(person).to receive(:financial_assistance_identifier).and_return(family_id)
     sign_in(user)
-    family.primary_consumer.move_identity_documents_to_verified
+    family.primary_person.consumer_role.move_identity_documents_to_verified
   end
 
   describe '#index' do
@@ -280,7 +280,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
       let(:user) { broker_user }
 
-      before { family.primary_consumer.move_identity_documents_to_verified }
+      before { family.primary_person.consumer_role.move_identity_documents_to_verified }
 
       context 'hired by family' do
         before(:each) do
@@ -562,7 +562,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       before do
         FinancialAssistance::Application.where(family_id: family_id).each {|app| app.update_attributes(aasm_state: "determined")}
         allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_profile)
-        family.primary_consumer.move_identity_documents_to_verified
+        family.primary_person.consumer_role.move_identity_documents_to_verified
       end
 
       context 'hired by family' do
@@ -749,7 +749,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
 
       it 'should find application with missing family id' do
-        family.primary_consumer.move_identity_documents_to_verified
+        family.primary_person.consumer_role.move_identity_documents_to_verified
         sign_in(admin_user)
         get :application_publish_error, params: { id: application.id }, session: { person_id: family.primary_person.id }
         expect(assigns(:application)).to eq application
