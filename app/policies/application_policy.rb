@@ -10,7 +10,7 @@ class ApplicationPolicy
     @current_person ||= user.person
   end
 
-  # TODO Remove the following line after the complete implementation of the methods
+  # TODO: Remove the following line after the complete implementation of the methods
   # MARCO's reference commit - https://github.com/ideacrew/enroll/commit/d70f1722dc9c8cc27d3ccdc9a5b1e77e2d34c7d8
 
   # START - Individual Market related methods
