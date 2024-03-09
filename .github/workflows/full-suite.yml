@@ -242,7 +242,7 @@ jobs:
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
-      - name: Run tests1
+      - name: Run tests
         env:
           COVERAGE: 'true'
           TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: 'components/financial_assistance/**/*_spec.rb'
@@ -557,7 +557,7 @@ jobs:
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
-      - name: Run tests3
+      - name: Run tests
         env:
           COVERAGE: 'true'
         run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
