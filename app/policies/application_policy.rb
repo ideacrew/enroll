@@ -10,13 +10,16 @@ class ApplicationPolicy
     @current_person ||= user.person
   end
 
+  # TODO Remove the following line after the complete implementation of the methods
+  # MARCO's reference commit - https://github.com/ideacrew/enroll/commit/d70f1722dc9c8cc27d3ccdc9a5b1e77e2d34c7d8
+
   # START - Individual Market related methods
   def individual_market_primary_family_member?(family)
-    family.primary_person.consumer_role.present? && current_person == family.primary_person
+    family.primary_consumer && current_person == family.primary_person
   end
 
   def active_associated_individual_market_family_broker?(family)
-    return false unless family.primary_person.consumer_role.present?
+    return false unless family.primary_consumer
 
     broker = current_person.broker_role
     return false if broker.blank? || !broker.active? || !broker.individual_market?
@@ -29,17 +32,17 @@ class ApplicationPolicy
   end
 
   def individual_market_admin?(family)
-    family.primary_person.consumer_role.present? && current_person.hbx_staff_role&.permission&.modify_family
+    family.primary_consumer && current_person.hbx_staff_role&.permission&.modify_family
   end
   # END - Individual Market related methods
 
   # START - Coverall Market related methods
   def coverall_market_primary_family_member?(family)
-    family.primary_person.resident_role.present? && current_person == family.primary_person
+    family.primary_resident && current_person == family.primary_person
   end
 
   def active_associated_coverall_market_family_broker?(family)
-    return false unless family.primary_person.resident_role.present?
+    return false unless family.primary_resident
 
     broker = current_person.broker_role
     return false if broker.blank? || !broker.active? || !broker.individual_market?
@@ -52,7 +55,7 @@ class ApplicationPolicy
   end
 
   def coverall_market_admin?(family)
-    family.primary_person.resident_role.present? && current_person.hbx_staff_role&.permission&.modify_family
+    family.primary_resident && current_person.hbx_staff_role&.permission&.modify_family
   end
   # END - Coverall Market related methods
 
