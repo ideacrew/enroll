@@ -20,21 +20,6 @@ function applyBrokerTabClickHandlers(){
   })
 }
 
-$(function() {
-  $('ul[name=broker_signup_primary_tabs] > li > a').on('click', function() {
-      filter = $(this).data('value');
-      action_url = '/broker_agencies/broker_roles/new_broker.js';
-      if (filter == 'staff') {
-        action_url = '/broker_agencies/broker_roles/new_staff_member.js';
-      }
-      $.ajax({
-        url: action_url,
-        type: "GET",
-        data : { 'filter': filter }
-      });
-  })
-})
-
 $(document).on('click', '.broker-agency-search a.search', function() {
   $('.broker-agency-search .result').empty();
   var broker_agency_search = $('input#agency_search').val();

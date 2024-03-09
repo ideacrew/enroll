@@ -2,23 +2,6 @@
 class BrokerAgencies::BrokerRolesController < ApplicationController
   before_action :assign_filter_and_agency_type
 
-  def new_staff_member
-    @broker_candidate = Forms::BrokerCandidate.new
-
-    respond_to do |format|
-      format.js
-    end
-  end
-
-  def new_broker_agency
-    @organization = Forms::BrokerAgencyProfile.new
-
-    respond_to do |format|
-      format.html { render 'new' }
-      format.js
-    end
-  end
-
   def search_broker_agency
     orgs = Organization.has_broker_agency_profile.or({legal_name: /#{Regexp.escape(params[:broker_agency_search])}/i}, {"fein" => /#{Regexp.escape(params[:broker_agency_search])}/i})
 
