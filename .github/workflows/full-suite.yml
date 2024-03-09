@@ -117,8 +117,7 @@ jobs:
             'notifier',
             'sponsored_benefits',
             'transport_gateway',
-            'transport_profiles' #,
-            # 'financial_assistance',
+            'transport_profiles'
           ]
     steps:
       - uses: actions/checkout@v3
@@ -243,7 +242,7 @@ jobs:
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
-      - name: Run tests
+      - name: Run tests1
         env:
           COVERAGE: 'true'
           TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: 'components/financial_assistance/**/*_spec.rb'
@@ -256,48 +255,6 @@ jobs:
         with:
           name: code-coverage
           path: ${{ github.workspace }}/coverage/fa_${{ matrix.group }}_${{ strategy.job-total }}_coverage.xml
-      # - name: Install node dependencies
-      #   if: steps.npm-cache.outputs.cache-hit != 'true'
-      #   run: yarn install
-      # - name: Restore Project Gems
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: vendor/bundle
-      #     key: benefit_sponsors-${{ hashFiles('**/Gemfile.lock') }}
-      #     restore-keys: |
-      #       benefit_sponsors-
-      # - name: bundle install
-      #   run: |
-      #     gem update --system --quiet --silent
-      #     bundle config path vendor/bundle
-      #     bundle install
-      #     cd components/benefit_sponsors
-      #     bundle config path ../../vendor/bundle
-      #     bundle install
-      #     gem install treye-semaphore_test_boosters --version '2.5.2'
-      # - name: Restore Node Modules
-      #   id: npm-cache
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: node_modules
-      #     key: ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-node_modules-v14-${{ hashFiles('yarn.lock') }}
-      # - name: yarn install
-      #   if: steps.npm-cache.outputs.cache-hit != 'true'
-      #   run: yarn install
-      # - name: run webpack
-      #   run: |
-      #     bundle config path vendor/bundle
-      #     NODE_ENV=test RAILS_ENV=test ./bin/webpack
-      # - name: test engine
-      #   env:
-      #     RSPEC_SPLIT_CONFIGURATION_PATH: '${{ github.workspace }}/ci/benefit_sponsors-split-config.json'
-      #     COVERAGE: 'true'
-      #   run: |
-      #     cd components/benefit_sponsors
-      #     bundle config path ../../vendor/bundle
-      #     rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   benefit-sponsors:
     needs: [brakeman-engines]
     runs-on: ubuntu-20.04
@@ -479,7 +436,7 @@ jobs:
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
-      - name: Run tests
+      - name: Run tests2
         env:
           COVERAGE: 'true'
           RSPEC_SPLIT_CONFIGURATION_PATH: 'ci/rspec-split-config.json'
@@ -600,7 +557,7 @@ jobs:
       - name: Install node dependencies
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: yarn install
-      - name: Run tests
+      - name: Run tests3
         env:
           COVERAGE: 'true'
         run: cucumber_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
