@@ -235,7 +235,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
     context 'primary person is not RIDP verified' do
       it 'redirects to root_path with a flash message' do
-        family.primary_consumer.update_attributes(identity_validation: 'na', application_validation: 'na')
+        family.primary_person.consumer_role.update_attributes(identity_validation: 'na', application_validation: 'na')
         get :index
         expect(response).to redirect_to(main_app.root_path)
         expect(flash[:error]).to eq('Access not allowed for family_policy.index?, (Pundit policy)')
