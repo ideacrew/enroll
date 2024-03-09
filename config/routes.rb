@@ -538,12 +538,7 @@ Rails.application.routes.draw do
     end
     resources :broker_roles, only: [:create] do
       collection do
-        get :new_broker_agency
-        get :search_broker_agency
         post :email_guide
-      end
-      member do
-        get :favorite
       end
     end
 

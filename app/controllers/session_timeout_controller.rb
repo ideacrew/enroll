@@ -10,7 +10,7 @@ class SessionTimeoutController < ApplicationController
   skip_before_action :authenticate_user!, only: [:has_user_timed_out], raise: false
 
   def check_time_until_logout
-    @time_left = Devise.timeout_in - (Time.now - (user_session["last_request_at"] || Time.now)).to_i.round
+    @time_left = 1.minute
     if @time_left <= 0
       sign_out(current_user)
       respond_to do |format|
