@@ -276,17 +276,20 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       end
       let(:user) { broker_user }
 
+      before { family.primary_consumer.move_identity_documents_to_verified }
+
       context 'hired by family' do
         before(:each) do
           family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
                                                                                               writing_agent_id: writing_agent.id,
                                                                                               start_on: Time.now,
                                                                                               is_active: true)
+
           family.reload
         end
 
         it "should render" do
-          get :edit, params: { id: application.id }
+          get :edit, params: { id: application.id }, session: { person_id: family.primary_person.id }
           expect(assigns(:application)).to eq application
           expect(response).to render_template(:financial_assistance_nav)
         end
@@ -294,7 +297,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
       context 'not hired by family' do
         it "should render" do
-          get :edit, params: { id: application.id }
+          get :edit, params: { id: application.id }, session: { person_id: family.primary_person.id }
           expect(assigns(:application)).to eq application
           expect(response).to have_http_status(:redirect)
           expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.edit?, (Pundit policy)")
@@ -555,6 +558,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       before do
         FinancialAssistance::Application.where(family_id: family_id).each {|app| app.update_attributes(aasm_state: "determined")}
         allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_profile)
+        family.primary_consumer.move_identity_documents_to_verified
       end
 
       context 'hired by family' do
@@ -569,7 +573,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         it "should render" do
           skip "skipped: iap_year_selection enabled" if FinancialAssistanceRegistry[:iap_year_selection].enabled?
 
-          get :copy, params: { id: application.id }
+          get :copy, params: { id: application.id }, session: { person_id: family.primary_person.id }
           existing_app_ids = [application.id, application2.id]
           copy_app = FinancialAssistance::Application.where(family_id: family_id).reject {|app| existing_app_ids.include? app.id}.first
           expect(response).to redirect_to(edit_application_path(copy_app.id))
@@ -580,7 +584,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         it "should render" do
           skip "skipped: iap_year_selection enabled" if FinancialAssistanceRegistry[:iap_year_selection].enabled?
 
-          get :copy, params: { id: application.id }
+          get :copy, params: { id: application.id }, session: { person_id: family.primary_person.id }
           expect(response).to have_http_status(:redirect)
           expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.edit?, (Pundit policy)")
         end
@@ -741,8 +745,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
 
       it 'should find application with missing family id' do
+        family.primary_consumer.move_identity_documents_to_verified
         sign_in(admin_user)
-        get :application_publish_error, params: { id: application.id }
+        get :application_publish_error, params: { id: application.id }, session: { person_id: family.primary_person.id }
         expect(assigns(:application)).to eq application
         expect(response).to render_template(:financial_assistance_nav)
       end
