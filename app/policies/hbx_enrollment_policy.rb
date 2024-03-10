@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# pundit Policies to access HbxEnrollment
 class HbxEnrollmentPolicy < ApplicationPolicy
 
   def checkout?
@@ -43,6 +44,7 @@ class HbxEnrollmentPolicy < ApplicationPolicy
   end
 
   private
+
   # Returns the family associated with the current enrollment.
   #
   # @return [Family] The family associated with the current enrollment.
@@ -85,7 +87,6 @@ class HbxEnrollmentPolicy < ApplicationPolicy
   end
 
   def create?
-    binding.pry
     case record.kind
     when HbxEnrollment::INDIVIDUAL_KIND
       can_create_ivl_enrollment?
