@@ -157,7 +157,13 @@ class ApplicationPolicy
   #
   # @return [Boolean] Returns true if the account holder is an admin in the coverall market, false otherwise.
   def coverall_market_admin?
-    coverall_market_role && account_holder_person.hbx_staff_role&.permission&.modify_family
+    hbx_role = account_holder_person.hbx_staff_role
+    return false if hbx_role.blank?
+
+    permission = hbx_role.permission
+    return false if permission.blank?
+
+    permission.modify_family
   end
   #
   # END - Non-ACA Coverall Market related methods
@@ -170,7 +176,49 @@ class ApplicationPolicy
   # @param family [Family] The family to check.
   # @return [Boolean] Returns true if the account holder is a primary family member in the ACA Shop market for the given family, false otherwise.
   def shop_market_primary_family_member?(family)
-    family.primary_person.employee_roles.present? && account_holder_person == family.primary_person
+    family.primary_person&.employee_roles.present? && account_holder_person == family.primary_person
+  end
+
+  # Checks if the account holder is an admin in the shop market.
+  # A user is considered an admin in the shop market if they have an hbx staff role and they have the permission to modify a family.
+  # TODO: We need to check if Primary Person's RIDP needs to be verified for Hbx Staff Admins
+  #
+  # @return [Boolean] Returns true if the account holder is an admin in the shop market, false otherwise.
+  def shop_market_admin?
+    hbx_role = account_holder_person.hbx_staff_role
+    return false if hbx_role.blank?
+
+    permission = hbx_role.permission
+    return false if permission.blank?
+
+    permission.modify_employer
+  end
+
+  def active_associated_shop_market_family_broker?(family)
+    broker = account_holder_person&.broker_role
+    broker_staff_roles = account_holder_person.broker_agency_staff_roles.where(aasm_state: 'active')
+
+    return false if broker.blank? && broker_staff_roles.blank?
+    return false unless broker.active? || broker.shop_market?
+    return true if broker_profile_ids(family).include?(broker.benefit_sponsors_broker_agency_profile_id)
+
+    broker_staff_roles.any? { |role| role.benefit_sponsors_broker_agency_profile_id == family_broker_agency_id }
+  end
+
+  def active_associated_shop_market_general_agency?(family)
+    account_holder_ga_roles = account_holder_person&.active_general_agency_staff_roles
+    return false if account_holder_ga_roles.blank?
+    return false if broker_profile_ids(family).blank?
+
+    ::SponsoredBenefits::Organizations::PlanDesignOrganization.where(
+      :owner_profile_id.in => broker_profile_ids(family),
+      :general_agency_accounts => {
+        :"$elemMatch" => {
+          aasm_state: :active,
+          :benefit_sponsrship_general_agency_profile_id.in => account_holder_ga_roles.map(&:benefit_sponsors_general_agency_profile_id)
+        }
+      }
+    ).present?
   end
   #
   # END - ACA Shop Market related methods
@@ -184,6 +232,18 @@ class ApplicationPolicy
   # @return [Boolean] Returns true if the account holder is a primary family member in the Non-ACA Fehb market for the given family, false otherwise.
   def fehb_market_primary_family_member?(family)
     shop_market_primary_family_member?(family)
+  end
+
+  def fehb_market_admin?
+    shop_market_admin?
+  end
+
+  def active_associated_fehb_market_family_broker?(_family)
+    false
+  end
+
+  def active_associated_fehb_market_general_agency?(_family)
+    false
   end
   #
   # END - Non-ACA Fehb Market related methods
@@ -251,5 +311,21 @@ class ApplicationPolicy
     def resolve
       scope
     end
+  end
+
+  private
+
+  def broker_profile_ids(family)
+    @broker_profile_ids ||= ([family_broker_agency_id(family)] + employee_role_broker_agency_ids(family)).compact
+  end
+
+  def family_broker_agency_id(family)
+    @family_broker_agency_id ||= family.current_broker_agency&.benefit_sponsors_broker_agency_profile_id
+  end
+
+  def employee_role_broker_agency_ids(family)
+    @employee_role_broker_agency_ids ||= family.primary_person.active_employee_roles.map do |er|
+      er.employer_profile&.active_broker_agency_account&.benefit_sponsors_broker_agency_profile_id
+    end.compact
   end
 end
