@@ -1,5 +1,5 @@
 class ApplicationPolicy
-  attr_reader :user, :record
+  attr_reader :user, :record, :family
 
   def initialize(user, record)
     @user = user
@@ -58,7 +58,7 @@ class ApplicationPolicy
   #
   # @param family [Family] The family to check.
   # @return [Boolean] Returns true if the account holder is a primary family member in the individual market for the given family, false otherwise.
-  def individual_market_primary_family_member?(family)
+  def individual_market_primary_family_member?
     individual_market_ridp_verified? && (account_holder_family == family)
   end
 
@@ -67,7 +67,7 @@ class ApplicationPolicy
   #
   # @param family [Family] The family to check.
   # @return [Boolean] Returns true if the account holder is a primary family member in the individual market for the given family, false otherwise.
-  def individual_market_non_ridp_primary_family_member?(family)
+  def individual_market_non_ridp_primary_family_member?
     individual_market_role && (account_holder_family == family)
   end
 
@@ -87,7 +87,7 @@ class ApplicationPolicy
   #
   # @param family [Family] The family to check.
   # @return [Boolean] Returns true if the account holder is an active broker associated with the given family in the individual market, false otherwise.
-  def active_associated_individual_market_family_broker?(family)
+  def active_associated_individual_market_family_broker?
     broker = account_holder_person.broker_role
     return false if broker.blank? || !broker.active? || !broker.individual_market?
 
@@ -114,7 +114,7 @@ class ApplicationPolicy
   end
 
   # # TODO: We need to implement General Agency Staff access for Individual Market if needed
-  # def active_associated_individual_market_family_general_agency_staff?(family)
+  # def active_associated_individual_market_family_general_agency_staff?
   #   false
   # end
   #
@@ -127,7 +127,7 @@ class ApplicationPolicy
   #
   # @param family [Family] The family to check.
   # @return [Boolean] Returns true if the account holder is a primary family member in the coverall market for the given family, false otherwise.
-  def coverall_market_primary_family_member?(family)
+  def coverall_market_primary_family_member?
     coverall_market_role && account_holder_person == family.primary_person
   end
 
@@ -138,7 +138,7 @@ class ApplicationPolicy
   #
   # @param family [Family] The family to check.
   # @return [Boolean] Returns true if the account holder is an active broker associated with the given family in the coverall market, false otherwise.
-  def active_associated_coverall_market_family_broker?(family)
+  def active_associated_coverall_market_family_broker?
     return false unless coverall_market_role
 
     broker = account_holder_person.broker_role
@@ -157,7 +157,13 @@ class ApplicationPolicy
   #
   # @return [Boolean] Returns true if the account holder is an admin in the coverall market, false otherwise.
   def coverall_market_admin?
-    coverall_market_role && account_holder_person.hbx_staff_role&.permission&.modify_family
+    hbx_role = account_holder_person.hbx_staff_role
+    return false if hbx_role.blank?
+
+    permission = hbx_role.permission
+    return false if permission.blank?
+
+    permission.modify_family
   end
   #
   # END - Non-ACA Coverall Market related methods
@@ -169,8 +175,55 @@ class ApplicationPolicy
   #
   # @param family [Family] The family to check.
   # @return [Boolean] Returns true if the account holder is a primary family member in the ACA Shop market for the given family, false otherwise.
-  def shop_market_primary_family_member?(family)
-    family.primary_person.employee_roles.present? && account_holder_person == family.primary_person
+  def shop_market_primary_family_member?
+    primary_person = family.primary_person
+    return false unless primary_person
+
+    primary_person.employee_roles.present? && account_holder_person == primary_person
+  end
+
+  # Checks if the account holder is an admin in the shop market.
+  # A user is considered an admin in the shop market if they have an hbx staff role and they have the permission to modify a family.
+  # TODO: We need to check if Primary Person's RIDP needs to be verified for Hbx Staff Admins
+  #
+  # @return [Boolean] Returns true if the account holder is an admin in the shop market, false otherwise.
+  def shop_market_admin?
+    individual_market_admin?
+    # hbx_role = account_holder_person.hbx_staff_role
+    # return false if hbx_role.blank?
+
+    # permission = hbx_role.permission
+    # return false if permission.blank?
+
+    # permission.modify_employer
+  end
+
+  def active_associated_shop_market_family_broker?
+    broker = account_holder_person&.broker_role
+    broker_staff_roles = account_holder_person&.broker_agency_staff_roles&.where(aasm_state: 'active')
+
+    return false if broker.blank? && broker_staff_roles.blank?
+    return false unless broker.active? || broker.shop_market?
+    return true if broker_profile_ids.include?(broker.benefit_sponsors_broker_agency_profile_id)
+
+    # broker_staff_roles.any? { |role| role.benefit_sponsors_broker_agency_profile_id == individual_market_family_broker_agency_id }
+    false
+  end
+
+  def active_associated_shop_market_general_agency?
+    account_holder_ga_roles = account_holder_person&.active_general_agency_staff_roles
+    return false if account_holder_ga_roles.blank?
+    return false if broker_profile_ids.blank?
+
+    ::SponsoredBenefits::Organizations::PlanDesignOrganization.where(
+      :owner_profile_id.in => broker_profile_ids,
+      :general_agency_accounts => {
+        :"$elemMatch" => {
+          aasm_state: :active,
+          :benefit_sponsrship_general_agency_profile_id.in => account_holder_ga_roles.map(&:benefit_sponsors_general_agency_profile_id)
+        }
+      }
+    ).present?
   end
   #
   # END - ACA Shop Market related methods
@@ -182,8 +235,20 @@ class ApplicationPolicy
   #
   # @param family [Family] The family to check.
   # @return [Boolean] Returns true if the account holder is a primary family member in the Non-ACA Fehb market for the given family, false otherwise.
-  def fehb_market_primary_family_member?(family)
-    shop_market_primary_family_member?(family)
+  def fehb_market_primary_family_member?
+    shop_market_primary_family_member?
+  end
+
+  def fehb_market_admin?
+    shop_market_admin?
+  end
+
+  def active_associated_fehb_market_family_broker?
+    false
+  end
+
+  def active_associated_fehb_market_general_agency?
+    false
   end
   #
   # END - Non-ACA Fehb Market related methods
@@ -251,5 +316,21 @@ class ApplicationPolicy
     def resolve
       scope
     end
+  end
+
+  private
+
+  def broker_profile_ids
+    @broker_profile_ids ||= ([individual_market_family_broker_agency_id] + shop_market_family_broker_agency_ids).compact
+  end
+
+  def individual_market_family_broker_agency_id
+    @individual_market_family_broker_agency_id ||= family.current_broker_agency&.benefit_sponsors_broker_agency_profile_id
+  end
+
+  def shop_market_family_broker_agency_ids
+    @shop_market_family_broker_agency_ids ||= family.primary_person.active_employee_roles.map do |er|
+      er.employer_profile&.active_broker_agency_account&.benefit_sponsors_broker_agency_profile_id
+    end.compact
   end
 end
