@@ -4,7 +4,7 @@
 class HbxEnrollmentPolicy < ApplicationPolicy
   def initialize(user, record)
     super
-    @family ||= record.family
+    @family = record.family
   end
 
   def checkout?
@@ -52,13 +52,6 @@ class HbxEnrollmentPolicy < ApplicationPolicy
   end
 
   private
-
-  # # Returns the family associated with the current enrollment.
-  # #
-  # # @return [Family] The family associated with the current enrollment.
-  # def enrollment_family
-  #   @enrollment_family ||= record.family
-  # end
 
   # rubocop:disable Metrics/CyclomaticComplexity
   def create?

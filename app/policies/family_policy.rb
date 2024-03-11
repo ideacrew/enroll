@@ -3,7 +3,7 @@
 class FamilyPolicy < ApplicationPolicy
   def initialize(user, record)
     super
-    @family ||= record
+    @family = record
   end
 
   # Returns the primary person of the family record.

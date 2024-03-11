@@ -19,7 +19,9 @@ class ApplicationPolicy
   #
   # @return [Person] The person who is the account holder.
   def account_holder_person
-    @account_holder_person ||= account_holder.person
+    return @account_holder_person if defined? @account_holder_person
+
+    @account_holder_person = account_holder.person
   end
 
   # Returns the individual market role of the account holder person.
@@ -29,7 +31,9 @@ class ApplicationPolicy
   # @return [ConsumerRole, nil] The individual market role of the account holder person,
   # or nil if the account holder person is not defined.
   def individual_market_role
-    @individual_market_role ||= account_holder_person&.consumer_role
+    return @individual_market_role if defined? @individual_market_role
+
+    @individual_market_role = account_holder_person&.consumer_role
   end
 
   # Returns the coverall market role of the account holder person.
@@ -39,7 +43,9 @@ class ApplicationPolicy
   # @return [ResidentRole, nil] The coverall market role of the account holder person,
   # or nil if the account holder person is not defined.
   def coverall_market_role
-    @coverall_market_role ||= account_holder_person&.resident_role
+    return @coverall_market_role if defined? @coverall_market_role
+
+    @coverall_market_role = account_holder_person&.resident_role
   end
 
   # Returns the family of the account holder.
@@ -336,15 +342,21 @@ class ApplicationPolicy
   private
 
   def broker_profile_ids
-    @broker_profile_ids ||= ([individual_market_family_broker_agency_id] + shop_market_family_broker_agency_ids).compact
+    return @broker_profile_ids if defined? @broker_profile_ids
+
+    @broker_profile_ids = ([individual_market_family_broker_agency_id] + shop_market_family_broker_agency_ids).compact
   end
 
   def individual_market_family_broker_agency_id
-    @individual_market_family_broker_agency_id ||= family.current_broker_agency&.benefit_sponsors_broker_agency_profile_id
+    return @individual_market_family_broker_agency_id if defined? @individual_market_family_broker_agency_id
+
+    @individual_market_family_broker_agency_id = family.current_broker_agency&.benefit_sponsors_broker_agency_profile_id
   end
 
   def shop_market_family_broker_agency_ids
-    @shop_market_family_broker_agency_ids ||= family.primary_person.active_employee_roles.map do |er|
+    return @shop_market_family_broker_agency_ids if defined? @shop_market_family_broker_agency_ids
+
+    @shop_market_family_broker_agency_ids = family.primary_person.active_employee_roles.map do |er|
       er.employer_profile&.active_broker_agency_account&.benefit_sponsors_broker_agency_profile_id
     end.compact
   end
