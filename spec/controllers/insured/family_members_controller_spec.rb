@@ -28,6 +28,22 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       allow(person).to receive(:primary_family).and_return(test_family)
     end
 
+    context 'with broker role' do
+      let(:broker_role) { FactoryBot.create(:broker_role, aasm_state: "active") }
+      let(:consumer_role) { FactoryBot.create(:consumer_role, person: person) }
+
+      before do
+        EnrollRegistry[:auto_assign_expert].feature.stub(:is_enabled).and_return(false)
+        allow(person).to receive(:broker_role).and_return(broker_role)
+        sign_in(user)
+      end
+
+      it 'does not auto-assign expert staff' do
+        get :index, params: { consumer_role_id: consumer_role.id }
+        expect(test_family.broker_agency_accounts).to be_empty
+      end
+    end
+
     context 'normal' do
       before(:each) do
         allow(person).to receive(:broker_role).and_return(nil)
