@@ -133,6 +133,31 @@ describe "match a person in db" do
         expect(subject.match_person).to eq db_person
       end
     end
+
+    context 'with a person who has no ssn but an employer staff role', dbclean: :after_each do
+      let!(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let!(:benefit_sponsor)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let!(:employer_profile)    { benefit_sponsor.employer_profile }
+      let!(:employer_staff_role) { EmployerStaffRole.create(person: db_person, benefit_sponsor_employer_profile_id: employer_profile.id) }
+      let(:broker_role) { FactoryBot.build(:broker_role, npn: '234567890', person: db_person) }
+      let(:user){ create(:user) }
+
+      before do
+        allow(Person).to receive(:where).and_return([db_person])
+        allow(db_person).to receive(:user).and_return(user)
+        allow(db_person).to receive(:broker_role).and_return(broker_role)
+        db_person.save!
+      end
+
+      it 'matches person by last name, first name and dob' do
+        db_person.employer_staff_roles << employer_staff_role
+        db_person.save!
+        allow(search_params).to receive(:ssn).and_return('517991234')
+        subject.does_not_match_a_different_users_person
+        expect(subject.errors.messages.present?).to eq true
+        expect(subject.errors[:base]).to match(['#{db_person.first_name} #{db_person.last_name} is already affiliated with another account.'])
+      end
+    end
   end
 
   context "with a person with a first name, last name, dob and ssn" do
