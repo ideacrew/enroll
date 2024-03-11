@@ -155,7 +155,7 @@ describe "match a person in db" do
         allow(search_params).to receive(:ssn).and_return('517991234')
         subject.does_not_match_a_different_users_person
         expect(subject.errors.messages.present?).to eq true
-        expect(subject.errors[:base]).to match(['#{db_person.first_name} #{db_person.last_name} is already affiliated with another account.'])
+        expect(subject.errors[:base]).to match(["#{db_person.first_name} #{db_person.last_name} is already affiliated with another account."])
       end
     end
   end
