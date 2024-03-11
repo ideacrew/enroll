@@ -141,7 +141,7 @@ module FinancialAssistance
     def immigration_document_options
       if params[:target_type] == "FinancialAssistance::Applicant" && params[:target_id].present?
         @target = FinancialAssistance::Applicant.find(params[:target_id])
-        authorize @target, immigration_document_options?
+        authorize @target, :immigration_document_options?
         # vlp_docs = @target.applicant.vlp_documents
       else
         @target = FinancialAssistance::Forms::Applicant.new
