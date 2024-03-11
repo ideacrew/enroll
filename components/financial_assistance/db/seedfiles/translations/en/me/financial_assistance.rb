@@ -259,6 +259,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.results.medicaid_eligible_next_steps" => "Medicaid coverage is free. If you would like to enroll and pay full price for private health insurance instead, select CONTINUE to:",
   "en.faa.results.medicaid_eligible_step1" => "pick a plan, or",
   "en.faa.results.medicaid_eligible_step2" => "add or remove someone from your plan.",
-  "en.faa.verification.documents" => "Financial Assistance Documents"
+  "en.faa.verification.documents" => "Financial Assistance Documents",
+  "en.faa.view_complete_checklist" => "View the Complete Application Checklist"
 }.freeze
 # rubocop:enable Layout/LineLength

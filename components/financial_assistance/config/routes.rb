@@ -15,9 +15,6 @@ FinancialAssistance::Engine.routes.draw do
     get 'help_paying_coverage', on: :collection, action: 'help_paying_coverage', as: 'help_paying_coverage'
     get 'application_year_selection', on: :member, action: 'application_year_selection', as: 'application_year_selection'
     get 'application_checklist', on: :member, action: 'application_checklist', as: 'application_checklist'
-    get 'get_help_paying_coverage_response', on: :collection, action: 'get_help_paying_coverage_response', as: 'get_help_paying_coverage_response'
-    get 'render_message', on: :collection, action: 'render_message', as: 'render_message'
-    get 'uqhp_flow', on: :collection, action: 'uqhp_flow', as: 'uqhp_flow'
     get :review_and_submit, on: :member
     get :review, on: :member
     get :raw_application, on: :member

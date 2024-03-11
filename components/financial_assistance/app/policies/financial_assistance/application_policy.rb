@@ -1,86 +1,156 @@
 # frozen_string_literal: true
 
 module FinancialAssistance
-  # This class is base policy class
-  # The ApplicationPolicy class is responsible for determining what actions a user can perform on Application records.
-  # It checks if the user has the necessary permissions to perform actions on applications.
-  # The permissions are determined based on the user's role and their relationship to the record.
-  class ApplicationPolicy < Policy
-    ACCESSABLE_ROLES = %w[hbx_staff_role broker_role active_broker_staff_roles consumer_role].freeze
+  # The ApplicationPolicy class defines the policy for accessing financial assistance applications.
+  # It provides methods to check if a user has the necessary permissions to perform various actions on an application.
+  class ApplicationPolicy < ::ApplicationPolicy
 
-    def can_view_checklist_pdf?
-      allowed_to_view?
+    # Returns the family associated with the current application.
+    #
+    # @return [Family] The family associated with the current application.
+    def application_family
+      @application_family ||= record.family
     end
 
-    def can_access_application?
-      allowed_to_modify?
-    end
+    # TODO: Define the conditions under which a new application can be created.
+    def new?; end
 
-    def can_review?
-      allowed_to_modify?
-    end
+    # TODO: Define the conditions under which an application can be created.
+    def create?; end
 
-    private
+    # Determines if the current user has permission to edit the application.
+    # The user can edit the application if they are a primary family member, an active associated broker, or an admin in the individual market.
+    #
+    # @return [Boolean] Returns true if the user has permission to edit the application, false otherwise.
+    def edit?
+      return true if individual_market_primary_family_member?(application_family)
+      return true if active_associated_individual_market_family_broker?(application_family)
+      return true if individual_market_admin?
 
-    def allowed_to_view?
-      role.present?
-    end
-
-    def allowed_to_modify?
-      return true if current_user == associated_user
-      return true if role_has_permission_to_access_applications?
       false
     end
 
-    def role_has_permission_to_access_applications?
-      role.present? && (can_hbx_staff_modify? || can_broker_access?)
+    # TODO: Define the conditions under which the list of applications can be viewed.
+    def index?; end
+
+    # Determines if the current user has permission to proceed to the next step of the application.
+    # The user can proceed if they have permission to edit the application.
+    #
+    # @return [Boolean] Returns true if the user has permission to proceed to the next step of the application, false otherwise.
+    def step?
+      edit?
     end
 
-    def can_hbx_staff_modify?
-      role.is_a?(HbxStaffRole) && role&.permission&.modify_family
+    # Determines if the current user has permission to copy the application.
+    # The user can copy the application if they have permission to edit it.
+    #
+    # @return [Boolean] Returns true if the user has permission to copy the application, false otherwise.
+    def copy?
+      edit?
     end
 
-    def can_broker_access?
-      (role.is_a?(::BrokerRole) || role.is_a?(::BrokerAgencyStaffRole)) && broker_agency_profile_matches?
+    # Determines if the current user has permission to view the help paying coverage page of the application.
+    # The user can view the page if they have permission to edit the application.
+    #
+    # @return [Boolean] Returns true if the user has permission to view the help paying coverage page of the application, false otherwise.
+    def help_paying_coverage?
+      edit?
     end
 
-    def can_consumer_access?
-      role.is_a?(::ConsumerRole)
+    # Determines if the current user has permission to select the application year.
+    # The user can select the year if they have permission to edit the application.
+    #
+    # @return [Boolean] Returns true if the user has permission to select the application year, false otherwise.
+    def application_year_selection?
+      edit?
     end
 
-    def broker_agency_profile_matches?
-      associated_family.active_broker_agency_account.present? && associated_family.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id == role.benefit_sponsors_broker_agency_profile_id
+    # Determines if the current user has permission to view the application checklist.
+    # The user can view the checklist if they have permission to edit the application.
+    #
+    # @return [Boolean] Returns true if the user has permission to view the application checklist, false otherwise.
+    def application_checklist?
+      edit?
     end
 
-    def role
-      @role ||= find_role
+    # Determines if the current user has permission to review and submit the application.
+    # The user can review and submit the application if they have permission to edit it.
+    #
+    # @return [Boolean] Returns true if the user has permission to review and submit the application, false otherwise.
+    def review_and_submit?
+      edit?
     end
 
-    def find_role
-      person = user&.person
-      return nil unless person
-
-      ACCESSABLE_ROLES.detect do |role|
-        return person.send(role) if person.respond_to?(role) && person.send(role)
-      end
-
-      nil
+    # Determines if the current user has permission to review the application.
+    # The user can review the application if they have permission to edit it.
+    #
+    # @return [Boolean] Returns true if the user has permission to review the application, false otherwise.
+    def review?
+      edit?
     end
 
-    def current_user
-      user
+    # Determines if the current user has permission to wait for the eligibility response of the application.
+    # The user can wait for the eligibility response if they have permission to edit the application.
+    #
+    # @return [Boolean] Returns true if the user has permission to wait for the eligibility response of the application, false otherwise.
+    def wait_for_eligibility_response?
+      edit?
     end
 
-    def associated_user
-      associated_family_primary_member&.user
+    # Determines if the current user has permission to view the eligibility results of the application.
+    # The user can view the eligibility results if they have permission to edit the application.
+    #
+    # @return [Boolean] Returns true if the user has permission to view the eligibility results of the application, false otherwise.
+    def eligibility_results?
+      edit?
     end
 
-    def associated_family_primary_member
-      associated_family&.primary_person
+    # Determines if the current user has permission to view the application publish error.
+    # The user can view the error if they have permission to edit the application.
+    #
+    # @return [Boolean] Returns true if the user has permission to view the application publish error, false otherwise.
+    def application_publish_error?
+      edit?
     end
 
-    def associated_family
-      record&.family
+    # Determines if the current user has permission to view the eligibility response error of the application.
+    # The user can view the error if they have permission to edit the application.
+    #
+    # @return [Boolean] Returns true if the user has permission to view the eligibility response error of the application, false otherwise.
+    def eligibility_response_error?
+      edit?
+    end
+
+    # Determines if the current user has permission to check if the eligibility results of the application have been received.
+    # The user can check if the results have been received if they have permission to edit the application.
+    #
+    # @return [Boolean] Returns true if the user has permission to check if the eligibility results of the application have been received, false otherwise.
+    def check_eligibility_results_received?
+      edit?
+    end
+
+    # Determines if the current user has permission to view the application checklist in PDF format.
+    # The user can view the checklist in PDF format if they have permission to edit the application.
+    #
+    # @return [Boolean] Returns true if the user has permission to view the application checklist in PDF format, false otherwise.
+    def checklist_pdf?
+      edit?
+    end
+
+    # Determines if the current user has permission to update the transfer requested status of the application.
+    # The user can update the status if they have permission to edit the application.
+    #
+    # @return [Boolean] Returns true if the user has permission to update the transfer requested status of the application, false otherwise.
+    def update_transfer_requested?
+      edit?
+    end
+
+    # Determines if the current user has permission to update the application year.
+    # The user can update the year if they have permission to edit the application.
+    #
+    # @return [Boolean] Returns true if the user has permission to update the application year, false otherwise.
+    def update_application_year?
+      edit?
     end
   end
 end
