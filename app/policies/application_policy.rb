@@ -57,48 +57,57 @@ class ApplicationPolicy
 
   # START - ACA Individual Market related methods
   #
-  # Checks if the account holder is a primary family member in the individual market for the given family.
-  # A user is considered a primary family member in the individual market if they have their identity verified and their primary family is the given family.
+  # Determines if the current user is a primary family member in the individual market.
+  # The user is considered a primary family member if they have verified their identity in the individual market (RIDP verified) and their account holder's family is the same as the current family.
   #
-  # @param family [Family] The family to check.
-  # @return [Boolean] Returns true if the account holder is a primary family member in the individual market for the given family, false otherwise.
+  # @return [Boolean] Returns true if the user is a primary family member in the individual market, false otherwise.
   def individual_market_primary_family_member?
     individual_market_ridp_verified? && (account_holder_family == family)
   end
 
-  # Checks if the account holder is a primary family member in the individual market for the given family, without requiring their identity to be verified.
-  # A user is considered a primary family member in the individual market if they have an individual market role and their primary family is the given family.
+  # Determines if the current user is a primary family member in the individual market who has not verified their identity (RIDP).
+  # The user is considered a primary family member if they have an individual market role and their account holder's family is the same as the current family.
   #
-  # @param family [Family] The family to check.
-  # @return [Boolean] Returns true if the account holder is a primary family member in the individual market for the given family, false otherwise.
+  # @return [Boolean] Returns true if the user is a primary family member in the individual market who has not verified their identity, false otherwise.
   def individual_market_non_ridp_primary_family_member?
     individual_market_role && (account_holder_family == family)
   end
 
-  # Checks if the account holder's identity is verified in the individual market.
-  # The method assumes that the individual_market_role is already defined and belongs to the account holder.
+  # Determines if the current user has verified their identity in the individual market (RIDP).
   #
-  # @return [Boolean, nil] Returns true if the account holder's identity is verified in the individual market,
-  # false if it's not, or nil if the account holder does not have an individual market role.
+  # @return [Boolean] Returns true if the user has verified their identity in the individual market, false otherwise.
   def individual_market_ridp_verified?
     individual_market_role&.identity_verified?
   end
 
-  # Checks if the account holder is an active broker associated with the given family in the individual market.
-  # A user is considered an active broker associated with the family in the individual market if they have an active broker role,
-  # they are associated with the individual market, and they are the writing agent for the family's active broker agency account.
-  # TODO: We need to check if Primary Person's RIDP needs to be verified for Associated Active Certified Brokers to access Individual Market
+  # Determines if the current user is an active associated broker in the individual market.
+  # The user is considered an active associated broker if they are an active associated broker for the family in the individual market.
+  # The primary family member must be verified for their identity.
+  # The broker is allowed to access only if the broker is active and associated to the family if the primary person of the family is RIDP verified.
   #
-  # @param family [Family] The family to check.
-  # @return [Boolean] Returns true if the account holder is an active broker associated with the given family in the individual market, false otherwise.
+  # @return [Boolean] Returns true if the user is an active associated broker in the individual market who has verified their identity, false otherwise.
   def active_associated_individual_market_ridp_verified_family_broker?
     primary_family_member_ridp_verified? && active_associated_individual_market_family_broker?
   end
 
+  # Determines if the primary person of the family has verified their identity (RIDP).
+  #
+  # @return [Boolean] Returns true if the primary person of the family has verified their identity, false otherwise.
   def primary_family_member_ridp_verified?
-    family.primary_person.consumer_role.identity_verified?
+    primary = family.primary_person
+    return false if primary.blank?
+
+    consumer_role = primary.consumer_role
+    return false if consumer_role.blank?
+
+    role.identity_verified?
   end
 
+  # Determines if the current user is an active associated broker in the individual market.
+  # The user is considered an active associated broker if they have a broker role that is active and in the individual market,
+  # and their broker agency account is active and associated with the same broker agency profile and writing agent as their broker role.
+  #
+  # @return [Boolean] Returns true if the user is an active associated broker in the individual market, false otherwise.
   def active_associated_individual_market_family_broker?
     broker = account_holder_person.broker_role
     return false if broker.blank? || !broker.active? || !broker.individual_market?
@@ -110,11 +119,10 @@ class ApplicationPolicy
       broker_agency_account.writing_agent_id == broker.id
   end
 
-  # Checks if the account holder is an admin in the individual market.
-  # A user is considered an admin in the individual market if they have an hbx staff role and they have the permission to modify a family.
-  # TODO: We need to check if Primary Person's RIDP needs to be verified for Hbx Staff Admins
+  # Determines if the current user is an admin in the individual market.
+  # The user is considered an admin if they have an HBX staff role that has permission to modify the family.
   #
-  # @return [Boolean] Returns true if the account holder is an admin in the individual market, false otherwise.
+  # @return [Boolean] Returns true if the user is an admin in the individual market, false otherwise.
   def individual_market_admin?
     hbx_role = account_holder_person.hbx_staff_role
     return false if hbx_role.blank?
@@ -124,11 +132,6 @@ class ApplicationPolicy
 
     permission.modify_family
   end
-
-  # # TODO: We need to implement General Agency Staff access for Individual Market if needed
-  # def active_associated_individual_market_family_general_agency_staff?
-  #   false
-  # end
   #
   # END - ACA Individual Market related methods
 

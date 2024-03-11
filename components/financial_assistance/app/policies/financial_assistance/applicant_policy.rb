@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module FinancialAssistance
+  # The ApplicantPolicy class defines the policy for accessing and modifying applicants.
+  # It determines what actions a user can perform on an applicant based on their roles and permissions.
   class ApplicantPolicy < ::ApplicationPolicy
 
     def initialize(user, record)

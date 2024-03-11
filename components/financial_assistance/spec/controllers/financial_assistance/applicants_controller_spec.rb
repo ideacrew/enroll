@@ -60,6 +60,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
   before do
     # Tests to make sure it can handle admin user
     allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+    person.consumer_role.move_identity_documents_to_verified
     sign_in(user)
   end
 

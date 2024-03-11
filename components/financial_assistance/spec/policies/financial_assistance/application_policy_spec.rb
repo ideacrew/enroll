@@ -116,10 +116,21 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
 
           context 'with active associated individual market certified broker' do
-            let(:baa_active) { true }
+            context 'consumer RIDP is verified' do
+              let(:baa_active) { true }
 
-            it 'grants access' do
-              expect(subject).to permit(logged_in_user, application)
+              it 'grants access' do
+                application.family.primary_person.consumer_role.move_identity_documents_to_verified
+                expect(subject).to permit(logged_in_user, application)
+              end
+            end
+
+            context 'consumer RIDP is unverified' do
+              let(:baa_active) { true }
+
+              it 'denies access' do
+                expect(subject).not_to permit(logged_in_user, application)
+              end
             end
           end
 
