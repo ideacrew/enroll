@@ -44,7 +44,6 @@ FinancialAssistance::Engine.routes.draw do
 
       delete 'verification_documents/destroy', to: 'verification_documents#destroy'
       get :age_of_applicant
-      get :primary_applicant_has_spouse
       get :applicant_is_eligible_for_joint_filing
       get 'other_questions', on: :member, action: 'other_questions', as: 'other_questions'
       get 'save_questions', on: :member, action: 'save_questions', as: 'save_questions'

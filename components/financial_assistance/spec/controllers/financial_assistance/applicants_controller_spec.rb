@@ -677,11 +677,4 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
       expect(response.body).to eq person.age_on(TimeKeeper.date_of_record).to_s
     end
   end
-
-  context "GET primary_applicant_has_spouse" do
-    it "should check for primary_applicant_has_spouse", dbclean: :after_each do
-      get :primary_applicant_has_spouse, params: { application_id: application.id, applicant_id: applicant.id }
-      expect(response.body).to eq "false"
-    end
-  end
 end

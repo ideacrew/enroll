@@ -10,11 +10,13 @@ module FinancialAssistance
       @family ||= record.family
     end
 
-    # TODO: Define the conditions under which a new application can be created.
-    def new?; end
+    def new?
+      edit?
+    end
 
-    # TODO: Define the conditions under which an application can be created.
-    def create?; end
+    def create?
+      edit?
+    end
 
     # Determines if the current user has permission to edit the application.
     # The user can edit the application if they are a primary family member, an active associated broker, or an admin in the individual market.
@@ -22,7 +24,7 @@ module FinancialAssistance
     # @return [Boolean] Returns true if the user has permission to edit the application, false otherwise.
     def edit?
       return true if individual_market_primary_family_member?
-      return true if active_associated_individual_market_family_broker?
+      return true if active_associated_individual_market_ridp_verified_family_broker?
       return true if individual_market_admin?
 
       false

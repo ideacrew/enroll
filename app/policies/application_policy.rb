@@ -42,13 +42,17 @@ class ApplicationPolicy
     @coverall_market_role ||= account_holder_person&.resident_role
   end
 
-  # Returns the primary family of the account holder person.
-  # The method uses memoization to store the result of the first call to it and then return that result on subsequent calls,
-  # instead of calling `account_holder_person.primary_family` each time.
+  # Returns the family of the account holder.
+  # If the @account_holder_family is defined and is set to nil, then the method will return nil.
+  # Otherwise, it will fetch the value of `account_holder_person&.primary_family` and returns the @account_holder_family.
+  # If we use `@account_holder_family ||= account_holder_person&.primary_family` when the value is nil, the code will call `account_holder_person.primary_family` which is not necessary.
+  # Reference: https://www.justinweiss.com/articles/4-simple-memoization-patterns-in-ruby-and-one-gem/
   #
-  # @return [Family, nil] The primary family of the account holder person, or nil if the account holder person is not defined.
+  # @return [Family, nil] The family of the account holder or nil if not defined or not present.
   def account_holder_family
-    @account_holder_family ||= account_holder_person&.primary_family
+    return @account_holder_family if defined? @account_holder_family
+
+    @account_holder_family = account_holder_person&.primary_family
   end
 
   # START - ACA Individual Market related methods
@@ -87,6 +91,14 @@ class ApplicationPolicy
   #
   # @param family [Family] The family to check.
   # @return [Boolean] Returns true if the account holder is an active broker associated with the given family in the individual market, false otherwise.
+  def active_associated_individual_market_ridp_verified_family_broker?
+    primary_family_member_ridp_verified? && active_associated_individual_market_family_broker?
+  end
+
+  def primary_family_member_ridp_verified?
+    family.primary_person.consumer_role.identity_verified?
+  end
+
   def active_associated_individual_market_family_broker?
     broker = account_holder_person.broker_role
     return false if broker.blank? || !broker.active? || !broker.individual_market?
