@@ -100,7 +100,7 @@ class ApplicationPolicy
     consumer_role = primary.consumer_role
     return false if consumer_role.blank?
 
-    role.identity_verified?
+    consumer_role.identity_verified?
   end
 
   # Determines if the current user is an active associated broker in the individual market.
