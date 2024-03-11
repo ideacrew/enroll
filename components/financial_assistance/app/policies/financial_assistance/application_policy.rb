@@ -5,15 +5,28 @@ module FinancialAssistance
   # It provides methods to check if a user has the necessary permissions to perform various actions on an application.
   class ApplicationPolicy < ::ApplicationPolicy
 
+    # Initializes the ApplicationPolicy with a user and a record.
+    # It sets the @family instance variable to the family of the record.
+    #
+    # @param user [User] the user who is performing the action
+    # @param record [Application] the application that the user is trying to access or modify
     def initialize(user, record)
       super
       @family ||= record.family
     end
 
+    # Determines if the current user has permission to create a new application.
+    # The user can create a new application if they have permission to edit it.
+    #
+    # @return [Boolean] Returns true if the user has permission to create a new application, false otherwise.
     def new?
       edit?
     end
 
+    # Determines if the current user has permission to create an application.
+    # The user can create an application if they have permission to edit it.
+    #
+    # @return [Boolean] Returns true if the user has permission to create an application, false otherwise.
     def create?
       edit?
     end
