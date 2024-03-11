@@ -176,7 +176,10 @@ class ApplicationPolicy
   # @param family [Family] The family to check.
   # @return [Boolean] Returns true if the account holder is a primary family member in the ACA Shop market for the given family, false otherwise.
   def shop_market_primary_family_member?(family)
-    family.primary_person&.employee_roles.present? && account_holder_person == family.primary_person
+    primary_person = family.primary_person
+    return false unless primary_person
+
+    primary_person.employee_roles.present? && account_holder_person == primary_person
   end
 
   # Checks if the account holder is an admin in the shop market.
