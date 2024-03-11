@@ -68,6 +68,7 @@ module Forms
       return nil if records.blank?
 
       if (match_criteria == :dob_present && ssn.present? && records.first.employer_staff_roles?) ||
+        (match_criteria == :dob_present && ssn.present? && (records.first.broker_role.present? || records.first.broker_agency_staff_roles.present?)) ||
          (match_criteria == :dob_present && ssn.blank?) ||
          match_criteria == :ssn_present
         records.first
