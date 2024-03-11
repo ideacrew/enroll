@@ -350,9 +350,9 @@ class Insured::FamilyMembersController < ApplicationController
   def authorize_family_access
     # We're using FamilyPolicy method here because FamilyMember is an extension of Family
     # All users/roles with the permissions to alter a Family should have the same permissions on the FamilyMember
-    # While using a single :show? method in the family policy isn't ideal, it does cover a variety of unforseen edge cases that could emerge when determining access permissions for insured/family_members
+    # While using a single :legacy_show? method in the family policy isn't ideal, it does cover a variety of unforseen edge cases that could emerge when determining access permissions for insured/family_members
 
-    authorize @family, :show?
+    authorize @family, :legacy_show?
   end
 
   def set_view_person

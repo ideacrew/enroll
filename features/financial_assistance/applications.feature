@@ -4,6 +4,7 @@ Feature: Start a new Financial Assistance Application
     Given the date is within open enrollment
     Given a consumer, with a family, exists
     And is logged in
+    And the consumer is RIDP verified
     And a benchmark plan exists
 
   @flaky

@@ -1,118 +1,155 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-# spec for FinancialAssistance::ApplicationPolicy
-RSpec.describe FinancialAssistance::ApplicationPolicy, dbclean: :after_each  do
-  let(:policy) { described_class.new(user, record) }
-  let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
-  let!(:associated_user) { FactoryBot.create(:user, :person => person) }
-  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
-  let!(:record) { family.family_members.first }
 
-  context 'hbx_admin user' do
-    let!(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
-    let!(:admin_user) { FactoryBot.create(:user, :with_hbx_staff_role, :person => admin_person) }
-    let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
-    let(:user) { admin_user }
+if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
+  RSpec.describe FinancialAssistance::ApplicationPolicy, dbclean: :after_each, type: :model do
+    subject { described_class }
 
-    context 'with permission' do
-      let!(:permission) { FactoryBot.create(:permission, :super_admin) }
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+    let(:consumer_role) { person.consumer_role }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id) }
 
-      context '#can_access_application?' do
-        it 'returns the result of #can_access_application?' do
-          expect(policy.can_access_application?).to be_truthy
+    permissions :edit? do
+      context 'when a valid user is logged in' do
+        context 'when the user is a consumer' do
+          context 'consumer is RIDP verified' do
+            let(:user_of_family) { FactoryBot.create(:user, person: person) }
+            let(:logged_in_user) { user_of_family }
+
+            it 'grants access' do
+              consumer_role.move_identity_documents_to_verified
+              expect(subject).to permit(logged_in_user, application)
+            end
+          end
+
+          context 'consumer is not RIDP verified' do
+            let(:user_of_family) { FactoryBot.create(:user, person: person) }
+            let(:logged_in_user) { user_of_family }
+
+            it 'denies access' do
+              expect(subject).not_to permit(logged_in_user, application)
+            end
+          end
+        end
+
+        context 'when the user is a hbx staff' do
+          let(:hbx_profile) do
+            FactoryBot.create(
+              :hbx_profile,
+              :normal_ivl_open_enrollment,
+              us_state_abbreviation: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
+              cms_id: "#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.upcase}0"
+            )
+          end
+          let(:hbx_staff_person) { FactoryBot.create(:person) }
+          let(:hbx_staff_role) do
+            hbx_staff_person.create_hbx_staff_role(
+              permission_id: permission.id,
+              subrole: permission.name,
+              hbx_profile: hbx_profile
+            )
+          end
+          let(:hbx_admin_user) do
+            FactoryBot.create(:user, person: hbx_staff_person)
+            hbx_staff_role.person.user
+          end
+
+          let(:logged_in_user) { hbx_admin_user }
+
+          context 'when the hbx staff has the correct permission' do
+            let(:permission) { FactoryBot.create(:permission, :super_admin) }
+
+            it 'grants access' do
+              expect(subject).to permit(logged_in_user, application)
+            end
+          end
+
+          context 'when the hbx staff does not have the correct permission' do
+            let(:permission) { FactoryBot.create(:permission, :developer) }
+
+            it 'denies access' do
+              expect(subject).not_to permit(logged_in_user, application)
+            end
+          end
+        end
+
+        context 'when the user is an assigned broker' do
+          let(:market_kind) { 'both' }
+          let(:broker_person) { FactoryBot.create(:person) }
+          let(:broker_role) { FactoryBot.create(:broker_role, person: broker_person, market_kind: market_kind) }
+          let(:broker_user) { FactoryBot.create(:user, person: broker_person) }
+
+          let(:site) do
+            FactoryBot.create(
+              :benefit_sponsors_site,
+              :with_benefit_market,
+              :as_hbx_profile,
+              site_key: ::EnrollRegistry[:enroll_app].settings(:site_key).item
+            )
+          end
+
+          let(:broker_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+          let(:broker_agency_profile) { broker_agency_organization.broker_agency_profile }
+          let(:broker_agency_id) { broker_agency_profile.id }
+
+          let(:logged_in_user) { broker_user }
+
+          let(:broker_agency_account) do
+            family.broker_agency_accounts.create!(
+              benefit_sponsors_broker_agency_profile_id: broker_agency_id,
+              writing_agent_id: broker_role.id,
+              is_active: baa_active,
+              start_on: TimeKeeper.date_of_record
+            )
+          end
+
+          before do
+            broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
+            broker_person.create_broker_agency_staff_role(
+              benefit_sponsors_broker_agency_profile_id: broker_role.benefit_sponsors_broker_agency_profile_id
+            )
+            broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id)
+            broker_role.approve!
+            broker_agency_account
+          end
+
+          context 'with active associated individual market certified broker' do
+            let(:baa_active) { true }
+
+            it 'grants access' do
+              expect(subject).to permit(logged_in_user, application)
+            end
+          end
+
+          context 'with active associated shop market certified broker' do
+            let(:baa_active) { false }
+            let(:market_kind) { 'shop' }
+
+            it 'denies access' do
+              expect(subject).not_to permit(logged_in_user, application)
+            end
+          end
+
+          context 'with unassociated broker' do
+            let(:baa_active) { false }
+
+            it 'denies access' do
+              expect(subject).not_to permit(logged_in_user, application)
+            end
+          end
         end
       end
 
-      context '#can_review?' do
-        it 'returns the result of #can_review?' do
-          expect(policy.can_review?).to be_truthy
+      context 'when a valid user is not logged in' do
+        let(:no_role_person) { FactoryBot.create(:person) }
+        let(:no_role_user) { FactoryBot.create(:user, person: no_role_person) }
+        let(:logged_in_user) { no_role_user }
+
+        it 'denies access' do
+          expect(subject).not_to permit(logged_in_user, application)
         end
-      end
-    end
-
-    context 'without permission' do
-      let!(:permission) { FactoryBot.create(:permission, :developer) }
-
-      context '#can_access_application?' do
-        it 'returns the result of #can_access_application?' do
-          expect(policy.can_access_application?).to be_falsey
-        end
-      end
-
-      context '#can_review?' do
-        it 'returns the result of #can_review?' do
-          expect(policy.can_review?).to be_falsey
-        end
-      end
-    end
-  end
-
-  context 'record user' do
-    let(:user) { associated_user }
-
-    context '#can_access_application?' do
-      it 'returns the result of #can_access_application?' do
-        expect(policy.can_access_application?).to be_truthy
-      end
-    end
-  end
-
-  context 'unauthorized user' do
-    let!(:fake_person) { FactoryBot.create(:person, :with_consumer_role) }
-    let!(:fake_user) {FactoryBot.create(:user, :person => fake_person)}
-    let!(:fake_family) { FactoryBot.create(:family, :with_primary_family_member, person: fake_person) }
-    let!(:fake_family_member) { fake_family.family_members.first }
-    let(:user) { fake_user }
-
-    context '#can_access_application?' do
-      it 'returns the result of #can_access_application?' do
-        expect(policy.can_access_application?).to be_falsey
-      end
-
-      context '#can_review?' do
-        it 'returns the result of #can_review?' do
-          expect(policy.can_review?).to be_falsey
-        end
-      end
-    end
-  end
-
-  context 'broker logged in' do
-    let!(:broker_user) { FactoryBot.create(:user, :person => writing_agent.person, roles: ['broker_role', 'broker_agency_staff_role']) }
-    let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
-    let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
-    let(:assister)  do
-      assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00")
-      assister.save(validate: false)
-      assister
-    end
-    let(:user) { broker_user }
-
-    context 'hired by family' do
-      before(:each) do
-        family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
-                                                                                            writing_agent_id: writing_agent.id,
-                                                                                            start_on: Time.now,
-                                                                                            is_active: true)
-        family.reload
-      end
-
-      it 'returns the result of #can_access_application?' do
-        expect(policy.can_access_application?).to be_truthy
-      end
-    end
-
-
-    context 'not hired by family' do
-      it 'returns the result of #can_access_application?' do
-        expect(policy.can_access_application?).to be_falsey
-      end
-    end
-
-    context '#can_review?' do
-      it 'returns the result of #can_review?' do
-        expect(policy.can_review?).to be_falsey
       end
     end
   end

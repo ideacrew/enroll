@@ -1,7 +1,8 @@
 Feature: Conditional Display of Family Relationships link in the left nav of the FAA Household Info page.
 
   Background: Household Info page
-    Given a consumer exists
+    Given a consumer exists with family
+    And the consumer is RIDP verified
     And is logged in
     And a benchmark plan exists
     And the user will navigate to the FAA Household Info page

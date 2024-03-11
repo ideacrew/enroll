@@ -205,6 +205,9 @@ end
 
 describe "#move_identity_documents_to_outstanding" do
   let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+  before do
+    person.consumer_role.update!(identity_validation: 'na')
+  end
 
   context 'move to outstanding if initial state is unverified' do
 

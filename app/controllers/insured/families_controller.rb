@@ -24,7 +24,7 @@ class Insured::FamiliesController < FamiliesController
   around_action :cache_hbx, only: [:home]
 
   def home
-    authorize @family, :show?
+    authorize @family, :legacy_show?
     build_employee_role_by_census_employee_id
     set_flash_by_announcement
     set_bookmark_url
@@ -73,7 +73,7 @@ class Insured::FamiliesController < FamiliesController
   def enrollment_history
     redirect_to main_app.family_account_path(tab: 'home') unless EnrollRegistry.feature_enabled?(:enrollment_history_page)
 
-    authorize @family, :show?
+    authorize @family, :legacy_show?
 
     @hbx_enrollments = @family.enrollments.non_external.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
     @hbx_enrollments += HbxEnrollment.family_non_pay_enrollments(@family)
@@ -94,7 +94,7 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def manage_family
-    authorize @family, :show?
+    authorize @family, :legacy_show?
 
     set_bookmark_url
     set_admin_bookmark_url(manage_family_insured_families_path)
@@ -157,7 +157,7 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def personal
-    authorize @family, :show?
+    authorize @family, :legacy_show?
 
     @tab = params['tab']
     @contact_preferences_mapping = ConsumerRole::CONTACT_METHOD_MAPPING.invert unless EnrollRegistry.feature_enabled?(:contact_method_via_dropdown)
@@ -173,7 +173,7 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def inbox
-    authorize @family, :show?
+    authorize @family, :legacy_show?
 
     @tab = params['tab']
     @folder = params[:folder] || 'Inbox'
@@ -215,7 +215,7 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def verification
-    authorize @family, :show?
+    authorize @family, :legacy_show?
 
     @family_members = @person.primary_family.has_active_consumer_family_members
   end

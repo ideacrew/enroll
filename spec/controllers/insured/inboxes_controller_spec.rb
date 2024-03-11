@@ -76,7 +76,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
 
           expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(403)
-          expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
         end
 
         it 'will not create a new message' do
@@ -84,7 +84,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
 
           expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(:redirect)
-          expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
         end
       end
 
@@ -94,7 +94,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
 
           expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(:redirect)
-          expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
         end
 
         it 'will not delete a message' do
@@ -102,7 +102,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
 
           expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(403)
-          expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
         end
       end
     end
@@ -170,7 +170,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
 
           expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(403)
-          expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
         end
 
         it 'will not create a new message' do
@@ -178,7 +178,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
 
           expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(:redirect)
-          expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
         end
       end
 
@@ -188,7 +188,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
 
           expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(403)
-          expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
         end
 
         it 'will not delete a message' do
@@ -196,7 +196,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
 
           expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(403)
-          expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
         end
       end
     end
@@ -268,7 +268,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
 
           expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(403)
-          expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
         end
 
         it 'will not create a new message' do
@@ -276,7 +276,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
 
           expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(:redirect)
-          expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
         end
       end
 
@@ -286,7 +286,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
 
           expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(:redirect)
-          expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
         end
 
         it 'will not delete a message' do
@@ -294,7 +294,7 @@ RSpec.describe Insured::InboxesController, :type => :controller do
 
           expect(assigns(:inbox_provider).present?).to be_falsey
           expect(response).to have_http_status(403)
-          expect(flash[:error]).to eq("Access not allowed for family_policy.show?, (Pundit policy)")
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
         end
       end
     end
