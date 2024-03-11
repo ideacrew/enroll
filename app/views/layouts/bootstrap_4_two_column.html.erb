@@ -7,17 +7,10 @@
     <%= favicon_link_tag Settings.site.tab_icon, :rel => 'shortcut icon', :type => EnrollRegistry[:enroll_app].settings(:favicon_tab_icon).item %>
 
     <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{site_short_name} | #{site_short_name}" %></title>
-    <%= javascript_pack_tag 'application' %>
-    <%= stylesheet_pack_tag 'application' %>
-    <%= javascript_pack_tag ENV['CLIENT'] %>
-    <%= stylesheet_pack_tag ENV['CLIENT'] %>
-    <!-- JQuery migrate has 2 versions, one for development/testing and one for production.
-         The former will show the areas it is patching, the latter won't -->
-    <% if ENV['ENROLL_REVIEW_ENVIRONMENT'] == 'true' || !Rails.env.production? %>
-      <script src="https://code.jquery.com/jquery-migrate-3.4.1.js"></script>
-    <% else %>
-      <script src="https://code.jquery.com/jquery-migrate-3.4.1.min.js"></script>
-    <% end %>
+    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= stylesheet_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_pack_tag ENV['CLIENT'], 'data-turbolinks-track': 'reload' %>
+    <%= stylesheet_pack_tag ENV['CLIENT'], 'data-turbolinks-track': 'reload' %>
     <%= csrf_meta_tags %>
 
 
