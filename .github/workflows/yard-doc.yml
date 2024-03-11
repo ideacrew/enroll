@@ -1,14 +1,15 @@
 name: yard doc generation
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - 'trunk'
 
 jobs:
   docs_deployment:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          submodules: recursive
       - uses: nelonoel/branch-name@v1.0.1
       - uses: actions/setup-node@v2
         with:
@@ -16,14 +17,10 @@ jobs:
       - name: Install global packages
         run: |
           yarn install
-          npm install -g postcss postcss-cli autoprefixer
       - uses: ruby/setup-ruby@v1
-      - uses: actions/cache@v2
         with:
-          path: vendor/bundle
-          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-          restore-keys: |
-            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+          bundler-cache: true
+          rubygems: 3.3.26
       - name: Install project gems
         run: |
           bundle config path vendor/bundle
@@ -31,11 +28,21 @@ jobs:
       - name: Run yard
         run: bundle exec yard doc && mv ./doc ./hugo/static/yard
       - run: sudo snap install hugo --channel=extended
-      - run: cd hugo && hugo --minify
+      - run: cd hugo && npm install && hugo --minify
       - uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read
         env:
           AWS_S3_BUCKET: ${{ secrets.YARD_S3_BUCKET }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.YARD_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.YARD_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.IC_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.IC_AWS_SECRET_ACCESS_KEY }}
           SOURCE_DIR: hugo/public
           DEST_DIR: ${{ env.BRANCH_NAME }}
+      - name: Invalidate CloudFront
+        uses: chetan/invalidate-cloudfront-action@v2
+        env:
+          DISTRIBUTION: ${{ secrets.S3_DISTRIBUTION }}
+          PATHS: "/*"
+          AWS_REGION: "us-east-1"
+          AWS_ACCESS_KEY_ID: ${{ secrets.IC_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.IC_AWS_SECRET_ACCESS_KEY }}

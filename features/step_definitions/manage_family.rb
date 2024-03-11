@@ -14,13 +14,6 @@ Then(/^Employee should not see the Ageoff Exclusion checkbox$/) do
   expect(page).not_to have_content(/Ageoff Exclusion/)
 end
 
-Then(/^Employee should click on Change my Password link$/) do
-  if aca_security_questions
-    wait_for_ajax
-    page.execute_script("document.querySelector('#change_password_link').click()")
-  end
-end
-
 Then(/they can submit a new password/) do
   fill_in SignIn.password, with: "aA1!aA1!aA1!"
   sleep 1
