@@ -13,9 +13,9 @@ module FinancialAssistance
     def initialize(user, record)
       super
 
-      # TODO: Replace _parent with applicant. For some weird reason, the applicant is returning `nil`.
-      # The applicant is a FinancialAssistance::Applicant object.
-      # Instead of using the applicant I am using the parent method which returns the FinancialAssistance::Application object.
+      # @todo Replace _parent with applicant. For some reason, the applicant is returning `nil`.
+      #   The applicant is supposed to be a FinancialAssistance::Applicant object.
+      #   Currently, the _parent method is being used, which returns the FinancialAssistance::Application object.
       @family ||= record._parent.application.family
     end
 
