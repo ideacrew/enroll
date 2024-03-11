@@ -536,12 +536,6 @@ Rails.application.routes.draw do
 
       resources :applicants
     end
-    resources :broker_roles, only: [:create] do
-      collection do
-        post :email_guide
-      end
-    end
-
 
     resources :broker_roles do
 
