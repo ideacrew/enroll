@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class FamilyPolicy < ApplicationPolicy
-  def initialize
+  def initialize(user, record)
     super
     @family ||= record
   end

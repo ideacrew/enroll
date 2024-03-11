@@ -5,7 +5,7 @@ module FinancialAssistance
   # It provides methods to check if a user has the necessary permissions to perform various actions on an application.
   class ApplicationPolicy < ::ApplicationPolicy
 
-    def initialize
+    def initialize(user, record)
       super
       @family ||= record.family
     end

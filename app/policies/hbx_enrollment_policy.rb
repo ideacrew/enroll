@@ -2,7 +2,7 @@
 
 # pundit Policies to access HbxEnrollment
 class HbxEnrollmentPolicy < ApplicationPolicy
-  def initialize
+  def initialize(user, record)
     super
     @family ||= record.family
   end
