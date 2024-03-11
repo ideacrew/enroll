@@ -1302,14 +1302,14 @@ Then(/^I should see Shop for new plan button$/) do
   expect(shop_for_new_plan_input.present?).to eq(true)
 end
 
-And(/^admin last signed in more than 60 days ago$/) do
+And(/^.+ last signed in more than 60 days ago$/) do
   User.first.update_attributes!(last_activity_at: Time.now - 61.days)
 end
 
-Then(/^admin should see text Logout$/) do
-  expect(page).to have_content("Logout")
+Then(/^.+ should be signed in successfully$/) do
+  expect(page).to have_content(l10n('devise.sessions.signed_in'))
 end
 
-Then(/^admin should not be able to log in$/) do
-  expect(page).to have_content("Your account has expired due to inactivity.")
+Then(/^.+ should not be able to log in$/) do
+  expect(page).to have_content(l10n('devise.failure.expired'))
 end
