@@ -3,33 +3,58 @@
 require 'rails_helper'
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
-  RSpec.describe FinancialAssistance::ApplicationPolicy, dbclean: :after_each, type: :model do
+  RSpec.describe FinancialAssistance::ApplicantPolicy, dbclean: :after_each, type: :model do
     subject { described_class }
 
     let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
     let(:consumer_role) { person.consumer_role }
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let(:primary_family_member) { family.primary_applicant }
+    let(:dependent_person) do
+      pr = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
+      person.ensure_relationship_with(pr, 'spouse')
+      pr
+    end
+    let(:dependent_member) { FactoryBot.create(:family_member, family: family, person: dependent_person) }
     let(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id) }
+    let(:primary_applicant) do
+      FactoryBot.create(
+        :financial_assistance_applicant,
+        application: application,
+        family_member_id: primary_family_member.id,
+        person_hbx_id: person.hbx_id
+      )
+    end
+    let(:dependent_applicant) do
+      FactoryBot.create(
+        :financial_assistance_applicant,
+        application: application,
+        family_member_id: dependent_member.id,
+        person_hbx_id: dependent_person.hbx_id
+      )
+    end
 
     permissions :edit? do
+      before do
+        primary_applicant
+        consumer_role.move_identity_documents_to_verified
+      end
+
       context 'when a valid user is logged in' do
         context 'when the user is a consumer' do
-          context 'consumer is RIDP verified' do
-            let(:user_of_family) { FactoryBot.create(:user, person: person) }
-            let(:logged_in_user) { user_of_family }
+          let(:user_of_family) { FactoryBot.create(:user, person: person) }
+          let(:logged_in_user) { user_of_family }
 
+          context 'with ridp verified' do
             it 'grants access' do
-              consumer_role.move_identity_documents_to_verified
-              expect(subject).to permit(logged_in_user, application)
+              expect(subject).to permit(logged_in_user, dependent_applicant)
             end
           end
 
-          context 'consumer is not RIDP verified' do
-            let(:user_of_family) { FactoryBot.create(:user, person: person) }
-            let(:logged_in_user) { user_of_family }
-
+          context 'without ridp verified' do
             it 'denies access' do
-              expect(subject).not_to permit(logged_in_user, application)
+              consumer_role.update_attributes(identity_validation: 'rejected')
+              expect(subject).not_to permit(logged_in_user, dependent_applicant)
             end
           end
         end
@@ -62,7 +87,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             let(:permission) { FactoryBot.create(:permission, :super_admin) }
 
             it 'grants access' do
-              expect(subject).to permit(logged_in_user, application)
+              expect(subject).to permit(logged_in_user, dependent_applicant)
             end
           end
 
@@ -70,13 +95,14 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             let(:permission) { FactoryBot.create(:permission, :developer) }
 
             it 'denies access' do
-              expect(subject).not_to permit(logged_in_user, application)
+              expect(subject).not_to permit(logged_in_user, dependent_applicant)
             end
           end
         end
 
         context 'when the user is an assigned broker' do
           let(:market_kind) { 'both' }
+          let(:broker_person) { FactoryBot.create(:person, :with_broker_role) }
           let(:broker_person) { FactoryBot.create(:person) }
           let(:broker_role) { FactoryBot.create(:broker_role, person: broker_person, market_kind: market_kind) }
           let(:broker_user) { FactoryBot.create(:user, person: broker_person) }
@@ -120,8 +146,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               let(:baa_active) { true }
 
               it 'grants access' do
-                application.family.primary_person.consumer_role.move_identity_documents_to_verified
-                expect(subject).to permit(logged_in_user, application)
+                expect(subject).to permit(logged_in_user, dependent_applicant)
               end
             end
 
@@ -129,7 +154,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               let(:baa_active) { true }
 
               it 'denies access' do
-                expect(subject).not_to permit(logged_in_user, application)
+                consumer_role.update_attributes(identity_validation: 'na', application_validation: 'na')
+                expect(subject).not_to permit(logged_in_user, dependent_applicant)
               end
             end
           end
@@ -139,7 +165,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             let(:market_kind) { 'shop' }
 
             it 'denies access' do
-              expect(subject).not_to permit(logged_in_user, application)
+              expect(subject).not_to permit(logged_in_user, dependent_applicant)
             end
           end
 
@@ -147,7 +173,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             let(:baa_active) { false }
 
             it 'denies access' do
-              expect(subject).not_to permit(logged_in_user, application)
+              expect(subject).not_to permit(logged_in_user, dependent_applicant)
             end
           end
         end
@@ -159,7 +185,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         let(:logged_in_user) { no_role_user }
 
         it 'denies access' do
-          expect(subject).not_to permit(logged_in_user, application)
+          expect(subject).not_to permit(logged_in_user, dependent_applicant)
         end
       end
     end
