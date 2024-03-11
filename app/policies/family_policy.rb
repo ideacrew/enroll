@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 class FamilyPolicy < ApplicationPolicy
+  def initialize(user, record)
+    super
+    @family ||= record
+  end
+
   # Returns the primary person of the family record.
   #
   # @return [Person] The primary person of the family record.
@@ -39,15 +44,15 @@ class FamilyPolicy < ApplicationPolicy
   #
   # @return [Boolean] Returns true if the user has permission to view the record, false otherwise.
   def show?
-    return true if individual_market_primary_family_member?(record)
-    return true if active_associated_individual_market_family_broker?(record)
+    return true if individual_market_primary_family_member?
+    return true if active_associated_individual_market_family_broker?
     return true if individual_market_admin?
 
-    return true if shop_market_primary_family_member?(record)
-    return true if fehb_market_primary_family_member?(record)
+    return true if shop_market_primary_family_member?
+    return true if fehb_market_primary_family_member?
 
-    return true if coverall_market_primary_family_member?(record)
-    return true if active_associated_coverall_market_family_broker?(record)
+    return true if coverall_market_primary_family_member?
+    return true if active_associated_coverall_market_family_broker?
     return true if coverall_market_admin?
 
     false

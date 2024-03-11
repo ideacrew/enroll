@@ -5,11 +5,9 @@ module FinancialAssistance
   # It provides methods to check if a user has the necessary permissions to perform various actions on an application.
   class ApplicationPolicy < ::ApplicationPolicy
 
-    # Returns the family associated with the current application.
-    #
-    # @return [Family] The family associated with the current application.
-    def application_family
-      @application_family ||= record.family
+    def initialize(user, record)
+      super
+      @family ||= record.family
     end
 
     # TODO: Define the conditions under which a new application can be created.
@@ -23,8 +21,8 @@ module FinancialAssistance
     #
     # @return [Boolean] Returns true if the user has permission to edit the application, false otherwise.
     def edit?
-      return true if individual_market_primary_family_member?(application_family)
-      return true if active_associated_individual_market_family_broker?(application_family)
+      return true if individual_market_primary_family_member?
+      return true if active_associated_individual_market_family_broker?
       return true if individual_market_admin?
 
       false
