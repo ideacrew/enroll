@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+Given(/^a consumer exists with family/) do
+  consumer :with_consumer_role
+end
+
 Given(/^a consumer, with a family, exists$/) do
   consumer :with_nuclear_family
   hbx_profile = FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)
@@ -16,6 +20,10 @@ end
 
 Given(/^is logged in$/) do
   login_as consumer, scope: :user
+end
+
+And(/^the consumer is RIDP verified$/) do
+  consumer.person.consumer_role.move_identity_documents_to_verified
 end
 
 Given(/^a benchmark plan exists$/) do
@@ -608,17 +616,17 @@ end
 
 Then(/^they should see the Medicaid Currently Enrolled warning text$/) do
   expect(page).to have_selector('#mec-check-response')
-  expect(page).to have_content(l10n('faa.mc_continue'))
+  expect(page).to have_content(l10n('faa.mc_continue_bold'))
 end
 
 Then(/^they should see the shop coverage exists warning text$/) do
   expect(page).to have_content(l10n('faa.shop_check_success'))
-  expect(page).to have_content(l10n('faa.mc_continue'))
+  expect(page).to have_content(l10n('faa.mc_continue_bold'))
 end
 
 Then(/^they should not see the shop coverage exists warning text$/) do
   expect(page).to_not have_content(l10n('faa.shop_check_success'))
-  expect(page).to_not have_content(l10n('faa.mc_continue'))
+  expect(page).to_not have_content('faa.mc_continue_bold')
 end
 
 # TODO: Refactor these with the resource_registry_world.rb helpers

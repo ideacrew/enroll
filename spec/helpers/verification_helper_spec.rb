@@ -135,12 +135,13 @@ RSpec.describe VerificationHelper, :type => :helper do
     end
 
     context 'ridp type status in review' do
-      it 'returns warning  for IDENTITY with docs' do
+      it 'returns warning for IDENTITY with docs' do
+        person.consumer_role.update!(identity_validation: 'na')
         person.consumer_role.ridp_documents << FactoryBot.build(:ridp_document, :ridp_verification_type => 'Identity')
         expect(helper.ridp_type_class('Identity', person)).to eq('warning')
       end
 
-      it 'returns warning  for APPLICATION with docs' do
+      it 'returns warning for APPLICATION with docs' do
         person.consumer_role.ridp_documents << FactoryBot.build(:ridp_document, :ridp_verification_type => 'Application')
         expect(helper.ridp_type_class('Application', person)).to eq('warning')
       end

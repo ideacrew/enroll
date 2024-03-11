@@ -11,7 +11,7 @@ describe FamilyPolicy, "given a user who has no properties" do
   subject { FamilyPolicy.new(user, family) }
 
   it "can't show" do
-    expect(subject.show?).to be_falsey
+    expect(subject.legacy_show?).to be_falsey
   end
 end
 
@@ -25,7 +25,7 @@ describe FamilyPolicy, "given a user who is the primary member" do
   subject { FamilyPolicy.new(user, family) }
 
   it "can show" do
-    expect(subject.show?).to be_truthy
+    expect(subject.legacy_show?).to be_truthy
   end
 end
 
@@ -51,7 +51,7 @@ describe FamilyPolicy, "given a family with an active broker agency account", :d
     let(:user) { FactoryBot.create(:user, :person => person)}
 
     it "can show" do
-      expect(subject.show?).to be_truthy
+      expect(subject.legacy_show?).to be_truthy
     end
   end
 
@@ -63,7 +63,7 @@ describe FamilyPolicy, "given a family with an active broker agency account", :d
     let(:user) { FactoryBot.create(:user, :person => broker_person)}
 
     it "can't show" do
-      expect(subject.show?).to be_falsey
+      expect(subject.legacy_show?).to be_falsey
     end
   end
 end
@@ -93,7 +93,7 @@ describe FamilyPolicy, "given a family where the primary has an active employer 
     let(:user) { FactoryBot.create(:user, :person => person)}
 
     it "can show" do
-      expect(subject.show?).to be_truthy
+      expect(subject.legacy_show?).to be_truthy
     end
   end
 
@@ -103,7 +103,7 @@ describe FamilyPolicy, "given a family where the primary has an active employer 
     let(:user) { FactoryBot.create(:user, :person => employee_person)}
 
     it "can't show" do
-      expect(subject.show?).to be_falsey
+      expect(subject.legacy_show?).to be_falsey
     end
   end
 end
@@ -129,7 +129,7 @@ describe FamilyPolicy, "given a family where the primary has an active employer 
     let(:general_agency_account_profile_id) { general_agency_profile_id }
 
     it "can show" do
-      expect(subject.show?).to be_truthy
+      expect(subject.legacy_show?).to be_truthy
     end
   end
 
@@ -137,7 +137,7 @@ describe FamilyPolicy, "given a family where the primary has an active employer 
     let(:general_agency_account_profile_id) { double }
 
     it "can't show" do
-      expect(subject.show?).to be_falsey
+      expect(subject.legacy_show?).to be_falsey
     end
   end
 end
@@ -155,7 +155,7 @@ describe FamilyPolicy, "given a user who has the modify family permission" do
   subject { FamilyPolicy.new(user, family) }
 
   it "can show" do
-    expect(subject.show?).to be_truthy
+    expect(subject.legacy_show?).to be_truthy
   end
 
   it "can can_view_entire_family_enrollment_history" do
@@ -188,7 +188,7 @@ describe FamilyPolicy, 'given a family with an active broker with only broker ro
 
     it 'can show' do
       allow(broker_person).to receive(:active_broker_staff_roles).and_return []
-      expect(subject.show?).to be_truthy
+      expect(subject.legacy_show?).to be_truthy
     end
   end
 end

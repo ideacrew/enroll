@@ -1,7 +1,8 @@
 Feature: Functionality for the Destroy Applicant
 
   Background: Household info page
-    Given a consumer exists
+    Given a consumer exists with family
+    And the consumer is RIDP verified
     And is logged in
     And a benchmark plan exists
     And the FAA feature configuration is enabled

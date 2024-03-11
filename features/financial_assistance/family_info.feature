@@ -4,7 +4,8 @@ Feature: Start a new Financial Assistance Application
   Background:
     Given the FAA feature configuration is enabled
     Given the date is within open enrollment
-    Given a consumer, with a family, exists
+    Given a consumer exists with family
+    And the consumer is RIDP verified
     And is logged in
     And a benchmark plan exists
 

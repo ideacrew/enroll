@@ -13,6 +13,7 @@ end
 
 And(/^this person has a consumer role with failed or pending RIDP verification$/) do
   @dual_role_person.user.update_attributes(identity_verified_date: nil)
+  @dual_role_person.consumer_role.update!(identity_validation: 'na')
   @dual_role_person.consumer_role.move_identity_documents_to_outstanding
 end
 

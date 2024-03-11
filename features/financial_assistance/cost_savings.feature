@@ -42,6 +42,7 @@ Feature: Cost Savings
     Given the iap year selection feature is enabled
     And a family with financial application in <application_state> state exists
     And the user with consumer role is logged in
+    And the user is RIDP verified
     When consumer visits home page
     And the Cost Savings link is visible
     And the consumer clicks on Cost Savings link

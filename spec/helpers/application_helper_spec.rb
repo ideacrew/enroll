@@ -981,6 +981,10 @@ describe "Enabled/Disabled IVL market" do
       let(:brce_enabled_or_disabled) { true }
 
       context 'without consumer role or employee role' do
+        before do
+          person.consumer_role.update!(identity_validation: 'na')
+        end
+
         it 'returns false' do
           expect(helper.eligible_to_redirect_to_home_page?(user)).to eq(false)
         end

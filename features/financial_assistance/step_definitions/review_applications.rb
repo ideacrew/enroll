@@ -3,8 +3,6 @@
 Given(/^that a family has a Financial Assistance application in the (.*?) state$/) do |state|
   # draft, submitted, determination_response_error, determined
   FactoryBot.create(:hbx_profile)
-  @family = user.primary_family
-  @applications = [FactoryBot.create(:financial_assistance_application, :with_applicants, family_id: @family.id, aasm_state: state, effective_date: TimeKeeper.date_of_record)]
   application.update_attributes(aasm_state: state)
 end
 
