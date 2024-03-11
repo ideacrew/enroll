@@ -128,7 +128,7 @@ class ApplicationPolicy
   # @param family [Family] The family to check.
   # @return [Boolean] Returns true if the account holder is a primary family member in the coverall market for the given family, false otherwise.
   def coverall_market_primary_family_member?(family)
-    coverall_market_role && account_holder_person == family.primary_person
+    account_holder_person == family.primary_person
   end
 
   # Checks if the account holder is an active broker associated with the given family in the coverall market.
