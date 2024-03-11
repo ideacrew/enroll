@@ -12,9 +12,28 @@ RSpec.describe HbxAdminController, :type => :controller do
   end
   let(:valid_benefit_sponsorship)  { FactoryBot.create(:benefit_sponsors_benefit_sponsorship, :with_full_package) }
   let(:valid_date)  { TimeKeeper.date_of_record.beginning_of_month }
+  let(:hbx_staff_permission) do
+    instance_double(
+      Permission,
+      :can_edit_aptc => true
+    )
+  end
+  let(:hbx_staff_role) do
+    instance_double(
+      HbxStaffRole,
+      :permission => hbx_staff_permission
+    )
+  end
+  let(:user_person) do
+    instance_double(
+      Person,
+      :hbx_staff_role => hbx_staff_role
+    )
+  end
 
   before :each do
     allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+    allow(user).to receive(:person).and_return(user_person)
     sign_in(user)
     allow(EnrollRegistry[:apply_aggregate_to_enrollment].feature).to receive(:is_enabled).and_return(false)
   end

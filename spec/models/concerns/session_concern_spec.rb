@@ -7,6 +7,11 @@ RSpec.describe SessionConcern, type: :model do
   let(:dummy_class)  { Class.new { include SessionConcern } }
   let(:subject) { dummy_class.new }
 
+  before :each do
+    Thread.current[:current_user] = nil
+    Thread.current[:current_session_values] = nil
+  end
+
   describe '#current_user' do
 
     it 'returns nil if no user is set in the thread' do

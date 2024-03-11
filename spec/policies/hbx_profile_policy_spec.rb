@@ -571,3 +571,121 @@ describe HbxProfilePolicy do
     it_behaves_like 'with role and permission', :update_setting?, :modify_admin_tabs, false, false
   end
 end
+
+RSpec.describe HbxProfilePolicy, "given an unlinked user" do
+  let(:user) do
+    instance_double(
+      User,
+      :person => nil
+    )
+  end
+
+  let(:subject) { described_class.new(user, nil) }
+
+  it "is not authorized to calculate_aptc_csr" do
+    expect(subject.calculate_aptc_csr?).to be_falsey
+  end
+
+  it "is not authorized to edit_aptc_csr" do
+    expect(subject.edit_aptc_csr?).to be_falsey
+  end
+end
+
+RSpec.describe HbxProfilePolicy, "given a linked, non-admin user" do
+  let(:person) do
+    instance_double(
+      Person,
+      :hbx_staff_role => nil
+    )
+  end
+  let(:user) do
+    instance_double(
+      User,
+      :person => person
+    )
+  end
+
+  let(:subject) { described_class.new(user, nil) }
+
+  it "is not authorized to calculate_aptc_csr" do
+    expect(subject.calculate_aptc_csr?).to be_falsey
+  end
+
+  it "is not authorized to edit_aptc_csr" do
+    expect(subject.edit_aptc_csr?).to be_falsey
+  end
+end
+
+RSpec.describe HbxProfilePolicy, "given a linked, admin user without the #can_edit_aptc permission" do
+  let(:permission) do
+    instance_double(
+      Permission,
+      :can_edit_aptc => false
+    )
+  end
+  let(:hbx_staff_role) do
+    instance_double(
+      HbxStaffRole,
+      :permission => permission
+    )
+  end
+  let(:person) do
+    instance_double(
+      Person,
+      :hbx_staff_role => hbx_staff_role
+    )
+  end
+  let(:user) do
+    instance_double(
+      User,
+      :person => person
+    )
+  end
+
+  let(:subject) { described_class.new(user, nil) }
+
+  it "is not authorized to calculate_aptc_csr" do
+    expect(subject.calculate_aptc_csr?).to be_falsey
+  end
+
+  it "is not authorized to edit_aptc_csr" do
+    expect(subject.edit_aptc_csr?).to be_falsey
+  end
+end
+
+RSpec.describe HbxProfilePolicy, "given a linked, admin user with the #can_edit_aptc permission" do
+  let(:permission) do
+    instance_double(
+      Permission,
+      :can_edit_aptc => true
+    )
+  end
+  let(:hbx_staff_role) do
+    instance_double(
+      HbxStaffRole,
+      :permission => permission
+    )
+  end
+  let(:person) do
+    instance_double(
+      Person,
+      :hbx_staff_role => hbx_staff_role
+    )
+  end
+  let(:user) do
+    instance_double(
+      User,
+      :person => person
+    )
+  end
+
+  let(:subject) { described_class.new(user, nil) }
+
+  it "is authorized to calculate_aptc_csr" do
+    expect(subject.calculate_aptc_csr?).to be_truthy
+  end
+
+  it "is authorized to edit_aptc_csr" do
+    expect(subject.edit_aptc_csr?).to be_truthy
+  end
+end
