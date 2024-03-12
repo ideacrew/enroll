@@ -111,10 +111,19 @@ module BenefitSponsors
           benefit_sponsorship.save!
           allow(controller).to receive(:authorize).and_return(true)
           sign_in user
-          post :bulk_employee_upload, :params => {:employer_profile_id => benefit_sponsor.profiles.first.id, :file => file}
         end
 
         it 'should throw error' do
+          post :bulk_employee_upload, :params => {:employer_profile_id => benefit_sponsor.profiles.first.id, :file => file}
+
+          expect(response).to render_template("benefit_sponsors/profiles/employers/employer_profiles/_employee_csv_upload_errors", "layouts/two_column")
+        end
+
+        it "does not allow docx files to be uploaded" do
+          file = fixture_file_upload("#{Rails.root}/test/sample.docx")
+          post :bulk_employee_upload, :params => {:employer_profile_id => benefit_sponsor.profiles.first.id, :file => file}
+
+          expect(flash[:error]).to include("Unable to upload file.")
           expect(response).to render_template("benefit_sponsors/profiles/employers/employer_profiles/_employee_csv_upload_errors", "layouts/two_column")
         end
       end
@@ -204,6 +213,19 @@ module BenefitSponsors
 
           expect(response).to have_http_status(:success)
           expect(JSON.parse(response.body)).to eq({ "wf_url" => nil })
+        end
+      end
+
+      context 'employee tab' do
+        before do
+          allow(::WellsFargo::BillPay::SingleSignOn).to receive(:new).and_return(double(url: "http://example.com", token: "token"))
+          get :show, params: {id: benefit_sponsor.profiles.first.id.to_s, tab: 'employees'}
+          allow(employer_profile).to receive(:active_benefit_sponsorship).and_return benefit_sponsorship
+        end
+
+        it "does not create a WellsFargoSSO instance" do
+          expect(assigns(:wells_fargo_sso)).to be_nil
+          expect(assigns(:wf_url)).to be_nil
         end
       end
 

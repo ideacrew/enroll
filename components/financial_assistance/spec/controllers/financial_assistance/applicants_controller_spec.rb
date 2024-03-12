@@ -60,6 +60,7 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
   before do
     # Tests to make sure it can handle admin user
     allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+    person.consumer_role.move_identity_documents_to_verified
     sign_in(user)
   end
 
@@ -675,13 +676,6 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
     it "should return age of applicant", dbclean: :after_each do
       get :age_of_applicant, params: { application_id: application.id, applicant_id: applicant.id }
       expect(response.body).to eq person.age_on(TimeKeeper.date_of_record).to_s
-    end
-  end
-
-  context "GET primary_applicant_has_spouse" do
-    it "should check for primary_applicant_has_spouse", dbclean: :after_each do
-      get :primary_applicant_has_spouse, params: { application_id: application.id, applicant_id: applicant.id }
-      expect(response.body).to eq "false"
     end
   end
 end

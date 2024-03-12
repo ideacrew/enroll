@@ -6,6 +6,7 @@ Feature: Start a new Financial Assistance Application and answers questions on O
     And FAA student_follow_up_questions feature is enabled
     Given a consumer, with a family, exists
     And is logged in
+    And the consumer is RIDP verified
     And the user SSN is nil
     And the user has an eligible immigration status
     And the user has an age between 18 and 19 years old

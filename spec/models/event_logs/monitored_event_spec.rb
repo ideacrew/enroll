@@ -201,9 +201,11 @@ RSpec.describe EventLogs::MonitoredEvent, type: :model, dbclean: :around_each do
         benefit_sponsorship.organization.to_global_id.uri.to_s
       end
 
+      let(:current_state) { :eligible }
+
       let(:payload) do
         {
-          current_state: :eligible,
+          current_state: current_state,
           title: "Aca Shop Osse Eligibility 2024",
           state_histories: [{ effective_on: Date.new(2024, 1, 1) }]
         }
@@ -246,6 +248,10 @@ RSpec.describe EventLogs::MonitoredEvent, type: :model, dbclean: :around_each do
           .success
       end
 
+      let(:eligibility_effective_date) do
+        payload.dig(:state_histories, -1, :effective_on)
+      end
+
       context "when application osse eligible" do
         before do
           allow_any_instance_of(
@@ -273,6 +279,29 @@ RSpec.describe EventLogs::MonitoredEvent, type: :model, dbclean: :around_each do
             .in_time_zone("Eastern Time (US & Canada)")
             .to_date
         end
+
+        context "when eligibility is in ineligible state" do
+          let(:current_state) { :ineligible }
+
+          it "should return eligibility effective date" do
+            expect(
+              subject[:effective_on]
+            ).to eq eligibility_effective_date
+          end
+
+          it "should return other attributes" do
+            expect(subject[:current_state]).to eq current_state.to_s
+            expect(
+              subject[:subject]
+            ).to eq benefit_sponsorship.organization.legal_name
+            expect(subject[:title]).to eq "SHOP HC4CC 2024"
+            expect(subject[:detail]).to eq "Eligibility Created"
+            expect(subject[:event_time].to_date).to eq event_log
+              .event_time
+              .in_time_zone("Eastern Time (US & Canada)")
+              .to_date
+          end
+        end
       end
 
       context "when application not osse eligible" do
@@ -280,10 +309,6 @@ RSpec.describe EventLogs::MonitoredEvent, type: :model, dbclean: :around_each do
           allow_any_instance_of(
             BenefitSponsors::BenefitApplications::BenefitApplication
           ).to receive(:osse_eligible?).and_return(false)
-        end
-
-        let(:eligibility_effective_date) do
-          payload.dig(:state_histories, -1, :effective_on)
         end
 
         subject { monitored_event.eligibility_details }

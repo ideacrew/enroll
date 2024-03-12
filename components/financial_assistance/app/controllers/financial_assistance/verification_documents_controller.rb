@@ -14,7 +14,12 @@ module FinancialAssistance
       authorize record, :can_upload?
 
       @doc_errors = []
-      if params[:file]
+      if params[:file].blank?
+        flash[:error] = "File not uploaded. Please select the file to upload."
+      elsif !valid_file_uploads?(params[:file], FileUploadValidator::VERIFICATION_DOC_TYPES)
+        redirect_to main_app.verification_insured_families_path
+        return
+      else
         params[:file].each do |file|
           doc_uri = Aws::S3Storage.save(file_path(file), 'id-verification')
           if doc_uri.present?
@@ -30,8 +35,6 @@ module FinancialAssistance
             flash[:error] = "Could not save file"
           end
         end
-      else
-        flash[:error] = "File not uploaded. Please select the file to upload."
       end
       redirect_to main_app.verification_insured_families_path
     end

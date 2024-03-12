@@ -8,9 +8,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
 
-  let(:person) {FactoryBot.create(:person, :with_family)}
+  let(:person) {FactoryBot.create(:person, :with_employee_role)}
   let(:user) { FactoryBot.create(:user, person: person) }
-  let(:family){ FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
+  let(:family){ FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person) }
   let(:family_members){ family.family_members.where(is_primary_applicant: false).to_a }
   let(:household){ family.active_household }
   let(:hbx_enrollment_member) do
@@ -205,6 +205,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     let!(:start_of_year) { Date.new(Date.today.year) }
     let!(:person10) { FactoryBot.create(:person, :with_consumer_role, dob: Date.new(Date.today.year - 25, 1, 19)) }
     let!(:family10) { FactoryBot.create(:family, :with_primary_family_member, person: person10) }
+    let(:user) { FactoryBot.create(:user, person: person10) }
     let!(:hbx_enrollment10) do
       FactoryBot.create(:hbx_enrollment,
                         :with_silver_health_product,
@@ -213,6 +214,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
                         family: family10,
                         household: family10.active_household,
                         coverage_kind: "health",
+                        kind: 'individual',
                         rating_area_id: rating_area.id)
     end
     let!(:hbx_enrollment_member10) do
@@ -234,6 +236,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     let(:elected_aptc) { 200.0 }
 
     let(:session_variables) { { elected_aptc: elected_aptc, max_aptc: max_aptc, aptc_grants: double } }
+
+    before { person10.consumer_role.move_identity_documents_to_verified }
 
     context 'with aca_individual_osse_aptc_minimum enabled' do
       before do
@@ -301,6 +305,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     let!(:start_of_year) { Date.new(system_year) }
     let!(:person10) { FactoryBot.create(:person, :with_consumer_role, dob: Date.new(system_year - 25, 1, 19)) }
     let!(:family10) { FactoryBot.create(:family, :with_primary_family_member, person: person10) }
+    let(:user) { FactoryBot.create(:user, person: person10) }
     let!(:hbx_enrollment10) do
       FactoryBot.create(:hbx_enrollment,
                         :with_silver_health_product,
@@ -345,6 +350,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     let(:aptc_value2) { 200.00 }
 
     before do
+      person10.consumer_role.move_identity_documents_to_verified
       allow(TimeKeeper).to receive(:date_of_record).and_return(start_of_year)
       allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
 
@@ -519,18 +525,35 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     # * When a broker purchases something for someone else, they see the correct page?
     # * When a broker also has a consumer role and purchases something, they see the correct page, for themselves?
     # I recommend we split this into two parts, and will create a ticket to that effect.
-    it "returns http success as BROKER" do
-      person = create(:person)
-      FactoryBot.create(:family,:family_members => [{:is_primary_applicant => true, :is_active => true, :person_id => person.id}])
-      current_broker_user = FactoryBot.create(:user, :roles => ['broker_agency_staff'],
-                                                     :person => person)
-      current_broker_user.person.broker_role = BrokerRole.new({:broker_agency_profile_id => 99})
+    it "returns http success if family has BROKER" do
+      current_broker_user = FactoryBot.create(:user, :roles => ['broker_agency_staff'], :person => create(:person))
+      broker_role = BrokerRole.new({:benefit_sponsors_broker_agency_profile_id => 99, aasm_state: "active", market_kind: 'both'})
+      current_broker_user.person.broker_role = broker_role
+      hbx_enrollment.family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: 99,
+                                                                                                         writing_agent_id: broker_role.id,
+                                                                                                         start_on: Time.now,
+                                                                                                         is_active: true)
+      hbx_enrollment.family.save!
+
       session[:person_id] = person.id.to_s
-      # allow(session).to receive(:[]).and_return(person.id.to_s)
       sign_in(current_broker_user)
 
       get :thankyou, params: {id: "id", plan_id: "plan_id"}
       expect(response).to have_http_status(:success)
+    end
+
+    it "returns authorization error if family is not associated with BROKER" do
+      person = create(:person)
+      current_broker_user = FactoryBot.create(:user, :roles => ['broker_agency_staff'], :person => person)
+      broker_role = BrokerRole.new({:benefit_sponsors_broker_agency_profile_id => 99, aasm_state: "active", market_kind: 'both'})
+      current_broker_user.person.broker_role = broker_role
+
+      session[:person_id] = person.id.to_s
+      sign_in(current_broker_user)
+
+      get :thankyou, params: {id: "id", plan_id: "plan_id"}
+      expect(response).to redirect_to(root_path)
+      expect(flash[:error]).to eq("Access not allowed for hbx_enrollment_policy.thankyou?, (Pundit policy)")
     end
 
     context "thankyou" do
@@ -629,27 +652,12 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         expect(session[:elected_aptc]).to eq 50
       end
     end
-
-    # context "for qualify_qle_notice" do
-    #   it "should get error msg" do
-    #     allow(hbx_enrollment).to receive(:can_select_coverage?).and_return false
-    #     sign_in(user)
-    #     get :thankyou, id: "id", plan_id: "plan_id"
-    #     expect(flash[:error]).to include("In order to purchase benefit coverage, you must be in either an Open Enrollment or Special Enrollment period. ")
-    #   end
-    #
-    #   it "should not get error msg" do
-    #     allow(hbx_enrollment).to receive(:can_select_coverage?).and_return true
-    #     sign_in(user)
-    #     get :thankyou, id: "id", plan_id: "plan_id"
-    #     expect(flash[:error]).to eq nil
-    #   end
-    # end
   end
 
   context 'GET thankyou  - reset coverage dates', :dbclean => :around_each do
 
     let(:person) {FactoryBot.create(:person, :with_active_consumer_role, :with_consumer_role)}
+    let(:user) { FactoryBot.create(:user, person: person) }
     let(:family) {FactoryBot.create(:family, :with_primary_family_member, :person => person)}
     let(:household) {FactoryBot.create(:household, family: family)}
     let(:year) {TimeKeeper.date_of_record.year}
@@ -716,6 +724,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
                                                         sponsored_benefit_id: sponsored_benefit.id,
                                                         rating_area_id: rating_area.id)
     end
+
+    before { person.consumer_role.move_identity_documents_to_verified }
 
     it 'should update the member coverage start on for continuous coverage' do
       sign_in(user)
@@ -1075,9 +1085,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(HbxEnrollmentSponsoredCostCalculator).to receive(:new).with(hbx_enrollment).and_return(cost_calculator)
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:household).and_return(household)
-      allow(family).to receive(:family_members).and_return(family_members)
-      allow(user).to receive(:person).and_return(person)
-      allow(person).to receive(:primary_family).and_return(family)
       allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
       allow(hbx_enrollment).to receive(:kind).and_return("employer_sponsored")
       allow(hbx_enrollment).to receive(:consumer_role).and_return(consumer_person.consumer_role)
@@ -1123,12 +1130,13 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         @original_product = BenefitMarkets::Products::Product.find(sponsored_benefit_product_packages_product.id)
         @original_product.update_attributes(hsa_eligibility: true)
         slug = Struct.new(:dob, :member_id)
-        family_member = family_members.last
-        age = ::BenefitSponsors::CoverageAgeCalculator.new.calc_coverage_age_for(slug.new(family_member.person.dob, family_member.person.id), nil, effective_period.max, {}, nil)
+        family_member = family.family_members.where(is_primary_applicant: false).to_a.last
+        coverage_start_date = HbxEnrollment.first.as_shop_member_group.clone_for_coverage(product).group_enrollment.coverage_start_on
+        age = ::BenefitSponsors::CoverageAgeCalculator.new.calc_coverage_age_for(slug.new(family_member.person.dob, family_member.person.id), nil, coverage_start_date, {}, nil)
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
           @original_product,
           effective_period.min,
-          age,
+          anything,
           "R-DC001"
         ).and_return(100.00)
       end
@@ -1162,9 +1170,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       context "when user has_active_consumer_role" do
         let(:tax_household) {double("TaxHousehold")}
-        let(:family) { FactoryBot.build(:individual_market_family) }
-        let(:person) {FactoryBot.create(:person, :with_family, :with_consumer_role)}
-        let(:user) {double("user",person: person, has_hbx_staff_role?: true)}
+        let(:person) {FactoryBot.create(:person, :with_consumer_role)}
+        let(:family) { FactoryBot.build(:individual_market_family, person: person) }
+        let(:user)  { FactoryBot.create(:user, person: person) }
 
         before do
           allow(hbx_enrollment).to receive(:coverage_kind).and_return('health')
@@ -1172,6 +1180,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
           allow(hbx_enrollment).to receive(:is_coverall?).and_return(false)
           allow(hbx_enrollment).to receive(:decorated_elected_plans).and_return([])
           allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(false)
+          person.consumer_role.move_identity_documents_to_verified
         end
 
         context "with tax_household" do
@@ -1183,6 +1192,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
             allow(person).to receive(:active_employee_roles).and_return []
             allow(person).to receive(:employee_roles).and_return []
             allow(hbx_enrollment).to receive(:kind).and_return 'individual'
+            allow(person).to receive(:primary_family).and_return(family)
+            sign_in user
             get :show, params: {id: "hbx_id", market_kind: "individual"}
           end
 
@@ -1344,6 +1355,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     end
 
     it 'should update the member coverage start on' do
+      person.consumer_role.move_identity_documents_to_verified
       sign_in(user)
       allow_any_instance_of(HbxEnrollment).to receive(:decorated_elected_plans).and_return([])
       hbx_enrollment.hbx_enrollment_members.update_all(coverage_start_on: previous_coverage.effective_on)
@@ -1352,7 +1364,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       expect(hbx_enrollment.hbx_enrollment_members.first.coverage_start_on).to eq hbx_enrollment.effective_on
     end
   end
-
 
   if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     describe "plan_selection_callback" do
@@ -1363,6 +1374,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual) }
       let(:year) { product.application_period.min.year }
       let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, kind: 'individual', effective_on: TimeKeeper.date_of_record.beginning_of_month.to_date, product_id: product.id) }
+
+      before { person.consumer_role.move_identity_documents_to_verified }
 
       context "When a callback is received" do
         before do
@@ -1387,5 +1400,35 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         end
       end
     end
+  end
+
+  context "logged in user has no roles" do
+    shared_examples_for "logged in user has no authorization roles" do |action|
+      before do
+        allow(HbxEnrollment).to receive(:find).with("id").and_return(hbx_enrollment)
+      end
+
+      it "redirects to root with flash message" do
+        person = create(:person)
+        current_broker_user = FactoryBot.create(:user, :person => person)
+        session[:person_id] = person.id.to_s
+        sign_in(current_broker_user)
+
+        get action, params: {id: "id", plan_id: "plan_id"}
+        expect(response).to redirect_to(root_path)
+        expect(flash[:error]).to eq("Access not allowed for hbx_enrollment_policy.#{action}?, (Pundit policy)")
+      end
+    end
+
+    it_behaves_like "logged in user has no authorization roles", :checkout
+    it_behaves_like "logged in user has no authorization roles", :receipt
+    it_behaves_like "logged in user has no authorization roles", :thankyou
+    it_behaves_like "logged in user has no authorization roles", :waive
+    it_behaves_like "logged in user has no authorization roles", :print_waiver
+    it_behaves_like "logged in user has no authorization roles", :terminate
+    it_behaves_like "logged in user has no authorization roles", :show
+    it_behaves_like "logged in user has no authorization roles", :plan_selection_callback
+    it_behaves_like 'logged in user has no authorization roles', :set_elected_aptc
+    it_behaves_like 'logged in user has no authorization roles', :plans
   end
 end

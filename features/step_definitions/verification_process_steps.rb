@@ -37,6 +37,10 @@ Given(/^the consumer is logged in$/) do
   login_as user
 end
 
+And(/^the user is RIDP verified$/) do
+  user.person.consumer_role.move_identity_documents_to_verified
+end
+
 Then(/^the consumer visits verification page$/) do
   visit verification_insured_families_path(tab: 'verification')
   find(".interaction-click-control-documents", wait: 5).click

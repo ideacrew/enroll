@@ -59,6 +59,8 @@ module Forms
       # rubocop:enable Lint/EmptyRescueClause
     end
 
+    # TODO: Refactor this
+    # rubocop:disable Metrics/CyclomaticComplexity
     def match_person
       match_criteria, records = Operations::People::Match.new.call({:dob => dob,
                                                                     :last_name => last_name,
@@ -67,12 +69,16 @@ module Forms
 
       return nil if records.blank?
 
-      if (match_criteria == :dob_present && ssn.present? && records.first.employer_staff_roles?) ||
+      dob_ssn_condition = (match_criteria == :dob_present && ssn.present?)
+
+      if (dob_ssn_condition && records.first.employer_staff_roles?) ||
+         (dob_ssn_condition && (records.first.broker_role.present? || records.first.broker_agency_staff_roles.present?)) ||
          (match_criteria == :dob_present && ssn.blank?) ||
          match_criteria == :ssn_present
         records.first
       end
     end
+    # rubocop:enable Metrics/CyclomaticComplexity
 
     def state_based_policy_satisfied?
       @configuration = EnrollRegistry[:person_match_policy].settings.map(&:to_h).each_with_object({}) do |s,c|

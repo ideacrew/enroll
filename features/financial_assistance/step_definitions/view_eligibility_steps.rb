@@ -2,6 +2,7 @@
 
 Given(/^that a user with a family has a Financial Assistance application in the "draft" state$/) do
   login_as consumer, scope: :user
+  step "the consumer is RIDP verified"
   visit financial_assistance.applications_path
   create_plan
   application aasm_state: 'draft'
@@ -22,6 +23,7 @@ end
 
 Given(/^that a user with a family has a Financial Assistance application in the "submitted" state$/) do
   login_as consumer, scope: :user
+  step "the consumer is RIDP verified"
   visit financial_assistance.applications_path
   create_plan
   application
@@ -35,6 +37,7 @@ end
 
 Given(/^that a user with a family has a Financial Assistance application in the "determination_response_error" state$/) do
   login_as consumer, scope: :user
+  step "the consumer is RIDP verified"
   visit financial_assistance.applications_path
   create_plan
   application
@@ -48,6 +51,7 @@ end
 
 Given(/^that a user with a family has a Financial Assistance application in the "cancelled" state$/) do
   login_as consumer, scope: :user
+  step "the consumer is RIDP verified"
   visit financial_assistance.applications_path
   create_plan
   application
@@ -61,6 +65,7 @@ end
 
 Given(/^that a user with a family has a Financial Assistance application in the "terminated" state$/) do
   login_as consumer, scope: :user
+  step "the consumer is RIDP verified"
   visit financial_assistance.applications_path
   create_plan
   application
@@ -74,6 +79,7 @@ end
 
 Given(/^that a user with a family has a Financial Assistance application in the "determined" state$/) do
   login_as consumer, scope: :user
+  step "the consumer is RIDP verified"
   visit financial_assistance.applications_path
   create_plan
   application
@@ -101,6 +107,7 @@ end
 
 Given(/^that a user with a family has a Financial Assistance application with tax households$/) do
   login_as consumer, scope: :user
+  step "the consumer is RIDP verified"
   visit financial_assistance.applications_path
   create_plan
   allow(application).to receive(:is_application_valid?).and_return(true)

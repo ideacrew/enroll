@@ -1,77 +1,302 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Insured::InboxesController, :type => :controller do
-  let(:hbx_profile) { FactoryBot.create(:benefit_sponsors_organizations_hbx_profile)}
-  let(:user) { double('user') }
-  let(:person) { double(:employer_staff_roles => [double('person', :employer_profile_id => double)], agent?: false)}
+  let(:hbx_profile) { FactoryBot.create(:benefit_sponsors_organizations_hbx_profile) }
+  let(:person) { FactoryBot.create(:person, :with_consumer_role) }
+  let(:user) { FactoryBot.create(:user, person: person) }
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
 
-  describe 'Get new' do
-    let(:inbox_provider){double(id: double('id'),full_name: double('inbox_provider'), inbox: double(messages: double(build: double('inbox'))))}
-    before do
-      sign_in
-      allow(Person).to receive(:find).and_return(inbox_provider)
-    end
+  # Need to generate an actual inbox for the authorization with InboxPolicy
+  let(:inbox) { FactoryBot.create(:inbox, :with_message, recipient: person) }
+  let(:message) { inbox.messages.first }
 
-    it 'render new template' do
-      get :new, params: {id: inbox_provider.id, profile_id: hbx_profile.id, to: 'test'}, format: :js, xhr: true
-      expect(response).to render_template('new')
-      expect(response).to have_http_status(:success)
-    end
+  # This is used for all CREATE methods
+  let(:valid_params) { {'subject' => 'test', 'body' => 'test', 'sender_id' => '558b63ef4741542b64290000', 'from' => 'HBXAdmin', 'to' => 'Acme Inc.'} }
+
+  before do
+    allow(person).to receive(:user).and_return(user)
   end
 
-  describe 'POST create' do
-    let(:inbox){Inbox.new}
-    let(:inbox_provider){double(id: double("id"),full_name: double("inbox_provider"))}
-    let(:valid_params){{'subject'=>'test', 'body'=>'test', 'sender_id'=>'558b63ef4741542b64290000', 'from'=>'HBXAdmin', 'to'=>'Acme Inc.'}}
-    before do
-      allow(user).to receive(:person).and_return(person)
-      sign_in(user)
-      allow(Person).to receive(:find).and_return(inbox_provider)
-      allow(inbox_provider).to receive(:inbox).and_return(inbox)
-      allow(inbox_provider.inbox).to receive(:post_message).and_return(inbox)
-      allow(inbox_provider.inbox).to receive(:save).and_return(true)
-      allow(hbx_profile).to receive(:inbox).and_return(inbox)
-    end
-
-    it 'creates new message' do
-      post :create, params: {id: inbox_provider.id, profile_id: hbx_profile.id, message: valid_params}
-      expect(response).to have_http_status(:redirect)
-    end
-  end
-
-  describe 'GET show / DELETE destroy' do
-    let(:message){double(to_a: double('to_array'), message_read: false)}
-    let(:inbox_provider){double(id: double('id'),full_name: double('inbox_provider'))}
-    before do
-      allow(user).to receive(:person).and_return(person)
-      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
-      sign_in(user)
-      allow(Person).to receive(:find).and_return(inbox_provider)
-      allow(controller).to receive(:find_message)
-      controller.instance_variable_set(:@message, message)
-      allow(message).to receive(:update_attributes).and_return(true)
-    end
-
-    context 'admin user GET show' do
+  context 'consumer' do
+    context 'with permissions' do
       before do
-        allow(user).to receive(:has_hbx_staff_role?).and_return(true)
-        it 'show action' do
-          get :show, params: {id: 1}
+        sign_in(user)
+      end
+
+      describe 'GET new / post CREATE' do
+        it 'will render :new' do
+          get :new, params: { id: person.id, profile_id: hbx_profile.id, to: 'test' }, format: :js, xhr: true
+
+          expect(assigns(:inbox_provider).present?).to be_truthy
+          expect(response).to render_template('new')
           expect(response).to have_http_status(:success)
-          expect(message.message_read).to eq(true)
+        end
+
+        it 'will create a new message' do
+          post :create, params: { id: person.id, profile_id: hbx_profile.id, message: valid_params }
+
+          expect(assigns(:inbox_provider).present?).to be_truthy
+          expect(response).to have_http_status(:redirect)
+          expect(flash[:notice]).to eq("Successfully sent message.")
+        end
+      end
+
+      describe 'GET show / DELETE destroy' do
+        it 'will show specific message' do
+          get :show, params: { id: person.id, message_id: message.id }
+
+          expect(assigns(:inbox_provider).present?).to be_truthy
+          expect(response).to render_template('show')
+          expect(response).to have_http_status(:success)
+        end
+
+        it 'will delete a message' do
+          delete :destroy, params: { id: person.id, message_id: message.id }, xhr: true
+
+          expect(assigns(:inbox_provider).present?).to be_truthy
+          expect(response).to have_http_status(:success)
         end
       end
     end
 
-    it 'show action' do
-      get :show, params: {id: 1}
-      expect(response).to have_http_status(:success)
-      expect(message.message_read).to eq(false)
+    context 'without permissions' do
+      let(:fake_person) { FactoryBot.create(:person, :with_consumer_role) }
+      let(:fake_user) { FactoryBot.create(:user, person: fake_person) }
+      let!(:fake_family) { FactoryBot.create(:family, :with_primary_family_member, person: fake_person) }
+
+      before do
+        sign_in(fake_user)
+      end
+
+      describe 'GET new / post CREATE' do
+        it 'will not render :new' do
+          get :new, params: { id: person.id, profile_id: hbx_profile.id, to: 'test' }, format: :js, xhr: true
+
+          expect(assigns(:inbox_provider).present?).to be_falsey
+          expect(response).to have_http_status(403)
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
+        end
+
+        it 'will not create a new message' do
+          post :create, params: { id: person.id, profile_id: hbx_profile.id, message: valid_params }
+
+          expect(assigns(:inbox_provider).present?).to be_falsey
+          expect(response).to have_http_status(:redirect)
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
+        end
+      end
+
+      describe 'GET show / DELETE destroy' do
+        it 'will not show specific message' do
+          get :show, params: { id: person.id, message_id: message.id }
+
+          expect(assigns(:inbox_provider).present?).to be_falsey
+          expect(response).to have_http_status(:redirect)
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
+        end
+
+        it 'will not delete a message' do
+          delete :destroy, params: { id: person.id, message_id: message.id }, xhr: true
+
+          expect(assigns(:inbox_provider).present?).to be_falsey
+          expect(response).to have_http_status(403)
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
+        end
+      end
+    end
+  end
+
+  context 'admin' do
+    let!(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+    let!(:admin_user) { FactoryBot.create(:user, :with_hbx_staff_role, person: admin_person) }
+
+    context 'with permissions' do
+      let!(:permission) { FactoryBot.create(:permission, :super_admin) }
+      let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
+
+      before do
+        sign_in(admin_user)
+      end
+
+      describe 'GET new / post CREATE' do
+        it 'will render :new' do
+          get :new, params: { id: person.id, profile_id: hbx_profile.id, to: 'test' }, format: :js, xhr: true
+
+          expect(assigns(:inbox_provider).present?).to be_truthy
+          expect(response).to render_template('new')
+          expect(response).to have_http_status(:success)
+        end
+
+        it 'will create a new message' do
+          post :create, params: { id: person.id, profile_id: hbx_profile.id, message: valid_params }
+
+          expect(assigns(:inbox_provider).present?).to be_truthy
+          expect(response).to have_http_status(:redirect)
+          expect(flash[:notice]).to eq("Successfully sent message.")
+        end
+      end
+
+      describe 'GET show / DELETE destroy' do
+        it 'will show specific message' do
+          get :show, params: { id: person.id, message_id: message.id }
+
+          expect(assigns(:inbox_provider).present?).to be_truthy
+          expect(response).to render_template('show')
+          expect(response).to have_http_status(:success)
+        end
+
+        it 'will delete a message' do
+          delete :destroy, params: { id: person.id, message_id: message.id }, xhr: true
+
+          expect(assigns(:inbox_provider).present?).to be_truthy
+          expect(response).to have_http_status(:success)
+        end
+      end
     end
 
-    it 'delete action' do
-      delete :destroy, params: {id: 1}, xhr: true
-      expect(response).to have_http_status(:success)
+    context 'without permissions' do
+      let!(:invalid_permission) { FactoryBot.create(:permission, :developer) }
+      let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: invalid_permission.id) }
+
+      before do
+        sign_in(admin_user)
+      end
+
+      describe 'GET new / post CREATE' do
+        it 'will not render :new' do
+          get :new, params: { id: person.id, profile_id: hbx_profile.id, to: 'test' }, format: :js, xhr: true
+
+          expect(assigns(:inbox_provider).present?).to be_falsey
+          expect(response).to have_http_status(403)
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
+        end
+
+        it 'will not create a new message' do
+          post :create, params: { id: person.id, profile_id: hbx_profile.id, message: valid_params }
+
+          expect(assigns(:inbox_provider).present?).to be_falsey
+          expect(response).to have_http_status(:redirect)
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
+        end
+      end
+
+      describe 'GET show / DELETE destroy' do
+        it 'will not show specific message' do
+          get :show, params: { id: person.id, message_id: message.id }, xhr: true, format: :js
+
+          expect(assigns(:inbox_provider).present?).to be_falsey
+          expect(response).to have_http_status(403)
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
+        end
+
+        it 'will not delete a message' do
+          delete :destroy, params: { id: person.id, message_id: message.id }, xhr: true
+
+          expect(assigns(:inbox_provider).present?).to be_falsey
+          expect(response).to have_http_status(403)
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
+        end
+      end
+    end
+  end
+
+  context 'broker' do
+    let!(:broker_user) {FactoryBot.create(:user, :person => writing_agent.person, roles: ['broker_role', 'broker_agency_staff_role'])}
+    let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
+    let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
+    let(:assister)  do
+      assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00")
+      assister.save(validate: false)
+      assister
+    end
+
+    context 'with permissions/hired by family' do
+      before do
+        family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                            writing_agent_id: writing_agent.id,
+                                                                                            start_on: Time.now,
+                                                                                            is_active: true)
+        sign_in(broker_user)
+      end
+
+      describe 'GET new / post CREATE' do
+        it 'will render :new' do
+          get :new, params: { id: person.id, profile_id: hbx_profile.id, to: 'test' }, format: :js, xhr: true
+
+          expect(assigns(:inbox_provider).present?).to be_truthy
+          expect(response).to render_template('new')
+          expect(response).to have_http_status(:success)
+        end
+
+        it 'will create a new message' do
+          post :create, params: { id: person.id, profile_id: hbx_profile.id, message: valid_params }
+
+          expect(assigns(:inbox_provider).present?).to be_truthy
+          expect(response).to have_http_status(:redirect)
+          expect(flash[:notice]).to eq("Successfully sent message.")
+        end
+      end
+
+      describe 'GET show / DELETE destroy' do
+        it 'will show specific message' do
+          get :show, params: { id: person.id, message_id: message.id }
+
+          expect(assigns(:inbox_provider).present?).to be_truthy
+          expect(response).to render_template('show')
+          expect(response).to have_http_status(:success)
+        end
+
+        it 'will delete a message' do
+          delete :destroy, params: { id: person.id, message_id: message.id }, xhr: true
+
+          expect(assigns(:inbox_provider).present?).to be_truthy
+          expect(response).to have_http_status(:success)
+        end
+      end
+    end
+
+    context 'without permissions/not hired by family' do
+      before do
+        sign_in(broker_user)
+      end
+
+      describe 'GET new / post CREATE' do
+        it 'will not render :new' do
+          get :new, params: { id: person.id, profile_id: hbx_profile.id, to: 'test' }, format: :js, xhr: true
+
+          expect(assigns(:inbox_provider).present?).to be_falsey
+          expect(response).to have_http_status(403)
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
+        end
+
+        it 'will not create a new message' do
+          post :create, params: { id: person.id, profile_id: hbx_profile.id, message: valid_params }
+
+          expect(assigns(:inbox_provider).present?).to be_falsey
+          expect(response).to have_http_status(:redirect)
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
+        end
+      end
+
+      describe 'GET show / DELETE destroy' do
+        it 'will not show specific message' do
+          get :show, params: { id: person.id, message_id: message.id }
+
+          expect(assigns(:inbox_provider).present?).to be_falsey
+          expect(response).to have_http_status(:redirect)
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
+        end
+
+        it 'will not delete a message' do
+          delete :destroy, params: { id: person.id, message_id: message.id }, xhr: true
+
+          expect(assigns(:inbox_provider).present?).to be_falsey
+          expect(response).to have_http_status(403)
+          expect(flash[:error]).to eq("Access not allowed for family_policy.legacy_show?, (Pundit policy)")
+        end
+      end
     end
   end
 end

@@ -16,7 +16,6 @@ module BenefitSponsors
         ]
         before_action :load_group_enrollments, only: [:coverage_reports], if: :is_format_csv?
         before_action :check_and_download_invoice, only: [:download_invoice, :show_invoice]
-        before_action :wells_fargo_sso, only: [:show]
         before_action :set_flash_by_announcement, only: :show
         layout "two_column", except: [:new]
 
@@ -197,6 +196,12 @@ module BenefitSponsors
 
         def bulk_employee_upload
           authorize @employer_profile, :show?
+
+          if params[:file].present? && !valid_file_upload?(params[:file], FileUploadValidator::CSV_TYPES + FileUploadValidator::XLS_TYPES)
+            render default_url
+            return
+          end
+
           if roster_upload_file_type.include?(file_content_type)
             file = params.require(:file)
             if ce_roster_bulk_upload_enabled?

@@ -65,7 +65,13 @@ RSpec.describe Insured::FamilyMembersController do
     end
 
     before(:each) do
+      # NOTE: using 'allow_any_instance_of' is usually seen as bad practice
+      # but in our case we _cannot_ run the policy on an instance_double,
+      # so in order to avoid remaking the entire test suite with factories (which would add to the sluggishness of the GHAs)
+      # we opt to use allow_any_instance_of in this very limited capacity
+      allow_any_instance_of(described_class).to receive(:authorize_family_access).and_return(true)
       sign_in(user)
+
       allow(person).to receive(:agent?).and_return(false)
       allow(Forms::FamilyMember).to receive(:find).with(dependent_id).and_return(dependent)
       allow(Family).to receive(:find).with(family_id).and_return(family)
