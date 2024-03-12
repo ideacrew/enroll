@@ -50,14 +50,6 @@ module BenefitSponsors
         end
       end
 
-      def msg_to_portal
-        @inbox_provider = @profile
-        @inbox_provider_name = @inbox_provider.try(:legal_name)
-        @inbox_to_name = "HBX Admin"
-        log("#3969 and #3985 params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @inbox_provider.blank?
-        @new_message = @inbox_provider.inbox.messages.build
-      end
-
       private
 
       def set_current_user
