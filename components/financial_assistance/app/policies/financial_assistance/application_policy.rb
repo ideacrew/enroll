@@ -5,26 +5,39 @@ module FinancialAssistance
   # It provides methods to check if a user has the necessary permissions to perform various actions on an application.
   class ApplicationPolicy < ::ApplicationPolicy
 
-    # Returns the family associated with the current application.
+    # Initializes the ApplicationPolicy with a user and a record.
+    # It sets the @family instance variable to the family of the record.
     #
-    # @return [Family] The family associated with the current application.
-    def application_family
-      @application_family ||= record.family
+    # @param user [User] the user who is performing the action
+    # @param record [Application] the application that the user is trying to access or modify
+    def initialize(user, record)
+      super
+      @family ||= record.family
     end
 
-    # TODO: Define the conditions under which a new application can be created.
-    def new?; end
+    # Determines if the current user has permission to create a new application.
+    # The user can create a new application if they have permission to edit it.
+    #
+    # @return [Boolean] Returns true if the user has permission to create a new application, false otherwise.
+    def new?
+      edit?
+    end
 
-    # TODO: Define the conditions under which an application can be created.
-    def create?; end
+    # Determines if the current user has permission to create an application.
+    # The user can create an application if they have permission to edit it.
+    #
+    # @return [Boolean] Returns true if the user has permission to create an application, false otherwise.
+    def create?
+      edit?
+    end
 
     # Determines if the current user has permission to edit the application.
     # The user can edit the application if they are a primary family member, an active associated broker, or an admin in the individual market.
     #
     # @return [Boolean] Returns true if the user has permission to edit the application, false otherwise.
     def edit?
-      return true if individual_market_primary_family_member?(application_family)
-      return true if active_associated_individual_market_family_broker?(application_family)
+      return true if individual_market_primary_family_member?
+      return true if active_associated_individual_market_ridp_verified_family_broker?
       return true if individual_market_admin?
 
       false

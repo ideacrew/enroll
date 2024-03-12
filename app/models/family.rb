@@ -440,8 +440,15 @@ class Family
     family_members.detect { |family_member| family_member.is_primary_applicant? && family_member.is_active? }
   end
 
+  # Returns the primary person of the family.
+  # If the @primary_person is defined, then the method will return @primary_person.
+  # Otherwise, it will fetch the primary applicant's person and assign it to @primary_person.
+  #
+  # @return [Person, nil] The primary person of the family or nil if not defined or not present.
   def primary_person
-    @primary_person ||= primary_applicant&.person
+    return @primary_person if defined?(@primary_person)
+
+    @primary_person = primary_applicant&.person
   end
 
   def primary_family_member=(new_primary_family_member)

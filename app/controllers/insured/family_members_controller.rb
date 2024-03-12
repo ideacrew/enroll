@@ -48,7 +48,8 @@ class Insured::FamilyMembersController < ApplicationController
 
       # This controller assumes the user accessing this page will NOT be an admin
       # The logic previously present here has been moved to a method only called _if_ @consumer_role is not nil
-      update_family_broker_agency if @consumer_role
+      @family = @consumer_role.person.primary_family
+      update_family_broker_agency if @consumer_role && EnrollRegistry.feature_enabled?(:auto_assign_expert)
     end
 
     @family = Family.find(params[:family_id]) if params[:family_id]
@@ -298,7 +299,6 @@ class Insured::FamilyMembersController < ApplicationController
   private
 
   def update_family_broker_agency
-    @family = @consumer_role.person.primary_family
     broker_role_id = @consumer_role.person.broker_role.try(:id)
     @family.hire_broker_agency(broker_role_id)
   end
