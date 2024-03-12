@@ -10,6 +10,8 @@ module FinancialAssistance
     before_action :set_cache_headers, only: [:index]
 
     def index
+      authorize @applicant, :index?
+
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       render layout: 'financial_assistance_nav'
@@ -17,6 +19,8 @@ module FinancialAssistance
     end
 
     def new
+      authorize @applicant, :index?
+
       @model = @applicant.benefits.build
       load_steps
       current_step
@@ -24,6 +28,8 @@ module FinancialAssistance
     end
 
     def step # rubocop:disable Metrics/CyclomaticComplexity TODO: Remove this
+      authorize @model, :step?
+
       save_faa_bookmark(request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
       flash[:error] = nil
@@ -55,6 +61,8 @@ module FinancialAssistance
     end
 
     def create
+      authorize @applicant, :create?
+
       format_date(params)
       @benefit = @applicant.benefits.build permit_params(params[:benefit])
       @benefit_kind = @benefit.kind
@@ -70,6 +78,8 @@ module FinancialAssistance
     def update
       format_date(params)
       @benefit = @applicant.benefits.find params[:id]
+      authorize @benefit, :update?
+
       if @benefit.update_attributes permit_params(params[:benefit])
         render :update, :locals => { kind: params[:benefit][:kind], insurance_kind: params[:benefit][:insurance_kind] }
       else
@@ -79,6 +89,8 @@ module FinancialAssistance
 
     def destroy
       @benefit = @applicant.benefits.find(params[:id])
+      authorize @benefit, :destroy?
+
       @benefit_kind = @benefit.kind
       @benefit_insurance_kind = @benefit.insurance_kind
       @benefit.destroy!
