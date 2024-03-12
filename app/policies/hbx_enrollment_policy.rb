@@ -4,7 +4,7 @@
 class HbxEnrollmentPolicy < ApplicationPolicy
   def initialize(user, record)
     super
-    @family ||= record.family
+    @family = record.family
   end
 
   def checkout?
@@ -42,7 +42,7 @@ class HbxEnrollmentPolicy < ApplicationPolicy
   def set_elected_aptc?
     return true if individual_market_primary_family_member?
     return true if individual_market_admin?
-    return true if active_associated_individual_market_family_broker?
+    return true if active_associated_individual_market_ridp_verified_family_broker?
 
     false
   end
@@ -53,18 +53,11 @@ class HbxEnrollmentPolicy < ApplicationPolicy
 
   private
 
-  # # Returns the family associated with the current enrollment.
-  # #
-  # # @return [Family] The family associated with the current enrollment.
-  # def enrollment_family
-  #   @enrollment_family ||= record.family
-  # end
-
   # rubocop:disable Metrics/CyclomaticComplexity
   def create?
     return true if individual_market_primary_family_member?
     return true if individual_market_admin?
-    return true if active_associated_individual_market_family_broker?
+    return true if active_associated_individual_market_ridp_verified_family_broker?
 
     return true if shop_market_primary_family_member?
     return true if shop_market_admin?
