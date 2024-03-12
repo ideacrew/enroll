@@ -12,16 +12,19 @@ module FinancialAssistance
     layout "financial_assistance_nav", only: [:index, :other, :new, :step]
 
     def index
+      authorize @applicant, :index?
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
     end
 
     def other
+      authorize @applicant, :other?
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
     end
 
     def new
+      authorize @applicant, :new?
       @model = @applicant.incomes.build
       load_steps
       current_step
@@ -30,12 +33,14 @@ module FinancialAssistance
 
     def edit
       @income = @applicant.incomes.find params[:id]
+      authorize @income, :edit?
       respond_to do |format|
         format.js { render partial: 'financial_assistance/incomes/other_income_form', locals: { income: income } }
       end
     end
 
     def step
+      authorize @model, :step?
       save_faa_bookmark(request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
       flash[:error] = nil
@@ -67,6 +72,7 @@ module FinancialAssistance
     end
 
     def create
+      authorize @applicant, :create?
       format_date(params)
       @income = @applicant.incomes.build permit_params(params[:income])
       if @income.save
@@ -79,6 +85,8 @@ module FinancialAssistance
     def update
       format_date(params)
       @income = @applicant.incomes.find params[:id]
+      authorize @income, :update?
+
       if @income.update_attributes permit_params(params[:income])
         render :update
       else
@@ -87,6 +95,7 @@ module FinancialAssistance
     end
 
     def destroy
+      authorize @applicant, :destroy?
       income_id = params['id'].split('_').last
       @income = @applicant.incomes.where(id: income_id).first
       @income&.destroy
