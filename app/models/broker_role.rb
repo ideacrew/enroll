@@ -18,10 +18,6 @@ class BrokerRole
     "Both – Individual & Family AND Small Business Marketplaces" => "both"
   }
 
-  INDIVIDUAL_MARKET_KINDS = ['individual', 'both'].freeze
-
-  SHOP_MARKET_KINDS = ['shop', 'both'].freeze
-
   embedded_in :person
 
   field :aasm_state, type: String
@@ -82,11 +78,15 @@ class BrokerRole
   end
 
   def individual_market?
-    INDIVIDUAL_MARKET_KINDS.include?(market_kind)
+    return false unless broker_agency_profile
+
+    broker_agency_profile.individual_market?
   end
 
   def shop_market?
-    SHOP_MARKET_KINDS.include?(market_kind)
+    return false unless broker_agency_profile
+
+    broker_agency_profile.shop_market?
   end
 
   def search_favorite_general_agencies(general_agency_profile_id)

@@ -15,6 +15,10 @@ module BenefitSponsors
         a << :both if is_shop_or_fehb_market_enabled?
       end
 
+      INDIVIDUAL_MARKET_KINDS = %i[both individual].freeze
+
+      SHOP_MARKET_KINDS = %i[both shop].freeze
+
       ALL_MARKET_KINDS_OPTIONS = {}.tap do |h|
         h["Individual & Family Marketplace ONLY"] = "individual" if is_individual_market_enabled?
         h["Small Business Marketplace ONLY"] = "shop" if is_shop_or_fehb_market_enabled?
@@ -180,6 +184,14 @@ module BenefitSponsors
         event :close do
           transitions from: [:is_approved, :is_suspended], to: :is_closed
         end
+      end
+
+      def individual_market?
+        INDIVIDUAL_MARKET_KINDS.include?(market_kind)
+      end
+
+      def shop_market?
+        SHOP_MARKET_KINDS.include?(market_kind)
       end
 
       private
