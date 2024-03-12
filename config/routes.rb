@@ -513,31 +513,7 @@ Rails.application.routes.draw do
     resources :inboxes, only: [:new, :create, :show, :destroy] do
       get :msg_to_portal
     end
-    resources :profiles, only: [:new, :create, :show, :index, :edit, :update] do
-      get :inbox
-
-      collection do
-        get :family_index
-        get :employers
-        get :messages
-        get :staff_index
-        get :agency_messages
-        get :assign_history
-        get :commission_statements
-      end
-      member do
-        get :general_agency_index
-        get :manage_employers
-        post :clear_assign_for_employer
-        get :assign
-        post :update_assign
-        post :employer_datatable
-        post :family_datatable
-        post :set_default_ga
-        get :download_commission_statement
-        get :show_commission_statement
-      end
-
+    resources :profiles, except: [:new, :create, :show, :index, :edit, :update, :destory] do
       resources :applicants
     end
     resources :broker_roles, only: [:create] do
