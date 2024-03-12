@@ -15,8 +15,14 @@ module BenefitSponsors
         a << :both if is_shop_or_fehb_market_enabled?
       end
 
+      # @!attribute INDIVIDUAL_MARKET_KINDS
+      #   @return [Array<Symbol>] Represents the market types that are considered as individual markets.
+      #   The possible values are :both and :individual.
       INDIVIDUAL_MARKET_KINDS = %i[both individual].freeze
 
+      # @!attribute SHOP_MARKET_KINDS
+      #   @return [Array<Symbol>] Represents the market types that are considered as shop markets.
+      #   The possible values are :both and :shop.
       SHOP_MARKET_KINDS = %i[both shop].freeze
 
       ALL_MARKET_KINDS_OPTIONS = {}.tap do |h|
@@ -186,10 +192,18 @@ module BenefitSponsors
         end
       end
 
+      # Checks if the broker agency profile is associated with the individual market.
+      # It checks if the market_kind of the broker agency profile is included in the INDIVIDUAL_MARKET_KINDS.
+      #
+      # @return [Boolean] Returns true if the broker agency profile is associated with the individual market, false otherwise.
       def individual_market?
         INDIVIDUAL_MARKET_KINDS.include?(market_kind)
       end
 
+      # Checks if the broker agency profile is associated with the shop market.
+      # It checks if the market_kind of the broker agency profile is included in the SHOP_MARKET_KINDS.
+      #
+      # @return [Boolean] Returns true if the broker agency profile is associated with the shop market, false otherwise.
       def shop_market?
         SHOP_MARKET_KINDS.include?(market_kind)
       end
