@@ -117,11 +117,7 @@ BenefitSponsors::Engine.routes.draw do
   end
 
   namespace :organizations do
-    resource :office_locations do
-      member do
-        get :new
-      end
-    end
+    resource :office_locations, only: [:new]
   end
 
   resources :benefit_sponsorships do
