@@ -48,11 +48,11 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       )
     end
 
-    permissions :step? do
-      before do
-        consumer_role.move_identity_documents_to_verified
-      end
+    before do
+      consumer_role.move_identity_documents_to_verified
+    end
 
+    permissions :step? do
       context 'when a valid user is logged in' do
         context 'when the user is a consumer' do
           let(:user_of_family) { FactoryBot.create(:user, person: person) }
@@ -186,6 +186,70 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             let(:baa_active) { false }
 
             it 'denies access' do
+              expect(subject).not_to permit(logged_in_user, deduction)
+            end
+          end
+        end
+      end
+
+      context 'when a valid user is not logged in' do
+        let(:no_role_person) { FactoryBot.create(:person) }
+        let(:no_role_user) { FactoryBot.create(:user, person: no_role_person) }
+        let(:logged_in_user) { no_role_user }
+
+        it 'denies access' do
+          expect(subject).not_to permit(logged_in_user, deduction)
+        end
+      end
+    end
+
+    permissions :update? do
+      context 'when a valid user is logged in' do
+        context 'when the user is a consumer' do
+          let(:user_of_family) { FactoryBot.create(:user, person: person) }
+          let(:logged_in_user) { user_of_family }
+
+          context 'with ridp verified' do
+            it 'grants access' do
+              expect(subject).to permit(logged_in_user, deduction)
+            end
+          end
+
+          context 'without ridp verified' do
+            it 'denies access' do
+              consumer_role.update_attributes(identity_validation: 'rejected')
+              expect(subject).not_to permit(logged_in_user, deduction)
+            end
+          end
+        end
+      end
+
+      context 'when a valid user is not logged in' do
+        let(:no_role_person) { FactoryBot.create(:person) }
+        let(:no_role_user) { FactoryBot.create(:user, person: no_role_person) }
+        let(:logged_in_user) { no_role_user }
+
+        it 'denies access' do
+          expect(subject).not_to permit(logged_in_user, deduction)
+        end
+      end
+    end
+
+    permissions :destroy? do
+      context 'when a valid user is logged in' do
+        context 'when the user is a consumer' do
+          let(:user_of_family) { FactoryBot.create(:user, person: person) }
+          let(:logged_in_user) { user_of_family }
+
+          context 'with ridp verified' do
+            it 'grants access' do
+              expect(subject).to permit(logged_in_user, deduction)
+            end
+          end
+
+          context 'without ridp verified' do
+            it 'denies access' do
+              consumer_role.update_attributes(identity_validation: 'rejected')
               expect(subject).not_to permit(logged_in_user, deduction)
             end
           end

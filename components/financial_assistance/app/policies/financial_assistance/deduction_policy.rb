@@ -32,19 +32,19 @@ module FinancialAssistance
     end
 
     # Determines if the current user has permission to update a deduction.
-    # The user can update a deduction if they have permission to create a new one.
+    # The user can update a deduction if they have permission to perform a step.
     #
     # @return [Boolean] Returns true if the user has permission to update a deduction, false otherwise.
     def update?
-      new?
+      step?
     end
 
     # Determines if the current user has permission to destroy a deduction.
-    # The user can destroy a deduction if they have permission to create a new one.
+    # The user can destroy a deduction if they have permission to perform a step.
     #
     # @return [Boolean] Returns true if the user has permission to destroy a deduction, false otherwise.
     def destroy?
-      new?
+      step?
     end
   end
 end
