@@ -115,7 +115,7 @@ class ApplicationPolicy
   #
   # @return [Boolean] Returns true if the user is an active associated broker in the individual market, false otherwise.
   def active_associated_individual_market_family_broker?
-    broker = account_holder_person.broker_role
+    broker = account_holder_person&.broker_role
     return false if broker.blank? || !broker.active? || !broker.individual_market?
 
     broker_agency_account = family.active_broker_agency_account
@@ -130,7 +130,7 @@ class ApplicationPolicy
   #
   # @return [Boolean] Returns true if the user is an admin in the individual market, false otherwise.
   def individual_market_admin?
-    hbx_role = account_holder_person.hbx_staff_role
+    hbx_role = account_holder_person&.hbx_staff_role
     return false if hbx_role.blank?
 
     permission = hbx_role.permission
@@ -162,7 +162,7 @@ class ApplicationPolicy
   def active_associated_coverall_market_family_broker?
     return false unless coverall_market_role
 
-    broker = account_holder_person.broker_role
+    broker = account_holder_person&.broker_role
     return false if broker.blank? || !broker.active? || !broker.individual_market?
 
     broker_agency_account = family.active_broker_agency_account
@@ -178,7 +178,7 @@ class ApplicationPolicy
   #
   # @return [Boolean] Returns true if the account holder is an admin in the coverall market, false otherwise.
   def coverall_market_admin?
-    hbx_role = account_holder_person.hbx_staff_role
+    hbx_role = account_holder_person&.hbx_staff_role
     return false if hbx_role.blank?
 
     permission = hbx_role.permission
@@ -197,7 +197,7 @@ class ApplicationPolicy
   # @param family [Family] The family to check.
   # @return [Boolean] Returns true if the account holder is a primary family member in the ACA Shop market for the given family, false otherwise.
   def shop_market_primary_family_member?
-    primary_person = family.primary_person
+    primary_person = family&.primary_person
     return false unless primary_person
 
     primary_person.employee_roles.present? && account_holder_person == primary_person
@@ -273,6 +273,158 @@ class ApplicationPolicy
   end
   #
   # END - Non-ACA Fehb Market related methods
+
+  # START - Hbx Staff Role permissions
+
+  def staff_view_admin_tabs?
+    permission&.view_admin_tabs
+  end
+
+  def staff_modify_employer?
+    permission&.modify_employer
+  end
+
+  def staff_modify_admin_tabs?
+    permission&.modify_admin_tabs
+  end
+
+  def staff_view_the_configuration_tab?
+    permission&.view_the_configuration_tab
+  end
+
+  def staff_can_submit_time_travel_request?
+    permission&.can_submit_time_travel_request
+  end
+
+  def staff_can_edit_aptc?
+    permission&.can_edit_aptc
+  end
+
+  def staff_send_broker_agency_message?
+    permission&.send_broker_agency_message
+  end
+
+  def staff_approve_broker?
+    permission&.approve_broker
+  end
+
+  def staff_approve_ga?
+    permission&.approve_ga
+  end
+
+  def staff_can_extend_open_enrollment?
+    permission&.can_extend_open_enrollment
+  end
+
+  def staff_can_modify_plan_year?
+    permission&.can_modify_plan_year
+  end
+
+  def staff_can_create_benefit_application?
+    permission&.can_create_benefit_application
+  end
+
+  def staff_can_change_fein?
+    permission&.can_change_fein
+  end
+
+  def staff_can_force_publish?
+    permission&.can_force_publish
+  end
+
+  def staff_can_access_age_off_excluded?
+    permission&.can_access_age_off_excluded
+  end
+
+  def staff_can_send_secure_message?
+    permission&.can_send_secure_message
+  end
+
+  def staff_can_add_sep?
+    permission&.can_add_sep
+  end
+
+  def staff_can_view_sep_history?
+    permission&.can_view_sep_history
+  end
+
+  def staff_can_cancel_enrollment?
+    permission&.can_cancel_enrollment
+  end
+
+  def staff_can_terminate_enrollment?
+    permission&.can_terminate_enrollment
+  end
+
+  def staff_can_reinstate_enrollment?
+    permission&.can_reinstate_enrollment
+  end
+
+  def staff_can_drop_enrollment_members?
+    permission&.can_drop_enrollment_members
+  end
+
+  def staff_change_enrollment_end_date?
+    permission&.change_enrollment_end_date
+  end
+
+  def staff_can_access_identity_verification_sub_tab?
+    permission&.can_access_identity_verification_sub_tab
+  end
+
+  def staff_can_access_outstanding_verification_sub_tab?
+    permission&.can_access_outstanding_verification_sub_tab
+  end
+
+  def staff_can_access_accept_reject_identity_documents?
+    permission&.can_access_accept_reject_identity_documents
+  end
+
+  def staff_can_access_accept_reject_paper_application_documents?
+    permission&.can_access_accept_reject_paper_application_documents
+  end
+
+  def staff_can_delete_identity_application_documents?
+    permission&.can_delete_identity_application_documents
+  end
+
+  def staff_can_access_user_account_tab?
+    permission&.can_access_user_account_tab
+  end
+
+  def staff_can_add_pdc?
+    permission&.can_add_pdc
+  end
+
+  def staff_can_call_hub?
+    permission&.can_call_hub
+  end
+
+  def staff_can_edit_osse_eligibility?
+    permission&.can_edit_osse_eligibility
+  end
+
+  def staff_can_view_audit_log?
+    permission&.can_view_audit_log
+  end
+
+  def staff_can_update_ssn?
+    permission&.can_update_ssn
+  end
+
+  def permission
+    return @permission if defined? @permission
+
+    @permission = hbx_role&.permission
+  end
+
+  def hbx_role
+    return @hbx_role if defined? @hbx_role
+
+    @hbx_role = account_holder_person&.hbx_staff_role
+  end
+
+  # END - Hbx Staff Role permissions
 
   def index?
     read_all?
