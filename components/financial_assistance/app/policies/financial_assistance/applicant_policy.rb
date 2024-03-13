@@ -19,7 +19,9 @@ module FinancialAssistance
     # The user can create a new applicant if they have permission to edit it.
     #
     # @return [Boolean] Returns true if the user has permission to create a new applicant, false otherwise.
-    def new?; end
+    def new?
+      edit?
+    end
 
     # Determines if the current user has permission to create an applicant.
     # The user can create an applicant if they have permission to edit it.
@@ -110,6 +112,14 @@ module FinancialAssistance
     #
     # @return [Boolean] Returns true if the user has permission to destroy an applicant, false otherwise.
     def destroy?
+      edit?
+    end
+
+    # Determines if the current user has permission to other an applicant.
+    # The user can other an applicant if they have permission to edit it.
+    #
+    # @return [Boolean] Returns true if the user has permission to other an applicant, false otherwise.
+    def other?
       edit?
     end
   end
