@@ -68,6 +68,16 @@ class BrokerAgencyStaffRole
   # Scopes
 
   # @!scope class
+  # @scope active
+  # Retrieves all Broker Agency Staff Roles that are in the 'active' state.
+  #
+  # @return [Mongoid::Criteria<BrokerAgencyStaffRole>] Returns a Mongoid::Criteria of BrokerAgencyStaffRole objects that are in the 'active' state.
+  #
+  # @example Retrieve all active Broker Agency Staff Roles
+  #   BrokerAgencyStaffRole.active #=> Mongoid::Criteria<BrokerAgencyStaffRole>
+  scope :active, -> { where(aasm_state: 'active') }
+
+  # @!scope class
   # @scope broker_agency_pending
   # Retrieves all Broker Agency Staff Roles that are in the 'broker_agency_pending' state.
   #
