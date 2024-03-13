@@ -14,14 +14,6 @@ class PersonPolicy < ApplicationPolicy
     allowed_to_modify?
   end
 
-  def can_download_document?
-    allowed_to_download?
-  end
-
-  def can_delete_document?
-    allowed_to_modify?
-  end
-
   def updateable?
     return true unless role = user.person.hbx_staff_role
     role.permission.modify_family

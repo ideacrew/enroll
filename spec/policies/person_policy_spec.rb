@@ -145,14 +145,6 @@ RSpec.describe PersonPolicy, type: :policy do
       end
 
       it 'broker should be able to download document' do
-        expect(policy.can_download_document?).to be true
-      end
-
-      it 'broker should be able to download document' do
-        expect(policy.can_delete_document?).to be true
-      end
-
-      it 'broker should be able to download document' do
         expect(policy.can_broker_modify?).to be true
       end
     end
@@ -160,14 +152,6 @@ RSpec.describe PersonPolicy, type: :policy do
     context 'unauthorized broker' do
       it 'broker should not be able to update' do
         expect(policy.can_update?).to be false
-      end
-
-      it 'broker should not be able to download document' do
-        expect(policy.can_download_document?).to be false
-      end
-
-      it 'broker should not be able to download document' do
-        expect(policy.can_delete_document?).to be false
       end
 
       it 'broker should not be able to download document' do
