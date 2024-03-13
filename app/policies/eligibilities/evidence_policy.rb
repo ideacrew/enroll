@@ -37,8 +37,8 @@ module Eligibilities
     def allowed_to_modify?
       return true if current_user == associated_user
       return false unless role.present?
-      return true if can_hbx_staff_modify?
-      return true if can_broker_modify?
+      return can_hbx_staff_modify? if role.is_a?(HbxStaffRole)
+      return can_broker_modify? if (has_active_broker_role? || has_active_broker_agency_staff_role?)
       false
     end
 
