@@ -81,18 +81,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
     end
   end
 
-  def staff_index
-    @q = params.permit(:q)[:q]
-    @staff = eligible_brokers
-    @page_alphabets = page_alphabets(@staff, "last_name")
-    page_no = cur_page_no(@page_alphabets.first)
-    if @q.nil?
-      @staff = @staff.where(last_name: /^#{page_no}/i)
-    else
-      @staff = @staff.where(last_name: /^#{Regexp.escape(@q)}/i)
-    end
-  end
-
   def family_datatable
     id = params[:id]
 
