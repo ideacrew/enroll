@@ -46,7 +46,7 @@ module Eligibilities
       role.is_a?(HbxStaffRole) && role&.permission&.modify_family
     end
 
-    def can_individual_market_broker_modify?
+    def can_broker_modify?
       (has_active_broker_role? || has_active_broker_agency_staff_role?) && matches_individual_market_broker_account?
     end
 
