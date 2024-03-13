@@ -1064,6 +1064,12 @@ class Exchanges::HbxProfilesController < ApplicationController
     params[:hbx_profile].permit(:hbx_profile_attributes)
   end
 
+  def check_hbx_staff_role
+    unless current_user.has_hbx_staff_role?
+      redirect_to root_path, :flash => { :error => "You must be an HBX staff member" }
+    end
+  end
+
   def check_csr_or_hbx_staff
     unless current_user.has_hbx_staff_role? || (current_user.person.csr_role && !current_user.person.csr_role.cac)
       redirect_to root_path, :flash => { :error => "You must be an HBX staff member or a CSR" }

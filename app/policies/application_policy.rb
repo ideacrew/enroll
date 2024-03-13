@@ -115,7 +115,7 @@ class ApplicationPolicy
   #
   # @return [Boolean] Returns true if the user is an active associated broker in the individual market, false otherwise.
   def active_associated_individual_market_family_broker?
-    broker = account_holder_person.broker_role
+    broker = account_holder_person&.broker_role
     return false if broker.blank? || !broker.active? || !broker.individual_market?
 
     broker_agency_account = family.active_broker_agency_account
@@ -130,7 +130,7 @@ class ApplicationPolicy
   #
   # @return [Boolean] Returns true if the user is an admin in the individual market, false otherwise.
   def individual_market_admin?
-    hbx_role = account_holder_person.hbx_staff_role
+    hbx_role = account_holder_person&.hbx_staff_role
     return false if hbx_role.blank?
 
     permission = hbx_role.permission
@@ -162,7 +162,7 @@ class ApplicationPolicy
   def active_associated_coverall_market_family_broker?
     return false unless coverall_market_role
 
-    broker = account_holder_person.broker_role
+    broker = account_holder_person&.broker_role
     return false if broker.blank? || !broker.active? || !broker.individual_market?
 
     broker_agency_account = family.active_broker_agency_account
@@ -178,7 +178,7 @@ class ApplicationPolicy
   #
   # @return [Boolean] Returns true if the account holder is an admin in the coverall market, false otherwise.
   def coverall_market_admin?
-    hbx_role = account_holder_person.hbx_staff_role
+    hbx_role = account_holder_person&.hbx_staff_role
     return false if hbx_role.blank?
 
     permission = hbx_role.permission
@@ -197,7 +197,7 @@ class ApplicationPolicy
   # @param family [Family] The family to check.
   # @return [Boolean] Returns true if the account holder is a primary family member in the ACA Shop market for the given family, false otherwise.
   def shop_market_primary_family_member?
-    primary_person = family.primary_person
+    primary_person = family&.primary_person
     return false unless primary_person
 
     primary_person.employee_roles.present? && account_holder_person == primary_person

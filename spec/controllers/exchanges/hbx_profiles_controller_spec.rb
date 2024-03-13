@@ -4,13 +4,15 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
+  let(:hbx_staff_role) { double("hbx_staff_role", permission: permission)}
+  let(:permission) { double("permission", modify_family: true) }
 
   describe "various index" do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
     let(:person) { double("person", agent?: true)}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("HbxProfile")}
-    let(:permission) { double("permission", can_drop_enrollment_members: true) }
+    let(:permission) { double("permission", can_drop_enrollment_members: true, modify_family: true) }
 
     before :each do
       allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
@@ -50,7 +52,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:user) { double("user")}
     let(:person) { double("person", agent?: true)}
     let(:hbx_profile) { double("HbxProfile") }
-    let(:hbx_staff_role) { double("hbx_staff_role", permission: FactoryBot.create(:permission))}
+    let(:hbx_staff_role) { double("hbx_staff_role", permission: FactoryBot.create(:permission, modify_family: true))}
     let(:employer_profile){ FactoryBot.create(:employer_profile, aasm_state: "enrolling") }
 
     before(:each) do
@@ -77,7 +79,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "new" do
     let(:user) { double("User")}
-    let(:person) { double("person", agent?: true)}
+    let(:person) { double("person", agent?: true, hbx_staff_role: hbx_staff_role)}
 
     it "renders new" do
       allow(user).to receive(:person).and_return person
@@ -1672,12 +1674,13 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   end
 
   describe "GET get_user_info" do
-    let(:user) { double("User", :has_hbx_staff_role? => true)}
-    let(:person) { double("Person", id: double)}
+    let(:user) { double("User", :has_hbx_staff_role? => true, :person => person)}
+    let(:person) { double("Person", id: double, hbx_staff_role: double(permission: permission))}
     let(:family_id) { double("Family_ID")}
     let(:employer_id) { "employer_id_1234" }
     let(:organization) { double("Organization")}
     let(:employer_profile) { double }
+    let(:permission) { double(modify_family: true) }
 
     before do
       sign_in user

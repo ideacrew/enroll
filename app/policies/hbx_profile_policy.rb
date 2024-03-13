@@ -73,7 +73,8 @@ class HbxProfilePolicy < ApplicationPolicy
   end
 
   def index?
-    return true if hbx_role
+    return true if individual_market_admin?
+    return true if shop_market_admin?
 
     false
   end
@@ -82,14 +83,38 @@ class HbxProfilePolicy < ApplicationPolicy
     index?
   end
 
-  # TODO: - currently, staff role not required
   def assister_index?
-    index?
+    return true if individual_market_admin?
+    return true if shop_market_admin?
+
+    return true if individual_market_primary_family_member?
+    return true if shop_market_primary_family_member?
+
+
+
+    return true if individual_market_primary_family_member?
+    return true if individual_market_admin?
+    return true if active_associated_individual_market_family_broker?
+
+    return true if shop_market_primary_family_member?
+    return true if shop_market_admin?
+    return true if active_associated_shop_market_family_broker?
+    return true if active_associated_shop_market_general_agency?
+
+    return true if fehb_market_primary_family_member?
+    return true if fehb_market_admin?
+    return true if active_associated_fehb_market_family_broker?
+    return true if active_associated_fehb_market_general_agency?
+
+    return true if coverall_market_primary_family_member?
+    return true if coverall_market_admin?
+    return true if active_associated_coverall_market_family_broker?
+
+    false
   end
 
-  # TODO: - currently, staff role not required
   def request_help?
-    true
+    assister_index?
   end
 
   def family_index?

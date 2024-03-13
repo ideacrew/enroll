@@ -3,10 +3,16 @@ require "rails_helper"
 describe HbxProfilePolicy do
   subject { described_class }
   let(:hbx_profile){ hbx_staff_person.hbx_staff_role.hbx_profile }
+  let(:permission) { FactoryBot.create(:permission, modify_family: true)}
   let(:hbx_staff_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
   let(:assister_person) { FactoryBot.create(:person, :with_assister_role) }
   let(:csr_person) { FactoryBot.create(:person, :with_csr_role) }
   let(:employee_person) { FactoryBot.create(:person, :with_employee_role)}
+  let(:hbx_staff_role) { hbx_staff_person.hbx_staff_role }
+
+  before do
+    allow(hbx_staff_role).to receive(:permission).and_return permission
+  end
 
   permissions :show? do
     it "grants access when hbx_staff" do
@@ -310,7 +316,7 @@ describe HbxProfilePolicy do
     subject { described_class.new(user, HbxProfile) }
 
     shared_examples_for 'access without role' do |def_name, result|
-      let(:user) { double(User, person: double(hbx_staff_role: nil)) }
+      let(:user) { double(User, person: double(hbx_staff_role: nil, consumer_role: nil, csr_role: nil, broker_role: nil, active_general_agency_staff_roles: [], broker_agency_staff_roles: nil)) }
 
       it "#{def_name} returns #{result}" do
         expect(subject.send(def_name)).to eq result
@@ -377,7 +383,7 @@ describe HbxProfilePolicy do
     it_behaves_like 'access without role', :update_setting?
 
     shared_examples_for 'with role and permission' do |def_name, permission_name, permission_val, result|
-      let(:user) { double(User, person: double(hbx_staff_role: staff_role)) }
+      let(:user) { double(User, person: double(hbx_staff_role: staff_role, consumer_role: nil, csr_role: nil, broker_role: nil, active_general_agency_staff_roles: [], broker_agency_staff_roles: nil)) }
       let(:staff_role) { double(permission: permission) }
       let(:permission) { double(:permission) }
 
@@ -438,29 +444,38 @@ describe HbxProfilePolicy do
     it_behaves_like 'with role and permission', :force_publish?, :can_force_publish, true, true
     it_behaves_like 'with role and permission', :force_publish?, :can_force_publish, false, false
 
-    it_behaves_like 'with role and permission', :employer_invoice?, nil, nil, true
+    it_behaves_like 'with role and permission', :employer_invoice?, :modify_family, false, false
+    it_behaves_like 'with role and permission', :employer_invoice?, :modify_family, true, true
 
-    it_behaves_like 'with role and permission', :employer_datatable?, nil, nil, true
+    it_behaves_like 'with role and permission', :employer_datatable?, :modify_family, false, false
+    it_behaves_like 'with role and permission', :employer_datatable?, :modify_family, true, true
 
-    it_behaves_like 'with role and permission', :index?, nil, nil, true
+    it_behaves_like 'with role and permission', :index?, :modify_family, false, false
+    it_behaves_like 'with role and permission', :index?, :modify_family, true, true
 
-    it_behaves_like 'with role and permission', :staff_index?, nil, nil, true
+    it_behaves_like 'with role and permission', :staff_index?, :modify_family, false, false
+    it_behaves_like 'with role and permission', :staff_index?, :modify_family, true, true
 
-    it_behaves_like 'with role and permission', :assister_index?, nil, nil, true
+    it_behaves_like 'with role and permission', :assister_index?, :modify_family, false, false
+    it_behaves_like 'with role and permission', :assister_index?, :modify_family, true, true
 
-    it_behaves_like 'with role and permission', :request_help?, :can_extend_open_enrollment, true, true
-    it_behaves_like 'with role and permission', :request_help?, :can_extend_open_enrollment, false, false
+    it_behaves_like 'with role and permission', :request_help?, :modify_family, true, true
+    it_behaves_like 'with role and permission', :request_help?, :modify_family, false, false
 
-    it_behaves_like 'with role and permission', :family_index?, nil, nil, true
+    it_behaves_like 'with role and permission', :family_index?, :modify_family, false, false
+    it_behaves_like 'with role and permission', :family_index?, :modify_family, true, true
 
-    it_behaves_like 'with role and permission', :family_index_dt?, nil, nil, true
+    it_behaves_like 'with role and permission', :family_index_dt?, :modify_family, false, false
+    it_behaves_like 'with role and permission', :family_index_dt?, :modify_family, true, true
 
-    it_behaves_like 'with role and permission', :identity_verification?, nil, nil, true
+    it_behaves_like 'with role and permission', :identity_verification?, :modify_family, false, false
+    it_behaves_like 'with role and permission', :identity_verification?, :modify_family, true, true
 
     it_behaves_like 'with role and permission', :user_account_index?, :can_access_user_account_tab, true, true
     it_behaves_like 'with role and permission', :user_account_index?, :can_access_user_account_tab, false, false
 
-    it_behaves_like 'with role and permission', :outstanding_verification_dt?, nil, nil, true
+    it_behaves_like 'with role and permission', :outstanding_verification_dt?, :modify_family, false, false
+    it_behaves_like 'with role and permission', :outstanding_verification_dt?, :modify_family, true, true
 
     it_behaves_like 'with role and permission', :hide_form?, :can_add_sep, true, true
     it_behaves_like 'with role and permission', :hide_form?, :can_add_sep, false, false
@@ -471,7 +486,8 @@ describe HbxProfilePolicy do
     it_behaves_like 'with role and permission', :show_sep_history?, :can_view_sep_history, true, true
     it_behaves_like 'with role and permission', :show_sep_history?, :can_view_sep_history, false, false
 
-    it_behaves_like 'with role and permission', :get_user_info?, nil, nil, true
+    it_behaves_like 'with role and permission', :get_user_info?, :modify_family, false, false
+    it_behaves_like 'with role and permission', :get_user_info?, :modify_family, true, true
 
     it_behaves_like 'with role and permission', :update_effective_date?, :can_add_sep, true, true
     it_behaves_like 'with role and permission', :update_effective_date?, :can_add_sep, false, false
@@ -506,14 +522,17 @@ describe HbxProfilePolicy do
     it_behaves_like 'with role and permission', :update_enrollment_terminated_on_date?, :change_enrollment_end_date, true, true
     it_behaves_like 'with role and permission', :update_enrollment_terminated_on_date?, :change_enrollment_end_date, false, false
 
-    it_behaves_like 'with role and permission', :broker_agency_index?, nil, nil, true
+    it_behaves_like 'with role and permission', :broker_agency_index?, :modify_family, false, false
+    it_behaves_like 'with role and permission', :broker_agency_index?, :modify_family, true, true
 
-    it_behaves_like 'with role and permission', :general_agency_index?, nil, nil, true
+    it_behaves_like 'with role and permission', :general_agency_index?, :modify_family, false, false
+    it_behaves_like 'with role and permission', :general_agency_index?, :modify_family, true, true
 
     it_behaves_like 'with role and permission', :configuration?, :view_the_configuration_tab, true, true
     it_behaves_like 'with role and permission', :configuration?, :view_the_configuration_tab, false, false
 
-    it_behaves_like 'with role and permission', :view_terminated_hbx_enrollments?, nil, nil, true
+    it_behaves_like 'with role and permission', :view_terminated_hbx_enrollments?, :modify_family, false, false
+    it_behaves_like 'with role and permission', :view_terminated_hbx_enrollments?, :modify_family, true, true
 
     it_behaves_like 'with role and permission', :reinstate_enrollment?, :can_reinstate_enrollment, true, true
     it_behaves_like 'with role and permission', :reinstate_enrollment?, :can_reinstate_enrollment, false, false
@@ -536,14 +555,17 @@ describe HbxProfilePolicy do
     it_behaves_like 'with role and permission', :create_eligibility?, :can_add_pdc, true, true
     it_behaves_like 'with role and permission', :create_eligibility?, :can_add_pdc, false, false
 
-    it_behaves_like 'with role and permission', :show?, nil, nil, true
+    it_behaves_like 'with role and permission', :show?, :modify_family, false, false
+    it_behaves_like 'with role and permission', :show?, :modify_family, true, true
 
-    it_behaves_like 'with role and permission', :inbox?, nil, nil, true
+    it_behaves_like 'with role and permission', :inbox?, :modify_family, false, false
+    it_behaves_like 'with role and permission', :inbox?, :modify_family, true, true
 
     it_behaves_like 'with role and permission', :set_date?, :can_submit_time_travel_request, true, true
     it_behaves_like 'with role and permission', :set_date?, :can_submit_time_travel_request, false, false
 
-    it_behaves_like 'with role and permission', :aptc_csr_family_index?, nil, nil, true
+    it_behaves_like 'with role and permission', :aptc_csr_family_index?, :modify_family, false, false
+    it_behaves_like 'with role and permission', :aptc_csr_family_index?, :modify_family, true, true
 
     it_behaves_like 'with role and permission', :update_setting?, :modify_admin_tabs, true, true
     it_behaves_like 'with role and permission', :update_setting?, :modify_admin_tabs, false, false
