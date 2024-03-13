@@ -204,6 +204,7 @@
 <%= render 'users/security_question_responses/edit_modal', action: 'replace', method: 'POST', edit_mode: true %>
 <script>
   Freebies.floatlabels();
+  $.inputMasks();
 
   $('#applicant_same_with_primary').click(function(){
     if($(this).is(':checked')){
