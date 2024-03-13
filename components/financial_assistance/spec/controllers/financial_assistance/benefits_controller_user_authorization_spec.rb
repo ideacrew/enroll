@@ -70,7 +70,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           benefit
           get :new, params: params
           expect(flash[:error]).to eq(
-            'Access not allowed for financial_assistance/applicant_policy.new?, (Pundit policy)'
+            'Access not allowed for financial_assistance/benefit_policy.new?, (Pundit policy)'
           )
         end
       end
@@ -96,13 +96,23 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     end
 
     describe '#create' do
-      let(:params) { { application_id: application.id, applicant_id: primary_applicant.id } }
+      let(:params) do
+        {
+          application_id: application.id,
+          applicant_id: primary_applicant.id,
+          benefit:
+            {
+              start_on: Date.today - 1.year,
+              end_on: Date.today + 1.year
+            }
+        }
+      end
 
       context 'logged in user has developer role' do
         it 'denies access and redirects to a different path' do
           post :create, params: params
           expect(flash[:error]).to eq(
-            'Access not allowed for financial_assistance/applicant_policy.create?, (Pundit policy)'
+            'Access not allowed for financial_assistance/benefit_policy.create?, (Pundit policy)'
           )
         end
       end

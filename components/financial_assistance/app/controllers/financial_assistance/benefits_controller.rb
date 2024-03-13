@@ -10,18 +10,19 @@ module FinancialAssistance
     before_action :set_cache_headers, only: [:index]
 
     def index
+      # Authorizing on applicant since no benefit records may exist on index page
+      # TODO: Use policy context to pass applicant to BenefitPolicy
       authorize @applicant, :index?
 
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       render layout: 'financial_assistance_nav'
-      # @insurance_kinds = FinancialAssistance::Benefit::INSURANCE_TYPE
     end
 
     def new
-      authorize @applicant, :new?
-
       @model = @applicant.benefits.build
+      authorize @model, :new?
+
       load_steps
       current_step
       render 'workflow/step', layout: 'financial_assistance_nav'
@@ -61,10 +62,10 @@ module FinancialAssistance
     end
 
     def create
-      authorize @applicant, :create?
-
       format_date(params)
       @benefit = @applicant.benefits.build permit_params(params[:benefit])
+      authorize @benefit, :create?
+
       @benefit_kind = @benefit.kind
       @benefit_insurance_kind = @benefit.insurance_kind
 
