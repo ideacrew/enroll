@@ -114,10 +114,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
 
         context 'when the user is an assigned broker' do
-          let(:market_kind) { 'both' }
+          let(:market_kind) { :both }
           let(:broker_person) { FactoryBot.create(:person, :with_broker_role) }
           let(:broker_person) { FactoryBot.create(:person) }
-          let(:broker_role) { FactoryBot.create(:broker_role, person: broker_person, market_kind: market_kind) }
+          let(:broker_role) { FactoryBot.create(:broker_role, person: broker_person) }
           let(:broker_user) { FactoryBot.create(:user, person: broker_person) }
 
           let(:site) do
@@ -149,7 +149,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             broker_person.create_broker_agency_staff_role(
               benefit_sponsors_broker_agency_profile_id: broker_role.benefit_sponsors_broker_agency_profile_id
             )
-            broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id)
+            broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id, market_kind: market_kind)
             broker_role.approve!
             broker_agency_account
           end
@@ -175,7 +175,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
           context 'with active associated shop market certified broker' do
             let(:baa_active) { false }
-            let(:market_kind) { 'shop' }
+            let(:market_kind) { :shop }
 
             it 'denies access' do
               expect(subject).not_to permit(logged_in_user, deduction)
