@@ -2,6 +2,7 @@ module BenefitSponsors
   module Profiles
     module BrokerAgencies
       class BrokerAgencyStaffRolesController < ::BenefitSponsors::ApplicationController
+        before_action :find_and_authorize_broker_agency_profile
 
         def new
           binding.irb
@@ -12,7 +13,7 @@ module BenefitSponsors
 
           respond_to do |format|
             format.html { render 'new', layout: false} if params[:profile_type]
-            format.js  { render 'new'}
+            format.js  { render 'new' }
           end
         end
 
@@ -75,6 +76,20 @@ module BenefitSponsors
         end
 
         private
+
+        def determine_profile_id
+          broker_staff_params[:staff] ? broker_staff_params[:staff][:profile_id] : params[:profile_id]
+        end
+
+        # NOTE: this will probably be consolidated with a similarily named method in BrokerAgencyProfilesController
+        def find_and_authorize_broker_agency_profile
+          # the #new action is missing profile_id from broker_staff_params, hence this conditional
+          profile_id = broker_staff_params[:profile_id] || params[:profile_id]
+          organizations = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId(profile_id))
+
+          broker_agency_profile = organizations&.first&.broker_agency_profile
+          authorize broker_agency_profile, :can_manage_broker_agency?
+        end
 
         def broker_staff_params
           params[:staff].presence || params[:staff] = {}

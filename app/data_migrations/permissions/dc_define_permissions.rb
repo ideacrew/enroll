@@ -130,6 +130,7 @@ class DcDefinePermissions < MigrationTask
     hbx_admin_can_view_notice_templates
     hbx_admin_can_edit_notice_templates
     hbx_admin_can_view_audit_log
+    hbx_admin_can_view_agency_staff
   end
 
   def build_test_roles
@@ -393,6 +394,14 @@ class DcDefinePermissions < MigrationTask
     Permission.super_admin.update_attributes!(can_edit_notice_templates: true)
     Permission.hbx_staff.update_attributes!(can_edit_notice_templates: true)
     Permission.hbx_tier3.update_attributes!(can_edit_notice_templates: true)
+  end
+
+  def hbx_admin_can_view_agency_staff
+    Permission.hbx_csr_tier1.update_attributes!(view_agency_staff: true)
+    Permission.hbx_csr_tier2.update_attributes!(view_agency_staff: true)
+    Permission.hbx_csr_supervisor.update_attributes!(view_agency_staff: true)
+    Permission.developer.update_attributes!(view_agency_staff: true)
+    Permission.hbx_read_only.update_attributes!(view_agency_staff: true)
   end
 end
 # rubocop:enable Metrics/ClassLength

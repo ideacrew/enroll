@@ -9,9 +9,9 @@ module BenefitSponsors
         return false unless user
         return false unless user.person
         return true if user.person.hbx_staff_role
-        return true if has_matching_broker_role?
+        return true if is_broker_agency_broker?
 
-        has_matching_broker_agency_staff_role?
+        is_broker_agency_staff?
       end
 
       def set_default_ga?
@@ -20,7 +20,6 @@ module BenefitSponsors
 
       def can_view_broker_agency?
         return true if admin_can_view_broker_agency?
-        return true if is_broker_agency_primary?
         return true if is_broker_agency_broker?
         return true if is_broker_agency_staff?
 
@@ -28,31 +27,14 @@ module BenefitSponsors
       end
 
       def can_manage_broker_agency?
+        binding.irb
         return true if admin_can_manage_broker_agency?
-        return true if is_broker_agency_primary?
+        return true if is_broker_agency_broker?
 
         false
       end
 
       protected
-
-      def has_matching_broker_agency_staff_role?
-        staff_roles = user.person.broker_agency_staff_roles || []
-        staff_roles.any? do |sr|
-          sr.active? &&
-            (
-              sr.broker_agency_profile_id == record.id ||
-                sr.benefit_sponsors_broker_agency_profile_id == record.id
-            )
-        end
-      end
-
-      def has_matching_broker_role?
-        broker_role = user.person.broker_role
-        return false unless broker_role
-
-        broker_role.benefit_sponsors_broker_agency_profile_id == record.id && broker_role.active?
-      end
 
       def admin_can_view_broker_agency?
         return false unless hbx_staff_role_permission
@@ -65,27 +47,20 @@ module BenefitSponsors
 
         hbx_staff_role_permission.manage_agency_staff
       end
-  
-      def is_broker_agency_primary?
-        return false unless broker_role
-  
-        broker_role.id == record&.primary_broker_role&.id
-      end
 
-      # For brokers who are not the primary broker, but still affiliated with the agency
+      # was originally using primary_broker method from broker_agency_profile to determine this auth step
+      # but it is possible for some older profiles to have more than one broker
       def is_broker_agency_broker?
         return false unless broker_role
   
-        broker_role.benefit_sponsors_broker_agency_profile_id == record.id
+        broker_role&.broker_agency_profile&.id == record.id
       end
   
       def is_broker_agency_staff?
         staff_roles = account_holder_person&.active_broker_staff_roles || []
         return false if staff_roles.empty?
-        id = record.id
 
-        # Are any broker_agency_staff_roles still associated with a BrokerAgencyProfile, or have they all been migrated to BenefitSponsors::Organizations::BrokerAgencyProfile?
-        staff_roles.detect{ |role| role&.broker_agency_profile&.id == id || role&.broker_agency_profile_id == id }
+        staff_roles.detect{ |role| role&.broker_agency_profile&.id == record.id || role&.broker_agency_profile_id == record.id }
       end
     end
   end

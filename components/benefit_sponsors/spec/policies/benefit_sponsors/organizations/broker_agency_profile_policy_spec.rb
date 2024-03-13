@@ -152,7 +152,7 @@ module BenefitSponsors
       it_behaves_like "does not permit agents not associated with the broker", :can_manage_broker_agency?
     end
 
-    describe "given a primary broker role for that profile" do
+    describe "given a broker role for that profile" do
       let(:person) do
         instance_double(
           Person,
@@ -166,13 +166,13 @@ module BenefitSponsors
           BrokerRole,
           :id => "SOME BROKER ID",
           :active? => true,
+          :broker_agency_profile_id => nil,
           :benefit_sponsors_broker_agency_profile_id => broker_agency_profile_id
         )
       end
 
       before do
         allow(broker_role).to receive(:broker_agency_profile).and_return(broker_agency_profile)
-        allow(broker_agency_profile).to receive(:primary_broker_role).and_return(broker_role)
       end
 
       shared_examples_for "permits brokers of the agency" do |policy_type|
@@ -188,54 +188,6 @@ module BenefitSponsors
       it_behaves_like "permits brokers of the agency", :can_manage_broker_agency?
     end
 
-    describe "given non-primary broker role for that profile" do
-      let(:person) do
-        instance_double(
-          Person,
-          :hbx_staff_role => nil,
-          :broker_role => lesser_broker_role
-        )
-      end
-
-      let(:lesser_broker_role) do
-        instance_double(
-          BrokerRole,
-          :id => "SOME BROKER ID",
-          :active? => true,
-          :benefit_sponsors_broker_agency_profile_id => broker_agency_profile_id
-        )
-      end
-
-      let(:broker_role) do
-        instance_double(
-          BrokerRole,
-          :id => "A BETTER BROKER ID",
-          :active? => true,
-          :benefit_sponsors_broker_agency_profile_id => broker_agency_profile_id
-        )
-      end
-
-      before do
-        allow(broker_role).to receive(:broker_agency_profile).and_return(broker_agency_profile)
-        allow(broker_agency_profile).to receive(:primary_broker_role).and_return(broker_role)
-      end
-
-      shared_examples_for "permits brokers of the agency" do |policy_type|
-        it "does permit" do
-          expect(policy.send(policy_type)).to be_truthy
-        end
-      end
-
-      it_behaves_like "permits brokers of the agency", :access_to_broker_agency_profile?
-      it_behaves_like "permits brokers of the agency", :redirect_signup?
-      it_behaves_like "permits brokers of the agency", :set_default_ga?
-      it_behaves_like "permits brokers of the agency", :can_view_broker_agency?
-      
-      it "does not permit #can_manage_broker_agency?" do
-        expect(policy.can_manage_broker_agency?).to be_falsey
-      end
-    end
-
     describe "given a broker role for a different profile" do
       let(:person) do
         instance_double(
@@ -249,25 +201,26 @@ module BenefitSponsors
       let(:broker_role) do
         instance_double(
           BrokerRole,
-          id: "SOME BROKER ID",
-          active?: true,
-          benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id
+          :id => "SOME BROKER ID",
+          :active? => true,
+          :broker_agency_profile_id => nil,
+          :benefit_sponsors_broker_agency_profile_id => broker_agency_profile.id
         )
       end
 
       let(:fake_broker_role) do
         instance_double(
           BrokerRole,
-          id: "SOME OTHER BROKER ID",
-          active?: true,
-          benefit_sponsors_broker_agency_profile_id: fake_broker_agency_profile.id
+          :id => "SOME OTHER BROKER ID",
+          :active? => true,
+          :broker_agency_profile_id => nil,
+          :benefit_sponsors_broker_agency_profile_id => fake_broker_agency_profile.id
         )
       end
 
       before do
         allow(person).to receive(:active_broker_staff_roles).and_return([])
-        allow(broker_role).to receive(:broker_agency_profile).and_return(fake_broker_agency_profile)
-        allow(broker_agency_profile).to receive(:primary_broker_role).and_return(broker_role)
+        allow(fake_broker_role).to receive(:broker_agency_profile).and_return(fake_broker_agency_profile)
       end
 
       shared_examples_for "does not permit brokers from a different agency" do |policy_type|
