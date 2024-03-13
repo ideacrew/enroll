@@ -35,23 +35,50 @@ module Eligibilities
     #
     # @note The user is the one who is trying to perform the action. The record_user is the user who owns the record. The record is an instance of Eligibilities::Evidence.
     def allowed_to_modify?
-      role_has_permission_to_modify? || (current_user == associated_user)
-    end
-
-    def role_has_permission_to_modify?
-      role.present? && (can_hbx_staff_modify? || can_broker_modify?)
+      return true if current_user == associated_user
+      return false unless role.present?
+      return true if can_hbx_staff_modify?
+      return true if can_broker_modify?
+      false
     end
 
     def can_hbx_staff_modify?
       role.is_a?(HbxStaffRole) && role&.permission&.modify_family
     end
 
-    def can_broker_modify?
-      (role.is_a?(::BrokerRole) || role.is_a?(::BrokerAgencyStaffRole)) && broker_agency_profile_matches?
+    def can_individual_market_broker_modify?
+      (has_active_broker_role? || has_active_broker_agency_staff_role?) && matches_individual_market_broker_account?
     end
 
     def broker_agency_profile_matches?
       associated_family.active_broker_agency_account.present? && associated_family.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id == role.benefit_sponsors_broker_agency_profile_id
+    end
+
+    # Checks if the broker agency profile ID of any of the roles
+    # matches the provided broker agency profile ID.
+    #
+    # @note The `role` can be a single broker role or multiple active broker agency staff roles.
+    #
+    # @param active_broker_agency_profile_id [String] The broker agency profile ID to match against.
+    #
+    # @return [Boolean] returns true if there is a match, false otherwise.
+    def matches_broker_agency_profile?(active_broker_agency_profile_id)
+      Array(role).any? do |role|
+        role.benefit_sponsors_broker_agency_profile_id == active_broker_agency_profile_id
+      end
+    end
+
+    def matches_individual_market_broker_account?
+      return false unless associated_family.active_broker_agency_account.present?
+      matches_broker_agency_profile?(associated_family.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id)
+    end
+
+    def has_active_broker_role?
+      role.is_a?(::BrokerRole) && role.active?
+    end
+
+    def has_active_broker_agency_staff_role?
+      role.any? { |r| r.is_a?(::BrokerAgencyStaffRole) }
     end
 
     def role
