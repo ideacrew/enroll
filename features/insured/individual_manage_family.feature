@@ -14,3 +14,11 @@ Feature: Individual ability to update family information
     And individual edits home address
     And individual saves personal information changes
     Then information should be saved successfully
+
+  Scenario: Individual updates gender
+    Given an individual has gender information as male
+    Then individual clicks on the Manage Family button
+    Then individual clicks on the Personal portal
+    And the individual selects gender as female
+    And individual saves personal information changes
+    Then the individual should show gender as female
