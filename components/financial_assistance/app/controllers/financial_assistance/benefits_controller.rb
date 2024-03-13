@@ -19,7 +19,7 @@ module FinancialAssistance
     end
 
     def new
-      authorize @applicant, :index?
+      authorize @applicant, :new?
 
       @model = @applicant.benefits.build
       load_steps
