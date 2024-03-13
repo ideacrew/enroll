@@ -5,7 +5,6 @@ module BenefitSponsors
         before_action :find_and_authorize_broker_agency_profile
 
         def new
-          binding.irb
           # somehow determine agency 
           # authorize agency, :can_add_staff_role?
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_new

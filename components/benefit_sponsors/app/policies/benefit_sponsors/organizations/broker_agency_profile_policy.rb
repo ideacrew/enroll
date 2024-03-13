@@ -1,6 +1,8 @@
 module BenefitSponsors
   module Organizations
     class BrokerAgencyProfilePolicy < ApplicationPolicy
+
+      # NOTE that 
       def redirect_signup?
         access_to_broker_agency_profile?
       end
@@ -27,7 +29,6 @@ module BenefitSponsors
       end
 
       def can_manage_broker_agency?
-        binding.irb
         return true if admin_can_manage_broker_agency?
         return true if is_broker_agency_broker?
 

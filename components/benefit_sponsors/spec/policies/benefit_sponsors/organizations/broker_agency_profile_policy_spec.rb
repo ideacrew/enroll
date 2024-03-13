@@ -56,7 +56,11 @@ module BenefitSponsors
       end
 
       context "that can't access a broker agency" do
-        let(:permission) { instance_double(Permission, view_agency_staff: true, manage_agency_staff: false) }
+        let(:permission) { instance_double(Permission, view_agency_staff: false, manage_agency_staff: false) }
+
+        before do
+          allow(person).to receive(:active_broker_staff_roles).and_return([])
+        end
 
         shared_examples_for "does not permit admins with the wrong permissions" do |policy_type|
           it "does permit" do
@@ -67,7 +71,10 @@ module BenefitSponsors
         it_behaves_like "does not permit admins with the wrong permissions", :access_to_broker_agency_profile?
         it_behaves_like "does not permit admins with the wrong permissions", :redirect_signup?
         it_behaves_like "does not permit admins with the wrong permissions", :set_default_ga?
-        it_behaves_like "does not permit admins with the wrong permissions", :can_view_broker_agency?
+
+        it "does not permit #can_view_broker_agency?" do
+          expect(policy.can_view_broker_agency?).to be_falsey
+        end
 
         it "does not permit #can_manage_broker_agency?" do
           expect(policy.can_manage_broker_agency?).to be_falsey

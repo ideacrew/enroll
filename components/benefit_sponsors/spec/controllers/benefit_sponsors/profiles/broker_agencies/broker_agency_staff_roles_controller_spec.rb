@@ -10,49 +10,139 @@ module BenefitSponsors
     end
 
     # Users/Person
-    let(:bap_id) { organization.broker_agency_profile.id }
-    let(:user) { FactoryBot.create(:user)}
-    let(:broker_user) { FactoryBot.create(:user, person: new_person_for_staff)}
-    let!(:new_person_for_staff) { FactoryBot.create(:person) }
-    let!(:new_person_for_staff1) { FactoryBot.create(:person, user: user) }
+    let(:broker_user)                    { FactoryBot.create(:user, person: new_person_for_staff) }
+    let(:user)                           { FactoryBot.create(:user, person: new_person_for_staff1) }
+    let!(:new_person_for_staff)          { FactoryBot.create(:person) }
+    let!(:new_person_for_staff1)         { FactoryBot.create(:person, user: user) }
 
     # Organizations
     let!(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let(:organization_with_hbx_profile)  { site.owner_organization }
     let!(:organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
-    let!(:broker_agency_profile1) { organization.broker_agency_profile }
+    let(:organization_with_hbx_profile)  { site.owner_organization }
+    let(:bap_id)                         { organization.broker_agency_profile.id }
+    let!(:broker_agency_profile1)        { organization.broker_agency_profile }
 
-    let!(:second_organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
-    let!(:second_broker_agency_profile) { second_organization.broker_agency_profile }
+    let!(:second_organization)           { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+    let!(:second_broker_agency_profile)  { second_organization.broker_agency_profile }
 
     # Roles
-    let!(:broker_role1) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: new_person_for_staff) }
-    let!(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: bap_id, person: new_person_for_staff1) }
-    let!(:broker_agency_staff_role1) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: bap_id, person: new_person_for_staff) }
+    let!(:broker_role)                   { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: new_person_for_staff) }
+    let!(:broker_agency_staff_role)      { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: bap_id, person: new_person_for_staff1) }
+    let!(:broker_agency_staff_role1)     { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: second_broker_agency_profile.id, person: new_person_for_staff) }
 
     let(:staff_class) { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm }
 
     describe "GET new" do
-
       before do
         allow(controller).to receive(:set_ie_flash_by_announcement).and_return true
-        sign_in broker_user
-
-        # there is always a profile_id present in the params when calling #new, no profile_id will throw an error
-        get :new, params: { profile_id: broker_agency_profile1.id, profile_type: "broker_agency_staff" }
       end
 
+      context 'for brokers and agents' do
+        context 'for a broker in the agency' do
+          before do
+            sign_in broker_user
+            # there is always a profile_id present in the params when calling #new, no profile_id will throw an error
+            get :new, params: { profile_id: broker_agency_profile1.id, profile_type: "broker_agency_staff" }
+          end
 
-      it "should render new template" do
-        expect(response).to render_template("new")
+          it "should render new template" do
+            expect(response).to render_template("new")
+          end
+  
+          it "should initialize staff" do
+            expect(assigns(:staff).class).to eq staff_class
+          end
+  
+          it "should return http success" do
+            expect(response).to have_http_status(:success)
+          end
+        end
+
+        context 'for broker agency staff' do
+          before do
+            sign_in user
+            # there is always a profile_id present in the params when calling #new, no profile_id will throw an error
+            get :new, params: { profile_id: broker_agency_profile1.id, profile_type: "broker_agency_staff" }
+          end
+
+          it "should not render new template" do
+            expect(response).not_to render_template("new")
+          end
+
+          it "should not initialize staff" do
+            expect(assigns(:staff).class).to eq NilClass
+          end
+
+          it "should return http redirect" do
+            expect(response).to have_http_status(:redirect)
+          end
+        end
+
+        context 'for a broker in a different agency' do
+          before do
+            sign_in broker_user1
+            # there is always a profile_id present in the params when calling #new, no profile_id will throw an error
+            get :new, params: { profile_id: broker_agency_profile1.id, profile_type: "broker_agency_staff" }
+          end
+
+
+          it "should not render new template" do
+            expect(response).not_to render_template("new")
+          end
+
+          it "should not initialize staff" do
+            expect(assigns(:staff).class).to eq NilClass
+          end
+
+          it "should return http redirect" do
+            expect(response).to have_http_status(:redirect)
+          end
+        end
       end
 
-      it "should initialize staff" do
-        expect(assigns(:staff).class).to eq staff_class
-      end
+      context 'for admin' do
 
-      it "should return http success" do
-        expect(response).to have_http_status(:success)
+        context 'with the correct permissions' do
+          before do
+            sign_in broker_user
+            # there is always a profile_id present in the params when calling #new, no profile_id will throw an error
+            get :new, params: { profile_id: broker_agency_profile1.id, profile_type: "broker_agency_staff" }
+          end
+
+
+          it "should render new template" do
+            expect(response).to render_template("new")
+          end
+
+          it "should initialize staff" do
+            expect(assigns(:staff).class).to eq staff_class
+          end
+
+          it "should return http success" do
+            expect(response).to have_http_status(:success)
+          end
+        end
+
+        context 'with the incorrect permissions' do
+          before do
+            sign_in broker_user
+            # there is always a profile_id present in the params when calling #new, no profile_id will throw an error
+            get :new, params: { profile_id: broker_agency_profile1.id, profile_type: "broker_agency_staff" }
+          end
+
+
+          it "should render new template" do
+            expect(response).to render_template("new")
+          end
+
+          it "should initialize staff" do
+            expect(assigns(:staff).class).to eq staff_class
+          end
+
+          it "should return http success" do
+            expect(response).to have_http_status(:success)
+          end
+        end
       end
     end
 
