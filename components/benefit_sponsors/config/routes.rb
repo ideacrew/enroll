@@ -116,14 +116,6 @@ BenefitSponsors::Engine.routes.draw do
     end
   end
 
-  namespace :organizations do
-    resource :office_locations do
-      member do
-        get :new
-      end
-    end
-  end
-
   resources :benefit_sponsorships do
     resources :benefit_applications, controller: "benefit_applications/benefit_applications" do
       get :late_rates_check, on: :collection
