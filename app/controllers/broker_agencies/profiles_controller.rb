@@ -42,19 +42,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
     end
   end
 
-  def show
-    set_flash_by_announcement
-    session[:person_id] = nil
-     @provider = @broker_agency_profile.primary_broker_role.person
-     @staff_role = current_user.has_broker_agency_staff_role?
-     @id=params[:id]
-  end
-
-  def edit
-    @organization = Forms::BrokerAgencyProfile.find(@broker_agency_profile.id)
-    @id = params[:id]
-  end
-
   def update
     sanitize_broker_profile_params
 
@@ -136,39 +123,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
       @primary_member_cache[pers.id] = pers
     end
     @draw = dt_query.draw
-  end
-
-  def family_index
-    @q = params.permit(:q)[:q]
-    id = params.permit(:id)[:id]
-    page = params.permit([:page])[:page]
-    if current_user.has_broker_role?
-      @broker_agency_profile = BrokerAgencyProfile.find(current_user.person.broker_role.broker_agency_profile_id)
-    elsif current_user.has_hbx_staff_role?
-      @broker_agency_profile = BrokerAgencyProfile.find(BSON::ObjectId.from_string(id))
-    else
-      redirect_to new_broker_agencies_profile_path
-      return
-    end
-    #
-    # total_families = @broker_agency_profile.families
-    # @total = total_families.count
-    # @page_alphabets = total_families.map{|f| f.primary_applicant.person.last_name[0]}.map(&:capitalize).uniq
-    # if page.present?
-    #   @families = total_families.select{|v| v.primary_applicant.person.last_name =~ /^#{page}/i }
-    # elsif @q.present?
-    #   query= Regexp.escape(@q)
-    #   query_args= query.split("\\ ")
-    #   reg_ex = query_args.join('(.*)?')
-    #   @families = total_families.select{|v| v.primary_applicant.person.full_name =~ /#{reg_ex}/i }
-    # else
-    #   @families = total_families[0..20]
-    # end
-    #
-    # @family_count = @families.count
-    respond_to do |format|
-      format.js {}
-    end
   end
 
   def commission_statements
@@ -301,96 +255,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @draw = dt_query.draw
     @employer_profiles = employer_profiles.present? ? employer_profiles : []
     render
-  end
-
-  def assign
-
-    page_string = params.permit(:employers_page)[:employers_page]
-    page_no = page_string.blank? ? nil : page_string.to_i
-    if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
-      @orgs = Organization.by_broker_agency_profile(@broker_agency_profile._id)
-    else
-      broker_role_id = current_user.person.broker_role.id
-      @orgs = Organization.by_broker_role(broker_role_id)
-    end
-    @broker_role = current_user.person.broker_role || nil
-    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
-
-    @employers = @orgs.map(&:employer_profile)
-    @employers = Kaminari.paginate_array(@employers).page page_no
-  end
-
-  def update_assign
-    params[:general_agency_id] = params[:employers_general_agency_id] if params[:employers_general_agency_id]
-    authorize @broker_agency_profile, :set_default_ga?
-    if params[:general_agency_id].present? || params[:employer_ids].present? && params[:bulk_actions_resources].present?
-      general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_id])
-      case params[:type]
-      when 'fire'
-        params[:employer_ids].each do |employer_id|
-          employer_profile = EmployerProfile.find(employer_id) rescue next
-
-          employer_profile.fire_general_agency!
-          send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Terminate')
-        end
-        notice = "Fire these employers successful."
-      else
-        employer_ids = if params.key? :bulk_actions_resources
-        params[:bulk_actions_resources].map do |pdo_id|
-          SponsoredBenefits::Organizations::PlanDesignOrganization.find(pdo_id).employer_profile.id
-        end
-        else
-          params[:employer_ids]
-        end
-        employer_ids.each do |employer_id|
-          employer_profile = EmployerProfile.find(employer_id) rescue nil
-          if employer_profile.present? #FIXME : Please move me to model
-            broker_role_id = current_user.person.broker_role.id rescue nil
-            broker_role_id ||= @broker_agency_profile.primary_broker_role_id
-            employer_profile.hire_general_agency(general_agency_profile, broker_role_id)
-            employer_profile.save
-            send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Hire')
-            general_agency_profile.general_agency_hired_notice(employer_profile) #GA notice when broker Assign a GA to employers
-          end
-        end
-        flash.now[:notice] ="Assign successful."
-        if params["from_assign"] == "true"
-          assign # calling this method as the latest copy of objects are needed.
-          render "assign" and return
-        else
-          employers # calling this method as the latest copy of objects are needed.
-          render "update_assign" and return
-        end
-      end
-    elsif params["commit"].try(:downcase) == "clear assignment"
-      employer_ids = if params.key? :bulk_actions_resources
-      params[:bulk_actions_resources].map do |pdo_id|
-        SponsoredBenefits::Organizations::PlanDesignOrganization.find(pdo_id).employer_profile.id
-      end
-      else
-        params[:employer_ids]
-      end
-      employer_ids.each do |employer_id|
-        employer_profile = EmployerProfile.find(employer_id) rescue next
-        if employer_profile.general_agency_profile.present?
-          send_general_agency_assign_msg(employer_profile.general_agency_profile, employer_profile, 'Terminate')
-          employer_profile.fire_general_agency!
-        end
-      end
-      notice = "Unassign successful."
-    end
-    redirect_to broker_agencies_profile_path(@broker_agency_profile), flash: {notice: notice}
-  end
-
-  def clear_assign_for_employer
-    @broker_role = current_user.person.broker_role || nil
-    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
-    @employer_profile = EmployerProfile.find(params[:employer_id]) rescue nil
-    authorize @employer_profile, :fire_general_agency?
-    if @employer_profile.present?
-      send_general_agency_assign_msg(@employer_profile.general_agency_profile, @employer_profile, 'Terminate')
-      @employer_profile.fire_general_agency!
-    end
   end
 
   def assign_history
