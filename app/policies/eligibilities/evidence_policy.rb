@@ -35,10 +35,16 @@ module Eligibilities
     #
     # @note The user is the one who is trying to perform the action. The record_user is the user who owns the record. The record is an instance of Eligibilities::Evidence.
     def allowed_to_modify?
-      return true if current_user == associated_user
+      return false unless individual_market_role_identity_verified?
+      return true if (current_user == associated_user)
       return false unless role.present?
       return can_hbx_staff_modify? if role.is_a?(HbxStaffRole)
       return can_broker_modify? if (has_active_broker_role? || has_active_broker_agency_staff_role?)
+      false
+    end
+
+    def individual_market_role_identity_verified?
+      return true if (associated_person.resident_role || associated_person.consumer_role&.identity_verified?)
       false
     end
 
@@ -100,16 +106,16 @@ module Eligibilities
       user
     end
 
+    def associated_person
+      associated_family.primary_person
+    end
+
     def associated_user
-      associated_family.primary_person.user
+      associated_person.user
     end
 
     def associated_family
       record.applicant.family
-    end
-
-    def record_user
-      record.applicant.family.primary_person.user
     end
   end
 end

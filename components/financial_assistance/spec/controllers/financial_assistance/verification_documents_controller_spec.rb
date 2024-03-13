@@ -54,6 +54,35 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
 
   let(:file) { [fixture_file_upload("#{Rails.root}/test/uhic.jpg")] }
 
+  before do
+    person.consumer_role.move_identity_documents_to_verified
+  end
+
+  context 'user is not RIDP verified' do
+    before do
+      person.consumer_role.update_attributes(:identity_validation => 'outstanding', :application_validation => 'outstanding')
+      sign_in(admin_user)
+    end
+
+    context 'GET #download' do
+      let!(:document) { esi_evidence.documents.create}
+
+      context 'with valid params' do
+        before do
+          allow(controller).to receive(:get_document).with('sample-key').and_return(document)
+        end
+
+        let!(:params) {{"key" => "sample-key", "evidence_kind" => "esi_evidence", "application_id" => application.id, "applicant_id" => applicant.id}}
+
+        it 'should not download' do
+          get :download, params: params
+          expect(response).to have_http_status(:found)
+          expect(flash[:error]).to eq("Access not allowed for eligibilities/evidence_policy.can_download?, (Pundit policy)")
+        end
+      end
+    end
+  end
+
   context 'admin' do
     before do
       sign_in(admin_user)

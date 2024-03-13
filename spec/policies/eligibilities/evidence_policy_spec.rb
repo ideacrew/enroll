@@ -44,6 +44,10 @@ RSpec.describe Eligibilities::EvidencePolicy, type: :policy do
     )
   end
 
+  before do
+    person.consumer_role.move_identity_documents_to_verified
+  end
+
   context 'admin user' do
     let!(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
     let!(:admin_user) {FactoryBot.create(:user, :with_hbx_staff_role, :person => admin_person)}
