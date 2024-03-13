@@ -94,7 +94,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   describe "inbox" do
     let(:user) { double("User")}
     let(:person) { double("person", agent?: true)}
-    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:hbx_staff_role) { double("hbx_staff_role", permission: permission)}
     let(:hbx_profile) { double("HbxProfile", id: double("id"))}
 
     it "renders inbox" do
@@ -113,7 +113,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   describe "employer_invoice" do
     let(:user) { double("User")}
     let(:person) { double("Person")}
-    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:hbx_staff_role) { double("hbx_staff_role", permission: permission)}
     let(:hbx_profile) { double("HbxProfile", id: double("id"))}
     let(:search_params){{"value" => ""}}
 
@@ -223,7 +223,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   describe "employer_datatable" do
     let(:user) { double("User")}
     let(:person) { double("Person")}
-    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:hbx_staff_role) { double("hbx_staff_role", permission: permission)}
     let(:hbx_profile) { double("HbxProfile", id: double("id"))}
 
     before do
@@ -266,7 +266,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   end
 
   describe "#check_hbx_staff_role" do
-    let(:user) { double("user")}
+    let(:user) { double("user", person: person)}
     let(:person) { double("person", agent?: true)}
 
     it "should render the new template" do
@@ -284,7 +284,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:person) { double("person", agent?: true)}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile")}
-    let(:admin_permission) { double("permission", name: "super_admin", view_the_configuration_tab: true)}
+    let(:admin_permission) { double("permission", name: "super_admin", view_the_configuration_tab: true, modify_admin_tabs: true)}
     let(:admin_permission_with_time_travel) { double("permission", name: "super_admin", can_submit_time_travel_request: true, modify_admin_tabs: true)}
     let(:staff_permission) { double("permission", name: "hbx_staff")}
 
@@ -357,7 +357,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   describe "Show" do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false, :has_csr_role? => false, :last_portal_visited => nil)}
     let(:person) { double("person", agent?: true)}
-    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:hbx_staff_role) { double("hbx_staff_role", permission: permission)}
     let(:hbx_profile) { double("hbx_profile", inbox: double("inbox", unread_messages: double("test")))}
 
     before :each do
@@ -391,7 +391,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   end
 
   describe "#generate_invoice" do
-    let(:person) { double("person", agent?: true)}
+    let(:person) { double("person", agent?: true, hbx_staff_role: hbx_staff_role)}
     let(:user) { double("user", :has_hbx_staff_role? => true)}
     let(:employer_profile) { double("EmployerProfile", id: double("id"))}
     let(:organization){ Organization.new }
@@ -534,8 +534,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "GET family index" do
     let(:user) { double("User")}
-    let(:person) { double("person", agent?: true)}
-    let(:hbx_staff_role) { double("hbx_staff_role")}
+    let(:person) { double("person", agent?: true, hbx_staff_role: hbx_staff_role)}
     let(:hbx_profile) { double("hbx_profile")}
     let(:csr_role) { double("csr_role", cac: false)}
     before :each do
@@ -837,7 +836,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   describe 'POST create_send_secure_message, :dbclean => :after_each' do
     render_views
 
-    let(:person) { FactoryBot.create(:person, :with_family) }
+    let(:person) { FactoryBot.create(:person, :with_family, hbx_staff_role: hbx_staff_role) }
+    let(:permission) { double('Permission', can_send_secure_message: true)}
     let(:user) { double("user", person: person, :has_hbx_staff_role? => true) }
     let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item) }
     let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}

@@ -316,7 +316,7 @@ describe HbxProfilePolicy do
     subject { described_class.new(user, HbxProfile) }
 
     shared_examples_for 'access without role' do |def_name, result|
-      let(:user) { double(User, person: double(hbx_staff_role: nil, consumer_role: nil, csr_role: nil, broker_role: nil, active_general_agency_staff_roles: [], broker_agency_staff_roles: nil)) }
+      let(:user) { double(User, person: double(hbx_staff_role: nil, consumer_role: nil, csr_role: nil, broker_role: nil, active_general_agency_staff_roles: [], broker_agency_staff_roles: nil, resident_role: nil)) }
 
       it "#{def_name} returns #{result}" do
         expect(subject.send(def_name)).to eq result
@@ -344,7 +344,7 @@ describe HbxProfilePolicy do
     it_behaves_like 'access without role', :index?, false
     it_behaves_like 'access without role', :staff_index?, false
     it_behaves_like 'access without role', :assister_index?, false
-    it_behaves_like 'access without role', :request_help?
+    it_behaves_like 'access without role', :request_help?, false
     it_behaves_like 'access without role', :family_index?, false
     it_behaves_like 'access without role', :family_index_dt?, false
     it_behaves_like 'access without role', :identity_verification?, false
@@ -383,7 +383,7 @@ describe HbxProfilePolicy do
     it_behaves_like 'access without role', :update_setting?
 
     shared_examples_for 'with role and permission' do |def_name, permission_name, permission_val, result|
-      let(:user) { double(User, person: double(hbx_staff_role: staff_role, consumer_role: nil, csr_role: nil, broker_role: nil, active_general_agency_staff_roles: [], broker_agency_staff_roles: nil)) }
+      let(:user) { double(User, person: double(hbx_staff_role: staff_role, consumer_role: nil, csr_role: nil, broker_role: nil, active_general_agency_staff_roles: [], broker_agency_staff_roles: nil, resident_role: nil)) }
       let(:staff_role) { double(permission: permission) }
       let(:permission) { double(:permission) }
 
