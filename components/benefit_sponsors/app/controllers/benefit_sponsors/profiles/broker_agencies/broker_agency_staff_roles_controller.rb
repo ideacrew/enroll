@@ -2,11 +2,12 @@ module BenefitSponsors
   module Profiles
     module BrokerAgencies
       class BrokerAgencyStaffRolesController < ::BenefitSponsors::ApplicationController
-        before_action :find_and_authorize_broker_agency_profile
+        before_action :find_and_authorize_broker_agency_profile, except: :search_broker_agency
+
+        # search_broker_agency is a generic endpoint used to search across all agencies, only prereqs are being an admin or a broker/agent
+        before_action :is_broker_or_admin?, only: :search_broker_agency
 
         def new
-          # somehow determine agency 
-          # authorize agency, :can_add_staff_role?
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_new
           set_ie_flash_by_announcement
 
@@ -17,8 +18,6 @@ module BenefitSponsors
         end
 
         def create
-          # somehow determine agency 
-          # authorize agency, :can_add_staff_role?
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_create(broker_staff_params)
           begin
             @status,@result = @staff.save
@@ -30,7 +29,7 @@ module BenefitSponsors
             flash[:error] = "Role was not added because " + e.message
           end
           respond_to do |format|
-            format.html  { redirect_to profiles_broker_agencies_broker_agency_profile_path(id: params[:profile_id])}
+            format.html  { redirect_to profiles_broker_agencies_broker_agency_profile_path(id: params[:profile_id]) }
             format.js
           end
         end
@@ -68,17 +67,11 @@ module BenefitSponsors
         end
 
         def search_broker_agency
-          # somehow determine agency 
-          # authorize agency, :can_add_staff_role?
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_broker_agency_search(broker_staff_params)
           @broker_agency_profiles = @staff.broker_agency_search
         end
 
         private
-
-        def determine_profile_id
-          broker_staff_params[:staff] ? broker_staff_params[:staff][:profile_id] : params[:profile_id]
-        end
 
         # NOTE: this will probably be consolidated with a similarily named method in BrokerAgencyProfilesController
         def find_and_authorize_broker_agency_profile
@@ -88,6 +81,11 @@ module BenefitSponsors
 
           broker_agency_profile = organizations&.first&.broker_agency_profile
           authorize broker_agency_profile, :can_manage_broker_agency?
+        end
+
+        def is_broker_or_admin?
+          # agency profile record is not required for this auth method
+          authorize BenefitSponsors::Organizations::BrokerAgencyProfile, :can_search_broker_agencies?
         end
 
         def broker_staff_params

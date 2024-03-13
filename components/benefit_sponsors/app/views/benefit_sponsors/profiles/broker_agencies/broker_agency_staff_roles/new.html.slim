@@ -19,11 +19,6 @@
               = f.hidden_field :profile_id
               = f.hidden_field :profile_type, value: "broker_agency_staff"
               = f.hidden_field :is_broker_registration_page, value: true
-              = f.text_field :agency_search, placeholder: "#{l10n('broker_agencies.broker_roles.agency_name_placeholder')}", class: 'form-control'
-              .input-group-btn
-                a.btn.btn-select.search[href="#" onclick="brokerSearch(); return false" data-loading-text="Loading..."]
-                  i.fa.fa-search
-                  = l10n("search").to_s.downcase
         .result
 
 
@@ -38,20 +33,6 @@
 
 javascript:
   validateAjaxForm();
-
-  function brokerSearch() {
-    var broker_agency_search = document.getElementById('staff_agency_search').value
-    var broker_registration_page = document.getElementById('staff_is_broker_registration_page').value
-    document.getElementById('broker-staff-btn').disabled = true;
-    if (broker_agency_search != undefined) {
-        $.ajax({
-          url: '/benefit_sponsors/profiles/broker_agencies/broker_agency_staff_roles/search_broker_agency.js',
-          type: "GET",
-          data: {'q': broker_agency_search, "broker_registration_page": broker_registration_page}
-        });
-    };
-
-  }
 
   function selectBrokereAgency(element) {
     var result = document.querySelectorAll('.result');

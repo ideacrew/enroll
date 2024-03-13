@@ -33,14 +33,21 @@ module BenefitSponsors
       @broker_role ||= account_holder_person.broker_role if account_holder_person&.broker_role&.active?
     end
 
+    # Returns an array of broker_staff_roles of account holder, if present
+    #
+    # @return Array([BrokerStaffRoles])
+    def broker_staff_roles
+      @staff_roles ||= account_holder_person&.active_broker_staff_roles
+    end
+
     # Determines if the current user has an hbx_staff_role with a permission
     #
     # @return [Permission], which can then have the relevant attr checked
     def hbx_staff_role_permission
-      @hbx_staff_role_permission ||= retrieve_hbx_staff_role_permission
+      @hbx_staff_role_permission ||= retrieve_account_holder_hbx_staff_role_permission
     end
 
-    def retrieve_hbx_staff_role_permission
+    def retrieve_account_holder_hbx_staff_role_permission
       hbx_role = account_holder_person&.hbx_staff_role
       return false if hbx_role.blank?
 
