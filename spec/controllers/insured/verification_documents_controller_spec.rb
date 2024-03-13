@@ -32,7 +32,7 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
       it "redirects" do
         request.env["HTTP_REFERER"] = "/home"
         person = create(:person, :with_consumer_role, user: user)
-        family  = create(:family, :with_primary_family_member, person: person)
+        _family  = create(:family, :with_primary_family_member, person: person)
 
         sign_in user
         post :upload, params: { consumer_role: consumer_role }
