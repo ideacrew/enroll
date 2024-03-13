@@ -284,6 +284,7 @@ module BenefitSponsors
               )
           end
           @wf_url = @wells_fargo_sso.url if @wells_fargo_sso&.token.present?
+          return if params[:page_num].present?
           respond_to do |format|
             format.html
             format.json { render json: {wf_url: @wf_url} }
