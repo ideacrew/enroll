@@ -64,7 +64,7 @@ And(/the individual selects gender as female/) do
   find(IvlPersonalInformation.female_radiobtn).click
 end
 
-Then (/the individual should show gender as female/) do
+Then(/the individual should show gender as female/) do
   gender = Person.first.gender
   gender == 'female'
 end
