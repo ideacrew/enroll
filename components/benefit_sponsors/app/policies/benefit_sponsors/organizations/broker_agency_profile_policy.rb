@@ -1,5 +1,10 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Organizations
+    # temporarily unable to inherit from main app ApplicationPolicy
+    # will temporarily inherit from BenefitSponsors
+    # class BrokerAgencyProfilePolicy < ::ApplicationPolicy
     class BrokerAgencyProfilePolicy < ApplicationPolicy
 
       # NOTE: All methods will most likely be consolidated with the auth refactor for BrokerAgencyProfilesController
@@ -22,14 +27,14 @@ module BenefitSponsors
       end
 
       def can_search_broker_agencies?
-        return true if admin_can_view_broker_agency?
-        return true if has_broker_role_or_broker_agency_staff_role?
+        return true if hbx_staff_can_view_agency_staff?
+        return true if is_associated_with_broker_agency?
 
         false
       end
 
       def can_view_broker_agency?
-        return true if admin_can_view_broker_agency?
+        return true if hbx_staff_can_view_agency_staff?
         return true if is_broker_for_broker_agency?
         return true if is_staff_for_broker_agency?
 
@@ -37,7 +42,7 @@ module BenefitSponsors
       end
 
       def can_manage_broker_agency?
-        return true if admin_can_manage_broker_agency?
+        return true if hbx_staff_can_manage_agency_staff?
         return true if is_broker_for_broker_agency?
 
         false
@@ -63,20 +68,11 @@ module BenefitSponsors
         broker_role.benefit_sponsors_broker_agency_profile_id == record.id && broker_role.active?
       end
 
-      def admin_can_view_broker_agency?
-        return false unless hbx_staff_role_permission
+      ################################################################################################################
+      # NOTE: the following methods are more specific to BrokerAgencyProfilePolicy and if approved will be used in
+      # the refactor for BrokerAgencyProfileController endpoints
+      ################################################################################################################
 
-        hbx_staff_role_permission.view_agency_staff
-      end
-  
-      def admin_can_manage_broker_agency?
-        return false unless hbx_staff_role_permission
-
-        hbx_staff_role_permission.manage_agency_staff
-      end
-
-      # was originally using primary_broker method from broker_agency_profile to determine this auth step
-      # but it is possible for some older profiles to have more than one broker
       def is_broker_for_broker_agency?
         return false unless broker_role
   
@@ -89,8 +85,29 @@ module BenefitSponsors
         broker_staff_roles.detect{ |role| role&.broker_agency_profile&.id == record.id || role&.broker_agency_profile_id == record.id }
       end
 
-      def has_broker_role_or_broker_agency_staff_role?
+      def is_associated_with_broker_agency?
         broker_role || (broker_staff_roles&.present?)
+      end
+
+      ################################################################################################################
+      # NOTE: the following methods or some variation thereof will most likely appear in ApplicationPolicy eventually
+      # they will be deleted from this policy once present in the ApplicationPolicy of the main application
+      ################################################################################################################
+
+      def broker_role
+        @broker_role ||= account_holder_person.broker_role if account_holder_person&.broker_role&.active?
+      end
+
+      def broker_staff_roles
+        @staff_roles ||= account_holder_person&.active_broker_staff_roles
+      end
+
+      def hbx_staff_can_view_agency_staff?
+        permission&.view_agency_staff
+      end
+  
+      def hbx_staff_can_manage_agency_staff?
+        permission&.manage_agency_staff
       end
     end
   end
