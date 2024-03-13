@@ -4,6 +4,9 @@ module BenefitSponsors
       class BrokerAgencyStaffRolesController < ::BenefitSponsors::ApplicationController
 
         def new
+          binding.irb
+          # somehow determine agency 
+          # authorize agency, :can_add_staff_role?
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_new
           set_ie_flash_by_announcement
 
@@ -14,6 +17,8 @@ module BenefitSponsors
         end
 
         def create
+          # somehow determine agency 
+          # authorize agency, :can_add_staff_role?
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_create(broker_staff_params)
           begin
             @status,@result = @staff.save
@@ -63,6 +68,8 @@ module BenefitSponsors
         end
 
         def search_broker_agency
+          # somehow determine agency 
+          # authorize agency, :can_add_staff_role?
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_broker_agency_search(broker_staff_params)
           @broker_agency_profiles = @staff.broker_agency_search
         end
