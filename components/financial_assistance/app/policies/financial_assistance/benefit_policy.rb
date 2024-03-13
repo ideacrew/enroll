@@ -14,15 +14,8 @@ module FinancialAssistance
     def initialize(user, record)
       super
 
+      @family ||= record._parent.application.family
       @applicant ||= record._parent
-    end
-
-    # Determines if the current user has permission to create a new benefit.
-    # The user can create a new benefit if they have permission to perform a step.
-    #
-    # @return [Boolean] Returns true if the user has permission to create a benefit, false otherwise.
-    def new?
-      step?
     end
 
     # Determines if the current user has permission to index a benefit.
@@ -34,11 +27,11 @@ module FinancialAssistance
     end
 
     # Determines if the current user has permission to perform a step.
-    # The user can perform a step if they are a primary family member in the individual market, an active associated broker in the individual market who has verified their identity, or an admin in the individual market.
+    # The user can perform a step if they can edit the applicant associated with the benefit.
     #
     # @return [Boolean] Returns true if the user has permission to perform a step, false otherwise.
     def step?
-      FinancialAssistance::ApplicantPolicy.new(user, @applicant).new?
+      FinancialAssistance::ApplicantPolicy.new(user, @applicant).edit?
     end
 
     # Determines if the current user has permission to create a benefit.

@@ -20,8 +20,9 @@ module FinancialAssistance
     end
 
     def new
+      # Authorizing on applicant before benefit record is built on it
+      authorize @applicant, :new?
       @model = @applicant.benefits.build
-      authorize @model, :new?
 
       load_steps
       current_step

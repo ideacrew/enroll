@@ -70,7 +70,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           benefit
           get :new, params: params
           expect(flash[:error]).to eq(
-            'Access not allowed for financial_assistance/benefit_policy.new?, (Pundit policy)'
+            'Access not allowed for financial_assistance/applicant_policy.new?, (Pundit policy)'
           )
         end
       end

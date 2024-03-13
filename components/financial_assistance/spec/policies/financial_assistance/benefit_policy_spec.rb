@@ -19,23 +19,29 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     end
 
     let(:dependent_member) { FactoryBot.create(:family_member, family: family, person: dependent_person) }
-    let(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id) }
+    let(:application) do
+     FactoryBot.create(:financial_assistance_application, family_id: family.id)
+    end
 
     let(:primary_applicant) do
       FactoryBot.create(
         :financial_assistance_applicant,
-        application: application,
         family_member_id: primary_family_member.id,
-        person_hbx_id: person.hbx_id
+        person_hbx_id: person.hbx_id,
+        application: application,
+        first_name: person.first_name,
+        last_name: person.last_name
       )
     end
 
     let(:dependent_applicant) do
       FactoryBot.create(
         :financial_assistance_applicant,
-        application: application,
         family_member_id: dependent_member.id,
-        person_hbx_id: dependent_person.hbx_id
+        person_hbx_id: dependent_person.hbx_id,
+        application: application,
+        first_name: dependent_person.first_name,
+        last_name: dependent_person.last_name
       )
     end
 
@@ -154,7 +160,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             broker_person.create_broker_agency_staff_role(
               benefit_sponsors_broker_agency_profile_id: broker_role.benefit_sponsors_broker_agency_profile_id
             )
-            broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id)
+            broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id ,market_kind: market_kind)
             broker_role.approve!
             broker_agency_account
           end
