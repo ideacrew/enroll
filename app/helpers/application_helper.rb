@@ -440,14 +440,14 @@ module ApplicationHelper
   end
 
   def retrieve_show_path(provider, message)
-    return broker_agencies_inbox_path(provider, message_id: message.id) if provider.try(:broker_role)
+    return  benefit_sponsors.inboxes_message_path(provider, message_id: message.id) if provider.try(:broker_role)
     case provider.model_name.name
     when "Person"
       insured_inbox_path(provider, message_id: message.id)
     when "EmployerProfile"
       employers_inbox_path(provider, message_id: message.id)
     when "BrokerAgencyProfile"
-      broker_agencies_inbox_path(provider, message_id: message.id)
+      benefit_sponsors.inboxes_message_path(provider, message_id: message.id)
     when "HbxProfile"
       exchanges_inbox_path(provider, message_id: message.id)
     when "GeneralAgencyProfile"
@@ -456,15 +456,18 @@ module ApplicationHelper
   end
 
   def retrieve_inbox_path(provider, folder: 'inbox')
-    broker_agency_mailbox =  broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
-    return broker_agency_mailbox if provider.try(:broker_role)
+    if provider.try(:broker_role)
+      broker_agency_mailbox =  benefit_sponsors.inbox_profiles_broker_agencies_broker_agency_profile_path(id: provider.id.to_s, folder: folder)
+      return broker_agency_mailbox
+    end
+
     case provider.model_name.name
     when "EmployerProfile"
       inbox_employers_employer_profiles_path(id: provider.id, folder: folder)
     when "HbxProfile"
       inbox_exchanges_hbx_profile_path(provider, folder: folder)
     when "BrokerAgencyProfile"
-      broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
+      benefit_sponsors.inbox_profiles_broker_agencies_broker_agency_profile_path(id: provider.id.to_s, folder: folder)
     when "Person"
       inbox_insured_families_path(profile_id: provider.id, folder: folder)
     when "GeneralAgencyProfile"
