@@ -4,12 +4,15 @@ require 'rails_helper'
 
 RSpec.describe FinancialAssistance::IncomesController, dbclean: :after_each, type: :controller do
   routes { FinancialAssistance::Engine.routes }
-  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+
+  let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+  let(:consumer_role) { person.consumer_role }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+  let(:primary_family_member) { family.primary_applicant }
+
   let!(:user) { FactoryBot.create(:user, :person => person) }
-  # let!(:family) { FactoryBot.create(:family, :with_primary_family_member,person: person) }
-  let!(:family_id) { BSON::ObjectId.new }
-  let!(:family_member_id) { BSON::ObjectId.new }
-  # let!(:hbx_profile) {FactoryBot.create(:hbx_profile,:open_enrollment_coverage_period)}
+  let!(:family_id) { family.id }
+  let!(:family_member_id) { primary_family_member.id }
   let!(:application) { FactoryBot.create(:application, family_id: family_id, aasm_state: "draft",effective_date: TimeKeeper.date_of_record) }
   let!(:applicant) { FactoryBot.create(:applicant, application: application, family_member_id: family_member_id) }
   let!(:income) do
@@ -27,6 +30,7 @@ RSpec.describe FinancialAssistance::IncomesController, dbclean: :after_each, typ
   let(:income_employer_phone_params) {{"full_phone_number" => ""}}
 
   before do
+    consumer_role.move_identity_documents_to_verified
     sign_in(user)
   end
 

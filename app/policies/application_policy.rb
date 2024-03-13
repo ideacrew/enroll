@@ -86,16 +86,6 @@ class ApplicationPolicy
     individual_market_role&.identity_verified?
   end
 
-  # Determines if the current user is an active associated broker in the individual market.
-  # The user is considered an active associated broker if they are an active associated broker for the family in the individual market.
-  # The primary family member must be verified for their identity.
-  # The broker is allowed to access only if the broker is active and associated to the family if the primary person of the family is RIDP verified.
-  #
-  # @return [Boolean] Returns true if the user is an active associated broker in the individual market who has verified their identity, false otherwise.
-  def active_associated_individual_market_ridp_verified_family_broker?
-    primary_family_member_ridp_verified? && active_associated_individual_market_family_broker?
-  end
-
   # Determines if the primary person of the family has verified their identity (RIDP).
   #
   # @return [Boolean] Returns true if the primary person of the family has verified their identity, false otherwise.
@@ -107,6 +97,44 @@ class ApplicationPolicy
     return false if consumer_role.blank?
 
     consumer_role.identity_verified?
+  end
+
+  # Checks if the current user is a primary family member who has verified their identity and is an active associated individual market family broker staff.
+  #
+  # @return [Boolean] Returns true if the primary family member has verified their
+  # identity and the user is an active associated individual market family broker staff, false otherwise.
+  def active_associated_individual_market_ridp_verified_family_broker_staff?
+    primary_family_member_ridp_verified? && active_associated_individual_market_family_broker_staff?
+  end
+
+  # Checks if the current user is an active associated individual market family broker staff.
+  # It checks if the user has any active broker agency staff roles and if the user's family has an active broker agency account.
+  # If both conditions are met, it checks if any of the user's broker agency staff roles
+  # are associated with the broker agency profile of the family's active broker agency account.
+  #
+  # @return [Boolean] Returns true if the user is an active associated individual market family broker staff, false otherwise.
+  def active_associated_individual_market_family_broker_staff?
+    broker_staffs = account_holder_person&.broker_agency_staff_roles&.active
+    return false if broker_staffs.blank?
+
+    broker_agency_account = family.active_broker_agency_account
+    return false if broker_agency_account.blank?
+
+    broker_agency = broker_agency_account.broker_agency_profile
+
+    broker_staffs.any? do |staff|
+      staff.benefit_sponsors_broker_agency_profile_id == broker_agency.id
+    end
+  end
+
+  # Determines if the current user is an active associated broker in the individual market.
+  # The user is considered an active associated broker if they are an active associated broker for the family in the individual market.
+  # The primary family member must be verified for their identity.
+  # The broker is allowed to access only if the broker is active and associated to the family if the primary person of the family is RIDP verified.
+  #
+  # @return [Boolean] Returns true if the user is an active associated broker in the individual market who has verified their identity, false otherwise.
+  def active_associated_individual_market_ridp_verified_family_broker?
+    primary_family_member_ridp_verified? && active_associated_individual_market_family_broker?
   end
 
   # Determines if the current user is an active associated broker in the individual market.
@@ -130,7 +158,6 @@ class ApplicationPolicy
   #
   # @return [Boolean] Returns true if the user is an admin in the individual market, false otherwise.
   def individual_market_admin?
-    hbx_role = account_holder_person&.hbx_staff_role
     return false if hbx_role.blank?
 
     permission = hbx_role.permission
@@ -178,13 +205,7 @@ class ApplicationPolicy
   #
   # @return [Boolean] Returns true if the account holder is an admin in the coverall market, false otherwise.
   def coverall_market_admin?
-    hbx_role = account_holder_person&.hbx_staff_role
-    return false if hbx_role.blank?
-
-    permission = hbx_role.permission
-    return false if permission.blank?
-
-    permission.modify_family
+    individual_market_admin?
   end
   #
   # END - Non-ACA Coverall Market related methods
@@ -209,7 +230,6 @@ class ApplicationPolicy
   #
   # @return [Boolean] Returns true if the account holder is an admin in the shop market, false otherwise.
   def shop_market_admin?
-    individual_market_admin?
     # hbx_role = account_holder_person.hbx_staff_role
     # return false if hbx_role.blank?
 
@@ -217,6 +237,7 @@ class ApplicationPolicy
     # return false if permission.blank?
 
     # permission.modify_employer
+    individual_market_admin?
   end
 
   def active_associated_shop_market_family_broker?

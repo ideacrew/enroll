@@ -83,15 +83,8 @@ class HbxProfilePolicy < ApplicationPolicy
     index?
   end
 
+  # rubocop:disable Metrics/CyclomaticComplexity
   def assister_index?
-    return true if individual_market_admin?
-    return true if shop_market_admin?
-
-    return true if individual_market_primary_family_member?
-    return true if shop_market_primary_family_member?
-
-
-
     return true if individual_market_primary_family_member?
     return true if individual_market_admin?
     return true if active_associated_individual_market_family_broker?
@@ -112,6 +105,7 @@ class HbxProfilePolicy < ApplicationPolicy
 
     false
   end
+  # rubocop:enable Metrics/CyclomaticComplexity
 
   def request_help?
     assister_index?
