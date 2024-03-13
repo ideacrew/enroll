@@ -1,6 +1,7 @@
 Feature: My Financial Assistance Applications page that visit the Review Application page
   Background: Review your application page
-    Given a consumer exists
+    Given a consumer exists with family
+    And the consumer is RIDP verified
     And the FAA feature configuration is enabled
     And FAA display_medicaid_question feature is enabled
     And the primary caretaker question configuration is enabled

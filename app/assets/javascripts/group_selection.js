@@ -190,7 +190,15 @@ function errorsForChangeInCoverageKind(employer_id){
 
 function disableIvlIneligible() {
   $('#coverage-household tr').filter("[class^=ineligible_]").not(".ineligible_ivl_row").find('input').prop({'checked': true, 'disabled': false});
-  $('#coverage-household tr').filter(".ineligible_ivl_row").find('input').prop({'checked': false, 'disabled': true});
+  $('#coverage-household tr').filter(".ineligible_ivl_row").each(function() {
+    var error_element = $(this).find('div.ivl_errors').find('div');
+    $(this).find('input').prop({'checked': false, 'disabled': true});
+
+    if (error_element.length && error_element.text() === "eligibility failed on active_individual_role") {
+      error_element.show();
+    }
+  })
+
 }
 
 function enableIvlEligibleForCoverall() {
@@ -199,7 +207,8 @@ function enableIvlEligibleForCoverall() {
     //$('#coverage-household tr').filter(".ineligible_ivl_row").find('input').prop({'checked': true, 'disabled': false});
 
   $('#coverage-household tr').filter(".ineligible_ivl_row").each(function() {
-    var error_element = $(this).children().filter('td.ivl_errors').find('div')
+    var error_element = $(this).find('div.ivl_errors').find('div');
+
     if (error_element.length && error_element.text() === "eligibility failed on active_individual_role") {
       $(this).find('input').prop({'checked': true, 'disabled': false});
       error_element.hide();

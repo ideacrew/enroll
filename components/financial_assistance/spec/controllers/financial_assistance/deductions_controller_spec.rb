@@ -24,19 +24,28 @@ RSpec.describe FinancialAssistance::DeductionsController, dbclean: :after_each, 
   end
 
   before do
+    person.consumer_role.move_identity_documents_to_verified
     sign_in(user)
   end
 
   context "POST create" do
+    let(:input_params) do
+      {
+        application_id: application.id,
+        applicant_id: applicant.id,
+        deduction: {
+          amount: "$200.00",
+          frequency_kind: "biweekly",
+          start_on: "1/1/#{TimeKeeper.datetime_of_record.year}",
+          end_on: "12/31/#{TimeKeeper.datetime_of_record.year}",
+          kind: "student_loan_interest"
+        }
+      }
+    end
+
     before do
       @applicant = applicant
-      post :create, params: {application_id: application.id,
-                             applicant_id: applicant.id,
-                             deduction: {amount: "$200.00",
-                                         frequency_kind: "biweekly",
-                                         start_on: "1/1/#{TimeKeeper.datetime_of_record.year}",
-                                         end_on: "12/31/#{TimeKeeper.datetime_of_record.year}",
-                                         kind: "student_loan_interest"}}, format: :js
+      post :create, params: input_params, format: :js
     end
 
     it "should create with valid params" do

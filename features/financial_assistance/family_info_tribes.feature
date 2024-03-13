@@ -7,6 +7,7 @@ Feature: Start a new Financial Assistance Application
     Given a consumer, with a family, exists
     And is logged in
     And a benchmark plan exists
+    And the consumer is RIDP verified
 
   Scenario: No Coverage Tribe Details feature is enabled
     Given No coverage tribe details feature is enabled

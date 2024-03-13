@@ -1,7 +1,8 @@
 Feature: Review your application page functionality 2
 
   Background: Review your application page
-    Given a consumer exists
+    Given a consumer exists with family
+    And the consumer is RIDP verified
     And is logged in
     And the FAA feature configuration is enabled
     And the user will navigate to the FAA Household Info page

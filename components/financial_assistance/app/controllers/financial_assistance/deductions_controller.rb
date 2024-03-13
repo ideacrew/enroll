@@ -10,19 +10,23 @@ module FinancialAssistance
     before_action :set_cache_headers, only: [:index]
 
     def index
+      authorize @applicant, :index?
+
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       render layout: 'financial_assistance_nav'
     end
 
     def new
-      @model = FinancialAssistance::Application.find(params[:application_id]).applicants.find(params[:applicant_id]).deductions.build
+      authorize @applicant, :new?
+      @model = @applicant.deductions.build
       load_steps
       current_step
       render 'workflow/step', layout: 'financial_assistance_nav'
     end
 
     def step
+      authorize @model, :step?
       save_faa_bookmark(request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
       model_name = @model.class.to_s.split('::').last.downcase
@@ -53,9 +57,9 @@ module FinancialAssistance
     end
 
     def create
+      authorize @applicant, :create?
       format_date(params)
       @deduction = @applicant.deductions.build permit_params(params[:deduction])
-
       if @deduction.save
         render :create
       else
@@ -66,6 +70,7 @@ module FinancialAssistance
     def update
       format_date(params)
       @deduction = @applicant.deductions.find params[:id]
+      authorize @deduction, :update?
 
       if @deduction.update_attributes permit_params(params[:deduction])
         render :update
@@ -76,6 +81,7 @@ module FinancialAssistance
 
     def destroy
       @deduction = @applicant.deductions.find(params[:id])
+      authorize @deduction, :destroy?
       @deduction_kind = @deduction.kind
       @deduction.destroy!
 

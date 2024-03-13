@@ -1,7 +1,84 @@
 # frozen_string_literal: true
 
 class FamilyPolicy < ApplicationPolicy
+  def initialize(user, record)
+    super
+    @family = record
+  end
+
+  # Returns the primary person of the family record.
+  #
+  # @return [Person] The primary person of the family record.
+  def primary_person
+    record.primary_person
+  end
+
+  # Determines if the current user has permission to edit the family record.
+  # The user can edit the record if they have permission to view it.
+  #
+  # @return [Boolean] Returns true if the user has permission to edit the record, false otherwise.
+  def edit?
+    show?
+  end
+
+  # Determines if the current user has permission to view the list of family records.
+  # The user can view the list if they have permission to view a single record.
+  #
+  # @return [Boolean] Returns true if the user has permission to view the list of records, false otherwise.
+  def index?
+    show?
+  end
+
+  # Determines if the current user has permission to create a new family record.
+  # The user can create a new record if they have permission to view a record.
+  #
+  # @return [Boolean] Returns true if the user has permission to create a new record, false otherwise.
+  def new?
+    show?
+  end
+
+  # Determines if the current user has permission to view the family record.
+  # The user can view the record if they are a primary family member,
+  # an active associated broker, or an admin in the individual market,
+  # the ACA Shop market, the Non-ACA Fehb market, or the coverall market.
+  #
+  # @return [Boolean] Returns true if the user has permission to view the record, false otherwise.
   def show?
+    return true if individual_market_primary_family_member?
+    return true if active_associated_individual_market_ridp_verified_family_broker_staff?
+    return true if active_associated_individual_market_ridp_verified_family_broker?
+    return true if individual_market_admin?
+
+    return true if shop_market_primary_family_member?
+    return true if fehb_market_primary_family_member?
+
+    return true if coverall_market_primary_family_member?
+    return true if active_associated_coverall_market_family_broker?
+    return true if coverall_market_admin?
+
+    false
+  end
+
+  # Determines if the current user has permission to create a new family record.
+  # TODO: Implement the logic to check if the user has permission to create a new family record.
+  #
+  # @return [Boolean] Returns true if the user has permission to create a new record, false otherwise.
+  def create?; end
+
+  # Determines if the current user has permission to update the family record.
+  # TODO: Implement the logic to check if the user has permission to update the family record.
+  #
+  # @return [Boolean] Returns true if the user has permission to update the record, false otherwise.
+  def update?; end
+
+  # Determines if the current user has permission to destroy the family record.
+  # TODO: Implement the logic to check if the user has permission to destroy the family record.
+  #
+  # @return [Boolean] Returns true if the user has permission to destroy the record, false otherwise.
+  def destroy?; end
+
+  # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+  def legacy_show?
     user_person = @user.person
     if user_person
       primary_applicant = @record.primary_applicant
@@ -33,6 +110,7 @@ class FamilyPolicy < ApplicationPolicy
     end
     false
   end
+  # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
   def can_view_entire_family_enrollment_history?
     return true if user.person.hbx_staff_role

@@ -16,7 +16,6 @@ module BenefitSponsors
         ]
         before_action :load_group_enrollments, only: [:coverage_reports], if: :is_format_csv?
         before_action :check_and_download_invoice, only: [:download_invoice, :show_invoice]
-        before_action :wells_fargo_sso, only: [:show]
         before_action :set_flash_by_announcement, only: :show
         layout "two_column", except: [:new]
 
@@ -285,6 +284,7 @@ module BenefitSponsors
               )
           end
           @wf_url = @wells_fargo_sso.url if @wells_fargo_sso&.token.present?
+          return if params[:page_num].present?
           respond_to do |format|
             format.html
             format.json { render json: {wf_url: @wf_url} }

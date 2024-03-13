@@ -3,6 +3,7 @@ Feature: Start a new Financial Assistance Application and fills out Other Income
   Background: User logs in and visits applicant's other income page and is not an indian or alaska tribe
     Given a consumer, with a family, exists
     And is logged in
+    And the consumer is RIDP verified
     And a benchmark plan exists
     And the FAA feature configuration is enabled
     When the user will navigate to the FAA Household Info page

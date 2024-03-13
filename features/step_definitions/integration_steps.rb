@@ -880,7 +880,7 @@ Then(/^.+ should see plans sorted by Plan Name/) do
 end
 
 When(/^.+ filters plans by Carrier/) do
-  find('.selectric-interaction-choice-control-carrier').click
+  find('.interaction-choice-control-carrier').click
   carrier_option = find('li .interaction-choice-control-carrier-1', wait: 5)
   @carrier_selected = carrier_option.text
   carrier_option.click
@@ -921,8 +921,12 @@ Then(/(.*?) should see (.*?) page with (.*?) plan year start as coverage effecti
   end
 end
 
-When(/^.+ selects? a plan on the plan shopping page$/) do
-  find_all(EmployeeChoosePlan.select_plan_btn, wait: 5)[0].click
+When(/^(.+) selects? a plan on the plan shopping page$/) do |role|
+  if role == 'consumer'
+    find_all('div.plan-row')[0].find('.plan-select').click
+  else
+    find_all(EmployeeChoosePlan.select_plan_btn, wait: 5)[0].click
+  end
 end
 
 When(/^.+ selects? a second plan on the plan shopping page$/) do

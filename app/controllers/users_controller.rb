@@ -1,5 +1,4 @@
 class UsersController < ApplicationController
-  before_action :confirm_existing_password, only: [:change_password]
   before_action :set_user, except: [:confirm_lock, :unsupported_browser, :index, :show]
 
   def index
@@ -49,17 +48,6 @@ class UsersController < ApplicationController
     redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "You are not authorized for this action."
   end
 
-  def change_password
-    @user.password = params[:user][:new_password]
-    @user.password_confirmation = params[:user][:password_confirmation]
-    if @user.save!
-      flash[:success] = "Password successfully changed"
-    else
-      flash[:error] = "We encountered a problem trying to update your password, please try again"
-    end
-    redirect_to personal_insured_families_path
-  end
-
   def change_username_and_email
     authorize User, :change_username_and_email?
     @user_id = params[:user_id]
@@ -89,13 +77,6 @@ class UsersController < ApplicationController
       format.js { render "change_username_and_email"} if @errors
       format.js { render "username_email_result"}
     end
-  end
-
-  def edit
-  end
-
-  def update
-    @user.update_attributes(email_update_params)
   end
 
   def login_history
@@ -130,13 +111,5 @@ class UsersController < ApplicationController
 
   def set_user
     @user = User.find(params[:id])
-  end
-
-  def confirm_existing_password
-    return unless @user.valid_password? params[:user][:password]
-
-    flash[:error] = "That password does not match the one we have stored"
-    redirect_to personal_insured_families_path
-    false
   end
 end
