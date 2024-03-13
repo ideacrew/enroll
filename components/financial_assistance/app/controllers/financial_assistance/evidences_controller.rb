@@ -1,15 +1,16 @@
 # frozen_string_literal: true
 
 module FinancialAssistance
-  # controller for evidencces
+  # controller for evidences
   class EvidencesController < FinancialAssistance::ApplicationController
     include ApplicationHelper
     include VerificationHelper
 
     before_action :fetch_applicant
-    before_action :updateable?, :find_type
+    before_action :find_type
 
     def update_evidence
+      authorize @evidence, :update_evidence?
       update_reason = params[:verification_reason]
       admin_action = params[:admin_action]
       reasons_list = FinancialAssistance::Evidence::VERIFY_REASONS + FinancialAssistance::Evidence::REJECT_REASONS
@@ -17,7 +18,6 @@ module FinancialAssistance
         verification_result = admin_verification_action(admin_action, @evidence, update_reason)
         message = (verification_result.is_a? String) ? verification_result : "Verification successfully approved."
         flash[:success] = message
-        # update_documents_status(@applicant) if @applicant
       else
         flash[:error] = "Please provide a verification reason."
       end
@@ -26,6 +26,7 @@ module FinancialAssistance
     end
 
     def fdsh_hub_request
+      authorize @evidence, :fdsh_hub_request?
       result = @evidence.request_determination(params[:admin_action], "Requested Hub for verification", current_user.oim_id)
 
       if result
@@ -46,6 +47,7 @@ module FinancialAssistance
     end
 
     def extend_due_date
+      authorize @evidence, :extend_due_date?
       @family_member = FamilyMember.find(@evidence.evidenceable.family_member_id)
       enrollment = @family_member.family.enrollments.enrolled.first
       if enrollment.present? && @evidence.type_unverified?
@@ -62,23 +64,15 @@ module FinancialAssistance
 
     private
 
-    def updateable?
-      authorize ::Family, :updateable?
-    end
-
     def find_docs_owner
       @docs_owner = ::FinancialAssistance::Applicant.find(params[:applicant_id]) if params[:applicant_id]
     end
 
     def find_type
+      authorize @applicant, :edit?
       fetch_applicant
       find_docs_owner
       @evidence = @docs_owner.send(params[:evidence_kind]) if @docs_owner.respond_to?(params[:evidence_kind])
-    end
-
-    def update_documents_status(applicant)
-      family = applicant.family
-      family.update_family_document_status!
     end
 
     def fetch_applicant_succeeded?
@@ -100,7 +94,7 @@ module FinancialAssistance
                      FinancialAssistance::Applicant.find(session[:person_id])
                    end
 
-      redirect_to maain_app.logout_saml_index_path unless fetch_applicant_succeeded?
+      redirect_to logout_saml_index_path unless fetch_applicant_succeeded?
     end
   end
 end
