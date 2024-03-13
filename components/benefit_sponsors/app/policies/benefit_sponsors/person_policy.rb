@@ -22,7 +22,7 @@ module BenefitSponsors
     end
 
     def can_hbx_staff_modify?
-      role.is_a?(HbxStaffRole)
+      role.is_a?(HbxStaffRole) && role.permission.modify_family
     end
 
     def has_broker_role?
