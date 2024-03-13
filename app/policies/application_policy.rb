@@ -130,7 +130,6 @@ class ApplicationPolicy
   #
   # @return [Boolean] Returns true if the user is an admin in the individual market, false otherwise.
   def individual_market_admin?
-    hbx_role = account_holder_person&.hbx_staff_role
     return false if hbx_role.blank?
 
     permission = hbx_role.permission
@@ -178,13 +177,7 @@ class ApplicationPolicy
   #
   # @return [Boolean] Returns true if the account holder is an admin in the coverall market, false otherwise.
   def coverall_market_admin?
-    hbx_role = account_holder_person&.hbx_staff_role
-    return false if hbx_role.blank?
-
-    permission = hbx_role.permission
-    return false if permission.blank?
-
-    permission.modify_family
+    individual_market_admin?
   end
   #
   # END - Non-ACA Coverall Market related methods
