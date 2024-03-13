@@ -145,11 +145,11 @@ RSpec.describe PersonPolicy, type: :policy do
         family.reload
       end
 
-      it 'broker should be able to update' do
+      it 'broker agency staff role should be able to update' do
         expect(policy.can_update?).to be true
       end
 
-      it 'should return true when it matches broker agency profile' do
+      it 'broker agency staff role should return true when it matches broker agency profile' do
         expect(policy.matches_broker_agency_profile?(broker_agency_profile.id)).to eq true
       end
     end
