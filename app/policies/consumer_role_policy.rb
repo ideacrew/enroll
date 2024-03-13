@@ -31,6 +31,7 @@ class ConsumerRolePolicy < ApplicationPolicy
   def ridp_document_upload?
     return true if individual_market_non_ridp_primary_family_member?
     return true if individual_market_admin?
+    return true if active_associated_individual_market_family_broker_staff?
     return true if active_associated_individual_market_family_broker?
 
     false
@@ -44,6 +45,7 @@ class ConsumerRolePolicy < ApplicationPolicy
   def ridp_document_download?
     return true if individual_market_non_ridp_primary_family_member?
     return true if individual_market_admin?
+    return true if active_associated_individual_market_family_broker_staff?
     return true if active_associated_individual_market_family_broker?
 
     false
@@ -57,6 +59,7 @@ class ConsumerRolePolicy < ApplicationPolicy
   def ridp_document_delete?
     return true if individual_market_non_ridp_primary_family_member?
     return true if individual_market_admin?
+    return true if active_associated_individual_market_family_broker_staff?
     return true if active_associated_individual_market_family_broker?
 
     false
