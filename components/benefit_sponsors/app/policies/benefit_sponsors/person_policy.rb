@@ -11,16 +11,8 @@ module BenefitSponsors
       false
     end
 
-    def can_active_broker_staff_role_modify?
-      person = user&.person
-      return false unless person.active_broker_staff_roles.present?
-      person.active_broker_staff_roles.any? do |broker_staff_role|
-        record&.broker_role&.benefit_sponsors_broker_agency_profile_id == broker_staff_role.benefit_sponsors_broker_agency_profile_id
-      end
-    end
-
     def can_broker_modify?
-      (has_active_broker_role? || has_active_broker_agency_staff_role?) && matches_broker_agency_profile?(record&.broker_role&.benefit_sponsors_broker_agency_profile_id)
+      (has_broker_role? || has_active_broker_agency_staff_role?) && matches_broker_agency_profile?(record&.broker_role&.benefit_sponsors_broker_agency_profile_id)
     end
 
     def matches_broker_agency_profile?(broker_agency_profile_id)
@@ -33,7 +25,7 @@ module BenefitSponsors
       role.is_a?(HbxStaffRole)
     end
 
-    def has_active_broker_role?
+    def has_broker_role?
       role.is_a?(::BrokerRole)
     end
 
