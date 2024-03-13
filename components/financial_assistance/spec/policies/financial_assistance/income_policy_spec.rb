@@ -3,19 +3,13 @@
 require 'rails_helper'
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
-  RSpec.describe FinancialAssistance::DeductionPolicy, dbclean: :after_each, type: :model do
+  RSpec.describe FinancialAssistance::IncomePolicy, dbclean: :after_each, type: :model do
     subject { described_class }
 
     let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
     let(:consumer_role) { person.consumer_role }
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
     let(:primary_family_member) { family.primary_applicant }
-    let(:dependent_person) do
-      pr = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
-      person.ensure_relationship_with(pr, 'spouse')
-      pr
-    end
-    let(:dependent_member) { FactoryBot.create(:family_member, family: family, person: dependent_person) }
     let(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id) }
     let(:primary_applicant) do
       FactoryBot.create(
@@ -25,27 +19,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         person_hbx_id: person.hbx_id
       )
     end
-    let(:dependent_applicant) do
-      FactoryBot.create(
-        :financial_assistance_applicant,
-        application: application,
-        family_member_id: dependent_member.id,
-        person_hbx_id: dependent_person.hbx_id
-      )
-    end
-
-    let(:deduction) do
-      dependent_applicant.deductions.create(
-        {
-          title: 'Test Alimony paid',
-          kind: 'alimony_paid',
-          amount: 100.00,
-          start_on: TimeKeeper.date_of_record.beginning_of_month,
-          end_on: TimeKeeper.date_of_record.end_of_month,
-          frequency_kind: 'biweekly',
-          submitted_at: DateTime.now.in_time_zone('Eastern Time (US & Canada)')
-        }
-      )
+    let(:applicant_income) do
+      income = FactoryBot.build(:financial_assistance_income)
+      primary_applicant.incomes << income
+      income
     end
 
     before do
@@ -60,14 +37,14 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
           context 'with ridp verified' do
             it 'grants access' do
-              expect(subject).to permit(logged_in_user, deduction)
+              expect(subject).to permit(logged_in_user, applicant_income)
             end
           end
 
           context 'without ridp verified' do
             it 'denies access' do
               consumer_role.update_attributes(identity_validation: 'rejected')
-              expect(subject).not_to permit(logged_in_user, deduction)
+              expect(subject).not_to permit(logged_in_user, applicant_income)
             end
           end
         end
@@ -100,7 +77,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             let(:permission) { FactoryBot.create(:permission, :super_admin) }
 
             it 'grants access' do
-              expect(subject).to permit(logged_in_user, deduction)
+              expect(subject).to permit(logged_in_user, applicant_income)
             end
           end
 
@@ -108,7 +85,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             let(:permission) { FactoryBot.create(:permission, :developer) }
 
             it 'denies access' do
-              expect(subject).not_to permit(logged_in_user, deduction)
+              expect(subject).not_to permit(logged_in_user, applicant_income)
             end
           end
         end
@@ -159,7 +136,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               let(:baa_active) { true }
 
               it 'grants access' do
-                expect(subject).to permit(logged_in_user, deduction)
+                expect(subject).to permit(logged_in_user, applicant_income)
               end
             end
 
@@ -168,7 +145,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
               it 'denies access' do
                 consumer_role.update_attributes(identity_validation: 'na', application_validation: 'na')
-                expect(subject).not_to permit(logged_in_user, deduction)
+                expect(subject).not_to permit(logged_in_user, applicant_income)
               end
             end
           end
@@ -178,7 +155,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             let(:market_kind) { :shop }
 
             it 'denies access' do
-              expect(subject).not_to permit(logged_in_user, deduction)
+              expect(subject).not_to permit(logged_in_user, applicant_income)
             end
           end
 
@@ -186,7 +163,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             let(:baa_active) { false }
 
             it 'denies access' do
-              expect(subject).not_to permit(logged_in_user, deduction)
+              expect(subject).not_to permit(logged_in_user, applicant_income)
             end
           end
         end
@@ -198,71 +175,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         let(:logged_in_user) { no_role_user }
 
         it 'denies access' do
-          expect(subject).not_to permit(logged_in_user, deduction)
-        end
-      end
-    end
-
-    permissions :update? do
-      context 'when a valid user is logged in' do
-        context 'when the user is a consumer' do
-          let(:user_of_family) { FactoryBot.create(:user, person: person) }
-          let(:logged_in_user) { user_of_family }
-
-          context 'with ridp verified' do
-            it 'grants access' do
-              expect(subject).to permit(logged_in_user, deduction)
-            end
-          end
-
-          context 'without ridp verified' do
-            it 'denies access' do
-              consumer_role.update_attributes(identity_validation: 'rejected')
-              expect(subject).not_to permit(logged_in_user, deduction)
-            end
-          end
-        end
-      end
-
-      context 'when a valid user is not logged in' do
-        let(:no_role_person) { FactoryBot.create(:person) }
-        let(:no_role_user) { FactoryBot.create(:user, person: no_role_person) }
-        let(:logged_in_user) { no_role_user }
-
-        it 'denies access' do
-          expect(subject).not_to permit(logged_in_user, deduction)
-        end
-      end
-    end
-
-    permissions :destroy? do
-      context 'when a valid user is logged in' do
-        context 'when the user is a consumer' do
-          let(:user_of_family) { FactoryBot.create(:user, person: person) }
-          let(:logged_in_user) { user_of_family }
-
-          context 'with ridp verified' do
-            it 'grants access' do
-              expect(subject).to permit(logged_in_user, deduction)
-            end
-          end
-
-          context 'without ridp verified' do
-            it 'denies access' do
-              consumer_role.update_attributes(identity_validation: 'rejected')
-              expect(subject).not_to permit(logged_in_user, deduction)
-            end
-          end
-        end
-      end
-
-      context 'when a valid user is not logged in' do
-        let(:no_role_person) { FactoryBot.create(:person) }
-        let(:no_role_user) { FactoryBot.create(:user, person: no_role_person) }
-        let(:logged_in_user) { no_role_user }
-
-        it 'denies access' do
-          expect(subject).not_to permit(logged_in_user, deduction)
+          expect(subject).not_to permit(logged_in_user, applicant_income)
         end
       end
     end
