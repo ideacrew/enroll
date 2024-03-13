@@ -107,10 +107,15 @@ RSpec.describe PersonPolicy, type: :policy do
     end
   end
 
-  context 'with broker role' do
+  context 'with broker agency staff role' do
     let(:broker_agency_profile) do
       FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile)
     end
+
+    let(:broker_agency_profile_2) do
+      FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile)
+    end
+
     let(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: 'active')}
     let(:broker_user) {FactoryBot.create(:user, :person => broker_agency_staff_role.person, roles: ['broker_role'])}
     let(:broker_person) { broker_agency_staff_role.person }
@@ -132,7 +137,7 @@ RSpec.describe PersonPolicy, type: :policy do
 
     let(:policy){PersonPolicy.new(broker_user, person)}
 
-    context 'authorized broker' do
+    context 'authorized broker agency staff role' do
       before(:each) do
         family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
                                                                                             start_on: Time.now,
@@ -144,18 +149,22 @@ RSpec.describe PersonPolicy, type: :policy do
         expect(policy.can_update?).to be true
       end
 
-      it 'broker should be able to download document' do
-        expect(policy.can_broker_modify?).to be true
+      it 'should return true when it matches broker agency profile' do
+        expect(policy.matches_broker_agency_profile?(broker_agency_profile.id)).to eq true
       end
     end
 
-    context 'unauthorized broker' do
-      it 'broker should not be able to update' do
+    context 'unauthorized broker agency staff role' do
+      before do
+        broker_agency_staff_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_profile_2.id)
+      end
+
+      it 'broker agency staff role should not be able to update' do
         expect(policy.can_update?).to be false
       end
 
-      it 'broker should not be able to download document' do
-        expect(policy.can_broker_modify?).to be false
+      it 'broker agency staff role should return false when it does not matches broker agency profile' do
+        expect(policy.matches_broker_agency_profile?(broker_agency_profile.id)).to eq false
       end
     end
   end
