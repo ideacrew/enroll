@@ -33,7 +33,6 @@ module FinancialAssistance
     end
 
     def allowed_to_modify?
-      return false unless individual_market_role_identity_verified?
       return true if (current_user == associated_user)
       return false unless role.present?
       return can_hbx_staff_modify? if role.is_a?(HbxStaffRole)
@@ -41,16 +40,11 @@ module FinancialAssistance
       false
     end
 
-    def individual_market_role_identity_verified?
-      return true if (associated_person.resident_role || associated_person.consumer_role&.identity_verified?)
-      false
-    end
-
     def role_has_permission_to_access_applications?
       role.present? && (can_hbx_staff_modify? || can_broker_access?)
     end
 
-        # Checks if the broker agency profile ID of any of the roles
+    # Checks if the broker agency profile ID of any of the roles
     # matches the provided broker agency profile ID.
     #
     # @note The `role` can be a single broker role or multiple active broker agency staff roles.
