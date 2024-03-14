@@ -1,0 +1,37 @@
+name: Clean Document Buckets
+
+on:
+  workflow_dispatch:
+    inputs:
+      cleanup_branch_name:
+        description: Branch to clean
+        required: true
+        type: string
+
+jobs:
+  clean-document-buckets:
+    runs-on: ubuntu-latest
+    steps:
+      - id: check-permissions
+        continue-on-error: false
+        uses: prince-chrismc/check-actor-permissions-action@v3
+        with:
+          permission: admin
+      - name: Block Trunk Cleanup
+        uses: actions/github-script@v6
+        with:
+          script: |
+            if (core.getInput('cleanup_branch_name').toLowerCase() == 'trunk') {
+              core.error("Can't delete trunk.")
+            }
+      - name: Clean Documents
+        uses: vitorsgomes/s3-rm-action@master
+        with:
+          args: --recursive
+        env:
+          AWS_S3_BUCKET: ${{ secrets.YARD_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.IC_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.IC_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
+          PATH_TO_DELETE: ${{ github.event.inputs.cleanup_branch_name }}/
+        
