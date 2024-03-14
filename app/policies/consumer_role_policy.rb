@@ -28,6 +28,34 @@ class ConsumerRolePolicy < ApplicationPolicy
   # an active associated broker, or an admin in the individual market,
   #
   # @return [Boolean] Returns true if the user has permission to upload the document, false otherwise.
+  def verification_document_upload?
+    return true if individual_market_primary_family_member?
+    return true if individual_market_admin?
+    return true if active_associated_individual_market_ridp_verified_family_broker_staff?
+    return true if active_associated_individual_market_ridp_verified_family_broker?
+
+    false
+  end
+
+  # Determines if the current user has permission to download verification document.
+  # The user can download the document if they are a primary family member,
+  # an active associated broker, or an admin in the individual market,
+  #
+  # @return [Boolean] Returns true if the user has permission to download the document, false otherwise.
+  def verification_document_download?
+    return true if individual_market_primary_family_member?
+    return true if individual_market_admin?
+    return true if active_associated_individual_market_family_broker_staff?
+    return true if active_associated_individual_market_family_broker?
+
+    false
+  end
+
+  # Determines if the current user has permission to upload ridp document.
+  # The user can download the document if they are a primary family member,
+  # an active associated broker, or an admin in the individual market,
+  #
+  # @return [Boolean] Returns true if the user has permission to download the document, false otherwise.
   def ridp_document_upload?
     return true if individual_market_non_ridp_primary_family_member?
     return true if individual_market_admin?
@@ -36,6 +64,7 @@ class ConsumerRolePolicy < ApplicationPolicy
 
     false
   end
+
 
   # Determines if the current user has permission to download ridp document.
   # The user can download the document if they are a primary family member,
