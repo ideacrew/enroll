@@ -4,7 +4,8 @@ module BenefitSponsors
   module Organizations
     module OrganizationForms
       # this policy does the basic authentication for all StaffRoleForms
-      class StaffRoleFormPolicy < ApplicationPolicy
+      # specificity of parent of inherited class added to pass GHAs
+      class StaffRoleFormPolicy < BenefitSponsors::ApplicationPolicy
 
         attr_reader :service
 
@@ -35,7 +36,7 @@ module BenefitSponsors
         end
 
         def admin?
-          permission.modify_employer
+          permission&.modify_employer
         end
 
         def profile
