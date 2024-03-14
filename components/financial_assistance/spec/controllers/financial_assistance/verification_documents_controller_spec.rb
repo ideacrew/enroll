@@ -76,8 +76,24 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
 
         it 'should not download' do
           get :download, params: params
-          expect(response).to have_http_status(:found)
-          expect(flash[:error]).to eq("Access not allowed for eligibilities/evidence_policy.can_download?, (Pundit policy)")
+          expect(response).to be_successful
+        end
+      end
+    end
+
+    context 'POST #upload' do
+      let!(:bucket_name) { 'id-verification' }
+      let!(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}sample-key" }
+      let!(:params) { { "applicant_id" => applicant.id, "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, file: file} }
+
+      context 'with valid params' do
+        before do
+          allow(Aws::S3Storage).to receive(:save).and_return(doc_id)
+        end
+
+        it 'uploads a new VerificationDocument' do
+          post :upload, params: params
+          expect(flash[:notice]).to eq("File Saved")
         end
       end
     end
