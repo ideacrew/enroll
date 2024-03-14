@@ -12,7 +12,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
   before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
   before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
   before_action :redirect_unless_general_agency_is_enabled?, only: [:assign, :update_assign]
-  before_action :check_and_download_commission_statement, only: [:download_commission_statement, :show_commission_statement]
 
   layout 'single_column'
 
@@ -111,42 +110,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
       @primary_member_cache[pers.id] = pers
     end
     @draw = dt_query.draw
-  end
-
-  def commission_statements
-    permitted = params.permit(:id)
-    @id = permitted[:id]
-    if current_user.has_broker_role?
-      @broker_agency_profile = BrokerAgencyProfile.find(current_user.person.broker_role.broker_agency_profile_id)
-    elsif current_user.has_hbx_staff_role?
-      @broker_agency_profile = BrokerAgencyProfile.find(BSON::ObjectId.from_string(@id))
-    else
-      redirect_to new_broker_agencies_profile_path
-      return
-    end
-    documents = @broker_agency_profile.organization.documents
-    if documents
-      @statements = get_commission_statements(documents)
-    end
-    collect_and_sort_commission_statements
-    respond_to do |format|
-      format.js
-    end
-  end
-
-  def show_commission_statement
-    options={}
-    options[:filename] = @commission_statement.title
-    options[:type] = 'application/pdf'
-    options[:disposition] = 'inline'
-    send_data Aws::S3Storage.find(@commission_statement.identifier) , options
-  end
-
-  def download_commission_statement
-    options={}
-    options[:content_type] = @commission_statement.type
-    options[:filename] = @commission_statement.title
-    send_data Aws::S3Storage.find(@commission_statement.identifier) , options
   end
 
   def employers
@@ -275,18 +238,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @broker_agency_profile = current_user.person.broker_agency_staff_roles.first.broker_agency_profile
   end
 
-  def inbox
-    @sent_box = true
-    id = params["id"]||params['profile_id']
-    @broker_agency_provider = BrokerAgencyProfile.find(id)
-    @folder = (params[:folder] || 'Inbox').capitalize
-    if current_user.person._id.to_s == id
-      @provider = current_user.person
-    else
-      @provider = @broker_agency_provider
-    end
-  end
-
   def redirect_to_show(broker_agency_profile_id)
     redirect_to broker_agencies_profile_path(id: broker_agency_profile_id)
   end
@@ -324,23 +275,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
       params[:organization][:office_locations_attributes].delete(key) unless location['address_attributes']
       location.delete('phone_attributes') if (location['phone_attributes'].present? && location['phone_attributes']['number'].blank?)
     end
-  end
-
-  def check_and_download_commission_statement
-      @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
-      authorize @broker_agency_profile, :access_to_broker_agency_profile?
-      @commission_statement = @broker_agency_profile.organization.documents.find(params[:statement_id])
-  end
-
-  def get_commission_statements(documents)
-    commission_statements = []
-    documents.each do |document|
-      # grab only documents that are commission statements by checking the bucket in which they are placed
-      if document.identifier.include?("commission-statements")
-        commission_statements << document
-      end
-    end
-    commission_statements
   end
 
   def collect_and_sort_commission_statements(sort_order='ASC')
