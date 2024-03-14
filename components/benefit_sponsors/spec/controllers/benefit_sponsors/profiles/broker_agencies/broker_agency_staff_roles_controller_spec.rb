@@ -243,7 +243,7 @@ module BenefitSponsors
           end
 
           it "should get an notice" do
-            expect(flash[:notice]).to match 'Role approved successfully'
+            expect(flash[:notice]).to eq 'Role approved successfully'
           end
 
           it "should update broker_agency_staff_role aasm_state to active" do
@@ -313,7 +313,7 @@ module BenefitSponsors
         end
 
         it "should display a flash error" do
-          expect(flash[:error]).to match 'Please contact HBX Admin to report this error'
+          expect(flash[:error]).to eq 'Please contact HBX Admin to report this error'
         end
       end
     end
@@ -346,7 +346,7 @@ module BenefitSponsors
           end
 
           it "should get an notice" do
-            expect(flash[:notice]).to match 'Role removed successfully'
+            expect(flash[:notice]).to eq 'Role removed successfully'
           end
 
           it "should update broker_staff_role aasm_state to broker_agency_terminated" do
@@ -587,7 +587,7 @@ module BenefitSponsors
           end
   
           it "should get a notice" do
-            expect(flash[:notice]).to match 'Role approved successfully'
+            expect(flash[:notice]).to eq 'Role approved successfully'
           end
   
           it "should update broker_agency_staff_role aasm_state to active" do
@@ -617,7 +617,7 @@ module BenefitSponsors
           end
   
           it "should get an notice" do
-            expect(flash[:notice]).to match 'Role removed successfully'
+            expect(flash[:notice]).to eq 'Role removed successfully'
           end
   
           it "should update broker_staff_role aasm_state to broker_agency_terminated" do
