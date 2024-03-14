@@ -78,13 +78,16 @@ module BenefitSponsors
 
         # NOTE: this will probably be consolidated with a similarily named method in BrokerAgencyProfilesController
         def find_and_authorize_broker_agency_profile
-          # if profile_type is in the params with a value of 'broker_agency', this is actually an entirely different page
-          # where a broker/agent (or aspiring broker/agent) can find agencies and send out an application
-          # if not, profile_id must be present and this will render a small form on the broker homepage to add a new staff role to the broker
-          return true if params[:profile_type] && params[:profile_type] == 'broker_agency'
-
+          
           # the #new action is missing profile_id from broker_staff_params, hence this conditional
           profile_id = broker_staff_params[:profile_id] || params[:profile_id]
+
+          # if profile_id is nil, this will render an entirely different page
+          # where a broker/agent (or aspiring broker/agent) can find agencies and send out an application
+          # if not, profile_id must be present and this will render a small form on the broker homepage to add a new staff role to the broker
+          # the latter must be authorized, but not the former
+          return true unless profile_id
+
           organizations = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId(profile_id))
 
           broker_agency_profile = organizations&.first&.broker_agency_profile
