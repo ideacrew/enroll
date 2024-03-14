@@ -93,14 +93,14 @@ module BrokerAgencyWorld
 
   def broker_agency_profile_with_organization(*traits)
     attributes = traits.extract_options!
-    @broker_agency_profile ||= FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, *traits, attributes)
+    @broker_agency_profile_with_organization ||= FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, *traits, attributes)
   end
 end
 
 World(BrokerAgencyWorld)
 
 Given(/^an individual market broker exists$/) do
-  broker_agency_profile_with_organization market_kind: :individual
+  @broker_agency_profile = broker_agency_profile_with_organization market_kind: :individual
   broker :with_family, :broker_with_person, organization: @broker_agency_profile.organization
 end
 
