@@ -24,13 +24,6 @@ module BenefitSponsors
         access_to_broker_agency_profile?
       end
 
-      def can_search_broker_agencies?
-        return true if hbx_staff_can_view_agency_staff?
-        return true if is_associated_with_broker_agency?
-
-        false
-      end
-
       def can_view_broker_agency?
         return true if hbx_staff_can_view_agency_staff?
         return true if has_matching_broker_role?
@@ -70,10 +63,6 @@ module BenefitSponsors
       # NOTE: the following methods or some variation thereof will hopefully appear in ApplicationPolicy
       # they will be deleted from this policy if present in the ApplicationPolicy of the main application
       ################################################################################################################
-
-      def is_broker_or_broker_agency_staff?
-        account_holder_person&.broker_role || account_holder_person&.broker_agency_staff_roles&.present?
-      end
 
       def hbx_staff_can_view_agency_staff?
         permission&.view_agency_staff

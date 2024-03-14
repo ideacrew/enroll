@@ -7,9 +7,6 @@ module BenefitSponsors
       class BrokerAgencyStaffRolesController < ::BenefitSponsors::ApplicationController
         before_action :find_and_authorize_broker_agency_profile, except: :search_broker_agency
 
-        # search_broker_agency is a generic endpoint used to search across all agencies, only prereqs are being an admin or a broker/agent
-        before_action :is_broker_or_admin?, only: :search_broker_agency
-
         def new
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_new
           set_ie_flash_by_announcement
@@ -91,11 +88,6 @@ module BenefitSponsors
 
           broker_agency_profile = organizations&.first&.broker_agency_profile
           authorize broker_agency_profile, :can_manage_broker_agency?
-        end
-
-        def is_broker_or_admin?
-          # agency profile record is not required for this auth method
-          authorize BenefitSponsors::Organizations::BrokerAgencyProfile, :can_search_broker_agencies?
         end
 
         def broker_staff_params
