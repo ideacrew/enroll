@@ -95,7 +95,8 @@ class HbxProfilePolicy < ApplicationPolicy
   def assister_index?
     return true if individual_market_primary_family_member?
     return true if individual_market_admin?
-    return true if active_associated_individual_market_family_broker?
+    return true if active_associated_individual_market_ridp_verified_family_broker_staff?
+    return true if active_associated_individual_market_ridp_verified_family_broker?
 
     return true if shop_market_primary_family_member?
     return true if shop_market_admin?
