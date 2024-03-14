@@ -45,6 +45,7 @@ class FamilyPolicy < ApplicationPolicy
   # @return [Boolean] Returns true if the user has permission to view the record, false otherwise.
   def show?
     return true if individual_market_primary_family_member?
+    return true if active_associated_individual_market_ridp_verified_family_broker_staff?
     return true if active_associated_individual_market_ridp_verified_family_broker?
     return true if individual_market_admin?
 
