@@ -3,7 +3,7 @@
 module BenefitSponsors
   module Profiles
     module BrokerAgencies
-      # controller that manages adding, approving and removing of staff agency roles to a broker
+      # controller that manages adding, approving and removing of staff agency roles to a broker agency profile
       class BrokerAgencyStaffRolesController < ::BenefitSponsors::ApplicationController
         before_action :find_and_authorize_broker_agency_profile, except: :search_broker_agency
 
