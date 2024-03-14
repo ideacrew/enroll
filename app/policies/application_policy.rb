@@ -433,6 +433,10 @@ class ApplicationPolicy
     permission&.can_update_ssn
   end
 
+  def staff_can_list_enrollments?
+    permission&.list_enrollments
+  end
+
   def permission
     return @permission if defined? @permission
 

@@ -81,10 +81,7 @@ class HbxProfilePolicy < ApplicationPolicy
   end
 
   def index?
-    return true if individual_market_admin?
-    return true if shop_market_admin?
-
-    false
+    hbx_role.present?
   end
 
   def staff_index?
@@ -132,7 +129,7 @@ class HbxProfilePolicy < ApplicationPolicy
   end
 
   def identity_verification?
-    index?
+    staff_can_access_identity_verification_sub_tab?
   end
 
   def user_account_index?
@@ -140,7 +137,7 @@ class HbxProfilePolicy < ApplicationPolicy
   end
 
   def outstanding_verification_dt?
-    index?
+    staff_can_access_outstanding_verification_sub_tab?
   end
 
   def hide_form?
@@ -218,7 +215,7 @@ class HbxProfilePolicy < ApplicationPolicy
   end
 
   def view_terminated_hbx_enrollments?
-    index?
+    staff_can_list_enrollments?
   end
 
   def reinstate_enrollment?
@@ -262,7 +259,7 @@ class HbxProfilePolicy < ApplicationPolicy
   end
 
   def aptc_csr_family_index?
-    index?
+    individual_market_admin?
   end
 
   def update_setting?

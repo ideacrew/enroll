@@ -1085,7 +1085,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     let(:staff_person) { double('Person', hbx_staff_role: hbx_staff_role) }
     let(:hbx_staff_role) { double('HbxStaffRole', permission: permission)}
-    let(:permission) { double('Permission', modify_family: true)}
+    let(:permission) { double('Permission', list_enrollments: true)}
 
     before do
       allow(EnrollRegistry[:change_end_date].feature.settings.last).to receive(:item).and_return(true)
