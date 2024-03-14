@@ -240,7 +240,7 @@ Rails.application.routes.draw do
     end
 
     resources :broker_applicants
-    resources :security_questions
+    resources :security_questions, only: [:index, :new, :create, :edit, :update, :destroy]
 
     # get 'hbx_profiles', to: 'hbx_profiles#welcome'
     # get 'hbx_profiles/:id', to: 'hbx_profiles#show', as: "my_account"
