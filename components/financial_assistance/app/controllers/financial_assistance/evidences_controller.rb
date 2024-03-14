@@ -94,7 +94,7 @@ module FinancialAssistance
                      FinancialAssistance::Applicant.find(session[:person_id])
                    end
 
-      redirect_to logout_saml_index_path unless fetch_applicant_succeeded?
+      redirect_to main_app.logout_saml_index_path unless fetch_applicant_succeeded?
     end
   end
 end

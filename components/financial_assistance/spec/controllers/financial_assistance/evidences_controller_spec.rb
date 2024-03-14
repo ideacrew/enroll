@@ -3,15 +3,72 @@
 require 'rails_helper'
 
 RSpec.describe FinancialAssistance::EvidencesController, dbclean: :after_each, type: :controller do
+  include Dry::Monads[:result, :do]
   routes { FinancialAssistance::Engine.routes }
-  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
-  let(:mock_consumer_role) { instance_double("ConsumerRole", id: "test") }
-  let!(:user) { FactoryBot.create(:user, :person => person) }
-  let(:family_id) { BSON::ObjectId.new }
-  let(:family_member_id) { BSON::ObjectId.new }
-  let!(:application) { FactoryBot.create(:application, family_id: family_id, aasm_state: 'draft',effective_date: TimeKeeper.date_of_record) }
-  let!(:applicant) { FactoryBot.create(:applicant, application: application,family_member_id: family_member_id) }
-  let(:evidence) do
+
+  let!(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+  let!(:admin_user) {FactoryBot.create(:user, :with_hbx_staff_role, :person => admin_person)}
+  let!(:permission) { FactoryBot.create(:permission, :super_admin) }
+  let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
+
+  let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
+  let!(:associated_user) {FactoryBot.create(:user, :person => person)}
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+  let!(:family_member) { family.family_members.first }
+
+  let(:market_kind) { :both }
+  let(:broker_person) { FactoryBot.create(:person) }
+  let(:broker_role) { FactoryBot.create(:broker_role, person: broker_person) }
+  let(:broker_user) { FactoryBot.create(:user, person: broker_person) }
+
+  let(:site) do
+    FactoryBot.create(
+      :benefit_sponsors_site,
+      :with_benefit_market,
+      :as_hbx_profile,
+      site_key: ::EnrollRegistry[:enroll_app].settings(:site_key).item
+    )
+  end
+
+  let(:broker_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+  let(:broker_agency_profile) { broker_agency_organization.broker_agency_profile }
+  let(:broker_agency_id) { broker_agency_profile.id }
+
+  let(:broker_agency_account) do
+    family.broker_agency_accounts.create!(
+      benefit_sponsors_broker_agency_profile_id: broker_agency_id,
+      writing_agent_id: broker_role.id,
+      is_active: baa_active,
+      start_on: TimeKeeper.date_of_record
+    )
+  end
+
+  let!(:application) do
+    FactoryBot.create(
+      :application,
+      family_id: family.id,
+      aasm_state: 'determined',
+      assistance_year: TimeKeeper.date_of_record.year,
+      effective_date: Date.today
+    )
+  end
+
+  let!(:applicant) do
+    applicant = FactoryBot.create(:financial_assistance_applicant,
+                                  application: application,
+                                  is_primary_applicant: true,
+                                  ssn: person.ssn,
+                                  dob: person.dob,
+                                  first_name: person.first_name,
+                                  last_name: person.last_name,
+                                  gender: person.gender,
+                                  person_hbx_id: person.hbx_id,
+                                  family_member_id: family_member.id)
+    applicant
+  end
+
+  let(:enrollment) { instance_double(HbxEnrollment) }
+  let!(:evidence) do
     applicant.create_income_evidence(
       key: :income,
       title: 'Income',
@@ -21,185 +78,223 @@ RSpec.describe FinancialAssistance::EvidencesController, dbclean: :after_each, t
       is_satisfied: true
     )
   end
-  let!(:params) { { "applicant_id" => applicant.id, "application_id" => application.id, "evidence_kind" => evidence, "admin_action" => 'verify' } }
-
+  let!(:params) { { "applicant_id" => applicant.id, "application_id" => application.id, "verification_reason" => "Expired", "evidence_kind" => "income_evidence", "admin_action" => 'verify' } }
+  let!(:params_minus_update_reason) { { "applicant_id" => applicant.id, "application_id" => application.id, "evidence_kind" => "income_evidence", "admin_action" => 'verify', "verification_reason" => '' } }
   before do
-    sign_in(user)
-    allow(controller).to receive(:authorize).and_return(true)
-    allow(controller).to receive(:current_user).and_return(user)
+    person.consumer_role.move_identity_documents_to_verified
+    sign_in(associated_user)
+    #allow(controller).to receive(:current_user).and_return(associated_user)
   end
 
-  describe 'GET #update_evidence' do
-    before do
-      allow(FinancialAssistance::Evidence).to receive(:find).and_return(evidence)
-    end
+  context 'admin user' do
+    describe 'GET #update_evidence' do
+      context 'when update reason is included in reasons list' do
+        before do
+          get :update_evidence, params: params
+        end
 
-    context 'when update reason is included in reasons list' do
-      before do
-        get :update_evidence, params: params
+        it 'sets a success flash message and redirects' do
+          expect(flash[:success]).to be_present
+          expect(response).to redirect_to main_app.verification_insured_families_path
+        end
       end
 
-      it 'sets a success flash message' do
-        expect(flash[:success]).to be_present
-      end
+      context 'when update reason is not included in reasons list' do
+        before do
+          get :update_evidence, params: params_minus_update_reason
+        end
 
-      it 'redirects to verification_insured_families_path' do
-        expect(response).to redirect_to verification_insured_families_path
-      end
-    end
-
-    context 'when update reason is not included in reasons list' do
-      before do
-        get :update_evidence, params: params
-      end
-
-      it 'sets an error flash message' do
-        expect(flash[:error]).to eq 'Please provide a verification reason.'
-      end
-
-      it 'redirects to verification_insured_families_path' do
-        expect(response).to redirect_to verification_insured_families_path
+        it 'sets an error flash message and redirects' do
+          expect(flash[:error]).to eq 'Please provide a verification reason.'
+          expect(response).to redirect_to main_app.verification_insured_families_path
+        end
       end
     end
-  end
 
-  describe 'GET #fdsh_hub_request' do
-    context 'when the request determination is successful' do
+    describe 'POST #fdsh_hub_request' do
+      #consumer and broker negative examples for this test
+      let (:request_double) { double }
       before do
-        allow(FinancialAssistance::Evidence).to receive(:find).and_return(evidence)
+        sign_in(admin_user)
+      end
+      context 'when the request determination is successful' do
+        before do
+          allow(Operations::Fdsh::RequestEvidenceDetermination).to receive(:new).and_return(request_double)
+          allow(request_double).to receive(:call).with(evidence).and_return(Success())
+          post :fdsh_hub_request, params: params
+        end
+
+        it 'sets a success flash message and redirects' do
+          expect(flash[:success]).to eq 'request submitted successfully'
+          expect(response).to redirect_to main_app.verification_insured_families_path
+        end
+      end
+
+      context 'when the request determination is not successful' do
+        before do
+          allow(Operations::Fdsh::RequestEvidenceDetermination).to receive(:new).and_return(request_double)
+          allow(request_double).to receive(:call).with(evidence).and_return(Failure())
+          post :fdsh_hub_request, params: params
+        end
+
+        it 'sets an error flash message and redirects' do
+          expect(flash[:error]).to eq 'unable to submit request'
+          expect(response).to redirect_to main_app.verification_insured_families_path
+        end
+      end
+    end
+
+    describe 'PUT #extend_due_date' do
+      before do
+        allow(FamilyMember).to receive(:find).and_return(family_member)
+        allow(family_member).to receive_message_chain(:family, :enrollments, :enrolled, :first).and_return(enrollment)
+      end
+
+      context 'when the evidence is type unverified and enrollment is present' do
+        before do
+          allow(evidence).to receive(:type_unverified?).and_return(true)
+          allow(evidence).to receive(:extend_due_on).and_return(true)
+        end
+
+        it 'extends the due date and sets a success flash message' do
+          put :extend_due_date, params: params
+          expect(flash[:success]).to eq("#{evidence.title} verification due date was extended for 30 days.")
+        end
+      end
+
+      context 'when the evidence is not type unverified or enrollment is not present' do
+        before do
+          allow(evidence).to receive(:type_unverified?).and_return(false)
+        end
+
+        it 'sets a danger flash message' do
+          put :extend_due_date, params: params
+          expect(flash[:danger]).to eq("Applicant doesn't have active Enrollment to extend verification due date.")
+        end
+      end
+
+      context 'when extending the due date fails' do
+        before do
+          allow(evidence).to receive(:type_unverified?).and_return(true)
+          allow(evidence).to receive(:extend_due_on).and_return(false)
+        end
+
+        it 'sets a danger flash message' do
+          put :extend_due_date, params: params
+          expect(flash[:danger]).to eq("Unable to extend due date")
+        end
+      end
+    end
+
+    describe '#find_docs_owner' do
+      context 'when applicant_id is provided' do
+        before do
+          allow(::FinancialAssistance::Applicant).to receive(:find).with(applicant.id.to_s).and_return(applicant)
+          controller.params = { applicant_id: applicant.id.to_s }
+          controller.send(:find_docs_owner)
+        end
+
+        it 'finds the applicant' do
+          expect(controller.instance_variable_get(:@docs_owner)).to eq(applicant)
+        end
+      end
+
+      context 'when applicant_id is not provided' do
+        before do
+          controller.params = {}
+          controller.send(:find_docs_owner)
+        end
+
+        it 'does not find an applicant' do
+          expect(controller.instance_variable_get(:@docs_owner)).to be_nil
+        end
+      end
+    end
+
+    describe '#find_type' do
+      before do
+        allow(controller).to receive(:fetch_applicant)
+        allow(controller).to receive(:find_docs_owner).and_return(applicant)
+        allow(controller).to receive(:authorize)
+        allow(controller).to receive(:params).and_return({ evidence_kind: 'Income' })
         allow(evidence).to receive(:request_determination).and_return(true)
-        get :fdsh_hub_request, params: params
+        allow_any_instance_of(ApplicationPolicy).to receive(:edit?).and_return(true)
       end
 
-      it 'sets a success flash message' do
-        expect(flash[:success]).to eq 'request submitted successfully'
+      context 'when docs_owner responds to evidence_kind' do
+        before do
+          allow(applicant).to receive(:respond_to?).with('Income').and_return(true)
+        end
+
+        it 'assigns the evidence' do
+          controller.send(:find_type)
+          expect(assigns(:evidence)).to eq(applicant.evidences.first)
+        end
       end
 
-      it 'redirects to verification_insured_families_path' do
-        expect(response).to redirect_to verification_insured_families_path
-      end
-    end
+      context 'when docs_owner does not respond to evidence_kind' do
+        before do
+          allow(applicant).to receive(:respond_to?).with('Income').and_return(false)
+        end
 
-    context 'when the request determination is not successful' do
-      before do
-        allow(evidence).to receive(:request_determination).and_return(false)
-        allow(controller).to receive(:current_user).and_return(user)
-        get :fdsh_hub_request, params: params
-      end
-
-      it 'sets an error flash message' do
-        expect(flash[:error]).to eq 'unable to submit request'
-      end
-
-      it 'redirects to verification_insured_families_path' do
-        expect(response).to redirect_to verification_insured_families_path
-      end
-    end
-  end
-
-  context 'extend_due_date' do
-    it "" do
-
-    end
-  end
-
-  describe '#find_docs_owner' do
-    context 'when applicant_id is provided' do
-      before do
-        allow(::FinancialAssistance::Applicant).to receive(:find).with(applicant.id.to_s).and_return(applicant)
-        controller.params = { applicant_id: applicant.id.to_s }
-        controller.send(:find_docs_owner)
-      end
-
-      it 'finds the applicant' do
-        expect(controller.instance_variable_get(:@docs_owner)).to eq(applicant)
+        it 'does not assign the evidence' do
+          controller.send(:find_type)
+          expect(assigns(:evidence)).to be_nil
+        end
       end
     end
 
-    context 'when applicant_id is not provided' do
-      before do
-        controller.params = {}
-        controller.send(:find_docs_owner)
+    describe '#fetch_applicant_succeeded?' do
+      context 'when @applicant is present' do
+        before do
+          controller.instance_variable_set(:@applicant, applicant)
+        end
+
+        it 'returns true' do
+          expect(controller.send(:fetch_applicant_succeeded?)).to eq(true)
+        end
       end
 
-      it 'does not find an applicant' do
-        expect(controller.instance_variable_get(:@docs_owner)).to be_nil
-      end
-    end
-  end
+      context 'when @applicant is not present' do
+        before do
+          controller.instance_variable_set(:@applicant, nil)
+        end
 
-  describe '#find_type' do
-    before do
-      allow(controller).to receive(:current_user).and_return(user)
-      allow(controller).to receive(:fetch_applicant).and_return(applicant)
-      allow(controller).to receive(:find_docs_owner).and_return(evidence)
-      allow(controller).to receive(:params).and_return({ evidence_kind: 'evidence' })
-      allow_any_instance_of(ApplicationPolicy).to receive(:edit?).and_return(true)
-    end
-
-    context 'when the applicant is authorized' do
-      it 'assigns the correct evidence' do
-        get :fdsh_hub_request, params: params
-        expect(assigns(:evidence)).to eq(applicant.some_kind)
+        it 'logs an error and returns false' do
+          expect(controller).to receive(:log).with(hash_including(message: 'Application Exception - applicant required'), severity: 'error')
+          expect(controller.send(:fetch_applicant_succeeded?)).to eq(false)
+        end
       end
     end
 
-    context 'when the applicant is not authorized' do
-      before do
-        # This simulates the applicant not being authorized
-        allow_any_instance_of(ApplicationPolicy).to receive(:edit?).and_return(false)
+    describe '#fetch_applicant' do
+      context 'when applicant_id is present in params' do
+        it 'assigns the applicant' do
+          get :fdsh_hub_request, params: params
+          expect(assigns(:applicant)).to eq(applicant)
+        end
       end
 
-      it 'raises a Pundit::NotAuthorizedError' do
-        expect { get :fdsh_hub_request, params: params }.to raise_error(Pundit::NotAuthorizedError)
+      context 'when current user is an agent and person_id is in session' do
+        before do
+          session[:person_id] = applicant.id
+        end
+
+        it 'assigns the applicant' do
+          get :fdsh_hub_request, params: params
+          expect(assigns(:applicant)).to eq(applicant)
+        end
       end
     end
   end
 
-  describe '#fetch_applicant_succeeded?' do
-    context 'when @applicant is present' do
-      before do
-        controller.instance_variable_set(:@applicant, applicant)
-      end
-
-      it 'returns true' do
-        expect(controller.send(:fetch_applicant_succeeded?)).to eq(true)
-      end
-    end
-
-    context 'when @applicant is not present' do
-      before do
-        controller.instance_variable_set(:@applicant, nil)
-      end
-
-      it 'logs an error and returns false' do
-        expect(controller).to receive(:log).with(hash_including(message: 'Application Exception - applicant required'), severity: 'error')
-        expect(controller.send(:fetch_applicant_succeeded?)).to eq(false)
-      end
-    end
+  context 'consumer user' do
   end
 
-  describe '#fetch_applicant' do
-    before do
-      allow(controller).to receive(:current_user).and_return(user)
-    end
-
-    context 'when applicant_id is present in params' do
-      it 'assigns the applicant' do
-        get :fdsh_hub_request, params: params
-        expect(assigns(:applicant)).to eq(applicant)
-      end
-    end
-
-    context 'when current user is an agent and person_id is in session' do
-      before do
-        session[:person_id] = applicant.id
-      end
-
-      it 'assigns the applicant' do
-        get :fdsh_hub_request, params: params
-        expect(assigns(:applicant)).to eq(applicant)
-      end
-    end
+  context 'broker user' do
   end
+end
+
+def main_app
+  Rails.application.class.routes.url_helpers
 end
