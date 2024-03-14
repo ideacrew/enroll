@@ -265,19 +265,6 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
   end
 
-  describe "#check_hbx_staff_role" do
-    let(:user) { double("user", person: person)}
-    let(:person) { double("person", agent?: true)}
-
-    it "should render the new template" do
-      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
-      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
-      sign_in(user)
-      get :new
-      expect(response).to have_http_status(:redirect)
-    end
-  end
-
   describe "#view_the_configuration_tab?" do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
     let(:user_2) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
@@ -339,6 +326,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     it "should not allow super admin to time travel" do
       allow(admin_permission).to receive(:view_the_configuration_tab).and_return(true)
       allow(staff_permission).to receive(:view_the_configuration_tab).and_return(true)
+      allow(staff_permission).to receive(:modify_admin_tabs).and_return(true)
       allow(hbx_staff_role).to receive(:permission).and_return(staff_permission)
       allow(hbx_staff_role).to receive(:view_the_configuration_tab).and_return(true)
       allow(hbx_staff_role).to receive(:subrole).and_return(staff_permission.name)
@@ -396,6 +384,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:employer_profile) { double("EmployerProfile", id: double("id"))}
     let(:organization){ Organization.new }
     let(:hbx_enrollment) { FactoryBot.build_stubbed :hbx_enrollment }
+    let(:permission) { double('Permission', modify_employer: true)}
 
     before :each do
       allow(user).to receive(:person).and_return(person)
@@ -509,32 +498,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
   end
 
-  describe "GET employer index" do
-    let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
-    let(:person) { double("person", agent?: true)}
-    let(:hbx_staff_role) { double("hbx_staff_role")}
-    let(:hbx_profile) { double("hbx_profile")}
-
-    before :each do
-      allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
-      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
-      allow(user).to receive(:person).and_return(person)
-      allow(person).to receive(:hbx_staff_role).and_return(hbx_staff_role)
-      expect(controller).to receive(:find_hbx_profile)
-      allow(hbx_staff_role).to receive(:hbx_profile).and_return(hbx_profile)
-      sign_in(user)
-      get :employer_index
-    end
-
-    it "renders the 'employer index' template" do
-      expect(response).to have_http_status(:success)
-      expect(response).to render_template("employers/employer_profiles/index")
-    end
-  end
-
   describe "GET family index" do
     let(:user) { double("User")}
-    let(:person) { double("person", agent?: true, hbx_staff_role: hbx_staff_role)}
     let(:hbx_profile) { double("hbx_profile")}
     let(:csr_role) { double("csr_role", cac: false)}
     before :each do
@@ -543,32 +508,34 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       sign_in(user)
     end
 
-    it "renders the 'families index' template for hbx_staff" do
-      allow(user).to receive(:has_hbx_staff_role?).and_return(true)
-      get :family_index
-      expect(response).to have_http_status(:success)
-      expect(response).to render_template("insured/families/index")
+    context 'with staff role' do
+      let(:person) { double("person", agent?: true, hbx_staff_role: hbx_staff_role)}
+
+      it "renders the 'families index' template for hbx_staff" do
+        allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+        get :family_index
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("insured/families/index")
+      end
     end
 
-    it "renders the 'families index' template for csr" do
-      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
-      get :family_index
-      expect(response).to have_http_status(:success)
-      expect(response).to render_template("insured/families/index")
-    end
+    context 'without staff role' do
+      let(:person) { double("person", agent?: true, hbx_staff_role: nil)}
 
-    it "redirects if not csr or hbx_staff 'families index' template for hbx_staff" do
-      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
-      allow(person).to receive(:csr_role).and_return(false)
-      get :family_index
-      expect(response).to redirect_to(root_url)
-    end
+      it "redirects if not csr or hbx_staff 'families index' template for hbx_staff" do
+        allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+        allow(person).to receive(:csr_role).and_return(double("csr_role", cac: false))
+        get :family_index
+        expect(response).to redirect_to(root_url)
+      end
 
-    it "redirects if not csr or hbx_staff 'families index' template for hbx_staff" do
-      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
-      allow(person).to receive(:csr_role).and_return(double("csr_role", cac: true))
-      get :family_index
-      expect(response).to redirect_to(root_url)
+      it "redirects if not csr or hbx_staff 'families index' template for hbx_staff" do
+        allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+        allow(person).to receive(:csr_role).and_return(double("csr_role", cac: true))
+        get :family_index
+        expect(response).to have_http_status(:success)
+        expect(response).to render_template("insured/families/index")
+      end
     end
   end
 
@@ -716,7 +683,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe 'POST create_eligibility' do
     let(:person) { FactoryBot.create(:person, :with_family) }
-    let(:user) { double("user", person: person, :has_hbx_staff_role? => true) }
+    let(:user) { double("user", :has_hbx_staff_role? => true) }
     let!(:hbx_profile) { FactoryBot.create(:hbx_profile) }
     let(:max_aptc) { 12 }
     let(:csr) { 100 }
@@ -737,6 +704,14 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         "jq_datepicker_ignore_person" => { "effective_date" => "04/13/2018" },
         format: 'js'
       }}
+    end
+
+    let(:staff_person) { double('Person', hbx_staff_role: hbx_staff_role) }
+    let(:hbx_staff_role) { double('HbxStaffRole', permission: permission)}
+    let(:permission) { double('Permission', can_add_pdc: true)}
+
+    before do
+      allow(user).to receive(:person).and_return staff_person
     end
 
     it "should render create_eligibility if save successful" do
@@ -836,7 +811,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   describe 'POST create_send_secure_message, :dbclean => :after_each' do
     render_views
 
-    let(:person) { FactoryBot.create(:person, :with_family, hbx_staff_role: hbx_staff_role) }
+    let(:person) { FactoryBot.create(:person, :with_family) }
     let(:permission) { double('Permission', can_send_secure_message: true)}
     let(:user) { double("user", person: person, :has_hbx_staff_role? => true) }
     let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, EnrollRegistry[:enroll_app].setting(:site_key).item) }
@@ -849,6 +824,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:invalid_params) {{resource_id: employer_profile.id, subject: '', body: '', actions_id: '1234', resource_name: employer_profile.class.to_s}}
 
     before do
+      allow(person).to receive(:hbx_staff_role).and_return hbx_staff_role
       sign_in(user)
     end
 
@@ -1040,8 +1016,13 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "GET general_agency_index" do
     let(:user) { FactoryBot.create(:user, roles: ["hbx_staff"]) }
+    let(:staff_person) { double('Person', hbx_staff_role: hbx_staff_role, agent?: true) }
+    let(:hbx_staff_role) { double('HbxStaffRole', permission: permission)}
+    let(:permission) { double('Permission', modify_family: true)}
+
     before :each do
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(user).to receive(:person).and_return staff_person
       sign_in user
     end
 
@@ -1102,9 +1083,14 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         format: 'js' }
     end
 
+    let(:staff_person) { double('Person', hbx_staff_role: hbx_staff_role) }
+    let(:hbx_staff_role) { double('HbxStaffRole', permission: permission)}
+    let(:permission) { double('Permission', modify_family: true)}
+
     before do
       allow(EnrollRegistry[:change_end_date].feature.settings.last).to receive(:item).and_return(true)
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(user).to receive(:person).and_return staff_person
       sign_in(user)
     end
 
@@ -1132,8 +1118,12 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
                         aasm_state: 'coverage_termination_pending')
     end
 
+    let(:staff_person) { double('Person', hbx_staff_role: hbx_staff_role) }
+    let(:hbx_staff_role) { double('HbxStaffRole', permission: permission)}
+    let(:permission) { double('Permission', can_reinstate_enrollment: true) }
     before :each do
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(user).to receive(:person).and_return staff_person
       sign_in user
     end
 
@@ -1209,8 +1199,13 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
                         aasm_state: 'coverage_terminated')
     end
 
+    let(:staff_person) { double('Person', hbx_staff_role: hbx_staff_role) }
+    let(:hbx_staff_role) { double('HbxStaffRole', permission: permission)}
+    let(:permission) { double('Permission', change_enrollment_end_date: true) }
+
     before :each do
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(user).to receive(:person).and_return staff_person
       sign_in user
     end
 
@@ -1261,8 +1256,13 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       hbx_enrollment
     end
 
+    let(:staff_person) { double('Person', hbx_staff_role: hbx_staff_role) }
+    let(:hbx_staff_role) { double('HbxStaffRole', permission: permission)}
+    let(:permission) { double('Permission', can_terminate_enrollment: true) }
+
     before :each do
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(user).to receive(:person).and_return staff_person
       sign_in user
     end
 
@@ -1301,6 +1301,9 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
 
     let(:user) { FactoryBot.create(:user, roles: ["hbx_staff"]) }
+    let(:staff_person) { double('Person', hbx_staff_role: hbx_staff_role) }
+    let(:hbx_staff_role) { double('HbxStaffRole', permission: permission)}
+    let(:permission) { double('Permission', can_drop_enrollment_members: true)}
     let!(:person) { FactoryBot.create(:person)}
     let!(:family) { FactoryBot.create(:family, :with_nuclear_family, person: person)}
     let!(:household) { FactoryBot.create(:household, family: family) }
@@ -1351,6 +1354,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     before :each do
       allow(EnrollRegistry[:drop_enrollment_members].feature).to receive(:is_enabled).and_return(true)
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(user).to receive(:person).and_return(staff_person)
       sign_in user
     end
 
@@ -1441,8 +1445,13 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       hbx_enrollment
     end
 
+    let(:staff_person) { double('Person', hbx_staff_role: hbx_staff_role) }
+    let(:hbx_staff_role) { double('HbxStaffRole', permission: permission)}
+    let(:permission) { double('Permission', can_cancel_enrollment: true, can_terminate_enrollment: true)}
+
     before :each do
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(user).to receive(:person).and_return(staff_person)
       sign_in user
     end
 
@@ -1564,9 +1573,12 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
     let!(:glue_event_queue_name) { "#{Rails.application.config.acapi.hbx_id}.#{Rails.application.config.acapi.environment_name}.q.glue.enrollment_event_batch_handler" }
 
-
+    let(:staff_person) { double('Person', hbx_staff_role: hbx_staff_role) }
+    let(:hbx_staff_role) { double('HbxStaffRole', permission: permission)}
+    let(:permission) { double('Permission', change_enrollment_end_date: true) }
     before :each do
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
+      allow(user).to receive(:person).and_return staff_person
       sign_in user
     end
 
@@ -1960,7 +1972,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       end
       let(:person) do
         FactoryBot.create(:person, :with_hbx_staff_role).tap do |person|
-          FactoryBot.create(:permission, :super_admin).tap do |permission|
+          FactoryBot.create(:permission, :super_admin, can_change_fein: true).tap do |permission|
             person.hbx_staff_role.update_attributes(permission_id: permission.id)
             person
           end
@@ -2046,7 +2058,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       end
       let(:person) do
         FactoryBot.create(:person, :with_hbx_staff_role).tap do |person|
-          FactoryBot.create(:permission, :super_admin).tap do |permission|
+          FactoryBot.create(:permission, :super_admin, can_change_fein: true).tap do |permission|
             person.hbx_staff_role.update_attributes(permission_id: permission.id)
             person
           end

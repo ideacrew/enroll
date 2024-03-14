@@ -83,7 +83,7 @@ class ApplicationController < ActionController::Base
       respond_to do |format|
       format.json { render nothing: true, status: :forbidden }
       format.html { redirect_to(request.referrer || main_app.root_path)}
-      format.js   { render nothing: true, status: :forbidden }
+      format.js { head :forbidden }
     end
   end
 

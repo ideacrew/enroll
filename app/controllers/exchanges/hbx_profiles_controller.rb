@@ -115,35 +115,6 @@ class Exchanges::HbxProfilesController < ApplicationController
     #redirect_to exchanges_hbx_profiles_root_path
   end
 
-  # def transmit_group_xml
-  #   authorize HbxProfile, :transmit_group_xml?
-
-  #   HbxProfile.transmit_group_xml(params[:id].split)
-  #   @employer_profile = EmployerProfile.find(params[:id])
-  #   @fein = @employer_profile.fein
-  #   start_on = @employer_profile.show_plan_year.start_on.strftime("%Y%m%d")
-  #   end_on = @employer_profile.show_plan_year.end_on.strftime("%Y%m%d")
-  #   @xml_submit_time = @employer_profile.xml_transmitted_timestamp
-  #   v2_xml_generator =  V2GroupXmlGenerator.new([@fein], start_on, end_on)
-  #   send_data v2_xml_generator.generate_xmls
-  # end
-
-  # def employer_index
-  #   authorize HbxProfile, :employer_index?
-
-  #   @q = params.permit(:q)[:q]
-  #   @orgs = Organization.search(@q).exists(employer_profile: true)
-  #   @page_alphabets = page_alphabets(@orgs, "legal_name")
-  #   page_no = cur_page_no(@page_alphabets.first)
-  #   @organizations = @orgs.where("legal_name" => /^#{Regexp.escape(page_no)}/i) if page_no.present?
-
-  #   @employer_profiles = @organizations&.map {|o| o.employer_profile}
-
-  #   respond_to do |format|
-  #     format.html { render "employers/employer_profiles/index" }
-  #   end
-  # end
-
   def new_secure_message
     authorize HbxProfile, :new_secure_message?
 
@@ -794,7 +765,7 @@ class Exchanges::HbxProfilesController < ApplicationController
 
   def set_date
     authorize HbxProfile, :modify_admin_tabs?
-    forms_time_keeper = Forms::TimeKeeper.new(timekeeper_params)
+    forms_time_keeper = Forms::TimeKeeper.new(timekeeper_params.to_h)
     begin
       forms_time_keeper.set_date_of_record(forms_time_keeper.forms_date_of_record)
       flash[:notice] = "Date of record set to " + TimeKeeper.date_of_record.strftime("%m/%d/%Y")
