@@ -9,6 +9,10 @@ RSpec.describe FinancialAssistance::ApplicationPolicy, dbclean: :after_each  do
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let!(:record) { family.family_members.first }
 
+  before do
+    person.consumer_role.move_identity_documents_to_verified
+  end
+
   context 'hbx_admin user' do
     let!(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
     let!(:admin_user) { FactoryBot.create(:user, :with_hbx_staff_role, :person => admin_person) }
@@ -78,16 +82,67 @@ RSpec.describe FinancialAssistance::ApplicationPolicy, dbclean: :after_each  do
     end
   end
 
-  context 'broker logged in' do
+  context 'broker role' do
     let!(:broker_user) { FactoryBot.create(:user, :person => writing_agent.person, roles: ['broker_role', 'broker_agency_staff_role']) }
     let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
-    let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
-    let(:assister)  do
-      assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00")
-      assister.save(validate: false)
-      assister
-    end
     let(:user) { broker_user }
+
+    context 'active broker logged in' do
+      let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: :active) }
+
+      context 'hired by family' do
+        before(:each) do
+          family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                              writing_agent_id: writing_agent.id,
+                                                                                              start_on: Time.now,
+                                                                                              is_active: true)
+          family.reload
+        end
+
+        it 'returns the result of #can_access_application?' do
+          expect(policy.can_access_application?).to be_truthy
+        end
+      end
+
+
+      context 'not hired by family' do
+        it 'returns the result of #can_access_application?' do
+          expect(policy.can_access_application?).to be_falsey
+        end
+      end
+
+      context '#can_review?' do
+        it 'returns the result of #can_review?' do
+          expect(policy.can_review?).to be_falsey
+        end
+      end
+    end
+
+    context 'inactive broker logged in' do
+      let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
+
+      context 'hired by family' do
+        before(:each) do
+          family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                              writing_agent_id: writing_agent.id,
+                                                                                              start_on: Time.now,
+                                                                                              is_active: true)
+          family.reload
+        end
+
+        it 'returns the result of #can_access_application?' do
+          expect(policy.can_access_application?).to be_falsey
+        end
+      end
+    end
+  end
+
+  context 'broker agency staff logged in' do
+    let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
+    let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
+    let(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: 'active')}
+    let(:broker_agency_staff_role_user) {FactoryBot.create(:user, :person => broker_agency_staff_role.person, roles: ['broker_agency_staff_role'])}
+    let(:user) { broker_agency_staff_role_user }
 
     context 'hired by family' do
       before(:each) do

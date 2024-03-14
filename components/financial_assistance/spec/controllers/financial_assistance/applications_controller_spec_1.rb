@@ -38,6 +38,10 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       applicant
     end
 
+    before do
+      person.consumer_role.move_identity_documents_to_verified
+    end
+
     context 'admin with permissions' do
       before do
         sign_in(admin_user)
