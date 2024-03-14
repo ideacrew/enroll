@@ -78,7 +78,6 @@ module BenefitSponsors
 
         # NOTE: this will probably be consolidated with a similarily named method in BrokerAgencyProfilesController
         def find_and_authorize_broker_agency_profile
-          
           # the #new action is missing profile_id from broker_staff_params, hence this conditional
           profile_id = broker_staff_params[:profile_id] || params[:profile_id]
 
