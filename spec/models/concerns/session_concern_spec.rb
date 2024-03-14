@@ -43,12 +43,14 @@ RSpec.describe SessionConcern, type: :model do
 
     it 'returns empty hash if no session is set in the thread' do
       Thread.current[:current_session_values] = nil
+      Thread.current[:login_session_id] = nil
 
       expect(subject.session).to eq({})
     end
 
     it 'returns the current user from the thread' do
       Thread.current[:current_session_values] = session
+      Thread.current[:login_session_id] = nil
 
       expect(subject.session).to eq(session.slice(*expected_keys))
     end
