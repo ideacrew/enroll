@@ -44,8 +44,13 @@ module FinancialAssistance
       false
     end
 
-    # TODO: Define the conditions under which the list of applications can be viewed.
-    def index?; end
+    # Determines if the current user has permission to view the index page.
+    # The user can view the index page if they have permission to edit.
+    #
+    # @return [Boolean] Returns true if the user has permission to view the index page, false otherwise.
+    def index?
+      edit?
+    end
 
     # Determines if the current user has permission to proceed to the next step of the application.
     # The user can proceed if they have permission to edit the application.
