@@ -8,6 +8,8 @@ module BenefitSponsors
 
       # NOTE: All methods will most likely be consolidated with the auth refactor for BrokerAgencyProfilesController
 
+      # NOTE: this method is only used by the BrokerAgencyProfileStaffRolesController, but it acts as an extension of 
+      # BrokerAgencyProfilesController does not have a :new? method
       def new?
         access_to_broker_agency_profile?
       end

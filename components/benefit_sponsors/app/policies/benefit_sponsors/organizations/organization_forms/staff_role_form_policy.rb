@@ -35,7 +35,7 @@ module BenefitSponsors
         end
 
         def admin?
-          user.has_hbx_staff_role? && user.person && user.person.hbx_staff_role.permission.modify_employer
+          permission.modify_employer
         end
 
         def profile

@@ -575,6 +575,8 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
         end
       end
 
+      # permissions for broker agency access waiver and are frequently subject to change
+      # specs built out for both kinds of hbx_staff_role in case of (another) permissions update
       context 'with insufficient permissions' do
         before do
           permission.update_attributes(manage_agency_staff: false, view_agency_staff: false)
