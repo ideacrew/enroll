@@ -1500,6 +1500,37 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
     end
   end
+
+  describe "logged in user has no roles" do
+    shared_examples_for "logged in user has no authorization roles for families controller" do |action|
+      it "redirects to root with flash message" do
+        person = FactoryBot.create(:person, :with_family)
+        unauthorized_user = FactoryBot.create(:user, :person => person)
+        sign_in(unauthorized_user)
+
+        get action
+        expect(response).to redirect_to(root_path)
+        expect(flash[:error]).to eq("Access not allowed for family_policy.#{action}?, (Pundit policy)")
+      end
+    end
+
+    it_behaves_like 'logged in user has no authorization roles for families controller', :home
+    it_behaves_like 'logged in user has no authorization roles for families controller', :enrollment_history
+    it_behaves_like 'logged in user has no authorization roles for families controller', :manage_family
+    it_behaves_like 'logged in user has no authorization roles for families controller', :brokers
+    it_behaves_like 'logged in user has no authorization roles for families controller', :find_sep
+    it_behaves_like 'logged in user has no authorization roles for families controller', :personal
+    it_behaves_like 'logged in user has no authorization roles for families controller', :inbox
+    it_behaves_like 'logged in user has no authorization roles for families controller', :healthcare_for_childcare_program
+    it_behaves_like 'logged in user has no authorization roles for families controller', :verification
+    it_behaves_like 'logged in user has no authorization roles for families controller', :upload_application
+    it_behaves_like 'logged in user has no authorization roles for families controller', :check_qle_date
+    it_behaves_like 'logged in user has no authorization roles for families controller', :sep_zip_compare
+    it_behaves_like 'logged in user has no authorization roles for families controller', :purchase
+    it_behaves_like 'logged in user has no authorization roles for families controller', :upload_notice
+    it_behaves_like 'logged in user has no authorization roles for families controller', :upload_notice_form
+    it_behaves_like 'logged in user has no authorization roles for families controller', :transition_family_members
+  end
 end
 
 RSpec.describe Insured::FamiliesController, dbclean: :after_each do

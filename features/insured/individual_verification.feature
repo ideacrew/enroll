@@ -27,6 +27,7 @@ Scenario: Outstanding verification
 
   Scenario: Consumer with outstanding verification and uploaded documents
     Given a consumer exists
+    And the user is RIDP verified
     And the consumer is logged in
     And EnrollRegistry location_residency_verification_type feature is enabled
     And consumer has outstanding verification and unverified enrollments
@@ -37,6 +38,7 @@ Scenario: Outstanding verification
 
   Scenario: Consumer is fully_verified should see verification types
     Given a consumer exists
+    And the user is RIDP verified
     And the consumer is logged in
     When the consumer is completely verified
     Then the consumer visits verification page
@@ -45,6 +47,7 @@ Scenario: Outstanding verification
 
   Scenario: Consumer is from Curam and is fully verified and shows verification types as verified
     Given a consumer exists
+    And the user is RIDP verified
     And the consumer is logged in
     When the consumer is completely verified from curam
     Then the consumer visits verification page
@@ -53,6 +56,7 @@ Scenario: Outstanding verification
 
   Scenario: Admin clicks on documents tab for Curam verified person
     Given a consumer exists
+    And the user is RIDP verified
     And the consumer is logged in
     When the consumer is completely verified from curam
     Then the consumer visits verification page
@@ -66,6 +70,7 @@ Scenario: Outstanding verification
     And FAA display_medicaid_question feature is enabled
     And FAA mec_check feature is enabled
     And a family with financial application and applicants in determined state exists with evidences
+    And the user is RIDP verified
     And the user with hbx_staff role is logged in
     When admin visits home page
     And Individual clicks on Documents link
@@ -82,6 +87,7 @@ Scenario: Outstanding verification
     And FAA display_medicaid_question feature is enabled
     And FAA mec_check feature is enabled
     And a family with financial application and applicants in determined state exists with evidences
+    And the consumer is RIDP verified
     And the user with hbx_staff role is logged in
     When admin visits home page
     And Individual clicks on Documents link

@@ -7,6 +7,7 @@ Feature: Customers go to Curam to view notices and verifications
 
   Scenario: Consumer can see the Navigation Button
     Given a consumer exists
+    And the user is RIDP verified
     And the consumer is logged in
     When the consumer visits verification page
     And the user navigates to the DOCUMENTS tab
@@ -14,6 +15,7 @@ Feature: Customers go to Curam to view notices and verifications
 
   Scenario: Consumer can see the text on left to the Navigation Button
     Given a consumer exists
+    And the user is RIDP verified
     And the consumer is logged in
     When the consumer visits verification page
     And the user navigates to the DOCUMENTS tab
@@ -38,6 +40,8 @@ Feature: Customers go to Curam to view notices and verifications
 
   Scenario: Broker can see the Navigation Button
     Given that a broker exists
+    Given a consumer exists
+    And the user is RIDP verified
     And the broker is signed in
     When the broker visits verification page
     And the user navigates to the DOCUMENTS tab
@@ -45,15 +49,17 @@ Feature: Customers go to Curam to view notices and verifications
 
   Scenario: Broker can see the Navigation Button
     Given that a broker exists
+    Given a consumer exists
+    And the user is RIDP verified
     And the broker is signed in
     When the broker visits verification page
     And the user navigates to the DOCUMENTS tab
     When MEDICAID & TAX CREDITS button is visible to the user
     Then there will be text to the left of the MEDICAID & TAX CREDITS button
 
-  
   Scenario: Consumer can see the Navigation Button
     Given a consumer exists
+    And the user is RIDP verified
     And the consumer is logged in
     When the user visits messages page
     Then there will be text to the left of the MEDICAID & TAX CREDITS button
@@ -70,6 +76,7 @@ Feature: Customers go to Curam to view notices and verifications
   Scenario: Broker can see the Navigation Button
     Given that a broker exists
     And the broker is signed in
+    And the consumer is RIDP verified
     When the user visits messages page
     Then there will be text to the left of the MEDICAID & TAX CREDITS button
     Then EA sets a flag in IAM to direct the consumer to the curam/ drupal login
