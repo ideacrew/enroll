@@ -93,7 +93,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
           instance_double("HbxEnrollment", family_id: testing_family.id)
         end
       end
-      let(:consumer_role) { FactoryBot.create(:consumer_role, bookmark_url: "/families/home", identity_validation: 'valid',) }
+      let(:consumer_role) { FactoryBot.create(:consumer_role, bookmark_url: "/families/home", identity_validation: 'valid') }
 
       it "should assign all_hbx_enrollments_for_admin variable if hbx admin user" do
         testing_family.stub_chain('primary_applicant.person_id').and_return(user_with_hbx_staff_role.person.id)
@@ -421,7 +421,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         allow(enrollments).to receive(:non_external).and_return(enrollments)
         allow(family).to receive(:enrollments).and_return(enrollments)
         allow(enrollments).to receive(:order).and_return([display_hbx])
-        allow(family).to receive(:enrollments_for_display).and_return([{"hbx_enrollment"=>{"_id"=>display_hbx.id}}])
+        allow(family).to receive(:enrollments_for_display).and_return([{"hbx_enrollment" => {"_id" => display_hbx.id}}])
         allow(family).to receive(:check_for_consumer_role).and_return true
         allow(controller).to receive(:update_changing_hbxs).and_return(true)
         allow(employee_role).to receive(:census_employee_id).and_return census_employee.id
@@ -743,10 +743,9 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       let(:writing_agent) { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: 'active') }
       let(:assister)  do
         assister = FactoryBot.build(:broker_role,
-          benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
-          aasm_state: 'active',
-          npn: "SMECDOA00"
-        )
+                                    benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                    aasm_state: 'active',
+                                    npn: "SMECDOA00")
         assister.save(validate: false)
         assister
       end
@@ -1338,7 +1337,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
     it "when successful displays 'File Saved'" do
       file = fixture_file_upload("#{Rails.root}/test/JavaScript.pdf")
-      post :upload_notice, params: {:file => file, :subject=> subject}
+      post :upload_notice, params: {:file => file, :subject => subject}
       expect(flash[:notice]).to eq("File Saved")
       expect(response).to have_http_status(:found)
       expect(response).to be_redirect
@@ -1360,8 +1359,10 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
     context "notice_upload_secure_message" do
 
-      let(:notice) {Document.new({ title: "file_name", creator: "hbx_staff", subject: "notice", identifier: "urn:openhbx:terms:v1:file_storage:s3:bucket:#bucket_name#key",
-                                   format: "file_content_type" })}
+      let(:notice) do
+        Document.new({ title: "file_name", creator: "hbx_staff", subject: "notice", identifier: "urn:openhbx:terms:v1:file_storage:s3:bucket:#bucket_name#key",
+                       format: "file_content_type" })
+      end
 
       before do
         allow(@controller).to receive(:authorized_document_download_path).with("Person", person2.id, "documents", notice.id).and_return("/path/")
@@ -1369,7 +1370,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
 
       it "adds a message to person inbox" do
-        expect(person2.inbox.messages.count).to eq (2) #1 welcome message, 1 upload notification
+        expect(person2.inbox.messages.count).to eq(2) #1 welcome message, 1 upload notification
       end
     end
 
@@ -1430,7 +1431,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       let(:consumer_family) { FactoryBot.create(:family, :with_primary_family_member, person: consumer_person) }
       let(:qle) {FactoryBot.create(:qualifying_life_event_kind, title: "Not eligible for marketplace coverage due to citizenship or immigration status", reason: "eligibility_failed_or_documents_not_received_by_due_date ")}
 
-      let(:consumer_params) {
+      let(:consumer_params) do
         {
           "transition_effective_date_#{consumer_person.id}" => TimeKeeper.date_of_record.to_s,
           "transition_user_#{consumer_person.id}" => consumer_person.id,
@@ -1440,7 +1441,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
           "family" => consumer_family.id,
           "qle_id" => qle.id
         }
-      }
+      end
 
       it "should transition people" do
         post :transition_family_members_update, params: consumer_params, format: :js, xhr: true
@@ -1448,11 +1449,11 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
 
       it "should transition people from consumer market to resident market" do
-        expect(consumer_person.is_consumer_role_active?). to be_truthy
+        expect(consumer_person.is_consumer_role_active?).to be_truthy
         post :transition_family_members_update, params: consumer_params, format: :js, xhr: true
         consumer_person.reload
-        expect(consumer_person.is_resident_role_active?). to be_truthy
-        expect(consumer_person.is_consumer_role_active?). to be_falsey
+        expect(consumer_person.is_resident_role_active?).to be_truthy
+        expect(consumer_person.is_consumer_role_active?).to be_falsey
       end
     end
 
@@ -1461,7 +1462,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       let(:resident_family) { FactoryBot.create(:family, :with_primary_family_member, person: resident_person) }
       let!(:individual_market_transition) { FactoryBot.create(:individual_market_transition, :resident, person: resident_person) }
       let(:qle) {FactoryBot.create(:qualifying_life_event_kind, title: "Provided documents proving eligibility", reason: "eligibility_documents_provided ")}
-      let(:resident_params) {
+      let(:resident_params) do
         {
           "transition_effective_date_#{resident_person.id}" => TimeKeeper.date_of_record.to_s,
           "transition_user_#{resident_person.id}" => resident_person.id,
@@ -1471,7 +1472,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
           "family" => resident_family.id,
           "qle_id" => qle.id
         }
-      }
+      end
 
       it "should transition people" do
         post :transition_family_members_update, params: resident_params, format: :js, xhr: true
@@ -1479,11 +1480,11 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
 
       it "should transition people from resident market to consumer market" do
-        expect(resident_person.is_resident_role_active?). to be_truthy
+        expect(resident_person.is_resident_role_active?).to be_truthy
         post :transition_family_members_update, params: resident_params, format: :js, xhr: true
         resident_person.reload
-        expect(resident_person.is_consumer_role_active?). to be_truthy
-        expect(resident_person.is_resident_role_active?). to be_falsey
+        expect(resident_person.is_consumer_role_active?).to be_truthy
+        expect(resident_person.is_resident_role_active?).to be_falsey
       end
 
       it "should trigger_cdc_to_ivl_transition_notice in queue" do
@@ -1527,7 +1528,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
                         sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
                         sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
                         benefit_sponsorship_id: initial_application.benefit_sponsorship.id,
-                        hbx_enrollment_members:[hbx_enrollment_member])
+                        hbx_enrollment_members: [hbx_enrollment_member])
     end
 
     let(:ivl_enrollment) do
@@ -1539,7 +1540,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
                         kind: "individual",
                         product: product,
                         aasm_state: "coverage_selected",
-                        hbx_enrollment_members:[ivl_hbx_enrollment_member])
+                        hbx_enrollment_members: [ivl_hbx_enrollment_member])
     end
 
     context "for shop" do
