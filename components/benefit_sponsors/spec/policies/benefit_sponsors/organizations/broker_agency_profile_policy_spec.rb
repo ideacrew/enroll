@@ -30,12 +30,12 @@ module BenefitSponsors
 
     describe "given an admin" do
       let(:hbx_staff_role) { instance_double(HbxStaffRole, permission: permission) }
-      let(:person) do 
+      let(:person) do
         instance_double(
-          Person, 
-          hbx_staff_role: hbx_staff_role, 
-          broker_role: nil, 
-          broker_agency_staff_roles: [] 
+          Person,
+          hbx_staff_role: hbx_staff_role,
+          broker_role: nil,
+          broker_agency_staff_roles: []
         )
       end
 

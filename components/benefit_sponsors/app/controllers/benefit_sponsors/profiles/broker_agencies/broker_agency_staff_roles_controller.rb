@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Profiles
     module BrokerAgencies
+      # controller that manages adding, approving and removing of staff agency roles to a broker
       class BrokerAgencyStaffRolesController < ::BenefitSponsors::ApplicationController
         before_action :find_and_authorize_broker_agency_profile, except: :search_broker_agency
 
@@ -23,10 +26,10 @@ module BenefitSponsors
             @status,@result = @staff.save
             unless @staff.is_broker_registration_page
               flash[:notice] = "Role added successfully" if @status
-              flash[:error] = "Role was not added because " + @result unless @status
+              flash[:error] = "Role was not added because #{@result}" unless @status
             end
           rescue Exception => e
-            flash[:error] = "Role was not added because " + e.message
+            flash[:error] = "Role was not added because #{e.message}"
           end
           respond_to do |format|
             format.html  { redirect_to profiles_broker_agencies_broker_agency_profile_path(id: params[:profile_id]) }
@@ -42,10 +45,10 @@ module BenefitSponsors
             if @status
               flash[:notice] = "Role approved successfully"
             else
-              flash[:error] = "Role was not approved because " + @result
+              flash[:error] = "Role was not approved because #{@result}"
             end
           rescue Exception => e
-            flash[:error] = "Role was not approved because " + e.message
+            flash[:error] = "Role was not approved because #{e.message}"
           end
           redirect_to profiles_broker_agencies_broker_agency_profile_path(id: params[:profile_id])
         end
@@ -58,10 +61,10 @@ module BenefitSponsors
             if @status
               flash[:notice] = "Role removed successfully"
             else
-              flash[:error] = "Role was not removed because " + @result
+              flash[:error] = "Role was not removed because #{@result}"
             end
           rescue Exception => e
-            flash[:error] = "Role was not removed because " + e.message
+            flash[:error] = "Role was not removed because #{e.message}"
           end
           redirect_to profiles_broker_agencies_broker_agency_profile_path(id: params[:profile_id])
         end
@@ -91,7 +94,7 @@ module BenefitSponsors
         def broker_staff_params
           params[:staff].presence || params[:staff] = {}
           params[:staff].merge!({profile_id: params["staff"]["profile_id"] || params["profile_id"] || params["id"], person_id: params["person_id"], profile_type: params[:profile_type] || "broker_agency_staff",
-                                  filter_criteria: params.permit(:q), is_broker_registration_page: params[:broker_registration_page] || params["staff"]["is_broker_registration_page"]})
+                                 filter_criteria: params.permit(:q), is_broker_registration_page: params[:broker_registration_page] || params["staff"]["is_broker_registration_page"]})
           params[:staff].permit!
         end
       end

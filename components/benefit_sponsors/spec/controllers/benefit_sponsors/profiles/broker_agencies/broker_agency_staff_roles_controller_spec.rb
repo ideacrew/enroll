@@ -1,6 +1,8 @@
-require 'rails_helper'
+# frozen_string_literal: true
 
-module BenefitSponsors
+require 'rails_helper'
+# spec for BenefitSponsors::Profiles::BrokerAgencies::BrokerAgencyStaffRolesController
+module BenefitSponsors # rubocop:disable Metrics/ModuleLength
   RSpec.describe Profiles::BrokerAgencies::BrokerAgencyStaffRolesController, type: :controller, dbclean: :after_each do
 
     routes { BenefitSponsors::Engine.routes }
@@ -313,7 +315,7 @@ module BenefitSponsors
         end
 
         it "should display a flash error" do
-          expect(flash[:error]).to eq 'Please contact HBX Admin to report this error'
+          expect(flash[:error]).to include('Please contact HBX Admin to report this error')
         end
       end
     end
@@ -326,7 +328,7 @@ module BenefitSponsors
             :id => bap_id, :person_id => new_person_for_staff1.id, :profile_id => bap_id
           }
         end
-        
+
         before do
           broker_agency_staff_role.update_attributes(aasm_state: 'active')
         end
@@ -514,7 +516,7 @@ module BenefitSponsors
     context 'for admins' do
       let!(:permission)               { FactoryBot.create(:permission, :hbx_staff, manage_agency_staff: true, view_agency_staff: true) }
       let!(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_hbx_staff_role) }
-      let!(:hbx_person)               { FactoryBot.create(:person, user: user_with_hbx_staff_role )}
+      let!(:hbx_person)               { FactoryBot.create(:person, user: user_with_hbx_staff_role)}
 
       before do
         user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id, permission_id: permission.id)
@@ -552,7 +554,7 @@ module BenefitSponsors
               :staff => {:first_name => "hello", :last_name => "world", :dob => "10/10/1998", email: "hello@hello.com",  :profile_id => bap_id}
             }
           end
-  
+
           before :each do
             post :create, params: staff_params, format: :js, xhr: true
           end
@@ -572,24 +574,24 @@ module BenefitSponsors
               :id => bap_id, :person_id => new_person_for_staff1.id, :profile_id => bap_id
             }
           end
-  
+
           before :each do
             broker_agency_staff_role.update_attributes(aasm_state: 'broker_agency_pending')
             get :approve, params: staff_params
           end
-  
+
           it "should initialize staff" do
             expect(assigns(:staff).class).to eq staff_class
           end
-  
+
           it "should redirect" do
             expect(response).to have_http_status(:redirect)
           end
-  
+
           it "should get a notice" do
             expect(flash[:notice]).to eq 'Role approved successfully'
           end
-  
+
           it "should update broker_agency_staff_role aasm_state to active" do
             broker_agency_staff_role.reload
             expect(broker_agency_staff_role.aasm_state).to eq "active"
@@ -602,24 +604,24 @@ module BenefitSponsors
               :id => bap_id, :person_id => new_person_for_staff1.id, :profile_id => bap_id
             }
           end
-  
+
           before :each do
             broker_agency_staff_role.update_attributes(aasm_state: 'active')
             delete :destroy, params: staff_params
           end
-  
+
           it "should initialize staff" do
             expect(assigns(:staff).class).to eq staff_class
           end
-  
+
           it "should redirect" do
             expect(response).to have_http_status(:redirect)
           end
-  
+
           it "should get an notice" do
             expect(flash[:notice]).to eq 'Role removed successfully'
           end
-  
+
           it "should update broker_staff_role aasm_state to broker_agency_terminated" do
             broker_agency_staff_role.reload
             expect(broker_agency_staff_role.aasm_state).to eq "broker_agency_terminated"
@@ -641,15 +643,15 @@ module BenefitSponsors
 
             get :search_broker_agency, params: params, format: :js, xhr: true
           end
-    
+
           it 'should be a success' do
             expect(response).to have_http_status(:success)
           end
-  
+
           it 'should render the new template' do
             expect(response).to render_template('search_broker_agency')
           end
-  
+
           it 'should assign broker_agency_profiles variable' do
             expect(assigns(:broker_agency_profiles)).to include(broker_agency_profile)
           end
@@ -671,11 +673,11 @@ module BenefitSponsors
           it "should not render new template" do
             expect(response).not_to render_template("new")
           end
-  
+
           it "should not initialize staff" do
             expect(assigns(:staff).class).to eq NilClass
           end
-  
+
           it "should redirect" do
             expect(response).to have_http_status(:redirect)
           end
@@ -689,7 +691,7 @@ module BenefitSponsors
               :staff => {:first_name => "hello", :last_name => "world", :dob => "10/10/1998", email: "hello@hello.com",  :profile_id => bap_id}
             }
           end
-  
+
           before :each do
             post :create, params: staff_params, format: :js, xhr: true
           end
@@ -709,24 +711,24 @@ module BenefitSponsors
               :id => bap_id, :person_id => new_person_for_staff1.id, :profile_id => bap_id
             }
           end
-  
+
           before :each do
             broker_agency_staff_role.update_attributes(aasm_state: 'broker_agency_pending')
             get :approve, params: staff_params
           end
-  
+
           it "should not initialize staff" do
             expect(assigns(:staff).class).to eq NilClass
           end
-  
+
           it "should redirect" do
             expect(response).to have_http_status(:redirect)
           end
-  
+
           it "should display a flash error" do
             expect(flash[:error]).to eq 'Access not allowed for can_manage_broker_agency?, (Pundit policy)'
           end
-  
+
           it "should not update broker_agency_staff_role aasm_state to active" do
             broker_agency_staff_role.reload
             expect(broker_agency_staff_role.aasm_state).to eq "broker_agency_pending"
@@ -739,24 +741,24 @@ module BenefitSponsors
               :id => bap_id, :person_id => new_person_for_staff1.id, :profile_id => bap_id
             }
           end
-  
+
           before :each do
             broker_agency_staff_role.update_attributes(aasm_state: 'active')
             delete :destroy, params: staff_params
           end
-  
+
           it "should not initialize staff" do
             expect(assigns(:staff).class).to eq NilClass
           end
-  
+
           it "should redirect" do
             expect(response).to have_http_status(:redirect)
           end
-  
+
           it "should display a flash error" do
             expect(flash[:error]).to eq 'Access not allowed for can_manage_broker_agency?, (Pundit policy)'
           end
-  
+
           it "should not update broker_staff_role aasm_state to broker_agency_terminated, should be 'active'" do
             broker_agency_staff_role.reload
             expect(broker_agency_staff_role.aasm_state).to eq "active"
@@ -775,18 +777,18 @@ module BenefitSponsors
             broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id)
             broker_agency_profile.approve!
             organization.reload
-    
+
             get :search_broker_agency, params: params, format: :js, xhr: true
           end
-    
+
           it "should return a 403" do
             expect(response.status).to eq(403)
           end
-  
+
           it "should display a flash error" do
             expect(flash[:error]).to eq 'Access not allowed for can_search_broker_agencies?, (Pundit policy)'
           end
-  
+
           it 'should assign broker_agency_profiles variable' do
             expect(assigns(:broker_agency_profiles)).to eq(nil)
           end

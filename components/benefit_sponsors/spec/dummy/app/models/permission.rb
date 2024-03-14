@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# dummy permissions class for running engine spec in GHA
 class Permission
   include Mongoid::Document
   include SetCurrentUser

@@ -74,19 +74,19 @@ module BenefitSponsors
       ################################################################################################################
 
       def is_broker_for_broker_agency?
-        return false unless broker_role
-  
-        broker_role&.broker_agency_profile&.id == record.id
-      end
-  
-      def is_staff_for_broker_agency?
-        return false unless broker_staff_roles && broker_staff_roles.present?
+        return false unless account_holder_broker_role
 
-        broker_staff_roles.detect{ |role| role&.broker_agency_profile&.id == record.id || role&.broker_agency_profile_id == record.id }
+        account_holder_broker_role&.broker_agency_profile&.id == record.id
+      end
+
+      def is_staff_for_broker_agency?
+        return false unless account_holder_broker_agency_staff_roles && account_holder_broker_agency_staff_roles&.present?
+
+        account_holder_broker_agency_staff_roles.detect{ |role| role&.broker_agency_profile&.id == record.id || role&.broker_agency_profile_id == record.id }
       end
 
       def is_associated_with_broker_agency?
-        broker_role || (broker_staff_roles&.present?)
+        account_holder_broker_role || account_holder_broker_agency_staff_roles&.present?
       end
 
       ################################################################################################################
@@ -94,18 +94,18 @@ module BenefitSponsors
       # they will be deleted from this policy once present in the ApplicationPolicy of the main application
       ################################################################################################################
 
-      def broker_role
-        @broker_role ||= account_holder_person.broker_role if account_holder_person&.broker_role&.active?
+      def account_holder_broker_role
+        @account_holder_broker_role ||= account_holder_person.broker_role if account_holder_person&.broker_role&.active?
       end
 
-      def broker_staff_roles
-        @staff_roles ||= account_holder_person&.active_broker_staff_roles
+      def account_holder_broker_agency_staff_roles
+        @account_holder_broker_agency_staff_roles ||= account_holder_person&.active_broker_staff_roles
       end
 
       def hbx_staff_can_view_agency_staff?
         permission&.view_agency_staff
       end
-  
+
       def hbx_staff_can_manage_agency_staff?
         permission&.manage_agency_staff
       end
