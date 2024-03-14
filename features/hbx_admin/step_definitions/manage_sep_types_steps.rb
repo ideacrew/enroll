@@ -3,7 +3,7 @@
 Given(/^that a user with a HBX staff role with (.*) subrole exists$/) do |subrole|
   p_staff = if ['super_admin', 'hbx_tier3'].include?(subrole)
               Permission.create(name: subrole, modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-                                send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+                                send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_send_secure_message: true,
                                 modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_access_outstanding_verification_sub_tab: true, can_manage_qles: true)
             else
               Permission.create(name: subrole, modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,

@@ -61,8 +61,8 @@ class ApplicationPolicy
     @account_holder_family = account_holder_person&.primary_family
   end
 
-  # START - ACA Individual Market related methods
-  #
+  # @!group ACA Individual Market related methods
+
   # Determines if the current user is a primary family member in the individual market.
   # The user is considered a primary family member if they have verified their identity in the individual market (RIDP verified) and their account holder's family is the same as the current family.
   #
@@ -86,6 +86,47 @@ class ApplicationPolicy
     individual_market_role&.identity_verified?
   end
 
+  # Determines if the primary person of the family has verified their identity (RIDP).
+  #
+  # @return [Boolean] Returns true if the primary person of the family has verified their identity, false otherwise.
+  def primary_family_member_ridp_verified?
+    primary = family&.primary_person
+    return false if primary.blank?
+
+    consumer_role = primary.consumer_role
+    return false if consumer_role.blank?
+
+    consumer_role.identity_verified?
+  end
+
+  # Checks if the current user is a primary family member who has verified their identity and is an active associated individual market family broker staff.
+  #
+  # @return [Boolean] Returns true if the primary family member has verified their
+  # identity and the user is an active associated individual market family broker staff, false otherwise.
+  def active_associated_individual_market_ridp_verified_family_broker_staff?
+    primary_family_member_ridp_verified? && active_associated_individual_market_family_broker_staff?
+  end
+
+  # Checks if the current user is an active associated individual market family broker staff.
+  # It checks if the user has any active broker agency staff roles and if the user's family has an active broker agency account.
+  # If both conditions are met, it checks if any of the user's broker agency staff roles
+  # are associated with the broker agency profile of the family's active broker agency account.
+  #
+  # @return [Boolean] Returns true if the user is an active associated individual market family broker staff, false otherwise.
+  def active_associated_individual_market_family_broker_staff?
+    broker_staffs = account_holder_person&.broker_agency_staff_roles&.active
+    return false if broker_staffs.blank?
+
+    broker_agency_account = family.active_broker_agency_account
+    return false if broker_agency_account.blank?
+
+    broker_agency = broker_agency_account.broker_agency_profile
+
+    broker_staffs.any? do |staff|
+      staff.benefit_sponsors_broker_agency_profile_id == broker_agency.id
+    end
+  end
+
   # Determines if the current user is an active associated broker in the individual market.
   # The user is considered an active associated broker if they are an active associated broker for the family in the individual market.
   # The primary family member must be verified for their identity.
@@ -94,19 +135,6 @@ class ApplicationPolicy
   # @return [Boolean] Returns true if the user is an active associated broker in the individual market who has verified their identity, false otherwise.
   def active_associated_individual_market_ridp_verified_family_broker?
     primary_family_member_ridp_verified? && active_associated_individual_market_family_broker?
-  end
-
-  # Determines if the primary person of the family has verified their identity (RIDP).
-  #
-  # @return [Boolean] Returns true if the primary person of the family has verified their identity, false otherwise.
-  def primary_family_member_ridp_verified?
-    primary = family.primary_person
-    return false if primary.blank?
-
-    consumer_role = primary.consumer_role
-    return false if consumer_role.blank?
-
-    consumer_role.identity_verified?
   end
 
   # Determines if the current user is an active associated broker in the individual market.
@@ -137,11 +165,11 @@ class ApplicationPolicy
 
     permission.modify_family
   end
-  #
-  # END - ACA Individual Market related methods
 
-  # START - Non-ACA Coverall Market related methods
-  #
+  # @!endgroup
+
+  # @!group Non-ACA Coverall Market related methods
+
   # Checks if the account holder is a primary family member in the coverall market for the given family.
   # A user is considered a primary family member in the coverall market if they have a coverall market role and they are the primary person of the given family.
   #
@@ -179,11 +207,11 @@ class ApplicationPolicy
   def coverall_market_admin?
     individual_market_admin?
   end
-  #
-  # END - Non-ACA Coverall Market related methods
 
-  # START - ACA Shop Market related methods
-  #
+  # @!endgroup
+
+  # @!group ACA Shop Market related methods
+
   # Checks if the account holder is a primary family member in the ACA Shop market for the given family.
   # A user is considered a primary family member in the ACA Shop market if they have an employee role and they are the primary person of the given family.
   #
@@ -202,7 +230,6 @@ class ApplicationPolicy
   #
   # @return [Boolean] Returns true if the account holder is an admin in the shop market, false otherwise.
   def shop_market_admin?
-    individual_market_admin?
     # hbx_role = account_holder_person.hbx_staff_role
     # return false if hbx_role.blank?
 
@@ -210,6 +237,7 @@ class ApplicationPolicy
     # return false if permission.blank?
 
     # permission.modify_employer
+    individual_market_admin?
   end
 
   def active_associated_shop_market_family_broker?
@@ -239,11 +267,11 @@ class ApplicationPolicy
       }
     ).present?
   end
-  #
-  # END - ACA Shop Market related methods
 
-  # START - Non-ACA Fehb Market related methods
-  #
+  # @endgrop
+
+  # @!group Non-ACA Fehb Market related methods
+
   # Checks if the account holder is a primary family member in the Non-ACA Fehb market for the given family.
   # A user is considered a primary family member in the Non-ACA Fehb market if they are a primary family member in the ACA Shop market for the given family.
   #
@@ -264,10 +292,10 @@ class ApplicationPolicy
   def active_associated_fehb_market_general_agency?
     false
   end
-  #
-  # END - Non-ACA Fehb Market related methods
 
-  # START - Hbx Staff Role permissions
+  # @!endgroup
+
+  # @!group Hbx Staff Role permissions
 
   def staff_view_admin_tabs?
     permission&.view_admin_tabs
@@ -417,7 +445,7 @@ class ApplicationPolicy
     @hbx_role = account_holder_person&.hbx_staff_role
   end
 
-  # END - Hbx Staff Role permissions
+  # @!endgroup
 
   def index?
     read_all?

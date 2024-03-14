@@ -25,6 +25,7 @@ module FinancialAssistance
     # @return [Boolean] Returns true if the user has permission to perform a step, false otherwise.
     def step?
       return true if individual_market_primary_family_member?
+      return true if active_associated_individual_market_ridp_verified_family_broker_staff?
       return true if active_associated_individual_market_ridp_verified_family_broker?
       return true if individual_market_admin?
 
