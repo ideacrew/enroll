@@ -88,8 +88,8 @@ module BenefitSponsors
       end
 
       ################################################################################################################
-      # NOTE: the following methods or some variation thereof will most likely appear in ApplicationPolicy eventually
-      # they will be deleted from this policy once present in the ApplicationPolicy of the main application
+      # NOTE: the following methods or some variation thereof will hopefully appear in ApplicationPolicy
+      # they will be deleted from this policy if present in the ApplicationPolicy of the main application
       ################################################################################################################
 
       def account_holder_broker_role
