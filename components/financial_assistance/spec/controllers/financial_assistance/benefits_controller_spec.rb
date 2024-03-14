@@ -8,7 +8,6 @@ RSpec.describe FinancialAssistance::BenefitsController, dbclean: :after_each, ty
   let!(:user) { FactoryBot.create(:user, :person => person) }
   let(:family_id) { BSON::ObjectId.new }
   let(:family_member_id) { BSON::ObjectId.new }
-  # let!(:family) { FactoryBot.create(:family, :with_primary_family_member,person: person) }
   let!(:application) { FactoryBot.create(:application, family_id: family_id, aasm_state: 'draft',effective_date: TimeKeeper.date_of_record) }
   let!(:applicant) { FactoryBot.create(:applicant, application: application,family_member_id: family_member_id) }
   let!(:benefit) do
@@ -46,6 +45,7 @@ RSpec.describe FinancialAssistance::BenefitsController, dbclean: :after_each, ty
   let(:employer_phone) {{'full_phone_number' => ''}}
 
   before do
+    person.consumer_role.move_identity_documents_to_verified
     sign_in(user)
   end
 
@@ -75,18 +75,40 @@ RSpec.describe FinancialAssistance::BenefitsController, dbclean: :after_each, ty
     end
 
     it 'should render step if no key present in params with modal_name' do
-      post :step, params: { application_id: application.id, applicant_id: applicant.id, benefit: {start_on: '09/04/2017', end_on: '09/20/2017'} }
+      post_params = {
+        application_id: application.id,
+        applicant_id: applicant.id,
+        benefit: {start_on: '09/04/2017', end_on: '09/20/2017'}
+      }
+      post :step, params: post_params
       expect(response).to render_template 'financial_assistance/benefits/create'
     end
 
     context 'when params has application key' do
       it 'When model is saved' do
-        post :step, params: { application_id: application.id, applicant_id: applicant.id, id: benefit.id, employer_address: employer_address, employer_phone: employer_phone }
+        post_params = {
+          application_id: application.id,
+          applicant_id: applicant.id,
+          id: benefit.id,
+          employer_address: employer_address,
+          employer_phone: employer_phone
+        }
+        post :step, params: post_params
         expect(applicant.save).to eq true
       end
 
       it 'should redirect to find_applicant_path when passing params last step' do
-        post :step, params: { application_id: application.id, applicant_id: applicant.id, id: benefit.id,benefit: valid_params1, employer_address: employer_address, employer_phone: employer_phone, commit: 'CONTINUE', last_step: true }
+        post_params = {
+          application_id: application.id,
+          applicant_id: applicant.id,
+          id: benefit.id,
+          benefit: valid_params1,
+          employer_address: employer_address,
+          employer_phone: employer_phone,
+          commit: 'CONTINUE',
+          last_step: true
+        }
+        post :step, params: post_params
         expect(response.headers['Location']).to have_content 'benefits'
         expect(response.status).to eq 302
         expect(flash[:notice]).to match('Benefit Info Added.')
@@ -94,19 +116,45 @@ RSpec.describe FinancialAssistance::BenefitsController, dbclean: :after_each, ty
       end
 
       it 'should not redirect to find_applicant_path when not passing params last step' do
-        post :step, params: { application_id: application.id, applicant_id: applicant.id, id: benefit.id,benefit: valid_params1, employer_address: employer_address, employer_phone: employer_phone, commit: 'CONTINUE' }
+        post_params = {
+          application_id: application.id,
+          applicant_id: applicant.id,
+          id: benefit.id,
+          benefit: valid_params1,
+          employer_address: employer_address,
+          employer_phone: employer_phone,
+          commit: 'CONTINUE'
+        }
+        post :step, params: post_params
         expect(response.status).to eq 200
         expect(response).to render_template 'workflow/step'
       end
 
       it 'should render workflow/step when we are not params last step' do
-        post :step, params: { application_id: application.id, applicant_id: applicant.id, id: benefit.id,benefit: valid_params1, employer_address: employer_address, employer_phone: employer_phone, commit: 'CONTINUE' }
+        post_params = {
+          application_id: application.id,
+          applicant_id: applicant.id,
+          id: benefit.id,
+          benefit: valid_params1,
+          employer_address: employer_address,
+          employer_phone: employer_phone,
+          commit: 'CONTINUE'
+        }
+        post :step, params: post_params
         expect(response).to render_template 'workflow/step'
       end
     end
 
     it 'should render step if model is not saved' do
-      post :step, params: {application_id: application.id, applicant_id: applicant.id, id: benefit.id, benefit: invalid_params, employer_address: employer_address, employer_phone: employer_phone}
+      post_params = {
+        application_id: application.id,
+        applicant_id: applicant.id,
+        id: benefit.id,
+        benefit: invalid_params,
+        employer_address: employer_address,
+        employer_phone: employer_phone
+      }
+      post :step, params: post_params
       expect(flash[:error]).to match('Pp Is Not A Valid Benefit Kind Type')
       expect(response).to render_template 'workflow/step'
     end
@@ -114,11 +162,23 @@ RSpec.describe FinancialAssistance::BenefitsController, dbclean: :after_each, ty
 
   context "create" do
     it "should create a benefit instance" do
-      post :create, params: { application_id: application.id, applicant_id: applicant.id, benefit: {start_on: "09/04/2017", end_on: "09/20/2017"}}, format: :js
+      create_params = {
+        application_id: application.id,
+        applicant_id: applicant.id,
+        benefit: {start_on: "09/04/2017",
+                  end_on: "09/20/2017"}
+      }
+      post :create, params: create_params, format: :js
       expect(applicant.benefits.count).to eq 1
     end
+
     it "should able to save an benefit instance with the 'to' field blank " do
-      post :create, params: { application_id: application.id, applicant_id: applicant.id, benefit: {start_on: "09/04/2017", end_on: " "}}, format: :js
+      create_params = {
+        application_id: application.id,
+        applicant_id: applicant.id,
+        benefit: {start_on: "09/04/2017", end_on: " "}
+      }
+      post :create, params: create_params, format: :js
       expect(applicant.benefits.count).to eq 1
     end
   end
