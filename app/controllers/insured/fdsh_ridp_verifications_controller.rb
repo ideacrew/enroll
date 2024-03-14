@@ -8,6 +8,7 @@ module Insured
     before_action :set_consumer_bookmark_url, only: [:service_unavailable, :failed_validation]
 
     def new
+      authorize @person, :complete_ridp?
       result = Operations::Fdsh::Ridp::RequestPrimaryDetermination.new.call(@person.primary_family)
 
       if result.success?
@@ -22,6 +23,7 @@ module Insured
     def wait_for_secondary_response; end
 
     def primary_response
+      authorize @person, :complete_ridp?
       response = find_response('primary')
       if response.present?
         payload = response.serializable_hash.deep_symbolize_keys[:ridp_eligibility][:event]
@@ -43,6 +45,7 @@ module Insured
     end
 
     def secondary_response
+      authorize @person, :complete_ridp?
       response = find_response('secondary')
       if response.present?
         response_hash = response.serializable_hash.deep_symbolize_keys
@@ -65,6 +68,7 @@ module Insured
     end
 
     def create
+      authorize @person, :complete_ridp?
       @interactive_verification = ::IdentityVerification::InteractiveVerification.new(
         params.require(:interactive_verification).permit(:session_id, :transaction_id, questions_attributes: {}).to_h
       )
@@ -87,21 +91,25 @@ module Insured
     end
 
     def check_primary_response_received
+      authorize @person, :complete_ridp?
       result = received_response('primary')
       render :plain => result.success?
     end
 
     def check_secondary_response_received
+      authorize @person, :complete_ridp?
       result = received_response('secondary')
       render :plain => result.success?
     end
 
     def service_unavailable
+      authorize @person, :complete_ridp?
       @person.consumer_role.move_identity_documents_to_outstanding
       render "service_unavailable"
     end
 
     def failed_validation
+      authorize @person, :complete_ridp?
       @person = Person.find(params[:person_id]) if params[:person_id].present?
       authorize @person, :can_access_identity_verifications?
       @step = params[:step]

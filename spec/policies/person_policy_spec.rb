@@ -157,3 +157,331 @@ describe PersonPolicy do
 
   end
 end
+
+describe PersonPolicy, "given an unliked user" do
+  let(:user) do
+    instance_double(
+      User,
+      person: nil
+    )
+  end
+
+  let(:record) do
+    instance_double(
+      Person,
+      primary_family: nil
+    )
+  end
+
+  subject { described_class.new(user, record) }
+
+  it "may not complete_ridp" do
+    expect(subject.complete_ridp?).to be_falsey
+  end
+end
+
+describe PersonPolicy, "given a user who is a different person, with no special permissions" do
+  let(:user) do
+    instance_double(
+      User,
+      person: user_person
+    )
+  end
+
+  let(:record) do
+    instance_double(
+      Person,
+      primary_family: nil
+    )
+  end
+
+  let(:user_person) do
+    instance_double(
+      Person,
+      primary_family: nil,
+      broker_agency_staff_roles: broker_agency_staff_roles_scope,
+      broker_role: nil,
+      hbx_staff_role: nil
+    )
+  end
+
+  let(:broker_agency_staff_roles_scope) do
+    double(
+      active: []
+    )
+  end
+
+  subject { described_class.new(user, record) }
+
+  it "may not complete_ridp" do
+    expect(subject.complete_ridp?).to be_falsey
+  end
+end
+
+describe PersonPolicy, "given a user who is an admin, but may not modify families" do
+  let(:user) do
+    instance_double(
+      User,
+      person: user_person
+    )
+  end
+
+  let(:record) do
+    instance_double(
+      Person,
+      primary_family: nil
+    )
+  end
+
+  let(:user_person) do
+    instance_double(
+      Person,
+      primary_family: nil,
+      broker_agency_staff_roles: broker_agency_staff_roles_scope,
+      broker_role: nil,
+      hbx_staff_role: hbx_staff_role
+    )
+  end
+
+  let(:broker_agency_staff_roles_scope) do
+    double(
+      active: []
+    )
+  end
+
+  let(:hbx_staff_role) do
+    instance_double(
+      HbxStaffRole,
+      permission: permission
+    )
+  end
+
+  let(:permission) do
+    instance_double(
+      Permission,
+      modify_family: false
+    )
+  end
+
+  subject { described_class.new(user, record) }
+
+  it "may not complete_ridp" do
+    expect(subject.complete_ridp?).to be_falsey
+  end
+end
+
+describe PersonPolicy, "given a user who is an admin, and may modify families" do
+  let(:user) do
+    instance_double(
+      User,
+      person: user_person
+    )
+  end
+
+  let(:record) do
+    instance_double(
+      Person,
+      primary_family: nil
+    )
+  end
+
+  let(:user_person) do
+    instance_double(
+      Person,
+      primary_family: nil,
+      broker_agency_staff_roles: broker_agency_staff_roles_scope,
+      broker_role: nil,
+      hbx_staff_role: hbx_staff_role
+    )
+  end
+
+  let(:broker_agency_staff_roles_scope) do
+    double(
+      active: []
+    )
+  end
+
+  let(:hbx_staff_role) do
+    instance_double(
+      HbxStaffRole,
+      permission: permission
+    )
+  end
+
+  let(:permission) do
+    instance_double(
+      Permission,
+      modify_family: true
+    )
+  end
+
+  subject { described_class.new(user, record) }
+
+  it "may complete_ridp" do
+    expect(subject.complete_ridp?).to be_truthy
+  end
+end
+
+describe PersonPolicy, "given a user who is an active broker for that person" do
+  let(:user) do
+    instance_double(
+      User,
+      person: user_person
+    )
+  end
+
+  let(:record) do
+    instance_double(
+      Person,
+      primary_family: family
+    )
+  end
+
+  let(:family) do
+    instance_double(
+      Family,
+      active_broker_agency_account: broker_agency_account
+    )
+  end
+
+  let(:broker_agency_account) do
+    instance_double(
+      BenefitSponsors::Accounts::BrokerAgencyAccount,
+      benefit_sponsors_broker_agency_profile_id: broker_agency_id,
+      writing_agent_id: writing_agent_id
+    )
+  end
+
+  let(:broker_agency_id) { "Some Broker Agency ID" }
+  let(:writing_agent_id) { "Some Writing Agent ID" }
+
+  let(:user_person) do
+    instance_double(
+      Person,
+      primary_family: nil,
+      broker_agency_staff_roles: broker_agency_staff_roles_scope,
+      broker_role: broker_role,
+      hbx_staff_role: nil
+    )
+  end
+
+  let(:broker_role) do
+    instance_double(
+      BrokerRole,
+      id: writing_agent_id,
+      :active? => true,
+      :individual_market? => true,
+      benefit_sponsors_broker_agency_profile_id: broker_agency_id
+    )
+  end
+
+  let(:broker_agency_staff_roles_scope) do
+    double(
+      active: []
+    )
+  end
+
+  let(:hbx_staff_role) do
+    instance_double(
+      HbxStaffRole,
+      permission: permission
+    )
+  end
+
+  let(:permission) do
+    instance_double(
+      Permission,
+      modify_family: true
+    )
+  end
+
+  subject { described_class.new(user, record) }
+
+  it "may complete_ridp" do
+    expect(subject.complete_ridp?).to be_truthy
+  end
+end
+
+describe PersonPolicy, "given a user who is active broker staff for that person" do
+  let(:user) do
+    instance_double(
+      User,
+      person: user_person
+    )
+  end
+
+  let(:record) do
+    instance_double(
+      Person,
+      primary_family: family
+    )
+  end
+
+  let(:family) do
+    instance_double(
+      Family,
+      active_broker_agency_account: broker_agency_account
+    )
+  end
+
+  let(:broker_agency_account) do
+    instance_double(
+      BenefitSponsors::Accounts::BrokerAgencyAccount,
+      broker_agency_profile: broker_agency_profile
+    )
+  end
+
+  let(:broker_agency_id) { "Some Broker Agency ID" }
+  let(:writing_agent_id) { "Some Writing Agent ID" }
+
+  let(:user_person) do
+    instance_double(
+      Person,
+      primary_family: nil,
+      broker_agency_staff_roles: broker_agency_staff_roles_scope,
+      broker_role: nil,
+      hbx_staff_role: nil
+    )
+  end
+
+  let(:broker_agency_staff_role) do
+    instance_double(
+      BrokerAgencyStaffRole,
+      :active? => true,
+      benefit_sponsors_broker_agency_profile_id: broker_agency_id
+    )
+  end
+
+  let(:broker_agency_staff_roles_scope) do
+    double(
+      active: [broker_agency_staff_role]
+    )
+  end
+
+  let(:broker_agency_profile) do
+    instance_double(
+      BenefitSponsors::Organizations::BrokerAgencyProfile,
+      id: broker_agency_id
+    )
+  end
+
+  let(:hbx_staff_role) do
+    instance_double(
+      HbxStaffRole,
+      permission: permission
+    )
+  end
+
+  let(:permission) do
+    instance_double(
+      Permission,
+      modify_family: true
+    )
+  end
+
+  subject { described_class.new(user, record) }
+
+  it "may complete_ridp" do
+    expect(subject.complete_ridp?).to be_truthy
+  end
+end

@@ -1,6 +1,16 @@
 class PersonPolicy < ApplicationPolicy
   ACCESSABLE_ROLES = %w[hbx_staff_role broker_role active_broker_staff_roles].freeze
 
+  # Is the given entity allowed to complete RIDP on behalf of a given
+  # individual?
+  def complete_ridp?
+    @family = record.primary_family
+    return true if active_associated_individual_market_family_broker_staff?
+    return true if active_associated_individual_market_family_broker?
+    return true if individual_market_admin?
+    (account_holder_person == record)
+  end
+
   def can_show?
     allowed_to_modify?
   end
