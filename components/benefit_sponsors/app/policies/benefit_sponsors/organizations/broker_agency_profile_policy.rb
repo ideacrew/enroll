@@ -33,15 +33,15 @@ module BenefitSponsors
 
       def can_view_broker_agency?
         return true if hbx_staff_can_view_agency_staff?
-        return true if is_broker_for_broker_agency?
-        return true if is_staff_for_broker_agency?
+        return true if has_matching_broker_role?
+        return true if has_matching_broker_agency_staff_role?
 
         false
       end
 
       def can_manage_broker_agency?
         return true if hbx_staff_can_manage_agency_staff?
-        return true if is_broker_for_broker_agency?
+        return true if has_matching_broker_role?
 
         false
       end
@@ -49,8 +49,8 @@ module BenefitSponsors
       protected
 
       def has_matching_broker_agency_staff_role?
-        staff_roles = user.person.broker_agency_staff_roles || []
-        staff_roles.any? do |sr|
+        staff_roles = user&.person&.broker_agency_staff_roles || []
+        staff_roles&.any? do |sr|
           sr.active? &&
             (
               sr.broker_agency_profile_id == record.id ||
@@ -60,31 +60,10 @@ module BenefitSponsors
       end
 
       def has_matching_broker_role?
-        broker_role = user.person.broker_role
+        broker_role = user&.person&.broker_role
         return false unless broker_role
 
-        broker_role.benefit_sponsors_broker_agency_profile_id == record.id && broker_role.active?
-      end
-
-      ################################################################################################################
-      # NOTE: the following methods are more specific to BrokerAgencyProfilePolicy and if approved will be used in
-      # the refactor for BrokerAgencyProfileController endpoints
-      ################################################################################################################
-
-      def is_broker_for_broker_agency?
-        return false unless account_holder_broker_role
-
-        account_holder_broker_role&.broker_agency_profile&.id == record.id
-      end
-
-      def is_staff_for_broker_agency?
-        return false unless account_holder_broker_agency_staff_roles && account_holder_broker_agency_staff_roles&.present?
-
-        account_holder_broker_agency_staff_roles.detect{ |role| role&.broker_agency_profile&.id == record.id || role&.broker_agency_profile_id == record.id }
-      end
-
-      def is_associated_with_broker_agency?
-        account_holder_broker_role || account_holder_broker_agency_staff_roles&.present?
+        broker_role&.benefit_sponsors_broker_agency_profile_id == record.id && broker_role&.active?
       end
 
       ################################################################################################################
@@ -92,12 +71,8 @@ module BenefitSponsors
       # they will be deleted from this policy if present in the ApplicationPolicy of the main application
       ################################################################################################################
 
-      def account_holder_broker_role
-        @account_holder_broker_role ||= account_holder_person.broker_role if account_holder_person&.broker_role&.active?
-      end
-
-      def account_holder_broker_agency_staff_roles
-        @account_holder_broker_agency_staff_roles ||= account_holder_person&.active_broker_staff_roles
+      def is_broker_or_broker_agency_staff?
+        account_holder_person&.broker_role || account_holder_person&.broker_agency_staff_roles&.present?
       end
 
       def hbx_staff_can_view_agency_staff?
