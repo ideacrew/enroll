@@ -5,20 +5,23 @@ module BenefitSponsors
     module BrokerAgencies
       # controller that manages adding, approving and removing of staff agency roles to a broker agency profile
       class BrokerAgencyStaffRolesController < ::BenefitSponsors::ApplicationController
-        before_action :find_and_authorize_broker_agency_profile, except: :search_broker_agency
 
         def new
+          profile = find_broker_agency_profile
+          authorize profile
+
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_new
           set_ie_flash_by_announcement
 
           respond_to do |format|
-            format.html { render 'new', layout: false} if params[:profile_type]
+            # previously rendered an HTML form which was unauthorized --> only JS responses should be allowed from this endpoint
             format.js  { render 'new' }
           end
         end
 
         def create
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_create(broker_staff_params)
+
           begin
             @status,@result = @staff.save
             unless @staff.is_broker_registration_page
@@ -66,6 +69,8 @@ module BenefitSponsors
           redirect_to profiles_broker_agencies_broker_agency_profile_path(id: params[:profile_id])
         end
 
+        # This endpoint should remain unauthorized: it is used by BenefitSponsors::Profiles::RegistrationsController to search for Broker Agencies
+        # By design, users do not have to be logged in to use this endpoint
         def search_broker_agency
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_broker_agency_search(broker_staff_params)
           @broker_agency_profiles = @staff.broker_agency_search
@@ -74,20 +79,12 @@ module BenefitSponsors
         private
 
         # NOTE: this will probably be consolidated with a similarily named method in BrokerAgencyProfilesController
-        def find_and_authorize_broker_agency_profile
+        def find_broker_agency_profile
           # the #new action is missing profile_id from broker_staff_params, hence this conditional
-          profile_id = broker_staff_params[:profile_id] || params[:profile_id]
+          profile_id = BSON::ObjectId(params[:profile_id])
 
-          # if profile_id is nil, this will render an entirely different page
-          # where a broker/agent (or aspiring broker/agent) can find agencies and send out an application
-          # if not, profile_id must be present and this will render a small form on the broker homepage to add a new staff role to the broker
-          # the latter must be authorized, but not the former
-          return true unless profile_id
-
-          organizations = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId(profile_id))
-
-          broker_agency_profile = organizations&.first&.broker_agency_profile
-          authorize broker_agency_profile, :can_manage_broker_agency?
+          organizations = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => profile_id)
+          organizations&.first&.broker_agency_profile
         end
 
         def broker_staff_params

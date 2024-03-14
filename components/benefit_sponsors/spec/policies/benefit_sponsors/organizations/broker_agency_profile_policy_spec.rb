@@ -24,12 +24,10 @@ module BenefitSponsors
       it_behaves_like "does not permit a user with no person", :access_to_broker_agency_profile?
       it_behaves_like "does not permit a user with no person", :redirect_signup?
       it_behaves_like "does not permit a user with no person", :set_default_ga?
-      it_behaves_like "does not permit a user with no person", :can_view_broker_agency?
-      it_behaves_like "does not permit a user with no person", :can_manage_broker_agency?
     end
 
     describe "given an admin" do
-      let(:hbx_staff_role) { instance_double(HbxStaffRole, permission: permission) }
+      let(:hbx_staff_role) { instance_double(HbxStaffRole) }
       let(:person) do
         instance_double(
           Person,
@@ -40,8 +38,6 @@ module BenefitSponsors
       end
 
       context "that can access a broker agency" do
-        let(:permission) { instance_double(Permission, view_agency_staff: true, manage_agency_staff: true) }
-
         shared_examples_for "permits admins with the right permissions" do |policy_type|
           it "does permit" do
             expect(policy.send(policy_type)).to be_truthy
@@ -51,30 +47,6 @@ module BenefitSponsors
         it_behaves_like "permits admins with the right permissions", :access_to_broker_agency_profile?
         it_behaves_like "permits admins with the right permissions", :redirect_signup?
         it_behaves_like "permits admins with the right permissions", :set_default_ga?
-        it_behaves_like "permits admins with the right permissions", :can_view_broker_agency?
-        it_behaves_like "permits admins with the right permissions", :can_manage_broker_agency?
-      end
-
-      context "that can't access a broker agency" do
-        let(:permission) { instance_double(Permission, view_agency_staff: false, manage_agency_staff: false) }
-
-        shared_examples_for "does not permit admins with the wrong permissions" do |policy_type|
-          it "does permit" do
-            expect(policy.send(policy_type)).to be_truthy
-          end
-        end
-
-        it_behaves_like "does not permit admins with the wrong permissions", :access_to_broker_agency_profile?
-        it_behaves_like "does not permit admins with the wrong permissions", :redirect_signup?
-        it_behaves_like "does not permit admins with the wrong permissions", :set_default_ga?
-
-        it "does not permit #can_view_broker_agency?" do
-          expect(policy.can_view_broker_agency?).to be_falsey
-        end
-
-        it "does not permit #can_manage_broker_agency?" do
-          expect(policy.can_manage_broker_agency?).to be_falsey
-        end
       end
     end
 
@@ -106,11 +78,6 @@ module BenefitSponsors
       it_behaves_like "permits broker agency staff with the right permissions", :access_to_broker_agency_profile?
       it_behaves_like "permits broker agency staff with the right permissions", :redirect_signup?
       it_behaves_like "permits broker agency staff with the right permissions", :set_default_ga?
-      it_behaves_like "permits broker agency staff with the right permissions", :can_view_broker_agency?
-
-      it "does not permit #can_manage_broker_agency?" do
-        expect(policy.can_manage_broker_agency?).to be_falsey
-      end
     end
 
     describe "given a broker agency staff role for a different profile" do
@@ -141,8 +108,6 @@ module BenefitSponsors
       it_behaves_like "does not permit agents not associated with the broker", :access_to_broker_agency_profile?
       it_behaves_like "does not permit agents not associated with the broker", :redirect_signup?
       it_behaves_like "does not permit agents not associated with the broker", :set_default_ga?
-      it_behaves_like "does not permit agents not associated with the broker", :can_view_broker_agency?
-      it_behaves_like "does not permit agents not associated with the broker", :can_manage_broker_agency?
     end
 
     describe "given a broker role for that profile" do
@@ -173,8 +138,6 @@ module BenefitSponsors
       it_behaves_like "permits brokers of the agency", :access_to_broker_agency_profile?
       it_behaves_like "permits brokers of the agency", :redirect_signup?
       it_behaves_like "permits brokers of the agency", :set_default_ga?
-      it_behaves_like "permits brokers of the agency", :can_view_broker_agency?
-      it_behaves_like "permits brokers of the agency", :can_manage_broker_agency?
     end
 
     describe "given a broker role for a different profile" do
@@ -216,8 +179,6 @@ module BenefitSponsors
       it_behaves_like "does not permit brokers from a different agency", :access_to_broker_agency_profile?
       it_behaves_like "does not permit brokers from a different agency", :redirect_signup?
       it_behaves_like "does not permit brokers from a different agency", :set_default_ga?
-      it_behaves_like "does not permit brokers from a different agency", :can_view_broker_agency?
-      it_behaves_like "does not permit brokers from a different agency", :can_manage_broker_agency?
     end
   end
 end

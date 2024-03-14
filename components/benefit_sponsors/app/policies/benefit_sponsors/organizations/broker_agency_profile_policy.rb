@@ -2,10 +2,15 @@
 
 module BenefitSponsors
   module Organizations
-    # policy for will BrokerAgencyProfile, inherits from main_app ApplicationPolicy
-    class BrokerAgencyProfilePolicy < ::ApplicationPolicy
+    # policy for will BrokerAgencyProfile, inherits from benefit_sponsors ApplicationPolicy, but methods are from main_app ApplicationPolicy
+    # methods had to be duplicated due to GHAs
+    class BrokerAgencyProfilePolicy < ApplicationPolicy
 
       # NOTE: All methods will most likely be consolidated with the auth refactor for BrokerAgencyProfilesController
+
+      def new?
+        access_to_broker_agency_profile?
+      end
 
       def redirect_signup?
         access_to_broker_agency_profile?
@@ -57,19 +62,6 @@ module BenefitSponsors
         return false unless broker_role
 
         broker_role&.benefit_sponsors_broker_agency_profile_id == record.id && broker_role&.active?
-      end
-
-      ################################################################################################################
-      # NOTE: the following methods or some variation thereof will hopefully appear in ApplicationPolicy
-      # they will be deleted from this policy if present in the ApplicationPolicy of the main application
-      ################################################################################################################
-
-      def hbx_staff_can_view_agency_staff?
-        permission&.view_agency_staff
-      end
-
-      def hbx_staff_can_manage_agency_staff?
-        permission&.manage_agency_staff
       end
     end
   end
