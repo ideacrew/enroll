@@ -150,7 +150,8 @@ RSpec.describe PersonPolicy, type: :policy do
       end
 
       it 'broker agency staff role should return true when it matches broker agency profile' do
-        expect(policy.matches_broker_agency_profile?(broker_agency_profile.id)).to eq true
+        @result = policy.send(:matches_broker_agency_profile?, broker_agency_profile.id)
+        expect@result(@result).to eq true
       end
     end
 
@@ -164,7 +165,8 @@ RSpec.describe PersonPolicy, type: :policy do
       end
 
       it 'broker agency staff role should return false when it does not matches broker agency profile' do
-        expect(policy.matches_broker_agency_profile?(broker_agency_profile.id)).to eq false
+        @result = policy.send(:matches_broker_agency_profile?, broker_agency_profile.id)
+        expect@result(@result).to eq false
       end
     end
   end
