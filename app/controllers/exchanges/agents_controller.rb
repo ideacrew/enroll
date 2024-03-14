@@ -1,5 +1,4 @@
 class Exchanges::AgentsController < ApplicationController
-  include ::Pundit
   before_action :check_agent_role, except: [:home, :inbox]
   before_action :check_for_paper_app, only: [:resume_enrollment]
 
