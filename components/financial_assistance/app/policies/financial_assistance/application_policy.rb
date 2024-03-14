@@ -74,7 +74,7 @@ module FinancialAssistance
     end
 
     def has_active_broker_agency_staff_role?
-      role.any? { |r| r.is_a?(::BrokerAgencyStaffRole) }
+      Array(role).any? { |r| r.is_a?(::BrokerAgencyStaffRole) }
     end
 
 
@@ -106,10 +106,10 @@ module FinancialAssistance
     end
 
     def associated_user
-      associated_primary_person.user
+      associated_person.user
     end
 
-    def associated_primary_person
+    def associated_person
       associated_family&.primary_person
     end
 
