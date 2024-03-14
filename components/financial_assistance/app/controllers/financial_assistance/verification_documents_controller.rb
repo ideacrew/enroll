@@ -57,7 +57,8 @@ module FinancialAssistance
     def destroy
       authorize record, :can_destroy?
 
-      @document.delete if @evidence.type_unverified?
+      @document.delete if !@evidence.type_verified?
+
       if @document.destroyed?
         add_verification_history(@document)
         @docs_owner.save!
