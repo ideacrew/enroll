@@ -55,6 +55,20 @@ When(/^(.*) selects a past qle date$/) do |_name|
   end
 end
 
+Given(/an individual has gender information as male/) do
+  gender = Person.first.gender
+  gender == 'male'
+end
+
+And(/the individual selects gender as female/) do
+  find(IvlPersonalInformation.female_radiobtn).click
+end
+
+Then(/the individual should show gender as female/) do
+  gender = Person.first.gender
+  gender == 'female'
+end
+
 When(/individual has a home and mailing address/) do
   addresses = Person.first.addresses
   addresses.last.destroy
