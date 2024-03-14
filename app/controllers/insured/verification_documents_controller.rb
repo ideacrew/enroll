@@ -8,8 +8,7 @@ class Insured::VerificationDocumentsController < ApplicationController
   before_action :check_for_consumer_role
 
   def upload
-    consumer_role = person_consumer_role
-    authorize consumer_role, :verification_document_upload?
+    authorize @consumer_role, :verification_document_upload?
 
     @doc_errors = []
     if params[:file].blank?
@@ -38,8 +37,7 @@ class Insured::VerificationDocumentsController < ApplicationController
   end
 
   def download
-    consumer_role = person_consumer_role
-    authorize consumer_role, :verification_document_download?
+    authorize @consumer_role, :verification_document_download?
 
     document = get_document(params[:key])
     if document.present?
@@ -66,10 +64,6 @@ class Insured::VerificationDocumentsController < ApplicationController
 
     flash[:error] = "No consumer role exists, you are not authorized to upload documents"
     redirect_to verification_insured_families_path
-  end
-
-  def person_consumer_role
-    @person.consumer_role
   end
 
   def file_path(file)
