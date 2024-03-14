@@ -80,7 +80,6 @@ module BenefitSponsors
 
         # NOTE: this will probably be consolidated with a similarily named method in BrokerAgencyProfilesController
         def find_broker_agency_profile
-          # the #new action is missing profile_id from broker_staff_params, hence this conditional
           profile_id = BSON::ObjectId(params[:profile_id])
 
           organizations = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => profile_id)
