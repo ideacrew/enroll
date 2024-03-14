@@ -8,11 +8,11 @@ class HbxAdminController < ApplicationController
   before_action :set_cache_headers, only: [:edit_aptc_csr]
 
   def registry
-    redirect_to main_app.root_path if ENV['AWS_ENV'] == 'prod'
+    authorize EnrollRegistry, :show?
   end
 
   def edit_aptc_csr
-    raise NotAuthorizedError if !current_user.has_hbx_staff_role?
+    authorize HbxProfile
 
     @slcsp_value = Admin::Aptc.calculate_slcsp_value(@current_year, @family)
     @household_members = Admin::Aptc.build_household_members(@current_year, @family)
@@ -32,7 +32,7 @@ class HbxAdminController < ApplicationController
   end
 
   def update_aptc_csr
-    raise NotAuthorizedError if !current_user.has_hbx_staff_role?
+    authorize HbxProfile, :edit_aptc_csr?
 
     if @aptc_errors.blank?
       if @family.present? #&& TimeKeeper.date_of_record.year == year
@@ -57,7 +57,7 @@ class HbxAdminController < ApplicationController
 
   # For AJAX Calculations.
   def calculate_aptc_csr
-    raise NotAuthorizedError if !current_user.has_hbx_staff_role?
+    authorize HbxProfile
 
     @enrollments_info = Admin::Aptc.build_enrollments_data(@current_year, @family, @hbxs, params[:applied_aptcs_array], params[:max_aptc].to_f, params[:csr_percentage].to_i, params[:memeber_ids])
     @slcsp_value = Admin::Aptc.calculate_slcsp_value(@current_year, @family)

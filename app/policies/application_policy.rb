@@ -61,8 +61,8 @@ class ApplicationPolicy
     @account_holder_family = account_holder_person&.primary_family
   end
 
-  # START - ACA Individual Market related methods
-  #
+  # @!group ACA Individual Market related methods
+
   # Determines if the current user is a primary family member in the individual market.
   # The user is considered a primary family member if they have verified their identity in the individual market (RIDP verified) and their account holder's family is the same as the current family.
   #
@@ -165,11 +165,11 @@ class ApplicationPolicy
 
     permission.modify_family
   end
-  #
-  # END - ACA Individual Market related methods
 
-  # START - Non-ACA Coverall Market related methods
-  #
+  # @!endgroup
+
+  # @!group Non-ACA Coverall Market related methods
+
   # Checks if the account holder is a primary family member in the coverall market for the given family.
   # A user is considered a primary family member in the coverall market if they have a coverall market role and they are the primary person of the given family.
   #
@@ -207,11 +207,11 @@ class ApplicationPolicy
   def coverall_market_admin?
     individual_market_admin?
   end
-  #
-  # END - Non-ACA Coverall Market related methods
 
-  # START - ACA Shop Market related methods
-  #
+  # @!endgroup
+
+  # @!group ACA Shop Market related methods
+
   # Checks if the account holder is a primary family member in the ACA Shop market for the given family.
   # A user is considered a primary family member in the ACA Shop market if they have an employee role and they are the primary person of the given family.
   #
@@ -267,11 +267,11 @@ class ApplicationPolicy
       }
     ).present?
   end
-  #
-  # END - ACA Shop Market related methods
 
-  # START - Non-ACA Fehb Market related methods
-  #
+  # @endgrop
+
+  # @!group Non-ACA Fehb Market related methods
+
   # Checks if the account holder is a primary family member in the Non-ACA Fehb market for the given family.
   # A user is considered a primary family member in the Non-ACA Fehb market if they are a primary family member in the ACA Shop market for the given family.
   #
@@ -292,10 +292,10 @@ class ApplicationPolicy
   def active_associated_fehb_market_general_agency?
     false
   end
-  #
-  # END - Non-ACA Fehb Market related methods
 
-  # START - Hbx Staff Role permissions
+  # @!endgroup
+
+  # @!group Hbx Staff Role permissions
 
   def staff_view_admin_tabs?
     permission&.view_admin_tabs
@@ -445,7 +445,7 @@ class ApplicationPolicy
     @hbx_role = account_holder_person&.hbx_staff_role
   end
 
-  # END - Hbx Staff Role permissions
+  # @!endgroup
 
   def index?
     read_all?
