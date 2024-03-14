@@ -2,10 +2,8 @@
 
 module BenefitSponsors
   module Organizations
-    # temporarily unable to inherit from main app ApplicationPolicy
-    # will temporarily inherit from BenefitSponsors
-    # class BrokerAgencyProfilePolicy < ::ApplicationPolicy
-    class BrokerAgencyProfilePolicy < ApplicationPolicy
+    # policy for will BrokerAgencyProfile, inherits from main_app ApplicationPolicy
+    class BrokerAgencyProfilePolicy < ::ApplicationPolicy
 
       # NOTE: All methods will most likely be consolidated with the auth refactor for BrokerAgencyProfilesController
 
