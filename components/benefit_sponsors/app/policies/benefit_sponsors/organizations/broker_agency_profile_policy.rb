@@ -29,21 +29,6 @@ module BenefitSponsors
         access_to_broker_agency_profile?
       end
 
-      def can_view_broker_agency?
-        return true if hbx_staff_can_view_agency_staff?
-        return true if has_matching_broker_role?
-        return true if has_matching_broker_agency_staff_role?
-
-        false
-      end
-
-      def can_manage_broker_agency?
-        return true if hbx_staff_can_manage_agency_staff?
-        return true if has_matching_broker_role?
-
-        false
-      end
-
       protected
 
       def has_matching_broker_agency_staff_role?
