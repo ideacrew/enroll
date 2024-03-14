@@ -33,13 +33,13 @@ module BenefitSponsors
 
     def permission
       return @permission if defined? @permission
-  
+
       @permission = hbx_role&.permission
     end
-  
+
     def hbx_role
       return @hbx_role if defined? @hbx_role
-  
+
       @hbx_role = account_holder_person&.hbx_staff_role
     end
   end
