@@ -3,10 +3,13 @@
 class Insured::VerificationDocumentsController < ApplicationController
   include ApplicationHelper
 
-  before_action :get_family
-  before_action :updateable?, :find_type, :find_docs_owner, only: [:upload]
+  before_action :set_current_person
+  before_action :find_type, :find_docs_owner, only: [:upload]
+  before_action :check_for_consumer_role
 
   def upload
+    authorize @consumer_role, :verification_document_upload?
+
     @doc_errors = []
     if params[:file].blank?
       flash[:error] = "File not uploaded. Please select the file to upload."
@@ -34,6 +37,8 @@ class Insured::VerificationDocumentsController < ApplicationController
   end
 
   def download
+    authorize @consumer_role, :verification_document_download?
+
     document = get_document(params[:key])
     if document.present?
       bucket = env_bucket_name('id-verification')
@@ -47,23 +52,18 @@ class Insured::VerificationDocumentsController < ApplicationController
   end
 
   private
-  def updateable?
-    authorize Family, :updateable?
-  end
 
   def find_type
-    set_current_person
     find_docs_owner
     @verification_type = @docs_owner.verification_types.find(params[:verification_type]) if params[:verification_type]
   end
 
-  def get_family
-    set_current_person
-    @family = @person.primary_family
-  end
+  def check_for_consumer_role
+    @consumer_role = @person.consumer_role
+    return if @consumer_role
 
-  def person_consumer_role
-    @person.consumer_role
+    flash[:error] = "No consumer role exists, you are not authorized to upload documents"
+    redirect_to verification_insured_families_path
   end
 
   def file_path(file)
