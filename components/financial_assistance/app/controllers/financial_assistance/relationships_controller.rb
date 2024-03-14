@@ -8,6 +8,8 @@ module FinancialAssistance
     layout 'financial_assistance_nav'
 
     def index
+      authorize @application, :index?
+
       @matrix = @application.build_relationship_matrix
       @missing_relationships = @application.find_missing_relationships(@matrix)
       @all_relationships = @application.find_all_relationships(@matrix)
@@ -15,6 +17,8 @@ module FinancialAssistance
     end
 
     def create
+      authorize @application, :create?
+
       applicant_id = params[:applicant_id]
       relative_id = params[:relative_id]
       predecessor = FinancialAssistance::Applicant.find(applicant_id)

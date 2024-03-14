@@ -1,7 +1,9 @@
 class Exchanges::AgentsController < ApplicationController
-  before_action :check_agent_role
+  before_action :check_agent_role, except: [:home, :inbox]
   before_action :check_for_paper_app, only: [:resume_enrollment]
+
   def home
+    authorize :agent, :home?
      @title = current_user.agent_title
      person_id = session[:person_id]
      @person=nil
@@ -49,6 +51,7 @@ class Exchanges::AgentsController < ApplicationController
   end
 
   def inbox
+    authorize :agent, :inbox?
     @inbox_provider = current_user.person
     @profile=@inbox_provider
     @folder = params[:folder] || 'inbox'
