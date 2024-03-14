@@ -28,7 +28,7 @@ FinancialAssistance::Engine.routes.draw do
     get :transfer_history, on: :member
     patch :update_application_year, on: :member
 
-    resources :relationships
+    resources :relationships, only: [:index, :create]
 
     resources :applicants do
       get 'verification_documents/upload', to: 'verification_documents#upload'
