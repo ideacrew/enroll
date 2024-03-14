@@ -2,14 +2,14 @@
 
 # FinancialAssistance module encapsulates all the models used in the Financial Assistance feature
 module FinancialAssistance
-  # The DeductionPolicy class defines the policy for accessing and modifying deductions.
-  # It determines what actions a user can perform on a deduction based on their roles and permissions.
-  class DeductionPolicy < ::ApplicationPolicy
-    # Initializes the DeductionPolicy with a user and a record.
+  # The IncomePolicy class defines the policy for accessing and modifying incomes.
+  # It determines what actions a user can perform on a income based on their roles and permissions.
+  class IncomePolicy < ::ApplicationPolicy
+    # Initializes the IncomePolicy with a user and a record.
     # It sets the @family instance variable to the family of the application record.
     #
     # @param user [User] the user who is performing the action
-    # @param record [Deduction] the deduction that the user is trying to access or modify
+    # @param record [Income] the income that the user is trying to access or modify
     def initialize(user, record)
       super
 
@@ -17,6 +17,14 @@ module FinancialAssistance
       #   The applicant is supposed to be a FinancialAssistance::Applicant object.
       #   Currently, the _parent method is being used, which returns the FinancialAssistance::Application object.
       @family ||= record._parent.application.family
+    end
+
+    # Determines if the current user has permission to edit a income.
+    # The user can edit a income if they have permission to perform a step.
+    #
+    # @return [Boolean] Returns true if the user has permission to edit a income, false otherwise.
+    def edit?
+      step?
     end
 
     # Determines if the current user has permission to perform a step.
@@ -32,19 +40,11 @@ module FinancialAssistance
       false
     end
 
-    # Determines if the current user has permission to update a deduction.
-    # The user can update a deduction if they have permission to perform a step.
+    # Determines if the current user has permission to update a income.
+    # The user can update a income if they have permission to perform a step.
     #
-    # @return [Boolean] Returns true if the user has permission to update a deduction, false otherwise.
+    # @return [Boolean] Returns true if the user has permission to update a income, false otherwise.
     def update?
-      step?
-    end
-
-    # Determines if the current user has permission to destroy a deduction.
-    # The user can destroy a deduction if they have permission to perform a step.
-    #
-    # @return [Boolean] Returns true if the user has permission to destroy a deduction, false otherwise.
-    def destroy?
       step?
     end
   end
