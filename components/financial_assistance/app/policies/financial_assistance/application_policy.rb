@@ -71,7 +71,6 @@ module FinancialAssistance
       Array(role).any? { |r| r.is_a?(::BrokerAgencyStaffRole) }
     end
 
-
     def can_hbx_staff_modify?
       role.is_a?(HbxStaffRole) && role&.permission&.modify_family
     end

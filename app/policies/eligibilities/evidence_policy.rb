@@ -56,10 +56,6 @@ module Eligibilities
       (has_active_broker_role? || has_active_broker_agency_staff_role?) && matches_individual_market_broker_account?
     end
 
-    def broker_agency_profile_matches?
-      associated_family.active_broker_agency_account.present? && associated_family.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id == role.benefit_sponsors_broker_agency_profile_id
-    end
-
     # Checks if the broker agency profile ID of any of the roles
     # matches the provided broker agency profile ID.
     #
@@ -84,7 +80,7 @@ module Eligibilities
     end
 
     def has_active_broker_agency_staff_role?
-      role.any? { |r| r.is_a?(::BrokerAgencyStaffRole) }
+      Array(role).any? { |r| r.is_a?(::BrokerAgencyStaffRole) }
     end
 
     def role
