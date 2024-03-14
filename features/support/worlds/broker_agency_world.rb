@@ -90,9 +90,39 @@ module BrokerAgencyWorld
     person_rec = FactoryBot.create(:person, first_name: person[:first_name], last_name: person[:last_name], dob: Date.strptime(person[:dob], "%m/%d/%Y"))
     FactoryBot.create(:user, person: person_rec, email: person[:email])
   end
+
+  def broker_agency_profile_with_organization(*traits)
+    attributes = traits.extract_options!
+    @broker_agency_profile ||= FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, *traits, attributes)
+  end
 end
 
 World(BrokerAgencyWorld)
+
+Given(/^an individual market broker exists$/) do
+  broker_agency_profile_with_organization market_kind: :individual
+  broker :with_family, :broker_with_person, organization: @broker_agency_profile.organization
+end
+
+And(/^a consumer role family exists with broker$/) do
+  @person = FactoryBot.create(:person, :with_family, :with_consumer_role)
+  @person.consumer_role.move_identity_documents_to_verified
+  @person.primary_family.broker_agency_accounts.create!(
+    start_on: TimeKeeper.date_of_record,
+    benefit_sponsors_broker_agency_profile_id: @broker_agency_profile.id,
+    writing_agent_id: @broker_agency_profile.primary_broker_role.id,
+    is_active: true
+  )
+end
+
+And(/^broker lands on broker agency home page$/) do
+  visit benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(id: @broker_agency_profile)
+end
+
+And(/^broker clicks on the name of the person in family index$/) do
+  person_name = @person&.first_name || 'John'
+  find('a', :text => person_name, :wait => 10).click
+end
 
 Given(/^there is a Broker Agency exists for (.*?)$/) do |broker_agency_name|
   broker_agency_organization broker_agency_name, legal_name: broker_agency_name, dba: broker_agency_name

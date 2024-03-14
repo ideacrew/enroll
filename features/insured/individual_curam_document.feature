@@ -39,19 +39,23 @@ Feature: Customers go to Curam to view notices and verifications
     Then there will be text to the left of the MEDICAID & TAX CREDITS button
 
   Scenario: Broker can see the Navigation Button
-    Given that a broker exists
-    Given a consumer exists
-    And the user is RIDP verified
+    Given an individual market broker exists
+    And a consumer role family exists with broker
     And the broker is signed in
+    And broker lands on broker agency home page
+    And the broker clicks on Families tab
+    And broker clicks on the name of the person in family index
     When the broker visits verification page
     And the user navigates to the DOCUMENTS tab
     Then MEDICAID & TAX CREDITS button is visible to the user
 
   Scenario: Broker can see the Navigation Button
-    Given that a broker exists
-    Given a consumer exists
-    And the user is RIDP verified
+    Given an individual market broker exists
+    And a consumer role family exists with broker
     And the broker is signed in
+    And broker lands on broker agency home page
+    And the broker clicks on Families tab
+    And broker clicks on the name of the person in family index
     When the broker visits verification page
     And the user navigates to the DOCUMENTS tab
     When MEDICAID & TAX CREDITS button is visible to the user
@@ -74,9 +78,12 @@ Feature: Customers go to Curam to view notices and verifications
     Then EA sets a flag in IAM to direct the consumer to the curam/ drupal login
 
   Scenario: Broker can see the Navigation Button
-    Given that a broker exists
+    Given an individual market broker exists
+    And a consumer role family exists with broker
     And the broker is signed in
-    And the consumer is RIDP verified
+    And broker lands on broker agency home page
+    And the broker clicks on Families tab
+    And broker clicks on the name of the person in family index
     When the user visits messages page
     Then there will be text to the left of the MEDICAID & TAX CREDITS button
     Then EA sets a flag in IAM to direct the consumer to the curam/ drupal login

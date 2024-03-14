@@ -87,7 +87,7 @@ Scenario: Outstanding verification
     And FAA display_medicaid_question feature is enabled
     And FAA mec_check feature is enabled
     And a family with financial application and applicants in determined state exists with evidences
-    And the consumer is RIDP verified
+    And the user is RIDP verified
     And the user with hbx_staff role is logged in
     When admin visits home page
     And Individual clicks on Documents link

@@ -6,6 +6,7 @@ Feature: Consumer verification process
     And FAA mec_check feature is enabled
     And validate_and_record_publish_application_errors feature is enabled
     And a family with financial application and applicants in determined state exists with unverified evidences
+    And the user is RIDP verified
     And the user with hbx_staff role is logged in
     When admin visits home page
     And Individual clicks on Documents link
