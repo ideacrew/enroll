@@ -124,14 +124,6 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :scheduled_events do
-      collection do
-        get 'current_events'
-        get 'delete_current_event'
-        get 'list'
-      end
-    end
-
     resources :issuers, only: [:index] do
       post :bulk_upload
       resources :products, only: [:index]
