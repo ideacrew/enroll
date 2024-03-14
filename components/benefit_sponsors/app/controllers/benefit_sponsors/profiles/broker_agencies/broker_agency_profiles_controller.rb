@@ -53,7 +53,6 @@ module BenefitSponsors
         end
 
         def staff_index
-          # admin only
           authorize self
           @q = params.permit(:q)[:q]
           @staff = eligible_brokers
@@ -76,7 +75,6 @@ module BenefitSponsors
         # TODO: need to refactor for cases around SHOP broker agencies
         def family_datatable
           find_broker_agency_profile(BSON::ObjectId.from_string(params.permit(:id)[:id]))
-          # can view
           authorize @broker_agency_profile, :access_to_broker_agency_profile?
           @display_family_link = if ::EnrollRegistry.feature_enabled?(:disable_family_link_in_broker_agency)
                                    current_user.has_hbx_staff_role? || !::EnrollRegistry[:disable_family_link_in_broker_agency].setting(:enable_after_time_period).item.cover?(TimeKeeper.date_of_record)
@@ -101,7 +99,6 @@ module BenefitSponsors
         end
 
         def family_index
-          # can view
           find_broker_agency_profile(BSON::ObjectId.from_string(params.permit(:id)[:id]))
           authorize @broker_agency_profile, :access_to_broker_agency_profile?
           @q = params.permit(:q)[:q]
