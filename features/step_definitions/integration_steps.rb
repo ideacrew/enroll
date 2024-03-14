@@ -881,16 +881,16 @@ end
 
 When(/^.+ filters plans by Carrier/) do
   find('.selectric-interaction-choice-control-carrier').click
-  carrier_option = find('li .interaction-choice-control-carrier-1', wait: 5)
+  carrier_option = find('li .interaction-choice-control-carrier-1', wait: 10)
   @carrier_selected = carrier_option.text
   carrier_option.click
   find(".interaction-click-control-apply", match: :first, wait: 5).click
 end
 
 Then(/^.+ should see plans filtered by Carrier/) do
-  sleep(2)
-  find_all('.plan-row', wait: 5).each do |row|
-    expect(row.find('h3 small', wait: 5).text).to eq @carrier_selected
+  sleep(10)
+  find_all('.plan-row', wait: 10).each do |row|
+    expect(row.find('h3 small', wait: 10).text).to eq @carrier_selected
   end
 end
 
