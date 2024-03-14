@@ -90,7 +90,7 @@ class ApplicationPolicy
   #
   # @return [Boolean] Returns true if the primary person of the family has verified their identity, false otherwise.
   def primary_family_member_ridp_verified?
-    primary = family.primary_person
+    primary = family&.primary_person
     return false if primary.blank?
 
     consumer_role = primary.consumer_role
