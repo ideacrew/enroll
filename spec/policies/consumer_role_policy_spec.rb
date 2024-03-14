@@ -282,7 +282,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
       end
     end
-    
+
     permissions :verification_document_upload? do
       context 'when a valid user is logged in' do
         context 'when the user is a consumer' do

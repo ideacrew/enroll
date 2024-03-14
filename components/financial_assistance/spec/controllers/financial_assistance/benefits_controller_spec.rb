@@ -13,7 +13,7 @@ RSpec.describe FinancialAssistance::BenefitsController, dbclean: :after_each, ty
   let!(:applicant) { FactoryBot.create(:applicant, application: application,family_member_id: family_member_id) }
   let!(:benefit) do
     benefit = FactoryBot.build(:financial_assistance_benefit)
-    applicant.benefits << benefit 
+    applicant.benefits << benefit
     benefit
   end
   let!(:valid_params1) do
