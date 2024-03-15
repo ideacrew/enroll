@@ -64,7 +64,7 @@ class DocumentsController < ApplicationController
   end
 
   def update_ridp_verification_type
-    authorize @person, :can_hbx_staff_modify?
+    authorize HbxProfile, :can_update_ridp_verification_type?
 
     ridp_type = params[:ridp_verification_type]
     update_reason = params[:verification_reason]
@@ -83,7 +83,7 @@ class DocumentsController < ApplicationController
   end
 
   def enrollment_verification
-    authorize @person, :can_hbx_staff_modify?
+    authorize HbxProfile, :can_verify_enrollment?
 
     family = @person.primary_family
     if family.active_household.hbx_enrollments.verification_needed.any?
@@ -140,7 +140,7 @@ class DocumentsController < ApplicationController
   end
 
   def extend_due_date
-    authorize HbxProfile, :can_update_verification_type?
+    authorize HbxProfile, :can_extend_due_date?
 
     @family_member = FamilyMember.find(params[:family_member_id])
     enrollment = @family_member.family.enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => @family_member.id).first
