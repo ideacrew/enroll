@@ -40,14 +40,16 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
     FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile)
   end
   let(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: 'active')}
-  let(:broker_user) {FactoryBot.create(:user, :person => broker_agency_staff_role.person, roles: ['broker_role'])}
+  let(:broker_role_user) {FactoryBot.create(:user, :person => broker_role.person, roles: ['broker_role'])}
+  let(:broker_agency_staff_user) {FactoryBot.create(:user, :person => broker_agency_staff_role.person, roles: ['broker_agency_staff_role'])}
   let(:broker_person) { broker_agency_staff_role.person }
   let(:broker_role) do
     role = BrokerRole.new(
       :broker_agency_profile => broker_agency_profile,
       :aasm_state => "applicant",
       :npn => "123456789",
-      :provider_kind => "broker"
+      :provider_kind => "broker",
+      :aasm_state => "active"
     )
     broker_person.broker_role = role
     broker_person.save!
@@ -57,6 +59,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
   before :each do
     # Needed for the American indian status type
     allow(EnrollRegistry[:indian_alaskan_tribe_details].feature).to receive(:is_enabled).and_return(false)
+    consumer_role.move_identity_documents_to_verified
   end
 
   describe "destroy" do
@@ -382,7 +385,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
 
         it 'should be able to download' do
           allow(Operations::Documents::Download).to receive(:call).and_return(Dry::Monads::Success(tempfile))
-          sign_in broker_user
+          sign_in broker_role_user
           get :cartafact_download, params: {model: "Person", model_id: consumer_person.id, relation: "documents", relation_id: document.id}
           expect(response.status).to eq(200)
           expect(response.headers["Content-Disposition"]).to eq 'attachment'
@@ -391,7 +394,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
 
       context 'is not authorized' do
         it 'should not be able to download' do
-          sign_in broker_user
+          sign_in broker_role_user
           get :cartafact_download, params: {model: "Person", model_id: consumer_person.id, relation: "documents", relation_id: document.id}
           expect(flash[:error]).to eq("Access not allowed for person_policy.can_download_document?, (Pundit policy)")
         end
@@ -484,7 +487,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
                                                                                                writing_agent_id: broker_role.id,
                                                                                                start_on: Time.now,
                                                                                                is_active: true)
-          sign_in broker_user
+          sign_in broker_role_user
         end
 
         it 'broker should be able to download' do
@@ -495,7 +498,7 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
 
       context 'without authorized account' do
         before do
-          sign_in broker_user
+          sign_in broker_role_user
         end
 
         it 'broker should be able to download' do

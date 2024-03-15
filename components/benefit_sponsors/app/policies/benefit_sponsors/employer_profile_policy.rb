@@ -7,8 +7,7 @@ module BenefitSponsors
     end
 
     def can_download_document?
-      return false unless user.present?
-      can_modify_employer? || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record) || is_broker_staff_role_for_employer?(record) || is_staff_role_for_employer?(record)
+      updateable?
     end
 
     def show_pending?
