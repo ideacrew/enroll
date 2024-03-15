@@ -154,46 +154,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     allow(individual_market_transition).to receive(:role_type).and_return(nil)
   end
 
-  context 'when user not authorized' do
-    before do
-      allow(controller).to receive(:is_family_authorized?).and_return(false)
-    end
-
-    context '#new' do
-      it "should redirect to root path" do
-        sign_in user
-        get :new, params: { person_id: person.id, consumer_role_id: consumer_role.id, change_plan: "change", hbx_enrollment_id: hbx_enrollment.id, coverage_kind: hbx_enrollment.coverage_kind }
-        expect(response).to have_http_status(:redirect)
-        expect(response).to redirect_to('/')
-      end
-    end
-
-    context '#create' do
-      let(:params) do
-        {
-          person_id: person.id,
-          consumer_role_id: consumer_role.id,
-          market_kind: "individual",
-          change_plan: "change",
-          hbx_enrollment_id: hbx_enrollment.id,
-          family_member_ids: [BSON::ObjectId.new],
-          enrollment_kind: 'sep',
-          coverage_kind: hbx_enrollment.coverage_kind
-        }
-      end
-      it "should redirect to root path" do
-        sign_in user
-        post :create, params: params
-        expect(response).to have_http_status(:redirect)
-        expect(response).to redirect_to('/')
-      end
-    end
-  end
-
   context "GET new" do
     before do
       allow(Person).to receive(:find).and_return(person)
-      allow(controller).to receive(:is_user_authorized?).and_return(true)
     end
 
     let(:hbx_enrollment_member) { FactoryBot.build(:hbx_enrollment_member) }
@@ -203,17 +166,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       get :new, params: { person_id: person.id, employee_role_id: employee_role.id }
       expect(response).to have_http_status(:success)
     end
-
-    # it "returns to family home page when employee is not under open enrollment" do
-    #   sign_in user
-    #   employee_roles = [employee_role]
-    #   allow(person).to receive(:employee_roles).and_return(employee_roles)
-    #   allow(employee_roles).to receive(:detect).and_return(employee_role)
-    #   allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
-    #   get :new, person_id: person.id, employee_role_id: employee_role.id
-    #   expect(response).to redirect_to(family_account_path)
-    #   expect(flash[:alert]).to eq "You can only shop for plans during open enrollment."
-    # end
 
     it "return blank change_plan" do
       sign_in user
@@ -235,11 +187,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     it "should get hbx_enrollment when has active hbx_enrollments and in qle flow" do
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
-      # FIXME: This is no better than mocking the controller itself on the
-      # #selected_enrollment method - and we need to actually mock out the items
-      # allow(controller).to receive(:selected_enrollment).and_return hbx_enrollment
-      # allow_any_instance_of(GroupSelectionPrevaricationAdapter).to receive(:selected_enrollment).with(family, employee_role).and_return(hbx_enrollment)
-
       sign_in user
       get :new, params: { person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop', hbx_enrollment_id: hbx_enrollment.id }
       expect(assigns(:hbx_enrollment)).to eq hbx_enrollment
@@ -266,10 +213,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     end
 
     it "should get hbx_enrollment when has enrolled hbx_enrollments and in shop qle flow but user has both employee_role and consumer_role" do
-      # FIXME: This is no better than mocking the controller itself on the
-      # #selected_enrollment method - and we need to actually mock out the items
-      # allow(controller).to receive(:selected_enrollment).and_return hbx_enrollment
-      # allow_any_instance_of(GroupSelectionPrevaricationAdapter).to receive(:selected_enrollment).with(family, employee_role).and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
       sign_in user
       get :new, params: { person_id: person.id, employee_role_id: employee_role.id, change_plan: 'change_by_qle', market_kind: 'shop', consumer_role_id: consumer_role.id, hbx_enrollment_id: hbx_enrollment.id }
@@ -284,10 +227,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     it "should disable individual market kind if selected market kind is shop in dual role SEP" do
       family.reload
-      # FIXME: This is no better than mocking the controller itself on the
-      # #selected_enrollment method - and we need to actually mock out the items
-      # allow(controller).to receive(:selected_enrollment).and_return hbx_enrollment
-      # allow_any_instance_of(GroupSelectionPrevaricationAdapter).to receive(:selected_enrollment).with(family, employee_role).and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
 
       sign_in user
@@ -544,13 +483,10 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
         area = EnrollRegistry[:rating_area].settings(:areas).item.first
         allow(Person).to receive(:find).and_return(person)
-        @user = FactoryBot.create(:user, person: person)
-        # allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, @enrollment.effective_on, 59, area).and_return(814.85)
-        # allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, @enrollment.effective_on, 61, area).and_return(879.8)
       end
 
       it 'return http success and render' do
-        sign_in @user
+        sign_in user
         @family.special_enrollment_periods << @sep
         attrs = {hbx_enrollment_id: @enrollment.id.to_s, family_id: @family.id}
         get :edit_plan, params: attrs
@@ -588,7 +524,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
   context 'IVL Market' do
     before do
       allow(Person).to receive(:find).and_return(person)
-      allow(controller).to receive(:is_user_authorized?).and_return(true)
     end
 
     context 'consumer role family' do
@@ -824,9 +759,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
 
       it "should be able to terminate coverage if user is valid and has broker role" do
-        # broker_role = broker_person.broker_role
-        # broker_role.aasm_state = "active"
-        # broker_role.save
         family.broker_agency_accounts << broker_agency_account
         family.save
         sign_in broker_user
@@ -1230,7 +1162,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     before do
       allow(Person).to receive(:find).and_return(person)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
-      allow(controller).to receive(:is_user_authorized?).and_return(true)
       sign_in user
       family.reload
     end
@@ -1250,7 +1181,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     it "with change_plan" do
       family.active_household.hbx_enrollments << [hbx_enrollment]
       family.save
-      user = FactoryBot.create(:user, id: 98, person: FactoryBot.create(:person))
       sign_in user
       allow(hbx_enrollment).to receive(:save).and_return(true)
       post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids, change_plan: 'change' }
@@ -1266,7 +1196,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       before :each do
         family.active_household.hbx_enrollments << [hbx_enrollment]
         family.save
-        user = FactoryBot.create(:user, person: FactoryBot.create(:person))
         sign_in user
         allow(old_hbx).to receive(:is_shop?).and_return true
         allow(employee_role.census_employee).to receive(:coverage_effective_on).with(hbx_enrollment.sponsored_benefit_package).and_return(hbx_enrollment.effective_on)
@@ -1288,6 +1217,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     end
 
     context "family has active sep" do
+      let(:user1) { FactoryBot.create(:user, person: person1) }
       let(:person1) { FactoryBot.create(:person, :with_family, :with_employee_role, first_name: "mock")}
       let(:family1) { person1.primary_family }
       let(:family_member_ids) {{"0" => family1.family_members.first.id}}
@@ -1327,7 +1257,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
           :coverage_kind => hbx_enrollment.coverage_kind}
       end
       it "should create an hbx enrollment" do
-        sign_in user
+        sign_in user1
         allow(Person).to receive(:find).and_return(person1)
         post :create, params: {person_id: person1.id, employee_role_id: person1.employee_roles.first.id, market_kind: "shop", family_member_ids: family_member_ids, change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id, enrollment_kind: 'special_enrollment', coverage_kind: hbx_enrollment.coverage_kind }
         expect(assigns(:change_plan)).to eq "change_by_qle"
@@ -1338,7 +1268,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       let(:existing_product) { ::BenefitMarkets::Products::Product.new(:id => existing_product_id) }
       let(:old_hbx) { HbxEnrollment.new(:sponsored_benefit_package_id => sponsored_benefit_package_id, :sponsored_benefit_id => sponsored_benefit_id, :product => existing_product) }
       before :each do
-        user = FactoryBot.create(:user, person: FactoryBot.create(:person))
         sign_in user
         allow(hbx_enrollments).to receive(:show_enrollments_sans_canceled).and_return []
         allow(hbx_enrollments).to receive(:build).and_return(hbx_enrollment)
@@ -1377,7 +1306,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
       it 'when benefit application is in termination pending' do
         initial_application.update_attributes(aasm_state: :termination_pending)
-        user = FactoryBot.create(:user, id: 190, person: FactoryBot.create(:person))
         sign_in user
         post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids }
         expect(flash[:error]).to eq "Your employer is no longer offering health insurance through #{EnrollRegistry[:enroll_app].setting(:short_name).item}." \
@@ -1386,7 +1314,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
       it 'when benefit application is terminated' do
         initial_application.update_attributes(aasm_state: :terminated)
-        user = FactoryBot.create(:user, id: 191, person: FactoryBot.create(:person))
         sign_in user
         post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids }
         expect(flash[:error]).to eq "Your employer is no longer offering health insurance through #{EnrollRegistry[:enroll_app].setting(:short_name).item}. Please contact your employer."
@@ -1394,7 +1321,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     end
 
     it "for cobra with invalid date" do
-      user = FactoryBot.create(:user, id: 196, person: FactoryBot.create(:person))
       sign_in user
       allow(census_employee).to receive(:have_valid_date_for_cobra?).and_return(false)
       allow(census_employee).to receive(:coverage_terminated_on).and_return(TimeKeeper.date_of_record)
@@ -1424,12 +1350,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       before do
         family.active_household.hbx_enrollments << [hbx_enrollment]
         family.save
-        user = FactoryBot.create(:user, person: FactoryBot.create(:person))
-
         allow_any_instance_of(HbxEnrollment).to receive(:shop_osse_eligibility_is_enabled?).and_return(true)
         allow_any_instance_of(BenefitSponsors::BenefitApplications::BenefitApplication).to receive(:osse_eligible?).and_return(true)
         allow_any_instance_of(HbxEnrollment).to receive(:osse_subsidy_for_member).and_return(subsidy_amount)
-        allow(controller).to receive(:is_user_authorized?).and_return(true)
 
         sign_in user
         allow(old_hbx).to receive(:is_shop?).and_return true
@@ -1456,7 +1379,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       before do
         allow(EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model)).to receive(:item).and_return('county')
         allow(EnrollRegistry[:enroll_app].setting(:rating_areas)).to receive(:item).and_return('county')
-        allow(controller).to receive(:is_user_authorized?).and_return(true)
         ::BenefitMarkets::Locations::RatingArea.all.update_all(covered_states: nil)
         sign_in user
         @person1 = FactoryBot.create(:person, :with_active_consumer_role, :with_consumer_role)

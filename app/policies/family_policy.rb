@@ -159,11 +159,27 @@ class FamilyPolicy < ApplicationPolicy
     false
   end
 
-  # Determines if the current user has permission to create a new family record.
-  # TODO: Implement the logic to check if the user has permission to create a new family record.
+  # Determines if the current user has permission to create a family.
+  # The user can create a family if they have permission to view a family.
   #
-  # @return [Boolean] Returns true if the user has permission to create a new record, false otherwise.
-  def create?; end
+  # @return [Boolean] Returns true if the user has permission to create a family, false otherwise.
+  def create?
+    show?
+  end
+
+  def terminate_selection?
+    return true if shop_market_primary_family_member?
+    return true if shop_market_admin?
+    return true if active_associated_shop_market_family_broker?
+    return true if active_associated_shop_market_general_agency?
+
+    return true if fehb_market_primary_family_member?
+    return true if fehb_market_admin?
+    return true if active_associated_fehb_market_family_broker?
+    return true if active_associated_fehb_market_general_agency?
+
+    false
+  end
 
   # Determines if the current user has permission to update the family record.
   # TODO: Implement the logic to check if the user has permission to update the family record.

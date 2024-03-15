@@ -7,11 +7,12 @@ class Insured::GroupSelectionController < ApplicationController
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   before_action :validate_rating_address, only: [:create]
   before_action :set_cache_headers, only: [:new, :edit_plan]
-  before_action :is_user_authorized?
-  # before_action :set_vars_for_market, only: [:new]
-  # before_action :is_under_open_enrollment, only: [:new]
+  before_action :find_hbx_enrollment
+  before_action :set_current_person
+  before_action :authorize_user_for_create
 
   def new
+    authorize @family, :new?
     set_bookmark_url
     set_admin_bookmark_url
 
@@ -172,24 +173,21 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def terminate_selection
+    authorize @family, :terminate_selection?
     @hbx_enrollments = @family.enrolled_hbx_enrollments.select{|pol| pol.may_terminate_coverage? } || []
     @termination_date_options = @family.options_for_termination_dates(@hbx_enrollments)
   end
 
   def terminate_confirm
-    @hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
-  rescue StandardError => e
-    flash[:error] = e.message
-    logger.error "#{e.message}\n#{e.backtrace.join("\n")}"
-    raise e.message
+    authorize @hbx_enrollment, :terminate_confirm?
   end
 
   def terminate
+    authorize @hbx_enrollment, :terminate?
     term_date = Date.strptime(params.require(:term_date),"%m/%d/%Y")
-    hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
-    if hbx_enrollment.may_terminate_coverage? && term_date >= TimeKeeper.date_of_record
-      hbx_enrollment.termination_submitted_on = TimeKeeper.datetime_of_record
-      hbx_enrollment.terminate_benefit(term_date)
+    if @hbx_enrollment.may_terminate_coverage? && term_date >= TimeKeeper.date_of_record
+      @hbx_enrollment.termination_submitted_on = TimeKeeper.datetime_of_record
+      @hbx_enrollment.terminate_benefit(term_date)
       redirect_to family_account_path
     else
       redirect_back(fallback_location: :back)
@@ -197,12 +195,14 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def edit_plan
+    authorize @hbx_enrollment, :edit_plan?
     @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_view({enrollment_id: params.require(:hbx_enrollment_id), family_id: params.require(:family_id)})
     flash[:error] = @self_term_or_cancel_form.errors.full_messages
     redirect_to family_account_path if @self_term_or_cancel_form.errors.present?
   end
 
   def term_or_cancel
+    authorize @hbx_enrollment, :term_or_cancel?
     @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_post({enrollment_id: params.require(:hbx_enrollment_id), term_date: params[:term_date], term_or_cancel: params[:term_or_cancel]})
 
     if @self_term_or_cancel_form.errors.present?
@@ -214,6 +214,7 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def edit_aptc
+    authorize @hbx_enrollment, :edit_aptc?
     enrollment_id = params.require(:hbx_enrollment_id)
     aptc_applied_total = revise_aptc_applied_total(params, enrollment_id)
     applied_aptc_pct = calculate_elected_aptc_pct(aptc_applied_total.to_f, params[:max_aptc].to_f)
@@ -230,6 +231,26 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   private
+
+  # Authorizes the user for creating a family.
+  # This method was added separately to avoid touching the create endpoint/action.
+  # @todo We need to remove this method by refactoring the create action to also include handle authorization.
+  #
+  # @return [nil, Pundit::NotAuthorizedError] Returns nil if the user is authorized to create a family, otherwise it raises a Pundit::NotAuthorizedError.
+  def authorize_user_for_create
+    authorize(@family || @person.primary_family, :create?)
+  end
+
+  # Finds an HbxEnrollment based on the hbx_enrollment_id parameter.
+  # If the @hbx_enrollment instance variable is already defined, it returns that.
+  # Otherwise, it tries to find an HbxEnrollment with the id provided in the hbx_enrollment_id parameter.
+  #
+  # @return [HbxEnrollment, nil] Returns the found HbxEnrollment or nil if no HbxEnrollment was found.
+  def find_hbx_enrollment
+    return @hbx_enrollment if defined? @hbx_enrollment
+
+    @hbx_enrollment = HbxEnrollment.where(id: params[:hbx_enrollment_id]).first if params[:hbx_enrollment_id].present?
+  end
 
   def person_has_dual_role?
     (@person.has_consumer_role? && @person.has_active_employee_role?) || (@person.has_active_employee_role? && @person.has_resident_role?)
@@ -260,26 +281,6 @@ class Insured::GroupSelectionController < ApplicationController
 
   def calculate_elected_aptc_pct(aptc_applied_amount, aggregate_aptc_amount)
     (aptc_applied_amount / aggregate_aptc_amount).round(2)
-  end
-
-  def is_user_authorized?
-    redirect_to root_path if current_user.blank? || (params[:hbx_enrollment_id].blank? && @family.blank?)
-
-    family = params[:hbx_enrollment_id].present? ? HbxEnrollment.where(id: params[:hbx_enrollment_id]).first&.family : @family
-    redirect_to root_path if family.blank?
-
-    return if current_user.has_hbx_staff_role? || is_family_authorized?(current_user, family) || is_broker_authorized?(current_user, family) || is_general_agency_authorized?(current_user, family)
-
-    error_message = 'User not authorized to perform this operation'
-    flash[:error] = error_message
-    redirect_to root_path
-  rescue StandardError => e
-    # The code should robustly handle all authorization use cases, but it's important to understand that there may be exceptional scenarios where we encounter
-    # difficulties in identifying the user and their enrollment relationship.
-    # In such rare instances, we will diligently log these occurrences, take the necessary steps to rectify the issue,
-    # and ensure that the system continues to function without disruption.
-    logger.error "[GroupSelectionController] Failed to authorize user #{current_user.id},
-                  class #{e.class} with message #{e.message}\n#{e.backtrace&.join("\n")}"
   end
 
   def family_member_eligibility_check(family_member)
