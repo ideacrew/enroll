@@ -111,9 +111,7 @@ BenefitSponsors::Engine.routes.draw do
   end
 
   namespace :inboxes do
-    resources :messages, only: [:show, :destroy] do
-      get :msg_to_portal
-    end
+    resources :messages, only: [:show, :destroy]
   end
 
   resources :benefit_sponsorships do
