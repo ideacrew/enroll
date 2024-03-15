@@ -90,7 +90,6 @@ aca:
   general_agency_enabled: true
   broker_carrier_appointments_enabled: true
   dental_market_enabled: true
-  calendar_enabled: true
   dental_plan_years_available: ['']
   address_query_county: false
   display_county: true
