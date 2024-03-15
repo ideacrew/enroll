@@ -36,25 +36,13 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
   end
 
   # broker role
-  let(:broker_agency_profile) do
-    FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile)
-  end
-  let(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: 'active')}
+  let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
+  let(:broker_role) { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: :active) }
   let(:broker_role_user) {FactoryBot.create(:user, :person => broker_role.person, roles: ['broker_role'])}
+
+  # broker staff role
+  let(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: 'active')}
   let(:broker_agency_staff_user) {FactoryBot.create(:user, :person => broker_agency_staff_role.person, roles: ['broker_agency_staff_role'])}
-  let(:broker_person) { broker_agency_staff_role.person }
-  let(:broker_role) do
-    role = BrokerRole.new(
-      :broker_agency_profile => broker_agency_profile,
-      :aasm_state => "applicant",
-      :npn => "123456789",
-      :provider_kind => "broker",
-      :aasm_state => "active"
-    )
-    broker_person.broker_role = role
-    broker_person.save!
-    broker_person.broker_role
-  end
 
   before :each do
     # Needed for the American indian status type
