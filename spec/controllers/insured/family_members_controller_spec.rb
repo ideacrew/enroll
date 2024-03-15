@@ -3,28 +3,23 @@
 require 'rails_helper'
 
 RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
-  let(:test_family) { FactoryBot.build(:family, :with_primary_family_member) }
-  let(:person) { test_family.primary_family_member.person }
-  let(:user) { FactoryBot.create(:user) }
-
+  let(:person) {FactoryBot.create(:person)}
+  let!(:test_family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person) }
+  let(:user) { FactoryBot.create(:user, person: person) }
   let(:qle) { FactoryBot.create(:qualifying_life_event_kind) }
   let(:published_plan_year)  { FactoryBot.build(:plan_year, aasm_state: :published)}
   let(:employer_profile) { FactoryBot.create(:employer_profile) }
-  let(:employee_role) { FactoryBot.create(:employee_role, employer_profile: employer_profile, person: person) }
+  let!(:employee_role) { FactoryBot.create(:employee_role, employer_profile: employer_profile, person: person) }
   let(:employee_role_id) { employee_role.id }
-  let(:census_employee) { FactoryBot.create(:census_employee) }
+  let(:census_employee) { FactoryBot.create(:census_employee, person: person) }
 
   before do
-    # A relationship between the user and the person is established here mostly due to the new requirements from the FamilyMemberPolicy
-    user.update(person: person)
-
     employer_profile.plan_years << published_plan_year
     employer_profile.save
   end
 
   describe "GET index" do
     before do
-      # NOTE: this inclusion needed to be made due to the limitations of Factory relationships
       allow(person).to receive(:primary_family).and_return(test_family)
     end
 
@@ -64,8 +59,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       end
 
       it "assigns the family" do
-        # I'm not sure why this test ever expected for the controller to assign `family` to equal nil
-        # the _family_members partial rendered in the `index` view will throw an error if @family is nil
         expect(assigns(:family)).to eq test_family
       end
     end
@@ -90,8 +83,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       end
 
       it "assigns the family" do
-        # I'm not sure why this test ever expected for the controller to assign `family` to equal nil
-        # the _family_members partial rendered in the `index` view will throw an error if @family is nil
         expect(assigns(:family)).to eq test_family
       end
     end
@@ -105,9 +96,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       let(:dup_sep) { double("SpecialEnrPeriod", qle_on: TimeKeeper.date_of_record - 5.days) }
 
       before :each do
-        allow(person).to receive(:broker_role).and_return(nil)
-        allow(user).to receive(:person).and_return(person)
-        allow(user).to receive(:has_hbx_staff_role?).and_return(false)
+        employee_role
         sign_in(user)
         allow(controller).to receive(:validate_address_params).and_return []
         allow(controller.request).to receive(:referer).and_return(nil)
@@ -173,10 +162,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     end
 
     it "with qle_id" do
-      allow(person).to receive(:primary_family).and_return(test_family)
-      allow(person).to receive(:broker_role).and_return(nil)
-      allow(user).to receive(:has_hbx_staff_role?).and_return(false)
-      allow(employee_role).to receive(:save!).and_return(true)
       allow(employer_profile).to receive(:published_plan_year).and_return(published_plan_year)
       sign_in user
       allow(controller).to receive(:validate_address_params).and_return []
@@ -188,13 +173,11 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
   end
 
   describe "GET show" do
-    let(:dependent) { double("Dependent", family_id: '1') }
-    let(:family_member) {double("FamilyMember", id: double("id"))}
+    let(:dependent) { double("Dependent", family_id: test_family.id) }
+    let(:family_member) { test_family.family_members.where(:is_primary_applicant => false).first }
 
     before(:each) do
       allow(Forms::FamilyMember).to receive(:find).and_return(dependent)
-      allow(dependent).to receive(:family_id).and_return(test_family.id)
-      allow(Family).to receive(:find).with(dependent.family_id).and_return(test_family)
       sign_in(user)
       get :show, params: {id: family_member.id}
     end
@@ -206,17 +189,12 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
   end
 
   describe "GET new" do
-    let(:family_id) { "addbedddedtotallyafamiyid" }
     let(:dependent) { double }
 
     before(:each) do
       sign_in(user)
-      allow(Forms::FamilyMember).to receive(:new).with({:family_id => family_id}).and_return(dependent)
-
-      # the following line needed to be added to pass the test after the FamilyMemberPolicy was added
-      allow(Family).to receive(:find).with(family_id).and_return(test_family)
-
-      get :new, params: { family_id: family_id }
+      allow(Forms::FamilyMember).to receive(:new).with({:family_id => test_family.id}).and_return(dependent)
+      get :new, params: { family_id: test_family.id }
     end
 
     it "renders the 'new' template" do
@@ -241,12 +219,10 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     end
     let(:dependent_properties) { {addresses: valid_addresses_attributes, :family_id => test_family.id, same_with_primary: "false" } }
     let(:save_result) { false }
-    let!(:test_family) { FactoryBot.create(:family, :with_primary_family_member) }
 
     describe "with an invalid dependent" do
       before :each do
         sign_in(user)
-        # No Resident Role
         allow_any_instance_of(Forms::FamilyMember).to receive(:save).and_return(save_result)
         post :create, params: {dependent: dependent_properties}, :format => "js"
       end
@@ -265,10 +241,9 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     describe "with a duplicate dependent" do
       let(:test_person) { FactoryBot.create(:person, :with_nuclear_family) }
       let(:duplicate_test_family) { test_person.primary_family }
-      let(:test_user) { FactoryBot.create(:user) }
-      let(:target_dependent) do
-        duplicate_test_family.dependents.detect { |dependent| dependent.relationship == 'child' }
-      end
+      let(:test_user) { FactoryBot.create(:user, person: test_person) }
+      let!(:employee_role) { FactoryBot.create(:employee_role, employer_profile: employer_profile, person: test_person) }
+      let(:target_dependent) { duplicate_test_family.dependents.detect { |dependent| dependent.relationship == 'child' } }
       let(:duplicate_dependent_attributes) do
         {
           dependent: {
@@ -281,11 +256,9 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
           }
         }
       end
-      before :each do
-        test_user.update(person: test_person)
-        sign_in(test_user)
-        # No Resident Role
 
+      before :each do
+        sign_in(test_user)
         post :create, params: duplicate_dependent_attributes, :format => "js"
       end
 
@@ -319,7 +292,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
       before :each do
         sign_in(user)
-        # No resident role
         allow_any_instance_of(Forms::FamilyMember).to receive(:save).and_return(save_result)
         post :create, params: {dependent: dependent_properties}, :format => "js"
       end
@@ -342,11 +314,9 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     describe "with a valid dependent but not applying for coverage" do
       let(:save_result) { true }
       let(:dependent_properties) { { "is_applying_coverage" => "false", "same_with_primary" => "true", "family_id" => test_family.id.to_s } }
-      let(:test_family) { FactoryBot.create(:family, :with_primary_family_member)}
 
       before :each do
         sign_in(user)
-        # No resident role
         allow_any_instance_of(Forms::FamilyMember).to receive(:save).and_return(save_result)
         post :create, params: {dependent: dependent_properties}, :format => "js"
       end
@@ -368,8 +338,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
     describe "when update_vlp_documents failed" do
       before :each do
-        allow(person).to receive(:user).and_return(user)
-        allow(Family).to receive(:find).with(dependent_properties[:family_id]).and_return(test_family)
         sign_in(user)
         allow(controller).to receive(:update_vlp_documents).and_return false
         post :create, params: {dependent: dependent_properties}, :format => "js"
@@ -387,20 +355,15 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     end
 
     describe "with a valid dependent but invalid addresses" do
+      let(:address_errors) {[{:zip => ["Home Addresses: zip should be in the form: 12345 or 12345-1234"]}, {:zip => ["Mailing Addresses: zip should be in the form: 12345 or 12345-1234"]}]}
+      let(:dependent) { double(addresses: [invalid_addresses_attributes], family_member: true, same_with_primary: true) }
+      let(:dependent_properties) { {addresses: invalid_addresses_attributes, :family_id => test_family.id, same_with_primary: "false" } }
+
       before :each do
-        allow(person).to receive(:user).and_return(user)
-        allow(Family).to receive(:find).with(dependent_properties[:family_id]).and_return(test_family)
         allow(controller).to receive(:update_vlp_documents).and_return false
         sign_in(user)
         post :create, params: {dependent: dependent_properties}, :format => "js"
       end
-
-      let(:address_errors) {[{:zip => ["Home Addresses: zip should be in the form: 12345 or 12345-1234"]}, {:zip => ["Mailing Addresses: zip should be in the form: 12345 or 12345-1234"]}]}
-
-      let(:dependent) { double(addresses: [invalid_addresses_attributes], family_member: true, same_with_primary: true) }
-      let(:dependent_properties) { {addresses: invalid_addresses_attributes, :family_id => test_family.id, same_with_primary: "false" } }
-      let!(:test_family) { FactoryBot.create(:family, :with_primary_family_member) }
-
 
       it "should assign the dependent" do
         expect(assigns(:dependent).class).to eq Forms::FamilyMember
@@ -428,7 +391,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
     before :each do
       sign_in(user)
-      allow(Family).to receive(:find).with(dependent.family_id).and_return(test_family)
     end
 
     it "should destroy the dependent" do
@@ -446,36 +408,31 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     end
 
     context "Delete Duplicate FM members" do
-      let(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
-      let(:test_person) { family.primary_person }
-      let(:test_user) { FactoryBot.create(:user) }
-      let(:dependent1) { family.family_members.where(is_primary_applicant: false).first }
-      let(:dependent2) { family.family_members.where(is_primary_applicant: false).last }
+      let(:dependent1) { test_family.family_members.where(is_primary_applicant: false).first }
+      let(:dependent2) { test_family.family_members.where(is_primary_applicant: false).last }
       let!(:duplicate_family_member_1) do
-        family.family_members << FamilyMember.new(person_id: dependent1.person.id)
-        dup_fm = family.family_members.last
+        test_family.family_members << FamilyMember.new(person_id: dependent1.person.id)
+        dup_fm = test_family.family_members.last
         dup_fm.save(validate: false)
         dup_fm
       end
       let!(:duplicate_family_member_2) do
-        family.family_members << FamilyMember.new(person_id: dependent1.person.id)
-        dup_fm = family.family_members.last
+        test_family.family_members << FamilyMember.new(person_id: dependent1.person.id)
+        dup_fm = test_family.family_members.last
         dup_fm.save(validate: false)
         dup_fm
       end
 
       before do
-        test_user.update(person: test_person)
-        sign_in(test_user)
-        allow(Family).to receive(:find).and_return(family)
+        sign_in(user)
       end
 
       it 'should destroy the duplicate dependents if exists' do
-        expect(family.family_members.active.count).to eq 5
+        expect(test_family.family_members.active.count).to eq 5
         delete :destroy, params: {id: dependent1.id}
         expect(response).to have_http_status(:success)
-        family.reload
-        expect(family.family_members.active.count).to eq 3
+        test_family.reload
+        expect(test_family.family_members.active.count).to eq 3
       end
 
     end
@@ -590,7 +547,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
   end
 
   context 'permissions' do
-    # this var will only be used in the CREATE and UPDATE permissions-related tests
     let(:dependent_properties) { { "is_applying_coverage" => "false", "same_with_primary" => "true", "family_id" => test_family.id.to_s } }
 
     before :each do
@@ -601,8 +557,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     context 'a user without permissions' do
       let(:fake_person) { FactoryBot.create(:person, :with_consumer_role) }
       let(:fake_user) { FactoryBot.create(:user, :person => fake_person) }
-
-      # let(:fake_family) { FactoryBot.create(:family, :with_primary_family_member, person: fake_person) }
       let(:fake_family) { FactoryBot.create(:family, :with_nuclear_family, person: fake_person) }
       let(:fake_family_member) { fake_family.family_members.first }
       let(:fake_employer_profile) { FactoryBot.create(:employer_profile) }
@@ -615,7 +569,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
       context 'index' do
         before do
-          # NOTE: this inclusion needed to be made due to the limitations of Factory relationships
           allow(fake_person).to receive(:primary_family).and_return(test_family)
         end
 
@@ -696,16 +649,10 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       end
 
       context 'index' do
-        before do
-          # NOTE: this inclusion needed to be made due to the limitations of Factory relationships
-          allow(person).to receive(:primary_family).and_return(test_family)
-        end
-
         context 'with permissions' do
           let!(:permission) { FactoryBot.create(:permission, :super_admin) }
 
           it "can't view another user's family_members index page" do
-            # only including employer_id to avoid initializing more factories
             get :index, params: { employee_role_id: employee_role_id, family_id: test_family.id }
 
             expect(response).to have_http_status(:success)
@@ -717,7 +664,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
           let!(:permission) { FactoryBot.create(:permission, :developer) }
 
           it "can't view another user's family_members index page" do
-            # only including employer_id to avoid initializing more factories
             get :index, params: { employee_role_id: employee_role_id, family_id: test_family.id }
 
             expect(response).to have_http_status(:redirect)
@@ -871,11 +817,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       end
 
       context 'index' do
-        before do
-          # NOTE: this inclusion needed to be made due to the limitations of Factory relationships
-          allow(person).to receive(:primary_family).and_return(test_family)
-        end
-
         context 'with permissions/hired by family' do
           before(:each) do
             test_family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
@@ -885,7 +826,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
           end
 
           it "can't view another user's family_members index page" do
-            # only including employer_id to avoid initializing more factories
             get :index, params: { employee_role_id: employee_role_id, family_id: test_family.id }
 
             expect(response).to have_http_status(:success)
@@ -895,7 +835,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
         context 'without permissions/not hired by family' do
           it "can't view another user's family_members index page" do
-            # only including employer_id to avoid initializing more factories
             get :index, params: { employee_role_id: employee_role_id, family_id: test_family.id }
 
             expect(response).to have_http_status(:redirect)

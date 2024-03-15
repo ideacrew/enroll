@@ -13,48 +13,20 @@ class Insured::FamilyMembersController < ApplicationController
   rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
 
   def index
+    set_type_role_and_family
+    authorize @family, :index?
+
     set_bookmark_url
     set_admin_bookmark_url(insured_family_members_path)
-    # There was an error where choosing a shop sep would eventually bring them to a @type == 'consumer'
-    @type = if params[:qle_id].present?
-              market_kind = QualifyingLifeEventKind.find(params[:qle_id]).market_kind
-              market_kind == 'individual' ? 'consumer' : 'employee'
-            elsif params[:employee_role_id].present? && params[:employee_role_id] != 'None'
-              "employee"
-            else
-              "consumer"
-            end
-    if params[:resident_role_id].present? && params[:resident_role_id]
-      @type = "resident"
-      @resident_role = ResidentRole.find(params[:resident_role_id])
-      @family = @resident_role.person.primary_family
-      # Why are we passing current_user? Isn't it supposed to be the actual family this is on
+
+    if @type == "resident"
       broker_role_id = @resident_role.person.broker_role.try(:id)
       @family.hire_broker_agency(broker_role_id)
       redirect_to resident_index_insured_family_members_path(:resident_role_id => @resident_role.id, :change_plan => params[:change_plan], :qle_date => params[:qle_date], :qle_id => params[:qle_id],
                                                              :effective_on_kind => params[:effective_on_kind], :qle_reason_choice => params[:qle_reason_choice], :commit => params[:commit])
     end
 
-    if @type == "employee"
-      emp_role_id = params[:employee_role_id].present? ? params.require(:employee_role_id) : nil
-      @employee_role = if emp_role_id.present?
-                         @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
-                       else
-                         @person.employee_roles.detect { |emp_role| emp_role.is_active == true }
-                       end
-      @family = @person.primary_family
-    elsif @type == "consumer"
-      @consumer_role = @person.consumer_role
-
-      # This controller assumes the user accessing this page will NOT be an admin
-      # The logic previously present here has been moved to a method only called _if_ @consumer_role is not nil
-      @family = @consumer_role.person.primary_family
-      update_family_broker_agency if @consumer_role && EnrollRegistry.feature_enabled?(:auto_assign_expert)
-    end
-
-    @family = Family.find(params[:family_id]) if params[:family_id]
-    authorize_family_access
-
+    update_family_broker_agency if @consumer_role.present? && EnrollRegistry.feature_enabled?(:auto_assign_expert)
     @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
 
@@ -64,16 +36,9 @@ class Insured::FamilyMembersController < ApplicationController
       @change_plan = 'change_by_qle'
       @change_plan_date = @sep.qle_on
     elsif params[:qle_id].present? && !params[:shop_for_plan]
-
       qle = QualifyingLifeEventKind.find(params[:qle_id])
-      special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
-      special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
-      special_enrollment_period.qualifying_life_event_kind = qle
-      special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
-      special_enrollment_period.market_kind = qle.market_kind == "individual" ? "ivl" : qle.market_kind
-      special_enrollment_period.qle_answer = params[:qle_reason_choice] if params[:qle_reason_choice].present?
-      special_enrollment_period.save
       @market_kind = qle.market_kind
+      create_special_enrollment_period(qle)
     end
     @market_kind = params[:market_kind] if params[:market_kind].present?
     if request.referer.present?
@@ -90,20 +55,19 @@ class Insured::FamilyMembersController < ApplicationController
   def new
     family_id = params.require(:family_id)
     @family = Family.find(family_id)
-    authorize_family_access
+    authorize @family, :new?
 
     @dependent = ::Forms::FamilyMember.new(:family_id => family_id)
+    set_view_person
     respond_to do |format|
       format.html
       format.js
     end
-
-    set_view_person
   end
 
   def create
     @family = Family.find(params[:dependent][:family_id])
-    authorize_family_access
+    authorize @family, :create?
 
     @dependent = ::Forms::FamilyMember.new(params[:dependent].merge({skip_consumer_role_callbacks: true}))
     @address_errors = validate_address_params(params)
@@ -148,6 +112,8 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def destroy
+    authorize @family, :destroy?
+
     @dependent.destroy!
     active_family_members_count = @family.active_family_members&.count
     household = @family.active_household
@@ -161,25 +127,30 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def show
+    authorize @family, :show?
+
+    set_view_person
     respond_to do |format|
       format.html
       format.js
     end
-    set_view_person
   end
 
   def edit
+    authorize @family, :edit?
+
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(consumer_role) if consumer_role.present?
-
+    set_view_person
     respond_to do |format|
       format.html
       format.js
     end
-    set_view_person
   end
 
   def update
+    authorize @family, :update?
+
     @dependent.skip_consumer_role_callbacks = true
     @address_errors = validate_address_params(params)
 
@@ -231,24 +202,18 @@ class Insured::FamilyMembersController < ApplicationController
   def resident_index
     @resident_role = ResidentRole.find(params[:resident_role_id])
     @family = @resident_role.person.primary_family
-    authorize_family_access
+
+    authorize @family, :resident_index?
 
     set_bookmark_url
     set_admin_bookmark_url(resident_index_insured_family_members_path)
-
     @change_plan = params[:change_plan].present? ? 'change_by_qle' : ''
     @change_plan_date = params[:qle_date].present? ? params[:qle_date] : ''
 
     if params[:qle_id].present?
       qle = QualifyingLifeEventKind.find(params[:qle_id])
-      # TODO: How do we know @family is getting set here
-      special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
-      @effective_on_date = special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
-      special_enrollment_period.qualifying_life_event_kind = qle
-      special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
-      special_enrollment_period.qle_answer = params[:qle_reason_choice] if params[:qle_reason_choice].present?
-      special_enrollment_period.save
       @market_kind = "coverall"
+      create_special_enrollment_period
     end
 
     if request.referer.present?
@@ -263,7 +228,7 @@ class Insured::FamilyMembersController < ApplicationController
   def new_resident_dependent
     family_id = params.require(:family_id)
     @family = Family.find(family_id)
-    authorize_family_access
+    authorize @family, :new_resident_dependent?
 
     @dependent = ::Forms::FamilyMember.new(:family_id => family_id)
     respond_to do |format|
@@ -275,7 +240,7 @@ class Insured::FamilyMembersController < ApplicationController
   def edit_resident_dependent
     family_id = params.require(:id)
     @family = Family.find(family_id)
-    authorize_family_access
+    authorize @family, :edit_resident_dependent?
 
     @dependent = ::Forms::FamilyMember.find(family_id)
     respond_to do |format|
@@ -287,7 +252,7 @@ class Insured::FamilyMembersController < ApplicationController
   def show_resident_dependent
     family_id = params.require(:id)
     @family = Family.find(family_id)
-    authorize_family_access
+    authorize @family, :show_resident_dependent?
 
     @dependent = ::Forms::FamilyMember.find(family_id)
     respond_to do |format|
@@ -297,6 +262,52 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   private
+
+  # rubocop:disable Metrics/CyclomaticComplexity
+  def set_type_role_and_family
+    @type = if params[:resident_role_id].present?
+              'resident'
+            elsif params[:qle_id].present?
+              market_kind = QualifyingLifeEventKind.find(params[:qle_id]).market_kind
+              market_kind == 'individual' ? 'consumer' : 'employee'
+            elsif params[:employee_role_id].present? && params[:employee_role_id] != 'None'
+              "employee"
+            else
+              "consumer"
+            end
+
+    case @type
+    when 'resident'
+      @resident_role = ResidentRole.find(params[:resident_role_id])
+      @family = @resident_role.person.primary_family
+    when 'employee'
+      emp_role_id = params[:employee_role_id]
+      @employee_role = if emp_role_id.present?
+                         @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
+                       else
+                         @person.employee_roles.detect { |emp_role| emp_role.is_active == true }
+                       end
+      @family = @person.primary_family
+    when 'consumer'
+      @consumer_role = @person.consumer_role
+      @family = @consumer_role.person.primary_family
+    end
+
+    @family = Family.find(params[:family_id]) if params[:family_id]
+  end
+  # rubocop:enable Metrics/CyclomaticComplexity
+
+  def create_special_enrollment_period(qle)
+    special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
+    @effective_on_date = special_enrollment_period.selected_effective_on = Date.strptime(params[:effective_on_date], "%m/%d/%Y") if params[:effective_on_date].present?
+    special_enrollment_period.qualifying_life_event_kind = qle
+    special_enrollment_period.qle_on = Date.strptime(params[:qle_date], "%m/%d/%Y")
+    special_enrollment_period.qle_answer = params[:qle_reason_choice] if params[:qle_reason_choice].present?
+    unless @market_kind == 'coverall'
+      special_enrollment_period.market_kind = @market_kind == "individual" ? "ivl" : @market_kind
+    end
+    special_enrollment_period.save
+  end
 
   def update_family_broker_agency
     broker_role_id = @consumer_role.person.broker_role.try(:id)
