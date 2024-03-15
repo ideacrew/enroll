@@ -4,6 +4,7 @@ Feature: Start a new Financial Assistance Application and answers questions on h
     Given the shop market configuration is enabled
     Given a consumer, with a family, exists
     And is logged in
+    And the consumer is RIDP verified
     And the FAA feature configuration is enabled
     And the user will navigate to the FAA Household Info page
     And FAA display_medicaid_question feature is enabled

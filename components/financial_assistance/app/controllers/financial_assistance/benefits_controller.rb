@@ -10,20 +10,28 @@ module FinancialAssistance
     before_action :set_cache_headers, only: [:index]
 
     def index
+      # Authorizing on applicant since no benefit records may exist on index page
+      # TODO: Use policy context to pass applicant to BenefitPolicy
+      authorize @applicant, :index?
+
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       render layout: 'financial_assistance_nav'
-      # @insurance_kinds = FinancialAssistance::Benefit::INSURANCE_TYPE
     end
 
     def new
+      # Authorizing on applicant before benefit record is built on it
+      authorize @applicant, :new?
       @model = @applicant.benefits.build
+
       load_steps
       current_step
       render 'workflow/step', layout: 'financial_assistance_nav'
     end
 
     def step # rubocop:disable Metrics/CyclomaticComplexity TODO: Remove this
+      authorize @model, :step?
+
       save_faa_bookmark(request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
       flash[:error] = nil
@@ -57,6 +65,8 @@ module FinancialAssistance
     def create
       format_date(params)
       @benefit = @applicant.benefits.build permit_params(params[:benefit])
+      authorize @benefit, :create?
+
       @benefit_kind = @benefit.kind
       @benefit_insurance_kind = @benefit.insurance_kind
 
@@ -70,6 +80,8 @@ module FinancialAssistance
     def update
       format_date(params)
       @benefit = @applicant.benefits.find params[:id]
+      authorize @benefit, :update?
+
       if @benefit.update_attributes permit_params(params[:benefit])
         render :update, :locals => { kind: params[:benefit][:kind], insurance_kind: params[:benefit][:insurance_kind] }
       else
@@ -79,6 +91,8 @@ module FinancialAssistance
 
     def destroy
       @benefit = @applicant.benefits.find(params[:id])
+      authorize @benefit, :destroy?
+
       @benefit_kind = @benefit.kind
       @benefit_insurance_kind = @benefit.insurance_kind
       @benefit.destroy!

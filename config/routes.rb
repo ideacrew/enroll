@@ -32,15 +32,6 @@ Rails.application.routes.draw do
     mount Sidekiq::Web => '/sidekiq'
   end
 
-  namespace :uis do
-    resources :bootstrap3_examples do
-      collection do
-        get :index
-        get :components
-        get :getting_started
-      end
-    end
-  end
   get 'datatables/*path.:json', to: 'application#resource_not_found'
   get 'insured/consumer_role/help_paying_coverage.:inc', to: 'application#resource_not_found'
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
@@ -67,10 +58,10 @@ Rails.application.routes.draw do
     post "/security_question_responses/replace", controller: "users/security_question_responses", action: 'replace'
 
     member do
-      get :reset_password, :lockable, :confirm_lock, :login_history, :change_username_and_email, :edit
-      put :confirm_reset_password, :confirm_change_username_and_email, :update
+      get :reset_password, :lockable, :confirm_lock, :login_history, :change_username_and_email
+      put :confirm_reset_password, :confirm_change_username_and_email
 
-      post :unlock, :change_password
+      post :unlock
     end
   end
 
@@ -240,7 +231,7 @@ Rails.application.routes.draw do
     end
 
     resources :broker_applicants
-    resources :security_questions
+    resources :security_questions, only: [:index, :new, :create, :edit, :update, :destroy]
 
     # get 'hbx_profiles', to: 'hbx_profiles#welcome'
     # get 'hbx_profiles/:id', to: 'hbx_profiles#show', as: "my_account"
@@ -501,7 +492,6 @@ Rails.application.routes.draw do
 
   match 'broker_registration', to: redirect('benefit_sponsors/profiles/registrations/new?profile_type=broker_agency'), via: [:get]
   # match 'general_agency_registration', to: redirect('benefit_sponsors/profiles/registrations/new?profile_type=general_agency'), via: [:get]
-  match 'check_ach_routing_number', to: 'broker_agencies/broker_roles#check_ach_routing', via: [:get]
 
   namespace :carriers do
     resources :carrier_profiles do
@@ -510,9 +500,6 @@ Rails.application.routes.draw do
 
   namespace :broker_agencies do
     root 'profiles#new'
-    resources :inboxes, only: [:new, :create, :show, :destroy] do
-      get :msg_to_portal
-    end
     resources :profiles, only: [:new, :create, :show, :index, :edit, :update] do
       get :inbox
 
@@ -540,20 +527,6 @@ Rails.application.routes.draw do
 
       resources :applicants
     end
-    resources :broker_roles, only: [:create] do
-      root 'broker_roles#new_broker'
-      collection do
-        get :new_broker
-        get :new_staff_member
-        get :new_broker_agency
-        get :search_broker_agency
-        post :email_guide
-      end
-      member do
-        get :favorite
-      end
-    end
-
 
     resources :broker_roles do
 
@@ -675,7 +648,6 @@ Rails.application.routes.draw do
       get :claim
     end
   end
-  resources :office_locations, only: [:new]
 
   get "document/download/:bucket/:key" => "documents#download", as: :document_download
   get "document/authorized_download/:model/:model_id/:relation/:relation_id" => "documents#authorized_download", as: :authorized_document_download
@@ -760,8 +732,6 @@ Rails.application.routes.draw do
   #   end
   #
   # You can have the root of your site routed with "root"
-
-  # API check_ach_routing
 
   resources :external_applications, only: [:show]
 

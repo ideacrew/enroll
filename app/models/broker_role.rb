@@ -12,12 +12,6 @@ class BrokerRole
 
   BROKER_ROLE_STATUS_TYPES = ['applicant', 'certified', 'pending', 'decertified', 'denied', 'extended', 'imported','all'].freeze
 
-  MARKET_KINDS_OPTIONS = {
-    "Individual & Family Marketplace ONLY" => "individual",
-    "Small Business Marketplace ONLY" => "shop",
-    "Both – Individual & Family AND Small Business Marketplaces" => "both"
-  }
-
   embedded_in :person
 
   field :aasm_state, type: String
@@ -29,7 +23,12 @@ class BrokerRole
   field :provider_kind, type: String
   field :reason, type: String
 
+  # @!attribute market_kind
+  #   @return [String] Represents the market type that the broker is associated with.
+  #   This field is not being used consistently across the application and may yield unexpected results.
+  #   It is recommended to fetch or depend on this field only after we start to persist information consistently.
   field :market_kind, type: String
+
   field :languages_spoken, type: Array, default: ["en"]
   field :working_hours, type: Boolean, default: false
   field :accept_new_clients, type: Boolean
@@ -75,6 +74,26 @@ class BrokerRole
       pr.broker_role.present? &&
         (pr.broker_role.npn == broker_npn)
     end.map(&:broker_role)
+  end
+
+  # Checks if the broker is associated with the individual market.
+  # As the field market_kind is not being used properly, we depend on Broker Agency Profile's market_kind.
+  #
+  # @return [Boolean] Returns true if the broker is associated with the individual market, false otherwise.
+  def individual_market?
+    return false unless broker_agency_profile
+
+    broker_agency_profile.individual_market?
+  end
+
+  # Checks if the broker is associated with the shop market.
+  # As the field market_kind is not being used properly, we depend on Broker Agency Profile's market_kind.
+  #
+  # @return [Boolean] Returns true if the broker is associated with the shop market, false otherwise.
+  def shop_market?
+    return false unless broker_agency_profile
+
+    broker_agency_profile.shop_market?
   end
 
   def search_favorite_general_agencies(general_agency_profile_id)

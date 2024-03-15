@@ -7,6 +7,7 @@ Feature: Start a new Financial Assistance Application and fills out Income Adjus
     Given a consumer, with a family, exists
     And is logged in
     And a benchmark plan exists
+    And the consumer is RIDP verified
     And the FAA feature configuration is enabled
     Given FAA income_and_deduction_date_warning feature is enabled
     When the user will navigate to the FAA Household Info page

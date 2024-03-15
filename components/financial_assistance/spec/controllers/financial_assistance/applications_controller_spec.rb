@@ -5,6 +5,10 @@ require 'rails_helper'
 RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each, type: :controller do
   routes { FinancialAssistance::Engine.routes }
 
+  after :all do
+    DatabaseCleaner.clean
+  end
+
   let(:person1) { FactoryBot.create(:person, :with_consumer_role)}
   let!(:user) { FactoryBot.create(:user, :person => person1) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person1) }
@@ -34,8 +38,11 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   let(:effective_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
   let(:application_period) {effective_on.beginning_of_year..effective_on.end_of_year}
 
-  describe "GET index" do
+  before do
+    family.primary_person.consumer_role.move_identity_documents_to_verified
+  end
 
+  describe "GET index" do
     before(:each) do
       sign_in user
     end
@@ -180,8 +187,8 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   let!(:applicant2) { FactoryBot.create(:applicant, application: application2,  family_member_id: family_member_id) }
   let(:application_valid_params) { {"medicaid_terms" => "yes", "report_change_terms" => "yes", "medicaid_insurance_collection_terms" => "yes", "parent_living_out_of_home_terms" => "true", "attestation_terms" => "yes", "submission_terms" => "yes"} }
   let!(:hbx_profile) {FactoryBot.create(:hbx_profile,:open_enrollment_coverage_period)}
-  let(:admin_person) { FactoryBot.create(:person) }
-  let(:admin_user) { FactoryBot.create(:user, :person => admin_person, oim_id: '1234567899', email: 'test@test.com') }
+  let(:admin_person) { FactoryBot.create(:person, :with_hbx_staff_role) }
+  let(:admin_user) { FactoryBot.create(:user, :with_hbx_staff_role, :person => admin_person, oim_id: '1234567899', email: 'test@test.com') }
 
   #set of objects that doesnt belong to the first family/user to validate the records returned only belong to the user logged in
   let(:person10) { FactoryBot.create(:person, :with_consumer_role)}
@@ -214,13 +221,25 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   before do
     allow(person).to receive(:financial_assistance_identifier).and_return(family_id)
     sign_in(user)
+    family.primary_person.consumer_role.move_identity_documents_to_verified
   end
 
-  context "GET Index" do
-    it "should assign applications", dbclean: :after_each do
-      get :index
-      applications = FinancialAssistance::Application.where(family_id: family_id)
-      expect(assigns(:applications)).to match_array(applications.to_a)
+  describe '#index' do
+    context 'primary person is RIDP verified' do
+      it 'assigns applications' do
+        get :index
+        applications = FinancialAssistance::Application.where(family_id: family_id)
+        expect(assigns(:applications)).to match_array(applications.to_a)
+      end
+    end
+
+    context 'primary person is not RIDP verified' do
+      it 'redirects to root_path with a flash message' do
+        family.primary_person.consumer_role.update_attributes(identity_validation: 'na', application_validation: 'na')
+        get :index
+        expect(response).to redirect_to(main_app.root_path)
+        expect(flash[:error]).to eq('Access not allowed for family_policy.index?, (Pundit policy)')
+      end
     end
   end
 
@@ -233,7 +252,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
   describe "GET edit" do
     context "With valid data" do
-
       it "should render" do
         get :edit, params: { id: application.id }
         expect(assigns(:application)).to eq application
@@ -242,32 +260,27 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     context "With missing family id" do
-      before do
-        allow(admin_user).to receive(:try).with(:id).and_call_original
-        allow(admin_user).to receive(:try).with(:person).and_return(admin_person)
-        allow(admin_person).to receive(:hbx_staff_role).and_return(true)
-        sign_in(admin_user)
-        allow(controller).to receive(:current_user).and_return(admin_user)
-      end
-
       it "should find the correct application" do
-        get :edit, params: { id: application.id }
+        sign_in(admin_user)
+        get :edit, params: { id: application.id }, session: { person_id: application.family.primary_person.id }
         expect(assigns(:application)).to eq application
       end
-
     end
-
 
     context 'broker logged in' do
       let!(:broker_user) { FactoryBot.create(:user, :person => writing_agent.person, roles: ['broker_role', 'broker_agency_staff_role']) }
-      let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
-      let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
+      let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile, market_kind: :both) }
+      let(:writing_agent) do
+        FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: "active")
+      end
       let(:assister)  do
-        assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00")
+        assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00", aasm_state: "active")
         assister.save(validate: false)
         assister
       end
       let(:user) { broker_user }
+
+      before { family.primary_person.consumer_role.move_identity_documents_to_verified }
 
       context 'hired by family' do
         before(:each) do
@@ -275,11 +288,12 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
                                                                                               writing_agent_id: writing_agent.id,
                                                                                               start_on: Time.now,
                                                                                               is_active: true)
+
           family.reload
         end
 
         it "should render" do
-          get :edit, params: { id: application.id }
+          get :edit, params: { id: application.id }, session: { person_id: family.primary_person.id }
           expect(assigns(:application)).to eq application
           expect(response).to render_template(:financial_assistance_nav)
         end
@@ -287,10 +301,10 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
       context 'not hired by family' do
         it "should render" do
-          get :edit, params: { id: application.id }
+          get :edit, params: { id: application.id }, session: { person_id: family.primary_person.id }
           expect(assigns(:application)).to eq application
           expect(response).to have_http_status(:redirect)
-          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.can_access_application?, (Pundit policy)")
+          expect(flash[:error]).to eq('Access not allowed for financial_assistance/application_policy.edit?, (Pundit policy)')
         end
       end
     end
@@ -531,10 +545,14 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
     context 'broker logged in' do
       let!(:broker_user) { FactoryBot.create(:user, :person => writing_agent.person, roles: ['broker_role', 'broker_agency_staff_role']) }
-      let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
-      let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
+      let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile, market_kind: :both) }
+
+      let(:writing_agent) do
+        FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: "active")
+      end
+
       let(:assister)  do
-        assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00")
+        assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00", aasm_state: "active")
         assister.save(validate: false)
         assister
       end
@@ -544,6 +562,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       before do
         FinancialAssistance::Application.where(family_id: family_id).each {|app| app.update_attributes(aasm_state: "determined")}
         allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_profile)
+        family.primary_person.consumer_role.move_identity_documents_to_verified
       end
 
       context 'hired by family' do
@@ -558,7 +577,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         it "should render" do
           skip "skipped: iap_year_selection enabled" if FinancialAssistanceRegistry[:iap_year_selection].enabled?
 
-          get :copy, params: { id: application.id }
+          get :copy, params: { id: application.id }, session: { person_id: family.primary_person.id }
           existing_app_ids = [application.id, application2.id]
           copy_app = FinancialAssistance::Application.where(family_id: family_id).reject {|app| existing_app_ids.include? app.id}.first
           expect(response).to redirect_to(edit_application_path(copy_app.id))
@@ -569,19 +588,11 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         it "should render" do
           skip "skipped: iap_year_selection enabled" if FinancialAssistanceRegistry[:iap_year_selection].enabled?
 
-          get :copy, params: { id: application.id }
+          get :copy, params: { id: application.id }, session: { person_id: family.primary_person.id }
           expect(response).to have_http_status(:redirect)
-          expect(flash[:error]).to eq("Access not allowed for financial_assistance/application_policy.can_access_application?, (Pundit policy)")
+          expect(flash[:error]).to eq('Access not allowed for financial_assistance/application_policy.copy?, (Pundit policy)')
         end
       end
-    end
-  end
-
-  context "uqhp_flow" do
-    it "should redirect to insured family members" do
-      get :uqhp_flow
-      expect(FinancialAssistance::Application.where(family_id: family_id, aasm_state: "draft").count).to eq 0
-      expect(response).to redirect_to(main_app.insured_family_members_path(consumer_role_id: person.consumer_role.id))
     end
   end
 
@@ -595,7 +606,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     context 'when the application does not have valid relations' do
-
       before do
         allow_any_instance_of(FinancialAssistance::Application).to receive(:valid_relations?).and_return(false)
       end
@@ -609,10 +619,10 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   end
 
   context "GET review" do
-
     before do
       sign_in(user)
     end
+
     it "should be successful" do
       application.update_attributes(:aasm_state => "submitted")
       get :review, params: { id: application.id }
@@ -696,16 +706,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     context "With missing family id" do
-      before do
-        allow(admin_user).to receive(:try).with(:id).and_call_original
-        allow(admin_user).to receive(:try).with(:person).and_return(admin_person)
-        allow(admin_person).to receive(:hbx_staff_role).and_return(true)
-        sign_in(admin_user)
-        allow(controller).to receive(:current_user).and_return(admin_user)
-      end
-
       it "should find application" do
-        get :wait_for_eligibility_response, params: { id: application.id }
+        sign_in(admin_user)
+        get :wait_for_eligibility_response, params: { id: application.id }, session: { person_id: application.family.primary_person.id }
         expect(assigns(:application)).to eq application
       end
     end
@@ -721,16 +724,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     context "With missing family id" do
-      before do
-        allow(admin_user).to receive(:try).with(:id).and_call_original
-        allow(admin_user).to receive(:try).with(:person).and_return(admin_person)
-        allow(admin_person).to receive(:hbx_staff_role).and_return(true)
-        sign_in(admin_user)
-        allow(controller).to receive(:current_user).and_return(admin_user)
-      end
-
       it 'should find the correct application' do
-        get :eligibility_results, params: {:id => application.id, :cur => 1}
+        sign_in(admin_user)
+        get :eligibility_results, params: {:id => application.id, :cur => 1}, session: { person_id: application.family.primary_person.id }
         expect(assigns(:application)).to eq application
       end
     end
@@ -752,12 +748,10 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       let!(:permission) { FactoryBot.create(:permission, :super_admin) }
       let!(:update_admin) { admin_person.hbx_staff_role.update_attributes(permission_id: permission.id) }
 
-      before do
-        sign_in(admin_user)
-      end
-
       it 'should find application with missing family id' do
-        get :application_publish_error, params: { id: application.id }
+        family.primary_person.consumer_role.move_identity_documents_to_verified
+        sign_in(admin_user)
+        get :application_publish_error, params: { id: application.id }, session: { person_id: family.primary_person.id }
         expect(assigns(:application)).to eq application
         expect(response).to render_template(:financial_assistance_nav)
       end
@@ -795,17 +789,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   end
 
   context "with missing family id" do
-    before do
-      allow(admin_user).to receive(:try).with(:id).and_call_original
-      allow(admin_user).to receive(:try).with(:person).and_return(admin_person)
-      allow(admin_person).to receive(:hbx_staff_role).and_return(true)
-      sign_in(admin_user)
-      allow(controller).to receive(:current_user).and_return(admin_user)
-
-    end
-
     it "should find the correct application" do
-      get :check_eligibility_results_received, params: { id: application.id }
+      sign_in(admin_user)
+      get :check_eligibility_results_received, params: { id: application.id }, session: { person_id: application.family.primary_person.id }
       expect(assigns(:application)).to eq application
     end
   end
@@ -846,17 +832,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     context "with missing family id" do
-      before do
-        allow(admin_user).to receive(:try).with(:id).and_call_original
-        allow(admin_user).to receive(:try).with(:person).and_return(admin_person)
-        allow(admin_person).to receive(:hbx_staff_role).and_return(true)
-        sign_in(admin_user)
-        allow(controller).to receive(:current_user).and_return(admin_user)
-
-      end
-
       it "finds the correct application" do
-        get :eligibility_response_error, params: { id: application.id }
+        sign_in(admin_user)
+        get :eligibility_response_error, params: { id: application.id }, session: { person_id: application.family.primary_person.id }
         expect(assigns(:application)).to eq application
       end
     end
@@ -873,7 +851,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   context "with :filtered_application_list on" do
     let(:person) { FactoryBot.create(:person, :with_consumer_role, first_name: "test1") }
     let(:user) { FactoryBot.create(:user, :person => person) }
-
 
     before do
       allow(FinancialAssistanceRegistry).to receive(:feature_enabled?).with(:filtered_application_list).and_return(true)
@@ -892,7 +869,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       describe "GET /applications" do
         let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
         let!(:application) { FactoryBot.create :financial_assistance_application, :with_applicants, family_id: family.id, aasm_state: 'determined' }
+
         before(:each) do
+          person.consumer_role.move_identity_documents_to_verified
           sign_in(user)
         end
 

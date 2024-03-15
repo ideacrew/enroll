@@ -239,8 +239,12 @@ registry:
             item: false
           - key: :send_rating_area_for_ivl_policy_to_edi
             item: false
+          - key: :medicaid_agency_phone_ttd
+            item: "(800) 877-8339"
           - key: :medicaid_agency_phone
             item: "(202) 727-5355"
+          - key: :medicaid_agency_url
+            item: "https://districtdirect.dc.gov"
           - key: :verifiable_immigration_statuses
             item: false
           - key: :appeal_link
@@ -888,3 +892,7 @@ registry:
       - key: :strong_password_length
         item: :strong_password_length
         is_enabled: <%= ENV['STRONG_PASSWORD_LENGTH_IS_ENABLED'] || false %>
+      - key: :auto_assign_expert
+        item: :auto_assign_expert
+        is_enabled: <%= ENV['AUTO_ASSIGN_EXPERT_IS_ENABLED'] || false %>
+

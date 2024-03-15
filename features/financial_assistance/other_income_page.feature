@@ -4,6 +4,7 @@ Feature: Start a new Financial Assistance Application and fills out Other Income
     Given a consumer, with a family, exists
     And is logged in
     And a benchmark plan exists
+    And the consumer is RIDP verified
     And the FAA feature configuration is enabled
     Given FAA income_and_deduction_date_warning feature is enabled
     Given divorce agreement year feature is disabled

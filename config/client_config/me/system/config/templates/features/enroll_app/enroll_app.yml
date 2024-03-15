@@ -258,8 +258,12 @@ registry:
             item: true
           - key: :send_rating_area_for_ivl_policy_to_edi
             item: true
+          - key: :medicaid_agency_phone_ttd
+            item: ''
           - key: :medicaid_agency_phone
             item: '(855) 797-4357'
+          - key: :medicaid_agency_url
+            item: ''
           - key: :verifiable_immigration_statuses
             item: true
           - key: :appeal_link
@@ -889,3 +893,7 @@ registry:
       - key: :strong_password_length
         item: :strong_password_length
         is_enabled: <%= ENV['STRONG_PASSWORD_LENGTH_IS_ENABLED'] || false %>
+      - key: :auto_assign_expert
+        item: :auto_assign_expert
+        is_enabled: <%= ENV['AUTO_ASSIGN_EXPERT_IS_ENABLED'] || false %>
+

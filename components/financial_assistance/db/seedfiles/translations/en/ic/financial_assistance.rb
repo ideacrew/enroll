@@ -161,7 +161,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   # Year Selection page
   "en.faa.year_selection_header" => "You’re About to Sign Up for Health Insurance that Starts January 1 or Later",
   "en.faa.year_selection_subheader" => "Select CONTINUE to start a new application for lower premiums or Medicaid.",
-  "en.faa.assitance_year_option1" => "%{year} Open Enrollment"
+  "en.faa.assitance_year_option1" => "%{year} Open Enrollment",
   "en.faa.year_selection_oe_year" => " Open Enrollment",
   "en.faa.see_if_you_qualify_1" => "See if you qualify for lower monthly premiums for ",
   "en.faa.see_if_you_qualify_2" => " %{short_name} health insurance or free Medicaid coverage.",
@@ -173,7 +173,9 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.application_for_coverage" => "Application for Coverage",
   "en.faa.update_reminder" => "If you make changes to your %{year} coverage that should apply to your %{year2} coverage too, you will need to come back and update your %{year2} application. You can do this by copying your latest %{year} application and submitting it for %{year2}.",
   # Mec check
-  "en.faa.mc_success" => "It looks like you may already be enrolled in MaineCare or Cub Care. If you need to update information like your income, address, or who is in your household, contact the Office for Family Independence at <a href='tel:855-797-4357'>(855) 797-4357</a> to make these changes before completing a CoverME.gov application.",
+  "en.faa.mc_success_existing" => "It looks like you already have Medicaid coverage.",
+  "en.faa.mc_success_enroll" => "If you’re enrolled in Medicaid and need to renew your coverage or update your information, go to %{medicaid_agency_url} or contact District Direct at %{medicaid_agency_phone} / TTD: %{medicaid_agency_phone_ttd}.",
+  "en.faa.mc_success_link" => "districtdirect.dc.gov",
   "en.faa.shop_check_success" => "It looks like you may already be enrolled in employer sponsored coverage. If you need to update information like your income, address, or who is in your household, visit the Manage Family page to make these changes before completing a CoverME.gov application.",
   "en.faa.mc_continue" => "Select 'CONTINUE' if you would still like to complete a CoverME.gov application.",
   # FAA display evidence type
@@ -244,6 +246,7 @@ FINANCIAL_ASSISTANCE_TRANSLATIONS = {
   "en.faa.results.medicaid_eligible_next_steps" => "Medicaid coverage is free. If you would like to enroll and pay full price for private health insurance instead, select CONTINUE to:",
   "en.faa.results.medicaid_eligible_step1" => "pick a plan, or",
   "en.faa.results.medicaid_eligible_step2" => "add or remove someone from your plan.",
-  "en.faa.verification.documents" => "Cost Savings Documents"
+  "en.faa.verification.documents" => "Cost Savings Documents",
+  "en.faa.view_complete_checklist" => "View the Complete Application Checklist"
 }.freeze
 # rubocop:enable Layout/LineLength
