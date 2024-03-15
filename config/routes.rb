@@ -240,7 +240,7 @@ Rails.application.routes.draw do
     end
 
     resources :broker_applicants
-    resources :security_questions
+    resources :security_questions, only: [:index, :new, :create, :edit, :update, :destroy]
 
     # get 'hbx_profiles', to: 'hbx_profiles#welcome'
     # get 'hbx_profiles/:id', to: 'hbx_profiles#show', as: "my_account"
@@ -501,7 +501,6 @@ Rails.application.routes.draw do
 
   match 'broker_registration', to: redirect('benefit_sponsors/profiles/registrations/new?profile_type=broker_agency'), via: [:get]
   # match 'general_agency_registration', to: redirect('benefit_sponsors/profiles/registrations/new?profile_type=general_agency'), via: [:get]
-  match 'check_ach_routing_number', to: 'broker_agencies/broker_roles#check_ach_routing', via: [:get]
 
   namespace :carriers do
     resources :carrier_profiles do
@@ -537,20 +536,6 @@ Rails.application.routes.draw do
 
       resources :applicants
     end
-    resources :broker_roles, only: [:create] do
-      root 'broker_roles#new_broker'
-      collection do
-        get :new_broker
-        get :new_staff_member
-        get :new_broker_agency
-        get :search_broker_agency
-        post :email_guide
-      end
-      member do
-        get :favorite
-      end
-    end
-
 
     resources :broker_roles do
 
@@ -756,8 +741,6 @@ Rails.application.routes.draw do
   #   end
   #
   # You can have the root of your site routed with "root"
-
-  # API check_ach_routing
 
   resources :external_applications, only: [:show]
 

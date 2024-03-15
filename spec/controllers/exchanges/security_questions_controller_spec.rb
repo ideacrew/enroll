@@ -8,6 +8,7 @@ RSpec.describe Exchanges::SecurityQuestionsController, dbclean: :after_each do
   let(:question) { instance_double("SecurityQuestion", title: 'Your Question', id: '1') }
 
   before :each do
+    allow(Settings).to receive_message_chain('aca.security_questions').and_return(true)
     allow(user).to receive(:has_hbx_staff_role?).and_return true
 
     allow(SecurityQuestion).to receive(:all).and_return([question])
