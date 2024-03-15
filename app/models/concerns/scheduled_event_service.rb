@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 module ScheduledEventService
   extend ActiveSupport::Concern
 
   included do
-    # has_many employers
     def self.individual_market_monthly_enrollment_due_on
       return @individual_market_monthly_enrollment_due_on if defined? @individual_market_monthly_enrollment_due_on
 
