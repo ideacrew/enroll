@@ -100,9 +100,6 @@ javascript:
     resetAptc()
     clearAll()
     clearSelections()
-    resetComparePlan()
-    total_plans = $('#plans .plan-row').length
-    $("#plans-count").text(total_plans);
   }
 
   function resetAptc() {
@@ -120,8 +117,8 @@ javascript:
         plan.remove()
       }
     })
-    if (document.getElementById('plans').length) {
-      document.getElementById('plans').classList.remove('hidden');
+    if ($('#plans').length > 0) {
+      $('#plans').classList.remove('hidden');
     }
   }
 
