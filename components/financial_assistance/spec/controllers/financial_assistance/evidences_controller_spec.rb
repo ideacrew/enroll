@@ -16,33 +16,6 @@ RSpec.describe FinancialAssistance::EvidencesController, dbclean: :after_each, t
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let!(:family_member) { family.family_members.first }
 
-  let(:market_kind) { :both }
-  let(:broker_person) { FactoryBot.create(:person) }
-  let(:broker_role) { FactoryBot.create(:broker_role, person: broker_person) }
-  let(:broker_user) { FactoryBot.create(:user, person: broker_person) }
-
-  let(:site) do
-    FactoryBot.create(
-      :benefit_sponsors_site,
-      :with_benefit_market,
-      :as_hbx_profile,
-      site_key: ::EnrollRegistry[:enroll_app].settings(:site_key).item
-    )
-  end
-
-  let(:broker_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
-  let(:broker_agency_profile) { broker_agency_organization.broker_agency_profile }
-  let(:broker_agency_id) { broker_agency_profile.id }
-
-  let(:broker_agency_account) do
-    family.broker_agency_accounts.create!(
-      benefit_sponsors_broker_agency_profile_id: broker_agency_id,
-      writing_agent_id: broker_role.id,
-      is_active: baa_active,
-      start_on: TimeKeeper.date_of_record
-    )
-  end
-
   let!(:application) do
     FactoryBot.create(
       :application,
@@ -72,21 +45,35 @@ RSpec.describe FinancialAssistance::EvidencesController, dbclean: :after_each, t
     applicant.create_income_evidence(
       key: :income,
       title: 'Income',
-      aasm_state: 'pending',
+      aasm_state: 'outstanding',
       due_on: nil,
       verification_outstanding: false,
       is_satisfied: true
     )
   end
+  let!(:attested_evidence) do
+    applicant.create_esi_evidence(
+      key: :esi_mec,
+      title: "Esi",
+      aasm_state: 'attested',
+      due_on: Date.today,
+      verification_outstanding: true,
+      is_satisfied: false
+    )
+  end
   let!(:params) { { "applicant_id" => applicant.id, "application_id" => application.id, "verification_reason" => "Expired", "evidence_kind" => "income_evidence", "admin_action" => 'verify' } }
   let!(:params_minus_update_reason) { { "applicant_id" => applicant.id, "application_id" => application.id, "evidence_kind" => "income_evidence", "admin_action" => 'verify', "verification_reason" => '' } }
+  let!(:esi_params) { { "applicant_id" => applicant.id, "application_id" => application.id, "verification_reason" => "Expired", "evidence_kind" => "esi_evidence", "admin_action" => 'verify' } }
+
   before do
     person.consumer_role.move_identity_documents_to_verified
-    sign_in(associated_user)
-    #allow(controller).to receive(:current_user).and_return(associated_user)
   end
 
   context 'admin user' do
+    before do
+      sign_in(admin_user)
+    end
+
     describe 'GET #update_evidence' do
       context 'when update reason is included in reasons list' do
         before do
@@ -112,11 +99,7 @@ RSpec.describe FinancialAssistance::EvidencesController, dbclean: :after_each, t
     end
 
     describe 'POST #fdsh_hub_request' do
-      #consumer and broker negative examples for this test
       let (:request_double) { double }
-      before do
-        sign_in(admin_user)
-      end
       context 'when the request determination is successful' do
         before do
           allow(Operations::Fdsh::RequestEvidenceDetermination).to receive(:new).and_return(request_double)
@@ -151,11 +134,6 @@ RSpec.describe FinancialAssistance::EvidencesController, dbclean: :after_each, t
       end
 
       context 'when the evidence is type unverified and enrollment is present' do
-        before do
-          allow(evidence).to receive(:type_unverified?).and_return(true)
-          allow(evidence).to receive(:extend_due_on).and_return(true)
-        end
-
         it 'extends the due date and sets a success flash message' do
           put :extend_due_date, params: params
           expect(flash[:success]).to eq("#{evidence.title} verification due date was extended for 30 days.")
@@ -163,20 +141,16 @@ RSpec.describe FinancialAssistance::EvidencesController, dbclean: :after_each, t
       end
 
       context 'when the evidence is not type unverified or enrollment is not present' do
-        before do
-          allow(evidence).to receive(:type_unverified?).and_return(false)
-        end
-
         it 'sets a danger flash message' do
-          put :extend_due_date, params: params
+          put :extend_due_date, params: esi_params
           expect(flash[:danger]).to eq("Applicant doesn't have active Enrollment to extend verification due date.")
         end
       end
 
       context 'when extending the due date fails' do
         before do
-          allow(evidence).to receive(:type_unverified?).and_return(true)
-          allow(evidence).to receive(:extend_due_on).and_return(false)
+          allow(evidence).to receive(:extend_due_on).with(any_args).and_return(false)
+          allow(evidence).to receive(:add_verification_history).with(any_args).and_return(true)
         end
 
         it 'sets a danger flash message' do
@@ -289,9 +263,243 @@ RSpec.describe FinancialAssistance::EvidencesController, dbclean: :after_each, t
   end
 
   context 'consumer user' do
+    before do
+      sign_in(associated_user)
+    end
+    describe 'GET #update_evidence' do
+      context 'when update reason is included in reasons list' do
+        before do
+          get :update_evidence, params: params
+        end
+
+        it 'sets a success flash message and redirects' do
+          expect(flash[:success]).to be_present
+          expect(response).to redirect_to main_app.verification_insured_families_path
+        end
+      end
+
+      context 'when update reason is not included in reasons list' do
+        before do
+          get :update_evidence, params: params_minus_update_reason
+        end
+
+        it 'sets an error flash message and redirects' do
+          expect(flash[:error]).to eq 'Please provide a verification reason.'
+          expect(response).to redirect_to main_app.verification_insured_families_path
+        end
+      end
+    end
+
+    describe 'POST #fdsh_hub_request' do
+      let (:request_double) { double }
+      context 'when the request comes from a non admin role' do
+        before do
+          post :fdsh_hub_request, params: params
+        end
+
+        it 'flashes a pundit policy unauthorized error' do
+          expect(flash[:error]).to eq "Access not allowed for eligibilities/evidence_policy.fdsh_hub_request?, (Pundit policy)"
+        end
+      end
+    end
+
+    describe 'PUT #extend_due_date' do
+      before do
+        allow(FamilyMember).to receive(:find).and_return(family_member)
+        allow(family_member).to receive_message_chain(:family, :enrollments, :enrolled, :first).and_return(enrollment)
+      end
+
+      context 'when the evidence is type unverified and enrollment is present' do
+        it 'extends the due date and sets a success flash message' do
+          put :extend_due_date, params: params
+          expect(flash[:success]).to eq("#{evidence.title} verification due date was extended for 30 days.")
+        end
+      end
+
+      context 'when the evidence is not type unverified or enrollment is not present' do
+        it 'sets a danger flash message' do
+          put :extend_due_date, params: esi_params
+          expect(flash[:danger]).to eq("Applicant doesn't have active Enrollment to extend verification due date.")
+        end
+      end
+
+      context 'when extending the due date fails' do
+        it 'sets a danger flash message' do
+          put :extend_due_date, params: params
+          expect(flash[:danger]).to eq("Unable to extend due date")
+        end
+      end
+    end
+
+    describe '#find_type' do
+      before do
+        allow(controller).to receive(:fetch_applicant)
+        allow(controller).to receive(:find_docs_owner).and_return(applicant)
+        allow(controller).to receive(:authorize)
+        allow(controller).to receive(:params).and_return({ evidence_kind: 'Income' })
+        allow(evidence).to receive(:request_determination).and_return(true)
+      end
+
+      context 'when docs_owner responds to evidence_kind' do
+        before do
+          allow(applicant).to receive(:respond_to?).with('Income').and_return(true)
+        end
+
+        it 'assigns the evidence' do
+          controller.send(:find_type)
+          expect(assigns(:evidence)).to eq(applicant.evidences.first)
+        end
+      end
+
+      context 'when docs_owner does not respond to evidence_kind' do
+        before do
+          allow(applicant).to receive(:respond_to?).with('Income').and_return(false)
+        end
+
+        it 'does not assign the evidence' do
+          controller.send(:find_type)
+          expect(assigns(:evidence)).to be_nil
+        end
+      end
+    end
   end
 
   context 'broker user' do
+    let(:market_kind) { :both }
+    let(:broker_person) { FactoryBot.create(:person) }
+    let(:broker_role) { FactoryBot.create(:broker_role, person: broker_person) }
+    let(:broker_user) { FactoryBot.create(:user, person: broker_person) }
+    let(:baa_active) { true }
+
+    let(:site) do
+      FactoryBot.create(
+        :benefit_sponsors_site,
+        :with_benefit_market,
+        :as_hbx_profile,
+        site_key: ::EnrollRegistry[:enroll_app].settings(:site_key).item
+      )
+    end
+
+    let(:broker_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+    let(:broker_agency_profile) { broker_agency_organization.broker_agency_profile }
+    let(:broker_agency_id) { broker_agency_profile.id }
+
+    let(:broker_agency_account) do
+      family.broker_agency_accounts.create!(
+        benefit_sponsors_broker_agency_profile_id: broker_agency_id,
+        writing_agent_id: broker_role.id,
+        is_active: baa_active,
+        start_on: TimeKeeper.date_of_record
+      )
+    end
+
+    before do
+      sign_in(broker_user)
+      broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
+      broker_person.create_broker_agency_staff_role(
+        benefit_sponsors_broker_agency_profile_id: broker_role.benefit_sponsors_broker_agency_profile_id
+      )
+      broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id, market_kind: market_kind)
+      broker_role.approve!
+      broker_agency_account
+    end
+    describe 'GET #update_evidence' do
+      context 'when update reason is included in reasons list' do
+        before do
+          get :update_evidence, params: params
+        end
+
+        it 'sets a success flash message and redirects' do
+          expect(flash[:success]).to be_present
+          expect(response).to redirect_to main_app.verification_insured_families_path
+        end
+      end
+
+      context 'when update reason is not included in reasons list' do
+        before do
+          get :update_evidence, params: params_minus_update_reason
+        end
+
+        it 'sets an error flash message and redirects' do
+          expect(flash[:error]).to eq 'Please provide a verification reason.'
+          expect(response).to redirect_to main_app.verification_insured_families_path
+        end
+      end
+    end
+
+    describe 'POST #fdsh_hub_request' do
+      let (:request_double) { double }
+      context 'when the request comes from a non admin role' do
+        before do
+          post :fdsh_hub_request, params: params
+        end
+
+        it 'flashes a pundit policy unauthorized error' do
+          expect(flash[:error]).to eq "Access not allowed for eligibilities/evidence_policy.fdsh_hub_request?, (Pundit policy)"
+        end
+      end
+    end
+
+    describe 'PUT #extend_due_date' do
+      before do
+        allow(FamilyMember).to receive(:find).and_return(family_member)
+        allow(family_member).to receive_message_chain(:family, :enrollments, :enrolled, :first).and_return(enrollment)
+      end
+
+      context 'when the evidence is type unverified and enrollment is present' do
+        it 'extends the due date and sets a success flash message' do
+          put :extend_due_date, params: params
+          expect(flash[:success]).to eq("#{evidence.title} verification due date was extended for 30 days.")
+        end
+      end
+
+      context 'when the evidence is not type unverified or enrollment is not present' do
+        it 'sets a danger flash message' do
+          put :extend_due_date, params: esi_params
+          expect(flash[:danger]).to eq("Applicant doesn't have active Enrollment to extend verification due date.")
+        end
+      end
+
+      context 'when extending the due date fails' do
+        it 'sets a danger flash message' do
+          put :extend_due_date, params: params
+          expect(flash[:danger]).to eq("Unable to extend due date")
+        end
+      end
+    end
+
+    describe '#find_type' do
+      before do
+        allow(controller).to receive(:fetch_applicant)
+        allow(controller).to receive(:find_docs_owner).and_return(applicant)
+        allow(controller).to receive(:authorize)
+        allow(controller).to receive(:params).and_return({ evidence_kind: 'Income' })
+        allow(evidence).to receive(:request_determination).and_return(true)
+        allow_any_instance_of(ApplicationPolicy).to receive(:edit?).and_return(true)
+      end
+
+      context 'when docs_owner responds to evidence_kind' do
+        before do
+          allow(applicant).to receive(:respond_to?).with('Income').and_return(true)
+        end
+
+        it 'assigns the evidence' do
+          controller.send(:find_type)
+          expect(assigns(:evidence)).to eq(applicant.evidences.first)
+        end
+      end
+
+      context 'when docs_owner does not respond to evidence_kind' do
+        before do
+          allow(applicant).to receive(:respond_to?).with('Income').and_return(false)
+        end
+
+        it 'does not assign the evidence' do
+          controller.send(:find_type)
+          expect(assigns(:evidence)).to be_nil
+        end
+      end
+    end
   end
 end
 
