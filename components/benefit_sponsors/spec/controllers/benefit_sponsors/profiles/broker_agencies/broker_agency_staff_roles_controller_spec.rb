@@ -469,18 +469,19 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
     end
 
     context 'for admins' do
-      let!(:permission)               { FactoryBot.create(:permission, :hbx_staff, manage_agency_staff: true, view_agency_staff: true) }
       let!(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_hbx_staff_role) }
-      let!(:hbx_person)               { FactoryBot.create(:person, user: user_with_hbx_staff_role)}
+      let!(:hbx_person)               { FactoryBot.create(:person, user: user_with_hbx_staff_role) }
 
-      before do
-        user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id, permission_id: permission.id)
-        user_with_hbx_staff_role.person.hbx_staff_role.save!
+      context 'with super_admin permissions' do
+        let!(:permission)               { FactoryBot.create(:permission, :super_admin) }
 
-        sign_in user_with_hbx_staff_role
-      end
+        before do
+          user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id, permission_id: permission.id)
+          user_with_hbx_staff_role.person.hbx_staff_role.save!
 
-      context 'with correct permissions' do
+          sign_in user_with_hbx_staff_role
+        end
+
         context "GET new" do
           before do
             allow(controller).to receive(:set_ie_flash_by_announcement).and_return true
@@ -587,8 +588,12 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
       # permissions for broker agency access waiver and are frequently subject to change
       # specs built out for both kinds of hbx_staff_role in case of (another) permissions update
       context 'with insufficient permissions' do
+        let!(:permission)           { FactoryBot.create(:permission, :hbx_read_only) }
+
         before do
-          permission.update_attributes(manage_agency_staff: false, view_agency_staff: false)
+          user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id, permission_id: permission.id)
+          user_with_hbx_staff_role.person.hbx_staff_role.save!
+
           sign_in user_with_hbx_staff_role
         end
 
