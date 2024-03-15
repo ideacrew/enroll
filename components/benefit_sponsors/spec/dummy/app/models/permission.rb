@@ -1,6 +1,3 @@
-# frozen_string_literal: true
-
-# dummy permissions class for running engine spec in GHA
 class Permission
   include Mongoid::Document
   include SetCurrentUser
@@ -39,8 +36,6 @@ class Permission
   field :can_drop_enrollment_members, type: Boolean, default: false
   field :can_edit_osse_eligibility, type: Boolean, default: false
   field :can_edit_broker_agency_profile, type: Boolean, default: false
-  field :view_agency_staff, type: Boolean, default: false
-  field :manage_agency_staff, type: Boolean, default: false
 
   class << self
     def hbx_staff

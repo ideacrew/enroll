@@ -36,6 +36,7 @@ module BenefitSponsors
     end
 
     context "broker_agency_profile with an hbx_admin without edit_broker_agency_profile permissions" do
+
       before do
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:edit_broker_agency_profile).and_return(true)
         allow(subject).to receive(:profile_type).and_return(profile_type)

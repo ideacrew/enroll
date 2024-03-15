@@ -4,7 +4,7 @@ module BenefitSponsors
   module Organizations
     # policy for will BrokerAgencyProfile, inherits from benefit_sponsors ApplicationPolicy, but methods are from main_app ApplicationPolicy
     # methods had to be duplicated due to GHAs
-    class BrokerAgencyProfilePolicy < ApplicationPolicy
+    class BrokerAgencyProfilePolicy < BenefitSponsors::ApplicationPolicy
 
       # NOTE: All methods will most likely be consolidated with the auth refactor for BrokerAgencyProfilesController
 
@@ -34,7 +34,7 @@ module BenefitSponsors
       protected
 
       def has_matching_broker_agency_staff_role?
-        staff_roles = user&.person&.broker_agency_staff_roles || []
+        staff_roles = account_holder_person&.broker_agency_staff_roles || []
         staff_roles&.any? do |sr|
           sr.active? &&
             (
@@ -45,7 +45,7 @@ module BenefitSponsors
       end
 
       def has_matching_broker_role?
-        broker_role = user&.person&.broker_role
+        broker_role = account_holder_person.broker_role
         return false unless broker_role
 
         broker_role&.benefit_sponsors_broker_agency_profile_id == record.id && broker_role&.active?
