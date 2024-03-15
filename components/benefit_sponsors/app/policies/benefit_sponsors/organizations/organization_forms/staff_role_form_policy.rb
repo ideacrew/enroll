@@ -25,7 +25,7 @@ module BenefitSponsors
         end
 
         def destroy?
-          return false if current_user_is_form_subject?
+          return false if account_holder_is_form_subject?
           return false if primary_broker_is_form_subject?
 
           return true if can_edit?
@@ -64,19 +64,19 @@ module BenefitSponsors
         private
 
         # Keep form-specific methods in StaffRoleFormPolicy, afterwards, move others to respective profile policies
-        def current_user_is_form_subject?
+        def account_holder_is_form_subject?
           # because this form is used by multiple Profile Types, we want to ignore the other types
           return false unless profile.is_a?(BrokerAgencyProfile)
 
           # person_id on the record is stored as a string
-          account_holder&.person&.id&.to_str == record&.person_id
+          account_holder_person&.id&.to_s == record&.person_id
         end
 
         def primary_broker_is_form_subject?
           return false unless profile.is_a?(BrokerAgencyProfile)
 
           # person_id on the record is stored as a string
-          profile&.primary_broker_role&.person&.id&.to_str == record&.person_id
+          profile&.primary_broker_role&.person&.id&.to_s == record&.person_id
         end
       end
     end

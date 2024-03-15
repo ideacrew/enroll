@@ -12,27 +12,27 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
     end
 
     # Brokers/Agents
-    let(:new_person_for_staff)          { FactoryBot.create(:person) }
-    let(:new_person_for_staff1)         { FactoryBot.create(:person) }
-    let(:user)                           { FactoryBot.create(:user, person: new_person_for_staff) }
-    let(:agent_user)                     { FactoryBot.create(:user, person: new_person_for_staff1) }
+    let(:new_person_for_staff1)           { FactoryBot.create(:person) }
+    let(:new_person_for_staff2)           { FactoryBot.create(:person) }
+    let(:user)                            { FactoryBot.create(:user, person: new_person_for_staff1) }
+    let(:agent_user)                      { FactoryBot.create(:user, person: new_person_for_staff2) }
 
     # Organizations
-    let!(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let!(:organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
-    let(:organization_with_hbx_profile)  { site.owner_organization }
-    let!(:broker_agency_profile)         { organization.broker_agency_profile }
-    let(:bap_id)                         { broker_agency_profile.id }
+    let!(:site)                           { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let!(:organization)                   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+    let(:organization_with_hbx_profile)   { site.owner_organization }
+    let!(:broker_agency_profile)          { organization.broker_agency_profile }
+    let(:bap_id)                          { broker_agency_profile.id }
 
-    let!(:second_organization)           { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
-    let!(:second_broker_agency_profile)  { second_organization.broker_agency_profile }
+    let!(:second_organization)            { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+    let!(:second_broker_agency_profile)   { second_organization.broker_agency_profile }
 
     # Roles
-    let!(:broker_role)                   { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: bap_id, person: new_person_for_staff) }
-    let!(:broker_agency_staff_role)      { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: bap_id, person: new_person_for_staff1) }
-    let!(:broker_agency_staff_role2)     { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: bap_id, person: new_person_for_staff) }
+    let!(:broker_role)                    { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: bap_id, person: new_person_for_staff1) }
+    let!(:broker_agency_staff_role1)      { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: bap_id, person: new_person_for_staff1) }
+    let!(:broker_agency_staff_role2)      { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: bap_id, person: new_person_for_staff2) }
 
-    let(:staff_class) { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm }
+    let(:staff_class)                     { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm }
 
     describe "GET new" do
       before do
@@ -82,7 +82,7 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
       context 'for a broker in a different agency' do
         before do
           broker_role.update_attributes(benefit_sponsors_broker_agency_profile_id: second_broker_agency_profile.id)
-          broker_agency_staff_role2.update_attributes(benefit_sponsors_broker_agency_profile_id: second_broker_agency_profile.id)
+          broker_agency_staff_role1.update_attributes(benefit_sponsors_broker_agency_profile_id: second_broker_agency_profile.id)
           sign_in user
           # there is always a profile_id present in the params when calling #new, no profile_id will throw an error in the view
           get :new, params: { profile_id: bap_id }, format: :js, xhr: true
@@ -99,19 +99,22 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
     end
 
     describe "POST create" do
+      let!(:previous_total_staff_roles) { Person.staff_for_broker_including_pending(broker_agency_profile).size }
 
       context "creating staff role with existing person params" do
+        let(:new_person_for_staff3) { FactoryBot.create(:person) }
 
-        let!(:staff_params) do
+        let(:staff_params) do
           {
             profile_type: "broker_agency_staff",
             broker_registration_page: "true",
-            :staff => {:first_name => new_person_for_staff.first_name, :last_name => new_person_for_staff.last_name, :dob => new_person_for_staff.dob, email: "hello@hello.com",  :profile_id => bap_id}
+            :staff => {:first_name => new_person_for_staff3.first_name, :last_name => new_person_for_staff3.last_name, :dob => '10/10/1998', email: "howdy@hello.com",  :profile_id => bap_id}
           }
         end
 
-        before :each do
+        before do
           sign_in user
+
           post :create, params: staff_params, format: :js, xhr: true
         end
 
@@ -119,7 +122,7 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           expect(assigns(:staff).class).to eq staff_class
         end
 
-        it "should render js template" do
+        it "should return a 200" do
           expect(response.status).to eq(200)
         end
 
@@ -127,18 +130,19 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           expect(response).to have_http_status(:success)
         end
 
-        it 'should get javascript content' do
-          expect(response.headers['Content-Type']).to eq 'text/javascript; charset=utf-8'
+        it 'should create a new staff role' do
+          new_total_staff_roles = Person.staff_for_broker_including_pending(broker_agency_profile).size
+
+          expect(previous_total_staff_roles).not_to eq(new_total_staff_roles)
         end
       end
 
       context 'person is already assigned as a staff to broker' do
-
         let!(:staff_params) do
           {
             profile_type: 'broker_agency_staff',
             broker_registration_page: 'true',
-            :staff => {:first_name => new_person_for_staff1.first_name, :last_name => new_person_for_staff1.last_name, :dob => new_person_for_staff1.dob, email: "hello@hello.com",  :profile_id => bap_id}
+            :staff => {:first_name => new_person_for_staff2.first_name, :last_name => new_person_for_staff2.last_name, :dob => new_person_for_staff2.dob, email: "hello@hello.com",  :profile_id => bap_id}
           }
         end
 
@@ -147,13 +151,15 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           post :create, params: staff_params, format: :js, xhr: true
         end
 
-        it 'should render js template' do
+        it 'should return a 200' do
           expect(response.status).to eq(200)
         end
 
 
-        it 'should get javascript content' do
-          expect(response.headers['Content-Type']).to eq 'text/javascript; charset=utf-8'
+        it 'should not create a new staff role' do
+          new_total_staff_roles = Person.staff_for_broker_including_pending(broker_agency_profile).size
+
+          expect(previous_total_staff_roles).to eq(new_total_staff_roles)
         end
       end
 
@@ -172,12 +178,14 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
             post :create, params: staff_params, format: :js, xhr: true
           end
 
-          it 'should render js template' do
+          it 'should return a 200' do
             expect(response.status).to eq(200)
           end
 
-          it 'should get javascript content' do
-            expect(response.headers['Content-Type']).to eq 'text/javascript; charset=utf-8'
+          it 'should create a new staff role' do
+            new_total_staff_roles = Person.staff_for_broker_including_pending(broker_agency_profile).size
+
+            expect(previous_total_staff_roles).not_to eq(new_total_staff_roles)
           end
         end
 
@@ -191,17 +199,16 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
             expect(response).to have_http_status(200)
           end
 
-          it 'should get javascript content' do
-            expect(response.headers['Content-Type']).to eq 'text/javascript; charset=utf-8'
+          it 'should create a new staff role' do
+            new_total_staff_roles = Person.staff_for_broker_including_pending(broker_agency_profile).size
+
+            expect(previous_total_staff_roles).not_to eq(new_total_staff_roles)
           end
         end
 
         # Even unauthorized users are allowed to access this endpoint by design
-        context 'as a broker from another agency' do
+        context 'a non-user' do
           before :each do
-            broker_role.update_attributes(benefit_sponsors_broker_agency_profile_id: second_broker_agency_profile.id)
-            broker_agency_staff_role2.update_attributes(benefit_sponsors_broker_agency_profile_id: second_broker_agency_profile.id)
-            sign_in user
             post :create, params: staff_params, format: :js, xhr: true
           end
 
@@ -209,8 +216,10 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
             expect(response.status).to eq(200)
           end
 
-          it 'should get javascript content' do
-            expect(response.headers['Content-Type']).to eq 'text/javascript; charset=utf-8'
+          it 'should create a new staff role' do
+            new_total_staff_roles = Person.staff_for_broker_including_pending(broker_agency_profile).size
+
+            expect(previous_total_staff_roles).not_to eq(new_total_staff_roles)
           end
         end
       end
@@ -220,13 +229,13 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
       context "approve applicant staff role" do
         let!(:staff_params) do
           {
-            :id => bap_id, :person_id => new_person_for_staff1.id, :profile_id => bap_id
+            :id => bap_id, :person_id => new_person_for_staff2.id, :profile_id => bap_id
           }
         end
 
         context 'as a broker in the agency' do
           before :each do
-            broker_agency_staff_role.update_attributes(aasm_state: 'broker_agency_pending')
+            broker_agency_staff_role2.update_attributes(aasm_state: 'broker_agency_pending')
 
             sign_in user
             get :approve, params: staff_params
@@ -244,21 +253,20 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
             expect(flash[:notice]).to eq 'Role approved successfully'
           end
 
-          it "should update broker_agency_staff_role aasm_state to active" do
-            broker_agency_staff_role.reload
-            expect(broker_agency_staff_role.aasm_state).to eq "active"
+          it "should update broker_agency_staff_role2 aasm_state to active" do
+            broker_agency_staff_role2.reload
+            expect(broker_agency_staff_role2.aasm_state).to eq "active"
           end
         end
 
         context 'as agency staff' do
           # initialize new role => agency staff can't approve their own role
-
-          let(:pending_agent)                  { FactoryBot.create(:user, person: new_person_for_staff2) }
-          let!(:new_person_for_staff2)          { FactoryBot.create(:person) }
-          let!(:broker_agency_staff_role2)     { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: bap_id, person: new_person_for_staff2, aasm_state: 'broker_agency_pending') }
+          let(:pending_agent)                  { FactoryBot.create(:user, person: new_person_for_staff3) }
+          let!(:new_person_for_staff3)         { FactoryBot.create(:person) }
+          let!(:broker_agency_staff_role3)     { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: bap_id, person: new_person_for_staff3, aasm_state: 'broker_agency_pending') }
 
           before :each do
-            staff_params[:person_id] = new_person_for_staff2.id
+            staff_params[:person_id] = new_person_for_staff3.id
             sign_in agent_user
             get :approve, params: staff_params
           end
@@ -275,17 +283,17 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
             expect(flash[:notice]).to eq 'Role approved successfully'
           end
 
-          it "should update broker_agency_staff_role aasm_state to active" do
-            broker_agency_staff_role.reload
-            expect(broker_agency_staff_role.aasm_state).to eq "active"
+          it "should update broker_agency_staff_role3 aasm_state to active" do
+            broker_agency_staff_role3.reload
+            expect(broker_agency_staff_role3.aasm_state).to eq "active"
           end
         end
 
         context 'as a broker from another agency' do
           before :each do
-            broker_agency_staff_role.update_attributes(aasm_state: 'broker_agency_pending')
+            broker_agency_staff_role2.update_attributes(aasm_state: 'broker_agency_pending')
             broker_role.update_attributes(benefit_sponsors_broker_agency_profile_id: second_broker_agency_profile.id)
-            broker_agency_staff_role2.update_attributes(benefit_sponsors_broker_agency_profile_id: second_broker_agency_profile.id)
+            broker_agency_staff_role1.update_attributes(benefit_sponsors_broker_agency_profile_id: second_broker_agency_profile.id)
 
             sign_in user
             get :approve, params: staff_params
@@ -295,9 +303,9 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
             expect(flash[:error]).to eq 'Access not allowed for approve?, (Pundit policy)'
           end
 
-          it "should not update broker_agency_staff_role aasm_state to active" do
-            broker_agency_staff_role.reload
-            expect(broker_agency_staff_role.aasm_state).to eq "broker_agency_pending"
+          it "should not update broker_agency_staff_role2 aasm_state to active" do
+            broker_agency_staff_role2.reload
+            expect(broker_agency_staff_role2.aasm_state).to eq "broker_agency_pending"
           end
         end
       end
@@ -305,13 +313,13 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
       context "approving invalid staff role" do
         let!(:staff_params) do
           {
-            :id => bap_id, :person_id => new_person_for_staff1.id, :profile_id => bap_id
+            :id => bap_id, :person_id => new_person_for_staff2.id, :profile_id => bap_id
           }
         end
 
         before :each do
           sign_in user
-          broker_agency_staff_role.update_attributes(aasm_state: 'active')
+          broker_agency_staff_role2.update_attributes(aasm_state: 'active')
           get :approve, params: staff_params
         end
 
@@ -328,12 +336,12 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
     describe "DELETE destroy" do
       context "should deactivate staff role" do
         before do
-          broker_agency_staff_role.update_attributes(aasm_state: 'active')
+          broker_agency_staff_role2.update_attributes(aasm_state: 'active')
         end
 
         context 'as a broker' do
           let!(:staff_params) do
-            { :id => bap_id, :person_id => new_person_for_staff1.id, :profile_id => bap_id }
+            { :id => bap_id, :person_id => new_person_for_staff2.id, :profile_id => bap_id }
           end
 
           before :each do
@@ -354,19 +362,19 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           end
 
           it "should update broker_staff_role aasm_state to broker_agency_terminated" do
-            broker_agency_staff_role.reload
-            expect(broker_agency_staff_role.aasm_state).to eq "broker_agency_terminated"
+            broker_agency_staff_role2.reload
+            expect(broker_agency_staff_role2.aasm_state).to eq "broker_agency_terminated"
           end
         end
 
         context 'as a broker from another agency' do
           let!(:staff_params) do
-            { :id => bap_id, :person_id => new_person_for_staff1.id, :profile_id => bap_id }
+            { :id => bap_id, :person_id => new_person_for_staff2.id, :profile_id => bap_id }
           end
 
           before :each do
             broker_role.update_attributes(benefit_sponsors_broker_agency_profile_id: second_broker_agency_profile.id)
-            broker_agency_staff_role2.update_attributes(benefit_sponsors_broker_agency_profile_id: second_broker_agency_profile.id)
+            broker_agency_staff_role1.update_attributes(benefit_sponsors_broker_agency_profile_id: second_broker_agency_profile.id)
             sign_in user
             delete :destroy, params: staff_params
           end
@@ -380,19 +388,19 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           end
 
           it "should not update broker_staff_role aasm_state to broker_agency_terminated" do
-            broker_agency_staff_role.reload
-            expect(broker_agency_staff_role.aasm_state).to eq "active"
+            broker_agency_staff_role2.reload
+            expect(broker_agency_staff_role2.aasm_state).to eq "active"
           end
         end
       end
 
       context "should not be able to delete their own role" do
         let(:staff_params) do
-          { :id => bap_id, :person_id => new_person_for_staff1.id, :profile_id => bap_id }
+          { :id => bap_id, :person_id => new_person_for_staff2.id, :profile_id => bap_id }
         end
 
         before :each do
-          broker_agency_staff_role.update_attributes(benefit_sponsors_broker_agency_profile_id: bap_id, aasm_state: 'active')
+          broker_agency_staff_role2.update_attributes(benefit_sponsors_broker_agency_profile_id: bap_id, aasm_state: 'active')
           sign_in agent_user
           delete :destroy, params: staff_params
         end
@@ -406,54 +414,55 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
         end
 
         it "should not update broker_staff_role aasm_state to broker_agency_terminated" do
-          broker_agency_staff_role.reload
-          expect(broker_agency_staff_role.aasm_state).to eq "active"
+          broker_agency_staff_role2.reload
+          expect(broker_agency_staff_role2.aasm_state).to eq "active"
         end
       end
 
       context "as a broker in one agency and staff in another should have the same permissions as other agency staff in the latter" do
-        let(:bap_id2)  { second_broker_agency_profile.id }
-        let(:broker_role2)                 { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: bap_id2, person: new_person_for_staff1, aasm_state: 'active') }
-        let(:broker_agency_staff_role2)     { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: bap_id2, person: new_person_for_staff, aasm_state: 'active') }
-        let(:broker_agency_staff_role3)     { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: bap_id2, person: new_person_for_staff1) }
+        let(:bap_id2) { second_broker_agency_profile.id }
 
         context 'cannot delete themselves' do
-          let(:staff_params) do
-            { :id => bap_id2, :person_id => new_person_for_staff.id, :profile_id => bap_id2 }
-          end
-
-          before :each do
-            sign_in user
-            delete :destroy, params: staff_params
-          end
-
-          it "should redirect" do
-            expect(response).to have_http_status(:redirect)
-          end
-
-          it "should display a flash error" do
-            expect(flash[:error]).to eq 'Access not allowed for destroy?, (Pundit policy)'
-          end
-        end
-
-        context 'cannot delete the primary_broker staff_role' do
           let(:staff_params) do
             { :id => bap_id2, :person_id => new_person_for_staff1.id, :profile_id => bap_id2 }
           end
 
           before :each do
-            second_broker_agency_profile.update_attributes(primary_broker_role_id: broker_role2.id)
             sign_in user
 
             delete :destroy, params: staff_params
           end
 
-          it "should redirect" do
-            expect(response).to have_http_status(:redirect)
+          it "should display a flash error" do
+            expect(flash[:error]).to eq 'Access not allowed for destroy?, (Pundit policy)'
+          end
+
+          it "should not update broker_staff_role aasm_state to broker_agency_terminated" do
+            broker_agency_staff_role1.reload
+            expect(broker_agency_staff_role1.aasm_state).to eq "active"
+          end
+        end
+
+        context 'cannot delete the primary_broker staff_role' do
+          let(:primary_broker_role) { second_broker_agency_profile.primary_broker_role }
+          let(:primary_broker_person) { primary_broker_role.person }
+          let(:staff_params) do
+            { :id => bap_id2, :person_id => primary_broker_person.id, :profile_id => bap_id2 }
+          end
+
+          before :each do
+            sign_in user
+
+            delete :destroy, params: staff_params
           end
 
           it "should display a flash error" do
             expect(flash[:error]).to eq 'Access not allowed for destroy?, (Pundit policy)'
+          end
+
+          it "should not update primary_broker_role aasm_state to broker_agency_terminated" do
+            broker_agency_staff_role1.reload
+            expect(broker_agency_staff_role1.aasm_state).to_not eq "broker_agency_terminated"
           end
         end
       end
@@ -517,12 +526,12 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
         context "GET approve applicant staff role" do
           let!(:staff_params) do
             {
-              :id => bap_id, :person_id => new_person_for_staff1.id, :profile_id => bap_id
+              :id => bap_id, :person_id => new_person_for_staff2.id, :profile_id => bap_id
             }
           end
 
           before :each do
-            broker_agency_staff_role.update_attributes(aasm_state: 'broker_agency_pending')
+            broker_agency_staff_role2.update_attributes(aasm_state: 'broker_agency_pending')
             get :approve, params: staff_params
           end
 
@@ -538,21 +547,21 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
             expect(flash[:notice]).to eq 'Role approved successfully'
           end
 
-          it "should update broker_agency_staff_role aasm_state to active" do
-            broker_agency_staff_role.reload
-            expect(broker_agency_staff_role.aasm_state).to eq "active"
+          it "should update broker_agency_staff_role2 aasm_state to active" do
+            broker_agency_staff_role2.reload
+            expect(broker_agency_staff_role2.aasm_state).to eq "active"
           end
         end
 
         context 'DELETE destroy' do
           let!(:staff_params) do
             {
-              :id => bap_id, :person_id => new_person_for_staff1.id, :profile_id => bap_id
+              :id => bap_id, :person_id => new_person_for_staff2.id, :profile_id => bap_id
             }
           end
 
           before :each do
-            broker_agency_staff_role.update_attributes(aasm_state: 'active')
+            broker_agency_staff_role2.update_attributes(aasm_state: 'active')
             delete :destroy, params: staff_params
           end
 
@@ -569,8 +578,8 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           end
 
           it "should update broker_staff_role aasm_state to broker_agency_terminated" do
-            broker_agency_staff_role.reload
-            expect(broker_agency_staff_role.aasm_state).to eq "broker_agency_terminated"
+            broker_agency_staff_role2.reload
+            expect(broker_agency_staff_role2.aasm_state).to eq "broker_agency_terminated"
           end
         end
       end
@@ -627,12 +636,12 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
         context "GET approve applicant staff role" do
           let!(:staff_params) do
             {
-              :id => bap_id, :person_id => new_person_for_staff1.id, :profile_id => bap_id
+              :id => bap_id, :person_id => new_person_for_staff2.id, :profile_id => bap_id
             }
           end
 
           before :each do
-            broker_agency_staff_role.update_attributes(aasm_state: 'broker_agency_pending')
+            broker_agency_staff_role2.update_attributes(aasm_state: 'broker_agency_pending')
             get :approve, params: staff_params
           end
 
@@ -648,21 +657,21 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
             expect(flash[:notice]).to eq 'Role approved successfully'
           end
 
-          it "should update broker_agency_staff_role aasm_state to active" do
-            broker_agency_staff_role.reload
-            expect(broker_agency_staff_role.aasm_state).to eq "active"
+          it "should update broker_agency_staff_role2 aasm_state to active" do
+            broker_agency_staff_role2.reload
+            expect(broker_agency_staff_role2.aasm_state).to eq "active"
           end
         end
 
         context 'DELETE destroy' do
           let!(:staff_params) do
             {
-              :id => bap_id, :person_id => new_person_for_staff1.id, :profile_id => bap_id
+              :id => bap_id, :person_id => new_person_for_staff2.id, :profile_id => bap_id
             }
           end
 
           before :each do
-            broker_agency_staff_role.update_attributes(aasm_state: 'active')
+            broker_agency_staff_role2.update_attributes(aasm_state: 'active')
             delete :destroy, params: staff_params
           end
 
@@ -679,8 +688,8 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           end
 
           it "should update broker_staff_role aasm_state to broker_agency_terminated" do
-            broker_agency_staff_role.reload
-            expect(broker_agency_staff_role.aasm_state).to eq "broker_agency_terminated"
+            broker_agency_staff_role2.reload
+            expect(broker_agency_staff_role2.aasm_state).to eq "broker_agency_terminated"
           end
         end
       end
