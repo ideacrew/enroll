@@ -31,16 +31,40 @@ module BenefitSponsors
       @account_holder_person = account_holder&.person
     end
 
+    def hbx_role
+      return @hbx_role if defined? @hbx_role
+
+      @hbx_role = account_holder_person&.hbx_staff_role
+    end
+
     def permission
       return @permission if defined? @permission
 
       @permission = hbx_role&.permission
     end
 
-    def hbx_role
-      return @hbx_role if defined? @hbx_role
+    def staff_modify_employer?
+      permission&.modify_employer
+    end
 
-      @hbx_role = account_holder_person&.hbx_staff_role
+    def individual_market_admin?
+      return false if hbx_role.blank?
+  
+      permission = hbx_role.permission
+      return false if permission.blank?
+  
+      permission.modify_family
+    end
+
+    def shop_market_admin?
+      # hbx_role = account_holder_person.hbx_staff_role
+      # return false if hbx_role.blank?
+  
+      # permission = hbx_role.permission
+      # return false if permission.blank?
+  
+      # permission.modify_employer
+      individual_market_admin?
     end
   end
 end

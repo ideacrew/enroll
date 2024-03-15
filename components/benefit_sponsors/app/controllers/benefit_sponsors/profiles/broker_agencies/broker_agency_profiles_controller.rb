@@ -26,6 +26,7 @@ module BenefitSponsors
           "5" => "employer_profile.plan_years.start_on"
         }.freeze
 
+        # Are we using this, or should this be deleted
         def create
           json = request.body.read
           body_json = JSON.parse(json)
@@ -40,7 +41,7 @@ module BenefitSponsors
         end
 
         def index
-          authorize self
+          authorize [:benefit_sponsors, :profiles, :broker_agencies, :broker_agency_profile]
           @broker_agency_profiles = BenefitSponsors::Organizations::Organization.broker_agency_profiles.map(&:broker_agency_profile)
         end
 

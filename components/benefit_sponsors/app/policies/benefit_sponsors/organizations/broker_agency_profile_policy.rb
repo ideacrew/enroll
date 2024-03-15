@@ -19,9 +19,7 @@ module BenefitSponsors
       end
 
       def access_to_broker_agency_profile?
-        return false unless user
-        return false unless user.person
-        return true if user.person.hbx_staff_role
+        return true if staff_modify_employer?
         return true if has_matching_broker_role?
 
         has_matching_broker_agency_staff_role?

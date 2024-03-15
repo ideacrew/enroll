@@ -22,31 +22,53 @@ module BenefitSponsors
     let!(:organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
 
     let(:bap_id) { organization.broker_agency_profile.id }
+    let(:permission) { FactoryBot.create(:permission, :super_admin) }
 
     before :each do
       person01.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: organization.broker_agency_profile.id)
       allow(organization.broker_agency_profile).to receive(:primary_broker_role).and_return(person01.broker_role)
-      user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id)
+      user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id, permission_id: permission.id)
       user_with_hbx_staff_role.person.hbx_staff_role.save!
     end
 
-    describe "for broker_agency_profile's index" do
-      context "index for user with admin_role(on successful pundit)" do
-        before :each do
-          sign_in(user_with_hbx_staff_role)
-          get :index
+    describe "#index" do
+      context "admin" do
+        context 'with the correct permissions' do
+          let!(:permission) { FactoryBot.create(:permission, :super_admin) }
+
+          before :each do
+            sign_in(user_with_hbx_staff_role)
+            get :index
+          end
+
+          it "should return http success" do
+            expect(response).to have_http_status(:success)
+          end
+
+          it "should render the index template" do
+            expect(response).to render_template("index")
+          end
         end
 
-        it "should return http success" do
-          expect(response).to have_http_status(:success)
-        end
+        context 'with the incorrect permissions' do
+          let!(:permission) { FactoryBot.create(:permission, :developer) }
 
-        it "should render the index template" do
-          expect(response).to render_template("index")
+          before :each do
+            sign_in(user_with_hbx_staff_role)
+            get :index
+          end
+
+          it "should return redirect" do
+            expect(response).to have_http_status(:redirect)
+          end
+
+          it "should not render the index template" do
+            expect(response).to_not render_template("index")
+          end
         end
       end
 
-      context "index for user with broker_role(on failed pundit)" do
+      context "broker" do
         before :each do
           sign_in(user_with_broker_role)
           get :index
@@ -61,7 +83,7 @@ module BenefitSponsors
         end
       end
 
-      context "index for user with broker_agency_staff_role(on failed pundit)" do
+      context "broker agency staff" do
         let!(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: organization.broker_agency_profile.id, person: person01) }
 
         before :each do
