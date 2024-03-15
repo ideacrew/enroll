@@ -4,6 +4,11 @@
 # Each public method corresponds to a potential action that can be performed.
 # The private methods are helper methods used to determine whether a user has the necessary permissions to perform an action.
 class PersonPolicy < ApplicationPolicy
+  def initialize(user, record)
+    super
+    @family = record.primary_family if record.is_a?(Person)
+  end
+
   ACCESSABLE_ROLES = %w[hbx_staff_role broker_role active_broker_staff_roles].freeze
 
   def can_show?
@@ -19,7 +24,7 @@ class PersonPolicy < ApplicationPolicy
   end
 
   def can_delete_document?
-    allowed_to_modify?
+    allowed_to_download?
   end
 
   def updateable?
@@ -56,17 +61,6 @@ class PersonPolicy < ApplicationPolicy
 
   private
 
-  # Determines if the user is allowed to download the associated resource.
-  # Access may be allowed to the roles: [HbxStaffRole, BrokerRole, BrokerAgencyStaffRole and EmployerStaffRole]
-  #
-  # @example Check if a user can modify an Evidence record
-  #  allowed_to_download? # => true/false
-  #
-  # @note The user is the one who is trying to perform the action. The associated_user is the user who owns the record. The record is an instance of Person.
-  def allowed_to_download?
-    (current_user == associated_user) || role_has_permission_to_modify?
-  end
-
   def allowed_to_modify?
     (current_user.person == record) || (current_user == associated_user) || role_has_permission_to_modify?
   end
@@ -91,6 +85,23 @@ class PersonPolicy < ApplicationPolicy
     elsif has_broker_role?
       can_broker_modify?
     end
+  end
+
+  # Determines if the current user has permission to upload ridp document.
+  # The user can download the document if they are a primary family member,
+  # an active associated broker, or an admin in the individual market,
+  #
+  # @return [Boolean] Returns true if the user has permission to download the document, false otherwise.
+  def allowed_to_download?
+    return true if individual_market_primary_family_member?
+    return true if shop_market_primary_family_member?
+    return true if individual_market_admin?
+    return true if shop_market_admin?
+    return true if active_associated_individual_market_ridp_verified_family_broker_staff?
+    return true if active_associated_individual_market_ridp_verified_family_broker?
+    return true if active_associated_shop_market_family_broker?
+
+    false
   end
 
   def matches_individual_broker_account?

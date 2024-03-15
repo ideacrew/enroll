@@ -1,7 +1,7 @@
 class DocumentsController < ApplicationController
   include ActionView::Helpers::TranslationHelper
   include L10nHelper
-  before_action :fetch_and_authorize_record, only: [:authorized_download, :cartafact_download]
+  before_action :fetch_record, only: [:authorized_download, :cartafact_download]
   before_action :set_document, only: [:destroy, :update]
   before_action :set_verification_type
   before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type, :extend_due_date, :update_ridp_verification_type]
@@ -17,6 +17,8 @@ class DocumentsController < ApplicationController
   end
 
   def authorized_download
+    authorize @record, :can_download_document?
+
     begin
       relation_id = params[:relation_id]
       documents = @record.documents
@@ -28,17 +30,21 @@ class DocumentsController < ApplicationController
   end
 
   def cartafact_download
-    result = ::Operations::Documents::Download.call({params: cartafact_download_params.to_h.deep_symbolize_keys, user: current_user})
-    if result.success?
-      response_data = result.value!
-      send_data response_data, get_options(params)
-    else
-      errors = result.failure
-      redirect_back(fallback_location: root_path, :flash => {error: errors[:message]})
+    authorize @record, :can_download_document?
+
+    begin
+      result = ::Operations::Documents::Download.call({params: cartafact_download_params.to_h.deep_symbolize_keys, user: current_user})
+      if result.success?
+        response_data = result.value!
+        send_data response_data, get_options(params)
+      else
+        errors = result.failure
+        redirect_back(fallback_location: root_path, :flash => {error: errors[:message]})
+      end
+    rescue StandardError => e
+      Rails.logger.error {"Cartafact Download Error - #{e}"}
+      redirect_back(fallback_location: root_path, :flash => {error: e.message})
     end
-  rescue StandardError => e
-    Rails.logger.error {"Cartafact Download Error - #{e}"}
-    redirect_back(fallback_location: root_path, :flash => {error: e.message})
   end
 
   def update_verification_type
@@ -181,7 +187,7 @@ class DocumentsController < ApplicationController
 
   private
 
-  def fetch_and_authorize_record
+  def fetch_record
     model_id = params[:model_id]
     model = params[:model].camelize
     model_klass = Document::MODEL_CLASS_MAPPING[model]
@@ -189,7 +195,6 @@ class DocumentsController < ApplicationController
     raise "Sorry! Invalid Request" unless model_klass
 
     @record = model_klass.find(model_id)
-    authorize @record, :can_download_document?
   end
 
   def add_type_history_element
