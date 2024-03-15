@@ -158,7 +158,6 @@ And(/Employee select "(.*?)" for "(.*?)" sep effective on kind and clicks contin
     find('.effective_on_kinds .selectric span.label').click
     find('.selectric-scroll li', text: effective_on_kind_date).click
   else
-    binding.irb
     find('.effective_on_kinds .selectric span.label').click
     find('.selectric-scroll li', text: effective_on_kind_date).click
 
