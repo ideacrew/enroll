@@ -99,7 +99,7 @@ RSpec.describe FinancialAssistance::EvidencesController, dbclean: :after_each, t
     end
 
     describe 'POST #fdsh_hub_request' do
-      let (:request_double) { double }
+      let(:request_double) { double }
       context 'when the request determination is successful' do
         before do
           allow(Operations::Fdsh::RequestEvidenceDetermination).to receive(:new).and_return(request_double)
@@ -291,7 +291,6 @@ RSpec.describe FinancialAssistance::EvidencesController, dbclean: :after_each, t
     end
 
     describe 'POST #fdsh_hub_request' do
-      let (:request_double) { double }
       context 'when the request comes from a non admin role' do
         before do
           post :fdsh_hub_request, params: params
@@ -428,7 +427,6 @@ RSpec.describe FinancialAssistance::EvidencesController, dbclean: :after_each, t
     end
 
     describe 'POST #fdsh_hub_request' do
-      let (:request_double) { double }
       context 'when the request comes from a non admin role' do
         before do
           post :fdsh_hub_request, params: params

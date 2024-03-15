@@ -16,11 +16,11 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       pr
     end
     let(:dependent_member) { FactoryBot.create(:family_member, family: family, person: dependent_person) }
-    let(:application) do 
+    let(:application) do
       FactoryBot.create(
         :financial_assistance_application,
-        family_id: family.id,
-      ) 
+        family_id: family.id
+      )
     end
     let(:primary_applicant) do
       FactoryBot.create(
@@ -273,48 +273,48 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     end
 
     permissions :fdsh_hub_request? do
-        context 'when a valid user is logged in' do
-          context 'when the user is an hbx admin' do
-            let(:hbx_profile) do
-              FactoryBot.create(
-                :hbx_profile,
-                :normal_ivl_open_enrollment,
-                us_state_abbreviation: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
-                cms_id: "#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.upcase}0"
-              )
-            end
-            let(:hbx_staff_person) { FactoryBot.create(:person) }
-            let(:permission) { FactoryBot.create(:permission, :super_admin) }
-            let(:hbx_staff_role) do
-              hbx_staff_person.create_hbx_staff_role(
-                permission_id: permission.id,
-                subrole: permission.name,
-                hbx_profile: hbx_profile
-              )
-            end
-            let(:hbx_admin_user) do
-              FactoryBot.create(:user, person: hbx_staff_person)
-              hbx_staff_role.person.user
-            end
-            let(:logged_in_user) { user_of_family }
-  
-            context 'with modify family role' do
-              it 'grants access' do
-                expect(subject).to permit(hbx_admin_user, evidence)
-              end
-            end
+      context 'when a valid user is logged in' do
+        context 'when the user is an hbx admin' do
+          let(:hbx_profile) do
+            FactoryBot.create(
+              :hbx_profile,
+              :normal_ivl_open_enrollment,
+              us_state_abbreviation: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
+              cms_id: "#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.upcase}0"
+            )
           end
-        end
-  
-        context 'when a valid user is not logged in' do
-          let(:no_role_person) { FactoryBot.create(:person) }
-          let(:no_role_user) { FactoryBot.create(:user, person: no_role_person) }
-          let(:logged_in_user) { no_role_user }
-  
-          it 'denies access' do
-            expect(subject).not_to permit(logged_in_user, evidence)
+          let(:hbx_staff_person) { FactoryBot.create(:person) }
+          let(:permission) { FactoryBot.create(:permission, :super_admin) }
+          let(:hbx_staff_role) do
+            hbx_staff_person.create_hbx_staff_role(
+              permission_id: permission.id,
+              subrole: permission.name,
+              hbx_profile: hbx_profile
+            )
+          end
+          let(:hbx_admin_user) do
+            FactoryBot.create(:user, person: hbx_staff_person)
+            hbx_staff_role.person.user
+          end
+          let(:logged_in_user) { user_of_family }
+
+          context 'with modify family role' do
+            it 'grants access' do
+              expect(subject).to permit(hbx_admin_user, evidence)
+            end
           end
         end
       end
+
+      context 'when a valid user is not logged in' do
+        let(:no_role_person) { FactoryBot.create(:person) }
+        let(:no_role_user) { FactoryBot.create(:user, person: no_role_person) }
+        let(:logged_in_user) { no_role_user }
+
+        it 'denies access' do
+          expect(subject).not_to permit(logged_in_user, evidence)
+        end
+      end
+    end
   end
 end

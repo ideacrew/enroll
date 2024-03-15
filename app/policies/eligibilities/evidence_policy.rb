@@ -17,7 +17,7 @@ module Eligibilities
     # @param record [Evidence] the evidence that the user is trying to access or modify
     def initialize(user, record)
       super
-  
+
       # @todo Replace _parent with applicant. For some reason, the applicant is returning `nil`.
       #   The applicant is supposed to be a FinancialAssistance::Applicant object.
       #   Currently, the _parent method is being used, which returns the FinancialAssistance::Application object.
@@ -36,7 +36,7 @@ module Eligibilities
     def can_destroy?
       allowed_to_modify?
     end
-  
+
     # Determines if the current user has permission to update evidence.
     # The user can update evidence if they have permission to perform an edit.
     #
@@ -44,7 +44,7 @@ module Eligibilities
     def update_evidence?
       edit?
     end
-  
+
     # Determines if the current user has permission to extend due date for evidence.
     # The user can extend due date if they have permission to perform an edit.
     #
