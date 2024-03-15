@@ -98,11 +98,8 @@
 <script>
   $(document).on('turbolinks:load', function() {
     $(document).on("change", "input[type=checkbox]", function () {
-      if (this.checked) {
-        $(this).closest('tr').find("input[type='radio']").prop('disabled','false');
-      } else {
-        $(this).closest('tr').find("input[type='radio']").prop('disabled','true');
-      }
+      var isCheckboxChecked = this.checked;
+      $(this).closest('tr').find("input[type='radio']").prop('disabled',!isCheckboxChecked);
     });
   });
 </script>
