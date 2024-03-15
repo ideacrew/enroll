@@ -78,7 +78,6 @@ module BenefitSponsors
 
         private
 
-        # NOTE: this will probably be consolidated with a similarily named method in BrokerAgencyProfilesController
         def find_broker_agency_profile
           profile_id = BSON::ObjectId(params[:profile_id])
 

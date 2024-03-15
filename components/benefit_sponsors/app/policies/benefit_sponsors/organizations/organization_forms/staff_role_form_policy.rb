@@ -3,8 +3,8 @@
 module BenefitSponsors
   module Organizations
     module OrganizationForms
-      # this policy does the basic authentication for all StaffRoleForms
-      # specificity of parent of inherited class added to pass GHAs
+      # NOTE: for now this class is inheriting from BenefitSponsors::ApplicationPolicy, due to not being able to pass the GHAs
+      # Once the GHA workflow has been updated, this will inherit from the main app ApplicationPolicy
       class StaffRoleFormPolicy < BenefitSponsors::ApplicationPolicy
 
         attr_reader :service

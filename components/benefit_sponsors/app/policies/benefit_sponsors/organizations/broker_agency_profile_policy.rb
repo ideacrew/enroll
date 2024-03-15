@@ -2,14 +2,11 @@
 
 module BenefitSponsors
   module Organizations
-    # policy for will BrokerAgencyProfile, inherits from benefit_sponsors ApplicationPolicy, but methods are from main_app ApplicationPolicy
-    # methods had to be duplicated due to GHAs
+    # NOTE: for now this class is inheriting from BenefitSponsors::ApplicationPolicy, due to not being able to pass the GHAs
+    # Once the GHA workflow has been updated, this will inherit from the main app ApplicationPolicy
     class BrokerAgencyProfilePolicy < BenefitSponsors::ApplicationPolicy
 
-      # NOTE: All methods will most likely be consolidated with the auth refactor for BrokerAgencyProfilesController
-
-      # NOTE: this method is only used by the BrokerAgencyProfileStaffRolesController, but it acts as an extension of
-      # BrokerAgencyProfilesController does not have a :new? method
+      # NOTE: this method is only used by the BrokerAgencyProfileStaffRolesController
       def new?
         access_to_broker_agency_profile?
       end
