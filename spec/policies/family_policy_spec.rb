@@ -333,3 +333,110 @@ describe 'user permission' do
     end
   end
 end
+
+
+
+
+describe FamilyPolicy, "#hire_broker_agency?" do
+  RSpec.shared_examples_for "a FamilyPolicy given a user with a needed permission" do |check|
+    before :each do
+      perm_list = [
+        :individual_market_primary_family_member?,
+        :individual_market_non_ridp_primary_family_member?,
+        :individual_market_admin?,
+        :shop_market_primary_family_member?,
+        :shop_market_admin?,
+        :fehb_market_primary_family_member?,
+        :fehb_market_admin?,
+        :coverall_market_primary_family_member?,
+        :coverall_market_admin?
+      ]
+      allow(subject).to receive(check.to_sym).and_return(true)
+      (perm_list - [check].compact).each do |perm|
+        allow(subject).to receive(perm.to_sym).and_return(false)
+      end
+    end
+
+    it "has the ability to #{check} and can hire_broker_agency" do
+      expect(subject.hire_broker_agency?).to be_truthy
+    end
+  end
+
+  let(:user) { instance_double(User, person: nil) }
+  let(:family) { instance_double(Family, primary_person: nil) }
+
+  subject { described_class.new(user, family) }
+
+  it "can't hire_broker_agency without permissions" do
+    expect(subject.hire_broker_agency?).to be_falsey
+  end
+
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :individual_market_primary_family_member?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :individual_market_non_ridp_primary_family_member?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :individual_market_admin?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :shop_market_primary_family_member?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :shop_market_admin?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :fehb_market_primary_family_member?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :fehb_market_admin?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :coverall_market_primary_family_member?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :coverall_market_admin?
+end
+
+describe FamilyPolicy, "#request_help?" do
+  RSpec.shared_examples_for "a FamilyPolicy given a user with a needed permission" do |check|
+    before :each do
+      perm_list = [
+        :individual_market_primary_family_member?,
+        :individual_market_non_ridp_primary_family_member?,
+        :individual_market_admin?,
+        :shop_market_primary_family_member?,
+        :shop_market_admin?,
+        :fehb_market_primary_family_member?,
+        :fehb_market_admin?,
+        :coverall_market_primary_family_member?,
+        :coverall_market_admin?,
+        :active_associated_individual_market_ridp_verified_family_broker_staff?,
+        :active_associated_individual_market_ridp_verified_family_broker?,
+        :active_associated_shop_market_family_broker?,
+        :active_associated_shop_market_general_agency?,
+        :active_associated_fehb_market_family_broker?,
+        :active_associated_fehb_market_general_agency?,
+        :active_associated_coverall_market_family_broker?
+      ]
+      allow(subject).to receive(check.to_sym).and_return(true)
+      (perm_list - [check].compact).each do |perm|
+        allow(subject).to receive(perm.to_sym).and_return(false)
+      end
+    end
+
+    it "has the ability to #{check} and can request_help" do
+      expect(subject.request_help?).to be_truthy
+    end
+  end
+
+  let(:user) { instance_double(User, person: nil) }
+  let(:family) { instance_double(Family, primary_person: nil) }
+
+  subject { described_class.new(user, family) }
+
+  it "can't request_help without permissions" do
+    expect(subject.request_help?).to be_falsey
+  end
+
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :individual_market_primary_family_member?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :individual_market_non_ridp_primary_family_member?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :individual_market_admin?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :shop_market_primary_family_member?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :shop_market_admin?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :fehb_market_primary_family_member?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :fehb_market_admin?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :coverall_market_primary_family_member?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :coverall_market_admin?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :active_associated_individual_market_ridp_verified_family_broker_staff?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :active_associated_individual_market_ridp_verified_family_broker?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :active_associated_shop_market_family_broker?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :active_associated_shop_market_general_agency?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :active_associated_fehb_market_family_broker?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :active_associated_fehb_market_general_agency?
+  it_behaves_like "a FamilyPolicy given a user with a needed permission", :active_associated_coverall_market_family_broker?
+end

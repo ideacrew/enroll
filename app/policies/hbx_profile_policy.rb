@@ -93,7 +93,10 @@ class HbxProfilePolicy < ApplicationPolicy
 
   # rubocop:disable Metrics/CyclomaticComplexity
   def assister_index?
+    # Fall back on a family if it exists for the current user.
+    @family = account_holder_family
     return true if individual_market_primary_family_member?
+    return true if individual_market_non_ridp_primary_family_member?
     return true if individual_market_admin?
     return true if active_associated_individual_market_ridp_verified_family_broker_staff?
     return true if active_associated_individual_market_ridp_verified_family_broker?
@@ -115,10 +118,6 @@ class HbxProfilePolicy < ApplicationPolicy
     false
   end
   # rubocop:enable Metrics/CyclomaticComplexity
-
-  def request_help?
-    assister_index?
-  end
 
   def family_index?
     return true if index?
