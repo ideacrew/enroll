@@ -12,6 +12,7 @@ Feature: Customers go to Curam to view notices and verifications
     When the consumer visits verification page
     And the user navigates to the DOCUMENTS tab
     Then MEDICAID & TAX CREDITS button is visible to the user
+    Then consumer logs out
 
   Scenario: Consumer can see the text on left to the Navigation Button
     Given a consumer exists
@@ -21,6 +22,7 @@ Feature: Customers go to Curam to view notices and verifications
     And the user navigates to the DOCUMENTS tab
     When MEDICAID & TAX CREDITS button is visible to the user
     Then there will be text to the left of the MEDICAID & TAX CREDITS button
+    Then consumer logs out
 
   Scenario: HbxAdmin can see the Navigation Button
     Given a Hbx admin with read only permissions exists
@@ -29,6 +31,7 @@ Feature: Customers go to Curam to view notices and verifications
     And selects a Person account and navigates to Verification page
     And the user navigates to the DOCUMENTS tab
     Then MEDICAID & TAX CREDITS button is visible to the user
+    Then Hbx Admin logs out
 
   Scenario: HbxAdmin can see the text on left to the Navigation Button
     Given a Hbx admin with read only permissions exists
@@ -37,6 +40,7 @@ Feature: Customers go to Curam to view notices and verifications
     And selects a Person account and navigates to Verification page
     When MEDICAID & TAX CREDITS button is visible to the user
     Then there will be text to the left of the MEDICAID & TAX CREDITS button
+    Then Hbx Admin logs out
 
   Scenario: Broker can see the Navigation Button
     Given an individual market broker exists
@@ -48,6 +52,7 @@ Feature: Customers go to Curam to view notices and verifications
     When the broker visits verification page
     And the user navigates to the DOCUMENTS tab
     Then MEDICAID & TAX CREDITS button is visible to the user
+    Then broker logs out
 
   Scenario: Broker can see the Navigation Button
     Given an individual market broker exists
@@ -60,6 +65,7 @@ Feature: Customers go to Curam to view notices and verifications
     And the user navigates to the DOCUMENTS tab
     When MEDICAID & TAX CREDITS button is visible to the user
     Then there will be text to the left of the MEDICAID & TAX CREDITS button
+    Then broker logs out
 
   Scenario: Consumer can see the Navigation Button
     Given a consumer exists
@@ -68,6 +74,7 @@ Feature: Customers go to Curam to view notices and verifications
     When the user visits messages page
     Then there will be text to the left of the MEDICAID & TAX CREDITS button
     Then EA sets a flag in IAM to direct the consumer to the curam/ drupal login
+    Then consumer logs out
 
   Scenario: HbxAdmin can see the Navigation Button
     Given a Hbx admin with read only permissions exists
@@ -76,6 +83,7 @@ Feature: Customers go to Curam to view notices and verifications
     And selects a Person account and navigates to Messages page
     Then there will be text to the left of the MEDICAID & TAX CREDITS button
     Then EA sets a flag in IAM to direct the consumer to the curam/ drupal login
+    Then Hbx Admin logs out
 
   Scenario: Broker can see the Navigation Button
     Given an individual market broker exists
@@ -87,3 +95,4 @@ Feature: Customers go to Curam to view notices and verifications
     When the user visits messages page
     Then there will be text to the left of the MEDICAID & TAX CREDITS button
     Then EA sets a flag in IAM to direct the consumer to the curam/ drupal login
+    Then broker logs out
