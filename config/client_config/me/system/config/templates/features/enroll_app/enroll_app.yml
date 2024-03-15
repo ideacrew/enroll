@@ -258,6 +258,8 @@ registry:
             item: true
           - key: :send_rating_area_for_ivl_policy_to_edi
             item: true
+          - key: :medicaid_agency_phone_ttd
+            item: ''
           - key: :medicaid_agency_phone
             item: '(855) 797-4357'
           - key: :medicaid_agency_url

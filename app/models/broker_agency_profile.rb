@@ -15,6 +15,8 @@ class BrokerAgencyProfile
     "Both - Individual & Family AND Small Business Marketplaces" => "both"
   }
   MARKET_KINDS_OPTIONS = ALL_MARKET_KINDS_OPTIONS.select { |k,v| MARKET_KINDS.include? v }
+  INDIVIDUAL_MARKET_KINDS = %w[both individual].freeze
+  SHOP_MARKET_KINDS = %w[both shop].freeze
 
   field :entity_kind, type: String
   field :market_kind, type: String
@@ -143,6 +145,14 @@ class BrokerAgencyProfile
 
   def is_active?
     self.is_approved?
+  end
+
+  def individual_market?
+    INDIVIDUAL_MARKET_KINDS.include?(market_kind)
+  end
+
+  def shop_market?
+    SHOP_MARKET_KINDS.include?(market_kind)
   end
 
   def languages

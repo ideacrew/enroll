@@ -218,18 +218,6 @@
     <li class="admin-dropdown dropdown">
       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin <span class="caret"></span></a>
         <ul class="dropdown-menu">
-          <% if calendar_is_enabled? %>
-            <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
-                                                                            tab_name: 'calendar',
-                                                                            link_path: main_app.exchanges_scheduled_events_path,
-                                                                            display_name: 'Calendar',
-                                                                            active_tab: active_tab,
-                                                                            glyphicon_class:'glyphicon-calendar',
-                                                                            remote: false,
-                                                                            pundit_object: nil,
-                                                                            pundit_method: nil
-                                                                          } %>
-          <% end %>
           <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
                                                                           tab_name: 'configuration',
                                                                           link_path: main_app.configuration_exchanges_hbx_profiles_path,
