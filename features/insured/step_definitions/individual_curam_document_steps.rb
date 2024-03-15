@@ -26,7 +26,6 @@ end
 
 When(/^the user visits messages page$/) do
   visit inbox_insured_families_path
-  sleep 5
 end
 
 When(/^the user visits the applications page$/) do

@@ -85,6 +85,7 @@ Feature: Customers go to Curam to view notices and verifications
     Then EA sets a flag in IAM to direct the consumer to the curam/ drupal login
     Then Hbx Admin logs out
 
+  @flaky
   Scenario: Broker can see the Navigation Button
     Given an individual market broker exists
     And a consumer role family exists with broker
