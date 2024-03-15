@@ -6,10 +6,9 @@ module BenefitSponsors
     class MessagesController < BenefitSponsors::ApplicationController
       before_action :authenticate_user!
       before_action :set_current_user
-      before_action :find_inbox_provider, except: [:msg_to_portal]
+      before_action :find_inbox_provider
       before_action :find_message
       before_action :set_sent_box, only: [:show, :destroy], if: :is_broker?
-      before_action :find_profile, only: [:msg_to_portal]
 
       def new
       end
