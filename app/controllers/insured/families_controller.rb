@@ -24,7 +24,7 @@ class Insured::FamiliesController < FamiliesController
   around_action :cache_hbx, only: [:home]
 
   def home
-    authorize @family, :legacy_show?
+    authorize @family, :home?
     build_employee_role_by_census_employee_id
     set_flash_by_announcement
     set_bookmark_url
@@ -71,9 +71,9 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def enrollment_history
-    redirect_to main_app.family_account_path(tab: 'home') unless EnrollRegistry.feature_enabled?(:enrollment_history_page)
+    authorize @family, :enrollment_history?
 
-    authorize @family, :legacy_show?
+    redirect_to main_app.family_account_path(tab: 'home') unless EnrollRegistry.feature_enabled?(:enrollment_history_page)
 
     @hbx_enrollments = @family.enrollments.non_external.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
     @hbx_enrollments += HbxEnrollment.family_non_pay_enrollments(@family)
@@ -94,7 +94,7 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def manage_family
-    authorize @family, :legacy_show?
+    authorize @family, :manage_family?
 
     set_bookmark_url
     set_admin_bookmark_url(manage_family_insured_families_path)
@@ -110,14 +110,17 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def brokers
-    @tab = params['tab']
+    authorize @family, :brokers?
 
+    @tab = params['tab']
     if @person.active_employee_roles.present?
       @employee_role = @person.active_employee_roles.first
     end
   end
 
   def find_sep
+    authorize @family, :find_sep?
+
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @change_plan = params[:change_plan]
     @employee_role_id = params[:employee_role_id]
@@ -138,6 +141,8 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def record_sep
+    authorize @family, :record_sep?
+
     if params[:qle_id].present?
       qle = QualifyingLifeEventKind.find(params[:qle_id])
       special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: params[:effective_on_kind])
@@ -157,7 +162,7 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def personal
-    authorize @family, :legacy_show?
+    authorize @family, :personal?
 
     @tab = params['tab']
     @contact_preferences_mapping = ConsumerRole::CONTACT_METHOD_MAPPING.invert unless EnrollRegistry.feature_enabled?(:contact_method_via_dropdown)
@@ -173,7 +178,7 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def inbox
-    authorize @family, :legacy_show?
+    authorize @family, :inbox?
 
     @tab = params['tab']
     @folder = params[:folder] || 'Inbox'
@@ -215,16 +220,20 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def verification
-    authorize @family, :legacy_show?
+    authorize @family, :verification?
 
     @family_members = @person.primary_family.has_active_consumer_family_members
   end
 
   def upload_application
+    authorize @family, :upload_application?
+
     @family_members = @person.primary_family.has_active_resident_family_members
   end
 
   def check_qle_date
+    authorize @family, :check_qle_date?
+
     today = TimeKeeper.date_of_record
     start_date = today - 30.days
     end_date = today + 30.days
@@ -273,6 +282,8 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def sep_zip_compare
+    authorize @family, :sep_zip_compare?
+
     old_zip = params[:old_zip].strip
     new_zip = params[:new_zip].strip
     is_approved = false
@@ -300,12 +311,15 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def check_move_reason
+    authorize @family, :check_qle_reason?
   end
 
   def check_insurance_reason
+    authorize @family, :check_qle_reason?
   end
 
   def check_marriage_reason
+    authorize @family, :check_qle_reason?
   end
 
   def purchase
@@ -314,13 +328,8 @@ class Insured::FamiliesController < FamiliesController
     else
       @enrollment = @family.active_household.hbx_enrollments.active.last if @family.present?
     end
-
-    family = @enrollment.family
-    unless current_user.has_hbx_staff_role? || is_family_authorized?(current_user, family) || is_broker_authorized?(current_user, family) || is_general_agency_authorized?(current_user, family)
-      flash[:error] = 'User not authorized to perform this operation'
-      redirect_to root_path
-      return
-    end
+    @family ||= @enrollment&.family
+    authorize @family, :purchase?
 
     if @enrollment.present?
       @enrollment.reset_dates_on_previously_covered_members
@@ -351,6 +360,8 @@ class Insured::FamiliesController < FamiliesController
 
   # admin manually uploads a notice for person
   def upload_notice
+    authorize @family, :upload_notice?
+
     if !params[:file] || !params[:subject]
       flash[:error] = "File or Subject not provided"
       redirect_back(fallback_location: :back)
@@ -385,11 +396,15 @@ class Insured::FamiliesController < FamiliesController
 
   # displays the form to upload a notice for a person
   def upload_notice_form
+    authorize @family, :upload_notice_form?
+
     @notices = @person.documents.where(subject: 'notice')
   end
 
   def delete_consumer_broker
     @family = Family.find(params[:id])
+    authorize @family, :delete_consumer_broker?
+
     broker_agency = @family&.current_broker_agency
 
     if broker_agency.present?
@@ -401,30 +416,9 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
-  def sep_request_denial_notice
-    begin
-      ShopNoticesNotifierJob.perform_later(@person.active_employee_roles.first.census_employee.id.to_s, "sep_request_denial_notice")
-    rescue Exception => e
-      log("#{e.message}; person_id: #{@person.id}")
-    end
-  end
-
-  def is_ee_sep_request_accepted?
-    !@person.has_multiple_active_employers? && @qle.present? && @qle.shop?
-  end
-
-  def ee_sep_request_accepted_notice
-    employee_role = @person.active_employee_roles.first
-    if employee_role.present? && employee_role.census_employee.present?
-      begin
-        ShopNoticesNotifierJob.perform_later(employee_role.census_employee.id.to_s, "ee_sep_request_accepted_notice", {title: @qle.title, end_on: "#{@qle_end_on}", qle_on: "#{@qle_date}"} )
-      rescue Exception => e
-        Rails.logger.error{"Unable to deliver employee SEP accepted notice to person_id: #{@person.id} due to #{e.message}"}
-      end
-    end
-  end
-
   def transition_family_members
+    authorize @family, :transition_family_members?
+
     @row_id = params[:family_actions_id]
     @family_members = @family.active_family_members
     @non_shop_market_kinds = Person::NON_SHOP_ROLES
@@ -434,6 +428,8 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def transition_family_members_update
+    authorize @family, :transition_family_members?
+
     @row_id = params[:family_actions_id]
     params_parser = ::Forms::BulkActionsForAdmin.new(params.permit(@permitted_param_keys).to_h)
     @result = params_parser.result
