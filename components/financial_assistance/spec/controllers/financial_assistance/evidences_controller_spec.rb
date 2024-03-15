@@ -41,12 +41,6 @@ RSpec.describe FinancialAssistance::EvidencesController, dbclean: :after_each, t
   end
 
   let(:enrollment) { instance_double(HbxEnrollment) }
-  let(:inactive_enrollment) do
-    FactoryBot.create(:hbx_enrollment,
-                      family: family,
-                      household: family.latest_household,
-                      is_active: false)
-  end
   let!(:evidence) do
     applicant.create_income_evidence(
       key: :income,
