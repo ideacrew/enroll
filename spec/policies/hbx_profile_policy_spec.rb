@@ -316,7 +316,7 @@ describe HbxProfilePolicy do
     subject { described_class.new(user, HbxProfile) }
 
     shared_examples_for 'access without role' do |def_name, result|
-      let(:user) { double(User, person: double(hbx_staff_role: nil, consumer_role: nil, csr_role: nil, broker_role: nil, active_general_agency_staff_roles: [], broker_agency_staff_roles: nil, resident_role: nil)) }
+      let(:user) { double(User, person: double(hbx_staff_role: nil, consumer_role: nil, csr_role: nil, broker_role: nil, active_general_agency_staff_roles: [], broker_agency_staff_roles: nil, resident_role: nil, primary_family: nil)) }
 
       it "#{def_name} returns #{result}" do
         expect(subject.send(def_name)).to eq result
@@ -344,7 +344,6 @@ describe HbxProfilePolicy do
     it_behaves_like 'access without role', :index?, false
     it_behaves_like 'access without role', :staff_index?, false
     it_behaves_like 'access without role', :assister_index?, false
-    it_behaves_like 'access without role', :request_help?, false
     it_behaves_like 'access without role', :family_index?, false
     it_behaves_like 'access without role', :family_index_dt?, false
     it_behaves_like 'access without role', :identity_verification?, false
@@ -381,9 +380,16 @@ describe HbxProfilePolicy do
     it_behaves_like 'access without role', :set_date?
     it_behaves_like 'access without role', :aptc_csr_family_index?, false
     it_behaves_like 'access without role', :update_setting?
+    it_behaves_like 'access without role', :confirm_lock?
+    it_behaves_like 'access without role', :lockable?
+    it_behaves_like 'access without role', :reset_password?
+    it_behaves_like 'access without role', :confirm_reset_password?
+    it_behaves_like 'access without role', :change_username_and_email?
+    it_behaves_like 'access without role', :confirm_change_username_and_email?
+    it_behaves_like 'access without role', :login_history?
 
     shared_examples_for 'with role and permission' do |def_name, permission_name, permission_val, result|
-      let(:user) { double(User, person: double(hbx_staff_role: staff_role, consumer_role: nil, csr_role: nil, broker_role: nil, active_general_agency_staff_roles: [], broker_agency_staff_roles: nil, resident_role: nil)) }
+      let(:user) { double(User, person: double(hbx_staff_role: staff_role, consumer_role: nil, csr_role: nil, broker_role: nil, active_general_agency_staff_roles: [], broker_agency_staff_roles: nil, resident_role: nil, primary_family: nil)) }
       let(:staff_role) { double(permission: permission) }
       let(:permission) { double(:permission) }
 
@@ -458,9 +464,6 @@ describe HbxProfilePolicy do
 
     it_behaves_like 'with role and permission', :assister_index?, :modify_family, false, false
     it_behaves_like 'with role and permission', :assister_index?, :modify_family, true, true
-
-    it_behaves_like 'with role and permission', :request_help?, :modify_family, true, true
-    it_behaves_like 'with role and permission', :request_help?, :modify_family, false, false
 
     it_behaves_like 'with role and permission', :family_index?, :modify_family, false, false
     it_behaves_like 'with role and permission', :family_index?, :modify_family, true, true
@@ -569,6 +572,27 @@ describe HbxProfilePolicy do
 
     it_behaves_like 'with role and permission', :update_setting?, :modify_admin_tabs, true, true
     it_behaves_like 'with role and permission', :update_setting?, :modify_admin_tabs, false, false
+
+    it_behaves_like 'with role and permission', :confirm_lock?, :can_lock_unlock, true, true
+    it_behaves_like 'with role and permission', :confirm_lock?, :can_lock_unlock, false, false
+
+    it_behaves_like 'with role and permission', :lockable?, :can_lock_unlock, true, true
+    it_behaves_like 'with role and permission', :lockable?, :can_lock_unlock, false, false
+
+    it_behaves_like 'with role and permission', :reset_password?, :can_reset_password, true, true
+    it_behaves_like 'with role and permission', :reset_password?, :can_reset_password, false, false
+
+    it_behaves_like 'with role and permission', :confirm_reset_password?, :can_reset_password, true, true
+    it_behaves_like 'with role and permission', :confirm_reset_password?, :can_reset_password, false, false
+
+    it_behaves_like 'with role and permission', :change_username_and_email?, :can_change_username_and_email, true, true
+    it_behaves_like 'with role and permission', :change_username_and_email?, :can_change_username_and_email, false, false
+
+    it_behaves_like 'with role and permission', :confirm_change_username_and_email?, :can_change_username_and_email, true, true
+    it_behaves_like 'with role and permission', :confirm_change_username_and_email?, :can_change_username_and_email, false, false
+
+    it_behaves_like 'with role and permission', :login_history?, :view_login_history, true, true
+    it_behaves_like 'with role and permission', :login_history?, :view_login_history, false, false
   end
 end
 

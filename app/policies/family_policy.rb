@@ -66,6 +66,28 @@ class FamilyPolicy < ApplicationPolicy
     false
   end
 
+  def request_help?
+    return true if individual_market_non_ridp_primary_family_member?
+    show?
+  end
+
+  def hire_broker_agency?
+    return true if individual_market_primary_family_member?
+    return true if individual_market_non_ridp_primary_family_member?
+    return true if individual_market_admin?
+
+    return true if shop_market_primary_family_member?
+    return true if shop_market_admin?
+
+    return true if fehb_market_primary_family_member?
+    return true if fehb_market_admin?
+
+    return true if coverall_market_primary_family_member?
+    return true if coverall_market_admin?
+
+    false
+  end
+
   def admin_show?
     return true if individual_market_admin?
     return true if shop_market_admin?
@@ -159,11 +181,29 @@ class FamilyPolicy < ApplicationPolicy
     false
   end
 
+  def resident_index?
+    show?
+  end
+
+  def new_resident_dependent?
+    show?
+  end
+
+  def edit_resident_dependent?
+    show?
+  end
+
+  def show_resident_dependent?
+    show?
+  end
+
   # Determines if the current user has permission to create a new family record.
   # TODO: Implement the logic to check if the user has permission to create a new family record.
   #
   # @return [Boolean] Returns true if the user has permission to create a new record, false otherwise.
-  def create?; end
+  def create?
+    show?
+  end
 
   # Determines if the current user has permission to update the family record.
   # TODO: Implement the logic to check if the user has permission to update the family record.
@@ -177,7 +217,9 @@ class FamilyPolicy < ApplicationPolicy
   # TODO: Implement the logic to check if the user has permission to destroy the family record.
   #
   # @return [Boolean] Returns true if the user has permission to destroy the record, false otherwise.
-  def destroy?; end
+  def destroy?
+    show?
+  end
 
   # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   def legacy_show?
