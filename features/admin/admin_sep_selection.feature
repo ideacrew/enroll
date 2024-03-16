@@ -15,6 +15,7 @@ Feature: Admin plan shopping via SEP
     And Admin clicks Families tab
     Then the Admin is navigated to the Families screen
     And I click the name of Patrick Doe from family list
+    And the person named Patrick Doe is RIDP verified
     And I should see the individual home page
     And I click Individual QLE events in QLE carousel
     When I click the "Had a baby" in qle carousel

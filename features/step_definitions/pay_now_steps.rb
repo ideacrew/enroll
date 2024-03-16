@@ -279,6 +279,10 @@ And(/^creates a consumer with SEP$/) do
   FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date_and_first_month, market_kind: "individual")
 end
 
+And(/^the consumer with SEP is RIDP verified$/) do
+  ::Person.all_consumer_roles.each { |per| per.consumer_role.move_identity_documents_to_verified }
+end
+
 Then(/^\w+ should the the First Payment button/) do
   expect(page).to have_content('Make a first payment')
 end

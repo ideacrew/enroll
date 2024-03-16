@@ -9,6 +9,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
   before :each do
     allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
     allow(EnrollRegistry[:apply_aggregate_to_enrollment].feature).to receive(:is_enabled).and_return(false)
+    allow(controller).to receive(:ridp_verified?).with(any_args).and_return(true)
   end
 
   let(:site) { BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
