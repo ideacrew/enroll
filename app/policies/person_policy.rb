@@ -9,8 +9,6 @@ class PersonPolicy < ApplicationPolicy
     @family = record.primary_family if record.is_a?(Person)
   end
 
-  ACCESSABLE_ROLES = %w[hbx_staff_role broker_role active_broker_staff_roles].freeze
-
   def can_show?
     allowed_to_modify?
   end
@@ -62,29 +60,11 @@ class PersonPolicy < ApplicationPolicy
   private
 
   def allowed_to_modify?
-    (current_user.person == record) || (current_user == associated_user) || role_has_permission_to_modify?
+    allowed_to_access?
   end
 
-  def associated_user
-    associated_family&.primary_person&.user
-  end
-
-  def current_user
-    user
-  end
-
-  def associated_family
-    record.primary_family
-  end
-
-  def role_has_permission_to_modify?
-    return false unless role.present?
-
-    if has_hbx_staff_role?
-      can_hbx_staff_modify?
-    elsif has_broker_role?
-      can_broker_modify?
-    end
+  def allowed_to_download?
+    allowed_to_access?
   end
 
   # Determines if the current user has permission to upload ridp document.
@@ -92,7 +72,7 @@ class PersonPolicy < ApplicationPolicy
   # an active associated broker, or an admin in the individual market,
   #
   # @return [Boolean] Returns true if the user has permission to download the document, false otherwise.
-  def allowed_to_download?
+  def allowed_to_access?
     return true if individual_market_primary_family_member?
     return true if shop_market_primary_family_member?
     return true if individual_market_admin?
@@ -103,57 +83,4 @@ class PersonPolicy < ApplicationPolicy
 
     false
   end
-
-  def matches_individual_broker_account?
-    return false unless associated_family.active_broker_agency_account.present?
-    matches_broker_agency_profile?(associated_family.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id)
-  end
-
-  def matches_shop_broker_account?
-    return false unless associated_employee_roles.present?
-    associated_employee_roles.any? do |employee_role|
-      matches_broker_agency_profile?(employee_role.employer_profile.active_broker_agency_account.benefit_sponsors_broker_agency_profile_id)
-    end
-  end
-
-  # Checks if the broker agency profile ID of any of the roles
-  # matches the provided broker agency profile ID.
-  #
-  # @note The `role` can be a single broker role or multiple active broker agency staff roles.
-  #
-  # @param active_broker_agency_profile_id [String] The broker agency profile ID to match against.
-  #
-  # @return [Boolean] returns true if there is a match, false otherwise.
-  def matches_broker_agency_profile?(active_broker_agency_profile_id)
-    Array(role).any? do |role|
-      role.benefit_sponsors_broker_agency_profile_id == active_broker_agency_profile_id
-    end
-  end
-
-  def associated_employee_roles
-    record.active_employee_roles
-  end
-
-  def role
-    @role ||= find_role
-  end
-
-  def has_broker_role?
-    role.is_a?(::BrokerRole) || role.any? { |r| r.is_a?(::BrokerAgencyStaffRole) }
-  end
-
-  def has_hbx_staff_role?
-    role.is_a?(::HbxStaffRole)
-  end
-
-  def find_role
-    person = user&.person
-    return nil unless person
-    ACCESSABLE_ROLES.detect do |role|
-      return person.send(role) if person.respond_to?(role) && person.send(role)
-    end
-
-    nil
-  end
-
 end

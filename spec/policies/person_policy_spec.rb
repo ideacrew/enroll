@@ -106,47 +106,66 @@ RSpec.describe PersonPolicy, type: :policy do
     end
   end
 
-  context 'with broker role' do
-    let(:broker_agency_profile) do
-      FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile)
-    end
-    let(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: 'active')}
-    let(:broker_user) {FactoryBot.create(:user, :person => broker_agency_staff_role.person, roles: ['broker_role'])}
-    let(:broker_person) { broker_agency_staff_role.person }
-    let(:broker_role) do
-      role = BrokerRole.new(
-        :broker_agency_profile => broker_agency_profile,
-        :aasm_state => "applicant",
-        :npn => "123456789",
-        :provider_kind => "broker"
-      )
-      broker_person.broker_role = role
-      broker_person.save!
-      broker_person.broker_role
-    end
+  context "for broker login" do
+    let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: :individual) }
+    let!(:broker_role) { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: :active) }
+    let!(:broker_role_user) {FactoryBot.create(:user, :person => broker_role.person, roles: ['broker_role'])}
 
+    let!(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: 'active')}
+    let!(:broker_agency_staff_user) {FactoryBot.create(:user, :person => broker_agency_staff_role.person, roles: ['broker_agency_staff_role'])}
+\
     let(:person) { FactoryBot.create(:person, :with_consumer_role) }
     let(:user) { FactoryBot.create(:user, person: person) }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
 
-    let(:policy){PersonPolicy.new(broker_user, person)}
+    before do
+      person.consumer_role.move_identity_documents_to_verified
+    end
 
-    context 'authorized broker' do
-      before(:each) do
-        family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
-                                                                                            start_on: Time.now,
-                                                                                            is_active: true)
-        family.reload
+    context 'with broker role' do
+      let(:policy) {PersonPolicy.new(broker_role_user, person)}
+
+      context 'authorized broker' do
+        before(:each) do
+          family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                              start_on: Time.now,
+                                                                                              writing_agent_id: broker_role.id,
+                                                                                              is_active: true)
+          family.reload
+        end
+
+        it 'broker should be able to update' do
+          expect(policy.can_update?).to be true
+        end
       end
 
-      it 'broker should be able to update' do
-        expect(policy.can_update?).to be true
+      context 'unauthorized broker' do
+        it 'broker should not be able to update' do
+          expect(policy.can_update?).to be false
+        end
       end
     end
 
-    context 'unauthorized broker' do
-      it 'broker should not be able to update' do
-        expect(policy.can_update?).to be false
+    context 'with broker staff role' do
+      let(:policy){PersonPolicy.new(broker_agency_staff_user, person)}
+
+      context 'authorized broker' do
+        before(:each) do
+          family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                              start_on: Time.now,
+                                                                                              is_active: true)
+          family.reload
+        end
+
+        it 'broker should be able to update' do
+          expect(policy.can_update?).to be true
+        end
+      end
+
+      context 'unauthorized broker' do
+        it 'broker should not be able to update' do
+          expect(policy.can_update?).to be false
+        end
       end
     end
   end
