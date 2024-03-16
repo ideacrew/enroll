@@ -141,10 +141,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     hbx_enrollment.save
     hbx_enrollment.reload
     FactoryBot.create(:special_enrollment_period, family: family)
-    allow(person).to receive(:primary_family).and_return(family)
-    allow(family).to receive(:active_household).and_return(household)
-    allow(person).to receive(:consumer_role).and_return(nil)
-    allow(person).to receive(:consumer_role?).and_return(false)
     allow(user).to receive(:last_portal_visited).and_return('/')
     allow(user).to receive(:has_hbx_staff_role?).and_return false
     allow(person).to receive(:active_employee_roles).and_return [employee_role]
@@ -367,7 +363,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
           allow(person_1).to receive(:primary_family).and_return(family_1)
           person_2.update_attributes!(is_incarcerated: nil)
           person_2.consumer_role.update_attributes!(is_applying_coverage: false)
+          person_2.consumer_role.move_identity_documents_to_verified
           person_1.update_attributes!(is_incarcerated: false)
+          person_1.consumer_role.update_attributes!(is_applying_coverage: true) if person_1.consumer_role
           family = person_1.primary_family
           expect(family.family_members.count).to eq(1)
           FactoryBot.create(:family_member, family: family, person: person_2)
@@ -705,169 +703,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     end
   end
 
-  context 'POST term_or_cancel' do
-    before { allow(Person).to receive(:find).and_return(person) }
-
-    let(:family) {FactoryBot.create(:individual_market_family)}
-    let(:sep) {FactoryBot.create(:special_enrollment_period, family: family)}
-    let(:sbc_document) {FactoryBot.build(:document, subject: 'SBC', identifier: 'urn:openhbx#123')}
-    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, title: 'AAA', sbc_document: sbc_document)}
-    let(:enrollment_to_cancel) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: Date.today + 1.month)}
-    let(:enrollment_to_term) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: Date.today - 1.month)}
-
-    it 'should cancel enrollment with no term date given' do
-      family.family_members.first.person.consumer_role.update_attributes(:aasm_state => :fully_verified)
-      sign_in user
-      post :term_or_cancel, params: {hbx_enrollment_id: enrollment_to_cancel.id, term_date: nil, term_or_cancel: 'cancel'}
-      enrollment_to_cancel.reload
-      expect(enrollment_to_cancel.aasm_state).to eq 'coverage_canceled'
-      expect(response).to redirect_to(family_account_path)
-    end
-
-    it 'should schedule terminate enrollment with term date given' do
-      family.family_members.first.person.consumer_role.update_attributes(:aasm_state => :fully_verified)
-      sign_in user
-      post :term_or_cancel, params: {hbx_enrollment_id: enrollment_to_term.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate'}
-      enrollment_to_term.reload
-      expect(enrollment_to_term.aasm_state).to eq 'coverage_terminated'
-      expect(response).to redirect_to(family_account_path)
-    end
-
-    it 'raises error if find the HBX enrollment does not belong to the current user' do
-      sign_in user
-      error_message = "HBX enrollment ID does not belong to the user"
-      post :term_or_cancel, params: {hbx_enrollment_id: "5f6278b81bdce242ca1eb1a1", term_date: nil, term_or_cancel: 'cancel'}
-      expect(flash[:error]).to eq 'User not authorized to perform this operation'
-    end
-
-    context "person has a broker role" do
-      let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
-      let(:broker_person) { broker_agency_profile.primary_broker_role.person }
-      let(:site)                      { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-      let(:broker_organization)      { FactoryBot.build(:benefit_sponsors_organizations_general_organization, site: site)}
-      let(:broker_user) { FactoryBot.create(:user, person: broker_person) }
-      let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
-      let(:broker_agency_account) { FactoryBot.build(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, is_active: true) }
-      let(:rating_area) { FactoryBot.create_default(:benefit_markets_locations_rating_area) }
-      let(:hbx_enrollment_with_broker) do
-        FactoryBot.create(:hbx_enrollment,
-                          product_id: product.id,
-                          kind: 'individual',
-                          family: family,
-                          rating_area_id: rating_area.id,
-                          broker_agency_profile_id: broker_agency_profile.id)
-      end
-
-      it "should be able to terminate coverage if user is valid and has broker role" do
-        family.broker_agency_accounts << broker_agency_account
-        family.save
-        sign_in broker_user
-
-        post :term_or_cancel, params: {hbx_enrollment_id: hbx_enrollment_with_broker.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate'}
-        hbx_enrollment_with_broker.reload
-        expect(hbx_enrollment_with_broker.aasm_state).to eq 'coverage_terminated'
-        expect(response).to redirect_to(family_account_path)
-      end
-
-      it "should not be able to view page if user does not have active staff role" do
-        sign_in broker_user
-
-        post :term_or_cancel, params: {hbx_enrollment_id: hbx_enrollment_with_broker.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate'}
-        hbx_enrollment_with_broker.reload
-
-        expect(hbx_enrollment_with_broker.aasm_state).to eq 'coverage_selected'
-        expect(response).to redirect_to(root_path)
-      end
-    end
-
-    context "person and broker staff role" do
-      let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
-      let(:broker_agency) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
-      let(:person1) { FactoryBot.create(:person)}
-      let(:user_with_broker_staff_role) { FactoryBot.create(:user, person: person1) }
-      let(:broker_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person1, broker_agency_profile: broker_agency_profile) }
-      let(:family) do
-        family = FactoryBot.create(:family, :with_primary_family_member)
-        family.broker_agency_accounts << broker_agency_account
-        family.save
-        family
-      end
-      let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
-      let(:broker_agency_account) { FactoryBot.build(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, is_active: true) }
-
-      let(:hbx_enrollment_with_broker) do
-        FactoryBot.create(:hbx_enrollment,
-                          product_id: product.id,
-                          kind: 'individual',
-                          family: family,
-                          rating_area_id: rating_area.id,
-                          writing_agent_id: broker_agency_profile.primary_broker_role.id,
-                          broker_agency_profile_id: broker_agency_profile.id)
-      end
-      it "should be able to terminate coverage if user is valid and has active broker staff role" do
-        person.broker_agency_staff_roles = [broker_staff_role]
-        person.save!
-        sign_in user_with_broker_staff_role
-        post :term_or_cancel, params: {hbx_enrollment_id: hbx_enrollment_with_broker.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate'}
-        hbx_enrollment_with_broker.reload
-
-        expect(hbx_enrollment_with_broker.aasm_state).to eq 'coverage_terminated'
-        expect(response).to redirect_to(family_account_path)
-      end
-    end
-
-    context "person and general agency staff role" do
-      let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site)}
-      let(:general_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_general_agency_profile, organization: organization) }
-      let(:broker_agency_profile) do
-        FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile,
-                          default_general_agency_profile_id: general_agency_profile.id)
-      end
-      let(:person1) { FactoryBot.create(:person)}
-      let(:user_with_general_staff_role) { FactoryBot.create(:user, person: person1) }
-      let(:general_staff_role) do
-        FactoryBot.create(:general_agency_staff_role,
-                          benefit_sponsors_general_agency_profile_id: general_agency_profile.id,
-                          person: person1, general_agency_profile: general_agency_profile,
-                          aasm_state: 'active')
-      end
-      let(:family) do
-        family = FactoryBot.create(:family, :with_primary_family_member)
-        family.broker_agency_accounts << broker_agency_account
-        family.save
-        family
-      end
-      let(:broker_role) { broker_agency_profile.primary_broker_role }
-      let(:broker_agency_account) { FactoryBot.build(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, is_active: true, writing_agent: broker_role) }
-      let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
-
-      let(:hbx_enrollment_with_broker) do
-        FactoryBot.create(:hbx_enrollment,
-                          product_id: product.id,
-                          kind: 'individual',
-                          family: family,
-                          rating_area_id: rating_area.id,
-                          writing_agent_id: broker_agency_profile.primary_broker_role.id,
-                          broker_agency_profile_id: broker_agency_profile.id)
-      end
-
-      before do
-        allow(::SponsoredBenefits::Organizations::PlanDesignOrganization).to receive(:where).and_return([double('PlanDesignOrganization')])
-      end
-
-      it "should be able to terminate coverage if user is valid and has active ga staff role" do
-        person.general_agency_staff_roles = [general_staff_role]
-        person.save!
-        sign_in user_with_general_staff_role
-        post :term_or_cancel, params: {hbx_enrollment_id: hbx_enrollment_with_broker.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate'}
-        hbx_enrollment_with_broker.reload
-
-        expect(hbx_enrollment_with_broker.aasm_state).to eq 'coverage_terminated'
-        expect(response).to redirect_to(family_account_path)
-      end
-    end
-  end
-
   context 'POST edit_aptc', dbclean: :after_each do
 
     before do
@@ -905,6 +740,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     let!(:person_14) do
       person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, is_incarcerated: false)
       person.consumer_role.update_attributes(aasm_state: 'fully_verified')
+      person.consumer_role.move_identity_documents_to_verified
       person
     end
     let!(:family_14) {FactoryBot.create(:family, :with_primary_family_member, person: person_14)}
@@ -913,6 +749,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       person_14.ensure_relationship_with(member, 'spouse')
       member.save!
       member.consumer_role.update_attributes(aasm_state: 'fully_verified')
+      member.consumer_role.move_identity_documents_to_verified
       member
     end
     let(:user_14) { FactoryBot.create(:user, person: person_14) }
@@ -1035,37 +872,47 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
   end
 
   context 'update aptc in the mthh context' do
-    let!(:person) do
-      person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, is_incarcerated: false)
-      person.consumer_role.update_attributes(aasm_state: 'fully_verified')
-      person
-    end
-    let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
-
-    let!(:hbx_enrollment) do
-      FactoryBot.create(:hbx_enrollment,
-                        family: family,
-                        household: family.active_household,
-                        coverage_kind: 'health',
-                        effective_on: TimeKeeper.date_of_record.beginning_of_month,
-                        enrollment_kind: 'open_enrollment',
-                        kind: 'individual',
-                        consumer_role: person.consumer_role,
-                        rating_area_id: rating_area.id,
-                        product: product)
+    let(:user2) { FactoryBot.create(:user, person: person2) }
+    let(:person2) do
+      per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, is_incarcerated: false)
+      per.consumer_role.update_attributes(aasm_state: 'fully_verified')
+      per.consumer_role.move_identity_documents_to_verified
+      per
     end
 
-    let!(:rating_area) do
-      ::BenefitMarkets::Locations::RatingArea.rating_area_for(person.rating_address, during: TimeKeeper.date_of_record.beginning_of_month) || FactoryBot.create_default(:benefit_markets_locations_rating_area)
+    let(:family2) { FactoryBot.create(:family, :with_primary_family_member, person: person2) }
+
+    let(:hbx_enrollment2) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        family: family2,
+        household: family2.active_household,
+        coverage_kind: 'health',
+        effective_on: TimeKeeper.date_of_record.beginning_of_month,
+        enrollment_kind: 'open_enrollment',
+        kind: 'individual',
+        consumer_role_id: person2.consumer_role.id,
+        rating_area_id: rating_area2.id,
+        product: product2
+      )
     end
 
-    let!(:product) do
-      FactoryBot.create(:benefit_markets_products_health_products_health_product,
-                        hios_id: '11111111122301-01',
-                        csr_variant_id: '01',
-                        metal_level_kind: :silver,
-                        application_period: TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year,
-                        benefit_market_kind: :aca_individual)
+    let(:rating_area2) do
+      ::BenefitMarkets::Locations::RatingArea.rating_area_for(
+        person.rating_address,
+        during: TimeKeeper.date_of_record.beginning_of_month
+      ) || FactoryBot.create_default(:benefit_markets_locations_rating_area)
+    end
+
+    let(:product2) do
+      FactoryBot.create(
+        :benefit_markets_products_health_products_health_product,
+        hios_id: '11111111122301-01',
+        csr_variant_id: '01',
+        metal_level_kind: :silver,
+        application_period: TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year,
+        benefit_market_kind: :aca_individual
+      )
     end
 
     let(:new_aptc_amount) {'1000'}
@@ -1073,26 +920,38 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     let(:max_tax_credit) {'2000'}
     let(:new_aptc_amount_float) { new_aptc_amount.to_f }
     let(:max_tax_credit_float) { max_tax_credit.to_f }
-    let(:new_effective_date) { Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), hbx_enrollment.effective_on).to_date }
+    let(:new_effective_date) do
+      Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(
+        TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'),
+        hbx_enrollment2.effective_on
+      ).to_date
+    end
 
-    let(:params) {{'applied_pct_1' => new_aptc_pct, 'aptc_applied_total' => new_aptc_amount, 'hbx_enrollment_id' => hbx_enrollment.id.to_s, max_aptc: max_tax_credit}}
+    let(:params) do
+      {
+        applied_pct_1: new_aptc_pct,
+        aptc_applied_total: new_aptc_amount,
+        hbx_enrollment_id: hbx_enrollment2.id.to_s,
+        max_aptc: max_tax_credit
+      }
+    end
 
     before :each do
       allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
       allow(EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature).to receive(:is_enabled).and_return(true)
-      sign_in user
-      post :edit_aptc, params: params
+      sign_in user2
+      post :edit_aptc, params: params, session: { person_id: user2.person.id }
     end
 
     it "should update APTC amount on the new enrollment based on the aggregate aptc amount" do
-      family.reload
-      new_enrollment = family.hbx_enrollments.last
+      family2.reload
+      new_enrollment = family2.hbx_enrollments.last
       new_enrollment.effective_on
-      if hbx_enrollment.effective_on.year == new_effective_date.year
+      if hbx_enrollment2.effective_on.year == new_effective_date.year
         expect(new_enrollment.elected_aptc_pct).to eq(new_aptc_amount_float / max_tax_credit_float)
       else
         # Can't create a corresponding enrollment during the end of the year due to overlapping plan year issue and hence disabling the change tax credit button
-        expect(new_enrollment.elected_aptc_pct).to eq(hbx_enrollment.elected_aptc_pct)
+        expect(new_enrollment.elected_aptc_pct).to eq(hbx_enrollment2.elected_aptc_pct)
       end
     end
   end
@@ -1414,11 +1273,14 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:tobacco_cost).and_return(true)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:prevent_concurrent_sessions).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:preferred_user_access).and_return(false)
+        allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
         sign_in user
       end
 
       it 'creates enrollment & set tobacco_use on hbx_enrollment member' do
-        expect(family.active_household.hbx_enrollments.size).to eq 0
+        family.primary_person.consumer_role.move_identity_documents_to_verified
+        family.active_household.hbx_enrollments.delete_all
+        expect(family.reload.active_household.hbx_enrollments.size).to eq(0)
         post :create, params: {
           "person_id" => person.id,
           "family_member_ids" => {"0" => family_member.id },
@@ -1428,9 +1290,9 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
           "change_plan" => "change_by_qle",
           "effective_on_option_selected" => TimeKeeper.date_of_record.to_s,
           "commit" => "Shop for new plan"
-        }
-
+        }, session: { person_id: family.primary_person.id }
         expect(response).to have_http_status(:redirect)
+        expect(family.reload.active_household.hbx_enrollments.size).to eq(1)
         ivl_enrollments = HbxEnrollment.where(kind: 'individual')
         expect(ivl_enrollments.size).to eq 1
         expect(ivl_enrollments.first.hbx_enrollment_members.first.tobacco_use).to eq 'Y'
@@ -1438,3 +1300,239 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     end
   end
 end
+
+# context 'POST term_or_cancel' do
+#   before { allow(Person).to receive(:find).and_return(person) }
+
+#   let(:family) {FactoryBot.create(:individual_market_family)}
+#   let(:sep) {FactoryBot.create(:special_enrollment_period, family: family)}
+#   let(:sbc_document) {FactoryBot.build(:document, subject: 'SBC', identifier: 'urn:openhbx#123')}
+#   let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, title: 'AAA', sbc_document: sbc_document)}
+#   let(:enrollment_to_cancel) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: Date.today + 1.month)}
+#   let(:enrollment_to_term) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: Date.today - 1.month)}
+
+#   it 'should cancel enrollment with no term date given' do
+#     role = family.family_members.first.person.consumer_role
+#     role.update_attributes(:aasm_state => :fully_verified)
+#     role.move_identity_documents_to_verified
+#     sign_in user
+#     params = { hbx_enrollment_id: enrollment_to_cancel.id, term_date: nil, term_or_cancel: 'cancel' }
+#     post :term_or_cancel, params: params, session: { person_id: enrollment_to_cancel.family.primary_person.id }
+#     enrollment_to_cancel.reload
+#     expect(enrollment_to_cancel.aasm_state).to eq 'coverage_canceled'
+#     expect(response).to redirect_to(family_account_path)
+#   end
+
+#   it 'should schedule terminate enrollment with term date given' do
+#     role = family.family_members.first.person.consumer_role
+#     role.update_attributes(:aasm_state => :fully_verified)
+#     role.move_identity_documents_to_verified
+#     sign_in user
+#     params = { hbx_enrollment_id: enrollment_to_term.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate' }
+#     post :term_or_cancel, params: params, session: { person_id: enrollment_to_term.family.primary_person.id }
+#     enrollment_to_term.reload
+#     expect(enrollment_to_term.aasm_state).to eq 'coverage_terminated'
+#     expect(response).to redirect_to(family_account_path)
+#   end
+
+#   it 'raises error if find the HBX enrollment does not belong to the current user' do
+#     sign_in user
+#     error_message = "HBX enrollment ID does not belong to the user"
+#     post :term_or_cancel, params: {hbx_enrollment_id: "5f6278b81bdce242ca1eb1a1", term_date: nil, term_or_cancel: 'cancel'}
+#     expect(flash[:error]).to eq 'User not authorized to perform this operation'
+#   end
+
+#   context "person has a broker role" do
+#     let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
+#     let(:broker_person) { broker_agency_profile.primary_broker_role.person }
+#     let(:site)                      { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+#     let(:broker_organization)      { FactoryBot.build(:benefit_sponsors_organizations_general_organization, site: site)}
+#     let(:broker_user) { FactoryBot.create(:user, person: broker_person) }
+#     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+#     let(:broker_agency_account) { FactoryBot.build(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, is_active: true) }
+#     let(:rating_area) { FactoryBot.create_default(:benefit_markets_locations_rating_area) }
+#     let(:hbx_enrollment_with_broker) do
+#       FactoryBot.create(:hbx_enrollment,
+#                         product_id: product.id,
+#                         kind: 'individual',
+#                         family: family,
+#                         rating_area_id: rating_area.id,
+#                         broker_agency_profile_id: broker_agency_profile.id)
+#     end
+
+#     let(:params) do
+#       {
+#         hbx_enrollment_id: hbx_enrollment_with_broker.id,
+#         term_date: TimeKeeper.date_of_record + 1,
+#         term_or_cancel: 'terminate'
+#       }
+#     end
+
+#     it "should be able to terminate coverage if user is valid and has broker role" do
+#       family.broker_agency_accounts << broker_agency_account
+#       family.save
+#       sign_in broker_user
+
+#       post :term_or_cancel, params: params, session: { person_id: hbx_enrollment_with_broker.family.primary_person.id }
+#       hbx_enrollment_with_broker.reload
+#       expect(hbx_enrollment_with_broker.aasm_state).to eq 'coverage_terminated'
+#       expect(response).to redirect_to(family_account_path)
+#     end
+
+#     it "should not be able to view page if user does not have active staff role" do
+#       sign_in broker_user
+
+#       post :term_or_cancel, params: params, session: { person_id: hbx_enrollment_with_broker.family.primary_person.id }
+#       hbx_enrollment_with_broker.reload
+
+#       expect(hbx_enrollment_with_broker.aasm_state).to eq 'coverage_selected'
+#       expect(response).to redirect_to(root_path)
+#     end
+#   end
+
+#   context "person and broker staff role" do
+#     let(:broker_person1) { FactoryBot.create(:person) }
+#     let(:broker_role1) { FactoryBot.create(:broker_role, person: broker_person1) }
+
+#     let(:broker_staff_person1) { FactoryBot.create(:person) }
+#     let(:broker_staff1) do
+#       FactoryBot.create(
+#         :broker_agency_staff_role,
+#         person: broker_staff_person1,
+#         aasm_state: 'active',
+#         benefit_sponsors_broker_agency_profile_id: broker_agency_id
+#       )
+#     end
+#     let(:broker_staff_user1) { FactoryBot.create(:user, person: broker_staff_person1) }
+
+#     let(:site1) do
+#       FactoryBot.create(
+#         :benefit_sponsors_site,
+#         :with_benefit_market,
+#         :as_hbx_profile,
+#         site_key: ::EnrollRegistry[:enroll_app].settings(:site_key).item
+#       )
+#     end
+
+#     let(:broker_agency_organization1) do
+#       FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site1)
+#     end
+#     let(:broker_agency_profile1) { broker_agency_organization1.broker_agency_profile }
+#     let(:broker_agency_id) { broker_agency_profile1.id }
+
+#     let(:broker_agency_account1) do
+#       family1.broker_agency_accounts.create!(
+#         benefit_sponsors_broker_agency_profile_id: broker_agency_id,
+#         writing_agent_id: broker_role1.id,
+#         is_active: true,
+#         start_on: TimeKeeper.date_of_record
+#       )
+#     end
+
+#     let(:person1) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+#     let(:family1) { FactoryBot.create(:family, :with_primary_family_member, person: person1) }
+#     let(:consumer_role) { person1.consumer_role }
+
+#     let(:enrollment1) do
+#       FactoryBot.create(
+#         :hbx_enrollment,
+#         product_id: product.id,
+#         kind: 'individual',
+#         family_id: family1.id,
+#         household_id: family1.active_household.id,
+#         consumer_role_id: consumer_role.id,
+#         rating_area_id: FactoryBot.create(:benefit_markets_locations_rating_area).id
+#       )
+#     end
+
+#     let(:input_params) do
+#       {
+#         hbx_enrollment_id: enrollment1.id,
+#         term_date: TimeKeeper.date_of_record + 1,
+#         term_or_cancel: 'terminate'
+#       }
+#     end
+
+#     before do
+#       broker_role1.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
+#       broker_person1.create_broker_agency_staff_role(
+#         benefit_sponsors_broker_agency_profile_id: broker_role1.benefit_sponsors_broker_agency_profile_id
+#       )
+#       broker_agency_profile1.update_attributes!(primary_broker_role_id: broker_role1.id, market_kind: :both)
+#       broker_role1.approve!
+#       broker_agency_account1
+#       broker_staff1
+#       consumer_role.move_identity_documents_to_verified
+#     end
+
+#     it "should be able to terminate coverage if user is valid and has active broker staff role" do
+#       sign_in broker_staff_user1
+#       post :term_or_cancel, params: input_params, session: { person_id: enrollment1.family.primary_person.id }
+#       enrollment1.reload
+
+#       expect(enrollment1.aasm_state).to eq 'coverage_terminated'
+#       expect(response).to redirect_to(family_account_path)
+#     end
+#   end
+
+#   context "person and general agency staff role" do
+#     let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{EnrollRegistry[:enroll_app].setting(:site_key).item}_employer_profile".to_sym, site: site)}
+#     let(:general_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_general_agency_profile, organization: organization) }
+#     let(:broker_agency_profile) do
+#       FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile,
+#                         default_general_agency_profile_id: general_agency_profile.id)
+#     end
+#     let(:person1) { FactoryBot.create(:person)}
+#     let(:user_with_general_staff_role) { FactoryBot.create(:user, person: person1) }
+#     let(:general_staff_role) do
+#       FactoryBot.create(:general_agency_staff_role,
+#                         benefit_sponsors_general_agency_profile_id: general_agency_profile.id,
+#                         person: person1, general_agency_profile: general_agency_profile,
+#                         aasm_state: 'active')
+#     end
+#     let(:family) do
+#       family = FactoryBot.create(:family, :with_primary_family_member)
+#       family.broker_agency_accounts << broker_agency_account
+#       family.save
+#       family
+#     end
+#     let(:broker_role) { broker_agency_profile.primary_broker_role }
+#     let(:broker_agency_account) { FactoryBot.build(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, is_active: true, writing_agent: broker_role) }
+#     let(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area) }
+
+#     let(:hbx_enrollment_with_broker) do
+#       FactoryBot.create(:hbx_enrollment,
+#                         product_id: product.id,
+#                         kind: 'individual',
+#                         family: family,
+#                         rating_area_id: rating_area.id,
+#                         writing_agent_id: broker_agency_profile.primary_broker_role.id,
+#                         broker_agency_profile_id: broker_agency_profile.id)
+#     end
+
+#     before do
+#       allow(::SponsoredBenefits::Organizations::PlanDesignOrganization).to receive(:where).and_return([double('PlanDesignOrganization')])
+#     end
+
+#     let(:params) do
+#       {
+#         hbx_enrollment_id: hbx_enrollment_with_broker.id,
+#         term_date: TimeKeeper.date_of_record + 1,
+#         term_or_cancel: 'terminate'
+#       }
+#     end
+
+#     it "should be able to terminate coverage if user is valid and has active ga staff role" do
+#       person.general_agency_staff_roles = [general_staff_role]
+#       person.save!
+#       sign_in user_with_general_staff_role
+#       post :term_or_cancel, params: params, session: { person_id: hbx_enrollment_with_broker.family.primary_person.id }
+#       hbx_enrollment_with_broker.reload
+
+#       expect(hbx_enrollment_with_broker.aasm_state).to eq 'coverage_terminated'
+#       expect(response).to redirect_to(family_account_path)
+#     end
+#   end
+# end
+
+

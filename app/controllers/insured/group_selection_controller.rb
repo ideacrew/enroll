@@ -203,7 +203,14 @@ class Insured::GroupSelectionController < ApplicationController
 
   def term_or_cancel
     authorize @hbx_enrollment, :term_or_cancel?
-    @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_post({enrollment_id: params.require(:hbx_enrollment_id), term_date: params[:term_date], term_or_cancel: params[:term_or_cancel]})
+
+    @self_term_or_cancel_form = ::Insured::Forms::SelfTermOrCancelForm.for_post(
+      {
+        enrollment_id: params.require(:hbx_enrollment_id),
+        term_date: params[:term_date],
+        term_or_cancel: params[:term_or_cancel]
+      }
+    )
 
     if @self_term_or_cancel_form.errors.present?
       flash[:error] = @self_term_or_cancel_form.errors.values.flatten.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}
@@ -249,7 +256,7 @@ class Insured::GroupSelectionController < ApplicationController
   def find_hbx_enrollment
     return @hbx_enrollment if defined? @hbx_enrollment
 
-    @hbx_enrollment = HbxEnrollment.where(id: params[:hbx_enrollment_id]).first if params[:hbx_enrollment_id].present?
+    @hbx_enrollment = HbxEnrollment.find(params[:hbx_enrollment_id]) if params[:hbx_enrollment_id].present?
   end
 
   def person_has_dual_role?
