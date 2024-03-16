@@ -35,40 +35,6 @@ RSpec.describe PersonPolicy, type: :policy do
       end
     end
 
-    # updateable? method does not have a proper authorization logic, it is always returning true except for :developer permission
-    # context 'hbx_staff_role subroles' do
-    #   it 'hbx_staff' do
-    #     allow(hbx_staff_role).to receive(:permission).and_return(FactoryBot.create(:permission, :hbx_staff))
-    #     expect(policy.updateable?).to be true
-    #   end
-
-    #   it 'hbx_read_only' do
-    #     allow(hbx_staff_role).to receive(:permission).and_return(FactoryBot.create(:permission, :hbx_read_only))
-    #     expect(policy.updateable?).to be true
-    #   end
-
-    #   it 'hbx_csr_supervisor' do
-    #     allow(hbx_staff_role).to receive(:permission).and_return(FactoryBot.create(:permission, :hbx_csr_supervisor))
-    #     expect(policy.updateable?).to be true
-    #   end
-
-    #   it 'hbx_csr_tier2' do
-    #     allow(hbx_staff_role).to receive(:permission).and_return(FactoryBot.create(:permission, :hbx_csr_tier2))
-    #     expect(policy.updateable?).to be true
-    #   end
-
-    #   it 'csr_tier1' do
-    #     allow(hbx_staff_role).to receive(:permission).and_return(FactoryBot.create(:permission, :hbx_csr_tier1))
-    #     expect(policy.updateable?).to be true
-    #   end
-
-    #   it 'developer' do
-    #     allow(hbx_staff_role).to receive(:permission).and_return(FactoryBot.create(:permission, :developer))
-    #     expect(policy.updateable?).to be false
-    #   end
-    # end
-
-
     context 'permissions' do
       let(:policy){PersonPolicy.new(admin_user, record_person)}
       subject { described_class }
