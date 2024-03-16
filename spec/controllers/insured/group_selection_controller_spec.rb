@@ -786,7 +786,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     it 'should cancel enrollment with no term date given' do
       family.family_members.first.person.consumer_role.update_attributes(:aasm_state => :fully_verified)
-      family.family_members.first.person.consumer_role.move_identity_documents_to_verified
+      allow(controller).to receive(:ridp_verified?).with(enrollment_to_term.kind, enrollment_to_term.family).and_return(true)
       sign_in user
       post :term_or_cancel, params: {hbx_enrollment_id: enrollment_to_cancel.id, term_date: nil, term_or_cancel: 'cancel'}
       enrollment_to_cancel.reload
@@ -796,7 +796,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     it 'should schedule terminate enrollment with term date given' do
       family.family_members.first.person.consumer_role.update_attributes(:aasm_state => :fully_verified)
-      family.family_members.first.person.consumer_role.move_identity_documents_to_verified
+      allow(controller).to receive(:ridp_verified?).with(enrollment_to_term.kind, enrollment_to_term.family).and_return(true)
       sign_in user
       post :term_or_cancel, params: {hbx_enrollment_id: enrollment_to_term.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate'}
       enrollment_to_term.reload
@@ -823,7 +823,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       let(:hbx_enrollment_with_broker) do
         FactoryBot.create(:hbx_enrollment,
                           product_id: product.id,
-                          kind: 'individual',
                           family: family,
                           rating_area_id: rating_area.id,
                           broker_agency_profile_id: broker_agency_profile.id)
@@ -832,9 +831,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       it "should be able to terminate coverage if user is valid and has broker role" do
         family.broker_agency_accounts << broker_agency_account
         family.save
-        family.primary_person.consumer_role.move_identity_documents_to_verified
+        allow(controller).to receive(:ridp_verified?).with(hbx_enrollment_with_broker.kind, hbx_enrollment_with_broker.family).and_return(true)
         sign_in broker_user
-
         post :term_or_cancel, params: {hbx_enrollment_id: hbx_enrollment_with_broker.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate'}
         hbx_enrollment_with_broker.reload
         expect(hbx_enrollment_with_broker.aasm_state).to eq 'coverage_terminated'
@@ -855,7 +853,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     context "person and broker staff role" do
       let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
       let(:broker_agency) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
-      let(:person1) { FactoryBot.create(:person)}
+      let(:person1) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
       let(:user_with_broker_staff_role) { FactoryBot.create(:user, person: person1) }
       let(:broker_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person1, broker_agency_profile: broker_agency_profile) }
       let(:family) do
@@ -870,20 +868,19 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       let(:hbx_enrollment_with_broker) do
         FactoryBot.create(:hbx_enrollment,
                           product_id: product.id,
-                          kind: 'individual',
                           family: family,
                           rating_area_id: rating_area.id,
                           writing_agent_id: broker_agency_profile.primary_broker_role.id,
                           broker_agency_profile_id: broker_agency_profile.id)
       end
+
       it "should be able to terminate coverage if user is valid and has active broker staff role" do
         person.broker_agency_staff_roles = [broker_staff_role]
         person.save!
-        person.consumer_role.move_identity_documents_to_verified
+        allow(controller).to receive(:ridp_verified?).with(hbx_enrollment_with_broker.kind, hbx_enrollment_with_broker.family).and_return(true)
         sign_in user_with_broker_staff_role
         post :term_or_cancel, params: {hbx_enrollment_id: hbx_enrollment_with_broker.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate'}
         hbx_enrollment_with_broker.reload
-
         expect(hbx_enrollment_with_broker.aasm_state).to eq 'coverage_terminated'
         expect(response).to redirect_to(family_account_path)
       end
@@ -917,7 +914,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       let(:hbx_enrollment_with_broker) do
         FactoryBot.create(:hbx_enrollment,
                           product_id: product.id,
-                          kind: 'individual',
                           family: family,
                           rating_area_id: rating_area.id,
                           writing_agent_id: broker_agency_profile.primary_broker_role.id,
@@ -931,12 +927,10 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       it "should be able to terminate coverage if user is valid and has active ga staff role" do
         person.general_agency_staff_roles = [general_staff_role]
         person.save!
-        binding.pry
-        person1.consumer_role.move_identity_documents_to_verified
+        allow(controller).to receive(:ridp_verified?).with(hbx_enrollment_with_broker.kind, hbx_enrollment_with_broker.family).and_return(true
         sign_in user_with_general_staff_role
         post :term_or_cancel, params: {hbx_enrollment_id: hbx_enrollment_with_broker.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate'}
         hbx_enrollment_with_broker.reload
-
         expect(hbx_enrollment_with_broker.aasm_state).to eq 'coverage_terminated'
         expect(response).to redirect_to(family_account_path)
       end

@@ -227,7 +227,6 @@ class Insured::GroupSelectionController < ApplicationController
   def term_or_cancel
     hbx_enrollment = HbxEnrollment.find(params.require(:hbx_enrollment_id))
 
-    binding.pry
     # @todo Refactor GroupSelectionController to implement the ideal solution. This is a temporary fix.
     # Redirects to root path unless RIDP is verified for the given market kind and family.
     (redirect_to(root_path) and return) unless ridp_verified?(hbx_enrollment.kind, hbx_enrollment.family)
