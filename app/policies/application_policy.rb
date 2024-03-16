@@ -245,8 +245,8 @@ class ApplicationPolicy
     broker_staff_roles = account_holder_person&.broker_agency_staff_roles&.where(aasm_state: 'active')
 
     return false if broker.blank? && broker_staff_roles.blank?
-    return false unless broker.active? || broker.shop_market?
-    return true if broker_profile_ids.include?(broker.benefit_sponsors_broker_agency_profile_id)
+    return false unless broker&.active? || broker&.shop_market?
+    return true if broker.present? && broker_profile_ids.include?(broker.benefit_sponsors_broker_agency_profile_id)
 
     # broker_staff_roles.any? { |role| role.benefit_sponsors_broker_agency_profile_id == individual_market_family_broker_agency_id }
     false

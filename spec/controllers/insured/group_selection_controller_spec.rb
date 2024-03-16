@@ -365,7 +365,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
           person_2.consumer_role.update_attributes!(is_applying_coverage: false)
           person_2.consumer_role.move_identity_documents_to_verified
           person_1.update_attributes!(is_incarcerated: false)
-          person_1.consumer_role.update_attributes!(is_applying_coverage: true) if person_1.consumer_role
+          person_1.consumer_role&.update_attributes!(is_applying_coverage: true)
           family = person_1.primary_family
           expect(family.family_members.count).to eq(1)
           FactoryBot.create(:family_member, family: family, person: person_2)
