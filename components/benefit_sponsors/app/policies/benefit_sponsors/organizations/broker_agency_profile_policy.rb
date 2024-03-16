@@ -26,12 +26,10 @@ module BenefitSponsors
       end
 
       def show?
-        binding.irb
         access_to_broker_agency_profile?
       end
       
       def access_to_broker_agency_profile?
-        binding.irb
         return true if individual_market_admin?
         return true if shop_market_admin?
         return true if has_matching_broker_role?
