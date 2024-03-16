@@ -155,7 +155,6 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           expect(response.status).to eq(200)
         end
 
-
         it 'should not create a new staff role' do
           new_total_staff_roles = Person.staff_for_broker_including_pending(broker_agency_profile).size
 

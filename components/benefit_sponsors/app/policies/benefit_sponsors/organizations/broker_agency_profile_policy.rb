@@ -28,7 +28,7 @@ module BenefitSponsors
       def show?
         access_to_broker_agency_profile?
       end
-      
+
       def access_to_broker_agency_profile?
         return true if individual_market_admin?
         return true if shop_market_admin?
@@ -43,22 +43,39 @@ module BenefitSponsors
       end
 
       def family_index?
-        user&.has_hbx_staff_role? || user&.has_broker_role? || user&.has_broker_agency_staff_role?
+        access_to_broker_agency_profile?
       end
 
       def family_datatable?
-        family_index?
+        access_to_broker_agency_profile?
       end
 
-      def index?
-        return true if individual_market_admin?
-        return true if shop_market_admin?
+      def commission_statements?
+        access_to_broker_agency_profile?
+      end
 
-        false
+      def show_commission_statement?
+        access_to_broker_agency_profile?
+      end
+
+      def download_commission_statement?
+        access_to_broker_agency_profile?
+      end
+
+      def general_agency_index?
+        access_to_broker_agency_profile?
+      end
+
+      def inbox?
+        access_to_broker_agency_profile?
       end
 
       def staff_index?
-        user&.has_hbx_staff_role? || user&.has_csr_role? || user&.has_consumer_role?
+        return true if individual_market_admin?
+        return true if shop_market_admin?
+        return true if account_holder&.has_consumer_role?
+
+        false
       end
 
       protected

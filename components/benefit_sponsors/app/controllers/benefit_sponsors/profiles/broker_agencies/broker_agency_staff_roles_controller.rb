@@ -19,6 +19,8 @@ module BenefitSponsors
           end
         end
 
+        # The endpoint is used to create applications to existing broker agencies and can be sent by anyone
+        # This endpoint is unauthorized by design
         def create
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_create(broker_staff_params)
 
