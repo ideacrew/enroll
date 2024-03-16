@@ -7,15 +7,20 @@ module BenefitSponsors
       class BrokerAgencyStaffRolesController < ::BenefitSponsors::ApplicationController
 
         def new
-          profile = find_broker_agency_profile
-          authorize profile
+          # this endpoint is used for two scenarios
+          # 1.) to render the form for brokers/agents creating new broker agency staff roles for their broker agencies
+          # 2.) to render a different form in the view for benefit_sponsors/profiles/registrations/new for non-users sending in applications to be staff for existing broker agencies
+          # authorization is only enforced here for the first scenario
+          authorize @broker_agency_profile if find_broker_agency_profile
 
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_new
           set_ie_flash_by_announcement
 
           respond_to do |format|
-            # previously rendered an HTML form which was unauthorized --> only JS responses should be allowed from this endpoint
-            format.js  { render 'new' }
+            # the js template is for the first scenario metioned above^
+            format.js  { render 'new' } if params[:profile_id]
+            # the html template is for the second scenario metioned above^
+            format.html { render 'new', layout: false} if params[:profile_type]
           end
         end
 
@@ -79,10 +84,11 @@ module BenefitSponsors
         private
 
         def find_broker_agency_profile
+          return unless params[:profile_id]
           profile_id = BSON::ObjectId(params[:profile_id])
 
           organizations = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => profile_id)
-          organizations&.first&.broker_agency_profile
+          @broker_agency_profile = organizations&.first&.broker_agency_profile
         end
 
         def broker_staff_params

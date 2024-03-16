@@ -42,15 +42,17 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
       context 'for a broker in the agency' do
         before do
           sign_in user
-          # there is always a profile_id present in the params when calling #new, no profile_id will throw an error in the view
+          # for brokers/staff adding staff to their agency, there is always a profile_id present in the params when calling #new
+          # no profile_id will throw an error
           get :new, params: { profile_id: bap_id }, format: :js, xhr: true
         end
 
         it "should render new template" do
+          # refers to components/benefit_sponsors/app/views/benefit_sponsors/profiles/broker_agencies/broker_agency_staff_roles/new.js.erb
           expect(response).to render_template("new")
         end
 
-        it "should initialize staff" do
+        it "should initialize staff form" do
           expect(assigns(:staff).class).to eq staff_class
         end
 
@@ -62,15 +64,17 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
       context 'for broker agency staff' do
         before do
           sign_in agent_user
-          # there is always a profile_id present in the params when calling #new, no profile_id will throw an error in the view
+          # for brokers/staff adding staff to their agency, there is always a profile_id present in the params when calling #new
+          # no profile_id will throw an error
           get :new, params: { profile_id: bap_id }, format: :js, xhr: true
         end
 
         it "should render new template" do
+          # refers to components/benefit_sponsors/app/views/benefit_sponsors/profiles/broker_agencies/broker_agency_staff_roles/new.js.erb
           expect(response).to render_template("new")
         end
 
-        it "should initialize staff" do
+        it "should initialize staff from" do
           expect(assigns(:staff).class).to eq staff_class
         end
 
@@ -84,11 +88,49 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           broker_role.update_attributes(benefit_sponsors_broker_agency_profile_id: second_broker_agency_profile.id)
           broker_agency_staff_role1.update_attributes(benefit_sponsors_broker_agency_profile_id: second_broker_agency_profile.id)
           sign_in user
-          # there is always a profile_id present in the params when calling #new, no profile_id will throw an error in the view
+          # for brokers/staff adding staff to their agency, there is always a profile_id present in the params when calling #new
+          # no profile_id will throw an error
           get :new, params: { profile_id: bap_id }, format: :js, xhr: true
         end
 
-        it "should not initialize staff" do
+        it "should not initialize staff form" do
+          expect(assigns(:staff).class).to eq NilClass
+        end
+
+        it "should return a 403" do
+          expect(response.status).to eq(403)
+        end
+      end
+
+      context 'for a non-user applying for an existing broker agency using the new registrations view' do
+        before do
+          # for prospective brokers applying to be staff to an existing agency, 
+          # the broker_agency_staff param needs to be present
+          get :new, params: { profile_type: 'broker_agency_staff' }
+        end
+
+        it "should render new template" do
+          # refers to components/benefit_sponsors/app/views/benefit_sponsors/profiles/broker_agencies/broker_agency_staff_roles/new.html.slim
+          expect(response).to render_template("new")
+        end
+
+        it "should initialize staff form" do
+          expect(assigns(:staff).class).to eq BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm
+        end
+
+        it "should return success" do
+          expect(response).to have_http_status(:success)
+        end
+      end
+
+      context 'for a non-user applying for an existing broker agency using the broker agency profile view' do
+        before do
+          # for prospective brokers applying to be staff to an existing agency, 
+          # the broker_agency_staff param needs to be present
+          get :new, params: { profile_id: bap_id }, format: :js, xhr: true
+        end
+
+        it "should not initialize staff form" do
           expect(assigns(:staff).class).to eq NilClass
         end
 
