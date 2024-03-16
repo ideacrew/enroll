@@ -927,7 +927,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       it "should be able to terminate coverage if user is valid and has active ga staff role" do
         person.general_agency_staff_roles = [general_staff_role]
         person.save!
-        allow(controller).to receive(:ridp_verified?).with(hbx_enrollment_with_broker.kind, hbx_enrollment_with_broker.family).and_return(true
+        allow(controller).to receive(:ridp_verified?).with(hbx_enrollment_with_broker.kind, hbx_enrollment_with_broker.family).and_return(true)
         sign_in user_with_general_staff_role
         post :term_or_cancel, params: {hbx_enrollment_id: hbx_enrollment_with_broker.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate'}
         hbx_enrollment_with_broker.reload
