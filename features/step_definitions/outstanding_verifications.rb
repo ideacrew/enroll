@@ -46,6 +46,12 @@ And(/I click the name of (.*) from family list/) do |named_person|
   find('a', :text => named_person).click
 end
 
+# Patrick Doe
+And(/the person named (.*) is RIDP verified/) do |named_person|
+  person = Person.where(first_name: named_person.split(' ')[0], last_name: named_person.split(' ')[1]).first
+  person.consumer_role.move_identity_documents_to_verified
+end
+
 Then(/^the Admin is navigated to the Outstanding Verifications screen$/) do
   expect(page).to have_xpath("//div[contains(@class, 'container')]/h1", text: 'Outstanding Verifications')
 end

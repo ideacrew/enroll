@@ -7,7 +7,6 @@ class Insured::GroupSelectionController < ApplicationController
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   before_action :validate_rating_address, only: [:create]
   before_action :set_cache_headers, only: [:new, :edit_plan]
-  before_action :set_current_person
   before_action :is_user_authorized?
 
   def new
@@ -273,7 +272,7 @@ class Insured::GroupSelectionController < ApplicationController
   # @param family [Family] The family to check for RIDP verification.
   # @return [Boolean] Returns true if the primary person of the family is RIDP verified or the market kind is not individual, otherwise it returns false.
   def ridp_verified?(market_kind, family)
-    return true unless market_kind == HbxEnrollment::INDIVIDUAL_KIND
+    return true if market_kind != HbxEnrollment::INDIVIDUAL_KIND
     return true if family&.primary_person&.consumer_role&.identity_verified?
 
     flash[:error] = 'You must verify your identity before shopping for insurance.'
