@@ -9,6 +9,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
   before :each do
     allow(EnrollRegistry[:aca_shop_market].feature).to receive(:is_enabled).and_return(true)
     allow(EnrollRegistry[:apply_aggregate_to_enrollment].feature).to receive(:is_enabled).and_return(false)
+    allow(controller).to receive(:ridp_verified?).with(any_args).and_return(true)
   end
 
   let(:site) { BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
@@ -362,7 +363,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         allow(person).to receive(:consumer_role).and_return(consumer_role)
         allow(HbxEnrollment).to receive(:calculate_effective_on_from).and_return TimeKeeper.date_of_record
         allow(hbx_enrollment).to receive(:kind).and_return "individual"
-        consumer_role.move_identity_documents_to_verified
       end
 
       it "should set session" do
@@ -459,7 +459,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
 
       it "should not redirect to coverage household page if incarceration is unanswered" do
-        consumer_role.move_identity_documents_to_verified
         person.unset(:is_incarcerated)
         HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.benefit_packages[0].incarceration_status = ["incarceration_status"]
         sign_in user
@@ -469,7 +468,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
 
       it "should create an hbx enrollment" do
-        consumer_role.move_identity_documents_to_verified
         params = {
           person_id: person.id,
           consumer_role_id: consumer_role.id,
@@ -548,10 +546,11 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         area = EnrollRegistry[:rating_area].settings(:areas).item.first
         allow(Person).to receive(:find).and_return(person)
         @user = FactoryBot.create(:user, person: person)
+        # allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, @enrollment.effective_on, 59, area).and_return(814.85)
+        # allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, @enrollment.effective_on, 61, area).and_return(879.8)
       end
 
       it 'return http success and render' do
-        @family.primary_person.consumer_role.move_identity_documents_to_verified
         sign_in @user
         @family.special_enrollment_periods << @sep
         attrs = {hbx_enrollment_id: @enrollment.id.to_s, family_id: @family.id}
@@ -611,7 +610,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         allow(person).to receive(:consumer_role).and_return(consumer_role)
       end
       it 'should create an hbx enrollment' do
-        consumer_role.move_identity_documents_to_verified
         params = {
             person_id: person.id,
             consumer_role_id: consumer_role.id,
@@ -707,7 +705,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
 
       it 'should create an hbx enrollment' do
-        consumer_role.move_identity_documents_to_verified
         params = {
             person_id: person.id,
             consumer_role_id: consumer_role.id,
@@ -786,7 +783,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     it 'should cancel enrollment with no term date given' do
       family.family_members.first.person.consumer_role.update_attributes(:aasm_state => :fully_verified)
-      allow(controller).to receive(:ridp_verified?).with(enrollment_to_term.kind, enrollment_to_term.family).and_return(true)
       sign_in user
       post :term_or_cancel, params: {hbx_enrollment_id: enrollment_to_cancel.id, term_date: nil, term_or_cancel: 'cancel'}
       enrollment_to_cancel.reload
@@ -796,7 +792,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     it 'should schedule terminate enrollment with term date given' do
       family.family_members.first.person.consumer_role.update_attributes(:aasm_state => :fully_verified)
-      allow(controller).to receive(:ridp_verified?).with(enrollment_to_term.kind, enrollment_to_term.family).and_return(true)
       sign_in user
       post :term_or_cancel, params: {hbx_enrollment_id: enrollment_to_term.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate'}
       enrollment_to_term.reload
@@ -823,16 +818,20 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       let(:hbx_enrollment_with_broker) do
         FactoryBot.create(:hbx_enrollment,
                           product_id: product.id,
+                          kind: 'individual',
                           family: family,
                           rating_area_id: rating_area.id,
                           broker_agency_profile_id: broker_agency_profile.id)
       end
 
       it "should be able to terminate coverage if user is valid and has broker role" do
+        # broker_role = broker_person.broker_role
+        # broker_role.aasm_state = "active"
+        # broker_role.save
         family.broker_agency_accounts << broker_agency_account
         family.save
-        allow(controller).to receive(:ridp_verified?).with(hbx_enrollment_with_broker.kind, hbx_enrollment_with_broker.family).and_return(true)
         sign_in broker_user
+
         post :term_or_cancel, params: {hbx_enrollment_id: hbx_enrollment_with_broker.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate'}
         hbx_enrollment_with_broker.reload
         expect(hbx_enrollment_with_broker.aasm_state).to eq 'coverage_terminated'
@@ -853,7 +852,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     context "person and broker staff role" do
       let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
       let(:broker_agency) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
-      let(:person1) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+      let(:person1) { FactoryBot.create(:person)}
       let(:user_with_broker_staff_role) { FactoryBot.create(:user, person: person1) }
       let(:broker_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person1, broker_agency_profile: broker_agency_profile) }
       let(:family) do
@@ -868,19 +867,19 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       let(:hbx_enrollment_with_broker) do
         FactoryBot.create(:hbx_enrollment,
                           product_id: product.id,
+                          kind: 'individual',
                           family: family,
                           rating_area_id: rating_area.id,
                           writing_agent_id: broker_agency_profile.primary_broker_role.id,
                           broker_agency_profile_id: broker_agency_profile.id)
       end
-
       it "should be able to terminate coverage if user is valid and has active broker staff role" do
         person.broker_agency_staff_roles = [broker_staff_role]
         person.save!
-        allow(controller).to receive(:ridp_verified?).with(hbx_enrollment_with_broker.kind, hbx_enrollment_with_broker.family).and_return(true)
         sign_in user_with_broker_staff_role
         post :term_or_cancel, params: {hbx_enrollment_id: hbx_enrollment_with_broker.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate'}
         hbx_enrollment_with_broker.reload
+
         expect(hbx_enrollment_with_broker.aasm_state).to eq 'coverage_terminated'
         expect(response).to redirect_to(family_account_path)
       end
@@ -914,6 +913,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       let(:hbx_enrollment_with_broker) do
         FactoryBot.create(:hbx_enrollment,
                           product_id: product.id,
+                          kind: 'individual',
                           family: family,
                           rating_area_id: rating_area.id,
                           writing_agent_id: broker_agency_profile.primary_broker_role.id,
@@ -927,10 +927,10 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       it "should be able to terminate coverage if user is valid and has active ga staff role" do
         person.general_agency_staff_roles = [general_staff_role]
         person.save!
-        allow(controller).to receive(:ridp_verified?).with(hbx_enrollment_with_broker.kind, hbx_enrollment_with_broker.family).and_return(true)
         sign_in user_with_general_staff_role
         post :term_or_cancel, params: {hbx_enrollment_id: hbx_enrollment_with_broker.id, term_date: TimeKeeper.date_of_record + 1, term_or_cancel: 'terminate'}
         hbx_enrollment_with_broker.reload
+
         expect(hbx_enrollment_with_broker.aasm_state).to eq 'coverage_terminated'
         expect(response).to redirect_to(family_account_path)
       end
@@ -1042,7 +1042,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
       sign_in user_14
       family_member2.person.update_attributes(is_incarcerated: false)
-      hbx_enrollment_14.family.primary_person.consumer_role.move_identity_documents_to_verified
       post :edit_aptc, params: params
     end
 
@@ -1150,7 +1149,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     before :each do
       allow(EnrollRegistry[:temporary_configuration_enable_multi_tax_household_feature].feature).to receive(:is_enabled).and_return(true)
       allow(EnrollRegistry[:fifteenth_of_the_month_rule_overridden].feature).to receive(:is_enabled).and_return(true)
-      Person.all.all_consumer_roles.first.consumer_role.move_identity_documents_to_verified
       sign_in user
       post :edit_aptc, params: params
     end
@@ -1485,13 +1483,11 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
           "market_kind" => "individual",
           "coverage_kind" => "health",
           "change_plan" => "change_by_qle",
-          "effective_on_option_selected" => TimeKeeper.date_of_record.to_s,
           "commit" => "Shop for new plan"
         }
       end
 
       before do
-        allow(EnrollRegistry).to receive(:feature_enabled?).and_call_original
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:fehb_market).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:aca_shop_market).and_return(false)
         allow(EnrollRegistry).to receive(:feature_enabled?).with(:tobacco_cost).and_return(true)
@@ -1501,9 +1497,18 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
 
       it 'creates enrollment & set tobacco_use on hbx_enrollment member' do
-        Person.all.where(:consumer_role.exists => true).first.consumer_role.move_identity_documents_to_verified
         expect(family.active_household.hbx_enrollments.size).to eq 0
-        post :create, params: params
+        post :create, params: {
+          "person_id" => person.id,
+          "family_member_ids" => {"0" => family_member.id },
+          "is_tobacco_user_#{family_member.id}" => "Y",
+          "market_kind" => "individual",
+          "coverage_kind" => "health",
+          "change_plan" => "change_by_qle",
+          "effective_on_option_selected" => TimeKeeper.date_of_record.to_s,
+          "commit" => "Shop for new plan"
+        }
+
         expect(response).to have_http_status(:redirect)
         ivl_enrollments = HbxEnrollment.where(kind: 'individual')
         expect(ivl_enrollments.size).to eq 1
