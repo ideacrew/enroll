@@ -18,9 +18,6 @@ gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd2'
 
 ## Fix this dependency -- bring into project
-# gem 'recurring_select', :git => 'https://github.com/brianweiner/recurring_select'
-
-## Fix this dependency -- bring into project
 gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar.git'
 
 #######################################################
@@ -37,7 +34,6 @@ gem 'financial_assistance', path: 'components/financial_assistance'
 gem "notifier",           path: "components/notifier"
 gem 'openhbx_cv2',        git:  'https://github.com/ideacrew/openhbx_cv2.git', branch: 'trunk'
 gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'trunk'
-# gem 'resource_registry',  git: '../resource_registry'
 
 gem "sponsored_benefits", path: "components/sponsored_benefits"
 gem "transport_gateway",  path: "components/transport_gateway"
@@ -143,7 +139,6 @@ group :development, :test do
   gem 'action-cable-testing'
   gem 'addressable',            '~> 2.3'
   gem 'axe-core-cucumber',      '~> 4.8.0'
-  # gem 'bundler-audit',          '~> 0.6'
   gem 'brakeman'
   gem 'climate_control',        '~> 0.2.0'
   gem 'email_spec',             '~> 2'
@@ -159,6 +154,7 @@ group :development, :test do
   gem 'stimulus_reflex_testing', '~> 0.3.0'
   gem 'yard',                   '~> 0.9.20',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
+  gem 'pry-byebug'
 end
 
 group :test do
