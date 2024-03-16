@@ -15,6 +15,16 @@ class Document
                      BenefitSponsors::Organizations::GeneralAgencyProfile
                      EmployeeRole Person ConsumerRole].push("BenefitSponsors::Organizations::#{EnrollRegistry[:enroll_app].setting(:site_key).item.capitalize}ShopEmployerProfile").uniq.freeze
 
+  MODEL_CLASS_MAPPING = {
+    "BenefitSponsors::Organizations::AcaShopDcEmployerProfile" => BenefitSponsors::Organizations::AcaShopDcEmployerProfile,
+    "BenefitSponsors::Organizations::FehbEmployerProfile" => BenefitSponsors::Organizations::FehbEmployerProfile,
+    "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile" => BenefitSponsors::Organizations::AcaShopCcaEmployerProfile,
+    "BenefitSponsors::Organizations::GeneralAgencyProfile" => BenefitSponsors::Organizations::GeneralAgencyProfile,
+    "EmployeeRole" => EmployeeRole,
+    "Person" => Person,
+    "ConsumerRole" => ConsumerRole
+  }.freeze
+
   after_save :notify_on_save
 
   # Enable polymorphic associations
