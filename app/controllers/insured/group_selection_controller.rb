@@ -270,9 +270,11 @@ class Insured::GroupSelectionController < ApplicationController
   #
   # @param market_kind [String] The market kind of the enrollment.
   # @param family [Family] The family to check for RIDP verification.
-  # @return [Boolean] Returns true if the primary person of the family is RIDP verified or the market kind is not individual, otherwise it returns false.
+  # @return [Boolean] Returns true if the market kind is not individual, the family is not the current user's primary family,
+  # or the primary person of the family is RIDP verified. Otherwise, it returns false.
   def ridp_verified?(market_kind, family)
     return true if market_kind != HbxEnrollment::INDIVIDUAL_KIND
+    return true if family != current_user.person&.primary_family
     return true if family&.primary_person&.consumer_role&.identity_verified?
 
     flash[:error] = 'You must verify your identity before shopping for insurance.'

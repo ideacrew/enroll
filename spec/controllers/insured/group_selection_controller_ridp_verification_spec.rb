@@ -32,6 +32,66 @@ RSpec.describe Insured::GroupSelectionController, type: :controller do
     )
   end
 
+  let(:broker_person) { FactoryBot.create(:person) }
+  let(:broker_role) { FactoryBot.create(:broker_role, person: broker_person) }
+  let(:broker_user) { FactoryBot.create(:user, person: broker_person) }
+
+  let(:broker_staff_person) { FactoryBot.create(:person) }
+  let(:broker_staff) do
+    FactoryBot.create(
+      :broker_agency_staff_role,
+      person: broker_staff_person,
+      aasm_state: 'active',
+      benefit_sponsors_broker_agency_profile_id: broker_agency_id
+    )
+  end
+  let(:broker_staff_user) { FactoryBot.create(:user, person: broker_staff_person) }
+
+  let(:site) do
+    FactoryBot.create(
+      :benefit_sponsors_site,
+      :with_benefit_market,
+      :as_hbx_profile,
+      site_key: ::EnrollRegistry[:enroll_app].settings(:site_key).item
+    )
+  end
+
+  let(:broker_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+  let(:broker_agency_profile) { broker_agency_organization.broker_agency_profile }
+  let(:broker_agency_id) { broker_agency_profile.id }
+
+  let(:broker_agency_account) do
+    family.broker_agency_accounts.create!(
+      benefit_sponsors_broker_agency_profile_id: broker_agency_id,
+      writing_agent_id: broker_role.id,
+      is_active: true,
+      start_on: TimeKeeper.date_of_record
+    )
+  end
+
+  let(:hbx_profile) do
+    FactoryBot.create(
+      :hbx_profile,
+      :normal_ivl_open_enrollment,
+      us_state_abbreviation: EnrollRegistry[:enroll_app].setting(:state_abbreviation).item,
+      cms_id: "#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.upcase}0"
+    )
+  end
+
+  before do
+    broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
+    broker_person.create_broker_agency_staff_role(
+      benefit_sponsors_broker_agency_profile_id: broker_role.benefit_sponsors_broker_agency_profile_id
+    )
+    broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id, market_kind: :both)
+    broker_role.approve!
+    broker_agency_account
+    broker_staff
+    rating_area
+    hbx_profile
+    sign_in logged_in_user
+  end
+
   describe "GET #new" do
     context 'with:
       - individual market family
@@ -47,11 +107,34 @@ RSpec.describe Insured::GroupSelectionController, type: :controller do
         }
       end
 
-      it 'redirects to root_path with a flash message' do
-        sign_in user
-        get :new, params: params, session: session_params
-        expect(response).to redirect_to root_path
-        expect(flash[:error]).to eq('You must verify your identity before shopping for insurance.')
+      context 'consumer logs into their own account' do
+        let(:logged_in_user) { user }
+
+        it 'redirects to root_path with a flash message' do
+          get :new, params: params, session: session_params
+          expect(response).to redirect_to root_path
+          expect(flash[:error]).to eq('You must verify your identity before shopping for insurance.')
+        end
+      end
+
+      context 'active associated certified broker logs into their own account' do
+        let(:logged_in_user) { broker_user }
+
+        it 'redirects to root_path with a flash message' do
+          get :new, params: params, session: session_params
+          expect(response).not_to redirect_to root_path
+          expect(flash[:error]).not_to eq('You must verify your identity before shopping for insurance.')
+        end
+      end
+
+      context 'active associated broker staff logs into their own account' do
+        let(:logged_in_user) { broker_staff_user }
+
+        it 'redirects to root_path with a flash message' do
+          get :new, params: params, session: session_params
+          expect(response).not_to redirect_to root_path
+          expect(flash[:error]).not_to eq('You must verify your identity before shopping for insurance.')
+        end
       end
     end
   end
@@ -73,12 +156,34 @@ RSpec.describe Insured::GroupSelectionController, type: :controller do
         }
       end
 
-      it 'redirects to root_path with a flash message' do
-        rating_area
-        sign_in user
-        post :create, params: params, session: session_params
-        expect(response).to redirect_to root_path
-        expect(flash[:error]).to eq('You must verify your identity before shopping for insurance.')
+      context 'consumer logs into their own account' do
+        let(:logged_in_user) { user }
+
+        it 'redirects to root_path with a flash message' do
+          post :create, params: params, session: session_params
+          expect(response).to redirect_to root_path
+          expect(flash[:error]).to eq('You must verify your identity before shopping for insurance.')
+        end
+      end
+
+      context 'active associated certified broker logs into their own account' do
+        let(:logged_in_user) { broker_user }
+
+        it 'redirects to root_path with a flash message' do
+          post :create, params: params, session: session_params
+          expect(response).not_to redirect_to root_path
+          expect(flash[:error]).not_to eq('You must verify your identity before shopping for insurance.')
+        end
+      end
+
+      context 'active associated broker staff logs into their own account' do
+        let(:logged_in_user) { broker_staff_user }
+
+        it 'redirects to root_path with a flash message' do
+          post :create, params: params, session: session_params
+          expect(response).not_to redirect_to root_path
+          expect(flash[:error]).not_to eq('You must verify your identity before shopping for insurance.')
+        end
       end
     end
   end
@@ -91,11 +196,34 @@ RSpec.describe Insured::GroupSelectionController, type: :controller do
 
       let(:params) { { hbx_enrollment_id: hbx_enrollment.id } }
 
-      it 'redirects to root_path with a flash message' do
-        sign_in user
-        get :terminate_confirm, params: params, session: session_params
-        expect(response).to redirect_to root_path
-        expect(flash[:error]).to eq('You must verify your identity before shopping for insurance.')
+      context 'consumer logs into their own account' do
+        let(:logged_in_user) { user }
+
+        it 'redirects to root_path with a flash message' do
+          get :terminate_confirm, params: params, session: session_params
+          expect(response).to redirect_to root_path
+          expect(flash[:error]).to eq('You must verify your identity before shopping for insurance.')
+        end
+      end
+
+      context 'active associated certified broker logs into their own account' do
+        let(:logged_in_user) { broker_user }
+
+        it 'redirects to root_path with a flash message' do
+          get :terminate_confirm, params: params, session: session_params
+          expect(response).not_to redirect_to root_path
+          expect(flash[:error]).not_to eq('You must verify your identity before shopping for insurance.')
+        end
+      end
+
+      context 'active associated broker staff logs into their own account' do
+        let(:logged_in_user) { broker_staff_user }
+
+        it 'redirects to root_path with a flash message' do
+          get :terminate_confirm, params: params, session: session_params
+          expect(response).not_to redirect_to root_path
+          expect(flash[:error]).not_to eq('You must verify your identity before shopping for insurance.')
+        end
       end
     end
   end
@@ -108,11 +236,34 @@ RSpec.describe Insured::GroupSelectionController, type: :controller do
 
       let(:params) { { term_date: TimeKeeper.date_of_record, hbx_enrollment_id: hbx_enrollment.id } }
 
-      it 'redirects to root_path with a flash message' do
-        sign_in user
-        post :terminate, params: params, session: session_params
-        expect(response).to redirect_to root_path
-        expect(flash[:error]).to eq('You must verify your identity before shopping for insurance.')
+      context 'consumer logs into their own account' do
+        let(:logged_in_user) { user }
+
+        it 'redirects to root_path with a flash message' do
+          post :terminate, params: params, session: session_params
+          expect(response).to redirect_to root_path
+          expect(flash[:error]).to eq('You must verify your identity before shopping for insurance.')
+        end
+      end
+
+      context 'active associated certified broker logs into their own account' do
+        let(:logged_in_user) { broker_user }
+
+        it 'redirects to root_path with a flash message' do
+          post :terminate, params: params, session: session_params
+          expect(response).not_to redirect_to root_path
+          expect(flash[:error]).not_to eq('You must verify your identity before shopping for insurance.')
+        end
+      end
+
+      context 'active associated broker staff logs into their own account' do
+        let(:logged_in_user) { broker_staff_user }
+
+        it 'redirects to root_path with a flash message' do
+          post :terminate, params: params, session: session_params
+          expect(response).not_to redirect_to root_path
+          expect(flash[:error]).not_to eq('You must verify your identity before shopping for insurance.')
+        end
       end
     end
   end
@@ -125,11 +276,14 @@ RSpec.describe Insured::GroupSelectionController, type: :controller do
 
       let(:params) { { hbx_enrollment_id: hbx_enrollment.id, family_id: family.id } }
 
-      it 'redirects to root_path with a flash message' do
-        sign_in user
-        get :edit_plan, params: params, session: session_params
-        expect(response).to redirect_to root_path
-        expect(flash[:error]).to eq('You must verify your identity before shopping for insurance.')
+      context 'consumer logs into their own account' do
+        let(:logged_in_user) { user }
+
+        it 'redirects to root_path with a flash message' do
+          get :edit_plan, params: params, session: session_params
+          expect(response).to redirect_to root_path
+          expect(flash[:error]).to eq('You must verify your identity before shopping for insurance.')
+        end
       end
     end
   end
@@ -142,11 +296,34 @@ RSpec.describe Insured::GroupSelectionController, type: :controller do
 
       let(:params) { { hbx_enrollment_id: hbx_enrollment.id, term_date: nil, term_or_cancel: 'cancel' } }
 
-      it 'redirects to root_path with a flash message' do
-        sign_in user
-        post :term_or_cancel, params: params, session: session_params
-        expect(response).to redirect_to root_path
-        expect(flash[:error]).to eq('You must verify your identity before shopping for insurance.')
+      context 'consumer logs into their own account' do
+        let(:logged_in_user) { user }
+
+        it 'redirects to root_path with a flash message' do
+          post :term_or_cancel, params: params, session: session_params
+          expect(response).to redirect_to root_path
+          expect(flash[:error]).to eq('You must verify your identity before shopping for insurance.')
+        end
+      end
+
+      context 'active associated certified broker logs into their own account' do
+        let(:logged_in_user) { broker_user }
+
+        it 'redirects to root_path with a flash message' do
+          post :term_or_cancel, params: params, session: session_params
+          expect(response).not_to redirect_to root_path
+          expect(flash[:error]).not_to eq('You must verify your identity before shopping for insurance.')
+        end
+      end
+
+      context 'active associated broker staff logs into their own account' do
+        let(:logged_in_user) { broker_staff_user }
+
+        it 'redirects to root_path with a flash message' do
+          post :term_or_cancel, params: params, session: session_params
+          expect(response).not_to redirect_to root_path
+          expect(flash[:error]).not_to eq('You must verify your identity before shopping for insurance.')
+        end
       end
     end
   end
@@ -157,7 +334,6 @@ RSpec.describe Insured::GroupSelectionController, type: :controller do
       - unverified RIDP
     ' do
 
-
       let(:params) do
         {
           applied_pct_1: '0.39772',
@@ -166,11 +342,34 @@ RSpec.describe Insured::GroupSelectionController, type: :controller do
         }
       end
 
-      it 'redirects to root_path with a flash message' do
-        sign_in user
-        post :edit_aptc, params: params, session: session_params
-        expect(response).to redirect_to root_path
-        expect(flash[:error]).to eq('You must verify your identity before shopping for insurance.')
+      context 'consumer logs into their own account' do
+        let(:logged_in_user) { user }
+
+        it 'redirects to root_path with a flash message' do
+          post :edit_aptc, params: params, session: session_params
+          expect(response).to redirect_to root_path
+          expect(flash[:error]).to eq('You must verify your identity before shopping for insurance.')
+        end
+      end
+
+      context 'active associated certified broker logs into their own account' do
+        let(:logged_in_user) { broker_user }
+
+        it 'redirects to root_path with a flash message' do
+          post :edit_aptc, params: params, session: session_params
+          expect(response).not_to redirect_to root_path
+          expect(flash[:error]).not_to eq('You must verify your identity before shopping for insurance.')
+        end
+      end
+
+      context 'active associated broker staff logs into their own account' do
+        let(:logged_in_user) { broker_staff_user }
+
+        it 'redirects to root_path with a flash message' do
+          post :edit_aptc, params: params, session: session_params
+          expect(response).not_to redirect_to root_path
+          expect(flash[:error]).not_to eq('You must verify your identity before shopping for insurance.')
+        end
       end
     end
   end
