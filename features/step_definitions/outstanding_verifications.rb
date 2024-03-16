@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given(/^oustanding verfications users exists$/) do
   person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
   @person_name = person.full_name
@@ -48,7 +50,7 @@ end
 
 # Patrick Doe
 And(/the person named (.*) is RIDP verified/) do |named_person|
-  person = Person.where(first_name: named_person.split(' ')[0], last_name: named_person.split(' ')[1]).first
+  person = Person.where(first_name: named_person.split[0], last_name: named_person.split[1]).first
   person.consumer_role.move_identity_documents_to_verified
 end
 
