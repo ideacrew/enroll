@@ -294,7 +294,8 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def request_help
-    authorize HbxProfile, :request_help?
+    insured = Person.where(_id: params[:person]).first
+    authorize insured.primary_family, :request_help?
 
     role = nil
     consumer = nil
@@ -311,6 +312,7 @@ class Exchanges::HbxProfilesController < ApplicationController
         broker_role_id = agent.broker_role.id
         consumer = Person.find(params[:person])
         family = consumer.primary_family
+        authorize family, :hire_broker_agency?
         family.hire_broker_agency(broker_role_id)
         role = l10n("broker")
       else
