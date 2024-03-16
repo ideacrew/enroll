@@ -179,10 +179,7 @@ class Insured::FamilyMembersController < ApplicationController
       Rails.logger.info("In FamilyMembersController Update action #{params}, #{@family.inspect}") unless active_family_members_count == immediate_household_members_count + extended_family_members_count
       consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
       if consumer_role.present? && !params[:dependent][:is_applying_coverage].nil?
-        consumer_role.update_attribute(
-          :is_applying_coverage,
-          params[:dependent][:is_applying_coverage]
-        )
+        consumer_role.update_attribute(:is_applying_coverage, params[:dependent][:is_applying_coverage])
       end
       fire_consumer_roles_update_for_vlp_docs(consumer_role, original_applying_for_coverage)
       respond_to do |format|
@@ -213,7 +210,7 @@ class Insured::FamilyMembersController < ApplicationController
     if params[:qle_id].present?
       qle = QualifyingLifeEventKind.find(params[:qle_id])
       @market_kind = "coverall"
-      create_special_enrollment_period
+      create_special_enrollment_period(qle)
     end
 
     if request.referer.present?
