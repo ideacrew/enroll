@@ -71,6 +71,24 @@ RSpec.describe Eligibilities::EvidencePolicy, type: :policy do
         end
       end
 
+      context '#update_evidence?' do
+        it 'returns the result of FinancialAssistance::ApplicantPolicy#edit?' do
+          expect(policy.update_evidence?).to be_truthy
+        end
+      end
+
+      context '#extend_due_date?' do
+        it 'returns the result of #update_evidence?' do
+          expect(policy.update_evidence?).to be_truthy
+        end
+      end
+
+      context '#fdsh_hub_request?' do
+        it 'returns true' do
+          expect(policy.fdsh_hub_request?).to be_truthy
+        end
+      end
+
       context '#allowed_to_modify?' do
         context 'when the user has the modify_family permission' do
 
@@ -99,6 +117,24 @@ RSpec.describe Eligibilities::EvidencePolicy, type: :policy do
       context '#can_destroy?' do
         it 'returns the result of #allowed_to_modify?' do
           expect(policy.can_destroy?).to be_falsey
+        end
+      end
+
+      context '#update_evidence?' do
+        it 'returns the result of FinancialAssistance::ApplicantPolicy#edit?' do
+          expect(policy.update_evidence?).to be_falsey
+        end
+      end
+
+      context '#extend_due_date?' do
+        it 'returns the result of #update_evidence?' do
+          expect(policy.update_evidence?).to be_falsey
+        end
+      end
+
+      context '#fdsh_hub_request?' do
+        it 'returns true' do
+          expect(policy.fdsh_hub_request?).to be_falsey
         end
       end
 
@@ -140,6 +176,24 @@ RSpec.describe Eligibilities::EvidencePolicy, type: :policy do
         it 'returns true' do
           expect(policy.send(:allowed_to_modify?)).to be true
         end
+      end
+    end
+
+    context '#update_evidence?' do
+      it 'returns the result of FinancialAssistance::ApplicantPolicy#edit?' do
+        expect(policy.update_evidence?).to be_falsey
+      end
+    end
+
+    context '#extend_due_date?' do
+      it 'returns the result of #update_evidence?' do
+        expect(policy.update_evidence?).to be_falsey
+      end
+    end
+
+    context '#fdsh_hub_request?' do
+      it 'returns true' do
+        expect(policy.fdsh_hub_request?).to be_falsey
       end
     end
   end

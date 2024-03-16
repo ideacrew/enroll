@@ -38,35 +38,28 @@ module Eligibilities
     end
 
     # Determines if the current user has permission to update evidence.
-    # The user can update evidence if they have permission to perform an edit.
+    # The user can update evidence if they have permission to edit the associated Applicant.
     #
     # @return [Boolean] Returns true if the user has permission to update evidence, false otherwise.
     def update_evidence?
-      edit?
+      FinancialAssistance::ApplicantPolicy.new(user, @applicant).edit?
     end
 
     # Determines if the current user has permission to extend due date for evidence.
-    # The user can extend due date if they have permission to perform an edit.
+    # The user can extend due date if they have permission to update evidence.
     #
     # @return [Boolean] Returns true if the user has permission to extend due date on evidence, false otherwise.
     def extend_due_date?
-      edit?
+      update_evidence?
     end
 
     # Determines if the current user has permission to send out the fdsh hub request.
-    # The user can call fdsh hub if they have permission to perform an edit.
+    # The user can call fdsh hub if they are an individual market admin.
     #
     # @return [Boolean] Returns true if the user has permission to call out to the fdsh hub, false otherwise.
     def fdsh_hub_request?
-      return true if individual_market_admin? #should this leverage hbxadmin policy instead?
-    end
-
-    # Determines if the current user has permission to perform an edit.
-    # The user can perform an edit if they are a primary family member in the individual market, an active associated broker in the individual market who has verified their identity, or an admin in the individual market.
-    #
-    # @return [Boolean] Returns true if the user has permission to perform an edit, false otherwise.
-    def edit?
-      FinancialAssistance::ApplicantPolicy.new(user, @applicant).edit?
+      HbxProfilePolicy.new(user).can_extend_due_date? # wait for Vishal's PR to get merged for this method to be available
+      # return true if individual_market_admin?
     end
 
     private

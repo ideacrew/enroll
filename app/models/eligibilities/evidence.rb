@@ -171,6 +171,7 @@ module Eligibilities
     def extend_due_on(period = 30.days, updated_by = nil, action = 'extend_due_date')
       self.due_on = verif_due_date + period
       add_verification_history(action, "Extended due date to #{due_on.strftime('%m/%d/%Y')}", updated_by)
+      #check persisted value, not verification history, and return true/false
     end
 
     def auto_extend_due_on(period = 30.days, updated_by = nil)
