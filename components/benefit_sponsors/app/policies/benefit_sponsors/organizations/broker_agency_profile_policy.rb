@@ -18,15 +18,49 @@ module BenefitSponsors
         access_to_broker_agency_profile?
       end
 
-      def access_to_broker_agency_profile?
-        return true if staff_modify_employer?
-        return true if has_matching_broker_role?
+      def index?
+        return true if individual_market_admin?
+        return true if shop_market_admin?
 
-        has_matching_broker_agency_staff_role?
+        false
+      end
+
+      def show?
+        binding.irb
+        access_to_broker_agency_profile?
+      end
+      
+      def access_to_broker_agency_profile?
+        binding.irb
+        return true if individual_market_admin?
+        return true if shop_market_admin?
+        return true if has_matching_broker_role?
+        return true if has_matching_broker_agency_staff_role?
+
+        false
       end
 
       def set_default_ga?
         access_to_broker_agency_profile?
+      end
+
+      def family_index?
+        user&.has_hbx_staff_role? || user&.has_broker_role? || user&.has_broker_agency_staff_role?
+      end
+
+      def family_datatable?
+        family_index?
+      end
+
+      def index?
+        return true if individual_market_admin?
+        return true if shop_market_admin?
+
+        false
+      end
+
+      def staff_index?
+        user&.has_hbx_staff_role? || user&.has_csr_role? || user&.has_consumer_role?
       end
 
       protected
@@ -43,7 +77,7 @@ module BenefitSponsors
       end
 
       def has_matching_broker_role?
-        broker_role = account_holder_person.broker_role
+        broker_role = account_holder_person&.broker_role
         return false unless broker_role
 
         broker_role&.benefit_sponsors_broker_agency_profile_id == record.id && broker_role&.active?

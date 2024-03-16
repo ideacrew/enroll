@@ -12,6 +12,7 @@ module BenefitSponsors
     routes { BenefitSponsors::Engine.routes }
     let!(:security_question)  { FactoryBot.create_default :security_question }
 
+    let!(:user_with_consumer_role)  { FactoryBot.create(:user, :with_consumer_role) }
     let!(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_hbx_staff_role) }
     let!(:person) { FactoryBot.create(:person, user: user_with_hbx_staff_role )}
     let!(:person01) { FactoryBot.create(:person, :with_broker_role) }
@@ -19,25 +20,35 @@ module BenefitSponsors
 
     let!(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let(:organization_with_hbx_profile)  { site.owner_organization }
-    let!(:organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+    let!(:organization1)                 { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+    let!(:organization2)                 { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
 
-    let(:bap_id) { organization.broker_agency_profile.id }
-    let(:permission) { FactoryBot.create(:permission, :super_admin) }
+    let(:bap_id) { organization1.broker_agency_profile.id }
+    let(:super_permission) { FactoryBot.create(:permission, :super_admin) }
+    let(:dev_permission) { FactoryBot.create(:permission, :developer) }
 
-    before :each do
-      person01.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: organization.broker_agency_profile.id)
-      allow(organization.broker_agency_profile).to receive(:primary_broker_role).and_return(person01.broker_role)
+    let(:initialize_and_login_admin) { ->(permission) {
       user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id, permission_id: permission.id)
       user_with_hbx_staff_role.person.hbx_staff_role.save!
-    end
+      sign_in(user_with_hbx_staff_role)
+    }}
+
+    let(:initialize_and_login_broker) { ->(org) {
+      person01.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: org.broker_agency_profile.id)
+      allow(org.broker_agency_profile).to receive(:primary_broker_role).and_return(person01.broker_role)
+      sign_in(user_with_broker_role)
+    }}
+
+    let(:initialize_and_login_broker_agency_staff) { ->(org) {
+      person01.create_broker_agency_staff_role({benefit_sponsors_broker_agency_profile_id: org.id})
+      sign_in(user_with_broker_role)
+    }}
 
     describe "#index" do
       context "admin" do
         context 'with the correct permissions' do
-          let!(:permission) { FactoryBot.create(:permission, :super_admin) }
-
-          before :each do
-            sign_in(user_with_hbx_staff_role)
+          before do
+            initialize_and_login_admin[super_permission]
             get :index
           end
 
@@ -51,10 +62,8 @@ module BenefitSponsors
         end
 
         context 'with the incorrect permissions' do
-          let!(:permission) { FactoryBot.create(:permission, :developer) }
-
-          before :each do
-            sign_in(user_with_hbx_staff_role)
+          before do
+            initialize_and_login_admin[dev_permission]
             get :index
           end
 
@@ -70,12 +79,12 @@ module BenefitSponsors
 
       context "broker" do
         before :each do
-          sign_in(user_with_broker_role)
+          initialize_and_login_broker[organization1]
           get :index
         end
 
         it "should not return success http status" do
-          expect(response).not_to have_http_status(:success)
+          expect(response).to_not have_http_status(:success)
         end
 
         it "should rendirect to registration's new with broker_agency in params" do
@@ -84,12 +93,8 @@ module BenefitSponsors
       end
 
       context "broker agency staff" do
-        let!(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: organization.broker_agency_profile.id, person: person01) }
-
         before :each do
-          user_with_broker_role.roles << "broker_agency_staff"
-          user_with_broker_role.save!
-          sign_in(user_with_broker_role)
+          initialize_and_login_broker_agency_staff[organization1]
           get :index
         end
 
@@ -103,34 +108,75 @@ module BenefitSponsors
       end
     end
 
-    describe "for broker_agency_profile's show" do
-      context "for show with a broker_agency_profile_id and with a valid user" do
-        before :each do
-          sign_in(user_with_hbx_staff_role)
+    describe "#show" do
+      context "admin" do
+        before do
           allow(controller).to receive(:set_flash_by_announcement).and_return(true)
-          get :show, params: {id: bap_id}
         end
 
-        it "should return http success" do
-          expect(response).to have_http_status(:success)
+        context "with the correct permissions" do
+          before :each do
+            initialize_and_login_admin[super_permission]
+            get :show, params: {id: bap_id}
+          end
+
+          it "should return http success" do
+            expect(response).to have_http_status(:success)
+          end
+
+          it "should render the show template" do
+            expect(response).to render_template("show")
+          end
         end
 
-        it "should render the index template" do
-          expect(response).to render_template("show")
+        context "with the incorrect permissions" do
+          let!(:permission) { FactoryBot.create(:permission, :developer) }
+
+          before :each do
+            initialize_and_login_admin[dev_permission]
+            get :show, params: {id: bap_id}
+          end
+
+          it "should return http redirect" do
+            expect(response).to have_http_status(:redirect)
+          end
+
+          it "should render the show template" do
+            expect(response).to_not render_template("show")
+          end
         end
       end
 
-      context "for show with a broker_agency_profile_id and without a user" do
-        before :each do
-          get :show, params:{id: bap_id}
+      context "broker" do
+        context 'in the agency' do
+          before :each do
+            initialize_and_login_broker[organization1]
+            get :show, params: { id: bap_id }
+          end
+
+          it "should return http success" do
+            expect(response).to have_http_status(:success)
+          end
+
+          it "should render the show template" do
+            expect(response).to render_template("show")
+          end
         end
 
-        it "should not return success http status" do
-          expect(response).not_to have_http_status(:success)
-        end
+        context 'not in the agency' do
+          before :each do
+            initialize_and_login_broker[organization2]
+            get :show, params: { id: bap_id }
+          end
 
-        it "should redirect to the user's signup" do
-          expect(response.location.include?('users/sign_up')).to be_truthy
+          it "should return http redirect" do
+            binding.irb
+            expect(response).to have_http_status(:redirect)
+          end
+
+          it "should not render the show template" do
+            expect(response).to_not render_template("show")
+          end
         end
       end
     end
