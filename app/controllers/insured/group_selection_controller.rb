@@ -276,7 +276,7 @@ class Insured::GroupSelectionController < ApplicationController
     return true unless market_kind == HbxEnrollment::INDIVIDUAL_KIND
     return true if family&.primary_person&.consumer_role&.identity_verified?
 
-    flash[:error] = 'You must verify your identity before shopping for health insurance.'
+    flash[:error] = 'You must verify your identity before shopping for insurance.'
 
     false
   end
