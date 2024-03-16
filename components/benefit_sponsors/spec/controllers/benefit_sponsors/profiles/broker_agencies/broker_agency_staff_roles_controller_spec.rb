@@ -104,7 +104,7 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
 
       context 'for a non-user applying for an existing broker agency using the new registrations view' do
         before do
-          # for prospective brokers applying to be staff to an existing agency, 
+          # for prospective brokers applying to be staff to an existing agency,
           # the broker_agency_staff param needs to be present
           get :new, params: { profile_type: 'broker_agency_staff' }
         end
@@ -125,7 +125,7 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
 
       context 'for a non-user applying for an existing broker agency using the broker agency profile view' do
         before do
-          # for prospective brokers applying to be staff to an existing agency, 
+          # for prospective brokers applying to be staff to an existing agency,
           # the broker_agency_staff param needs to be present
           get :new, params: { profile_id: bap_id }, format: :js, xhr: true
         end
