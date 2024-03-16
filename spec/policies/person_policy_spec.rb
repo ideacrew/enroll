@@ -113,7 +113,7 @@ RSpec.describe PersonPolicy, type: :policy do
 
     let!(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: 'active')}
     let!(:broker_agency_staff_user) {FactoryBot.create(:user, :person => broker_agency_staff_role.person, roles: ['broker_agency_staff_role'])}
-\
+
     let(:person) { FactoryBot.create(:person, :with_consumer_role) }
     let(:user) { FactoryBot.create(:user, person: person) }
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }

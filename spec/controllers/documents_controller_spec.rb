@@ -36,13 +36,13 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
   end
 
   # broker role
-  let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
+  let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: :individual) }
   let(:broker_role) { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: :active) }
-  let(:broker_role_user) {FactoryBot.create(:user, :person => broker_role.person, roles: ['broker_role'])}
+  let!(:broker_role_user) {FactoryBot.create(:user, :person => broker_role.person, roles: ['broker_role'])}
 
   # broker staff role
   let(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: 'active')}
-  let(:broker_agency_staff_user) {FactoryBot.create(:user, :person => broker_agency_staff_role.person, roles: ['broker_agency_staff_role'])}
+  let!(:broker_agency_staff_user) {FactoryBot.create(:user, :person => broker_agency_staff_role.person, roles: ['broker_agency_staff_role'])}
 
   before :each do
     # Needed for the American indian status type
@@ -367,13 +367,14 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
         before(:each) do
           family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
                                                                                               start_on: Time.now,
+                                                                                              writing_agent_id: broker_role.id,
                                                                                               is_active: true)
           family.reload
+          allow(Operations::Documents::Download).to receive(:call).and_return(Dry::Monads::Success(tempfile))
+          sign_in broker_role_user
         end
 
         it 'should be able to download' do
-          allow(Operations::Documents::Download).to receive(:call).and_return(Dry::Monads::Success(tempfile))
-          sign_in broker_role_user
           get :cartafact_download, params: {model: "Person", model_id: consumer_person.id, relation: "documents", relation_id: document.id}
           expect(response.status).to eq(200)
           expect(response.headers["Content-Disposition"]).to eq 'attachment'
