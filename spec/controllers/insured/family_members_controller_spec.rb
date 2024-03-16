@@ -461,7 +461,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
   describe "PUT update" do
     let(:address) { double }
-    let(:family_member) { double }
+    # let(:family_member) { double }
     let(:valid_addresses_attributes) do
       {"0" => {"kind" => "home", "address_1" => "address1_a", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211"},
        "1" => {"kind" => "mailing", "address_1" => "address1_b", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211" } }
@@ -487,7 +487,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     end
 
     let(:update_result) { false }
-    let!(:test_family) { FactoryBot.create(:family, :with_primary_family_member) }
+    # let!(:test_family) { FactoryBot.create(:family, :with_primary_family_member) }
 
     before(:each) do
       sign_in(user)
@@ -978,5 +978,22 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
         end
       end
     end
+  end
+
+  describe "logged in user failed authorization" do
+    shared_examples_for "logged in user has no authorization roles for family_members controller" do |action|
+      it "redirects to root with flash message" do
+        person = FactoryBot.create(:person, :with_family, :with_consumer_role)
+        unauthorized_user = FactoryBot.create(:user, :person => person)
+        sign_in(unauthorized_user)
+
+        get action, params: {consumer_role_id: person.consumer_role.id, family_id: person.primary_family.id}
+        expect(response).to redirect_to(root_path)
+        expect(flash[:error]).to eq("Access not allowed for family_policy.#{action}?, (Pundit policy)")
+      end
+    end
+
+    it_behaves_like 'logged in user has no authorization roles for family_members controller', :index
+    it_behaves_like 'logged in user has no authorization roles for family_members controller', :new
   end
 end
