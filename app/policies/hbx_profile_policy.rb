@@ -92,14 +92,21 @@ class HbxProfilePolicy < ApplicationPolicy
   end
 
   # rubocop:disable Metrics/CyclomaticComplexity
+  # Determines if the current user has permission to access the assister index.
+  # The user can access the assister index if they are a primary family member,
+  # an admin, an active associated broker staff, or an active associated broker in the individual market,
+  # the ACA Shop market, the Non-ACA Fehb market, or the coverall market.
+  #
+  # @return [Boolean] Returns true if the user has permission to access the assister index, false otherwise.
+  # @note This method checks for permissions across multiple markets and roles.
   def assister_index?
     # Fall back on a family if it exists for the current user.
     @family = account_holder_family
     return true if individual_market_primary_family_member?
     return true if individual_market_non_ridp_primary_family_member?
     return true if individual_market_admin?
-    return true if active_associated_individual_market_ridp_verified_family_broker_staff?
-    return true if active_associated_individual_market_ridp_verified_family_broker?
+    return true if active_associated_individual_market_family_broker_staff?
+    return true if active_associated_individual_market_family_broker?
 
     return true if shop_market_primary_family_member?
     return true if shop_market_admin?
