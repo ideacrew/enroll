@@ -66,6 +66,28 @@ class FamilyPolicy < ApplicationPolicy
     false
   end
 
+  def request_help?
+    return true if individual_market_non_ridp_primary_family_member?
+    show?
+  end
+
+  def hire_broker_agency?
+    return true if individual_market_primary_family_member?
+    return true if individual_market_non_ridp_primary_family_member?
+    return true if individual_market_admin?
+
+    return true if shop_market_primary_family_member?
+    return true if shop_market_admin?
+
+    return true if fehb_market_primary_family_member?
+    return true if fehb_market_admin?
+
+    return true if coverall_market_primary_family_member?
+    return true if coverall_market_admin?
+
+    false
+  end
+
   def admin_show?
     return true if individual_market_admin?
     return true if shop_market_admin?
