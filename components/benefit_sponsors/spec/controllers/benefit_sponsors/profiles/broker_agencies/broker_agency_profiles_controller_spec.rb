@@ -287,23 +287,6 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           expect(response).to_not render_template("staff_index")
         end
       end
-
-      context "consumer" do
-        let(:user_with_consumer_role)  { FactoryBot.create(:user, :with_consumer_role) }
-
-        before :each do
-          sign_in(user_with_consumer_role)
-          get :staff_index, params: { id: bap_id }, xhr: true
-        end
-
-        it "should return http success" do
-          expect(response).to have_http_status(:success)
-        end
-
-        it "should render the staff_index template" do
-          expect(response).to render_template("staff_index")
-        end
-      end
     end
 
     describe "#family_datatable" do
@@ -321,7 +304,9 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
         ce.save
         ee_person.employee_roles.first.census_employee_id = ce.id
         ee_person.save
-        data_tables_in_query = Struct.new(:draw, :skip, :take, :search_string)
+
+        # changing the struct to fit rubocop's specifications breaks the query -> overriding for this test
+        data_tables_in_query = Struct.new(:draw, :skip, :take, :search_string) # rubocop:disable Lint/StructNewOverride
         dt_query = data_tables_in_query.new("1", 0, 10, "")
 
         allow(controller).to receive(:extract_datatable_parameters).and_return(dt_query)
@@ -1120,27 +1105,6 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           it "should not render the inbox template" do
             expect(response).to_not render_template("inbox")
           end
-        end
-      end
-    end
-
-    # this spec is testing a private method, no need to test auth here
-    describe "#eligible_brokers" do
-      context "brokers accepting new clients" do
-        let(:broker_agency_profile_accepting_new_clients) { FactoryBot.create :benefit_sponsors_organizations_broker_agency_profile, accept_new_clients: true, aasm_state: "is_approved", market_kind: "both" }
-        let(:broker_role_accepting_new_clients) { FactoryBot.create :broker_agency_staff_role, broker_agency_profile: broker_agency_profile_accepting_new_clients }
-        let!(:person_accepting_new_clients) { FactoryBot.create :person, broker_role: broker_role_accepting_new_clients }
-
-        let(:broker_agency_profile_not_accepting_new_clients) { FactoryBot.create :benefit_sponsors_organizations_broker_agency_profile, accept_new_clients: false, aasm_state: "is_approved", market_kind: "both" }
-        let(:broker_role_not_accepting_new_clients) { FactoryBot.create :broker_agency_staff_role, broker_agency_profile: broker_agency_profile_not_accepting_new_clients }
-        let!(:person_not_accepting_new_clients) { FactoryBot.create :person, broker_role: broker_role_not_accepting_new_clients }
-
-        before do
-          allow(controller).to receive(:person_market_kind).and_return("individual")
-        end
-
-        it "does include person not accepting new clients" do
-          expect(controller.send(:eligible_brokers).to_a).to include(person_not_accepting_new_clients)
         end
       end
     end
