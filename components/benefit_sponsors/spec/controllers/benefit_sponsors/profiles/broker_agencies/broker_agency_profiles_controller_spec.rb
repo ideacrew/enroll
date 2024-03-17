@@ -289,8 +289,7 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
       end
 
       context "consumer" do
-        let!(:person02) { FactoryBot.create(:person) }
-        let!(:user_with_consumer_role)  { FactoryBot.create(:user, :with_consumer_role, person: person02) }
+        let(:user_with_consumer_role)  { FactoryBot.create(:user, :with_consumer_role) }
 
         before :each do
           sign_in(user_with_consumer_role)
@@ -322,8 +321,8 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
         ce.save
         ee_person.employee_roles.first.census_employee_id = ce.id
         ee_person.save
-        DataTablesInQuery = Struct.new(:draw, :skip, :take, :search_string)
-        dt_query = DataTablesInQuery.new("1", 0, 10, "")
+        data_tables_in_query = Struct.new(:draw, :skip, :take, :search_string)
+        dt_query = data_tables_in_query.new("1", 0, 10, "")
 
         allow(controller).to receive(:extract_datatable_parameters).and_return(dt_query)
       end
