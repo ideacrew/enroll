@@ -88,8 +88,8 @@ RSpec.describe Eligibilities::EvidencePolicy, type: :policy do
       end
 
       context '#extend_due_date?' do
-        it 'returns the result of #update_evidence?' do
-          expect(policy.update_evidence?).to be_truthy
+        it 'returns the result of #extend_due_date?' do
+          expect(policy.extend_due_date?).to be_truthy
         end
       end
 
@@ -137,8 +137,8 @@ RSpec.describe Eligibilities::EvidencePolicy, type: :policy do
       end
 
       context '#extend_due_date?' do
-        it 'returns the result of #update_evidence?' do
-          expect(policy.update_evidence?).to be_falsey
+        it 'returns the result of #extend_due_date?' do
+          expect(policy.extend_due_date?).to be_falsey
         end
       end
 
@@ -187,8 +187,8 @@ RSpec.describe Eligibilities::EvidencePolicy, type: :policy do
     end
 
     context '#extend_due_date?' do
-      it 'returns the result of #update_evidence?' do
-        expect(policy.update_evidence?).to be_falsey
+      it 'returns the result of #extend_due_date?' do
+        expect(policy.extend_due_date?).to be_falsey
       end
     end
 
@@ -240,8 +240,8 @@ RSpec.describe Eligibilities::EvidencePolicy, type: :policy do
     end
 
     context '#extend_due_date?' do
-      it 'returns the result of #update_evidence?' do
-        expect(policy.update_evidence?).to be_falsey
+      it 'returns the result of #extend_due_date?' do
+        expect(policy.extend_due_date?).to be_falsey
       end
     end
 
@@ -334,8 +334,8 @@ RSpec.describe Eligibilities::EvidencePolicy, type: :policy do
       end
 
       context '#extend_due_date?' do
-        it 'returns the result of #update_evidence?' do
-          expect(policy.update_evidence?).to be_falsey
+        it 'returns the result of #extend_due_date?' do
+          expect(policy.extend_due_date?).to be_falsey
         end
       end
 
@@ -372,8 +372,8 @@ RSpec.describe Eligibilities::EvidencePolicy, type: :policy do
       end
 
       context '#extend_due_date?' do
-        it 'returns the result of #update_evidence?' do
-          expect(policy.update_evidence?).to be_falsey
+        it 'returns the result of extend_due_date?' do
+          expect(policy.extend_due_date?).to be_falsey
         end
       end
 
