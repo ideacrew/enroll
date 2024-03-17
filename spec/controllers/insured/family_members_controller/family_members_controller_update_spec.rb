@@ -4,112 +4,56 @@ require "rails_helper"
 
 RSpec.describe Insured::FamilyMembersController do
   describe "PUT update, for an IVL market dependent with a consumer role" do
-    let(:dependent_id) { "SOME DEPENDENT ID" }
-    let(:person) { instance_double(Person) }
-    let(:user) { instance_double("User", :primary_family => family, :person => person) }
+    let(:person) {FactoryBot.create(:person)}
+    let(:user) { FactoryBot.create(:user, person: person) }
+    let!(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person) }
+
     let(:dependent) do
       instance_double(
         Forms::FamilyMember,
         addresses: [],
         same_with_primary: 'true',
-        family_id: family_id,
+        family_id: family.id,
         family_member: family_member
       )
     end
-    let(:immediate_family_coverage_household) { double(coverage_household_members: []) }
-    let(:extended_family_coverage_household) { double(coverage_household_members: []) }
-    let(:active_household) do
-      double(
-        immediate_family_coverage_household: immediate_family_coverage_household,
-        extended_family_coverage_household: extended_family_coverage_household
-      )
-    end
-    let(:family) { instance_double(Family, id: family_id, active_family_members: [], active_household: active_household) }
-    let(:family_id) { "SOME FAMILY ID" }
-    let(:family_member) do
-      instance_double(
-        FamilyMember,
-        person: dependent_person,
-        family: family
-      )
-    end
-    let(:dependent_person) do
-      instance_double(
-        Person,
-        consumer_role: consumer_role,
-        is_resident_role_active?: false
-      )
-    end
-    let(:consumer_role) do
-      instance_double(
-        ConsumerRole,
-        person: double(is_homeless: false, is_temporarily_out_of_state: false),
-        local_residency_validation: nil,
-        residency_determined_at: nil,
-        to_global_id: global_id,
-        active_vlp_document: vlp_document,
-        verification_types: []
-      )
-    end
-
-    let(:vlp_document) do
-      instance_double(VlpDocument)
-    end
-
-    let(:global_id) do
-      ConsumerRole.new.to_global_id
-    end
+    let(:family_member) { family.family_members.where(:is_primary_applicant => false).first }
+    let(:consumer_role) { FactoryBot.create(:consumer_role, person: person) }
+    let!(:dependent_consumer_role) { FactoryBot.create(:consumer_role, person: family_member.person) }
 
     let(:dependent_controller_parameters) do
       ActionController::Parameters.new(dependent_update_properties).permit!
     end
 
     before(:each) do
-      # NOTE: using 'allow_any_instance_of' is usually seen as bad practice
-      # but in our case we _cannot_ run the policy on an instance_double,
-      # so in order to avoid remaking the entire test suite with factories (which would add to the sluggishness of the GHAs)
-      # we opt to use allow_any_instance_of in this very limited capacity
-      allow_any_instance_of(described_class).to receive(:authorize_family_access).and_return(true)
-      sign_in(user)
-
-      allow(person).to receive(:agent?).and_return(false)
-      allow(Forms::FamilyMember).to receive(:find).with(dependent_id).and_return(dependent)
-      allow(Family).to receive(:find).with(family_id).and_return(family)
-      allow(dependent).to receive(:update_attributes).with(dependent_controller_parameters).and_return(true)
-      allow(consumer_role).to receive(:sensitive_information_changed?).with(dependent_update_properties).and_return(false)
-      allow(consumer_role).to receive(:check_for_critical_changes).with(family, info_changed: false, is_homeless: nil, is_temporarily_out_of_state: nil, dc_status: false)
+      consumer_role.move_identity_documents_to_verified
+      dependent_consumer_role.update!(is_applying_coverage: true)
       allow(dependent).to receive(:skip_consumer_role_callbacks=).with(true)
+      sign_in(user)
     end
 
     describe "when the value for 'is_applying_coverage' is provided" do
-      before :each do
-        allow(consumer_role).to receive(:is_applying_coverage).and_return(!is_applying_coverage_value)
-      end
-
-      let(:is_applying_coverage_value) { "false" }
       let(:dependent_update_properties) do
-        { "first_name" => "Dependent First Name", "same_with_primary" => "true", "is_applying_coverage" => is_applying_coverage_value }
+        { "first_name" => "Dependent First Name", "same_with_primary" => "true", "is_applying_coverage" => "false" }
       end
-
 
       it "updates the 'is_applying_coverage' value for the dependent" do
-        expect(consumer_role).to receive(:update_attribute).with(:is_applying_coverage, is_applying_coverage_value).and_return(true)
-        put :update, params: {id: dependent_id, dependent: dependent_update_properties}
+        expect(dependent_consumer_role.is_applying_coverage).to eq true
+        put :update, params: {id: family_member.id, dependent: dependent_update_properties}
+        expect(dependent_consumer_role.is_applying_coverage).to eq true
       end
     end
 
     describe "when the value for 'is_applying_coverage' is NOT provided" do
-      before :each do
-        allow(consumer_role).to receive(:is_applying_coverage).and_return(true)
-      end
-
       let(:dependent_update_properties) do
         { "first_name" => "Dependent First Name", "same_with_primary" => "true" }
       end
 
       it "does not change the 'is_applying_coverage' value for the dependent" do
-        expect(consumer_role).not_to receive(:update_attribute)
-        put :update, params: {id: dependent_id, dependent: dependent_update_properties}
+        expect(dependent_consumer_role.is_applying_coverage).to eq true
+        expect(dependent_consumer_role).not_to receive(:update_attribute)
+        put :update, params: {id: family_member.id, dependent: dependent_update_properties}
+        expect(dependent_consumer_role.is_applying_coverage).to eq true
       end
     end
   end
