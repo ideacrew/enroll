@@ -27,21 +27,6 @@ module BenefitSponsors
           "5" => "employer_profile.plan_years.start_on"
         }.freeze
 
-        # should this be deleted?
-        # there are no places in Enroll app that reference this endpoint, is it being used by an external app?
-        def create
-          json = request.body.read
-          body_json = JSON.parse(json)
-          result = ::BenefitSponsors::Services::BrokerRegistrationService.call(body_json["data"], current_user)
-          respond_to do |format|
-            if result.success?
-              format.json { render :status => 201, json: { :message => "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed." } }
-            else
-              format.json { render :status => 422, :json => { errors: result.errors.to_h } }
-            end
-          end
-        end
-
         def index
           # the _authorize_ method without a BrokerAgencyProfile instance must be called in this format due to the policy not directly corresponding to the controller
           # calling _authorize_ with no args here will look for a BenefitSponsors::Profiles::BrokerAgencies::BrokerAgencyProfilePolicy instead of a BenefitSponsors::Organizations::BrokerAgencyProfilePolicy
