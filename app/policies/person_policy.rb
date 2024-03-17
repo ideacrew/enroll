@@ -9,6 +9,18 @@ class PersonPolicy < ApplicationPolicy
     @family = record.primary_family if record.is_a?(Person)
   end
 
+  # Is the given entity allowed to complete RIDP on behalf of a given
+  # individual?
+  def complete_ridp?
+    @family = record.primary_family
+    consumer_role = record.consumer_role
+    return false unless consumer_role
+    return true if active_associated_individual_market_family_broker_staff?
+    return true if active_associated_individual_market_family_broker?
+    return true if individual_market_admin?
+    (consumer_role == individual_market_role)
+  end
+
   def can_show?
     allowed_to_modify?
   end

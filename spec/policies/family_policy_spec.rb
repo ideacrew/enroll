@@ -395,8 +395,6 @@ describe FamilyPolicy, "#request_help?" do
         :fehb_market_admin?,
         :coverall_market_primary_family_member?,
         :coverall_market_admin?,
-        :active_associated_individual_market_ridp_verified_family_broker_staff?,
-        :active_associated_individual_market_ridp_verified_family_broker?,
         :active_associated_shop_market_family_broker?,
         :active_associated_shop_market_general_agency?,
         :active_associated_fehb_market_family_broker?,
@@ -432,8 +430,6 @@ describe FamilyPolicy, "#request_help?" do
   it_behaves_like "a FamilyPolicy given a user with a needed permission", :fehb_market_admin?
   it_behaves_like "a FamilyPolicy given a user with a needed permission", :coverall_market_primary_family_member?
   it_behaves_like "a FamilyPolicy given a user with a needed permission", :coverall_market_admin?
-  it_behaves_like "a FamilyPolicy given a user with a needed permission", :active_associated_individual_market_ridp_verified_family_broker_staff?
-  it_behaves_like "a FamilyPolicy given a user with a needed permission", :active_associated_individual_market_ridp_verified_family_broker?
   it_behaves_like "a FamilyPolicy given a user with a needed permission", :active_associated_shop_market_family_broker?
   it_behaves_like "a FamilyPolicy given a user with a needed permission", :active_associated_shop_market_general_agency?
   it_behaves_like "a FamilyPolicy given a user with a needed permission", :active_associated_fehb_market_family_broker?
