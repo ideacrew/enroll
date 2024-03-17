@@ -13,6 +13,10 @@ RSpec.describe PeopleController, dbclean: :after_each do
 
   let(:vlp_document){FactoryBot.build(:vlp_document)}
 
+  before do
+    consumer_role.move_identity_documents_to_verified
+  end
+
   describe "different roles" do
     let!(:permission)                           { FactoryBot.create(:permission, :hbx_staff) }
     let!(:person_with_hbx_staff_role)           { FactoryBot.create(:person, :with_hbx_staff_role)}
@@ -77,6 +81,7 @@ RSpec.describe PeopleController, dbclean: :after_each do
 
       before :each do
         allow(Person).to receive(:find).and_return(ai_an_person)
+        ai_an_person.consumer_role.move_identity_documents_to_verified
         ai_an_person.consumer_role.coverage_purchased
         request.env['HTTP_REFERER'] = "insured/families/personal"
         allow(ai_an_person).to receive(:is_consumer_role_active?).and_return(true)

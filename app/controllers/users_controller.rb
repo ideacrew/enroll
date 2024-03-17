@@ -1,41 +1,25 @@
 class UsersController < ApplicationController
-  before_action :set_user, except: [:confirm_lock, :unsupported_browser, :index, :show]
-
-  def index
-    redirect_to root_path
-  end
-
-  def show
-    redirect_to root_path
-  end
+  before_action :set_user, except: [:confirm_lock, :unsupported_browser]
 
   def confirm_lock
-    authorize User, :lockable?
+    authorize HbxProfile, :confirm_lock?
     @user_id  = params[:user_action_id]
-  rescue Pundit::NotAuthorizedError
-    flash[:alert] = "You are not authorized for this action."
-    render inline: "location.reload();"
   end
 
   def lockable
-    authorize User, :lockable?
+    authorize HbxProfile, :lockable?
     @user.lock!
     flash[:notice] = "User #{user.email} is successfully #{user.lockable_notice}."
     render file: 'users/lockable.js.erb'
-  rescue Pundit::NotAuthorizedError
-    redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "You are not authorized for this action."
   end
 
   def reset_password
-    authorize User, :reset_password?
+    authorize HbxProfile, :reset_password?
     render file: 'users/reset_password.js.erb'
-  rescue Pundit::NotAuthorizedError
-    flash[:alert] = "You are not authorized for this action."
-    render inline: "location.reload();"
   end
 
   def confirm_reset_password
-    authorize User, :reset_password?
+    authorize HbxProfile, :confirm_reset_password?
     @error = nil
     validate_email if params[:user].present?
     if @error.nil?
@@ -44,20 +28,15 @@ class UsersController < ApplicationController
     else
       render file: 'users/reset_password.js.erb'
     end
-  rescue Pundit::NotAuthorizedError
-    redirect_to user_account_index_exchanges_hbx_profiles_url, alert: "You are not authorized for this action."
   end
 
   def change_username_and_email
-    authorize User, :change_username_and_email?
+    authorize HbxProfile, :change_username_and_email?
     @user_id = params[:user_id]
-  rescue Pundit::NotAuthorizedError
-    flash[:alert] = "You are not authorized for this action."
-    render inline: "location.reload();"
   end
 
   def confirm_change_username_and_email
-    authorize User, :change_username_and_email?
+    authorize HbxProfile, :confirm_change_username_and_email?
     @element_to_replace_id = params[:family_actions_id]
     @email_taken = User.where(:email => params[:new_email].strip, :id.ne => @user.id).first if params[:new_email]
     @username_taken = User.where(:oim_id => params[:new_oim_id].strip, :id.ne => @user.id).first if params[:new_oim_id]
@@ -80,13 +59,11 @@ class UsersController < ApplicationController
   end
 
   def login_history
-    authorize User, :view_login_history?
+    authorize HbxProfile, :login_history?
     @user_login_history = SessionIdHistory.for_user(user_id: @user.id).order('created_at DESC').page(params[:page]).per(15)
-  rescue Pundit::NotAuthorizedError
-    flash[:alert] = "You are not authorized for this action."
-    render inline: "location.reload();"
   end
 
+  # Auth not required
   def unsupported_browser; end
 
   private

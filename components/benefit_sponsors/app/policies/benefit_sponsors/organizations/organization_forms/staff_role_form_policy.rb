@@ -3,9 +3,10 @@
 module BenefitSponsors
   module Organizations
     module OrganizationForms
-      # this policy does the basic authentication for all StaffRoleForms
-      # specificity of parent of inherited class added to pass GHAs
+      # NOTE: for now this class is inheriting from BenefitSponsors::ApplicationPolicy, due to not being able to pass the GHAs
+      # Once the GHA workflow has been updated, this will inherit from the main app ApplicationPolicy
       class StaffRoleFormPolicy < BenefitSponsors::ApplicationPolicy
+
         attr_reader :service
 
         def initialize(user, record)
@@ -34,6 +35,10 @@ module BenefitSponsors
           return true if can_edit?
         end
 
+        def admin?
+          permission&.modify_employer
+        end
+
         def profile
           @profile ||= service.find_profile(record)
         end
@@ -46,11 +51,11 @@ module BenefitSponsors
             # BrokerAgencyProfilePolicy has a different level of access than EmployerProfile and GeneralAgencyProfile
             BenefitSponsors::Organizations::BrokerAgencyProfilePolicy.new(account_holder, profile).access_to_broker_agency_profile?
           when profile.is_a?(GeneralAgencyProfile)
-            return true if staff_modify_employer
+            return true if admin?
             return false if user.person.general_agency_primary_staff.blank?
             return true if Person.staff_for_ga(profile).include?(user.person)
           else
-            return true if staff_modify_employer
+            return true if admin?
             return true if reg_service.is_broker_for_employer?(user, record) || reg_service.is_general_agency_staff_for_employer?(user, record)
             return true if Person.staff_for_employer(profile).include?(user.person)
           end

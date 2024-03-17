@@ -98,50 +98,6 @@
       "note": ""
     },
     {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
-      "fingerprint": "088566b895fef0855e7c446a17c5f13dca0a3088568ab7edcd76cd529278c45c",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped model attribute",
-      "file": "app/views/layouts/_flash.html.erb",
-      "line": 6,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "ScheduledEvent.new(scheduled_event_params).errors.values.flatten.to_sentence",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Exchanges::ScheduledEventsController",
-          "method": "create",
-          "line": 25,
-          "file": "app/controllers/exchanges/scheduled_events_controller.rb",
-          "rendered": {
-            "name": "exchanges/scheduled_events/new",
-            "file": "app/views/exchanges/scheduled_events/new.js.erb"
-          }
-        },
-        {
-          "type": "template",
-          "name": "exchanges/scheduled_events/new",
-          "line": 4,
-          "file": "app/views/exchanges/scheduled_events/new.js.erb",
-          "rendered": {
-            "name": "layouts/_flash",
-            "file": "app/views/layouts/_flash.html.erb"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "layouts/_flash"
-      },
-      "user_input": null,
-      "confidence": "High",
-      "cwe_id": [
-        79
-      ],
-      "note": ""
-    },
-    {
       "warning_type": "Command Injection",
       "warning_code": 14,
       "fingerprint": "0d6e4d3e256f0c6ef196baa5ed9e68712d4bdffb7c9886ca5c7bae3e2687d624",
