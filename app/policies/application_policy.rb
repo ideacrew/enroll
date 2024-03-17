@@ -412,6 +412,10 @@ class ApplicationPolicy
     permission&.can_access_user_account_tab
   end
 
+  def staff_can_access_pay_now?
+    permission&.can_access_pay_now
+  end
+
   def staff_can_add_pdc?
     permission&.can_add_pdc
   end
