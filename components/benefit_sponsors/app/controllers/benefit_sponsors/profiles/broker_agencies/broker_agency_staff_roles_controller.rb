@@ -5,13 +5,14 @@ module BenefitSponsors
     module BrokerAgencies
       # controller that manages adding, approving and removing of staff agency roles to a broker agency profile
       class BrokerAgencyStaffRolesController < ::BenefitSponsors::ApplicationController
+        before_action :find_broker_agency_profile, only: [:new]
 
         def new
           # this endpoint is used for two scenarios
           # 1.) to render the form for brokers/agents creating new broker agency staff roles for their broker agencies
           # 2.) to render a different form in the view for benefit_sponsors/profiles/registrations/new for non-users sending in applications to be staff for existing broker agencies
           # authorization is only enforced here for the first scenario
-          authorize @broker_agency_profile if find_broker_agency_profile
+          authorize @broker_agency_profile if request.format.js?
 
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_new
           set_ie_flash_by_announcement
