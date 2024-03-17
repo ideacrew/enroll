@@ -38,27 +38,27 @@ module Eligibilities
     end
 
     # Determines if the current user has permission to update evidence.
-    # The user can update evidence if they have permission to perform an edit.
+    # The user can update evidence if they have permission to edit the associated Applicant.
     #
     # @return [Boolean] Returns true if the user has permission to update evidence, false otherwise.
     def update_evidence?
-      edit?
+      FinancialAssistance::ApplicantPolicy.new(user, @applicant).edit?
     end
 
     # Determines if the current user has permission to extend due date for evidence.
-    # The user can extend due date if they have permission to perform an edit.
+    # The user can extend due date if they have permission to edit the associated Applicant.
     #
     # @return [Boolean] Returns true if the user has permission to extend due date on evidence, false otherwise.
     def extend_due_date?
-      edit?
+      HbxProfilePolicy.new(user, @applicant).can_extend_due_date?
     end
 
     # Determines if the current user has permission to send out the fdsh hub request.
-    # The user can call fdsh hub if they have permission to perform an edit.
+    # The user can call fdsh hub if they are an individual market admin.
     #
     # @return [Boolean] Returns true if the user has permission to call out to the fdsh hub, false otherwise.
     def fdsh_hub_request?
-      return true if individual_market_admin? #should this leverage hbxadmin policy instead?
+      HbxProfilePolicy.new(user, @applicant).can_extend_due_date?
     end
 
     # Determines if the current user has permission to perform an edit.
