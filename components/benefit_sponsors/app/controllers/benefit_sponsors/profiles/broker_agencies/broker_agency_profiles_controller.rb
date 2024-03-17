@@ -5,6 +5,7 @@ require_dependency "benefit_sponsors/application_controller"
 module BenefitSponsors
   module Profiles
     module BrokerAgencies
+      # controller for broker agency profiles, frequently utilized in but not limited to the broker portal
       class BrokerAgencyProfilesController < ::BenefitSponsors::ApplicationController
         # include Acapi::Notifiers
         include DataTablesAdapter
@@ -42,6 +43,8 @@ module BenefitSponsors
         end
 
         def index
+          # the _authorize_ method without a BrokerAgencyProfile instance must be called in this format due to the policy not directly corresponding to the controller
+          # calling _authorize_ with no args here will look for a BenefitSponsors::Profiles::BrokerAgencies::BrokerAgencyProfilePolicy instead of a BenefitSponsors::Organizations::BrokerAgencyProfilePolicy
           authorize [:benefit_sponsors, :organizations, :broker_agency_profile]
           @broker_agency_profiles = BenefitSponsors::Organizations::Organization.broker_agency_profiles.map(&:broker_agency_profile)
         end

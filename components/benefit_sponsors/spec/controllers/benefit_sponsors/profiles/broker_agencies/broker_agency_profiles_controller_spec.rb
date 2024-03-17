@@ -1,8 +1,11 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-module BenefitSponsors
+# spec for Profiles::BrokerAgencies::BrokerAgencyProfilesController
+module BenefitSponsors # rubocop:disable Metrics/ModuleLength
   RSpec.describe Profiles::BrokerAgencies::BrokerAgencyProfilesController, type: :controller, dbclean: :after_each do
 
     before :all do
@@ -13,7 +16,7 @@ module BenefitSponsors
     let!(:security_question)  { FactoryBot.create_default :security_question }
 
     let!(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_hbx_staff_role) }
-    let!(:person) { FactoryBot.create(:person, user: user_with_hbx_staff_role )}
+    let!(:person) { FactoryBot.create(:person, user: user_with_hbx_staff_role)}
     let!(:person01) { FactoryBot.create(:person, :with_broker_role) }
     let!(:user_with_broker_role) { FactoryBot.create(:user, person: person01) }
 
@@ -29,25 +32,32 @@ module BenefitSponsors
     let(:super_permission) { FactoryBot.create(:permission, :super_admin) }
     let(:dev_permission) { FactoryBot.create(:permission, :developer) }
 
-    let(:initialize_and_login_admin) { ->(permission) {
-      user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id, permission_id: permission.id)
-      user_with_hbx_staff_role.person.hbx_staff_role.save!
-      sign_in(user_with_hbx_staff_role)
-    }}
+    let(:initialize_and_login_admin) do
+      lambda { |permission|
+        user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id, permission_id: permission.id)
+        user_with_hbx_staff_role.person.hbx_staff_role.save!
+        sign_in(user_with_hbx_staff_role)
+      }
+    end
 
-    let(:initialize_and_login_broker) { ->(org) {
-      person01.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: org.broker_agency_profile.id, aasm_state: 'active')
-      allow(org.broker_agency_profile).to receive(:primary_broker_role).and_return(person01.broker_role)
-      role = person01.create_broker_agency_staff_role({benefit_sponsors_broker_agency_profile_id: org.broker_agency_profile.id, aasm_state: 'active'})
-      role.broker_agency_accept!
-      sign_in(user_with_broker_role)
-    }}
+    let(:initialize_and_login_broker) do
+      lambda { |org|
+        person01.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: org.broker_agency_profile.id, aasm_state: 'active')
+        allow(org.broker_agency_profile).to receive(:primary_broker_role).and_return(person01.broker_role)
+      # all brokers in an agency also have a 'broker_agency_staff_role'
+        role = person01.create_broker_agency_staff_role({benefit_sponsors_broker_agency_profile_id: org.broker_agency_profile.id, aasm_state: 'active'})
+        role.broker_agency_accept!
+        sign_in(user_with_broker_role)
+      }
+    end
 
-    let(:initialize_and_login_broker_agency_staff) { ->(org) {
-      role = person01.create_broker_agency_staff_role({benefit_sponsors_broker_agency_profile_id: org.broker_agency_profile.id, aasm_state: 'active'})
-      role.broker_agency_accept!
-      sign_in(user_with_broker_role)
-    }}
+    let(:initialize_and_login_broker_agency_staff) do
+      lambda { |org|
+        role = person01.create_broker_agency_staff_role({benefit_sponsors_broker_agency_profile_id: org.broker_agency_profile.id, aasm_state: 'active'})
+        role.broker_agency_accept!
+        sign_in(user_with_broker_role)
+      }
+    end
 
     describe "#index" do
       context "admin" do
@@ -330,7 +340,7 @@ module BenefitSponsors
             it "should return a family" do
               expect(@query.total_count).not_to eq 0
             end
-    
+
             it "should return success http status" do
               expect(response).to have_http_status(:success)
             end
@@ -344,7 +354,7 @@ module BenefitSponsors
               post :family_datatable, params: { id: bap_id }, xhr: true
               @query = ::BenefitSponsors::Queries::BrokerFamiliesQuery.new(nil, organization1.profiles.first.id, organization1.profiles.first.market_kind)
             end
-    
+
             it "should not return family" do
               expect(@query.total_count).to eq 0
             end
@@ -357,7 +367,7 @@ module BenefitSponsors
             post :family_datatable, params: { id: bap_id }, xhr: true
             @query = ::BenefitSponsors::Queries::BrokerFamiliesQuery.new(nil, organization1.profiles.first.id, organization1.profiles.first.market_kind)
           end
-  
+
           it "should not be a success" do
             expect(response.status).to_not have_http_status(:success)
           end
@@ -375,7 +385,7 @@ module BenefitSponsors
           it "should return a family" do
             expect(@query.total_count).not_to eq 0
           end
-  
+
           it "should return success http status" do
             expect(response).to have_http_status(:success)
           end
@@ -386,7 +396,7 @@ module BenefitSponsors
             initialize_and_login_broker[organization2]
             post :family_datatable, params: { id: bap_id }, xhr: true
           end
-  
+
           it "should not be a success" do
             expect(response.status).to_not have_http_status(:success)
           end
@@ -1002,7 +1012,7 @@ module BenefitSponsors
     end
 
     describe "#inbox" do
-      # For the admin and broker_agency_staff tests, another broker needs to be created 
+      # For the admin and broker_agency_staff tests, another broker needs to be created
       # this endpoint uses a primary_broker's id as the :id param, hence this before action
 
       let!(:person02) { FactoryBot.create(:person, :with_broker_role) }
@@ -1140,7 +1150,7 @@ module BenefitSponsors
     # no user-role related auth is required here, but may want to consider some kind of rate limit usage to prevent it from being abused
     describe "broker request registration guide" do
       before do
-        post :email_guide, params: {email:'Broker@test.com', first_name:'Broker'}
+        post :email_guide, params: {email: 'Broker@test.com', first_name: 'Broker'}
       end
 
       it "should send Registration Guide to Broker@test.com" do

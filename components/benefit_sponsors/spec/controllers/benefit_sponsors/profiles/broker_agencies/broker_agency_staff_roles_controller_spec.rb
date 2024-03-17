@@ -52,7 +52,7 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           expect(response).to render_template("new")
         end
 
-        it "should initialize staff form" do
+        it "should initialize a staff form" do
           expect(assigns(:staff).class).to eq staff_class
         end
 
@@ -74,7 +74,7 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           expect(response).to render_template("new")
         end
 
-        it "should initialize staff from" do
+        it "should initialize a staff form" do
           expect(assigns(:staff).class).to eq staff_class
         end
 
@@ -95,7 +95,7 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
             get :new, params: { profile_id: bap_id }, format: :js, xhr: true
           end
 
-          it "should not initialize staff form" do
+          it "should not initialize a staff form" do
             expect(assigns(:staff).class).to eq NilClass
           end
 
@@ -111,7 +111,7 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
             get :new, params: { profile_id: fake_id }, format: :js, xhr: true
           end
 
-          it "should not initialize staff form" do
+          it "should not initialize a staff form" do
             expect(assigns(:staff).class).to eq NilClass
           end
 
@@ -137,7 +137,7 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           expect(response).to render_template("new")
         end
 
-        it "should initialize staff form" do
+        it "should initialize a staff form" do
           expect(assigns(:staff).class).to eq BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm
         end
 
@@ -153,7 +153,7 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           get :new, params: { profile_id: bap_id }, format: :js, xhr: true
         end
 
-        it "should not initialize staff form" do
+        it "should not initialize a staff form" do
           expect(assigns(:staff).class).to eq NilClass
         end
 
