@@ -11,7 +11,7 @@ module BenefitSponsors
         access_to_broker_agency_profile?
       end
 
-      def redirect_signup?p
+      def redirect_signup?
         access_to_broker_agency_profile?
       end
 
