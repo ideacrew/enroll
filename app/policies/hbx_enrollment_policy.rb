@@ -57,6 +57,20 @@ class HbxEnrollmentPolicy < ApplicationPolicy
     create?
   end
 
+  def pay_now?
+    return false if record.is_shop?
+    return true if individual_market_primary_family_member?
+    return true if active_associated_individual_market_family_broker_staff?
+    return true if active_associated_individual_market_family_broker?
+
+    return true if coverall_market_primary_family_member?
+    return true if active_associated_coverall_market_family_broker?
+
+    return true if staff_can_access_pay_now?
+
+    false
+  end
+
   private
 
   # rubocop:disable Metrics/CyclomaticComplexity
