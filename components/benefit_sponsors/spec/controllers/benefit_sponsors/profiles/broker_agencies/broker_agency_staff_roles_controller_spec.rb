@@ -88,17 +88,40 @@ module BenefitSponsors # rubocop:disable Metrics/ModuleLength
           broker_role.update_attributes(benefit_sponsors_broker_agency_profile_id: second_broker_agency_profile.id)
           broker_agency_staff_role1.update_attributes(benefit_sponsors_broker_agency_profile_id: second_broker_agency_profile.id)
           sign_in user
-          # for brokers/staff adding staff to their agency, there is always a profile_id present in the params when calling #new
-          # no profile_id will throw an error
-          get :new, params: { profile_id: bap_id }, format: :js, xhr: true
         end
 
-        it "should not initialize staff form" do
-          expect(assigns(:staff).class).to eq NilClass
+        context 'with a real profile_id' do
+          before do
+            get :new, params: { profile_id: bap_id }, format: :js, xhr: true
+          end
+
+          it "should not initialize staff form" do
+            expect(assigns(:staff).class).to eq NilClass
+          end
+
+          it "should return a 403" do
+            expect(response.status).to eq(403)
+          end
         end
 
-        it "should return a 403" do
-          expect(response.status).to eq(403)
+        context 'with a fake profile_id' do
+          let(:fake_id) { '65f70eb2eadf941f19eaa862' }
+
+          before do
+            get :new, params: { profile_id: fake_id }, format: :js, xhr: true
+          end
+
+          it "should not initialize staff form" do
+            expect(assigns(:staff).class).to eq NilClass
+          end
+
+          it "should return a 403" do
+            expect(response.status).to eq(403)
+          end
+
+          it "should return a flash message error" do
+            expect(flash[:error]).to eq("Access not allowed for Pundit::NotDefinedError, (Pundit policy)")
+          end
         end
       end
 
