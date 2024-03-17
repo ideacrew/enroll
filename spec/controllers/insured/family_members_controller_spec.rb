@@ -552,6 +552,9 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     before :each do
       allow(controller.request).to receive(:referer).and_return(nil)
       allow(Family).to receive(:find).with(test_family.id).and_return(test_family)
+
+      FactoryBot.create(:consumer_role, person: test_family.primary_person)
+      test_family.primary_person.consumer_role.move_identity_documents_to_verified
     end
 
     context 'a user without permissions' do
@@ -804,13 +807,8 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
     context 'a broker' do
       let!(:broker_user) { FactoryBot.create(:user, :person => writing_agent.person, roles: ['broker_role', 'broker_agency_staff_role']) }
-      let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
-      let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id) }
-      let(:assister)  do
-        assister = FactoryBot.build(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, npn: "SMECDOA00")
-        assister.save(validate: false)
-        assister
-      end
+      let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile, market_kind: :individual)}
+      let(:writing_agent)         { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: :active) }
 
       before :each do
         sign_in(broker_user)

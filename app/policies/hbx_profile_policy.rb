@@ -268,6 +268,34 @@ class HbxProfilePolicy < ApplicationPolicy
     staff_modify_admin_tabs?
   end
 
+  def confirm_lock?
+    staff_can_lock_unlock?
+  end
+
+  def lockable?
+    staff_can_lock_unlock?
+  end
+
+  def reset_password?
+    staff_can_reset_password?
+  end
+
+  def confirm_reset_password?
+    staff_can_reset_password?
+  end
+
+  def change_username_and_email?
+    staff_can_change_username_and_email?
+  end
+
+  def confirm_change_username_and_email?
+    staff_can_change_username_and_email?
+  end
+
+  def login_history?
+    staff_view_login_history?
+  end
+
 
 
   # Acts as the entire Pundit Policy for app/controllers/translations_controller.rb
@@ -437,9 +465,23 @@ class HbxProfilePolicy < ApplicationPolicy
   end
 
   def can_call_hub?
-    role = user_hbx_staff_role
-    return false unless role
-    role.permission.can_call_hub
+    staff_can_call_hub?
+  end
+
+  def can_verify_enrollment?
+    individual_market_admin?
+  end
+
+  def can_update_ridp_verification_type?
+    individual_market_admin?
+  end
+
+  def can_extend_due_date?
+    individual_market_admin?
+  end
+
+  def can_update_verification_type?
+    individual_market_admin?
   end
 
   def can_edit_osse_eligibility?

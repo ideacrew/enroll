@@ -1,7 +1,7 @@
 class DocumentsController < ApplicationController
   include ActionView::Helpers::TranslationHelper
   include L10nHelper
-  before_action :updateable?, except: [:show_docs, :download]
+  before_action :fetch_record, only: [:authorized_download, :cartafact_download]
   before_action :set_document, only: [:destroy, :update]
   before_action :set_verification_type
   before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type, :extend_due_date, :update_ridp_verification_type]
@@ -16,58 +16,43 @@ class DocumentsController < ApplicationController
     send_data Aws::S3Storage.find(uri), get_options(params)
   end
 
-  def download_employer_document
-    document = BenefitSponsors::Documents::EmployerAttestationDocument.find_by(identifier: params[:path])
-    document.present? ? (send_file document.identifier) : redirect_back(fallback_location: root_path, :flash => {error: "Document Not Found"})
-  rescue StandardError => e
-    redirect_back(fallback_location: root_path, :flash => {error: e.message})
-  end
-
   def authorized_download
+    authorize @record, :can_download_document?
+
     begin
-      model = params[:model].camelize
-      model_id = params[:model_id]
-      relation = ["documents"].include?(params[:relation]) ? params[:relation] : "documents"
       relation_id = params[:relation_id]
-
-      #this is a fix for new model inbox-messages notice download
-      if model == "AcaShopCcaEmployerProfile"
-        model = "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile"
-      end
-      model_klass = Document::RESOURCE_LIST.include?(model) ? model.safe_constantize : nil
-      raise "Sorry! Invalid Request" unless model_klass
-
-      model_object = model_klass.find(model_id)
-      documents = model_object.send(relation.to_sym)
-      if authorized_to_download?(model_object, documents, relation_id)
-        uri = documents.find(relation_id).identifier
-        send_data Aws::S3Storage.find(uri), get_options(params)
-      else
-       raise "Sorry! You are not authorized to download this document."
-      end
+      documents = @record.documents
+      uri = documents.find(relation_id).identifier
+      send_data Aws::S3Storage.find(uri), get_options(params)
     rescue => e
       redirect_back(fallback_location: root_path, :flash => {error: e.message})
     end
   end
 
   def cartafact_download
-    result = ::Operations::Documents::Download.call({params: cartafact_download_params.to_h.deep_symbolize_keys, user: current_user})
-    if result.success?
-      response_data = result.value!
-      send_data response_data, get_options(params)
-    else
-      errors = result.failure
-      redirect_back(fallback_location: root_path, :flash => {error: errors[:message]})
+    authorize @record, :can_download_document?
+
+    begin
+      result = ::Operations::Documents::Download.call({params: cartafact_download_params.to_h.deep_symbolize_keys, user: current_user})
+      if result.success?
+        response_data = result.value!
+        send_data response_data, get_options(params)
+      else
+        errors = result.failure
+        redirect_back(fallback_location: root_path, :flash => {error: errors[:message]})
+      end
+    rescue StandardError => e
+      Rails.logger.error {"Cartafact Download Error - #{e}"}
+      redirect_back(fallback_location: root_path, :flash => {error: e.message})
     end
-  rescue StandardError => e
-    Rails.logger.error {"Cartafact Download Error - #{e}"}
-    redirect_back(fallback_location: root_path, :flash => {error: e.message})
   end
 
   def update_verification_type
+    authorize HbxProfile, :can_update_verification_type?
+
+    family_member = FamilyMember.find(params[:family_member_id]) if params[:family_member_id].present?
     update_reason = params[:verification_reason]
     admin_action = params[:admin_action]
-    family_member = FamilyMember.find(params[:family_member_id]) if params[:family_member_id].present?
     reasons_list = VlpDocument::VERIFICATION_REASONS + VlpDocument::ALL_TYPES_REJECT_REASONS + VlpDocument::CITIZEN_IMMIGR_TYPE_ADD_REASONS
     if (reasons_list).include? (update_reason)
       verification_result = @person.consumer_role.admin_verification_action(admin_action, @verification_type, update_reason)
@@ -85,6 +70,8 @@ class DocumentsController < ApplicationController
   end
 
   def update_ridp_verification_type
+    authorize HbxProfile, :can_update_ridp_verification_type?
+
     ridp_type = params[:ridp_verification_type]
     update_reason = params[:verification_reason]
     admin_action = params[:admin_action]
@@ -102,30 +89,31 @@ class DocumentsController < ApplicationController
   end
 
   def enrollment_verification
-     family = @person.primary_family
-     if family.active_household.hbx_enrollments.verification_needed.any?
-       family.active_household.hbx_enrollments.verification_needed.each do |enrollment|
-         enrollment.evaluate_individual_market_eligiblity
-       end
-       family.save!
-       respond_to do |format|
-         format.html {
-           flash[:success] = "Enrollment group was completely verified."
-           redirect_back(fallback_location: root_path)
-         }
-       end
-     else
-       respond_to do |format|
-         format.html {
-           flash[:danger] = "Family does not have any active Enrollment to verify."
-           redirect_back(fallback_location: root_path)
-         }
-       end
-     end
+    authorize HbxProfile, :can_verify_enrollment?
+
+    family = @person.primary_family
+    if family.active_household.hbx_enrollments.verification_needed.any?
+      family.active_household.hbx_enrollments.verification_needed.each(&:evaluate_individual_market_eligiblity)
+      family.save!
+      respond_to do |format|
+        format.html do
+          flash[:success] = "Enrollment group was completely verified."
+          redirect_back(fallback_location: root_path)
+        end
+      end
+    else
+      respond_to do |format|
+        format.html do
+          flash[:danger] = "Family does not have any active Enrollment to verify."
+          redirect_back(fallback_location: root_path)
+        end
+      end
+    end
   end
 
   def fed_hub_request
     authorize HbxProfile, :can_call_hub?
+
     request_hash = {person_id: @person.id, verification_type: @verification_type.type_name}
     result = ::Operations::CallFedHub.new.call(request_hash)
     key, message = result.failure? ? result.failure : result.success
@@ -158,6 +146,8 @@ class DocumentsController < ApplicationController
   end
 
   def extend_due_date
+    authorize HbxProfile, :can_extend_due_date?
+
     @family_member = FamilyMember.find(params[:family_member_id])
     enrollment = @family_member.family.enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => @family_member.id).first
     if enrollment.present?
@@ -175,6 +165,8 @@ class DocumentsController < ApplicationController
   end
 
   def destroy
+    authorize @person, :can_delete_document?
+
     @document.delete if @verification_type.type_unverified?
     if @document.destroyed?
       @person.save!
@@ -193,56 +185,16 @@ class DocumentsController < ApplicationController
     end
   end
 
-  def new
-    @document = Document.new
-    respond_to do |format|
-      format.js
-    end
-  end
+  private
 
-  def create
-    @employer_profile = Organization.all_employer_profiles.where(legal_name: params[:document][:creator]).last.employer_profile
-    @employer_profile.employer_attestation= EmployerAttestation.new() unless @employer_profile.employer_attestation
-    #@employer_profile.employer_attestation.employer_attestation_doccument = EmployerAttestationDocument.new() unless @employer_profile.employer_attestation.employer_attestation_doccument
-    document = @employer_profile.employer_attestation.upload_document(file_path(params[:file]),file_name(params[:file]),params[:subject],params[:file].size)
-    if document.save!
-      @employer_profile.employer_attestation.update_attributes(aasm_state: "submitted")
-    end
-    redirect_to exchanges_hbx_profiles_path+'?tab=documents'
-  end
+  def fetch_record
+    model_id = params[:model_id]
+    model = params[:model].camelize
+    model_klass = Document::MODEL_CLASS_MAPPING[model]
 
-  def document_reader
-    content = @document.source.read
-    if stale?(etag: content, last_modified: @user.updated_at.utc, public: true)
-      send_data content, type: @document.source.file.content_type, disposition: "inline"
-      expires_in 0, public: true
-    end
-  end
+    raise "Sorry! Invalid Request" unless model_klass
 
-  def download_documents
-    docs = Document.find(params[:ids])
-    docs.each do |doc|
-      send_file "#{Rails.root}"+"/tmp" + doc.source.url, file_name: doc.title, :type=>"application/pdf"
-    end
-
-  end
-
-  def delete_documents
-    begin
-      Document.any_in(:_id =>params[:ids]).destroy_all
-      render json: { status: 200, message: 'Successfully submitted the selected employer(s) for binder paid.' }
-    rescue => e
-      render json: { status: 500, message: 'An error occured while submitting employer(s) for binder paid.' }
-    end
-  end
-
-  def update_document
-    @document = EmployerProfile.find(params[:document_id]).employer_attestation
-    @reason = params[:reason_for_rejection] == "nil" ? params[:other_reason] : params[:reason_for_rejection]
-    @document.employer_attestation_documents.find(params[:attestation_doc_id]).update_attributes(aasm_state: params[:status],reason_for_rejection: @reason)
-    @document.update_attributes(aasm_state: params[:status])
-
-    redirect_to exchanges_hbx_profiles_path+'?tab=documents'
+    @record = model_klass.find(model_id)
   end
 
   def add_type_history_element
@@ -255,12 +207,6 @@ class DocumentsController < ApplicationController
                                                   modifier: actor,
                                                   update_reason: reason)
     end
-  end
-
-  private
-
-  def updateable?
-    authorize Family, :updateable?
   end
 
   def get_options(params)
