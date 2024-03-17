@@ -23,16 +23,17 @@ class ConsumerRolePolicy < ApplicationPolicy
     end
   end
 
-  # Determines if the current user has permission to upload ridp document.
-  # The user can upload the document if they are a primary family member,
-  # an active associated broker, or an admin in the individual market,
+  # Determines if the current user has permission to upload verification documents.
+  # The user can upload verification documents if they are a primary family member in the individual market,
+  # an individual market admin, an active associated individual market family broker staff,
+  # or an active associated individual market family broker.
   #
-  # @return [Boolean] Returns true if the user has permission to upload the document, false otherwise.
+  # @return [Boolean] Returns true if the user has permission to upload verification documents, false otherwise.
   def verification_document_upload?
     return true if individual_market_primary_family_member?
     return true if individual_market_admin?
-    return true if active_associated_individual_market_ridp_verified_family_broker_staff?
-    return true if active_associated_individual_market_ridp_verified_family_broker?
+    return true if active_associated_individual_market_family_broker_staff?
+    return true if active_associated_individual_market_family_broker?
 
     false
   end
