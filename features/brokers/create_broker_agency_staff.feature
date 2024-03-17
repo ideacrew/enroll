@@ -30,7 +30,6 @@ Feature: Assign Broker Agency Staff to Broker Agency
     And Max Planck logs on to the Broker Agency Portal
     When the Broker removes Broker staff from Broker staff table
     Then Broker should see the staff successfully removed message
-    
 
   Scenario: Adding Existing person as Broker Staff to Broker Agency
     Given there is a Broker Agency exists for District Brokers Inc

@@ -4,6 +4,7 @@ module Insured
     before_action :set_consumer_bookmark_url, only: [:service_unavailable, :failed_validation]
 
     def new
+      authorize @person, :complete_ridp?
       service = ::IdentityVerification::InteractiveVerificationService.new
       service_response = service.initiate_session(render_session_start)
       respond_to do |format|
@@ -25,13 +26,14 @@ module Insured
     end
 
     def service_unavailable
+      authorize @person, :complete_ridp?
       @person.consumer_role.move_identity_documents_to_outstanding
       render "service_unavailable"
     end
 
     def failed_validation
+      authorize @person, :complete_ridp?
       @person = Person.find(params[:person_id]) if params[:person_id].present?
-      authorize @person, :can_access_identity_verifications?
       @step = params[:step]
       @verification_transaction_id = params[:verification_transaction_id]
       @person = Person.find(params[:person_id]) if params[:person_id].present?
@@ -40,6 +42,7 @@ module Insured
     end
 
     def create
+      authorize @person, :complete_ridp?
       @interactive_verification = ::IdentityVerification::InteractiveVerification.new(
         params.require(:interactive_verification).permit(:session_id, :transaction_id, questions_attributes: {}).to_h
       )
@@ -67,6 +70,7 @@ module Insured
     end
 
     def update
+      authorize @person, :complete_ridp?
       @transaction_id = params.require(:id)
 
       respond_to do |format|

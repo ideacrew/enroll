@@ -92,11 +92,21 @@ class HbxProfilePolicy < ApplicationPolicy
   end
 
   # rubocop:disable Metrics/CyclomaticComplexity
+  # Determines if the current user has permission to access the assister index.
+  # The user can access the assister index if they are a primary family member,
+  # an admin, an active associated broker staff, or an active associated broker in the individual market,
+  # the ACA Shop market, the Non-ACA Fehb market, or the coverall market.
+  #
+  # @return [Boolean] Returns true if the user has permission to access the assister index, false otherwise.
+  # @note This method checks for permissions across multiple markets and roles.
   def assister_index?
+    # Fall back on a family if it exists for the current user.
+    @family = account_holder_family
     return true if individual_market_primary_family_member?
+    return true if individual_market_non_ridp_primary_family_member?
     return true if individual_market_admin?
-    return true if active_associated_individual_market_ridp_verified_family_broker_staff?
-    return true if active_associated_individual_market_ridp_verified_family_broker?
+    return true if active_associated_individual_market_family_broker_staff?
+    return true if active_associated_individual_market_family_broker?
 
     return true if shop_market_primary_family_member?
     return true if shop_market_admin?
@@ -115,10 +125,6 @@ class HbxProfilePolicy < ApplicationPolicy
     false
   end
   # rubocop:enable Metrics/CyclomaticComplexity
-
-  def request_help?
-    assister_index?
-  end
 
   def family_index?
     return true if index?
@@ -267,6 +273,34 @@ class HbxProfilePolicy < ApplicationPolicy
 
   def update_setting?
     staff_modify_admin_tabs?
+  end
+
+  def confirm_lock?
+    staff_can_lock_unlock?
+  end
+
+  def lockable?
+    staff_can_lock_unlock?
+  end
+
+  def reset_password?
+    staff_can_reset_password?
+  end
+
+  def confirm_reset_password?
+    staff_can_reset_password?
+  end
+
+  def change_username_and_email?
+    staff_can_change_username_and_email?
+  end
+
+  def confirm_change_username_and_email?
+    staff_can_change_username_and_email?
+  end
+
+  def login_history?
+    staff_view_login_history?
   end
 
 
@@ -438,9 +472,23 @@ class HbxProfilePolicy < ApplicationPolicy
   end
 
   def can_call_hub?
-    role = user_hbx_staff_role
-    return false unless role
-    role.permission.can_call_hub
+    staff_can_call_hub?
+  end
+
+  def can_verify_enrollment?
+    individual_market_admin?
+  end
+
+  def can_update_ridp_verification_type?
+    individual_market_admin?
+  end
+
+  def can_extend_due_date?
+    individual_market_admin?
+  end
+
+  def can_update_verification_type?
+    individual_market_admin?
   end
 
   def can_edit_osse_eligibility?
