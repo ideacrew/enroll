@@ -250,5 +250,27 @@ module BenefitSponsors
         end
       end
     end
+
+    context '#can_download_document?' do
+      let(:er_staff_role) { FactoryBot.create(:benefit_sponsor_employer_staff_role, benefit_sponsor_employer_profile_id: benefit_sponsorship.organization.employer_profile.id) }
+      let(:user) { FactoryBot.create(:user, person: person) }
+
+      context 'authorized employer staff' do
+        before do
+          person.employer_staff_roles << er_staff_role
+          person.save!
+        end
+
+        it 'employer staff should be able to update' do
+          expect(policy.can_download_document?).to be true
+        end
+      end
+
+      context 'unauthorized employer staff' do
+        it 'employer staff should not be able to update' do
+          expect(policy.can_download_document?).to be false
+        end
+      end
+    end
   end
 end

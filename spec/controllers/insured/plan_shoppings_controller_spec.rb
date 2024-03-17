@@ -521,39 +521,43 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       expect(assigns(:employer_profile)).to eq abc_profile
     end
 
-    # It is not clear what this spec is trying to test.  Is it trying to test:
-    # * When a broker purchases something for someone else, they see the correct page?
-    # * When a broker also has a consumer role and purchases something, they see the correct page, for themselves?
-    # I recommend we split this into two parts, and will create a ticket to that effect.
-    it "returns http success if family has BROKER" do
-      current_broker_user = FactoryBot.create(:user, :roles => ['broker_agency_staff'], :person => create(:person))
-      broker_role = BrokerRole.new({:benefit_sponsors_broker_agency_profile_id => 99, aasm_state: "active", market_kind: 'both'})
-      current_broker_user.person.broker_role = broker_role
-      hbx_enrollment.family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: 99,
-                                                                                                         writing_agent_id: broker_role.id,
-                                                                                                         start_on: Time.now,
-                                                                                                         is_active: true)
-      hbx_enrollment.family.save!
+    context "when shop broker is logged in" do
+      let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, market_kind: :shop) }
+      let!(:broker_role) { FactoryBot.create(:broker_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: "active", market_kind: 'both') }
+      let!(:broker_role_user) {FactoryBot.create(:user, :person => broker_role.person, roles: ['broker_role'])}
 
-      session[:person_id] = person.id.to_s
-      sign_in(current_broker_user)
+      let!(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: 'active')}
+      let!(:broker_agency_staff_user) {FactoryBot.create(:user, :person => broker_agency_staff_role.person, roles: ['broker_agency_staff_role'])}
 
-      get :thankyou, params: {id: "id", plan_id: "plan_id"}
-      expect(response).to have_http_status(:success)
-    end
+      context "when broker is hired by an employer for employee" do
+        before do
+          family.primary_person.active_employee_roles.first.employer_profile.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                                                                                          writing_agent_id: broker_role.id,
+                                                                                                                                                          start_on: Time.now,
+                                                                                                                                                          is_active: true)
 
-    it "returns authorization error if family is not associated with BROKER" do
-      person = create(:person)
-      current_broker_user = FactoryBot.create(:user, :roles => ['broker_agency_staff'], :person => person)
-      broker_role = BrokerRole.new({:benefit_sponsors_broker_agency_profile_id => 99, aasm_state: "active", market_kind: 'both'})
-      current_broker_user.person.broker_role = broker_role
+          family.save!
+        end
 
-      session[:person_id] = person.id.to_s
-      sign_in(current_broker_user)
+        it "returns http success if employee has BROKER" do
+          session[:person_id] = hbx_enrollment.family.primary_person.id.to_s
+          sign_in(broker_role_user)
 
-      get :thankyou, params: {id: "id", plan_id: "plan_id"}
-      expect(response).to redirect_to(root_path)
-      expect(flash[:error]).to eq("Access not allowed for hbx_enrollment_policy.thankyou?, (Pundit policy)")
+          get :thankyou, params: {id: "id", plan_id: "plan_id"}
+          expect(response).to have_http_status(:success)
+        end
+      end
+
+      context "when broker is not hired by an employer" do
+        it "returns authorization error" do
+          session[:person_id] = hbx_enrollment.family.primary_person.id.to_s
+          sign_in(broker_role_user)
+
+          get :thankyou, params: {id: "id", plan_id: "plan_id"}
+          expect(response).to redirect_to(root_path)
+          expect(flash[:error]).to eq("Access not allowed for hbx_enrollment_policy.thankyou?, (Pundit policy)")
+        end
+      end
     end
 
     context "thankyou" do

@@ -645,8 +645,7 @@ Rails.application.routes.draw do
   get "document/authorized_download/:model/:model_id/:relation/:relation_id" => "documents#authorized_download", as: :authorized_document_download
   get "document/cartafact_download/:model/:model_id/:relation/:relation_id" => "documents#cartafact_download", as: :cartafact_document_download
 
-  resources :documents, only: [:new, :create, :destroy, :update] do
-    get :document_reader,on: :member
+  resources :documents, only: [:destroy] do
     get :autocomplete_organization_legal_name, :on => :collection
     collection do
       put :change_person_aasm_state
@@ -656,13 +655,7 @@ Rails.application.routes.draw do
       get :enrollment_verification
       put :extend_due_date
       get :fed_hub_request
-      post 'download_documents'
-      post 'delete_documents'
       post :fed_hub_request
-    end
-
-    member do
-      get :download_employer_document
     end
   end
 

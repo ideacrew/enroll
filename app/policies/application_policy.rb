@@ -242,13 +242,12 @@ class ApplicationPolicy
 
   def active_associated_shop_market_family_broker?
     broker = account_holder_person&.broker_role
-    broker_staff_roles = account_holder_person&.broker_agency_staff_roles&.where(aasm_state: 'active')
+    broker_staff_roles = account_holder_person&.broker_agency_staff_roles&.active
 
     return false if broker.blank? && broker_staff_roles.blank?
-    return false unless broker.active? || broker.shop_market?
-    return true if broker_profile_ids.include?(broker.benefit_sponsors_broker_agency_profile_id)
-
-    # broker_staff_roles.any? { |role| role.benefit_sponsors_broker_agency_profile_id == individual_market_family_broker_agency_id }
+    return false if broker.present? && (!broker.active? || !broker.shop_market?)
+    return true if broker.present? && shop_market_family_broker_agency_ids.include?(broker.benefit_sponsors_broker_agency_profile_id)
+    return true if broker_staff_roles.present? && (broker_staff_roles.pluck(:benefit_sponsors_broker_agency_profile_id) & shop_market_family_broker_agency_ids).present?
     false
   end
 
