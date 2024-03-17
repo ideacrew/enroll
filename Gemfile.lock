@@ -531,7 +531,7 @@ GEM
     fast_jsonapi (1.5)
       activesupport (>= 4.2)
     ffaker (2.18.0)
-    ffi (1.15.4)
+    ffi (1.9.25)
     file_validators (3.0.0)
       activemodel (>= 3.2)
       mime-types (>= 1.0)
