@@ -8,9 +8,9 @@ module BenefitSponsors
 
     helper BenefitSponsors::Engine.helpers
 
-    PUNDIT_EXCEPTIONS = [Pundit::NotAuthorizedError, Pundit::NotDefinedError]
+    PUNDIT_EXCEPTIONS = [Pundit::NotAuthorizedError, Pundit::NotDefinedError].freeze
 
-    rescue_from *PUNDIT_EXCEPTIONS, with: :user_not_authorized
+    rescue_from (*PUNDIT_EXCEPTIONS, with: :user_not_authorized)
     rescue_from ActionController::InvalidAuthenticityToken, :with => :bad_token_due_to_session_expired
 
     # for current_user
