@@ -379,6 +379,13 @@ RSpec.describe DocumentsController, dbclean: :after_each, :type => :controller d
           expect(response.status).to eq(200)
           expect(response.headers["Content-Disposition"]).to eq 'attachment'
         end
+
+        it 'downloads document even if Consumer is not RIDP verified' do
+          consumer_person.consumer_role.update_attributes!(identity_validation: 'na', application_validation: 'na')
+          get :cartafact_download, params: {model: "Person", model_id: consumer_person.id, relation: "documents", relation_id: document.id}
+          expect(response.status).to eq(200)
+          expect(response.headers["Content-Disposition"]).to eq 'attachment'
+        end
       end
 
       context 'is not authorized' do

@@ -166,9 +166,9 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             context 'consumer RIDP is unverified' do
               let(:baa_active) { true }
 
-              it 'denies access' do
+              it 'grants access' do
                 consumer_role.update_attributes(identity_validation: 'na', application_validation: 'na')
-                expect(subject).not_to permit(logged_in_user, deduction)
+                expect(subject).to permit(logged_in_user, deduction)
               end
             end
           end
@@ -256,9 +256,9 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             context 'consumer RIDP is unverified' do
               let(:baa_active) { true }
 
-              it 'denies access' do
+              it 'grants access' do
                 consumer_role.update_attributes(identity_validation: 'na', application_validation: 'na')
-                expect(subject).not_to permit(logged_in_user, deduction)
+                expect(subject).to permit(logged_in_user, deduction)
               end
             end
           end
