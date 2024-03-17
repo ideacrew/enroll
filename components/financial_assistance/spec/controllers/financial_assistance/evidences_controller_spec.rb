@@ -304,17 +304,10 @@ RSpec.describe FinancialAssistance::EvidencesController, dbclean: :after_each, t
         allow(family_member).to receive_message_chain(:family, :enrollments, :enrolled, :first).and_return(enrollment)
       end
 
-      context 'when the evidence is type unverified and enrollment is present' do
-        it 'extends the due date and sets a success flash message' do
+      context 'when the request comes from a non admin role' do
+        it 'flashes a pundit policy unauthorized error' do
           put :extend_due_date, params: params
-          expect(flash[:success]).to eq("#{evidence.title} verification due date was extended for 30 days.")
-        end
-      end
-
-      context 'when the evidence is not type unverified or enrollment is not present' do
-        it 'sets a danger flash message' do
-          put :extend_due_date, params: esi_params
-          expect(flash[:danger]).to eq("Applicant doesn't have active Enrollment to extend verification due date.")
+          expect(flash[:error]).to eq "Access not allowed for eligibilities/evidence_policy.extend_due_date?, (Pundit policy)"
         end
       end
     end
@@ -433,17 +426,10 @@ RSpec.describe FinancialAssistance::EvidencesController, dbclean: :after_each, t
         allow(family_member).to receive_message_chain(:family, :enrollments, :enrolled, :first).and_return(enrollment)
       end
 
-      context 'when the evidence is type unverified and enrollment is present' do
-        it 'extends the due date and sets a success flash message' do
+      context 'when the request comes from a non admin role' do
+        it 'flashes a pundit policy unauthorized error' do
           put :extend_due_date, params: params
-          expect(flash[:success]).to eq("#{evidence.title} verification due date was extended for 30 days.")
-        end
-      end
-
-      context 'when the evidence is not type unverified or enrollment is not present' do
-        it 'sets a danger flash message' do
-          put :extend_due_date, params: esi_params
-          expect(flash[:danger]).to eq("Applicant doesn't have active Enrollment to extend verification due date.")
+          expect(flash[:error]).to eq "Access not allowed for eligibilities/evidence_policy.extend_due_date?, (Pundit policy)"
         end
       end
     end
