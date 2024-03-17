@@ -26,7 +26,8 @@ module BenefitSponsors
           "5" => "employer_profile.plan_years.start_on"
         }.freeze
 
-        # Are we using this, or should this be deleted
+        # should this be deleted?
+        # there are no places in Enroll app that reference this endpoint, is it being used by an external app?
         def create
           json = request.body.read
           body_json = JSON.parse(json)
@@ -162,14 +163,14 @@ module BenefitSponsors
           # messages are different for current_user is admin and broker account login
           @broker_agency_profile = ::BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id])
           @broker_provider = @broker_agency_profile.primary_broker_role.person
-          authorize @broker_agency_profile, :access_to_broker_agency_profile?
+          authorize @broker_agency_profile
 
           respond_to do |format|
             format.js {}
           end
         end
 
-        # No auth required for this action
+        # no auth required for this action
         def agency_messages; end
 
         def inbox
@@ -178,12 +179,11 @@ module BenefitSponsors
             provider_id = params["id"]
             @broker_agency_provider = Person.find(provider_id)
             @broker_agency_profile = @broker_agency_provider.broker_role.broker_agency_profile
-            authorize @broker_agency_profile, :access_to_broker_agency_profile?
+            authorize @broker_agency_profile
           elsif params['profile_id'].present?
             provider_id = params['profile_id']
             @broker_agency_provider = find_broker_agency_profile(BSON::ObjectId(provider_id))
-            # Added auth here
-            authorize @broker_agency_provider, :access_to_broker_agency_profile?
+            authorize @broker_agency_provider
           end
 
           @folder = (params[:folder] || 'Inbox').capitalize
@@ -191,6 +191,8 @@ module BenefitSponsors
           @provider = (current_user.person._id.to_s == provider_id) ? current_user.person : @broker_agency_provider
         end
 
+        # no auth required for this action: it is used to send an email for prospective brokers, which can be non-users
+        # may want to consider implementing some sort of rate limitation on this endpoint to prevent it from being abused
         def email_guide
           notice = "A copy of the Broker Registration Guide has been emailed to #{params[:email]}"
           flash[:notice] = notice

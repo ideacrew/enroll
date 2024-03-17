@@ -42,6 +42,14 @@ module BenefitSponsors
         access_to_broker_agency_profile?
       end
 
+      def staff_index?
+        return true if individual_market_admin?
+        return true if shop_market_admin?
+        return true if account_holder&.has_consumer_role?
+
+        false
+      end
+
       def family_index?
         access_to_broker_agency_profile?
       end
@@ -66,16 +74,12 @@ module BenefitSponsors
         access_to_broker_agency_profile?
       end
 
-      def inbox?
+      def messages?
         access_to_broker_agency_profile?
       end
 
-      def staff_index?
-        return true if individual_market_admin?
-        return true if shop_market_admin?
-        return true if account_holder&.has_consumer_role?
-
-        false
+      def inbox?
+        access_to_broker_agency_profile?
       end
 
       protected

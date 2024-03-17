@@ -36,6 +36,18 @@ module BenefitSponsors
       @hbx_role = account_holder_person&.hbx_staff_role
     end
 
+    # Returns the individual market role of the account holder person.
+    # The method uses memoization to store the result of the first call to it and then return that result on subsequent calls,
+    # instead of calling `account_holder_person.consumer_role` each time.
+    #
+    # @return [ConsumerRole, nil] The individual market role of the account holder person,
+    # or nil if the account holder person is not defined.
+    def individual_market_role
+      return @individual_market_role if defined? @individual_market_role
+
+      @individual_market_role = account_holder_person&.consumer_role
+    end
+
     def permission
       return @permission if defined? @permission
 

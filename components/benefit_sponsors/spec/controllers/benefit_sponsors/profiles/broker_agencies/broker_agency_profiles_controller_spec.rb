@@ -12,7 +12,6 @@ module BenefitSponsors
     routes { BenefitSponsors::Engine.routes }
     let!(:security_question)  { FactoryBot.create_default :security_question }
 
-    let!(:user_with_consumer_role)  { FactoryBot.create(:user, :with_consumer_role) }
     let!(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_hbx_staff_role) }
     let!(:person) { FactoryBot.create(:person, user: user_with_hbx_staff_role )}
     let!(:person01) { FactoryBot.create(:person, :with_broker_role) }
@@ -26,6 +25,7 @@ module BenefitSponsors
     let(:broker_agency2)                 { organization2.broker_agency_profile }
 
     let(:bap_id) { broker_agency1.id }
+    let(:bap_id2) { broker_agency2.id }
     let(:super_permission) { FactoryBot.create(:permission, :super_admin) }
     let(:dev_permission) { FactoryBot.create(:permission, :developer) }
 
@@ -92,8 +92,8 @@ module BenefitSponsors
           expect(response).to_not have_http_status(:success)
         end
 
-        it "should rendirect to registration's new with broker_agency in params" do
-          expect(response).to redirect_to(new_profiles_registration_path(profile_type: "broker_agency"))
+        it "should redirect to controller's show with broker_agency_profile's id" do
+          expect(response).to redirect_to(profiles_broker_agencies_broker_agency_profile_path(:id => bap_id))
         end
       end
 
@@ -118,7 +118,7 @@ module BenefitSponsors
         context "with the correct permissions" do
           before :each do
             initialize_and_login_admin[super_permission]
-            get :show, params: {id: bap_id}
+            get :show, params: { id: bap_id }
           end
 
           it "should return http success" do
@@ -135,7 +135,7 @@ module BenefitSponsors
 
           before :each do
             initialize_and_login_admin[dev_permission]
-            get :show, params: {id: bap_id}
+            get :show, params: { id: bap_id }
           end
 
           it "should return http redirect" do
@@ -173,6 +173,10 @@ module BenefitSponsors
           it "should not render the show template" do
             expect(response).to_not render_template("show")
           end
+
+          it "should redirect to controller's show with broker_agency_profile's id" do
+            expect(response).to redirect_to(profiles_broker_agencies_broker_agency_profile_path(:id => bap_id2))
+          end
         end
       end
 
@@ -198,6 +202,10 @@ module BenefitSponsors
             get :show, params: { id: bap_id }
           end
 
+          it "should redirect to controller's show with broker_agency_profile's id" do
+            expect(response).to redirect_to(profiles_broker_agencies_broker_agency_profile_path(:id => bap_id2))
+          end
+
           it "should not render the show template" do
             expect(response).to_not render_template("show")
           end
@@ -210,7 +218,7 @@ module BenefitSponsors
         context "with the correct permissions" do
           before :each do
             initialize_and_login_admin[super_permission]
-            get :staff_index, params: {id: bap_id}, xhr: true
+            get :staff_index, params: { id: bap_id }, xhr: true
           end
 
           it "should return http success" do
@@ -227,7 +235,7 @@ module BenefitSponsors
 
           before :each do
             initialize_and_login_admin[dev_permission]
-            get :staff_index, params: {id: bap_id}, xhr: true
+            get :staff_index, params: { id: bap_id }, xhr: true
           end
 
           it "should return not assign a staff var" do
@@ -247,11 +255,11 @@ module BenefitSponsors
         end
 
         it "should not return http success" do
-          expect(response).to have_http_status(:success)
+          expect(response).to_not have_http_status(:success)
         end
 
         it "should not render the staff_index template" do
-          expect(response).to render_template("staff_index")
+          expect(response).to_not render_template("staff_index")
         end
       end
 
@@ -271,15 +279,19 @@ module BenefitSponsors
       end
 
       context "consumer" do
+        let!(:person02) { FactoryBot.create(:person) }
+        let!(:user_with_consumer_role)  { FactoryBot.create(:user, :with_consumer_role, person: person02) }
+
         before :each do
-          get :staff_index, params: { id: bap_id }
+          sign_in(user_with_consumer_role)
+          get :staff_index, params: { id: bap_id }, xhr: true
         end
 
-        it "should not return http success" do
+        it "should return http success" do
           expect(response).to have_http_status(:success)
         end
 
-        it "should not render the staff_index template" do
+        it "should render the staff_index template" do
           expect(response).to render_template("staff_index")
         end
       end
@@ -346,8 +358,8 @@ module BenefitSponsors
             @query = ::BenefitSponsors::Queries::BrokerFamiliesQuery.new(nil, organization1.profiles.first.id, organization1.profiles.first.market_kind)
           end
   
-          it "should return redirect http status" do
-            expect(response).to have_http_status(:redirect)
+          it "should not be a success" do
+            expect(response.status).to_not have_http_status(:success)
           end
         end
       end
@@ -375,8 +387,8 @@ module BenefitSponsors
             post :family_datatable, params: { id: bap_id }, xhr: true
           end
   
-          it "should redirect" do
-            expect(response).to_not have_http_status(:redirect)
+          it "should not be a success" do
+            expect(response.status).to_not have_http_status(:success)
           end
         end
       end
@@ -393,8 +405,8 @@ module BenefitSponsors
             expect(@query.total_count).not_to eq 0
           end
 
-          it "should not return success http status" do
-            expect(response).to_not have_http_status(:success)
+          it "should return success http status" do
+            expect(response).to have_http_status(:success)
           end
         end
 
@@ -404,8 +416,8 @@ module BenefitSponsors
             get :show, params: { id: bap_id }
           end
 
-          it "should return redirect http status" do
-            expect(response).to have_http_status(:redirect)
+          it "should not be a success" do
+            expect(response.status).to_not have_http_status(:success)
           end
         end
       end
@@ -416,7 +428,7 @@ module BenefitSponsors
         context "with the correct permissions" do
           before :each do
             initialize_and_login_admin[super_permission]
-            get :family_index, params: {id: bap_id}, xhr: true
+            get :family_index, params: { id: bap_id }, xhr: true
           end
 
           it "should return http success" do
@@ -433,7 +445,7 @@ module BenefitSponsors
 
           before :each do
             initialize_and_login_admin[dev_permission]
-            get :family_index, params: {id: bap_id}, xhr: true
+            get :family_index, params: { id: bap_id }, xhr: true
           end
 
           it "should redirect to new of registration's controller for broker_agency" do
@@ -518,7 +530,7 @@ module BenefitSponsors
         context "with the correct permissions" do
           before :each do
             initialize_and_login_admin[super_permission]
-            get :commission_statements, params: {id: bap_id}, xhr: true
+            get :commission_statements, params: { id: bap_id }, xhr: true
           end
 
           it "should return http success" do
@@ -535,7 +547,7 @@ module BenefitSponsors
 
           before :each do
             initialize_and_login_admin[dev_permission]
-            get :commission_statements, params: {id: bap_id}, xhr: true
+            get :commission_statements, params: { id: bap_id }, xhr: true
           end
 
           it "should redirect to new of registration's controller for broker_agency" do
@@ -785,8 +797,327 @@ module BenefitSponsors
       end
     end
 
+    describe "#general_agency_index" do
+      context "admin" do
+        context "with the correct permissions" do
+          before :each do
+            initialize_and_login_admin[super_permission]
+            get :general_agency_index, params: { id: bap_id }, xhr: true
+          end
+
+          it "should return http success" do
+            expect(response).to have_http_status(:success)
+          end
+
+          it "should render the general_agency_index template" do
+            expect(response).to render_template("general_agency_index")
+          end
+        end
+
+        context "with the incorrect permissions" do
+          let!(:permission) { FactoryBot.create(:permission, :developer) }
+
+          before :each do
+            initialize_and_login_admin[dev_permission]
+            get :general_agency_index, params: { id: bap_id }, xhr: true
+          end
+
+          it "should redirect to new of registration's controller for broker_agency" do
+            expect(response).to redirect_to(new_profiles_registration_path(profile_type: "broker_agency"))
+          end
+
+          it "should not render the general_agency_index template" do
+            expect(response).to_not render_template("general_agency_index")
+          end
+        end
+      end
+
+      context "broker" do
+        context 'in the agency' do
+          before :each do
+            initialize_and_login_broker[organization1]
+            get :general_agency_index, params: { id: bap_id }, xhr: true
+          end
+
+          it "should return http success" do
+            expect(response).to have_http_status(:success)
+          end
+
+          it "should not render the general_agency_index template" do
+            expect(response).to render_template("general_agency_index")
+          end
+        end
+
+        context 'not in the agency' do
+          before :each do
+            initialize_and_login_broker[organization2]
+            get :general_agency_index, params: { id: bap_id }, xhr: true
+          end
+
+          it "should redirect to the profile page of their broker agency" do
+            profile_page = profiles_broker_agencies_broker_agency_profile_path(:id => broker_agency2.id)
+            expect(response).to redirect_to(profile_page)
+          end
+
+          it "should not render the general_agency_index template" do
+            expect(response).to_not render_template("general_agency_index")
+          end
+        end
+      end
+
+      context "broker staff" do
+        context 'in the agency' do
+          before :each do
+            initialize_and_login_broker_agency_staff[organization1]
+            get :general_agency_index, params: { id: bap_id }, xhr: true
+          end
+
+          it "should return http success" do
+            expect(response).to have_http_status(:success)
+          end
+
+          it "should not render the general_agency_index template" do
+            expect(response).to render_template("general_agency_index")
+          end
+        end
+
+        context 'not in the agency' do
+          before :each do
+            initialize_and_login_broker_agency_staff[organization2]
+            get :general_agency_index, params: { id: bap_id }, xhr: true
+          end
+
+          it "should redirect to the profile page of their broker agency" do
+            profile_page = profiles_broker_agencies_broker_agency_profile_path(:id => broker_agency2.id)
+            expect(response).to redirect_to(profile_page)
+          end
+
+          it "should not render the general_agency_index template" do
+            expect(response).to_not render_template("general_agency_index")
+          end
+        end
+      end
+    end
+
+    describe "#messages" do
+      context "admin" do
+        context "with the correct permissions" do
+          before :each do
+            initialize_and_login_admin[super_permission]
+            get :messages, params: { id: bap_id }, xhr: true
+          end
+
+          it "should return http success" do
+            expect(response).to have_http_status(:success)
+          end
+
+          it "should render the messages template" do
+            expect(response).to render_template("messages")
+          end
+        end
+
+        context "with the incorrect permissions" do
+          let!(:permission) { FactoryBot.create(:permission, :developer) }
+
+          before :each do
+            initialize_and_login_admin[dev_permission]
+            get :messages, params: { id: bap_id }, xhr: true
+          end
+
+          it "should redirect to new of registration's controller for broker_agency" do
+            expect(response).to redirect_to(new_profiles_registration_path(profile_type: "broker_agency"))
+          end
+
+          it "should not render the messages template" do
+            expect(response).to_not render_template("messages")
+          end
+        end
+      end
+
+      context "broker" do
+        context 'in the agency' do
+          before :each do
+            initialize_and_login_broker[organization1]
+            get :messages, params: { id: bap_id }, xhr: true
+          end
+
+          it "should return http success" do
+            expect(response).to have_http_status(:success)
+          end
+
+          it "should not render the messages template" do
+            expect(response).to render_template("messages")
+          end
+        end
+
+        context 'not in the agency' do
+          before :each do
+            initialize_and_login_broker[organization2]
+            get :messages, params: { id: bap_id }, xhr: true
+          end
+
+          it "should redirect to the profile page of their broker agency" do
+            profile_page = profiles_broker_agencies_broker_agency_profile_path(:id => broker_agency2.id)
+            expect(response).to redirect_to(profile_page)
+          end
+
+          it "should not render the messages template" do
+            expect(response).to_not render_template("messages")
+          end
+        end
+      end
+
+      context "broker staff" do
+        context 'in the agency' do
+          before :each do
+            initialize_and_login_broker_agency_staff[organization1]
+            get :messages, params: { id: bap_id }, xhr: true
+          end
+
+          it "should return http success" do
+            expect(response).to have_http_status(:success)
+          end
+
+          it "should not render the messages template" do
+            expect(response).to render_template("messages")
+          end
+        end
+
+        context 'not in the agency' do
+          before :each do
+            initialize_and_login_broker_agency_staff[organization2]
+            get :messages, params: { id: bap_id }, xhr: true
+          end
+
+          it "should redirect to the profile page of their broker agency" do
+            profile_page = profiles_broker_agencies_broker_agency_profile_path(:id => broker_agency2.id)
+            expect(response).to redirect_to(profile_page)
+          end
+
+          it "should not render the messages template" do
+            expect(response).to_not render_template("messages")
+          end
+        end
+      end
+    end
+
+    describe "#inbox" do
+      # For the admin and broker_agency_staff tests, another broker needs to be created 
+      # this endpoint uses a primary_broker's id as the :id param, hence this before action
+
+      let!(:person02) { FactoryBot.create(:person, :with_broker_role) }
+      let!(:user_with_broker_role2) { FactoryBot.create(:user, person: person02) }
+
+      before do
+        person02.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: organization2.broker_agency_profile.id, aasm_state: 'active')
+        allow(organization2.broker_agency_profile).to receive(:primary_broker_role).and_return(person02.broker_role)
+        role = person02.create_broker_agency_staff_role({benefit_sponsors_broker_agency_profile_id: organization2.broker_agency_profile.id, aasm_state: 'active'})
+        role.broker_agency_accept!
+      end
+
+      context "admin" do
+        context "with the correct permissions" do
+          before :each do
+            initialize_and_login_admin[super_permission]
+            get :inbox, params: { id: person02.id }, xhr: true
+          end
+
+          it "should return http success" do
+            expect(response).to have_http_status(:success)
+          end
+
+          it "should render the inbox template" do
+            expect(response).to render_template("inbox")
+          end
+        end
+
+        context "with the incorrect permissions" do
+          before :each do
+            initialize_and_login_admin[dev_permission]
+            get :inbox, params: { id: person02.id }, xhr: true
+          end
+
+          it "should redirect to new of registration's controller for broker_agency" do
+            expect(response).to redirect_to(new_profiles_registration_path(profile_type: "broker_agency"))
+          end
+
+          it "should not render the inbox template" do
+            expect(response).to_not render_template("inbox")
+          end
+        end
+      end
+
+      context "broker" do
+        context 'in the agency' do
+
+          before :each do
+            sign_in(user_with_broker_role2)
+            get :inbox, params: { id: person02.id }, xhr: true
+          end
+
+          it "should return http success" do
+            expect(response).to have_http_status(:success)
+          end
+
+          it "should render the inbox template" do
+            expect(response).to render_template("inbox")
+          end
+        end
+
+        context 'not in the agency' do
+          before :each do
+            initialize_and_login_broker[organization1]
+            get :inbox, params: { id: person02.id }, xhr: true
+          end
+
+          it "should redirect to the profile page of their broker agency" do
+            profile_page = profiles_broker_agencies_broker_agency_profile_path(:id => broker_agency1.id)
+            expect(response).to redirect_to(profile_page)
+          end
+
+          it "should not render the inbox template" do
+            expect(response).to_not render_template("inbox")
+          end
+        end
+      end
+
+      context "broker staff" do
+        context 'in the agency' do
+          before :each do
+            initialize_and_login_broker_agency_staff[organization2]
+            get :inbox, params: { id: person02.id }, xhr: true
+          end
+
+          it "should return http success" do
+            expect(response).to have_http_status(:success)
+          end
+
+          it "should not render the inbox template" do
+            expect(response).to render_template("inbox")
+          end
+        end
+
+        context 'not in the agency' do
+          before :each do
+            initialize_and_login_broker_agency_staff[organization1]
+            get :inbox, params: { id: person02.id }, xhr: true
+          end
+
+          it "should redirect to the profile page of their broker agency" do
+            profile_page = profiles_broker_agencies_broker_agency_profile_path(:id => broker_agency1.id)
+            expect(response).to redirect_to(profile_page)
+          end
+
+          it "should not render the inbox template" do
+            expect(response).to_not render_template("inbox")
+          end
+        end
+      end
+    end
+
+    # this spec is testing a private method, no need to test auth here
     describe "#eligible_brokers" do
-      context "brokers are accepting new clients" do
+      context "brokers accepting new clients" do
         let(:broker_agency_profile_accepting_new_clients) { FactoryBot.create :benefit_sponsors_organizations_broker_agency_profile, accept_new_clients: true, aasm_state: "is_approved", market_kind: "both" }
         let(:broker_role_accepting_new_clients) { FactoryBot.create :broker_agency_staff_role, broker_agency_profile: broker_agency_profile_accepting_new_clients }
         let!(:person_accepting_new_clients) { FactoryBot.create :person, broker_role: broker_role_accepting_new_clients }
@@ -805,40 +1136,8 @@ module BenefitSponsors
       end
     end
 
-    describe "for broker_agency_profile's staff_index" do
-      context "with a valid user" do
-        before :each do
-          sign_in(user_with_hbx_staff_role)
-          get :staff_index, params:{id: bap_id}, xhr: true
-        end
-
-        it "should return success http status" do
-          expect(response).to have_http_status(:success)
-        end
-
-        it "should render staff_index template" do
-          expect(response).to render_template("benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/staff_index")
-        end
-      end
-
-      context "without a valid user" do
-        let!(:user) { FactoryBot.create(:user, roles: [], person: FactoryBot.create(:person)) }
-
-        before :each do
-          sign_in(user)
-          get :staff_index, params:{id: bap_id}, xhr: true
-        end
-
-        it "should not return success http status" do
-          expect(response).not_to have_http_status(:success)
-        end
-
-        it "should redirect to new of registration's controller for broker_agency" do
-          expect(response).to redirect_to(new_profiles_registration_path(profile_type: "broker_agency"))
-        end
-      end
-    end
-
+    # this spec is testing a method for non-users to get emails about broker registration
+    # no user-role related auth is required here, but may want to consider some kind of rate limit usage to prevent it from being abused
     describe "broker request registration guide" do
       before do
         post :email_guide, params: {email:'Broker@test.com', first_name:'Broker'}

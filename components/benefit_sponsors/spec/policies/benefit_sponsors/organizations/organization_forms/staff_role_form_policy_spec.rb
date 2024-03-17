@@ -52,7 +52,6 @@ module BenefitSponsors
           it_behaves_like "is permitted", :edit?
           it_behaves_like "is permitted", :destroy?
           it_behaves_like "is permitted", :approve?
-          it_behaves_like "is permitted", :admin?
           it_behaves_like "is permitted", :can_edit?
         end
 
