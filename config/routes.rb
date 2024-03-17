@@ -269,7 +269,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :fdsh_ridp_verifications, format: false, only: [:create, :new, :update] do
+    resources :fdsh_ridp_verifications, format: false, only: [:create, :new] do
       collection do
         get 'failed_validation'
         get 'service_unavailable'
