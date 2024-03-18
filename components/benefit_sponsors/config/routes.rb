@@ -7,7 +7,6 @@ BenefitSponsors::Engine.routes.draw do
     end
 
     namespace :broker_agencies do
-      # removed create from broker_agency_profiles actions, made ticket to confirm deletion: https://www.pivotaltracker.com/story/show/187259493
       resources :broker_agency_profiles, format: false, only: [:new, :show, :index, :edit, :update] do
         collection do
           get :family_index
