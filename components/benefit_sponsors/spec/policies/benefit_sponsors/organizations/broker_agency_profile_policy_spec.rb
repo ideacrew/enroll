@@ -12,22 +12,38 @@ module BenefitSponsors
     let(:fake_broker_agency_profile) { instance_double(::BenefitSponsors::Organizations::BrokerAgencyProfile, :id => "34509823749514314") }
     let(:policy) { ::BenefitSponsors::Organizations::BrokerAgencyProfilePolicy.new(user, broker_agency_profile) }
 
+    before do
+      allow(user).to receive(:has_consumer_role?).and_return(false)
+    end
+
     describe "given a user with no person" do
       let(:person) { nil }
 
-      shared_examples_for "does not permit a user with no person" do |policy_type|
-        it "does not permit" do
+      shared_examples_for "is not permitted" do |policy_type|
+        it "to access #{policy_type}" do
           expect(policy.send(policy_type)).to be_falsey
         end
       end
 
-      it_behaves_like "does not permit a user with no person", :access_to_broker_agency_profile?
-      it_behaves_like "does not permit a user with no person", :redirect_signup?
-      it_behaves_like "does not permit a user with no person", :set_default_ga?
+      it_behaves_like "is not permitted", :access_to_broker_agency_profile?
+      it_behaves_like "is not permitted", :redirect_signup?
+      it_behaves_like "is not permitted", :set_default_ga?
+      it_behaves_like "is not permitted", :new?
+      it_behaves_like "is not permitted", :index?
+      it_behaves_like "is not permitted", :show?
+      it_behaves_like "is not permitted", :staff_index?
+      it_behaves_like "is not permitted", :family_index?
+      it_behaves_like "is not permitted", :family_datatable?
+      it_behaves_like "is not permitted", :commission_statements?
+      it_behaves_like "is not permitted", :show_commission_statement?
+      it_behaves_like "is not permitted", :download_commission_statement?
+      it_behaves_like "is not permitted", :general_agency_index?
+      it_behaves_like "is not permitted", :messages?
+      it_behaves_like "is not permitted", :inbox?
     end
 
     describe "given an admin" do
-      let(:hbx_staff_role) { instance_double(HbxStaffRole) }
+      let(:hbx_staff_role) { instance_double(HbxStaffRole, permission: permission) }
       let(:person) do
         instance_double(
           Person,
@@ -37,16 +53,56 @@ module BenefitSponsors
         )
       end
 
-      context "that can access a broker agency" do
-        shared_examples_for "permits admins with the right permissions" do |policy_type|
-          it "does permit" do
+      context "with higher-level access" do
+        let(:permission) { instance_double(Permission, modify_family: true) }
+
+        shared_examples_for "is permitted" do |policy_type|
+          it "to access #{policy_type}" do
             expect(policy.send(policy_type)).to be_truthy
           end
         end
 
-        it_behaves_like "permits admins with the right permissions", :access_to_broker_agency_profile?
-        it_behaves_like "permits admins with the right permissions", :redirect_signup?
-        it_behaves_like "permits admins with the right permissions", :set_default_ga?
+        it_behaves_like "is permitted", :access_to_broker_agency_profile?
+        it_behaves_like "is permitted", :redirect_signup?
+        it_behaves_like "is permitted", :set_default_ga?
+        it_behaves_like "is permitted", :new?
+        it_behaves_like "is permitted", :index?
+        it_behaves_like "is permitted", :show?
+        it_behaves_like "is permitted", :staff_index?
+        it_behaves_like "is permitted", :family_index?
+        it_behaves_like "is permitted", :family_datatable?
+        it_behaves_like "is permitted", :commission_statements?
+        it_behaves_like "is permitted", :show_commission_statement?
+        it_behaves_like "is permitted", :download_commission_statement?
+        it_behaves_like "is permitted", :general_agency_index?
+        it_behaves_like "is permitted", :messages?
+        it_behaves_like "is permitted", :inbox?
+      end
+
+      context "with insufficient access" do
+        let(:permission) { instance_double(Permission, modify_family: false) }
+
+        shared_examples_for "is not permitted" do |policy_type|
+          it "to access #{policy_type}" do
+            expect(policy.send(policy_type)).to be_falsey
+          end
+        end
+
+        it_behaves_like "is not permitted", :access_to_broker_agency_profile?
+        it_behaves_like "is not permitted", :redirect_signup?
+        it_behaves_like "is not permitted", :set_default_ga?
+        it_behaves_like "is not permitted", :new?
+        it_behaves_like "is not permitted", :index?
+        it_behaves_like "is not permitted", :show?
+        it_behaves_like "is not permitted", :staff_index?
+        it_behaves_like "is not permitted", :family_index?
+        it_behaves_like "is not permitted", :family_datatable?
+        it_behaves_like "is not permitted", :commission_statements?
+        it_behaves_like "is not permitted", :show_commission_statement?
+        it_behaves_like "is not permitted", :download_commission_statement?
+        it_behaves_like "is not permitted", :general_agency_index?
+        it_behaves_like "is not permitted", :messages?
+        it_behaves_like "is not permitted", :inbox?
       end
     end
 
@@ -69,17 +125,37 @@ module BenefitSponsors
         )
       end
 
-      shared_examples_for "permits broker agency staff with the right permissions" do |policy_type|
-        it "does permit" do
+      shared_examples_for "is permitted" do |policy_type|
+        it "to access #{policy_type}" do
           expect(policy.send(policy_type)).to be_truthy
         end
       end
 
-      it_behaves_like "permits broker agency staff with the right permissions", :access_to_broker_agency_profile?
-      it_behaves_like "permits broker agency staff with the right permissions", :redirect_signup?
-      it_behaves_like "permits broker agency staff with the right permissions", :set_default_ga?
+      it_behaves_like "is permitted", :access_to_broker_agency_profile?
+      it_behaves_like "is permitted", :redirect_signup?
+      it_behaves_like "is permitted", :set_default_ga?
+      it_behaves_like "is permitted", :new?
+      it_behaves_like "is permitted", :show?
+      it_behaves_like "is permitted", :family_index?
+      it_behaves_like "is permitted", :family_datatable?
+      it_behaves_like "is permitted", :commission_statements?
+      it_behaves_like "is permitted", :show_commission_statement?
+      it_behaves_like "is permitted", :download_commission_statement?
+      it_behaves_like "is permitted", :general_agency_index?
+      it_behaves_like "is permitted", :messages?
+      it_behaves_like "is permitted", :inbox?
+
+      it "is not permitted to access :index?" do
+        expect(policy.send(:index?)).to be_falsey
+      end
+
+      it "is not permitted to access :staff_index?" do
+        expect(policy.send(:staff_index?)).to be_falsey
+      end
     end
 
+    # it should be noted that the :index? and :staff_index? methods are not specific to broker agency profile
+    # they are omitted from the 'for a different profile' contexts because they would be redundant
     describe "given a broker agency staff role for a different profile" do
       let(:person) do
         instance_double(
@@ -99,15 +175,25 @@ module BenefitSponsors
         )
       end
 
-      shared_examples_for "does not permit agents not associated with the broker" do |policy_type|
-        it "does not permit" do
+      shared_examples_for "is not permitted" do |policy_type|
+        it "to access #{policy_type}" do
           expect(policy.send(policy_type)).to be_falsey
         end
       end
 
-      it_behaves_like "does not permit agents not associated with the broker", :access_to_broker_agency_profile?
-      it_behaves_like "does not permit agents not associated with the broker", :redirect_signup?
-      it_behaves_like "does not permit agents not associated with the broker", :set_default_ga?
+      it_behaves_like "is not permitted", :access_to_broker_agency_profile?
+      it_behaves_like "is not permitted", :redirect_signup?
+      it_behaves_like "is not permitted", :set_default_ga?
+      it_behaves_like "is not permitted", :new?
+      it_behaves_like "is not permitted", :show?
+      it_behaves_like "is not permitted", :family_index?
+      it_behaves_like "is not permitted", :family_datatable?
+      it_behaves_like "is not permitted", :commission_statements?
+      it_behaves_like "is not permitted", :show_commission_statement?
+      it_behaves_like "is not permitted", :download_commission_statement?
+      it_behaves_like "is not permitted", :general_agency_index?
+      it_behaves_like "is not permitted", :messages?
+      it_behaves_like "is not permitted", :inbox?
     end
 
     describe "given a broker role for that profile" do
@@ -129,17 +215,37 @@ module BenefitSponsors
         )
       end
 
-      shared_examples_for "permits brokers of the agency" do |policy_type|
-        it "does permit" do
+      shared_examples_for "is permitted" do |policy_type|
+        it "to access #{policy_type}" do
           expect(policy.send(policy_type)).to be_truthy
         end
       end
 
-      it_behaves_like "permits brokers of the agency", :access_to_broker_agency_profile?
-      it_behaves_like "permits brokers of the agency", :redirect_signup?
-      it_behaves_like "permits brokers of the agency", :set_default_ga?
+      it_behaves_like "is permitted", :access_to_broker_agency_profile?
+      it_behaves_like "is permitted", :redirect_signup?
+      it_behaves_like "is permitted", :set_default_ga?
+      it_behaves_like "is permitted", :new?
+      it_behaves_like "is permitted", :show?
+      it_behaves_like "is permitted", :family_index?
+      it_behaves_like "is permitted", :family_datatable?
+      it_behaves_like "is permitted", :commission_statements?
+      it_behaves_like "is permitted", :show_commission_statement?
+      it_behaves_like "is permitted", :download_commission_statement?
+      it_behaves_like "is permitted", :general_agency_index?
+      it_behaves_like "is permitted", :messages?
+      it_behaves_like "is permitted", :inbox?
+
+      it "is not permitted to access :index?" do
+        expect(policy.send(:index?)).to be_falsey
+      end
+
+      it "is not permitted to access :staff_index?" do
+        expect(policy.send(:staff_index?)).to be_falsey
+      end
     end
 
+    # it should be noted that the :index? and :staff_index? methods are not specific to broker agency profile
+    # they are omitted from the 'for a different profile' contexts because they would be redundant
     describe "given a broker role for a different profile" do
       let(:person) do
         instance_double(
@@ -170,15 +276,25 @@ module BenefitSponsors
         )
       end
 
-      shared_examples_for "does not permit brokers from a different agency" do |policy_type|
-        it "does not permit" do
+      shared_examples_for "is not permitted" do |policy_type|
+        it "to access #{policy_type}" do
           expect(policy.send(policy_type)).to be_falsey
         end
       end
 
-      it_behaves_like "does not permit brokers from a different agency", :access_to_broker_agency_profile?
-      it_behaves_like "does not permit brokers from a different agency", :redirect_signup?
-      it_behaves_like "does not permit brokers from a different agency", :set_default_ga?
+      it_behaves_like "is not permitted", :access_to_broker_agency_profile?
+      it_behaves_like "is not permitted", :redirect_signup?
+      it_behaves_like "is not permitted", :set_default_ga?
+      it_behaves_like "is not permitted", :new?
+      it_behaves_like "is not permitted", :show?
+      it_behaves_like "is not permitted", :family_index?
+      it_behaves_like "is not permitted", :family_datatable?
+      it_behaves_like "is not permitted", :commission_statements?
+      it_behaves_like "is not permitted", :show_commission_statement?
+      it_behaves_like "is not permitted", :download_commission_statement?
+      it_behaves_like "is not permitted", :general_agency_index?
+      it_behaves_like "is not permitted", :messages?
+      it_behaves_like "is not permitted", :inbox?
     end
   end
 end

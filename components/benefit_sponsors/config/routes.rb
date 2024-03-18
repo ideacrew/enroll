@@ -7,7 +7,7 @@ BenefitSponsors::Engine.routes.draw do
     end
 
     namespace :broker_agencies do
-      resources :broker_agency_profiles, format: false, only: [:new, :create, :show, :index, :edit, :update] do
+      resources :broker_agency_profiles, format: false, only: [:new, :show, :index, :edit, :update] do
         collection do
           get :family_index
           get :messages
