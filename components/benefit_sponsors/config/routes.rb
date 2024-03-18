@@ -29,8 +29,6 @@ BenefitSponsors::Engine.routes.draw do
       end
       resources :broker_applicants
 
-      resources :broker_roles
-
       resources :broker_agency_staff_roles do
         collection do
           get :search_broker_agency
@@ -111,17 +109,7 @@ BenefitSponsors::Engine.routes.draw do
   end
 
   namespace :inboxes do
-    resources :messages, only: [:show, :destroy] do
-      get :msg_to_portal
-    end
-  end
-
-  namespace :organizations do
-    resource :office_locations do
-      member do
-        get :new
-      end
-    end
+    resources :messages, only: [:show, :destroy]
   end
 
   resources :benefit_sponsorships do

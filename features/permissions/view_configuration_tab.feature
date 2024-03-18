@@ -19,7 +19,6 @@ Feature: As a Super Admin I will be the only user
       | HBX Tier3     | see    |
       | HBX Staff     | see    |
       | HBX Read Only | see    |
-      | Developer     | see    |
 
   Scenario: HBX Staff with Super Admin subroles should not have the option to time travel
     Given that a user with a HBX staff role with Super Admin subrole exists and is logged in

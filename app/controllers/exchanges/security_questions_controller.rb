@@ -1,5 +1,11 @@
+# frozen_string_literal: true
+
 class Exchanges::SecurityQuestionsController < ApplicationController
+  include ::L10nHelper
+
   layout 'single_column'
+
+  before_action :check_feature_enabled
 
   def index
     @questions = SecurityQuestion.all
@@ -43,6 +49,18 @@ class Exchanges::SecurityQuestionsController < ApplicationController
   end
 
   private
+
+  # Checks if the security questions feature is enabled.
+  # If the feature is not enabled, it sets a flash error message and redirects the user to the root path.
+  #
+  # @return [nil, ActionController::Redirecting] Returns nil if the security questions feature is enabled,
+  # otherwise it redirects the user to the root path.
+  def check_feature_enabled
+    return if Settings.aca.security_questions
+
+    flash[:error] = l10n('exchanges.security_questions.denied_access_message')
+    redirect_to root_path
+  end
 
   def security_question_params
     params.require(:security_question).permit(:title, :visible)

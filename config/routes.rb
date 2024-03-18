@@ -32,15 +32,6 @@ Rails.application.routes.draw do
     mount Sidekiq::Web => '/sidekiq'
   end
 
-  namespace :uis do
-    resources :bootstrap3_examples do
-      collection do
-        get :index
-        get :components
-        get :getting_started
-      end
-    end
-  end
   get 'datatables/*path.:json', to: 'application#resource_not_found'
   get 'insured/consumer_role/help_paying_coverage.:inc', to: 'application#resource_not_found'
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
@@ -121,14 +112,6 @@ Rails.application.routes.draw do
           post 'expire_sep_type'
           get 'clone'
         end
-      end
-    end
-
-    resources :scheduled_events do
-      collection do
-        get 'current_events'
-        get 'delete_current_event'
-        get 'list'
       end
     end
 
@@ -240,7 +223,7 @@ Rails.application.routes.draw do
     end
 
     resources :broker_applicants
-    resources :security_questions
+    resources :security_questions, only: [:index, :new, :create, :edit, :update, :destroy]
 
     # get 'hbx_profiles', to: 'hbx_profiles#welcome'
     # get 'hbx_profiles/:id', to: 'hbx_profiles#show', as: "my_account"
@@ -286,7 +269,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :fdsh_ridp_verifications, format: false, only: [:create, :new, :update] do
+    resources :fdsh_ridp_verifications, format: false, only: [:create, :new] do
       collection do
         get 'failed_validation'
         get 'service_unavailable'
@@ -501,7 +484,6 @@ Rails.application.routes.draw do
 
   match 'broker_registration', to: redirect('benefit_sponsors/profiles/registrations/new?profile_type=broker_agency'), via: [:get]
   # match 'general_agency_registration', to: redirect('benefit_sponsors/profiles/registrations/new?profile_type=general_agency'), via: [:get]
-  match 'check_ach_routing_number', to: 'broker_agencies/broker_roles#check_ach_routing', via: [:get]
 
   namespace :carriers do
     resources :carrier_profiles do
@@ -510,9 +492,6 @@ Rails.application.routes.draw do
 
   namespace :broker_agencies do
     root 'profiles#new'
-    resources :inboxes, only: [:new, :create, :show, :destroy] do
-      get :msg_to_portal
-    end
     resources :profiles, only: [:new, :create, :show, :index, :edit, :update] do
       get :inbox
 
@@ -540,20 +519,6 @@ Rails.application.routes.draw do
 
       resources :applicants
     end
-    resources :broker_roles, only: [:create] do
-      root 'broker_roles#new_broker'
-      collection do
-        get :new_broker
-        get :new_staff_member
-        get :new_broker_agency
-        get :search_broker_agency
-        post :email_guide
-      end
-      member do
-        get :favorite
-      end
-    end
-
 
     resources :broker_roles do
 
@@ -675,14 +640,12 @@ Rails.application.routes.draw do
       get :claim
     end
   end
-  resources :office_locations, only: [:new]
 
   get "document/download/:bucket/:key" => "documents#download", as: :document_download
   get "document/authorized_download/:model/:model_id/:relation/:relation_id" => "documents#authorized_download", as: :authorized_document_download
   get "document/cartafact_download/:model/:model_id/:relation/:relation_id" => "documents#cartafact_download", as: :cartafact_document_download
 
-  resources :documents, only: [:new, :create, :destroy, :update] do
-    get :document_reader,on: :member
+  resources :documents, only: [:destroy] do
     get :autocomplete_organization_legal_name, :on => :collection
     collection do
       put :change_person_aasm_state
@@ -692,13 +655,7 @@ Rails.application.routes.draw do
       get :enrollment_verification
       put :extend_due_date
       get :fed_hub_request
-      post 'download_documents'
-      post 'delete_documents'
       post :fed_hub_request
-    end
-
-    member do
-      get :download_employer_document
     end
   end
 
@@ -760,8 +717,6 @@ Rails.application.routes.draw do
   #   end
   #
   # You can have the root of your site routed with "root"
-
-  # API check_ach_routing
 
   resources :external_applications, only: [:show]
 

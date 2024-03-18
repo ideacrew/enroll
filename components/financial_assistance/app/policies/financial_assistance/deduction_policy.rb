@@ -19,13 +19,15 @@ module FinancialAssistance
       @family ||= record._parent.application.family
     end
 
-    # Determines if the current user has permission to perform a step.
-    # The user can perform a step if they are a primary family member in the individual market, an active associated broker in the individual market who has verified their identity, or an admin in the individual market.
+    # Determines if the current user has permission to proceed to the next step in the deduction process.
+    # The user can proceed if they are a primary family member,
+    # an active associated broker staff, an active associated broker, or an admin in the individual market.
     #
-    # @return [Boolean] Returns true if the user has permission to perform a step, false otherwise.
+    # @return [Boolean] Returns true if the user has permission to proceed to the next step, false otherwise.
     def step?
       return true if individual_market_primary_family_member?
-      return true if active_associated_individual_market_ridp_verified_family_broker?
+      return true if active_associated_individual_market_family_broker_staff?
+      return true if active_associated_individual_market_family_broker?
       return true if individual_market_admin?
 
       false

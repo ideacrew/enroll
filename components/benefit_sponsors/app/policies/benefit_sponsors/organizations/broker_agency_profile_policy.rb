@@ -1,6 +1,16 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Organizations
-    class BrokerAgencyProfilePolicy < ApplicationPolicy
+    # NOTE: for now this class is inheriting from BenefitSponsors::ApplicationPolicy, due to not being able to pass the GHAs
+    # Once the GHA workflow has been updated, this will inherit from the main app ApplicationPolicy
+    class BrokerAgencyProfilePolicy < BenefitSponsors::ApplicationPolicy
+
+      # NOTE: this method is only used by the BrokerAgencyProfileStaffRolesController
+      def new?
+        access_to_broker_agency_profile?
+      end
+
       def redirect_signup?
         access_to_broker_agency_profile?
       end
@@ -21,8 +31,8 @@ module BenefitSponsors
       protected
 
       def has_matching_broker_agency_staff_role?
-        staff_roles = user.person.broker_agency_staff_roles || []
-        staff_roles.any? do |sr|
+        staff_roles = account_holder_person&.broker_agency_staff_roles || []
+        staff_roles&.any? do |sr|
           sr.active? &&
             (
               sr.broker_agency_profile_id == record.id ||
@@ -32,10 +42,10 @@ module BenefitSponsors
       end
 
       def has_matching_broker_role?
-        broker_role = user.person.broker_role
+        broker_role = account_holder_person.broker_role
         return false unless broker_role
 
-        broker_role.benefit_sponsors_broker_agency_profile_id == record.id && broker_role.active?
+        broker_role&.benefit_sponsors_broker_agency_profile_id == record.id && broker_role&.active?
       end
     end
   end

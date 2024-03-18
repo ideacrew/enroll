@@ -24,7 +24,7 @@ class WelcomeController < ApplicationController
   private
 
   def set_cookie_attributes
-    response.headers['Set-Cookie'] = "_session_id=#{session.id}; SameSite=Strict; Secure=true"
+    response.headers['Set-Cookie'] = "_session_id=#{session.id}; SameSite=Strict; Secure=true; HttpOnly"
     response.headers['Strict-Transport-Security'] = "max-age=31536000; includeSubDomains; preload"
   end
 
