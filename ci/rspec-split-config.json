@@ -1278,7 +1278,8 @@
       "components/benefit_sponsors/spec/models/benefit_sponsors/model_events/initial_employer_first_reminder_to_publish_plan_year_spec.rb",
       "spec/models/group_selection_prevarication_adapter_spec.rb",
       "components/benefit_sponsors/spec/models/benefit_sponsors/model_events/initial_employer_final_reminder_to_publish_plan_year_spec.rb",
-      "spec/script/daily_faa_submission_report_spec.rb"
+      "spec/script/daily_faa_submission_report_spec.rb",
+      "components/financial_assistance/spec/domain/financial_assistance/operations/applications/auto_extend_income_evidence_spec.rb"
     ]
   },
   {
