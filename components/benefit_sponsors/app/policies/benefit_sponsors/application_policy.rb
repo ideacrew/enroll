@@ -1,4 +1,4 @@
-# # frozen_string_literal: true
+# frozen_string_literal: true
 
 module BenefitSponsors
   # Not currently being used -- policies should all inherit from the main app (::ApplicationPolicy)

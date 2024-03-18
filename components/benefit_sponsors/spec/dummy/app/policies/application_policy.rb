@@ -1,4 +1,7 @@
-class ApplicationPolicy
+# frozen_string_literal: true
+
+# used to simulate inheriting from the main app's ApplicationPolicy in the GHAs
+class ApplicationPolicy # rubocop:disable Metrics/ClassLength
   attr_reader :user, :record, :family
 
   def initialize(user, record)
@@ -240,7 +243,7 @@ class ApplicationPolicy
     individual_market_admin?
   end
 
-  def active_associated_shop_market_family_broker?
+  def active_associated_shop_market_family_broker? # rubocop:disable Metrics/CyclomaticComplexity
     broker = account_holder_person&.broker_role
     broker_staff_roles = account_holder_person&.broker_agency_staff_roles&.active
 
@@ -498,7 +501,7 @@ class ApplicationPolicy
     Pundit.policy_scope!(user, record.class)
   end
 
-  def read_all?
+  def read_all? # rubocop:disable Metrics/CyclomaticComplexity
     @user.has_role? :employer_staff or
       @user.has_role? :employee or
       @user.has_role? :broker or
@@ -518,6 +521,7 @@ class ApplicationPolicy
       @user.has_role? :csr
   end
 
+  # used to simulate inheriting from the main app's ApplicationPolicy in the GHAs
   class Scope
     attr_reader :user, :scope
 
