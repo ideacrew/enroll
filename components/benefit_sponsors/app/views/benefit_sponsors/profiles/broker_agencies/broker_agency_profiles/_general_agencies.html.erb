@@ -61,11 +61,6 @@
           <tbody>
             <td id="ga-<%= general_agency_profile.id %>">
               <%= general_agency_profile.legal_name %>
-              <% if @broker_role.present? %>
-                <%= link_to main_app.favorite_broker_agencies_broker_role_path(id: @broker_role.id, general_agency_profile_id: general_agency_profile.id), remote: true do %>
-                  <span class="glyphicon <%= favorite_class(@broker_role, general_agency_profile) %>" aria-hidden="true" data-toggle="tooltip" title= "<%= l10n('broker_agencies.profiles.favorite_general_agency_title') %>"></span>
-                <% end %>
-              <% end %>
             </td>
             <td><%= general_agency_profile.dba %></td>
             <td><%= general_agency_profile.fein %></td>
