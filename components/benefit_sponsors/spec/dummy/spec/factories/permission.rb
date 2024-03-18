@@ -23,6 +23,10 @@ FactoryBot.define do
       can_edit_broker_agency_profile { true }
     end
 
+    trait :developer do
+      modify_family { false }
+    end
+
     trait :hbx_csr_tier1 do
       can_edit_osse_eligibility {false}
       can_add_sep { true }
