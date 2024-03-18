@@ -7,8 +7,11 @@ Feature: Consumer verification process
     And validate_and_record_publish_application_errors feature is enabled
     And a family with financial application and applicants in determined state exists with unverified evidences
     And the user is RIDP verified
-    And the user with hbx_staff role is logged in
+    Given an HBX admin exists
+    And the HBX admin is logged in
     When admin visits home page
+    When Hbx Admin click Families link
+    Then Hbx Admin clicks on a family member
     And Individual clicks on Documents link
     Then Individual should see cost saving documents for evidences
     And Admin clicks on esi evidence action dropdown
