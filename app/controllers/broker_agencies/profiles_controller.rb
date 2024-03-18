@@ -20,9 +20,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     "5"     => "employer_profile.plan_years.start_on"
   }
 
-  def new
-    @organization = ::Forms::BrokerAgencyProfile.new
-  end
+
 
   def create
     @organization = ::Forms::BrokerAgencyProfile.new(params.permit(:organization))
