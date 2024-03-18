@@ -210,7 +210,9 @@ And(/^.+ selects (.*) for coverage$/) do |coverage|
 end
 
 Then(/^the question "(.*)" is displayed$/) do |question|
-  expect(page).to have_content(question)
+  page_text = page.text.gsub("\n", ' ')
+
+  expect(page_text).to include(question)
 end
 
 Then(/^the question "(.*)" is not displayed$/) do |question|
