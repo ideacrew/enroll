@@ -36,23 +36,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
     end
   end
 
-  def employers
-    if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
-      @orgs = Organization.by_broker_agency_profile(@broker_agency_profile._id)
-    else
-      broker_role_id = current_user.person.broker_role.id
-      @orgs = Organization.by_broker_role(broker_role_id)
-    end
-    @memo = {}
-    @broker_role = current_user.person.broker_role || nil
-    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
-  end
-
-  def manage_employers
-    @general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_profile_id])
-    @employers = @general_agency_profile.employer_clients
-  end
-
   def agency_messages
     @sent_box = true
     @broker_agency_profile = current_user.person.broker_agency_staff_roles.first.broker_agency_profile
