@@ -21,7 +21,7 @@ class ApplicationPolicy
   def account_holder_person
     return @account_holder_person if defined? @account_holder_person
 
-    @account_holder_person = account_holder.person
+    @account_holder_person = account_holder&.person
   end
 
   # Returns the individual market role of the account holder person.
