@@ -28,14 +28,6 @@
               <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Brokers"></span>
             <%# end %>
           </li>
-          <!-- Hidden due to request in 18558
-          <li role="presentation" id="inbox-tab" <%= menu_tab_class(active_tab, "inbox-tab") %>>
-            <%#= link_to(agency_messages_broker_agencies_profiles_path(id: @broker_agency_profile), :remote => true, "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab") do  %>
-              <span class="badge message-unread"><%=begin; @broker_agency_profile.inbox.unread_messages.try(:count); rescue; return 0; end %></span>
-              <%= l10n("broker_agencies.profiles.agency_mail")%>
-            <%# end %>
-          </li>
-          -->
         <% end %>
         <li role="presentation" id="general-agency-tab" <%= menu_tab_class(active_tab, "general-agency-tab") %>>
           <!--TODO: Enable Link when GA is moved to the Engine-->
