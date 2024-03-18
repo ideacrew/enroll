@@ -617,9 +617,7 @@ function saveProposalAndPublish(event) {
   event.preventDefault();
   event.stopImmediatePropagation();
   data = buildBenefitGroupParams();
-  if (proposalIsInvalid(data)) {
-
-  } else {
+  if (!proposalIsInvalid(data)) {
     var url = $("#benefit_groups_url").val();
     $.ajax({
       type: "POST",
