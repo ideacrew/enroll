@@ -188,9 +188,10 @@ Then(/Employee should see (.*?) page with "(.*?)" as coverage effective date/) d
                  end
 
   find('.coverage_effective_date', text: effective_on.strftime("%m/%d/%Y"), wait: 5)
-
   if screen == "coverage summary"
     find('.interaction-click-control-confirm').click
+  elsif EnrollRegistry[:enroll_app].setting(:state_abbreviation).item == "DC"
+    find('.interaction-click-control-go-to-my-account').click
   else
     find('.interaction-click-control-continue-to-my-account').click
   end
