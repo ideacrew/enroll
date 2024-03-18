@@ -10,7 +10,7 @@ module FinancialAssistance
     before_action :find_type
 
     def update_evidence
-      authorize @evidence, :update_evidence?
+      authorize @applicant, :edit?
       update_reason = params[:verification_reason]
       admin_action = params[:admin_action]
       reasons_list = FinancialAssistance::Evidence::VERIFY_REASONS + FinancialAssistance::Evidence::REJECT_REASONS

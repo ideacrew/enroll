@@ -37,14 +37,6 @@ module Eligibilities
       allowed_to_modify?
     end
 
-    # Determines if the current user has permission to update evidence.
-    # The user can update evidence if they have permission to edit the associated Applicant.
-    #
-    # @return [Boolean] Returns true if the user has permission to update evidence, false otherwise.
-    def update_evidence?
-      FinancialAssistance::ApplicantPolicy.new(user, @applicant).edit?
-    end
-
     # Determines if the current user has permission to extend due date for evidence.
     # The user can extend due date if they have permission to edit the associated Applicant.
     #

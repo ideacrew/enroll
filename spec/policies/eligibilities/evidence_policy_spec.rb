@@ -81,12 +81,6 @@ RSpec.describe Eligibilities::EvidencePolicy, type: :policy do
         end
       end
 
-      context '#update_evidence?' do
-        it 'returns the result of FinancialAssistance::ApplicantPolicy#edit?' do
-          expect(policy.update_evidence?).to be_truthy
-        end
-      end
-
       context '#extend_due_date?' do
         it 'returns the result of #extend_due_date?' do
           expect(policy.extend_due_date?).to be_truthy
@@ -127,12 +121,6 @@ RSpec.describe Eligibilities::EvidencePolicy, type: :policy do
           it 'returns true' do
             expect(policy.send(:allowed_to_modify?)).to be false
           end
-        end
-      end
-
-      context '#update_evidence?' do
-        it 'returns the result of FinancialAssistance::ApplicantPolicy#edit?' do
-          expect(policy.update_evidence?).to be_falsey
         end
       end
 
@@ -180,12 +168,6 @@ RSpec.describe Eligibilities::EvidencePolicy, type: :policy do
       end
     end
 
-    context '#update_evidence?' do
-      it 'returns the result of FinancialAssistance::ApplicantPolicy#edit?' do
-        expect(policy.update_evidence?).to be_falsey
-      end
-    end
-
     context '#extend_due_date?' do
       it 'returns the result of #extend_due_date?' do
         expect(policy.extend_due_date?).to be_falsey
@@ -230,12 +212,6 @@ RSpec.describe Eligibilities::EvidencePolicy, type: :policy do
         it 'returns true' do
           expect(policy.send(:allowed_to_modify?)).to be false
         end
-      end
-    end
-
-    context '#update_evidence?' do
-      it 'returns the result of FinancialAssistance::ApplicantPolicy#edit?' do
-        expect(policy.update_evidence?).to be_falsey
       end
     end
 
@@ -324,15 +300,6 @@ RSpec.describe Eligibilities::EvidencePolicy, type: :policy do
         end
       end
 
-      context '#update_evidence?' do
-        before do
-          consumer_role.move_identity_documents_to_verified
-        end
-        it 'returns the result of FinancialAssistance::ApplicantPolicy#edit?' do
-          expect(policy.update_evidence?).to be_truthy
-        end
-      end
-
       context '#extend_due_date?' do
         it 'returns the result of #extend_due_date?' do
           expect(policy.extend_due_date?).to be_falsey
@@ -362,12 +329,6 @@ RSpec.describe Eligibilities::EvidencePolicy, type: :policy do
       context '#can_destroy?' do
         it 'returns the result of #allowed_to_modify?' do
           expect(policy.can_destroy?).to be_falsey
-        end
-      end
-
-      context '#update_evidence?' do
-        it 'returns the result of FinancialAssistance::ApplicantPolicy#edit?' do
-          expect(policy.update_evidence?).to be_falsey
         end
       end
 
