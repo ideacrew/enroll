@@ -71,7 +71,7 @@ class BrokerHealthBenefitsPage
     '#publishPlanDesignProposal'
   end
 
-  def self.select_refrence_plan
+  def self.select_reference_plan
     'input[name="reference_plan"]'
   end
 end

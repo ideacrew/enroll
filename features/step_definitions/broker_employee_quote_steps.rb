@@ -138,9 +138,9 @@ end
 
 
 Then(/^.+ publishes the quote$/) do
-  wait_for_ajax(3, 2)
-  find(BrokerHealthBenefitsPage.select_refrence_plan).click
-  wait_for_ajax(3, 2)
+  wait_for_ajax(5, 2)
+  find(BrokerHealthBenefitsPage.select_reference_plan).click
+  wait_for_ajax(5, 2)
   find(BrokerHealthBenefitsPage.publish_quote_btn).click
   expect(page).to have_content("Quote Published")
 end

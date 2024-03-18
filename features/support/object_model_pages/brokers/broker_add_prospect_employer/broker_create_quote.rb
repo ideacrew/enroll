@@ -8,7 +8,7 @@ class BrokerCreateQuotePage
   end
 
   def self.select_start_on_dropdown
-    'div[class="selectric"] span'
+    'div.selectric span'
   end
 
   def self.select_start_on_date
