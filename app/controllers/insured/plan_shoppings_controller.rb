@@ -16,7 +16,7 @@ class Insured::PlanShoppingsController < ApplicationController
   before_action :validate_rating_address, only: [:show]
 
   def checkout
-    (redirect_back(fallback_location: :back) and return) unless agreed_to_thankyou_page_terms
+    (redirect_back(fallback_location: :back) and return) unless agreed_to_thankyou_ivl_page_terms
 
     authorize @hbx_enrollment, :checkout?
     @enrollment = @hbx_enrollment
@@ -276,12 +276,14 @@ class Insured::PlanShoppingsController < ApplicationController
 
   private
 
-  # Determines if the user has agreed to the terms on the thank you page.
+  # Determines if the user has agreed to the terms on the individual market thank you page.
   # The user has agreed if the 'thankyou_page_agreement_terms' parameter is set to 'agreed'.
+  # This check is only performed for enrollments of individual market kinds.
   #
-  # @return [Boolean] Returns true if the user has agreed to the terms, false otherwise.
+  # @return [Boolean] Returns true if the user has agreed to the terms or the enrollment is not of individual market kind, false otherwise.
   # @note This method sets a flash error message if the user has not agreed to the terms.
-  def agreed_to_thankyou_page_terms
+  def agreed_to_thankyou_ivl_page_terms
+    return true unless HbxEnrollment::IVL_KINDS.include?(@hbx_enrollment.kind)
     return true if params['thankyou_page_agreement_terms'] == 'agreed'
 
     flash[:error] = l10n('insured.plan_shopping.thankyou.agreement_terms_conditions')
