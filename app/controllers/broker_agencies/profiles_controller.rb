@@ -36,10 +36,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
     end
   end
 
-  def agency_messages
-    @sent_box = true
-    @broker_agency_profile = current_user.person.broker_agency_staff_roles.first.broker_agency_profile
-  end
 
   def redirect_to_show(broker_agency_profile_id)
     redirect_to broker_agencies_profile_path(id: broker_agency_profile_id)
