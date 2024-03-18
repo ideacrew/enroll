@@ -30,12 +30,6 @@ module AccessPolicies
       controller.redirect_to_show(broker_agency_profile.id)
     end
 
-    def authorize_set_default_ga(controller, broker_agency_profile)
-      return true if user.has_hbx_staff_role? || user.has_broker_role?
-
-      controller.redirect_to_show(broker_agency_profile.id)
-    end
-
     def view_families(general_agency)
       return false unless user
       return true if user.has_hbx_staff_role?
