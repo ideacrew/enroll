@@ -48,82 +48,9 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
   end
 
-  def employer_datatable
-    order_by = EMPLOYER_DT_COLUMN_TO_FIELD_MAP[params[:order]["0"][:column]].try(:to_sym)
-
-    cursor        = params[:start]  || 0
-    page_size     = params[:length] || 10
-
-    is_search = false
-
-    dt_query = extract_datatable_parameters
-
-    if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
-      @orgs = Organization.unscoped.by_broker_agency_profile(@broker_agency_profile._id)
-    else
-      broker_role_id = current_user.person.broker_role.id
-      @orgs = Organization.unscoped.by_broker_role(broker_role_id)
-    end
-
-    #commented not using code to fix brakeman errors
-    # if order_by.present?
-    #   If searching on column 5 (PY start_on), also sort by aasm_state
-    #   @orgs = params[:order]["0"][:column] == 5 ? @orgs.order_by(:'employer_profile.plan_years.aasm_state'.asc, order_by.send(params[:order]["0"][:dir])) : @orgs.order_by(order_by.send(params[:order]["0"][:dir]))
-    # end
-
-    total_records = @orgs.count
-
-    if params[:search][:value].present?
-      @orgs = @orgs.where(legal_name: /.*#{dt_query.search_string}.*/i)
-      is_search = true
-    end
-
-    employer_profiles = @orgs.skip(dt_query.skip).limit(dt_query.take).map { |o| o.employer_profile } unless @orgs.blank?
-    employer_ids = employer_profiles.present? ? employer_profiles.map(&:id) : []
-    @census_totals = Hash.new(0)
-    census_member_counts = CensusMember.collection.aggregate([
-      { "$match" => {aasm_state: {"$in"=> CensusEmployee::EMPLOYMENT_ACTIVE_STATES}, employer_profile_id: {"$in" => employer_ids}}},
-      { "$group" => {"_id" => "$employer_profile_id", "count" => {"$sum" => 1}}}
-    ])
-    census_member_counts.each do |cmc|
-      @census_totals[cmc["_id"]] = cmc["count"]
-    end
-    @memo = {}
-
-    @records_filtered = is_search ? @orgs.count : total_records
-    @total_records = total_records
-    broker_role = current_user.person.broker_role || nil
-    if general_agency_is_enabled?
-      @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(broker_role, approved_only: true)
-    end
-    @draw = dt_query.draw
-    @employer_profiles = employer_profiles.present? ? employer_profiles : []
-    render
-  end
-
-  def assign_history
-    page_string = params.permit(:gas_page)[:gas_page]
-    page_no = page_string.blank? ? nil : page_string.to_i
-
-    if current_user.has_hbx_staff_role?
-      @general_agency_account_history = Kaminari.paginate_array(GeneralAgencyAccount.all).page page_no
-    elsif current_user.has_broker_role? && current_user.person.broker_role.present?
-      broker_role_id = @broker_agency_profile.present? ? @broker_agency_profile.primary_broker_role_id : current_user.person.broker_role.id
-      @general_agency_account_history = Kaminari.paginate_array(GeneralAgencyAccount.find_by_broker_role_id(broker_role_id)).page page_no
-    else
-      @general_agency_account_history = Kaminari.paginate_array(Array.new)
-    end
-  end
-
   def manage_employers
     @general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_profile_id])
     @employers = @general_agency_profile.employer_clients
-  end
-
-  def messages
-    @sent_box = true
-    @provider = Person.find(params["id"])
-    @broker_agency_profile = BrokerAgencyProfile.find(params[:profile_id])
   end
 
   def agency_messages
