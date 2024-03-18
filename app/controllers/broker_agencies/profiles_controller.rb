@@ -11,7 +11,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
   before_action :set_current_person, only: [:staff_index]
   before_action :check_general_agency_profile_permissions_assign, only: [:assign, :update_assign, :clear_assign_for_employer, :assign_history]
   before_action :check_general_agency_profile_permissions_set_default, only: [:set_default_ga]
-  before_action :redirect_unless_general_agency_is_enabled?, only: [:assign, :update_assign]
 
   layout 'single_column'
 
@@ -20,10 +19,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
     "4"     => "employer_profile.aasm_state",
     "5"     => "employer_profile.plan_years.start_on"
   }
-
-  def index
-    @broker_agency_profiles = BrokerAgencyProfile.all
-  end
 
   def new
     @organization = ::Forms::BrokerAgencyProfile.new
@@ -38,45 +33,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
     else
       flash[:error] = "Failed to create Broker Agency Profile"
       render "new"
-    end
-  end
-
-  def update
-    sanitize_broker_profile_params
-
-    # lookup by the origanization and not BrokerAgencyProfile
-    broker_agency_profile = ::Forms::BrokerAgencyProfile.new(params.permit(:organization))
-
-    @organization = Organization.find(params[:organization][:id])
-    @organization_dup = @organization.office_locations.as_json
-
-    #clear office_locations, don't worry, we will recreate
-
-    authorize @organization.broker_agency_profile, :update?
-
-    @organization.assign_attributes(:office_locations => [])
-    @organization.save(validate: false)
-    person = @broker_agency_profile.primary_broker_role.person
-    person.update_attributes(person_profile_params)
-    @broker_agency_profile.update_attributes(languages_spoken_params.merge(ach_account_number: broker_agency_profile.ach_record.account_number, ach_routing_number: broker_agency_profile.ach_record.routing_number))
-
-    if @organization.update_attributes(broker_profile_params)
-      office_location = @organization.primary_office_location
-      if office_location.present?
-        update_broker_phone(office_location, person)
-      end
-
-      flash[:notice] = "Successfully Update Broker Agency Profile"
-      redirect_to broker_agencies_profile_path(@broker_agency_profile)
-    else
-
-      @organization.assign_attributes(:office_locations => @organization_dup)
-      @organization.save(validate: false)
-
-      flash[:error] = "Failed to Update Broker Agency Profile"
-      #render "edit"
-      redirect_to broker_agencies_profile_path(@broker_agency_profile)
-
     end
   end
 
