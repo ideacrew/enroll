@@ -153,9 +153,7 @@ module PortalHeaderHelper
     class_string = broker_agency_profile.class.to_s.demodulize
     klass_name = ["BrokerAgencyProfile"].include?(class_string) ? class_string.constantize : nil
 
-    if broker_agency_profile.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)
-      benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(id: @broker_role.benefit_sponsors_broker_agency_profile_id)
-    end
+    benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(id: @broker_role.benefit_sponsors_broker_agency_profile_id) if broker_agency_profile.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)
   end
   # rubocop:enable Naming/AccessorMethodName
 
