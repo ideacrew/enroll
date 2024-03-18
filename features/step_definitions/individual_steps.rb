@@ -211,7 +211,6 @@ end
 
 Then(/^the question "(.*)" is displayed$/) do |question|
   page_text = page.text.gsub("\n", ' ')
-
   expect(page_text).to include(question)
 end
 
@@ -266,7 +265,8 @@ And(/(.*) selects eligible immigration status$/) do |text|
   else
     find(:xpath, '//label[@for="person_us_citizen_false"]').click
     if EnrollRegistry[:immigration_status_checkbox].enabled?
-      find('#person_eligible_immigration_status').click
+      peis_checkbox = find('#person_eligible_immigration_status')
+      peis_checkbox.checked? ? peis_checkbox.double_click : peis_checkbox.click
     else
       find('label[for=person_eligible_immigration_status_true]').click
       choose 'person_eligible_immigration_status_true', visible: false, allow_label_click: true
@@ -339,7 +339,8 @@ end
 
 When(/click eligible immigration status yes/) do
   if EnrollRegistry[:immigration_status_checkbox].enabled?
-    find('#person_eligible_immigration_status').click
+    peis_checkbox = find('#person_eligible_immigration_status')
+    peis_checkbox.checked? ? peis_checkbox.double_click : peis_checkbox.click
   else
     find('label[for=person_eligible_immigration_status_true]', wait: 20).click
     choose 'person_eligible_immigration_status_true', visible: false, allow_label_click: true
