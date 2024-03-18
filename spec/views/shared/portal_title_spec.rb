@@ -8,7 +8,10 @@ RSpec.describe "layouts/_header.html.erb", :dbclean => :around_each do
   let(:benefit_sponsor)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
   let(:employer_profile)    { benefit_sponsor.employer_profile }
   let(:active_employer_staff_role) {FactoryBot.create(:benefit_sponsor_employer_staff_role, person: person_user, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
-  let(:this_broker_agency_profile){FactoryBot.create(:broker_agency_profile)}
+  let!(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+  let(:organization_with_hbx_profile)  { site.owner_organization }
+  let!(:organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+  let(:this_broker_agency_profile){organization.broker_agency_profile}
   let(:signed_in?){ true }
   let(:broker_role) { FactoryBot.create(:broker_role, :aasm_state => 'active', broker_agency_profile: this_broker_agency_profile) }
   let(:broker_agency_staff_role) {FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: this_broker_agency_profile.id, person: person_user, broker_agency_profile: this_broker_agency_profile, aasm_state: 'active')}
