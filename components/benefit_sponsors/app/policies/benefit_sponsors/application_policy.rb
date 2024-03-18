@@ -2,8 +2,8 @@
 
 module BenefitSponsors
   # Policy used for auth in the BenefitSponsors app when running rspec from a GHA
-  # For the time being there is no way to pass the GHAs without pulling from the BenefitSponsors
-  # All "building blocks" have been select from existing methods in the main app ApplicationPolicy for ease of transition
+  # For the time being there is no way to pass the GHAs without pulling from the BenefitSponsors::ApplicationPolicy
+  # All "building blocks" have been selected from existing methods in the main app ApplicationPolicy for ease of transition
   class ApplicationPolicy
     attr_reader :user, :record
 

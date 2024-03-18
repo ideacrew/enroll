@@ -28,9 +28,8 @@ module BenefitSponsors
         }.freeze
 
         def index
-          # the _authorize_ method without a BrokerAgencyProfile instance must be called in this format due to the policy not directly corresponding to the controller
-          # calling _authorize_ with no args here will look for a BenefitSponsors::Profiles::BrokerAgencies::BrokerAgencyProfilePolicy instead of a BenefitSponsors::Organizations::BrokerAgencyProfilePolicy
-          authorize [:benefit_sponsors, :organizations, :broker_agency_profile]
+          # a specific instance of BenefitSponsors::Organizations::BrokerAgencyProfile is not needed to test this endpoint
+          authorize BenefitSponsors::Organizations::BrokerAgencyProfile
           @broker_agency_profiles = BenefitSponsors::Organizations::Organization.broker_agency_profiles.map(&:broker_agency_profile)
         end
 
@@ -43,7 +42,8 @@ module BenefitSponsors
         end
 
         def staff_index
-          authorize [:benefit_sponsors, :organizations, :broker_agency_profile]
+          # a specific instance of BenefitSponsors::Organizations::BrokerAgencyProfile is not needed to test this endpoint
+          authorize BenefitSponsors::Organizations::BrokerAgencyProfile
           @q = params.permit(:q)[:q]
           @staff = eligible_brokers
           @page_alphabets = page_alphabets(@staff, "last_name")
