@@ -61,14 +61,6 @@ module Eligibilities
       HbxProfilePolicy.new(user, @applicant).can_extend_due_date?
     end
 
-    # Determines if the current user has permission to perform an edit.
-    # The user can perform an edit if they are a primary family member in the individual market, an active associated broker in the individual market who has verified their identity, or an admin in the individual market.
-    #
-    # @return [Boolean] Returns true if the user has permission to perform an edit, false otherwise.
-    def edit?
-      FinancialAssistance::ApplicantPolicy.new(user, @applicant).edit?
-    end
-
     private
 
     # Determines if the user is allowed to modify an Evidence record.
