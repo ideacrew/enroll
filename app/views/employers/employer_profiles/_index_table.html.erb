@@ -36,7 +36,7 @@
       <% else %>
       <%- if er.active_broker_agency_account.present? %>
         <% broker_agency_profile = er.active_broker_agency_account.broker_agency_profile %>
-        <td><%= link_to broker_agency_profile.legal_name, broker_agencies_profile_path(broker_agency_profile) %></td>
+        <td><%#= link_to broker_agency_profile.legal_name, broker_agencies_profile_path(broker_agency_profile) %></td>
       <%- else %>
         <td>None selected</td>
       <% end %>

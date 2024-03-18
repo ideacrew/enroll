@@ -26,10 +26,4 @@ module Config::AcaConcern
   def general_agency_is_enabled?
     EnrollRegistry.feature_enabled?(:general_agency)
   end
-
-  def redirect_unless_general_agency_is_enabled?
-    return if EnrollRegistry.feature_enabled?(:general_agency)
-    flash[:error] = "General Agencies are not supported by this Exchange"
-    redirect_to broker_agencies_profile_path(@broker_agency_profile)
-  end
 end
