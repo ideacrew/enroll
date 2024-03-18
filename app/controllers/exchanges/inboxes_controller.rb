@@ -3,7 +3,7 @@ class Exchanges::InboxesController < InboxesController
   before_action :check_inbox_tab_enabled
 
   def find_inbox_provider
-    authorize :hbx_profile
+    authorize HbxProfile, :inbox?
     @inbox_provider = HbxProfile.find(params["id"])
     @inbox_provider_name = "System Admin"
   end

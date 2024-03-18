@@ -411,10 +411,6 @@ class HbxProfilePolicy < ApplicationPolicy
     end
   end
 
-  def inbox?
-    index?
-  end
-
   def create?
     new?
   end
