@@ -988,7 +988,8 @@
       "spec/domain/operations/products/fetch_silver_products_spec.rb",
       "spec/data_migrations/expire_conversion_employers_spec.rb",
       "spec/views/people/landing_pages/_peronal.html.erb_spec.rb",
-      "spec/domain/operations/products/import_service_area_spec.rb"
+      "spec/domain/operations/products/import_service_area_spec.rb",
+      "components/financial_assistance/spec/controllers/financial_assistance/verification_documents_controller_spec.rb"
     ]
   },
   {

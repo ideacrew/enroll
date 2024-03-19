@@ -117,6 +117,22 @@ module FinancialAssistance
       edit?
     end
 
+    # Determines if the current user has permission to upload a document for an applicant.
+    # The user can upload a document for the applicant if they have permission to edit it.
+    #
+    # @return [Boolean] Returns true if the user has permission to upload a document for an applicant, false otherwise.
+    def upload?
+      edit?
+    end
+
+    # Determines if the current user has permission to download a document from an applicant.
+    # The user can download a document from the applicant if they have permission to edit it.
+    #
+    # @return [Boolean] Returns true if the user has permission to download a document from an applicant, false otherwise.
+    def download?
+      edit?
+    end
+
     # Determines if the current user has permission to other an applicant.
     # The user can other an applicant if they have permission to edit it.
     #
