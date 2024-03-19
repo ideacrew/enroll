@@ -36,8 +36,13 @@ module BenefitSponsors
         raise 'User not authorized to perform this operation'
       end
 
+      # id passed in is not the message id but the person id or profile id.
+      # The message id is passed in as message_id.
+      # The implementation is so weird that the messages of a BrokerAgencyProfile are attached to the person who is the primary broker of the agency and not the agency itself.
       def destroy
-        if @inbox_provider.instance_of?(Person)
+        if is_broker?
+          authorize @inbox_provider, :destroy_inbox_message?, policy_class: BenefitSponsors::PersonPolicy
+        elsif @inbox_provider.instance_of?(Person)
           authorize @inbox_provider, :can_read_inbox?, policy_class: BenefitSponsors::PersonPolicy
         else
           authorize @inbox_provider, :can_read_inbox?
