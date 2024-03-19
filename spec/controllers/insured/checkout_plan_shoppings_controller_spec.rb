@@ -1,10 +1,16 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
-require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe Insured::PlanShoppingsController, type: :controller, dbclean: :after_each do
+  before :all do
+    DatabaseCleaner.clean
+  end
+
+  after :all do
+    DatabaseCleaner.clean
+  end
+
   describe 'POST #checkout' do
     let(:rating_area) { FactoryBot.create_default(:benefit_markets_locations_rating_area) }
     let(:user) { FactoryBot.create(:user, person: person) }
