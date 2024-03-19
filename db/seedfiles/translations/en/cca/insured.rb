@@ -450,5 +450,6 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.insured.verification_acceptable_file_types' => "PDF, JPEG, PNG, and GIF",
   :'en.insured.verification_max_file_size' => "File should not exceed 100 MB",
   :'en.waiting_for_eligibility' => "Waiting for your eligibility results...",
-  :'en.insured.existing_person_record_warning_message' => 'Person is already affiliated with another account.'
+  :'en.insured.existing_person_record_warning_message' => 'Person is already affiliated with another account.',
+  :'en.insured.plan_shopping.thankyou.agreement_terms_conditions' => 'You must complete Agreement and Terms and Conditions sections to continue.'
 }.freeze
