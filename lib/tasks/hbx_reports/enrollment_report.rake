@@ -115,11 +115,19 @@ namespace :reports do
     end
 
     # rubocop:disable Metrics/CyclomaticComplexity
-    def member_status(enr)
+    def member_status(enr,per)
+      all_enrollments_for_person = per.families.flat_map(&:hbx_enrollments)
+      enrollments = all_enrollments_for_year(enr, all_enrollments_for_person, per)
+      pre_11_1_purchases = pre_11_1_purchase_enrollments(enr, all_enrollments_for_person, per)
+      post_11_1_purchases = post_11_1_purchase_enrollments(enr, all_enrollments_for_person, per)
+      renewed_enrollments = renewed_enrollments(enr, all_enrollments_for_person, per)
+      @previous_enrollments = all_effectuated_enrollments_for_prev_year(enr, all_enrollments_for_person, per)
+      all_expired_enrollments = all_expired_enrollments_for_prev_year(enr, all_enrollments_for_person, per)
+
       enrs_between_nov_and_dec_set = has_effectuated_coverage_in_prev_year_during_oe?(enr)
-      re_enrolled_member_set = @enrollments&.map(&:hbx_id)
-      active_renewals_set = (re_enrolled_member_set & @post_11_1_purchases&.map(&:hbx_id)) - @renewed_enrollments&.map(&:hbx_id)
-      passive_renewals_set = re_enrolled_member_set - (@post_11_1_purchases&.map(&:hbx_id) - @renewed_enrollments&.map(&:hbx_id))
+      re_enrolled_member_set = enrollments&.map(&:hbx_id)
+      active_renewals_set = (re_enrolled_member_set & post_11_1_purchases&.map(&:hbx_id)) - renewed_enrollments&.map(&:hbx_id)
+      passive_renewals_set = re_enrolled_member_set - (post_11_1_purchases&.map(&:hbx_id) - renewed_enrollments&.map(&:hbx_id))
 
       if active_renewals_set.present? && enrs_between_nov_and_dec_set.present?
         "Active Re-enrollee"
@@ -155,7 +163,7 @@ namespace :reports do
     count = 0
     batch_size = 1000
     offset = 0
-    @member_status_lookup = {}
+    member_status_lookup = {}
     total_count = enrollments.size
     CSV.open("enroll_enrollment_report.csv", 'w') do |csv|
       csv << ["Primary Member ID", "Member ID", "Policy ID", "Policy Last Updated", "Policy Subscriber ID", "Status", "Member Status",
@@ -185,17 +193,15 @@ namespace :reports do
                 premium_amount = (enr.is_ivl_by_kind? ? enr.premium_for(en) : (enr.decorated_hbx_enrollment.member_enrollments.find { |enrollment| enrollment.member_id == en.id }).product_price).to_f.round(2)
                 next if per.blank?
 
-                all_enrollments_for_person = per.families.flat_map(&:hbx_enrollments)
-                @enrollments = all_enrollments_for_year(enr, all_enrollments_for_person, per)
-                @pre_11_1_purchases = pre_11_1_purchase_enrollments(enr, all_enrollments_for_person, per)
-                @post_11_1_purchases = post_11_1_purchase_enrollments(enr, all_enrollments_for_person, per)
-                @renewed_enrollments = renewed_enrollments(enr, all_enrollments_for_person, per)
-                @previous_enrollments = all_effectuated_enrollments_for_prev_year(enr, all_enrollments_for_person, per)
-                @all_expired_enrollments = all_expired_enrollments_for_prev_year(enr, all_enrollments_for_person, per)
+                member_status = member_status_lookup["#{enr.coverage_kind}_#{per.hbx_id}"] 
+                if member_status.blank?
+                  member_status = member_status(enr, per)
+                  member_status_lookup["#{enr.coverage_kind}_#{per.hbx_id}"] = member_status
+                end
                 csv << [
                   primary_person_hbx_id, per.hbx_id, enr.hbx_id, enr&.updated_at&.to_s,
                   enr.subscriber.hbx_id, enr.aasm_state,
-                  @member_status_lookup["#{enr.coverage_kind}_#{per.hbx_id}"] ||= member_status(enr),
+                  member_status,
                   #per.first_name,
                   #per.last_name,
                   #per.ssn,
