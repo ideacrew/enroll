@@ -30,30 +30,36 @@ namespace :reports do
         enrollment_member_hbx_ids = enrollment.hbx_enrollment_members.flat_map(&:person).pluck(:hbx_id)
         states.include?(enrollment.aasm_state) && enrollment.coverage_kind == enr.coverage_kind &&
           enrollment.effective_on >= enr.effective_on.beginning_of_year &&
+          enrollment.effective_on < enr.effective_on.end_of_year &&
           enrollment_member_hbx_ids.include?(person.hbx_id)
       end
     end
 
     def pre_11_1_purchase_enrollments(enr, all_enrollments, person)
-      time_period = Time.zone.parse("2022-11-01 10:00:00").utc
+      previous_year = enr.effective_on.prev_year.year
+      time_period = Time.zone.parse("#{previous_year}-11-01 10:00:00").utc
       states = HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES
       all_enrollments.select do |enrollment|
         enrollment_member_hbx_ids = enrollment.hbx_enrollment_members.flat_map(&:person).pluck(:hbx_id)
+        enrollment.created_at.year == previous_year &&
         enrollment.created_at < time_period && states.include?(enrollment.aasm_state) &&
           enrollment.coverage_kind == enr.coverage_kind &&
           enrollment.effective_on >= enr.effective_on.beginning_of_year &&
+          enrollment.effective_on < enr.effective_on.end_of_year &&
           enrollment_member_hbx_ids.include?(person.hbx_id)
       end
     end
 
     def post_11_1_purchase_enrollments(enr, all_enrollments, person)
-      time_period = Time.zone.parse("2022-11-01 10:00:00").utc
+      previous_year = enr.effective_on.prev_year.year
+      time_period = Time.zone.parse("#{previous_year}-11-01 10:00:00").utc
       states = HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES
       all_enrollments.select do |enrollment|
         enrollment_member_hbx_ids = enrollment.hbx_enrollment_members.flat_map(&:person).pluck(:hbx_id)
         enrollment.created_at >= time_period && states.include?(enrollment.aasm_state) &&
           enrollment.coverage_kind == enr.coverage_kind &&
           enrollment.effective_on >= enr.effective_on.beginning_of_year &&
+          enrollment.effective_on < enr.effective_on.end_of_year &&
           enrollment_member_hbx_ids.include?(person.hbx_id)
       end
     end
@@ -65,6 +71,7 @@ namespace :reports do
           states.include?(enrollment.aasm_state) &&
           enrollment.coverage_kind == enr.coverage_kind &&
           enrollment.effective_on >= enr.effective_on.beginning_of_year &&
+          enrollment.effective_on < enr.effective_on.end_of_year &&
           enrollment_member_hbx_ids.include?(person.hbx_id) &&
           enrollment.workflow_state_transitions.any? do |wst|
             HbxEnrollment::RENEWAL_STATUSES.include?(wst.from_state.to_s) || HbxEnrollment::RENEWAL_STATUSES.include?(wst.to_state.to_s)
