@@ -3,8 +3,6 @@
 class BenefitEligibilityElementGroup
   include Mongoid::Document
 
-  # whitelist approach
-
   embedded_in :benefit_package
 
   INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS = %w[
@@ -48,26 +46,17 @@ class BenefitEligibilityElementGroup
     ].freeze
 
 
-  field :market_places,          type: Array, default: ["any"]   # %w[any shop individual],
-  field :enrollment_periods,     type: Array, default: ["any"]   # %w[any open_enrollment special_enrollment],
-  field :family_relationships,   type: Array, default: ["any"]   # %w[any self spouse domestic_partner child_under_26 child_26_and_over disabled_children_26_and_over],
-  field :benefit_categories,     type: Array, default: ["any"]   # %w[health dental retirement disability],
+  field :market_places,          type: Array, default: ["any"]
+  field :enrollment_periods,     type: Array, default: ["any"]
+  field :family_relationships,   type: Array, default: ["any"]
+  field :benefit_categories,     type: Array, default: ["any"]
 
-  field :incarceration_status,   type: Array, default: ["any"]   # %w[any unincarcerated],
+  field :incarceration_status,   type: Array, default: ["any"]
   field :age_range,              type: Range, default: 0..0
-  field :citizenship_status,     type: Array, default: ["any"]   # %w[any us_citizen naturalized_citizen alien_lawfully_present lawful_permanent_resident],
-  field :residency_status,       type: Array, default: ["any"]   # %w[any state_resident],
-  field :ethnicity,              type: Array, default: ["any"]   # %w[any indian_tribe_member],
+  field :citizenship_status,     type: Array, default: ["any"]
+  field :residency_status,       type: Array, default: ["any"]
+  field :ethnicity,              type: Array, default: ["any"]
   field :cost_sharing,           type: String, default: ""
   field :lawful_presence_status, type: String, default: ""
   field :active_individual_role, type: Boolean, default: false
-
-
-  # validates :eligible_relationship_categories,
-  #   allow_blank: false,
-  #   inclusion: {
-  #     in: ELIGIBLE_RELATIONSHIP_CATEGORY_KINDS,
-  #     message: "%{value} is not a valid eligible relationship category kind"
-  #   }
-
 end

@@ -5,10 +5,6 @@ class BenefitSponsorship
   include Mongoid::Timestamps
 
   embedded_in :hbx_profile
-  # embedded_in :employer_profile
-
-  # person/roles can determine which sponsor in a class has a relationship (offer products)
-  # which benefit packages should be offered to person/roles
 
   SERVICE_MARKET_KINDS = %w[shop individual coverall].freeze
 
@@ -52,11 +48,6 @@ class BenefitSponsorship
     benefit_coverage_periods.detect { |bcp| bcp.contains?(effective_date) }
   end
 
-
-  # def is_under_special_enrollment_period?
-  #   benefit_coverage_periods.detect { |bcp| bcp.contains?(TimeKeeper.date_of_record) }
-  # end
-
   def is_coverage_period_under_open_enrollment?
     benefit_coverage_periods.any? do |benefit_coverage_period|
       benefit_coverage_period.open_enrollment_contains?(TimeKeeper.date_of_record)
@@ -75,30 +66,6 @@ class BenefitSponsorship
       current_benefit_coverage_period
     end
   end
-
-# effective_coverage_period
-# HBX: Jan-Dec
-# Employers: year-over-year, e.g. Jun-May
-
-# Shopping time range
-# Benefit effective time range: can exceed one year
-# Issuer begin date
-# Issuer end date --
-
-# Employer
-# Effective start on date: Dec 1, 2015
-# Effective end on date: Nov 30, 2016
-# (policy) contract start on date
-# (policy) contract end on date
-
-# SHOP plan effective start on date Jan 1, 2015
-# SHOP plan effective end on date: Dec 31, 2015
-
-# product effective_start_on
-# product effective_end_on
-
-# 2015 SHOP plan that becomes effective Jan 1 2015
-#   benefit_service_period between Jan 1 2015 and Nov 30, 2016
 
   class << self
     def advance_day(new_date)
