@@ -28,4 +28,16 @@ class UserPolicy < ApplicationPolicy
     return false unless role.permission
     role.permission.can_access_user_account_tab
   end
+
+  def view?
+    user.present?
+  end
+
+  def new?
+    view?
+  end
+
+  def create?
+    view?
+  end
 end

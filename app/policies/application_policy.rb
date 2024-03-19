@@ -21,7 +21,7 @@ class ApplicationPolicy
   def account_holder_person
     return @account_holder_person if defined? @account_holder_person
 
-    @account_holder_person = account_holder.person
+    @account_holder_person = account_holder&.person
   end
 
   # Returns the individual market role of the account holder person.
@@ -61,8 +61,8 @@ class ApplicationPolicy
     @account_holder_family = account_holder_person&.primary_family
   end
 
-  # START - ACA Individual Market related methods
-  #
+  # @!group ACA Individual Market related methods
+
   # Determines if the current user is a primary family member in the individual market.
   # The user is considered a primary family member if they have verified their identity in the individual market (RIDP verified) and their account holder's family is the same as the current family.
   #
@@ -86,6 +86,47 @@ class ApplicationPolicy
     individual_market_role&.identity_verified?
   end
 
+  # Determines if the primary person of the family has verified their identity (RIDP).
+  #
+  # @return [Boolean] Returns true if the primary person of the family has verified their identity, false otherwise.
+  def primary_family_member_ridp_verified?
+    primary = family&.primary_person
+    return false if primary.blank?
+
+    consumer_role = primary.consumer_role
+    return false if consumer_role.blank?
+
+    consumer_role.identity_verified?
+  end
+
+  # Checks if the current user is a primary family member who has verified their identity and is an active associated individual market family broker staff.
+  #
+  # @return [Boolean] Returns true if the primary family member has verified their
+  # identity and the user is an active associated individual market family broker staff, false otherwise.
+  def active_associated_individual_market_ridp_verified_family_broker_staff?
+    primary_family_member_ridp_verified? && active_associated_individual_market_family_broker_staff?
+  end
+
+  # Checks if the current user is an active associated individual market family broker staff.
+  # It checks if the user has any active broker agency staff roles and if the user's family has an active broker agency account.
+  # If both conditions are met, it checks if any of the user's broker agency staff roles
+  # are associated with the broker agency profile of the family's active broker agency account.
+  #
+  # @return [Boolean] Returns true if the user is an active associated individual market family broker staff, false otherwise.
+  def active_associated_individual_market_family_broker_staff?
+    broker_staffs = account_holder_person&.broker_agency_staff_roles&.active
+    return false if broker_staffs.blank?
+
+    broker_agency_account = family.active_broker_agency_account
+    return false if broker_agency_account.blank?
+
+    broker_agency = broker_agency_account.broker_agency_profile
+
+    broker_staffs.any? do |staff|
+      staff.benefit_sponsors_broker_agency_profile_id == broker_agency.id
+    end
+  end
+
   # Determines if the current user is an active associated broker in the individual market.
   # The user is considered an active associated broker if they are an active associated broker for the family in the individual market.
   # The primary family member must be verified for their identity.
@@ -96,26 +137,13 @@ class ApplicationPolicy
     primary_family_member_ridp_verified? && active_associated_individual_market_family_broker?
   end
 
-  # Determines if the primary person of the family has verified their identity (RIDP).
-  #
-  # @return [Boolean] Returns true if the primary person of the family has verified their identity, false otherwise.
-  def primary_family_member_ridp_verified?
-    primary = family.primary_person
-    return false if primary.blank?
-
-    consumer_role = primary.consumer_role
-    return false if consumer_role.blank?
-
-    consumer_role.identity_verified?
-  end
-
   # Determines if the current user is an active associated broker in the individual market.
   # The user is considered an active associated broker if they have a broker role that is active and in the individual market,
   # and their broker agency account is active and associated with the same broker agency profile and writing agent as their broker role.
   #
   # @return [Boolean] Returns true if the user is an active associated broker in the individual market, false otherwise.
   def active_associated_individual_market_family_broker?
-    broker = account_holder_person.broker_role
+    broker = account_holder_person&.broker_role
     return false if broker.blank? || !broker.active? || !broker.individual_market?
 
     broker_agency_account = family.active_broker_agency_account
@@ -130,7 +158,6 @@ class ApplicationPolicy
   #
   # @return [Boolean] Returns true if the user is an admin in the individual market, false otherwise.
   def individual_market_admin?
-    hbx_role = account_holder_person.hbx_staff_role
     return false if hbx_role.blank?
 
     permission = hbx_role.permission
@@ -138,11 +165,11 @@ class ApplicationPolicy
 
     permission.modify_family
   end
-  #
-  # END - ACA Individual Market related methods
 
-  # START - Non-ACA Coverall Market related methods
-  #
+  # @!endgroup
+
+  # @!group Non-ACA Coverall Market related methods
+
   # Checks if the account holder is a primary family member in the coverall market for the given family.
   # A user is considered a primary family member in the coverall market if they have a coverall market role and they are the primary person of the given family.
   #
@@ -162,7 +189,7 @@ class ApplicationPolicy
   def active_associated_coverall_market_family_broker?
     return false unless coverall_market_role
 
-    broker = account_holder_person.broker_role
+    broker = account_holder_person&.broker_role
     return false if broker.blank? || !broker.active? || !broker.individual_market?
 
     broker_agency_account = family.active_broker_agency_account
@@ -178,26 +205,20 @@ class ApplicationPolicy
   #
   # @return [Boolean] Returns true if the account holder is an admin in the coverall market, false otherwise.
   def coverall_market_admin?
-    hbx_role = account_holder_person.hbx_staff_role
-    return false if hbx_role.blank?
-
-    permission = hbx_role.permission
-    return false if permission.blank?
-
-    permission.modify_family
+    individual_market_admin?
   end
-  #
-  # END - Non-ACA Coverall Market related methods
 
-  # START - ACA Shop Market related methods
-  #
+  # @!endgroup
+
+  # @!group ACA Shop Market related methods
+
   # Checks if the account holder is a primary family member in the ACA Shop market for the given family.
   # A user is considered a primary family member in the ACA Shop market if they have an employee role and they are the primary person of the given family.
   #
   # @param family [Family] The family to check.
   # @return [Boolean] Returns true if the account holder is a primary family member in the ACA Shop market for the given family, false otherwise.
   def shop_market_primary_family_member?
-    primary_person = family.primary_person
+    primary_person = family&.primary_person
     return false unless primary_person
 
     primary_person.employee_roles.present? && account_holder_person == primary_person
@@ -209,7 +230,6 @@ class ApplicationPolicy
   #
   # @return [Boolean] Returns true if the account holder is an admin in the shop market, false otherwise.
   def shop_market_admin?
-    individual_market_admin?
     # hbx_role = account_holder_person.hbx_staff_role
     # return false if hbx_role.blank?
 
@@ -217,17 +237,17 @@ class ApplicationPolicy
     # return false if permission.blank?
 
     # permission.modify_employer
+    individual_market_admin?
   end
 
   def active_associated_shop_market_family_broker?
     broker = account_holder_person&.broker_role
-    broker_staff_roles = account_holder_person&.broker_agency_staff_roles&.where(aasm_state: 'active')
+    broker_staff_roles = account_holder_person&.broker_agency_staff_roles&.active
 
     return false if broker.blank? && broker_staff_roles.blank?
-    return false unless broker.active? || broker.shop_market?
-    return true if broker_profile_ids.include?(broker.benefit_sponsors_broker_agency_profile_id)
-
-    # broker_staff_roles.any? { |role| role.benefit_sponsors_broker_agency_profile_id == individual_market_family_broker_agency_id }
+    return false if broker.present? && (!broker.active? || !broker.shop_market?)
+    return true if broker.present? && shop_market_family_broker_agency_ids.include?(broker.benefit_sponsors_broker_agency_profile_id)
+    return true if broker_staff_roles.present? && (broker_staff_roles.pluck(:benefit_sponsors_broker_agency_profile_id) & shop_market_family_broker_agency_ids).present?
     false
   end
 
@@ -246,11 +266,11 @@ class ApplicationPolicy
       }
     ).present?
   end
-  #
-  # END - ACA Shop Market related methods
 
-  # START - Non-ACA Fehb Market related methods
-  #
+  # @endgrop
+
+  # @!group Non-ACA Fehb Market related methods
+
   # Checks if the account holder is a primary family member in the Non-ACA Fehb market for the given family.
   # A user is considered a primary family member in the Non-ACA Fehb market if they are a primary family member in the ACA Shop market for the given family.
   #
@@ -271,8 +291,180 @@ class ApplicationPolicy
   def active_associated_fehb_market_general_agency?
     false
   end
-  #
-  # END - Non-ACA Fehb Market related methods
+
+  # @!endgroup
+
+  # @!group Hbx Staff Role permissions
+
+  def staff_view_admin_tabs?
+    permission&.view_admin_tabs
+  end
+
+  def staff_modify_employer?
+    permission&.modify_employer
+  end
+
+  def staff_modify_admin_tabs?
+    permission&.modify_admin_tabs
+  end
+
+  def staff_view_the_configuration_tab?
+    permission&.view_the_configuration_tab
+  end
+
+  def staff_can_submit_time_travel_request?
+    permission&.can_submit_time_travel_request
+  end
+
+  def staff_can_edit_aptc?
+    permission&.can_edit_aptc
+  end
+
+  def staff_send_broker_agency_message?
+    permission&.send_broker_agency_message
+  end
+
+  def staff_approve_broker?
+    permission&.approve_broker
+  end
+
+  def staff_approve_ga?
+    permission&.approve_ga
+  end
+
+  def staff_can_extend_open_enrollment?
+    permission&.can_extend_open_enrollment
+  end
+
+  def staff_can_modify_plan_year?
+    permission&.can_modify_plan_year
+  end
+
+  def staff_can_create_benefit_application?
+    permission&.can_create_benefit_application
+  end
+
+  def staff_can_change_fein?
+    permission&.can_change_fein
+  end
+
+  def staff_can_force_publish?
+    permission&.can_force_publish
+  end
+
+  def staff_can_access_age_off_excluded?
+    permission&.can_access_age_off_excluded
+  end
+
+  def staff_can_send_secure_message?
+    permission&.can_send_secure_message
+  end
+
+  def staff_can_add_sep?
+    permission&.can_add_sep
+  end
+
+  def staff_can_view_sep_history?
+    permission&.can_view_sep_history
+  end
+
+  def staff_can_cancel_enrollment?
+    permission&.can_cancel_enrollment
+  end
+
+  def staff_can_terminate_enrollment?
+    permission&.can_terminate_enrollment
+  end
+
+  def staff_can_reinstate_enrollment?
+    permission&.can_reinstate_enrollment
+  end
+
+  def staff_can_drop_enrollment_members?
+    permission&.can_drop_enrollment_members
+  end
+
+  def staff_change_enrollment_end_date?
+    permission&.change_enrollment_end_date
+  end
+
+  def staff_can_access_identity_verification_sub_tab?
+    permission&.can_access_identity_verification_sub_tab
+  end
+
+  def staff_can_access_outstanding_verification_sub_tab?
+    permission&.can_access_outstanding_verification_sub_tab
+  end
+
+  def staff_can_access_accept_reject_identity_documents?
+    permission&.can_access_accept_reject_identity_documents
+  end
+
+  def staff_can_access_accept_reject_paper_application_documents?
+    permission&.can_access_accept_reject_paper_application_documents
+  end
+
+  def staff_can_delete_identity_application_documents?
+    permission&.can_delete_identity_application_documents
+  end
+
+  def staff_can_access_user_account_tab?
+    permission&.can_access_user_account_tab
+  end
+
+  def staff_can_access_pay_now?
+    permission&.can_access_pay_now
+  end
+
+  def staff_can_add_pdc?
+    permission&.can_add_pdc
+  end
+
+  def staff_can_call_hub?
+    permission&.can_call_hub
+  end
+
+  def staff_can_edit_osse_eligibility?
+    permission&.can_edit_osse_eligibility
+  end
+
+  def staff_can_view_audit_log?
+    permission&.can_view_audit_log
+  end
+
+  def staff_can_update_ssn?
+    permission&.can_update_ssn
+  end
+
+  def staff_can_lock_unlock?
+    permission&.can_lock_unlock
+  end
+
+  def staff_can_reset_password?
+    permission&.can_reset_password
+  end
+
+  def staff_can_change_username_and_email?
+    permission&.can_change_username_and_email
+  end
+
+  def staff_view_login_history?
+    permission&.view_login_history
+  end
+
+  def permission
+    return @permission if defined? @permission
+
+    @permission = hbx_role&.permission
+  end
+
+  def hbx_role
+    return @hbx_role if defined? @hbx_role
+
+    @hbx_role = account_holder_person&.hbx_staff_role
+  end
+
+  # @!endgroup
 
   def index?
     read_all?

@@ -20,6 +20,7 @@ Feature: Mixed household with consumer and resident role plan purchase
     Then consumer should see both dependent and primary
     And consumer should see the list of plans
     Then consumer selects a plan on the plan shopping page
+    And consumer completes agreement terms and conditions sections on thankyou page
     When consumer clicks on Confirm button on the coverage summary page
     Then consumer clicks back to my account button
     Then consumer should see primary and dependent person on enrollment

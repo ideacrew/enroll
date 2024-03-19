@@ -44,14 +44,9 @@
           <% end %>
           <% broker_staff_roles.each do |broker_staff_role| %>
             <%profile = broker_staff_role.broker_agency_profile%>
-
             <% if profile.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile %>
               <% broker_link = benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(profile, tab:'home') %>
-            <% else %>
-              <% #backwards compatibility with old model %>
-              <% broker_link =  main_app.broker_agencies_profile_path(profile) %>
             <% end %>
-
             <li style="text-align:left"><%= link_to profile.legal_name, broker_link, class: 'header-text' %></li>
           <% end %>
           <% ga_staff_roles.each do |ga_staff_role| %>

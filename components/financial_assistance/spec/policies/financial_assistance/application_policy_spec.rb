@@ -11,6 +11,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
     let(:application) { FactoryBot.create(:financial_assistance_application, family_id: family.id) }
 
+    before do
+      consumer_role.move_identity_documents_to_verified
+    end
+
     permissions :edit? do
       context 'when a valid user is logged in' do
         context 'when the user is a consumer' do
@@ -19,7 +23,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             let(:logged_in_user) { user_of_family }
 
             it 'grants access' do
-              consumer_role.move_identity_documents_to_verified
               expect(subject).to permit(logged_in_user, application)
             end
           end
@@ -29,6 +32,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             let(:logged_in_user) { user_of_family }
 
             it 'denies access' do
+              consumer_role.update_attributes(identity_validation: 'na', application_validation: 'na')
               expect(subject).not_to permit(logged_in_user, application)
             end
           end
@@ -76,9 +80,9 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
 
         context 'when the user is an assigned broker' do
-          let(:market_kind) { 'both' }
+          let(:market_kind) { :both }
           let(:broker_person) { FactoryBot.create(:person) }
-          let(:broker_role) { FactoryBot.create(:broker_role, person: broker_person, market_kind: market_kind) }
+          let(:broker_role) { FactoryBot.create(:broker_role, person: broker_person) }
           let(:broker_user) { FactoryBot.create(:user, person: broker_person) }
 
           let(:site) do
@@ -110,7 +114,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             broker_person.create_broker_agency_staff_role(
               benefit_sponsors_broker_agency_profile_id: broker_role.benefit_sponsors_broker_agency_profile_id
             )
-            broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id)
+            broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id, market_kind: market_kind)
             broker_role.approve!
             broker_agency_account
           end
@@ -120,7 +124,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
               let(:baa_active) { true }
 
               it 'grants access' do
-                application.family.primary_person.consumer_role.move_identity_documents_to_verified
                 expect(subject).to permit(logged_in_user, application)
               end
             end
@@ -128,15 +131,16 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             context 'consumer RIDP is unverified' do
               let(:baa_active) { true }
 
-              it 'denies access' do
-                expect(subject).not_to permit(logged_in_user, application)
+              it 'grants access' do
+                consumer_role.update_attributes(identity_validation: 'na', application_validation: 'na')
+                expect(subject).to permit(logged_in_user, application)
               end
             end
           end
 
           context 'with active associated shop market certified broker' do
             let(:baa_active) { false }
-            let(:market_kind) { 'shop' }
+            let(:market_kind) { :shop }
 
             it 'denies access' do
               expect(subject).not_to permit(logged_in_user, application)
@@ -145,6 +149,123 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
           context 'with unassociated broker' do
             let(:baa_active) { false }
+
+            it 'denies access' do
+              expect(subject).not_to permit(logged_in_user, application)
+            end
+          end
+        end
+
+        context 'when the user is a broker staff' do
+          let(:market_kind) { :both }
+          let(:broker_person) { FactoryBot.create(:person) }
+          let(:broker_role) { FactoryBot.create(:broker_role, person: broker_person) }
+          let(:broker_staff_person) { FactoryBot.create(:person) }
+
+          let(:broker_staff_state) { 'active' }
+
+          let(:broker_staff) do
+            FactoryBot.create(
+              :broker_agency_staff_role,
+              person: broker_staff_person,
+              aasm_state: broker_staff_state,
+              benefit_sponsors_broker_agency_profile_id: broker_agency_id
+            )
+          end
+          let(:broker_staff_user) { FactoryBot.create(:user, person: broker_staff_person) }
+
+          let(:site) do
+            FactoryBot.create(
+              :benefit_sponsors_site,
+              :with_benefit_market,
+              :as_hbx_profile,
+              site_key: ::EnrollRegistry[:enroll_app].settings(:site_key).item
+            )
+          end
+
+          let(:broker_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+          let(:broker_agency_profile) { broker_agency_organization.broker_agency_profile }
+          let(:broker_agency_id) { broker_agency_profile.id }
+
+          let(:logged_in_user) { broker_staff_user }
+
+          let(:broker_agency_account) do
+            family.broker_agency_accounts.create!(
+              benefit_sponsors_broker_agency_profile_id: broker_agency_id,
+              writing_agent_id: broker_role.id,
+              is_active: baa_active,
+              start_on: TimeKeeper.date_of_record
+            )
+          end
+
+          before do
+            broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: broker_agency_id)
+            broker_person.create_broker_agency_staff_role(
+              benefit_sponsors_broker_agency_profile_id: broker_role.benefit_sponsors_broker_agency_profile_id
+            )
+            broker_agency_profile.update_attributes!(primary_broker_role_id: broker_role.id, market_kind: market_kind)
+            broker_role.approve!
+            broker_agency_account
+            broker_staff
+          end
+
+          context 'with active associated individual market broker staff' do
+            context 'consumer RIDP is verified' do
+              let(:baa_active) { true }
+
+              it 'grants access' do
+                expect(subject).to permit(logged_in_user, application)
+              end
+            end
+
+            context 'consumer RIDP is unverified' do
+              let(:baa_active) { true }
+
+              it 'grants access' do
+                consumer_role.update_attributes(identity_validation: 'na', application_validation: 'na')
+                expect(subject).to permit(logged_in_user, application)
+              end
+            end
+          end
+
+          context 'with active associated shop market broker staff' do
+            let(:baa_active) { false }
+            let(:market_kind) { :shop }
+
+            it 'denies access' do
+              expect(subject).not_to permit(logged_in_user, application)
+            end
+          end
+
+          context 'with unassociated broker staff' do
+            let(:baa_active) { false }
+
+            it 'denies access' do
+              expect(subject).not_to permit(logged_in_user, application)
+            end
+          end
+
+          context 'with unapproved broker staff' do
+            let(:baa_active) { true }
+            let(:broker_staff_state) { 'broker_agency_pending' }
+
+            it 'denies access' do
+              expect(subject).not_to permit(logged_in_user, application)
+            end
+          end
+
+          context 'with broker_agency_declined broker staff' do
+            let(:baa_active) { true }
+            let(:broker_staff_state) { 'broker_agency_declined' }
+
+            it 'denies access' do
+              expect(subject).not_to permit(logged_in_user, application)
+            end
+          end
+
+          context 'with broker_agency_terminated broker staff' do
+            let(:baa_active) { true }
+            let(:broker_staff_state) { 'broker_agency_terminated' }
 
             it 'denies access' do
               expect(subject).not_to permit(logged_in_user, application)

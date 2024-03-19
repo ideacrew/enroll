@@ -946,6 +946,20 @@ Then(/^.+ should see the coverage summary page$/) do
   # screenshot("summary_page")
 end
 
+# This step completes the agreement terms and conditions sections on the thank you page for the consumer.
+# It selects the checkbox for the terms and conditions and fills in the first and last name of the primary person.
+And(/consumer completes agreement terms and conditions sections on thankyou page$/) do
+  find('#terms_check_thank_you').click
+  primary = Person.all.select { |person| person.primary_family.present? }.first
+  fill_in('First Name *', with: primary.first_name)
+  fill_in('Last Name *', with: primary.last_name)
+end
+
+# This step simulates the consumer clicking the 'Continue to My Account' button.
+Then(/the consumer clicks continue to my account button/) do
+  find('.interaction-click-control-continue-to-my-account').click
+end
+
 When(/^.+ clicks? on Confirm button on the coverage summary page$/) do
   find(EmployeeConfirmYourPlanSelection.confirm_btn, wait: 10).click
 end

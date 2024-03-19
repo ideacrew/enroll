@@ -8,6 +8,9 @@ components/benefit_markets/lib/**/*.rb
 components/benefit_markets/app/**/*.rb
 components/benefit_sponsors/lib/**/*.rb
 components/benefit_sponsors/app/**/*.rb
+components/financial_assistance/app/**/*.rb
+components/financial_assistance/lib/**/*.rb
+components/benefit_sponsors/app/**/*.rb
 components/notifier/lib/**/*.rb
 components/notifier/app/**/*.rb
 components/sponsored_benefits/lib/**/*.rb
@@ -16,5 +19,7 @@ components/transport_gateway/lib/**/*.rb
 components/transport_gateway/app/**/*.rb
 components/transport_profiles/lib/**/*.rb
 components/transport_profiles/app/**/*.rb
+components/ui_helpers/app/**/*.rb
+components/ui_helpers/lib/**/*.rb
 - 
 documentation/PROJECT.md

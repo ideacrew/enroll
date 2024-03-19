@@ -2,12 +2,16 @@ class Insured::RidpDocumentsController < ApplicationController
   include ApplicationHelper
 
   before_action :get_person
-  before_action :updateable?, only: [:upload]
+  before_action :check_for_consumer_role
   before_action :set_document,  only: [:destroy]
 
   def upload
+    consumer_role = person_consumer_role
+    authorize consumer_role, :ridp_document_upload?
+
     @doc_errors = []
     @docs_owner = @person
+
     if params[:file].blank?
       flash[:error] = "File not uploaded. Please select the file to upload."
     elsif !valid_file_uploads?(params[:file], FileUploadValidator::VERIFICATION_DOC_TYPES)
@@ -34,6 +38,9 @@ class Insured::RidpDocumentsController < ApplicationController
   end
 
   def download
+    consumer_role = person_consumer_role
+    authorize consumer_role, :ridp_document_download?
+
     document = get_document(params[:key])
     if document.present?
       bucket = env_bucket_name('id-verification')
@@ -47,6 +54,9 @@ class Insured::RidpDocumentsController < ApplicationController
   end
 
   def destroy
+    consumer_role = person_consumer_role
+    authorize consumer_role, :ridp_document_delete?
+
     @document.delete
 
     if @person.consumer_role.identity_validation == "pending"
@@ -88,6 +98,14 @@ class Insured::RidpDocumentsController < ApplicationController
 
   def set_document
     @document = @person.consumer_role.ridp_documents.find(params[:id])
+  end
+
+  def check_for_consumer_role
+    @consumer_role = @person.consumer_role
+    return if @consumer_role
+
+    flash[:error] = "No consumer role exists, you are not authorized to upload documents"
+    redirect_back fallback_location: '/'
   end
 
   def update_ridp_documents(title, file_uri)
