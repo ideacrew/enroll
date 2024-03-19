@@ -293,7 +293,7 @@ RSpec.describe FinancialAssistance::EvidencesController, dbclean: :after_each, t
         end
 
         it 'flashes a pundit policy unauthorized error' do
-          expect(flash[:error]).to eq "Access not allowed for hbx_profile_policy.can_fdsh_hub_request?, (Pundit policy)"
+          expect(flash[:error]).to eq "Access not allowed for hbx_profile_policy.can_call_hub?, (Pundit policy)"
         end
       end
     end
@@ -415,7 +415,7 @@ RSpec.describe FinancialAssistance::EvidencesController, dbclean: :after_each, t
         end
 
         it 'flashes a pundit policy unauthorized error' do
-          expect(flash[:error]).to eq "Access not allowed for hbx_profile_policy.can_fdsh_hub_request?, (Pundit policy)"
+          expect(flash[:error]).to eq "Access not allowed for hbx_profile_policy.can_call_hub?, (Pundit policy)"
         end
       end
     end

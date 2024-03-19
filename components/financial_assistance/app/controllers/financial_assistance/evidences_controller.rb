@@ -26,7 +26,7 @@ module FinancialAssistance
     end
 
     def fdsh_hub_request
-      authorize HbxProfile, :can_fdsh_hub_request?
+      authorize HbxProfile, :can_call_hub?
       result = @evidence.request_determination(params[:admin_action], "Requested Hub for verification", current_user.oim_id)
 
       if result

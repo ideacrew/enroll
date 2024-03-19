@@ -483,10 +483,6 @@ class HbxProfilePolicy < ApplicationPolicy
     individual_market_admin?
   end
 
-  def can_fdsh_hub_request?
-    individual_market_admin?
-  end
-
   def can_update_verification_type?
     individual_market_admin?
   end

@@ -7,7 +7,7 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/aca_entities.git
-  revision: d10013bfa0d5c772238eed7791a8d34d47adcbad
+  revision: ff788c8b0287e6d0dc2abe0e8536cb7a843922c7
   branch: trunk
   specs:
     aca_entities (0.10.0)
@@ -531,7 +531,7 @@ GEM
     fast_jsonapi (1.5)
       activesupport (>= 4.2)
     ffaker (2.18.0)
-    ffi (1.9.25)
+    ffi (1.15.4)
     file_validators (3.0.0)
       activemodel (>= 3.2)
       mime-types (>= 1.0)

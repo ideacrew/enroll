@@ -312,6 +312,8 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
     let!(:family_member) { family.family_members.first }
     let!(:broker_user) {FactoryBot.create(:user, :person => writing_agent.person, roles: ['broker_role', 'broker_agency_staff_role'])}
     let(:broker_agency_profile) { FactoryBot.build(:benefit_sponsors_organizations_broker_agency_profile)}
+    let(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: 'active')}
+    let(:broker_agency_staff_role_user) {FactoryBot.create(:user, :person => broker_agency_staff_role.person, roles: ['broker_agency_staff_role'])}
 
     let(:broker_agency_account) do
       family.broker_agency_accounts.create!(
@@ -453,6 +455,130 @@ RSpec.describe FinancialAssistance::VerificationDocumentsController, type: :cont
           expect do
             delete :destroy, params: params
           end.to change(esi_evidence.documents, :count).by(0)
+        end
+      end
+    end
+
+    context 'broker_agency_staff_role_user logged in' do
+      context 'hired by family' do
+        before(:each) do
+          family.broker_agency_accounts << BenefitSponsors::Accounts::BrokerAgencyAccount.new(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id,
+                                                                                              writing_agent_id: writing_agent.id,
+                                                                                              start_on: Time.now,
+                                                                                              is_active: true)
+          family.reload
+
+          sign_in(broker_agency_staff_role_user)
+        end
+
+
+        context 'POST #upload' do
+          let!(:bucket_name) { 'id-verification' }
+          let!(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}sample-key" }
+          let!(:params) { { "applicant_id" => applicant.id, "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, file: file} }
+
+          context 'with valid params' do
+            before do
+              allow(Aws::S3Storage).to receive(:save).and_return(doc_id)
+            end
+
+            it 'uploads a new VerificationDocument' do
+              post :upload, params: params
+              expect(flash[:notice]).to eq("File Saved")
+            end
+          end
+        end
+
+        context 'GET #download' do
+          let!(:document) { esi_evidence.documents.create}
+          context 'with valid params' do
+            before do
+              allow(controller).to receive(:get_document).with('sample-key').and_return(document)
+            end
+
+            let!(:params) {{"key" => "sample-key", "evidence_kind" => "esi_evidence", "application_id" => application.id, "applicant_id" => applicant.id}}
+
+            it 'downloads the requested verification document' do
+              get :download, params: params
+              expect(response).to be_successful
+            end
+          end
+        end
+
+        context 'DELETE #destroy' do
+          let!(:document) { esi_evidence.documents.create}
+
+          before do
+            allow(controller).to receive(:get_document).with('sample-key').and_return(document)
+          end
+
+          let!(:params) do
+            { "doc_key" => "sample-key", "doc_title" => "sample-key.Png", "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, "applicant_id" => applicant.id}
+          end
+
+          it 'destroys the requested verification document' do
+            expect do
+              delete :destroy, params: params
+            end.to change(esi_evidence.documents, :count).by(-1)
+          end
+        end
+      end
+
+      context 'not hired by family' do
+        before(:each) do
+          sign_in(broker_agency_staff_role_user)
+        end
+
+        context 'POST #upload' do
+          let!(:bucket_name) { 'id-verification' }
+          let!(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}sample-key" }
+          let!(:params) { { "applicant_id" => applicant.id, "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, file: file} }
+
+          context 'with valid params' do
+            before do
+              allow(Aws::S3Storage).to receive(:save).and_return(doc_id)
+            end
+
+            it 'returns failure' do
+              post :upload, params: params
+              expect(flash[:error]).to eq("Access not allowed for financial_assistance/applicant_policy.upload?, (Pundit policy)")
+            end
+          end
+        end
+
+        context 'GET #download' do
+          let!(:document) { esi_evidence.documents.create}
+          context 'with valid params' do
+            before do
+              allow(controller).to receive(:get_document).with('sample-key').and_return(document)
+            end
+
+            let!(:params) {{"key" => "sample-key", "evidence_kind" => "esi_evidence", "application_id" => application.id, "applicant_id" => applicant.id}}
+
+            it 'downloads the requested verification document' do
+              get :download, params: params
+              expect(response).to have_http_status(:found)
+              expect(flash[:error]).to eq("Access not allowed for financial_assistance/applicant_policy.download?, (Pundit policy)")
+            end
+          end
+        end
+
+        context 'DELETE #destroy' do
+          let!(:document) { esi_evidence.documents.create}
+
+          before do
+            allow(controller).to receive(:get_document).with('sample-key').and_return(document)
+          end
+
+          let!(:params) do
+            { "doc_key" => "sample-key", "doc_title" => "sample-key.Png", "evidence" => esi_evidence.id, "evidence_kind" => "esi_evidence", "application_id" => application.id, "applicant_id" => applicant.id}
+          end
+
+          it 'destroys the requested verification document' do
+            expect do
+              delete :destroy, params: params
+            end.to change(esi_evidence.documents, :count).by(0)
+          end
         end
       end
     end
