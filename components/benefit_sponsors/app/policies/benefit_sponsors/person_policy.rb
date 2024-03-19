@@ -9,8 +9,13 @@ module BenefitSponsors
       false
     end
 
-    # This is implemented for the destroy action in the messages controller.
+    # Determines if the current user has permission to destroy an inbox message.
+    # The user can destroy an inbox message if they are the person associated with the record,
+    # an admin in the shop market, or a broker agency staff member associated with the broker agency of the record.
     # This method currently only supports people with broker roles.
+    #
+    # @return [Boolean] Returns true if the user has permission to destroy an inbox message, false otherwise.
+    # @note This method is implemented for the destroy action in the messages controller.
     def destroy_inbox_message?
       broker = record.broker_role
       broker_staff_roles = account_holder_person&.broker_agency_staff_roles&.active

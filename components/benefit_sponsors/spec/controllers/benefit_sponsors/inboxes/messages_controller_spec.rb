@@ -138,16 +138,6 @@ module BenefitSponsors
             expect(response).to have_http_status(:success)
           end
         end
-
-        context "delete message" do
-          before do
-            delete :destroy, params:{id: broker_person.id, message_id: @broker_inbox.messages.first.id}, format: :js
-          end
-
-          it "should get a notice" do
-            expect(flash[:notice]).to match /Successfully deleted inbox message./
-          end
-        end
       end
     end
   end

@@ -36,9 +36,17 @@ module BenefitSponsors
         raise 'User not authorized to perform this operation'
       end
 
-      # id passed in is not the message id but the person id or profile id.
+      # Destroys an inbox message.
+      # The id passed in is not the message id but the person id or profile id.
       # The message id is passed in as message_id.
-      # The implementation is so weird that the messages of a BrokerAgencyProfile are attached to the person who is the primary broker of the agency and not the agency itself.
+      # The implementation is so that the messages of a BrokerAgencyProfile are attached to the person
+      # who is the primary broker of the agency and not the agency itself.
+      # This method checks if the user has the necessary permissions to destroy the message and then destroys it.
+      # A success message is displayed to the user after the message is destroyed.
+      # If a url is passed in the parameters, it is stored in the @inbox_url instance variable.
+      #
+      # @note This method is used in the destroy action of the messages controller.
+      # @note The authorization checks are performed using the BenefitSponsors::PersonPolicy policy.
       def destroy
         if is_broker?
           authorize @inbox_provider, :destroy_inbox_message?, policy_class: BenefitSponsors::PersonPolicy
