@@ -16,7 +16,7 @@ class Insured::PlanShoppingsController < ApplicationController
   before_action :validate_rating_address, only: [:show]
 
   def checkout
-    (redirect_back(fallback_location: :back) and return) unless agreed_to_thankyou_ivl_page_terms
+    (redirect_back(fallback_location: root_path) and return) unless agreed_to_thankyou_ivl_page_terms
 
     authorize @hbx_enrollment, :checkout?
     @enrollment = @hbx_enrollment
