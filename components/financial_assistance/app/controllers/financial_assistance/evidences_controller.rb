@@ -26,7 +26,7 @@ module FinancialAssistance
     end
 
     def fdsh_hub_request
-      authorize @evidence, :fdsh_hub_request?
+      authorize HbxProfile, :can_call_hub?
       result = @evidence.request_determination(params[:admin_action], "Requested Hub for verification", current_user.oim_id)
 
       if result
@@ -47,7 +47,7 @@ module FinancialAssistance
     end
 
     def extend_due_date
-      authorize @evidence, :extend_due_date?
+      authorize HbxProfile, :can_extend_due_date?
       @family_member = FamilyMember.find(@evidence.evidenceable.family_member_id)
       enrollment = @family_member.family.enrollments.enrolled.first
       if enrollment.present? && @evidence.type_unverified?
