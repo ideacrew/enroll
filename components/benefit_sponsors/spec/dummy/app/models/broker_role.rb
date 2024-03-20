@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 class BrokerRole
   include Mongoid::Document
   include Mongoid::Timestamps
   include AASM
 
-  PROVIDER_KINDS = %W[broker assister]
+  PROVIDER_KINDS = %w[broker assister].freeze
   BROKER_UPDATED_EVENT_NAME = "acapi.info.events.broker.updated"
 
   MARKET_KINDS_OPTIONS = {
     "Individual & Family Marketplace ONLY" => "individual",
     "Small Business Marketplace ONLY" => "shop",
     "Both – Individual & Family AND Small Business Marketplaces" => "both"
-  }
+  }.freeze
 
   DC_BROKER_CARRIER_APPOINTMENTS = {
     "Aetna Health Inc" => nil,
@@ -56,20 +58,20 @@ class BrokerRole
   validates_presence_of :npn, :provider_kind
 
   validates :npn,
-    numericality: {only_integer: true},
-    length: { minimum: 1, maximum: 10 },
-    uniqueness: true,
-    allow_blank: false
+            numericality: {only_integer: true},
+            length: { minimum: 1, maximum: 10 },
+            uniqueness: true,
+            allow_blank: false
 
   validates :provider_kind,
-    allow_blank: false,
-    inclusion: { in: PROVIDER_KINDS, message: "%{value} is not a valid provider kind" }
+            allow_blank: false,
+            inclusion: { in: PROVIDER_KINDS, message: "%{value} is not a valid provider kind" }
 
   def broker_agency_profile=(new_broker_agency)
     if new_broker_agency.nil?
       self.benefit_sponsors_broker_agency_profile_id = nil
     else
-      raise ArgumentError.new("expected BenefitSponsors::Organizations::BrokerAgencyProfile class") unless new_broker_agency.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile
+      raise ArgumentError, "expected BenefitSponsors::Organizations::BrokerAgencyProfile class" unless new_broker_agency.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile
       self.benefit_sponsors_broker_agency_profile_id = new_broker_agency._id
       @broker_agency_profile = new_broker_agency
     end
@@ -114,7 +116,7 @@ class BrokerRole
       transitions from: :applicant, to: :broker_agency_pending
     end
 
-    event :pending , :after =>[:record_transition, :notify_updated, :notify_broker_pending] do
+    event :pending, :after => [:record_transition, :notify_updated, :notify_broker_pending] do
       transitions from: :applicant, to: :broker_agency_pending, :guard => :is_primary_broker?
       transitions from: :broker_agency_pending, to: :broker_agency_pending, :guard => :is_primary_broker?
     end
@@ -160,7 +162,7 @@ class BrokerRole
       transitions from: [:broker_agency_pending, :denied], to: :application_extended
     end
   end
-  
+
   class << self
     def find(id)
       return nil if id.blank?
@@ -174,7 +176,7 @@ class BrokerRole
 
     def agencies_with_matching_broker(search_str)
       broker_role_ids = brokers_matching_search_criteria(search_str).map(&:broker_role).map(&:id)
-      if brokers_matching_search_criteria(search_str).map(&:broker_role).detect{|b|b.benefit_sponsors_broker_agency_profile_id}.present?
+      if brokers_matching_search_criteria(search_str).map(&:broker_role).detect(&:benefit_sponsors_broker_agency_profile_id).present?
         Person.collection.raw_aggregate([
                                             {"$match" => {"broker_role.aasm_state" => "active", "broker_role._id" => { "$in" => broker_role_ids}}},
                                             {"$group" => {"_id" => "$broker_role.benefit_sponsors_broker_agency_profile_id"}}
@@ -200,7 +202,9 @@ class BrokerRole
     broker_agency_profile.primary_broker_role == self
   end
 
-  def record_transition
-  end
+  def record_transition; end
 
+  def send_invitation; end
+
+  def notify_updated; end
 end
