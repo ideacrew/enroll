@@ -134,9 +134,9 @@ describe "match a person in db" do
       end
     end
 
-    context 'with a person who has no ssn but an employer staff role', dbclean: :after_each do
+    context "validating :match person", dbclean: :after_each do
       let!(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-      let!(:benefit_sponsor)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+      let!(:benefit_sponsor)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile,:with_broker_agency_profile, site: site) }
       let!(:employer_profile)    { benefit_sponsor.employer_profile }
       let!(:employer_staff_role) { EmployerStaffRole.create(person: db_person, benefit_sponsor_employer_profile_id: employer_profile.id) }
       let(:broker_role) { FactoryBot.build(:broker_role, npn: '234567890', person: db_person) }
@@ -145,17 +145,136 @@ describe "match a person in db" do
       before do
         allow(Person).to receive(:where).and_return([db_person])
         allow(db_person).to receive(:user).and_return(user)
-        allow(db_person).to receive(:broker_role).and_return(broker_role)
+        allow(search_params).to receive(:ssn).and_return("517991234")
+      end
+
+      context 'with a person who has no ssn but with employer staff role', dbclean: :after_each do
+        it 'matches person by last name, first name and dob' do
+          db_person.employer_staff_roles << employer_staff_role
+          db_person.save!
+          expect(subject.match_person).to eq db_person
+        end
+      end
+
+      context 'with a person who has no ssn but with broker role', dbclean: :after_each do
+        before do
+          allow(db_person).to receive(:broker_role).and_return(broker_role)
+          db_person.save!
+        end
+
+        it 'matches person by last name, first name and dob' do
+          subject.does_not_match_a_different_users_person
+          expect(subject.errors.messages.present?).to eq true
+          expect(subject.errors[:base]).to match(["#{db_person.first_name} #{db_person.last_name} is already affiliated with another account."])
+        end
+      end
+
+      context 'with a person who has ssn but an broker agency staff role', dbclean: :after_each do
+        before do
+          db_person.broker_agency_staff_roles.create(aasm_state: :active, benefit_sponsors_broker_agency_profile_id: benefit_sponsor.broker_agency_profile.id)
+          db_person.save!
+        end
+
+        it 'matches person by last name, first name and dob' do
+          subject.does_not_match_a_different_users_person
+          expect(subject.errors.messages.present?).to eq true
+          expect(subject.errors[:base]).to match(["#{db_person.first_name} #{db_person.last_name} is already affiliated with another account."])
+        end
+      end
+
+      context 'with a person who has ssn but no roles', dbclean: :after_each do
+        before do
+          allow(db_person).to receive(:employer_staff_roles).and_return(nil)
+          db_person.save!
+        end
+
+        it 'matches person by last name, first name and dob' do
+          subject.does_not_match_a_different_users_person
+          expect(subject.errors.messages.present?).to eq true
+          expect(subject.errors[:base]).to match(["#{db_person.first_name} #{db_person.last_name} is already affiliated with another account."])
+        end
+      end
+
+      context 'with a person who no ssn but no roles', dbclean: :after_each do
+        before do
+          allow(db_person).to receive(:employer_staff_roles).and_return(nil)
+          allow(search_params).to receive(:ssn).and_return(nil)
+          db_person.save!
+        end
+
+        it 'matches person by last name, first name and dob' do
+          subject.does_not_match_a_different_users_person
+          expect(subject.errors.messages.present?).to eq true
+          expect(subject.errors[:base]).to match(["#{db_person.first_name} #{db_person.last_name} is already affiliated with another account."])
+        end
+      end
+    end
+
+    context 'validating :uniq_name_ssn_dob', dbclean: :after_each do
+      let!(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+      let!(:benefit_sponsor)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile,:with_broker_agency_profile, site: site) }
+      let!(:employer_profile)    { benefit_sponsor.employer_profile }
+      let!(:employer_staff_role) { EmployerStaffRole.create(person: db_person, benefit_sponsor_employer_profile_id: employer_profile.id) }
+      let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile) }
+      let(:broker_role) { FactoryBot.build(:broker_role, npn: '234567890', person: db_person) }
+      let(:user){ create(:user) }
+
+      before do
+        allow(Person).to receive(:where).and_return([db_person])
+        allow(db_person).to receive(:user).and_return(user)
+        allow(search_params).to receive(:ssn).and_return('517991234')
         db_person.save!
       end
 
-      it 'matches person by last name, first name and dob' do
-        db_person.employer_staff_roles << employer_staff_role
-        db_person.save!
-        allow(search_params).to receive(:ssn).and_return('517991234')
-        subject.does_not_match_a_different_users_person
-        expect(subject.errors.messages.present?).to eq true
-        expect(subject.errors[:base]).to match(["#{db_person.first_name} #{db_person.last_name} is already affiliated with another account."])
+      context 'when matched person has a broker role', dbclean: :after_each do
+        before do
+          allow(db_person).to receive(:broker_role).and_return(broker_role)
+          db_person.save!
+        end
+
+        it 'returns true if matched person has broker role' do
+          allow(subject).to receive(:match_person).and_return(db_person)
+          expect(subject.uniq_name_ssn_dob).to eq true
+        end
+      end
+
+      context 'when matched person has a broker agency staff role', dbclean: :after_each do
+        before do
+          allow(db_person).to receive(:broker_role).and_return(nil)
+          db_person.broker_agency_staff_roles.create(aasm_state: :active, benefit_sponsors_broker_agency_profile_id: benefit_sponsor.broker_agency_profile.id)
+          db_person.save!
+        end
+
+        it 'returns true if matched person has broker agency staff role' do
+          allow(subject).to receive(:match_person).and_return(db_person)
+          expect(subject.uniq_name_ssn_dob).to eq true
+        end
+      end
+
+      context 'when matched person have broker role or broker agency staff roles', dbclean: :after_each do
+        before do
+          allow(db_person).to receive(:broker_role).and_return(broker_role)
+          db_person.broker_agency_staff_roles.create(aasm_state: :active, benefit_sponsors_broker_agency_profile_id: benefit_sponsor.broker_agency_profile.id)
+          db_person.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: benefit_sponsor.broker_agency_profile.id)
+          db_person.save!
+        end
+
+        it 'returns true if matched person has broker agency staff role' do
+          allow(subject).to receive(:match_person).and_return(db_person)
+          expect(subject.uniq_name_ssn_dob).to eq true
+        end
+      end
+
+      context 'when matched person have no broker role or broker agency staff roles' do
+        before do
+          allow(db_person).to receive(:broker_role).and_return(nil)
+          db_person.save!
+        end
+
+        it 'returns nil if matched person has broker agency staff role' do
+          allow(subject).to receive(:match_person).and_return(db_person)
+          expect(subject.uniq_name_ssn_dob).to eq nil
+        end
       end
     end
   end
