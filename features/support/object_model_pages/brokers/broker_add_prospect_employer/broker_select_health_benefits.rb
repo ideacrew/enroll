@@ -7,7 +7,7 @@ class BrokerHealthBenefitsPage
     '.col-xs-4.single-carrier-tab'
   end
 
-  def self.by_meta_level_tab
+  def self.by_metal_level_tab
     '.col-xs-4.metal-level-tab'
   end
 
