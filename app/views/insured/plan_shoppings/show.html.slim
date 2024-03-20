@@ -118,7 +118,9 @@ javascript:
       }
     })
     if ($('#plans').length > 0) {
-      $('#plans').classList.remove('hidden');
+      $('#plans').each( function () {
+        $(this).removeClass('hidden');
+      });
     }
   }
 
