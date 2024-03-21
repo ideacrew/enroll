@@ -65,11 +65,6 @@ module AuthorizationConcern
 
     has_many :whitelisted_jwts
 
-    def update_last_activity!
-      return unless EnrollRegistry.feature_enabled?(:admin_account_autolock)
-      self.update_attributes!(last_activity_at: Time.now) if has_hbx_staff_role?
-    end
-
     def expired?
       return false unless roles.include?("hbx_staff") && EnrollRegistry.feature_enabled?(:admin_account_autolock)
       return expired_at < Time.now.utc unless expired_at.nil?

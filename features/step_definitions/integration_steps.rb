@@ -1307,7 +1307,7 @@ And(/^.+ last signed in more than 60 days ago$/) do
 end
 
 Then(/^.+ should be signed in successfully$/) do
-  expect(page).to have_content(l10n('devise.sessions.signed_in'))
+  expect(page).to have_content(/logout/i)
 end
 
 Then(/^.+ should not be able to log in$/) do
