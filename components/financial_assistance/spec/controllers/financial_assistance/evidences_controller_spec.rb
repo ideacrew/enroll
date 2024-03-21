@@ -293,7 +293,7 @@ RSpec.describe FinancialAssistance::EvidencesController, dbclean: :after_each, t
         end
 
         it 'flashes a pundit policy unauthorized error' do
-          expect(flash[:error]).to eq "Access not allowed for eligibilities/evidence_policy.fdsh_hub_request?, (Pundit policy)"
+          expect(flash[:error]).to eq "Access not allowed for hbx_profile_policy.can_call_hub?, (Pundit policy)"
         end
       end
     end
@@ -307,7 +307,7 @@ RSpec.describe FinancialAssistance::EvidencesController, dbclean: :after_each, t
       context 'when the request comes from a non admin role' do
         it 'flashes a pundit policy unauthorized error' do
           put :extend_due_date, params: params
-          expect(flash[:error]).to eq "Access not allowed for eligibilities/evidence_policy.extend_due_date?, (Pundit policy)"
+          expect(flash[:error]).to eq "Access not allowed for hbx_profile_policy.can_extend_due_date?, (Pundit policy)"
         end
       end
     end
@@ -415,7 +415,7 @@ RSpec.describe FinancialAssistance::EvidencesController, dbclean: :after_each, t
         end
 
         it 'flashes a pundit policy unauthorized error' do
-          expect(flash[:error]).to eq "Access not allowed for eligibilities/evidence_policy.fdsh_hub_request?, (Pundit policy)"
+          expect(flash[:error]).to eq "Access not allowed for hbx_profile_policy.can_call_hub?, (Pundit policy)"
         end
       end
     end
@@ -429,7 +429,7 @@ RSpec.describe FinancialAssistance::EvidencesController, dbclean: :after_each, t
       context 'when the request comes from a non admin role' do
         it 'flashes a pundit policy unauthorized error' do
           put :extend_due_date, params: params
-          expect(flash[:error]).to eq "Access not allowed for eligibilities/evidence_policy.extend_due_date?, (Pundit policy)"
+          expect(flash[:error]).to eq "Access not allowed for hbx_profile_policy.can_extend_due_date?, (Pundit policy)"
         end
       end
     end
