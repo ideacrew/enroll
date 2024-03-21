@@ -12,7 +12,7 @@ module AuthorizationConcern
              jwt_revocation_strategy: self
     else
       devise :database_authenticatable, :registerable, :lockable,
-             :recoverable, :jwt_authenticatable, :rememberable, :trackable, :timeoutable,
+             :recoverable, :jwt_authenticatable, :rememberable, :trackable, :timeoutable, :expirable,
              :authentication_keys => {email: false, login: true},
              jwt_revocation_strategy: self
     end
@@ -68,6 +68,27 @@ module AuthorizationConcern
     def update_last_activity!
       return unless EnrollRegistry.feature_enabled?(:admin_account_autolock)
       self.update_attributes!(last_activity_at: Time.now) if has_hbx_staff_role?
+    end
+
+    # def active_for_authentication?
+    #   # binding.irb
+      
+    #   #return unless has_hbx_staff_role?
+    #   super && !expired?
+    # end
+
+    def expired?
+      # expired_at set (manually, via cron, etc.)
+      # binding.irb
+      # update_last_activity!
+      return false unless roles.include?("hbx_staff") && EnrollRegistry.feature_enabled?(:admin_account_autolock)
+      return expired_at < Time.now.utc unless expired_at.nil?
+
+      # if it is not set, check the last activity against configured expire_after time range
+      return last_activity_at < self.class.expire_after.ago unless last_activity_at.nil?
+
+      # if last_activity_at is nil as well, the user has to be 'fresh' and is therefore not expired
+      false
     end
 
     def generate_jwt(scope, audience)
