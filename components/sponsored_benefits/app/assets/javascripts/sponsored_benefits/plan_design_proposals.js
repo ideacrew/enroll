@@ -637,7 +637,8 @@ function saveProposalAndPublish(event) {
         },
         error: function(data) {
           console.log("error fetching proposal url: " + data.url);
-          window.location.href = data.url + "&profile_id=" + $("#profile_id").val();
+          var assembled_url = data.url + "&profile_id=" + $("#profile_id").val();
+          window.location.href = assembled_url
         }
       });
     });
