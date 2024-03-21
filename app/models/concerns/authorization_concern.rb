@@ -50,7 +50,7 @@ module AuthorizationConcern
 
     field :last_activity_at, type: Time
     field :expired_at, type: Time
-    
+
     validate :password_complexity
     validates :password, format: { without: /\s/, message: "Password must not contain spaces"}
     validates_presence_of     :password, if: :password_required?
@@ -64,23 +64,13 @@ module AuthorizationConcern
     before_save :ensure_authentication_token
 
     has_many :whitelisted_jwts
- 
+
     def update_last_activity!
       return unless EnrollRegistry.feature_enabled?(:admin_account_autolock)
       self.update_attributes!(last_activity_at: Time.now) if has_hbx_staff_role?
     end
 
-    # def active_for_authentication?
-    #   # binding.irb
-      
-    #   #return unless has_hbx_staff_role?
-    #   super && !expired?
-    # end
-
     def expired?
-      # expired_at set (manually, via cron, etc.)
-      # binding.irb
-      # update_last_activity!
       return false unless roles.include?("hbx_staff") && EnrollRegistry.feature_enabled?(:admin_account_autolock)
       return expired_at < Time.now.utc unless expired_at.nil?
 
