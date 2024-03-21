@@ -94,7 +94,7 @@ module Forms
 
       person_with_ssn = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn)).first
       matched_person = match_person
-      return true if matched_person.broker_role.present? || matched_person.broker_agency_staff_roles.present?
+      return true if matched_person&.broker_role.present? || matched_person&.broker_agency_staff_roles.present?
 
       if matched_person != person_with_ssn
         errors.add(:base, l10n("insured.match_person.ssn_dob_name_error", site_short_name: EnrollRegistry[:enroll_app].settings(:short_name).item,
