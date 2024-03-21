@@ -144,13 +144,17 @@ end
 RSpec.describe UserMailer, "sending an approval linked notification email for a broker" do
   include Config::SiteHelper
 
+  before do
+    allow(EnrollRegistry[:enroll_app].setting(:broker_linked_invitation_email_login_url)).to receive(:item).and_return('https://www.dchealthlink.com/')
+  end
+
   let(:email) { "some-broker@adomain.com"}
   let(:name) { "Broker Name"}
 
   subject { UserMailer.broker_linked_invitation_email(email, name) }
 
   it "has the login link" do
-    expect(subject.body.raw_source.include?("href=\"#{site_main_web_address_url}\"")).to be_truthy
+    expect(subject.body.raw_source.include?("href=\"#{site_broker_linked_invitation_email_login_url}\"")).to be_truthy
   end
 
   it "has the greeting" do
@@ -161,13 +165,17 @@ end
 RSpec.describe UserMailer, "sending an approval linked notification email for broker staff" do
   include Config::SiteHelper
 
+  before do
+    allow(EnrollRegistry[:enroll_app].setting(:broker_linked_invitation_email_login_url)).to receive(:item).and_return('https://www.dchealthlink.com/')
+  end
+
   let(:email) { "some-broker@adomain.com"}
   let(:name) { "Broker Name"}
 
   subject { UserMailer.broker_staff_linked_invitation_email(email, name) }
 
   it "has the login link" do
-    expect(subject.body.raw_source.include?("href=\"#{site_main_web_address_url}\"")).to be_truthy
+    expect(subject.body.raw_source.include?("href=\"#{site_broker_linked_invitation_email_login_url}\"")).to be_truthy
   end
 
   it "has the greeting" do

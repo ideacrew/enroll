@@ -116,6 +116,8 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  # Only when "broker_role_consumer_enhancement" (cr-95) is enabled, the below email will be sent to the broker.
+  # site_broker_linked_invitation_email_login_url only applies when "broker_role_consumer_enhancement" is enabled.
   def broker_linked_invitation_email(email, person_name)
     return if email.blank?
 
@@ -124,6 +126,8 @@ class UserMailer < ApplicationMailer
     end
   end
 
+  # Only when "broker_role_consumer_enhancement" (cr-95) is enabled, the below email will be sent to the broker staff.
+  # site_broker_linked_invitation_email_login_url only applies when "broker_role_consumer_enhancement" is enabled.
   def broker_staff_linked_invitation_email(email, person_name)
     return if email.blank?
 
